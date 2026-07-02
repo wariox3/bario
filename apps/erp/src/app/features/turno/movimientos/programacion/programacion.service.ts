@@ -6,6 +6,7 @@ import type {
   ActualizarProgramacionPayload,
   CrearProgramacionPayload,
   EliminarProgramacionPayload,
+  ProgramacionDetalleResponse,
   ProgramacionMutacionMasivoResumen,
   ProgramacionMutacionResumen,
 } from './programacion.model';
@@ -28,11 +29,12 @@ export class ProgramacionService extends BaseHttpService {
    *
    * `GET /turno/programacion/detalle/?documento=<id_del_documento>` — el
    * `documento` es el id del documento de la fila (no el `documento_tipo_id`).
-   *
-   * TODO: tipar la respuesta cuando se confirme el shape.
+   * Devuelve la cabecera del documento + el calendario (`fechas` + `filas`).
    */
-  getDetalle(documentoId: number): Observable<unknown> {
-    return this.get<unknown>(`${this.resourcePath}detalle/`, { documento: documentoId });
+  getDetalle(documentoId: number): Observable<ProgramacionDetalleResponse> {
+    return this.get<ProgramacionDetalleResponse>(`${this.resourcePath}detalle/`, {
+      documento: documentoId,
+    });
   }
 
   /**

@@ -43,6 +43,9 @@ interface CabeceraView {
   readonly horas: number | null;
   readonly horasDiurnas: number | null;
   readonly horasNocturnas: number | null;
+  readonly horasProgramadas: number | null;
+  readonly horasDiurnasProgramadas: number | null;
+  readonly horasNocturnasProgramadas: number | null;
 }
 
 /** Datos del grid (calendario) ya normalizados para el componente. */
@@ -68,11 +71,10 @@ function toProgramacionFecha(iso: string, _index: number): ProgramacionFecha {
  *
  * Movimiento del módulo Turno. Llega desde el listado (`detalle/:id`). Replica
  * el shape visual de la ficha de documentos (factura de venta): encabezado con
- * volver + sección "Información general".
+ * volver + sección "Información general", más el grid (calendario) de turnos.
  *
- * WIP: la tabla de líneas / resumen aún no se arma. El shape de la respuesta de
- * `GET /turno/programacion/detalle/?documento=…` está pendiente de confirmar, así
- * que se loguea en consola y el mapeo de `CabeceraView` es tentativo.
+ * La cabecera (`CabeceraView`) se mapea de `ProgramacionDetalleResponse.documento`
+ * (número/fecha/contacto/horas) y el grid de `fechas` + `filas`.
  */
 @Component({
   selector: 'app-programacion-detail',
@@ -297,18 +299,20 @@ export class ProgramacionDetailComponent implements OnInit {
       .getDetalle(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (detalle) => {
-          const res = detalle as ProgramacionDetalleResponse;
+        next: (res) => {
           this.cargarFestivosDelPeriodo(res.fechas);
-          // La respuesta real no incluye cabecera del documento; se muestra vacía.
+          const doc = res.documento;
           this.cabecera.set({
-            numero: null,
-            fecha: null,
-            identificacion: null,
-            contacto: null,
-            horas: null,
-            horasDiurnas: null,
-            horasNocturnas: null,
+            numero: String(doc.numero),
+            fecha: fromIsoDate(doc.fecha),
+            identificacion: doc.contacto_numero_identificacion,
+            contacto: doc.contacto_nombre_corto,
+            horas: doc.horas,
+            horasDiurnas: doc.horas_diurnas,
+            horasNocturnas: doc.horas_nocturnas,
+            horasProgramadas: doc.horas_programadas,
+            horasDiurnasProgramadas: doc.horas_diurnas_programadas,
+            horasNocturnasProgramadas: doc.horas_nocturnas_programadas,
           });
           this.grid.set(this.parseGrid(res));
           this.isLoading.set(false);

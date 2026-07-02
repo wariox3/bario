@@ -985,6 +985,12 @@ export const es: AppDict = {
           horasDiurnas: 'Horas diurnas',
           horasNocturnas: 'Horas nocturnas',
         },
+        resumen: {
+          horas: 'Horas',
+          diurnas: 'Diurnas',
+          nocturnas: 'Nocturnas',
+          leyenda: 'Contratadas / programadas',
+        },
         grid: {
           headers: {
             empleado: 'Empleado',

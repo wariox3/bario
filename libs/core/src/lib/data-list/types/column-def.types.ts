@@ -7,8 +7,30 @@
  * - `date`:     fecha formateada (acepta ISO o Date)
  * - `boolean`:  badge sí/no
  * - `enum`:     valor traducido via clave i18n (`enumKeyPrefix.<value>`)
+ * - `combined`: varias props en una celda (`parts`), unidas por `separator`
  */
-export type ColumnValueType = 'text' | 'number' | 'currency' | 'date' | 'boolean' | 'enum';
+export type ColumnValueType =
+  | 'text'
+  | 'number'
+  | 'currency'
+  | 'date'
+  | 'boolean'
+  | 'enum'
+  | 'combined';
+
+/** Formateo admitido por cada parte de una columna `combined` (sin anidar ni i18n). */
+export type ColumnPartType = 'text' | 'number' | 'currency' | 'date';
+
+/**
+ * Una parte de una columna `combined`: qué campo leer y cómo formatearlo. Ej. para
+ * mostrar `horas / horas_programadas`, dos partes `{ field, type: 'number' }`.
+ */
+export interface ColumnPart {
+  /** Nombre del campo en el row (acceso por `row[field]`). */
+  readonly field: string;
+  /** Formateo de esta parte. Default `'text'`. */
+  readonly type?: ColumnPartType;
+}
 
 /** Alineación horizontal del contenido de la columna. */
 export type ColumnAlignment = 'left' | 'center' | 'right';
@@ -46,4 +68,12 @@ export interface ColumnDef {
    * Permite personalizar por columna: `'common.boolAccepted'` → "Aceptado/Rechazado".
    */
   readonly booleanKeyPrefix?: string;
+  /**
+   * Para `type === 'combined'`: las partes a mostrar en la misma celda, cada una
+   * formateada según su `type` y unidas por `separator`. El `field` de la columna se
+   * mantiene para la key/orden; las partes definen qué se pinta.
+   */
+  readonly parts?: readonly ColumnPart[];
+  /** Para `type === 'combined'`: separador entre partes. Default `'/'`. */
+  readonly separator?: string;
 }

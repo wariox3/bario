@@ -88,6 +88,14 @@
             @case ('date') {
               {{ dateCell(readValue(row, col.field)) }}
             }
+            @case ('combined') {
+              @for (part of col.parts ?? []; track $index) {
+                @if ($index > 0) {
+                  <span class="lib-data-table__cell-sep">{{ col.separator ?? '/' }}</span>
+                }
+                {{ formatPart(row, part) }}
+              }
+            }
             @default {
               {{ readValue(row, col.field) }}
             }

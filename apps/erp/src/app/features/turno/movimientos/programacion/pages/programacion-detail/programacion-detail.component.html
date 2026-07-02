@@ -46,7 +46,7 @@
         {{ det.sections.general }}
       </h2>
     </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
       <div class="flex flex-col gap-0.5">
         <dt class="programacion-detail__label">{{ det.labels.numero }}</dt>
         <dd class="programacion-detail__value">{{ c.numero || '—' }}</dd>
@@ -56,7 +56,7 @@
         <dd class="programacion-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
       @if (c.contacto) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
+        <div class="flex flex-col gap-0.5">
           <dt class="programacion-detail__label">{{ det.labels.contacto }}</dt>
           <dd class="programacion-detail__value">{{ c.contacto }}</dd>
         </div>
@@ -65,19 +65,57 @@
         <dt class="programacion-detail__label">{{ det.labels.identificacion }}</dt>
         <dd class="programacion-detail__value">{{ c.identificacion || '—' }}</dd>
       </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="programacion-detail__label">{{ det.labels.horas }}</dt>
-        <dd class="programacion-detail__value">{{ c.horas ?? '—' }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="programacion-detail__label">{{ det.labels.horasDiurnas }}</dt>
-        <dd class="programacion-detail__value">{{ c.horasDiurnas ?? '—' }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="programacion-detail__label">{{ det.labels.horasNocturnas }}</dt>
-        <dd class="programacion-detail__value">{{ c.horasNocturnas ?? '—' }}</dd>
-      </div>
     </dl>
+
+    <!-- Resumen de horas del documento (contratadas / programadas): el KPI de la ficha.
+         Ocupa la mitad izquierda de la card; la derecha queda libre. -->
+    <div class="programacion-detail__resumen">
+      <div class="programacion-detail__resumen-inner">
+        <span class="programacion-detail__resumen-legend">{{ det.resumen.leyenda }}</span>
+        <div class="programacion-detail__resumen-grid">
+          <div class="programacion-detail__stat" [title]="det.grid.stats.total">
+            <span class="programacion-detail__stat-head">
+              <span class="programacion-detail__stat-icon programacion-detail__stat-icon--total">
+                <i class="pi pi-clock"></i>
+              </span>
+              {{ det.resumen.horas }}
+            </span>
+            <span class="programacion-detail__stat-value">
+              {{ c.horas ?? '—' }}<span class="programacion-detail__stat-sep">/</span
+              >{{ c.horasProgramadas ?? '—' }}<span class="programacion-detail__stat-unit">h</span>
+            </span>
+          </div>
+
+          <div class="programacion-detail__stat" [title]="det.grid.stats.diurnas">
+            <span class="programacion-detail__stat-head">
+              <span class="programacion-detail__stat-icon programacion-detail__stat-icon--dia">
+                <i class="pi pi-sun"></i>
+              </span>
+              {{ det.resumen.diurnas }}
+            </span>
+            <span class="programacion-detail__stat-value">
+              {{ c.horasDiurnas ?? '—' }}<span class="programacion-detail__stat-sep">/</span
+              >{{ c.horasDiurnasProgramadas ?? '—'
+              }}<span class="programacion-detail__stat-unit">h</span>
+            </span>
+          </div>
+
+          <div class="programacion-detail__stat" [title]="det.grid.stats.nocturnas">
+            <span class="programacion-detail__stat-head">
+              <span class="programacion-detail__stat-icon programacion-detail__stat-icon--noche">
+                <i class="pi pi-moon"></i>
+              </span>
+              {{ det.resumen.nocturnas }}
+            </span>
+            <span class="programacion-detail__stat-value">
+              {{ c.horasNocturnas ?? '—' }}<span class="programacion-detail__stat-sep">/</span
+              >{{ c.horasNocturnasProgramadas ?? '—'
+              }}<span class="programacion-detail__stat-unit">h</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ── Programación (grid de turnos) ────────────────────────────────────────── -->

@@ -19,6 +19,7 @@ import {
   formatCop,
   toFiniteNumber,
   type ColumnDef,
+  type ColumnPart,
   type SortSpec,
 } from '@reddoc/core';
 import type { PageChangeEvent, RowAction, RowActionInvokedEvent } from './data-table.types';
@@ -176,6 +177,25 @@ export class DataTableComponent {
       return formatDate(value as string | number | Date, 'mediumDate', this.locale);
     } catch {
       return String(value);
+    }
+  }
+
+  /**
+   * Formatea una parte de una columna `combined`, leyendo su `field` de la fila y
+   * aplicando el formateo de su `type` (default `text`). Reusa los formateadores de
+   * celda para que el par se vea consistente con las columnas simples.
+   */
+  protected formatPart(row: unknown, part: ColumnPart): string {
+    const value = this.readValue(row, part.field);
+    switch (part.type) {
+      case 'number':
+        return this.numberCell(value);
+      case 'currency':
+        return this.currencyCell(value);
+      case 'date':
+        return this.dateCell(value);
+      default:
+        return value === null || value === undefined ? '' : String(value);
     }
   }
 

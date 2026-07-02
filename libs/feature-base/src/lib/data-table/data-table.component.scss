@@ -8,6 +8,12 @@
 }
 
 .lib-data-table {
+  // Separador entre partes de una columna `combined` (ej. `816 / 368`): discreto.
+  &__cell-sep {
+    margin: 0 0.35em;
+    color: var(--brand-muted);
+  }
+
   &__select-col {
     width: 38px;
     text-align: center;

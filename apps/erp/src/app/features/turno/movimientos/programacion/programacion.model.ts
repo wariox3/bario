@@ -20,16 +20,48 @@ export interface Programacion {
   readonly horas: number;
   readonly horas_diurnas: number;
   readonly horas_nocturnas: number;
+  /** Horas ya programadas (con turno asignado), para el par `contratadas / programadas`. */
+  readonly horas_programadas: number;
+  readonly horas_diurnas_programadas: number;
+  readonly horas_nocturnas_programadas: number;
+}
+
+/**
+ * Horas contratadas y programadas (total / diurnas / nocturnas). Las comparten la
+ * cabecera del documento y cada fila (puesto): `horas*` son las contratadas y
+ * `horas*_programadas` las que ya tienen turno asignado en el período.
+ */
+export interface ProgramacionHoras {
+  readonly horas: number;
+  readonly horas_diurnas: number;
+  readonly horas_nocturnas: number;
+  readonly horas_programadas: number;
+  readonly horas_diurnas_programadas: number;
+  readonly horas_nocturnas_programadas: number;
+}
+
+/**
+ * Cabecera del documento de programación (`documento` en el detalle): número, fecha,
+ * contacto (tercero) y el resumen de horas del documento completo.
+ */
+export interface ProgramacionDocumentoCabecera extends ProgramacionHoras {
+  readonly id: number;
+  readonly numero: number;
+  /** Fecha del documento en ISO `YYYY-MM-DD`. */
+  readonly fecha: string;
+  readonly contacto_nombre_corto: string | null;
+  readonly contacto_numero_identificacion: string | null;
 }
 
 /**
  * Respuesta de `GET /turno/programacion/detalle/?documento=<id>`.
  *
- * Calendario por documento: `fechas` son las columnas (strings ISO `YYYY-MM-DD`)
- * y `filas` las líneas agrupables por `documento_detalle_id`.
+ * Calendario por documento: `documento` es la cabecera (número/fecha/contacto/horas),
+ * `fechas` las columnas (strings ISO `YYYY-MM-DD`) y `filas` las líneas agrupables
+ * por `documento_detalle_id`.
  */
 export interface ProgramacionDetalleResponse {
-  readonly documento: number;
+  readonly documento: ProgramacionDocumentoCabecera;
   readonly fechas: readonly string[];
   readonly filas: readonly ProgramacionFila[];
 }
@@ -68,10 +100,9 @@ export interface ProgramacionDiaCelda {
  * compartir `documento_detalle_id` (el grid las agrupa por puesto); el
  * `contrato_contacto_nombre_corto` identifica cada fila dentro del grupo.
  *
- * `horas*` son las horas contratadas del puesto; `horas*_programadas` las que
- * ya tienen turno asignado en el período.
+ * Hereda el resumen de horas de `ProgramacionHoras` (contratadas y programadas).
  */
-export interface ProgramacionFila {
+export interface ProgramacionFila extends ProgramacionHoras {
   readonly documento_detalle_id: number;
   /** Detalle del documento afectado (origen del puesto); informativo. */
   readonly documento_detalle_afectado_id: number | null;
@@ -87,12 +118,6 @@ export interface ProgramacionFila {
   readonly contrato_contacto_id: number | null;
   readonly contrato_contacto_nombre_corto: string | null;
   readonly contrato_contacto_numero_identificacion: string | null;
-  readonly horas: number;
-  readonly horas_diurnas: number;
-  readonly horas_nocturnas: number;
-  readonly horas_programadas: number;
-  readonly horas_diurnas_programadas: number;
-  readonly horas_nocturnas_programadas: number;
   /** Mapa fecha ISO → celda del día (clave = `ProgramacionFecha.clave`). */
   readonly dias: Record<string, ProgramacionDiaCelda | null>;
 }

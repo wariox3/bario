@@ -55,22 +55,34 @@ export const PROGRAMACIONES_COLUMNS: readonly ColumnDef[] = [
   {
     field: 'horas',
     headerKey: 'entities.programacion.columns.horas',
-    type: 'number',
-    width: '90px',
+    type: 'combined',
+    parts: [
+      { field: 'horas', type: 'number' },
+      { field: 'horas_programadas', type: 'number' },
+    ],
+    width: '110px',
     align: 'right',
   },
   {
     field: 'horas_diurnas',
     headerKey: 'entities.programacion.columns.horasDiurnas',
-    type: 'number',
-    width: '90px',
+    type: 'combined',
+    parts: [
+      { field: 'horas_diurnas', type: 'number' },
+      { field: 'horas_diurnas_programadas', type: 'number' },
+    ],
+    width: '110px',
     align: 'right',
   },
   {
     field: 'horas_nocturnas',
     headerKey: 'entities.programacion.columns.horasNocturnas',
-    type: 'number',
-    width: '90px',
+    type: 'combined',
+    parts: [
+      { field: 'horas_nocturnas', type: 'number' },
+      { field: 'horas_nocturnas_programadas', type: 'number' },
+    ],
+    width: '110px',
     align: 'right',
   },
 ];

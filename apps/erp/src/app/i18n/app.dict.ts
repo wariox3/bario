@@ -709,6 +709,13 @@ export interface AppDict extends AuthTranslationsHost {
           horasDiurnas: string;
           horasNocturnas: string;
         };
+        /** Resumen de horas del documento (contratadas / programadas) en la cabecera. */
+        resumen: {
+          horas: string;
+          diurnas: string;
+          nocturnas: string;
+          leyenda: string;
+        };
         grid: {
           headers: {
             empleado: string;

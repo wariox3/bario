@@ -14,7 +14,13 @@
  */
 
 // Types
-export type { ColumnDef, ColumnValueType, ColumnAlignment } from './types/column-def.types';
+export type {
+  ColumnDef,
+  ColumnValueType,
+  ColumnAlignment,
+  ColumnPart,
+  ColumnPartType,
+} from './types/column-def.types';
 export type { FilterField, FilterFieldType } from './types/filter-field.types';
 export type {
   FilterCondition,
