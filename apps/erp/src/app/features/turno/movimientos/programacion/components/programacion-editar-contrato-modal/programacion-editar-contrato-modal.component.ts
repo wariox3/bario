@@ -10,7 +10,6 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   FormArray,
   FormControl,
@@ -21,19 +20,22 @@ import { finalize, type Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { I18nService, ToastService, fromIsoDate } from '@reddoc/core';
+import { I18nService, ToastService, formatHorario, fromIsoDate } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { UppercaseDirective } from '@erp/core/directives/uppercase.directive';
 import type { ProgramacionContratoRef } from '../programacion-grid/programacion-grid.component';
 import { ProgramacionService } from '../../programacion.service';
 import type {
   ActualizarProgramacionPayload,
-  ProgramacionErroresMasivoResponse,
-  ProgramacionErroresResponse,
   ProgramacionErrorItem,
   ProgramacionFecha,
   ProgramacionFila,
 } from '../../programacion.model';
+import {
+  extraerErroresMasivo,
+  extraerErroresProgramacion,
+  separarErroresProgramacion,
+} from '../../programacion-errores.util';
 
 /**
  * Celda editable de un día: metadatos para pintar/aria + el `FormControl` real. El
@@ -68,16 +70,22 @@ interface BandaVm {
  */
 export type EditarProgramacionModo = 'linea' | 'masivo';
 
-/** `HH:mm:ss` → `HH:mm`; `null` si el valor no viene o no es válido. */
-function horaCorta(hora: string | null): string | null {
-  return hora && hora.length >= 5 ? hora.slice(0, 5) : null;
+/**
+ * Errores del 400 repartidos por alcance:
+ *  - `celdas`: `documento_detalle_id → (día → mensaje)` para resaltar la casilla.
+ *  - `avisos`: `documento_detalle_id → mensajes[]` de puesto sin fecha (ej. horas
+ *    excedidas) atribuidos a una línea.
+ *  - `globales`: mensajes de validación del batch no atribuibles a un puesto (masivo
+ *    con `{ errores }` de nivel superior, sin `indice`).
+ */
+interface ErroresPorPuesto {
+  readonly celdas: Map<number, ReadonlyMap<string, string>>;
+  readonly avisos: Map<number, readonly string[]>;
+  readonly globales: string[];
 }
 
-/** Franja `hora_desde`–`hora_hasta` formateada, o `null` si falta algún extremo. */
-function formatHorario(desde: string | null, hasta: string | null): string | null {
-  const d = horaCorta(desde);
-  const h = horaCorta(hasta);
-  return d && h ? `${d} - ${h}` : null;
+function nuevoErroresPorPuesto(): ErroresPorPuesto {
+  return { celdas: new Map(), avisos: new Map(), globales: [] };
 }
 
 /**
@@ -206,6 +214,24 @@ export class ProgramacionEditarContratoModalComponent {
   }
 
   /**
+   * Avisos a nivel de **puesto** tras guardar: `documento_detalle_id → mensajes[]`.
+   * Se alimentan de los errores del 400 sin `fecha` (ej. horas excedidas) y se muestran
+   * bajo la banda del puesto hasta que el usuario corrige.
+   */
+  protected readonly avisosPuesto = signal<ReadonlyMap<number, readonly string[]>>(new Map());
+
+  /**
+   * Avisos de validación del batch no atribuibles a un puesto (masivo con `{ errores }`
+   * de nivel superior). Se muestran en un banner arriba del modal.
+   */
+  protected readonly avisosGlobales = signal<readonly string[]>([]);
+
+  /** Mensajes de nivel puesto (sin fecha) de un `documento_detalle_id`; `[]` si no hay. */
+  protected avisosDe(documentoDetalleId: number): readonly string[] {
+    return this.avisosPuesto().get(documentoDetalleId) ?? [];
+  }
+
+  /**
    * Versión de los valores del form. Se incrementa en cada `valueChanges` para
    * disparar el recálculo de `conflictos` sin suscripciones por celda (el `computed`
    * lee los controles de forma imperativa; este signal es su gatillo al teclear).
@@ -271,8 +297,10 @@ export class ProgramacionEditarContratoModalComponent {
         }
         arr.push(dias, { emitEvent: false });
       }
-      // Nuevo contrato/mes: limpia los resaltados de un guardado anterior.
+      // Nuevo contrato/mes: limpia los errores (celda, puesto y globales) de un guardado anterior.
       this.celdasError.set(new Map());
+      this.avisosPuesto.set(new Map());
+      this.avisosGlobales.set([]);
       // El pre-llenado usa `emitEvent: false`, así que `valueChanges` NO dispara.
       // Se bumpean las versiones a mano contra el form recién reconstruido:
       //  - `valoresVersion` → `conflictos` (lee los controles imperativamente).
@@ -283,10 +311,12 @@ export class ProgramacionEditarContratoModalComponent {
     });
 
     // Al tocar cualquier casilla: bumpea la versión (recalcula conflictos) y retira
-    // el resaltado de errores del backend.
+    // los errores del backend (celda y puesto).
     this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.valoresVersion.update((v) => v + 1);
       if (this.celdasError().size) this.celdasError.set(new Map());
+      if (this.avisosPuesto().size) this.avisosPuesto.set(new Map());
+      if (this.avisosGlobales().length) this.avisosGlobales.set([]);
     });
   }
 
@@ -335,72 +365,83 @@ export class ProgramacionEditarContratoModalComponent {
 
   /** Cierra el modal, avisa al padre para que recargue y muestra el toast de éxito. */
   private onGuardadoExitoso(): void {
-    const ts = this.t().entities.programacion.detail.empleadosModal.toasts;
+    const ts = this.t().entities.programacion.detail.programacionModal.toasts;
     this.toast.success(ts.success.title, ts.success.desc);
     this.applied.emit();
     this.visible.set(false);
   }
 
   /**
-   * Deja el modal abierto, resalta las celdas del 400 (`documento_detalle_id → fecha →
-   * mensaje`) y muestra un toast. El 400 difiere por modo: `'linea'` trae
-   * `{ errores: [] }` (una fila); `'masivo'` trae `{ resultados: [{ indice, errores }] }`
-   * y el `indice` mapea a `payloads[indice].documento_detalle_id`.
+   * Deja el modal abierto, aplica los errores del 400 y muestra un toast. Separa por
+   * alcance: celdas (`documento_detalle_id → fecha → mensaje`) y avisos de puesto
+   * (`documento_detalle_id → mensajes[]`, errores sin `fecha`). El 400 difiere por modo:
+   * `'linea'` trae `{ errores: [] }` (una fila); `'masivo'` trae
+   * `{ resultados: [{ indice, errores }] }` con el `indice` mapeado a `payloads[indice]`.
    */
   private onGuardadoError(err: unknown, payloads: readonly ActualizarProgramacionPayload[]): void {
-    const ts = this.t().entities.programacion.detail.empleadosModal.toasts;
-    const celdas =
+    const ts = this.t().entities.programacion.detail.programacionModal.toasts;
+    const { celdas, avisos, globales } =
       this.modo() === 'masivo'
         ? this.parseErroresMasivo(err, payloads)
         : this.parseErroresLinea(err, payloads[0]);
-    if (celdas.size) this.celdasError.set(celdas);
+    this.celdasError.set(celdas);
+    this.avisosPuesto.set(avisos);
+    this.avisosGlobales.set(globales);
     this.toast.error(ts.error.title, ts.error.desc);
   }
 
   /**
-   * 400 de `actualizar-programacion` (`{ errores: [{ fecha, mensaje, … }] }`) →
-   * `documento_detalle_id → (fecha ISO → mensaje)` de la única fila enviada.
+   * 400 de `actualizar-programacion` (`{ errores: [] }`) → celdas y avisos de puesto de
+   * la única fila enviada, keyed por su `documento_detalle_id`.
    */
   private parseErroresLinea(
     err: unknown,
     payload: ActualizarProgramacionPayload,
-  ): Map<number, ReadonlyMap<string, string>> {
-    const mapa = new Map<number, ReadonlyMap<string, string>>();
-    if (!(err instanceof HttpErrorResponse)) return mapa;
-    const body = err.error as Partial<ProgramacionErroresResponse> | null;
-    if (!body || !Array.isArray(body.errores)) return mapa;
-    const celdas = this.erroresACeldas(body.errores);
-    if (celdas.size) mapa.set(payload.documento_detalle_id, celdas);
-    return mapa;
+  ): ErroresPorPuesto {
+    const acc = nuevoErroresPorPuesto();
+    const body = extraerErroresProgramacion(err);
+    if (body) this.acumularErrores(acc, payload.documento_detalle_id, body.errores);
+    return acc;
   }
 
   /**
-   * 400 de `actualizar-programacion-masivo` (`{ resultados: [{ indice, errores }] }`) →
-   * `documento_detalle_id → (fecha ISO → mensaje)` por línea, resolviendo el
-   * `documento_detalle_id` desde `payloads[indice]`.
+   * 400 de `actualizar-programacion-masivo`. Dos formas posibles:
+   *  - `{ resultados: [{ indice, errores }] }` → celdas/avisos por línea, resolviendo el
+   *    `documento_detalle_id` desde `payloads[indice]`.
+   *  - `{ detail, errores: [] }` → validación global del batch (sin `indice`, ej. horas
+   *    excedidas): no atribuible a un puesto → van a `globales` (banner arriba).
    */
   private parseErroresMasivo(
     err: unknown,
     payloads: readonly ActualizarProgramacionPayload[],
-  ): Map<number, ReadonlyMap<string, string>> {
-    const mapa = new Map<number, ReadonlyMap<string, string>>();
-    if (!(err instanceof HttpErrorResponse)) return mapa;
-    const body = err.error as Partial<ProgramacionErroresMasivoResponse> | null;
-    if (!body || !Array.isArray(body.resultados)) return mapa;
-    for (const linea of body.resultados) {
-      const payload = payloads[linea.indice];
-      if (!payload || !Array.isArray(linea.errores)) continue;
-      const celdas = this.erroresACeldas(linea.errores);
-      if (celdas.size) mapa.set(payload.documento_detalle_id, celdas);
+  ): ErroresPorPuesto {
+    const acc = nuevoErroresPorPuesto();
+    const masivo = extraerErroresMasivo(err);
+    if (masivo) {
+      for (const linea of masivo.resultados) {
+        const payload = payloads[linea.indice];
+        if (!payload || !Array.isArray(linea.errores)) continue;
+        this.acumularErrores(acc, payload.documento_detalle_id, linea.errores);
+      }
+      return acc;
     }
-    return mapa;
+    const global = extraerErroresProgramacion(err);
+    if (global) for (const e of global.errores) acc.globales.push(e.mensaje);
+    return acc;
   }
 
-  /** `ProgramacionErrorItem[]` → mapa `fecha ISO → mensaje` (identidad de la celda). */
-  private erroresACeldas(errores: readonly ProgramacionErrorItem[]): Map<string, string> {
-    const celdas = new Map<string, string>();
-    for (const e of errores) celdas.set(e.fecha, e.mensaje);
-    return celdas;
+  /**
+   * Reparte los `errores` de un puesto en el acumulador: con `fecha` → celda
+   * (`documento_detalle_id → fecha → mensaje`); sin `fecha` → aviso de puesto.
+   */
+  private acumularErrores(
+    acc: ErroresPorPuesto,
+    documentoDetalleId: number,
+    errores: readonly ProgramacionErrorItem[],
+  ): void {
+    const { celdas, avisos } = separarErroresProgramacion(errores);
+    if (celdas.size) acc.celdas.set(documentoDetalleId, celdas);
+    if (avisos.length) acc.avisos.set(documentoDetalleId, avisos);
   }
 
   protected onClose(): void {

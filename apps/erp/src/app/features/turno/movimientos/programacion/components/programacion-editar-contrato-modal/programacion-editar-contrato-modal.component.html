@@ -1,4 +1,4 @@
-@let m = t().entities.programacion.detail.empleadosModal;
+@let m = t().entities.programacion.detail.programacionModal;
 @let g = t().entities.programacion.detail.grid;
 
 <p-dialog
@@ -50,6 +50,18 @@
       }
     </div>
 
+    <!-- Banner de validación global del batch (errores del 400 sin puesto atribuible) -->
+    @if (avisosGlobales().length) {
+      <div class="editar-grid__aviso editar-grid__aviso--bloque">
+        <span class="editar-grid__aviso-icon"><i class="pi pi-exclamation-circle"></i></span>
+        <ul class="editar-grid__aviso-list">
+          @for (msg of avisosGlobales(); track msg) {
+            <li class="editar-grid__aviso-item">{{ msg }}</li>
+          }
+        </ul>
+      </div>
+    }
+
     <div class="max-h-[32rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
       <table class="editar-grid">
         <thead>
@@ -96,6 +108,25 @@
                 </div>
               </td>
             </tr>
+
+            <!-- Aviso de puesto (errores sin fecha del 400: ej. horas excedidas) -->
+            @let avisosBanda = avisosDe(banda.documentoDetalleId);
+            @if (avisosBanda.length) {
+              <tr class="editar-grid__aviso-row">
+                <td [attr.colspan]="colspan()" class="editar-grid__aviso-cell">
+                  <div class="editar-grid__aviso">
+                    <span class="editar-grid__aviso-icon">
+                      <i class="pi pi-exclamation-circle"></i>
+                    </span>
+                    <ul class="editar-grid__aviso-list">
+                      @for (msg of avisosBanda; track msg) {
+                        <li class="editar-grid__aviso-item">{{ msg }}</li>
+                      }
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            }
 
             <!-- Fila editable del contrato en ese puesto -->
             <tr class="editar-grid__row">

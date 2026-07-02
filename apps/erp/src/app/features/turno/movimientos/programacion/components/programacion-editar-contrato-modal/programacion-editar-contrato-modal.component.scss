@@ -154,3 +154,61 @@
   background: rgba(15, 118, 110, 0.09);
   color: #0f766e;
 }
+
+// Aviso de rechazo del backend a nivel de puesto/lote (ej. horas excedidas). Usa el
+// mismo rojo de rechazo que las celdas en error, integrado como banda inset con una
+// barra de acento a la izquierda que lo ata al puesto de arriba.
+.editar-grid__aviso-cell {
+  padding: 0;
+}
+
+.editar-grid__aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  background: rgba(239, 68, 68, 0.06);
+  border-left: 3px solid #ef4444;
+  box-shadow:
+    inset 0 1px 0 rgba(239, 68, 68, 0.14),
+    inset 0 -1px 0 rgba(239, 68, 68, 0.14);
+}
+
+// Variante bloque (banner global, fuera de la tabla): borde completo + radio.
+.editar-grid__aviso--bloque {
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-left-width: 3px;
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.editar-grid__aviso-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.02rem;
+  border-radius: 5px;
+  background: rgba(239, 68, 68, 0.14);
+  color: #dc2626;
+  font-size: 0.62rem;
+}
+
+.editar-grid__aviso-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editar-grid__aviso-item {
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #b91c1c;
+  font-variant-numeric: tabular-nums;
+}

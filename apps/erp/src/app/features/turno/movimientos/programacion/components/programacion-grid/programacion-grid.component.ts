@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, output } from '@angular/core';
-import { I18nService } from '@reddoc/core';
+import { I18nService, formatHorario } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { ProgramacionFecha, ProgramacionFila } from '../../programacion.model';
 
@@ -23,19 +23,6 @@ interface GrupoFilas {
   readonly horasDiurnasProgramadas: number;
   readonly horasNocturnasProgramadas: number;
   readonly items: readonly ProgramacionFila[];
-}
-
-/** `HH:mm:ss` → `HH:mm`; `null` si el valor no viene o no es válido. */
-function horaCorta(hora: string | null): string | null {
-  return hora && hora.length >= 5 ? hora.slice(0, 5) : null;
-}
-
-/** Franja `hora_desde`–`hora_hasta` formateada, o `null` si falta algún extremo. */
-function formatHorario(desde: string | null, hasta: string | null): string | null {
-  const d = horaCorta(desde);
-  const h = horaCorta(hasta);
-  if (!d || !h) return null;
-  return `${d} - ${h}`;
 }
 
 /**

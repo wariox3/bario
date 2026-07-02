@@ -56,6 +56,21 @@ export function daysBetween(a: Date, b: Date): number {
   return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
 
+/** `HH:mm:ss` → `HH:mm`; `null` si el valor no viene o es más corto que `HH:mm`. */
+function horaCorta(hora: string | null): string | null {
+  return hora && hora.length >= 5 ? hora.slice(0, 5) : null;
+}
+
+/**
+ * Franja horaria `desde`–`hasta` (ambas `HH:mm:ss`) formateada como `HH:mm - HH:mm`,
+ * o `null` si falta algún extremo.
+ */
+export function formatHorario(desde: string | null, hasta: string | null): string | null {
+  const d = horaCorta(desde);
+  const h = horaCorta(hasta);
+  return d && h ? `${d} - ${h}` : null;
+}
+
 /** Año y mes (1-based) extraídos de una fecha ISO `yyyy-MM-dd`. */
 export interface AnioMes {
   readonly anio: number;

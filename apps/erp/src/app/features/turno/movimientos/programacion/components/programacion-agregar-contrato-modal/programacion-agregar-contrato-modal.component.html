@@ -1,4 +1,4 @@
-@let m = t().entities.programacion.detail.empleadosModal;
+@let m = t().entities.programacion.detail.programacionModal;
 
 <p-dialog
   [visible]="visible()"
@@ -78,6 +78,26 @@
     <div class="flex flex-col gap-2">
       <span class="text-[0.78rem] font-medium text-brand-muted">{{ m.diasSection }}</span>
 
+      <!-- Aviso de rechazo del backend a nivel de puesto (ej. horas excedidas) -->
+      @if (avisosPuesto().length) {
+        <div
+          class="flex items-start gap-2 rounded-lg border border-l-[3px] border-red-500/20 border-l-red-500 bg-red-500/[0.06] px-3 py-2"
+        >
+          <span
+            class="mt-0.5 flex h-[1.1rem] w-[1.1rem] shrink-0 items-center justify-center rounded-[5px] bg-red-500/15 text-[0.62rem] text-red-600"
+          >
+            <i class="pi pi-exclamation-circle"></i>
+          </span>
+          <ul class="m-0 flex list-none flex-col gap-0.5 p-0">
+            @for (msg of avisosPuesto(); track msg) {
+              <li class="text-[0.72rem] font-medium leading-snug tabular-nums text-red-700">
+                {{ msg }}
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
       @if (cargandoPeriodo()) {
         <div
           class="flex items-center justify-center gap-2 rounded-xl border border-[rgba(20,48,73,0.12)] px-4 py-8 text-sm text-brand-muted"
@@ -108,27 +128,27 @@
                 }
               </tr>
             </thead>
-            <tbody formArrayName="dias">
+            <tbody>
               <tr>
-                @for (d of dias(); track d.dia; let i = $index) {
+                @for (dc of diasControles(); track dc.control) {
                   <td
                     class="aplicar-dias__td"
                     [class.aplicar-dias__td--festivo]="
-                      d.inicial === 'D' || festivoPorDia().has(d.dia)
+                      dc.inicial === 'D' || festivoPorDia().has(dc.dia)
                     "
                     [class.aplicar-dias__td--sabado]="
-                      d.inicial === 'S' && !festivoPorDia().has(d.dia)
+                      dc.inicial === 'S' && !festivoPorDia().has(dc.dia)
                     "
-                    [class.aplicar-dias__td--error]="celdasError().has(d.dia)"
+                    [class.aplicar-dias__td--error]="celdasError().has(dc.dia)"
                   >
                     <input
                       pInputText
                       appUppercase
                       type="text"
-                      [formControlName]="i"
+                      [formControl]="dc.control"
                       class="aplicar-dias__input"
-                      [attr.aria-label]="m.diaAria + ' ' + d.dia + ' ' + d.inicial"
-                      [attr.title]="errorDia(d.dia)"
+                      [attr.aria-label]="m.diaAria + ' ' + dc.dia + ' ' + dc.inicial"
+                      [attr.title]="errorDia(dc.dia)"
                     />
                   </td>
                 }

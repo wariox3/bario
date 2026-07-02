@@ -54,6 +54,7 @@ export {
   toHora,
   fromHora,
   daysBetween,
+  formatHorario,
   anioMesDeIso,
   diasDelMes,
   INICIALES_DIA_SEMANA_ES,

@@ -10,7 +10,6 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   FormArray,
   FormControl,
@@ -33,10 +32,11 @@ import type { ErpSelectOption } from '@erp/core/data/erp-select-data.service';
 import type { SecuenciaMesCalculado } from '@erp/features/turno/masters/secuencia/secuencia.service';
 import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-grid.component';
 import { ProgramacionService } from '../../programacion.service';
-import type {
-  CrearProgramacionPayload,
-  ProgramacionErroresResponse,
-} from '../../programacion.model';
+import type { CrearProgramacionPayload } from '../../programacion.model';
+import {
+  extraerErroresProgramacion,
+  separarErroresProgramacion,
+} from '../../programacion-errores.util';
 import { ProgramacionPeriodoStore } from './programacion-periodo.store';
 import { ProgramacionSecuenciaPickerComponent } from './programacion-secuencia-picker.component';
 
@@ -112,6 +112,27 @@ export class ProgramacionAgregarContratoModalComponent {
     return this.form.controls.dias;
   }
 
+  /**
+   * Se incrementa dentro del `effect` que reconstruye `diasArray`, para que
+   * `diasControles` recompute con los controles frescos (los effects corren tras el
+   * render). Sin esto, `diasControles` leería controles viejos.
+   */
+  private readonly estructuraVersion = signal(0);
+
+  /**
+   * Días del mes emparejados con su `FormControl` real. El template ata
+   * `[formControl]="dc.control"` con `track dc.control`, así al reconstruir el form el
+   * `@for` revincula los inputs a las instancias nuevas por identidad (evita la
+   * desincronización input↔control por índice al reabrir o recalcular).
+   */
+  protected readonly diasControles = computed(() => {
+    this.estructuraVersion();
+    const dias = this.dias();
+    const arr = this.diasArray;
+    if (arr.length !== dias.length) return [];
+    return dias.map((d, i) => ({ ...d, control: arr.at(i) }));
+  });
+
   protected readonly isSubmitting = signal(false);
 
   /**
@@ -125,6 +146,12 @@ export class ProgramacionAgregarContratoModalComponent {
   protected errorDia(dia: number): string | null {
     return this.celdasError().get(dia) ?? null;
   }
+
+  /**
+   * Avisos de nivel puesto tras crear (errores del 400 sin `fecha`, ej. horas
+   * excedidas). Se muestran en un banner rojo hasta que el usuario corrige.
+   */
+  protected readonly avisosPuesto = signal<readonly string[]>([]);
 
   /**
    * Contrato elegido como señal (el valor del form no lo es). Sin esto el
@@ -153,6 +180,9 @@ export class ProgramacionAgregarContratoModalComponent {
       const arr = this.diasArray;
       arr.clear({ emitEvent: false });
       for (let i = 0; i < total; i++) arr.push(this.fb.control(''), { emitEvent: false });
+      // Gatilla `diasControles` contra los controles recién creados (los effects
+      // corren tras el render, así que sin esto leería los viejos).
+      this.estructuraVersion.update((v) => v + 1);
     });
 
     // Al abrir (puede ser para otro puesto): form limpio y período recargado
@@ -161,6 +191,8 @@ export class ProgramacionAgregarContratoModalComponent {
       if (!this.visible()) return;
       this.form.reset();
       this.periodoStore.reset();
+      this.celdasError.set(new Map());
+      this.avisosPuesto.set([]);
       const grupo = this.grupo();
       if (grupo) {
         this.periodoStore.cargarDesdeLinea(grupo.documentoDetalleId, () => {
@@ -170,9 +202,10 @@ export class ProgramacionAgregarContratoModalComponent {
       }
     });
 
-    // Al tocar cualquier campo, retira el resaltado de casillas en error.
+    // Al tocar cualquier campo, retira el resaltado de casillas y avisos en error.
     this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.celdasError().size) this.celdasError.set(new Map());
+      if (this.avisosPuesto().length) this.avisosPuesto.set([]);
     });
   }
 
@@ -212,13 +245,13 @@ export class ProgramacionAgregarContratoModalComponent {
       )
       .subscribe({
         next: () => {
-          const ts = this.t().entities.programacion.detail.empleadosModal.toasts.success;
+          const ts = this.t().entities.programacion.detail.programacionModal.toasts.success;
           this.toast.success(ts.title, ts.desc);
           this.applied.emit();
           this.visible.set(false);
         },
         error: (err: unknown) => {
-          const ts = this.t().entities.programacion.detail.empleadosModal.toasts.error;
+          const ts = this.t().entities.programacion.detail.programacionModal.toasts.error;
           if (this.handleErroresProgramacion(err, ts.title)) return;
           this.toast.error(ts.title, ts.desc);
         },
@@ -226,27 +259,26 @@ export class ProgramacionAgregarContratoModalComponent {
   }
 
   /**
-   * Maneja el 400 normalizado de crear/actualizar-programacion
-   * (`{ detail, errores: [{ fecha, codigo, mensaje, … }] }`): resalta las casillas
-   * de los días con error (con su `mensaje` como tooltip) y muestra el `detail` en
-   * un toast. Devuelve `true` si el error tenía esta forma (ya manejado); `false`
-   * para que el caller siga con el toast genérico.
+   * Maneja el 400 de crear-programacion (`{ detail, errores: [{ fecha, mensaje, … }] }`):
+   * resalta las casillas de los días con error (`fecha` → día del período) y muestra en
+   * un banner los avisos de puesto (errores sin `fecha`, ej. horas excedidas). Devuelve
+   * `true` si el error tenía esta forma (ya manejado); `false` para el toast genérico.
    */
   private handleErroresProgramacion(err: unknown, fallbackTitle: string): boolean {
-    if (!(err instanceof HttpErrorResponse)) return false;
-    const body = err.error as Partial<ProgramacionErroresResponse> | null;
-    if (!body || !Array.isArray(body.errores)) return false;
-
+    const body = extraerErroresProgramacion(err);
     const p = this.periodo();
-    if (!p) return false;
-    const mapa = new Map<number, string>();
-    for (const e of body.errores) {
-      const [anio, mes, dia] = e.fecha.split('-').map(Number);
-      if (anio === p.anio && mes === p.mes) mapa.set(dia, e.mensaje);
-    }
-    if (mapa.size === 0) return false;
+    if (!body || !p) return false;
 
-    this.celdasError.set(mapa);
+    const { celdas, avisos } = separarErroresProgramacion(body.errores);
+    const porDia = new Map<number, string>();
+    for (const [fecha, mensaje] of celdas) {
+      const [anio, mes, dia] = fecha.split('-').map(Number);
+      if (anio === p.anio && mes === p.mes) porDia.set(dia, mensaje);
+    }
+    if (porDia.size === 0 && avisos.length === 0) return false;
+
+    this.celdasError.set(porDia);
+    this.avisosPuesto.set(avisos);
     this.toast.error(fallbackTitle, body.detail);
     return true;
   }

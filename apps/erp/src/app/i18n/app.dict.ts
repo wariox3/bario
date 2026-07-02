@@ -738,7 +738,7 @@ export interface AppDict extends AuthTranslationsHost {
             error: { title: string; desc: string };
           };
         };
-        empleadosModal: {
+        programacionModal: {
           title: string;
           editTitle: string;
           subtitle: string;

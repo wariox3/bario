@@ -183,14 +183,17 @@ export interface ProgramacionMutacionMasivoResumen {
 }
 
 /**
- * Error a nivel de **celda (día)** devuelto por crear/actualizar-programacion.
- * Anclado por `fecha` (identidad del ítem del payload). `codigo` es el motivo
- * máquina (`turno_inexistente`, `dia_ocupado`, …) para que el front pueda
- * ramificar sin parsear texto; `mensaje` es el detalle por celda (tooltip).
+ * Error devuelto por crear/actualizar-programacion. `codigo` es el motivo máquina
+ * (`turno_inexistente`, `dia_ocupado`, `horas_diurnas_excedidas`, …) para ramificar
+ * sin parsear texto; `mensaje` es el detalle legible.
+ *
+ * `fecha` distingue el **alcance**: con fecha ISO es un error de **celda (día)**
+ * anclado a ese ítem; con `null` es un error de **puesto/línea** (ej. horas
+ * excedidas), que no se ancla a ninguna casilla.
  */
 export interface ProgramacionErrorItem {
-  /** Fecha del día en conflicto, ISO `YYYY-MM-DD` (matchea el ítem enviado). */
-  readonly fecha: string;
+  /** Día en error (ISO `YYYY-MM-DD`), o `null` si el error es de puesto/línea. */
+  readonly fecha: string | null;
   /** Código de turno que causó el error (el que escribió el usuario), o `null`. */
   readonly turno_codigo: string | null;
   /** Motivo máquina del error (ej. `turno_inexistente`, `dia_ocupado`). */
