@@ -29,17 +29,19 @@
   background: rgba(20, 48, 73, 0.02);
 }
 
-// El contenido ocupa la mitad izquierda de la card; la derecha queda libre.
+// El contenido ocupa la mitad derecha de la card; la izquierda queda libre.
 .programacion-detail__resumen-inner {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
   width: 50%;
+  margin-left: auto;
 }
 
 @media (max-width: 640px) {
   .programacion-detail__resumen-inner {
     width: 100%;
+    margin-left: 0;
   }
 }
 
@@ -90,7 +92,12 @@
   width: 1.1rem;
   height: 1.1rem;
   border-radius: 5px;
-  font-size: 0.6rem;
+}
+
+// Solo el glifo, más pequeño; el contenedor (1.1rem) se mantiene. Se apunta al `.pi`
+// directamente porque PrimeIcons fija su propio `font-size` que ignora el del contenedor.
+.programacion-detail__stat-icon .pi {
+  font-size: 0.7rem;
 }
 
 // Mismos colores que las stats del grid: total navy, día ámbar, noche azul.
