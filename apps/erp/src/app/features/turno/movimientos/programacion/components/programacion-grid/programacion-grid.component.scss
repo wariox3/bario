@@ -112,8 +112,8 @@
 }
 
 .programacion-grid__th--resumen {
+  // Fondo sky tenue, pero el texto hereda el muted del header base (igual que EMPLEADO).
   background: #eff5fa;
-  color: var(--p-primary-color, #143049);
 }
 
 .programacion-grid__row:hover .programacion-grid__td--resumen {
