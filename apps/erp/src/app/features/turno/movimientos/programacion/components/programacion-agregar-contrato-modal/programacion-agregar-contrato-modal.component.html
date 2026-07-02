@@ -96,6 +96,9 @@
                     [class.aplicar-dias__th--festivo]="
                       d.inicial === 'D' || festivoPorDia().has(d.dia)
                     "
+                    [class.aplicar-dias__th--sabado]="
+                      d.inicial === 'S' && !festivoPorDia().has(d.dia)
+                    "
                     [class.aplicar-dias__th--error]="celdasError().has(d.dia)"
                     [attr.title]="errorDia(d.dia) ?? festivoPorDia().get(d.dia)"
                   >
@@ -112,6 +115,9 @@
                     class="aplicar-dias__td"
                     [class.aplicar-dias__td--festivo]="
                       d.inicial === 'D' || festivoPorDia().has(d.dia)
+                    "
+                    [class.aplicar-dias__td--sabado]="
+                      d.inicial === 'S' && !festivoPorDia().has(d.dia)
                     "
                     [class.aplicar-dias__td--error]="celdasError().has(d.dia)"
                   >

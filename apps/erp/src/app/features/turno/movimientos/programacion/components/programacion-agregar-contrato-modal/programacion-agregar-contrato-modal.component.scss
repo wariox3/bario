@@ -42,19 +42,28 @@
   vertical-align: middle;
 }
 
-// Festivo (incluye el domingo): tinte rojo/rosa para distinguirlo. El sábado
-// queda neutro, sin tinte de fin de semana.
+// Festivo (incluye el domingo): tinte azul claro para distinguirlo. El sábado
+// lleva un gris levemente más oscuro que el header.
 .aplicar-dias__th--festivo {
-  background: #fdeaea;
-  box-shadow: inset 0 -1px 0 rgba(190, 18, 60, 0.25);
+  background: #e8f1fb;
+  box-shadow: inset 0 -1px 0 rgba(37, 99, 235, 0.25);
 }
 
 .aplicar-dias__th--festivo .aplicar-dias__num {
-  color: #be123c;
+  color: #2563eb;
 }
 
 .aplicar-dias__td--festivo {
-  background: rgba(190, 18, 60, 0.07);
+  background: rgba(37, 99, 235, 0.07);
+}
+
+// Sábado: mismo gris del header pero un punto más oscuro para resaltarlo.
+.aplicar-dias__th--sabado {
+  background: #eceef1;
+}
+
+.aplicar-dias__td--sabado {
+  background: rgba(20, 48, 73, 0.035);
 }
 
 // Día ya programado (conflicto al aplicar): rojo fuerte. Gana sobre finde/festivo
