@@ -32,6 +32,7 @@ import type {
   ProgramacionFila,
 } from '../../programacion.model';
 import {
+  extraerDetalleProgramacion,
   extraerErroresMasivo,
   extraerErroresProgramacion,
   separarErroresProgramacion,
@@ -387,7 +388,10 @@ export class ProgramacionEditarContratoModalComponent {
     this.celdasError.set(celdas);
     this.avisosPuesto.set(avisos);
     this.avisosGlobales.set(globales);
-    this.toast.error(ts.error.title, ts.error.desc);
+    // Si el 400 no trajo celdas/avisos pero sí un `detail`, se muestra ese mensaje.
+    const huboDetalle = celdas.size > 0 || avisos.size > 0 || globales.length > 0;
+    const desc = huboDetalle ? ts.error.desc : (extraerDetalleProgramacion(err) ?? ts.error.desc);
+    this.toast.error(ts.error.title, desc);
   }
 
   /**

@@ -34,6 +34,7 @@ import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-gri
 import { ProgramacionService } from '../../programacion.service';
 import type { CrearProgramacionPayload } from '../../programacion.model';
 import {
+  extraerDetalleProgramacion,
   extraerErroresProgramacion,
   separarErroresProgramacion,
 } from '../../programacion-errores.util';
@@ -253,7 +254,9 @@ export class ProgramacionAgregarContratoModalComponent {
         error: (err: unknown) => {
           const ts = this.t().entities.programacion.detail.programacionModal.toasts.error;
           if (this.handleErroresProgramacion(err, ts.title)) return;
-          this.toast.error(ts.title, ts.desc);
+          // 400 sin `errores[]` pero con `detail` (ej. "ya existe... use actualizar"):
+          // se muestra el mensaje del backend en vez del genérico.
+          this.toast.error(ts.title, extraerDetalleProgramacion(err) ?? ts.desc);
         },
       });
   }

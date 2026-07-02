@@ -36,6 +36,17 @@ export function extraerErroresMasivo(err: unknown): ProgramacionErroresMasivoRes
 }
 
 /**
+ * Extrae el `detail` (mensaje general) de un 400 de programación, si lo trae. Útil
+ * para errores sin `errores[]` (ej. "Ya existe programación para este contrato y
+ * puesto; use actualizar."): se muestra tal cual en el toast.
+ */
+export function extraerDetalleProgramacion(err: unknown): string | null {
+  if (!(err instanceof HttpErrorResponse)) return null;
+  const body = err.error as { readonly detail?: unknown } | null;
+  return body && typeof body.detail === 'string' ? body.detail : null;
+}
+
+/**
  * Reparte los `errores` por alcance:
  *  - con `fecha` → celda (`fecha ISO → mensaje`) para resaltar la casilla del día.
  *  - sin `fecha` → aviso de puesto (ej. horas excedidas), no anclable a una casilla.
