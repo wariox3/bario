@@ -727,6 +727,7 @@ export interface AppDict extends AuthTranslationsHost {
           empty: string;
           verEmpleados: string;
           editar: string;
+          editarContrato: string;
           eliminar: string;
         };
         eliminar: {

@@ -118,14 +118,34 @@ export class ProgramacionDetailComponent implements OnInit {
   protected readonly edicionContrato = signal<ProgramacionContratoRef | null>(null);
 
   /**
-   * Filas del contrato en edición (una por puesto), filtradas del grid ya cargado.
-   * El modal de edición las lista para modificarlas todas a la vez. Comparten las
-   * mismas `fechas` (mismo mes de la programación).
+   * Modo del modal de edición: `'linea'` edita una sola fila (lápiz) y guarda con
+   * `actualizar-programacion`; `'masivo'` edita todas las líneas del contrato
+   * (click en el nombre) y guarda con `actualizar-programacion-masivo`.
+   */
+  protected readonly edicionModo = signal<'linea' | 'masivo'>('masivo');
+
+  /** Línea concreta en edición cuando el modo es `'linea'`; `null` en masivo. */
+  protected readonly edicionLineaRef = signal<ProgramacionFilaRef | null>(null);
+
+  /**
+   * Filas que edita el modal, filtradas del grid ya cargado. En `'linea'` es solo
+   * la fila señalada (contrato + puesto); en `'masivo'`, todas las líneas del
+   * contrato (una por puesto). Comparten las mismas `fechas` (mismo mes).
    */
   protected readonly edicionFilas = computed<readonly ProgramacionFila[]>(() => {
-    const contrato = this.edicionContrato();
     const grid = this.grid();
-    if (!contrato || !grid) return [];
+    if (!grid) return [];
+    if (this.edicionModo() === 'linea') {
+      const ref = this.edicionLineaRef();
+      if (!ref) return [];
+      const fila = grid.filas.find(
+        (f) =>
+          f.documento_detalle_id === ref.documentoDetalleId && f.contrato_id === ref.contratoId,
+      );
+      return fila ? [fila] : [];
+    }
+    const contrato = this.edicionContrato();
+    if (!contrato) return [];
     return grid.filas.filter((f) => f.contrato_id === contrato.id);
   });
 
@@ -177,8 +197,30 @@ export class ProgramacionDetailComponent implements OnInit {
     this.agregarContratoVisible.set(true);
   }
 
-  /** Abre el modal de edición con todas las líneas (puestos) del contrato. */
+  /** Abre el modal de edición con una sola línea (fila) del contrato. */
+  protected onEditarLinea(ref: ProgramacionFilaRef): void {
+    const fila = this.grid()?.filas.find(
+      (f) => f.documento_detalle_id === ref.documentoDetalleId && f.contrato_id === ref.contratoId,
+    );
+    this.edicionModo.set('linea');
+    this.edicionLineaRef.set(ref);
+    // El header del modal lee `edicionContrato`; se arma desde la fila señalada.
+    this.edicionContrato.set(
+      fila
+        ? {
+            id: ref.contratoId,
+            nombre: fila.contrato_contacto_nombre_corto ?? '',
+            numeroIdentificacion: fila.contrato_contacto_numero_identificacion ?? '',
+          }
+        : null,
+    );
+    this.editarContratoVisible.set(true);
+  }
+
+  /** Abre el modal de edición con todas las líneas (puestos) del contrato (masivo). */
   protected onEditarContrato(ref: ProgramacionContratoRef): void {
+    this.edicionModo.set('masivo');
+    this.edicionLineaRef.set(null);
     this.edicionContrato.set(ref);
     this.editarContratoVisible.set(true);
   }

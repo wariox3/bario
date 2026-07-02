@@ -17,8 +17,7 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { forkJoin, of, finalize } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { finalize, type Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -29,28 +28,45 @@ import type { ProgramacionContratoRef } from '../programacion-grid/programacion-
 import { ProgramacionService } from '../../programacion.service';
 import type {
   ActualizarProgramacionPayload,
+  ProgramacionErroresMasivoResponse,
   ProgramacionErroresResponse,
+  ProgramacionErrorItem,
   ProgramacionFecha,
   ProgramacionFila,
 } from '../../programacion.model';
 
 /**
- * Vista de un puesto (línea) del contrato para la banda del grid editable: solo lo
- * que se muestra a la izquierda (puesto + modalidad + horario). Cada puesto tiene
- * aquí una única fila: la del contrato en edición.
+ * Celda editable de un día: metadatos para pintar/aria + el `FormControl` real. El
+ * template ata `[formControl]="control"` (no por índice) para que, al reconstruir el
+ * form, el `@for` revincule los inputs a las instancias nuevas por identidad.
  */
-interface PuestoView {
+interface DiaControlVm {
+  readonly clave: string;
+  readonly etiqueta: string;
+  readonly inicial: string;
+  readonly control: FormControl<string>;
+}
+
+/**
+ * Banda de un puesto (línea) del contrato en el grid editable: metadatos a la
+ * izquierda (puesto + modalidad + horario) más sus celdas de día con control.
+ */
+interface BandaVm {
   readonly documentoDetalleId: number;
   readonly puestoId: number | null;
   readonly puestoNombre: string | null;
   readonly modalidadNombre: string | null;
   readonly horario: string | null;
+  readonly dias: readonly DiaControlVm[];
 }
 
-/** Resultado de guardar un puesto: éxito, o error con la respuesta cruda del 400. */
-type GuardarResult =
-  | { readonly documentoDetalleId: number; readonly ok: true }
-  | { readonly documentoDetalleId: number; readonly ok: false; readonly err: unknown };
+/**
+ * Modo de guardado del modal:
+ *  - `'linea'`: una sola fila → `POST actualizar-programacion` (payload single).
+ *  - `'masivo'`: todas las líneas del contrato → `POST actualizar-programacion-masivo`
+ *    (un request con `programaciones: []`).
+ */
+export type EditarProgramacionModo = 'linea' | 'masivo';
 
 /** `HH:mm:ss` → `HH:mm`; `null` si el valor no viene o no es válido. */
 function horaCorta(hora: string | null): string | null {
@@ -94,6 +110,12 @@ export class ProgramacionEditarContratoModalComponent {
   /** Contrato en edición (identidad). `null` cuando el modal está cerrado. */
   readonly contrato = input<ProgramacionContratoRef | null>(null);
 
+  /**
+   * Modo de guardado: `'linea'` (una fila, endpoint single) o `'masivo'` (todas las
+   * líneas del contrato, endpoint masivo). Determina el endpoint en `onGuardar`.
+   */
+  readonly modo = input<EditarProgramacionModo>('masivo');
+
   /** Columnas de día del mes (compartidas por todos los puestos de la programación). */
   readonly fechas = input<readonly ProgramacionFecha[]>([]);
 
@@ -119,16 +141,43 @@ export class ProgramacionEditarContratoModalComponent {
     return this.form.controls.puestos;
   }
 
-  /** Metadatos de puesto para la banda (deriva de `filas()`, mismo orden). */
-  protected readonly puestosView = computed<readonly PuestoView[]>(() =>
-    this.filas().map((f) => ({
-      documentoDetalleId: f.documento_detalle_id,
-      puestoId: f.puesto_id,
-      puestoNombre: f.puesto_nombre,
-      modalidadNombre: f.modalidad_nombre,
-      horario: formatHorario(f.hora_desde, f.hora_hasta),
-    })),
-  );
+  /**
+   * Se incrementa dentro del `effect` tras (re)construir el form. `bandas` depende de
+   * este signal para recomputar con los controles frescos: los effects corren tras el
+   * render, así que sin este gatillo `bandas` leería controles viejos/vacíos.
+   */
+  private readonly estructuraVersion = signal(0);
+
+  /**
+   * Bandas del grid: metadatos del puesto + celdas de día con su `FormControl` real.
+   * Empareja `filas()`/`fechas()` con `puestosArray` (mismo orden). El template ata
+   * `[formControl]="dia.control"` y hace `track dia.control`, de modo que al recrear
+   * los controles el `@for` revincula los inputs por identidad (sin desfase).
+   */
+  protected readonly bandas = computed<readonly BandaVm[]>(() => {
+    this.estructuraVersion();
+    const filas = this.filas();
+    const fechas = this.fechas();
+    const arr = this.puestosArray;
+    if (arr.length !== filas.length) return [];
+
+    return filas.map((fila, i) => {
+      const dias = arr.at(i);
+      return {
+        documentoDetalleId: fila.documento_detalle_id,
+        puestoId: fila.puesto_id,
+        puestoNombre: fila.puesto_nombre,
+        modalidadNombre: fila.modalidad_nombre,
+        horario: formatHorario(fila.hora_desde, fila.hora_hasta),
+        dias: fechas.map((fecha, j) => ({
+          clave: fecha.clave,
+          etiqueta: fecha.etiqueta,
+          inicial: fecha.inicial,
+          control: dias.at(j),
+        })),
+      };
+    });
+  });
 
   /** Columnas totales de la tabla: solo los días (sin columna de empleado). */
   protected readonly colspan = computed(() => this.fechas().length);
@@ -224,6 +273,13 @@ export class ProgramacionEditarContratoModalComponent {
       }
       // Nuevo contrato/mes: limpia los resaltados de un guardado anterior.
       this.celdasError.set(new Map());
+      // El pre-llenado usa `emitEvent: false`, así que `valueChanges` NO dispara.
+      // Se bumpean las versiones a mano contra el form recién reconstruido:
+      //  - `valoresVersion` → `conflictos` (lee los controles imperativamente).
+      //  - `estructuraVersion` → `bandas` recompute con los controles frescos, para que
+      //    el template revincule los inputs a las instancias nuevas por identidad.
+      this.valoresVersion.update((v) => v + 1);
+      this.estructuraVersion.update((v) => v + 1);
     });
 
     // Al tocar cualquier casilla: bumpea la versión (recalcula conflictos) y retira
@@ -235,10 +291,11 @@ export class ProgramacionEditarContratoModalComponent {
   }
 
   /**
-   * Guarda cada puesto con su propia llamada `actualizar-programacion` (el endpoint
-   * es por `documento_detalle_id`) y agrega los resultados con `forkJoin`. Si todos
-   * pasan, cierra y avisa al padre; si alguno falla, mantiene el modal abierto,
-   * resalta las celdas en error de ese puesto y muestra un toast.
+   * Guarda la programación editada. Arma un payload por fila y, según el `modo`,
+   * dispara una sola llamada: `actualizar-programacion` (una línea) o
+   * `actualizar-programacion-masivo` (todas las líneas del contrato). Al éxito cierra
+   * y avisa al padre; al error mantiene el modal abierto y muestra un toast (en
+   * `'linea'` además resalta las celdas del 400).
    */
   protected onGuardar(): void {
     const contrato = this.contrato();
@@ -246,65 +303,104 @@ export class ProgramacionEditarContratoModalComponent {
     const fechas = this.fechas();
     if (!contrato || filas.length === 0 || this.isSubmitting()) return;
 
-    const requests = filas.map((fila, i) => {
-      const payload: ActualizarProgramacionPayload = {
+    const payloads = filas.map(
+      (fila, i): ActualizarProgramacionPayload => ({
         contrato_id: contrato.id,
         documento_detalle_id: fila.documento_detalle_id,
         items: fechas.map((fecha, j) => ({
           fecha: fecha.clave,
           turno_codigo: this.puestosArray.at(i).at(j).value.trim() || null,
         })),
-      };
-      return this.service.actualizarProgramacion(payload).pipe(
-        map((): GuardarResult => ({ documentoDetalleId: fila.documento_detalle_id, ok: true })),
-        catchError((err: unknown) =>
-          of<GuardarResult>({ documentoDetalleId: fila.documento_detalle_id, ok: false, err }),
-        ),
-      );
-    });
+      }),
+    );
+
+    // Los dos endpoints devuelven shapes distintos (resumen por línea vs `resultados[]`),
+    // pero acá solo interesa éxito/error → se unifica como `Observable<unknown>`.
+    const request$: Observable<unknown> =
+      this.modo() === 'masivo'
+        ? this.service.actualizarProgramacionMasivo({ programaciones: payloads })
+        : this.service.actualizarProgramacion(payloads[0]);
 
     this.isSubmitting.set(true);
-    forkJoin(requests)
+    request$
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
       )
-      .subscribe((results) => this.procesarResultados(results));
+      .subscribe({
+        next: () => this.onGuardadoExitoso(),
+        error: (err: unknown) => this.onGuardadoError(err, payloads),
+      });
   }
 
-  /** Cierra con éxito si no hubo fallos; si los hubo, resalta y deja el modal abierto. */
-  private procesarResultados(results: readonly GuardarResult[]): void {
+  /** Cierra el modal, avisa al padre para que recargue y muestra el toast de éxito. */
+  private onGuardadoExitoso(): void {
     const ts = this.t().entities.programacion.detail.empleadosModal.toasts;
-    const fallidos = results.filter((r) => !r.ok);
+    this.toast.success(ts.success.title, ts.success.desc);
+    this.applied.emit();
+    this.visible.set(false);
+  }
 
-    if (fallidos.length === 0) {
-      this.toast.success(ts.success.title, ts.success.desc);
-      this.applied.emit();
-      this.visible.set(false);
-      return;
-    }
-
-    const mapa = new Map<number, ReadonlyMap<string, string>>();
-    for (const r of fallidos) {
-      if (r.ok) continue;
-      const errores = this.parseErrores(r.err);
-      if (errores) mapa.set(r.documentoDetalleId, errores);
-    }
-    this.celdasError.set(mapa);
+  /**
+   * Deja el modal abierto, resalta las celdas del 400 (`documento_detalle_id → fecha →
+   * mensaje`) y muestra un toast. El 400 difiere por modo: `'linea'` trae
+   * `{ errores: [] }` (una fila); `'masivo'` trae `{ resultados: [{ indice, errores }] }`
+   * y el `indice` mapea a `payloads[indice].documento_detalle_id`.
+   */
+  private onGuardadoError(err: unknown, payloads: readonly ActualizarProgramacionPayload[]): void {
+    const ts = this.t().entities.programacion.detail.empleadosModal.toasts;
+    const celdas =
+      this.modo() === 'masivo'
+        ? this.parseErroresMasivo(err, payloads)
+        : this.parseErroresLinea(err, payloads[0]);
+    if (celdas.size) this.celdasError.set(celdas);
     this.toast.error(ts.error.title, ts.error.desc);
   }
 
   /**
-   * Extrae del 400 normalizado (`{ detail, errores: [{ fecha, mensaje, … }] }`) el
-   * mapa `fecha ISO → mensaje` de un puesto. `null` si el error no tiene esa forma.
+   * 400 de `actualizar-programacion` (`{ errores: [{ fecha, mensaje, … }] }`) →
+   * `documento_detalle_id → (fecha ISO → mensaje)` de la única fila enviada.
    */
-  private parseErrores(err: unknown): ReadonlyMap<string, string> | null {
-    if (!(err instanceof HttpErrorResponse)) return null;
+  private parseErroresLinea(
+    err: unknown,
+    payload: ActualizarProgramacionPayload,
+  ): Map<number, ReadonlyMap<string, string>> {
+    const mapa = new Map<number, ReadonlyMap<string, string>>();
+    if (!(err instanceof HttpErrorResponse)) return mapa;
     const body = err.error as Partial<ProgramacionErroresResponse> | null;
-    if (!body || !Array.isArray(body.errores)) return null;
-    const mapa = new Map<string, string>();
-    for (const e of body.errores) mapa.set(e.fecha, e.mensaje);
-    return mapa.size ? mapa : null;
+    if (!body || !Array.isArray(body.errores)) return mapa;
+    const celdas = this.erroresACeldas(body.errores);
+    if (celdas.size) mapa.set(payload.documento_detalle_id, celdas);
+    return mapa;
+  }
+
+  /**
+   * 400 de `actualizar-programacion-masivo` (`{ resultados: [{ indice, errores }] }`) →
+   * `documento_detalle_id → (fecha ISO → mensaje)` por línea, resolviendo el
+   * `documento_detalle_id` desde `payloads[indice]`.
+   */
+  private parseErroresMasivo(
+    err: unknown,
+    payloads: readonly ActualizarProgramacionPayload[],
+  ): Map<number, ReadonlyMap<string, string>> {
+    const mapa = new Map<number, ReadonlyMap<string, string>>();
+    if (!(err instanceof HttpErrorResponse)) return mapa;
+    const body = err.error as Partial<ProgramacionErroresMasivoResponse> | null;
+    if (!body || !Array.isArray(body.resultados)) return mapa;
+    for (const linea of body.resultados) {
+      const payload = payloads[linea.indice];
+      if (!payload || !Array.isArray(linea.errores)) continue;
+      const celdas = this.erroresACeldas(linea.errores);
+      if (celdas.size) mapa.set(payload.documento_detalle_id, celdas);
+    }
+    return mapa;
+  }
+
+  /** `ProgramacionErrorItem[]` → mapa `fecha ISO → mensaje` (identidad de la celda). */
+  private erroresACeldas(errores: readonly ProgramacionErrorItem[]): Map<string, string> {
+    const celdas = new Map<string, string>();
+    for (const e of errores) celdas.set(e.fecha, e.mensaje);
+    return celdas;
   }
 
   protected onClose(): void {

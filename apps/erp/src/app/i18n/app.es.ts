@@ -1001,7 +1001,8 @@ export const es: AppDict = {
           },
           empty: 'Sin filas para mostrar.',
           verEmpleados: 'Ver empleados del puesto',
-          editar: 'Editar programación del contrato',
+          editar: 'Editar programación de la línea',
+          editarContrato: 'Editar programación del contrato',
           eliminar: 'Eliminar programación del contrato',
         },
         eliminar: {

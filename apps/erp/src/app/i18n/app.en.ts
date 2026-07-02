@@ -986,7 +986,8 @@ export const en: AppDict = {
           },
           empty: 'No rows to show.',
           verEmpleados: 'View employees of this position',
-          editar: 'Edit contract scheduling',
+          editar: 'Edit line scheduling',
+          editarContrato: 'Edit contract scheduling',
           eliminar: 'Delete contract scheduling',
         },
         eliminar: {

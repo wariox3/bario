@@ -135,12 +135,51 @@ export interface CrearProgramacionPayload {
 export type ActualizarProgramacionPayload = CrearProgramacionPayload;
 
 /**
+ * Payload de `POST /turno/programacion/actualizar-programacion-masivo/`: reprograma
+ * varias líneas (contrato en un puesto) en una sola llamada. Cada entrada es un
+ * `ActualizarProgramacionPayload` completo; el backend los aplica en batch.
+ *
+ * TODO: tipar el 400 del masivo cuando el backend confirme el shape (idealmente
+ * agrupado por `documento_detalle_id` para conservar el resaltado por celda).
+ */
+export interface ActualizarProgramacionMasivoPayload {
+  readonly programaciones: readonly ActualizarProgramacionPayload[];
+}
+
+/**
  * Payload de `POST /turno/programacion/eliminar-programacion/`: borra la
  * programación (mes de turnos) de un contrato en un puesto (`documento_detalle_id`).
  */
 export interface EliminarProgramacionPayload {
   readonly contrato_id: number;
   readonly documento_detalle_id: number;
+}
+
+/**
+ * Resumen que devuelven las mutaciones de programación **por línea**
+ * (crear/actualizar/eliminar): cuántas celdas-día se crearon, actualizaron y
+ * eliminaron. Ej. `{ creados: 0, actualizados: 0, eliminados: 1 }` al borrar un día.
+ */
+export interface ProgramacionMutacionResumen {
+  readonly creados: number;
+  readonly actualizados: number;
+  readonly eliminados: number;
+}
+
+/**
+ * Resumen de una línea dentro de la respuesta masiva, anclado por `indice` (posición
+ * de la programación en el array `programaciones` enviado).
+ */
+export interface ProgramacionMutacionResultado extends ProgramacionMutacionResumen {
+  readonly indice: number;
+}
+
+/**
+ * Respuesta de `POST /turno/programacion/actualizar-programacion-masivo/`: un
+ * `resultados[]` con el resumen de cada línea enviada (en el orden del payload).
+ */
+export interface ProgramacionMutacionMasivoResumen {
+  readonly resultados: readonly ProgramacionMutacionResultado[];
 }
 
 /**
@@ -167,4 +206,22 @@ export interface ProgramacionErrorItem {
 export interface ProgramacionErroresResponse {
   readonly detail: string;
   readonly errores: readonly ProgramacionErrorItem[];
+}
+
+/**
+ * Errores de una **línea** dentro del 400 masivo, anclados por `indice` (posición de
+ * la programación en el array `programaciones` enviado).
+ */
+export interface ProgramacionErrorLinea {
+  readonly indice: number;
+  readonly errores: readonly ProgramacionErrorItem[];
+}
+
+/**
+ * Body del 400 de `actualizar-programacion-masivo`: `detail` (resumen para el toast)
+ * + `resultados` (errores por línea, anclados por `indice`).
+ */
+export interface ProgramacionErroresMasivoResponse {
+  readonly detail: string;
+  readonly resultados: readonly ProgramacionErrorLinea[];
 }

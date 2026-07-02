@@ -105,7 +105,13 @@ export class ProgramacionGridComponent {
   /** Pide eliminar la programación de un contrato (fila). El padre confirma y borra. */
   readonly eliminarContrato = output<ProgramacionFilaRef>();
 
-  /** Pide editar la programación de un contrato. El padre abre el modal multi-puesto. */
+  /** Pide editar **una sola línea** (contrato en un puesto). El padre abre el modal. */
+  readonly editarLinea = output<ProgramacionFilaRef>();
+
+  /**
+   * Pide editar **todas las líneas** del contrato a la vez (masivo). El padre abre
+   * el modal con una banda por puesto.
+   */
   readonly editarContrato = output<ProgramacionContratoRef>();
 
   /** Filas agrupadas por `documento_detalle_id` para renderizar separadores. */
@@ -152,10 +158,24 @@ export class ProgramacionGridComponent {
   }
 
   /**
-   * Emite la identidad del contrato para que el padre abra el modal de edición.
-   * El modal reúne todas las líneas del contrato (una por puesto) desde el detalle.
+   * Emite la **fila** (contrato en un puesto) para editar una sola línea. Lo dispara
+   * el botón de lápiz; el padre abre el modal con una única banda.
    */
   protected onEditar(fila: ProgramacionFila): void {
+    if (fila.contrato_id == null) return;
+    this.editarLinea.emit({
+      documentoDetalleId: fila.documento_detalle_id,
+      contratoId: fila.contrato_id,
+      contratoNombre: fila.contrato_contacto_nombre_corto,
+    });
+  }
+
+  /**
+   * Emite la identidad del **contrato** para editar todas sus líneas a la vez
+   * (masivo). Lo dispara el click en el nombre del contrato; el modal reúne todos
+   * sus puestos desde el detalle.
+   */
+  protected onEditarNombre(fila: ProgramacionFila): void {
     if (fila.contrato_id == null) return;
     this.editarContrato.emit({
       id: fila.contrato_id,

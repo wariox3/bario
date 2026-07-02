@@ -100,6 +100,7 @@
           [filas]="gr.filas"
           [festivoClaves]="festivoClaves()"
           (verEmpleados)="onAgregarContrato($event)"
+          (editarLinea)="onEditarLinea($event)"
           (editarContrato)="onEditarContrato($event)"
           (eliminarContrato)="onEliminarContrato($event)"
         />
@@ -118,6 +119,7 @@
 <!-- ── Modal: editar la programación de un contrato (multi-puesto) ────────────── -->
 <app-programacion-editar-contrato-modal
   [(visible)]="editarContratoVisible"
+  [modo]="edicionModo()"
   [contrato]="edicionContrato()"
   [fechas]="grid()?.fechas ?? []"
   [filas]="edicionFilas()"

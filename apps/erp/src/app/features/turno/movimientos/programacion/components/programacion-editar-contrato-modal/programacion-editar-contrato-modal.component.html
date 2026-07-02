@@ -68,26 +68,26 @@
           </tr>
         </thead>
 
-        <tbody formArrayName="puestos">
-          @for (pv of puestosView(); track pv.documentoDetalleId; let pi = $index) {
+        <tbody>
+          @for (banda of bandas(); track banda.documentoDetalleId) {
             <!-- Banda del puesto -->
             <tr class="editar-grid__group-row">
               <td [attr.colspan]="colspan()" class="editar-grid__group-cell">
                 <div class="flex items-center gap-3">
                   <span class="editar-grid__group-label">
-                    @if (pv.puestoNombre) {
-                      {{ pv.puestoId }} | {{ pv.puestoNombre }}
+                    @if (banda.puestoNombre) {
+                      {{ banda.puestoId }} | {{ banda.puestoNombre }}
                     } @else {
-                      #{{ pv.documentoDetalleId }}
+                      #{{ banda.documentoDetalleId }}
                     }
                   </span>
-                  @if (pv.modalidadNombre) {
-                    <span class="editar-grid__group-chip">{{ pv.modalidadNombre }}</span>
+                  @if (banda.modalidadNombre) {
+                    <span class="editar-grid__group-chip">{{ banda.modalidadNombre }}</span>
                   }
-                  @if (pv.horario) {
+                  @if (banda.horario) {
                     <span class="editar-grid__group-chip editar-grid__group-chip--horario">
                       <i class="pi pi-clock text-[0.58rem]"></i>
-                      {{ pv.horario }}
+                      {{ banda.horario }}
                     </span>
                   }
                 </div>
@@ -95,26 +95,26 @@
             </tr>
 
             <!-- Fila editable del contrato en ese puesto -->
-            <tr class="editar-grid__row" [formArrayName]="pi">
-              @for (fecha of fechas(); track fecha.clave; let di = $index) {
+            <tr class="editar-grid__row">
+              @for (dia of banda.dias; track dia.control) {
                 <td
                   class="editar-grid__td editar-grid__td--dia"
-                  [class.editar-grid__td--error]="errorCelda(pv.documentoDetalleId, fecha.clave)"
+                  [class.editar-grid__td--error]="errorCelda(banda.documentoDetalleId, dia.clave)"
                   [class.editar-grid__td--conflicto]="
-                    !errorCelda(pv.documentoDetalleId, fecha.clave) &&
-                    conflictoCelda(pv.documentoDetalleId, fecha.clave)
+                    !errorCelda(banda.documentoDetalleId, dia.clave) &&
+                    conflictoCelda(banda.documentoDetalleId, dia.clave)
                   "
                 >
                   <input
                     pInputText
                     appUppercase
                     type="text"
-                    [formControlName]="di"
+                    [formControl]="dia.control"
                     class="editar-grid__input"
-                    [attr.aria-label]="m.diaAria + ' ' + fecha.etiqueta + ' ' + fecha.inicial"
+                    [attr.aria-label]="m.diaAria + ' ' + dia.etiqueta + ' ' + dia.inicial"
                     [attr.title]="
-                      errorCelda(pv.documentoDetalleId, fecha.clave) ??
-                      (conflictoCelda(pv.documentoDetalleId, fecha.clave) ? m.conflictoDia : null)
+                      errorCelda(banda.documentoDetalleId, dia.clave) ??
+                      (conflictoCelda(banda.documentoDetalleId, dia.clave) ? m.conflictoDia : null)
                     "
                   />
                 </td>
