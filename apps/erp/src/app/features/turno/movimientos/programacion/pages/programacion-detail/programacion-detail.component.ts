@@ -111,6 +111,9 @@ export class ProgramacionDetailComponent implements OnInit {
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
+  /** Filas seleccionadas en el grid (checkboxes), para la acción de borrado masivo. */
+  protected readonly seleccionadas = signal<readonly ProgramacionFilaRef[]>([]);
+
   /** Modal de agregar contrato al puesto (se abre desde el botón del grupo del grid). */
   protected readonly agregarContratoVisible = signal(false);
   protected readonly agregarContratoGrupo = signal<ProgramacionGrupoRef | null>(null);
@@ -258,8 +261,48 @@ export class ProgramacionDetailComponent implements OnInit {
       });
   }
 
-  /** Tras aplicar la programación, recarga el detalle para reflejar los cambios. */
+  /** Recibe la selección del grid (checkboxes) para habilitar la acción del header. */
+  protected onSeleccionChange(refs: readonly ProgramacionFilaRef[]): void {
+    this.seleccionadas.set(refs);
+  }
+
+  /** Confirma y elimina en masivo las líneas seleccionadas (checkboxes) del grid. */
+  protected onEliminarSeleccion(refs: readonly ProgramacionFilaRef[]): void {
+    if (refs.length === 0) return;
+    const el = this.t().entities.programacion.detail.eliminar;
+    this.confirmation.confirm({
+      header: el.confirmMasivoHeader,
+      message: el.confirmMasivoMessage.replace('{n}', String(refs.length)),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.t().common.actions.delete,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.eliminarSeleccion(refs),
+    });
+  }
+
+  private eliminarSeleccion(refs: readonly ProgramacionFilaRef[]): void {
+    const el = this.t().entities.programacion.detail.eliminar;
+    this.service
+      .eliminarProgramacionMasivo({
+        programaciones: refs.map((r) => ({
+          contrato_id: r.contratoId,
+          documento_detalle_id: r.documentoDetalleId,
+        })),
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toast.success(el.toasts.success.title, el.toasts.success.desc);
+          this.onApplied();
+        },
+        error: () => this.toast.error(el.toasts.error.title, el.toasts.error.desc),
+      });
+  }
+
+  /** Tras aplicar la programación, recarga el detalle y limpia la selección. */
   protected onApplied(): void {
+    this.seleccionadas.set([]);
     const id = Number(this.id());
     if (Number.isFinite(id)) this.loadDetalle(id);
   }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { I18nService, formatHorario } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { ProgramacionFecha, ProgramacionFila } from '../../programacion.model';
@@ -101,6 +101,9 @@ export class ProgramacionGridComponent {
    */
   readonly editarContrato = output<ProgramacionContratoRef>();
 
+  /** Emite las filas seleccionadas (checkboxes) al cambiar. El padre muestra la acción. */
+  readonly selectionChange = output<readonly ProgramacionFilaRef[]>();
+
   /** Filas agrupadas por `documento_detalle_id` para renderizar separadores. */
   protected readonly grupos = computed<readonly GrupoFilas[]>(() => {
     const result: GrupoFilas[] = [];
@@ -134,6 +137,92 @@ export class ProgramacionGridComponent {
    * 2 reservadas para opciones por fila.
    */
   protected readonly colspan = computed(() => 1 + this.fechas().length + 4 + 2);
+
+  // ── Selección de filas (para el borrado masivo) ───────────────────────────
+
+  /** Claves (`documento_detalle_id|contrato_id`) de las filas marcadas. */
+  private readonly seleccion = signal<ReadonlySet<string>>(new Set());
+
+  /** Filas borrables (con contrato asignado): las únicas seleccionables. */
+  private readonly filasSeleccionables = computed<readonly ProgramacionFila[]>(() =>
+    this.filas().filter((f) => f.contrato_id !== null),
+  );
+
+  /** Filas seleccionadas, como refs listos para emitir al padre. */
+  protected readonly seleccionadas = computed<readonly ProgramacionFilaRef[]>(() => {
+    const marcadas = this.seleccion();
+    return this.filasSeleccionables()
+      .filter((f) => marcadas.has(this.filaKey(f)))
+      .map((f) => this.toRef(f));
+  });
+
+  /** `true` si todas las filas seleccionables están marcadas (para el header). */
+  protected readonly todasSeleccionadas = computed(() => {
+    const total = this.filasSeleccionables().length;
+    return total > 0 && this.seleccionadas().length === total;
+  });
+
+  /** `true` si hay selección parcial (estado indeterminado del checkbox del header). */
+  protected readonly indeterminado = computed(() => {
+    const n = this.seleccionadas().length;
+    return n > 0 && n < this.filasSeleccionables().length;
+  });
+
+  constructor() {
+    // Al cambiar las filas (recarga tras aplicar/borrar) la selección queda obsoleta:
+    // se limpia para no arrastrar claves de un mes/documento anterior.
+    effect(() => {
+      this.filas();
+      this.seleccion.set(new Set());
+    });
+  }
+
+  /** Clave estable de una fila para la selección. */
+  private filaKey(fila: ProgramacionFila): string {
+    return `${fila.documento_detalle_id}|${fila.contrato_id}`;
+  }
+
+  /** `true` si la fila está marcada. */
+  protected estaSeleccionada(fila: ProgramacionFila): boolean {
+    return this.seleccion().has(this.filaKey(fila));
+  }
+
+  /** Marca/desmarca una fila. */
+  protected toggleFila(fila: ProgramacionFila): void {
+    const next = new Set(this.seleccion());
+    const key = this.filaKey(fila);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    this.commitSeleccion(next);
+  }
+
+  /** Marca todas las filas seleccionables, o las desmarca si ya estaban todas. */
+  protected toggleTodas(): void {
+    this.commitSeleccion(
+      this.todasSeleccionadas()
+        ? new Set()
+        : new Set(this.filasSeleccionables().map((f) => this.filaKey(f))),
+    );
+  }
+
+  /** Limpia la selección (acción del padre). Público para invocarlo por template ref. */
+  limpiarSeleccion(): void {
+    this.commitSeleccion(new Set());
+  }
+
+  /** Fija la selección y emite las filas resultantes al padre. */
+  private commitSeleccion(next: ReadonlySet<string>): void {
+    this.seleccion.set(next);
+    this.selectionChange.emit(this.seleccionadas());
+  }
+
+  private toRef(fila: ProgramacionFila): ProgramacionFilaRef {
+    return {
+      documentoDetalleId: fila.documento_detalle_id,
+      contratoId: fila.contrato_id as number,
+      contratoNombre: fila.contrato_contacto_nombre_corto,
+    };
+  }
 
   /** Emite la identidad del puesto (la agrupación) para abrir el modal. */
   protected onVerEmpleados(grupo: GrupoFilas): void {
@@ -197,9 +286,9 @@ export class ProgramacionGridComponent {
     return partes.join(' - ');
   }
 
-  /** Código del turno del día (`fila.dias[clave].turno_codigo`), con fallback `—`. */
+  /** Código del turno del día (`fila.dias[clave].turno_codigo`), vacío si el día no tiene turno. */
   protected celda(fila: ProgramacionFila, clave: string): string {
-    return fila.dias[clave]?.turno_codigo ?? '—';
+    return fila.dias[clave]?.turno_codigo ?? '';
   }
 
   /** Total de horas diurnas de la fila (suma de los días). */

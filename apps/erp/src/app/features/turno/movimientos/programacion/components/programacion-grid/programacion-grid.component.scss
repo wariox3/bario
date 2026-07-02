@@ -39,6 +39,38 @@
   background: rgba(20, 48, 73, 0.015);
 }
 
+// ── Selección (borrado masivo) ────────────────────────────────────────────
+
+// Checkbox de fila/header: navy de marca, compacto.
+.programacion-grid__check {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--brand-navy, #143049);
+}
+
+// Hueco del checkbox en filas no seleccionables (sin contrato), para alinear el nombre.
+.programacion-grid__check-spacer {
+  display: inline-block;
+  width: 0.95rem;
+  flex-shrink: 0;
+}
+
+// Fila seleccionada: tinte sky tenue, el mismo lenguaje que las columnas resumen.
+.programacion-grid__row--selected .programacion-grid__td {
+  background: rgba(119, 170, 215, 0.12);
+}
+
+.programacion-grid__row--selected .programacion-grid__td--sticky-left {
+  background: #eef5fb;
+}
+
+.programacion-grid__row--selected:hover .programacion-grid__td,
+.programacion-grid__row--selected:hover .programacion-grid__td--sticky-left {
+  background: rgba(119, 170, 215, 0.18);
+}
+
 // Primera columna (empleado): fija a la izquierda al hacer scroll horizontal.
 .programacion-grid__th--sticky-left {
   left: 0;

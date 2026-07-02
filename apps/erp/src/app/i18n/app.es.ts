@@ -1010,11 +1010,21 @@ export const es: AppDict = {
           editar: 'Editar programación de la línea',
           editarContrato: 'Editar programación del contrato',
           eliminar: 'Eliminar programación del contrato',
+          seleccion: {
+            contador: 'seleccionadas',
+            eliminar: 'Eliminar',
+            limpiar: 'Limpiar',
+            todo: 'Seleccionar todas las líneas',
+            fila: 'Seleccionar línea',
+          },
         },
         eliminar: {
           confirmHeader: '¿Eliminar programación?',
           confirmMessage:
             'Se eliminará la programación de {nombre} en este puesto. Esta acción no se puede deshacer.',
+          confirmMasivoHeader: '¿Eliminar las líneas seleccionadas?',
+          confirmMasivoMessage:
+            'Se eliminará la programación de {n} líneas seleccionadas. Esta acción no se puede deshacer.',
           toasts: {
             success: {
               title: 'Programación eliminada',

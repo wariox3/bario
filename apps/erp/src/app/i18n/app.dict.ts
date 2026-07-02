@@ -736,10 +736,21 @@ export interface AppDict extends AuthTranslationsHost {
           editar: string;
           editarContrato: string;
           eliminar: string;
+          /** Barra contextual de selección de filas (borrado masivo). */
+          seleccion: {
+            contador: string;
+            eliminar: string;
+            limpiar: string;
+            todo: string;
+            fila: string;
+          };
         };
         eliminar: {
           confirmHeader: string;
           confirmMessage: string;
+          confirmMasivoHeader: string;
+          /** Mensaje con `{n}` = cantidad de líneas seleccionadas. */
+          confirmMasivoMessage: string;
           toasts: {
             success: { title: string; desc: string };
             error: { title: string; desc: string };

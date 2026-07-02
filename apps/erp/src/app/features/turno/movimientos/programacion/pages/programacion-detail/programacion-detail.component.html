@@ -71,7 +71,6 @@
          Ocupa la mitad izquierda de la card; la derecha queda libre. -->
     <div class="programacion-detail__resumen">
       <div class="programacion-detail__resumen-inner">
-        <span class="programacion-detail__resumen-legend">{{ det.resumen.leyenda }}</span>
         <div class="programacion-detail__resumen-grid">
           <div class="programacion-detail__stat" [title]="det.grid.stats.total">
             <span class="programacion-detail__stat-head">
@@ -121,7 +120,9 @@
   <!-- ── Programación (grid de turnos) ────────────────────────────────────────── -->
   @if (grid(); as gr) {
     <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <div
+        class="flex min-h-[3.65rem] items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-2"
+      >
         <span
           class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
         >
@@ -130,10 +131,36 @@
         <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
           {{ det.sections.detalle }}
         </h2>
+
+        <!-- Acción de borrado masivo: aparece en el header (sin empujar la tabla). -->
+        @if (seleccionadas().length; as n) {
+          <div class="ml-auto flex items-center gap-2">
+            <span class="text-[0.78rem] text-brand-muted">
+              <span class="font-bold tabular-nums text-brand-text">{{ n }}</span>
+              {{ det.grid.seleccion.contador }}
+            </span>
+            <button
+              type="button"
+              (click)="grid.limpiarSeleccion()"
+              class="cursor-pointer rounded-md border-0 bg-transparent px-2 py-1 text-[0.75rem] font-semibold text-brand-muted transition-colors hover:text-brand-text"
+            >
+              {{ det.grid.seleccion.limpiar }}
+            </button>
+            <button
+              type="button"
+              (click)="onEliminarSeleccion(seleccionadas())"
+              class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-red-600/35 bg-red-500/[0.08] px-2.5 py-1 text-[0.75rem] font-bold text-red-700 transition-colors hover:border-red-600/50 hover:bg-red-500/15"
+            >
+              <i class="pi pi-trash text-[0.7rem]"></i>
+              {{ det.grid.seleccion.eliminar }}
+            </button>
+          </div>
+        }
       </div>
 
       <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
         <app-programacion-grid
+          #grid
           [fechas]="gr.fechas"
           [filas]="gr.filas"
           [festivoClaves]="festivoClaves()"
@@ -141,6 +168,7 @@
           (editarLinea)="onEditarLinea($event)"
           (editarContrato)="onEditarContrato($event)"
           (eliminarContrato)="onEliminarContrato($event)"
+          (selectionChange)="onSeleccionChange($event)"
         />
       </div>
     </section>

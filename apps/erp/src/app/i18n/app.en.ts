@@ -995,11 +995,21 @@ export const en: AppDict = {
           editar: 'Edit line scheduling',
           editarContrato: 'Edit contract scheduling',
           eliminar: 'Delete contract scheduling',
+          seleccion: {
+            contador: 'selected',
+            eliminar: 'Delete',
+            limpiar: 'Clear',
+            todo: 'Select all lines',
+            fila: 'Select line',
+          },
         },
         eliminar: {
           confirmHeader: 'Delete scheduling?',
           confirmMessage:
             'The scheduling for {nombre} in this position will be deleted. This action cannot be undone.',
+          confirmMasivoHeader: 'Delete the selected lines?',
+          confirmMasivoMessage:
+            'The scheduling for {n} selected lines will be deleted. This action cannot be undone.',
           toasts: {
             success: {
               title: 'Scheduling deleted',

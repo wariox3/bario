@@ -181,6 +181,19 @@ export interface EliminarProgramacionPayload {
 }
 
 /**
+ * Payload de `POST /turno/programacion/eliminar-programacion-masivo/`: borra varias
+ * líneas (contrato en un puesto) en una sola llamada. Espejo del borrado single.
+ */
+export interface EliminarProgramacionMasivoPayload {
+  readonly programaciones: readonly EliminarProgramacionPayload[];
+}
+
+/** Respuesta (200) del borrado masivo: cuántas celdas-día se eliminaron en total. */
+export interface ProgramacionEliminacionResumen {
+  readonly eliminados: number;
+}
+
+/**
  * Resumen que devuelven las mutaciones de programación **por línea**
  * (crear/actualizar/eliminar): cuántas celdas-día se crearon, actualizaron y
  * eliminaron. Ej. `{ creados: 0, actualizados: 0, eliminados: 1 }` al borrar un día.

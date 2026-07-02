@@ -5,7 +5,17 @@
     <thead>
       <tr>
         <th class="programacion-grid__th programacion-grid__th--sticky-left">
-          {{ g.headers.empleado }}
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              class="programacion-grid__check"
+              [checked]="todasSeleccionadas()"
+              [indeterminate]="indeterminado()"
+              [attr.aria-label]="g.seleccion.todo"
+              (change)="toggleTodas()"
+            />
+            {{ g.headers.empleado }}
+          </div>
         </th>
         @for (fecha of fechas(); track fecha.clave) {
           <th
@@ -98,27 +108,47 @@
         </tr>
 
         @for (fila of grupo.items; track fila.documento_detalle_id + '_' + $index) {
-          <tr class="programacion-grid__row">
+          <tr
+            class="programacion-grid__row"
+            [class.programacion-grid__row--selected]="estaSeleccionada(fila)"
+          >
             <td class="programacion-grid__td programacion-grid__td--sticky-left text-brand-text">
-              @if (fila.contrato_id !== null) {
-                <button
-                  type="button"
-                  (click)="onEditarNombre(fila)"
-                  [title]="g.editarContrato"
-                  [attr.aria-label]="g.editarContrato"
-                  class="block cursor-pointer border-0 bg-transparent p-0 text-left font-medium text-brand-text underline decoration-transparent decoration-dotted underline-offset-2 transition-colors hover:text-sky-700 hover:decoration-current"
-                >
-                  {{ fila.contrato_contacto_nombre_corto || '—' }}
-                </button>
-              } @else {
-                <span class="block font-medium">{{
-                  fila.contrato_contacto_nombre_corto || '—'
-                }}</span>
-              }
-              @let meta = metaLinea(fila, g.contratoAbrev);
-              @if (meta) {
-                <span class="block text-[0.68rem] text-brand-muted tabular-nums">{{ meta }}</span>
-              }
+              <div class="flex items-start gap-2">
+                @if (fila.contrato_id !== null) {
+                  <input
+                    type="checkbox"
+                    class="programacion-grid__check mt-0.5"
+                    [checked]="estaSeleccionada(fila)"
+                    [attr.aria-label]="g.seleccion.fila"
+                    (change)="toggleFila(fila)"
+                  />
+                } @else {
+                  <span class="programacion-grid__check-spacer"></span>
+                }
+                <div class="min-w-0">
+                  @if (fila.contrato_id !== null) {
+                    <button
+                      type="button"
+                      (click)="onEditarNombre(fila)"
+                      [title]="g.editarContrato"
+                      [attr.aria-label]="g.editarContrato"
+                      class="block cursor-pointer border-0 bg-transparent p-0 text-left font-medium text-brand-text underline decoration-transparent decoration-dotted underline-offset-2 transition-colors hover:text-sky-700 hover:decoration-current"
+                    >
+                      {{ fila.contrato_contacto_nombre_corto || '—' }}
+                    </button>
+                  } @else {
+                    <span class="block font-medium">{{
+                      fila.contrato_contacto_nombre_corto || '—'
+                    }}</span>
+                  }
+                  @let meta = metaLinea(fila, g.contratoAbrev);
+                  @if (meta) {
+                    <span class="block text-[0.68rem] text-brand-muted tabular-nums">{{
+                      meta
+                    }}</span>
+                  }
+                </div>
+              </div>
             </td>
 
             @for (fecha of fechas(); track fecha.clave) {

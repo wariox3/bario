@@ -5,8 +5,10 @@ import type {
   ActualizarProgramacionMasivoPayload,
   ActualizarProgramacionPayload,
   CrearProgramacionPayload,
+  EliminarProgramacionMasivoPayload,
   EliminarProgramacionPayload,
   ProgramacionDetalleResponse,
+  ProgramacionEliminacionResumen,
   ProgramacionMutacionMasivoResumen,
   ProgramacionMutacionResumen,
 } from './programacion.model';
@@ -90,6 +92,20 @@ export class ProgramacionService extends BaseHttpService {
   ): Observable<ProgramacionMutacionResumen> {
     return this.post<ProgramacionMutacionResumen>(
       `${this.resourcePath}eliminar-programacion/`,
+      payload,
+    );
+  }
+
+  /**
+   * Borra **varias líneas** en una sola llamada
+   * (`POST /turno/programacion/eliminar-programacion-masivo/`). Se dispara desde la
+   * selección con checkboxes del grid. Devuelve el total de celdas-día eliminadas.
+   */
+  eliminarProgramacionMasivo(
+    payload: EliminarProgramacionMasivoPayload,
+  ): Observable<ProgramacionEliminacionResumen> {
+    return this.post<ProgramacionEliminacionResumen>(
+      `${this.resourcePath}eliminar-programacion-masivo/`,
       payload,
     );
   }
