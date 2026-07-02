@@ -60,6 +60,9 @@
                 [class.editar-grid__th--festivo]="
                   fecha.inicial === 'D' || festivoClaves().has(fecha.clave)
                 "
+                [class.editar-grid__th--sabado]="
+                  fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
+                "
               >
                 <span class="editar-grid__dia-num">{{ fecha.etiqueta }}</span>
                 <span class="editar-grid__dia-ini">{{ fecha.inicial }}</span>

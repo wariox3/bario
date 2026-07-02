@@ -85,19 +85,24 @@
   color: var(--brand-muted, #64748b);
 }
 
-// Día festivo en header: fondo rojo suave + borde inferior, igual que el modal.
-// El domingo se trata como festivo (sin tinte de fin de semana en el sábado).
+// Día festivo en header: fondo azul claro + borde inferior, igual que el modal.
+// El domingo se trata como festivo; el sábado lleva un gris levemente más oscuro.
 .programacion-grid__th--festivo {
-  background: #fdeaea;
-  box-shadow: inset 0 -1px 0 rgba(190, 18, 60, 0.25);
+  background: #e8f1fb;
+  box-shadow: inset 0 -1px 0 rgba(37, 99, 235, 0.25);
 
   .programacion-grid__dia-num {
-    color: #be123c;
+    color: #2563eb;
   }
 
   .programacion-grid__dia-ini {
-    color: rgba(190, 18, 60, 0.65);
+    color: rgba(37, 99, 235, 0.65);
   }
+}
+
+// Sábado en header: mismo gris del header pero un punto más oscuro para resaltarlo.
+.programacion-grid__th--sabado {
+  background: #eceef1;
 }
 
 // Columnas resumen (HD · HN · C · A): banda sky tenue, como cierre de la tabla.

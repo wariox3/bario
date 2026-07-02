@@ -13,6 +13,9 @@
             [class.programacion-grid__th--festivo]="
               fecha.inicial === 'D' || festivoClaves().has(fecha.clave)
             "
+            [class.programacion-grid__th--sabado]="
+              fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
+            "
           >
             <span class="programacion-grid__dia-num">{{ fecha.etiqueta }}</span>
             <span class="programacion-grid__dia-ini">{{ fecha.inicial }}</span>
