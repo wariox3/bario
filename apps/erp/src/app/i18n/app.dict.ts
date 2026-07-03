@@ -225,6 +225,8 @@ export interface AppDict extends AuthTranslationsHost {
     inventario: { name: string };
     turno: { name: string };
     contabilidad: { name: string };
+    tesoreria: { name: string };
+    cartera: { name: string };
     humano: { name: string };
   };
   entities: {

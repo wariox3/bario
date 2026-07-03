@@ -294,6 +294,8 @@ export const es: AppDict = {
     inventario: { name: 'Inventario' },
     turno: { name: 'Turno' },
     contabilidad: { name: 'Contabilidad' },
+    tesoreria: { name: 'Tesorería' },
+    cartera: { name: 'Cartera' },
     humano: { name: 'Humano' },
   },
   entities: {

@@ -83,6 +83,16 @@ export const appRoutes: Route[] = [
           import('./features/contabilidad/contabilidad.routes').then((m) => m.CONTABILIDAD_ROUTES),
       },
       {
+        path: 'tesoreria',
+        loadChildren: () =>
+          import('./features/tesoreria/tesoreria.routes').then((m) => m.TESORERIA_ROUTES),
+      },
+      {
+        path: 'cartera',
+        loadChildren: () =>
+          import('./features/cartera/cartera.routes').then((m) => m.CARTERA_ROUTES),
+      },
+      {
         path: 'humano',
         loadChildren: () => import('./features/humano/humano.routes').then((m) => m.HUMANO_ROUTES),
       },
