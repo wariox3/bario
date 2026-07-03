@@ -1,13 +1,20 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { activeModuleResolver } from '@erp/core/module-config';
 import { COMPRA_MODULE } from './compra.module-descriptor';
 
 /**
  * Rutas del módulo Compra.
  *
- * `erpModuleResolver('compra')` en la raíz sincroniza topbar y sidebar. Expone
- * masters compartidos de general (item, contacto, resolución) reusados vía
- * `loadChildren`: son module-agnostic (derivan el módulo activo del
+ * Encadena dos resolvers ortogonales en la ruta raíz:
+ *  - `erpModuleResolver('compra')`: registra el módulo activo en
+ *    `ActiveModuleStore` para sincronizar topbar y sidebar.
+ *  - `activeModuleResolver('compra')`: carga `COMPRA_CONFIG` desde el registry
+ *    y lo deja en `ModuleNavigationStore`, para que `activeDocumentResolver(...)`
+ *    resuelva los documentos dentro de `documentos/<doc>/<doc>.routes.ts`.
+ *
+ * Expone masters compartidos de general (item, contacto, resolución) reusados
+ * vía `loadChildren`: son module-agnostic (derivan el módulo activo del
  * `ActiveModuleStore`), así que su navegación se queda en Compra. La resolución
  * además fija el flag con `data: { tipo: 'compra' }`. `formas-pago` también es
  * un master module-agnostic de general reusado aquí.
@@ -15,7 +22,10 @@ import { COMPRA_MODULE } from './compra.module-descriptor';
 export const COMPRA_ROUTES: Route[] = [
   {
     path: '',
-    resolve: { _module: erpModuleResolver('compra') },
+    resolve: {
+      _navModule: erpModuleResolver('compra'),
+      _docModule: activeModuleResolver('compra'),
+    },
     children: [
       moduleIndexRoute(COMPRA_MODULE),
       {
@@ -24,6 +34,13 @@ export const COMPRA_ROUTES: Route[] = [
         loadComponent: () =>
           import('@erp/layouts/module-placeholder/module-placeholder.component').then(
             (m) => m.ModulePlaceholderComponent,
+          ),
+      },
+      {
+        path: 'factura-compra',
+        loadChildren: () =>
+          import('./documentos/factura-compra/factura-compra.routes').then(
+            (m) => m.FACTURA_COMPRA_ROUTES,
           ),
       },
       {

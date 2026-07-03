@@ -1983,6 +1983,86 @@ export const en: AppDict = {
         },
       },
     },
+    facturaCompra: {
+      name: 'Purchase invoice',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New purchase invoice',
+        editTitle: 'Edit purchase invoice',
+        sectionHint: 'Main document details',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          plazoPagoPlaceholder: 'Select…',
+          sede: 'Branch',
+          sedePlaceholder: 'Select…',
+          metodoPago: 'Payment method',
+          metodoPagoPlaceholder: 'Select…',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Invoice created',
+            desc: 'The purchase invoice was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The purchase invoice could not be created',
+          },
+          editSuccess: {
+            title: 'Invoice updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The purchase invoice could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          sede: 'Branch',
+          metodoPago: 'Payment method',
+        },
+        notFound: {
+          title: 'Invoice not found',
+          desc: 'The invoice you are looking for does not exist or was deleted.',
+        },
+      },
+    },
     comercialDetalle: {
       title: 'Lines',
       hint: 'Products and services of the document',

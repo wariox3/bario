@@ -87,11 +87,24 @@ export function tasaFromImpuestoOption(opt: ImpuestoSeleccionarOption): TasaImpu
   };
 }
 
-/** Tasas de **venta** del ítem (opcionalmente acotadas a `ids`) como `TasaImpuesto[]`. */
-export function tasasDeVentaDelItem(item: Item, ids?: readonly number[]): TasaImpuesto[] {
+/**
+ * Tasas de **venta o compra** del ítem (opcionalmente acotadas a `ids`) como
+ * `TasaImpuesto[]`. El `modo` selecciona el flag del ítem a filtrar
+ * (`impuesto_venta` vs `impuesto_compra`): un documento comercial de venta usa
+ * los de venta; uno de compra, los de compra.
+ */
+export function tasasDelItem(
+  item: Item,
+  modo: 'venta' | 'compra',
+  ids?: readonly number[],
+): TasaImpuesto[] {
   const idSet = ids ? new Set(ids) : null;
   return (item.impuestos ?? [])
-    .filter((imp) => imp.impuesto_venta && (!idSet || idSet.has(imp.impuesto)))
+    .filter(
+      (imp) =>
+        (modo === 'venta' ? imp.impuesto_venta : imp.impuesto_compra) &&
+        (!idSet || idSet.has(imp.impuesto)),
+    )
     .map((imp) => ({
       id: imp.impuesto,
       nombre: imp.impuesto_nombre ?? '',

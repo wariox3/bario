@@ -2033,6 +2033,86 @@ export const es: AppDict = {
         },
       },
     },
+    facturaCompra: {
+      name: 'Factura de compra',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva factura de compra',
+        editTitle: 'Editar factura de compra',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          plazoPagoPlaceholder: 'Selecciona…',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
+          metodoPago: 'Método de pago',
+          metodoPagoPlaceholder: 'Selecciona…',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Factura creada',
+            desc: 'La factura de compra se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la factura de compra',
+          },
+          editSuccess: {
+            title: 'Factura actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la factura de compra',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          sede: 'Sede',
+          metodoPago: 'Método de pago',
+        },
+        notFound: {
+          title: 'Factura no encontrada',
+          desc: 'La factura que buscas no existe o fue eliminada.',
+        },
+      },
+    },
     comercialDetalle: {
       title: 'Detalles',
       hint: 'Productos y servicios del documento',
