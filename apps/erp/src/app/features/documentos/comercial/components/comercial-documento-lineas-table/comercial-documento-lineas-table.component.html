@@ -5,6 +5,7 @@
     <thead>
       <tr>
         <th class="comercial-detalle-table__th w-10 text-center">{{ c.columns.linea }}</th>
+        <th class="comercial-detalle-table__th w-12 text-center">{{ c.columns.ref }}</th>
         <th class="comercial-detalle-table__th min-w-[16rem] text-left">{{ c.columns.item }}</th>
         <th class="comercial-detalle-table__th w-24 text-right">{{ c.columns.cantidad }}</th>
         <th class="comercial-detalle-table__th w-32 text-right">{{ c.columns.precio }}</th>
@@ -23,12 +24,25 @@
               <button
                 type="button"
                 class="cursor-pointer border-0 bg-transparent p-0 font-medium text-sky-700 underline-offset-2 hover:underline tabular-nums"
-                (click)="verAfectacion.emit(line)"
+                (click)="verAfectacion.emit(afectacionDe(line, 'quien-lo-afecta'))"
               >
                 {{ line.id }}
               </button>
             } @else {
               {{ line.id ?? '—' }}
+            }
+          </td>
+          <td class="comercial-detalle-table__td text-center text-brand-muted tabular-nums">
+            @if (linkable() && line.documento_detalle_afectado !== null) {
+              <button
+                type="button"
+                class="cursor-pointer border-0 bg-transparent p-0 font-medium text-sky-700 underline-offset-2 hover:underline tabular-nums"
+                (click)="verAfectacion.emit(afectacionDe(line, 'a-quien-afecta'))"
+              >
+                {{ line.documento_detalle_afectado }}
+              </button>
+            } @else {
+              {{ line.documento_detalle_afectado ?? '—' }}
             }
           </td>
           <td class="comercial-detalle-table__td font-medium text-brand-text">
@@ -68,7 +82,7 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="9" class="px-5 py-8 text-center text-sm text-brand-muted">
+          <td colspan="10" class="px-5 py-8 text-center text-sm text-brand-muted">
             <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
           </td>
         </tr>

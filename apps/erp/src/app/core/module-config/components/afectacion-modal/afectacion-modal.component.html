@@ -20,9 +20,9 @@
       </span>
       <div class="flex flex-col gap-[0.1rem]">
         <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
-          {{ a.title }}
+          {{ modoLabels().title }}
         </h2>
-        <p class="m-0 text-[0.75rem] text-brand-muted">{{ a.subtitle }}</p>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ modoLabels().subtitle }}</p>
       </div>
     </div>
   </ng-template>
@@ -179,7 +179,7 @@
             } @empty {
               <tr>
                 <td colspan="5" class="px-5 py-10 text-center text-sm text-brand-muted">
-                  <i class="pi pi-inbox mr-2"></i>{{ a.empty }}
+                  <i class="pi pi-inbox mr-2"></i>{{ modoLabels().empty }}
                 </td>
               </tr>
             }

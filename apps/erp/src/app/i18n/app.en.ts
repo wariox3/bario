@@ -230,8 +230,18 @@ export const en: AppDict = {
       },
     },
     afectacion: {
-      title: 'Line traceability',
-      subtitle: 'Lines from other documents that affect this one',
+      modo: {
+        quienLoAfecta: {
+          title: 'What affects this line',
+          subtitle: 'Lines from other documents that affect this one',
+          empty: 'No lines affect this one.',
+        },
+        aQuienAfecta: {
+          title: 'What this line affects',
+          subtitle: 'Origin line this one affects',
+          empty: 'This line affects none.',
+        },
+      },
       cols: {
         id: '#',
         documento: 'Document',
@@ -247,7 +257,6 @@ export const en: AppDict = {
         total: 'Total',
       },
       identidad: { detalleId: 'Detail ID', documentoId: 'Document ID' },
-      empty: 'No lines affect this one.',
       close: 'Close',
       loadError: {
         title: 'Could not load',
@@ -2276,6 +2285,7 @@ export const en: AppDict = {
       confirmDeleteLine: 'Remove this line from the document?',
       columns: {
         linea: '#',
+        ref: 'Ref',
         item: 'Item',
         cantidad: 'Qty.',
         precio: 'Price',

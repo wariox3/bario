@@ -1,6 +1,7 @@
 import { Component, inject, input, output } from '@angular/core';
 import { I18nService, formatCop, type ImpuestoLinea } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
+import type { AfectacionRequest } from '@erp/core/module-config/components/afectacion-modal/afectacion.types';
 import { lineBruto, lineNeto } from '../../comercial-documento-detalle.mapper';
 import type { ComercialDetalleFormRawValue } from '../../comercial-documento-detalle.types';
 
@@ -26,15 +27,27 @@ export class ComercialDocumentoLineasTableComponent {
   readonly lines = input.required<readonly ComercialDetalleFormRawValue[]>();
 
   /**
-   * Hace clickeable la columna # para consultar la afectación de la línea. Solo
-   * el detail lo activa; en el form queda como texto plano.
+   * Hace clickeables las columnas # y REF para consultar la afectación de la línea.
+   * Solo el detail lo activa; en el form quedan como texto plano.
    */
   readonly linkable = input<boolean>(false);
 
-  /** Línea cuya afectación se quiere consultar (clic en #). */
-  readonly verAfectacion = output<ComercialDetalleFormRawValue>();
+  /** Petición de afectación (dirección + ids) al clickear el # o el REF de una línea. */
+  readonly verAfectacion = output<AfectacionRequest>();
 
   protected readonly formatMoney = formatCop;
+
+  /** Arma la petición de afectación de una línea en la dirección dada. */
+  protected afectacionDe(
+    line: ComercialDetalleFormRawValue,
+    direction: AfectacionRequest['direction'],
+  ): AfectacionRequest {
+    return {
+      lineId: line.id as number,
+      afectadoId: line.documento_detalle_afectado,
+      direction,
+    };
+  }
 
   /** Subtotal bruto de una línea por índice. */
   protected subtotalOf(index: number): number {

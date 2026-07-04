@@ -1,6 +1,7 @@
 import {
   Component,
   DestroyRef,
+  computed,
   effect,
   inject,
   input,
@@ -17,6 +18,7 @@ import type { DocumentoDetalleReadBase } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { DocumentoDetalleService } from '../../data/documento-detalle.service';
 import { DocumentoService } from '../../data/documento.service';
+import type { AfectacionDireccion } from './afectacion.types';
 
 /** Cabecera de documento, recortada a lo que el modal lee (`documento_tipo_nombre`). */
 interface AfectacionDocumentoRead {
@@ -79,10 +81,17 @@ export class AfectacionModalComponent {
   /** Id de la línea clickeada; arma la cabecera (`obtenerPorId`). */
   readonly lineId = input<number | null>(null);
   /**
-   * `documento_detalle_afectado` (REF) de la línea clickeada; con él se consulta
-   * "quién la afecta". Si es `null` (línea sin REF) la tabla queda vacía.
+   * `documento_detalle_afectado` (REF) de la línea clickeada. Alimenta la dirección
+   * "a quién afecta" (la línea origen). Si es `null` (línea sin REF) la tabla queda vacía.
    */
   readonly afectadoId = input<number | null>(null);
+
+  /**
+   * Dirección de trazabilidad a mostrar:
+   * - `quien-lo-afecta`: líneas que afectan a la clickeada (`listarPorAfectado(lineId)`).
+   * - `a-quien-afecta`: la línea origen que la clickeada consume (`obtenerPorId(afectadoId)`).
+   */
+  readonly direction = input<AfectacionDireccion>('quien-lo-afecta');
 
   protected readonly loading = signal(false);
   protected readonly error = signal(false);
@@ -93,6 +102,12 @@ export class AfectacionModalComponent {
 
   protected readonly formatMoney = formatCop;
 
+  /** Textos (título/subtítulo/empty) del modal según la dirección activa. */
+  protected readonly modoLabels = computed(() => {
+    const modo = this.t().documentActions.afectacion.modo;
+    return this.direction() === 'quien-lo-afecta' ? modo.quienLoAfecta : modo.aQuienAfecta;
+  });
+
   constructor() {
     // Al abrir, carga la afectación de la línea activa. Los ids se leen con
     // `untracked` (la ficha los setea junto con `visible`); solo `visible` dispara.
@@ -100,7 +115,7 @@ export class AfectacionModalComponent {
       if (!this.visible()) return;
       const lineId = untracked(this.lineId);
       if (lineId == null) return;
-      this.load(lineId, untracked(this.afectadoId));
+      this.load(lineId, untracked(this.afectadoId), untracked(this.direction));
     });
   }
 
@@ -122,7 +137,7 @@ export class AfectacionModalComponent {
     });
   }
 
-  private load(lineId: number, afectadoId: number | null): void {
+  private load(lineId: number, afectadoId: number | null, direction: AfectacionDireccion): void {
     this.loading.set(true);
     this.error.set(false);
     this.cabecera.set(null);
@@ -130,13 +145,20 @@ export class AfectacionModalComponent {
     this.documentoTipoNombre.set(null);
 
     forkJoin({
-      // Cabecera: la línea clickeada. Tabla: quién afecta a su origen (REF). Sin
-      // REF no hay a quién consultar → lista vacía sin pegarle al backend.
+      // Cabecera: siempre la línea clickeada (contexto). La tabla depende de la
+      // dirección:
+      //  - quien-lo-afecta: líneas cuyo REF apunta a esta (`listarPorAfectado(lineId)`).
+      //  - a-quien-afecta: la línea origen que esta consume (`obtenerPorId(afectadoId)`);
+      //    sin REF no hay origen → lista vacía sin pegarle al backend.
       cabecera: this.detalleService.obtenerPorId<AfectacionDetalleRead>(lineId),
       filas:
-        afectadoId == null
-          ? of<AfectacionDetalleRead[]>([])
-          : this.detalleService.listarPorAfectado<AfectacionDetalleRead>(afectadoId),
+        direction === 'quien-lo-afecta'
+          ? this.detalleService.listarPorAfectado<AfectacionDetalleRead>(lineId)
+          : afectadoId == null
+            ? of<AfectacionDetalleRead[]>([])
+            : this.detalleService
+                .obtenerPorId<AfectacionDetalleRead>(afectadoId)
+                .pipe(map((origen) => [origen])),
     })
       .pipe(
         // El nombre del tipo de documento vive en la cabecera del documento

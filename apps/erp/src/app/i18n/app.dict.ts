@@ -173,8 +173,10 @@ export interface AppDict extends AuthTranslationsHost {
       };
     };
     afectacion: {
-      title: string;
-      subtitle: string;
+      modo: {
+        quienLoAfecta: { title: string; subtitle: string; empty: string };
+        aQuienAfecta: { title: string; subtitle: string; empty: string };
+      };
       cols: {
         id: string;
         documento: string;
@@ -190,7 +192,6 @@ export interface AppDict extends AuthTranslationsHost {
         total: string;
       };
       identidad: { detalleId: string; documentoId: string };
-      empty: string;
       close: string;
       loadError: { title: string; desc: string };
     };
@@ -1711,6 +1712,7 @@ export interface AppDict extends AuthTranslationsHost {
       confirmDeleteLine: string;
       columns: {
         linea: string;
+        ref: string;
         item: string;
         cantidad: string;
         precio: string;

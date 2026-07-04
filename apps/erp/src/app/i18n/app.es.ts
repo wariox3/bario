@@ -230,8 +230,18 @@ export const es: AppDict = {
       },
     },
     afectacion: {
-      title: 'Afectación de la línea',
-      subtitle: 'Líneas de otros documentos que afectan a esta',
+      modo: {
+        quienLoAfecta: {
+          title: 'Quién afecta esta línea',
+          subtitle: 'Líneas de otros documentos que afectan a esta',
+          empty: 'Ninguna línea afecta a esta.',
+        },
+        aQuienAfecta: {
+          title: 'A qué línea afecta',
+          subtitle: 'Línea origen que esta afecta',
+          empty: 'Esta línea no afecta a ninguna.',
+        },
+      },
       cols: {
         id: '#',
         documento: 'Documento',
@@ -247,7 +257,6 @@ export const es: AppDict = {
         total: 'Total',
       },
       identidad: { detalleId: 'Detalle ID', documentoId: 'Documento ID' },
-      empty: 'Ninguna línea afecta a esta.',
       close: 'Cerrar',
       loadError: {
         title: 'No se pudo cargar',
@@ -2326,6 +2335,7 @@ export const es: AppDict = {
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
       columns: {
         linea: '#',
+        ref: 'Ref',
         item: 'Ítem',
         cantidad: 'Cant.',
         precio: 'Precio',

@@ -2,6 +2,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { I18nService, formatCop, toHora } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { AfectacionRequest } from '@erp/core/module-config/components/afectacion-modal/afectacion.types';
 import type { DetalleFormRawValue } from '../../servicio-documento-detalle.types';
 import { lineAmount } from '../../servicio-documento-detalle.utils';
 
@@ -41,11 +42,23 @@ export class ServicioDocumentoLineasTableComponent {
   readonly edit = output<number>();
   /** Índice absoluto de la línea a eliminar. */
   readonly remove = output<number>();
-  /** Línea cuya afectación se quiere consultar (clic en # o REF). */
-  readonly verAfectacion = output<DetalleFormRawValue>();
+  /** Petición de afectación (dirección + ids) al clickear el # o el REF de una línea. */
+  readonly verAfectacion = output<AfectacionRequest>();
 
   /** Columnas totales para el `colspan` de la fila de grupo y el empty state. */
   protected readonly colspan = computed(() => (this.showActions() ? 16 : 15));
+
+  /** Arma la petición de afectación de una línea en la dirección dada. */
+  protected afectacionDe(
+    line: DetalleFormRawValue,
+    direction: AfectacionRequest['direction'],
+  ): AfectacionRequest {
+    return {
+      lineId: line.id as number,
+      afectadoId: line.documento_detalle_afectado,
+      direction,
+    };
+  }
 
   /** Líneas agrupadas por puesto para renderizar separadores en la tabla. */
   protected readonly groupedLines = computed(() => {

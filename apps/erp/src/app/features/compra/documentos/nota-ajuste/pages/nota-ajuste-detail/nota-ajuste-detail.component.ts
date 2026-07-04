@@ -21,6 +21,10 @@ import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
+import type {
+  AfectacionDireccion,
+  AfectacionRequest,
+} from '@erp/core/module-config/components/afectacion-modal/afectacion.types';
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
@@ -96,6 +100,7 @@ export class NotaAjusteDetailComponent implements OnInit {
   protected readonly afectacionVisible = signal(false);
   protected readonly afectacionLineId = signal<number | null>(null);
   protected readonly afectacionAfectadoId = signal<number | null>(null);
+  protected readonly afectacionDireccion = signal<AfectacionDireccion>('quien-lo-afecta');
 
   /**
    * ¿Es editable el documento según su política declarativa (`canEditRow`)?
@@ -141,10 +146,10 @@ export class NotaAjusteDetailComponent implements OnInit {
   }
 
   /** Clic en # de una línea: abre el modal de afectación (trazabilidad) de esa línea. */
-  protected onVerAfectacion(line: ComercialDetalleFormRawValue): void {
-    if (line.id == null) return;
-    this.afectacionLineId.set(line.id);
-    this.afectacionAfectadoId.set(line.documento_detalle_afectado);
+  protected onVerAfectacion(req: AfectacionRequest): void {
+    this.afectacionLineId.set(req.lineId);
+    this.afectacionAfectadoId.set(req.afectadoId);
+    this.afectacionDireccion.set(req.direction);
     this.afectacionVisible.set(true);
   }
 
