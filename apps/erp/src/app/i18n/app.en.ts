@@ -230,18 +230,9 @@ export const en: AppDict = {
       },
     },
     afectacion: {
-      modo: {
-        quienLoAfecta: {
-          title: 'What affects this line',
-          subtitle: 'Lines from other documents that affect this one',
-          empty: 'No lines affect this one.',
-        },
-        aQuienAfecta: {
-          title: 'What this line affects',
-          subtitle: 'Origin line this one affects',
-          empty: 'This line affects none.',
-        },
-      },
+      title: 'Document traceability',
+      subtitle: 'The document, its affected document and the details that affect it',
+      empty: 'No details affect this one.',
       cols: {
         id: '#',
         documento: 'Document',
@@ -256,7 +247,13 @@ export const en: AppDict = {
         impuesto: 'Tax',
         total: 'Total',
       },
-      identidad: { detalleId: 'Detail ID', documentoId: 'Document ID' },
+      cards: { documento: 'Document', documentoAfectado: 'Affected document' },
+      campos: {
+        detalleId: 'Detail ID',
+        documentoId: 'Document ID',
+        fecha: 'Date',
+        contacto: 'Contact',
+      },
       close: 'Close',
       loadError: {
         title: 'Could not load',

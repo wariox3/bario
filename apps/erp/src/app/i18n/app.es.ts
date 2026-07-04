@@ -230,18 +230,9 @@ export const es: AppDict = {
       },
     },
     afectacion: {
-      modo: {
-        quienLoAfecta: {
-          title: 'Quién afecta esta línea',
-          subtitle: 'Líneas de otros documentos que afectan a esta',
-          empty: 'Ninguna línea afecta a esta.',
-        },
-        aQuienAfecta: {
-          title: 'A qué línea afecta',
-          subtitle: 'Línea origen que esta afecta',
-          empty: 'Esta línea no afecta a ninguna.',
-        },
-      },
+      title: 'Afectación del documento',
+      subtitle: 'El documento, su documento afectado y los detalles que lo afectan',
+      empty: 'Ningún detalle afecta a este.',
       cols: {
         id: '#',
         documento: 'Documento',
@@ -256,7 +247,13 @@ export const es: AppDict = {
         impuesto: 'Impuesto',
         total: 'Total',
       },
-      identidad: { detalleId: 'Detalle ID', documentoId: 'Documento ID' },
+      cards: { documento: 'Documento', documentoAfectado: 'Documento afectado' },
+      campos: {
+        detalleId: 'Detalle ID',
+        documentoId: 'Documento ID',
+        fecha: 'Fecha',
+        contacto: 'Contacto',
+      },
       close: 'Cerrar',
       loadError: {
         title: 'No se pudo cargar',

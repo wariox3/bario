@@ -20,9 +20,9 @@
       </span>
       <div class="flex flex-col gap-[0.1rem]">
         <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
-          {{ modoLabels().title }}
+          {{ a.title }}
         </h2>
-        <p class="m-0 text-[0.75rem] text-brand-muted">{{ modoLabels().subtitle }}</p>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ a.subtitle }}</p>
       </div>
     </div>
   </ng-template>
@@ -45,70 +45,51 @@
     </div>
   } @else {
     <div class="flex flex-col gap-4 pt-1">
-      <!-- ── Ficha-resumen de la línea origen ────────────────────────────────────── -->
-      @if (cabecera(); as c) {
+      <!-- ── Card 1: documento del detalle base ──────────────────────────────────── -->
+      @if (documento(); as doc) {
         <div class="overflow-hidden rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+          <!-- Título -->
+          <div class="border-b border-[rgba(20,48,73,0.06)] px-4 pt-2.5 pb-1.5">
+            <span class="afectacion__micro-label">{{ a.cards.documento }}</span>
+          </div>
+
           <!-- Identidad: tipo de documento + ids -->
-          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-3 pb-2.5">
+          <div
+            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-2.5 pb-2.5"
+          >
             <span class="text-[0.95rem] font-semibold text-brand-text">
-              {{ documentoTipoNombre() || '—' }}
+              {{ doc.documento_tipo_nombre || '—' }}
             </span>
             <div class="flex items-center gap-4">
               <span class="inline-flex items-center gap-1.5">
-                <span class="afectacion__micro-label">{{ a.identidad.detalleId }}</span>
+                <span class="afectacion__micro-label">{{ a.campos.detalleId }}</span>
                 <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
-                  {{ c.id ?? '—' }}
+                  {{ detalleId() ?? '—' }}
                 </span>
               </span>
               <span class="inline-flex items-center gap-1.5">
-                <span class="afectacion__micro-label">{{ a.identidad.documentoId }}</span>
+                <span class="afectacion__micro-label">{{ a.campos.documentoId }}</span>
                 <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
-                  {{ c.documento ?? '—' }}
+                  {{ doc.id ?? '—' }}
                 </span>
               </span>
             </div>
           </div>
 
-          <!-- Atributos: ítem · cantidad · precio · (período · puesto · modalidad de servicio) -->
+          <!-- Atributos: fecha · contacto -->
           <div
             class="flex flex-wrap gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.06)] px-4 py-2.5"
           >
             <div class="flex flex-col gap-0.5">
-              <span class="afectacion__micro-label">{{ a.cols.item }}</span>
-              <span class="text-[0.85rem] text-brand-text">{{ c.item_nombre || '—' }}</span>
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <span class="afectacion__micro-label">{{ a.cols.cantidad }}</span>
-              <span class="text-[0.85rem] tabular-nums text-brand-text">
-                {{ formatCantidad(c.cantidad) }}
+              <span class="afectacion__micro-label">{{ a.campos.fecha }}</span>
+              <span class="whitespace-nowrap text-[0.85rem] text-brand-text">
+                {{ formatFecha(doc.fecha) }}
               </span>
             </div>
-            <div class="flex flex-col gap-0.5">
-              <span class="afectacion__micro-label">{{ a.cols.precio }}</span>
-              <span class="text-[0.85rem] tabular-nums text-brand-text">
-                {{ formatMoney(c.precio ?? 0) }}
-              </span>
-            </div>
-            @if (c.fecha_desde || c.fecha_hasta) {
+            @if (doc.contacto_nombre) {
               <div class="flex flex-col gap-0.5">
-                <span class="afectacion__micro-label">{{ a.cols.periodo }}</span>
-                <span class="whitespace-nowrap text-[0.85rem] text-brand-text">
-                  {{ formatFecha(c.fecha_desde) }}
-                  <i class="pi pi-arrow-right mx-0.5 text-[0.6rem] text-brand-muted"></i>
-                  {{ formatFecha(c.fecha_hasta) }}
-                </span>
-              </div>
-            }
-            @if (c.puesto_nombre) {
-              <div class="flex flex-col gap-0.5">
-                <span class="afectacion__micro-label">{{ a.cols.puesto }}</span>
-                <span class="text-[0.85rem] text-brand-text">{{ c.puesto_nombre }}</span>
-              </div>
-            }
-            @if (c.modalidad_nombre) {
-              <div class="flex flex-col gap-0.5">
-                <span class="afectacion__micro-label">{{ a.cols.modalidad }}</span>
-                <span class="text-[0.85rem] text-brand-text">{{ c.modalidad_nombre }}</span>
+                <span class="afectacion__micro-label">{{ a.campos.contacto }}</span>
+                <span class="text-[0.85rem] text-brand-text">{{ doc.contacto_nombre }}</span>
               </div>
             }
           </div>
@@ -120,32 +101,113 @@
             <div class="flex flex-col gap-0.5">
               <span class="afectacion__micro-label">{{ a.cols.subtotal }}</span>
               <span class="text-[0.85rem] tabular-nums text-brand-text">
-                {{ formatMoney(c.subtotal ?? 0) }}
+                {{ formatMoney(doc.subtotal ?? 0) }}
               </span>
             </div>
             <div class="flex flex-col gap-0.5">
               <span class="afectacion__micro-label">{{ a.cols.baseImpuesto }}</span>
               <span class="text-[0.85rem] tabular-nums text-brand-text">
-                {{ formatMoney(c.base_impuesto ?? 0) }}
+                {{ formatMoney(doc.base_impuesto ?? 0) }}
               </span>
             </div>
             <div class="flex flex-col gap-0.5">
               <span class="afectacion__micro-label">{{ a.cols.impuesto }}</span>
               <span class="text-[0.85rem] tabular-nums text-brand-text">
-                {{ formatMoney(c.impuesto ?? 0) }}
+                {{ formatMoney(doc.impuesto ?? 0) }}
               </span>
             </div>
             <div class="flex flex-col gap-0.5">
               <span class="afectacion__micro-label">{{ a.cols.total }}</span>
               <span class="text-[0.9rem] font-bold tabular-nums text-brand-text">
-                {{ formatMoney(c.total ?? 0) }}
+                {{ formatMoney(doc.total ?? 0) }}
               </span>
             </div>
           </div>
         </div>
       }
 
-      <!-- ── Tabla "quién la afecta" ──────────────────────────────────────────────── -->
+      <!-- ── Card 2: documento afectado (referencia), si existe ──────────────────── -->
+      @if (documentoReferencia(); as ref) {
+        <div class="overflow-hidden rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+          <!-- Título -->
+          <div class="border-b border-[rgba(20,48,73,0.06)] px-4 pt-2.5 pb-1.5">
+            <span class="afectacion__micro-label">{{ a.cards.documentoAfectado }}</span>
+          </div>
+
+          <!-- Identidad: tipo de documento + ids -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-2.5 pb-2.5"
+          >
+            <span class="text-[0.95rem] font-semibold text-brand-text">
+              {{ ref.documento_tipo_nombre || '—' }}
+            </span>
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="afectacion__micro-label">{{ a.campos.detalleId }}</span>
+                <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+                  {{ detalleAfectadoId() ?? '—' }}
+                </span>
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="afectacion__micro-label">{{ a.campos.documentoId }}</span>
+                <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+                  {{ ref.id ?? '—' }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Atributos: fecha · contacto -->
+          <div
+            class="flex flex-wrap gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.06)] px-4 py-2.5"
+          >
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.campos.fecha }}</span>
+              <span class="whitespace-nowrap text-[0.85rem] text-brand-text">
+                {{ formatFecha(ref.fecha) }}
+              </span>
+            </div>
+            @if (ref.contacto_nombre) {
+              <div class="flex flex-col gap-0.5">
+                <span class="afectacion__micro-label">{{ a.campos.contacto }}</span>
+                <span class="text-[0.85rem] text-brand-text">{{ ref.contacto_nombre }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Resumen financiero: banda con tinte sky; total destacado -->
+          <div
+            class="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.08)] bg-[rgba(119,170,215,0.06)] px-4 py-2.5 sm:grid-cols-4"
+          >
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.subtotal }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(ref.subtotal ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.baseImpuesto }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(ref.base_impuesto ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.impuesto }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(ref.impuesto ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.total }}</span>
+              <span class="text-[0.9rem] font-bold tabular-nums text-brand-text">
+                {{ formatMoney(ref.total ?? 0) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ── Lista: detalles que afectan al detalle base ─────────────────────────── -->
       <div class="max-h-96 overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
         <table class="detalle-table">
           <thead>
@@ -179,7 +241,7 @@
             } @empty {
               <tr>
                 <td colspan="5" class="px-5 py-10 text-center text-sm text-brand-muted">
-                  <i class="pi pi-inbox mr-2"></i>{{ modoLabels().empty }}
+                  <i class="pi pi-inbox mr-2"></i>{{ a.empty }}
                 </td>
               </tr>
             }

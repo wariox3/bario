@@ -131,9 +131,4 @@
 
 <p-confirmDialog />
 
-<app-afectacion-modal
-  [(visible)]="afectacionVisible"
-  [lineId]="afectacionLineId()"
-  [afectadoId]="afectacionAfectadoId()"
-  [direction]="afectacionDireccion()"
-/>
+<app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />

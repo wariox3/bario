@@ -30,10 +30,6 @@ import { ServicioDocumentoResumenComponent } from '../../components/servicio-doc
 import { ServicioDocumentoLineasTableComponent } from '../../components/servicio-documento-lineas-table/servicio-documento-lineas-table.component';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
-import type {
-  AfectacionDireccion,
-  AfectacionRequest,
-} from '@erp/core/module-config/components/afectacion-modal/afectacion.types';
 
 /** Cabecera legible del documento para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -100,9 +96,8 @@ export class ServicioDocumentoDetailComponent implements OnInit {
 
   /** Control del modal de afectación (trazabilidad de una línea). */
   protected readonly afectacionVisible = signal(false);
-  protected readonly afectacionLineId = signal<number | null>(null);
-  protected readonly afectacionAfectadoId = signal<number | null>(null);
-  protected readonly afectacionDireccion = signal<AfectacionDireccion>('quien-lo-afecta');
+  /** Id del detalle base que consulta el modal de afectación (línea o su REF). */
+  protected readonly afectacionDetalleId = signal<number | null>(null);
 
   /**
    * ¿Es editable el documento según su política declarativa (`canEditRow`)?
@@ -149,10 +144,8 @@ export class ServicioDocumentoDetailComponent implements OnInit {
   }
 
   /** Clic en # / REF de una línea: abre el modal de afectación (trazabilidad) de esa línea. */
-  protected onVerAfectacion(req: AfectacionRequest): void {
-    this.afectacionLineId.set(req.lineId);
-    this.afectacionAfectadoId.set(req.afectadoId);
-    this.afectacionDireccion.set(req.direction);
+  protected onVerAfectacion(detalleId: number): void {
+    this.afectacionDetalleId.set(detalleId);
     this.afectacionVisible.set(true);
   }
 

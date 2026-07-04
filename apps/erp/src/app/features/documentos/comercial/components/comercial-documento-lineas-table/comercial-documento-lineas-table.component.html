@@ -24,7 +24,7 @@
               <button
                 type="button"
                 class="cursor-pointer border-0 bg-transparent p-0 font-medium text-sky-700 underline-offset-2 hover:underline tabular-nums"
-                (click)="verAfectacion.emit(afectacionDe(line, 'quien-lo-afecta'))"
+                (click)="verAfectacion.emit(line.id)"
               >
                 {{ line.id }}
               </button>
@@ -37,7 +37,7 @@
               <button
                 type="button"
                 class="cursor-pointer border-0 bg-transparent p-0 font-medium text-sky-700 underline-offset-2 hover:underline tabular-nums"
-                (click)="verAfectacion.emit(afectacionDe(line, 'a-quien-afecta'))"
+                (click)="verAfectacion.emit(line.documento_detalle_afectado)"
               >
                 {{ line.documento_detalle_afectado }}
               </button>

@@ -1,7 +1,6 @@
 import {
   Component,
   DestroyRef,
-  computed,
   effect,
   inject,
   input,
@@ -18,48 +17,54 @@ import type { DocumentoDetalleReadBase } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { DocumentoDetalleService } from '../../data/documento-detalle.service';
 import { DocumentoService } from '../../data/documento.service';
-import type { AfectacionDireccion } from './afectacion.types';
-
-/** Cabecera de documento, recortada a lo que el modal lee (`documento_tipo_nombre`). */
-interface AfectacionDocumentoRead {
-  readonly documento_tipo_nombre?: string | null;
-}
 
 /**
- * Línea de documento-detalle, recortada a lo que el modal de afectación pinta.
+ * Cabecera de documento (`documento/<id>/`), recortada a lo que el modal pinta.
  *
- * Extiende `DocumentoDetalleReadBase` (de `@reddoc/core`) para reutilizar los campos
- * comunes de línea (`id`, `item`, `item_nombre`, `cantidad`, `precio`, `impuestos`) y
- * solo agrega lo que el backend devuelve por línea pero el base aún no tipa: el FK
- * `documento`, las fechas/atributos de servicio y los **totales calculados** (que hoy
- * solo viven tipados a nivel documento en `DocumentoListRowBase`). Los montos y horas
- * llegan como string con decimales, de ahí `string | number | null`.
+ * Alimenta las dos cards: la del documento del detalle base (card 1) y la del
+ * `documento_referencia` de ese documento (card 2, si existe). Los montos llegan
+ * como string con decimales, de ahí `string | number | null`.
  */
-interface AfectacionDetalleRead extends DocumentoDetalleReadBase {
-  /** Id del documento al que pertenece la línea (FK; sin número/tipo legible aún). */
-  readonly documento?: number | null;
-  /** Atributos de servicio (ausentes en líneas comerciales → se ocultan). */
-  readonly fecha_desde?: string | null;
-  readonly fecha_hasta?: string | null;
-  readonly puesto_nombre?: string | null;
-  readonly modalidad_nombre?: string | null;
-  /** Totales calculados por el backend para la línea. */
+interface AfectacionDocumentoRead {
+  readonly id?: number | null;
+  readonly numero?: string | null;
+  readonly fecha?: string | null;
+  readonly contacto_nombre?: string | null;
+  readonly documento_tipo_nombre?: string | null;
+  /** FK al documento de referencia (origen). Algunos serializadores lo exponen con `_id`. */
+  readonly documento_referencia?: number | null;
+  readonly documento_referencia_id?: number | null;
   readonly subtotal?: string | number | null;
   readonly base_impuesto?: string | number | null;
   readonly impuesto?: string | number | null;
-  readonly impuesto_retencion?: string | number | null;
   readonly total?: string | number | null;
 }
 
 /**
- * Modal de **trazabilidad** de una línea: al clickear su `#`/`REF` en la ficha de
- * detalle, muestra una franja-resumen de la línea origen y, debajo, la tabla de
- * "quién la afecta" (líneas de otros documentos que la referencian).
+ * Línea de documento-detalle, recortada a lo que el modal lee.
  *
- * Es **autocontenido y agnóstico** del tipo de documento: recibe `lineId` + `visible`
- * y dispara sus dos peticiones al `DocumentoDetalleService` al abrirse. Compartido por
- * todas las fichas de detalle (factura de venta, servicio y futuras), igual que
- * `DocumentDetailActionsComponent`.
+ * Del **detalle base** solo se usa su FK `documento` (para resolver la card 1). En
+ * la **lista** de detalles que afectan se muestran `id`, `documento`, `item_nombre`,
+ * `cantidad` y el `total` calculado por el backend (string con decimales).
+ */
+interface AfectacionDetalleRead extends DocumentoDetalleReadBase {
+  /** Id del documento al que pertenece la línea (FK). */
+  readonly documento?: number | null;
+  /** REF: id del detalle (afectado) que esta consume; es un detalle del documento referencia. */
+  readonly documento_detalle_afectado?: number | null;
+  /** Totales calculados por el backend para la línea. */
+  readonly total?: string | number | null;
+}
+
+/**
+ * Modal de **trazabilidad** a nivel documento. Al clickear el `#` o el `REF` de una
+ * línea, la ficha le pasa el **id del detalle base** (`line.id` o su
+ * `documento_detalle_afectado`). El modal resuelve, a partir de ese detalle, el
+ * documento al que pertenece (card 1) y el `documento_referencia` de ese documento
+ * (card 2), y lista los detalles que lo afectan (`documento_detalle_afectado_id`).
+ *
+ * Es **autocontenido y agnóstico** del tipo de documento. Compartido por todas las
+ * fichas de detalle (comerciales y de servicio), igual que `DocumentDetailActionsComponent`.
  */
 @Component({
   selector: 'app-afectacion-modal',
@@ -78,44 +83,33 @@ export class AfectacionModalComponent {
 
   /** Visibilidad two-way: la ficha la abre seteándola en `true`. */
   readonly visible = model<boolean>(false);
-  /** Id de la línea clickeada; arma la cabecera (`obtenerPorId`). */
-  readonly lineId = input<number | null>(null);
   /**
-   * `documento_detalle_afectado` (REF) de la línea clickeada. Alimenta la dirección
-   * "a quién afecta" (la línea origen). Si es `null` (línea sin REF) la tabla queda vacía.
+   * Id del **detalle base** a consultar: `line.id` (clic en #) o
+   * `line.documento_detalle_afectado` (clic en REF). De él se resuelve el documento.
    */
-  readonly afectadoId = input<number | null>(null);
-
-  /**
-   * Dirección de trazabilidad a mostrar:
-   * - `quien-lo-afecta`: líneas que afectan a la clickeada (`listarPorAfectado(lineId)`).
-   * - `a-quien-afecta`: la línea origen que la clickeada consume (`obtenerPorId(afectadoId)`).
-   */
-  readonly direction = input<AfectacionDireccion>('quien-lo-afecta');
+  readonly detalleId = input<number | null>(null);
 
   protected readonly loading = signal(false);
   protected readonly error = signal(false);
-  protected readonly cabecera = signal<AfectacionDetalleRead | null>(null);
+  /** Detalles que afectan al detalle base (`documento_detalle_afectado_id = detalleId`). */
   protected readonly filas = signal<readonly AfectacionDetalleRead[]>([]);
-  /** Nombre del tipo de documento de la línea (de `documento/<id>/`), para el header de la ficha. */
-  protected readonly documentoTipoNombre = signal<string | null>(null);
+  /** Card 1: el documento del detalle base. */
+  protected readonly documento = signal<AfectacionDocumentoRead | null>(null);
+  /** Card 2: el `documento_referencia` de ese documento, si tiene. */
+  protected readonly documentoReferencia = signal<AfectacionDocumentoRead | null>(null);
+  /** Id del detalle afectado (`base.documento_detalle_afectado`), para la card 2. */
+  protected readonly detalleAfectadoId = signal<number | null>(null);
 
   protected readonly formatMoney = formatCop;
 
-  /** Textos (título/subtítulo/empty) del modal según la dirección activa. */
-  protected readonly modoLabels = computed(() => {
-    const modo = this.t().documentActions.afectacion.modo;
-    return this.direction() === 'quien-lo-afecta' ? modo.quienLoAfecta : modo.aQuienAfecta;
-  });
-
   constructor() {
-    // Al abrir, carga la afectación de la línea activa. Los ids se leen con
-    // `untracked` (la ficha los setea junto con `visible`); solo `visible` dispara.
+    // Al abrir, carga la afectación del detalle base. El id se lee con `untracked`
+    // (la ficha lo setea junto con `visible`); solo `visible` dispara.
     effect(() => {
       if (!this.visible()) return;
-      const lineId = untracked(this.lineId);
-      if (lineId == null) return;
-      this.load(lineId, untracked(this.afectadoId), untracked(this.direction));
+      const detalleId = untracked(this.detalleId);
+      if (detalleId == null) return;
+      this.load(detalleId);
     });
   }
 
@@ -137,50 +131,60 @@ export class AfectacionModalComponent {
     });
   }
 
-  private load(lineId: number, afectadoId: number | null, direction: AfectacionDireccion): void {
+  private load(detalleId: number): void {
     this.loading.set(true);
     this.error.set(false);
-    this.cabecera.set(null);
     this.filas.set([]);
-    this.documentoTipoNombre.set(null);
+    this.documento.set(null);
+    this.documentoReferencia.set(null);
+    this.detalleAfectadoId.set(null);
 
     forkJoin({
-      // Cabecera: siempre la línea clickeada (contexto). La tabla depende de la
-      // dirección:
-      //  - quien-lo-afecta: líneas cuyo REF apunta a esta (`listarPorAfectado(lineId)`).
-      //  - a-quien-afecta: la línea origen que esta consume (`obtenerPorId(afectadoId)`);
-      //    sin REF no hay origen → lista vacía sin pegarle al backend.
-      cabecera: this.detalleService.obtenerPorId<AfectacionDetalleRead>(lineId),
-      filas:
-        direction === 'quien-lo-afecta'
-          ? this.detalleService.listarPorAfectado<AfectacionDetalleRead>(lineId)
-          : afectadoId == null
-            ? of<AfectacionDetalleRead[]>([])
-            : this.detalleService
-                .obtenerPorId<AfectacionDetalleRead>(afectadoId)
-                .pipe(map((origen) => [origen])),
+      // Base: el detalle a consultar (solo se usa su FK `documento`).
+      // Filas: los detalles que lo afectan (`documento_detalle_afectado_id = detalleId`).
+      base: this.detalleService.obtenerPorId<AfectacionDetalleRead>(detalleId),
+      filas: this.detalleService.listarPorAfectado<AfectacionDetalleRead>(detalleId),
     })
       .pipe(
-        // El nombre del tipo de documento vive en la cabecera del documento
-        // (`documento/<id>/`), no en la línea: con el FK `documento` de la línea se
-        // trae aparte. Si falla o no hay documento, la ficha sigue mostrándose.
-        switchMap(({ cabecera, filas }) => {
-          const docId = cabecera.documento;
+        // Del documento del detalle base (card 1) y, si este tiene `documento_referencia`,
+        // del documento origen (card 2). Cada fetch de documento cae a `null` si falla,
+        // así el modal sigue mostrándose (la lista es independiente).
+        switchMap(({ base, filas }) => {
+          const docId = base.documento;
           const documento =
             docId != null
               ? this.documentoService
                   .obtenerPorId<AfectacionDocumentoRead>(docId)
                   .pipe(catchError(() => of<AfectacionDocumentoRead | null>(null)))
               : of<AfectacionDocumentoRead | null>(null);
-          return documento.pipe(map((doc) => ({ cabecera, filas, doc })));
+          return documento.pipe(
+            switchMap((doc) => {
+              const refId = doc?.documento_referencia ?? doc?.documento_referencia_id ?? null;
+              const referencia =
+                refId != null
+                  ? this.documentoService
+                      .obtenerPorId<AfectacionDocumentoRead>(refId)
+                      .pipe(catchError(() => of<AfectacionDocumentoRead | null>(null)))
+                  : of<AfectacionDocumentoRead | null>(null);
+              return referencia.pipe(
+                map((ref) => ({
+                  filas,
+                  doc,
+                  ref,
+                  afectadoId: base.documento_detalle_afectado ?? null,
+                })),
+              );
+            }),
+          );
         }),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: ({ cabecera, filas, doc }) => {
-          this.cabecera.set(cabecera);
+        next: ({ filas, doc, ref, afectadoId }) => {
           this.filas.set(filas);
-          this.documentoTipoNombre.set(doc?.documento_tipo_nombre ?? null);
+          this.documento.set(doc);
+          this.documentoReferencia.set(ref);
+          this.detalleAfectadoId.set(afectadoId);
           this.loading.set(false);
         },
         error: () => {
