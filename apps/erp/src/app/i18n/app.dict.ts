@@ -728,6 +728,8 @@ export interface AppDict extends AuthTranslationsHost {
           };
           /** Abreviatura del contrato en la meta-línea bajo el nombre (`Cont. 2`). */
           contratoAbrev: string;
+          /** Abreviatura del `documento_detalle_id` en la banda de grupo (`DET: 382`). */
+          documentoDetalleAbrev: string;
           stats: {
             diurnas: string;
             nocturnas: string;

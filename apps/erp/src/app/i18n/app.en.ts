@@ -987,6 +987,7 @@ export const en: AppDict = {
             a: 'A',
           },
           contratoAbrev: 'Cont.',
+          documentoDetalleAbrev: 'DET',
           stats: {
             diurnas: 'Day hours contracted / scheduled',
             nocturnas: 'Night hours contracted / scheduled',

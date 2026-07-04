@@ -226,6 +226,20 @@
   line-height: 1;
 }
 
+// Referencia técnica del documento_detalle_id (`DET: 382`). Identificador, no
+// clasificación: por eso va sin pill y con el tono más apagado de la banda. Sin
+// uppercase (a diferencia del label del puesto) para que lea como caption de
+// referencia y no como parte del nombre del puesto.
+.programacion-grid__group-ref {
+  font-size: 0.64rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: rgba(20, 48, 73, 0.4);
+  white-space: nowrap;
+  line-height: 1;
+}
+
 // Chip informativo del puesto en la banda de grupo.
 // Base = modalidad: etiqueta neutra (tinte navy), lee como clasificación/estructura.
 .programacion-grid__group-chip {

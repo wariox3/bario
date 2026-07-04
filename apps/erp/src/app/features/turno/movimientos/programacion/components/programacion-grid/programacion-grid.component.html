@@ -55,12 +55,17 @@
           <!-- Banda principal: puesto + stats a la derecha -->
           <td [attr.colspan]="colspan() - 1" class="programacion-grid__group-cell">
             <div class="flex items-center gap-3">
-              <span class="programacion-grid__group-label">
-                @if (grupo.puestoNombre) {
-                  {{ grupo.puestoId }} | {{ grupo.puestoNombre }}
-                } @else {
-                  #{{ grupo.documentoDetalleId }}
-                }
+              @if (grupo.puestoNombre || grupo.puestoId !== null) {
+                <span class="programacion-grid__group-label">
+                  @if (grupo.puestoNombre) {
+                    {{ grupo.puestoId }} | {{ grupo.puestoNombre }}
+                  } @else {
+                    {{ grupo.puestoId }}
+                  }
+                </span>
+              }
+              <span class="programacion-grid__group-ref">
+                {{ g.documentoDetalleAbrev }}: {{ grupo.documentoDetalleId }}
               </span>
               @if (grupo.modalidadNombre) {
                 <span class="programacion-grid__group-chip">{{ grupo.modalidadNombre }}</span>
