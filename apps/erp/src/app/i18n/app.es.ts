@@ -234,7 +234,7 @@ export const es: AppDict = {
       subtitle: 'El documento, su documento afectado y los detalles que lo afectan',
       empty: 'Ningún detalle afecta a este.',
       cols: {
-        id: '#',
+        id: 'ID',
         documento: 'Documento',
         item: 'Ítem',
         cantidad: 'Cantidad',
