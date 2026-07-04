@@ -246,6 +246,7 @@ export const en: AppDict = {
         impuesto: 'Tax',
         total: 'Total',
       },
+      identidad: { detalleId: 'Detail ID', documentoId: 'Document ID' },
       empty: 'No lines affect this one.',
       close: 'Close',
       loadError: {

@@ -246,6 +246,7 @@ export const es: AppDict = {
         impuesto: 'Impuesto',
         total: 'Total',
       },
+      identidad: { detalleId: 'Detalle ID', documentoId: 'Documento ID' },
       empty: 'Ninguna línea afecta a esta.',
       close: 'Cerrar',
       loadError: {

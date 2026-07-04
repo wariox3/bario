@@ -9,13 +9,19 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { I18nService, ToastService, formatCop, toFiniteNumber } from '@reddoc/core';
 import type { DocumentoDetalleReadBase } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { DocumentoDetalleService } from '../../data/documento-detalle.service';
+import { DocumentoService } from '../../data/documento.service';
+
+/** Cabecera de documento, recortada a lo que el modal lee (`documento_tipo_nombre`). */
+interface AfectacionDocumentoRead {
+  readonly documento_tipo_nombre?: string | null;
+}
 
 /**
  * Línea de documento-detalle, recortada a lo que el modal de afectación pinta.
@@ -62,6 +68,7 @@ interface AfectacionDetalleRead extends DocumentoDetalleReadBase {
 })
 export class AfectacionModalComponent {
   private readonly detalleService = inject(DocumentoDetalleService);
+  private readonly documentoService = inject(DocumentoService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -81,6 +88,8 @@ export class AfectacionModalComponent {
   protected readonly error = signal(false);
   protected readonly cabecera = signal<AfectacionDetalleRead | null>(null);
   protected readonly filas = signal<readonly AfectacionDetalleRead[]>([]);
+  /** Nombre del tipo de documento de la línea (de `documento/<id>/`), para el header de la ficha. */
+  protected readonly documentoTipoNombre = signal<string | null>(null);
 
   protected readonly formatMoney = formatCop;
 
@@ -118,6 +127,7 @@ export class AfectacionModalComponent {
     this.error.set(false);
     this.cabecera.set(null);
     this.filas.set([]);
+    this.documentoTipoNombre.set(null);
 
     forkJoin({
       // Cabecera: la línea clickeada. Tabla: quién afecta a su origen (REF). Sin
@@ -128,11 +138,27 @@ export class AfectacionModalComponent {
           ? of<AfectacionDetalleRead[]>([])
           : this.detalleService.listarPorAfectado<AfectacionDetalleRead>(afectadoId),
     })
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        // El nombre del tipo de documento vive en la cabecera del documento
+        // (`documento/<id>/`), no en la línea: con el FK `documento` de la línea se
+        // trae aparte. Si falla o no hay documento, la ficha sigue mostrándose.
+        switchMap(({ cabecera, filas }) => {
+          const docId = cabecera.documento;
+          const documento =
+            docId != null
+              ? this.documentoService
+                  .obtenerPorId<AfectacionDocumentoRead>(docId)
+                  .pipe(catchError(() => of<AfectacionDocumentoRead | null>(null)))
+              : of<AfectacionDocumentoRead | null>(null);
+          return documento.pipe(map((doc) => ({ cabecera, filas, doc })));
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
-        next: ({ cabecera, filas }) => {
+        next: ({ cabecera, filas, doc }) => {
           this.cabecera.set(cabecera);
           this.filas.set(filas);
+          this.documentoTipoNombre.set(doc?.documento_tipo_nombre ?? null);
           this.loading.set(false);
         },
         error: () => {

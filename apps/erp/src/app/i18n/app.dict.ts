@@ -189,6 +189,7 @@ export interface AppDict extends AuthTranslationsHost {
         impuesto: string;
         total: string;
       };
+      identidad: { detalleId: string; documentoId: string };
       empty: string;
       close: string;
       loadError: { title: string; desc: string };
