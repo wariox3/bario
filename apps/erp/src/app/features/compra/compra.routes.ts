@@ -51,6 +51,11 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'nota-ajuste',
+        loadChildren: () =>
+          import('./documentos/nota-ajuste/nota-ajuste.routes').then((m) => m.NOTA_AJUSTE_ROUTES),
+      },
+      {
         path: 'items',
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),

@@ -17,6 +17,7 @@ export const SELECT_ENDPOINTS = {
   tipoPersona: '/general/tipo-persona/seleccionar/',
   responsabilidad: '/general/responsabilidad/seleccionar/',
   plazoPago: '/general/plazo-pago/seleccionar/',
+  metodoPago: '/general/metodo-pago/seleccionar/',
   precio: '/general/precio/seleccionar/',
   asesor: '/general/asesor/seleccionar/',
   banco: '/general/banco/seleccionar/',
