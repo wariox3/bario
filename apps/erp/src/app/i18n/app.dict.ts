@@ -739,6 +739,7 @@ export interface AppDict extends AuthTranslationsHost {
           verEmpleados: string;
           editar: string;
           editarContrato: string;
+          editarPuesto: string;
           eliminar: string;
           /** Barra contextual de selección de filas (borrado masivo). */
           seleccion: {
@@ -776,6 +777,18 @@ export interface AppDict extends AuthTranslationsHost {
           diaAria: string;
           conflictoDia: string;
           conflictoAviso: string;
+          aplicar: string;
+          close: string;
+          toasts: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+        /** Modal para editar la programación de todos los contratos de un puesto. */
+        programacionPuestoModal: {
+          editTitle: string;
+          diasSection: string;
+          diaAria: string;
           aplicar: string;
           close: string;
           toasts: {

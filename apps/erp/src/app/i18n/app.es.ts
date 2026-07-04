@@ -1012,6 +1012,7 @@ export const es: AppDict = {
           verEmpleados: 'Ver empleados del puesto',
           editar: 'Editar programación de la línea',
           editarContrato: 'Editar programación del contrato',
+          editarPuesto: 'Editar programación del puesto',
           eliminar: 'Eliminar programación del contrato',
           seleccion: {
             contador: 'seleccionadas',
@@ -1061,6 +1062,23 @@ export const es: AppDict = {
             success: {
               title: 'Programación aplicada',
               desc: 'Se aplicó la programación del contrato al puesto.',
+            },
+            error: {
+              title: 'No se pudo aplicar',
+              desc: 'Ocurrió un error al aplicar la programación.',
+            },
+          },
+        },
+        programacionPuestoModal: {
+          editTitle: 'Editar programación del puesto',
+          diasSection: 'Días del mes',
+          diaAria: 'Día',
+          aplicar: 'Guardar',
+          close: 'Cerrar',
+          toasts: {
+            success: {
+              title: 'Programación aplicada',
+              desc: 'Se aplicó la programación de los contratos del puesto.',
             },
             error: {
               title: 'No se pudo aplicar',

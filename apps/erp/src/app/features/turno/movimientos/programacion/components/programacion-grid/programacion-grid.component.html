@@ -56,13 +56,19 @@
           <td [attr.colspan]="colspan() - 1" class="programacion-grid__group-cell">
             <div class="flex items-center gap-3">
               @if (grupo.puestoNombre || grupo.puestoId !== null) {
-                <span class="programacion-grid__group-label">
+                <button
+                  type="button"
+                  (click)="onEditarPuesto(grupo)"
+                  [title]="g.editarPuesto"
+                  [attr.aria-label]="g.editarPuesto"
+                  class="programacion-grid__group-label programacion-grid__group-label--btn pointer-events-auto cursor-pointer border-0 bg-transparent p-0 underline decoration-transparent decoration-dotted underline-offset-2 transition-colors hover:decoration-current"
+                >
                   @if (grupo.puestoNombre) {
                     {{ grupo.puestoId }} | {{ grupo.puestoNombre }}
                   } @else {
                     {{ grupo.puestoId }}
                   }
-                </span>
+                </button>
               }
               <span class="programacion-grid__group-ref">
                 {{ g.documentoDetalleAbrev }}: {{ grupo.documentoDetalleId }}

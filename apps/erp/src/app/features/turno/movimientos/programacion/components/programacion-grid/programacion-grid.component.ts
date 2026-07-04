@@ -89,6 +89,9 @@ export class ProgramacionGridComponent {
   /** Pide ver los empleados de un grupo (puesto). El padre abre el modal. */
   readonly verEmpleados = output<ProgramacionGrupoRef>();
 
+  /** Pide editar la programación de todos los contratos del puesto (grupo). El padre abre el modal. */
+  readonly editarPuesto = output<ProgramacionGrupoRef>();
+
   /** Pide eliminar la programación de un contrato (fila). El padre confirma y borra. */
   readonly eliminarContrato = output<ProgramacionFilaRef>();
 
@@ -227,6 +230,15 @@ export class ProgramacionGridComponent {
   /** Emite la identidad del puesto (la agrupación) para abrir el modal. */
   protected onVerEmpleados(grupo: GrupoFilas): void {
     this.verEmpleados.emit({
+      documentoDetalleId: grupo.documentoDetalleId,
+      puestoId: grupo.puestoId,
+      puestoNombre: grupo.puestoNombre,
+    });
+  }
+
+  /** Emite la identidad del puesto para editar la programación de todos sus contratos. */
+  protected onEditarPuesto(grupo: GrupoFilas): void {
+    this.editarPuesto.emit({
       documentoDetalleId: grupo.documentoDetalleId,
       puestoId: grupo.puestoId,
       puestoNombre: grupo.puestoNombre,

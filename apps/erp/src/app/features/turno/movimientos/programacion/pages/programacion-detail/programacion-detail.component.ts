@@ -33,6 +33,7 @@ import {
 } from '../../components/programacion-grid/programacion-grid.component';
 import { ProgramacionAgregarContratoModalComponent } from '../../components/programacion-agregar-contrato-modal/programacion-agregar-contrato-modal.component';
 import { ProgramacionEditarContratoModalComponent } from '../../components/programacion-editar-contrato-modal/programacion-editar-contrato-modal.component';
+import { ProgramacionEditarPuestoModalComponent } from '../../components/programacion-editar-puesto-modal/programacion-editar-puesto-modal.component';
 
 /** Cabecera legible de la programación para la ficha. */
 interface CabeceraView {
@@ -86,6 +87,7 @@ function toProgramacionFecha(iso: string, _index: number): ProgramacionFecha {
     ProgramacionGridComponent,
     ProgramacionAgregarContratoModalComponent,
     ProgramacionEditarContratoModalComponent,
+    ProgramacionEditarPuestoModalComponent,
   ],
   templateUrl: './programacion-detail.component.html',
   styleUrl: './programacion-detail.component.scss',
@@ -121,6 +123,23 @@ export class ProgramacionDetailComponent implements OnInit {
   /** Modal de editar la programación de un contrato (se abre desde la fila del grid). */
   protected readonly editarContratoVisible = signal(false);
   protected readonly edicionContrato = signal<ProgramacionContratoRef | null>(null);
+
+  /** Modal de editar la programación del puesto (se abre desde el nombre del puesto en el grid). */
+  protected readonly editarPuestoVisible = signal(false);
+  protected readonly edicionPuesto = signal<ProgramacionGrupoRef | null>(null);
+
+  /**
+   * Filas que edita el modal de puesto: todos los contratos de ese puesto (mismo
+   * `documento_detalle_id`), excluyendo vacantes sin contrato asignado (no programables).
+   */
+  protected readonly edicionPuestoFilas = computed<readonly ProgramacionFila[]>(() => {
+    const grid = this.grid();
+    const puesto = this.edicionPuesto();
+    if (!grid || !puesto) return [];
+    return grid.filas.filter(
+      (f) => f.documento_detalle_id === puesto.documentoDetalleId && f.contrato_id !== null,
+    );
+  });
 
   /**
    * Modo del modal de edición: `'linea'` edita una sola fila (lápiz) y guarda con
@@ -228,6 +247,12 @@ export class ProgramacionDetailComponent implements OnInit {
     this.edicionLineaRef.set(null);
     this.edicionContrato.set(ref);
     this.editarContratoVisible.set(true);
+  }
+
+  /** Abre el modal de edición de la programación de todos los contratos del puesto. */
+  protected onEditarPuesto(ref: ProgramacionGrupoRef): void {
+    this.edicionPuesto.set(ref);
+    this.editarPuestoVisible.set(true);
   }
 
   /** Confirma y elimina la programación del contrato (fila) emitida por el grid. */

@@ -167,6 +167,7 @@
           (verEmpleados)="onAgregarContrato($event)"
           (editarLinea)="onEditarLinea($event)"
           (editarContrato)="onEditarContrato($event)"
+          (editarPuesto)="onEditarPuesto($event)"
           (eliminarContrato)="onEliminarContrato($event)"
           (selectionChange)="onSeleccionChange($event)"
         />
@@ -189,6 +190,16 @@
   [contrato]="edicionContrato()"
   [fechas]="grid()?.fechas ?? []"
   [filas]="edicionFilas()"
+  [festivoClaves]="festivoClaves()"
+  (applied)="onApplied()"
+/>
+
+<!-- ── Modal: editar la programación del puesto (multi-contrato) ──────────────── -->
+<app-programacion-editar-puesto-modal
+  [(visible)]="editarPuestoVisible"
+  [puesto]="edicionPuesto()"
+  [fechas]="grid()?.fechas ?? []"
+  [filas]="edicionPuestoFilas()"
   [festivoClaves]="festivoClaves()"
   (applied)="onApplied()"
 />

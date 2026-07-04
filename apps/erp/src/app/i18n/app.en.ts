@@ -997,6 +997,7 @@ export const en: AppDict = {
           verEmpleados: 'View employees of this position',
           editar: 'Edit line scheduling',
           editarContrato: 'Edit contract scheduling',
+          editarPuesto: 'Edit position scheduling',
           eliminar: 'Delete contract scheduling',
           seleccion: {
             contador: 'selected',
@@ -1046,6 +1047,23 @@ export const en: AppDict = {
             success: {
               title: 'Scheduling applied',
               desc: 'The contract scheduling was applied to the position.',
+            },
+            error: {
+              title: 'Could not apply',
+              desc: 'An error occurred while applying the scheduling.',
+            },
+          },
+        },
+        programacionPuestoModal: {
+          editTitle: 'Edit position scheduling',
+          diasSection: 'Days of the month',
+          diaAria: 'Day',
+          aplicar: 'Save',
+          close: 'Close',
+          toasts: {
+            success: {
+              title: 'Scheduling applied',
+              desc: 'The scheduling of the position contracts was applied.',
             },
             error: {
               title: 'Could not apply',

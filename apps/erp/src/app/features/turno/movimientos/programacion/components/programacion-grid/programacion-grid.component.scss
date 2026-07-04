@@ -226,6 +226,13 @@
   line-height: 1;
 }
 
+// El nombre del puesto es un botón que abre el modal de edición del puesto. Hover:
+// acento sky (mismo #0369a1 que el nombre de contrato clickeable de la fila). Se
+// resuelve en el scss del componente para no depender del orden entre hojas.
+.programacion-grid__group-label--btn:hover {
+  color: #0369a1;
+}
+
 // Referencia técnica del documento_detalle_id (`DET: 382`). Identificador, no
 // clasificación: por eso va sin pill y con el tono más apagado de la banda. Sin
 // uppercase (a diferencia del label del puesto) para que lea como caption de
