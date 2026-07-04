@@ -15,7 +15,10 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
       defaultExpanded: true,
       groups: [
         {
-          items: [{ labelKey: 'entities.facturaCompra.name', path: 'factura-compra/list' }],
+          items: [
+            { labelKey: 'entities.facturaCompra.name', path: 'factura-compra/list' },
+            { labelKey: 'entities.documentoSoporte.name', path: 'documento-soporte/list' },
+          ],
         },
       ],
     },

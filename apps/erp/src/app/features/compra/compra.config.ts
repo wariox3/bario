@@ -1,5 +1,6 @@
 import type { ModuleConfig } from '@erp/core/module-config';
 import { FACTURA_COMPRA_CONFIG } from './documentos/factura-compra/factura-compra.config';
+import { DOCUMENTO_SOPORTE_CONFIG } from './documentos/documento-soporte/documento-soporte.config';
 
 /**
  * Configuración del módulo Compra para el framework configuracional de
@@ -14,5 +15,5 @@ export const COMPRA_CONFIG: ModuleConfig = {
   id: 'compra',
   displayNameKey: 'modules.compra.name',
   iconClass: 'pi pi-shopping-cart',
-  documents: [FACTURA_COMPRA_CONFIG],
+  documents: [FACTURA_COMPRA_CONFIG, DOCUMENTO_SOPORTE_CONFIG],
 };

@@ -44,6 +44,13 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'documento-soporte',
+        loadChildren: () =>
+          import('./documentos/documento-soporte/documento-soporte.routes').then(
+            (m) => m.DOCUMENTO_SOPORTE_ROUTES,
+          ),
+      },
+      {
         path: 'items',
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
