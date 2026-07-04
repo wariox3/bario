@@ -194,7 +194,7 @@ export class ProgramacionDetailComponent implements OnInit {
         label: this.t().entities.programacion.name,
         routerLink: slug ? ['/t', slug, ...PROGRAMACION_LIST_PATH] : undefined,
       },
-      { label: `#${this.id() ?? ''}` },
+      { label: `ID ${this.id() ?? ''}` },
     ];
   });
 

@@ -124,7 +124,7 @@ export class ServicioDocumentoDetailComponent implements OnInit {
       this.tenant.currentSlug(),
       this.translateKey(this.document().displayNameKey),
       this.document().id,
-      `#${this.id() ?? ''}`,
+      `ID ${this.id() ?? ''}`,
     ),
   );
 
