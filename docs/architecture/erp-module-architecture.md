@@ -297,7 +297,7 @@ Aplica a entidades transaccionales sobre el endpoint genérico `/api/documento`.
 
 #### 6.A.1 Tipos
 
-Ubicación: `libs/core/src/lib/module-config/types/`
+Ubicación: `libs/core/src/lib/documento/` (expuesto por `@reddoc/core`, consumido por erp y turnos)
 
 ```ts
 // entity-config.types.ts
@@ -936,7 +936,8 @@ Cada paso queda en su commit, así puedes revisar el diff o revertir individualm
 
 - **`libs/feature-base/`** — building blocks tontos verdaderamente cross-app: hoy `DataTableComponent`. Cuando aparezcan `<lib-filter-panel>` y `<lib-toolbar-actions>` también vivirán aquí.
 - **`libs/core/src/lib/data-list/`** — tipos y helpers cross-app de listados: `ColumnDef`, `FilterField`, `ListQuery`, `serializeListQuery`, `FilterStorageService`.
-- **`apps/erp/src/app/core/module-config/`** — todo el framework configuracional ERP-específico: tipos `DocumentEntityConfig`/`ModuleConfig`, `MODULE_REGISTRY`, services, resolvers, errores, `EntityDataGateway` + `HttpEntityDataGateway`, `buildEntityStorageKey`, y `BaseDocumentListComponent` bajo `components/base-document-list/`.
+- **`libs/core/src/lib/documento/`** — núcleo **compartido** del framework (lo consumen erp y turnos vía `@reddoc/core`): tipos `DocumentEntityConfig`/`ModuleConfig`/`EntityConfig`, `ENTITY_DATA_GATEWAY` + `HttpEntityDataGateway`, `DocumentoDetalleService`, `DOCUMENT_TYPE_ID`.
+- **`apps/erp/src/app/core/module-config/`** — lo **ERP-específico** del framework: `MODULE_REGISTRY`, `ModuleRegistryService`, resolvers, `ModuleNavigationStore`, acciones extra, `buildEntityStorageKey`, importar-documento, errores, y `BaseDocumentListComponent` bajo `components/base-document-list/`. Su `index.ts` re-exporta los tipos/gateway desde `@reddoc/core`, así que los consumidores del erp siguen importando de `@erp/core/module-config`.
 
 **Por qué la reorganización**: el dominio "módulos del ERP con documentos transaccionales sobre `/api/documento`" es exclusivo del ERP. POS, cuenta, transporte y demás apps no tienen este patrón. Forzarlo a vivir en `libs/core` mezclaba infra cross-app con dominio ERP, contaminando la lib y dejando puerta a importar piezas que esas apps nunca usarían. Las **piezas genuinamente cross-app** (tabla tonta, tipos de columna, query serialization, filter storage) sí se quedan en libs porque tienen reuso real.
 

@@ -58,7 +58,7 @@ Path aliases:
 - **Cross-app (libs)**: `@reddoc/core`, `@reddoc/ui`, `@reddoc/feature-base`, `@reddoc/styles`.
 - **Intra-app (solo erp)**: `@erp/*` → `apps/erp/src/app/*`. Permitido por excepción en `@nx/enforce-module-boundaries` para evitar paths relativos profundos (los masters viven anidados en `features/<modulo>/masters/<entity>/pages/<page>/`). Úsalo para imports cross-feature (`@erp/core/...`, `@erp/i18n`, `@erp/layouts/...`). Para hermanos del mismo bounded context, sigue con relativos cortos (`./contacto.service`).
 
-**Lo que ES cross-app va en libs/. Lo que es ERP-específico vive en `apps/erp/src/app/core/`** — incluyendo el framework configuracional de documentos.
+**Lo que ES cross-app va en libs/. Lo que es ERP-específico vive en `apps/erp/src/app/core/`.** El **núcleo compartido** del framework configuracional de documentos (tipos, gateway y `DocumentoDetalleService`) vive en `libs/core/documento` porque también lo consume `apps/turnos`; solo el registry, resolvers y `BaseDocumentListComponent` quedan en el ERP.
 
 ### landing
 
@@ -127,28 +127,44 @@ Cualquier app del monorepo puede usarlos para construir listas paginadas.
 
 El ERP usa un **enfoque híbrido** (documentado en `docs/architecture/erp-module-architecture.md`):
 
-| Camino                                   | A quién aplica                                                                                                       | Cómo se implementa                                                                                                                                                                       |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Framework configuracional (camino A)** | Documentos transaccionales (factura, nota crédito, etc.) sobre `/api/documento` discriminado por `documento_tipo_id` | `DocumentEntityConfig` declarativo + `MODULE_REGISTRY` lazy + resolvers + `BaseDocumentListComponent`. Todo vive en **`apps/erp/src/app/core/module-config/`** porque es ERP-específico. |
-| **Features directos (camino B)**         | Masters administrativos (contacto, ítem, sede, almacén, etc.) con endpoint propio                                    | Cada master: `services/*.service.ts` (extends `BaseHttpService`) + `pages/*-list/*-list.component.ts` que compone `<lib-data-table>` con inputs concretos                                |
-| **Building blocks compartidos**          | Ambos caminos + otras apps potencialmente                                                                            | `<lib-data-table>` (`@reddoc/feature-base`), tipos `ColumnDef`/`FilterField`/`ListQuery`, `serializeListQuery`, `FilterStorageService` (todos en `@reddoc/core` data-list)               |
+| Camino                                   | A quién aplica                                                                                                       | Cómo se implementa                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework configuracional (camino A)** | Documentos transaccionales (factura, nota crédito, etc.) sobre `/api/documento` discriminado por `documento_tipo_id` | `DocumentEntityConfig` declarativo + `MODULE_REGISTRY` lazy + resolvers + `BaseDocumentListComponent`. El **núcleo compartido** (tipos, `ENTITY_DATA_GATEWAY`/`HttpEntityDataGateway`, `DocumentoDetalleService`, `DOCUMENT_TYPE_ID`) vive en **`libs/core/documento`** (vía `@reddoc/core`, lo consumen erp y turnos); lo **ERP-específico** (registry, resolvers, store, actions, storage, `BaseDocumentListComponent`) vive en **`apps/erp/src/app/core/module-config/`**. |
+| **Features directos (camino B)**         | Masters administrativos (contacto, ítem, sede, almacén, etc.) con endpoint propio                                    | Cada master: `services/*.service.ts` (extends `BaseHttpService`) + `pages/*-list/*-list.component.ts` que compone `<lib-data-table>` con inputs concretos                                                                                                                                                                                                                                                                                                                     |
+| **Building blocks compartidos**          | Ambos caminos + otras apps potencialmente                                                                            | `<lib-data-table>` (`@reddoc/feature-base`), tipos `ColumnDef`/`FilterField`/`ListQuery`, `serializeListQuery`, `FilterStorageService` (todos en `@reddoc/core` data-list)                                                                                                                                                                                                                                                                                                    |
 
-**Estructura del framework configuracional en el ERP**:
+**Estructura del framework configuracional**:
+
+El **núcleo compartido** vive en `libs/core/documento/` (expuesto por `@reddoc/core`, consumido por erp y turnos):
+
+```
+libs/core/src/lib/documento/
+├── entity-config.types.ts       DocumentEntityConfig, ModuleConfig, EntityConfig, capabilities
+├── module-config.types.ts       ModuleConfig
+├── documento.types.ts           Read/Payload base de documento y detalle
+├── document-types.constants.ts  DOCUMENT_TYPE_ID
+├── entity-data-gateway.ts       ENTITY_DATA_GATEWAY (token) + EntityDataGateway (interface)
+├── http-entity-data-gateway.service.ts  HttpEntityDataGateway
+├── documento-detalle.service.ts DocumentoDetalleService
+└── index.ts
+```
+
+Lo **ERP-específico** queda en `apps/erp/src/app/core/module-config/`:
 
 ```
 apps/erp/src/app/core/module-config/
-├── types/                       DocumentEntityConfig, ModuleConfig, capabilities
 ├── module-registry.token.ts     InjectionToken + ModuleConfigLoader / ModuleRegistry
 ├── module-registry.constant.ts  ERP_MODULE_REGISTRY (módulos transaccionales)
 ├── module-registry.service.ts   Carga lazy + cache + validación
 ├── module-navigation.store.ts   Signals del módulo/documento activos
 ├── resolvers/                   activeModuleResolver, activeDocumentResolver
-├── data/                        EntityDataGateway (interface) + HttpEntityDataGateway
+├── data/                        documento.service.ts (el gateway compartido vive en libs/core/documento)
 ├── storage/                     buildEntityStorageKey (usa EntityConfig)
 ├── errors/                      Errores tipados del dominio
+├── importar-documento/          Importación desde documento afectado
 ├── components/
 │   └── base-document-list/      BaseDocumentListComponent (lazy load — NO exportar desde el barrel)
-└── index.ts                     Barrel sin BaseDocumentListComponent: evita jalar PrimeNG al initial bundle
+└── index.ts                     Re-exporta los tipos desde @reddoc/core; sin BaseDocumentListComponent (evita PrimeNG en el initial bundle)
 ```
 
 El `BaseDocumentListComponent` se importa **siempre vía `loadComponent`** desde las rutas de documentos, no por barrel.
