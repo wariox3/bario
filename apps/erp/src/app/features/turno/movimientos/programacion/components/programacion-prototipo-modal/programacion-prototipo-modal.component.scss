@@ -1,0 +1,175 @@
+// Estilos scoped del modal de prototipo. Mismo lenguaje visual que
+// `programacion-editar-puesto` (tabla editable). La UI/UX definitiva se pulirá
+// luego con la skill interface-design.
+:host {
+  display: contents;
+}
+
+.prototipo-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.prototipo-grid__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--brand-muted, #64748b);
+  background: #f8f9fa;
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
+}
+
+.prototipo-grid__th--check,
+.prototipo-grid__td--check {
+  width: 2.4rem;
+  text-align: center;
+}
+
+.prototipo-grid__th--fecha,
+.prototipo-grid__td--fecha {
+  width: 11rem;
+}
+
+.prototipo-grid__th--pos,
+.prototipo-grid__td--pos {
+  width: 6.5rem;
+}
+
+.prototipo-grid__td {
+  padding: 0.35rem 0.6rem;
+  vertical-align: middle;
+}
+
+.prototipo-grid__td--contrato {
+  min-width: 18rem;
+}
+
+.prototipo-grid__td--secuencia {
+  min-width: 13rem;
+}
+
+.prototipo-grid__row + .prototipo-grid__row .prototipo-grid__td {
+  border-top: 1px solid rgba(20, 48, 73, 0.07);
+}
+
+.prototipo-grid__row:hover .prototipo-grid__td {
+  background: rgba(20, 48, 73, 0.015);
+}
+
+.prototipo-grid__check {
+  width: 0.9rem;
+  height: 0.9rem;
+  cursor: pointer;
+  accent-color: var(--brand-primary, #143049);
+}
+
+.prototipo-grid__input {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.prototipo-grid__input--num {
+  text-align: center;
+}
+
+.prototipo-grid__input--invalid {
+  border-color: #f87171;
+}
+
+// ── Vista previa (simulación) ─────────────────────────────────────────────────
+// Mismo lenguaje visual que `editar-grid`: header sticky, columnas de día
+// angostas con num + inicial. Columnas fijas (año/mes/cód/empleado) a la izquierda.
+.prototipo-preview {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.prototipo-preview__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--brand-muted, #64748b);
+  background: #f8f9fa;
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
+}
+
+.prototipo-preview__th--empleado,
+.prototipo-preview__td--empleado {
+  min-width: 12rem;
+  white-space: nowrap;
+}
+
+.prototipo-preview__td {
+  padding: 0.3rem 0.6rem;
+  vertical-align: middle;
+  color: var(--brand-text, #143049);
+}
+
+.prototipo-preview__row + .prototipo-preview__row .prototipo-preview__td {
+  border-top: 1px solid rgba(20, 48, 73, 0.07);
+}
+
+.prototipo-preview__row:hover .prototipo-preview__td {
+  background: rgba(20, 48, 73, 0.015);
+}
+
+.prototipo-preview__th--dia,
+.prototipo-preview__td--dia {
+  min-width: 2.4rem;
+  padding-left: 0.2rem;
+  padding-right: 0.2rem;
+  text-align: center;
+}
+
+.prototipo-preview__dia-num {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--brand-text, #143049);
+}
+
+.prototipo-preview__dia-ini {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--brand-muted, #64748b);
+}
+
+// Día festivo en header (el domingo cuenta como festivo).
+.prototipo-preview__th--festivo {
+  background: #e8f1fb;
+  box-shadow: inset 0 -1px 0 rgba(37, 99, 235, 0.25);
+
+  .prototipo-preview__dia-num {
+    color: #2563eb;
+  }
+
+  .prototipo-preview__dia-ini {
+    color: rgba(37, 99, 235, 0.65);
+  }
+}
+
+// Sábado en header: gris un punto más oscuro.
+.prototipo-preview__th--sabado {
+  background: #eceef1;
+}

@@ -739,6 +739,8 @@ export interface AppDict extends AuthTranslationsHost {
           };
           empty: string;
           verEmpleados: string;
+          /** Botón que abre el modal de prototipo (generar turnos automáticamente). */
+          prototipo: string;
           editar: string;
           editarContrato: string;
           editarPuesto: string;
@@ -796,6 +798,54 @@ export interface AppDict extends AuthTranslationsHost {
           toasts: {
             success: { title: string; desc: string };
             error: { title: string; desc: string };
+          };
+        };
+        /** Modal de prototipo (base para simular/generar turnos del puesto). */
+        prototipoModal: {
+          title: string;
+          /** Etiquetas del encabezado con el contexto del puesto. */
+          codigoLabel: string;
+          clienteLabel: string;
+          puestoLabel: string;
+          /** Columnas de la tabla editable. */
+          columns: {
+            contrato: string;
+            secuencia: string;
+            fechaInicio: string;
+            posicion: string;
+          };
+          contratoPlaceholder: string;
+          secuenciaPlaceholder: string;
+          seleccionarTodo: string;
+          seleccionarFila: string;
+          /** Estado vacío (sin filas) y mientras carga la lista. */
+          empty: string;
+          cargando: string;
+          /** Acciones. */
+          nuevo: string;
+          guardar: string;
+          eliminar: string;
+          /** Simular (preview) y generar (materializar) los turnos del prototipo. */
+          simular: string;
+          generar: string;
+          close: string;
+          /** Avisos de validación / sin cambios. */
+          validacion: string;
+          sinCambios: string;
+          /** Tabla de vista previa (simulación): año/mes/código/empleado + días. */
+          preview: {
+            title: string;
+            anio: string;
+            mes: string;
+            codigo: string;
+            empleado: string;
+            empty: string;
+          };
+          toasts: {
+            saveSuccess: { title: string; desc: string };
+            saveError: { title: string; desc: string };
+            deleteSuccess: { title: string; desc: string };
+            deleteError: { title: string; desc: string };
           };
         };
       };

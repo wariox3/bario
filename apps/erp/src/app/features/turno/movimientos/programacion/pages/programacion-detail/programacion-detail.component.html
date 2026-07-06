@@ -165,6 +165,7 @@
           [filas]="gr.filas"
           [festivoClaves]="festivoClaves()"
           (verEmpleados)="onAgregarContrato($event)"
+          (prototipo)="onPrototipo($event)"
           (editarLinea)="onEditarLinea($event)"
           (editarContrato)="onEditarContrato($event)"
           (editarPuesto)="onEditarPuesto($event)"
@@ -201,6 +202,15 @@
   [fechas]="grid()?.fechas ?? []"
   [filas]="edicionPuestoFilas()"
   [festivoClaves]="festivoClaves()"
+  (applied)="onApplied()"
+/>
+
+<!-- ── Modal: prototipo del puesto (generar turnos automáticamente) ───────────── -->
+<app-programacion-prototipo-modal
+  [(visible)]="prototipoVisible"
+  [grupo]="prototipoGrupo()"
+  [documentoNumero]="cabecera()?.numero ?? null"
+  [clienteNombre]="cabecera()?.contacto ?? null"
   (applied)="onApplied()"
 />
 

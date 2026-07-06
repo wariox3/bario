@@ -53,7 +53,7 @@
       @for (grupo of grupos(); track grupo.documentoDetalleId + '_' + $index) {
         <tr class="programacion-grid__group-row">
           <!-- Banda principal: puesto + stats a la derecha -->
-          <td [attr.colspan]="colspan() - 1" class="programacion-grid__group-cell">
+          <td [attr.colspan]="colspan() - 2" class="programacion-grid__group-cell">
             <div class="flex items-center gap-3">
               @if (grupo.puestoNombre || grupo.puestoId !== null) {
                 <button
@@ -104,17 +104,31 @@
               </div>
             </div>
           </td>
-          <!-- Columna de acción: botón al final -->
-          <td class="programacion-grid__group-cell programacion-grid__col-accion">
-            <button
-              type="button"
-              (click)="onVerEmpleados(grupo)"
-              [title]="g.verEmpleados"
-              [attr.aria-label]="g.verEmpleados"
-              class="pointer-events-auto flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-white/70 hover:text-sky-700"
-            >
-              <i class="pi pi-user-plus text-[0.78rem]"></i>
-            </button>
+          <!-- Columna de acción: botones al final (abarca las 2 columnas reservadas) -->
+          <td
+            [attr.colspan]="2"
+            class="programacion-grid__group-cell programacion-grid__col-accion"
+          >
+            <div class="flex items-center justify-end gap-1">
+              <button
+                type="button"
+                (click)="onVerEmpleados(grupo)"
+                [title]="g.verEmpleados"
+                [attr.aria-label]="g.verEmpleados"
+                class="pointer-events-auto flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-white/70 hover:text-sky-700"
+              >
+                <i class="pi pi-user-plus text-[0.78rem]"></i>
+              </button>
+              <button
+                type="button"
+                (click)="onPrototipo(grupo)"
+                [title]="g.prototipo"
+                [attr.aria-label]="g.prototipo"
+                class="pointer-events-auto flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-white/70 hover:text-sky-700"
+              >
+                <i class="pi pi-calendar-plus text-[0.78rem]"></i>
+              </button>
+            </div>
           </td>
         </tr>
 

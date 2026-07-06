@@ -34,6 +34,7 @@ import {
 import { ProgramacionAgregarContratoModalComponent } from '../../components/programacion-agregar-contrato-modal/programacion-agregar-contrato-modal.component';
 import { ProgramacionEditarContratoModalComponent } from '../../components/programacion-editar-contrato-modal/programacion-editar-contrato-modal.component';
 import { ProgramacionEditarPuestoModalComponent } from '../../components/programacion-editar-puesto-modal/programacion-editar-puesto-modal.component';
+import { ProgramacionPrototipoModalComponent } from '../../components/programacion-prototipo-modal/programacion-prototipo-modal.component';
 
 /** Cabecera legible de la programación para la ficha. */
 interface CabeceraView {
@@ -88,6 +89,7 @@ function toProgramacionFecha(iso: string, _index: number): ProgramacionFecha {
     ProgramacionAgregarContratoModalComponent,
     ProgramacionEditarContratoModalComponent,
     ProgramacionEditarPuestoModalComponent,
+    ProgramacionPrototipoModalComponent,
   ],
   templateUrl: './programacion-detail.component.html',
   styleUrl: './programacion-detail.component.scss',
@@ -119,6 +121,10 @@ export class ProgramacionDetailComponent implements OnInit {
   /** Modal de agregar contrato al puesto (se abre desde el botón del grupo del grid). */
   protected readonly agregarContratoVisible = signal(false);
   protected readonly agregarContratoGrupo = signal<ProgramacionGrupoRef | null>(null);
+
+  /** Modal de prototipo del puesto (se abre desde el botón del grupo del grid). */
+  protected readonly prototipoVisible = signal(false);
+  protected readonly prototipoGrupo = signal<ProgramacionGrupoRef | null>(null);
 
   /** Modal de editar la programación de un contrato (se abre desde la fila del grid). */
   protected readonly editarContratoVisible = signal(false);
@@ -219,6 +225,12 @@ export class ProgramacionDetailComponent implements OnInit {
   protected onAgregarContrato(grupo: ProgramacionGrupoRef): void {
     this.agregarContratoGrupo.set(grupo);
     this.agregarContratoVisible.set(true);
+  }
+
+  /** Abre el modal de prototipo del puesto emitido por el grid. */
+  protected onPrototipo(grupo: ProgramacionGrupoRef): void {
+    this.prototipoGrupo.set(grupo);
+    this.prototipoVisible.set(true);
   }
 
   /** Abre el modal de edición con una sola línea (fila) del contrato. */

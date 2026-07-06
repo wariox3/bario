@@ -89,6 +89,9 @@ export class ProgramacionGridComponent {
   /** Pide ver los empleados de un grupo (puesto). El padre abre el modal. */
   readonly verEmpleados = output<ProgramacionGrupoRef>();
 
+  /** Pide abrir el prototipo (generar turnos automáticamente) de un puesto. El padre abre el modal. */
+  readonly prototipo = output<ProgramacionGrupoRef>();
+
   /** Pide editar la programación de todos los contratos del puesto (grupo). El padre abre el modal. */
   readonly editarPuesto = output<ProgramacionGrupoRef>();
 
@@ -230,6 +233,15 @@ export class ProgramacionGridComponent {
   /** Emite la identidad del puesto (la agrupación) para abrir el modal. */
   protected onVerEmpleados(grupo: GrupoFilas): void {
     this.verEmpleados.emit({
+      documentoDetalleId: grupo.documentoDetalleId,
+      puestoId: grupo.puestoId,
+      puestoNombre: grupo.puestoNombre,
+    });
+  }
+
+  /** Emite la identidad del puesto para abrir su prototipo (generar turnos automáticamente). */
+  protected onPrototipo(grupo: GrupoFilas): void {
+    this.prototipo.emit({
       documentoDetalleId: grupo.documentoDetalleId,
       puestoId: grupo.puestoId,
       puestoNombre: grupo.puestoNombre,
