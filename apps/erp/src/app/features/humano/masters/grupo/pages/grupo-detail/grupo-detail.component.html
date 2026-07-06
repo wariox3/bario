@@ -42,7 +42,7 @@
   </div>
 } @else if (grupo(); as g) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-users"
     [eyebrow]="t().entities.grupo.detail.eyebrow"
     [title]="g.nombre"
@@ -50,5 +50,5 @@
     <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
       {{ t().entities.grupo.columns.periodo }}: {{ g.periodo_nombre }}
     </p>
-  </app-detail-header>
+  </lib-detail-header>
 }

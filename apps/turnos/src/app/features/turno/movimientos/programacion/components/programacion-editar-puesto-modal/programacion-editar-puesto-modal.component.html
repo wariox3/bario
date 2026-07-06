@@ -1,0 +1,173 @@
+@let m = t().entities.programacion.detail.programacionPuestoModal;
+@let g = t().entities.programacion.detail.grid;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [focusOnShow]="false"
+  [style]="{ width: '96rem' }"
+  [breakpoints]="{ '1100px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-pencil text-[1.05rem]"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.editTitle }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          @if (puesto(); as p) {
+            @if (p.puestoNombre) {
+              {{ p.puestoId }} | {{ p.puestoNombre }}
+            } @else {
+              #{{ p.documentoDetalleId }}
+            }
+          }
+          @if (puestoInfo(); as info) {
+            @if (info.modalidadNombre) {
+              <span class="mx-1 text-brand-muted/50">·</span>{{ info.modalidadNombre }}
+            }
+            @if (info.horario) {
+              <span class="mx-1 text-brand-muted/50">·</span>
+              <span class="tabular-nums">{{ info.horario }}</span>
+            }
+          }
+          @if (periodoEtiqueta(); as p) {
+            <span class="mx-1 text-brand-muted/50">·</span>
+            <span class="capitalize">{{ p }}</span>
+          }
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="form" class="flex flex-col gap-2 pt-1">
+    <span class="text-[0.78rem] font-medium text-brand-muted">{{ m.diasSection }}</span>
+
+    <!-- Banner de validación global del batch (errores del 400 sin contrato atribuible) -->
+    @if (avisosGlobales().length) {
+      <div class="editar-grid__aviso editar-grid__aviso--bloque">
+        <span class="editar-grid__aviso-icon"><i class="pi pi-exclamation-circle"></i></span>
+        <ul class="editar-grid__aviso-list">
+          @for (msg of avisosGlobales(); track msg) {
+            <li class="editar-grid__aviso-item">{{ msg }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="max-h-[32rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+      <table class="editar-grid">
+        <thead>
+          <tr>
+            @for (fecha of fechas(); track fecha.clave) {
+              <th
+                class="editar-grid__th editar-grid__th--dia"
+                [class.editar-grid__th--festivo]="
+                  fecha.inicial === 'D' || festivoClaves().has(fecha.clave)
+                "
+                [class.editar-grid__th--sabado]="
+                  fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
+                "
+              >
+                <span class="editar-grid__dia-num">{{ fecha.etiqueta }}</span>
+                <span class="editar-grid__dia-ini">{{ fecha.inicial }}</span>
+              </th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (banda of bandas(); track banda.key) {
+            <!-- Banda del contrato -->
+            <tr class="editar-grid__group-row">
+              <td [attr.colspan]="colspan()" class="editar-grid__group-cell">
+                <div class="flex items-center gap-3">
+                  <span class="editar-grid__group-label">{{ banda.contratoNombre || '—' }}</span>
+                  @if (banda.identificacion) {
+                    <span class="editar-grid__group-chip font-mono">{{
+                      banda.identificacion
+                    }}</span>
+                  }
+                </div>
+              </td>
+            </tr>
+
+            <!-- Aviso de contrato (errores sin fecha del 400: ej. horas excedidas) -->
+            @let avisosBanda = avisosDe(banda.contratoId);
+            @if (avisosBanda.length) {
+              <tr class="editar-grid__aviso-row">
+                <td [attr.colspan]="colspan()" class="editar-grid__aviso-cell">
+                  <div class="editar-grid__aviso">
+                    <span class="editar-grid__aviso-icon">
+                      <i class="pi pi-exclamation-circle"></i>
+                    </span>
+                    <ul class="editar-grid__aviso-list">
+                      @for (msg of avisosBanda; track msg) {
+                        <li class="editar-grid__aviso-item">{{ msg }}</li>
+                      }
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            }
+
+            <!-- Fila editable del contrato en este puesto -->
+            <tr class="editar-grid__row">
+              @for (dia of banda.dias; track dia.control) {
+                <td
+                  class="editar-grid__td editar-grid__td--dia"
+                  [class.editar-grid__td--error]="errorCelda(banda.contratoId, dia.clave)"
+                >
+                  <input
+                    pInputText
+                    libUppercase
+                    type="text"
+                    [formControl]="dia.control"
+                    class="editar-grid__input"
+                    [attr.aria-label]="m.diaAria + ' ' + dia.etiqueta + ' ' + dia.inicial"
+                    [attr.title]="errorCelda(banda.contratoId, dia.clave)"
+                  />
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="colspan()" class="px-5 py-8 text-center text-sm text-brand-muted">
+                <i class="pi pi-inbox mr-2"></i>{{ g.empty }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end gap-2">
+      <p-button
+        type="button"
+        [label]="m.close"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onClose()"
+      />
+      <p-button
+        type="button"
+        [label]="m.aplicar"
+        icon="pi pi-check"
+        [loading]="isSubmitting()"
+        [disabled]="!puedeGuardar()"
+        (onClick)="onGuardar()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

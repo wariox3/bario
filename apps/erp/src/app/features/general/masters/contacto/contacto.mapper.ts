@@ -8,8 +8,8 @@ import { construirNombreCorto } from './utils/nombre-corto.util';
  *
  * Los selects/autocompletes guardan `ErpSelectOption` ({ id, nombre }), por lo
  * que el id pelado del FK + su `*_nombre` se reagrupan en objetos. Para los
- * `app-api-select` el `nombre` puede ir vacío: el select resuelve la etiqueta
- * contra sus opciones por `id`. Para los `app-api-autocomplete` (ciudad, banco)
+ * `lib-api-select` el `nombre` puede ir vacío: el select resuelve la etiqueta
+ * contra sus opciones por `id`. Para los `lib-api-autocomplete` (ciudad, banco)
  * el `nombre` sí importa porque la etiqueta sale del valor.
  */
 export function contactoToFormValue(c: Contacto): Partial<ContactoFormRawValue> {

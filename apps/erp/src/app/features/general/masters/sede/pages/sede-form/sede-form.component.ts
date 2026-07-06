@@ -7,8 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FieldErrorComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { SedeService } from '../../sede.service';
 import { CENTRO_COSTO_SELECT_ENDPOINT, SEDE_LIST_PATH } from '../../sede.constants';
@@ -20,7 +20,7 @@ import { formValueToPayload, sedeToFormValue } from '../../sede.mapper';
  * Master del módulo General (camino B). La misma página cubre crear y editar:
  * sin `:id` → alta; con `:id` → edición (el id llega por
  * `withComponentInputBinding`). El centro de costo es un autocomplete buscable
- * (`<app-api-autocomplete>`) contra `/contabilidad/centro-costo/seleccionar/`.
+ * (`<lib-api-autocomplete>`) contra `/contabilidad/centro-costo/seleccionar/`.
  */
 @Component({
   selector: 'app-sede-form',

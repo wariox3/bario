@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService, formatCop, fromIsoDate } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@erp/core/components/detail-header/detail-header.component';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
 import { CONTRATO_LIST_PATH } from '../../contrato.constants';

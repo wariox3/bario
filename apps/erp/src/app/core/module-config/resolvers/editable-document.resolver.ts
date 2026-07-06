@@ -1,12 +1,16 @@
 import { inject } from '@angular/core';
 import { RedirectCommand, Router, type ResolveFn } from '@angular/router';
 import { type Observable, catchError, map, of } from 'rxjs';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import {
+  type EditableRowContext,
+  ENTITY_DATA_GATEWAY,
+  I18nService,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import { ENTITY_DATA_GATEWAY } from '../data/entity-data-gateway';
 import { MissingModuleContextError } from '../errors/config.errors';
 import { ModuleNavigationStore } from '../module-navigation.store';
-import type { EditableRowContext } from '../types/entity-config.types';
 
 /**
  * Puerta de la ruta de edición (`editar/:id`) que cumple dos roles a la vez:

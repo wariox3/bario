@@ -51,7 +51,7 @@ import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/e
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
-import { ErpSelectDataService } from '@erp/core/data/erp-select-data.service';
+import { ErpSelectDataService } from '@reddoc/core';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
 import type { AppDict } from '@erp/i18n';
 import {

@@ -1,5 +1,5 @@
 import type { ImpuestoLinea } from '@reddoc/core';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 
 /** Re-export: `ItemOption` vive ahora en `core/components` (infra compartida). */

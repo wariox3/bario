@@ -4,13 +4,10 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
+import { FormErrorService, I18nService, SELECT_ENDPOINTS, ToastService } from '@reddoc/core';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import { calcularDigitoVerificacion } from '@erp/features/general/masters/contacto/utils/digito-verificacion.util';
-import { SELECT_ENDPOINTS } from '@erp/core/data/select-endpoints';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionService } from '../../configuracion.service';
 import { EMPRESA_CAMPOS } from '../../configuracion.constants';

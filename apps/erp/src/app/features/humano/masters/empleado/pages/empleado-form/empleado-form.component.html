@@ -49,7 +49,7 @@
           <label for="identificacion" class="empleado-form__label">
             {{ f.fields.identificacion }}<span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="identificacion"
             formControlName="identificacion"
             [endpoint]="endpoints.identificacion"
@@ -153,7 +153,7 @@
           <label for="ciudad" class="empleado-form__label">
             {{ f.fields.ciudad }}<span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="ciudad"
             formControlName="ciudad"
             [endpoint]="endpoints.ciudad"
@@ -224,7 +224,7 @@
           <label for="banco" class="empleado-form__label">
             {{ f.fields.banco }}<span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="banco"
             formControlName="banco"
             [endpoint]="endpoints.banco"
@@ -254,7 +254,7 @@
           <label for="cuenta_banco_clase" class="empleado-form__label">
             {{ f.fields.cuentaBancoClase }}<span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="cuenta_banco_clase"
             formControlName="cuenta_banco_clase"
             [endpoint]="endpoints.cuentaBancoClase"

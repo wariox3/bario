@@ -44,7 +44,7 @@
   </div>
 } @else if (item(); as it) {
   <!-- ── Encabezado de identidad (ficha) ─────────────────────────────────────── -->
-  <app-detail-header [eyebrow]="t().entities.item.detail.eyebrow" [title]="it.nombre">
+  <lib-detail-header [eyebrow]="t().entities.item.detail.eyebrow" [title]="it.nombre">
     <!-- Imagen del item -->
     <app-erp-image-upload
       detailHeaderMedia
@@ -120,7 +120,7 @@
         }
       </div>
     </div>
-  </app-detail-header>
+  </lib-detail-header>
 
   <!-- ── Precios ─────────────────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

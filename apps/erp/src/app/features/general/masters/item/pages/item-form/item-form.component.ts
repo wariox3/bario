@@ -9,10 +9,16 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
+import {
+  ErpSelectDataService,
+  type ErpSelectOption,
+  FormErrorService,
+  I18nService,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
-import { ErpSelectDataService, type ErpSelectOption } from '@erp/core/data/erp-select-data.service';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ItemService } from '../../item.service';

@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { FormaPago, FormaPagoPayload } from './forma-pago.model';
 import type { FormaPagoFormRawValue } from './pages/forma-pago-form/forma-pago-form.types';
 

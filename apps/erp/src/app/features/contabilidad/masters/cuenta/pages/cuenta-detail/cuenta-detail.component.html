@@ -42,7 +42,7 @@
   </div>
 } @else if (cuenta(); as c) {
   <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-book"
     [eyebrow]="t().entities.cuenta.detail.eyebrow"
     [title]="c.nombre"
@@ -86,7 +86,7 @@
         }
       </div>
     </div>
-  </app-detail-header>
+  </lib-detail-header>
 
   <!-- ── Clasificación contable ───────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

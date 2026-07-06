@@ -1,4 +1,4 @@
-import type { EntityConfig } from '../types/entity-config.types';
+import type { EntityConfig } from '@reddoc/core';
 
 /** Prefijo común de todas las claves de localStorage para filtros de entidades del framework. */
 const STORAGE_KEY_PREFIX = 'entity-filters';

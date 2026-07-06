@@ -11,8 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MultiSelectModule } from 'primeng/multiselect';
-import type { ParamValue } from '@reddoc/core';
-import { ErpSelectDataService, ErpSelectOption } from '@erp/core/data/erp-select-data.service';
+import { ErpSelectDataService, ErpSelectOption, type ParamValue } from '@reddoc/core';
 
 /** Endpoint de selección de impuestos. */
 const ENDPOINT = '/general/impuesto/seleccionar/';
@@ -23,7 +22,7 @@ const ENDPOINT = '/general/impuesto/seleccionar/';
  * Carga las opciones de `general/impuesto/seleccionar/` (acotadas por `params`,
  * default `{ venta: 'True' }`) y las presenta en un `p-multiselect` con chips.
  *
- * A diferencia de `app-cuenta-select`/`app-contacto-select` (que emiten un
+ * A diferencia de `app-cuenta-select`/`lib-contacto-select` (que emiten un
  * `ErpSelectOption`), este emite directamente el **array de ids**
  * (`number[]`) — el shape que espera el backend en `impuestos_ids`. Así es
  * reutilizable en cualquier documento sin mapear opción→id en el consumidor.

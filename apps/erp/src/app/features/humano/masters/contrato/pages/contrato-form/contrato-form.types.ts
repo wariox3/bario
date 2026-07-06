@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { EmpleadoOption } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
 
 /**

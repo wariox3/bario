@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { Item, ItemImpuesto, ItemPayload } from './item.model';
 import type { ItemFormRawValue } from './pages/item-form/item-form.types';
 

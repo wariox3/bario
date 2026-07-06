@@ -42,7 +42,7 @@
   </div>
 } @else if (sucursal(); as s) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-building"
     [eyebrow]="t().entities.sucursal.detail.eyebrow"
     [title]="s.nombre"
@@ -50,5 +50,5 @@
     <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
       {{ t().entities.sucursal.columns.codigo }}: {{ s.codigo }}
     </p>
-  </app-detail-header>
+  </lib-detail-header>
 }

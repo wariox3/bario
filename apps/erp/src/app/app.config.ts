@@ -30,6 +30,7 @@ import {
   errorInterceptor,
   tenantInterceptor,
   provideI18n,
+  TENANT_ROUTES,
 } from '@reddoc/core';
 import { AuthService } from './features/auth/services/auth.service';
 import { ROUTE_PATHS } from './core/constants/route-paths.constants';
@@ -91,6 +92,14 @@ export const appConfig: ApplicationConfig = {
       useValue: { appName: 'ERP', tagline: 'Gestiona tu empresa desde un solo lugar.' },
     },
     { provide: AUTH_SERVICE, useExisting: AuthService },
+    {
+      provide: TENANT_ROUTES,
+      useValue: {
+        contenedoresRoot: ROUTE_PATHS.contenedores.root,
+        login: ROUTE_PATHS.auth.login,
+        tenantHome: (slug: string) => ROUTE_PATHS.tenant.dashboard(slug),
+      },
+    },
     { provide: MODULE_REGISTRY, useValue: ERP_MODULE_REGISTRY },
     { provide: ENTITY_DATA_GATEWAY, useExisting: HttpEntityDataGateway },
     {

@@ -69,7 +69,7 @@
               {{ t().configuracion.empresa.fields.tipoPersona }}
               <span class="ml-px text-red-500">*</span>
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="tipo_persona"
               formControlName="tipo_persona"
               [endpoint]="endpoints.tipoPersona"
@@ -89,7 +89,7 @@
               {{ t().configuracion.empresa.fields.identificacion }}
               <span class="ml-px text-red-500">*</span>
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="identificacion"
               formControlName="identificacion"
               [endpoint]="endpoints.identificacion"
@@ -182,7 +182,7 @@
             >
               {{ t().configuracion.empresa.fields.ciudad }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="ciudad"
               formControlName="ciudad"
               [endpoint]="endpoints.ciudad"

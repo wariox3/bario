@@ -15,15 +15,10 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import {
-  ContratoAutocompleteComponent,
-  type ContratoOption,
-} from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
-import { SELECT_ENDPOINTS } from '@erp/core/data/select-endpoints';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
+import { SELECT_ENDPOINTS } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { NovedadService } from '../../novedad.service';
 import {

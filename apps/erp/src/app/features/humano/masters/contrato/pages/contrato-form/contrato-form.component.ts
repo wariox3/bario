@@ -16,12 +16,12 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { ErpApiSelectComponent } from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import { EmpleadoAutocompleteComponent } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
 import type { EmpleadoOption } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-import { SELECT_ENDPOINTS } from '@erp/core/data/select-endpoints';
+import type { ErpSelectOption } from '@reddoc/core';
+import { SELECT_ENDPOINTS } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionService } from '@erp/core/services/configuracion.service';
 import { ContratoService } from '../../contrato.service';
@@ -34,9 +34,9 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
  * Master del módulo Humano (camino B). La misma página cubre crear y editar:
  * sin `:id` → alta; con `:id` → edición (el id llega por `withComponentInputBinding`).
  *
- * Todas las FK están cableadas a sus endpoints `seleccionar/` vía `<app-api-select>`
+ * Todas las FK están cableadas a sus endpoints `seleccionar/` vía `<lib-api-select>`
  * (`contacto` usa `<app-empleado-autocomplete>`, que pinta la identificación al lado;
- * `ciudad_contrato` / `ciudad_labora` usan `<app-api-autocomplete>` con búsqueda contra
+ * `ciudad_contrato` / `ciudad_labora` usan `<lib-api-autocomplete>` con búsqueda contra
  * `/general/ciudad/seleccionar/`). Las FK de humano apuntan a `/humano/<slug>/seleccionar/`
  * y `centro_costo` a `/contabilidad/centro-costo/seleccionar/`. Las cuatro entidades de
  * seguridad social (`entidad_salud`, `entidad_pension`, `entidad_cesantias`, `entidad_caja`)

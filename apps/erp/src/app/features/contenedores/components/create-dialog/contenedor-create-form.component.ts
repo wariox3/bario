@@ -13,10 +13,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { I18nService, ToastService, FormErrorService } from '@reddoc/core';
+import {
+  Contenedor,
+  ContenedorService,
+  FormErrorService,
+  I18nService,
+  ToastService,
+} from '@reddoc/core';
 import { AuthService } from '../../../auth/services/auth.service';
-import { Contenedor } from '../../models/contenedor.model';
-import { ContenedorService } from '../../services/contenedor.service';
 import type { AppDict } from '../../../../i18n';
 
 @Component({

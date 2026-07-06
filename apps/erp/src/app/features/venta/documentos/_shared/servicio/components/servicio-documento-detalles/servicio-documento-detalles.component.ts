@@ -15,7 +15,7 @@ import { detalleToFormValue, detalleToPayload } from '../../servicio-documento.m
 import { toLineaCalculo } from '../../servicio-documento-detalle.utils';
 import type { ServicioDocumentoDetalleRead } from '../../servicio-documento.model';
 import type { DetalleFormRawValue } from '../../servicio-documento-detalle.types';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 
 /**
  * Listado de las líneas de servicio (detalles) del documento.

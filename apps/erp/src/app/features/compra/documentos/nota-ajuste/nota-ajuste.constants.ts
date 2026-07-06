@@ -8,7 +8,7 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
  * estado). Los `field` mapean el shape del endpoint `general/documento/lista/`.
  *
  * Los endpoints de los selects (plazo/método de pago, centro de costo) NO viven
- * aquí: se toman de `@erp/core/data/select-endpoints` para no repetirlos.
+ * aquí: se toman de `@reddoc/core` para no repetirlos.
  */
 export const NOTA_AJUSTE_COLUMNS: readonly ColumnDef[] = [
   {

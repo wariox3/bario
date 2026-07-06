@@ -69,7 +69,7 @@
             {{ t().entities.cuentaBanco.form.fields.tipo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="cuenta_banco_tipo"
             formControlName="cuenta_banco_tipo"
             [endpoint]="tipoEndpoint"
@@ -110,7 +110,7 @@
               {{ t().entities.cuentaBanco.form.fields.clase }}
               <span class="ml-px text-red-500">*</span>
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="cuenta_banco_clase"
               formControlName="cuenta_banco_clase"
               [endpoint]="claseEndpoint"

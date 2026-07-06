@@ -1,5 +1,5 @@
 import { toFiniteNumber } from '@reddoc/core';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { ConfiguracionPayload, ConfiguracionRead } from './configuracion.model';
 
 /** Opción mínima para precargar un select por id (el label lo resuelve el `dataKey`). */

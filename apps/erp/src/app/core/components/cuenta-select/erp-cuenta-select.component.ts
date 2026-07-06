@@ -13,8 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { map } from 'rxjs/operators';
-import type { ParamValue } from '@reddoc/core';
-import { ErpSelectDataService, ErpSelectOption } from '@erp/core/data/erp-select-data.service';
+import { ErpSelectDataService, ErpSelectOption, type ParamValue } from '@reddoc/core';
 
 /** Fila cruda del endpoint `contabilidad/cuenta/seleccionar/`. */
 interface CuentaApiRow {
@@ -53,7 +52,7 @@ function toOption(row: CuentaApiRow): ErpSelectOption {
  * Implementa `ControlValueAccessor`: el valor del control es un `ErpSelectOption`
  * (`{ id, nombre }`) donde `nombre` ya es la etiqueta `código - nombre` —misma
  * convención que produce `item.mapper`, por lo que es intercambiable con
- * `app-api-autocomplete` en los campos de cuenta.
+ * `lib-api-autocomplete` en los campos de cuenta.
  */
 @Component({
   selector: 'app-cuenta-select',

@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { I18nService, formatCop, toHora } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { DetalleFormRawValue } from '../../servicio-documento-detalle.types';
 import { lineAmount } from '../../servicio-documento-detalle.utils';
 

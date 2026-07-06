@@ -15,7 +15,7 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { UppercaseDirective } from '@erp/core/directives/uppercase.directive';
+import { UppercaseDirective } from '@reddoc/ui';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ResolucionService } from '../../resolucion.service';

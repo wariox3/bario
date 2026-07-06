@@ -55,7 +55,7 @@
             {{ t().entities.contacto.form.fields.tipoPersona }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tipo_persona"
             formControlName="tipo_persona"
             [endpoint]="endpoints.tipoPersona"
@@ -74,7 +74,7 @@
             {{ t().entities.contacto.form.fields.responsabilidad }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="responsabilidad"
             formControlName="responsabilidad"
             [endpoint]="endpoints.responsabilidad"
@@ -95,7 +95,7 @@
             {{ t().entities.contacto.form.fields.identificacion }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="identificacion"
             formControlName="identificacion"
             [endpoint]="endpoints.identificacion"
@@ -238,7 +238,7 @@
             {{ t().entities.contacto.form.fields.ciudad }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="ciudad"
             formControlName="ciudad"
             [endpoint]="endpoints.ciudad"
@@ -346,7 +346,7 @@
               {{ t().entities.contacto.form.fields.plazoPago }}
               <span class="ml-px text-red-500">*</span>
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="plazo_pago"
               formControlName="plazo_pago"
               [suggestedIndex]="0"
@@ -364,7 +364,7 @@
             <label for="precio" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.precio }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="precio"
               formControlName="precio"
               [endpoint]="endpoints.precio"
@@ -377,7 +377,7 @@
             <label for="asesor" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.asesor }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="asesor"
               formControlName="asesor"
               [endpoint]="endpoints.asesor"
@@ -435,7 +435,7 @@
             <label for="banco" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.banco }}
             </label>
-            <app-api-autocomplete
+            <lib-api-autocomplete
               inputId="banco"
               formControlName="banco"
               [endpoint]="endpoints.banco"
@@ -463,7 +463,7 @@
             <label for="cuenta_banco_clase" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.cuentaBancoClase }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="cuenta_banco_clase"
               formControlName="cuenta_banco_clase"
               [endpoint]="endpoints.cuentaBancoClase"
@@ -475,7 +475,7 @@
             <label for="plazo_pago_proveedor" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.plazoPagoProveedor }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="plazo_pago_proveedor"
               formControlName="plazo_pago_proveedor"
               [endpoint]="endpoints.plazoPago"

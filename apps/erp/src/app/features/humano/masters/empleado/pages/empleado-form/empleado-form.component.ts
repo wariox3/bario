@@ -5,14 +5,17 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
-import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import {
-  ErpApiSelectComponent,
-  ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
-import { SELECT_ENDPOINTS } from '@erp/core/data/select-endpoints';
+  FormErrorService,
+  I18nService,
+  SELECT_ENDPOINTS,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
+import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '@erp/features/general/masters/contacto/contacto.service';
 import { TIPO_PERSONA } from '@erp/features/general/masters/contacto/contacto.constants';

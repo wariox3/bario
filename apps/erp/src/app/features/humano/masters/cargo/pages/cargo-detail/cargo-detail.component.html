@@ -42,7 +42,7 @@
   </div>
 } @else if (cargo(); as c) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-briefcase"
     [eyebrow]="t().entities.cargo.detail.eyebrow"
     [title]="c.nombre"
@@ -68,5 +68,5 @@
         </span>
       }
     </div>
-  </app-detail-header>
+  </lib-detail-header>
 }

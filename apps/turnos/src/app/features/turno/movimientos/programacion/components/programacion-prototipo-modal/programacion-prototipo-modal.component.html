@@ -1,0 +1,267 @@
+@let m = t().entities.programacion.detail.prototipoModal;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [focusOnShow]="false"
+  [style]="{ width: '72rem' }"
+  [breakpoints]="{ '1100px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-calendar-plus text-[1.05rem]"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.title }}
+        </h2>
+        <p class="m-0 flex flex-wrap items-center gap-x-1 text-[0.75rem] text-brand-muted">
+          @if (documentoNumero()) {
+            <span>{{ m.codigoLabel }}: {{ documentoNumero() }}</span>
+          }
+          @if (clienteNombre()) {
+            <span class="text-brand-muted/50">·</span>
+            <span>{{ m.clienteLabel }}: {{ clienteNombre() }}</span>
+          }
+          @if (grupo(); as g) {
+            <span class="text-brand-muted/50">·</span>
+            <span>
+              {{ m.puestoLabel }}:
+              @if (g.puestoNombre) {
+                {{ g.puestoId }} | {{ g.puestoNombre }}
+              } @else {
+                {{ g.documentoDetalleId }}
+              }
+            </span>
+          }
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="form" class="flex flex-col gap-3 pt-1">
+    <!-- Barra de acciones de la tabla -->
+    <div class="flex items-center gap-2">
+      <p-button
+        type="button"
+        [label]="m.nuevo"
+        icon="pi pi-plus"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onNuevo()"
+      />
+      @if (seleccionadasCount(); as n) {
+        <button
+          type="button"
+          (click)="onEliminarSeleccionadas()"
+          [disabled]="isSubmitting()"
+          class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-red-600/35 bg-red-500/[0.08] px-2.5 py-1 text-[0.75rem] font-bold text-red-700 transition-colors hover:border-red-600/50 hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <i class="pi pi-trash text-[0.7rem]"></i>
+          {{ m.eliminar }} ({{ n }})
+        </button>
+      }
+    </div>
+
+    <div class="overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+      <table class="prototipo-grid">
+        <thead>
+          <tr>
+            <th class="prototipo-grid__th prototipo-grid__th--check">
+              <input
+                type="checkbox"
+                class="prototipo-grid__check"
+                [checked]="todasSeleccionadas()"
+                [attr.aria-label]="m.seleccionarTodo"
+                [disabled]="!filas.length"
+                (change)="onToggleTodas()"
+              />
+            </th>
+            <th class="prototipo-grid__th">{{ m.columns.contrato }}</th>
+            <th class="prototipo-grid__th">{{ m.columns.secuencia }}</th>
+            <th class="prototipo-grid__th prototipo-grid__th--fecha">
+              {{ m.columns.fechaInicio }}
+            </th>
+            <th class="prototipo-grid__th prototipo-grid__th--pos">{{ m.columns.posicion }}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (g of filas.controls; track g; let i = $index) {
+            <tr class="prototipo-grid__row" [formGroup]="g">
+              <td class="prototipo-grid__td prototipo-grid__td--check">
+                <input
+                  type="checkbox"
+                  class="prototipo-grid__check"
+                  [checked]="g.controls.sel.value"
+                  [attr.aria-label]="m.seleccionarFila"
+                  (change)="onToggleFila(g)"
+                />
+              </td>
+              <td class="prototipo-grid__td prototipo-grid__td--contrato">
+                <lib-contrato-autocomplete
+                  formControlName="contrato"
+                  [placeholder]="m.contratoPlaceholder"
+                  [invalid]="g.controls.contrato.touched && g.controls.contrato.invalid"
+                />
+              </td>
+              <td class="prototipo-grid__td prototipo-grid__td--secuencia">
+                <lib-api-autocomplete
+                  formControlName="secuencia"
+                  [endpoint]="secuenciaEndpoint"
+                  [placeholder]="m.secuenciaPlaceholder"
+                  [invalid]="g.controls.secuencia.touched && g.controls.secuencia.invalid"
+                />
+              </td>
+              <td class="prototipo-grid__td prototipo-grid__td--fecha">
+                <input
+                  pInputText
+                  type="date"
+                  formControlName="fechaInicio"
+                  class="prototipo-grid__input"
+                  [class.prototipo-grid__input--invalid]="
+                    g.controls.fechaInicio.touched && g.controls.fechaInicio.invalid
+                  "
+                />
+              </td>
+              <td class="prototipo-grid__td prototipo-grid__td--pos">
+                <input
+                  pInputText
+                  type="number"
+                  min="1"
+                  formControlName="posicion"
+                  class="prototipo-grid__input prototipo-grid__input--num"
+                />
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="px-5 py-10 text-center text-sm text-brand-muted">
+                @if (cargandoLista()) {
+                  <i class="pi pi-spin pi-spinner mr-2"></i>{{ m.cargando }}
+                } @else {
+                  <i class="pi pi-inbox mr-2"></i>{{ m.empty }}
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </form>
+
+  <!-- ── Vista previa (simulación) — MAQUETA ──────────────────────────────────────
+       TODO(prototipo): alimentar `simulacion()` desde el resultado real de onSimular. -->
+  <div class="mt-4 flex flex-col gap-2">
+    <span class="text-[0.78rem] font-medium text-brand-muted">{{ m.preview.title }}</span>
+    <div class="max-h-[22rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+      <table class="prototipo-preview">
+        <thead>
+          <tr>
+            <th class="prototipo-preview__th">{{ m.preview.anio }}</th>
+            <th class="prototipo-preview__th">{{ m.preview.mes }}</th>
+            <th class="prototipo-preview__th">{{ m.preview.codigo }}</th>
+            <th class="prototipo-preview__th prototipo-preview__th--empleado">
+              {{ m.preview.empleado }}
+            </th>
+            @for (d of dias(); track d.dia) {
+              <th
+                class="prototipo-preview__th prototipo-preview__th--dia"
+                [class.prototipo-preview__th--festivo]="
+                  d.inicial === 'D' || festivoPorDia().has(d.dia)
+                "
+                [class.prototipo-preview__th--sabado]="
+                  d.inicial === 'S' && !festivoPorDia().has(d.dia)
+                "
+              >
+                <span class="prototipo-preview__dia-num">{{ d.dia }}</span>
+                <span class="prototipo-preview__dia-ini">{{ d.inicial }}</span>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of simulacion(); track fila.empleado + '_' + fila.codigo) {
+            <tr class="prototipo-preview__row">
+              <td class="prototipo-preview__td tabular-nums">{{ fila.anio }}</td>
+              <td class="prototipo-preview__td tabular-nums">{{ fila.mes }}</td>
+              <td class="prototipo-preview__td">{{ fila.codigo }}</td>
+              <td class="prototipo-preview__td prototipo-preview__td--empleado">
+                {{ fila.empleado }}
+              </td>
+              @for (d of dias(); track d.dia) {
+                <td class="prototipo-preview__td prototipo-preview__td--dia tabular-nums">
+                  {{ fila.dias[d.dia] || '' }}
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td
+                [attr.colspan]="dias().length + 4"
+                class="px-5 py-8 text-center text-sm text-brand-muted"
+              >
+                <i class="pi pi-inbox mr-2"></i>{{ m.preview.empty }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <!-- Dos clusters: izq. = previsualizar (Simular, no destructivo);
+         der. = descartar · guardar config · generar (CTA terminal). -->
+    <div class="flex items-center justify-between gap-2">
+      <!-- Simular: dry-run, otra clase de acción → outlined, separado a la izquierda.
+           TODO(prototipo): conectar con la simulación (ver onSimular). -->
+      <p-button
+        type="button"
+        [label]="m.simular"
+        icon="pi pi-play"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="!filas.length || cargandoPeriodo() || isSubmitting()"
+        (onClick)="onSimular()"
+      />
+
+      <div class="flex items-center gap-2">
+        <p-button
+          type="button"
+          [label]="m.close"
+          severity="secondary"
+          [text]="true"
+          (onClick)="onClose()"
+        />
+        <p-button
+          type="button"
+          [label]="m.guardar"
+          icon="pi pi-check"
+          severity="secondary"
+          [outlined]="true"
+          [loading]="isSubmitting()"
+          [disabled]="!filas.length || cargandoPeriodo()"
+          (onClick)="onGuardar()"
+        />
+        <!-- Generar: único primario (meta terminal — materializa el prototipo).
+             TODO(prototipo): conectar con la generación (ver onGenerar). -->
+        <p-button
+          type="button"
+          [label]="m.generar"
+          icon="pi pi-bolt"
+          [disabled]="!filas.length || cargandoPeriodo() || isSubmitting()"
+          (onClick)="onGenerar()"
+        />
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -67,7 +67,7 @@
             {{ t().entities.contrato.form.fields.contratoTipo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="contrato_tipo"
             formControlName="contrato_tipo"
             endpoint="/humano/contrato-tipo/seleccionar/"
@@ -81,7 +81,7 @@
             {{ t().entities.contrato.form.fields.cargo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="cargo"
             formControlName="cargo"
             endpoint="/humano/cargo/seleccionar/"
@@ -95,7 +95,7 @@
             {{ t().entities.contrato.form.fields.grupo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="grupo"
             formControlName="grupo"
             endpoint="/humano/grupo/seleccionar/"
@@ -109,7 +109,7 @@
             {{ t().entities.contrato.form.fields.sucursal }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="sucursal"
             formControlName="sucursal"
             endpoint="/humano/sucursal/seleccionar/"
@@ -123,7 +123,7 @@
             {{ t().entities.contrato.form.fields.tiempo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tiempo"
             formControlName="tiempo"
             endpoint="/humano/tiempo/seleccionar/"
@@ -237,7 +237,7 @@
           <label for="tipo_costo" class="contrato-form__label">
             {{ t().entities.contrato.form.fields.tipoCosto }}
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tipo_costo"
             formControlName="tipo_costo"
             [suggestedIndex]="0"
@@ -250,7 +250,7 @@
           <label for="centro_costo" class="contrato-form__label">
             {{ t().entities.contrato.form.fields.centroCosto }}
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="centro_costo"
             formControlName="centro_costo"
             [endpoint]="endpoints.centroCosto"
@@ -310,7 +310,7 @@
             {{ t().entities.contrato.form.fields.salud }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="salud"
             formControlName="salud"
             endpoint="/humano/salud/seleccionar/"
@@ -325,7 +325,7 @@
             {{ t().entities.contrato.form.fields.entidadSalud }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_salud"
             formControlName="entidad_salud"
             endpoint="/humano/entidad/seleccionar/"
@@ -339,7 +339,7 @@
             {{ t().entities.contrato.form.fields.pension }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="pension"
             formControlName="pension"
             endpoint="/humano/pension/seleccionar/"
@@ -354,7 +354,7 @@
             {{ t().entities.contrato.form.fields.entidadPension }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_pension"
             formControlName="entidad_pension"
             endpoint="/humano/entidad/seleccionar/"
@@ -370,7 +370,7 @@
             {{ t().entities.contrato.form.fields.entidadCesantias }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_cesantias"
             formControlName="entidad_cesantias"
             endpoint="/humano/entidad/seleccionar/"
@@ -386,7 +386,7 @@
             {{ t().entities.contrato.form.fields.entidadCaja }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_caja"
             formControlName="entidad_caja"
             endpoint="/humano/entidad/seleccionar/"
@@ -400,7 +400,7 @@
             {{ t().entities.contrato.form.fields.riesgo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="riesgo"
             formControlName="riesgo"
             endpoint="/humano/riesgo/seleccionar/"
@@ -414,7 +414,7 @@
             {{ t().entities.contrato.form.fields.tipoCotizante }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tipo_cotizante"
             formControlName="tipo_cotizante"
             endpoint="/humano/tipo-cotizante/seleccionar/"
@@ -429,7 +429,7 @@
             {{ t().entities.contrato.form.fields.subtipoCotizante }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="subtipo_cotizante"
             formControlName="subtipo_cotizante"
             endpoint="/humano/subtipo-cotizante/seleccionar/"
@@ -446,7 +446,7 @@
             {{ t().entities.contrato.form.fields.ciudadContrato }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="ciudad_contrato"
             formControlName="ciudad_contrato"
             [endpoint]="endpoints.ciudad"
@@ -462,7 +462,7 @@
             {{ t().entities.contrato.form.fields.ciudadLabora }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="ciudad_labora"
             formControlName="ciudad_labora"
             [endpoint]="endpoints.ciudad"
@@ -499,7 +499,7 @@
             <label for="motivo_terminacion" class="contrato-form__label">
               {{ t().entities.contrato.form.fields.motivoTerminacion }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="motivo_terminacion"
               formControlName="motivo_terminacion"
               endpoint="/humano/motivo-terminacion/seleccionar/"

@@ -12,9 +12,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { map } from 'rxjs/operators';
-import { toFiniteNumber } from '@reddoc/core';
-import { ErpSelectDataService } from '@erp/core/data/erp-select-data.service';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpSelectDataService, toFiniteNumber } from '@reddoc/core';
+import type { ErpSelectOption } from '@reddoc/core';
 
 /**
  * Opción de ítem para las líneas de detalle de un documento. Extiende

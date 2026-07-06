@@ -26,12 +26,10 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
-import { ErpContactoSelectComponent } from '@erp/core/components/contacto-select/erp-contacto-select.component';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpSelectDataService } from '@erp/core/data/erp-select-data.service';
+import { ErpContactoSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ErpSelectDataService } from '@reddoc/core';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';

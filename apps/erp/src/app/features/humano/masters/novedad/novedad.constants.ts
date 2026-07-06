@@ -8,7 +8,7 @@ export const NOVEDADES_QUICK_SEARCH_FIELD = 'contrato_nombre';
 export const NOVEDAD_LIST_PATH = ['humano', 'novedades'] as const;
 
 // El endpoint del selector de tipo de novedad es cross-form (novedad + turno);
-// vive en `SELECT_ENDPOINTS.novedadTipo` (`@erp/core/data/select-endpoints`).
+// vive en `SELECT_ENDPOINTS.novedadTipo` (`@reddoc/core`).
 /** Endpoint del selector de novedad de referencia (filtrado por contrato + tipo). */
 export const NOVEDAD_REFERENCIA_ENDPOINT = '/humano/novedad/seleccionar/';
 

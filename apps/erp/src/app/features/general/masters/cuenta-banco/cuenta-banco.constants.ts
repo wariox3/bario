@@ -1,6 +1,5 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import { type ColumnDef, type FilterField, SELECT_ENDPOINTS } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
-import { SELECT_ENDPOINTS } from '@erp/core/data/select-endpoints';
 
 export const CUENTAS_BANCO_FILTERS_STORAGE_KEY = 'cuentas-banco:filters:v1';
 export const CUENTAS_BANCO_QUICK_SEARCH_FIELD = 'nombre';

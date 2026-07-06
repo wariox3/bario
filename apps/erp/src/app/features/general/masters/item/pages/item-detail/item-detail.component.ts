@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@erp/core/components/detail-header/detail-header.component';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';

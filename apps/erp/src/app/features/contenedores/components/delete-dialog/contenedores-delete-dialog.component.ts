@@ -1,7 +1,6 @@
 import { Component, inject, input, output } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
-import { I18nService } from '@reddoc/core';
-import { Contenedor } from '../../models/contenedor.model';
+import { Contenedor, I18nService } from '@reddoc/core';
 import { ContenedorDeleteFormComponent } from './contenedor-delete-form.component';
 import type { AppDict } from '../../../../i18n';
 

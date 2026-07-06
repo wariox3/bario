@@ -12,10 +12,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { I18nService, ToastService, formatCop, toFiniteNumber } from '@reddoc/core';
-import type { DocumentoDetalleReadBase } from '@reddoc/core';
+import {
+  type DocumentoDetalleReadBase,
+  DocumentoDetalleService,
+  formatCop,
+  I18nService,
+  ToastService,
+  toFiniteNumber,
+} from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import { DocumentoDetalleService } from '../../data/documento-detalle.service';
 import { DocumentoService } from '../../data/documento.service';
 
 /**

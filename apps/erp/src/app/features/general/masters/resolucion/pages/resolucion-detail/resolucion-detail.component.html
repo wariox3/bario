@@ -42,7 +42,7 @@
   </div>
 } @else if (resolucion(); as r) {
   <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-file"
     [eyebrow]="t().entities.resolucion.detail.eyebrow"
     [title]="r.prefijo + ' ' + r.numero"
@@ -54,7 +54,7 @@
         {{ r.fecha_hasta ? (r.fecha_hasta | date: 'yyyy-MM-dd') : '—' }}
       </p>
     }
-  </app-detail-header>
+  </lib-detail-header>
 
   <!-- ── Datos de la resolución ─────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

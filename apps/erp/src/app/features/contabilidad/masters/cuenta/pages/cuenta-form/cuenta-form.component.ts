@@ -8,8 +8,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { FieldErrorComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiSelectComponent } from '@erp/core/components/api-select/erp-api-select.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { CuentaService } from '../../cuenta.service';
 import {
@@ -33,7 +33,7 @@ import { longitudPar, noIniciaCon, soloDigitos } from '../../utils/cuenta-codigo
  * Cascada `clase → grupo → cuenta`: grupo y cuenta arrancan deshabilitados y se
  * habilitan al elegir su padre. Las opciones de cada nivel se filtran por rango
  * de id (`grupoParams` / `cuentaParams`, derivados del padre) que alimenta el
- * `[params]` reactivo del `<app-api-select>`. Al cambiar un padre se limpian sus
+ * `[params]` reactivo del `<lib-api-select>`. Al cambiar un padre se limpian sus
  * hijos.
  */
 @Component({

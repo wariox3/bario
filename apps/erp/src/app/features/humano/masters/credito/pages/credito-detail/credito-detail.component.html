@@ -42,7 +42,7 @@
   </div>
 } @else if (credito(); as c) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-wallet"
     [eyebrow]="t().entities.credito.detail.eyebrow"
     [title]="c.contrato_nombre || '—'"
@@ -50,7 +50,7 @@
     <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
       {{ c.concepto_nombre || '—' }}
     </p>
-  </app-detail-header>
+  </lib-detail-header>
 
   <!-- ── Datos del crédito ─────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

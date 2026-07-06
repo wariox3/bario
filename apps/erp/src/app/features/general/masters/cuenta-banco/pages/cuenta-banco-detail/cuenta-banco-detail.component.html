@@ -42,7 +42,7 @@
   </div>
 } @else if (cuentaBanco(); as c) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-wallet"
     [eyebrow]="t().entities.cuentaBanco.detail.eyebrow"
     [title]="c.nombre"
@@ -52,7 +52,7 @@
         {{ c.cuenta_banco_tipo_nombre }}
       </p>
     }
-  </app-detail-header>
+  </lib-detail-header>
 
   <!-- ── Datos ────────────────────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

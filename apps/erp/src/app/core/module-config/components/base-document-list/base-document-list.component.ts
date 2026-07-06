@@ -38,11 +38,14 @@ import type {
 } from '@reddoc/feature-base';
 import { ENTITY_ACTION_STRATEGY } from '../../actions/entity-action.token';
 import type { EntityActionStrategy } from '../../actions/entity-action-strategy';
-import { ENTITY_DATA_GATEWAY } from '../../data/entity-data-gateway';
+import {
+  type DocumentEntityConfig,
+  type EditableRowContext,
+  ENTITY_DATA_GATEWAY,
+} from '@reddoc/core';
 import { MissingModuleContextError } from '../../errors/config.errors';
 import { ModuleNavigationStore } from '../../module-navigation.store';
 import { buildEntityStorageKey } from '../../storage/build-entity-storage-key';
-import type { DocumentEntityConfig, EditableRowContext } from '../../types/entity-config.types';
 
 /** Tamaño de página default mientras `DocumentEntityConfig` no exponga `paginationDefaults`. */
 const DEFAULT_PAGE_SIZE = 25;

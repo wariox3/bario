@@ -15,12 +15,9 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-import {
-  ContratoAutocompleteComponent,
-  type ContratoOption,
-} from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { CreditoService } from '../../credito.service';
 import { CONCEPTO_ENDPOINT, CREDITO_LIST_PATH } from '../../credito.constants';
@@ -31,7 +28,7 @@ import { creditoToFormValue, formValueToPayload } from '../../credito.mapper';
  *
  * Master del módulo Humano (camino B). La misma página cubre crear y editar: sin
  * `:id` → alta (sugiere hoy en fecha_inicio); con `:id` → edición. `contrato` usa
- * `<app-contrato-autocomplete>` y `concepto` usa `<app-api-autocomplete>` (búsqueda
+ * `<lib-contrato-autocomplete>` y `concepto` usa `<lib-api-autocomplete>` (búsqueda
  * por `nombre__icontains`).
  */
 @Component({

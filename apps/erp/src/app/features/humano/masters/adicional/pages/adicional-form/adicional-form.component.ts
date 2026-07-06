@@ -9,12 +9,9 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { FieldErrorComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-import {
-  ContratoAutocompleteComponent,
-  type ContratoOption,
-} from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
 import { CONCEPTO_ENDPOINT, ADICIONAL_LIST_PATH } from '../../adicional.constants';
@@ -24,8 +21,8 @@ import { adicionalToFormValue, formValueToPayload } from '../../adicional.mapper
  * Formulario de alta/edición de adicional de empleado.
  *
  * Master del módulo Humano (camino B). La misma página cubre crear y editar: sin
- * `:id` → alta; con `:id` → edición. `contrato` usa `<app-contrato-autocomplete>`
- * y `concepto` usa `<app-api-autocomplete>` (búsqueda por `nombre__icontains`).
+ * `:id` → alta; con `:id` → edición. `contrato` usa `<lib-contrato-autocomplete>`
+ * y `concepto` usa `<lib-api-autocomplete>` (búsqueda por `nombre__icontains`).
  */
 @Component({
   selector: 'app-adicional-form',

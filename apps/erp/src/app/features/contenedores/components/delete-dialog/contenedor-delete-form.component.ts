@@ -2,9 +2,7 @@ import { Component, DestroyRef, computed, inject, input, output, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { I18nService, ToastService } from '@reddoc/core';
-import { Contenedor } from '../../models/contenedor.model';
-import { ContenedorService } from '../../services/contenedor.service';
+import { Contenedor, ContenedorService, I18nService, ToastService } from '@reddoc/core';
 import type { AppDict } from '../../../../i18n';
 
 @Component({

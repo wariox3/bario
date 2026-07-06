@@ -51,7 +51,7 @@
             {{ t().entities.servicioDocumento.form.fields.contacto }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-contacto-select
+          <lib-contacto-select
             inputId="contacto"
             formControlName="contacto"
             [placeholder]="t().entities.servicioDocumento.form.fields.contactoPlaceholder"
@@ -97,7 +97,7 @@
             {{ t().entities.servicioDocumento.form.fields.sector }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="sector"
             formControlName="sector"
             [endpoint]="sectorEndpoint"

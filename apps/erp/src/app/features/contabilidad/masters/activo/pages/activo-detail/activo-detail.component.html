@@ -42,7 +42,7 @@
   </div>
 } @else if (activo(); as a) {
   <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-box"
     [eyebrow]="t().entities.activo.detail.eyebrow"
     [title]="a.nombre"
@@ -50,7 +50,7 @@
     <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
       {{ a.codigo }}
     </p>
-  </app-detail-header>
+  </lib-detail-header>
 
   <!-- ── Datos del activo ──────────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

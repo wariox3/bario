@@ -56,7 +56,7 @@
             {{ t().entities.adicional.form.fields.contrato }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-contrato-autocomplete
+          <lib-contrato-autocomplete
             inputId="contrato"
             formControlName="contrato"
             [placeholder]="t().entities.adicional.form.fields.contratoPlaceholder"
@@ -74,7 +74,7 @@
             {{ t().entities.adicional.form.fields.concepto }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="concepto"
             formControlName="concepto"
             [endpoint]="conceptoEndpoint"

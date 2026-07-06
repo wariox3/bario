@@ -1,7 +1,6 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
-import { I18nService } from '@reddoc/core';
-import { Contenedor } from '../../models/contenedor.model';
+import { Contenedor, I18nService } from '@reddoc/core';
 import { ContenedorCreateFormComponent } from './contenedor-create-form.component';
 import { ContenedorCreationOverlayComponent } from '../creation-overlay/contenedor-creation-overlay.component';
 import type { AppDict } from '../../../../i18n';

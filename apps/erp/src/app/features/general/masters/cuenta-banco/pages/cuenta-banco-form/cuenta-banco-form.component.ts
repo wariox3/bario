@@ -7,10 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FieldErrorComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';

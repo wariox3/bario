@@ -1,13 +1,12 @@
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { I18nService, ToastService, getInitials } from '@reddoc/core';
+import { ContenedorService, getInitials, I18nService, ToastService } from '@reddoc/core';
 import {
   Contenedor,
   ContenedorInvitacionEstado,
   ContenedorInvitacionPendiente,
-} from '../../models/contenedor.model';
-import { ContenedorService } from '../../services/contenedor.service';
+} from '@reddoc/core';
 import type { AppDict } from '../../../../i18n';
 
 @Component({

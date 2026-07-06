@@ -42,7 +42,7 @@
   </div>
 } @else if (empleado(); as c) {
   <!-- ── Identidad ───────────────────────────────────────────────────────── -->
-  <app-detail-header [eyebrow]="d.eyebrow" [title]="c.nombre_corto">
+  <lib-detail-header [eyebrow]="d.eyebrow" [title]="c.nombre_corto">
     <!-- Monograma de iniciales -->
     <span
       detailHeaderMedia
@@ -54,7 +54,7 @@
     <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
       {{ documento() }}
     </p>
-  </app-detail-header>
+  </lib-detail-header>
 
   <!-- ── Información general ──────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

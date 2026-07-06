@@ -17,9 +17,15 @@ import {
   AutoCompleteModule,
 } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, ToastService, extractErrorMessage, getInitials } from '@reddoc/core';
-import { Contenedor, UserSearchResult } from '../../models/contenedor.model';
-import { ContenedorService } from '../../services/contenedor.service';
+import {
+  Contenedor,
+  ContenedorService,
+  extractErrorMessage,
+  getInitials,
+  I18nService,
+  ToastService,
+  UserSearchResult,
+} from '@reddoc/core';
 import type { AppDict } from '../../../../i18n';
 
 const ROL_ID_DEFAULT = 9;

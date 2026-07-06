@@ -6,9 +6,9 @@ import type { ContratoFormRawValue } from './pages/contrato-form/contrato-form.t
  * Adapta el read-model (`Contrato`) a los valores del reactive form.
  *
  * Las FK se reagrupan en `{ id, nombre }` usando el companion `*_nombre` que
- * devuelve el backend para pintar la etiqueta en edición (los `<app-api-select>`
+ * devuelve el backend para pintar la etiqueta en edición (los `<lib-api-select>`
  * también la resuelven por `id` al cargar opciones, pero las ciudades usan
- * `<app-api-autocomplete>`, que no precarga, así que el `*_nombre` es necesario).
+ * `<lib-api-autocomplete>`, que no precarga, así que el `*_nombre` es necesario).
  * `salario` llega como string Decimal → se normaliza a número para el inputnumber.
  */
 export function contratoToFormValue(c: Contrato): Partial<ContratoFormRawValue> {

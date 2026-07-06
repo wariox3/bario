@@ -42,7 +42,7 @@
   </div>
 } @else if (sede(); as s) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <app-detail-header
+  <lib-detail-header
     icon="pi pi-building"
     [eyebrow]="t().entities.sede.detail.eyebrow"
     [title]="s.nombre"
@@ -57,5 +57,5 @@
         {{ t().entities.sede.columns.centroCosto }}: {{ s.centro_costo_nombre }}
       </p>
     }
-  </app-detail-header>
+  </lib-detail-header>
 }

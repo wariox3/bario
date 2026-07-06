@@ -1,6 +1,6 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { startOfToday, type ImpuestoLinea } from '@reddoc/core';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { DetalleFormRawValue, ItemOption } from './servicio-documento-detalle.types';
 
 function defaultFechaDesde(value?: Partial<DetalleFormRawValue>): Date | null {

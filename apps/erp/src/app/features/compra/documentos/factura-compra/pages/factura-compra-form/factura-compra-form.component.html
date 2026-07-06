@@ -54,7 +54,7 @@
             {{ t().entities.facturaCompra.form.fields.proveedor }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-contacto-select
+          <lib-contacto-select
             inputId="contacto"
             formControlName="contacto"
             [extraParams]="contactoParams"
@@ -118,7 +118,7 @@
             {{ t().entities.facturaCompra.form.fields.plazoPago }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="plazo_pago"
             formControlName="plazo_pago"
             [endpoint]="plazoPagoEndpoint"
@@ -137,7 +137,7 @@
             {{ t().entities.facturaCompra.form.fields.metodoPago }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="metodo_pago"
             formControlName="metodo_pago"
             [endpoint]="metodoPagoEndpoint"
@@ -155,7 +155,7 @@
           <label for="sede" class="factura-compra-form__label">
             {{ t().entities.facturaCompra.form.fields.sede }}
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="sede"
             formControlName="sede"
             [endpoint]="sedeEndpoint"

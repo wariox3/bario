@@ -1,7 +1,6 @@
 import type { Observable } from 'rxjs';
-import type { ListQuery } from '@reddoc/core';
+import { type DocumentEntityConfig, type ListQuery } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
-import type { DocumentEntityConfig } from '../types/entity-config.types';
 
 /**
  * Contexto que el listado anfitrión (`BaseDocumentListComponent`) entrega a un

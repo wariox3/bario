@@ -6,7 +6,7 @@ import {
   MissingModuleContextError,
 } from '../errors/config.errors';
 import { ModuleNavigationStore } from '../module-navigation.store';
-import type { DocumentEntityConfig } from '../types/entity-config.types';
+import type { DocumentEntityConfig } from '@reddoc/core';
 
 /**
  * Nombre del parámetro de ruta que identifica el documento activo.

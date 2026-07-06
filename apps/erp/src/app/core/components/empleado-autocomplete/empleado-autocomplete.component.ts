@@ -17,8 +17,7 @@ import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'pri
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { map } from 'rxjs/operators';
-import type { ParamValue } from '@reddoc/core';
-import { ErpSelectDataService } from '@erp/core/data/erp-select-data.service';
+import { ErpSelectDataService, type ParamValue } from '@reddoc/core';
 
 /**
  * Opción de empleado seleccionado. A diferencia de `ErpSelectOption`, conserva la
