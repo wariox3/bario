@@ -54,7 +54,12 @@ export {
   toHora,
   fromHora,
   daysBetween,
+  formatHorario,
+  anioMesDeIso,
+  diasDelMes,
+  INICIALES_DIA_SEMANA_ES,
 } from './lib/utils/date.utils';
+export type { DiaDelMes, AnioMes } from './lib/utils/date.utils';
 export { formatCop, toFiniteNumber } from './lib/utils/currency.utils';
 export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/calculo';
 export type { TasaImpuesto, ImpuestoLinea, LineaCalculo, ResumenDocumento } from './lib/calculo';
@@ -66,6 +71,26 @@ export type {
   DocumentoDetallePayloadBase,
   DocumentoDetalleImpuestoRead,
 } from './lib/documento';
+export {
+  DOCUMENT_TYPE_ID,
+  ENTITY_DATA_GATEWAY,
+  HttpEntityDataGateway,
+  DocumentoDetalleService,
+} from './lib/documento';
+export type {
+  EntityKind,
+  InventoryEffect,
+  DocumentCapabilities,
+  EditableRowContext,
+  EntityRoutes,
+  ImportDescriptor,
+  DocumentEntityConfig,
+  EntityConfig,
+  ModuleConfig,
+  DocumentTypeId,
+  DocumentTypeKey,
+  EntityDataGateway,
+} from './lib/documento';
 export type { ApiError, ApiErrorResponse } from './lib/utils/error.utils';
 export {
   I18nService,
@@ -75,8 +100,35 @@ export {
   REDDOC_PRIMENG_ES,
 } from './lib/i18n';
 export type { Lang } from './lib/i18n';
-export { TenantService, tenantGuard, TENANT_SCOPED, LAST_TENANT_KEY } from './lib/tenant';
-export type { TenantSlug, ContenedorAccess } from './lib/tenant';
+export {
+  TenantService,
+  tenantGuard,
+  tenantAccessGuard,
+  rootRedirectGuard,
+  TENANT_SCOPED,
+  LAST_TENANT_KEY,
+  TENANT_ROUTES,
+  ContenedorService,
+} from './lib/tenant';
+export type {
+  TenantSlug,
+  ContenedorAccess,
+  TenantRoutes,
+  UpdateContenedorRequest,
+  Contenedor,
+  ContenedorRol,
+  ContenedorMember,
+  ContenedorMembersResponse,
+  ContenedorInvitacionEstado,
+  ContenedorInvitacionPendiente,
+  ContenedorInvitacionesPendientesResponse,
+  SendInviteRequest,
+  ContenedoresResponse,
+  CreateContenedorRequest,
+  UserSearchResult,
+} from './lib/tenant';
+export { ErpSelectDataService, SELECT_ENDPOINTS } from './lib/data';
+export type { ErpSelectOption } from './lib/data';
 export * from './lib/data-list';
 export * from './lib/plans';
 export { normalizeHttpError, classifyStatus, NON_FIELD_KEY } from './lib/utils/error-normalizer';

@@ -1,6 +1,6 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { startOfToday, type ImpuestoLinea } from '@reddoc/core';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { DetalleFormRawValue, ItemOption } from './servicio-documento-detalle.types';
 
 function defaultFechaDesde(value?: Partial<DetalleFormRawValue>): Date | null {
@@ -38,6 +38,7 @@ export type DetalleGroup = FormGroup<{
   horas_diurnas: FormControl<number | null>;
   horas_nocturnas: FormControl<number | null>;
   precio_minimo: FormControl<number | null>;
+  documento_detalle_afectado: FormControl<number | null>;
 }>;
 
 /**
@@ -102,6 +103,9 @@ export function createDetalleGroup(value?: Partial<DetalleFormRawValue>): Detall
     horas_diurnas: new FormControl<number | null>(value?.horas_diurnas ?? null),
     horas_nocturnas: new FormControl<number | null>(value?.horas_nocturnas ?? null),
     precio_minimo: new FormControl<number | null>(value?.precio_minimo ?? null),
+    documento_detalle_afectado: new FormControl<number | null>(
+      value?.documento_detalle_afectado ?? null,
+    ),
   });
 
   // Recuerda el último precio antes de que cortesía lo ponga en 0, para restaurarlo

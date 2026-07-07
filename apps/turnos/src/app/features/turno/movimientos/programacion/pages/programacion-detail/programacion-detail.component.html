@@ -1,0 +1,218 @@
+@let det = t().entities.programacion.detail;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+</header>
+
+@if (isLoading()) {
+  <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <!-- ── No encontrado ───────────────────────────────────────────────────────── -->
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ det.notFound.title }}</p>
+    <p class="m-0 mt-1 max-w-[280px] text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ det.notFound.desc }}
+    </p>
+  </div>
+} @else if (cabecera(); as c) {
+  <!-- ── Información general ──────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-calendar text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ det.sections.general }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="flex flex-col gap-0.5">
+        <dt class="programacion-detail__label">{{ det.labels.numero }}</dt>
+        <dd class="programacion-detail__value">{{ c.numero || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="programacion-detail__label">{{ det.labels.fecha }}</dt>
+        <dd class="programacion-detail__value">{{ formatFecha(c.fecha) }}</dd>
+      </div>
+      @if (c.contacto) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="programacion-detail__label">{{ det.labels.contacto }}</dt>
+          <dd class="programacion-detail__value">{{ c.contacto }}</dd>
+        </div>
+      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="programacion-detail__label">{{ det.labels.identificacion }}</dt>
+        <dd class="programacion-detail__value">{{ c.identificacion || '—' }}</dd>
+      </div>
+    </dl>
+
+    <!-- Resumen de horas del documento (contratadas / programadas): el KPI de la ficha.
+         Ocupa la mitad izquierda de la card; la derecha queda libre. -->
+    <div class="programacion-detail__resumen">
+      <div class="programacion-detail__resumen-inner">
+        <div class="programacion-detail__resumen-grid">
+          <div class="programacion-detail__stat" [title]="det.grid.stats.total">
+            <span class="programacion-detail__stat-head">
+              <span class="programacion-detail__stat-icon programacion-detail__stat-icon--total">
+                <i class="pi pi-clock"></i>
+              </span>
+              {{ det.resumen.horas }}
+            </span>
+            <span class="programacion-detail__stat-value">
+              {{ c.horas ?? '—' }}<span class="programacion-detail__stat-sep">/</span
+              >{{ c.horasProgramadas ?? '—' }}<span class="programacion-detail__stat-unit">h</span>
+            </span>
+          </div>
+
+          <div class="programacion-detail__stat" [title]="det.grid.stats.diurnas">
+            <span class="programacion-detail__stat-head">
+              <span class="programacion-detail__stat-icon programacion-detail__stat-icon--dia">
+                <i class="pi pi-sun"></i>
+              </span>
+              {{ det.resumen.diurnas }}
+            </span>
+            <span class="programacion-detail__stat-value">
+              {{ c.horasDiurnas ?? '—' }}<span class="programacion-detail__stat-sep">/</span
+              >{{ c.horasDiurnasProgramadas ?? '—'
+              }}<span class="programacion-detail__stat-unit">h</span>
+            </span>
+          </div>
+
+          <div class="programacion-detail__stat" [title]="det.grid.stats.nocturnas">
+            <span class="programacion-detail__stat-head">
+              <span class="programacion-detail__stat-icon programacion-detail__stat-icon--noche">
+                <i class="pi pi-moon"></i>
+              </span>
+              {{ det.resumen.nocturnas }}
+            </span>
+            <span class="programacion-detail__stat-value">
+              {{ c.horasNocturnas ?? '—' }}<span class="programacion-detail__stat-sep">/</span
+              >{{ c.horasNocturnasProgramadas ?? '—'
+              }}<span class="programacion-detail__stat-unit">h</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Programación (grid de turnos) ────────────────────────────────────────── -->
+  @if (grid(); as gr) {
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div
+        class="flex min-h-[3.65rem] items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-2"
+      >
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+        >
+          <i class="pi pi-table text-[1rem]"></i>
+        </span>
+        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+          {{ det.sections.detalle }}
+        </h2>
+
+        <!-- Acción de borrado masivo: aparece en el header (sin empujar la tabla). -->
+        @if (seleccionadas().length; as n) {
+          <div class="ml-auto flex items-center gap-2">
+            <span class="text-[0.78rem] text-brand-muted">
+              <span class="font-bold tabular-nums text-brand-text">{{ n }}</span>
+              {{ det.grid.seleccion.contador }}
+            </span>
+            <button
+              type="button"
+              (click)="grid.limpiarSeleccion()"
+              class="cursor-pointer rounded-md border-0 bg-transparent px-2 py-1 text-[0.75rem] font-semibold text-brand-muted transition-colors hover:text-brand-text"
+            >
+              {{ det.grid.seleccion.limpiar }}
+            </button>
+            <button
+              type="button"
+              (click)="onEliminarSeleccion(seleccionadas())"
+              class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-red-600/35 bg-red-500/[0.08] px-2.5 py-1 text-[0.75rem] font-bold text-red-700 transition-colors hover:border-red-600/50 hover:bg-red-500/15"
+            >
+              <i class="pi pi-trash text-[0.7rem]"></i>
+              {{ det.grid.seleccion.eliminar }}
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+        <app-programacion-grid
+          #grid
+          [fechas]="gr.fechas"
+          [filas]="gr.filas"
+          [festivoClaves]="festivoClaves()"
+          (verEmpleados)="onAgregarContrato($event)"
+          (prototipo)="onPrototipo($event)"
+          (editarLinea)="onEditarLinea($event)"
+          (editarContrato)="onEditarContrato($event)"
+          (editarPuesto)="onEditarPuesto($event)"
+          (eliminarContrato)="onEliminarContrato($event)"
+          (selectionChange)="onSeleccionChange($event)"
+        />
+      </div>
+    </section>
+  }
+}
+
+<!-- ── Modal: agregar contrato al puesto ─────────────────────────────────────── -->
+<app-programacion-agregar-contrato-modal
+  [(visible)]="agregarContratoVisible"
+  [grupo]="agregarContratoGrupo()"
+  (applied)="onApplied()"
+/>
+
+<!-- ── Modal: editar la programación de un contrato (multi-puesto) ────────────── -->
+<app-programacion-editar-contrato-modal
+  [(visible)]="editarContratoVisible"
+  [modo]="edicionModo()"
+  [contrato]="edicionContrato()"
+  [fechas]="grid()?.fechas ?? []"
+  [filas]="edicionFilas()"
+  [festivoClaves]="festivoClaves()"
+  (applied)="onApplied()"
+/>
+
+<!-- ── Modal: editar la programación del puesto (multi-contrato) ──────────────── -->
+<app-programacion-editar-puesto-modal
+  [(visible)]="editarPuestoVisible"
+  [puesto]="edicionPuesto()"
+  [fechas]="grid()?.fechas ?? []"
+  [filas]="edicionPuestoFilas()"
+  [festivoClaves]="festivoClaves()"
+  (applied)="onApplied()"
+/>
+
+<!-- ── Modal: prototipo del puesto (generar turnos automáticamente) ───────────── -->
+<app-programacion-prototipo-modal
+  [(visible)]="prototipoVisible"
+  [grupo]="prototipoGrupo()"
+  [documentoNumero]="cabecera()?.numero ?? null"
+  [clienteNombre]="cabecera()?.contacto ?? null"
+  (applied)="onApplied()"
+/>
+
+<!-- ── Confirmación de borrado de la programación de un contrato ──────────────── -->
+<p-confirmDialog />

@@ -1,0 +1,84 @@
+@let e = t().entities.periodo;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '420px' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+      >
+        <i class="pi pi-calendar-plus text-[1.1rem] text-brand-blue"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+        >
+          {{ e.anioNuevo.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ e.anioNuevo.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      autocomplete="off"
+      class="flex flex-col gap-5 pt-1"
+    >
+      <div class="flex flex-col gap-1.5">
+        <label for="anio" class="text-[0.8rem] font-medium text-brand-text">
+          {{ e.anioNuevo.field.anio }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <input
+          id="anio"
+          pInputText
+          type="number"
+          inputmode="numeric"
+          [placeholder]="e.anioNuevo.field.anioPlaceholder"
+          formControlName="anio"
+          fluid
+        />
+        <lib-field-error
+          [control]="form.controls.anio"
+          [messages]="{
+            required: e.anioNuevo.validation.required,
+            min: e.anioNuevo.validation.rango,
+            max: e.anioNuevo.validation.rango,
+          }"
+        />
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <p-button
+          type="button"
+          [label]="t().common.actions.cancel"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="onCancel()"
+        />
+        <p-button
+          type="submit"
+          [label]="e.anioNuevo.submit"
+          icon="pi pi-check"
+          size="small"
+          [loading]="isSaving()"
+          [disabled]="form.invalid || isSaving()"
+        />
+      </div>
+    </form>
+  }
+</p-dialog>

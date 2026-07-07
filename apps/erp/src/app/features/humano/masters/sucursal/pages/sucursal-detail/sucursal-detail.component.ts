@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { SucursalService } from '../../sucursal.service';
 import { SUCURSAL_LIST_PATH } from '../../sucursal.constants';
@@ -12,7 +13,7 @@ import type { Sucursal } from '../../sucursal.model';
 @Component({
   selector: 'app-sucursal-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
   templateUrl: './sucursal-detail.component.html',
   styleUrl: './sucursal-detail.component.scss',
 })

@@ -68,6 +68,7 @@ export interface DocumentoReadBase {
   readonly contacto_nombre?: string | null;
   /** Fecha en formato `yyyy-MM-dd`. */
   readonly fecha: string | null;
+  readonly estado_aprobado: boolean;
 }
 
 /** Cuerpo común enviado en `POST`/`PATCH` de la cabecera de un documento. */

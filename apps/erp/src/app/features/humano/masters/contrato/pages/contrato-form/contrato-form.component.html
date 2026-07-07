@@ -67,7 +67,7 @@
             {{ t().entities.contrato.form.fields.contratoTipo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="contrato_tipo"
             formControlName="contrato_tipo"
             endpoint="/humano/contrato-tipo/seleccionar/"
@@ -81,7 +81,7 @@
             {{ t().entities.contrato.form.fields.cargo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="cargo"
             formControlName="cargo"
             endpoint="/humano/cargo/seleccionar/"
@@ -95,7 +95,7 @@
             {{ t().entities.contrato.form.fields.grupo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="grupo"
             formControlName="grupo"
             endpoint="/humano/grupo/seleccionar/"
@@ -109,7 +109,7 @@
             {{ t().entities.contrato.form.fields.sucursal }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="sucursal"
             formControlName="sucursal"
             endpoint="/humano/sucursal/seleccionar/"
@@ -123,7 +123,7 @@
             {{ t().entities.contrato.form.fields.tiempo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tiempo"
             formControlName="tiempo"
             endpoint="/humano/tiempo/seleccionar/"
@@ -147,6 +147,10 @@
             [fluid]="true"
             [invalid]="form.controls.fecha_desde.invalid && form.controls.fecha_desde.touched"
           />
+          <lib-field-error
+            [control]="form.controls.fecha_desde"
+            [messages]="{ required: t().entities.contrato.form.validation.required }"
+          />
         </div>
 
         @if (!isIndefinido()) {
@@ -164,8 +168,26 @@
               [fluid]="true"
               [invalid]="form.controls.fecha_hasta.invalid && form.controls.fecha_hasta.touched"
             />
+            <lib-field-error
+              [control]="form.controls.fecha_hasta"
+              [messages]="{ required: t().entities.contrato.form.validation.required }"
+            />
           </div>
         }
+
+        <!-- Bandera operativa del contrato: lo habilita para la programación de turnos. -->
+        <div class="flex flex-col gap-1 sm:col-span-2">
+          <label for="habilitado_turno" class="flex w-fit cursor-pointer items-center gap-2">
+            <p-checkbox
+              inputId="habilitado_turno"
+              formControlName="habilitado_turno"
+              [binary]="true"
+            />
+            <span class="text-[0.85rem] font-medium text-brand-text">
+              {{ t().entities.contrato.form.fields.habilitadoTurno }}
+            </span>
+          </label>
+        </div>
       </div>
     </div>
   </section>
@@ -205,13 +227,17 @@
             [fluid]="true"
             [invalid]="form.controls.salario.invalid && form.controls.salario.touched"
           />
+          <lib-field-error
+            [control]="form.controls.salario"
+            [messages]="{ required: t().entities.contrato.form.validation.required }"
+          />
         </div>
 
         <div class="flex flex-col gap-1.5">
           <label for="tipo_costo" class="contrato-form__label">
             {{ t().entities.contrato.form.fields.tipoCosto }}
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tipo_costo"
             formControlName="tipo_costo"
             [suggestedIndex]="0"
@@ -224,10 +250,10 @@
           <label for="centro_costo" class="contrato-form__label">
             {{ t().entities.contrato.form.fields.centroCosto }}
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="centro_costo"
             formControlName="centro_costo"
-            endpoint="/contabilidad/centro-costo/seleccionar/"
+            [endpoint]="endpoints.centroCosto"
             [params]="{ limit: '100' }"
           />
         </div>
@@ -284,7 +310,7 @@
             {{ t().entities.contrato.form.fields.salud }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="salud"
             formControlName="salud"
             endpoint="/humano/salud/seleccionar/"
@@ -299,7 +325,7 @@
             {{ t().entities.contrato.form.fields.entidadSalud }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_salud"
             formControlName="entidad_salud"
             endpoint="/humano/entidad/seleccionar/"
@@ -313,7 +339,7 @@
             {{ t().entities.contrato.form.fields.pension }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="pension"
             formControlName="pension"
             endpoint="/humano/pension/seleccionar/"
@@ -328,7 +354,7 @@
             {{ t().entities.contrato.form.fields.entidadPension }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_pension"
             formControlName="entidad_pension"
             endpoint="/humano/entidad/seleccionar/"
@@ -344,7 +370,7 @@
             {{ t().entities.contrato.form.fields.entidadCesantias }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_cesantias"
             formControlName="entidad_cesantias"
             endpoint="/humano/entidad/seleccionar/"
@@ -360,7 +386,7 @@
             {{ t().entities.contrato.form.fields.entidadCaja }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="entidad_caja"
             formControlName="entidad_caja"
             endpoint="/humano/entidad/seleccionar/"
@@ -374,7 +400,7 @@
             {{ t().entities.contrato.form.fields.riesgo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="riesgo"
             formControlName="riesgo"
             endpoint="/humano/riesgo/seleccionar/"
@@ -388,7 +414,7 @@
             {{ t().entities.contrato.form.fields.tipoCotizante }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tipo_cotizante"
             formControlName="tipo_cotizante"
             endpoint="/humano/tipo-cotizante/seleccionar/"
@@ -403,7 +429,7 @@
             {{ t().entities.contrato.form.fields.subtipoCotizante }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="subtipo_cotizante"
             formControlName="subtipo_cotizante"
             endpoint="/humano/subtipo-cotizante/seleccionar/"
@@ -420,10 +446,10 @@
             {{ t().entities.contrato.form.fields.ciudadContrato }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="ciudad_contrato"
             formControlName="ciudad_contrato"
-            endpoint="/general/ciudad/seleccionar/"
+            [endpoint]="endpoints.ciudad"
             [placeholder]="t().entities.contrato.form.fields.ciudadPlaceholder"
             [invalid]="
               form.controls.ciudad_contrato.invalid && form.controls.ciudad_contrato.touched
@@ -436,10 +462,10 @@
             {{ t().entities.contrato.form.fields.ciudadLabora }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="ciudad_labora"
             formControlName="ciudad_labora"
-            endpoint="/general/ciudad/seleccionar/"
+            [endpoint]="endpoints.ciudad"
             [placeholder]="t().entities.contrato.form.fields.ciudadPlaceholder"
             [invalid]="form.controls.ciudad_labora.invalid && form.controls.ciudad_labora.touched"
           />
@@ -473,7 +499,7 @@
             <label for="motivo_terminacion" class="contrato-form__label">
               {{ t().entities.contrato.form.fields.motivoTerminacion }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="motivo_terminacion"
               formControlName="motivo_terminacion"
               endpoint="/humano/motivo-terminacion/seleccionar/"

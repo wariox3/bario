@@ -1,0 +1,253 @@
+<p-confirmdialog />
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Información general ──────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file-edit text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{
+            isEditMode()
+              ? t().entities.documentoSoporte.form.editTitle
+              : t().entities.documentoSoporte.form.createTitle
+          }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ t().entities.documentoSoporte.form.sectionHint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Proveedor -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="contacto" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.proveedor }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-contacto-select
+            inputId="contacto"
+            formControlName="contacto"
+            [extraParams]="contactoParams"
+            [placeholder]="t().entities.documentoSoporte.form.fields.proveedorPlaceholder"
+            [invalid]="form.controls.contacto.invalid && form.controls.contacto.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.contacto"
+            [messages]="{ required: t().entities.documentoSoporte.form.validation.required }"
+          />
+        </div>
+
+        <!-- Fechas (emisión + vencimiento) -->
+        <div class="grid grid-cols-2 gap-x-4 gap-y-4">
+          <!-- Fecha -->
+          <div class="flex flex-col gap-1.5">
+            <label for="fecha" class="documento-soporte-form__label">
+              {{ t().entities.documentoSoporte.form.fields.fecha }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-datepicker
+              inputId="fecha"
+              formControlName="fecha"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fecha"
+              [messages]="{ required: t().entities.documentoSoporte.form.validation.required }"
+            />
+          </div>
+
+          <!-- Fecha de vencimiento -->
+          <div class="flex flex-col gap-1.5">
+            <label for="fecha_vence" class="documento-soporte-form__label">
+              {{ t().entities.documentoSoporte.form.fields.fechaVence }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-datepicker
+              inputId="fecha_vence"
+              formControlName="fecha_vence"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fecha_vence"
+              [messages]="{ required: t().entities.documentoSoporte.form.validation.required }"
+            />
+          </div>
+        </div>
+
+        <!-- Plazo de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="plazo_pago" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.plazoPago }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="plazo_pago"
+            formControlName="plazo_pago"
+            [endpoint]="plazoPagoEndpoint"
+            [placeholder]="t().entities.documentoSoporte.form.fields.plazoPagoPlaceholder"
+            [invalid]="form.controls.plazo_pago.invalid && form.controls.plazo_pago.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.plazo_pago"
+            [messages]="{ required: t().entities.documentoSoporte.form.validation.required }"
+          />
+        </div>
+
+        <!-- Método de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="metodo_pago" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.metodoPago }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="metodo_pago"
+            formControlName="metodo_pago"
+            [endpoint]="metodoPagoEndpoint"
+            [placeholder]="t().entities.documentoSoporte.form.fields.metodoPagoPlaceholder"
+            [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.metodo_pago"
+            [messages]="{ required: t().entities.documentoSoporte.form.validation.required }"
+          />
+        </div>
+
+        <!-- Forma de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="forma_pago" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.formaPago }}
+          </label>
+          <lib-api-select
+            inputId="forma_pago"
+            formControlName="forma_pago"
+            [endpoint]="formaPagoEndpoint"
+            [placeholder]="t().entities.documentoSoporte.form.fields.formaPagoPlaceholder"
+          />
+        </div>
+
+        <!-- Resolución -->
+        <div class="flex flex-col gap-1.5">
+          <label for="resolucion" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.resolucion }}
+          </label>
+          <lib-api-select
+            inputId="resolucion"
+            formControlName="resolucion"
+            [endpoint]="resolucionEndpoint"
+            [params]="resolucionParams"
+            [placeholder]="t().entities.documentoSoporte.form.fields.resolucionPlaceholder"
+          />
+        </div>
+
+        <!-- Sede -->
+        <div class="flex flex-col gap-1.5">
+          <label for="sede" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.sede }}
+          </label>
+          <lib-api-select
+            inputId="sede"
+            formControlName="sede"
+            [endpoint]="sedeEndpoint"
+            [placeholder]="t().entities.documentoSoporte.form.fields.sedePlaceholder"
+          />
+        </div>
+
+        <!-- Orden de compra -->
+        <div class="flex flex-col gap-1.5">
+          <label for="orden_compra" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.ordenCompra }}
+          </label>
+          <input
+            id="orden_compra"
+            pInputText
+            formControlName="orden_compra"
+            maxlength="50"
+            class="w-full"
+          />
+        </div>
+
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.comentario }}
+          </label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            maxlength="500"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sección: Detalles (líneas comerciales) ───────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-list text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ t().entities.comercialDetalle.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ t().entities.comercialDetalle.hint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <app-comercial-documento-detalles
+        modo="compra"
+        [detalles]="form.controls.detalles"
+        [documentId]="documentId()"
+        [contactoId]="form.controls.contacto.value?.id ?? null"
+        (imported)="onImported()"
+      />
+    </div>
+  </section>
+</form>

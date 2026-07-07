@@ -1,0 +1,311 @@
+:host {
+  display: block;
+}
+
+.programacion-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+// Cabecera: etiquetas discretas en mayúscula, sticky al hacer scroll vertical.
+.programacion-grid__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--brand-muted, #64748b);
+  // Opaco para que las filas no se transparenten a través del header.
+  background: #f8f9fa;
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
+}
+
+.programacion-grid__td {
+  padding: 0.45rem 0.6rem;
+  vertical-align: middle;
+}
+
+.programacion-grid__row + .programacion-grid__row .programacion-grid__td {
+  border-top: 1px solid rgba(20, 48, 73, 0.07);
+}
+
+.programacion-grid__row:hover .programacion-grid__td {
+  background: rgba(20, 48, 73, 0.015);
+}
+
+// ── Selección (borrado masivo) ────────────────────────────────────────────
+
+// Checkbox de fila/header: navy de marca, compacto.
+.programacion-grid__check {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--brand-navy, #143049);
+}
+
+// Hueco del checkbox en filas no seleccionables (sin contrato), para alinear el nombre.
+.programacion-grid__check-spacer {
+  display: inline-block;
+  width: 0.95rem;
+  flex-shrink: 0;
+}
+
+// Fila seleccionada: tinte sky tenue, el mismo lenguaje que las columnas resumen.
+.programacion-grid__row--selected .programacion-grid__td {
+  background: rgba(119, 170, 215, 0.12);
+}
+
+.programacion-grid__row--selected .programacion-grid__td--sticky-left {
+  background: #eef5fb;
+}
+
+.programacion-grid__row--selected:hover .programacion-grid__td,
+.programacion-grid__row--selected:hover .programacion-grid__td--sticky-left {
+  background: rgba(119, 170, 215, 0.18);
+}
+
+// Primera columna (empleado): fija a la izquierda al hacer scroll horizontal.
+.programacion-grid__th--sticky-left {
+  left: 0;
+  z-index: 2;
+  min-width: 11rem;
+}
+
+.programacion-grid__td--sticky-left {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 11rem;
+  background: var(--brand-surface, #fff);
+}
+
+.programacion-grid__row:hover .programacion-grid__td--sticky-left {
+  background: #fbfcfd;
+}
+
+// Columnas de día: angostas, ancho mínimo para que el scroll horizontal respire.
+.programacion-grid__th--dia,
+.programacion-grid__td--dia {
+  min-width: 2rem;
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+  text-align: center;
+}
+
+// Header de día: número arriba + inicial del día de la semana abajo.
+.programacion-grid__dia-num {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--brand-text, #143049);
+}
+
+.programacion-grid__dia-ini {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--brand-muted, #64748b);
+}
+
+// Día festivo en header: fondo azul claro + borde inferior, igual que el modal.
+// El domingo se trata como festivo; el sábado lleva un gris levemente más oscuro.
+.programacion-grid__th--festivo {
+  background: #e8f1fb;
+  box-shadow: inset 0 -1px 0 rgba(37, 99, 235, 0.25);
+
+  .programacion-grid__dia-num {
+    color: #2563eb;
+  }
+
+  .programacion-grid__dia-ini {
+    color: rgba(37, 99, 235, 0.65);
+  }
+}
+
+// Sábado en header: mismo gris del header pero un punto más oscuro para resaltarlo.
+.programacion-grid__th--sabado {
+  background: #eceef1;
+}
+
+// Columnas resumen (HD · HN · C · A): banda sky tenue, como cierre de la tabla.
+.programacion-grid__th--resumen,
+.programacion-grid__td--resumen {
+  background: rgba(119, 170, 215, 0.06);
+}
+
+.programacion-grid__th--resumen {
+  // Fondo sky tenue, pero el texto hereda el muted del header base (igual que EMPLEADO).
+  background: #eff5fa;
+}
+
+.programacion-grid__row:hover .programacion-grid__td--resumen {
+  background: rgba(119, 170, 215, 0.1);
+}
+
+// Columnas reservadas para opciones por fila. Slim: ancho fijo angosto y padding
+// mínimo para que los dos botones (editar · eliminar) queden juntos.
+.programacion-grid__col-accion {
+  width: 1.75rem;
+  min-width: 1.75rem;
+  padding-left: 0.05rem;
+  padding-right: 0.05rem;
+  text-align: center;
+}
+
+// Acciones por fila (editar · eliminar). Botón-ícono compacto, mismo lenguaje que
+// el botón de la banda de grupo. Siempre visibles: ícono en tono muted en reposo
+// para no gritar, y el hover tiñe el chip (neutro/destructivo).
+.programacion-grid__row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--brand-muted, #64748b);
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+}
+
+// Editar (primer botón): un respiro a la izquierda para separarlo de la columna
+// de resumen contigua.
+.programacion-grid__row-action--editar {
+  margin-left: 0.4rem;
+}
+
+// Editar: hover neutro (tinte navy) + ícono acento, como el botón del grupo.
+.programacion-grid__row-action--editar:hover {
+  background: rgba(20, 48, 73, 0.06);
+  color: #0369a1;
+}
+
+// Eliminar: hover destructivo, mismo rojo que los festivos del grid.
+.programacion-grid__row-action--eliminar:hover {
+  background: rgba(190, 18, 60, 0.08);
+  color: #be123c;
+}
+
+// Fila separadora de grupo por documento_detalle_id.
+.programacion-grid__group-row {
+  pointer-events: none;
+
+  .programacion-grid__row + & td {
+    border-top: 1px solid rgba(20, 48, 73, 0.07);
+  }
+}
+
+// Banda de la agrupación (puesto): tono navy translúcido, sutil pero perceptible
+// — estructura, no dato (el resumen ya usa la banda sky). Padding simétrico para
+// que se lea como cabecera de sección.
+.programacion-grid__group-cell {
+  padding: 0.5rem 1rem;
+  background: rgba(20, 48, 73, 0.05);
+}
+
+.programacion-grid__group-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(20, 48, 73, 0.45);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+// El nombre del puesto es un botón que abre el modal de edición del puesto. Hover:
+// acento sky (mismo #0369a1 que el nombre de contrato clickeable de la fila). Se
+// resuelve en el scss del componente para no depender del orden entre hojas.
+.programacion-grid__group-label--btn:hover {
+  color: #0369a1;
+}
+
+// Referencia técnica del documento_detalle_id (`DET: 382`). Identificador, no
+// clasificación: por eso va sin pill y con el tono más apagado de la banda. Sin
+// uppercase (a diferencia del label del puesto) para que lea como caption de
+// referencia y no como parte del nombre del puesto.
+.programacion-grid__group-ref {
+  font-size: 0.64rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: rgba(20, 48, 73, 0.4);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+// Chip informativo del puesto en la banda de grupo.
+// Base = modalidad: etiqueta neutra (tinte navy), lee como clasificación/estructura.
+.programacion-grid__group-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.64rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  background: rgba(20, 48, 73, 0.07);
+  color: rgba(20, 48, 73, 0.6);
+  white-space: nowrap;
+}
+
+// Horario: tinte teal apagado (concepto "tiempo/agenda"). Distinto del ámbar
+// (diurnas) y el azul-índigo (nocturnas) para no confundir la franja con las horas.
+.programacion-grid__group-chip--horario {
+  background: rgba(15, 118, 110, 0.09);
+  color: #0f766e;
+}
+
+// Pills de stats inline (H_D, H_N) dentro de la banda de grupo.
+.programacion-grid__group-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.programacion-grid__group-stat--dia {
+  background: rgba(146, 64, 14, 0.09);
+  color: #92400e;
+}
+
+.programacion-grid__group-stat--noche {
+  background: rgba(30, 64, 175, 0.09);
+  color: #1e40af;
+}
+
+// Separador visual entre pills y total.
+.programacion-grid__group-sep {
+  display: inline-block;
+  width: 1px;
+  height: 0.85rem;
+  background: rgba(20, 48, 73, 0.15);
+}
+
+// Total horas programadas / contratadas.
+.programacion-grid__group-total {
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgba(20, 48, 73, 0.5);
+  white-space: nowrap;
+}

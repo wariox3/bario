@@ -11,8 +11,8 @@ export interface RawImportErrorResponse {
   readonly fase?: string;
   /** Total de errores detectados (puede ser mayor que los devueltos). */
   readonly total_errores?: number;
-  /** Errores por fila. */
-  readonly errores?: ReadonlyArray<{ readonly fila: number; readonly mensaje: string }>;
+  /** Errores por fila. `fila` es opcional (errores sin fila asociada). */
+  readonly errores?: ReadonlyArray<{ readonly fila?: number; readonly mensaje: string }>;
 }
 
 /** Resultado del parseo, listo para alimentar al `ImportDialogComponent`. */
@@ -59,7 +59,11 @@ export function parseImportErrors(input: unknown, max = 100): ParsedImportErrors
   const rawList = Array.isArray(body['errores']) ? (body['errores'] as ReadonlyArray<unknown>) : [];
   const errors: ImportError[] = rawList
     .filter(isRecord)
-    .map((e) => ({ row: Number(e['fila']), message: String(e['mensaje'] ?? '') }))
+    .map((e) => {
+      const fila = e['fila'];
+      const row = typeof fila === 'number' && Number.isFinite(fila) ? fila : undefined;
+      return { row, message: String(e['mensaje'] ?? '') };
+    })
     .slice(0, max);
 
   const summary = typeof body['detail'] === 'string' ? body['detail'] : '';

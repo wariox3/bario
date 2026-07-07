@@ -150,13 +150,14 @@ export const es: AppDict = {
     },
     nav: {
       dashboard: 'Dashboard',
+      home: 'Inicio',
       account: 'Gestionar cuenta',
       empty: 'Seleccioná un módulo desde la barra superior.',
       sections: {
         master: 'Administrador',
         document: 'Documentos',
         process: 'Proceso',
-        movement: 'Movimiento',
+        movement: 'Movimientos',
         utility: 'Utilidades',
         report: 'Informes',
       },
@@ -184,6 +185,79 @@ export const es: AppDict = {
       error: {
         title: 'Error al generar',
         desc: 'No se pudo generar el documento. Intentá de nuevo.',
+      },
+    },
+    detail: {
+      aprobar: 'Aprobar',
+      desaprobar: 'Desaprobar',
+      acciones: 'Acciones',
+      imprimir: 'Imprimir',
+      opciones: 'Opciones',
+      archivos: 'Archivos',
+      confirmAprobar: {
+        message: '¿Confirmas la aprobación de este documento?',
+        header: 'Aprobar documento',
+      },
+      confirmDesaprobar: {
+        message: '¿Confirmas desaprobar este documento?',
+        header: 'Desaprobar documento',
+      },
+      toasts: {
+        aprobarSuccess: {
+          title: 'Documento aprobado',
+          desc: 'El documento se aprobó correctamente.',
+        },
+        aprobarError: {
+          title: 'No se pudo aprobar',
+          desc: 'Ocurrió un error al aprobar el documento.',
+        },
+        desaprobarSuccess: {
+          title: 'Documento desaprobado',
+          desc: 'El documento se desaprobó correctamente.',
+        },
+        desaprobarError: {
+          title: 'No se pudo desaprobar',
+          desc: 'Ocurrió un error al desaprobar el documento.',
+        },
+        imprimirError: {
+          title: 'No se pudo imprimir',
+          desc: 'Ocurrió un error al generar el PDF.',
+        },
+        editBloqueado: {
+          title: 'Documento aprobado',
+          desc: 'No se puede editar un documento ya aprobado.',
+        },
+      },
+    },
+    afectacion: {
+      title: 'Afectación del documento',
+      subtitle: 'El documento, su documento afectado y los detalles que lo afectan',
+      empty: 'Ningún detalle afecta a este.',
+      cols: {
+        id: 'ID',
+        documento: 'Documento',
+        item: 'Ítem',
+        cantidad: 'Cantidad',
+        precio: 'Precio',
+        periodo: 'Período',
+        puesto: 'Puesto',
+        modalidad: 'Modalidad',
+        subtotal: 'Subtotal',
+        baseImpuesto: 'Base impuesto',
+        impuesto: 'Impuesto',
+        total: 'Total',
+      },
+      cards: { documento: 'Documento', documentoAfectado: 'Documento afectado' },
+      campos: {
+        detalleId: 'Detalle ID',
+        documentoId: 'Documento ID',
+        fecha: 'Fecha',
+        contacto: 'Contacto',
+      },
+      close: 'Cerrar',
+      loadError: {
+        title: 'No se pudo cargar',
+        desc: 'Ocurrió un error al cargar la afectación de la línea.',
       },
     },
   },
@@ -225,8 +299,9 @@ export const es: AppDict = {
     compra: { name: 'Compra' },
     venta: { name: 'Venta' },
     inventario: { name: 'Inventario' },
-    turno: { name: 'Turno' },
     contabilidad: { name: 'Contabilidad' },
+    tesoreria: { name: 'Tesorería' },
+    cartera: { name: 'Cartera' },
     humano: { name: 'Humano' },
   },
   entities: {
@@ -258,6 +333,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Asesor',
         notFound: {
           title: 'Asesor no encontrado',
           desc: 'El asesor que buscás no existe o fue eliminado.',
@@ -309,6 +385,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Cuenta de banco',
         notFound: {
           title: 'Cuenta de banco no encontrada',
           desc: 'La cuenta de banco que buscás no existe o fue eliminada.',
@@ -355,6 +432,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Lista de precios',
         notFound: {
           title: 'Lista de precios no encontrada',
           desc: 'La lista de precios que buscás no existe o fue eliminada.',
@@ -412,6 +490,8 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Resolución',
+        vigencia: 'Vigencia',
         notFound: {
           title: 'Resolución no encontrada',
           desc: 'La resolución que buscás no existe o fue eliminada.',
@@ -538,6 +618,7 @@ export const es: AppDict = {
       detail: {
         title: 'Detalle del contacto',
         subtitle: 'Información y datos comerciales',
+        eyebrow: 'Contacto',
         sections: {
           general: 'Información general',
           contacto: 'Contacto',
@@ -633,6 +714,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Ítem',
         sections: {
           precios: 'Precios',
           impuestos: 'Impuestos',
@@ -667,256 +749,6 @@ export const es: AppDict = {
         },
       },
     },
-    puesto: {
-      name: 'Puestos',
-      searchPlaceholder: 'Buscar por nombre…',
-      columns: {
-        id: 'ID',
-        nombre: 'Nombre',
-        direccion: 'Dirección',
-        celular: 'Celular',
-        latitud: 'Latitud',
-        longitud: 'Longitud',
-        comentario: 'Comentario',
-        estado: 'Inactivo',
-      },
-      form: {
-        createTitle: 'Nuevo puesto',
-        editTitle: 'Editar puesto',
-        createSubtitle: 'Completá la información del puesto de trabajo',
-        editSubtitle: 'Modificá la información del puesto de trabajo',
-        cancel: 'Cancelar',
-        submitCreate: 'Crear puesto',
-        submitEdit: 'Guardar cambios',
-        sections: {
-          principal: 'Información principal',
-        },
-        sectionsHint: {
-          principal: 'Datos de ubicación, contacto y coordenadas del puesto',
-        },
-        fields: {
-          nombre: 'Nombre',
-          direccion: 'Dirección',
-          celular: 'Celular',
-          latitud: 'Latitud',
-          longitud: 'Longitud',
-          comentario: 'Comentario',
-          ciudad: 'Ciudad',
-          ciudadPlaceholder: 'Buscá una ciudad…',
-          contacto: 'Contacto',
-          contactoPlaceholder: 'Buscá un contacto…',
-          centroCosto: 'Centro de costo',
-          centroCostoPlaceholder: 'Buscá un centro de costo…',
-          programador: 'Programador',
-          programadorPlaceholder: 'Buscá un programador…',
-        },
-        validation: {
-          required: 'Este campo es requerido',
-        },
-        toasts: {
-          createSuccess: { title: 'Puesto creado', desc: 'El puesto se creó correctamente' },
-          editSuccess: {
-            title: 'Puesto actualizado',
-            desc: 'Los cambios se guardaron correctamente',
-          },
-          createError: { title: 'Error al crear', desc: 'No se pudo crear el puesto' },
-          editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el puesto' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Puesto no encontrado',
-          desc: 'El puesto que buscás no existe o fue eliminado.',
-        },
-        sections: {
-          ubicacion: 'Ubicación',
-          relaciones: 'Relaciones',
-          comentario: 'Comentario',
-        },
-        toasts: {
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el puesto' },
-        },
-      },
-    },
-    programador: {
-      name: 'Programadores',
-      searchPlaceholder: 'Buscar por nombre…',
-      columns: {
-        id: 'ID',
-        nombre: 'Nombre',
-        estado: 'Inactivo',
-      },
-      form: {
-        createTitle: 'Nuevo programador',
-        editTitle: 'Editar programador',
-        createSubtitle: 'Completá la información del programador',
-        editSubtitle: 'Modificá la información del programador',
-        cancel: 'Cancelar',
-        submitCreate: 'Crear programador',
-        submitEdit: 'Guardar cambios',
-        sections: { principal: 'Información principal' },
-        sectionsHint: { principal: 'Datos básicos del programador de turnos' },
-        fields: { nombre: 'Nombre' },
-        validation: { required: 'Este campo es requerido' },
-        toasts: {
-          createSuccess: {
-            title: 'Programador creado',
-            desc: 'El programador se creó correctamente',
-          },
-          editSuccess: {
-            title: 'Programador actualizado',
-            desc: 'Los cambios se guardaron correctamente',
-          },
-          createError: { title: 'Error al crear', desc: 'No se pudo crear el programador' },
-          editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el programador' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Programador no encontrado',
-          desc: 'El programador que buscás no existe o fue eliminado.',
-        },
-        toasts: {
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el programador' },
-        },
-      },
-    },
-    secuencia: {
-      name: 'Secuencias',
-      searchPlaceholder: 'Buscar por nombre…',
-      columns: {
-        id: 'ID',
-        codigo: 'Código',
-        nombre: 'Nombre',
-        horas: 'Horas',
-        dias: 'Días',
-        homologar: 'Homologar',
-        estado: 'Inactivo',
-      },
-      form: {
-        createTitle: 'Nueva secuencia',
-        editTitle: 'Editar secuencia',
-        createSubtitle: 'Completá el patrón de turnos de la secuencia',
-        editSubtitle: 'Modificá el patrón de turnos de la secuencia',
-        cancel: 'Cancelar',
-        submitCreate: 'Crear secuencia',
-        submitEdit: 'Guardar cambios',
-        sections: {
-          principal: 'Información principal',
-          diasMes: 'Días del mes',
-          diasSemana: 'Días de la semana',
-        },
-        sectionsHint: {
-          principal: 'Código, nombre y totales de la secuencia',
-          diasMes: 'Código del turno asignado a cada día del mes (1 a 31)',
-          diasSemana: 'Código del turno por día de la semana y festivos',
-        },
-        fields: {
-          codigo: 'Código',
-          nombre: 'Nombre',
-          horas: 'Horas',
-          dias: 'Días',
-          homologar: 'Homologar',
-          lunes: 'Lunes',
-          martes: 'Martes',
-          miercoles: 'Miércoles',
-          jueves: 'Jueves',
-          viernes: 'Viernes',
-          sabado: 'Sábado',
-          domingo: 'Domingo',
-          festivo: 'Festivo',
-          domingoFestivo: 'Domingo festivo',
-        },
-        validation: {
-          required: 'Este campo es requerido',
-        },
-        toasts: {
-          createSuccess: {
-            title: 'Secuencia creada',
-            desc: 'La secuencia se creó correctamente',
-          },
-          editSuccess: {
-            title: 'Secuencia actualizada',
-            desc: 'Los cambios se guardaron correctamente',
-          },
-          createError: { title: 'Error al crear', desc: 'No se pudo crear la secuencia' },
-          editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la secuencia' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Secuencia no encontrada',
-          desc: 'La secuencia que buscás no existe o fue eliminada.',
-        },
-        sections: {
-          principal: 'Información principal',
-          diasMes: 'Días del mes',
-          diasSemana: 'Días de la semana',
-        },
-        toasts: {
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la secuencia' },
-        },
-      },
-    },
-    turno: {
-      name: 'Turnos',
-      searchPlaceholder: 'Buscar por nombre…',
-      columns: {
-        id: 'ID',
-        codigo: 'Código',
-        nombre: 'Nombre',
-        horaInicio: 'Hora inicio',
-        horaFin: 'Hora fin',
-        horas: 'Horas',
-        horasDiurnas: 'Horas diurnas',
-        horasNocturnas: 'Horas nocturnas',
-        color: 'Color',
-        estado: 'Inactivo',
-      },
-      form: {
-        createTitle: 'Nuevo turno',
-        editTitle: 'Editar turno',
-        createSubtitle: 'Completá la información del turno',
-        editSubtitle: 'Modificá la información del turno',
-        fields: {
-          codigo: 'Código',
-          nombre: 'Nombre',
-          horaInicio: 'Hora inicio',
-          horaFin: 'Hora fin',
-          horas: 'Horas',
-          horasDiurnas: 'Horas diurnas',
-          horasNocturnas: 'Horas nocturnas',
-          color: 'Color',
-        },
-        validation: {
-          required: 'Este campo es requerido',
-        },
-        toasts: {
-          createSuccess: { title: 'Turno creado', desc: 'El turno se creó correctamente' },
-          editSuccess: {
-            title: 'Turno actualizado',
-            desc: 'Los cambios se guardaron correctamente',
-          },
-          createError: { title: 'Error al crear', desc: 'No se pudo crear el turno' },
-          editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el turno' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Turno no encontrado',
-          desc: 'El turno que buscás no existe o fue eliminado.',
-        },
-        sections: { principal: 'Información principal' },
-        activo: 'Activo',
-        toasts: {
-          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el turno' },
-        },
-      },
-    },
     sucursal: {
       name: 'Sucursales',
       searchPlaceholder: 'Buscar por nombre…',
@@ -944,6 +776,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Sucursal',
         notFound: {
           title: 'Sucursal no encontrada',
           desc: 'La sucursal que buscás no existe o fue eliminada.',
@@ -985,6 +818,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Grupo',
         notFound: {
           title: 'Grupo no encontrado',
           desc: 'El grupo que buscás no existe o fue eliminado.',
@@ -1022,6 +856,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Cargo',
         activo: 'Activo',
         notFound: {
           title: 'Cargo no encontrado',
@@ -1035,6 +870,10 @@ export const es: AppDict = {
     centroCosto: {
       name: 'Centros de costo',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar centros de costo',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
         id: 'ID',
         codigo: 'Código',
@@ -1068,6 +907,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Centro de costo',
         notFound: {
           title: 'Centro de costo no encontrado',
           desc: 'El centro de costo que buscás no existe o fue eliminado.',
@@ -1077,14 +917,114 @@ export const es: AppDict = {
         },
       },
     },
+    formaPago: {
+      name: 'Formas de pago',
+      searchPlaceholder: 'Buscar por nombre…',
+      columns: {
+        id: 'ID',
+        nombre: 'Nombre',
+        cuenta: 'Cuenta',
+      },
+      form: {
+        createTitle: 'Nueva forma de pago',
+        editTitle: 'Editar forma de pago',
+        createSubtitle: 'Completá la información de la forma de pago',
+        editSubtitle: 'Modificá la información de la forma de pago',
+        fields: {
+          nombre: 'Nombre',
+          cuenta: 'Cuenta contable',
+          cuentaPlaceholder: 'Buscar cuenta…',
+        },
+        validation: {
+          required: 'Este campo es requerido',
+          maxlength: 'Supera la longitud máxima',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Forma de pago creada',
+            desc: 'La forma de pago se creó correctamente',
+          },
+          editSuccess: {
+            title: 'Forma de pago actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear la forma de pago' },
+          editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la forma de pago' },
+        },
+      },
+      detail: {
+        eyebrow: 'Forma de pago',
+        notFound: {
+          title: 'Forma de pago no encontrada',
+          desc: 'La forma de pago que buscás no existe o fue eliminada.',
+        },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la forma de pago' },
+        },
+      },
+    },
+    sede: {
+      name: 'Sedes',
+      searchPlaceholder: 'Buscar por nombre…',
+      columns: {
+        id: 'ID',
+        codigo: 'Código',
+        nombre: 'Nombre',
+        centroCosto: 'Centro de costo',
+      },
+      form: {
+        createTitle: 'Nueva sede',
+        editTitle: 'Editar sede',
+        createSubtitle: 'Completá la información de la sede',
+        editSubtitle: 'Modificá la información de la sede',
+        fields: {
+          nombre: 'Nombre',
+          codigo: 'Código',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Buscá un centro de costo…',
+        },
+        validation: {
+          required: 'Este campo es requerido',
+          maxlength: 'Supera la longitud máxima',
+        },
+        toasts: {
+          createSuccess: { title: 'Sede creada', desc: 'La sede se creó correctamente' },
+          editSuccess: {
+            title: 'Sede actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear la sede' },
+          editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la sede' },
+        },
+      },
+      detail: {
+        eyebrow: 'Sede',
+        notFound: {
+          title: 'Sede no encontrada',
+          desc: 'La sede que buscás no existe o fue eliminada.',
+        },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la sede' },
+        },
+      },
+    },
     cuenta: {
       name: 'Cuentas',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar cuentas',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
+        id: 'ID',
         codigo: 'Código',
         nombre: 'Nombre',
-        clase: 'Clase',
         movimiento: 'Movimiento',
+        exigeBase: 'Exige base',
+        exigeContacto: 'Exige contacto',
+        exigeGrupo: 'Exige grupo',
       },
       form: {
         createTitle: 'Nueva cuenta',
@@ -1130,6 +1070,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Cuenta',
         notFound: {
           title: 'Cuenta no encontrada',
           desc: 'La cuenta que buscás no existe o fue eliminada.',
@@ -1194,6 +1135,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Activo fijo',
         notFound: {
           title: 'Activo no encontrado',
           desc: 'El activo que buscás no existe o fue eliminado.',
@@ -1201,6 +1143,160 @@ export const es: AppDict = {
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el activo' },
         },
+      },
+    },
+    periodo: {
+      name: 'Periodos',
+      meses: [
+        'Enero',
+        'Febrero',
+        'Marzo',
+        'Abril',
+        'Mayo',
+        'Junio',
+        'Julio',
+        'Agosto',
+        'Septiembre',
+        'Octubre',
+        'Noviembre',
+        'Diciembre',
+        'Cierre',
+      ],
+      panel: {
+        emptyAnios: 'Aún no hay periodos. Creá un año para empezar.',
+        emptyTitle: 'Seleccioná un año',
+        emptySub: 'Elegí un año de la lista para ver y gestionar sus meses.',
+      },
+      estados: {
+        abierto: 'Abierto',
+        bloqueado: 'Bloqueado',
+        cerrado: 'Cerrado',
+        inconsistencia: 'Con inconsistencias',
+      },
+      acciones: {
+        nuevoAnio: 'Nuevo año',
+        verInconsistencias: 'Ver inconsistencias',
+        bloquear: 'Bloquear',
+        desbloquear: 'Desbloquear',
+        cerrar: 'Cerrar',
+      },
+      confirms: {
+        cerrar: {
+          header: 'Cerrar periodo',
+          message: '¿Seguro que querés cerrar este periodo? Esta acción no se puede deshacer.',
+        },
+      },
+      anioNuevo: {
+        title: 'Nuevo año',
+        subtitle: 'Se crearán los doce periodos mensuales del año indicado.',
+        field: { anio: 'Año', anioPlaceholder: '2025' },
+        validation: { required: 'Este campo es requerido', rango: 'Ingresá un año válido' },
+        submit: 'Crear',
+      },
+      inconsistencias: {
+        title: 'Inconsistencias',
+        columns: {
+          comprobante: 'Comprobante',
+          numero: 'Número',
+          documento: 'Documento',
+          descripcion: 'Descripción',
+        },
+        empty: 'Este periodo no tiene inconsistencias.',
+        loadError: 'No se pudieron cargar las inconsistencias.',
+      },
+      toasts: {
+        bloquearSuccess: {
+          title: 'Periodo bloqueado',
+          desc: 'El periodo se bloqueó correctamente',
+        },
+        bloquearError: { title: 'Error al bloquear', desc: 'No se pudo bloquear el periodo' },
+        desbloquearSuccess: {
+          title: 'Periodo desbloqueado',
+          desc: 'El periodo se desbloqueó correctamente',
+        },
+        desbloquearError: {
+          title: 'Error al desbloquear',
+          desc: 'No se pudo desbloquear el periodo',
+        },
+        cerrarSuccess: { title: 'Periodo cerrado', desc: 'El periodo se cerró correctamente' },
+        cerrarError: { title: 'Error al cerrar', desc: 'No se pudo cerrar el periodo' },
+        crearSuccess: {
+          title: 'Año creado',
+          desc: 'Los periodos del año se crearon correctamente',
+        },
+        crearError: {
+          title: 'Error al crear',
+          desc: 'No se pudieron crear los periodos del año',
+        },
+        loadError: { title: 'Error al cargar', desc: 'No se pudieron cargar los periodos' },
+      },
+    },
+    empleado: {
+      name: 'Empleados',
+      searchPlaceholder: 'Buscar por nombre…',
+      columns: {
+        id: 'ID',
+        identificacion: 'Identificación',
+        identificacion_abreviatura: 'Tipo',
+        nombre: 'Nombre',
+        correo: 'Correo',
+        celular: 'Celular',
+      },
+      form: {
+        createTitle: 'Nuevo empleado',
+        editTitle: 'Editar empleado',
+        createSubtitle: 'Completá la información del empleado',
+        editSubtitle: 'Modificá la información del empleado',
+        sections: { banca: 'Datos bancarios' },
+        sectionsHint: { banca: 'Cuenta donde se consigna la nómina' },
+        fields: {
+          identificacion: 'Tipo de identificación',
+          numeroIdentificacion: 'Número de identificación',
+          nombre1: 'Primer nombre',
+          nombre2: 'Segundo nombre',
+          apellido1: 'Primer apellido',
+          apellido2: 'Segundo apellido',
+          telefono: 'Teléfono',
+          celular: 'Celular',
+          ciudad: 'Ciudad',
+          ciudadPlaceholder: 'Buscá una ciudad…',
+          direccion: 'Dirección',
+          barrio: 'Barrio',
+          correo: 'Correo',
+          banco: 'Banco',
+          bancoPlaceholder: 'Buscá un banco…',
+          numeroCuenta: 'Número de cuenta',
+          cuentaBancoClase: 'Clase de cuenta',
+        },
+        validation: {
+          required: 'Este campo es requerido',
+          emailInvalid: 'El correo no es válido',
+          numeroIdentificacionExistente: 'Ya existe un contacto con esta identificación',
+        },
+        toasts: {
+          createSuccess: { title: 'Empleado creado', desc: 'El empleado se creó correctamente' },
+          editSuccess: {
+            title: 'Empleado actualizado',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear el empleado' },
+          editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el empleado' },
+        },
+      },
+      detail: {
+        eyebrow: 'Empleado',
+        sections: {
+          general: 'Información general',
+          contacto: 'Contacto',
+          ubicacion: 'Ubicación',
+          banca: 'Datos bancarios',
+        },
+        notFound: {
+          title: 'Empleado no encontrado',
+          desc: 'El empleado que buscás no existe o fue eliminado.',
+        },
+        toasts: { loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el empleado' } },
       },
     },
     credito: {
@@ -1255,6 +1351,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Crédito',
         notFound: {
           title: 'Crédito no encontrado',
           desc: 'El crédito que buscás no existe o fue eliminado.',
@@ -1310,6 +1407,7 @@ export const es: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Adicional',
         notFound: {
           title: 'Adicional no encontrado',
           desc: 'El adicional que buscás no existe o fue eliminado.',
@@ -1411,6 +1509,7 @@ export const es: AppDict = {
           tiempo: 'Tiempo',
           fechaDesde: 'Fecha desde',
           fechaHasta: 'Fecha hasta',
+          habilitadoTurno: 'Habilitar turno',
           salario: 'Salario',
           aplicaAuxilioTransporte: 'Aplica auxilio de transporte',
           salarioIntegral: 'Salario integral',
@@ -1447,15 +1546,50 @@ export const es: AppDict = {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el contrato' },
         },
       },
+      detail: {
+        eyebrow: 'Contrato',
+        sections: {
+          datos: 'Datos del contrato',
+          remuneracion: 'Remuneración',
+          seguridadSocial: 'Seguridad social',
+        },
+        estado: {
+          activo: 'Activo',
+          terminado: 'Terminado',
+        },
+        boolean: {
+          si: 'Sí',
+          no: 'No',
+        },
+        notFound: {
+          title: 'Contrato no encontrado',
+          desc: 'El contrato que buscás no existe o fue eliminado.',
+        },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el contrato' },
+        },
+      },
     },
     facturaVenta: {
       name: 'Factura de venta',
       columns: {
+        id: 'ID',
         numero: 'Número',
         fecha: 'Fecha',
+        identificacion: 'Identificación',
         contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
         total: 'Total',
-        estado: 'Estado',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
       },
       form: {
         createTitle: 'Nueva factura de venta',
@@ -1497,6 +1631,279 @@ export const es: AppDict = {
           },
         },
       },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          cliente: 'Cliente',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          sede: 'Sede',
+          metodoPago: 'Método de pago',
+        },
+        notFound: {
+          title: 'Factura no encontrada',
+          desc: 'La factura que buscas no existe o fue eliminada.',
+        },
+      },
+    },
+    facturaCompra: {
+      name: 'Factura de compra',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva factura de compra',
+        editTitle: 'Editar factura de compra',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          plazoPagoPlaceholder: 'Selecciona…',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
+          metodoPago: 'Método de pago',
+          metodoPagoPlaceholder: 'Selecciona…',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Factura creada',
+            desc: 'La factura de compra se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la factura de compra',
+          },
+          editSuccess: {
+            title: 'Factura actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la factura de compra',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          sede: 'Sede',
+          metodoPago: 'Método de pago',
+        },
+        notFound: {
+          title: 'Factura no encontrada',
+          desc: 'La factura que buscas no existe o fue eliminada.',
+        },
+      },
+    },
+    documentoSoporte: {
+      name: 'Documento soporte',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nuevo documento soporte',
+        editTitle: 'Editar documento soporte',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          plazoPagoPlaceholder: 'Selecciona…',
+          metodoPago: 'Método de pago',
+          metodoPagoPlaceholder: 'Selecciona…',
+          formaPago: 'Forma de pago',
+          formaPagoPlaceholder: 'Selecciona…',
+          resolucion: 'Resolución',
+          resolucionPlaceholder: 'Selecciona…',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Documento creado',
+            desc: 'El documento soporte se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear el documento soporte',
+          },
+          editSuccess: {
+            title: 'Documento actualizado',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar el documento soporte',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          sede: 'Sede',
+          metodoPago: 'Método de pago',
+          formaPago: 'Forma de pago',
+          resolucion: 'Resolución',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Documento no encontrado',
+          desc: 'El documento que buscas no existe o fue eliminado.',
+        },
+      },
+    },
+    notaAjuste: {
+      name: 'Nota ajuste',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva nota ajuste',
+        editTitle: 'Editar nota ajuste',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          plazoPagoPlaceholder: 'Selecciona…',
+          metodoPago: 'Método de pago',
+          metodoPagoPlaceholder: 'Selecciona…',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Nota creada',
+            desc: 'La nota ajuste se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la nota ajuste',
+          },
+          editSuccess: {
+            title: 'Nota actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la nota ajuste',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          metodoPago: 'Método de pago',
+          centroCosto: 'Centro de costo',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Nota no encontrada',
+          desc: 'La nota que buscas no existe o fue eliminada.',
+        },
+      },
     },
     comercialDetalle: {
       title: 'Detalles',
@@ -1517,6 +1924,7 @@ export const es: AppDict = {
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
       columns: {
         linea: '#',
+        ref: 'Ref',
         item: 'Ítem',
         cantidad: 'Cant.',
         precio: 'Precio',
@@ -1617,10 +2025,10 @@ export const es: AppDict = {
         horas: 'H',
         horasDiurnas: 'HD',
         horasNocturnas: 'HN',
-        iva: 'IVA',
         valor: 'Valor',
-        valorPendiente: 'Vr pendiente',
         total: 'Total',
+        afectado: 'Afectado',
+        valorPendiente: 'Vr pendiente',
       },
     },
     regenerarAfectado: {
@@ -1708,6 +2116,7 @@ export const es: AppDict = {
           lineLabel: 'Línea',
           coverage: 'Cobertura',
           subtotalCol: 'Subtotal',
+          documentoAfectadoCol: 'Ref',
           contractSummaryTitle: 'Resumen del documento',
           contractSubtotal: 'Subtotal',
           contractTotal: 'Total',
@@ -1782,6 +2191,24 @@ export const es: AppDict = {
               desc: 'Ocurrió un error al guardar la línea del documento',
             },
           },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          contacto: 'Contacto',
+          fecha: 'Fecha',
+          sector: 'Sector',
+          estrato: 'Estrato',
+          salario: 'Salario',
+        },
+        notFound: {
+          title: 'Documento no encontrado',
+          desc: 'El documento que buscas no existe o fue eliminado.',
         },
       },
     },

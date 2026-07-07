@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ResolucionService } from '../../resolucion.service';
@@ -13,7 +14,7 @@ import type { Resolucion, ResolucionTipo } from '../../resolucion.model';
 @Component({
   selector: 'app-resolucion-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonModule, BreadcrumbComponent, DatePipe, DetailHeaderComponent],
   templateUrl: './resolucion-detail.component.html',
   styleUrl: './resolucion-detail.component.scss',
 })

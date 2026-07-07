@@ -38,11 +38,14 @@ import type {
 } from '@reddoc/feature-base';
 import { ENTITY_ACTION_STRATEGY } from '../../actions/entity-action.token';
 import type { EntityActionStrategy } from '../../actions/entity-action-strategy';
-import { ENTITY_DATA_GATEWAY } from '../../data/entity-data-gateway';
+import {
+  type DocumentEntityConfig,
+  type EditableRowContext,
+  ENTITY_DATA_GATEWAY,
+} from '@reddoc/core';
 import { MissingModuleContextError } from '../../errors/config.errors';
 import { ModuleNavigationStore } from '../../module-navigation.store';
 import { buildEntityStorageKey } from '../../storage/build-entity-storage-key';
-import type { DocumentEntityConfig } from '../../types/entity-config.types';
 
 /** Tamaño de página default mientras `DocumentEntityConfig` no exponga `paginationDefaults`. */
 const DEFAULT_PAGE_SIZE = 25;
@@ -209,10 +212,22 @@ export class BaseDocumentListComponent {
     const caps = this.capabilities();
     const actions: RowAction[] = [];
     if (caps.canEdit) {
+      // La acción se oculta por fila según la política declarativa del
+      // documento (`canEditRow`): un documento aprobado, p. ej., no se edita.
+      const canEditRow = this.document().canEditRow;
       actions.push({
         id: 'edit',
         labelKey: 'common.actions.edit',
         iconClass: 'pi pi-pencil',
+        inline: true,
+        visibleFor: canEditRow ? (row) => canEditRow(row as EditableRowContext) : undefined,
+      });
+    }
+    if (caps.canView) {
+      actions.push({
+        id: 'view',
+        labelKey: 'common.actions.view',
+        iconClass: 'pi pi-eye',
         inline: true,
       });
     }
@@ -319,6 +334,9 @@ export class BaseDocumentListComponent {
     const id = this.extractId(event.row);
     if (id === null) return;
     switch (event.actionId) {
+      case 'view':
+        this.navigateToDetail(id);
+        break;
       case 'edit':
         this.navigateToEdit(id);
         break;
@@ -424,6 +442,10 @@ export class BaseDocumentListComponent {
 
   private navigateToEdit(id: string | number): void {
     this.router.navigate([...this.buildRouteCommands(this.document().routes.edit), id]);
+  }
+
+  private navigateToDetail(id: string | number): void {
+    this.router.navigate([...this.buildRouteCommands(this.document().routes.detail), id]);
   }
 
   /**

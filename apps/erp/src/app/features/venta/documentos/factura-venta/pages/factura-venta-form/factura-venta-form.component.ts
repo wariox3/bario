@@ -26,12 +26,10 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
-import { ErpContactoSelectComponent } from '@erp/core/components/contacto-select/erp-contacto-select.component';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpSelectDataService } from '@erp/core/data/erp-select-data.service';
+import { ErpContactoSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ErpSelectDataService } from '@reddoc/core';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
@@ -122,6 +120,13 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   /** Id del documento a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
 
+  /**
+   * Cabecera pre-cargada por `editableDocumentResolver` (clave de ruta
+   * `documentoEdit`). En edición llega ya resuelta y el form la reúsa en vez de
+   * volver a pedirla; `null`/ausente en alta o si el resolver hizo fail-open.
+   */
+  readonly documentoEdit = input<unknown>();
+
   protected readonly isEditMode = computed(() => !!this.id());
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
@@ -170,7 +175,16 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   ngOnInit(): void {
     this.loadPlazoDias();
     const id = this.id();
-    if (id) this.loadDocumento(Number(id));
+    if (!id) return;
+    // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
+    // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
+    const prefetched = this.documentoEdit();
+    if (prefetched) {
+      this.applyCabecera(prefetched as FacturaVentaRead);
+      this.loadLineas(Number(id));
+    } else {
+      this.loadDocumento(Number(id));
+    }
   }
 
   protected onSubmit(): void {
@@ -281,10 +295,13 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     if (id != null) this.loadDocumento(id);
   }
 
+  /**
+   * Carga completa (cabecera + líneas). La cabecera (`documento/:id/`) ya no
+   * embebe los detalles: las líneas se traen aparte de
+   * `documento-detalle/?documento_id=`. Se usa como fallback de la carga inicial
+   * (si el resolver no pre-cargó la cabecera) y para recargar tras importar.
+   */
   private loadDocumento(id: number): void {
-    // La cabecera (`documento/:id/`) ya no embebe los detalles: las líneas se
-    // traen aparte de `documento-detalle/?documento_id=`. Las dos peticiones son
-    // independientes, así que cargan en paralelo y se pueblan juntas.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
@@ -292,20 +309,43 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ cabecera, lineas }) => {
-          const read = cabecera as FacturaVentaRead;
-          // `emitEvent: false`: no disparar el autocálculo y respetar el
-          // vencimiento que viene del backend.
-          this.form.patchValue(facturaVentaToFormValue(read), { emitEvent: false });
-          const detalles = this.form.controls.detalles;
-          detalles.clear();
-          for (const line of lineas)
-            detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+          this.applyCabecera(cabecera as FacturaVentaRead);
+          this.populateLineas(lineas);
         },
-        error: () => {
-          const toasts = this.t().entities.facturaVenta.form.toasts;
-          this.toast.error(toasts.loadError.title, toasts.loadError.desc);
-        },
+        error: () => this.notifyLoadError(),
       });
+  }
+
+  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
+  private loadLineas(id: number): void {
+    this.detalleService
+      .listarPorDocumento<ComercialDetalleRead>(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lineas) => this.populateLineas(lineas),
+        error: () => this.notifyLoadError(),
+      });
+  }
+
+  /**
+   * Pobla la cabecera en el form. `emitEvent: false`: no disparar el autocálculo
+   * y respetar el vencimiento que viene del backend.
+   */
+  private applyCabecera(read: FacturaVentaRead): void {
+    this.form.patchValue(facturaVentaToFormValue(read), { emitEvent: false });
+  }
+
+  /** Reemplaza el FormArray de detalles con las líneas recibidas. */
+  private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
+    const detalles = this.form.controls.detalles;
+    detalles.clear();
+    for (const line of lineas)
+      detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+  }
+
+  private notifyLoadError(): void {
+    const toasts = this.t().entities.facturaVenta.form.toasts;
+    this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
 
   /** Carga el mapa `idPlazo → días` para el autocálculo del vencimiento. */

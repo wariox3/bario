@@ -1,11 +1,14 @@
 import {
   ApplicationConfig,
+  LOCALE_ID,
   inject,
   provideBrowserGlobalErrorListeners,
   provideAppInitializer,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeEsCo from '@angular/common/locales/es-CO';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
@@ -24,18 +27,27 @@ import {
   REDDOC_PRIMENG_ES,
   authInterceptor,
   errorInterceptor,
+  tenantInterceptor,
   provideI18n,
+  TENANT_ROUTES,
+  ENTITY_DATA_GATEWAY,
+  HttpEntityDataGateway,
 } from '@reddoc/core';
-import { authEs, authEn } from '@reddoc/ui';
 import { AuthService } from './features/auth/services/auth.service';
 import { ROUTE_PATHS } from './core/constants/route-paths.constants';
+import { dictionaries } from './i18n';
+
+// Locale colombiano: habilita el formateo de moneda/número/fecha de las tablas
+// y fichas ($ 120.600, punto de miles, sin decimales en moneda).
+registerLocaleData(localeEsCo);
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: LOCALE_ID, useValue: 'es-CO' },
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(appRoutes),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideRouter(appRoutes, withComponentInputBinding()),
+    provideHttpClient(withInterceptors([authInterceptor, tenantInterceptor, errorInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -48,7 +60,7 @@ export const appConfig: ApplicationConfig = {
       translation: REDDOC_PRIMENG_ES,
     }),
     MessageService,
-    provideI18n({ es: { auth: authEs }, en: { auth: authEn } }),
+    provideI18n(dictionaries),
     { provide: ENVIRONMENT, useValue: environment },
     {
       provide: ROUTE_PATHS_TOKEN,
@@ -61,7 +73,7 @@ export const appConfig: ApplicationConfig = {
           resendVerification: ROUTE_PATHS.auth.resendVerification,
           verifyEmail: ROUTE_PATHS.auth.verifyEmail,
         },
-        dashboard: { root: ROUTE_PATHS.dashboard.root },
+        dashboard: { root: ROUTE_PATHS.contenedores.root },
       },
     },
     {
@@ -70,9 +82,15 @@ export const appConfig: ApplicationConfig = {
     },
     { provide: AUTH_SERVICE, useExisting: AuthService },
     {
-      provide: AUTH_SKIP_URLS,
-      useValue: AUTH_DEFAULT_SKIP_URLS,
+      provide: TENANT_ROUTES,
+      useValue: {
+        contenedoresRoot: ROUTE_PATHS.contenedores.root,
+        login: ROUTE_PATHS.auth.login,
+        tenantHome: (slug: string) => ROUTE_PATHS.tenant.home(slug),
+      },
     },
+    { provide: ENTITY_DATA_GATEWAY, useExisting: HttpEntityDataGateway },
+    { provide: AUTH_SKIP_URLS, useValue: AUTH_DEFAULT_SKIP_URLS },
     provideAppInitializer(() => {
       const auth = inject(AuthService);
       return firstValueFrom(auth.me()).catch(() => null);

@@ -22,7 +22,8 @@
       "@reddoc/feature-base": ["libs/feature-base/src/index.ts"],
       "@reddoc/styles": ["libs/styles/src/index.ts"],
       "@reddoc/ui": ["libs/ui/src/index.ts"],
-      "@erp/*": ["apps/erp/src/app/*"]
+      "@erp/*": ["apps/erp/src/app/*"],
+      "@turnos/*": ["apps/turnos/src/app/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,0 +1,132 @@
+@let det = t().entities.facturaCompra.detail;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+  @if (cabecera()) {
+    <p-button
+      type="button"
+      [label]="t().common.actions.edit"
+      icon="pi pi-pencil"
+      size="small"
+      [disabled]="!isEditable()"
+      (onClick)="onEdit()"
+    />
+    <app-document-detail-actions
+      [canAprobar]="!cabecera()?.estadoAprobado"
+      [canDesaprobar]="!!cabecera()?.estadoAprobado"
+      (aprobar)="onAprobar()"
+      (desaprobar)="onDesaprobar()"
+      (imprimir)="onImprimir()"
+      (archivos)="onArchivos()"
+    />
+  }
+</header>
+
+<p-confirmDialog />
+
+<app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
+
+@if (isLoading()) {
+  <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <!-- ── No encontrado ───────────────────────────────────────────────────────── -->
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ det.notFound.title }}</p>
+    <p class="m-0 mt-1 max-w-[280px] text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ det.notFound.desc }}
+    </p>
+  </div>
+} @else if (cabecera(); as c) {
+  <!-- ── Información general ──────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file-edit text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ det.sections.general }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-compra-detail__label">{{ det.labels.numero }}</dt>
+        <dd class="factura-compra-detail__value">{{ c.numero || '—' }}</dd>
+      </div>
+      @if (c.proveedor) {
+        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
+          <dt class="factura-compra-detail__label">{{ det.labels.proveedor }}</dt>
+          <dd class="factura-compra-detail__value">{{ c.proveedor }}</dd>
+        </div>
+      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-compra-detail__label">{{ det.labels.fecha }}</dt>
+        <dd class="factura-compra-detail__value">{{ formatFecha(c.fecha) }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-compra-detail__label">{{ det.labels.fechaVence }}</dt>
+        <dd class="factura-compra-detail__value">{{ formatFecha(c.fechaVence) }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-compra-detail__label">{{ det.labels.plazoPago }}</dt>
+        <dd class="factura-compra-detail__value">{{ c.plazoPago || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-compra-detail__label">{{ det.labels.metodoPago }}</dt>
+        <dd class="factura-compra-detail__value">{{ c.metodoPago || '—' }}</dd>
+      </div>
+      @if (c.sede) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-compra-detail__label">{{ det.labels.sede }}</dt>
+          <dd class="factura-compra-detail__value">{{ c.sede }}</dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- ── Detalles (líneas comerciales) ───────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-list text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ det.sections.detalles }}
+      </h2>
+    </div>
+
+    <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <app-comercial-documento-lineas-table
+        [lines]="lines()"
+        [linkable]="true"
+        (verAfectacion)="onVerAfectacion($event)"
+      />
+
+      @if (lines().length > 0) {
+        <app-comercial-documento-resumen [resumen]="resumen()" />
+      }
+    </div>
+  </section>
+}

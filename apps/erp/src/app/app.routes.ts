@@ -1,8 +1,6 @@
 import { Route } from '@angular/router';
-import { authGuard } from '@reddoc/core';
+import { authGuard, rootRedirectGuard, tenantAccessGuard } from '@reddoc/core';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
-import { rootRedirectGuard } from './core/guards/root-redirect.guard';
-import { tenantAccessGuard } from './core/guards/tenant-access.guard';
 import { erpModuleResolver } from '@erp/core/erp-modules';
 
 export const appRoutes: Route[] = [
@@ -74,13 +72,19 @@ export const appRoutes: Route[] = [
           import('./features/inventario/inventario.routes').then((m) => m.INVENTARIO_ROUTES),
       },
       {
-        path: 'turno',
-        loadChildren: () => import('./features/turno/turno.routes').then((m) => m.TURNO_ROUTES),
-      },
-      {
         path: 'contabilidad',
         loadChildren: () =>
           import('./features/contabilidad/contabilidad.routes').then((m) => m.CONTABILIDAD_ROUTES),
+      },
+      {
+        path: 'tesoreria',
+        loadChildren: () =>
+          import('./features/tesoreria/tesoreria.routes').then((m) => m.TESORERIA_ROUTES),
+      },
+      {
+        path: 'cartera',
+        loadChildren: () =>
+          import('./features/cartera/cartera.routes').then((m) => m.CARTERA_ROUTES),
       },
       {
         path: 'humano',

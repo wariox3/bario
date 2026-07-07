@@ -1,0 +1,43 @@
+@let i = t().entities.periodo.inconsistencias;
+
+@if (isLoading()) {
+  <div class="flex items-center justify-center gap-2 py-10 text-brand-muted">
+    <i class="pi pi-spin pi-spinner text-[1.1rem]"></i>
+    <span class="text-[0.85rem]">{{ t().common.list.records }}…</span>
+  </div>
+} @else if (hasError()) {
+  <div class="flex flex-col items-center gap-1 py-10 text-center">
+    <i class="pi pi-exclamation-triangle text-[1.4rem] text-red-500"></i>
+    <p class="m-0 text-[0.85rem] text-brand-muted">{{ i.loadError }}</p>
+  </div>
+} @else if (inconsistencias().length === 0) {
+  <div class="flex flex-col items-center gap-1 py-10 text-center">
+    <i class="pi pi-check-circle text-[1.4rem] text-emerald-500"></i>
+    <p class="m-0 text-[0.85rem] text-brand-muted">{{ i.empty }}</p>
+  </div>
+} @else {
+  <div class="overflow-x-auto rounded-lg border border-[rgba(20,48,73,0.1)]">
+    <table class="w-full border-collapse text-[0.82rem]">
+      <thead>
+        <tr
+          class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-brand-muted"
+        >
+          <th class="px-3 py-2 font-semibold">{{ i.columns.comprobante }}</th>
+          <th class="px-3 py-2 font-semibold">{{ i.columns.numero }}</th>
+          <th class="px-3 py-2 font-semibold">{{ i.columns.documento }}</th>
+          <th class="px-3 py-2 font-semibold">{{ i.columns.descripcion }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of inconsistencias(); track $index) {
+          <tr class="border-b border-[rgba(20,48,73,0.06)] last:border-0">
+            <td class="px-3 py-2 text-brand-text">{{ row.comprobante_id }}</td>
+            <td class="px-3 py-2 text-brand-text">{{ row.numero }}</td>
+            <td class="px-3 py-2 text-brand-muted">{{ row.documento_tipo_nombre || '—' }}</td>
+            <td class="px-3 py-2 text-brand-text">{{ row.inconsistencia }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

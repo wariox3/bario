@@ -40,7 +40,18 @@ jobs:
       - name: Check affected apps
         id: check
         run: |
-          AFFECTED=$(npx nx show projects --affected --type=app 2>/dev/null || echo "")
+          # La metadata del release (commit-and-tag-version) solo cambia version:
+          # package.json/package-lock.json/CHANGELOG.md. En Nx cada uno marca TODAS
+          # las apps como affected, así que la excluimos para no desplegar de mas.
+          CHANGED=$(git diff --name-only "$NX_BASE" "$NX_HEAD" -- . \
+            ':(exclude)package.json' \
+            ':(exclude)package-lock.json' \
+            ':(exclude)CHANGELOG.md' | paste -sd, -)
+          if [ -z "$CHANGED" ]; then
+            AFFECTED=""
+          else
+            AFFECTED=$(npx nx show projects --affected --files="$CHANGED" --type=app 2>/dev/null || echo "")
+          fi
           echo "landing=$(echo "$AFFECTED" | grep -q "^landing$" && echo true || echo false)" >> $GITHUB_OUTPUT
           echo "erp=$(echo "$AFFECTED" | grep -q "^erp$" && echo true || echo false)" >> $GITHUB_OUTPUT
           echo "cuenta=$(echo "$AFFECTED" | grep -q "^cuenta$" && echo true || echo false)" >> $GITHUB_OUTPUT

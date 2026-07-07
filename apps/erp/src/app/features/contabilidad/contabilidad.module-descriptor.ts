@@ -11,8 +11,9 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
   id: 'contabilidad',
   displayNameKey: 'modules.contabilidad.name',
   iconClass: 'pi pi-calculator',
-  defaultChildPath: 'cuentas',
+  defaultChildPath: 'inicio',
   menu: [
+    { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
     {
       kind: 'accordion',
       id: 'contabilidad-administracion',
@@ -25,6 +26,7 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
             { labelKey: 'entities.cuenta.name', path: 'cuentas' },
             { labelKey: 'entities.centroCosto.name', path: 'centros-costo' },
             { labelKey: 'entities.activo.name', path: 'activos' },
+            { labelKey: 'entities.periodo.name', path: 'periodo/anio' },
           ],
         },
       ],

@@ -5,10 +5,15 @@ import { Subject, startWith, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
-import { ENVIRONMENT, I18nService, TenantService, getInitials } from '@reddoc/core';
+import {
+  Contenedor,
+  ContenedorService,
+  ENVIRONMENT,
+  getInitials,
+  I18nService,
+  TenantService,
+} from '@reddoc/core';
 import { AuthService } from '../../../auth/services/auth.service';
-import { Contenedor } from '../../models/contenedor.model';
-import { ContenedorService } from '../../services/contenedor.service';
 import { isSuscripcionExpired } from '../../utils/contenedor-suscripcion.utils';
 import { ContenedoresCreateDialogComponent } from '../../components/create-dialog/contenedores-create-dialog.component';
 import { ContenedoresDeleteDialogComponent } from '../../components/delete-dialog/contenedores-delete-dialog.component';

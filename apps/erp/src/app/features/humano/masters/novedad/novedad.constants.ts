@@ -7,8 +7,8 @@ export const NOVEDADES_QUICK_SEARCH_FIELD = 'contrato_nombre';
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const NOVEDAD_LIST_PATH = ['humano', 'novedades'] as const;
 
-/** Endpoint del selector de tipo de novedad. */
-export const NOVEDAD_TIPO_ENDPOINT = '/humano/novedad-tipo/seleccionar/';
+// El endpoint del selector de tipo de novedad es cross-form (novedad + turno);
+// vive en `SELECT_ENDPOINTS.novedadTipo` (`@reddoc/core`).
 /** Endpoint del selector de novedad de referencia (filtrado por contrato + tipo). */
 export const NOVEDAD_REFERENCIA_ENDPOINT = '/humano/novedad/seleccionar/';
 
@@ -86,3 +86,14 @@ export const NOVEDADES_PRIMARY_ACTION: ToolbarAction = {
   labelKey: 'common.actions.new',
   iconClass: 'pi pi-plus',
 };
+
+export const NOVEDADES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: 'actions',
+    labelKey: 'common.actions.actions',
+    iconClass: '',
+    children: [
+      { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
+    ],
+  },
+];

@@ -16,6 +16,8 @@ import type { ComercialDetallePayload } from '@erp/features/documentos/comercial
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de venta. */
 export interface FacturaVentaRead extends DocumentoReadBase {
+  /** Número (consecutivo) del documento que asigna el backend. */
+  readonly numero: string | null;
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly plazo_pago_nombre?: string | null;

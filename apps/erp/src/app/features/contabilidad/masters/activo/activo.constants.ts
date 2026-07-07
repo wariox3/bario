@@ -1,4 +1,4 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import { type ColumnDef, type FilterField, SELECT_ENDPOINTS } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
 export const ACTIVOS_FILTERS_STORAGE_KEY = 'activos:filters:v1';
@@ -10,7 +10,7 @@ export const ACTIVO_LIST_PATH = ['contabilidad', 'activos'] as const;
 /** Endpoints de los selectores FK (convención de guion del backend nuevo). */
 export const ACTIVO_GRUPO_ENDPOINT = '/contabilidad/activo-grupo/seleccionar/';
 export const METODO_DEPRECIACION_ENDPOINT = '/contabilidad/metodo-depreciacion/seleccionar/';
-export const CENTRO_COSTO_ENDPOINT = '/contabilidad/centro-costo/seleccionar/';
+export const CENTRO_COSTO_ENDPOINT = SELECT_ENDPOINTS.centroCosto;
 
 export const ACTIVOS_COLUMNS: readonly ColumnDef[] = [
   {
@@ -72,3 +72,14 @@ export const ACTIVOS_PRIMARY_ACTION: ToolbarAction = {
   labelKey: 'common.actions.new',
   iconClass: 'pi pi-plus',
 };
+
+export const ACTIVOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: 'actions',
+    labelKey: 'common.actions.actions',
+    iconClass: '',
+    children: [
+      { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
+    ],
+  },
+];

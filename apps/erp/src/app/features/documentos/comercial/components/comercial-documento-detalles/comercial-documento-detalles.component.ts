@@ -51,7 +51,7 @@ import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/e
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
-import { ErpSelectDataService } from '@erp/core/data/erp-select-data.service';
+import { ErpSelectDataService } from '@reddoc/core';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
 import type { AppDict } from '@erp/i18n';
 import {
@@ -65,7 +65,7 @@ import {
   lineBruto,
   lineNeto,
   tasaFromImpuestoOption,
-  tasasDeVentaDelItem,
+  tasasDelItem,
   toLineaCalculo,
 } from '../../comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '../../comercial-documento-detalle.model';
@@ -73,6 +73,7 @@ import type {
   ComercialDetalleFormRawValue,
   ImpuestoSeleccionarOption,
 } from '../../comercial-documento-detalle.types';
+import { ComercialDocumentoResumenComponent } from '../comercial-documento-resumen/comercial-documento-resumen.component';
 
 /** Endpoint del catálogo de impuestos (mismo que usa `app-impuesto-select`). */
 const IMPUESTO_SELECCIONAR_ENDPOINT = '/general/impuesto/seleccionar/';
@@ -105,6 +106,7 @@ const IMPUESTO_SELECCIONAR_ENDPOINT = '/general/impuesto/seleccionar/';
     ConfirmDialogModule,
     ErpItemAutocompleteComponent,
     ErpImpuestoSelectComponent,
+    ComercialDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './comercial-documento-detalles.component.html',
@@ -125,6 +127,14 @@ export class ComercialDocumentoDetallesComponent {
 
   /** FormArray de líneas, propiedad del form padre. */
   readonly detalles = input.required<FormArray<ComercialDetalleGroup>>();
+
+  /**
+   * Familia fiscal del documento. Selecciona qué impuestos ofrece/def-selecciona
+   * el editor: `'venta'` usa los `impuesto_venta` (catálogo `?venta=True`);
+   * `'compra'` los `impuesto_compra` (catálogo `?compra=True`). Default `'venta'`
+   * para no alterar los documentos de venta existentes.
+   */
+  readonly modo = input<'venta' | 'compra'>('venta');
 
   /**
    * Id del documento en edición (`null` en alta). Cuando existe, las líneas
@@ -185,9 +195,10 @@ export class ComercialDocumentoDetallesComponent {
   private readonly wired = new WeakSet<ComercialDetalleGroup>();
 
   /**
-   * Pool de tasas de venta del catálogo (`general/impuesto/seleccionar/`). Fuente
-   * autoritativa para calcular el monto de **cualquier** impuesto elegido en la
-   * línea, no solo los configurados en el ítem. Vacío hasta que el fetch resuelve.
+   * Pool de tasas del catálogo (`general/impuesto/seleccionar/`) del `modo`
+   * activo (venta o compra). Fuente autoritativa para calcular el monto de
+   * **cualquier** impuesto elegido en la línea, no solo los configurados en el
+   * ítem. Vacío hasta que el fetch resuelve.
    */
   private readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
 
@@ -206,10 +217,12 @@ export class ComercialDocumentoDetallesComponent {
     });
   }
 
-  /** Carga el catálogo de impuestos de venta una vez y lo aplica a las filas nuevas. */
+  /** Carga el catálogo de impuestos del `modo` una vez y lo aplica a las filas nuevas. */
   private loadImpuestosCatalog(): void {
     this.selectData
-      .fetchOptions<ImpuestoSeleccionarOption>(IMPUESTO_SELECCIONAR_ENDPOINT, { venta: 'True' })
+      .fetchOptions<ImpuestoSeleccionarOption>(IMPUESTO_SELECCIONAR_ENDPOINT, {
+        [this.modo()]: 'True',
+      })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (options) => {
@@ -486,8 +499,8 @@ export class ComercialDocumentoDetallesComponent {
   }
 
   /**
-   * Default-selecciona los impuestos de venta del ítem y asegura el pool de tasas.
-   * Las tasas para calcular salen del catálogo (`ensureCatalog`), no del ítem.
+   * Default-selecciona los impuestos del ítem (según `modo`) y asegura el pool de
+   * tasas. Las tasas para calcular salen del catálogo (`ensureCatalog`), no del ítem.
    */
   private loadItemTaxes(group: ComercialDetalleGroup, opt: ItemOption | null): void {
     if (!opt) {
@@ -499,7 +512,9 @@ export class ComercialDocumentoDetallesComponent {
       .getById(opt.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((item) => {
-        group.controls.impuestos_ids.setValue(tasasDeVentaDelItem(item).map((tasa) => tasa.id));
+        group.controls.impuestos_ids.setValue(
+          tasasDelItem(item, this.modo()).map((tasa) => tasa.id),
+        );
       });
   }
 

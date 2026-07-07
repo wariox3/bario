@@ -1,5 +1,5 @@
 import type { ImpuestoLinea } from '@reddoc/core';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 
 /** Re-export: `ItemOption` vive ahora en `core/components` (infra compartida). */
@@ -40,4 +40,6 @@ export interface DetalleFormRawValue {
   readonly horas_nocturnas: number | null;
   /** Precio mínimo regulado de la cobertura (del tarifador). No editable por UI. */
   readonly precio_minimo: number | null;
+  /** Referencia a la línea afectada en otro documento. Derivada del backend; no editable. */
+  readonly documento_detalle_afectado: number | null;
 }

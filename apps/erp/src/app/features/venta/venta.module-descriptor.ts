@@ -15,8 +15,9 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
   id: 'venta',
   displayNameKey: 'modules.venta.name',
   iconClass: 'pi pi-tag',
-  defaultChildPath: 'contrato-servicio/list',
+  defaultChildPath: 'inicio',
   menu: [
+    { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
     {
       kind: 'accordion',
       id: 'venta-documentos',
@@ -41,7 +42,15 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
       defaultExpanded: false,
       groups: [
         {
-          items: [{ labelKey: 'entities.resolucion.name', path: 'resoluciones' }],
+          items: [
+            { labelKey: 'entities.contacto.name', path: 'contactos' },
+            { labelKey: 'entities.item.name', path: 'items' },
+            // sede: pendiente (el master aún no existe)
+            { labelKey: 'entities.precio.name', path: 'precios' },
+            { labelKey: 'entities.asesor.name', path: 'asesores' },
+            { labelKey: 'entities.resolucion.name', path: 'resoluciones' },
+            { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
+          ],
         },
       ],
     },

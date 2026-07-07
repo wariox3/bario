@@ -10,10 +10,15 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { I18nService, ToastService, getInitials } from '@reddoc/core';
+import {
+  Contenedor,
+  ContenedorMember,
+  ContenedorService,
+  getInitials,
+  I18nService,
+  ToastService,
+} from '@reddoc/core';
 import { AuthService } from '../../../auth/services/auth.service';
-import { Contenedor, ContenedorMember } from '../../models/contenedor.model';
-import { ContenedorService } from '../../services/contenedor.service';
 import type { AppDict } from '../../../../i18n';
 
 const ROLE_ORDER: Record<number, number> = {

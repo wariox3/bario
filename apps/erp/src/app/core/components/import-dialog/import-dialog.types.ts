@@ -16,9 +16,12 @@ export type ExampleConfig =
 /**
  * Error individual reportado por el backend tras importar.
  * Shape mínimo, pensado para crecer cuando el backend defina su contrato.
+ *
+ * `row` es opcional: hay fases (encabezados/estructural) cuyos errores no están
+ * asociados a una fila concreta del archivo.
  */
 export interface ImportError {
-  readonly row: number;
+  readonly row?: number;
   readonly field?: string;
   readonly message: string;
 }

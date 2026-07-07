@@ -29,10 +29,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { I18nService, calcularImpuestosLinea, toHora, type TasaImpuesto } from '@reddoc/core';
 import { FieldErrorComponent } from '@reddoc/ui';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import type { AppDict } from '@erp/i18n';
 import { ItemService } from '@erp/features/general/masters/item/item.service';

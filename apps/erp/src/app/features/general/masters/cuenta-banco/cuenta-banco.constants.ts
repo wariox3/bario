@@ -1,11 +1,11 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import { type ColumnDef, type FilterField, SELECT_ENDPOINTS } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
 export const CUENTAS_BANCO_FILTERS_STORAGE_KEY = 'cuentas-banco:filters:v1';
 export const CUENTAS_BANCO_QUICK_SEARCH_FIELD = 'nombre';
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const CUENTA_BANCO_LIST_PATH = ['general', 'cuentas-banco'] as const;
+/** Segmento de ruta del listado, relativo al módulo activo (se antepone en runtime). */
+export const CUENTA_BANCO_LIST_PATH = ['cuentas-banco'] as const;
 
 /**
  * Id del tipo "caja" (efectivo). Para este tipo el backend no espera número de
@@ -17,7 +17,7 @@ export const CUENTA_BANCO_TIPO_CAJA = 3;
 
 /** Endpoints de los selectores FK. */
 export const CUENTA_BANCO_TIPO_ENDPOINT = '/general/cuenta-banco-tipo/seleccionar/';
-export const CUENTA_BANCO_CLASE_ENDPOINT = '/general/cuenta-banco-clase/seleccionar/';
+export const CUENTA_BANCO_CLASE_ENDPOINT = SELECT_ENDPOINTS.cuentaBancoClase;
 
 export const CUENTAS_BANCO_COLUMNS: readonly ColumnDef[] = [
   {
@@ -70,3 +70,14 @@ export const CUENTAS_BANCO_PRIMARY_ACTION: ToolbarAction = {
   labelKey: 'common.actions.new',
   iconClass: 'pi pi-plus',
 };
+
+export const CUENTAS_BANCO_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: 'actions',
+    labelKey: 'common.actions.actions',
+    iconClass: '',
+    children: [
+      { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
+    ],
+  },
+];

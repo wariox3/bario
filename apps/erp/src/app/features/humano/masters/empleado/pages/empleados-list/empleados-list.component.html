@@ -1,0 +1,46 @@
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.empleado.name">
+  <lib-data-toolbar
+    toolbar
+    [primaryAction]="primaryAction"
+    [trailingActions]="trailingActions"
+    [searchPlaceholderKey]="'entities.empleado.searchPlaceholder'"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    [deleteSelectedEnabled]="hasSelection()"
+    [deleteSelectedCount]="selectedRows().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+    (deleteSelected)="removeSelected()"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    [rowActions]="rowActions"
+    [rowClickable]="true"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+    (rowClick)="onRowClick($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />

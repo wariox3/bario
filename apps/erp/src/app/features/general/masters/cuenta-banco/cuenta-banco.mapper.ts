@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { CuentaBanco, CuentaBancoPayload } from './cuenta-banco.model';
 import type { CuentaBancoFormRawValue } from './pages/cuenta-banco-form/cuenta-banco-form.types';
 import { CUENTA_BANCO_TIPO_CAJA } from './cuenta-banco.constants';
@@ -17,7 +17,7 @@ function cuentaOption(
 /**
  * Adapta el read-model (`CuentaBanco`) a los valores del reactive form.
  *
- * Los FK de tipo/clase usan `app-api-select`: el `nombre` puede ir vacío porque
+ * Los FK de tipo/clase usan `lib-api-select`: el `nombre` puede ir vacío porque
  * el select resuelve la etiqueta contra sus opciones por `id`. La cuenta contable
  * usa `app-cuenta-select`, cuya etiqueta es `código - nombre`.
  */

@@ -1,0 +1,45 @@
+@let a = t().documentActions.detail;
+
+<p-button
+  type="button"
+  [label]="a.aprobar"
+  icon="pi pi-check-circle"
+  size="small"
+  [disabled]="!canAprobar()"
+  (onClick)="aprobar.emit()"
+/>
+
+<p-button
+  type="button"
+  [label]="a.imprimir"
+  icon="pi pi-print"
+  severity="secondary"
+  [outlined]="true"
+  size="small"
+  [disabled]="!canImprimir()"
+  (onClick)="imprimir.emit()"
+/>
+
+<p-button
+  type="button"
+  [label]="a.acciones"
+  icon="pi pi-chevron-down"
+  iconPos="right"
+  severity="secondary"
+  [outlined]="true"
+  size="small"
+  (onClick)="toggleAcciones($event)"
+/>
+<p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
+
+<p-button
+  type="button"
+  [label]="a.opciones"
+  icon="pi pi-chevron-down"
+  iconPos="right"
+  severity="secondary"
+  [outlined]="true"
+  size="small"
+  (onClick)="toggleOpciones($event)"
+/>
+<p-menu #opcionesMenu [popup]="true" [model]="opcionesItems()" appendTo="body" />

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
 import { ACTIVO_LIST_PATH } from '../../activo.constants';
@@ -13,7 +14,7 @@ import type { Activo } from '../../activo.model';
 @Component({
   selector: 'app-activo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonModule, BreadcrumbComponent, DatePipe, DetailHeaderComponent],
   templateUrl: './activo-detail.component.html',
   styleUrl: './activo-detail.component.scss',
 })

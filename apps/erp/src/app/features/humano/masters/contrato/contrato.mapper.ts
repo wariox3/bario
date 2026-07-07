@@ -6,9 +6,9 @@ import type { ContratoFormRawValue } from './pages/contrato-form/contrato-form.t
  * Adapta el read-model (`Contrato`) a los valores del reactive form.
  *
  * Las FK se reagrupan en `{ id, nombre }` usando el companion `*_nombre` que
- * devuelve el backend para pintar la etiqueta en edición (los `<app-api-select>`
+ * devuelve el backend para pintar la etiqueta en edición (los `<lib-api-select>`
  * también la resuelven por `id` al cargar opciones, pero las ciudades usan
- * `<app-api-autocomplete>`, que no precarga, así que el `*_nombre` es necesario).
+ * `<lib-api-autocomplete>`, que no precarga, así que el `*_nombre` es necesario).
  * `salario` llega como string Decimal → se normaliza a número para el inputnumber.
  */
 export function contratoToFormValue(c: Contrato): Partial<ContratoFormRawValue> {
@@ -35,6 +35,7 @@ export function contratoToFormValue(c: Contrato): Partial<ContratoFormRawValue> 
         : null,
     fecha_desde: fromIsoDate(c.fecha_desde),
     fecha_hasta: fromIsoDate(c.fecha_hasta),
+    habilitado_turno: c.habilitado_turno,
     salario: toFiniteNumber(c.salario),
     auxilio_transporte: c.auxilio_transporte,
     salario_integral: c.salario_integral,
@@ -91,6 +92,7 @@ export function formValueToPayload(v: ContratoFormRawValue): ContratoPayload {
     salario: v.salario ?? null,
     auxilio_transporte: v.auxilio_transporte ?? false,
     salario_integral: v.salario_integral ?? false,
+    habilitado_turno: v.habilitado_turno ?? false,
     comentario: v.comentario || null,
     fecha_ultimo_pago: toIsoDate(v.fecha_ultimo_pago),
     fecha_ultimo_pago_prima: toIsoDate(v.fecha_ultimo_pago_prima),

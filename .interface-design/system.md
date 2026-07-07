@@ -74,6 +74,31 @@ oculto `<768px` (se reemplaza por `<p-drawer>`). Items: `0.85rem`, radius `8px`,
 `rgba(19 38 60 / 0.04)`, activo `rgba(19 38 60 / 0.08)` + texto `--brand-navy` + ícono `--brand-blue`.
 Acordeones con chevron `pi` alineado a la derecha (`margin-left:auto`).
 
+## Patrón: tabla horizontal de datos slim (tira calendario)
+
+Para mostrar un set fijo de pares `etiqueta → dato` corto y comparable (ej. código de turno por
+día del mes / día de semana en `secuencia-detail`). Tira tipo calendario en vez de cards o `<dl>`:
+lee de un vistazo el patrón completo y ocupa poco alto.
+
+- **Estructura:** `<div class="overflow-x-auto px-5 py-4">` → `<table>`. Una fila `<thead>` con la
+  etiqueta y una fila `<tbody>` con el dato debajo (alineados por columna).
+- **Columnas iguales (clave):** usar `table-fixed` para que el ancho NO dependa del largo del
+  texto (si no, etiquetas como "domingo festivo" ensanchan su columna y desalinean el resto).
+  - Pocas columnas (≤ ~12): `w-full table-fixed` → reparten todo el ancho.
+  - Muchas columnas (ej. 31 días): `w-full min-w-[60rem] table-fixed` → llenan el ancho en
+    pantallas grandes y hacen scroll bajo el `min-width`.
+- **Encabezado** (`<th>`): etiqueta en `text-[0.7rem] font-semibold text-brand-muted`,
+  `text-center`, `tabular-nums` si es numérica, `leading-tight` si puede envolver en 2 líneas.
+  Único divisor: `border-b border-[rgba(20,48,73,0.1)]` (sin grilla vertical).
+- **Cuerpo** (`<td>` `text-center align-middle`, `pt-2.5`):
+  - **Dato presente → ficha:** `<span class="inline-block rounded-md bg-[rgba(20,48,73,0.06)]
+px-2 py-0.5 font-mono text-[0.8rem] font-semibold text-brand-text">`. El tinte navy = "tiene
+    valor"; las fichas dan el ritmo visual sin necesidad de bordes de columna.
+  - **Dato vacío → punto tenue:** `<span class="text-[0.9rem] text-[rgba(20,48,73,0.25)]">·</span>`.
+- **Regla:** el dato siempre en monoespaciada; etiqueta en muted. Borders-only (solo el divisor
+  bajo el encabezado). Mostrar el set completo (incluidos los vacíos como punto) para que el patrón
+  se lea como una tira. Usar solo para valores cortos; si son largos, volver al `<dl>` vertical.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { CreditoService } from '../../credito.service';
 import { CREDITO_LIST_PATH } from '../../credito.constants';
@@ -13,7 +14,7 @@ import type { Credito } from '../../credito.model';
 @Component({
   selector: 'app-credito-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonModule, BreadcrumbComponent, DatePipe, DetailHeaderComponent],
   templateUrl: './credito-detail.component.html',
   styleUrl: './credito-detail.component.scss',
 })

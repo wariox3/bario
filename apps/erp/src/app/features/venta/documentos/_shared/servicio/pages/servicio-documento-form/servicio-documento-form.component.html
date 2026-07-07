@@ -44,14 +44,14 @@
     </div>
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-4">
         <!-- Contacto -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <div class="flex flex-col gap-1.5 sm:col-span-4">
           <label for="contacto" class="servicio-documento-form__label">
             {{ t().entities.servicioDocumento.form.fields.contacto }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-contacto-select
+          <lib-contacto-select
             inputId="contacto"
             formControlName="contacto"
             [placeholder]="t().entities.servicioDocumento.form.fields.contactoPlaceholder"
@@ -91,6 +91,32 @@
           />
         </div>
 
+        <!-- Sector -->
+        <div class="flex flex-col gap-1.5">
+          <label for="sector" class="servicio-documento-form__label">
+            {{ t().entities.servicioDocumento.form.fields.sector }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="sector"
+            formControlName="sector"
+            [endpoint]="sectorEndpoint"
+            [placeholder]="t().entities.servicioDocumento.form.fields.sectorPlaceholder"
+            [invalid]="form.controls.sector.invalid && form.controls.sector.touched"
+          />
+          @if (sectorLocked()) {
+            <span class="inline-flex items-center gap-1.5 text-[0.72rem] text-brand-muted">
+              <i class="pi pi-lock text-[0.68rem]"></i>
+              {{ t().entities.servicioDocumento.form.sectorLockedHint }}
+            </span>
+          } @else {
+            <lib-field-error
+              [control]="form.controls.sector"
+              [messages]="{ required: t().entities.servicioDocumento.form.validation.required }"
+            />
+          }
+        </div>
+
         <!-- Estrato -->
         <div class="flex flex-col gap-1.5">
           <label for="estrato" class="servicio-documento-form__label">
@@ -112,32 +138,6 @@
             [control]="form.controls.estrato"
             [messages]="{ required: t().entities.servicioDocumento.form.validation.required }"
           />
-        </div>
-
-        <!-- Sector -->
-        <div class="flex flex-col gap-1.5">
-          <label for="sector" class="servicio-documento-form__label">
-            {{ t().entities.servicioDocumento.form.fields.sector }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <app-api-select
-            inputId="sector"
-            formControlName="sector"
-            [endpoint]="sectorEndpoint"
-            [placeholder]="t().entities.servicioDocumento.form.fields.sectorPlaceholder"
-            [invalid]="form.controls.sector.invalid && form.controls.sector.touched"
-          />
-          @if (sectorLocked()) {
-            <span class="inline-flex items-center gap-1.5 text-[0.72rem] text-brand-muted">
-              <i class="pi pi-lock text-[0.68rem]"></i>
-              {{ t().entities.servicioDocumento.form.sectorLockedHint }}
-            </span>
-          } @else {
-            <lib-field-error
-              [control]="form.controls.sector"
-              [messages]="{ required: t().entities.servicioDocumento.form.validation.required }"
-            />
-          }
         </div>
 
         <!-- Salario -->

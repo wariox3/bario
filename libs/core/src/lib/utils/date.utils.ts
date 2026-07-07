@@ -55,3 +55,73 @@ export function fromHora(value: string | null | undefined): Date | null {
 export function daysBetween(a: Date, b: Date): number {
   return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
+
+/** `HH:mm:ss` → `HH:mm`; `null` si el valor no viene o es más corto que `HH:mm`. */
+function horaCorta(hora: string | null): string | null {
+  return hora && hora.length >= 5 ? hora.slice(0, 5) : null;
+}
+
+/**
+ * Franja horaria `desde`–`hasta` (ambas `HH:mm:ss`) formateada como `HH:mm - HH:mm`,
+ * o `null` si falta algún extremo.
+ */
+export function formatHorario(desde: string | null, hasta: string | null): string | null {
+  const d = horaCorta(desde);
+  const h = horaCorta(hasta);
+  return d && h ? `${d} - ${h}` : null;
+}
+
+/** Año y mes (1-based) extraídos de una fecha ISO `yyyy-MM-dd`. */
+export interface AnioMes {
+  readonly anio: number;
+  readonly mes: number;
+}
+
+/**
+ * Extrae `{ anio, mes }` (mes 1-based) de una fecha ISO `yyyy-MM-dd`, sin pasar
+ * por `Date` (evita corrimientos de zona). Retorna `null` si el string es vacío
+ * o no tiene año/mes válidos.
+ */
+export function anioMesDeIso(iso: string | null | undefined): AnioMes | null {
+  if (!iso) return null;
+  const anio = Number(iso.slice(0, 4));
+  const mes = Number(iso.slice(5, 7));
+  if (!Number.isFinite(anio) || !Number.isFinite(mes) || mes < 1 || mes > 12) return null;
+  return { anio, mes };
+}
+
+/**
+ * Inicial del día de la semana en español, indexada por `Date.getDay()`
+ * (0 = domingo … 6 = sábado). Miércoles usa `X` para no chocar con Martes (`M`).
+ */
+export const INICIALES_DIA_SEMANA_ES = ['D', 'L', 'M', 'X', 'J', 'V', 'S'] as const;
+
+/** Día de un mes: su número y la inicial del día de la semana que le corresponde. */
+export interface DiaDelMes {
+  /** Número de día (1..N). */
+  readonly dia: number;
+  /** Inicial del día de la semana en español (`L M X J V S D`). */
+  readonly inicial: string;
+  /** `true` si cae sábado o domingo. */
+  readonly finDeSemana: boolean;
+}
+
+/**
+ * Días de un mes (`1..N`, según corresponda 28/29/30/31) con la inicial del día
+ * de la semana de cada fecha. `mes` es **1-based** (1 = enero).
+ *
+ * Ej. junio 2026 → `[{ dia: 1, inicial: 'L', finDeSemana: false }, … ]`.
+ */
+export function diasDelMes(anio: number, mes: number): DiaDelMes[] {
+  // `new Date(anio, mes, 0)` con `mes` 1-based es el último día de ese mes.
+  const totalDias = new Date(anio, mes, 0).getDate();
+  return Array.from({ length: totalDias }, (_, i) => {
+    const dia = i + 1;
+    const diaSemana = new Date(anio, mes - 1, dia).getDay();
+    return {
+      dia,
+      inicial: INICIALES_DIA_SEMANA_ES[diaSemana],
+      finDeSemana: diaSemana === 0 || diaSemana === 6,
+    };
+  });
+}

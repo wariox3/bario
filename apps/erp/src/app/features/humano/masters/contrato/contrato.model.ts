@@ -12,6 +12,8 @@ export interface Contrato {
   readonly salario: string | number | null;
   readonly auxilio_transporte: boolean;
   readonly salario_integral: boolean;
+  /** Habilita la programación de turnos para este contrato. */
+  readonly habilitado_turno: boolean;
   readonly estado_terminado: boolean;
   readonly comentario: string | null;
   readonly fecha_ultimo_pago: string | null;
@@ -71,6 +73,7 @@ export interface ContratoPayload {
   readonly salario: number | null;
   readonly auxilio_transporte: boolean;
   readonly salario_integral: boolean;
+  readonly habilitado_turno: boolean;
   readonly comentario: string | null;
   readonly fecha_ultimo_pago: string | null;
   readonly fecha_ultimo_pago_prima: string | null;

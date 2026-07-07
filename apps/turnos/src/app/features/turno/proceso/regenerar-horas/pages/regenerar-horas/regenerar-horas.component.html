@@ -1,0 +1,72 @@
+<!--
+  Proceso "Regenerar horas".
+  Vive dentro de <lib-list-shell> para igualar a las listas: breadcrumb + card
+  con el título en el header. Como no hay tabla, el área de contenido aloja un
+  panel de acción centrado (icono + explicación + selector de período + botón).
+  Tras correr, el resultado aparece en verde con el conteo (si el backend lo
+  devuelve). Paleta casa (navy/sky), depth borders-only, éxito en emerald.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.regenerarHoras.name">
+  <div table class="flex items-center justify-center p-8 max-[576px]:p-5">
+    <div class="flex w-full max-w-md flex-col items-center gap-5 text-center">
+      <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
+        <i class="pi pi-clock text-[1.5rem]"></i>
+      </span>
+
+      <p class="m-0 text-[0.9rem] leading-relaxed text-brand-text/80">
+        {{ t().entities.regenerarHoras.description }}
+      </p>
+
+      <!-- Control: período + disparo, alineados por la base en una sola fila
+           (apila en móvil). Se lee como una unidad, no como piezas sueltas. -->
+      <div class="flex w-full flex-col gap-3 text-left sm:flex-row sm:items-end">
+        <div class="flex flex-1 flex-col gap-1.5">
+          <label for="regenerar-horas-periodo" class="text-[0.78rem] font-semibold text-brand-navy">
+            {{ t().entities.regenerarHoras.periodoLabel }}
+          </label>
+          <p-datepicker
+            inputId="regenerar-horas-periodo"
+            [ngModel]="periodo()"
+            (ngModelChange)="periodo.set($event)"
+            view="month"
+            dateFormat="mm/yy"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+          />
+        </div>
+        <p-button
+          [label]="t().entities.regenerarHoras.run"
+          icon="pi pi-sync"
+          styleClass="w-full sm:w-auto"
+          [loading]="status() === 'running'"
+          [disabled]="!periodo()"
+          (onClick)="onRegenerar()"
+        />
+      </div>
+
+      @if (status() === 'success') {
+        <div
+          class="mt-1 flex w-full items-start gap-3 rounded-[10px] border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-left"
+        >
+          <i class="pi pi-check-circle mt-px text-[1.05rem] text-emerald-600"></i>
+          <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span class="text-[0.85rem] font-semibold text-emerald-900">
+              {{ t().entities.regenerarHoras.result.successTitle }}
+            </span>
+            <span class="text-[0.78rem] text-emerald-800/80">
+              @if (affectedCount() !== null) {
+                {{ t().entities.regenerarHoras.result.updatedLabel }}:
+                <span class="font-semibold tabular-nums">{{ affectedCount() }}</span>
+              } @else {
+                {{ t().entities.regenerarHoras.result.successDesc }}
+              }
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</lib-list-shell>
+
+<p-confirmDialog />

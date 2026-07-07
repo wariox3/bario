@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
 import { ADICIONAL_LIST_PATH } from '../../adicional.constants';
@@ -12,7 +13,7 @@ import type { Adicional } from '../../adicional.model';
 @Component({
   selector: 'app-adicional-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
   templateUrl: './adicional-detail.component.html',
   styleUrl: './adicional-detail.component.scss',
 })

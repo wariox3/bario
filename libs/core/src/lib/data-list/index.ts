@@ -8,13 +8,21 @@
  *  - Serialización al body `{filtros, ordenamientos, …}` del backend (`buildListBody`).
  *  - Persistencia de filtros en localStorage (`FilterStorageService`).
  *
- * El framework configuracional específico del ERP (registry de módulos,
- * resolvers, gateway, base-document-list, etc.) vive en
- * `apps/erp/src/app/core/module-config/`, no aquí.
+ * El núcleo compartido del framework configuracional de documentos (tipos
+ * `DocumentEntityConfig`/`ModuleConfig`, gateway `ENTITY_DATA_GATEWAY` +
+ * `HttpEntityDataGateway`, `DocumentoDetalleService`) vive al lado, en
+ * `libs/core/documento`. Lo específico del ERP (registry de módulos, resolvers,
+ * `BaseDocumentListComponent`) queda en `apps/erp/src/app/core/module-config/`.
  */
 
 // Types
-export type { ColumnDef, ColumnValueType, ColumnAlignment } from './types/column-def.types';
+export type {
+  ColumnDef,
+  ColumnValueType,
+  ColumnAlignment,
+  ColumnPart,
+  ColumnPartType,
+} from './types/column-def.types';
 export type { FilterField, FilterFieldType } from './types/filter-field.types';
 export type {
   FilterCondition,

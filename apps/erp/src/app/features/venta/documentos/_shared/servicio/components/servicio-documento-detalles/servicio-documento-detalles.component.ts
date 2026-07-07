@@ -4,34 +4,18 @@ import { FormArray } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import {
-  I18nService,
-  ToastService,
-  calcularResumen,
-  formatCop,
-  toHora,
-  type LineaCalculo,
-  type ResumenDocumento,
-} from '@reddoc/core';
+import { I18nService, ToastService, calcularResumen, type ResumenDocumento } from '@reddoc/core';
 import { DocumentoDetalleService } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ServicioDocumentoDetalleModalComponent } from '../servicio-documento-detalle-modal/servicio-documento-detalle-modal.component';
 import { ServicioDocumentoResumenComponent } from '../servicio-documento-resumen/servicio-documento-resumen.component';
+import { ServicioDocumentoLineasTableComponent } from '../servicio-documento-lineas-table/servicio-documento-lineas-table.component';
 import { createDetalleGroup, type DetalleGroup } from '../../servicio-documento-detalle.form';
 import { detalleToFormValue, detalleToPayload } from '../../servicio-documento.mapper';
+import { toLineaCalculo } from '../../servicio-documento-detalle.utils';
 import type { ServicioDocumentoDetalleRead } from '../../servicio-documento.model';
 import type { DetalleFormRawValue } from '../../servicio-documento-detalle.types';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-
-/** Base gravable de una línea del documento: `cantidad × precio`. */
-function lineAmount(line: Pick<DetalleFormRawValue, 'cantidad' | 'precio'>): number {
-  return (line.cantidad ?? 0) * (line.precio ?? 0);
-}
-
-/** Adapta una línea del documento al contrato mínimo del kernel de cálculo. */
-function toLineaCalculo(line: DetalleFormRawValue): LineaCalculo {
-  return { base: lineAmount(line), impuestos: line.impuestos_totales };
-}
+import type { ErpSelectOption } from '@reddoc/core';
 
 /**
  * Listado de las líneas de servicio (detalles) del documento.
@@ -50,6 +34,7 @@ function toLineaCalculo(line: DetalleFormRawValue): LineaCalculo {
     ConfirmDialogModule,
     ServicioDocumentoDetalleModalComponent,
     ServicioDocumentoResumenComponent,
+    ServicioDocumentoLineasTableComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './servicio-documento-detalles.component.html',
@@ -96,27 +81,6 @@ export class ServicioDocumentoDetallesComponent {
   protected readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),
   );
-
-  /** Líneas agrupadas por puesto para renderizar separadores en la tabla. */
-  protected readonly groupedLines = computed(() => {
-    const result: Array<{
-      puesto: ErpSelectOption | null;
-      items: DetalleFormRawValue[];
-      startIndex: number;
-    }> = [];
-    let cursor = 0;
-    for (const line of this.lines()) {
-      const last = result[result.length - 1];
-      const sameGroup = last && (last.puesto?.id ?? null) === (line.puesto?.id ?? null);
-      if (sameGroup) {
-        last.items.push(line);
-      } else {
-        result.push({ puesto: line.puesto, items: [line], startIndex: cursor });
-      }
-      cursor++;
-    }
-    return result;
-  });
 
   // ── Estado del modal ────────────────────────────────────────────────────────
   protected readonly modalVisible = signal(false);
@@ -269,37 +233,5 @@ export class ServicioDocumentoDetallesComponent {
   private notifyLineError(): void {
     const toast = this.t().entities.servicioDocumento.form.detalles.toasts.lineSaveError;
     this.toast.error(toast.title, toast.desc);
-  }
-
-  /** Subtotal de una línea por índice. */
-  protected lineSubtotal(index: number): number {
-    const line = this.lines()[index];
-    return line ? lineAmount(line) : 0;
-  }
-
-  /**
-   * Formatea un monto a pesos colombianos sin decimales (`$ 1.000.000`).
-   * `formatCop` coacciona el valor a número, así tolera el string con cola de
-   * ceros que el backend autollena en `precio` al seleccionar un ítem.
-   */
-  protected readonly formatMoney = formatCop;
-
-  /** Formatea una fecha a `dd MMM` (ej. `01 jun`). */
-  protected formatDate(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
-  }
-
-  /** Formatea la hora de un `Date` a `HH:mm`. */
-  protected formatTime(date: Date | null): string {
-    return toHora(date) ?? '—';
-  }
-
-  /** "LMX-V--F" — 7 posiciones fijas + F al final si festivo. */
-  protected formatDias(dias: readonly number[], festivo = false): string {
-    const base = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
-      .map((l, i) => (dias.includes(i) ? l : '-'))
-      .join('');
-    return festivo ? `${base}F` : base;
   }
 }

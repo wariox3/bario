@@ -1,0 +1,227 @@
+@let f = t().entities.empleado.form.fields;
+@let d = t().entities.empleado.detail;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+  @if (empleado(); as c) {
+    <p-button
+      type="button"
+      [label]="t().common.actions.edit"
+      icon="pi pi-pencil"
+      size="small"
+      (onClick)="onEdit()"
+    />
+  }
+</header>
+
+@if (isLoading()) {
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ d.notFound.title }}</p>
+    <p class="m-0 mt-1 max-w-[280px] text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ d.notFound.desc }}
+    </p>
+  </div>
+} @else if (empleado(); as c) {
+  <!-- ── Identidad ───────────────────────────────────────────────────────── -->
+  <lib-detail-header [eyebrow]="d.eyebrow" [title]="c.nombre_corto">
+    <!-- Monograma de iniciales -->
+    <span
+      detailHeaderMedia
+      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-50 text-[1.05rem] font-bold tracking-tight text-sky-700"
+    >
+      {{ iniciales() }}
+    </span>
+
+    <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
+      {{ documento() }}
+    </p>
+  </lib-detail-header>
+
+  <!-- ── Información general ──────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-id-card text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.sections.general }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      @if (c.identificacion_nombre) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.identificacion }}</dt>
+          <dd class="empleado-detail__value">{{ c.identificacion_nombre }}</dd>
+        </div>
+      }
+      @if (c.numero_identificacion) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.numeroIdentificacion }}</dt>
+          <dd class="empleado-detail__value">
+            {{ c.numero_identificacion }}
+            @if (c.digito_verificacion) {
+              <span class="text-brand-muted">-{{ c.digito_verificacion }}</span>
+            }
+          </dd>
+        </div>
+      }
+      @if (c.nombre1) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.nombre1 }}</dt>
+          <dd class="empleado-detail__value">{{ c.nombre1 }}</dd>
+        </div>
+      }
+      @if (c.nombre2) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.nombre2 }}</dt>
+          <dd class="empleado-detail__value">{{ c.nombre2 }}</dd>
+        </div>
+      }
+      @if (c.apellido1) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.apellido1 }}</dt>
+          <dd class="empleado-detail__value">{{ c.apellido1 }}</dd>
+        </div>
+      }
+      @if (c.apellido2) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.apellido2 }}</dt>
+          <dd class="empleado-detail__value">{{ c.apellido2 }}</dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- ── Contacto ────────────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
+      >
+        <i class="pi pi-envelope text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.sections.contacto }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      @if (c.correo) {
+        <div class="flex flex-col gap-0.5 sm:col-span-2">
+          <dt class="empleado-detail__label">{{ f.correo }}</dt>
+          <dd class="empleado-detail__value">
+            <a [href]="'mailto:' + c.correo" class="empleado-detail__link">{{ c.correo }}</a>
+          </dd>
+        </div>
+      }
+      @if (c.celular) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.celular }}</dt>
+          <dd class="empleado-detail__value">
+            <a [href]="'tel:' + c.celular" class="empleado-detail__link">{{ c.celular }}</a>
+          </dd>
+        </div>
+      }
+      @if (c.telefono) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="empleado-detail__label">{{ f.telefono }}</dt>
+          <dd class="empleado-detail__value">
+            <a [href]="'tel:' + c.telefono" class="empleado-detail__link">{{ c.telefono }}</a>
+          </dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- ── Ubicación ───────────────────────────────────────────────────────── -->
+  @if (c.direccion || c.barrio || c.ciudad_nombre) {
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
+        >
+          <i class="pi pi-map-marker text-[1rem]"></i>
+        </span>
+        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+          {{ d.sections.ubicacion }}
+        </h2>
+      </div>
+      <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+        @if (c.ciudad_nombre) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.ciudad }}</dt>
+            <dd class="empleado-detail__value">{{ c.ciudad_nombre }}</dd>
+          </div>
+        }
+        @if (c.direccion) {
+          <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
+            <dt class="empleado-detail__label">{{ f.direccion }}</dt>
+            <dd class="empleado-detail__value">{{ c.direccion }}</dd>
+          </div>
+        }
+        @if (c.barrio) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.barrio }}</dt>
+            <dd class="empleado-detail__value">{{ c.barrio }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+  }
+
+  <!-- ── Datos bancarios ─────────────────────────────────────────────────── -->
+  @if (c.banco_nombre || c.numero_cuenta || c.cuenta_banco_clase_nombre) {
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
+        >
+          <i class="pi pi-wallet text-[1rem]"></i>
+        </span>
+        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+          {{ d.sections.banca }}
+        </h2>
+      </div>
+      <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+        @if (c.banco_nombre) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.banco }}</dt>
+            <dd class="empleado-detail__value">{{ c.banco_nombre }}</dd>
+          </div>
+        }
+        @if (c.numero_cuenta) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.numeroCuenta }}</dt>
+            <dd class="empleado-detail__value">{{ c.numero_cuenta }}</dd>
+          </div>
+        }
+        @if (c.cuenta_banco_clase_nombre) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.cuentaBancoClase }}</dt>
+            <dd class="empleado-detail__value">{{ c.cuenta_banco_clase_nombre }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+  }
+}

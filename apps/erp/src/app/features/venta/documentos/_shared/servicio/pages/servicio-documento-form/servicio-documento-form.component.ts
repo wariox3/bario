@@ -18,11 +18,9 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
-import { ErpContactoSelectComponent } from '@erp/core/components/contacto-select/erp-contacto-select.component';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpContactoSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import { ConfiguracionService } from '@erp/core/services/configuracion.service';
@@ -96,6 +94,13 @@ export class ServicioDocumentoFormComponent implements OnInit {
   /** Id del documento a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
 
+  /**
+   * Cabecera pre-cargada por `editableDocumentResolver` (clave de ruta
+   * `documentoEdit`). En edición llega ya resuelta y el form la reúsa en vez de
+   * volver a pedirla; `null`/ausente en alta o si el resolver hizo fail-open.
+   */
+  readonly documentoEdit = input<unknown>();
+
   protected readonly isEditMode = computed(() => !!this.id());
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
@@ -150,10 +155,20 @@ export class ServicioDocumentoFormComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.id();
-    if (id) {
-      this.loadDocumento(Number(id));
-    } else {
+    if (!id) {
       this.prefillSalarioMinimo();
+      return;
+    }
+    // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
+    // pedimos las líneas (que heredan el salario de la cabecera). Sin resolved
+    // (fail-open) cae a la carga completa.
+    const prefetched = this.documentoEdit();
+    if (prefetched) {
+      const read = prefetched as ServicioDocumentoRead;
+      this.applyCabecera(read);
+      this.loadLineas(Number(id), toFiniteNumber(read.salario));
+    } else {
+      this.loadDocumento(Number(id));
     }
   }
 
@@ -192,10 +207,13 @@ export class ServicioDocumentoFormComponent implements OnInit {
     this.navigateToList();
   }
 
+  /**
+   * Carga completa (cabecera + líneas). La cabecera (`documento/:id/`) ya no
+   * embebe los detalles: las líneas se traen aparte de
+   * `documento-detalle/?documento_id=`. Se usa como fallback de la carga inicial
+   * cuando el resolver no pre-cargó la cabecera.
+   */
   private loadDocumento(id: number): void {
-    // La cabecera (`documento/:id/`) ya no embebe los detalles: las líneas se
-    // traen aparte de `documento-detalle/?documento_id=`. Las dos peticiones son
-    // independientes, así que cargan en paralelo y se pueblan juntas.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ServicioDocumentoDetalleRead>(id),
@@ -204,19 +222,46 @@ export class ServicioDocumentoFormComponent implements OnInit {
       .subscribe({
         next: ({ cabecera, lineas }) => {
           const read = cabecera as ServicioDocumentoRead;
-          // El salario viaja en la cabecera; cada línea lo hereda.
-          const salarioDoc = toFiniteNumber(read.salario);
-          this.form.patchValue(servicioDocumentoToFormValue(read));
-          const detalles = this.form.controls.detalles;
-          detalles.clear();
-          for (const line of lineas)
-            detalles.push(createDetalleGroup(detalleToFormValue(line, salarioDoc)));
+          this.applyCabecera(read);
+          this.populateLineas(lineas, toFiniteNumber(read.salario));
         },
-        error: () => {
-          const toasts = this.t().entities.servicioDocumento.form.toasts;
-          this.toast.error(toasts.loadError.title, toasts.loadError.desc);
-        },
+        error: () => this.notifyLoadError(),
       });
+  }
+
+  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
+  private loadLineas(id: number, salarioDoc: number | null): void {
+    this.detalleService
+      .listarPorDocumento<ServicioDocumentoDetalleRead>(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lineas) => this.populateLineas(lineas, salarioDoc),
+        error: () => this.notifyLoadError(),
+      });
+  }
+
+  /** Pobla la cabecera en el form. */
+  private applyCabecera(read: ServicioDocumentoRead): void {
+    this.form.patchValue(servicioDocumentoToFormValue(read));
+  }
+
+  /**
+   * Reemplaza el FormArray de detalles con las líneas recibidas. El salario
+   * viaja en la cabecera; cada línea lo hereda.
+   */
+  private populateLineas(
+    lineas: readonly ServicioDocumentoDetalleRead[],
+    salarioDoc: number | null,
+  ): void {
+    const detalles = this.form.controls.detalles;
+    detalles.clear();
+    for (const line of lineas)
+      detalles.push(createDetalleGroup(detalleToFormValue(line, salarioDoc)));
+  }
+
+  private notifyLoadError(): void {
+    const toasts = this.t().entities.servicioDocumento.form.toasts;
+    this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
 
   private prefillSalarioMinimo(): void {

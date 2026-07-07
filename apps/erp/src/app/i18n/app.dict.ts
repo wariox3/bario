@@ -123,6 +123,7 @@ export interface AppDict extends AuthTranslationsHost {
     };
     nav: {
       dashboard: string;
+      home: string;
       account: string;
       empty: string;
       sections: {
@@ -152,6 +153,47 @@ export interface AppDict extends AuthTranslationsHost {
       cancel: string;
       success: { title: string; desc: string };
       error: { title: string; desc: string };
+    };
+    detail: {
+      aprobar: string;
+      desaprobar: string;
+      acciones: string;
+      imprimir: string;
+      opciones: string;
+      archivos: string;
+      confirmAprobar: { message: string; header: string };
+      confirmDesaprobar: { message: string; header: string };
+      toasts: {
+        aprobarSuccess: { title: string; desc: string };
+        aprobarError: { title: string; desc: string };
+        desaprobarSuccess: { title: string; desc: string };
+        desaprobarError: { title: string; desc: string };
+        imprimirError: { title: string; desc: string };
+        editBloqueado: { title: string; desc: string };
+      };
+    };
+    afectacion: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      cols: {
+        id: string;
+        documento: string;
+        item: string;
+        cantidad: string;
+        precio: string;
+        periodo: string;
+        puesto: string;
+        modalidad: string;
+        subtotal: string;
+        baseImpuesto: string;
+        impuesto: string;
+        total: string;
+      };
+      cards: { documento: string; documentoAfectado: string };
+      campos: { detalleId: string; documentoId: string; fecha: string; contacto: string };
+      close: string;
+      loadError: { title: string; desc: string };
     };
   };
   documentImport: {
@@ -183,8 +225,9 @@ export interface AppDict extends AuthTranslationsHost {
     compra: { name: string };
     venta: { name: string };
     inventario: { name: string };
-    turno: { name: string };
     contabilidad: { name: string };
+    tesoreria: { name: string };
+    cartera: { name: string };
     humano: { name: string };
   };
   entities: {
@@ -208,6 +251,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -242,6 +286,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -266,6 +311,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -312,6 +358,8 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
+        vigencia: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -398,6 +446,7 @@ export interface AppDict extends AuthTranslationsHost {
       detail: {
         title: string;
         subtitle: string;
+        eyebrow: string;
         sections: {
           general: string;
           contacto: string;
@@ -465,6 +514,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         sections: { precios: string; impuestos: string; cuentas: string };
         labels: { impuestosVenta: string; impuestosCompra: string; sinImpuestos: string };
         notFound: { title: string; desc: string };
@@ -474,188 +524,6 @@ export interface AppDict extends AuthTranslationsHost {
           imageRemoveSuccess: { title: string; desc: string };
           imageRemoveError: { title: string; desc: string };
         };
-      };
-    };
-    puesto: {
-      name: string;
-      searchPlaceholder: string;
-      columns: {
-        id: string;
-        nombre: string;
-        direccion: string;
-        celular: string;
-        latitud: string;
-        longitud: string;
-        comentario: string;
-        estado: string;
-      };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        cancel: string;
-        submitCreate: string;
-        submitEdit: string;
-        sections: { principal: string };
-        sectionsHint: { principal: string };
-        fields: {
-          nombre: string;
-          direccion: string;
-          celular: string;
-          latitud: string;
-          longitud: string;
-          comentario: string;
-          ciudad: string;
-          ciudadPlaceholder: string;
-          contacto: string;
-          contactoPlaceholder: string;
-          centroCosto: string;
-          centroCostoPlaceholder: string;
-          programador: string;
-          programadorPlaceholder: string;
-        };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
-        notFound: { title: string; desc: string };
-        sections: { ubicacion: string; relaciones: string; comentario: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-    };
-    programador: {
-      name: string;
-      searchPlaceholder: string;
-      columns: { id: string; nombre: string; estado: string };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        cancel: string;
-        submitCreate: string;
-        submitEdit: string;
-        sections: { principal: string };
-        sectionsHint: { principal: string };
-        fields: { nombre: string };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
-        notFound: { title: string; desc: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-    };
-    secuencia: {
-      name: string;
-      searchPlaceholder: string;
-      columns: {
-        id: string;
-        codigo: string;
-        nombre: string;
-        horas: string;
-        dias: string;
-        homologar: string;
-        estado: string;
-      };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        cancel: string;
-        submitCreate: string;
-        submitEdit: string;
-        sections: { principal: string; diasMes: string; diasSemana: string };
-        sectionsHint: { principal: string; diasMes: string; diasSemana: string };
-        fields: {
-          codigo: string;
-          nombre: string;
-          horas: string;
-          dias: string;
-          homologar: string;
-          lunes: string;
-          martes: string;
-          miercoles: string;
-          jueves: string;
-          viernes: string;
-          sabado: string;
-          domingo: string;
-          festivo: string;
-          domingoFestivo: string;
-        };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
-        notFound: { title: string; desc: string };
-        sections: { principal: string; diasMes: string; diasSemana: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-    };
-    turno: {
-      name: string;
-      searchPlaceholder: string;
-      columns: {
-        id: string;
-        codigo: string;
-        nombre: string;
-        horaInicio: string;
-        horaFin: string;
-        horas: string;
-        horasDiurnas: string;
-        horasNocturnas: string;
-        color: string;
-        estado: string;
-      };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        fields: {
-          codigo: string;
-          nombre: string;
-          horaInicio: string;
-          horaFin: string;
-          horas: string;
-          horasDiurnas: string;
-          horasNocturnas: string;
-          color: string;
-        };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
-        notFound: { title: string; desc: string };
-        sections: { principal: string };
-        activo: string;
-        toasts: { loadError: { title: string; desc: string } };
       };
     };
     sucursal: {
@@ -678,6 +546,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -703,6 +572,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -727,6 +597,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
@@ -735,6 +606,7 @@ export interface AppDict extends AuthTranslationsHost {
     centroCosto: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: { id: string; codigo: string; nombre: string; estado: string };
       form: {
         createTitle: string;
@@ -757,6 +629,62 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    formaPago: {
+      name: string;
+      searchPlaceholder: string;
+      columns: { id: string; nombre: string; cuenta: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: { nombre: string; cuenta: string; cuentaPlaceholder: string };
+        validation: { required: string; maxlength: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        eyebrow: string;
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    sede: {
+      name: string;
+      searchPlaceholder: string;
+      columns: { id: string; codigo: string; nombre: string; centroCosto: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: {
+          nombre: string;
+          codigo: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+        };
+        validation: { required: string; maxlength: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -764,7 +692,16 @@ export interface AppDict extends AuthTranslationsHost {
     cuenta: {
       name: string;
       searchPlaceholder: string;
-      columns: { codigo: string; nombre: string; clase: string; movimiento: string };
+      import: { title: string; subtitle: string };
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        movimiento: string;
+        exigeBase: string;
+        exigeContacto: string;
+        exigeGrupo: string;
+      };
       form: {
         createTitle: string;
         editTitle: string;
@@ -800,6 +737,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -853,6 +791,103 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    periodo: {
+      name: string;
+      /** 13 entradas: enero..diciembre (índices 0..11) + cierre (12). */
+      meses: string[];
+      panel: { emptyAnios: string; emptyTitle: string; emptySub: string };
+      estados: { abierto: string; bloqueado: string; cerrado: string; inconsistencia: string };
+      acciones: {
+        nuevoAnio: string;
+        verInconsistencias: string;
+        bloquear: string;
+        desbloquear: string;
+        cerrar: string;
+      };
+      confirms: { cerrar: { header: string; message: string } };
+      anioNuevo: {
+        title: string;
+        subtitle: string;
+        field: { anio: string; anioPlaceholder: string };
+        validation: { required: string; rango: string };
+        submit: string;
+      };
+      inconsistencias: {
+        title: string;
+        columns: { comprobante: string; numero: string; documento: string; descripcion: string };
+        empty: string;
+        loadError: string;
+      };
+      toasts: {
+        bloquearSuccess: { title: string; desc: string };
+        bloquearError: { title: string; desc: string };
+        desbloquearSuccess: { title: string; desc: string };
+        desbloquearError: { title: string; desc: string };
+        cerrarSuccess: { title: string; desc: string };
+        cerrarError: { title: string; desc: string };
+        crearSuccess: { title: string; desc: string };
+        crearError: { title: string; desc: string };
+        loadError: { title: string; desc: string };
+      };
+    };
+    empleado: {
+      name: string;
+      searchPlaceholder: string;
+      columns: {
+        id: string;
+        identificacion: string;
+        identificacion_abreviatura: string;
+        nombre: string;
+        correo: string;
+        celular: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        sections: { banca: string };
+        sectionsHint: { banca: string };
+        fields: {
+          identificacion: string;
+          numeroIdentificacion: string;
+          nombre1: string;
+          nombre2: string;
+          apellido1: string;
+          apellido2: string;
+          telefono: string;
+          celular: string;
+          ciudad: string;
+          ciudadPlaceholder: string;
+          direccion: string;
+          barrio: string;
+          correo: string;
+          banco: string;
+          bancoPlaceholder: string;
+          numeroCuenta: string;
+          cuentaBancoClase: string;
+        };
+        validation: {
+          required: string;
+          emailInvalid: string;
+          numeroIdentificacionExistente: string;
+        };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        eyebrow: string;
+        sections: { general: string; contacto: string; ubicacion: string; banca: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -903,6 +938,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -947,6 +983,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        eyebrow: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1036,6 +1073,7 @@ export interface AppDict extends AuthTranslationsHost {
           tiempo: string;
           fechaDesde: string;
           fechaHasta: string;
+          habilitadoTurno: string;
           salario: string;
           aplicaAuxilioTransporte: string;
           salarioIntegral: string;
@@ -1069,15 +1107,35 @@ export interface AppDict extends AuthTranslationsHost {
           loadError: { title: string; desc: string };
         };
       };
+      detail: {
+        eyebrow: string;
+        sections: { datos: string; remuneracion: string; seguridadSocial: string };
+        estado: { activo: string; terminado: string };
+        boolean: { si: string; no: string };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
     };
     facturaVenta: {
       name: string;
       columns: {
+        id: string;
         numero: string;
         fecha: string;
+        identificacion: string;
         contacto: string;
+        subtotal: string;
+        impuesto: string;
         total: string;
-        estado: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
       };
       form: {
         createTitle: string;
@@ -1104,6 +1162,210 @@ export interface AppDict extends AuthTranslationsHost {
           loadError: { title: string; desc: string };
         };
       };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    facturaCompra: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    documentoSoporte: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
+          resolucion: string;
+          resolucionPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+          formaPago: string;
+          resolucion: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    notaAjuste: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          metodoPago: string;
+          centroCosto: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
     };
     comercialDetalle: {
       title: string;
@@ -1124,6 +1386,7 @@ export interface AppDict extends AuthTranslationsHost {
       confirmDeleteLine: string;
       columns: {
         linea: string;
+        ref: string;
         item: string;
         cantidad: string;
         precio: string;
@@ -1212,10 +1475,10 @@ export interface AppDict extends AuthTranslationsHost {
         horas: string;
         horasDiurnas: string;
         horasNocturnas: string;
-        iva: string;
         valor: string;
-        valorPendiente: string;
         total: string;
+        afectado: string;
+        valorPendiente: string;
       };
     };
     regenerarAfectado: {
@@ -1280,6 +1543,7 @@ export interface AppDict extends AuthTranslationsHost {
           lineLabel: string;
           coverage: string;
           subtotalCol: string;
+          documentoAfectadoCol: string;
           contractSummaryTitle: string;
           contractSubtotal: string;
           contractTotal: string;
@@ -1349,6 +1613,18 @@ export interface AppDict extends AuthTranslationsHost {
             lineSaveError: { title: string; desc: string };
           };
         };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          fecha: string;
+          sector: string;
+          estrato: string;
+          salario: string;
+        };
+        notFound: { title: string; desc: string };
       };
     };
   };

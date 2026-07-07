@@ -41,59 +41,52 @@
     </p>
   </div>
 } @else if (cuenta(); as c) {
-  <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex flex-wrap items-start gap-4 px-5 py-5 max-[576px]:px-4">
-      <span
-        class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-book text-[1.4rem]"></i>
-      </span>
+  <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
+  <lib-detail-header
+    icon="pi pi-book"
+    [eyebrow]="t().entities.cuenta.detail.eyebrow"
+    [title]="c.nombre"
+  >
+    <div detailHeaderSubtitle class="flex flex-col gap-2">
+      @if (c.codigo) {
+        <span class="text-[0.8rem] font-medium text-brand-muted">
+          {{ t().entities.cuenta.columns.codigo }}: {{ c.codigo }}
+        </span>
+      }
 
-      <div class="flex min-w-0 flex-1 flex-col gap-2">
-        <h1 class="m-0 truncate text-2xl font-bold tracking-tight text-brand-text">
-          {{ c.nombre }}
-        </h1>
-        @if (c.codigo) {
-          <p class="m-0 text-[0.8rem] font-medium text-brand-muted">
-            {{ t().entities.cuenta.columns.codigo }}: {{ c.codigo }}
-          </p>
+      <div class="flex flex-wrap gap-2">
+        @if (c.permite_movimiento) {
+          <span
+            class="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            {{ t().entities.cuenta.form.fields.permiteMovimiento }}
+          </span>
         }
-
-        <div class="mt-1 flex flex-wrap gap-2">
-          @if (c.permite_movimiento) {
-            <span
-              class="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
-            >
-              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-              {{ t().entities.cuenta.form.fields.permiteMovimiento }}
-            </span>
-          }
-          @if (c.exige_base) {
-            <span
-              class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-            >
-              {{ t().entities.cuenta.form.fields.exigeBase }}
-            </span>
-          }
-          @if (c.exige_contacto) {
-            <span
-              class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-            >
-              {{ t().entities.cuenta.form.fields.exigeContacto }}
-            </span>
-          }
-          @if (c.exige_grupo) {
-            <span
-              class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-            >
-              {{ t().entities.cuenta.form.fields.exigeGrupo }}
-            </span>
-          }
-        </div>
+        @if (c.exige_base) {
+          <span
+            class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
+          >
+            {{ t().entities.cuenta.form.fields.exigeBase }}
+          </span>
+        }
+        @if (c.exige_contacto) {
+          <span
+            class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
+          >
+            {{ t().entities.cuenta.form.fields.exigeContacto }}
+          </span>
+        }
+        @if (c.exige_grupo) {
+          <span
+            class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
+          >
+            {{ t().entities.cuenta.form.fields.exigeGrupo }}
+          </span>
+        }
       </div>
     </div>
-  </section>
+  </lib-detail-header>
 
   <!-- ── Clasificación contable ───────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

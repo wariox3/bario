@@ -19,9 +19,36 @@ export const CUENTA_GRUPO_RANGO = { multiplicador: 10, desplazamiento: 9 } as co
 export const CUENTA_CUENTA_RANGO = { multiplicador: 100, desplazamiento: 99 } as const;
 
 export const CUENTAS_COLUMNS: readonly ColumnDef[] = [
+  {
+    field: 'id',
+    headerKey: 'entities.cuenta.columns.id',
+    type: 'number',
+    width: '80px',
+    align: 'right',
+  },
   { field: 'codigo', headerKey: 'entities.cuenta.columns.codigo', type: 'text', width: '110px' },
   { field: 'nombre', headerKey: 'entities.cuenta.columns.nombre', type: 'text' },
-  { field: 'cuenta_clase_nombre', headerKey: 'entities.cuenta.columns.clase', type: 'text' },
+  {
+    field: 'exige_base',
+    headerKey: 'entities.cuenta.columns.exigeBase',
+    type: 'boolean',
+    width: '110px',
+    align: 'center',
+  },
+  {
+    field: 'exige_contacto',
+    headerKey: 'entities.cuenta.columns.exigeContacto',
+    type: 'boolean',
+    width: '120px',
+    align: 'center',
+  },
+  {
+    field: 'exige_grupo',
+    headerKey: 'entities.cuenta.columns.exigeGrupo',
+    type: 'boolean',
+    width: '110px',
+    align: 'center',
+  },
   {
     field: 'permite_movimiento',
     headerKey: 'entities.cuenta.columns.movimiento',
@@ -52,3 +79,15 @@ export const CUENTAS_PRIMARY_ACTION: ToolbarAction = {
   labelKey: 'common.actions.new',
   iconClass: 'pi pi-plus',
 };
+
+export const CUENTAS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: 'actions',
+    labelKey: 'common.actions.actions',
+    iconClass: '',
+    children: [
+      { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
+      { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
+    ],
+  },
+];

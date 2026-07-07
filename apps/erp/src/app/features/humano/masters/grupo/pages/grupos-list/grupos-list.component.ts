@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -33,6 +36,7 @@ import {
   GRUPOS_QUICK_SEARCH_FIELD,
   GRUPOS_PRIMARY_ACTION,
   GRUPOS_ROW_ACTIONS,
+  GRUPOS_TRAILING_ACTIONS,
 } from '../../grupo.constants';
 
 @Component({
@@ -51,6 +55,7 @@ import {
 })
 export class GruposListComponent {
   private readonly service = inject(GrupoService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
@@ -74,6 +79,8 @@ export class GruposListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -91,6 +98,7 @@ export class GruposListComponent {
   protected readonly filterFields = GRUPOS_FILTER_FIELDS;
   protected readonly rowActions = GRUPOS_ROW_ACTIONS;
   protected readonly primaryAction = GRUPOS_PRIMARY_ACTION;
+  protected readonly trailingActions = GRUPOS_TRAILING_ACTIONS;
 
   constructor() {
     this.loadList();
@@ -150,7 +158,14 @@ export class GruposListComponent {
   }
 
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +176,31 @@ export class GruposListComponent {
     const ids = this.selectedRows().map((g) => g.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/humano/grupo/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'grupos.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {

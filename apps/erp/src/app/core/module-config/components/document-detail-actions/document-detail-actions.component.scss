@@ -1,0 +1,16 @@
+:host {
+  // Empuja la botonera a la derecha del header, separada de Volver/Editar.
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+// Los menús popup ("Acciones"/"Opciones") se renderizan en <body> (appendTo),
+// pero su elemento host queda en el flex como ítem de ancho cero: eso duplica el
+// gap entre Acciones y Opciones y deja un espacio fantasma contra el borde
+// derecho. Sacándolos del flujo, todos los espaciados quedan iguales al de
+// Aprobar↔Imprimir.
+p-menu {
+  display: none;
+}

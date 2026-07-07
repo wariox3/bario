@@ -1,0 +1,55 @@
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+  @if (formaPago(); as m) {
+    <p-button
+      type="button"
+      [label]="t().common.actions.edit"
+      icon="pi pi-pencil"
+      size="small"
+      (onClick)="onEdit()"
+    />
+  }
+</header>
+
+@if (isLoading()) {
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">
+      {{ t().entities.formaPago.detail.notFound.title }}
+    </p>
+    <p class="m-0 mt-1 max-w-70 text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ t().entities.formaPago.detail.notFound.desc }}
+    </p>
+  </div>
+} @else if (formaPago(); as m) {
+  <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
+  <lib-detail-header
+    icon="pi pi-credit-card"
+    [eyebrow]="t().entities.formaPago.detail.eyebrow"
+    [title]="m.nombre"
+  >
+    <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
+      {{ t().entities.formaPago.columns.cuenta }}:
+      {{ m.cuenta ? [m.cuenta_codigo, m.cuenta_nombre].join(' - ') : '—' }}
+    </p>
+  </lib-detail-header>
+}

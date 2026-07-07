@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { CargoService } from '../../cargo.service';
 import { CARGO_LIST_PATH } from '../../cargo.constants';
@@ -12,7 +13,7 @@ import type { Cargo } from '../../cargo.model';
 @Component({
   selector: 'app-cargo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
   templateUrl: './cargo-detail.component.html',
   styleUrl: './cargo-detail.component.scss',
 })

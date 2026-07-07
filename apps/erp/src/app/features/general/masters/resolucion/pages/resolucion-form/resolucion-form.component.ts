@@ -15,6 +15,7 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { UppercaseDirective } from '@reddoc/ui';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ResolucionService } from '../../resolucion.service';
@@ -32,7 +33,8 @@ import {
  * Master compartido enrutado desde Venta y Compra. El `tipo` (venta/compra) se
  * deriva del módulo activo (`ActiveModuleStore`) y fija el flag del payload —
  * el usuario no lo edita. La misma página cubre crear y editar: sin `:id` →
- * alta (sugiere hoy en fecha_desde/fecha_hasta); con `:id` → edición.
+ * alta (sugiere hoy en fecha_desde; deja fecha_hasta vacío); con `:id` →
+ * edición.
  */
 @Component({
   selector: 'app-resolucion-form',
@@ -45,6 +47,7 @@ import {
     InputNumberModule,
     DatePickerModule,
     FieldErrorComponent,
+    UppercaseDirective,
   ],
   templateUrl: './resolucion-form.component.html',
   styleUrl: './resolucion-form.component.scss',
@@ -111,8 +114,9 @@ export class ResolucionFormComponent implements OnInit {
     if (id) {
       this.loadResolucion(Number(id));
     } else {
-      const today = startOfToday();
-      this.form.patchValue({ fecha_desde: today, fecha_hasta: today });
+      // Solo sugerimos el inicio de vigencia; el vencimiento es una decisión
+      // consciente (una resolución vigente "de hoy a hoy" no tiene sentido).
+      this.form.patchValue({ fecha_desde: startOfToday() });
     }
   }
 

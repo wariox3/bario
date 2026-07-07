@@ -1,5 +1,5 @@
 import type { Route } from '@angular/router';
-import { activeDocumentResolver } from '@erp/core/module-config';
+import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 
 /**
  * Rutas de **Contrato servicio** (documento de venta).
@@ -34,9 +34,21 @@ export const CONTRATO_SERVICIO_ROUTES: Route[] = [
       },
       {
         path: 'editar/:id',
+        // Puerta de edición: bloquea (redirige) si `canEditRow` declara el
+        // documento no editable —p. ej. aprobado, incluso por URL directa— y, si
+        // es editable, entrega la cabecera al form (input `documentoEdit`) para
+        // que no la vuelva a pedir.
+        resolve: { documentoEdit: editableDocumentResolver() },
         loadComponent: () =>
           import('../_shared/servicio/pages/servicio-documento-form/servicio-documento-form.component').then(
             (m) => m.ServicioDocumentoFormComponent,
+          ),
+      },
+      {
+        path: 'detalle/:id',
+        loadComponent: () =>
+          import('../_shared/servicio/pages/servicio-documento-detail/servicio-documento-detail.component').then(
+            (m) => m.ServicioDocumentoDetailComponent,
           ),
       },
     ],

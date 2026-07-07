@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { CuentaBancoService } from '../../cuenta-banco.service';
 import { CUENTA_BANCO_LIST_PATH } from '../../cuenta-banco.constants';
@@ -12,13 +14,14 @@ import type { CuentaBanco } from '../../cuenta-banco.model';
 @Component({
   selector: 'app-cuenta-banco-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
   templateUrl: './cuenta-banco-detail.component.html',
   styleUrl: './cuenta-banco-detail.component.scss',
 })
 export class CuentaBancoDetailComponent implements OnInit {
   private readonly cuentaBancoService = inject(CuentaBancoService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
@@ -43,14 +46,15 @@ export class CuentaBancoDetailComponent implements OnInit {
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     const c = this.cuentaBanco();
+    const moduleId = currentModuleId(this.activeModule);
     const items: BreadcrumbItem[] = [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, moduleId] : undefined,
       },
       {
         label: this.t().entities.cuentaBanco.name,
-        routerLink: slug ? ['/t', slug, ...CUENTA_BANCO_LIST_PATH] : undefined,
+        routerLink: slug ? ['/t', slug, moduleId, ...CUENTA_BANCO_LIST_PATH] : undefined,
       },
     ];
     if (c) items.push({ label: c.nombre });
@@ -99,6 +103,6 @@ export class CuentaBancoDetailComponent implements OnInit {
   private navigate(...subPath: (string | number)[]): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    void this.router.navigate(['/t', slug, ...subPath]);
+    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...subPath]);
   }
 }

@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import type { ModuleConfig } from './types/module-config.types';
+import type { ModuleConfig } from '@reddoc/core';
 
 /**
  * Función que carga la configuración de un módulo de forma asíncrona.

@@ -150,6 +150,7 @@ export const en: AppDict = {
     },
     nav: {
       dashboard: 'Dashboard',
+      home: 'Home',
       account: 'Manage account',
       empty: 'Pick a module from the top bar.',
       sections: {
@@ -184,6 +185,79 @@ export const en: AppDict = {
       error: {
         title: 'Generation failed',
         desc: 'Could not generate the document. Please try again.',
+      },
+    },
+    detail: {
+      aprobar: 'Approve',
+      desaprobar: 'Unapprove',
+      acciones: 'Actions',
+      imprimir: 'Print',
+      opciones: 'Options',
+      archivos: 'Files',
+      confirmAprobar: {
+        message: 'Do you confirm the approval of this document?',
+        header: 'Approve document',
+      },
+      confirmDesaprobar: {
+        message: 'Do you confirm unapproving this document?',
+        header: 'Unapprove document',
+      },
+      toasts: {
+        aprobarSuccess: {
+          title: 'Document approved',
+          desc: 'The document was approved successfully.',
+        },
+        aprobarError: {
+          title: 'Could not approve',
+          desc: 'An error occurred while approving the document.',
+        },
+        desaprobarSuccess: {
+          title: 'Document unapproved',
+          desc: 'The document was unapproved successfully.',
+        },
+        desaprobarError: {
+          title: 'Could not unapprove',
+          desc: 'An error occurred while unapproving the document.',
+        },
+        imprimirError: {
+          title: 'Could not print',
+          desc: 'An error occurred while generating the PDF.',
+        },
+        editBloqueado: {
+          title: 'Approved document',
+          desc: 'An approved document can no longer be edited.',
+        },
+      },
+    },
+    afectacion: {
+      title: 'Document traceability',
+      subtitle: 'The document, its affected document and the details that affect it',
+      empty: 'No details affect this one.',
+      cols: {
+        id: 'ID',
+        documento: 'Document',
+        item: 'Item',
+        cantidad: 'Quantity',
+        precio: 'Price',
+        periodo: 'Period',
+        puesto: 'Position',
+        modalidad: 'Modality',
+        subtotal: 'Subtotal',
+        baseImpuesto: 'Tax base',
+        impuesto: 'Tax',
+        total: 'Total',
+      },
+      cards: { documento: 'Document', documentoAfectado: 'Affected document' },
+      campos: {
+        detalleId: 'Detail ID',
+        documentoId: 'Document ID',
+        fecha: 'Date',
+        contacto: 'Contact',
+      },
+      close: 'Close',
+      loadError: {
+        title: 'Could not load',
+        desc: 'An error occurred while loading the line traceability.',
       },
     },
   },
@@ -225,8 +299,9 @@ export const en: AppDict = {
     compra: { name: 'Purchases' },
     venta: { name: 'Sales' },
     inventario: { name: 'Inventory' },
-    turno: { name: 'Shifts' },
     contabilidad: { name: 'Accounting' },
+    tesoreria: { name: 'Treasury' },
+    cartera: { name: 'Receivables' },
     humano: { name: 'Human' },
   },
   entities: {
@@ -258,6 +333,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Advisor',
         notFound: {
           title: 'Advisor not found',
           desc: 'The advisor you are looking for does not exist or was deleted.',
@@ -309,6 +385,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Bank account',
         notFound: {
           title: 'Bank account not found',
           desc: 'The bank account you are looking for does not exist or was deleted.',
@@ -355,6 +432,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Price list',
         notFound: {
           title: 'Price list not found',
           desc: 'The price list you are looking for does not exist or was deleted.',
@@ -412,6 +490,8 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Resolution',
+        vigencia: 'Validity',
         notFound: {
           title: 'Resolution not found',
           desc: 'The resolution you are looking for does not exist or was deleted.',
@@ -538,6 +618,7 @@ export const en: AppDict = {
       detail: {
         title: 'Contact detail',
         subtitle: 'Information and commercial data',
+        eyebrow: 'Contact',
         sections: {
           general: 'General information',
           contacto: 'Contact',
@@ -624,6 +705,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Item',
         sections: {
           precios: 'Prices',
           impuestos: 'Taxes',
@@ -658,247 +740,6 @@ export const en: AppDict = {
         },
       },
     },
-    puesto: {
-      name: 'Workplaces',
-      searchPlaceholder: 'Search by name…',
-      columns: {
-        id: 'ID',
-        nombre: 'Name',
-        direccion: 'Address',
-        celular: 'Mobile',
-        latitud: 'Latitude',
-        longitud: 'Longitude',
-        comentario: 'Comment',
-        estado: 'Inactive',
-      },
-      form: {
-        createTitle: 'New workplace',
-        editTitle: 'Edit workplace',
-        createSubtitle: 'Fill in the workplace information',
-        editSubtitle: 'Update the workplace information',
-        cancel: 'Cancel',
-        submitCreate: 'Create workplace',
-        submitEdit: 'Save changes',
-        sections: {
-          principal: 'Main information',
-        },
-        sectionsHint: {
-          principal: 'Location, contact and coordinates of the workplace',
-        },
-        fields: {
-          nombre: 'Name',
-          direccion: 'Address',
-          celular: 'Mobile',
-          latitud: 'Latitude',
-          longitud: 'Longitude',
-          comentario: 'Comment',
-          ciudad: 'City',
-          ciudadPlaceholder: 'Search a city…',
-          contacto: 'Contact',
-          contactoPlaceholder: 'Search a contact…',
-          centroCosto: 'Cost center',
-          centroCostoPlaceholder: 'Search a cost center…',
-          programador: 'Scheduler',
-          programadorPlaceholder: 'Search a scheduler…',
-        },
-        validation: {
-          required: 'This field is required',
-        },
-        toasts: {
-          createSuccess: {
-            title: 'Workplace created',
-            desc: 'The workplace was created successfully',
-          },
-          editSuccess: { title: 'Workplace updated', desc: 'Changes were saved successfully' },
-          createError: { title: 'Create error', desc: 'Could not create the workplace' },
-          editError: { title: 'Save error', desc: 'Could not save the changes' },
-          loadError: { title: 'Load error', desc: 'Could not load the workplace' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Workplace not found',
-          desc: 'The workplace you are looking for does not exist or was deleted.',
-        },
-        sections: {
-          ubicacion: 'Location',
-          relaciones: 'Relationships',
-          comentario: 'Comment',
-        },
-        toasts: {
-          loadError: { title: 'Load error', desc: 'Could not load the workplace' },
-        },
-      },
-    },
-    programador: {
-      name: 'Schedulers',
-      searchPlaceholder: 'Search by name…',
-      columns: {
-        id: 'ID',
-        nombre: 'Name',
-        estado: 'Inactive',
-      },
-      form: {
-        createTitle: 'New scheduler',
-        editTitle: 'Edit scheduler',
-        createSubtitle: 'Fill in the scheduler information',
-        editSubtitle: 'Update the scheduler information',
-        cancel: 'Cancel',
-        submitCreate: 'Create scheduler',
-        submitEdit: 'Save changes',
-        sections: { principal: 'Main information' },
-        sectionsHint: { principal: 'Basic data of the shift scheduler' },
-        fields: { nombre: 'Name' },
-        validation: { required: 'This field is required' },
-        toasts: {
-          createSuccess: {
-            title: 'Scheduler created',
-            desc: 'The scheduler was created successfully',
-          },
-          editSuccess: { title: 'Scheduler updated', desc: 'Changes were saved successfully' },
-          createError: { title: 'Create error', desc: 'Could not create the scheduler' },
-          editError: { title: 'Save error', desc: 'Could not save the changes' },
-          loadError: { title: 'Load error', desc: 'Could not load the scheduler' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Scheduler not found',
-          desc: 'The scheduler you are looking for does not exist or was deleted.',
-        },
-        toasts: {
-          loadError: { title: 'Load error', desc: 'Could not load the scheduler' },
-        },
-      },
-    },
-    secuencia: {
-      name: 'Sequences',
-      searchPlaceholder: 'Search by name…',
-      columns: {
-        id: 'ID',
-        codigo: 'Code',
-        nombre: 'Name',
-        horas: 'Hours',
-        dias: 'Days',
-        homologar: 'Homologate',
-        estado: 'Inactive',
-      },
-      form: {
-        createTitle: 'New sequence',
-        editTitle: 'Edit sequence',
-        createSubtitle: 'Fill in the shift pattern of the sequence',
-        editSubtitle: 'Update the shift pattern of the sequence',
-        cancel: 'Cancel',
-        submitCreate: 'Create sequence',
-        submitEdit: 'Save changes',
-        sections: {
-          principal: 'Main information',
-          diasMes: 'Days of the month',
-          diasSemana: 'Days of the week',
-        },
-        sectionsHint: {
-          principal: 'Code, name and totals of the sequence',
-          diasMes: 'Shift code assigned to each day of the month (1 to 31)',
-          diasSemana: 'Shift code per day of the week and holidays',
-        },
-        fields: {
-          codigo: 'Code',
-          nombre: 'Name',
-          horas: 'Hours',
-          dias: 'Days',
-          homologar: 'Homologate',
-          lunes: 'Monday',
-          martes: 'Tuesday',
-          miercoles: 'Wednesday',
-          jueves: 'Thursday',
-          viernes: 'Friday',
-          sabado: 'Saturday',
-          domingo: 'Sunday',
-          festivo: 'Holiday',
-          domingoFestivo: 'Holiday Sunday',
-        },
-        validation: {
-          required: 'This field is required',
-        },
-        toasts: {
-          createSuccess: {
-            title: 'Sequence created',
-            desc: 'The sequence was created successfully',
-          },
-          editSuccess: { title: 'Sequence updated', desc: 'Changes were saved successfully' },
-          createError: { title: 'Create error', desc: 'Could not create the sequence' },
-          editError: { title: 'Save error', desc: 'Could not save the changes' },
-          loadError: { title: 'Load error', desc: 'Could not load the sequence' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Sequence not found',
-          desc: 'The sequence you are looking for does not exist or was deleted.',
-        },
-        sections: {
-          principal: 'Main information',
-          diasMes: 'Days of the month',
-          diasSemana: 'Days of the week',
-        },
-        toasts: {
-          loadError: { title: 'Load error', desc: 'Could not load the sequence' },
-        },
-      },
-    },
-    turno: {
-      name: 'Shifts',
-      searchPlaceholder: 'Search by name…',
-      columns: {
-        id: 'ID',
-        codigo: 'Code',
-        nombre: 'Name',
-        horaInicio: 'Start time',
-        horaFin: 'End time',
-        horas: 'Hours',
-        horasDiurnas: 'Day hours',
-        horasNocturnas: 'Night hours',
-        color: 'Color',
-        estado: 'Inactive',
-      },
-      form: {
-        createTitle: 'New shift',
-        editTitle: 'Edit shift',
-        createSubtitle: 'Fill in the shift information',
-        editSubtitle: 'Update the shift information',
-        fields: {
-          codigo: 'Code',
-          nombre: 'Name',
-          horaInicio: 'Start time',
-          horaFin: 'End time',
-          horas: 'Hours',
-          horasDiurnas: 'Day hours',
-          horasNocturnas: 'Night hours',
-          color: 'Color',
-        },
-        validation: {
-          required: 'This field is required',
-        },
-        toasts: {
-          createSuccess: { title: 'Shift created', desc: 'The shift was created successfully' },
-          editSuccess: { title: 'Shift updated', desc: 'Changes were saved successfully' },
-          createError: { title: 'Create error', desc: 'Could not create the shift' },
-          editError: { title: 'Save error', desc: 'Could not save the changes' },
-          loadError: { title: 'Load error', desc: 'Could not load the shift' },
-        },
-      },
-      detail: {
-        notFound: {
-          title: 'Shift not found',
-          desc: 'The shift you are looking for does not exist or was deleted.',
-        },
-        sections: { principal: 'Main information' },
-        activo: 'Active',
-        toasts: {
-          loadError: { title: 'Load error', desc: 'Could not load the shift' },
-        },
-      },
-    },
     sucursal: {
       name: 'Branches',
       searchPlaceholder: 'Search by name…',
@@ -923,6 +764,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Branch office',
         notFound: {
           title: 'Branch not found',
           desc: 'The branch you are looking for does not exist or was deleted.',
@@ -957,6 +799,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Group',
         notFound: {
           title: 'Group not found',
           desc: 'The group you are looking for does not exist or was deleted.',
@@ -994,6 +837,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Position',
         activo: 'Active',
         notFound: {
           title: 'Position not found',
@@ -1007,6 +851,10 @@ export const en: AppDict = {
     centroCosto: {
       name: 'Cost centers',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import cost centers',
+        subtitle: 'Upload an Excel with the records to load',
+      },
       columns: {
         id: 'ID',
         codigo: 'Code',
@@ -1037,6 +885,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Cost center',
         notFound: {
           title: 'Cost center not found',
           desc: 'The cost center you are looking for does not exist or was deleted.',
@@ -1046,14 +895,107 @@ export const en: AppDict = {
         },
       },
     },
+    formaPago: {
+      name: 'Payment forms',
+      searchPlaceholder: 'Search by name…',
+      columns: {
+        id: 'ID',
+        nombre: 'Name',
+        cuenta: 'Account',
+      },
+      form: {
+        createTitle: 'New payment form',
+        editTitle: 'Edit payment form',
+        createSubtitle: 'Fill in the payment form information',
+        editSubtitle: 'Update the payment form information',
+        fields: { nombre: 'Name', cuenta: 'Account', cuentaPlaceholder: 'Search account…' },
+        validation: {
+          required: 'This field is required',
+          maxlength: 'Exceeds the maximum length',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Payment form created',
+            desc: 'The payment form was created successfully',
+          },
+          editSuccess: {
+            title: 'Payment form updated',
+            desc: 'Changes were saved successfully',
+          },
+          createError: { title: 'Create error', desc: 'Could not create the payment form' },
+          editError: { title: 'Save error', desc: 'Could not save the changes' },
+          loadError: { title: 'Load error', desc: 'Could not load the payment form' },
+        },
+      },
+      detail: {
+        eyebrow: 'Payment method',
+        notFound: {
+          title: 'Payment form not found',
+          desc: 'The payment form you are looking for does not exist or was deleted.',
+        },
+        toasts: {
+          loadError: { title: 'Load error', desc: 'Could not load the payment form' },
+        },
+      },
+    },
+    sede: {
+      name: 'Branches',
+      searchPlaceholder: 'Search by name…',
+      columns: {
+        id: 'ID',
+        codigo: 'Code',
+        nombre: 'Name',
+        centroCosto: 'Cost center',
+      },
+      form: {
+        createTitle: 'New branch',
+        editTitle: 'Edit branch',
+        createSubtitle: 'Fill in the branch information',
+        editSubtitle: 'Update the branch information',
+        fields: {
+          nombre: 'Name',
+          codigo: 'Code',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Search a cost center…',
+        },
+        validation: {
+          required: 'This field is required',
+          maxlength: 'Exceeds the maximum length',
+        },
+        toasts: {
+          createSuccess: { title: 'Branch created', desc: 'The branch was created successfully' },
+          editSuccess: { title: 'Branch updated', desc: 'Changes were saved successfully' },
+          createError: { title: 'Create error', desc: 'Could not create the branch' },
+          editError: { title: 'Save error', desc: 'Could not save the changes' },
+          loadError: { title: 'Load error', desc: 'Could not load the branch' },
+        },
+      },
+      detail: {
+        eyebrow: 'Branch',
+        notFound: {
+          title: 'Branch not found',
+          desc: 'The branch you are looking for does not exist or was deleted.',
+        },
+        toasts: {
+          loadError: { title: 'Load error', desc: 'Could not load the branch' },
+        },
+      },
+    },
     cuenta: {
       name: 'Accounts',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import accounts',
+        subtitle: 'Upload an Excel with the records to load',
+      },
       columns: {
+        id: 'ID',
         codigo: 'Code',
         nombre: 'Name',
-        clase: 'Class',
         movimiento: 'Movement',
+        exigeBase: 'Requires base',
+        exigeContacto: 'Requires contact',
+        exigeGrupo: 'Requires group',
       },
       form: {
         createTitle: 'New account',
@@ -1096,6 +1038,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Account',
         notFound: {
           title: 'Account not found',
           desc: 'The account you are looking for does not exist or was deleted.',
@@ -1160,6 +1103,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Fixed asset',
         notFound: {
           title: 'Asset not found',
           desc: 'The asset you are looking for does not exist or was deleted.',
@@ -1167,6 +1111,148 @@ export const en: AppDict = {
         toasts: {
           loadError: { title: 'Load error', desc: 'The asset could not be loaded' },
         },
+      },
+    },
+    periodo: {
+      name: 'Periods',
+      meses: [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+        'Closing',
+      ],
+      panel: {
+        emptyAnios: 'No periods yet. Create a year to get started.',
+        emptyTitle: 'Select a year',
+        emptySub: 'Pick a year from the list to view and manage its months.',
+      },
+      estados: {
+        abierto: 'Open',
+        bloqueado: 'Locked',
+        cerrado: 'Closed',
+        inconsistencia: 'Has inconsistencies',
+      },
+      acciones: {
+        nuevoAnio: 'New year',
+        verInconsistencias: 'View inconsistencies',
+        bloquear: 'Lock',
+        desbloquear: 'Unlock',
+        cerrar: 'Close',
+      },
+      confirms: {
+        cerrar: {
+          header: 'Close period',
+          message: 'Are you sure you want to close this period? This action cannot be undone.',
+        },
+      },
+      anioNuevo: {
+        title: 'New year',
+        subtitle: 'The twelve monthly periods for the given year will be created.',
+        field: { anio: 'Year', anioPlaceholder: '2025' },
+        validation: { required: 'This field is required', rango: 'Enter a valid year' },
+        submit: 'Create',
+      },
+      inconsistencias: {
+        title: 'Inconsistencies',
+        columns: {
+          comprobante: 'Voucher',
+          numero: 'Number',
+          documento: 'Document',
+          descripcion: 'Description',
+        },
+        empty: 'This period has no inconsistencies.',
+        loadError: 'Inconsistencies could not be loaded.',
+      },
+      toasts: {
+        bloquearSuccess: { title: 'Period locked', desc: 'The period was locked successfully' },
+        bloquearError: { title: 'Lock error', desc: 'The period could not be locked' },
+        desbloquearSuccess: {
+          title: 'Period unlocked',
+          desc: 'The period was unlocked successfully',
+        },
+        desbloquearError: { title: 'Unlock error', desc: 'The period could not be unlocked' },
+        cerrarSuccess: { title: 'Period closed', desc: 'The period was closed successfully' },
+        cerrarError: { title: 'Close error', desc: 'The period could not be closed' },
+        crearSuccess: { title: 'Year created', desc: 'The year periods were created successfully' },
+        crearError: { title: 'Create error', desc: 'The year periods could not be created' },
+        loadError: { title: 'Load error', desc: 'Periods could not be loaded' },
+      },
+    },
+    empleado: {
+      name: 'Employees',
+      searchPlaceholder: 'Search by name…',
+      columns: {
+        id: 'ID',
+        identificacion: 'ID number',
+        identificacion_abreviatura: 'Type',
+        nombre: 'Name',
+        correo: 'Email',
+        celular: 'Mobile',
+      },
+      form: {
+        createTitle: 'New employee',
+        editTitle: 'Edit employee',
+        createSubtitle: 'Fill in the employee information',
+        editSubtitle: 'Update the employee information',
+        sections: { banca: 'Bank details' },
+        sectionsHint: { banca: 'Account where payroll is deposited' },
+        fields: {
+          identificacion: 'ID type',
+          numeroIdentificacion: 'ID number',
+          nombre1: 'First name',
+          nombre2: 'Middle name',
+          apellido1: 'First surname',
+          apellido2: 'Second surname',
+          telefono: 'Phone',
+          celular: 'Mobile',
+          ciudad: 'City',
+          ciudadPlaceholder: 'Search a city…',
+          direccion: 'Address',
+          barrio: 'Neighborhood',
+          correo: 'Email',
+          banco: 'Bank',
+          bancoPlaceholder: 'Search a bank…',
+          numeroCuenta: 'Account number',
+          cuentaBancoClase: 'Account type',
+        },
+        validation: {
+          required: 'This field is required',
+          emailInvalid: 'The email is not valid',
+          numeroIdentificacionExistente: 'A contact with this ID already exists',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Employee created',
+            desc: 'The employee was created successfully',
+          },
+          editSuccess: { title: 'Employee updated', desc: 'Changes were saved successfully' },
+          createError: { title: 'Create error', desc: 'The employee could not be created' },
+          editError: { title: 'Save error', desc: 'Changes could not be saved' },
+          loadError: { title: 'Load error', desc: 'The employee could not be loaded' },
+        },
+      },
+      detail: {
+        eyebrow: 'Employee',
+        sections: {
+          general: 'General information',
+          contacto: 'Contact',
+          ubicacion: 'Location',
+          banca: 'Bank details',
+        },
+        notFound: {
+          title: 'Employee not found',
+          desc: 'The employee you are looking for does not exist or was deleted.',
+        },
+        toasts: { loadError: { title: 'Load error', desc: 'The employee could not be loaded' } },
       },
     },
     credito: {
@@ -1221,6 +1307,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Credit',
         notFound: {
           title: 'Credit not found',
           desc: 'The credit you are looking for does not exist or was deleted.',
@@ -1279,6 +1366,7 @@ export const en: AppDict = {
         },
       },
       detail: {
+        eyebrow: 'Additional',
         notFound: {
           title: 'Additional not found',
           desc: 'The additional you are looking for does not exist or was deleted.',
@@ -1380,6 +1468,7 @@ export const en: AppDict = {
           tiempo: 'Time',
           fechaDesde: 'Start date',
           fechaHasta: 'End date',
+          habilitadoTurno: 'Enable shift',
           salario: 'Salary',
           aplicaAuxilioTransporte: 'Applies transport allowance',
           salarioIntegral: 'Integral salary',
@@ -1416,15 +1505,50 @@ export const en: AppDict = {
           loadError: { title: 'Load error', desc: 'Could not load the contract' },
         },
       },
+      detail: {
+        eyebrow: 'Contract',
+        sections: {
+          datos: 'Contract data',
+          remuneracion: 'Compensation',
+          seguridadSocial: 'Social security',
+        },
+        estado: {
+          activo: 'Active',
+          terminado: 'Terminated',
+        },
+        boolean: {
+          si: 'Yes',
+          no: 'No',
+        },
+        notFound: {
+          title: 'Contract not found',
+          desc: 'The contract you are looking for does not exist or was deleted.',
+        },
+        toasts: {
+          loadError: { title: 'Load error', desc: 'Could not load the contract' },
+        },
+      },
     },
     facturaVenta: {
       name: 'Sales invoice',
       columns: {
+        id: 'ID',
         numero: 'Number',
         fecha: 'Date',
+        identificacion: 'ID number',
         contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
         total: 'Total',
-        estado: 'Status',
+        aprobado: 'Apr',
+        anulado: 'Voi',
+        contabilizado: 'Pos',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        electronico: 'Electronic',
+        contabilizado: 'Posted',
       },
       form: {
         createTitle: 'New sales invoice',
@@ -1466,6 +1590,279 @@ export const en: AppDict = {
           },
         },
       },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          cliente: 'Customer',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          sede: 'Branch',
+          metodoPago: 'Payment method',
+        },
+        notFound: {
+          title: 'Invoice not found',
+          desc: 'The invoice you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+    facturaCompra: {
+      name: 'Purchase invoice',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New purchase invoice',
+        editTitle: 'Edit purchase invoice',
+        sectionHint: 'Main document details',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          plazoPagoPlaceholder: 'Select…',
+          sede: 'Branch',
+          sedePlaceholder: 'Select…',
+          metodoPago: 'Payment method',
+          metodoPagoPlaceholder: 'Select…',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Invoice created',
+            desc: 'The purchase invoice was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The purchase invoice could not be created',
+          },
+          editSuccess: {
+            title: 'Invoice updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The purchase invoice could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          sede: 'Branch',
+          metodoPago: 'Payment method',
+        },
+        notFound: {
+          title: 'Invoice not found',
+          desc: 'The invoice you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+    documentoSoporte: {
+      name: 'Support document',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New support document',
+        editTitle: 'Edit support document',
+        sectionHint: 'Main document details',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          plazoPagoPlaceholder: 'Select…',
+          metodoPago: 'Payment method',
+          metodoPagoPlaceholder: 'Select…',
+          formaPago: 'Payment form',
+          formaPagoPlaceholder: 'Select…',
+          resolucion: 'Resolution',
+          resolucionPlaceholder: 'Select…',
+          sede: 'Branch',
+          sedePlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Document created',
+            desc: 'The support document was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The support document could not be created',
+          },
+          editSuccess: {
+            title: 'Document updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The support document could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          sede: 'Branch',
+          metodoPago: 'Payment method',
+          formaPago: 'Payment form',
+          resolucion: 'Resolution',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Document not found',
+          desc: 'The document you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+    notaAjuste: {
+      name: 'Adjustment note',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New adjustment note',
+        editTitle: 'Edit adjustment note',
+        sectionHint: 'Main document details',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          plazoPagoPlaceholder: 'Select…',
+          metodoPago: 'Payment method',
+          metodoPagoPlaceholder: 'Select…',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Note created',
+            desc: 'The adjustment note was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The adjustment note could not be created',
+          },
+          editSuccess: {
+            title: 'Note updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The adjustment note could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          plazoPago: 'Payment terms',
+          metodoPago: 'Payment method',
+          centroCosto: 'Cost center',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Note not found',
+          desc: 'The note you are looking for does not exist or was deleted.',
+        },
+      },
     },
     comercialDetalle: {
       title: 'Lines',
@@ -1486,6 +1883,7 @@ export const en: AppDict = {
       confirmDeleteLine: 'Remove this line from the document?',
       columns: {
         linea: '#',
+        ref: 'Ref',
         item: 'Item',
         cantidad: 'Qty.',
         precio: 'Price',
@@ -1586,10 +1984,10 @@ export const en: AppDict = {
         horas: 'H',
         horasDiurnas: 'DH',
         horasNocturnas: 'NH',
-        iva: 'VAT',
         valor: 'Value',
-        valorPendiente: 'Pending',
         total: 'Total',
+        afectado: 'Billed',
+        valorPendiente: 'Pending',
       },
     },
     regenerarAfectado: {
@@ -1677,6 +2075,7 @@ export const en: AppDict = {
           lineLabel: 'Line',
           coverage: 'Coverage',
           subtotalCol: 'Subtotal',
+          documentoAfectadoCol: 'Ref',
           contractSummaryTitle: 'Document summary',
           contractSubtotal: 'Document subtotal',
           contractTotal: 'Document total',
@@ -1751,6 +2150,24 @@ export const en: AppDict = {
               desc: 'An error occurred while saving the document line',
             },
           },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          contacto: 'Contact',
+          fecha: 'Date',
+          sector: 'Sector',
+          estrato: 'Stratum',
+          salario: 'Salary',
+        },
+        notFound: {
+          title: 'Document not found',
+          desc: 'The document you are looking for does not exist or was deleted.',
         },
       },
     },

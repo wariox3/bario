@@ -44,93 +44,83 @@
   </div>
 } @else if (item(); as it) {
   <!-- ── Encabezado de identidad (ficha) ─────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex flex-wrap items-start gap-5 px-5 py-5 max-[576px]:px-4">
-      <!-- Imagen del item -->
-      <app-erp-image-upload
-        [imageUrl]="imageUrl()"
-        [alt]="it.nombre"
-        [disabled]="isSavingImage()"
-        width="148px"
-        height="148px"
-        (imageSelected)="onImageSelected($event)"
-        (imageRemoved)="onImageRemoved()"
-      />
+  <lib-detail-header [eyebrow]="t().entities.item.detail.eyebrow" [title]="it.nombre">
+    <!-- Imagen del item -->
+    <app-erp-image-upload
+      detailHeaderMedia
+      [imageUrl]="imageUrl()"
+      [alt]="it.nombre"
+      [disabled]="isSavingImage()"
+      width="148px"
+      height="148px"
+      (imageSelected)="onImageSelected($event)"
+      (imageRemoved)="onImageRemoved()"
+    />
 
-      <!-- Identidad -->
-      <div class="flex min-w-0 flex-1 flex-col gap-2">
-        <div class="flex min-w-0 flex-col gap-1">
-          @if (it.codigo) {
-            <span class="font-mono text-[0.78rem] font-medium text-brand-muted">{{
-              it.codigo
-            }}</span>
-          }
-          <h1 class="m-0 truncate text-2xl font-bold tracking-tight text-brand-text">
-            {{ it.nombre }}
-          </h1>
-          @if (it.referencia) {
-            <span class="text-[0.85rem] font-medium text-brand-muted">{{ it.referencia }}</span>
-          }
-        </div>
+    <div detailHeaderSubtitle class="flex flex-col gap-2">
+      @if (it.codigo || it.referencia) {
+        <span class="text-[0.85rem] font-medium text-brand-muted">
+          {{ it.codigo }}{{ it.codigo && it.referencia ? ' · ' : '' }}{{ it.referencia }}
+        </span>
+      }
 
-        <!-- Pills: tipo + badges de estado -->
-        <div class="flex flex-wrap items-center gap-1.5">
-          @if (tipo(); as tp) {
-            <span
-              class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-            >
-              <i class="pi pi-tag text-[0.62rem]"></i>
-              {{ t().entities.item.form.tipoOptions[tp] }}
-            </span>
-          }
-          @for (badge of badges(); track badge.labelKey) {
-            @switch (badge.tone) {
-              @case ('emerald') {
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
-                >
-                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                  {{ t().entities.item.form.fields[badge.labelKey] }}
-                </span>
-              }
-              @case ('amber') {
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
-                >
-                  <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                  {{ t().entities.item.form.fields[badge.labelKey] }}
-                </span>
-              }
-              @case ('sky') {
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-                >
-                  <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
-                  {{ t().entities.item.form.fields[badge.labelKey] }}
-                </span>
-              }
-              @case ('slate') {
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-slate-600"
-                >
-                  <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
-                  {{ t().entities.item.form.fields[badge.labelKey] }}
-                </span>
-              }
-              @case ('rose') {
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-rose-700"
-                >
-                  <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
-                  {{ t().entities.item.form.fields[badge.labelKey] }}
-                </span>
-              }
+      <!-- Pills: tipo + badges de estado -->
+      <div class="flex flex-wrap items-center gap-1.5">
+        @if (tipo(); as tp) {
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
+          >
+            <i class="pi pi-tag text-[0.62rem]"></i>
+            {{ t().entities.item.form.tipoOptions[tp] }}
+          </span>
+        }
+        @for (badge of badges(); track badge.labelKey) {
+          @switch (badge.tone) {
+            @case ('emerald') {
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                {{ t().entities.item.form.fields[badge.labelKey] }}
+              </span>
+            }
+            @case ('amber') {
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                {{ t().entities.item.form.fields[badge.labelKey] }}
+              </span>
+            }
+            @case ('sky') {
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+                {{ t().entities.item.form.fields[badge.labelKey] }}
+              </span>
+            }
+            @case ('slate') {
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-slate-600"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                {{ t().entities.item.form.fields[badge.labelKey] }}
+              </span>
+            }
+            @case ('rose') {
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-rose-700"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+                {{ t().entities.item.form.fields[badge.labelKey] }}
+              </span>
             }
           }
-        </div>
+        }
       </div>
     </div>
-  </section>
+  </lib-detail-header>
 
   <!-- ── Precios ─────────────────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

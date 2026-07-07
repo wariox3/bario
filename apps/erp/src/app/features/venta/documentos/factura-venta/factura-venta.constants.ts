@@ -10,17 +10,28 @@ export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
 /**
  * Columnas visibles del listado de Factura de venta.
  *
- * Los campos asumen el shape canónico del endpoint `general/documento/`:
- * `numero`, `fecha`, `contacto_nombre`, `total`, `estado_nombre`. Si la
- * respuesta real difiere, basta ajustar `field` aquí — la tabla y el
- * gateway no se enteran.
+ * Mismo set que los documentos de servicio (id, identificación, desglose de
+ * montos y flags de estado), salvo las columnas de horas (`horas`,
+ * `horas_diurnas`, `horas_nocturnas`), que son específicas de supervigilancia:
+ * la factura es comercial (ítem/cantidad/precio) y no las trae.
+ *
+ * Los `field` mapean el shape canónico del endpoint `general/documento/lista/`
+ * (`DocumentoListRowBase`): identificación como `tercero_numero_identificacion`,
+ * montos `currency` y estados como flags booleanos.
  */
 export const FACTURA_VENTA_COLUMNS: readonly ColumnDef[] = [
+  {
+    field: 'id',
+    headerKey: 'entities.facturaVenta.columns.id',
+    type: 'number',
+    width: '80px',
+    align: 'right',
+  },
   {
     field: 'numero',
     headerKey: 'entities.facturaVenta.columns.numero',
     type: 'text',
-    width: '120px',
+    width: '130px',
   },
   {
     field: 'fecha',
@@ -29,9 +40,29 @@ export const FACTURA_VENTA_COLUMNS: readonly ColumnDef[] = [
     width: '110px',
   },
   {
+    field: 'tercero_numero_identificacion',
+    headerKey: 'entities.facturaVenta.columns.identificacion',
+    type: 'text',
+    width: '140px',
+  },
+  {
     field: 'contacto_nombre',
     headerKey: 'entities.facturaVenta.columns.contacto',
     type: 'text',
+  },
+  {
+    field: 'subtotal',
+    headerKey: 'entities.facturaVenta.columns.subtotal',
+    type: 'currency',
+    width: '130px',
+    align: 'right',
+  },
+  {
+    field: 'impuesto',
+    headerKey: 'entities.facturaVenta.columns.impuesto',
+    type: 'currency',
+    width: '120px',
+    align: 'right',
   },
   {
     field: 'total',
@@ -41,19 +72,64 @@ export const FACTURA_VENTA_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'estado_nombre',
-    headerKey: 'entities.facturaVenta.columns.estado',
-    type: 'text',
-    width: '120px',
+    field: 'estado_aprobado',
+    headerKey: 'entities.facturaVenta.columns.aprobado',
+    type: 'boolean',
+    width: '70px',
+    align: 'center',
+  },
+  {
+    field: 'estado_anulado',
+    headerKey: 'entities.facturaVenta.columns.anulado',
+    type: 'boolean',
+    width: '70px',
+    align: 'center',
+  },
+  {
+    field: 'estado_contabilizado',
+    headerKey: 'entities.facturaVenta.columns.contabilizado',
+    type: 'boolean',
+    width: '70px',
+    align: 'center',
   },
 ];
 
 /**
- * Filtros visibles del listado.
- *
- * Vacío por ahora: el único filtro que viaja al backend es
- * `documento_tipo_id = FACTURA_VENTA`, y eso lo inyecta el gateway
- * automáticamente desde `documentTypeId` del config. Sumar acá cuando
- * agreguemos un filter panel.
+ * Filtros visibles del listado (mismo set que los documentos de servicio). El
+ * filtro implícito `documento_tipo_id` lo inyecta el gateway desde el config;
+ * aquí solo van los del usuario.
  */
-export const FACTURA_VENTA_FILTERS: readonly FilterField[] = [];
+export const FACTURA_VENTA_FILTERS: readonly FilterField[] = [
+  { name: 'numero', displayNameKey: 'entities.facturaVenta.columns.numero', type: 'string' },
+  { name: 'fecha', displayNameKey: 'entities.facturaVenta.columns.fecha', type: 'date' },
+  {
+    name: 'contacto__numero_identificacion',
+    displayNameKey: 'entities.facturaVenta.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'contacto__nombre_corto',
+    displayNameKey: 'entities.facturaVenta.columns.contacto',
+    type: 'string',
+  },
+  {
+    name: 'estado_aprobado',
+    displayNameKey: 'entities.facturaVenta.filters.aprobado',
+    type: 'boolean',
+  },
+  {
+    name: 'estado_anulado',
+    displayNameKey: 'entities.facturaVenta.filters.anulado',
+    type: 'boolean',
+  },
+  {
+    name: 'estado_electronico',
+    displayNameKey: 'entities.facturaVenta.filters.electronico',
+    type: 'boolean',
+  },
+  {
+    name: 'estado_contabilizado',
+    displayNameKey: 'entities.facturaVenta.filters.contabilizado',
+    type: 'boolean',
+  },
+];

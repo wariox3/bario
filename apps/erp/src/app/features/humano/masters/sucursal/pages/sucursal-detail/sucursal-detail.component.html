@@ -42,24 +42,13 @@
   </div>
 } @else if (sucursal(); as s) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex flex-wrap items-start gap-4 px-5 py-5 max-[576px]:px-4">
-      <!-- Ícono -->
-      <span
-        class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-building text-[1.4rem]"></i>
-      </span>
-
-      <!-- Identidad -->
-      <div class="flex min-w-0 flex-1 flex-col gap-2">
-        <h1 class="m-0 truncate text-2xl font-bold tracking-tight text-brand-text">
-          {{ s.nombre }}
-        </h1>
-        <p class="m-0 text-[0.8rem] font-medium text-brand-muted">
-          {{ t().entities.sucursal.columns.codigo }}: {{ s.codigo }}
-        </p>
-      </div>
-    </div>
-  </section>
+  <lib-detail-header
+    icon="pi pi-building"
+    [eyebrow]="t().entities.sucursal.detail.eyebrow"
+    [title]="s.nombre"
+  >
+    <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
+      {{ t().entities.sucursal.columns.codigo }}: {{ s.codigo }}
+    </p>
+  </lib-detail-header>
 }

@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { CuentaBancoService } from '../../cuenta-banco.service';
 import type { CuentaBanco } from '../../cuenta-banco.model';
@@ -33,6 +37,7 @@ import {
   CUENTAS_BANCO_QUICK_SEARCH_FIELD,
   CUENTAS_BANCO_PRIMARY_ACTION,
   CUENTAS_BANCO_ROW_ACTIONS,
+  CUENTAS_BANCO_TRAILING_ACTIONS,
 } from '../../cuenta-banco.constants';
 
 @Component({
@@ -51,8 +56,10 @@ import {
 })
 export class CuentasBancoListComponent {
   private readonly service = inject(CuentaBancoService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
@@ -74,14 +81,16 @@ export class CuentasBancoListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, currentModuleId(this.activeModule)] : undefined,
       },
       { label: this.t().entities.cuentaBanco.name },
     ];
@@ -91,6 +100,7 @@ export class CuentasBancoListComponent {
   protected readonly filterFields = CUENTAS_BANCO_FILTER_FIELDS;
   protected readonly rowActions = CUENTAS_BANCO_ROW_ACTIONS;
   protected readonly primaryAction = CUENTAS_BANCO_PRIMARY_ACTION;
+  protected readonly trailingActions = CUENTAS_BANCO_TRAILING_ACTIONS;
 
   constructor() {
     this.loadList();
@@ -150,7 +160,14 @@ export class CuentasBancoListComponent {
   }
 
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +178,31 @@ export class CuentasBancoListComponent {
     const ids = this.selectedRows().map((c) => c.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/general/cuenta-banco/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'cuentas-banco.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {
@@ -234,6 +276,12 @@ export class CuentasBancoListComponent {
   private navigateTo(...subPath: (string | number)[]): void {
     const slug = this.tenant.currentSlug();
     if (!slug) throw new Error('Cannot navigate without an active tenant slug.');
-    void this.router.navigate(['/t', slug, 'general', 'cuentas-banco', ...subPath]);
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      'cuentas-banco',
+      ...subPath,
+    ]);
   }
 }

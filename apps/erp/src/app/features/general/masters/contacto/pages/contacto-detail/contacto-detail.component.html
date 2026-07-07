@@ -43,61 +43,54 @@
     </p>
   </div>
 } @else if (contacto(); as c) {
-  <!-- ── Encabezado de identidad (ficha) ─────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex flex-wrap items-start gap-4 px-5 py-5 max-[576px]:px-4">
-      <!-- Monograma -->
-      <span
-        class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-50 text-[1.05rem] font-bold tracking-tight text-sky-700"
-      >
-        {{ iniciales() }}
-      </span>
+  <!-- ── Encabezado de identidad (ficha estándar) ────────────────────────────── -->
+  <lib-detail-header [eyebrow]="t().entities.contacto.detail.eyebrow" [title]="c.nombre_corto">
+    <!-- Monograma de iniciales -->
+    <span
+      detailHeaderMedia
+      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-50 text-[1.05rem] font-bold tracking-tight text-sky-700"
+    >
+      {{ iniciales() }}
+    </span>
 
-      <!-- Identidad -->
-      <div class="flex min-w-0 flex-1 flex-col gap-2">
-        <div class="flex min-w-0 flex-col gap-1">
-          <h1 class="m-0 truncate text-2xl font-bold tracking-tight text-brand-text">
-            {{ c.nombre_corto }}
-          </h1>
-          <span class="text-[0.85rem] font-medium text-brand-muted">{{ documento() }}</span>
-        </div>
+    <!-- Documento + pills de rol -->
+    <div detailHeaderSubtitle class="flex flex-col gap-2">
+      <span class="text-[0.85rem] font-medium text-brand-muted">{{ documento() }}</span>
 
-        <!-- Pills de rol -->
-        @if (roles().length > 0) {
-          <div class="flex flex-wrap gap-1.5">
-            @for (rol of roles(); track rol.key) {
-              @switch (rol.tone) {
-                @case ('emerald') {
-                  <span
-                    class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
-                  >
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    {{ t().entities.contacto.form.fields[rol.key] }}
-                  </span>
-                }
-                @case ('amber') {
-                  <span
-                    class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
-                  >
-                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                    {{ t().entities.contacto.form.fields[rol.key] }}
-                  </span>
-                }
-                @case ('sky') {
-                  <span
-                    class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-                  >
-                    <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
-                    {{ t().entities.contacto.form.fields[rol.key] }}
-                  </span>
-                }
+      @if (roles().length > 0) {
+        <div class="flex flex-wrap gap-1.5">
+          @for (rol of roles(); track rol.key) {
+            @switch (rol.tone) {
+              @case ('emerald') {
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                  {{ t().entities.contacto.form.fields[rol.key] }}
+                </span>
+              }
+              @case ('amber') {
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                  {{ t().entities.contacto.form.fields[rol.key] }}
+                </span>
+              }
+              @case ('sky') {
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+                  {{ t().entities.contacto.form.fields[rol.key] }}
+                </span>
               }
             }
-          </div>
-        }
-      </div>
+          }
+        </div>
+      }
     </div>
-  </section>
+  </lib-detail-header>
 
   <!-- ── Información general ──────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">

@@ -87,7 +87,7 @@ apps/erp/src/app/core/module-config/importar-documento/   (nombre tentativo)
 
 Reutilizamos (NO duplicar):
 
-- `DocumentoDetalleService` (`core/module-config/data/`) — le agregamos: (a) **lectura por id**
+- `DocumentoDetalleService` (`libs/core/documento/`, vía `@reddoc/core`) — le agregamos: (a) **lectura por id**
   (`GET /general/documento-detalle/{id}/`) y (b) **alta masiva** (`POST .../masivo/`); hoy solo
   tiene crear/actualizar/eliminar.
 - `comercialDetalleToFormValue()` (`features/documentos/comercial/`) — convierte la lectura de la

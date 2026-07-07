@@ -1,0 +1,87 @@
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Información principal ────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-building text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ isEditMode() ? t().entities.sede.form.editTitle : t().entities.sede.form.createTitle }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{
+            isEditMode()
+              ? t().entities.sede.form.editSubtitle
+              : t().entities.sede.form.createSubtitle
+          }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Nombre -->
+        <div class="flex flex-col gap-1.5">
+          <label for="nombre" class="sede-form__label">
+            {{ t().entities.sede.form.fields.nombre }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <input
+            id="nombre"
+            pInputText
+            type="text"
+            maxlength="100"
+            formControlName="nombre"
+            fluid
+          />
+          <lib-field-error
+            [control]="form.controls.nombre"
+            [messages]="{
+              required: t().entities.sede.form.validation.required,
+              maxlength: t().entities.sede.form.validation.maxlength,
+            }"
+          />
+        </div>
+
+        <!-- Centro de costo (autocomplete buscable) -->
+        <div class="flex flex-col gap-1.5">
+          <label for="centro_costo" class="sede-form__label">
+            {{ t().entities.sede.form.fields.centroCosto }}
+          </label>
+          <lib-api-autocomplete
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
+            [placeholder]="t().entities.sede.form.fields.centroCostoPlaceholder"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+</form>

@@ -7,8 +7,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
+import {
+  FormErrorService,
+  I18nService,
+  TenantService,
+  ToastService,
+  startOfToday,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { PrecioService } from '../../precio.service';
 import { PRECIO_LIST_PATH } from '../../precio.constants';
@@ -42,6 +49,7 @@ export class PrecioFormComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -56,14 +64,15 @@ export class PrecioFormComponent implements OnInit {
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
+    const moduleId = currentModuleId(this.activeModule);
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, moduleId] : undefined,
       },
       {
         label: this.t().entities.precio.name,
-        routerLink: slug ? ['/t', slug, ...PRECIO_LIST_PATH] : undefined,
+        routerLink: slug ? ['/t', slug, moduleId, ...PRECIO_LIST_PATH] : undefined,
       },
       { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
     ];
@@ -73,7 +82,7 @@ export class PrecioFormComponent implements OnInit {
     nombre: ['', Validators.required],
     venta: [false],
     compra: [false],
-    fecha_vence: [null as Date | null],
+    fecha_vence: [startOfToday() as Date | null, Validators.required],
   });
 
   ngOnInit(): void {
@@ -127,6 +136,11 @@ export class PrecioFormComponent implements OnInit {
   private navigateToList(): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    void this.router.navigate(['/t', slug, ...PRECIO_LIST_PATH]);
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...PRECIO_LIST_PATH,
+    ]);
   }
 }

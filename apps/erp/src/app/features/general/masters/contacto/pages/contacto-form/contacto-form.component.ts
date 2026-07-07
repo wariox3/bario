@@ -1,4 +1,14 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type ElementRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,13 +16,18 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
-import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import {
-  ErpApiSelectComponent,
-  ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
+  FormErrorService,
+  I18nService,
+  SELECT_ENDPOINTS,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
+import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
 import { CONTACTO_LIST_PATH, TIPO_PERSONA } from '../../contacto.constants';
@@ -51,11 +66,15 @@ export class ContactoFormComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  /** Endpoints `seleccionar` de catálogos compartidos, para los `<app-api-*>` del template. */
+  protected readonly endpoints = SELECT_ENDPOINTS;
 
   /** Id del contacto a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -65,14 +84,15 @@ export class ContactoFormComponent implements OnInit {
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
+    const moduleId = currentModuleId(this.activeModule);
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, moduleId] : undefined,
       },
       {
         label: this.t().entities.contacto.name,
-        routerLink: slug ? ['/t', slug, ...CONTACTO_LIST_PATH] : undefined,
+        routerLink: slug ? ['/t', slug, moduleId, ...CONTACTO_LIST_PATH] : undefined,
       },
       { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
     ];
@@ -83,6 +103,16 @@ export class ContactoFormComponent implements OnInit {
 
   protected readonly esCliente = signal(true);
   protected readonly esProveedor = signal(false);
+
+  /** Cards que se revelan al marcar cada clasificación; usadas para hacer scroll. */
+  private readonly clienteSection = viewChild<ElementRef<HTMLElement>>('clienteSection');
+  private readonly proveedorSection = viewChild<ElementRef<HTMLElement>>('proveedorSection');
+
+  /**
+   * Suprime el auto-scroll mientras se hidrata el form en edición: el
+   * `patchValue` dispara `valueChanges` y no queremos saltar la vista al cargar.
+   */
+  private isHydrating = false;
 
   /** Consulta DIAN en vuelo (deshabilita el botón y muestra spinner). */
   protected readonly isConsultingDian = signal(false);
@@ -236,6 +266,18 @@ export class ContactoFormComponent implements OnInit {
 
   // ── Internos ────────────────────────────────────────────────────────────────
 
+  /**
+   * Hace scroll suave hacia la card recién revelada. La sección se renderiza vía
+   * `@if` tras actualizar el signal, así que esperamos un frame a que esté en el
+   * DOM. No actúa durante la hidratación en edición.
+   */
+  private scrollToSection(section: () => ElementRef<HTMLElement> | undefined): void {
+    if (this.isHydrating || typeof requestAnimationFrame === 'undefined') return;
+    requestAnimationFrame(() => {
+      section()?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   /** Conecta los `valueChanges` del form a los signals y al async validator. */
   private setupFormReactions(): void {
     const { controls } = this.form;
@@ -249,13 +291,18 @@ export class ContactoFormComponent implements OnInit {
 
     controls.cliente.valueChanges.pipe(takeUntilDestroyed()).subscribe((v) => {
       const esCliente = v ?? false;
+      const seActivo = esCliente && !this.esCliente();
       this.esCliente.set(esCliente);
       this.applyClienteValidators(esCliente);
+      if (seActivo) this.scrollToSection(this.clienteSection);
     });
 
-    controls.proveedor.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe((v) => this.esProveedor.set(v ?? false));
+    controls.proveedor.valueChanges.pipe(takeUntilDestroyed()).subscribe((v) => {
+      const esProveedor = v ?? false;
+      const seActivo = esProveedor && !this.esProveedor();
+      this.esProveedor.set(esProveedor);
+      if (seActivo) this.scrollToSection(this.proveedorSection);
+    });
 
     // El dígito de verificación se deriva del número de identificación.
     controls.numero_identificacion.valueChanges.pipe(takeUntilDestroyed()).subscribe((numero) => {
@@ -319,7 +366,9 @@ export class ContactoFormComponent implements OnInit {
             numero_identificacion: c.numero_identificacion,
             identificacion_id: c.identificacion,
           });
+          this.isHydrating = true;
           this.form.patchValue(contactoToFormValue(c));
+          this.isHydrating = false;
         },
         error: () => {
           const toasts = this.t().entities.contacto.form.toasts;
@@ -331,6 +380,11 @@ export class ContactoFormComponent implements OnInit {
   private navigateToList(): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    void this.router.navigate(['/t', slug, ...CONTACTO_LIST_PATH]);
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...CONTACTO_LIST_PATH,
+    ]);
   }
 }

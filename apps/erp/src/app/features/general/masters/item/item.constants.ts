@@ -10,8 +10,8 @@ export const ITEMS_FILTERS_STORAGE_KEY = 'items:filters:v1';
  */
 export const ITEMS_QUICK_SEARCH_FIELD = 'nombre';
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const ITEM_LIST_PATH = ['general', 'items'] as const;
+/** Segmento de ruta del listado, relativo al módulo activo (se antepone en runtime). */
+export const ITEM_LIST_PATH = ['items'] as const;
 
 export const ITEMS_COLUMNS: readonly ColumnDef[] = [
   {

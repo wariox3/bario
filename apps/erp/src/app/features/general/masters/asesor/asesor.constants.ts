@@ -4,8 +4,8 @@ import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 export const ASESORES_FILTERS_STORAGE_KEY = 'asesores:filters:v1';
 export const ASESORES_QUICK_SEARCH_FIELD = 'nombre_corto';
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const ASESOR_LIST_PATH = ['general', 'asesores'] as const;
+/** Segmento de ruta del listado, relativo al módulo activo (se antepone en runtime). */
+export const ASESOR_LIST_PATH = ['asesores'] as const;
 
 export const ASESORES_COLUMNS: readonly ColumnDef[] = [
   {
@@ -50,3 +50,14 @@ export const ASESORES_PRIMARY_ACTION: ToolbarAction = {
   labelKey: 'common.actions.new',
   iconClass: 'pi pi-plus',
 };
+
+export const ASESORES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: 'actions',
+    labelKey: 'common.actions.actions',
+    iconClass: '',
+    children: [
+      { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
+    ],
+  },
+];

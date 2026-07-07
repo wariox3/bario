@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { I18nService, TenantService } from '@reddoc/core';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
@@ -29,6 +29,7 @@ import type {
   imports: [
     RouterOutlet,
     RouterLink,
+    RouterLinkActive,
     NgTemplateOutlet,
     DrawerModule,
     UserMenuComponent,

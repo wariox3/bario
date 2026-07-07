@@ -16,8 +16,11 @@ export const TIPO_PERSONA = {
   NATURAL: 2,
 } as const;
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const CONTACTO_LIST_PATH = ['general', 'contactos'] as const;
+/**
+ * Segmento de ruta del listado, relativo al módulo activo. El módulo se antepone
+ * en runtime (`currentModuleId`) para que el master sea agnóstico (general/venta…).
+ */
+export const CONTACTO_LIST_PATH = ['contactos'] as const;
 
 export const CONTACTOS_COLUMNS: readonly ColumnDef[] = [
   {

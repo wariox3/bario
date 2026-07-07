@@ -15,10 +15,8 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
@@ -36,7 +34,7 @@ import { activoToFormValue, formValueToPayload } from '../../activo.mapper';
  * Master del módulo Contabilidad (camino B). La misma página cubre crear y
  * editar: sin `:id` → alta (sugiere hoy en fecha_compra/fecha_activacion); con
  * `:id` → edición. Las FK `activo_grupo`, `metodo_depreciacion` y `centro_costo`
- * usan `<app-api-select>`; las cuentas contables (`cuenta_gasto`,
+ * usan `<lib-api-select>`; las cuentas contables (`cuenta_gasto`,
  * `cuenta_depreciacion`) usan `<app-cuenta-select>`.
  */
 @Component({

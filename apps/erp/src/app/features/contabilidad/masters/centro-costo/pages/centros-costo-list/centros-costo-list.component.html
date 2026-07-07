@@ -2,6 +2,7 @@
   <lib-data-toolbar
     toolbar
     [primaryAction]="primaryAction"
+    [trailingActions]="trailingActions"
     [searchPlaceholderKey]="'entities.centroCosto.searchPlaceholder'"
     [filtersEnabled]="true"
     [activeFiltersCount]="activeFilters().length"
@@ -43,3 +44,17 @@
 />
 
 <p-confirmDialog />
+
+<app-import-dialog
+  [visible]="importVisible()"
+  (visibleChange)="onImportVisibleChange($event)"
+  [title]="t().entities.centroCosto.import.title"
+  [subtitle]="t().entities.centroCosto.import.subtitle"
+  [importing]="importLoading()"
+  [errors]="importErrors()"
+  [errorSummary]="importErrorSummary()"
+  [errorTotal]="importErrorTotal()"
+  [mastersTouched]="importMasters()"
+  (importRequested)="onImportRequested($event)"
+  [exampleConfig]="exampleConfig"
+/>

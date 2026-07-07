@@ -62,6 +62,7 @@
             type="text"
             formControlName="prefijo"
             maxlength="10"
+            libUppercase
             fluid
           />
           <lib-field-error
@@ -176,6 +177,10 @@
             [fluid]="true"
             [invalid]="form.controls.fecha_desde.invalid && form.controls.fecha_desde.touched"
           />
+          <lib-field-error
+            [control]="form.controls.fecha_desde"
+            [messages]="{ required: t().entities.resolucion.form.validation.required }"
+          />
         </div>
 
         <!-- Fecha hasta -->
@@ -191,11 +196,16 @@
             [showIcon]="true"
             appendTo="body"
             [fluid]="true"
+            [minDate]="form.controls.fecha_desde.value ?? undefined"
             [invalid]="
               (form.controls.fecha_hasta.invalid && form.controls.fecha_hasta.touched) ||
               (!!form.errors?.['rangoFechasInvalido'] &&
                 (form.controls.fecha_hasta.dirty || form.controls.fecha_desde.dirty))
             "
+          />
+          <lib-field-error
+            [control]="form.controls.fecha_hasta"
+            [messages]="{ required: t().entities.resolucion.form.validation.required }"
           />
           @if (
             form.errors?.['rangoFechasInvalido'] &&

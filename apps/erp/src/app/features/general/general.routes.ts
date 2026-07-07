@@ -20,6 +20,16 @@ export const GENERAL_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(GENERAL_MODULE),
       {
+        // Inicio del módulo (vacío por ahora — sin endpoints de estadísticas).
+        // Reusa el placeholder compartido; reemplazar por un inicio propio
+        // (como turno) cuando exista su endpoint de analítica.
+        path: 'inicio',
+        loadComponent: () =>
+          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
+            (m) => m.ModulePlaceholderComponent,
+          ),
+      },
+      {
         path: 'contactos',
         loadChildren: () =>
           import('./masters/contacto/contacto.routes').then((m) => m.CONTACTO_ROUTES),
@@ -41,7 +51,11 @@ export const GENERAL_ROUTES: Route[] = [
         path: 'precios',
         loadChildren: () => import('./masters/precio/precio.routes').then((m) => m.PRECIO_ROUTES),
       },
-      // Futuros: sedes, almacenes, formas-pago, resoluciones.
+      {
+        path: 'sedes',
+        loadChildren: () => import('./masters/sede/sede.routes').then((m) => m.SEDE_ROUTES),
+      },
+      // Futuros: almacenes, formas-pago, resoluciones.
       // Cada uno delega a su `masters/<entity>/<entity>.routes.ts`.
     ],
   },

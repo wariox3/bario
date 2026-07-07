@@ -1,0 +1,245 @@
+@let g = t().entities.programacion.detail.grid;
+
+<div class="max-h-[32rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <table class="programacion-grid">
+    <thead>
+      <tr>
+        <th class="programacion-grid__th programacion-grid__th--sticky-left">
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              class="programacion-grid__check"
+              [checked]="todasSeleccionadas()"
+              [indeterminate]="indeterminado()"
+              [attr.aria-label]="g.seleccion.todo"
+              (change)="toggleTodas()"
+            />
+            {{ g.headers.empleado }}
+          </div>
+        </th>
+        @for (fecha of fechas(); track fecha.clave) {
+          <th
+            class="programacion-grid__th programacion-grid__th--dia"
+            [class.programacion-grid__th--festivo]="
+              fecha.inicial === 'D' || festivoClaves().has(fecha.clave)
+            "
+            [class.programacion-grid__th--sabado]="
+              fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
+            "
+          >
+            <span class="programacion-grid__dia-num">{{ fecha.etiqueta }}</span>
+            <span class="programacion-grid__dia-ini">{{ fecha.inicial }}</span>
+          </th>
+        }
+        <th class="programacion-grid__th programacion-grid__th--resumen w-10 text-center">
+          {{ g.headers.hd }}
+        </th>
+        <th class="programacion-grid__th programacion-grid__th--resumen w-10 text-center">
+          {{ g.headers.hn }}
+        </th>
+        <th class="programacion-grid__th programacion-grid__th--resumen w-10 text-center">
+          {{ g.headers.c }}
+        </th>
+        <th class="programacion-grid__th programacion-grid__th--resumen w-10 text-center">
+          {{ g.headers.a }}
+        </th>
+        <!-- Columnas reservadas para opciones por fila (etiquetas pendientes). -->
+        <th class="programacion-grid__th programacion-grid__col-accion"></th>
+        <th class="programacion-grid__th programacion-grid__col-accion"></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (grupo of grupos(); track grupo.documentoDetalleId + '_' + $index) {
+        <tr class="programacion-grid__group-row">
+          <!-- Banda principal: puesto + stats a la derecha -->
+          <td [attr.colspan]="colspan() - 2" class="programacion-grid__group-cell">
+            <div class="flex items-center gap-3">
+              @if (grupo.puestoNombre || grupo.puestoId !== null) {
+                <button
+                  type="button"
+                  (click)="onEditarPuesto(grupo)"
+                  [title]="g.editarPuesto"
+                  [attr.aria-label]="g.editarPuesto"
+                  class="programacion-grid__group-label programacion-grid__group-label--btn pointer-events-auto cursor-pointer border-0 bg-transparent p-0 underline decoration-transparent decoration-dotted underline-offset-2 transition-colors hover:decoration-current"
+                >
+                  @if (grupo.puestoNombre) {
+                    {{ grupo.puestoId }} | {{ grupo.puestoNombre }}
+                  } @else {
+                    {{ grupo.puestoId }}
+                  }
+                </button>
+              }
+              <span class="programacion-grid__group-ref">
+                {{ g.documentoDetalleAbrev }}: {{ grupo.documentoDetalleId }}
+              </span>
+              @if (grupo.modalidadNombre) {
+                <span class="programacion-grid__group-chip">{{ grupo.modalidadNombre }}</span>
+              }
+              @if (grupo.horario) {
+                <span class="programacion-grid__group-chip programacion-grid__group-chip--horario">
+                  <i class="pi pi-clock text-[0.58rem]"></i>
+                  {{ grupo.horario }}
+                </span>
+              }
+              <div class="ml-auto flex shrink-0 items-center gap-2">
+                <span
+                  class="programacion-grid__group-stat programacion-grid__group-stat--dia"
+                  [title]="g.stats.diurnas"
+                >
+                  <i class="pi pi-sun text-[0.58rem]"></i>
+                  {{ grupo.horasDiurnas }}&thinsp;/&thinsp;{{ grupo.horasDiurnasProgramadas }}
+                </span>
+                <span
+                  class="programacion-grid__group-stat programacion-grid__group-stat--noche"
+                  [title]="g.stats.nocturnas"
+                >
+                  <i class="pi pi-moon text-[0.58rem]"></i>
+                  {{ grupo.horasNocturnas }}&thinsp;/&thinsp;{{ grupo.horasNocturnasProgramadas }}
+                </span>
+                <span class="programacion-grid__group-sep"></span>
+                <span class="programacion-grid__group-total" [title]="g.stats.total">
+                  {{ grupo.horas }}&thinsp;/&thinsp;{{ grupo.horasProgramadas }}&nbsp;h
+                </span>
+              </div>
+            </div>
+          </td>
+          <!-- Columna de acción: botones al final (abarca las 2 columnas reservadas) -->
+          <td
+            [attr.colspan]="2"
+            class="programacion-grid__group-cell programacion-grid__col-accion"
+          >
+            <div class="flex items-center justify-end gap-1">
+              <button
+                type="button"
+                (click)="onVerEmpleados(grupo)"
+                [title]="g.verEmpleados"
+                [attr.aria-label]="g.verEmpleados"
+                class="pointer-events-auto flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-white/70 hover:text-sky-700"
+              >
+                <i class="pi pi-user-plus text-[0.78rem]"></i>
+              </button>
+              <button
+                type="button"
+                (click)="onPrototipo(grupo)"
+                [title]="g.prototipo"
+                [attr.aria-label]="g.prototipo"
+                class="pointer-events-auto flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-white/70 hover:text-sky-700"
+              >
+                <i class="pi pi-calendar-plus text-[0.78rem]"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        @for (fila of grupo.items; track fila.documento_detalle_id + '_' + $index) {
+          <tr
+            class="programacion-grid__row"
+            [class.programacion-grid__row--selected]="estaSeleccionada(fila)"
+          >
+            <td class="programacion-grid__td programacion-grid__td--sticky-left text-brand-text">
+              <div class="flex items-start gap-2">
+                @if (fila.contrato_id !== null) {
+                  <input
+                    type="checkbox"
+                    class="programacion-grid__check mt-0.5"
+                    [checked]="estaSeleccionada(fila)"
+                    [attr.aria-label]="g.seleccion.fila"
+                    (change)="toggleFila(fila)"
+                  />
+                } @else {
+                  <span class="programacion-grid__check-spacer"></span>
+                }
+                <div class="min-w-0">
+                  @if (fila.contrato_id !== null) {
+                    <button
+                      type="button"
+                      (click)="onEditarNombre(fila)"
+                      [title]="g.editarContrato"
+                      [attr.aria-label]="g.editarContrato"
+                      class="block cursor-pointer border-0 bg-transparent p-0 text-left font-medium text-brand-text underline decoration-transparent decoration-dotted underline-offset-2 transition-colors hover:text-sky-700 hover:decoration-current"
+                    >
+                      {{ fila.contrato_contacto_nombre_corto || '—' }}
+                    </button>
+                  } @else {
+                    <span class="block font-medium">{{
+                      fila.contrato_contacto_nombre_corto || '—'
+                    }}</span>
+                  }
+                  @let meta = metaLinea(fila, g.contratoAbrev);
+                  @if (meta) {
+                    <span class="block text-[0.68rem] text-brand-muted tabular-nums">{{
+                      meta
+                    }}</span>
+                  }
+                </div>
+              </div>
+            </td>
+
+            @for (fecha of fechas(); track fecha.clave) {
+              <td class="programacion-grid__td programacion-grid__td--dia text-center tabular-nums">
+                {{ celda(fila, fecha.clave) }}
+              </td>
+            }
+
+            <td
+              class="programacion-grid__td programacion-grid__td--resumen w-10 text-center tabular-nums"
+            >
+              {{ resumen(horasDiurnas(fila)) }}
+            </td>
+            <td
+              class="programacion-grid__td programacion-grid__td--resumen w-10 text-center tabular-nums"
+            >
+              {{ resumen(horasNocturnas(fila)) }}
+            </td>
+            <td
+              class="programacion-grid__td programacion-grid__td--resumen w-10 text-center tabular-nums"
+            >
+              —
+            </td>
+            <td
+              class="programacion-grid__td programacion-grid__td--resumen w-10 text-center tabular-nums"
+            >
+              —
+            </td>
+
+            <!-- Acciones por fila: editar + eliminar la programación del contrato.
+                 Siempre visibles (ancho de celda ya reservado). -->
+            <td class="programacion-grid__td programacion-grid__col-accion">
+              @if (fila.contrato_id !== null) {
+                <button
+                  type="button"
+                  (click)="onEditar(fila)"
+                  [title]="g.editar"
+                  [attr.aria-label]="g.editar"
+                  class="programacion-grid__row-action programacion-grid__row-action--editar"
+                >
+                  <i class="pi pi-pencil text-[0.72rem]"></i>
+                </button>
+              }
+            </td>
+            <td class="programacion-grid__td programacion-grid__col-accion">
+              @if (fila.contrato_id !== null) {
+                <button
+                  type="button"
+                  (click)="onEliminar(fila)"
+                  [title]="g.eliminar"
+                  [attr.aria-label]="g.eliminar"
+                  class="programacion-grid__row-action programacion-grid__row-action--eliminar"
+                >
+                  <i class="pi pi-trash text-[0.72rem]"></i>
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      } @empty {
+        <tr>
+          <td [attr.colspan]="colspan()" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <i class="pi pi-inbox mr-2"></i>{{ g.empty }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

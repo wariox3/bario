@@ -76,6 +76,7 @@ export function detalleToFormValue(
     horas_diurnas: toFiniteNumber(read.horas_diurnas),
     horas_nocturnas: toFiniteNumber(read.horas_nocturnas),
     precio_minimo: toFiniteNumber(read.precio_minimo),
+    documento_detalle_afectado: read.documento_detalle_afectado ?? null,
   };
 }
 
@@ -135,5 +136,6 @@ export function detalleToPayload(raw: DetalleFormRawValue): ServicioDocumentoDet
     horas_nocturnas: (raw.horas_nocturnas ?? 0).toFixed(2),
     precio_minimo: (raw.precio_minimo ?? 0).toFixed(2),
     impuestos_ids: raw.impuestos_ids,
+    documento_detalle_afectado: raw.documento_detalle_afectado,
   };
 }

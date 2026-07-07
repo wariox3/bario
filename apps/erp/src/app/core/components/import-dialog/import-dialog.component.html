@@ -165,7 +165,11 @@
                         @for (err of errors(); track $index) {
                           <tr>
                             <td class="cp-import-dialog__errors-rowcol">
-                              <span class="cp-import-dialog__row-chip">{{ err.row }}</span>
+                              @if (err.row !== undefined) {
+                                <span class="cp-import-dialog__row-chip">{{ err.row }}</span>
+                              } @else {
+                                <span class="text-brand-muted">—</span>
+                              }
                             </td>
                             <td class="cp-import-dialog__errors-msg">{{ err.message }}</td>
                           </tr>

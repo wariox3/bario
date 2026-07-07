@@ -64,6 +64,7 @@
             {{ t().entities.item.form.fields.referencia }}
           </label>
           <input id="referencia" pInputText type="text" formControlName="referencia" fluid />
+          <lib-field-error [control]="form.controls.referencia" />
         </div>
 
         <!-- Nombre -->
@@ -174,6 +175,7 @@
             prefix="$ "
             [fluid]="true"
           />
+          <lib-field-error [control]="form.controls.precio" />
         </div>
 
         <!-- Costo -->
@@ -190,6 +192,7 @@
             prefix="$ "
             [fluid]="true"
           />
+          <lib-field-error [control]="form.controls.costo" />
         </div>
 
         <!-- Impuestos de venta -->
@@ -260,7 +263,6 @@
             inputId="cuenta_venta"
             formControlName="cuenta_venta"
             [extraParams]="{ cuenta_clase: 4 }"
-            [suggestFirst]="!isEditMode()"
             [placeholder]="t().entities.item.form.fields.cuentaPlaceholder"
           />
         </div>

@@ -27,10 +27,11 @@ export type {
   EntityRoutes,
   DocumentEntityConfig,
   DocumentCapabilities,
+  EditableRowContext,
   InventoryEffect,
   ImportDescriptor,
-} from './types/entity-config.types';
-export type { ModuleConfig } from './types/module-config.types';
+} from '@reddoc/core';
+export type { ModuleConfig } from '@reddoc/core';
 
 // Registry
 export { MODULE_REGISTRY } from './module-registry.token';
@@ -48,12 +49,13 @@ export {
   activeDocumentResolver,
   DOCUMENT_KEY_ROUTE_PARAM,
 } from './resolvers/active-document.resolver';
+export { editableDocumentResolver } from './resolvers/editable-document.resolver';
 
 // Data gateway
-export { ENTITY_DATA_GATEWAY } from './data/entity-data-gateway';
-export type { EntityDataGateway } from './data/entity-data-gateway';
-export { HttpEntityDataGateway } from './data/http-entity-data-gateway.service';
-export { DocumentoDetalleService } from './data/documento-detalle.service';
+export { ENTITY_DATA_GATEWAY } from '@reddoc/core';
+export type { EntityDataGateway } from '@reddoc/core';
+export { HttpEntityDataGateway } from '@reddoc/core';
+export { DocumentoDetalleService } from '@reddoc/core';
 
 // Importar desde documento (servicio + tipos; el modal NO se exporta para no
 // arrastrar PrimeNG al bundle inicial — se carga vía loadComponent).
@@ -77,8 +79,8 @@ export { ENTITY_ACTION_PROVIDERS } from './actions/entity-action.providers';
 export { buildEntityStorageKey } from './storage/build-entity-storage-key';
 
 // Constants del dominio
-export { DOCUMENT_TYPE_ID } from './constants/document-types.constants';
-export type { DocumentTypeId, DocumentTypeKey } from './constants/document-types.constants';
+export { DOCUMENT_TYPE_ID } from '@reddoc/core';
+export type { DocumentTypeId, DocumentTypeKey } from '@reddoc/core';
 
 // Components
 // NOTA: BaseDocumentListComponent NO se exporta desde aquí para evitar que

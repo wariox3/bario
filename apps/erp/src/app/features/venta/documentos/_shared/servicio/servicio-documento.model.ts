@@ -22,6 +22,8 @@ export type { DocumentoDetalleImpuestoRead } from '@reddoc/core';
 
 /** Shape (parcial) de un documento de servicio leído desde la API en edición. */
 export interface ServicioDocumentoRead extends DocumentoReadBase {
+  /** Número (consecutivo) del documento que asigna el backend. */
+  readonly numero: string | null;
   readonly sector: number | null;
   /** Nombre del sector para etiquetar el selector al cargar en edición. */
   readonly sector_nombre?: string | null;
@@ -96,6 +98,8 @@ export interface ServicioDocumentoDetalleRead extends DocumentoDetalleReadBase {
   readonly horas_nocturnas?: string | null;
   /** Precio mínimo regulado de la cobertura (string con cola de ceros). */
   readonly precio_minimo?: string | null;
+  /** Referencia a la línea afectada en otro documento (trazabilidad). */
+  readonly documento_detalle_afectado?: number | null;
   // `impuestos?` se hereda de `DocumentoDetalleReadBase`.
 }
 
@@ -121,6 +125,8 @@ export interface ServicioDocumentoDetallePayload extends DocumentoDetallePayload
   readonly cortesia: boolean;
   /** Se reenvía tal cual para no perderlo en el round-trip (no hay UI que lo edite). */
   readonly compuesto: boolean;
+  /** Referencia a la línea afectada en otro documento (trazabilidad). */
+  readonly documento_detalle_afectado: number | null;
   /**
    * Horas y precio mínimo de la cobertura (del tarifador). Strings con 2 decimales,
    * igual que `precio`. Se persisten porque el backend no los recalcula al guardar.

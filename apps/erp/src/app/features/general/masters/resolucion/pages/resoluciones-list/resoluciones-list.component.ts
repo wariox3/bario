@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -33,6 +36,7 @@ import {
   RESOLUCIONES_QUICK_SEARCH_FIELD,
   RESOLUCIONES_PRIMARY_ACTION,
   RESOLUCIONES_ROW_ACTIONS,
+  RESOLUCIONES_TRAILING_ACTIONS,
   resolucionTipoFilter,
   resolucionesFiltersStorageKey,
 } from '../../resolucion.constants';
@@ -53,6 +57,7 @@ import {
 })
 export class ResolucionesListComponent {
   private readonly service = inject(ResolucionService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
@@ -84,6 +89,8 @@ export class ResolucionesListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -101,6 +108,7 @@ export class ResolucionesListComponent {
   protected readonly filterFields = RESOLUCIONES_FILTER_FIELDS;
   protected readonly rowActions = RESOLUCIONES_ROW_ACTIONS;
   protected readonly primaryAction = RESOLUCIONES_PRIMARY_ACTION;
+  protected readonly trailingActions = RESOLUCIONES_TRAILING_ACTIONS;
 
   constructor() {
     this.loadList();
@@ -160,7 +168,14 @@ export class ResolucionesListComponent {
   }
 
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -171,6 +186,32 @@ export class ResolucionesListComponent {
     const ids = this.selectedRows().map((r) => r.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/general/resolucion/excel/', {
+        method: 'POST',
+        body: {
+          // Mantiene el filtro fijo del módulo (venta/compra) que aplica el listado.
+          filtros: buildFiltros([resolucionTipoFilter(this.tipo()), ...this.activeFilters()]),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'resoluciones.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {

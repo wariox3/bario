@@ -15,14 +15,10 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import {
-  ContratoAutocompleteComponent,
-  type ContratoOption,
-} from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
+import { SELECT_ENDPOINTS } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { NovedadService } from '../../novedad.service';
 import {
@@ -30,7 +26,6 @@ import {
   NOVEDAD_REFERENCIA_CONTRATO_PARAM,
   NOVEDAD_REFERENCIA_ENDPOINT,
   NOVEDAD_REFERENCIA_TIPO_PARAM,
-  NOVEDAD_TIPO_ENDPOINT,
 } from '../../novedad.constants';
 import { esVacaciones, requiereReferencia } from '../../novedad.rules';
 import { dateRangeValidator } from '../../utils/date-range.validator';
@@ -76,7 +71,7 @@ export class NovedadFormComponent implements OnInit {
 
   protected readonly t = this.i18n.t;
 
-  protected readonly novedadTipoEndpoint = NOVEDAD_TIPO_ENDPOINT;
+  protected readonly novedadTipoEndpoint = SELECT_ENDPOINTS.novedadTipo;
   protected readonly novedadReferenciaEndpoint = NOVEDAD_REFERENCIA_ENDPOINT;
   /** Referencia estable para no re-disparar el fetch del selector en cada ciclo de CD. */
   protected readonly tipoParams: Record<string, string> = { limit: '100' };

@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.aplicar-dias {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+// Header de día: número (arriba) + inicial del día de la semana (abajo, discreta),
+// sticky al hacer scroll vertical.
+.aplicar-dias__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.35rem 0.15rem;
+  text-align: center;
+  background: #f8f9fa;
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
+}
+
+.aplicar-dias__num {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--brand-text, #143049);
+}
+
+.aplicar-dias__ini {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--brand-muted, #64748b);
+}
+
+.aplicar-dias__td {
+  padding: 0.3rem 0.15rem;
+  vertical-align: middle;
+}
+
+// Festivo (incluye el domingo): tinte azul claro para distinguirlo. El sábado
+// lleva un gris levemente más oscuro que el header.
+.aplicar-dias__th--festivo {
+  background: #e8f1fb;
+  box-shadow: inset 0 -1px 0 rgba(37, 99, 235, 0.25);
+}
+
+.aplicar-dias__th--festivo .aplicar-dias__num {
+  color: #2563eb;
+}
+
+.aplicar-dias__td--festivo {
+  background: rgba(37, 99, 235, 0.07);
+}
+
+// Sábado: mismo gris del header pero un punto más oscuro para resaltarlo.
+.aplicar-dias__th--sabado {
+  background: #eceef1;
+}
+
+.aplicar-dias__td--sabado {
+  background: rgba(20, 48, 73, 0.035);
+}
+
+// Día ya programado (conflicto al aplicar): rojo fuerte. Gana sobre finde/festivo
+// por ir al final de la hoja.
+.aplicar-dias__th--error {
+  background: #fee2e2;
+  box-shadow: inset 0 -2px 0 #ef4444;
+}
+
+.aplicar-dias__th--error .aplicar-dias__num {
+  color: #b91c1c;
+}
+
+.aplicar-dias__td--error {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.aplicar-dias__td--error .aplicar-dias__input {
+  border-color: #f87171;
+}
+
+// Input slim por día: llena la celda y se centra.
+.aplicar-dias__input {
+  width: 100%;
+  min-width: 1.8rem;
+  padding: 0.25rem 0.2rem;
+  text-align: center;
+  font-size: 0.78rem;
+}

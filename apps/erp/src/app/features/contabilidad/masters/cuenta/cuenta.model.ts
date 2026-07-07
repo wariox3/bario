@@ -31,3 +31,16 @@ export interface CuentaPayload {
   readonly cuenta_grupo: number | null;
   readonly cuenta_cuenta: number | null;
 }
+
+/**
+ * Respuesta del endpoint de importación masiva.
+ * Shape provisional: crece cuando el backend defina su contrato final.
+ */
+export interface CuentaImportResult {
+  readonly imported_count: number;
+  readonly errors?: ReadonlyArray<{
+    readonly row: number;
+    readonly field?: string;
+    readonly message: string;
+  }>;
+}

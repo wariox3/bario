@@ -11,5 +11,12 @@ export { CiudadAutocompleteComponent } from './lib/components/ciudad-autocomplet
 export { IdentificacionSelectComponent } from './lib/components/identificacion-select/identificacion-select.component';
 export { LanguageToggleComponent } from './lib/components/language-toggle/language-toggle.component';
 export { UserAvatarComponent } from './lib/components/user-avatar/user-avatar.component';
+export { ErpApiSelectComponent } from './lib/components/api-select/erp-api-select.component';
+export { ErpApiAutocompleteComponent } from './lib/components/api-autocomplete/erp-api-autocomplete.component';
+export { ErpContactoSelectComponent } from './lib/components/contacto-select/erp-contacto-select.component';
+export { ContratoAutocompleteComponent } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
+export type { ContratoOption } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
+export { DetailHeaderComponent } from './lib/components/detail-header/detail-header.component';
+export { UppercaseDirective } from './lib/directives/uppercase.directive';
 export type { AuthDict, AuthTranslationsHost } from './lib/auth/i18n';
 export { authEs, authEn } from './lib/auth/i18n';

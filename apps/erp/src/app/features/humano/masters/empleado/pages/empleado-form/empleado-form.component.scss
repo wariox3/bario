@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// Label de campo — mismo tratamiento que el resto de formularios de la app.
+.empleado-form__label {
+  font-size: 0.855rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--brand-text);
+}

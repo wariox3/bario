@@ -1,0 +1,225 @@
+@let f = t().entities.contrato.form.fields;
+@let d = t().entities.contrato.detail;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+  @if (contrato()) {
+    <p-button
+      type="button"
+      [label]="t().common.actions.edit"
+      icon="pi pi-pencil"
+      size="small"
+      (onClick)="onEdit()"
+    />
+  }
+</header>
+
+@if (isLoading()) {
+  <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <!-- ── No encontrado ───────────────────────────────────────────────────────── -->
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ d.notFound.title }}</p>
+    <p class="m-0 mt-1 max-w-[280px] text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ d.notFound.desc }}
+    </p>
+  </div>
+} @else if (contrato(); as c) {
+  <!-- ── Identidad ───────────────────────────────────────────────────────────── -->
+  <lib-detail-header icon="pi pi-file" [eyebrow]="d.eyebrow" [title]="c.contacto_nombre || '—'">
+    @if (c.contrato_tipo_nombre) {
+      <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
+        {{ c.contrato_tipo_nombre }}
+      </p>
+    }
+
+    <span
+      detailHeaderActions
+      class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.72rem] font-semibold"
+      [class.bg-emerald-50]="!c.estado_terminado"
+      [class.text-emerald-700]="!c.estado_terminado"
+      [class.bg-slate-100]="c.estado_terminado"
+      [class.text-brand-muted]="c.estado_terminado"
+    >
+      <i
+        class="pi text-[0.7rem]"
+        [class.pi-check-circle]="!c.estado_terminado"
+        [class.pi-ban]="c.estado_terminado"
+      ></i>
+      {{ c.estado_terminado ? d.estado.terminado : d.estado.activo }}
+    </span>
+  </lib-detail-header>
+
+  <!-- ── Datos del contrato ──────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.sections.datos }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.contratoTipo }}</dt>
+        <dd class="contrato-detail__value">{{ c.contrato_tipo_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.cargo }}</dt>
+        <dd class="contrato-detail__value">{{ c.cargo_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.grupo }}</dt>
+        <dd class="contrato-detail__value">{{ c.grupo_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.sucursal }}</dt>
+        <dd class="contrato-detail__value">{{ c.sucursal_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.tiempo }}</dt>
+        <dd class="contrato-detail__value">{{ c.tiempo_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.fechaDesde }}</dt>
+        <dd class="contrato-detail__value">{{ formatFecha(c.fecha_desde) }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.fechaHasta }}</dt>
+        <dd class="contrato-detail__value">{{ formatFecha(c.fecha_hasta) }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.habilitadoTurno }}</dt>
+        <dd class="contrato-detail__value">
+          {{ c.habilitado_turno ? d.boolean.si : d.boolean.no }}
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ── Remuneración ────────────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
+      >
+        <i class="pi pi-dollar text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.sections.remuneracion }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.salario }}</dt>
+        <dd class="contrato-detail__value tabular-nums">{{ formatMoney(c.salario) }}</dd>
+      </div>
+      @if (c.tipo_costo_nombre) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="contrato-detail__label">{{ f.tipoCosto }}</dt>
+          <dd class="contrato-detail__value">{{ c.tipo_costo_nombre }}</dd>
+        </div>
+      }
+      @if (c.centro_costo_nombre) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="contrato-detail__label">{{ f.centroCosto }}</dt>
+          <dd class="contrato-detail__value">{{ c.centro_costo_nombre }}</dd>
+        </div>
+      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.aplicaAuxilioTransporte }}</dt>
+        <dd class="contrato-detail__value">
+          {{ c.auxilio_transporte ? d.boolean.si : d.boolean.no }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.salarioIntegral }}</dt>
+        <dd class="contrato-detail__value">
+          {{ c.salario_integral ? d.boolean.si : d.boolean.no }}
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ── Seguridad social ────────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
+      >
+        <i class="pi pi-shield text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.sections.seguridadSocial }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.salud }}</dt>
+        <dd class="contrato-detail__value">{{ c.salud_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.entidadSalud }}</dt>
+        <dd class="contrato-detail__value">{{ c.entidad_salud_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.pension }}</dt>
+        <dd class="contrato-detail__value">{{ c.pension_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.entidadPension }}</dt>
+        <dd class="contrato-detail__value">{{ c.entidad_pension_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.entidadCesantias }}</dt>
+        <dd class="contrato-detail__value">{{ c.entidad_cesantias_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.entidadCaja }}</dt>
+        <dd class="contrato-detail__value">{{ c.entidad_caja_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.riesgo }}</dt>
+        <dd class="contrato-detail__value">{{ c.riesgo_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.tipoCotizante }}</dt>
+        <dd class="contrato-detail__value">{{ c.tipo_cotizante_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.subtipoCotizante }}</dt>
+        <dd class="contrato-detail__value">{{ c.subtipo_cotizante_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.ciudadContrato }}</dt>
+        <dd class="contrato-detail__value">{{ c.ciudad_contrato_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.ciudadLabora }}</dt>
+        <dd class="contrato-detail__value">{{ c.ciudad_labora_nombre || '—' }}</dd>
+      </div>
+    </dl>
+  </section>
+}

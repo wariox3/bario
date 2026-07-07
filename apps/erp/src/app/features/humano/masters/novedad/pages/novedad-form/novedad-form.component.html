@@ -56,7 +56,7 @@
             {{ t().entities.novedad.form.fields.novedadTipo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="novedad_tipo"
             formControlName="novedad_tipo"
             [endpoint]="novedadTipoEndpoint"
@@ -76,7 +76,7 @@
             {{ t().entities.novedad.form.fields.contrato }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-contrato-autocomplete
+          <lib-contrato-autocomplete
             inputId="contrato"
             formControlName="contrato"
             [placeholder]="t().entities.novedad.form.fields.contratoPlaceholder"
@@ -144,7 +144,7 @@
             <label for="novedad_referencia" class="novedad-form__label">
               {{ t().entities.novedad.form.fields.novedadReferencia }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="novedad_referencia"
               formControlName="novedad_referencia"
               [endpoint]="novedadReferenciaEndpoint"
@@ -166,6 +166,7 @@
             rows="3"
             class="w-full"
           ></textarea>
+          <lib-field-error [control]="form.controls.detalle" />
         </div>
       </div>
     </div>

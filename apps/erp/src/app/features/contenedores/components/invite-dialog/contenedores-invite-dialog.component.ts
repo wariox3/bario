@@ -2,8 +2,7 @@ import { Component, effect, inject, input, output, signal } from '@angular/core'
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TabsModule } from 'primeng/tabs';
-import { I18nService } from '@reddoc/core';
-import { Contenedor } from '../../models/contenedor.model';
+import { Contenedor, I18nService } from '@reddoc/core';
 import { ContenedorInviteFormComponent } from './contenedor-invite-form.component';
 import { ContenedorMembersListComponent } from './contenedor-members-list.component';
 import { ContenedorPendingInvitesComponent } from './contenedor-pending-invites.component';

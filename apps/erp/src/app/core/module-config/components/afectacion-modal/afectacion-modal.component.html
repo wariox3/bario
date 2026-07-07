@@ -1,0 +1,265 @@
+@let a = t().documentActions.afectacion;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [focusOnShow]="false"
+  [style]="{ width: '82rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-share-alt text-[1.05rem]"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ a.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ a.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (loading()) {
+    <!-- ── Carga ───────────────────────────────────────────────────────────────── -->
+    <div class="flex items-center justify-center py-16 text-brand-muted">
+      <i class="pi pi-spin pi-spinner text-xl"></i>
+    </div>
+  } @else if (error()) {
+    <!-- ── Error ───────────────────────────────────────────────────────────────── -->
+    <div
+      class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-12 text-center"
+    >
+      <i class="pi pi-exclamation-triangle mb-3 text-2xl text-amber-500 opacity-80"></i>
+      <p class="m-0 text-[0.9rem] font-bold text-brand-text">{{ a.loadError.title }}</p>
+      <p class="m-0 mt-1 max-w-70 text-[0.8rem] leading-relaxed text-brand-muted">
+        {{ a.loadError.desc }}
+      </p>
+    </div>
+  } @else {
+    <div class="flex flex-col gap-4 pt-1">
+      <!-- ── Card 1: documento del detalle base ──────────────────────────────────── -->
+      @if (documento(); as doc) {
+        <div class="overflow-hidden rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+          <!-- Título -->
+          <div class="border-b border-[rgba(20,48,73,0.06)] px-4 pt-2.5 pb-1.5">
+            <span class="afectacion__micro-label">{{ a.cards.documento }}</span>
+          </div>
+
+          <!-- Identidad: tipo de documento + ids -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-2.5 pb-2.5"
+          >
+            <span class="text-[0.95rem] font-semibold text-brand-text">
+              {{ doc.documento_tipo_nombre || '—' }}
+            </span>
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="afectacion__micro-label">{{ a.campos.detalleId }}</span>
+                <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+                  {{ detalleId() ?? '—' }}
+                </span>
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="afectacion__micro-label">{{ a.campos.documentoId }}</span>
+                <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+                  {{ doc.id ?? '—' }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Atributos: fecha · contacto -->
+          <div
+            class="flex flex-wrap gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.06)] px-4 py-2.5"
+          >
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.campos.fecha }}</span>
+              <span class="whitespace-nowrap text-[0.85rem] text-brand-text">
+                {{ formatFecha(doc.fecha) }}
+              </span>
+            </div>
+            @if (doc.contacto_nombre) {
+              <div class="flex flex-col gap-0.5">
+                <span class="afectacion__micro-label">{{ a.campos.contacto }}</span>
+                <span class="text-[0.85rem] text-brand-text">{{ doc.contacto_nombre }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Resumen financiero: banda con tinte sky; total destacado -->
+          <div
+            class="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.08)] bg-[rgba(119,170,215,0.06)] px-4 py-2.5 sm:grid-cols-4"
+          >
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.subtotal }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(doc.subtotal ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.baseImpuesto }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(doc.base_impuesto ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.impuesto }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(doc.impuesto ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.total }}</span>
+              <span class="text-[0.9rem] font-bold tabular-nums text-brand-text">
+                {{ formatMoney(doc.total ?? 0) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ── Card 2: documento afectado (referencia), si existe ──────────────────── -->
+      @if (documentoReferencia(); as ref) {
+        <div class="overflow-hidden rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+          <!-- Título -->
+          <div class="border-b border-[rgba(20,48,73,0.06)] px-4 pt-2.5 pb-1.5">
+            <span class="afectacion__micro-label">{{ a.cards.documentoAfectado }}</span>
+          </div>
+
+          <!-- Identidad: tipo de documento + ids -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-2.5 pb-2.5"
+          >
+            <span class="text-[0.95rem] font-semibold text-brand-text">
+              {{ ref.documento_tipo_nombre || '—' }}
+            </span>
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="afectacion__micro-label">{{ a.campos.detalleId }}</span>
+                <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+                  {{ detalleAfectadoId() ?? '—' }}
+                </span>
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="afectacion__micro-label">{{ a.campos.documentoId }}</span>
+                <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+                  {{ ref.id ?? '—' }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Atributos: fecha · contacto -->
+          <div
+            class="flex flex-wrap gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.06)] px-4 py-2.5"
+          >
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.campos.fecha }}</span>
+              <span class="whitespace-nowrap text-[0.85rem] text-brand-text">
+                {{ formatFecha(ref.fecha) }}
+              </span>
+            </div>
+            @if (ref.contacto_nombre) {
+              <div class="flex flex-col gap-0.5">
+                <span class="afectacion__micro-label">{{ a.campos.contacto }}</span>
+                <span class="text-[0.85rem] text-brand-text">{{ ref.contacto_nombre }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Resumen financiero: banda con tinte sky; total destacado -->
+          <div
+            class="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.08)] bg-[rgba(119,170,215,0.06)] px-4 py-2.5 sm:grid-cols-4"
+          >
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.subtotal }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(ref.subtotal ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.baseImpuesto }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(ref.base_impuesto ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.impuesto }}</span>
+              <span class="text-[0.85rem] tabular-nums text-brand-text">
+                {{ formatMoney(ref.impuesto ?? 0) }}
+              </span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="afectacion__micro-label">{{ a.cols.total }}</span>
+              <span class="text-[0.9rem] font-bold tabular-nums text-brand-text">
+                {{ formatMoney(ref.total ?? 0) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ── Lista: detalles que afectan al detalle base ─────────────────────────── -->
+      <div class="max-h-96 overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+        <table class="detalle-table">
+          <thead>
+            <tr>
+              <th class="detalle-table__th text-center">{{ a.cols.id }}</th>
+              <th class="detalle-table__th text-center">{{ a.cols.documento }}</th>
+              <th class="detalle-table__th">{{ a.cols.item }}</th>
+              <th class="detalle-table__th w-10 text-center">{{ a.cols.cantidad }}</th>
+              <th class="detalle-table__th text-right">{{ a.cols.total }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (fila of filas(); track fila.id ?? $index) {
+              <tr class="detalle-table__row">
+                <td class="detalle-table__td text-center tabular-nums text-brand-muted">
+                  {{ fila.id ?? '—' }}
+                </td>
+                <td class="detalle-table__td text-center tabular-nums text-brand-text">
+                  {{ fila.documento ?? '—' }}
+                </td>
+                <td class="detalle-table__td font-medium text-brand-text">
+                  {{ fila.item_nombre || '—' }}
+                </td>
+                <td class="detalle-table__td w-10 text-center tabular-nums">
+                  {{ formatCantidad(fila.cantidad) }}
+                </td>
+                <td class="detalle-table__td text-right font-semibold tabular-nums text-brand-text">
+                  {{ formatMoney(fila.total ?? 0) }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="px-5 py-10 text-center text-sm text-brand-muted">
+                  <i class="pi pi-inbox mr-2"></i>{{ a.empty }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end">
+      <p-button
+        type="button"
+        [label]="a.close"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="visible.set(false)"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

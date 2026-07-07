@@ -55,10 +55,10 @@
             {{ t().entities.contacto.form.fields.tipoPersona }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="tipo_persona"
             formControlName="tipo_persona"
-            endpoint="/general/tipo-persona/seleccionar/"
+            [endpoint]="endpoints.tipoPersona"
             [suggestedIndex]="isEditMode() ? null : 0"
             [invalid]="form.controls.tipo_persona.invalid && form.controls.tipo_persona.touched"
           />
@@ -74,10 +74,10 @@
             {{ t().entities.contacto.form.fields.responsabilidad }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="responsabilidad"
             formControlName="responsabilidad"
-            endpoint="/general/responsabilidad/seleccionar/"
+            [endpoint]="endpoints.responsabilidad"
             [suggestedIndex]="isEditMode() ? null : 0"
             [invalid]="
               form.controls.responsabilidad.invalid && form.controls.responsabilidad.touched
@@ -95,10 +95,10 @@
             {{ t().entities.contacto.form.fields.identificacion }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="identificacion"
             formControlName="identificacion"
-            endpoint="/general/identificacion/seleccionar/"
+            [endpoint]="endpoints.identificacion"
             [params]="identificacionParams()"
             [suggestedIndex]="isEditMode() ? null : 0"
             [invalid]="form.controls.identificacion.invalid && form.controls.identificacion.touched"
@@ -238,10 +238,10 @@
             {{ t().entities.contacto.form.fields.ciudad }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-autocomplete
+          <lib-api-autocomplete
             inputId="ciudad"
             formControlName="ciudad"
-            endpoint="/general/ciudad/seleccionar/"
+            [endpoint]="endpoints.ciudad"
             [placeholder]="t().entities.contacto.form.fields.ciudadPlaceholder"
             [invalid]="form.controls.ciudad.invalid && form.controls.ciudad.touched"
           />
@@ -273,7 +273,7 @@
         </div>
 
         <!-- Correo -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <div class="flex flex-col gap-1.5">
           <label for="correo" class="contacto-form__label">
             {{ t().entities.contacto.form.fields.correo }}
             <span class="ml-px text-red-500">*</span>
@@ -318,7 +318,10 @@
 
   <!-- ── Sección 2: Información cliente ────────────────────────────────────── -->
   @if (esCliente()) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <section
+      #clienteSection
+      class="scroll-mt-4 overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+    >
       <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
         <span
           class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
@@ -343,11 +346,11 @@
               {{ t().entities.contacto.form.fields.plazoPago }}
               <span class="ml-px text-red-500">*</span>
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="plazo_pago"
               formControlName="plazo_pago"
               [suggestedIndex]="0"
-              endpoint="/general/plazo-pago/seleccionar/"
+              [endpoint]="endpoints.plazoPago"
               [invalid]="form.controls.plazo_pago.invalid && form.controls.plazo_pago.touched"
             />
             <lib-field-error
@@ -361,10 +364,10 @@
             <label for="precio" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.precio }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="precio"
               formControlName="precio"
-              endpoint="/general/precio/seleccionar/"
+              [endpoint]="endpoints.precio"
               [params]="precioParams"
             />
           </div>
@@ -374,10 +377,10 @@
             <label for="asesor" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.asesor }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="asesor"
               formControlName="asesor"
-              endpoint="/general/asesor/seleccionar/"
+              [endpoint]="endpoints.asesor"
             />
           </div>
 
@@ -405,7 +408,10 @@
 
   <!-- ── Sección 3: Información proveedor ──────────────────────────────────── -->
   @if (esProveedor()) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <section
+      #proveedorSection
+      class="scroll-mt-4 overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+    >
       <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
         <span
           class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-amber-50 text-amber-700"
@@ -429,10 +435,10 @@
             <label for="banco" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.banco }}
             </label>
-            <app-api-autocomplete
+            <lib-api-autocomplete
               inputId="banco"
               formControlName="banco"
-              endpoint="/general/banco/seleccionar/"
+              [endpoint]="endpoints.banco"
               [placeholder]="t().entities.contacto.form.fields.bancoPlaceholder"
               [invalid]="form.controls.banco.invalid && form.controls.banco.touched"
             />
@@ -457,10 +463,10 @@
             <label for="cuenta_banco_clase" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.cuentaBancoClase }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="cuenta_banco_clase"
               formControlName="cuenta_banco_clase"
-              endpoint="/general/cuenta-banco-clase/seleccionar/"
+              [endpoint]="endpoints.cuentaBancoClase"
             />
           </div>
 
@@ -469,10 +475,10 @@
             <label for="plazo_pago_proveedor" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.plazoPagoProveedor }}
             </label>
-            <app-api-select
+            <lib-api-select
               inputId="plazo_pago_proveedor"
               formControlName="plazo_pago_proveedor"
-              endpoint="/general/plazo-pago/seleccionar/"
+              [endpoint]="endpoints.plazoPago"
               [invalid]="
                 form.controls.plazo_pago_proveedor.invalid &&
                 form.controls.plazo_pago_proveedor.touched

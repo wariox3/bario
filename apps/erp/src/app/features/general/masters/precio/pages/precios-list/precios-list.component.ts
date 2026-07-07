@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { PrecioService } from '../../precio.service';
 import type { Precio } from '../../precio.model';
@@ -33,6 +37,7 @@ import {
   PRECIOS_QUICK_SEARCH_FIELD,
   PRECIOS_PRIMARY_ACTION,
   PRECIOS_ROW_ACTIONS,
+  PRECIOS_TRAILING_ACTIONS,
 } from '../../precio.constants';
 
 @Component({
@@ -51,8 +56,10 @@ import {
 })
 export class PreciosListComponent {
   private readonly service = inject(PrecioService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
@@ -74,14 +81,16 @@ export class PreciosListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, currentModuleId(this.activeModule)] : undefined,
       },
       { label: this.t().entities.precio.name },
     ];
@@ -91,6 +100,7 @@ export class PreciosListComponent {
   protected readonly filterFields = PRECIOS_FILTER_FIELDS;
   protected readonly rowActions = PRECIOS_ROW_ACTIONS;
   protected readonly primaryAction = PRECIOS_PRIMARY_ACTION;
+  protected readonly trailingActions = PRECIOS_TRAILING_ACTIONS;
 
   constructor() {
     this.loadList();
@@ -150,7 +160,14 @@ export class PreciosListComponent {
   }
 
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +178,31 @@ export class PreciosListComponent {
     const ids = this.selectedRows().map((p) => p.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/general/precio/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'precios.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {
@@ -234,6 +276,12 @@ export class PreciosListComponent {
   private navigateTo(...subPath: (string | number)[]): void {
     const slug = this.tenant.currentSlug();
     if (!slug) throw new Error('Cannot navigate without an active tenant slug.');
-    void this.router.navigate(['/t', slug, 'general', 'precios', ...subPath]);
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      'precios',
+      ...subPath,
+    ]);
   }
 }

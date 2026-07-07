@@ -1,7 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { getInitials } from '@reddoc/core';
-import { Contenedor } from '../../models/contenedor.model';
+import { Contenedor, getInitials } from '@reddoc/core';
 import {
   getSuscripcionExpiryLabel,
   isSuscripcionExpired,

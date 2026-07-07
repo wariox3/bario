@@ -17,7 +17,7 @@ import type { ModuleRegistry } from './module-registry.token';
  */
 export const ERP_MODULE_REGISTRY = {
   venta: () => import('../../features/venta/venta.config').then((m) => m.VENTA_CONFIG),
-  // compra: () => import('../../features/compra/compra.config').then((m) => m.COMPRA_CONFIG),
+  compra: () => import('../../features/compra/compra.config').then((m) => m.COMPRA_CONFIG),
   // inventario: () => import('../../features/inventario/inventario.config').then((m) => m.INVENTARIO_CONFIG),
 } as const satisfies ModuleRegistry;
 

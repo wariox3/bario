@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { DetailHeaderComponent } from '@reddoc/ui';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { PrecioService } from '../../precio.service';
 import { PRECIO_LIST_PATH } from '../../precio.constants';
@@ -13,13 +15,14 @@ import type { Precio } from '../../precio.model';
 @Component({
   selector: 'app-precio-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonModule, BreadcrumbComponent, DatePipe, DetailHeaderComponent],
   templateUrl: './precio-detail.component.html',
   styleUrl: './precio-detail.component.scss',
 })
 export class PrecioDetailComponent implements OnInit {
   private readonly precioService = inject(PrecioService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
@@ -37,14 +40,15 @@ export class PrecioDetailComponent implements OnInit {
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     const precio = this.precio();
+    const moduleId = currentModuleId(this.activeModule);
     const items: BreadcrumbItem[] = [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, moduleId] : undefined,
       },
       {
         label: this.t().entities.precio.name,
-        routerLink: slug ? ['/t', slug, ...PRECIO_LIST_PATH] : undefined,
+        routerLink: slug ? ['/t', slug, moduleId, ...PRECIO_LIST_PATH] : undefined,
       },
     ];
     if (precio) items.push({ label: precio.nombre });
@@ -93,6 +97,6 @@ export class PrecioDetailComponent implements OnInit {
   private navigate(...subPath: (string | number)[]): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    void this.router.navigate(['/t', slug, ...subPath]);
+    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...subPath]);
   }
 }

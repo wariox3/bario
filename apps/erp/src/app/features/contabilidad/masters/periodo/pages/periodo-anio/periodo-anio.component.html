@@ -1,0 +1,162 @@
+@let e = t().entities.periodo;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[clamp(190px,18vw,230px)_minmax(0,460px)]">
+  <!-- ── Panel: años ──────────────────────────────────────────────────────── -->
+  <aside class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex items-center justify-between gap-2 border-b border-[rgba(20,48,73,0.08)] px-4 py-2.5"
+    >
+      <h2 class="m-0 text-[0.85rem] font-bold tracking-tight text-brand-text">{{ e.name }}</h2>
+      <p-button
+        type="button"
+        [label]="e.acciones.nuevoAnio"
+        icon="pi pi-plus"
+        size="small"
+        (onClick)="onNuevoAnio()"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1 p-2.5">
+      @for (a of anios(); track a) {
+        <button
+          type="button"
+          (click)="seleccionarAnio(a)"
+          class="flex items-center justify-between rounded-md px-3 py-1.5 text-left text-[0.85rem] font-medium transition-colors"
+          [ngClass]="
+            a === anioSeleccionado()
+              ? 'bg-[rgba(20,48,73,0.08)] text-brand-navy'
+              : 'text-brand-text hover:bg-[rgba(20,48,73,0.04)]'
+          "
+        >
+          <span>{{ a }}</span>
+          @if (a === anioSeleccionado()) {
+            <i class="pi pi-chevron-right text-[0.7rem] text-brand-blue"></i>
+          }
+        </button>
+      } @empty {
+        @if (!isLoading()) {
+          <p class="px-3 py-6 text-center text-[0.82rem] text-brand-muted">
+            {{ e.panel.emptyAnios }}
+          </p>
+        }
+      }
+    </div>
+  </aside>
+
+  <!-- ── Panel: meses del año activo ──────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    @if (isLoading()) {
+      <div class="flex items-center justify-center gap-2 py-12 text-brand-muted">
+        <i class="pi pi-spin pi-spinner text-[1.1rem]"></i>
+      </div>
+    } @else if (anioSeleccionado() === null || mesesActivos().length === 0) {
+      <div class="flex flex-col items-center gap-1.5 px-5 py-12 text-center">
+        <span
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(20,48,73,0.05)] text-brand-muted"
+        >
+          <i class="pi pi-calendar text-[1.1rem]"></i>
+        </span>
+        <p class="m-0 text-[0.85rem] font-semibold text-brand-text">{{ e.panel.emptyTitle }}</p>
+        <p class="m-0 max-w-[16rem] text-[0.78rem] text-brand-muted">{{ e.panel.emptySub }}</p>
+      </div>
+    } @else {
+      <div class="flex items-center gap-2 border-b border-[rgba(20,48,73,0.08)] px-4 py-2.5">
+        <i class="pi pi-calendar text-[0.85rem] text-brand-muted"></i>
+        <h3 class="m-0 text-[0.85rem] font-bold tracking-tight text-brand-text">
+          {{ anioSeleccionado() }}
+        </h3>
+      </div>
+
+      <ul class="m-0 list-none p-0">
+        @for (p of mesesActivos(); track p.id) {
+          <li
+            class="flex items-center gap-2.5 border-b border-[rgba(20,48,73,0.06)] px-4 py-1.5 last:border-0"
+          >
+            <!-- Estado: contenedor de ícono con color semántico -->
+            @switch (estadoDe(p)) {
+              @case ('cerrado') {
+                <span
+                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600"
+                >
+                  <i [class]="iconoEstado(p)" class="text-[0.8rem]"></i>
+                </span>
+              }
+              @case ('bloqueado') {
+                <span
+                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-amber-50 text-amber-600"
+                >
+                  <i [class]="iconoEstado(p)" class="text-[0.8rem]"></i>
+                </span>
+              }
+              @default {
+                <span
+                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[rgba(20,48,73,0.05)] text-brand-muted"
+                >
+                  <i [class]="iconoEstado(p)" class="text-[0.8rem]"></i>
+                </span>
+              }
+            }
+
+            <span class="text-[0.83rem] font-medium text-brand-text">{{ nombreMes(p.mes) }}</span>
+
+            @if (p.estado_inconsistencia) {
+              <span
+                class="inline-flex items-center text-red-500"
+                [title]="e.estados.inconsistencia"
+                [attr.aria-label]="e.estados.inconsistencia"
+              >
+                <i class="pi pi-exclamation-triangle text-[0.7rem]"></i>
+              </span>
+            }
+
+            <div class="ml-auto">
+              @if (p.estado_cerrado) {
+                <span class="text-[0.7rem] font-medium uppercase tracking-wide text-emerald-600">
+                  {{ e.estados.cerrado }}
+                </span>
+              } @else {
+                <button
+                  type="button"
+                  class="flex h-6 w-6 items-center justify-center rounded-md text-brand-muted transition-colors hover:bg-[rgba(20,48,73,0.05)] hover:text-brand-text"
+                  [attr.aria-label]="t().common.actions.actions"
+                  (click)="onRowMenu($event, p)"
+                >
+                  <i class="pi pi-ellipsis-v text-[0.8rem]"></i>
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>
+
+<!-- Menú de acciones por fila (reusado) -->
+<p-menu #rowMenu [popup]="true" [model]="rowMenuItems()" appendTo="body" />
+
+<!-- Confirmación de cierre -->
+<p-confirmDialog />
+
+<!-- Diálogo de creación de año nuevo -->
+<app-periodo-anio-nuevo-dialog
+  [visible]="nuevoDialogVisible()"
+  (visibleChange)="nuevoDialogVisible.set($event)"
+  (created)="onAnioCreado($event)"
+/>
+
+<!-- Diálogo de inconsistencias -->
+<p-dialog
+  [header]="e.inconsistencias.title"
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '46rem', maxWidth: '95vw' }"
+>
+  @if (dialogVisible() && periodoInconsistencia(); as p) {
+    <app-periodo-inconsistencias [anio]="p.anio" [mes]="p.mes" />
+  }
+</p-dialog>

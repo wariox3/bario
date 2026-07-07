@@ -1,1 +1,102 @@
-<router-outlet />
+<header class="app-header">
+  <div class="app-header__brand">
+    <button
+      class="app-header__hamburger"
+      (click)="toggleDrawer()"
+      [attr.aria-label]="t().layout.menuLabel"
+    >
+      <i class="pi pi-bars"></i>
+    </button>
+    <img src="/logos/reddoc.svg" alt="RedDoc" class="app-header__logo" />
+    <span class="app-header__divider" aria-hidden="true"></span>
+    <app-tenant-badge />
+  </div>
+  <div class="app-header__actions">
+    <app-user-menu />
+  </div>
+</header>
+
+<div class="workspace-body">
+  <aside class="workspace-sidebar">
+    <nav class="workspace-nav">
+      <ng-container *ngTemplateOutlet="navTpl" />
+    </nav>
+  </aside>
+
+  <main class="workspace-main">
+    <router-outlet />
+  </main>
+</div>
+
+<!-- Drawer móvil -->
+<p-drawer
+  [visible]="drawerVisible()"
+  (visibleChange)="drawerVisible.set($event)"
+  position="left"
+  [header]="t().layout.drawerHeader"
+>
+  <nav class="workspace-nav">
+    <ng-container *ngTemplateOutlet="navTpl; context: { $implicit: true }" />
+  </nav>
+</p-drawer>
+
+<!-- Template de navegación compartido entre sidebar y drawer -->
+<ng-template #navTpl let-inDrawer>
+  @for (
+    section of sections;
+    track section.kind + '-' + (isItem(section) ? section.path : asAccordion(section).id)
+  ) {
+    @if (isItem(section)) {
+      <a
+        class="workspace-nav__item"
+        [routerLink]="itemPath(section)"
+        routerLinkActive="workspace-nav__item--active"
+        (click)="inDrawer && drawerVisible.set(false)"
+      >
+        <i class="workspace-nav__icon {{ section.iconClass }}"></i>
+        <span class="workspace-nav__label">{{ translate(section.labelKey) }}</span>
+      </a>
+    } @else {
+      <div class="workspace-nav__module">
+        <button
+          type="button"
+          class="workspace-nav__module-header"
+          [class.workspace-nav__module-header--expanded]="isExpanded(asAccordion(section).id)"
+          [attr.aria-expanded]="isExpanded(asAccordion(section).id)"
+          (click)="toggleAccordion(asAccordion(section).id)"
+        >
+          <i class="workspace-nav__icon {{ asAccordion(section).iconClass }}"></i>
+          <span class="workspace-nav__label">{{ translate(asAccordion(section).labelKey) }}</span>
+          <i
+            class="workspace-nav__chevron pi"
+            [class.pi-chevron-down]="isExpanded(asAccordion(section).id)"
+            [class.pi-chevron-right]="!isExpanded(asAccordion(section).id)"
+            aria-hidden="true"
+          ></i>
+        </button>
+
+        @if (isExpanded(asAccordion(section).id)) {
+          <div class="workspace-nav__module-body">
+            @for (group of asAccordion(section).groups; track $index) {
+              <div class="workspace-nav__group">
+                @if (group.labelKey) {
+                  <span class="workspace-nav__group-label">{{ translate(group.labelKey) }}</span>
+                }
+                @for (leaf of group.items; track leaf.path) {
+                  <a
+                    class="workspace-nav__leaf"
+                    [routerLink]="leafPath(leaf)"
+                    [class.workspace-nav__leaf--active]="isLeafActive(leaf)"
+                    (click)="inDrawer && drawerVisible.set(false)"
+                  >
+                    {{ translate(leaf.labelKey) }}
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</ng-template>
