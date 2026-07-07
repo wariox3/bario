@@ -452,6 +452,9 @@ export interface AppDict extends AuthTranslationsHost {
           /** Avisos de validación / sin cambios. */
           validacion: string;
           sinCambios: string;
+          /** Indicador de cambios sin guardar + confirmación al cerrar con cambios. */
+          sinGuardar: string;
+          descartar: { header: string; message: string; aceptar: string };
           /** Tabla de vista previa (simulación): año/mes/código/empleado + días. */
           preview: {
             title: string;

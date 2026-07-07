@@ -18,7 +18,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { Observable, finalize, forkJoin } from 'rxjs';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { type ErpSelectOption, I18nService, ToastService, toIsoDate } from '@reddoc/core';
@@ -73,19 +75,21 @@ type FilaGroup = FormGroup<{
     ReactiveFormsModule,
     DialogModule,
     ButtonModule,
+    ConfirmDialogModule,
     InputTextModule,
     ContratoAutocompleteComponent,
     ErpApiAutocompleteComponent,
   ],
   templateUrl: './programacion-prototipo-modal.component.html',
   styleUrl: './programacion-prototipo-modal.component.scss',
-  providers: [ProgramacionPeriodoStore],
+  providers: [ProgramacionPeriodoStore, ConfirmationService],
 })
 export class ProgramacionPrototipoModalComponent {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly service = inject(PrototipoService);
   private readonly periodoStore = inject(ProgramacionPeriodoStore);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
@@ -147,34 +151,40 @@ export class ProgramacionPrototipoModalComponent {
     return total > 0 && this.seleccionadasCount() === total;
   });
 
-  /** Cambios del formulario como señal, para recomputar la vista previa al editar filas. */
+  /** Cambios del form como señal, para recomputar `hayCambiosSinGuardar` al editar celdas. */
   private readonly formVersion = toSignal(this.form.valueChanges, { initialValue: null });
+
+  /**
+   * `true` si el borrador tiene cambios que **no** están persistidos: filas
+   * nuevas (id `null`) o filas existentes cuya firma difiere del `snapshot`.
+   * Es la misma noción que decide los POST/PUT en `onGuardar`; alimenta el
+   * indicador "sin guardar" y la guardia al cerrar. Reacciona tanto a ediciones
+   * de celda (`formVersion`) como a agregar/quitar filas (`estructuraVersion`).
+   */
+  protected readonly hayCambiosSinGuardar = computed<boolean>(() => {
+    this.formVersion();
+    this.estructuraVersion();
+    return this.filas.controls.some((g) => {
+      const id = g.controls.id.value;
+      if (id === null) return true;
+      const firmaActual = this.firma(
+        g.controls.fechaInicio.value,
+        g.controls.secuencia.value?.id ?? 0,
+        g.controls.contrato.value?.id ?? 0,
+        g.controls.posicion.value,
+      );
+      return this.snapshot.get(id) !== firmaActual;
+    });
+  });
 
   /**
    * Filas de la **vista previa** (cómo quedaría la programación simulada).
    *
-   * MAQUETA: por ahora se arma en el front a partir de los contratos ya puestos
-   * en la tabla y códigos de turno de ejemplo, solo para mostrar el layout.
-   * TODO(prototipo): reemplazar por el resultado real de `onSimular()`
-   * (endpoint de simulación) — año/mes/código/empleado + turno por día.
+   * Vacío hasta que `onSimular()` reciba el resultado real del backend
+   * (`/turno/prototipo/simular/`). TODO(prototipo): poblarlo con la respuesta
+   * una vez confirmada su forma (año/mes/código/empleado + turno por día).
    */
-  protected readonly simulacion = computed<readonly SimulacionFila[]>(() => {
-    this.formVersion();
-    const dias = this.dias();
-    const periodo = this.periodo();
-    if (!dias.length || !periodo) return [];
-    const muestra = ['D', '1', '2', 'D', '2', 'N'];
-    return this.filas.controls
-      .map((g) => g.controls.contrato.value)
-      .filter((c): c is ContratoOption => c !== null)
-      .map((c, idx) => ({
-        anio: periodo.anio,
-        mes: periodo.mes,
-        codigo: `C${idx + 1}`,
-        empleado: c.nombre,
-        dias: Object.fromEntries(dias.map((d, i) => [d.dia, muestra[(i + idx) % muestra.length]])),
-      }));
-  });
+  protected readonly simulacion = signal<readonly SimulacionFila[]>([]);
 
   constructor() {
     // Al abrir (puede ser para otro puesto): tabla y período recargados.
@@ -196,6 +206,7 @@ export class ProgramacionPrototipoModalComponent {
   private reset(): void {
     this.filas.clear();
     this.snapshot.clear();
+    this.simulacion.set([]);
     this.periodoStore.reset();
     this.bump();
   }
@@ -265,8 +276,22 @@ export class ProgramacionPrototipoModalComponent {
   // ── Acciones de tabla ─────────────────────────────────────────────────────────
 
   protected onNuevo(): void {
-    this.filas.push(this.nuevaFila());
+    const fila = this.nuevaFila();
+    const sugerida = this.fechaInicioSugerida();
+    if (sugerida) fila.controls.fechaInicio.setValue(sugerida);
+    this.filas.push(fila);
     this.bump();
+  }
+
+  /**
+   * Fecha de inicio sugerida para una fila nueva: el primer día del período
+   * (mes/año) que se está programando — el arranque natural del ciclo, y la
+   * misma `fecha` que se envía al guardar. Vacío si el período aún no cargó
+   * (el usuario la completa a mano).
+   */
+  private fechaInicioSugerida(): string {
+    const periodo = this.periodo();
+    return periodo ? toIsoDate(new Date(periodo.anio, periodo.mes - 1, 1)) : '';
   }
 
   protected onToggleFila(g: FilaGroup): void {
@@ -407,15 +432,27 @@ export class ProgramacionPrototipoModalComponent {
 
   /**
    * Simular: previsualiza (dry-run) los turnos que generaría el prototipo del
-   * puesto, sin persistirlos.
+   * puesto, sin persistirlos (`POST /turno/prototipo/simular/`).
    *
-   * TODO: conectar con backend. Falta definir el endpoint (p. ej.
-   * `POST /turno/prototipo/simular/` con `{ documento_detalle }`) y pintar el
-   * resultado (tabla de vista previa año/mes/empleado × días, como en la
-   * referencia). Por ahora el botón solo queda ubicado.
+   * TODO(prototipo): por ahora solo dispara la simulación y loguea la respuesta
+   * cruda para conocer su forma; falta pintar la vista previa (año/mes/empleado
+   * × días) a partir de `simulacion()` con el resultado real.
    */
   protected onSimular(): void {
-    // TODO(prototipo): invocar la simulación y mostrar la vista previa.
+    const grupo = this.grupo();
+    if (!grupo || this.isSubmitting()) return;
+
+    this.isSubmitting.set(true);
+    this.service
+      .simular(grupo.documentoDetalleId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: (res) => console.log('[prototipo] simular →', res),
+        error: (err) => console.error('[prototipo] simular error →', err),
+      });
   }
 
   /**
@@ -431,7 +468,36 @@ export class ProgramacionPrototipoModalComponent {
     // TODO(prototipo): invocar la generación y, al éxito, this.applied.emit().
   }
 
+  /**
+   * Intercepta el `visibleChange` del diálogo: cualquier vía de cierre (botón
+   * "Cerrar", ícono X, ESC) pasa por acá. Si hay cambios sin guardar pide
+   * confirmación antes de descartar; si no, cierra directo. Reabrir es no-op:
+   * el estado abierto lo controla el padre.
+   */
+  protected onVisibleChange(next: boolean): void {
+    if (next) return;
+    this.intentarCerrar();
+  }
+
   protected onClose(): void {
-    this.visible.set(false);
+    this.intentarCerrar();
+  }
+
+  /** Cierra el modal, confirmando el descarte si el borrador tiene cambios sin guardar. */
+  private intentarCerrar(): void {
+    if (!this.hayCambiosSinGuardar()) {
+      this.visible.set(false);
+      return;
+    }
+    const d = this.t().entities.programacion.detail.prototipoModal.descartar;
+    this.confirmation.confirm({
+      header: d.header,
+      message: d.message,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: d.aceptar,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.visible.set(false),
+    });
   }
 }

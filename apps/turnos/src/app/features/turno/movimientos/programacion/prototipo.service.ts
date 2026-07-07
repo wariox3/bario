@@ -37,6 +37,19 @@ export class PrototipoService extends BaseHttpService {
   }
 
   /**
+   * Simula (dry-run) los turnos que generaría el prototipo del puesto sin
+   * persistirlos: `POST /turno/prototipo/simular/` con `{ documento_detalle }`.
+   *
+   * TODO(prototipo): tipar la respuesta cuando el backend confirme su forma
+   * (por ahora `unknown`, se inspecciona en el `console.log` del componente).
+   */
+  simular(documentoDetalleId: number): Observable<unknown> {
+    return this.post<unknown>(`${this.resourcePath}simular/`, {
+      documento_detalle: documentoDetalleId,
+    });
+  }
+
+  /**
    * Elimina una o varias filas de prototipo. El backend no expone batch-delete,
    * así que se paralelizan DELETEs individuales con `forkJoin` (patrón de los
    * masters, ver `SecuenciaService.remove`).

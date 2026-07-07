@@ -537,6 +537,13 @@ export const en: AppDict = {
           close: 'Close',
           validacion: 'Fill in contract, sequence and start date in every row.',
           sinCambios: 'There are no changes to save.',
+          sinGuardar: 'Unsaved changes',
+          descartar: {
+            header: 'Unsaved changes',
+            message:
+              'You have prototype changes that are not saved. Closing will discard them. Discard?',
+            aceptar: 'Discard',
+          },
           preview: {
             title: 'Preview',
             anio: 'Year',
