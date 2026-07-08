@@ -1452,12 +1452,8 @@ export interface AppDict extends AuthTranslationsHost {
           formaPagoPlaceholder: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
-          almacen: string;
-          almacenPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
-          asesor: string;
-          asesorPlaceholder: string;
           ordenCompra: string;
         };
         validation: { required: string };
@@ -1478,9 +1474,7 @@ export interface AppDict extends AuthTranslationsHost {
           plazoPago: string;
           formaPago: string;
           centroCosto: string;
-          almacen: string;
           sede: string;
-          asesor: string;
           ordenCompra: string;
         };
         notFound: { title: string; desc: string };

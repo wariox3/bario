@@ -29,9 +29,7 @@ export function facturaCompraRecurrenteToFormValue(
       read.centro_costo != null
         ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
         : null,
-    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
-    asesor: read.asesor != null ? { id: read.asesor, nombre: read.asesor_nombre ?? '' } : null,
     orden_compra: read.orden_compra ?? null,
   };
 }
@@ -55,9 +53,7 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     forma_pago: raw.forma_pago?.id ?? null,
     centro_costo: raw.centro_costo?.id ?? null,
-    almacen: raw.almacen?.id ?? null,
     sede: raw.sede?.id ?? null,
-    asesor: raw.asesor?.id ?? null,
     orden_compra: raw.orden_compra?.trim() || null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };

@@ -15,9 +15,7 @@ export interface FacturaCompraRecurrenteFormRawValue {
   readonly plazo_pago: ErpSelectOption | null;
   readonly forma_pago: ErpSelectOption | null;
   readonly centro_costo: ErpSelectOption | null;
-  readonly almacen: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
-  readonly asesor: ErpSelectOption | null;
   readonly orden_compra: string | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];
 }

@@ -38,9 +38,7 @@ interface CabeceraView {
   readonly plazoPago: string | null;
   readonly formaPago: string | null;
   readonly centroCosto: string | null;
-  readonly almacen: string | null;
   readonly sede: string | null;
-  readonly asesor: string | null;
   readonly ordenCompra: string | null;
   /** Si ya está aprobado no se puede volver a aprobar (deshabilita la acción). */
   readonly estadoAprobado: boolean;
@@ -256,9 +254,7 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
             plazoPago: read.plazo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
-            almacen: read.almacen_nombre ?? null,
             sede: read.sede_nombre ?? null,
-            asesor: read.asesor_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             estadoAprobado: read.estado_aprobado,
           });

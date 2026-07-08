@@ -42,8 +42,6 @@ import {
 import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import {
-  ALMACEN_ENDPOINT,
-  ASESOR_ENDPOINT,
   FORMA_PAGO_ENDPOINT,
   PLAZO_PAGO_ENDPOINT,
   SEDE_ENDPOINT,
@@ -110,9 +108,7 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   protected readonly plazoPagoEndpoint = PLAZO_PAGO_ENDPOINT;
   protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
-  protected readonly almacenEndpoint = ALMACEN_ENDPOINT;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
-  protected readonly asesorEndpoint = ASESOR_ENDPOINT;
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
@@ -155,9 +151,7 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     forma_pago: this.fb.control<ErpSelectOption | null>(null),
     centro_costo: this.fb.control<ErpSelectOption | null>(null),
-    almacen: this.fb.control<ErpSelectOption | null>(null),
     sede: this.fb.control<ErpSelectOption | null>(null),
-    asesor: this.fb.control<ErpSelectOption | null>(null),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });

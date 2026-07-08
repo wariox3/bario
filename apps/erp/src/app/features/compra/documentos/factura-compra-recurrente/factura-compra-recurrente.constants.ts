@@ -6,16 +6,6 @@ export const PLAZO_PAGO_ENDPOINT = '/general/plazo-pago/seleccionar/';
 export const FORMA_PAGO_ENDPOINT = '/general/forma-pago/seleccionar/';
 /** Endpoint `seleccionar` de sedes. */
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
-/** Endpoint `seleccionar` de asesores. */
-export const ASESOR_ENDPOINT = '/general/asesor/seleccionar/';
-/**
- * Endpoint `seleccionar` de almacenes (inventario).
- *
- * TODO(factura-compra-recurrente): confirmar el endpoint con backend — se tomó
- * del legacy (`inventario/almacen/seleccionar/`); no hay otro consumidor en el
- * monorepo aún.
- */
-export const ALMACEN_ENDPOINT = '/inventario/almacen/seleccionar/';
 
 /**
  * Columnas visibles del listado de Factura de compra recurrente.

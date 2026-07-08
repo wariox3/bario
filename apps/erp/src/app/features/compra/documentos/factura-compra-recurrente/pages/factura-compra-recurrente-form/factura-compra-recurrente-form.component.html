@@ -133,23 +133,6 @@
           />
         </div>
 
-        <!-- Almacén -->
-        <!-- TODO(factura-compra-recurrente): campo deshabilitado hasta confirmar
-             el endpoint de almacén con backend (ALMACEN_ENDPOINT, tomado del
-             legacy `inventario/almacen/seleccionar/`, sin otro consumidor en el
-             monorepo). Al reactivar, descomentar este bloque. -->
-        <!-- <div class="flex flex-col gap-1.5">
-          <label for="almacen" class="factura-compra-recurrente-form__label">
-            {{ t().entities.facturaCompraRecurrente.form.fields.almacen }}
-          </label>
-          <lib-api-select
-            inputId="almacen"
-            formControlName="almacen"
-            [endpoint]="almacenEndpoint"
-            [placeholder]="t().entities.facturaCompraRecurrente.form.fields.almacenPlaceholder"
-          />
-        </div> -->
-
         <!-- Sede -->
         <div class="flex flex-col gap-1.5">
           <label for="sede" class="factura-compra-recurrente-form__label">
@@ -160,19 +143,6 @@
             formControlName="sede"
             [endpoint]="sedeEndpoint"
             [placeholder]="t().entities.facturaCompraRecurrente.form.fields.sedePlaceholder"
-          />
-        </div>
-
-        <!-- Asesor -->
-        <div class="flex flex-col gap-1.5">
-          <label for="asesor" class="factura-compra-recurrente-form__label">
-            {{ t().entities.facturaCompraRecurrente.form.fields.asesor }}
-          </label>
-          <lib-api-select
-            inputId="asesor"
-            formControlName="asesor"
-            [endpoint]="asesorEndpoint"
-            [placeholder]="t().entities.facturaCompraRecurrente.form.fields.asesorPlaceholder"
           />
         </div>
 
