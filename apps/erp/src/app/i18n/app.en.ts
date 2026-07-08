@@ -187,6 +187,25 @@ export const en: AppDict = {
         desc: 'Could not generate the document. Please try again.',
       },
     },
+    generarRecurrente: {
+      seleccionadosLabel: 'Generate selected',
+      noSelection: {
+        title: 'No selection',
+        desc: 'Select at least one recurring invoice to generate.',
+      },
+      success: {
+        title: 'Invoices generated',
+        desc: 'The invoices were generated successfully from the templates.',
+      },
+      empty: {
+        title: 'Nothing to do',
+        desc: 'There were no invoices to generate in the selection.',
+      },
+      error: {
+        title: 'Generation failed',
+        desc: 'Could not generate the invoices. Please try again.',
+      },
+    },
     detail: {
       aprobar: 'Approve',
       desaprobar: 'Unapprove',

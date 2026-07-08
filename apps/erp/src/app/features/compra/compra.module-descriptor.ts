@@ -16,14 +16,15 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.facturaCompra.name', path: 'factura-compra/list' },
-            { labelKey: 'entities.documentoSoporte.name', path: 'documento-soporte/list' },
-            { labelKey: 'entities.notaCreditoCompra.name', path: 'nota-credito-compra/list' },
-            { labelKey: 'entities.notaDebitoCompra.name', path: 'nota-debito-compra/list' },
             {
               labelKey: 'entities.facturaCompraRecurrente.name',
               path: 'factura-compra-recurrente/list',
             },
+            { labelKey: 'entities.facturaCompra.name', path: 'factura-compra/list' },
+            { labelKey: 'entities.documentoSoporte.name', path: 'documento-soporte/list' },
+            { labelKey: 'entities.notaCreditoCompra.name', path: 'nota-credito-compra/list' },
+            { labelKey: 'entities.notaDebitoCompra.name', path: 'nota-debito-compra/list' },
+
             { labelKey: 'entities.notaAjuste.name', path: 'nota-ajuste/list' },
           ],
         },

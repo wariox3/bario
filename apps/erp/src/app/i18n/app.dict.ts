@@ -154,6 +154,13 @@ export interface AppDict extends AuthTranslationsHost {
       success: { title: string; desc: string };
       error: { title: string; desc: string };
     };
+    generarRecurrente: {
+      seleccionadosLabel: string;
+      noSelection: { title: string; desc: string };
+      success: { title: string; desc: string };
+      empty: { title: string; desc: string };
+      error: { title: string; desc: string };
+    };
     detail: {
       aprobar: string;
       desaprobar: string;

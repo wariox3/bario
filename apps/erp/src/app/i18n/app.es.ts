@@ -187,6 +187,25 @@ export const es: AppDict = {
         desc: 'No se pudo generar el documento. Intentá de nuevo.',
       },
     },
+    generarRecurrente: {
+      seleccionadosLabel: 'Generar seleccionados',
+      noSelection: {
+        title: 'Sin selección',
+        desc: 'Selecciona al menos una factura recurrente para generar.',
+      },
+      success: {
+        title: 'Facturas generadas',
+        desc: 'Las facturas se generaron correctamente a partir de las plantillas.',
+      },
+      empty: {
+        title: 'Sin novedades',
+        desc: 'No había facturas por generar en la selección.',
+      },
+      error: {
+        title: 'Error al generar',
+        desc: 'No se pudieron generar las facturas. Intenta de nuevo.',
+      },
+    },
     detail: {
       aprobar: 'Aprobar',
       desaprobar: 'Desaprobar',
