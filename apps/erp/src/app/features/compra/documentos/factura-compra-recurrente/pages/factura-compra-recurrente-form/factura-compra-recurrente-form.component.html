@@ -134,7 +134,11 @@
         </div>
 
         <!-- Almacén -->
-        <div class="flex flex-col gap-1.5">
+        <!-- TODO(factura-compra-recurrente): campo deshabilitado hasta confirmar
+             el endpoint de almacén con backend (ALMACEN_ENDPOINT, tomado del
+             legacy `inventario/almacen/seleccionar/`, sin otro consumidor en el
+             monorepo). Al reactivar, descomentar este bloque. -->
+        <!-- <div class="flex flex-col gap-1.5">
           <label for="almacen" class="factura-compra-recurrente-form__label">
             {{ t().entities.facturaCompraRecurrente.form.fields.almacen }}
           </label>
@@ -144,7 +148,7 @@
             [endpoint]="almacenEndpoint"
             [placeholder]="t().entities.facturaCompraRecurrente.form.fields.almacenPlaceholder"
           />
-        </div>
+        </div> -->
 
         <!-- Sede -->
         <div class="flex flex-col gap-1.5">
