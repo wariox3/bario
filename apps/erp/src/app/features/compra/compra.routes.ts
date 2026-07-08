@@ -65,6 +65,13 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'factura-compra-recurrente',
+        loadChildren: () =>
+          import('./documentos/factura-compra-recurrente/factura-compra-recurrente.routes').then(
+            (m) => m.FACTURA_COMPRA_RECURRENTE_ROUTES,
+          ),
+      },
+      {
         path: 'nota-ajuste',
         loadChildren: () =>
           import('./documentos/nota-ajuste/nota-ajuste.routes').then((m) => m.NOTA_AJUSTE_ROUTES),

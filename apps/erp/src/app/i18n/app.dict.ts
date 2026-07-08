@@ -1418,6 +1418,74 @@ export interface AppDict extends AuthTranslationsHost {
         notFound: { title: string; desc: string };
       };
     };
+    facturaCompraRecurrente: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          ordenCompra: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          plazoPago: string;
+          formaPago: string;
+          centroCosto: string;
+          almacen: string;
+          sede: string;
+          asesor: string;
+          ordenCompra: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     notaAjuste: {
       name: string;
       columns: {
