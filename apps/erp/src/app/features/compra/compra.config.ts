@@ -2,6 +2,7 @@ import type { ModuleConfig } from '@erp/core/module-config';
 import { FACTURA_COMPRA_CONFIG } from './documentos/factura-compra/factura-compra.config';
 import { DOCUMENTO_SOPORTE_CONFIG } from './documentos/documento-soporte/documento-soporte.config';
 import { NOTA_CREDITO_COMPRA_CONFIG } from './documentos/nota-credito-compra/nota-credito-compra.config';
+import { NOTA_DEBITO_COMPRA_CONFIG } from './documentos/nota-debito-compra/nota-debito-compra.config';
 import { NOTA_AJUSTE_CONFIG } from './documentos/nota-ajuste/nota-ajuste.config';
 
 /**
@@ -21,6 +22,7 @@ export const COMPRA_CONFIG: ModuleConfig = {
     FACTURA_COMPRA_CONFIG,
     DOCUMENTO_SOPORTE_CONFIG,
     NOTA_CREDITO_COMPRA_CONFIG,
+    NOTA_DEBITO_COMPRA_CONFIG,
     NOTA_AJUSTE_CONFIG,
   ],
 };

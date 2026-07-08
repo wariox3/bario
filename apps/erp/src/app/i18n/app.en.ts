@@ -1858,6 +1858,84 @@ export const en: AppDict = {
         },
       },
     },
+    notaDebitoCompra: {
+      name: 'Debit note',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New debit note',
+        editTitle: 'Edit debit note',
+        sectionHint: 'Main document details',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          documentoReferencia: 'Reference document',
+          documentoReferenciaPlaceholder: 'Select the invoice…',
+          documentoReferenciaDisabled: 'Select a supplier first',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Select…',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Note created',
+            desc: 'The debit note was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The debit note could not be created',
+          },
+          editSuccess: {
+            title: 'Note updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The debit note could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          documentoReferencia: 'Reference document',
+          centroCosto: 'Cost center',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Note not found',
+          desc: 'The note you are looking for does not exist or was deleted.',
+        },
+      },
+    },
     notaAjuste: {
       name: 'Adjustment note',
       columns: {

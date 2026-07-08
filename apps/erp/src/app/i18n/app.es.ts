@@ -1899,6 +1899,84 @@ export const es: AppDict = {
         },
       },
     },
+    notaDebitoCompra: {
+      name: 'Nota débito',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva nota débito',
+        editTitle: 'Editar nota débito',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          documentoReferencia: 'Documento referencia',
+          documentoReferenciaPlaceholder: 'Selecciona la factura…',
+          documentoReferenciaDisabled: 'Selecciona primero un proveedor',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Nota creada',
+            desc: 'La nota débito se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la nota débito',
+          },
+          editSuccess: {
+            title: 'Nota actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la nota débito',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          documentoReferencia: 'Documento referencia',
+          centroCosto: 'Centro de costo',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Nota no encontrada',
+          desc: 'La nota que buscas no existe o fue eliminada.',
+        },
+      },
+    },
     notaAjuste: {
       name: 'Nota ajuste',
       columns: {

@@ -58,6 +58,13 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'nota-debito-compra',
+        loadChildren: () =>
+          import('./documentos/nota-debito-compra/nota-debito-compra.routes').then(
+            (m) => m.NOTA_DEBITO_COMPRA_ROUTES,
+          ),
+      },
+      {
         path: 'nota-ajuste',
         loadChildren: () =>
           import('./documentos/nota-ajuste/nota-ajuste.routes').then((m) => m.NOTA_AJUSTE_ROUTES),
