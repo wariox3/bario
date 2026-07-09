@@ -19,6 +19,7 @@ import { environment } from '../environments/environment';
 import {
   APP_BRANDING,
   AUTH_DEFAULT_SKIP_URLS,
+  CURRENT_APP,
   ENVIRONMENT,
   ROUTE_PATHS_TOKEN,
   AUTH_SERVICE,
@@ -33,6 +34,7 @@ import {
   ENTITY_DATA_GATEWAY,
   HttpEntityDataGateway,
 } from '@reddoc/core';
+import type { ReddocAppId } from '@reddoc/core';
 import { AuthService } from './features/auth/services/auth.service';
 import { ROUTE_PATHS } from './core/constants/route-paths.constants';
 import { dictionaries } from './i18n';
@@ -80,6 +82,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_BRANDING,
       useValue: { appName: 'Turnos', tagline: 'Gestión de turnos RedDoc.' },
     },
+    { provide: CURRENT_APP, useValue: 'turnos' satisfies ReddocAppId },
     { provide: AUTH_SERVICE, useExisting: AuthService },
     {
       provide: TENANT_ROUTES,

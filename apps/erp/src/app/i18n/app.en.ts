@@ -1,8 +1,9 @@
-import { authEn } from '@reddoc/ui';
+import { appSwitcherEn, authEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
+  appSwitcher: appSwitcherEn,
   common: {
     comingSoon: 'Coming soon.',
     actions: {
@@ -168,14 +169,6 @@ export const en: AppDict = {
       manageAccount: 'Manage account',
       settings: 'Settings',
       logout: 'Sign out',
-    },
-    appSwitcher: {
-      triggerLabel: 'Open applications',
-      heading: 'Applications',
-      comingSoon: 'Coming soon',
-      apps: {
-        turnos: { name: 'Turnos', description: 'Shift management' },
-      },
     },
   },
   documentActions: {

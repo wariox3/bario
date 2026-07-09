@@ -130,10 +130,18 @@ Ejemplo vivo: "Datos adicionales" (orden de compra, prefijo/número, comentario)
 
 ## Patrón: app-switcher (constelación de apps reddoc)
 
-`shared/app-switcher/` — waffle en `app-header__actions` (izquierda del user-menu, en
-workspace-layout y shell-layout) para saltar a apps hermanas del monorepo (turnos, luego más).
-Enchufado en ambos layouts. **No usa PrimeNG**: panel custom con signals (mejor UX de hover y
-control total del look; `p-popover`/`p-megaMenu` no encajan con tiles de monograma ni con hover).
+`libs/ui/src/lib/app-switcher/` (`<lib-app-switcher>`, vía `@reddoc/ui`) — waffle en
+`app-header__actions` (izquierda del user-menu, en workspace-layout y shell-layout) para saltar
+entre apps hermanas del monorepo. Hoy lo consumen **erp y turnos**, en sus dos layouts cada uno.
+**No usa PrimeNG**: panel custom con signals (mejor UX de hover y control total del look;
+`p-popover`/`p-megaMenu` no encajan con tiles de monograma ni con hover).
+
+El componente es **agnóstico de app**. Lo único que cambia por app son sus providers:
+
+- `CURRENT_APP` (`@reddoc/core`, tipo `ReddocAppId`) — quién soy, para **excluirme de mi propia
+  lista**. Cada `app.config.ts` lo provee: `{ provide: CURRENT_APP, useValue: 'erp' satisfies ReddocAppId }`.
+- Las `<app>Url` del `ENVIRONMENT` — a quiénes veo. El ERP declara `turnosUrl`; turnos declara
+  `erpUrl`. Ninguno declara la suya, así la auto-exclusión queda respaldada también por config.
 
 - **Trigger:** `pi pi-th-large`, `32×32`, mismo tratamiento que la hamburguesa
   (hover/activo `rgba(19 38 60 / 0.06)`, radius `6px`, ícono muted→text).
@@ -150,21 +158,29 @@ control total del look; `p-popover`/`p-megaMenu` no encajan con tiles de monogra
 - **Grilla waffle:** `grid-template-columns: repeat(2, 1fr); gap:0.25rem`. Cada app = `<a>` columna
   centrada, hover `rgba(19 38 60 / 0.04)`, radius `8px`, `target="_blank" rel="noopener"`.
 - **Tile = identidad reddoc:** monograma `44×44` navy (`var(--brand-navy)`) radius `10px` + glifo
-  blanco (`pi` de dominio; turnos → `pi pi-clock`). Es el mismo idioma del `tenant-badge`: la
-  constelación de apps se lee como una familia, no como un dropdown genérico. Nombre debajo
-  `0.8rem/500 --brand-text`.
+  blanco (`pi` de dominio; erp → `pi pi-building`, turnos → `pi pi-clock`). Es el mismo idioma del
+  `tenant-badge`: la constelación de apps se lee como una familia, no como un dropdown genérico.
+  Nombre debajo `0.8rem/500 --brand-text`.
 - **Placeholder de crecimiento:** tile "Próximamente" con `background:transparent`, borde
   `1px dashed rgba(19 38 60 / 0.2)`, `pi pi-plus` muted, `aria-hidden`. Rellena la grilla con 1 sola
   app y anticipa lo que viene.
-- **Registro progresivo** (`app-switcher.constants.ts`): `SwitcherApp[]` tipado
-  (`id`, `icon`, `url:(env)=>env.<app>Url`, `name/description:(d:AppDict)=>…`). Agregar app =
-  1 entrada + bloque i18n `layout.appSwitcher.apps.<id>` + URL en los 3 environments del ERP +
-  campo en `ReddocEnvironment` (`libs/core/tokens.ts`). El componente **filtra por URL presente**
-  (`flatMap` → `[]` si `undefined`): una app sin URL en ese entorno no se muestra → rollout sin
-  tocar el componente. Navegar a otra app = leer su `env.<app>Url` (mismo patrón que "Gestionar
-  cuenta" con `cuentaUrl` en user-menu).
-- **A futuro:** cuando se necesite en turnos/pos/etc., promover a `@reddoc/ui` con un token de
-  registro. Reemplazar el monograma por SVG real cuando exista en `libs/ui/src/assets/logos/`.
+- **Sin apps hermanas → sin trigger:** el template entero va tras `@if (apps().length)`. Una app sin
+  URLs configuradas no muestra un waffle que abre un panel vacío.
+- **Catálogo progresivo** (`app-switcher.constants.ts`): `SwitcherApp[]` tipado (`id: ReddocAppId`,
+  `icon`, `url:(env)=>env.<app>Url`). Los textos NO viven acá: los da el dict. El componente
+  **filtra por URL presente** (`flatMap` → `[]` si `undefined`) y por `CURRENT_APP` → rollout sin
+  tocar el componente. Navegar a otra app = leer su `env.<app>Url` con `target="_blank"` (mismo
+  patrón que "Gestionar cuenta" con `cuentaUrl` en user-menu).
+- **Agregar una app** = id en `ReddocAppId` (`libs/core/tokens.ts`) + `<app>Url` en
+  `ReddocEnvironment` + 1 entrada en `SWITCHER_APPS` + su bloque en `app-switcher.es/en.ts` (el
+  `Record<ReddocAppId, …>` del dict **obliga** a traducirla) + la URL en los environments de las
+  apps que deban verla. Nada más.
+- **i18n del lib** (`libs/ui/src/lib/app-switcher/i18n/`): dict propio + `AppSwitcherTranslationsHost`,
+  calcado de `libs/ui/src/lib/auth/i18n/`. Cada app hace
+  `AppDict extends AuthTranslationsHost, AppSwitcherTranslationsHost` y pone `appSwitcher: appSwitcherEs/En`.
+- **Pendiente:** deep-link al tenant activo (`${url}/t/${slug}`) — hoy enlaza a la raíz, así que al
+  saltar hay que reelegir empresa. Y reemplazar el monograma por SVG real cuando exista en
+  `libs/ui/src/assets/logos/`.
 
 ## i18n
 

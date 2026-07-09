@@ -1,6 +1,6 @@
-import type { AuthTranslationsHost } from '@reddoc/ui';
+import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
 
-export interface AppDict extends AuthTranslationsHost {
+export interface AppDict extends AuthTranslationsHost, AppSwitcherTranslationsHost {
   common: {
     comingSoon: string;
     actions: {

@@ -1,8 +1,9 @@
-import { authEn } from '@reddoc/ui';
+import { appSwitcherEn, authEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
+  appSwitcher: appSwitcherEn,
   common: {
     comingSoon: 'Coming soon.',
     actions: {
