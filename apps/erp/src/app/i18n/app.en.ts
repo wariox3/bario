@@ -1979,6 +1979,7 @@ export const en: AppDict = {
         createTitle: 'New recurring invoice',
         editTitle: 'Edit recurring invoice',
         sectionHint: 'Template used to generate the invoices',
+        adicionales: { title: 'Additional details', hint: 'optional' },
         fields: {
           proveedor: 'Supplier',
           proveedorPlaceholder: 'Search supplier…',
@@ -1992,6 +1993,7 @@ export const en: AppDict = {
           sede: 'Branch',
           sedePlaceholder: 'Select…',
           ordenCompra: 'Purchase order',
+          comentario: 'Comment',
         },
         validation: { required: 'This field is required' },
         toasts: {

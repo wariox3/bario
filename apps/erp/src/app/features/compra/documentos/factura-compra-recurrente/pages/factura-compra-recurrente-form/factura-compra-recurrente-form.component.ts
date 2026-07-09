@@ -15,8 +15,8 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { FieldErrorComponent } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -76,8 +76,8 @@ import { SELECT_ENDPOINTS } from '@reddoc/core';
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
-    DatePickerModule,
     InputTextModule,
+    TextareaModule,
     FieldErrorComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
@@ -135,6 +135,17 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   });
   protected readonly isSaving = signal(false);
 
+  /**
+   * Disclosure de "Datos adicionales" (orden de compra y comentario).
+   * Colapsado por defecto: son metadatos poco relevantes que no deben
+   * competir con la cabecera principal.
+   */
+  protected readonly adicionalesOpen = signal(false);
+
+  protected toggleAdicionales(): void {
+    this.adicionalesOpen.update((open) => !open);
+  }
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     compraDocumentoBreadcrumb(
       this.t(),
@@ -153,6 +164,7 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     centro_costo: this.fb.control<ErpSelectOption | null>(null),
     sede: this.fb.control<ErpSelectOption | null>(null),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
 

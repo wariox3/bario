@@ -99,6 +99,35 @@ px-2 py-0.5 font-mono text-[0.8rem] font-semibold text-brand-text">`. El tinte n
   bajo el encabezado). Mostrar el set completo (incluidos los vacíos como punto) para que el patrón
   se lea como una tira. Usar solo para valores cortos; si son largos, volver al `<dl>` vertical.
 
+## Patrón: disclosure de datos secundarios (banda colapsable)
+
+Para campos poco relevantes de un formulario (metadatos, referencias externas, numeración, notas)
+que no deben competir con la cabecera principal ni ocupar espacio de entrada. Banda delgada al
+**pie de la card** que colapsa/expande; colapsada cuesta **una sola línea**. Lo primario queda
+siempre visible (a diferencia de tabs, que esconderían también lo primario tras un clic).
+
+Ejemplo vivo: "Datos adicionales" (orden de compra, prefijo/número, comentario) en el form de
+`factura-compra-recurrente`.
+
+- **Estado:** un `signal<boolean>` en el componente (`adicionalesOpen`, default `false`) + método
+  `toggle...()` con `.update((o) => !o)`. Nada de PrimeNG: un `@if` gobierna el bloque expandido.
+- **Banda** (`<button type="button">`, full-bleed dentro del card con `overflow-hidden`):
+  `flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-left`
+  `transition-colors hover:bg-[rgba(20,48,73,0.04)]`. Es la **misma** `px-5` del card pero más
+  slim (`py-3` vs `py-5` del cuerpo). Reusa el idioma del acordeón del sidebar.
+- **Chevron:** `pi pi-chevron-right text-[0.7rem] text-brand-muted transition-transform`
+  `[class.rotate-90]="open()"` — leading, rota 90° al abrir. Sin color de acento: revelar no es una
+  acción, va todo en muted.
+- **Etiqueta:** `text-[0.85rem] font-medium text-brand-muted`. **Hint** ("opcional") a la derecha
+  con `ml-auto text-[0.72rem] text-brand-muted`.
+- **Región expandida** (`@if (open())`): `div` con `id` (referenciado por `aria-controls`),
+  `border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4` y dentro la
+  **misma grilla** que la cabecera (`grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2`) para que el
+  ritmo no cambie al abrir.
+- **A11y:** `<button>` real con `[attr.aria-expanded]="open()"` + `aria-controls="<id>"`.
+- **Cuándo NO:** si los campos son primarios o hay muchísimos, usar tabs o una card aparte. El
+  disclosure es para "guarnición" que la mayoría de las veces no se toca.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

@@ -67,27 +67,6 @@
           />
         </div>
 
-        <!-- Fecha -->
-        <div class="flex flex-col gap-1.5">
-          <label for="fecha" class="factura-compra-recurrente-form__label">
-            {{ t().entities.facturaCompraRecurrente.form.fields.fecha }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <p-datepicker
-            inputId="fecha"
-            formControlName="fecha"
-            dateFormat="yy-mm-dd"
-            [showIcon]="true"
-            appendTo="body"
-            [fluid]="true"
-            [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
-          />
-          <lib-field-error
-            [control]="form.controls.fecha"
-            [messages]="{ required: t().entities.facturaCompraRecurrente.form.validation.required }"
-          />
-        </div>
-
         <!-- Plazo de pago -->
         <div class="flex flex-col gap-1.5">
           <label for="plazo_pago" class="factura-compra-recurrente-form__label">
@@ -98,6 +77,7 @@
             inputId="plazo_pago"
             formControlName="plazo_pago"
             [endpoint]="plazoPagoEndpoint"
+            [suggestedIndex]="0"
             [placeholder]="t().entities.facturaCompraRecurrente.form.fields.plazoPagoPlaceholder"
             [invalid]="form.controls.plazo_pago.invalid && form.controls.plazo_pago.touched"
           />
@@ -120,47 +100,101 @@
           />
         </div>
 
-        <!-- Centro de costo -->
-        <div class="flex flex-col gap-1.5">
-          <label for="centro_costo" class="factura-compra-recurrente-form__label">
-            {{ t().entities.facturaCompraRecurrente.form.fields.centroCosto }}
-          </label>
-          <lib-api-select
-            inputId="centro_costo"
-            formControlName="centro_costo"
-            [endpoint]="centroCostoEndpoint"
-            [placeholder]="t().entities.facturaCompraRecurrente.form.fields.centroCostoPlaceholder"
-          />
-        </div>
+        <!-- Centro de costo + Sede (par compacto en la mitad izquierda) -->
+        <div class="grid grid-cols-2 gap-x-3">
+          <!-- Centro de costo -->
+          <div class="flex flex-col gap-1.5">
+            <label for="centro_costo" class="factura-compra-recurrente-form__label">
+              {{ t().entities.facturaCompraRecurrente.form.fields.centroCosto }}
+            </label>
+            <lib-api-select
+              inputId="centro_costo"
+              formControlName="centro_costo"
+              [endpoint]="centroCostoEndpoint"
+              [suggestedIndex]="0"
+              [placeholder]="
+                t().entities.facturaCompraRecurrente.form.fields.centroCostoPlaceholder
+              "
+            />
+          </div>
 
-        <!-- Sede -->
-        <div class="flex flex-col gap-1.5">
-          <label for="sede" class="factura-compra-recurrente-form__label">
-            {{ t().entities.facturaCompraRecurrente.form.fields.sede }}
-          </label>
-          <lib-api-select
-            inputId="sede"
-            formControlName="sede"
-            [endpoint]="sedeEndpoint"
-            [placeholder]="t().entities.facturaCompraRecurrente.form.fields.sedePlaceholder"
-          />
-        </div>
-
-        <!-- Orden de compra -->
-        <div class="flex flex-col gap-1.5">
-          <label for="orden_compra" class="factura-compra-recurrente-form__label">
-            {{ t().entities.facturaCompraRecurrente.form.fields.ordenCompra }}
-          </label>
-          <input
-            id="orden_compra"
-            pInputText
-            formControlName="orden_compra"
-            maxlength="50"
-            class="w-full"
-          />
+          <!-- Sede -->
+          <div class="flex flex-col gap-1.5">
+            <label for="sede" class="factura-compra-recurrente-form__label">
+              {{ t().entities.facturaCompraRecurrente.form.fields.sede }}
+            </label>
+            <lib-api-select
+              inputId="sede"
+              formControlName="sede"
+              [endpoint]="sedeEndpoint"
+              [placeholder]="t().entities.facturaCompraRecurrente.form.fields.sedePlaceholder"
+            />
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- ── Datos adicionales (disclosure colapsable) ────────────────────────
+         Metadatos poco relevantes (orden de compra y comentario). Colapsados
+         por defecto: cuestan una sola línea y no compiten con la cabecera
+         principal. Borders-only, muted — reusa el idioma del acordeón del
+         sidebar. -->
+    <button
+      type="button"
+      (click)="toggleAdicionales()"
+      [attr.aria-expanded]="adicionalesOpen()"
+      aria-controls="factura-compra-recurrente-adicionales"
+      class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-left transition-colors hover:bg-[rgba(20,48,73,0.04)]"
+    >
+      <i
+        class="pi pi-chevron-right text-[0.7rem] text-brand-muted transition-transform"
+        [class.rotate-90]="adicionalesOpen()"
+      ></i>
+      <span class="text-[0.85rem] font-medium text-brand-muted">
+        {{ t().entities.facturaCompraRecurrente.form.adicionales.title }}
+      </span>
+      <span class="ml-auto text-[0.72rem] text-brand-muted">
+        {{ t().entities.facturaCompraRecurrente.form.adicionales.hint }}
+      </span>
+    </button>
+
+    @if (adicionalesOpen()) {
+      <div
+        id="factura-compra-recurrente-adicionales"
+        class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4"
+      >
+        <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+          <!-- Orden de compra -->
+          <div class="flex flex-col gap-1.5">
+            <label for="orden_compra" class="factura-compra-recurrente-form__label">
+              {{ t().entities.facturaCompraRecurrente.form.fields.ordenCompra }}
+            </label>
+            <input
+              id="orden_compra"
+              pInputText
+              formControlName="orden_compra"
+              maxlength="50"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Comentario -->
+          <div class="flex flex-col gap-1.5 sm:col-span-2">
+            <label for="comentario" class="factura-compra-recurrente-form__label">
+              {{ t().entities.facturaCompraRecurrente.form.fields.comentario }}
+            </label>
+            <textarea
+              id="comentario"
+              pTextarea
+              formControlName="comentario"
+              rows="3"
+              maxlength="500"
+              class="w-full"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    }
   </section>
 
   <!-- ── Sección: Detalles (líneas comerciales) ───────────────────────────── -->

@@ -8,8 +8,8 @@
  *
  * Es una **plantilla** de la familia comercial (mismas líneas ítem/cantidad/
  * precio que la factura de compra) desde la que luego se generan facturas reales.
- * Suma a la cabecera el plazo/forma de pago, el centro de costo, la sede y la
- * orden de compra.
+ * Suma a la cabecera el plazo/forma de pago, el centro de costo, la sede, la
+ * orden de compra y el comentario.
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
@@ -27,6 +27,7 @@ export interface FacturaCompraRecurrenteRead extends DocumentoReadBase {
   readonly sede: number | null;
   readonly sede_nombre?: string | null;
   readonly orden_compra: string | null;
+  readonly comentario: string | null;
 }
 
 /** Body (POST/PATCH) de una factura de compra recurrente. */
@@ -36,6 +37,7 @@ export interface FacturaCompraRecurrentePayload extends DocumentoPayloadBase {
   readonly centro_costo: number | null;
   readonly sede: number | null;
   readonly orden_compra: string | null;
+  readonly comentario: string | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
 }

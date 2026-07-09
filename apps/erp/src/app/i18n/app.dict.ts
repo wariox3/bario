@@ -1449,6 +1449,7 @@ export interface AppDict extends AuthTranslationsHost {
         createTitle: string;
         editTitle: string;
         sectionHint: string;
+        adicionales: { title: string; hint: string };
         fields: {
           proveedor: string;
           proveedorPlaceholder: string;
@@ -1462,6 +1463,7 @@ export interface AppDict extends AuthTranslationsHost {
           sede: string;
           sedePlaceholder: string;
           ordenCompra: string;
+          comentario: string;
         };
         validation: { required: string };
         toasts: {

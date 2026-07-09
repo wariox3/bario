@@ -2020,6 +2020,7 @@ export const es: AppDict = {
         createTitle: 'Nueva factura recurrente',
         editTitle: 'Editar factura recurrente',
         sectionHint: 'Plantilla desde la que se generan las facturas',
+        adicionales: { title: 'Datos adicionales', hint: 'opcional' },
         fields: {
           proveedor: 'Proveedor',
           proveedorPlaceholder: 'Buscar proveedor…',
@@ -2033,6 +2034,7 @@ export const es: AppDict = {
           sede: 'Sede',
           sedePlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
         },
         validation: { required: 'Este campo es requerido' },
         toasts: {
