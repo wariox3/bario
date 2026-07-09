@@ -169,6 +169,14 @@ export const es: AppDict = {
       settings: 'Configuración',
       logout: 'Cerrar sesión',
     },
+    appSwitcher: {
+      triggerLabel: 'Abrir aplicaciones',
+      heading: 'Aplicaciones',
+      comingSoon: 'Próximamente',
+      apps: {
+        turnos: { name: 'Turnos', description: 'Gestión de turnos' },
+      },
+    },
   },
   documentActions: {
     generar: {

@@ -169,6 +169,14 @@ export const en: AppDict = {
       settings: 'Settings',
       logout: 'Sign out',
     },
+    appSwitcher: {
+      triggerLabel: 'Open applications',
+      heading: 'Applications',
+      comingSoon: 'Coming soon',
+      apps: {
+        turnos: { name: 'Turnos', description: 'Shift management' },
+      },
+    },
   },
   documentActions: {
     generar: {

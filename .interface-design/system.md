@@ -128,6 +128,44 @@ Ejemplo vivo: "Datos adicionales" (orden de compra, prefijo/número, comentario)
 - **Cuándo NO:** si los campos son primarios o hay muchísimos, usar tabs o una card aparte. El
   disclosure es para "guarnición" que la mayoría de las veces no se toca.
 
+## Patrón: app-switcher (constelación de apps reddoc)
+
+`shared/app-switcher/` — waffle en `app-header__actions` (izquierda del user-menu, en
+workspace-layout y shell-layout) para saltar a apps hermanas del monorepo (turnos, luego más).
+Enchufado en ambos layouts. **No usa PrimeNG**: panel custom con signals (mejor UX de hover y
+control total del look; `p-popover`/`p-megaMenu` no encajan con tiles de monograma ni con hover).
+
+- **Trigger:** `pi pi-th-large`, `32×32`, mismo tratamiento que la hamburguesa
+  (hover/activo `rgba(19 38 60 / 0.06)`, radius `6px`, ícono muted→text).
+- **Interacción:** `open = signal(false)`. Hover para abrir con **gracia de 150ms** al salir
+  (`CLOSE_DELAY_MS`, no perder el panel al cruzar el gap) + **click** (touch/teclado) + `Escape`
+  - click-fuera (`@HostListener('document:click')`, narrow con `target instanceof Node`). A11y:
+    trigger con `aria-haspopup`, `[attr.aria-expanded]`, `aria-controls`; panel `role="menu"`, items
+    `role="menuitem"`.
+- **Panel:** `position:absolute; top:calc(100% + 8px); right:0; z-index:60` (sobre el header z-50),
+  `width:260px`, `#fff`, borde `rgba(19 38 60 / 0.08)`, radius `10px`. Overlay flotante → excepción
+  al borders-only: whisper-shadow `0 10px 30px rgba(19 38 60 / 0.1)` + animación de entrada `0.12s`
+  (`translateY(-4px)→0`, `opacity`). Encabezado como `group-label` (uppercase `0.65rem/600` muted
+  `opacity .7`).
+- **Grilla waffle:** `grid-template-columns: repeat(2, 1fr); gap:0.25rem`. Cada app = `<a>` columna
+  centrada, hover `rgba(19 38 60 / 0.04)`, radius `8px`, `target="_blank" rel="noopener"`.
+- **Tile = identidad reddoc:** monograma `44×44` navy (`var(--brand-navy)`) radius `10px` + glifo
+  blanco (`pi` de dominio; turnos → `pi pi-clock`). Es el mismo idioma del `tenant-badge`: la
+  constelación de apps se lee como una familia, no como un dropdown genérico. Nombre debajo
+  `0.8rem/500 --brand-text`.
+- **Placeholder de crecimiento:** tile "Próximamente" con `background:transparent`, borde
+  `1px dashed rgba(19 38 60 / 0.2)`, `pi pi-plus` muted, `aria-hidden`. Rellena la grilla con 1 sola
+  app y anticipa lo que viene.
+- **Registro progresivo** (`app-switcher.constants.ts`): `SwitcherApp[]` tipado
+  (`id`, `icon`, `url:(env)=>env.<app>Url`, `name/description:(d:AppDict)=>…`). Agregar app =
+  1 entrada + bloque i18n `layout.appSwitcher.apps.<id>` + URL en los 3 environments del ERP +
+  campo en `ReddocEnvironment` (`libs/core/tokens.ts`). El componente **filtra por URL presente**
+  (`flatMap` → `[]` si `undefined`): una app sin URL en ese entorno no se muestra → rollout sin
+  tocar el componente. Navegar a otra app = leer su `env.<app>Url` (mismo patrón que "Gestionar
+  cuenta" con `cuentaUrl` en user-menu).
+- **A futuro:** cuando se necesite en turnos/pos/etc., promover a `@reddoc/ui` con un token de
+  registro. Reemplazar el monograma por SVG real cuando exista en `libs/ui/src/assets/logos/`.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

@@ -142,6 +142,14 @@ export interface AppDict extends AuthTranslationsHost {
       settings: string;
       logout: string;
     };
+    appSwitcher: {
+      triggerLabel: string;
+      heading: string;
+      comingSoon: string;
+      apps: {
+        turnos: { name: string; description: string };
+      };
+    };
   };
   documentActions: {
     generar: {

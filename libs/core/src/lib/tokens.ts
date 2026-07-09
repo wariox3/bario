@@ -13,6 +13,7 @@ export interface ReddocEnvironment {
   turnstileSiteKey: string;
   landingUrl?: string;
   cuentaUrl?: string;
+  turnosUrl?: string;
   wompiPublicKey?: string;
   /**
    * Origen al que Wompi va a devolver al usuario tras el checkout (`redirect-url`).

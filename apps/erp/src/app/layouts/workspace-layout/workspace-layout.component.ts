@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { DrawerModule } from 'primeng/drawer';
 import { I18nService, TenantService } from '@reddoc/core';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
+import { AppSwitcherComponent } from '../../shared/app-switcher/app-switcher.component';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ModuleBarComponent } from '../module-bar/module-bar.component';
@@ -33,6 +34,7 @@ import type {
     NgTemplateOutlet,
     DrawerModule,
     UserMenuComponent,
+    AppSwitcherComponent,
     ModuleBarComponent,
     TenantBadgeComponent,
   ],
