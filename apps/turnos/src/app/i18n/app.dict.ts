@@ -1,6 +1,8 @@
+import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
 import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
 
-export interface AppDict extends AuthTranslationsHost, AppSwitcherTranslationsHost {
+export interface AppDict
+  extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
   common: {
     comingSoon: string;
     actions: {

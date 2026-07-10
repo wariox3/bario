@@ -1,6 +1,8 @@
+import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
 import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
 
-export interface AppDict extends AuthTranslationsHost, AppSwitcherTranslationsHost {
+export interface AppDict
+  extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
   common: {
     comingSoon: string;
     actions: {
@@ -1810,134 +1812,6 @@ export interface AppDict extends AuthTranslationsHost, AppSwitcherTranslationsHo
           salario: string;
         };
         notFound: { title: string; desc: string };
-      };
-    };
-  };
-  contenedores: {
-    list: {
-      title: string;
-      subtitle: string;
-      newButton: string;
-      searchPlaceholder: string;
-      enter: string;
-      status: { active: string; inactive: string };
-      summary: {
-        containers: { one: string; other: string };
-        active: { one: string; other: string };
-      };
-      actions: {
-        menuLabel: string;
-        invite: string;
-        edit: string;
-        updateSubscription: string;
-        delete: string;
-      };
-      view: {
-        list: string;
-        grid: string;
-      };
-      empty: {
-        noResults: { title: string; sub: string };
-        noContenedores: { title: string; sub: string; cta: string };
-      };
-      expired: {
-        badge: string;
-        ownerCta: string;
-        memberLocked: string;
-      };
-    };
-    create: {
-      title: string;
-      subtitle: string;
-      fields: {
-        name: string;
-        namePlaceholder: string;
-        phone: string;
-        phonePlaceholder: string;
-        email: string;
-        emailPlaceholder: string;
-      };
-      validation: {
-        nameRequired: string;
-        nameMin2: string;
-        phoneRequired: string;
-        phoneMax20: string;
-        emailRequired: string;
-        emailInvalid: string;
-      };
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    edit: {
-      title: string;
-      subtitle: string;
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    delete: {
-      title: string;
-      subtitle: string;
-      warning: string;
-      containerLabel: string;
-      confirmLabel: string;
-      confirmError: string;
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    invite: {
-      title: string;
-      subtitle: string;
-      tabs: { members: string; pending: string };
-      form: {
-        label: string;
-        placeholder: string;
-        invalid: string;
-        submit: string;
-        sending: string;
-      };
-      pending: {
-        estados: { P: string; A: string; R: string };
-        count: { one: string; other: string };
-        empty: { title: string; sub: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-      members: {
-        title: string;
-        count: { one: string; other: string };
-        empty: { title: string; sub: string };
-        you: string;
-        roles: {
-          propietario: string;
-          administrador: string;
-          usuario: string;
-        };
-        removeAria: string;
-      };
-      remove: {
-        title: string;
-        desc: string;
-        confirm: string;
-        cancel: string;
-      };
-      close: string;
-      toasts: {
-        sent: { title: string; desc: string };
-        sendError: { title: string; desc: string };
-        removed: { title: string; desc: string };
-        removeError: { title: string; desc: string };
-        loadError: { title: string; desc: string };
       };
     };
   };

@@ -1,9 +1,11 @@
+import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
 import { appSwitcherEs, authEs } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
   auth: authEs,
   appSwitcher: appSwitcherEs,
+  contenedores: contenedoresEs,
   common: {
     comingSoon: 'Próximamente disponible.',
     actions: {

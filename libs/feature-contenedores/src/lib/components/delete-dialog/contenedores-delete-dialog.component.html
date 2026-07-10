@@ -1,0 +1,36 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [style]="{ width: '460px' }"
+  styleClass="cp-delete-dialog"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-red-50">
+        <i class="pi pi-trash text-[1.1rem] text-red-600"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-red-700">
+          {{ t().contenedores.delete.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ t().contenedores.delete.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Body -->
+  @if (visible()) {
+    <lib-contenedor-delete-form
+      [contenedor]="contenedor()"
+      (deleted)="onDeleted()"
+      (cancelled)="onCancel()"
+    />
+  }
+</p-dialog>

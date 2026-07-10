@@ -1,0 +1,125 @@
+<div
+  role="button"
+  [attr.tabindex]="isExpired() && !isOwner() ? -1 : 0"
+  class="cl-row"
+  [class.cl-row--expired]="isExpired()"
+  [class.cl-row--locked]="isExpired() && !isOwner()"
+  [style.--i]="index()"
+  (click)="onActivate()"
+  (keydown.enter)="onActivate()"
+  (keydown.space)="$event.preventDefault(); onActivate()"
+>
+  <!-- Monogram -->
+  <span class="cl-row__monogram" aria-hidden="true">{{ avatarLabel() }}</span>
+
+  <!-- Main: nombre + meta -->
+  <span class="cl-row__main">
+    <span class="cl-row__nombre">{{ contenedor().nombre }}</span>
+    <span class="cl-row__meta">
+      <i class="pi pi-globe cl-row__meta-icon" aria-hidden="true"></i>
+      <span class="cl-row__domain">{{ contenedor().dominio }}</span>
+      <span
+        class="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
+        [ngClass]="
+          isOwner()
+            ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+            : 'bg-slate-50 text-slate-600 border-slate-200'
+        "
+      >
+        @if (isOwner()) {
+          <i class="pi pi-crown text-[0.6rem]" aria-hidden="true"></i>
+        }
+        {{ contenedor().rol_nombre }}
+      </span>
+      @if (!contenedor().activo) {
+        <span
+          class="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+          Inactivo
+        </span>
+      }
+    </span>
+  </span>
+
+  <!-- Suscripción: plan pill + fecha de vencimiento -->
+  @if (contenedor().suscripcion_suscripcion_tipo_nombre) {
+    <span class="cl-row__suscripcion hidden sm:flex flex-col items-end gap-1 shrink-0">
+      @if (isExpired()) {
+        <span
+          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[0.68rem] font-semibold leading-none border bg-rose-50 text-rose-700 border-rose-200"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block shrink-0"></span>
+          {{ expiredBadgeLabel() }}
+          <span class="opacity-60">· {{ contenedor().suscripcion_suscripcion_tipo_nombre }}</span>
+        </span>
+      } @else {
+        <span
+          class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[0.68rem] font-semibold leading-none border"
+          [ngClass]="{
+            'bg-amber-50 text-amber-700 border-amber-200':
+              contenedor().suscripcion_frecuencia === 'P',
+            'bg-sky-50 text-sky-700 border-sky-200': contenedor().suscripcion_frecuencia === 'M',
+            'bg-emerald-50 text-emerald-700 border-emerald-200':
+              contenedor().suscripcion_frecuencia === 'A',
+          }"
+        >
+          <span
+            class="w-1.5 h-1.5 rounded-full inline-block shrink-0"
+            [ngClass]="{
+              'bg-amber-500': contenedor().suscripcion_frecuencia === 'P',
+              'bg-sky-500': contenedor().suscripcion_frecuencia === 'M',
+              'bg-emerald-500': contenedor().suscripcion_frecuencia === 'A',
+            }"
+          ></span>
+          {{ contenedor().suscripcion_suscripcion_tipo_nombre }}
+          @if (frecuenciaLabel()) {
+            <span class="opacity-60">· {{ frecuenciaLabel() }}</span>
+          }
+        </span>
+        @if (contenedor().suscripcion_fecha_fin) {
+          <span
+            class="inline-flex mt-2 items-center gap-1 text-[0.65rem] leading-none text-brand-muted"
+          >
+            <i class="pi pi-calendar text-[0.9em]"></i>
+            {{ expiryLabel() }}
+          </span>
+        }
+      }
+    </span>
+  }
+
+  <!-- CTA -->
+  @if (isExpired()) {
+    @if (isOwner() && canRenew()) {
+      <span class="cl-row__cta cl-row__cta--renew">
+        {{ renewLabel() }}
+        <i class="pi pi-external-link" aria-hidden="true"></i>
+      </span>
+    } @else {
+      <span class="cl-row__locked-msg">
+        <i class="pi pi-lock text-[0.7rem]" aria-hidden="true"></i>
+        {{ memberLockedLabel() }}
+      </span>
+    }
+  } @else {
+    <span class="cl-row__cta">
+      {{ enterLabel() }}
+      <i class="pi pi-arrow-right" aria-hidden="true"></i>
+    </span>
+  }
+
+  <!-- Acción -->
+  @if (isOwner() && showMenu()) {
+    <button
+      type="button"
+      class="cl-row__action"
+      [attr.aria-label]="menuLabel()"
+      (click)="$event.stopPropagation(); menuOpen.emit($event)"
+      (keydown.enter)="$event.stopPropagation()"
+      (keydown.space)="$event.stopPropagation()"
+    >
+      <i class="pi pi-cog" aria-hidden="true"></i>
+    </button>
+  }
+</div>

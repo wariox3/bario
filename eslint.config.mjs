@@ -21,7 +21,21 @@ export default [
           // cualquier proyecto y este `allow` los exime del boundary global. La
           // barrera cross-app (que una app no importe el alias de la otra) NO la
           // da este `allow`, sino los overrides `no-restricted-imports` de abajo.
-          allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$', '^@erp/', '^@turnos/'],
+          //
+          // `@reddoc/feature-contenedores/i18n` es el entry point del diccionario.
+          // El lib se carga lazy (`loadComponent`), pero `provideI18n` recibe un
+          // objeto estático y cada `app.es.ts` tiene que importarlo eager. La regla
+          // "static imports of lazy-loaded libraries" es de granularidad proyecto y
+          // no ve que `src/i18n.ts` no importa `src/index.ts`: son grafos disjuntos,
+          // así que el chunk lazy del componente sobrevive. Eximimos ese specifier
+          // exacto, no el barrel: importar `@reddoc/feature-contenedores` estático
+          // sigue siendo un error, que es lo que de verdad rompería la laziness.
+          allow: [
+            '^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$',
+            '^@erp/',
+            '^@turnos/',
+            '^@reddoc/feature-contenedores/i18n$',
+          ],
           depConstraints: [
             {
               sourceTag: '*',
