@@ -3,6 +3,7 @@ export interface BaseUsuario {
   email: string;
   role?: string;
   nombre_corto?: string | null;
+  celular?: string | null;
   imagen?: string | null;
   imagen_thumbnail?: string | null;
 }
