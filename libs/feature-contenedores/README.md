@@ -32,22 +32,22 @@ Cada app declara qué acciones habilita, como `data` de su ruta de contenedores.
 `InjectionToken` justamente porque `app.config.ts` tendría que importarlo estático desde este lib:
 
 ```ts
-// apps/turnos/src/app/features/contenedores/contenedores.routes.ts
+// apps/<app>/src/app/features/contenedores/contenedores.routes.ts
 import type { ContenedoresCapabilities } from '@reddoc/feature-contenedores'; // se borra al compilar
 
-const TURNOS_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
-  create: false,
-  edit: false,
-  invite: false,
+const APP_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
+  create: true,
+  edit: true,
+  invite: false, // esta app no gestiona miembros
   delete: false,
   subscription: true,
-  viewToggle: false,
+  viewToggle: true,
 };
 
 export const CONTENEDORES_ROUTES: Route[] = [
   {
     path: '',
-    data: { capabilities: TURNOS_CONTENEDORES_CAPABILITIES },
+    data: { capabilities: APP_CONTENEDORES_CAPABILITIES },
     loadComponent: () =>
       import('@reddoc/feature-contenedores').then((m) => m.ContenedoresListComponent),
   },
@@ -56,6 +56,10 @@ export const CONTENEDORES_ROUTES: Route[] = [
 
 `withComponentInputBinding()` ata `data.capabilities` al input del componente. Si no se pasa nada, el
 default es `CONTENEDORES_CAPABILITIES_FULL`.
+
+Escribí las seis banderas a mano aunque las quieras todas en `true`. `CONTENEDORES_CAPABILITIES_FULL`
+es un **valor** del barrel principal, así que importarlo desde las rutas de la app sería un import
+estático del lib — exactamente lo que colapsa el chunk lazy. Hoy erp y turnos habilitan las seis.
 
 ## Qué necesita la app que lo consuma
 

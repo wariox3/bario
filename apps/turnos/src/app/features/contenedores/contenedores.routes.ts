@@ -2,18 +2,19 @@ import type { Route } from '@angular/router';
 import type { ContenedoresCapabilities } from '@reddoc/feature-contenedores';
 
 /**
- * Turnos puede elegir empresa, crear una nueva y alternar la vista. Editar,
- * invitar y eliminar siguen siendo exclusivos del ERP.
+ * Turnos administra contenedores igual que el ERP: las seis acciones habilitadas.
  *
- * `subscription` queda en `true` a propósito: si el propietario entra con la
- * suscripción vencida, `enterContenedor` le bloquea el paso, y sin ese botón no
- * tendría cómo llegar a cuenta a renovar.
+ * Se escriben una por una en vez de reusar `CONTENEDORES_CAPABILITIES_FULL`: esa
+ * constante es un valor del barrel `@reddoc/feature-contenedores`, e importarla
+ * acá sería un import estático del lib, que es justo lo que colapsa su chunk lazy
+ * contra el bundle inicial. `ContenedoresCapabilities` sí se puede traer porque
+ * es un `import type` y TypeScript lo borra al compilar.
  */
 const TURNOS_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   create: true,
-  edit: false,
-  invite: false,
-  delete: false,
+  edit: true,
+  invite: true,
+  delete: true,
   subscription: true,
   viewToggle: true,
 };
