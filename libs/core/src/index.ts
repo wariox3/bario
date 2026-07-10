@@ -111,6 +111,7 @@ export {
   TenantService,
   tenantGuard,
   tenantAccessGuard,
+  clearTenantGuard,
   rootRedirectGuard,
   TENANT_SCOPED,
   LAST_TENANT_KEY,

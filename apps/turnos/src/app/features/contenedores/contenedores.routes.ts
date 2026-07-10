@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { clearTenantGuard } from '@reddoc/core';
 import type { ContenedoresCapabilities } from '@reddoc/feature-contenedores';
 
 /**
@@ -22,6 +23,7 @@ const TURNOS_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
 export const CONTENEDORES_ROUTES: Route[] = [
   {
     path: '',
+    canActivate: [clearTenantGuard],
     data: { capabilities: TURNOS_CONTENEDORES_CAPABILITIES },
     loadComponent: () =>
       import('@reddoc/feature-contenedores').then((m) => m.ContenedoresListComponent),
