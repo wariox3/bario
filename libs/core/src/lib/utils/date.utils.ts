@@ -56,6 +56,13 @@ export function daysBetween(a: Date, b: Date): number {
   return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
 
+/** Nueva fecha desplazada `days` días (±), preservando la hora local (sin corrimiento UTC). */
+export function addDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
 /** `HH:mm:ss` → `HH:mm`; `null` si el valor no viene o es más corto que `HH:mm`. */
 function horaCorta(hora: string | null): string | null {
   return hora && hora.length >= 5 ? hora.slice(0, 5) : null;

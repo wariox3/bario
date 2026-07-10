@@ -29,16 +29,13 @@ import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-br
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService } from '@reddoc/core';
+import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
-import {
-  METODO_PAGO_ENDPOINT,
-  PLAZO_PAGO_ENDPOINT,
-  SEDE_ENDPOINT,
-} from '../../factura-compra.constants';
+import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-compra.constants';
+import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -48,11 +45,6 @@ import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import { facturaCompraToFormValue, formValueToPayload } from '../../factura-compra.mapper';
 import type { FacturaCompraRead } from '../../factura-compra.model';
-
-/** Fila del endpoint `plazo-pago/seleccionar/` con los días que aporta el plazo. */
-interface PlazoPagoOption extends ErpSelectOption {
-  readonly dias?: number | null;
-}
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de compra.
@@ -106,7 +98,7 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
-  protected readonly plazoPagoEndpoint = PLAZO_PAGO_ENDPOINT;
+  protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
 
@@ -135,9 +127,6 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   });
   protected readonly isSaving = signal(false);
 
-  /** Mapa `idPlazo → días` para autocalcular la fecha de vencimiento. */
-  private readonly plazoDias = new Map<number, number>();
-
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     compraDocumentoBreadcrumb(
       this.t(),
@@ -159,20 +148,18 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   });
 
   constructor() {
-    // Autocálculo del vencimiento: al cambiar fecha o plazo, vencimiento =
-    // fecha + días del plazo. El campo sigue siendo editable; las ediciones
-    // manuales se conservan hasta el próximo cambio de fecha/plazo.
-    const recompute = () => this.recomputeVencimiento();
-    this.form.controls.fecha.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(recompute);
-    this.form.controls.plazo_pago.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(recompute);
+    // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
+    setupVencimientoAutocompute({
+      fecha: this.form.controls.fecha,
+      plazoPago: this.form.controls.plazo_pago,
+      fechaVence: this.form.controls.fecha_vence,
+      selectData: this.selectData,
+      destroyRef: this.destroyRef,
+      endpoint: this.plazoPagoEndpoint,
+    });
   }
 
   ngOnInit(): void {
-    this.loadPlazoDias();
     const id = this.id();
     if (!id) return;
     // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
@@ -345,38 +332,6 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   private notifyLoadError(): void {
     const toasts = this.t().entities.facturaCompra.form.toasts;
     this.toast.error(toasts.loadError.title, toasts.loadError.desc);
-  }
-
-  /** Carga el mapa `idPlazo → días` para el autocálculo del vencimiento. */
-  private loadPlazoDias(): void {
-    this.selectData
-      .fetchOptions<PlazoPagoOption>(PLAZO_PAGO_ENDPOINT)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (plazos) => {
-          for (const plazo of plazos) {
-            if (plazo.dias != null) this.plazoDias.set(plazo.id, plazo.dias);
-          }
-          // Si ya hay fecha + plazo elegidos, refrescar el vencimiento.
-          this.recomputeVencimiento();
-        },
-        error: () => {
-          // Sin días disponibles el vencimiento queda manual (sigue editable).
-        },
-      });
-  }
-
-  /** vencimiento = fecha + días del plazo (si ambos y los días están disponibles). */
-  private recomputeVencimiento(): void {
-    const fecha = this.form.controls.fecha.value;
-    const plazoId = this.form.controls.plazo_pago.value?.id;
-    if (!fecha || plazoId == null) return;
-    const dias = this.plazoDias.get(plazoId);
-    if (dias == null) return;
-
-    const vencimiento = new Date(fecha);
-    vencimiento.setDate(vencimiento.getDate() + dias);
-    this.form.controls.fecha_vence.setValue(vencimiento, { emitEvent: false });
   }
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */

@@ -1,7 +1,5 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 
-/** Endpoint `seleccionar` del plazo de pago (alimenta el autocálculo de vencimiento). */
-export const PLAZO_PAGO_ENDPOINT = '/general/plazo-pago/seleccionar/';
 /** Endpoint `seleccionar` de sedes. */
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /** Endpoint `seleccionar` de métodos de pago. */

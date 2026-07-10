@@ -61,6 +61,7 @@ export {
   toHora,
   fromHora,
   daysBetween,
+  addDays,
   formatHorario,
   anioMesDeIso,
   diasDelMes,
