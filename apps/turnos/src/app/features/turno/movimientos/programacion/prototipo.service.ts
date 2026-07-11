@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable, forkJoin, map } from 'rxjs';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import {
+  BaseHttpService,
+  buildListBody,
+  buildListParams,
+  type ListQuery,
+  type PaginatedResponse,
+} from '@reddoc/core';
 import type { Prototipo, PrototipoPayload } from './prototipo.model';
 
 /**
@@ -20,12 +26,30 @@ export class PrototipoService extends BaseHttpService {
   /**
    * Lista las filas de prototipo de un puesto: `GET /turno/prototipo/` filtrado
    * por `documento_detalle`. La respuesta es paginada (DRF), así que se mapea a
-   * `results`.
+   * `results`. Lo usa el modal de prototipo dentro de la programación.
    */
-  list(documentoDetalleId: number): Observable<readonly Prototipo[]> {
+  listByDetalle(documentoDetalleId: number): Observable<readonly Prototipo[]> {
     return this.get<PaginatedResponse<Prototipo>>(this.resourcePath, {
       documento_detalle: documentoDetalleId,
     }).pipe(map((res) => res.results));
+  }
+
+  /**
+   * Listado paginado para el **administrador de prototipos** (master de solo
+   * lectura): `POST /turno/prototipo/lista/` con `{ filtros, ordenamientos }` y
+   * la paginación por query params, igual que el resto de masters del módulo.
+   */
+  list(query: ListQuery): Observable<PaginatedResponse<Prototipo>> {
+    return this.post<PaginatedResponse<Prototipo>>(
+      `${this.resourcePath}lista/`,
+      buildListBody(query),
+      buildListParams(query),
+    );
+  }
+
+  /** Ficha de un prototipo por id (`GET /turno/prototipo/:id/`) — detalle del master. */
+  getById(id: number): Observable<Prototipo> {
+    return this.get<Prototipo>(`${this.resourcePath}${id}/`);
   }
 
   create(payload: PrototipoPayload): Observable<Prototipo> {

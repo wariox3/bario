@@ -219,7 +219,7 @@ export class ProgramacionPrototipoModalComponent {
   private cargarLista(documentoDetalleAfectadoId: number): void {
     this.cargandoLista.set(true);
     this.service
-      .list(documentoDetalleAfectadoId)
+      .listByDetalle(documentoDetalleAfectadoId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.cargandoLista.set(false)),

@@ -300,6 +300,40 @@ export const es: AppDict = {
         },
       },
     },
+    prototipo: {
+      name: 'Prototipos',
+      columns: {
+        id: 'ID',
+        documento: 'Documento',
+        puesto: 'Puesto',
+        contrato: 'Contrato',
+        secuencia: 'Secuencia',
+        fechaInicio: 'Fecha de inicio',
+        posicion: 'Posición',
+      },
+      detail: {
+        eyebrow: 'Prototipo',
+        sections: { general: 'Documento de origen', asignacion: 'Asignación' },
+        fields: {
+          documento: 'Documento',
+          tipo: 'Tipo',
+          documentoFecha: 'Fecha del documento',
+          puesto: 'Puesto',
+          fecha: 'Período',
+          contrato: 'Contrato',
+          secuencia: 'Secuencia',
+          fechaInicio: 'Fecha de inicio',
+          posicion: 'Posición',
+        },
+        notFound: {
+          title: 'Prototipo no encontrado',
+          desc: 'El prototipo que buscás no existe o fue eliminado.',
+        },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el prototipo' },
+        },
+      },
+    },
     secuencia: {
       name: 'Secuencias',
       searchPlaceholder: 'Buscar por nombre…',

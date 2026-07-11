@@ -239,6 +239,35 @@ export interface AppDict
         toasts: { loadError: { title: string; desc: string } };
       };
     };
+    prototipo: {
+      name: string;
+      columns: {
+        id: string;
+        documento: string;
+        puesto: string;
+        contrato: string;
+        secuencia: string;
+        fechaInicio: string;
+        posicion: string;
+      };
+      detail: {
+        eyebrow: string;
+        sections: { general: string; asignacion: string };
+        fields: {
+          documento: string;
+          tipo: string;
+          documentoFecha: string;
+          puesto: string;
+          fecha: string;
+          contrato: string;
+          secuencia: string;
+          fechaInicio: string;
+          posicion: string;
+        };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
     secuencia: {
       name: string;
       searchPlaceholder: string;

@@ -297,6 +297,40 @@ export const en: AppDict = {
         },
       },
     },
+    prototipo: {
+      name: 'Prototypes',
+      columns: {
+        id: 'ID',
+        documento: 'Document',
+        puesto: 'Position',
+        contrato: 'Contract',
+        secuencia: 'Sequence',
+        fechaInicio: 'Start date',
+        posicion: 'Position no.',
+      },
+      detail: {
+        eyebrow: 'Prototype',
+        sections: { general: 'Source document', asignacion: 'Assignment' },
+        fields: {
+          documento: 'Document',
+          tipo: 'Type',
+          documentoFecha: 'Document date',
+          puesto: 'Position',
+          fecha: 'Period',
+          contrato: 'Contract',
+          secuencia: 'Sequence',
+          fechaInicio: 'Start date',
+          posicion: 'Position no.',
+        },
+        notFound: {
+          title: 'Prototype not found',
+          desc: 'The prototype you are looking for does not exist or was deleted.',
+        },
+        toasts: {
+          loadError: { title: 'Load error', desc: 'The prototype could not be loaded' },
+        },
+      },
+    },
     secuencia: {
       name: 'Sequences',
       searchPlaceholder: 'Search by name…',
