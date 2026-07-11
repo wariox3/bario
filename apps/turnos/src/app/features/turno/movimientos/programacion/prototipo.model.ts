@@ -42,6 +42,8 @@ export interface PrototipoPayload {
 export interface Prototipo extends PrototipoPayload {
   readonly id: number;
   readonly contrato_nombre?: string | null;
+  /** Nº de identificación del contacto del contrato (C.C./NIT), para el autocomplete. */
+  readonly contrato_contacto_numero_identificacion?: string | null;
   readonly secuencia_nombre?: string | null;
   readonly puesto_nombre?: string | null;
   readonly documento_numero?: number | null;

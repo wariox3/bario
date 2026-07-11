@@ -245,12 +245,17 @@ export class ProgramacionPrototipoModalComponent {
 
   // ── Fábrica de filas ─────────────────────────────────────────────────────────
 
-  /** Fila existente (desde el GET): contrato bloqueado (no se cambia el contrato). */
+  /**
+   * Fila existente (desde el GET). El contrato queda editable: se puede cambiar
+   * y el PUT lo actualiza. La identificación viene del GET
+   * (`contrato_contacto_numero_identificacion`) para que el autocomplete muestre
+   * la C.C. del contrato ya seleccionado.
+   */
   private filaDesde(r: Prototipo): FilaGroup {
     const contrato: ContratoOption = {
       id: r.contrato,
       nombre: r.contrato_nombre ?? `Contrato ${r.contrato}`,
-      numero_identificacion: '',
+      numero_identificacion: r.contrato_contacto_numero_identificacion ?? '',
     };
     const secuencia: ErpSelectOption = {
       id: r.secuencia,
@@ -259,7 +264,6 @@ export class ProgramacionPrototipoModalComponent {
     const g = this.nuevaFila();
     g.controls.id.setValue(r.id);
     g.controls.contrato.setValue(contrato);
-    g.controls.contrato.disable();
     g.controls.secuencia.setValue(secuencia);
     g.controls.fechaInicio.setValue(r.fecha_inicio);
     g.controls.posicion.setValue(r.posicion);
@@ -420,8 +424,6 @@ export class ProgramacionPrototipoModalComponent {
     documentoDetalleAfectadoId: number,
     fecha: string,
   ): PrototipoPayload {
-    // `contrato` puede estar deshabilitado (fila existente): se lee del control,
-    // no del `form.value`, que excluye los controles deshabilitados.
     const contrato = g.controls.contrato.value;
     const secuencia = g.controls.secuencia.value;
     return {
