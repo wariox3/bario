@@ -8,6 +8,7 @@ import {
   type PaginatedResponse,
 } from '@reddoc/core';
 import type { Prototipo, PrototipoPayload } from './prototipo.model';
+import type { ProgramacionDetalleResponse } from './programacion.model';
 
 /**
  * Servicio HTTP del **prototipo** de turnos (`/turno/prototipo`).
@@ -62,18 +63,35 @@ export class PrototipoService extends BaseHttpService {
 
   /**
    * Simula (dry-run) los turnos que generaría el prototipo del puesto sin
-   * persistirlos: `POST /turno/prototipo/simular/` con
-   * `{ documento_detalle, anio, mes }`. El año/mes los elige el usuario en el
-   * modal (selector de la barra de acciones) para simular el período deseado.
+   * persistirlos: `POST /turno/programacion-simulacion/simular/` con
+   * `{ documento_detalle_id, anio, mes }`. Es un recurso aparte del prototipo
+   * (no cuelga de `resourcePath`). El año/mes los elige el usuario en el modal
+   * (selector de la barra de acciones) para simular el período deseado.
    *
    * TODO(prototipo): tipar la respuesta cuando el backend confirme su forma
    * (por ahora `unknown`, se inspecciona en el `console.log` del componente).
    */
   simular(documentoDetalleId: number, anio: number, mes: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}simular/`, {
-      documento_detalle: documentoDetalleId,
+    return this.post<unknown>('/turno/programacion-simulacion/simular/', {
+      documento_detalle_id: documentoDetalleId,
       anio,
       mes,
+    });
+  }
+
+  /**
+   * Trae el **detalle** de la última simulación de un puesto:
+   * `GET /turno/programacion-simulacion/detalle/?documento=<documento_detalle_id>`.
+   * Se llama después de `simular` (que solo devuelve el conteo `{ creados }`) para
+   * obtener los datos con que se pinta la tabla de vista previa del modal.
+   *
+   * Devuelve el **mismo shape** que el calendario de la programación
+   * (`ProgramacionDetalleResponse`: cabecera + `fechas` + `filas`), así que la
+   * vista previa reusa esos tipos.
+   */
+  detalleSimulacion(documentoDetalleId: number): Observable<ProgramacionDetalleResponse> {
+    return this.get<ProgramacionDetalleResponse>('/turno/programacion-simulacion/detalle/', {
+      documento: documentoDetalleId,
     });
   }
 

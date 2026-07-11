@@ -203,55 +203,46 @@
     </div>
   </form>
 
-  <!-- ── Vista previa (simulación) — MAQUETA ──────────────────────────────────────
-       TODO(prototipo): alimentar `simulacion()` desde el resultado real de onSimular. -->
+  <!-- ── Vista previa (simulación) ────────────────────────────────────────────────
+       Calendario del detalle de la simulación: filas por puesto/empleado ×
+       columnas de día, con el código de turno en cada celda. -->
   <div class="mt-4 flex flex-col gap-2">
     <span class="text-[0.78rem] font-medium text-brand-muted">{{ m.preview.title }}</span>
     <div class="max-h-[22rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
       <table class="prototipo-preview">
         <thead>
           <tr>
-            <th class="prototipo-preview__th">{{ m.preview.anio }}</th>
-            <th class="prototipo-preview__th">{{ m.preview.mes }}</th>
-            <th class="prototipo-preview__th">{{ m.preview.codigo }}</th>
             <th class="prototipo-preview__th prototipo-preview__th--empleado">
               {{ m.preview.empleado }}
             </th>
-            @for (d of dias(); track d.dia) {
+            @for (f of previewFechas(); track f.clave) {
               <th
                 class="prototipo-preview__th prototipo-preview__th--dia"
-                [class.prototipo-preview__th--festivo]="
-                  d.inicial === 'D' || festivoPorDia().has(d.dia)
-                "
-                [class.prototipo-preview__th--sabado]="
-                  d.inicial === 'S' && !festivoPorDia().has(d.dia)
-                "
+                [class.prototipo-preview__th--festivo]="f.inicial === 'D'"
+                [class.prototipo-preview__th--sabado]="f.inicial === 'S'"
               >
-                <span class="prototipo-preview__dia-num">{{ d.dia }}</span>
-                <span class="prototipo-preview__dia-ini">{{ d.inicial }}</span>
+                <span class="prototipo-preview__dia-num">{{ f.etiqueta }}</span>
+                <span class="prototipo-preview__dia-ini">{{ f.inicial }}</span>
               </th>
             }
           </tr>
         </thead>
         <tbody>
-          @for (fila of simulacion(); track fila.empleado + '_' + fila.codigo) {
+          @for (fila of previewFilas(); track fila.documento_detalle_id + '_' + $index) {
             <tr class="prototipo-preview__row">
-              <td class="prototipo-preview__td tabular-nums">{{ fila.anio }}</td>
-              <td class="prototipo-preview__td tabular-nums">{{ fila.mes }}</td>
-              <td class="prototipo-preview__td">{{ fila.codigo }}</td>
               <td class="prototipo-preview__td prototipo-preview__td--empleado">
-                {{ fila.empleado }}
+                {{ fila.contrato_contacto_nombre_corto ?? fila.puesto_nombre }}
               </td>
-              @for (d of dias(); track d.dia) {
+              @for (f of previewFechas(); track f.clave) {
                 <td class="prototipo-preview__td prototipo-preview__td--dia tabular-nums">
-                  {{ fila.dias[d.dia] || '' }}
+                  {{ fila.dias[f.clave]?.turno_codigo ?? '' }}
                 </td>
               }
             </tr>
           } @empty {
             <tr>
               <td
-                [attr.colspan]="dias().length + 4"
+                [attr.colspan]="previewFechas().length + 1"
                 class="px-5 py-8 text-center text-sm text-brand-muted"
               >
                 <i class="pi pi-inbox mr-2"></i>{{ m.preview.empty }}

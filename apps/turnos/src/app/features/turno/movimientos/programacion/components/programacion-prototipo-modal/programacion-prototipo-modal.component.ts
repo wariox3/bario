@@ -18,7 +18,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Observable, finalize, forkJoin } from 'rxjs';
+import { Observable, finalize, forkJoin, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -33,16 +33,8 @@ import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-gri
 import { ProgramacionPeriodoStore } from '../programacion-agregar-contrato-modal/programacion-periodo.store';
 import { PrototipoService } from '../../prototipo.service';
 import type { Prototipo, PrototipoPayload } from '../../prototipo.model';
-
-/** Fila de la tabla de **vista previa** (simulación) — año/mes/código/empleado + días. */
-interface SimulacionFila {
-  readonly anio: number;
-  readonly mes: number;
-  readonly codigo: string;
-  readonly empleado: string;
-  /** Código de turno por número de día del mes (`dia → codigo`). */
-  readonly dias: Record<number, string>;
-}
+import type { ProgramacionDetalleResponse } from '../../programacion.model';
+import { toProgramacionFecha } from '../../programacion.utils';
 
 /** Grupo de formulario de una fila de la tabla de prototipo. */
 type FilaGroup = FormGroup<{
@@ -117,11 +109,6 @@ export class ProgramacionPrototipoModalComponent {
   protected readonly periodo = this.periodoStore.periodo;
   protected readonly cargandoPeriodo = this.periodoStore.cargando;
 
-  /** Días del período (1..N con inicial del día de semana) — columnas de la vista previa. */
-  protected readonly dias = this.periodoStore.dias;
-  /** Días festivos del mes (para resaltar columnas de la vista previa). */
-  protected readonly festivoPorDia = this.periodoStore.festivoPorDia;
-
   /** Endpoint `seleccionar` de secuencias para el `<lib-api-autocomplete>`. */
   protected readonly secuenciaEndpoint = '/turno/secuencia/seleccionar/';
 
@@ -182,13 +169,19 @@ export class ProgramacionPrototipoModalComponent {
   });
 
   /**
-   * Filas de la **vista previa** (cómo quedaría la programación simulada).
-   *
-   * Vacío hasta que `onSimular()` reciba el resultado real del backend
-   * (`/turno/prototipo/simular/`). TODO(prototipo): poblarlo con la respuesta
-   * una vez confirmada su forma (año/mes/código/empleado + turno por día).
+   * Resultado de la **vista previa**: el detalle de la simulación
+   * (`ProgramacionDetalleResponse`, mismo shape del calendario de la
+   * programación). `null` hasta que `onSimular()` trae el detalle del backend.
    */
-  protected readonly simulacion = signal<readonly SimulacionFila[]>([]);
+  protected readonly simulacion = signal<ProgramacionDetalleResponse | null>(null);
+
+  /** Columnas de día de la vista previa (normalizadas desde `simulacion().fechas`). */
+  protected readonly previewFechas = computed(() =>
+    (this.simulacion()?.fechas ?? []).map(toProgramacionFecha),
+  );
+
+  /** Filas de la vista previa (puestos/empleados con su turno por día). */
+  protected readonly previewFilas = computed(() => this.simulacion()?.filas ?? []);
 
   /**
    * Período (mes/año) elegido para **simular** (selector de la barra de acciones,
@@ -235,7 +228,7 @@ export class ProgramacionPrototipoModalComponent {
   private reset(): void {
     this.filas.clear();
     this.snapshot.clear();
-    this.simulacion.set([]);
+    this.simulacion.set(null);
     this.periodoStore.reset();
     // El próximo período (al recargar la línea) vuelve a sembrar el selector.
     this.periodoSembrado = false;
@@ -478,12 +471,11 @@ export class ProgramacionPrototipoModalComponent {
   }
 
   /**
-   * Simular: previsualiza (dry-run) los turnos que generaría el prototipo del
-   * puesto, sin persistirlos (`POST /turno/prototipo/simular/`).
-   *
-   * TODO(prototipo): por ahora solo dispara la simulación y loguea la respuesta
-   * cruda para conocer su forma; falta pintar la vista previa (año/mes/empleado
-   * × días) a partir de `simulacion()` con el resultado real.
+   * Simular: genera la simulación (dry-run) y luego trae su detalle para pintar
+   * la tabla de vista previa. Son dos pasos encadenados:
+   *  1. `simular` → crea los registros y devuelve solo el conteo (`{ creados }`).
+   *  2. `detalleSimulacion` → trae el calendario (`fechas` + `filas`) con que se
+   *     llena la tabla inferior.
    */
   protected onSimular(): void {
     const grupo = this.grupo();
@@ -508,12 +500,18 @@ export class ProgramacionPrototipoModalComponent {
     this.service
       .simular(documentoDetalleAfectadoId, anio, mes)
       .pipe(
+        // Tras simular (solo devuelve `{ creados }`), se pide el detalle con el
+        // que se llena la tabla de vista previa.
+        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
       )
       .subscribe({
-        next: (res) => console.log('[prototipo] simular →', res),
-        error: (err) => console.error('[prototipo] simular error →', err),
+        next: (detalle) => this.simulacion.set(detalle),
+        error: () => {
+          const m = this.t().entities.programacion.detail.prototipoModal;
+          this.toast.error(m.toasts.saveError.title, m.toasts.saveError.desc);
+        },
       });
   }
 

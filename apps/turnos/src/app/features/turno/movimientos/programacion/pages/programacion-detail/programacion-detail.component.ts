@@ -4,14 +4,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import {
-  I18nService,
-  INICIALES_DIA_SEMANA_ES,
-  TenantService,
-  ToastService,
-  anioMesDeIso,
-  fromIsoDate,
-} from '@reddoc/core';
+import { I18nService, TenantService, ToastService, anioMesDeIso, fromIsoDate } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@turnos/i18n';
 import { FestivoService, type Festivo } from '../../festivo.service';
@@ -22,6 +15,7 @@ import type {
   ProgramacionFecha,
   ProgramacionFila,
 } from '../../programacion.model';
+import { toProgramacionFecha } from '../../programacion.utils';
 import {
   ProgramacionGridComponent,
   type ProgramacionContratoRef,
@@ -51,18 +45,6 @@ interface CabeceraView {
 interface GridView {
   readonly fechas: readonly ProgramacionFecha[];
   readonly filas: readonly ProgramacionFila[];
-}
-
-/** Convierte un string ISO `YYYY-MM-DD` a la columna normalizada del grid. */
-function toProgramacionFecha(iso: string, _index: number): ProgramacionFecha {
-  const date = fromIsoDate(iso);
-  const dow = date ? date.getDay() : 0;
-  return {
-    clave: iso,
-    etiqueta: iso.slice(8, 10).replace(/^0/, ''),
-    inicial: INICIALES_DIA_SEMANA_ES[dow],
-    finDeSemana: dow === 0 || dow === 6,
-  };
 }
 
 /**
@@ -406,7 +388,7 @@ export class ProgramacionDetailComponent implements OnInit {
   }
 
   private parseGrid(res: ProgramacionDetalleResponse): GridView {
-    const fechas = res.fechas.map((f, i) => toProgramacionFecha(f, i));
+    const fechas = res.fechas.map(toProgramacionFecha);
     return { fechas, filas: res.filas };
   }
 }
