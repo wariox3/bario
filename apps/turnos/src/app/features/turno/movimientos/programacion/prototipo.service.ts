@@ -62,14 +62,18 @@ export class PrototipoService extends BaseHttpService {
 
   /**
    * Simula (dry-run) los turnos que generaría el prototipo del puesto sin
-   * persistirlos: `POST /turno/prototipo/simular/` con `{ documento_detalle }`.
+   * persistirlos: `POST /turno/prototipo/simular/` con
+   * `{ documento_detalle, anio, mes }`. El año/mes los elige el usuario en el
+   * modal (selector de la barra de acciones) para simular el período deseado.
    *
    * TODO(prototipo): tipar la respuesta cuando el backend confirme su forma
    * (por ahora `unknown`, se inspecciona en el `console.log` del componente).
    */
-  simular(documentoDetalleId: number): Observable<unknown> {
+  simular(documentoDetalleId: number, anio: number, mes: number): Observable<unknown> {
     return this.post<unknown>(`${this.resourcePath}simular/`, {
       documento_detalle: documentoDetalleId,
+      anio,
+      mes,
     });
   }
 

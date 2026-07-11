@@ -50,6 +50,19 @@
     <!-- Barra de acciones de la tabla: indicador "sin guardar" + eliminar
          (contextuales) a la izquierda; nuevo · simular · guardar a la derecha. -->
     <div class="flex items-center gap-2">
+      <!-- Selector de período (mes/año) para simular — bien a la izquierda. -->
+      <p-datepicker
+        [ngModel]="periodoSeleccionado()"
+        (ngModelChange)="periodoSeleccionado.set($event)"
+        [ngModelOptions]="{ standalone: true }"
+        view="month"
+        dateFormat="mm/yy"
+        [showIcon]="true"
+        [disabled]="cargandoPeriodo() || isSubmitting()"
+        [placeholder]="m.periodoLabel"
+        appendTo="body"
+      />
+
       @if (hayCambiosSinGuardar()) {
         <span
           class="inline-flex items-center gap-1.5 rounded-md bg-amber-500/10 px-2 py-1 text-[0.72rem] font-semibold text-amber-700"

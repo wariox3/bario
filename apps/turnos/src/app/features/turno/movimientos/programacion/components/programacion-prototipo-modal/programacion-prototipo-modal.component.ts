@@ -12,6 +12,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   FormControl,
+  FormsModule,
   type FormGroup,
   NonNullableFormBuilder,
   ReactiveFormsModule,
@@ -21,6 +22,7 @@ import { Observable, finalize, forkJoin } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { type ErpSelectOption, I18nService, ToastService, toIsoDate } from '@reddoc/core';
@@ -73,10 +75,12 @@ type FilaGroup = FormGroup<{
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     DialogModule,
     ButtonModule,
     ConfirmDialogModule,
     InputTextModule,
+    DatePickerModule,
     ContratoAutocompleteComponent,
     ErpApiAutocompleteComponent,
   ],
@@ -186,6 +190,17 @@ export class ProgramacionPrototipoModalComponent {
    */
   protected readonly simulacion = signal<readonly SimulacionFila[]>([]);
 
+  /**
+   * Período (mes/año) elegido para **simular** (selector de la barra de acciones,
+   * un `p-datepicker view="month"`). Se siembra con el período derivado de la
+   * línea al abrir el modal, y el usuario puede cambiarlo para simular otro mes.
+   * Independiente del período que alimenta el guardado.
+   */
+  protected readonly periodoSeleccionado = signal<Date | null>(null);
+
+  /** Guarda que el sembrado inicial del período ya se aplicó (por apertura). */
+  private periodoSembrado = false;
+
   constructor() {
     // Al abrir (puede ser para otro puesto): tabla y período recargados.
     effect(() => {
@@ -204,6 +219,15 @@ export class ProgramacionPrototipoModalComponent {
         this.cargarLista(grupo.documentoDetalleAfectadoId);
       }
     });
+
+    // Siembra el período del selector con el derivado de la línea (una vez por
+    // apertura); luego el usuario lo controla libremente hasta el próximo `reset()`.
+    effect(() => {
+      const p = this.periodo();
+      if (!p || this.periodoSembrado) return;
+      this.periodoSembrado = true;
+      this.periodoSeleccionado.set(new Date(p.anio, p.mes - 1, 1));
+    });
   }
 
   // ── Carga ───────────────────────────────────────────────────────────────────
@@ -213,6 +237,9 @@ export class ProgramacionPrototipoModalComponent {
     this.snapshot.clear();
     this.simulacion.set([]);
     this.periodoStore.reset();
+    // El próximo período (al recargar la línea) vuelve a sembrar el selector.
+    this.periodoSembrado = false;
+    this.periodoSeleccionado.set(null);
     this.bump();
   }
 
@@ -470,9 +497,16 @@ export class ProgramacionPrototipoModalComponent {
       return;
     }
 
+    // Período a simular: lo elige el usuario en el selector (sembrado con el
+    // período de la línea). Si aún no hay selección, se cae al período derivado.
+    const fecha = this.periodoSeleccionado();
+    const anio = fecha ? fecha.getFullYear() : (this.periodo()?.anio ?? null);
+    const mes = fecha ? fecha.getMonth() + 1 : (this.periodo()?.mes ?? null);
+    if (anio === null || mes === null) return;
+
     this.isSubmitting.set(true);
     this.service
-      .simular(documentoDetalleAfectadoId)
+      .simular(documentoDetalleAfectadoId, anio, mes)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),

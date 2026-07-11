@@ -554,6 +554,7 @@ export const en: AppDict = {
           codigoLabel: 'Code',
           clienteLabel: 'Client',
           puestoLabel: 'Position',
+          periodoLabel: 'Period',
           columns: {
             contrato: 'Contract',
             secuencia: 'Sequence',
