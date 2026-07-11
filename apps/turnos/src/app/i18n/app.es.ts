@@ -546,6 +546,7 @@ export const es: AppDict = {
           close: 'Cerrar',
           validacion: 'Completá contrato, secuencia y fecha de inicio en todas las filas.',
           sinCambios: 'No hay cambios para guardar.',
+          sinAfectado: 'Este puesto no tiene documento afectado, no se puede guardar el prototipo.',
           sinGuardar: 'Cambios sin guardar',
           descartar: {
             header: 'Cambios sin guardar',

@@ -540,6 +540,7 @@ export const en: AppDict = {
           close: 'Close',
           validacion: 'Fill in contract, sequence and start date in every row.',
           sinCambios: 'There are no changes to save.',
+          sinAfectado: 'This position has no affected document; the prototype cannot be saved.',
           sinGuardar: 'Unsaved changes',
           descartar: {
             header: 'Unsaved changes',

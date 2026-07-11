@@ -193,11 +193,16 @@ export class ProgramacionPrototipoModalComponent {
       this.reset();
       const grupo = this.grupo();
       if (!grupo) return;
+      // El período (mes/año) se deriva de la línea real de programación.
       this.periodoStore.cargarDesdeLinea(grupo.documentoDetalleId, () => {
         const ts = this.t().common.toasts.loadError;
         this.toast.error(ts.title, ts.desc);
       });
-      this.cargarLista(grupo.documentoDetalleId);
+      // Las filas del prototipo se listan por el detalle afectado (su FK). Si el
+      // puesto no tiene documento afectado no hay nada guardado que listar.
+      if (grupo.documentoDetalleAfectadoId !== null) {
+        this.cargarLista(grupo.documentoDetalleAfectadoId);
+      }
     });
   }
 
@@ -211,10 +216,10 @@ export class ProgramacionPrototipoModalComponent {
     this.bump();
   }
 
-  private cargarLista(documentoDetalleId: number): void {
+  private cargarLista(documentoDetalleAfectadoId: number): void {
     this.cargandoLista.set(true);
     this.service
-      .list(documentoDetalleId)
+      .list(documentoDetalleAfectadoId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.cargandoLista.set(false)),
@@ -353,9 +358,19 @@ export class ProgramacionPrototipoModalComponent {
     if (!grupo || !periodo || this.isSubmitting()) return;
 
     if (this.filas.length === 0) return;
+
+    const m = this.t().entities.programacion.detail.prototipoModal;
+
+    // El prototipo se persiste contra el detalle afectado (su FK). Sin él no se
+    // puede guardar: se avisa y se corta antes de armar los POST/PUT.
+    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
+    if (documentoDetalleAfectadoId === null) {
+      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      const m = this.t().entities.programacion.detail.prototipoModal;
       this.toast.error(m.toasts.saveError.title, m.validacion);
       return;
     }
@@ -364,7 +379,7 @@ export class ProgramacionPrototipoModalComponent {
     const ops: Observable<Prototipo>[] = [];
 
     for (const g of this.filas.controls) {
-      const payload = this.payloadDe(g, grupo.documentoDetalleId, fecha);
+      const payload = this.payloadDe(g, documentoDetalleAfectadoId, fecha);
       const id = g.controls.id.value;
       if (id === null) {
         ops.push(this.service.create(payload));
@@ -379,7 +394,6 @@ export class ProgramacionPrototipoModalComponent {
       }
     }
 
-    const m = this.t().entities.programacion.detail.prototipoModal;
     if (ops.length === 0) {
       this.toast.info(m.title, m.sinCambios);
       return;
@@ -395,13 +409,17 @@ export class ProgramacionPrototipoModalComponent {
         next: () => {
           this.toast.success(m.toasts.saveSuccess.title, m.toasts.saveSuccess.desc);
           this.applied.emit();
-          this.cargarLista(grupo.documentoDetalleId);
+          this.cargarLista(documentoDetalleAfectadoId);
         },
         error: () => this.toast.error(m.toasts.saveError.title, m.toasts.saveError.desc),
       });
   }
 
-  private payloadDe(g: FilaGroup, documentoDetalleId: number, fecha: string): PrototipoPayload {
+  private payloadDe(
+    g: FilaGroup,
+    documentoDetalleAfectadoId: number,
+    fecha: string,
+  ): PrototipoPayload {
     // `contrato` puede estar deshabilitado (fila existente): se lee del control,
     // no del `form.value`, que excluye los controles deshabilitados.
     const contrato = g.controls.contrato.value;
@@ -409,7 +427,7 @@ export class ProgramacionPrototipoModalComponent {
     return {
       fecha,
       fecha_inicio: g.controls.fechaInicio.value,
-      documento_detalle: documentoDetalleId,
+      documento_detalle: documentoDetalleAfectadoId,
       secuencia: secuencia?.id ?? 0,
       contrato: contrato?.id ?? 0,
       posicion: g.controls.posicion.value,
@@ -442,9 +460,17 @@ export class ProgramacionPrototipoModalComponent {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
+    // Igual que el guardado, la simulación corre contra el detalle afectado.
+    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
+    if (documentoDetalleAfectadoId === null) {
+      const m = this.t().entities.programacion.detail.prototipoModal;
+      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
+      return;
+    }
+
     this.isSubmitting.set(true);
     this.service
-      .simular(grupo.documentoDetalleId)
+      .simular(documentoDetalleAfectadoId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),

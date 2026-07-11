@@ -6,6 +6,8 @@ import type { ProgramacionFecha, ProgramacionFila } from '../../programacion.mod
 /** Grupo de filas que comparten `documento_detalle_id` — un puesto. */
 interface GrupoFilas {
   readonly documentoDetalleId: number;
+  /** Línea del documento afectado (origen del puesto); FK del prototipo. Puede ser `null`. */
+  readonly documentoDetalleAfectadoId: number | null;
   readonly puestoId: number | null;
   readonly puestoNombre: string | null;
   readonly modalidadNombre: string | null;
@@ -31,6 +33,12 @@ interface GrupoFilas {
  */
 export interface ProgramacionGrupoRef {
   readonly documentoDetalleId: number;
+  /**
+   * Línea del documento afectado (origen del puesto). Es el FK con el que el
+   * prototipo lista/crea/simula sus filas (`documento_detalle`). Puede ser `null`
+   * (puesto sin documento afectado), en cuyo caso el prototipo no puede guardarse.
+   */
+  readonly documentoDetalleAfectadoId: number | null;
   readonly puestoId: number | null;
   readonly puestoNombre: string | null;
 }
@@ -120,6 +128,7 @@ export class ProgramacionGridComponent {
       } else {
         result.push({
           documentoDetalleId: fila.documento_detalle_id,
+          documentoDetalleAfectadoId: fila.documento_detalle_afectado_id,
           puestoId: fila.puesto_id,
           puestoNombre: fila.puesto_nombre,
           modalidadNombre: fila.modalidad_nombre,
@@ -234,6 +243,7 @@ export class ProgramacionGridComponent {
   protected onVerEmpleados(grupo: GrupoFilas): void {
     this.verEmpleados.emit({
       documentoDetalleId: grupo.documentoDetalleId,
+      documentoDetalleAfectadoId: grupo.documentoDetalleAfectadoId,
       puestoId: grupo.puestoId,
       puestoNombre: grupo.puestoNombre,
     });
@@ -243,6 +253,7 @@ export class ProgramacionGridComponent {
   protected onPrototipo(grupo: GrupoFilas): void {
     this.prototipo.emit({
       documentoDetalleId: grupo.documentoDetalleId,
+      documentoDetalleAfectadoId: grupo.documentoDetalleAfectadoId,
       puestoId: grupo.puestoId,
       puestoNombre: grupo.puestoNombre,
     });
@@ -252,6 +263,7 @@ export class ProgramacionGridComponent {
   protected onEditarPuesto(grupo: GrupoFilas): void {
     this.editarPuesto.emit({
       documentoDetalleId: grupo.documentoDetalleId,
+      documentoDetalleAfectadoId: grupo.documentoDetalleAfectadoId,
       puestoId: grupo.puestoId,
       puestoNombre: grupo.puestoNombre,
     });

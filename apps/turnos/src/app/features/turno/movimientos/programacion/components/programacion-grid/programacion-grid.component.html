@@ -119,15 +119,17 @@
               >
                 <i class="pi pi-user-plus text-[0.78rem]"></i>
               </button>
-              <button
-                type="button"
-                (click)="onPrototipo(grupo)"
-                [title]="g.prototipo"
-                [attr.aria-label]="g.prototipo"
-                class="pointer-events-auto flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-white/70 hover:text-sky-700"
-              >
-                <i class="pi pi-calendar-plus text-[0.78rem]"></i>
-              </button>
+              @if (grupo.documentoDetalleAfectadoId !== null) {
+                <button
+                  type="button"
+                  (click)="onPrototipo(grupo)"
+                  [title]="g.prototipo"
+                  [attr.aria-label]="g.prototipo"
+                  class="pointer-events-auto flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-white/70 hover:text-sky-700"
+                >
+                  <i class="pi pi-calendar-plus text-[0.78rem]"></i>
+                </button>
+              }
             </div>
           </td>
         </tr>

@@ -454,6 +454,8 @@ export interface AppDict
           /** Avisos de validación / sin cambios. */
           validacion: string;
           sinCambios: string;
+          /** El puesto no tiene documento afectado: no se puede guardar/simular el prototipo. */
+          sinAfectado: string;
           /** Indicador de cambios sin guardar + confirmación al cerrar con cambios. */
           sinGuardar: string;
           descartar: { header: string; message: string; aceptar: string };
