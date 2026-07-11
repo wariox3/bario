@@ -1,5 +1,6 @@
 import { fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { cuentaDetalleToPayload } from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
 import type { FacturaCompraRead, FacturaCompraPayload } from './factura-compra.model';
 import type { FacturaCompraFormRawValue } from './factura-compra-form.types';
 
@@ -9,7 +10,7 @@ import type { FacturaCompraFormRawValue } from './factura-compra-form.types';
  */
 export function facturaCompraToFormValue(
   read: FacturaCompraRead,
-): Partial<Omit<FacturaCompraFormRawValue, 'detalles'>> {
+): Partial<Omit<FacturaCompraFormRawValue, 'detalles' | 'cuentas'>> {
   return {
     contacto:
       read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
@@ -32,7 +33,9 @@ export function facturaCompraToFormValue(
  *
  * `documento_tipo` proviene del `documentTypeId` del `DocumentEntityConfig`.
  * En **edición** se omiten los detalles (`includeDetalles=false`): transaccionan
- * en vivo contra `documento-detalle`. En **alta** viajan embebidos.
+ * en vivo contra `documento-detalle`. En **alta** viajan embebidos: se concatenan
+ * las líneas de ítem (comerciales) y las de cuenta contable en el único array
+ * `detalles` que espera el backend (cada una lleva su `tipo_registro`).
  */
 export function formValueToPayload(
   raw: FacturaCompraFormRawValue,
@@ -47,6 +50,13 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
-    ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
+    ...(includeDetalles
+      ? {
+          detalles: [
+            ...raw.detalles.map(comercialDetalleToPayload),
+            ...raw.cuentas.map(cuentaDetalleToPayload),
+          ],
+        }
+      : {}),
   };
 }

@@ -1221,6 +1221,7 @@ export interface AppDict
           metodoPago: string;
           metodoPagoPlaceholder: string;
         };
+        tabs: { detalles: string; cuentas: string };
         validation: { required: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -1589,6 +1590,31 @@ export interface AppDict
         descuento: string;
         total: string;
       };
+      toasts: {
+        lineSaveSuccess: { title: string; desc: string };
+        lineSaveError: { title: string; desc: string };
+        allSaved: { title: string; desc: string };
+        incompleteLines: { title: string; desc: string };
+      };
+    };
+    cuentaDetalle: {
+      empty: string;
+      addLine: string;
+      removeLine: string;
+      saveLine: string;
+      saveAll: string;
+      pendingSuffix: string;
+      cuentaPlaceholder: string;
+      confirmDeleteLine: string;
+      naturaleza: { debito: string; credito: string };
+      columns: {
+        linea: string;
+        cuenta: string;
+        naturaleza: string;
+        valor: string;
+        acciones: string;
+      };
+      resumen: { debitos: string; creditos: string };
       toasts: {
         lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };

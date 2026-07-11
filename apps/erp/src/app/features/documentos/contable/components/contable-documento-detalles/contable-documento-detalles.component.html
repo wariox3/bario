@@ -1,0 +1,161 @@
+<p-confirmdialog />
+
+<div class="flex flex-col gap-4">
+  <!-- Toolbar -->
+  <div class="flex items-center justify-end gap-2">
+    @if (documentId() !== null && pendingCount() > 0) {
+      <span
+        class="mr-auto inline-flex items-center gap-1.5 text-[0.74rem] font-medium text-amber-600"
+      >
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        {{ pendingCount() }} {{ t().entities.cuentaDetalle.pendingSuffix }}
+      </span>
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-save"
+        [label]="t().entities.cuentaDetalle.saveAll + ' (' + pendingCount() + ')'"
+        [loading]="savingAll()"
+        [disabled]="savingAll()"
+        (onClick)="onSaveAllClick()"
+      />
+    }
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-plus"
+      [label]="t().entities.cuentaDetalle.addLine"
+      [outlined]="true"
+      (onClick)="addLinea()"
+    />
+  </div>
+
+  <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <table class="contable-detalle-table">
+      <thead>
+        <tr>
+          <th class="contable-detalle-table__th w-10 text-center">
+            {{ t().entities.cuentaDetalle.columns.linea }}
+          </th>
+          <th class="contable-detalle-table__th min-w-[20rem] text-left">
+            {{ t().entities.cuentaDetalle.columns.cuenta }}
+          </th>
+          <th class="contable-detalle-table__th w-40 text-left">
+            {{ t().entities.cuentaDetalle.columns.naturaleza }}
+          </th>
+          <th class="contable-detalle-table__th w-40 text-right">
+            {{ t().entities.cuentaDetalle.columns.valor }}
+          </th>
+          <th class="contable-detalle-table__th w-20 text-center">
+            {{ t().entities.cuentaDetalle.columns.acciones }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of detalles().controls; track row; let i = $index) {
+          <tr
+            [formGroup]="row"
+            class="contable-detalle-table__row"
+            [class.contable-detalle-table__row--pending]="isPending(row)"
+          >
+            <td class="contable-detalle-table__td text-center text-brand-muted tabular-nums">
+              @if (isPending(row)) {
+                <span
+                  class="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 align-middle"
+                  [pTooltip]="t().entities.cuentaDetalle.pendingSuffix"
+                ></span>
+              }
+              {{ i + 1 }}
+            </td>
+
+            <td class="contable-detalle-table__td">
+              <app-cuenta-select
+                formControlName="cuenta"
+                [placeholder]="t().entities.cuentaDetalle.cuentaPlaceholder"
+                [invalid]="row.controls.cuenta.invalid && row.controls.cuenta.touched"
+              />
+            </td>
+
+            <td class="contable-detalle-table__td">
+              <p-select
+                formControlName="naturaleza"
+                [options]="naturalezaOptions()"
+                optionLabel="label"
+                optionValue="value"
+                [fluid]="true"
+              />
+            </td>
+
+            <td class="contable-detalle-table__td">
+              <p-inputnumber
+                formControlName="valor"
+                mode="decimal"
+                [min]="0"
+                [minFractionDigits]="0"
+                [maxFractionDigits]="2"
+                prefix="$ "
+                [fluid]="true"
+                inputStyleClass="text-right"
+              />
+            </td>
+
+            <td class="contable-detalle-table__td">
+              <div class="flex items-center justify-center gap-0.5">
+                @if (canSaveRow(row)) {
+                  <button
+                    type="button"
+                    (click)="saveLinea(row)"
+                    [disabled]="isSavingRow(row)"
+                    [pTooltip]="t().entities.cuentaDetalle.saveLine"
+                    [attr.aria-label]="t().entities.cuentaDetalle.saveLine"
+                    class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
+                  >
+                    @if (isSavingRow(row)) {
+                      <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+                    } @else {
+                      <i class="pi pi-check text-[0.78rem]"></i>
+                    }
+                  </button>
+                }
+                <button
+                  type="button"
+                  (click)="removeLinea(row)"
+                  [pTooltip]="t().entities.cuentaDetalle.removeLine"
+                  [attr.aria-label]="t().entities.cuentaDetalle.removeLine"
+                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                >
+                  <i class="pi pi-trash text-[0.78rem]"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="px-5 py-8 text-center text-sm text-brand-muted">
+              <i class="pi pi-inbox mr-2"></i>{{ t().entities.cuentaDetalle.empty }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (detalles().controls.length > 0) {
+    <div class="flex justify-end">
+      <div
+        class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
+      >
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+            <span class="text-brand-muted">{{ t().entities.cuentaDetalle.resumen.debitos }}</span>
+            <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().debitos) }}</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+            <span class="text-brand-muted">{{ t().entities.cuentaDetalle.resumen.creditos }}</span>
+            <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().creditos) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

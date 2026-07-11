@@ -1668,6 +1668,7 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
         },
+        tabs: { detalles: 'Details', cuentas: 'Accounts' },
         validation: { required: 'This field is required' },
         toasts: {
           createSuccess: {
@@ -2178,6 +2179,43 @@ export const en: AppDict = {
         incompleteLines: {
           title: 'Incomplete lines',
           desc: 'Complete or remove lines without an item before saving',
+        },
+      },
+    },
+    cuentaDetalle: {
+      empty: 'No accounts yet. Add the first one to get started',
+      addLine: 'Add account',
+      removeLine: 'Remove account',
+      saveLine: 'Save account',
+      saveAll: 'Save accounts',
+      pendingSuffix: 'unsaved',
+      cuentaPlaceholder: 'Search account…',
+      confirmDeleteLine: 'Remove this account from the document?',
+      naturaleza: { debito: 'Debit', credito: 'Credit' },
+      columns: {
+        linea: '#',
+        cuenta: 'Account',
+        naturaleza: 'Nature',
+        valor: 'Amount',
+        acciones: 'Actions',
+      },
+      resumen: { debitos: 'Debits', creditos: 'Credits' },
+      toasts: {
+        lineSaveSuccess: {
+          title: 'Account saved',
+          desc: 'The account was saved successfully',
+        },
+        lineSaveError: {
+          title: 'Save failed',
+          desc: 'The account could not be saved',
+        },
+        allSaved: {
+          title: 'Accounts saved',
+          desc: 'Pending accounts were saved',
+        },
+        incompleteLines: {
+          title: 'Incomplete accounts',
+          desc: 'Complete or remove accounts without an account or amount before saving',
         },
       },
     },

@@ -1709,6 +1709,7 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
         },
+        tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
         validation: { required: 'Este campo es requerido' },
         toasts: {
           createSuccess: {
@@ -2219,6 +2220,43 @@ export const es: AppDict = {
         incompleteLines: {
           title: 'Líneas incompletas',
           desc: 'Completa o elimina las líneas sin ítem antes de guardar',
+        },
+      },
+    },
+    cuentaDetalle: {
+      empty: 'Aún no hay cuentas. Agrega la primera para empezar',
+      addLine: 'Agregar cuenta',
+      removeLine: 'Eliminar cuenta',
+      saveLine: 'Guardar cuenta',
+      saveAll: 'Guardar cuentas',
+      pendingSuffix: 'sin guardar',
+      cuentaPlaceholder: 'Buscar cuenta…',
+      confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
+      naturaleza: { debito: 'Débito', credito: 'Crédito' },
+      columns: {
+        linea: '#',
+        cuenta: 'Cuenta',
+        naturaleza: 'Naturaleza',
+        valor: 'Valor',
+        acciones: 'Acciones',
+      },
+      resumen: { debitos: 'Débitos', creditos: 'Créditos' },
+      toasts: {
+        lineSaveSuccess: {
+          title: 'Cuenta guardada',
+          desc: 'La cuenta se guardó correctamente',
+        },
+        lineSaveError: {
+          title: 'Error al guardar',
+          desc: 'No se pudo guardar la cuenta',
+        },
+        allSaved: {
+          title: 'Cuentas guardadas',
+          desc: 'Se guardaron las cuentas pendientes',
+        },
+        incompleteLines: {
+          title: 'Cuentas incompletas',
+          desc: 'Completa o elimina las cuentas sin cuenta o valor antes de guardar',
         },
       },
     },
