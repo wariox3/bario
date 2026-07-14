@@ -549,13 +549,9 @@ export class ProgramacionPrototipoModalComponent {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
-    // Igual que el guardado, la simulación corre contra el detalle afectado.
-    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
-    if (documentoDetalleAfectadoId === null) {
-      const m = this.t().entities.programacion.detail.prototipoModal;
-      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
-      return;
-    }
+    // La simulación corre contra la línea del pedido (`documento_detalle_id`), no
+    // contra el detalle afectado (ese solo ancla el CRUD del prototipo).
+    const documentoDetalleId = grupo.documentoDetalleId;
 
     // Período a simular: lo elige el usuario en el selector (sembrado con el
     // período de la línea). Si aún no hay selección, se cae al período derivado.
@@ -566,11 +562,11 @@ export class ProgramacionPrototipoModalComponent {
     this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
-      .simular(documentoDetalleAfectadoId, anio, mes)
+      .simular(documentoDetalleId, anio, mes)
       .pipe(
         // Tras simular (solo devuelve `{ creados }`), se pide el detalle del mismo
         // período con el que se llena la tabla de vista previa.
-        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId, anio, mes)),
+        switchMap(() => this.service.detalleSimulacion(documentoDetalleId, anio, mes)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
       )
@@ -592,13 +588,9 @@ export class ProgramacionPrototipoModalComponent {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
-    // Igual que simular/guardar, la limpieza corre contra el detalle afectado.
-    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
-    if (documentoDetalleAfectadoId === null) {
-      const m = this.t().entities.programacion.detail.prototipoModal;
-      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
-      return;
-    }
+    // Igual que simular, la limpieza corre contra la línea del pedido
+    // (`documento_detalle_id`), no contra el detalle afectado.
+    const documentoDetalleId = grupo.documentoDetalleId;
 
     // Mismo período del selector para pedir el detalle tras limpiar.
     const periodo = this.periodoActual();
@@ -608,11 +600,11 @@ export class ProgramacionPrototipoModalComponent {
     this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
-      .limpiar(documentoDetalleAfectadoId)
+      .limpiar(documentoDetalleId)
       .pipe(
         // Tras limpiar, se pide el detalle (vacío) del período con el que se
         // repinta la tabla.
-        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId, anio, mes)),
+        switchMap(() => this.service.detalleSimulacion(documentoDetalleId, anio, mes)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
       )
@@ -656,25 +648,22 @@ export class ProgramacionPrototipoModalComponent {
 
   /**
    * Generar: materializa el prototipo en la programación real del puesto
-   * (`POST /turno/programacion/generar/` con `{ documento_detalle }`). Es la
+   * (`POST /turno/programacion/generar/` con `{ documento_detalle_id }`). Es la
    * acción terminal: al éxito avisa al padre (`applied`) para que recargue el
-   * grid y cierra el modal. Corre contra el detalle afectado (igual que el resto).
+   * grid y cierra el modal. Corre contra la línea del pedido
+   * (`documento_detalle_id`), no contra el detalle afectado.
    */
   protected onGenerar(): void {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
     const m = this.t().entities.programacion.detail.prototipoModal;
-    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
-    if (documentoDetalleAfectadoId === null) {
-      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
-      return;
-    }
+    const documentoDetalleId = grupo.documentoDetalleId;
 
     this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
-      .generar(documentoDetalleAfectadoId)
+      .generar(documentoDetalleId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
