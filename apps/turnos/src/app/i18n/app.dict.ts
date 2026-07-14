@@ -458,6 +458,8 @@ export interface AppDict
           codigoLabel: string;
           clienteLabel: string;
           puestoLabel: string;
+          detalleAfectadoLabel: string;
+          sinAfectadoCorto: string;
           /** Selector de período (mes/año) de la barra de acciones, para simular. */
           periodoLabel: string;
           /** Columnas de la tabla editable. */

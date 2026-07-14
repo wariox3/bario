@@ -81,7 +81,7 @@ export class PrototipoService extends BaseHttpService {
 
   /**
    * Trae el **detalle** de la última simulación de un puesto:
-   * `GET /turno/programacion-simulacion/detalle/?documento=<documento_detalle_id>`.
+   * `GET /turno/programacion-simulacion/detalle/?documento_detalle=<documento_detalle_id>`.
    * Se llama después de `simular` (que solo devuelve el conteo `{ creados }`) para
    * obtener los datos con que se pinta la tabla de vista previa del modal.
    *
@@ -91,7 +91,7 @@ export class PrototipoService extends BaseHttpService {
    */
   detalleSimulacion(documentoDetalleId: number): Observable<ProgramacionDetalleResponse> {
     return this.get<ProgramacionDetalleResponse>('/turno/programacion-simulacion/detalle/', {
-      documento: documentoDetalleId,
+      documento_detalle: documentoDetalleId,
     });
   }
 

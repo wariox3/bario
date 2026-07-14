@@ -362,7 +362,7 @@ export class ProgramacionDetailComponent implements OnInit {
           this.cargarFestivosDelPeriodo(res.fechas);
           const doc = res.documento;
           this.cabecera.set({
-            numero: String(doc.numero),
+            numero: doc.numero != null ? String(doc.numero) : null,
             fecha: fromIsoDate(doc.fecha),
             identificacion: doc.contacto_numero_identificacion,
             contacto: doc.contacto_nombre_corto,

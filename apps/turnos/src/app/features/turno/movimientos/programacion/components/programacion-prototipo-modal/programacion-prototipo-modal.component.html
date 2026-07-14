@@ -12,13 +12,13 @@
   [breakpoints]="{ '1100px': '95vw' }"
 >
   <ng-template pTemplate="header">
-    <div class="flex items-center gap-3">
+    <div class="flex grow items-center gap-3">
       <span
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
       >
         <i class="pi pi-calendar-plus text-[1.05rem]"></i>
       </span>
-      <div class="flex flex-col gap-[0.1rem]">
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
         <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
           {{ m.title }}
         </h2>
@@ -43,12 +43,36 @@
           }
         </p>
       </div>
+
+      <!-- Ancla del modal: el detalle afectado contra el que corren listar,
+           simular, guardar y generar. Bloque de referencia propio (no un chip
+           más en la subline) para que se lea como el objetivo de las acciones. -->
+      @if (grupo(); as g) {
+        <div
+          class="ml-auto me-2 flex shrink-0 flex-col items-end gap-0.5 rounded-lg border border-[rgba(20,48,73,0.12)] px-3 py-1.5"
+        >
+          <span class="text-[0.62rem] font-semibold uppercase tracking-wide text-brand-muted">
+            {{ m.detalleAfectadoLabel }}
+          </span>
+          @if (g.documentoDetalleAfectadoId !== null) {
+            <span
+              class="font-mono text-[0.9rem] font-semibold leading-none tabular-nums text-brand-text"
+            >
+              #{{ g.documentoDetalleAfectadoId }}
+            </span>
+          } @else {
+            <span class="text-[0.82rem] font-semibold leading-none text-amber-600">
+              {{ m.sinAfectadoCorto }}
+            </span>
+          }
+        </div>
+      }
     </div>
   </ng-template>
 
   <form [formGroup]="form" class="flex flex-col gap-3 pt-1">
-    <!-- Barra de acciones de la tabla: indicador "sin guardar" + eliminar
-         (contextuales) a la izquierda; nuevo · simular · guardar a la derecha. -->
+    <!-- Barra de acciones de la tabla: período + indicador "sin guardar" a la
+         izquierda; eliminar (contextual) · nuevo · simular · guardar a la derecha. -->
     <div class="flex items-center gap-2">
       <!-- Selector de período (mes/año) para simular — bien a la izquierda. -->
       <p-datepicker
@@ -71,19 +95,19 @@
           {{ m.sinGuardar }}
         </span>
       }
-      @if (seleccionadasCount(); as n) {
-        <button
-          type="button"
-          (click)="onEliminarSeleccionadas()"
-          [disabled]="isSubmitting()"
-          class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-red-600/35 bg-red-500/[0.08] px-2.5 py-1 text-[0.75rem] font-bold text-red-700 transition-colors hover:border-red-600/50 hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <i class="pi pi-trash text-[0.7rem]"></i>
-          {{ m.eliminar }} ({{ n }})
-        </button>
-      }
-
       <div class="ml-auto flex items-center gap-2">
+        @if (seleccionadasCount(); as n) {
+          <p-button
+            type="button"
+            [label]="m.eliminar + ' (' + n + ')'"
+            icon="pi pi-trash"
+            severity="danger"
+            [outlined]="true"
+            size="small"
+            [disabled]="isSubmitting()"
+            (onClick)="onEliminarSeleccionadas()"
+          />
+        }
         <p-button
           type="button"
           [label]="m.nuevo"
