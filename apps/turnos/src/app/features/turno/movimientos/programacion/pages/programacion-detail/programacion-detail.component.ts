@@ -128,8 +128,8 @@ export class ProgramacionDetailComponent implements OnInit {
 
   /**
    * Modo del modal de edición: `'linea'` edita una sola fila (lápiz) y guarda con
-   * `actualizar-programacion`; `'masivo'` edita todas las líneas del contrato
-   * (click en el nombre) y guarda con `actualizar-programacion-masivo`.
+   * `actualizar`; `'masivo'` edita todas las líneas del contrato
+   * (click en el nombre) y guarda con `actualizar-masivo`.
    */
   protected readonly edicionModo = signal<'linea' | 'masivo'>('masivo');
 

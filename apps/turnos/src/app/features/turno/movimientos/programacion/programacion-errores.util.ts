@@ -12,7 +12,7 @@ import type {
  */
 
 /**
- * Extrae el body del 400 de `crear`/`actualizar-programacion`
+ * Extrae el body del 400 de `crear`/`actualizar`
  * (`{ detail, errores: [] }`), o `null` si el error no tiene esa forma.
  */
 export function extraerErroresProgramacion(err: unknown): ProgramacionErroresResponse | null {
@@ -22,7 +22,7 @@ export function extraerErroresProgramacion(err: unknown): ProgramacionErroresRes
 }
 
 /**
- * Extrae el body del 400 de `actualizar-programacion-masivo`
+ * Extrae el body del 400 de `actualizar-masivo`
  * (`{ detail, resultados: [{ indice, errores }] }`), o `null` si no tiene `resultados`.
  * Para el caso de validación global del batch (sin `resultados`) usar
  * `extraerErroresProgramacion` como fallback.

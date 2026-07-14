@@ -133,7 +133,7 @@ export interface ProgramacionLineaRead {
   readonly fecha_desde: string | null;
 }
 
-/** Ítem de día en `crear-programacion`. `fecha` en formato ISO `YYYY-MM-DD`. */
+/** Ítem de día en `crear`. `fecha` en formato ISO `YYYY-MM-DD`. */
 export interface ProgramacionItem {
   readonly fecha: string;
   /** Código del turno escrito en la celda (`null` si el día queda sin turno). */
@@ -141,7 +141,7 @@ export interface ProgramacionItem {
 }
 
 /**
- * Payload de `POST /turno/programacion/crear-programacion/`: crea la
+ * Payload de `POST /turno/programacion/crear/`: crea la
  * programación de un contrato en un puesto (`documento_detalle_id`) con un ítem
  * por día (`fecha` + `turno_codigo`).
  */
@@ -152,7 +152,7 @@ export interface CrearProgramacionPayload {
 }
 
 /**
- * Payload de `POST /turno/programacion/actualizar-programacion/`: reprograma los
+ * Payload de `POST /turno/programacion/actualizar/`: reprograma los
  * turnos de un contrato ya asignado a un puesto. Mismo shape que la creación
  * (contrato + `documento_detalle_id` + un ítem por día); el backend sobrescribe
  * los días existentes en vez de responder con conflicto.
@@ -160,7 +160,7 @@ export interface CrearProgramacionPayload {
 export type ActualizarProgramacionPayload = CrearProgramacionPayload;
 
 /**
- * Payload de `POST /turno/programacion/actualizar-programacion-masivo/`: reprograma
+ * Payload de `POST /turno/programacion/actualizar-masivo/`: reprograma
  * varias líneas (contrato en un puesto) en una sola llamada. Cada entrada es un
  * `ActualizarProgramacionPayload` completo; el backend los aplica en batch.
  *
@@ -172,7 +172,7 @@ export interface ActualizarProgramacionMasivoPayload {
 }
 
 /**
- * Payload de `POST /turno/programacion/eliminar-programacion/`: borra la
+ * Payload de `POST /turno/programacion/eliminar/`: borra la
  * programación (mes de turnos) de un contrato en un puesto (`documento_detalle_id`).
  */
 export interface EliminarProgramacionPayload {
@@ -181,7 +181,7 @@ export interface EliminarProgramacionPayload {
 }
 
 /**
- * Payload de `POST /turno/programacion/eliminar-programacion-masivo/`: borra varias
+ * Payload de `POST /turno/programacion/eliminar-masivo/`: borra varias
  * líneas (contrato en un puesto) en una sola llamada. Espejo del borrado single.
  */
 export interface EliminarProgramacionMasivoPayload {
@@ -213,7 +213,7 @@ export interface ProgramacionMutacionResultado extends ProgramacionMutacionResum
 }
 
 /**
- * Respuesta de `POST /turno/programacion/actualizar-programacion-masivo/`: un
+ * Respuesta de `POST /turno/programacion/actualizar-masivo/`: un
  * `resultados[]` con el resumen de cada línea enviada (en el orden del payload).
  */
 export interface ProgramacionMutacionMasivoResumen {
@@ -221,7 +221,7 @@ export interface ProgramacionMutacionMasivoResumen {
 }
 
 /**
- * Error devuelto por crear/actualizar-programacion. `codigo` es el motivo máquina
+ * Error devuelto por crear/actualizar. `codigo` es el motivo máquina
  * (`turno_inexistente`, `dia_ocupado`, `horas_diurnas_excedidas`, …) para ramificar
  * sin parsear texto; `mensaje` es el detalle legible.
  *
@@ -241,7 +241,7 @@ export interface ProgramacionErrorItem {
 }
 
 /**
- * Body del 400 de crear/actualizar-programacion: `detail` (resumen para el toast)
+ * Body del 400 de crear/actualizar: `detail` (resumen para el toast)
  * + `errores` (una entrada por celda en conflicto, anclada por `fecha`).
  */
 export interface ProgramacionErroresResponse {
@@ -259,7 +259,7 @@ export interface ProgramacionErrorLinea {
 }
 
 /**
- * Body del 400 de `actualizar-programacion-masivo`: `detail` (resumen para el toast)
+ * Body del 400 de `actualizar-masivo`: `detail` (resumen para el toast)
  * + `resultados` (errores por línea, anclados por `indice`).
  */
 export interface ProgramacionErroresMasivoResponse {

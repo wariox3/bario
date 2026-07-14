@@ -86,7 +86,7 @@ function nuevoErroresPorContrato(): ErroresPorContrato {
  * Se abre desde el nombre del puesto en la banda de agrupación del grid. Lista una
  * banda por contrato (una línea del puesto) con sus días **editables**, pre-llenados
  * con los turnos actuales, y guarda con una única llamada
- * `POST actualizar-programacion-masivo` (una entrada por contrato). Las `fechas` y las
+ * `POST actualizar-masivo` (una entrada por contrato). Las `fechas` y las
  * `filas` (ya filtradas por puesto) llegan del detalle, así que no hay HTTP de carga.
  * Al éxito emite `applied` para que el padre recargue.
  *
@@ -275,7 +275,7 @@ export class ProgramacionEditarPuestoModalComponent {
 
   /**
    * Guarda la programación editada. Arma un payload por fila (contrato) y dispara una
-   * única llamada `actualizar-programacion-masivo`. Al éxito cierra y avisa al padre;
+   * única llamada `actualizar-masivo`. Al éxito cierra y avisa al padre;
    * al error mantiene el modal abierto, resalta las celdas del 400 y muestra un toast.
    */
   protected onGuardar(): void {
@@ -334,7 +334,7 @@ export class ProgramacionEditarPuestoModalComponent {
   }
 
   /**
-   * 400 de `actualizar-programacion-masivo`. Dos formas posibles:
+   * 400 de `actualizar-masivo`. Dos formas posibles:
    *  - `{ resultados: [{ indice, errores }] }` → celdas/avisos por línea, resolviendo el
    *    `contrato_id` desde `payloads[indice]`.
    *  - `{ detail, errores: [] }` → validación global del batch (sin `indice`): no
