@@ -55,7 +55,7 @@ function toOption(row: EmpleadoApiRow): EmpleadoOption {
 /**
  * Selector de empleado con identificación al lado (input group).
  *
- * Autocomplete sobre `general/contacto/seleccionar/?empleado=True` que:
+ * Autocomplete sobre `general/contacto/seleccionar/?empleado=true` que:
  * - Trae los primeros resultados al enfocar (sin término de búsqueda).
  * - Busca con el parámetro genérico DRF `?search=<query>` (el back resuelve contra
  *   identificación y nombre).
@@ -161,7 +161,7 @@ export class EmpleadoAutocompleteComponent implements ControlValueAccessor {
   /** Endpoint de selección. Default: contactos; overridable para otros masters. */
   readonly endpoint = input<string>('/general/contacto/seleccionar/');
   /** Filtros fijos extra. Default: solo empleados. */
-  readonly extraParams = input<Record<string, ParamValue>>({ empleado: 'True' });
+  readonly extraParams = input<Record<string, ParamValue>>({ empleado: 'true' });
   /**
    * Posición (0-based) a auto-seleccionar al cargar, cuando el control está vacío.
    * `null` (default) lo desactiva. No pisa una selección manual ni el valor cargado
