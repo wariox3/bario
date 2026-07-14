@@ -560,7 +560,8 @@ export const es: AppDict = {
           codigoLabel: 'Código',
           clienteLabel: 'Cliente',
           puestoLabel: 'Puesto',
-          detalleAfectadoLabel: 'Detalle afectado',
+          detalleAfectadoLabel: 'Contrato detalle',
+          pedidoDetalleLabel: 'Pedido detalle',
           sinAfectadoCorto: 'Sin asignar',
           periodoLabel: 'Período',
           columns: {
@@ -591,6 +592,7 @@ export const es: AppDict = {
               'Tenés cambios en el prototipo que no guardaste. Si cerrás se perderán. ¿Descartar?',
             aceptar: 'Descartar',
           },
+          generarErrores: { dias: 'días', cerrar: 'Cerrar' },
           preview: {
             title: 'Vista previa',
             anio: 'Año',

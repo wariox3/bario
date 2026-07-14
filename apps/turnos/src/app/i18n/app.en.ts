@@ -554,7 +554,8 @@ export const en: AppDict = {
           codigoLabel: 'Code',
           clienteLabel: 'Client',
           puestoLabel: 'Position',
-          detalleAfectadoLabel: 'Affected detail',
+          detalleAfectadoLabel: 'Contract detail',
+          pedidoDetalleLabel: 'Order detail',
           sinAfectadoCorto: 'Unassigned',
           periodoLabel: 'Period',
           columns: {
@@ -585,6 +586,7 @@ export const en: AppDict = {
               'You have prototype changes that are not saved. Closing will discard them. Discard?',
             aceptar: 'Discard',
           },
+          generarErrores: { dias: 'days', cerrar: 'Close' },
           preview: {
             title: 'Preview',
             anio: 'Year',

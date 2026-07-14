@@ -44,27 +44,43 @@
         </p>
       </div>
 
-      <!-- Ancla del modal: el detalle afectado contra el que corren listar,
-           simular, guardar y generar. Bloque de referencia propio (no un chip
-           más en la subline) para que se lea como el objetivo de las acciones. -->
+      <!-- Ancla del modal: los detalles contra los que corren listar, simular,
+           guardar y generar. El "contrato detalle" (detalle afectado) es la FK de
+           las acciones; el "pedido detalle" es la línea del documento. Bloques de
+           referencia propios (no chips en la subline) para que se lean como el
+           objetivo de las acciones. -->
       @if (grupo(); as g) {
-        <div
-          class="ml-auto me-2 flex shrink-0 flex-col items-end gap-0.5 rounded-lg border border-[rgba(20,48,73,0.12)] px-3 py-1.5"
-        >
-          <span class="text-[0.62rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ m.detalleAfectadoLabel }}
-          </span>
-          @if (g.documentoDetalleAfectadoId !== null) {
+        <div class="ml-auto me-2 flex shrink-0 items-stretch gap-2">
+          <div
+            class="flex flex-col items-end gap-0.5 rounded-lg border border-[rgba(20,48,73,0.12)] px-3 py-1.5"
+          >
+            <span class="text-[0.62rem] font-semibold uppercase tracking-wide text-brand-muted">
+              {{ m.detalleAfectadoLabel }}
+            </span>
+            @if (g.documentoDetalleAfectadoId !== null) {
+              <span
+                class="font-mono text-[0.9rem] font-semibold leading-none tabular-nums text-brand-text"
+              >
+                #{{ g.documentoDetalleAfectadoId }}
+              </span>
+            } @else {
+              <span class="text-[0.82rem] font-semibold leading-none text-amber-600">
+                {{ m.sinAfectadoCorto }}
+              </span>
+            }
+          </div>
+          <div
+            class="flex flex-col items-end gap-0.5 rounded-lg border border-[rgba(20,48,73,0.12)] px-3 py-1.5"
+          >
+            <span class="text-[0.62rem] font-semibold uppercase tracking-wide text-brand-muted">
+              {{ m.pedidoDetalleLabel }}
+            </span>
             <span
               class="font-mono text-[0.9rem] font-semibold leading-none tabular-nums text-brand-text"
             >
-              #{{ g.documentoDetalleAfectadoId }}
+              #{{ g.documentoDetalleId }}
             </span>
-          } @else {
-            <span class="text-[0.82rem] font-semibold leading-none text-amber-600">
-              {{ m.sinAfectadoCorto }}
-            </span>
-          }
+          </div>
         </div>
       }
     </div>
@@ -162,6 +178,67 @@
         />
       </div>
     </div>
+
+    <!-- Banner de errores de generación: el 400 `{ detail, errores }` agrupado por
+         mensaje con los días afectados (chips). Independiente del alto de las tablas
+         y acotado con su propio scroll. Se descarta al reintentar o al cerrarlo. -->
+    @if (generarErrores(); as ge) {
+      <div
+        class="max-h-56 overflow-auto rounded-[9px] border border-l-[3px] border-[rgba(239,68,68,0.2)] border-l-[#ef4444] bg-[rgba(239,68,68,0.06)]"
+      >
+        <div class="flex items-start gap-2 px-3.5 py-2.5">
+          <span
+            class="mt-px flex h-[1.1rem] w-[1.1rem] shrink-0 items-center justify-center rounded-[5px] bg-[rgba(239,68,68,0.14)] text-[0.62rem] text-[#dc2626]"
+          >
+            <i class="pi pi-exclamation-circle"></i>
+          </span>
+          <div class="flex min-w-0 flex-1 flex-col gap-2">
+            <span class="text-[0.8rem] font-semibold leading-tight text-[#b91c1c]">
+              {{ ge.detail }}
+            </span>
+
+            @for (grupo of ge.grupos; track grupo.mensaje) {
+              <div class="flex flex-col gap-1">
+                <span class="flex items-baseline gap-1.5 text-[0.75rem] text-[#b91c1c]">
+                  {{ grupo.mensaje }}
+                  <span class="text-[0.7rem] font-semibold text-[#b91c1c]/70">
+                    {{ grupo.dias.length }} {{ m.generarErrores.dias }}
+                  </span>
+                </span>
+                <div class="flex flex-wrap gap-1">
+                  @for (dia of grupo.dias; track dia) {
+                    <span
+                      class="inline-block rounded bg-[rgba(239,68,68,0.1)] px-1.5 py-px font-mono text-[0.7rem] font-semibold tabular-nums text-[#b91c1c]"
+                    >
+                      {{ dia }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (ge.avisos.length) {
+              <ul class="m-0 flex list-none flex-col gap-0.5 p-0">
+                @for (aviso of ge.avisos; track aviso) {
+                  <li class="text-[0.72rem] font-medium leading-snug text-[#b91c1c]">
+                    {{ aviso }}
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          <button
+            type="button"
+            (click)="cerrarGenerarErrores()"
+            [attr.aria-label]="m.generarErrores.cerrar"
+            class="-mr-1 -mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#b91c1c]/70 transition-colors hover:bg-[rgba(239,68,68,0.1)] hover:text-[#b91c1c]"
+          >
+            <i class="pi pi-times text-[0.72rem]"></i>
+          </button>
+        </div>
+      </div>
+    }
 
     <div class="overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
       <table class="prototipo-grid">

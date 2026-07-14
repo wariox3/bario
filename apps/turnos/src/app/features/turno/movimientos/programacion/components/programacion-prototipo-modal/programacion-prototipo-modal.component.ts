@@ -33,9 +33,15 @@ import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-gri
 import { ProgramacionPeriodoStore } from '../programacion-agregar-contrato-modal/programacion-periodo.store';
 import { PrototipoService } from '../../prototipo.service';
 import type { Prototipo, PrototipoPayload } from '../../prototipo.model';
-import type { ProgramacionDetalleResponse } from '../../programacion.model';
+import type {
+  ProgramacionDetalleResponse,
+  ProgramacionErroresResponse,
+} from '../../programacion.model';
 import { toProgramacionFecha } from '../../programacion.utils';
-import { extraerDetalleProgramacion } from '../../programacion-errores.util';
+import {
+  extraerDetalleProgramacion,
+  extraerErroresProgramacion,
+} from '../../programacion-errores.util';
 
 /** Grupo de formulario de una fila de la tabla de prototipo. */
 type FilaGroup = FormGroup<{
@@ -48,6 +54,23 @@ type FilaGroup = FormGroup<{
   fechaInicio: FormControl<string>;
   posicion: FormControl<number>;
 }>;
+
+/** Un mensaje de error del generar con los días (número) a los que aplica. */
+interface GenerarErrorGrupo {
+  readonly mensaje: string;
+  readonly dias: readonly string[];
+}
+
+/**
+ * Vista del 400 de **generar** ya agrupada para el banner: el `detail` general,
+ * los errores por día agrupados por mensaje (dedup de días) y los avisos sin
+ * fecha (ej. horas excedidas).
+ */
+interface GenerarErroresVista {
+  readonly detail: string;
+  readonly grupos: readonly GenerarErrorGrupo[];
+  readonly avisos: readonly string[];
+}
 
 /**
  * Modal de **prototipo** de turnos de un puesto.
@@ -176,6 +199,13 @@ export class ProgramacionPrototipoModalComponent {
    */
   protected readonly simulacion = signal<ProgramacionDetalleResponse | null>(null);
 
+  /**
+   * Errores del último **generar** (400 `{ detail, errores }`), agrupados para el
+   * banner. `null` mientras no haya error. Se limpia al reintentar cualquier
+   * acción (generar/simular/limpiar/guardar) o al cerrar el banner.
+   */
+  protected readonly generarErrores = signal<GenerarErroresVista | null>(null);
+
   /** Columnas de día de la vista previa (normalizadas desde `simulacion().fechas`). */
   protected readonly previewFechas = computed(() =>
     (this.simulacion()?.fechas ?? []).map(toProgramacionFecha),
@@ -246,6 +276,7 @@ export class ProgramacionPrototipoModalComponent {
     this.filas.clear();
     this.snapshot.clear();
     this.simulacion.set(null);
+    this.generarErrores.set(null);
     this.periodoStore.reset();
     // El próximo período (al recargar la línea) vuelve a sembrar el selector.
     this.periodoSembrado = false;
@@ -440,6 +471,7 @@ export class ProgramacionPrototipoModalComponent {
       return;
     }
 
+    this.generarErrores.set(null);
     this.isSubmitting.set(true);
     forkJoin(ops)
       .pipe(
@@ -531,6 +563,7 @@ export class ProgramacionPrototipoModalComponent {
     if (!periodo) return;
     const { anio, mes } = periodo;
 
+    this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
       .simular(documentoDetalleAfectadoId, anio, mes)
@@ -572,6 +605,7 @@ export class ProgramacionPrototipoModalComponent {
     if (!periodo) return;
     const { anio, mes } = periodo;
 
+    this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
       .limpiar(documentoDetalleAfectadoId)
@@ -591,6 +625,35 @@ export class ProgramacionPrototipoModalComponent {
       });
   }
 
+  /** Cierra el banner de errores de generación (botón X del banner). */
+  protected cerrarGenerarErrores(): void {
+    this.generarErrores.set(null);
+  }
+
+  /**
+   * Arma la vista del 400 de generar: agrupa los `errores` con fecha por
+   * `mensaje` (deduplicando días — un día trae una entrada por turno) y separa
+   * los que no tienen fecha como `avisos`. Los días se muestran como número.
+   */
+  private construirGenerarErrores(parsed: ProgramacionErroresResponse): GenerarErroresVista {
+    const porMensaje = new Map<string, Set<string>>();
+    const avisos = new Set<string>();
+    for (const e of parsed.errores) {
+      if (!e.fecha) {
+        avisos.add(e.mensaje);
+        continue;
+      }
+      const fechas = porMensaje.get(e.mensaje) ?? new Set<string>();
+      fechas.add(e.fecha);
+      porMensaje.set(e.mensaje, fechas);
+    }
+    const grupos = [...porMensaje.entries()].map(([mensaje, fechas]) => ({
+      mensaje,
+      dias: [...fechas].sort().map((f) => f.slice(8, 10).replace(/^0/, '')),
+    }));
+    return { detail: parsed.detail, grupos, avisos: [...avisos] };
+  }
+
   /**
    * Generar: materializa el prototipo en la programación real del puesto
    * (`POST /turno/programacion/generar/` con `{ documento_detalle }`). Es la
@@ -608,6 +671,7 @@ export class ProgramacionPrototipoModalComponent {
       return;
     }
 
+    this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
       .generar(documentoDetalleAfectadoId)
@@ -621,7 +685,18 @@ export class ProgramacionPrototipoModalComponent {
           this.applied.emit();
           this.visible.set(false);
         },
-        error: () => this.toast.error(m.toasts.generarError.title, m.toasts.generarError.desc),
+        // El backend responde 400 con `{ detail, errores }`: el `detail` va al toast
+        // y, si trae `errores` por día, se pintan agrupados en el banner inline.
+        error: (err) => {
+          const parsed = extraerErroresProgramacion(err);
+          if (parsed && parsed.errores.length) {
+            this.generarErrores.set(this.construirGenerarErrores(parsed));
+          }
+          this.toast.error(
+            m.toasts.generarError.title,
+            extraerDetalleProgramacion(err) ?? m.toasts.generarError.desc,
+          );
+        },
       });
   }
 

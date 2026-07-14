@@ -459,6 +459,7 @@ export interface AppDict
           clienteLabel: string;
           puestoLabel: string;
           detalleAfectadoLabel: string;
+          pedidoDetalleLabel: string;
           sinAfectadoCorto: string;
           /** Selector de período (mes/año) de la barra de acciones, para simular. */
           periodoLabel: string;
@@ -493,6 +494,8 @@ export interface AppDict
           /** Indicador de cambios sin guardar + confirmación al cerrar con cambios. */
           sinGuardar: string;
           descartar: { header: string; message: string; aceptar: string };
+          /** Banner del 400 de generar (errores por día agrupados). */
+          generarErrores: { dias: string; cerrar: string };
           /** Tabla de vista previa (simulación): año/mes/código/empleado + días. */
           preview: {
             title: string;
