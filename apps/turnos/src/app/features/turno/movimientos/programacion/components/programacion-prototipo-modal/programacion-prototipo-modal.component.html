@@ -119,6 +119,16 @@
         />
         <p-button
           type="button"
+          [label]="m.limpiar"
+          icon="pi pi-eraser"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [disabled]="cargandoPeriodo() || isSubmitting()"
+          (onClick)="onLimpiar()"
+        />
+        <p-button
+          type="button"
           [label]="m.simular"
           icon="pi pi-play"
           severity="secondary"

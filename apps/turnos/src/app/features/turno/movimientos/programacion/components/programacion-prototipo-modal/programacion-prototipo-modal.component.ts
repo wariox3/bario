@@ -487,6 +487,19 @@ export class ProgramacionPrototipoModalComponent {
   }
 
   /**
+   * Período (año/mes) elegido para simular/consultar: el del selector de la barra
+   * (sembrado con el período de la línea). Si aún no hay selección, cae al período
+   * derivado de la línea. `null` si ninguno cargó todavía. Lo comparten simular,
+   * limpiar y el detalle de la vista previa.
+   */
+  private periodoActual(): { anio: number; mes: number } | null {
+    const fecha = this.periodoSeleccionado();
+    const anio = fecha ? fecha.getFullYear() : (this.periodo()?.anio ?? null);
+    const mes = fecha ? fecha.getMonth() + 1 : (this.periodo()?.mes ?? null);
+    return anio === null || mes === null ? null : { anio, mes };
+  }
+
+  /**
    * Simular: genera la simulación (dry-run) y luego trae su detalle para pintar
    * la tabla de vista previa. Son dos pasos encadenados:
    *  1. `simular` → crea los registros y devuelve solo el conteo (`{ creados }`).
@@ -507,18 +520,58 @@ export class ProgramacionPrototipoModalComponent {
 
     // Período a simular: lo elige el usuario en el selector (sembrado con el
     // período de la línea). Si aún no hay selección, se cae al período derivado.
-    const fecha = this.periodoSeleccionado();
-    const anio = fecha ? fecha.getFullYear() : (this.periodo()?.anio ?? null);
-    const mes = fecha ? fecha.getMonth() + 1 : (this.periodo()?.mes ?? null);
-    if (anio === null || mes === null) return;
+    const periodo = this.periodoActual();
+    if (!periodo) return;
+    const { anio, mes } = periodo;
 
     this.isSubmitting.set(true);
     this.service
       .simular(documentoDetalleAfectadoId, anio, mes)
       .pipe(
-        // Tras simular (solo devuelve `{ creados }`), se pide el detalle con el
-        // que se llena la tabla de vista previa.
-        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId)),
+        // Tras simular (solo devuelve `{ creados }`), se pide el detalle del mismo
+        // período con el que se llena la tabla de vista previa.
+        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId, anio, mes)),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: (detalle) => this.simulacion.set(detalle),
+        error: () => {
+          const m = this.t().entities.programacion.detail.prototipoModal;
+          this.toast.error(m.toasts.saveError.title, m.toasts.saveError.desc);
+        },
+      });
+  }
+
+  /**
+   * Limpiar: borra la simulación (dry-run) del puesto y refresca la vista previa.
+   * Mismo encadenado que `onSimular`: `limpiar` (borra en el backend) →
+   * `detalleSimulacion` (que ahora vuelve vacío) para dejar la tabla sin filas.
+   */
+  protected onLimpiar(): void {
+    const grupo = this.grupo();
+    if (!grupo || this.isSubmitting()) return;
+
+    // Igual que simular/guardar, la limpieza corre contra el detalle afectado.
+    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
+    if (documentoDetalleAfectadoId === null) {
+      const m = this.t().entities.programacion.detail.prototipoModal;
+      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
+      return;
+    }
+
+    // Mismo período del selector para pedir el detalle tras limpiar.
+    const periodo = this.periodoActual();
+    if (!periodo) return;
+    const { anio, mes } = periodo;
+
+    this.isSubmitting.set(true);
+    this.service
+      .limpiar(documentoDetalleAfectadoId)
+      .pipe(
+        // Tras limpiar, se pide el detalle (vacío) del período con el que se
+        // repinta la tabla.
+        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId, anio, mes)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
       )

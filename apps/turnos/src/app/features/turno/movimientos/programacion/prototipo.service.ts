@@ -80,18 +80,37 @@ export class PrototipoService extends BaseHttpService {
   }
 
   /**
-   * Trae el **detalle** de la última simulación de un puesto:
-   * `GET /turno/programacion-simulacion/detalle/?documento_detalle=<documento_detalle_id>`.
-   * Se llama después de `simular` (que solo devuelve el conteo `{ creados }`) para
-   * obtener los datos con que se pinta la tabla de vista previa del modal.
+   * Limpia la simulación del puesto (borra los registros dry-run):
+   * `POST /turno/programacion-simulacion/limpiar/` con `{ documento_detalle_id }`.
+   * Tras limpiar, el `detalle` vuelve vacío — el modal lo pide de nuevo para
+   * refrescar la tabla de vista previa.
+   */
+  limpiar(documentoDetalleId: number): Observable<unknown> {
+    return this.post<unknown>('/turno/programacion-simulacion/limpiar/', {
+      documento_detalle_id: documentoDetalleId,
+    });
+  }
+
+  /**
+   * Trae el **detalle** de la simulación de un puesto para el período dado:
+   * `GET /turno/programacion-simulacion/detalle/?documento_detalle=<id>&anio=<a>&mes=<m>`.
+   * Se llama después de `simular`/`limpiar` para obtener los datos con que se
+   * pinta la tabla de vista previa del modal. El año/mes salen del selector de
+   * período del modal (el mismo que alimenta `simular`).
    *
    * Devuelve el **mismo shape** que el calendario de la programación
    * (`ProgramacionDetalleResponse`: cabecera + `fechas` + `filas`), así que la
    * vista previa reusa esos tipos.
    */
-  detalleSimulacion(documentoDetalleId: number): Observable<ProgramacionDetalleResponse> {
+  detalleSimulacion(
+    documentoDetalleId: number,
+    anio: number,
+    mes: number,
+  ): Observable<ProgramacionDetalleResponse> {
     return this.get<ProgramacionDetalleResponse>('/turno/programacion-simulacion/detalle/', {
       documento_detalle: documentoDetalleId,
+      anio,
+      mes,
     });
   }
 

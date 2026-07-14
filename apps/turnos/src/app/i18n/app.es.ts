@@ -579,6 +579,7 @@ export const es: AppDict = {
           guardar: 'Guardar',
           eliminar: 'Eliminar',
           simular: 'Simular',
+          limpiar: 'Limpiar',
           generar: 'Generar',
           close: 'Cerrar',
           validacion: 'Completá contrato, secuencia y fecha de inicio en todas las filas.',

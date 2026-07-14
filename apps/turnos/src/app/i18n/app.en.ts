@@ -573,6 +573,7 @@ export const en: AppDict = {
           guardar: 'Save',
           eliminar: 'Delete',
           simular: 'Simulate',
+          limpiar: 'Clear',
           generar: 'Generate',
           close: 'Close',
           validacion: 'Fill in contract, sequence and start date in every row.',

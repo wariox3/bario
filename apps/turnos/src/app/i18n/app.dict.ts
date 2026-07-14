@@ -482,6 +482,8 @@ export interface AppDict
           eliminar: string;
           /** Simular (preview) y generar (materializar) los turnos del prototipo. */
           simular: string;
+          /** Limpiar la simulación (borra la vista previa en el backend). */
+          limpiar: string;
           generar: string;
           close: string;
           /** Avisos de validación / sin cambios. */
