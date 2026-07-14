@@ -184,6 +184,22 @@ export class ProgramacionPrototipoModalComponent {
   protected readonly previewFilas = computed(() => this.simulacion()?.filas ?? []);
 
   /**
+   * Fechas ISO marcadas como **festivo** por el backend. El flag `festivo` viaja
+   * por celda (`fila.dias[fecha].festivo`), no en el array `fechas`, y es global
+   * a la fecha (igual en todas las filas); se recolecta con un OR sobre las
+   * celdas para pintar la columna del header. Set → lookup O(1) por columna.
+   */
+  protected readonly festivos = computed<ReadonlySet<string>>(() => {
+    const set = new Set<string>();
+    for (const fila of this.simulacion()?.filas ?? []) {
+      for (const [fecha, celda] of Object.entries(fila.dias)) {
+        if (celda?.festivo) set.add(fecha);
+      }
+    }
+    return set;
+  });
+
+  /**
    * Período (mes/año) elegido para **simular** (selector de la barra de acciones,
    * un `p-datepicker view="month"`). Se siembra con el período derivado de la
    * línea al abrir el modal, y el usuario puede cambiarlo para simular otro mes.
