@@ -92,6 +92,17 @@ export class PrototipoService extends BaseHttpService {
   }
 
   /**
+   * Genera (materializa) la programación real del puesto a partir del prototipo:
+   * `POST /turno/programacion/generar/` con `{ documento_detalle }`. Es la acción
+   * terminal del modal; al éxito el padre recarga el grid de programación.
+   */
+  generar(documentoDetalle: number): Observable<unknown> {
+    return this.post<unknown>('/turno/programacion/generar/', {
+      documento_detalle_id: documentoDetalle,
+    });
+  }
+
+  /**
    * Trae el **detalle** de la simulación de un puesto para el período dado:
    * `GET /turno/programacion-simulacion/detalle/?documento_detalle=<id>&anio=<a>&mes=<m>`.
    * Se llama después de `simular`/`limpiar` para obtener los datos con que se

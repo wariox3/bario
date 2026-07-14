@@ -108,6 +108,15 @@
             (onClick)="onEliminarSeleccionadas()"
           />
         }
+        <!-- Generar: CTA terminal (materializa el prototipo en la programación). -->
+        <p-button
+          type="button"
+          [label]="m.generar"
+          icon="pi pi-bolt"
+          size="small"
+          [disabled]="!filas.length || cargandoPeriodo() || isSubmitting()"
+          (onClick)="onGenerar()"
+        />
         <p-button
           type="button"
           [label]="m.nuevo"
@@ -289,30 +298,6 @@
       </table>
     </div>
   </div>
-
-  <ng-template pTemplate="footer">
-    <!-- Cerrar (descartar) · Generar (CTA terminal — materializa el prototipo).
-         Nuevo · Simular · Guardar viven en la barra sobre la tabla. -->
-    <div class="flex items-center justify-end gap-2">
-      <p-button
-        type="button"
-        [label]="m.close"
-        icon="pi pi-times"
-        severity="secondary"
-        [outlined]="true"
-        (onClick)="onClose()"
-      />
-      <!-- Generar: único primario (meta terminal — materializa el prototipo).
-           TODO(prototipo): conectar con la generación (ver onGenerar). -->
-      <p-button
-        type="button"
-        [label]="m.generar"
-        icon="pi pi-bolt"
-        [disabled]="!filas.length || cargandoPeriodo() || isSubmitting()"
-        (onClick)="onGenerar()"
-      />
-    </div>
-  </ng-template>
 </p-dialog>
 
 <!-- Confirmación de descarte al cerrar con cambios sin guardar. -->

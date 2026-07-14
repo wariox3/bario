@@ -485,7 +485,6 @@ export interface AppDict
           /** Limpiar la simulación (borra la vista previa en el backend). */
           limpiar: string;
           generar: string;
-          close: string;
           /** Avisos de validación / sin cambios. */
           validacion: string;
           sinCambios: string;
@@ -508,6 +507,8 @@ export interface AppDict
             saveError: { title: string; desc: string };
             deleteSuccess: { title: string; desc: string };
             deleteError: { title: string; desc: string };
+            generarSuccess: { title: string; desc: string };
+            generarError: { title: string; desc: string };
           };
         };
       };

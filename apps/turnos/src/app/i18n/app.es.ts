@@ -581,7 +581,6 @@ export const es: AppDict = {
           simular: 'Simular',
           limpiar: 'Limpiar',
           generar: 'Generar',
-          close: 'Cerrar',
           validacion: 'Completá contrato, secuencia y fecha de inicio en todas las filas.',
           sinCambios: 'No hay cambios para guardar.',
           sinAfectado: 'Este puesto no tiene documento afectado, no se puede guardar el prototipo.',
@@ -616,6 +615,14 @@ export const es: AppDict = {
             deleteError: {
               title: 'No se pudo eliminar',
               desc: 'Ocurrió un error al eliminar las filas.',
+            },
+            generarSuccess: {
+              title: 'Programación generada',
+              desc: 'Se generaron los turnos del prototipo en la programación.',
+            },
+            generarError: {
+              title: 'No se pudo generar',
+              desc: 'Ocurrió un error al generar la programación.',
             },
           },
         },

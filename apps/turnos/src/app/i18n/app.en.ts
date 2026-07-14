@@ -575,7 +575,6 @@ export const en: AppDict = {
           simular: 'Simulate',
           limpiar: 'Clear',
           generar: 'Generate',
-          close: 'Close',
           validacion: 'Fill in contract, sequence and start date in every row.',
           sinCambios: 'There are no changes to save.',
           sinAfectado: 'This position has no affected document; the prototype cannot be saved.',
@@ -610,6 +609,14 @@ export const en: AppDict = {
             deleteError: {
               title: 'Could not delete',
               desc: 'An error occurred while deleting the rows.',
+            },
+            generarSuccess: {
+              title: 'Schedule generated',
+              desc: 'The prototype shifts were generated into the schedule.',
+            },
+            generarError: {
+              title: 'Could not generate',
+              desc: 'An error occurred while generating the schedule.',
             },
           },
         },

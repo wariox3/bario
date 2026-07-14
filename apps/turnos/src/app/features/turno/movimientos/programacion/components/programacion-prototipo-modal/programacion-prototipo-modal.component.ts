@@ -35,6 +35,7 @@ import { PrototipoService } from '../../prototipo.service';
 import type { Prototipo, PrototipoPayload } from '../../prototipo.model';
 import type { ProgramacionDetalleResponse } from '../../programacion.model';
 import { toProgramacionFecha } from '../../programacion.utils';
+import { extraerDetalleProgramacion } from '../../programacion-errores.util';
 
 /** Grupo de formulario de una fila de la tabla de prototipo. */
 type FilaGroup = FormGroup<{
@@ -451,7 +452,13 @@ export class ProgramacionPrototipoModalComponent {
           this.applied.emit();
           this.cargarLista(documentoDetalleAfectadoId);
         },
-        error: () => this.toast.error(m.toasts.saveError.title, m.toasts.saveError.desc),
+        // El backend responde 400 con `{ detail: [...] }` (ej. contrato duplicado);
+        // se muestra ese mensaje tal cual, con fallback al genérico.
+        error: (err) =>
+          this.toast.error(
+            m.toasts.saveError.title,
+            extraerDetalleProgramacion(err) ?? m.toasts.saveError.desc,
+          ),
       });
   }
 
@@ -586,29 +593,46 @@ export class ProgramacionPrototipoModalComponent {
 
   /**
    * Generar: materializa el prototipo en la programación real del puesto
-   * (crea los turnos definitivos a partir de las secuencias).
-   *
-   * TODO: conectar con backend. Falta definir el endpoint (p. ej.
-   * `POST /turno/prototipo/generar/` con `{ documento_detalle }`), y al éxito
-   * emitir `applied` para que el padre recargue el grid de programación.
-   * Por ahora el botón solo queda ubicado.
+   * (`POST /turno/programacion/generar/` con `{ documento_detalle }`). Es la
+   * acción terminal: al éxito avisa al padre (`applied`) para que recargue el
+   * grid y cierra el modal. Corre contra el detalle afectado (igual que el resto).
    */
   protected onGenerar(): void {
-    // TODO(prototipo): invocar la generación y, al éxito, this.applied.emit().
+    const grupo = this.grupo();
+    if (!grupo || this.isSubmitting()) return;
+
+    const m = this.t().entities.programacion.detail.prototipoModal;
+    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
+    if (documentoDetalleAfectadoId === null) {
+      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.service
+      .generar(documentoDetalleAfectadoId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success(m.toasts.generarSuccess.title, m.toasts.generarSuccess.desc);
+          this.applied.emit();
+          this.visible.set(false);
+        },
+        error: () => this.toast.error(m.toasts.generarError.title, m.toasts.generarError.desc),
+      });
   }
 
   /**
-   * Intercepta el `visibleChange` del diálogo: cualquier vía de cierre (botón
-   * "Cerrar", ícono X, ESC) pasa por acá. Si hay cambios sin guardar pide
+   * Intercepta el `visibleChange` del diálogo: cualquier vía de cierre (ícono X,
+   * ESC, clic en el backdrop) pasa por acá. Si hay cambios sin guardar pide
    * confirmación antes de descartar; si no, cierra directo. Reabrir es no-op:
    * el estado abierto lo controla el padre.
    */
   protected onVisibleChange(next: boolean): void {
     if (next) return;
-    this.intentarCerrar();
-  }
-
-  protected onClose(): void {
     this.intentarCerrar();
   }
 
