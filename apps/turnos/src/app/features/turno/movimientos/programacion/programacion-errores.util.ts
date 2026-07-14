@@ -12,7 +12,7 @@ import type {
  */
 
 /**
- * Extrae el body del 400 de `crear`/`actualizar-programacion`
+ * Extrae el body del 400 de `crear`/`actualizar`
  * (`{ detail, errores: [] }`), o `null` si el error no tiene esa forma.
  */
 export function extraerErroresProgramacion(err: unknown): ProgramacionErroresResponse | null {
@@ -22,7 +22,7 @@ export function extraerErroresProgramacion(err: unknown): ProgramacionErroresRes
 }
 
 /**
- * Extrae el body del 400 de `actualizar-programacion-masivo`
+ * Extrae el body del 400 de `actualizar-masivo`
  * (`{ detail, resultados: [{ indice, errores }] }`), o `null` si no tiene `resultados`.
  * Para el caso de validación global del batch (sin `resultados`) usar
  * `extraerErroresProgramacion` como fallback.
@@ -38,12 +38,22 @@ export function extraerErroresMasivo(err: unknown): ProgramacionErroresMasivoRes
 /**
  * Extrae el `detail` (mensaje general) de un 400 de programación, si lo trae. Útil
  * para errores sin `errores[]` (ej. "Ya existe programación para este contrato y
- * puesto; use actualizar."): se muestra tal cual en el toast.
+ * puesto; use actualizar." o "Ya existe un prototipo para ese contrato y documento
+ * detalle."): se muestra tal cual en el toast.
+ *
+ * DRF devuelve `detail` como **string** o como **lista de strings** (los
+ * `ValidationError` de serializer llegan en lista); se contemplan ambos y la
+ * lista se une con un espacio.
  */
 export function extraerDetalleProgramacion(err: unknown): string | null {
   if (!(err instanceof HttpErrorResponse)) return null;
-  const body = err.error as { readonly detail?: unknown } | null;
-  return body && typeof body.detail === 'string' ? body.detail : null;
+  const detail = (err.error as { readonly detail?: unknown } | null)?.detail;
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    const msgs = detail.filter((d): d is string => typeof d === 'string');
+    return msgs.length ? msgs.join(' ') : null;
+  }
+  return null;
 }
 
 /**

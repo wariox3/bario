@@ -18,7 +18,11 @@ export interface PrototipoPayload {
   readonly fecha: string;
   /** Fecha ISO `YYYY-MM-DD` desde la que arranca el ciclo de la secuencia. */
   readonly fecha_inicio: string;
-  /** Puesto (línea del documento) al que pertenece el prototipo. */
+  /**
+   * Puesto al que pertenece el prototipo: es el **detalle del documento afectado**
+   * (`documento_detalle_afectado_id` de la fila de programación), no la línea de
+   * programación en sí. El front solo persiste cuando ese detalle existe.
+   */
   readonly documento_detalle: number;
   readonly secuencia: number;
   readonly contrato: number;
@@ -38,6 +42,8 @@ export interface PrototipoPayload {
 export interface Prototipo extends PrototipoPayload {
   readonly id: number;
   readonly contrato_nombre?: string | null;
+  /** Nº de identificación del contacto del contrato (C.C./NIT), para el autocomplete. */
+  readonly contrato_contacto_numero_identificacion?: string | null;
   readonly secuencia_nombre?: string | null;
   readonly puesto_nombre?: string | null;
   readonly documento_numero?: number | null;

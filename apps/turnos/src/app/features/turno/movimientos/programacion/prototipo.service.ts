@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, forkJoin, map } from 'rxjs';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import {
+  BaseHttpService,
+  buildListBody,
+  buildListParams,
+  type ListQuery,
+  type PaginatedResponse,
+} from '@reddoc/core';
 import type { Prototipo, PrototipoPayload } from './prototipo.model';
+import type { ProgramacionDetalleResponse } from './programacion.model';
 
 /**
  * Servicio HTTP del **prototipo** de turnos (`/turno/prototipo`).
@@ -20,12 +27,30 @@ export class PrototipoService extends BaseHttpService {
   /**
    * Lista las filas de prototipo de un puesto: `GET /turno/prototipo/` filtrado
    * por `documento_detalle`. La respuesta es paginada (DRF), así que se mapea a
-   * `results`.
+   * `results`. Lo usa el modal de prototipo dentro de la programación.
    */
-  list(documentoDetalleId: number): Observable<readonly Prototipo[]> {
+  listByDetalle(documentoDetalleId: number): Observable<readonly Prototipo[]> {
     return this.get<PaginatedResponse<Prototipo>>(this.resourcePath, {
       documento_detalle: documentoDetalleId,
     }).pipe(map((res) => res.results));
+  }
+
+  /**
+   * Listado paginado para el **administrador de prototipos** (master de solo
+   * lectura): `POST /turno/prototipo/lista/` con `{ filtros, ordenamientos }` y
+   * la paginación por query params, igual que el resto de masters del módulo.
+   */
+  list(query: ListQuery): Observable<PaginatedResponse<Prototipo>> {
+    return this.post<PaginatedResponse<Prototipo>>(
+      `${this.resourcePath}lista/`,
+      buildListBody(query),
+      buildListParams(query),
+    );
+  }
+
+  /** Ficha de un prototipo por id (`GET /turno/prototipo/:id/`) — detalle del master. */
+  getById(id: number): Observable<Prototipo> {
+    return this.get<Prototipo>(`${this.resourcePath}${id}/`);
   }
 
   create(payload: PrototipoPayload): Observable<Prototipo> {
@@ -34,6 +59,82 @@ export class PrototipoService extends BaseHttpService {
 
   update(id: number, payload: PrototipoPayload): Observable<Prototipo> {
     return this.put<Prototipo>(`${this.resourcePath}${id}/`, payload);
+  }
+
+  /**
+   * Simula (dry-run) los turnos que generaría el prototipo del puesto sin
+   * persistirlos: `POST /turno/programacion-simulacion/simular/` con
+   * `{ documento_detalle_id, anio, mes }`. Es un recurso aparte del prototipo
+   * (no cuelga de `resourcePath`). El año/mes los elige el usuario en el modal
+   * (selector de la barra de acciones) para simular el período deseado.
+   *
+   * TODO(prototipo): tipar la respuesta cuando el backend confirme su forma
+   * (por ahora `unknown`, se inspecciona en el `console.log` del componente).
+   */
+  simular(documentoDetalleId: number, anio: number, mes: number): Observable<unknown> {
+    return this.post<unknown>('/turno/programacion-simulacion/simular/', {
+      documento_detalle_id: documentoDetalleId,
+      anio,
+      mes,
+    });
+  }
+
+  /**
+   * Limpia la simulación del puesto (borra los registros dry-run):
+   * `POST /turno/programacion-simulacion/limpiar/` con `{ documento_detalle_id }`.
+   * Tras limpiar, el `detalle` vuelve vacío — el modal lo pide de nuevo para
+   * refrescar la tabla de vista previa.
+   */
+  limpiar(documentoDetalleId: number): Observable<unknown> {
+    return this.post<unknown>('/turno/programacion-simulacion/limpiar/', {
+      documento_detalle_id: documentoDetalleId,
+    });
+  }
+
+  /**
+   * Genera (materializa) la programación real del puesto a partir del prototipo:
+   * `POST /turno/programacion/generar/` con `{ documento_detalle }`. Es la acción
+   * terminal del modal; al éxito el padre recarga el grid de programación.
+   */
+  generar(documentoDetalle: number): Observable<unknown> {
+    return this.post<unknown>('/turno/programacion/generar/', {
+      documento_detalle_id: documentoDetalle,
+    });
+  }
+
+  /**
+   * Desgenera (revierte) la programación materializada del puesto:
+   * `POST /turno/programacion/desgenerar/` con `{ documento_detalle_id }`. Es el
+   * inverso de `generar`; el modal alterna entre ambos según el flag `generado`
+   * de la línea. Corre contra la línea del pedido (`documento_detalle_id`).
+   */
+  desgenerar(documentoDetalle: number): Observable<unknown> {
+    return this.post<unknown>('/turno/programacion/desgenerar/', {
+      documento_detalle_id: documentoDetalle,
+    });
+  }
+
+  /**
+   * Trae el **detalle** de la simulación de un puesto para el período dado:
+   * `GET /turno/programacion-simulacion/detalle/?documento_detalle=<id>&anio=<a>&mes=<m>`.
+   * Se llama después de `simular`/`limpiar` para obtener los datos con que se
+   * pinta la tabla de vista previa del modal. El año/mes salen del selector de
+   * período del modal (el mismo que alimenta `simular`).
+   *
+   * Devuelve el **mismo shape** que el calendario de la programación
+   * (`ProgramacionDetalleResponse`: cabecera + `fechas` + `filas`), así que la
+   * vista previa reusa esos tipos.
+   */
+  detalleSimulacion(
+    documentoDetalleId: number,
+    anio: number,
+    mes: number,
+  ): Observable<ProgramacionDetalleResponse> {
+    return this.get<ProgramacionDetalleResponse>('/turno/programacion-simulacion/detalle/', {
+      documento_detalle: documentoDetalleId,
+      anio,
+      mes,
+    });
   }
 
   /**

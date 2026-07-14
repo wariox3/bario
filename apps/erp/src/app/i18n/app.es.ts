@@ -1,8 +1,11 @@
-import { authEs } from '@reddoc/ui';
+import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
+import { appSwitcherEs, authEs } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
   auth: authEs,
+  appSwitcher: appSwitcherEs,
+  contenedores: contenedoresEs,
   common: {
     comingSoon: 'Próximamente disponible.',
     actions: {
@@ -185,6 +188,25 @@ export const es: AppDict = {
       error: {
         title: 'Error al generar',
         desc: 'No se pudo generar el documento. Intentá de nuevo.',
+      },
+    },
+    generarRecurrente: {
+      seleccionadosLabel: 'Generar seleccionados',
+      noSelection: {
+        title: 'Sin selección',
+        desc: 'Selecciona al menos una factura recurrente para generar.',
+      },
+      success: {
+        title: 'Facturas generadas',
+        desc: 'Las facturas se generaron correctamente a partir de las plantillas.',
+      },
+      empty: {
+        title: 'Sin novedades',
+        desc: 'No había facturas por generar en la selección.',
+      },
+      error: {
+        title: 'Error al generar',
+        desc: 'No se pudieron generar las facturas. Intenta de nuevo.',
       },
     },
     detail: {
@@ -1687,6 +1709,7 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
         },
+        tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
         validation: { required: 'Este campo es requerido' },
         toasts: {
           createSuccess: {
@@ -1818,6 +1841,247 @@ export const es: AppDict = {
         notFound: {
           title: 'Documento no encontrado',
           desc: 'El documento que buscas no existe o fue eliminado.',
+        },
+      },
+    },
+    notaCreditoCompra: {
+      name: 'Nota crédito',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva nota crédito',
+        editTitle: 'Editar nota crédito',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          documentoReferencia: 'Documento referencia',
+          documentoReferenciaPlaceholder: 'Selecciona la factura…',
+          documentoReferenciaDisabled: 'Selecciona primero un proveedor',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Nota creada',
+            desc: 'La nota crédito se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la nota crédito',
+          },
+          editSuccess: {
+            title: 'Nota actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la nota crédito',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          documentoReferencia: 'Documento referencia',
+          centroCosto: 'Centro de costo',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Nota no encontrada',
+          desc: 'La nota que buscas no existe o fue eliminada.',
+        },
+      },
+    },
+    notaDebitoCompra: {
+      name: 'Nota débito',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva nota débito',
+        editTitle: 'Editar nota débito',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          documentoReferencia: 'Documento referencia',
+          documentoReferenciaPlaceholder: 'Selecciona la factura…',
+          documentoReferenciaDisabled: 'Selecciona primero un proveedor',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Nota creada',
+            desc: 'La nota débito se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la nota débito',
+          },
+          editSuccess: {
+            title: 'Nota actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la nota débito',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          documentoReferencia: 'Documento referencia',
+          centroCosto: 'Centro de costo',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Nota no encontrada',
+          desc: 'La nota que buscas no existe o fue eliminada.',
+        },
+      },
+    },
+    facturaCompraRecurrente: {
+      name: 'Factura recurrente',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva factura recurrente',
+        editTitle: 'Editar factura recurrente',
+        sectionHint: 'Plantilla desde la que se generan las facturas',
+        adicionales: { title: 'Datos adicionales', hint: 'opcional' },
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          plazoPago: 'Plazo de pago',
+          plazoPagoPlaceholder: 'Selecciona…',
+          formaPago: 'Forma de pago',
+          formaPagoPlaceholder: 'Selecciona…',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Factura creada',
+            desc: 'La factura recurrente se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la factura recurrente',
+          },
+          editSuccess: {
+            title: 'Factura actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la factura recurrente',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          plazoPago: 'Plazo de pago',
+          formaPago: 'Forma de pago',
+          centroCosto: 'Centro de costo',
+          sede: 'Sede',
+          ordenCompra: 'Orden de compra',
+        },
+        notFound: {
+          title: 'Factura no encontrada',
+          desc: 'La factura que buscas no existe o fue eliminada.',
         },
       },
     },
@@ -1956,6 +2220,43 @@ export const es: AppDict = {
         incompleteLines: {
           title: 'Líneas incompletas',
           desc: 'Completa o elimina las líneas sin ítem antes de guardar',
+        },
+      },
+    },
+    cuentaDetalle: {
+      empty: 'Aún no hay cuentas. Agrega la primera para empezar',
+      addLine: 'Agregar cuenta',
+      removeLine: 'Eliminar cuenta',
+      saveLine: 'Guardar cuenta',
+      saveAll: 'Guardar cuentas',
+      pendingSuffix: 'sin guardar',
+      cuentaPlaceholder: 'Buscar cuenta…',
+      confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
+      naturaleza: { debito: 'Débito', credito: 'Crédito' },
+      columns: {
+        linea: '#',
+        cuenta: 'Cuenta',
+        naturaleza: 'Naturaleza',
+        valor: 'Valor',
+        acciones: 'Acciones',
+      },
+      resumen: { debitos: 'Débitos', creditos: 'Créditos' },
+      toasts: {
+        lineSaveSuccess: {
+          title: 'Cuenta guardada',
+          desc: 'La cuenta se guardó correctamente',
+        },
+        lineSaveError: {
+          title: 'Error al guardar',
+          desc: 'No se pudo guardar la cuenta',
+        },
+        allSaved: {
+          title: 'Cuentas guardadas',
+          desc: 'Se guardaron las cuentas pendientes',
+        },
+        incompleteLines: {
+          title: 'Cuentas incompletas',
+          desc: 'Completa o elimina las cuentas sin cuenta o valor antes de guardar',
         },
       },
     },
@@ -2209,179 +2510,6 @@ export const es: AppDict = {
         notFound: {
           title: 'Documento no encontrado',
           desc: 'El documento que buscas no existe o fue eliminado.',
-        },
-      },
-    },
-  },
-  contenedores: {
-    list: {
-      title: 'Tus contenedores de empresa',
-      subtitle: 'Seleccioná un espacio de trabajo para continuar',
-      newButton: 'Nuevo contenedor',
-      searchPlaceholder: 'Buscar...',
-      enter: 'Ingresar',
-      status: { active: 'Activo', inactive: 'Inactivo' },
-      summary: {
-        containers: { one: 'contenedor', other: 'contenedores' },
-        active: { one: 'activo', other: 'activos' },
-      },
-      actions: {
-        menuLabel: 'Opciones del contenedor',
-        invite: 'Invitar usuario',
-        edit: 'Editar contenedor',
-        updateSubscription: 'Actualizar suscripción',
-        delete: 'Eliminar contenedor',
-      },
-      view: {
-        list: 'Vista de lista',
-        grid: 'Vista de cuadrícula',
-      },
-      empty: {
-        noResults: {
-          title: 'Sin resultados',
-          sub: 'No encontramos empresas que coincidan con tu búsqueda.',
-        },
-        noContenedores: {
-          title: 'Sin empresas',
-          sub: 'Aún no tenés ningún espacio de trabajo asignado.',
-          cta: 'Crear primera empresa',
-        },
-      },
-      expired: {
-        badge: 'Vencida',
-        ownerCta: 'Renovar suscripción',
-        memberLocked: 'Solo el propietario puede renovar',
-      },
-    },
-    create: {
-      title: 'Nuevo contenedor',
-      subtitle: 'Configurá el nuevo espacio de trabajo',
-      fields: {
-        name: 'Nombre del contenedor',
-        namePlaceholder: 'Acme Corp',
-        phone: 'Teléfono',
-        phonePlaceholder: '3153334455',
-        email: 'Correo electrónico',
-        emailPlaceholder: 'contacto@empresa.com',
-      },
-      validation: {
-        nameRequired: 'El nombre es obligatorio.',
-        nameMin2: 'Mínimo 2 caracteres.',
-        phoneRequired: 'El teléfono es obligatorio.',
-        phoneMax20: 'Máximo 20 caracteres.',
-        emailRequired: 'El correo es obligatorio.',
-        emailInvalid: 'Ingresá un correo válido.',
-      },
-      submit: 'Crear contenedor',
-      cancel: 'Cancelar',
-      toasts: {
-        success: { title: 'Contenedor creado', desc: 'El contenedor fue creado correctamente.' },
-        error: {
-          title: 'Error al crear',
-          desc: 'No se pudo crear el contenedor. Intentá de nuevo.',
-        },
-      },
-    },
-    edit: {
-      title: 'Editar contenedor',
-      subtitle: 'Actualizá los datos del contenedor',
-      submit: 'Guardar cambios',
-      cancel: 'Cancelar',
-      toasts: {
-        success: { title: 'Empresa actualizada', desc: 'Los cambios se guardaron correctamente.' },
-        error: {
-          title: 'Error al actualizar',
-          desc: 'No se pudo actualizar la empresa. Intentá de nuevo.',
-        },
-      },
-    },
-    delete: {
-      title: 'Eliminar contenedor',
-      subtitle: 'Esta acción es permanente y no se puede deshacer.',
-      warning: 'Se eliminarán todos los datos asociados a este contenedor de forma irreversible.',
-      containerLabel: 'Contenedor a eliminar',
-      confirmLabel: 'Para confirmar, escribí el nombre exacto del contenedor',
-      confirmError: 'El nombre no coincide.',
-      submit: 'Eliminar',
-      cancel: 'Cancelar',
-      toasts: {
-        success: {
-          title: 'Contenedor eliminado',
-          desc: 'El contenedor fue eliminado correctamente.',
-        },
-        error: {
-          title: 'Error al eliminar',
-          desc: 'No se pudo eliminar el contenedor. Intentá de nuevo.',
-        },
-      },
-    },
-    invite: {
-      title: 'Invitar al contenedor',
-      subtitle: 'Compartí este espacio con tu equipo por correo electrónico.',
-      tabs: { members: 'Miembros', pending: 'Invitaciones' },
-      form: {
-        label: 'Correo del invitado',
-        placeholder: 'nombre@empresa.com',
-        invalid: 'Ingresá un correo válido.',
-        submit: 'Enviar invitación',
-        sending: 'Enviando…',
-      },
-      pending: {
-        estados: { P: 'Pendiente', A: 'Aceptada', R: 'Rechazada' },
-        count: { one: 'invitación', other: 'invitaciones' },
-        empty: {
-          title: 'Sin invitaciones',
-          sub: 'Las invitaciones que envíes aparecerán acá.',
-        },
-        toasts: {
-          loadError: {
-            title: 'Error al cargar invitaciones',
-            desc: 'No pudimos traer las invitaciones pendientes.',
-          },
-        },
-      },
-      members: {
-        title: 'Miembros',
-        count: { one: 'miembro', other: 'miembros' },
-        empty: {
-          title: 'Aún nadie más',
-          sub: 'Invitá a alguien por correo y aparecerá acá.',
-        },
-        you: 'tú',
-        roles: {
-          propietario: 'Propietario',
-          administrador: 'Administrador',
-          usuario: 'Miembro',
-        },
-        removeAria: 'Quitar miembro',
-      },
-      remove: {
-        title: 'Quitar miembro',
-        desc: 'Perderá el acceso al contenedor. Esta acción no se puede deshacer.',
-        confirm: 'Quitar',
-        cancel: 'Cancelar',
-      },
-      close: 'Cerrar',
-      toasts: {
-        sent: {
-          title: 'Invitación enviada',
-          desc: 'Le enviamos un correo para sumarse al contenedor.',
-        },
-        sendError: {
-          title: 'No se pudo invitar',
-          desc: 'Intentá nuevamente en unos segundos.',
-        },
-        removed: {
-          title: 'Miembro quitado',
-          desc: 'Ya no tiene acceso al contenedor.',
-        },
-        removeError: {
-          title: 'No se pudo quitar',
-          desc: 'Intentá nuevamente en unos segundos.',
-        },
-        loadError: {
-          title: 'Error al cargar miembros',
-          desc: 'No pudimos traer la lista de miembros.',
         },
       },
     },

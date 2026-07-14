@@ -1,0 +1,267 @@
+import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { type Observable, defer, finalize, forkJoin, map, of, tap } from 'rxjs';
+import { FormArray, ReactiveFormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { I18nService, ToastService, formatCop } from '@reddoc/core';
+import { DocumentoDetalleService } from '@erp/core/module-config';
+import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
+import type { AppDict } from '@erp/i18n';
+import {
+  createCuentaDetalleGroup,
+  type CuentaDetalleGroup,
+} from '../../contable-documento-detalle.form';
+import {
+  calcularResumenContable,
+  cuentaDetalleToFormValue,
+  cuentaDetalleToPayload,
+} from '../../contable-documento-detalle.mapper';
+import type { CuentaDetalleRead } from '../../contable-documento-detalle.model';
+import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
+
+/**
+ * Tabla de **líneas de cuenta contable** (asientos manuales) de un documento.
+ * Espeja `ComercialDocumentoDetallesComponent` pero recortada al núcleo mínimo:
+ * cuenta + naturaleza (D/C) + valor, con el acumulado de débitos/créditos.
+ *
+ * Persistencia idéntica a la familia comercial: en **alta** (`documentId == null`)
+ * las líneas viven en el `FormArray` y viajan embebidas al crear el documento; en
+ * **edición** transaccionan al instante contra `/documento-detalle` (✓ por fila,
+ * baja inmediata). Expone la misma API pública (`saveAll`, `pendingCount`,
+ * `hasInvalidPending`) para que el form padre orqueste ítems y cuentas por igual.
+ */
+@Component({
+  selector: 'app-contable-documento-detalles',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    InputNumberModule,
+    SelectModule,
+    TooltipModule,
+    ConfirmDialogModule,
+    ErpCuentaSelectComponent,
+  ],
+  providers: [ConfirmationService],
+  templateUrl: './contable-documento-detalles.component.html',
+  styleUrl: './contable-documento-detalles.component.scss',
+})
+export class ContableDocumentoDetallesComponent {
+  private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly detalleService = inject(DocumentoDetalleService);
+  private readonly confirmation = inject(ConfirmationService);
+  private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly t = this.i18n.t;
+  protected readonly formatMoney = formatCop;
+
+  /** FormArray de líneas de cuenta, propiedad del form padre. */
+  readonly detalles = input.required<FormArray<CuentaDetalleGroup>>();
+
+  /**
+   * Id del documento en edición (`null` en alta). Cuando existe, las líneas
+   * transaccionan al instante contra `/documento-detalle`.
+   */
+  readonly documentId = input<number | null>(null);
+
+  /** Opciones del select de naturaleza (D/C), con etiquetas i18n. */
+  protected readonly naturalezaOptions = computed(() => [
+    { label: this.t().entities.cuentaDetalle.naturaleza.debito, value: 'D' as const },
+    { label: this.t().entities.cuentaDetalle.naturaleza.credito, value: 'C' as const },
+  ]);
+
+  /** Espejo reactivo del valor del array para la tabla y el resumen. */
+  protected readonly lines = signal<readonly CuentaDetalleFormRawValue[]>([]);
+
+  /** Acumulado de débitos/créditos del documento. */
+  protected readonly resumen = computed(() => calcularResumenContable(this.lines()));
+
+  /** Grupo persistiéndose ahora mismo (edición); bloquea su botón. */
+  protected readonly savingGroup = signal<CuentaDetalleGroup | null>(null);
+
+  /** Guardado en lote ("Guardar líneas" / flush del padre) en curso. */
+  protected readonly savingAll = signal(false);
+
+  constructor() {
+    effect((onCleanup) => {
+      const array = this.detalles();
+      const sync = (): void => this.lines.set(array.getRawValue());
+      sync();
+      const sub = array.valueChanges.subscribe(sync);
+      onCleanup(() => sub.unsubscribe());
+    });
+  }
+
+  protected addLinea(): void {
+    this.detalles().push(createCuentaDetalleGroup());
+  }
+
+  /** Pide confirmación y, al aceptar, elimina la línea (persiste en edición). */
+  protected removeLinea(group: CuentaDetalleGroup): void {
+    const { id } = group.getRawValue();
+    this.confirmation.confirm({
+      message: this.t().entities.cuentaDetalle.confirmDeleteLine,
+      header: this.t().common.confirms.deleteHeader,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.t().common.actions.delete,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deleteLinea(group, id),
+    });
+  }
+
+  /**
+   * Una fila está **pendiente** (sin persistir) cuando es nueva con cuenta elegida
+   * o cuando una existente fue modificada. Una fila recién agregada y vacía no
+   * cuenta: no hay nada que guardar ni perder.
+   */
+  protected isPending(group: CuentaDetalleGroup): boolean {
+    if (this.documentId() == null) return false;
+    return group.controls.id.value == null ? group.controls.cuenta.value != null : group.dirty;
+  }
+
+  private pendingRows(): readonly CuentaDetalleGroup[] {
+    return this.detalles().controls.filter((row) => this.isPending(row));
+  }
+
+  /** Nº de líneas sin guardar; alimenta el botón, el toolbar y el guard de salida. */
+  pendingCount(): number {
+    return this.pendingRows().length;
+  }
+
+  private pendingSavable(): readonly CuentaDetalleGroup[] {
+    return this.pendingRows().filter((row) => row.valid);
+  }
+
+  /** `true` si alguna línea pendiente está incompleta (p. ej. sin cuenta o sin valor). */
+  hasInvalidPending(): boolean {
+    return this.pendingRows().some((row) => row.invalid);
+  }
+
+  protected canSaveRow(group: CuentaDetalleGroup): boolean {
+    return this.documentId() != null && group.valid && this.isPending(group);
+  }
+
+  protected isSavingRow(group: CuentaDetalleGroup): boolean {
+    return this.savingGroup() === group;
+  }
+
+  /**
+   * Persiste una línea (PATCH si ya tiene `id`, POST con `documento_id` si es
+   * nueva) y la reconstruye desde la respuesta autoritativa del backend. Núcleo
+   * compartido por el ✓ por fila y el guardado en lote; no muestra toasts.
+   */
+  private persistRow(group: CuentaDetalleGroup): Observable<CuentaDetalleRead> {
+    const docId = this.documentId() as number;
+    const payload = cuentaDetalleToPayload(group.getRawValue());
+    const id = group.controls.id.value;
+    const op =
+      id != null
+        ? this.detalleService.actualizar<CuentaDetalleRead>(id, payload)
+        : this.detalleService.crear<CuentaDetalleRead>(docId, payload);
+    return op.pipe(
+      tap((saved) => {
+        const index = this.detalles().controls.indexOf(group);
+        if (index >= 0)
+          this.detalles().setControl(
+            index,
+            createCuentaDetalleGroup(cuentaDetalleToFormValue(saved)),
+          );
+      }),
+    );
+  }
+
+  /** Guarda una sola línea (botón ✓ por fila). */
+  protected saveLinea(group: CuentaDetalleGroup): void {
+    if (this.documentId() == null || group.invalid || this.savingGroup() || this.savingAll())
+      return;
+    this.savingGroup.set(group);
+    this.persistRow(group)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.savingGroup.set(null);
+          const toast = this.t().entities.cuentaDetalle.toasts.lineSaveSuccess;
+          this.toast.success(toast.title, toast.desc);
+        },
+        error: () => {
+          this.savingGroup.set(null);
+          const toast = this.t().entities.cuentaDetalle.toasts.lineSaveError;
+          this.toast.error(toast.title, toast.desc);
+        },
+      });
+  }
+
+  /** Click del botón "Guardar líneas": avisa de incompletas y guarda las válidas. */
+  protected onSaveAllClick(): void {
+    if (this.hasInvalidPending()) {
+      const toast = this.t().entities.cuentaDetalle.toasts.incompleteLines;
+      this.toast.warn(toast.title, toast.desc);
+    }
+    if (this.pendingSavable().length === 0) return;
+    this.saveAll().subscribe({
+      next: () => {
+        const toast = this.t().entities.cuentaDetalle.toasts.allSaved;
+        this.toast.success(toast.title, toast.desc);
+      },
+      error: () => {
+        const toast = this.t().entities.cuentaDetalle.toasts.lineSaveError;
+        this.toast.error(toast.title, toast.desc);
+      },
+    });
+  }
+
+  /**
+   * Guarda en lote todas las líneas pendientes y válidas. Lo usa el botón del
+   * toolbar y el form padre al guardar el documento (para no perder cambios).
+   * Operación pura: no muestra toasts (el feedback lo decide cada caller).
+   */
+  saveAll(): Observable<void> {
+    return defer(() => {
+      const rows = this.pendingSavable();
+      if (this.documentId() == null || rows.length === 0) return of(undefined);
+
+      this.savingAll.set(true);
+      return forkJoin(rows.map((row) => this.persistRow(row))).pipe(
+        map(() => undefined),
+        finalize(() => this.savingAll.set(false)),
+      );
+    }).pipe(takeUntilDestroyed(this.destroyRef));
+  }
+
+  /** Ejecuta la baja: local en alta/línea no persistida; contra la API en edición. */
+  private deleteLinea(group: CuentaDetalleGroup, id: number | null): void {
+    if (this.documentId() == null || id == null) {
+      this.removeGroup(group);
+      return;
+    }
+    this.detalleService
+      .eliminar(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.removeGroup(group);
+          this.toast.success(
+            this.t().common.toasts.deleteSuccess.title,
+            this.t().common.toasts.deleteSuccess.desc,
+          );
+        },
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.deleteError.title,
+            this.t().common.toasts.deleteError.desc,
+          ),
+      });
+  }
+
+  private removeGroup(group: CuentaDetalleGroup): void {
+    const i = this.detalles().controls.indexOf(group);
+    if (i >= 0) this.detalles().removeAt(i);
+  }
+}

@@ -1,8 +1,11 @@
-import { authEn } from '@reddoc/ui';
+import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
+import { appSwitcherEn, authEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
+  appSwitcher: appSwitcherEn,
+  contenedores: contenedoresEn,
   common: {
     comingSoon: 'Coming soon.',
     actions: {
@@ -185,6 +188,25 @@ export const en: AppDict = {
       error: {
         title: 'Generation failed',
         desc: 'Could not generate the document. Please try again.',
+      },
+    },
+    generarRecurrente: {
+      seleccionadosLabel: 'Generate selected',
+      noSelection: {
+        title: 'No selection',
+        desc: 'Select at least one recurring invoice to generate.',
+      },
+      success: {
+        title: 'Invoices generated',
+        desc: 'The invoices were generated successfully from the templates.',
+      },
+      empty: {
+        title: 'Nothing to do',
+        desc: 'There were no invoices to generate in the selection.',
+      },
+      error: {
+        title: 'Generation failed',
+        desc: 'Could not generate the invoices. Please try again.',
       },
     },
     detail: {
@@ -1646,6 +1668,7 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
         },
+        tabs: { detalles: 'Details', cuentas: 'Accounts' },
         validation: { required: 'This field is required' },
         toasts: {
           createSuccess: {
@@ -1777,6 +1800,247 @@ export const en: AppDict = {
         notFound: {
           title: 'Document not found',
           desc: 'The document you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+    notaCreditoCompra: {
+      name: 'Credit note',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New credit note',
+        editTitle: 'Edit credit note',
+        sectionHint: 'Main document details',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          documentoReferencia: 'Reference document',
+          documentoReferenciaPlaceholder: 'Select the invoice…',
+          documentoReferenciaDisabled: 'Select a supplier first',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Select…',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Note created',
+            desc: 'The credit note was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The credit note could not be created',
+          },
+          editSuccess: {
+            title: 'Note updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The credit note could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          documentoReferencia: 'Reference document',
+          centroCosto: 'Cost center',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Note not found',
+          desc: 'The note you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+    notaDebitoCompra: {
+      name: 'Debit note',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New debit note',
+        editTitle: 'Edit debit note',
+        sectionHint: 'Main document details',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          documentoReferencia: 'Reference document',
+          documentoReferenciaPlaceholder: 'Select the invoice…',
+          documentoReferenciaDisabled: 'Select a supplier first',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Select…',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Note created',
+            desc: 'The debit note was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The debit note could not be created',
+          },
+          editSuccess: {
+            title: 'Note updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The debit note could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          documentoReferencia: 'Reference document',
+          centroCosto: 'Cost center',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Note not found',
+          desc: 'The note you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+    facturaCompraRecurrente: {
+      name: 'Recurring invoice',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New recurring invoice',
+        editTitle: 'Edit recurring invoice',
+        sectionHint: 'Template used to generate the invoices',
+        adicionales: { title: 'Additional details', hint: 'optional' },
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          plazoPago: 'Payment terms',
+          plazoPagoPlaceholder: 'Select…',
+          formaPago: 'Payment form',
+          formaPagoPlaceholder: 'Select…',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Select…',
+          sede: 'Branch',
+          sedePlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Invoice created',
+            desc: 'The recurring invoice was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The recurring invoice could not be created',
+          },
+          editSuccess: {
+            title: 'Invoice updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The recurring invoice could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          plazoPago: 'Payment terms',
+          formaPago: 'Payment form',
+          centroCosto: 'Cost center',
+          sede: 'Branch',
+          ordenCompra: 'Purchase order',
+        },
+        notFound: {
+          title: 'Invoice not found',
+          desc: 'The invoice you are looking for does not exist or was deleted.',
         },
       },
     },
@@ -1915,6 +2179,43 @@ export const en: AppDict = {
         incompleteLines: {
           title: 'Incomplete lines',
           desc: 'Complete or remove lines without an item before saving',
+        },
+      },
+    },
+    cuentaDetalle: {
+      empty: 'No accounts yet. Add the first one to get started',
+      addLine: 'Add account',
+      removeLine: 'Remove account',
+      saveLine: 'Save account',
+      saveAll: 'Save accounts',
+      pendingSuffix: 'unsaved',
+      cuentaPlaceholder: 'Search account…',
+      confirmDeleteLine: 'Remove this account from the document?',
+      naturaleza: { debito: 'Debit', credito: 'Credit' },
+      columns: {
+        linea: '#',
+        cuenta: 'Account',
+        naturaleza: 'Nature',
+        valor: 'Amount',
+        acciones: 'Actions',
+      },
+      resumen: { debitos: 'Debits', creditos: 'Credits' },
+      toasts: {
+        lineSaveSuccess: {
+          title: 'Account saved',
+          desc: 'The account was saved successfully',
+        },
+        lineSaveError: {
+          title: 'Save failed',
+          desc: 'The account could not be saved',
+        },
+        allSaved: {
+          title: 'Accounts saved',
+          desc: 'Pending accounts were saved',
+        },
+        incompleteLines: {
+          title: 'Incomplete accounts',
+          desc: 'Complete or remove accounts without an account or amount before saving',
         },
       },
     },
@@ -2168,167 +2469,6 @@ export const en: AppDict = {
         notFound: {
           title: 'Document not found',
           desc: 'The document you are looking for does not exist or was deleted.',
-        },
-      },
-    },
-  },
-  contenedores: {
-    list: {
-      title: 'Your companies',
-      subtitle: 'Pick a workspace to continue',
-      newButton: 'New company',
-      searchPlaceholder: 'Search...',
-      enter: 'Enter',
-      status: { active: 'Active', inactive: 'Inactive' },
-      summary: {
-        containers: { one: 'container', other: 'containers' },
-        active: { one: 'active', other: 'active' },
-      },
-      actions: {
-        menuLabel: 'Container options',
-        invite: 'Invite user',
-        edit: 'Edit container',
-        updateSubscription: 'Update subscription',
-        delete: 'Delete container',
-      },
-      view: {
-        list: 'List view',
-        grid: 'Grid view',
-      },
-      empty: {
-        noResults: {
-          title: 'No results',
-          sub: 'No companies match your search.',
-        },
-        noContenedores: {
-          title: 'No companies',
-          sub: 'You do not have any workspaces assigned yet.',
-          cta: 'Create first company',
-        },
-      },
-      expired: {
-        badge: 'Expired',
-        ownerCta: 'Renew subscription',
-        memberLocked: 'Only the owner can renew',
-      },
-    },
-    create: {
-      title: 'New company',
-      subtitle: 'Configure the new workspace',
-      fields: {
-        name: 'Company name',
-        namePlaceholder: 'Acme Corp',
-        phone: 'Phone',
-        phonePlaceholder: '3153334455',
-        email: 'Email',
-        emailPlaceholder: 'contact@company.com',
-      },
-      validation: {
-        nameRequired: 'Name is required.',
-        nameMin2: 'Minimum 2 characters.',
-        phoneRequired: 'Phone is required.',
-        phoneMax20: 'Maximum 20 characters.',
-        emailRequired: 'Email is required.',
-        emailInvalid: 'Enter a valid email.',
-      },
-      submit: 'Create company',
-      cancel: 'Cancel',
-      toasts: {
-        success: { title: 'Company created', desc: 'The container was created successfully.' },
-        error: { title: 'Creation error', desc: 'Could not create the container. Try again.' },
-      },
-    },
-    edit: {
-      title: 'Edit container',
-      subtitle: 'Update the container details',
-      submit: 'Save changes',
-      cancel: 'Cancel',
-      toasts: {
-        success: { title: 'Company updated', desc: 'Changes were saved successfully.' },
-        error: { title: 'Update error', desc: 'Could not update the company. Try again.' },
-      },
-    },
-    delete: {
-      title: 'Delete container',
-      subtitle: 'This action is permanent and cannot be undone.',
-      warning: 'All data associated with this container will be permanently deleted.',
-      containerLabel: 'Container to delete',
-      confirmLabel: 'To confirm, type the exact name of the container',
-      confirmError: 'The name does not match.',
-      submit: 'Delete',
-      cancel: 'Cancel',
-      toasts: {
-        success: { title: 'Container deleted', desc: 'The container was deleted successfully.' },
-        error: { title: 'Deletion error', desc: 'Could not delete the container. Try again.' },
-      },
-    },
-    invite: {
-      title: 'Invite to container',
-      subtitle: 'Share this workspace with your team by email.',
-      tabs: { members: 'Members', pending: 'Invitations' },
-      form: {
-        label: 'Invitee email',
-        placeholder: 'name@company.com',
-        invalid: 'Enter a valid email.',
-        submit: 'Send invitation',
-        sending: 'Sending…',
-      },
-      pending: {
-        estados: { P: 'Pending', A: 'Accepted', R: 'Rejected' },
-        count: { one: 'invitation', other: 'invitations' },
-        empty: {
-          title: 'No invitations',
-          sub: 'Invitations you send will appear here.',
-        },
-        toasts: {
-          loadError: {
-            title: 'Failed to load invitations',
-            desc: 'We could not fetch the pending invitations.',
-          },
-        },
-      },
-      members: {
-        title: 'Members',
-        count: { one: 'member', other: 'members' },
-        empty: {
-          title: 'No one else yet',
-          sub: 'Invite someone by email and they will appear here.',
-        },
-        you: 'you',
-        roles: {
-          propietario: 'Owner',
-          administrador: 'Admin',
-          usuario: 'Member',
-        },
-        removeAria: 'Remove member',
-      },
-      remove: {
-        title: 'Remove member',
-        desc: 'They will lose access to the container. This cannot be undone.',
-        confirm: 'Remove',
-        cancel: 'Cancel',
-      },
-      close: 'Close',
-      toasts: {
-        sent: {
-          title: 'Invitation sent',
-          desc: 'We emailed them to join the container.',
-        },
-        sendError: {
-          title: 'Could not invite',
-          desc: 'Try again in a moment.',
-        },
-        removed: {
-          title: 'Member removed',
-          desc: 'They no longer have access to the container.',
-        },
-        removeError: {
-          title: 'Could not remove',
-          desc: 'Try again in a moment.',
-        },
-        loadError: {
-          title: 'Failed to load members',
-          desc: 'We could not fetch the member list.',
         },
       },
     },

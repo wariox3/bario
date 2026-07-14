@@ -82,6 +82,12 @@ export interface DocumentoPayloadBase {
 export interface DocumentoDetalleReadBase {
   /** Id de la línea (para distinguir existente vs nueva al editar). */
   readonly id?: number | null;
+  /**
+   * Discriminador de familia de línea que comparte la tabla `documento-detalle`:
+   * `'I'` (ítem de inventario), `'C'` (cuenta contable), etc. Permite separar las
+   * líneas al cargar un documento en edición. Ausente en backends que no lo envíen.
+   */
+  readonly tipo_registro?: string | null;
   readonly item: number | null;
   readonly item_nombre?: string | null;
   readonly cantidad: string | number | null;

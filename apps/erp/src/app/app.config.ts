@@ -20,6 +20,7 @@ import { environment } from '../environments/environment';
 import {
   APP_BRANDING,
   AUTH_DEFAULT_SKIP_URLS,
+  CURRENT_APP,
   ENVIRONMENT,
   ROUTE_PATHS_TOKEN,
   AUTH_SERVICE,
@@ -32,6 +33,7 @@ import {
   provideI18n,
   TENANT_ROUTES,
 } from '@reddoc/core';
+import type { ReddocAppId } from '@reddoc/core';
 import { AuthService } from './features/auth/services/auth.service';
 import { ROUTE_PATHS } from './core/constants/route-paths.constants';
 import {
@@ -91,6 +93,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_BRANDING,
       useValue: { appName: 'ERP', tagline: 'Gestiona tu empresa desde un solo lugar.' },
     },
+    { provide: CURRENT_APP, useValue: 'erp' satisfies ReddocAppId },
     { provide: AUTH_SERVICE, useExisting: AuthService },
     {
       provide: TENANT_ROUTES,

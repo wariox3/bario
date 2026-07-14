@@ -85,6 +85,25 @@
   border-color: #f87171;
 }
 
+// Contrato y secuencia montan autocompletes de PrimeNG, cuyo input trae la
+// altura default (más alta que los `pInputText` compactos de fecha/posición).
+// Igualamos su padding/tipografía a `.prototipo-grid__input` para que todas las
+// celdas de una fila queden a la misma altura. El addon de la C.C. (input group
+// del contrato) sigue la misma altura para no volver a estirar la fila.
+.prototipo-grid__td--contrato,
+.prototipo-grid__td--secuencia {
+  ::ng-deep .p-inputtext {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  ::ng-deep .p-inputgroupaddon {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+    font-size: 0.72rem;
+  }
+}
+
 // ── Vista previa (simulación) ─────────────────────────────────────────────────
 // Mismo lenguaje visual que `editar-grid`: header sticky, columnas de día
 // angostas con num + inicial. Columnas fijas (año/mes/cód/empleado) a la izquierda.

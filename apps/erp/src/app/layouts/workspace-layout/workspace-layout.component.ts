@@ -3,6 +3,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { I18nService, TenantService } from '@reddoc/core';
+import { AppSwitcherComponent } from '@reddoc/ui';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
@@ -33,6 +34,7 @@ import type {
     NgTemplateOutlet,
     DrawerModule,
     UserMenuComponent,
+    AppSwitcherComponent,
     ModuleBarComponent,
     TenantBadgeComponent,
   ],

@@ -320,6 +320,7 @@ export class BaseDocumentListComponent {
       ?.execute({
         document: this.document(),
         query: this.currentQuery(),
+        selectedIds: this.currentSelectedIds(),
         reload: () => this.loadList(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -351,9 +352,7 @@ export class BaseDocumentListComponent {
   }
 
   protected removeSelected(): void {
-    const ids = this.selectedRows()
-      .map((row) => this.extractId(row))
-      .filter((id): id is string | number => id !== null);
+    const ids = this.currentSelectedIds();
     if (ids.length === 0) return;
     this.confirmRemove(ids);
   }
@@ -371,6 +370,13 @@ export class BaseDocumentListComponent {
   }
 
   // ── Internos ──────────────────────────────────────────────────────────────
+
+  /** Ids de las filas seleccionadas; alimenta las acciones masivas del toolbar. */
+  private currentSelectedIds(): readonly (string | number)[] {
+    return this.selectedRows()
+      .map((row) => this.extractId(row))
+      .filter((id): id is string | number => id !== null);
+  }
 
   /** Query activo (filtros/orden/paginación) que comparten `loadList` y las acciones. */
   private currentQuery(): ListQuery {

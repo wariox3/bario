@@ -1,0 +1,174 @@
+<p-confirmdialog />
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Información general ──────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file-edit text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{
+            isEditMode()
+              ? t().entities.notaCreditoCompra.form.editTitle
+              : t().entities.notaCreditoCompra.form.createTitle
+          }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ t().entities.notaCreditoCompra.form.sectionHint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Proveedor -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="contacto" class="nota-credito-compra-form__label">
+            {{ t().entities.notaCreditoCompra.form.fields.proveedor }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-contacto-select
+            inputId="contacto"
+            formControlName="contacto"
+            [extraParams]="contactoParams"
+            [placeholder]="t().entities.notaCreditoCompra.form.fields.proveedorPlaceholder"
+            [invalid]="form.controls.contacto.invalid && form.controls.contacto.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.contacto"
+            [messages]="{ required: t().entities.notaCreditoCompra.form.validation.required }"
+          />
+        </div>
+
+        <!-- Fecha -->
+        <div class="flex flex-col gap-1.5">
+          <label for="fecha" class="nota-credito-compra-form__label">
+            {{ t().entities.notaCreditoCompra.form.fields.fecha }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="fecha"
+            formControlName="fecha"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+            [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.fecha"
+            [messages]="{ required: t().entities.notaCreditoCompra.form.validation.required }"
+          />
+        </div>
+
+        <!-- Documento de referencia (facturas de compra aprobadas del proveedor) -->
+        <!-- TODO(nota-credito-compra): select deshabilitado hasta confirmar el
+             contrato del backend del endpoint de referencia. Ver el TODO en
+             nota-credito-compra-form.component.ts (referenciaParams/referenciaEndpoint)
+             y la nota de memoria project-nota-credito-compra.md. Al reactivar,
+             descomentar este bloque. -->
+        <div class="flex flex-col gap-1.5">
+          <!-- <label for="documento_referencia" class="nota-credito-compra-form__label">
+            {{ t().entities.notaCreditoCompra.form.fields.documentoReferencia }}
+          </label>
+          <lib-api-select
+            inputId="documento_referencia"
+            formControlName="documento_referencia"
+            [endpoint]="referenciaEndpoint"
+            [params]="referenciaParams()"
+            [displayWith]="referenciaLabel"
+            [placeholder]="
+              form.controls.contacto.value
+                ? t().entities.notaCreditoCompra.form.fields.documentoReferenciaPlaceholder
+                : t().entities.notaCreditoCompra.form.fields.documentoReferenciaDisabled
+            "
+          /> -->
+        </div>
+
+        <!-- Centro de costo -->
+        <div class="flex flex-col gap-1.5">
+          <label for="centro_costo" class="nota-credito-compra-form__label">
+            {{ t().entities.notaCreditoCompra.form.fields.centroCosto }}
+          </label>
+          <lib-api-select
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
+            [placeholder]="t().entities.notaCreditoCompra.form.fields.centroCostoPlaceholder"
+          />
+        </div>
+
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="nota-credito-compra-form__label">
+            {{ t().entities.notaCreditoCompra.form.fields.comentario }}
+          </label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            maxlength="500"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sección: Detalles (líneas comerciales) ───────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-list text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ t().entities.comercialDetalle.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ t().entities.comercialDetalle.hint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <app-comercial-documento-detalles
+        modo="compra"
+        [detalles]="form.controls.detalles"
+        [documentId]="documentId()"
+        [contactoId]="form.controls.contacto.value?.id ?? null"
+        (imported)="onImported()"
+      />
+    </div>
+  </section>
+</form>

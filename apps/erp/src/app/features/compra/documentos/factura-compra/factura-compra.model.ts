@@ -12,6 +12,7 @@
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type { CuentaDetallePayload } from '@erp/features/documentos/contable/contable-documento-detalle.model';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de compra. */
 export interface FacturaCompraRead extends DocumentoReadBase {
@@ -32,6 +33,10 @@ export interface FacturaCompraPayload extends DocumentoPayloadBase {
   readonly plazo_pago: number | null;
   readonly sede: number | null;
   readonly metodo_pago: number | null;
-  /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
-  readonly detalles?: readonly ComercialDetallePayload[];
+  /**
+   * Solo en alta: en edición las líneas transaccionan contra `documento-detalle`.
+   * Mezcla líneas de ítem (comerciales) y de cuenta contable; el backend las
+   * discrimina por `tipo_registro`.
+   */
+  readonly detalles?: readonly (ComercialDetallePayload | CuentaDetallePayload)[];
 }

@@ -1,0 +1,140 @@
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+</header>
+
+@if (isLoading()) {
+  <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <!-- ── No encontrado ───────────────────────────────────────────────────────── -->
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">
+      {{ t().entities.prototipo.detail.notFound.title }}
+    </p>
+    <p class="m-0 mt-1 max-w-70 text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ t().entities.prototipo.detail.notFound.desc }}
+    </p>
+  </div>
+} @else if (prototipo(); as p) {
+  <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
+  <lib-detail-header
+    icon="pi pi-calendar-plus"
+    [eyebrow]="t().entities.prototipo.detail.eyebrow"
+    [title]="titulo()"
+  >
+    <div detailHeaderSubtitle>
+      @if (p.documento_documento_tipo_nombre || p.documento_numero) {
+        <span class="text-[0.8rem] text-brand-muted">
+          {{ p.documento_documento_tipo_nombre }}
+          @if (p.documento_numero) {
+            <span class="font-semibold text-brand-text">#{{ p.documento_numero }}</span>
+          }
+        </span>
+      }
+    </div>
+  </lib-detail-header>
+
+  <!-- ── Documento de origen ─────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
+      >
+        <i class="pi pi-file text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.prototipo.detail.sections.general }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      @if (p.documento_numero) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="prototipo-detail__label">
+            {{ t().entities.prototipo.detail.fields.documento }}
+          </dt>
+          <dd class="prototipo-detail__value">#{{ p.documento_numero }}</dd>
+        </div>
+      }
+      @if (p.documento_documento_tipo_nombre) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.tipo }}</dt>
+          <dd class="prototipo-detail__value">{{ p.documento_documento_tipo_nombre }}</dd>
+        </div>
+      }
+      @if (p.documento_fecha) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="prototipo-detail__label">
+            {{ t().entities.prototipo.detail.fields.documentoFecha }}
+          </dt>
+          <dd class="prototipo-detail__value">{{ p.documento_fecha | date: 'mediumDate' }}</dd>
+        </div>
+      }
+      @if (p.puesto_nombre) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.puesto }}</dt>
+          <dd class="prototipo-detail__value">{{ p.puesto_nombre }}</dd>
+        </div>
+      }
+      @if (p.fecha) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.fecha }}</dt>
+          <dd class="prototipo-detail__value">{{ p.fecha | date: 'MMMM y' }}</dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- ── Asignación ──────────────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-sync text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.prototipo.detail.sections.asignacion }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.contrato }}</dt>
+        <dd class="prototipo-detail__value">{{ p.contrato_nombre ?? p.contrato }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">
+          {{ t().entities.prototipo.detail.fields.secuencia }}
+        </dt>
+        <dd class="prototipo-detail__value">{{ p.secuencia_nombre ?? p.secuencia }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">
+          {{ t().entities.prototipo.detail.fields.fechaInicio }}
+        </dt>
+        <dd class="prototipo-detail__value">{{ p.fecha_inicio | date: 'mediumDate' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.posicion }}</dt>
+        <dd class="prototipo-detail__value">{{ p.posicion }}</dd>
+      </div>
+    </dl>
+  </section>
+}

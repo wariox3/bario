@@ -18,6 +18,12 @@ export interface EntityActionContext {
    * acciones que operan sobre lo que el usuario está viendo (ej. exportar).
    */
   readonly query: ListQuery;
+  /**
+   * Ids de las filas seleccionadas (checkbox) al momento de disparar la acción.
+   * Vacío si no hay selección. Lo consumen las acciones masivas (ej. generar
+   * seleccionados); las que operan sobre el query completo pueden ignorarlo.
+   */
+  readonly selectedIds: readonly (string | number)[];
   /** Recarga la lista. El strategy lo llama tras una operación exitosa. */
   readonly reload: () => void;
 }

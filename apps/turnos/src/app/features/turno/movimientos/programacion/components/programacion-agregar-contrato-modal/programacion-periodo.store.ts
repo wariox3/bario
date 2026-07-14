@@ -40,12 +40,19 @@ export class ProgramacionPeriodoStore {
   private readonly _periodo = signal<ProgramacionPeriodo | null>(null);
   private readonly _cargando = signal(false);
   private readonly _festivos = signal<readonly Festivo[]>([]);
+  private readonly _generado = signal(false);
 
   /** Período resuelto (`null` mientras carga o si la línea no trae fecha). */
   readonly periodo = this._periodo.asReadonly();
 
   /** `true` mientras se resuelve el período (carga de la línea de documento). */
   readonly cargando = this._cargando.asReadonly();
+
+  /**
+   * `true` si la línea ya tiene la programación generada (materializada). Lo lee
+   * el modal de prototipo para alternar el botón entre generar y desgenerar.
+   */
+  readonly generado = this._generado.asReadonly();
 
   /**
    * Días del período (1..N) con la inicial del día de la semana. Vacío mientras
@@ -73,10 +80,11 @@ export class ProgramacionPeriodoStore {
     return mapa;
   });
 
-  /** Limpia el período y sus festivos (al reabrir el modal para otro puesto). */
+  /** Limpia el período, sus festivos y el flag de generado (al reabrir el modal). */
   reset(): void {
     this._periodo.set(null);
     this._festivos.set([]);
+    this._generado.set(false);
   }
 
   /**
@@ -94,9 +102,12 @@ export class ProgramacionPeriodoStore {
       )
       .subscribe({
         next: (linea) => {
+          // El flag de generado se conserva aunque la línea no traiga fecha.
+          this._generado.set(linea.generado);
           const ym = anioMesDeIso(linea.fecha_desde);
           if (!ym) {
-            this.reset();
+            this._periodo.set(null);
+            this._festivos.set([]);
             return;
           }
           this._periodo.set({ ...ym, etiqueta: etiquetaMes(ym.anio, ym.mes) });

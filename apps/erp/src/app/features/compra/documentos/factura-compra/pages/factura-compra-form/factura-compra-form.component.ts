@@ -16,6 +16,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
+import { TabsModule } from 'primeng/tabs';
 import { FieldErrorComponent } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -29,16 +30,13 @@ import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-br
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService } from '@reddoc/core';
+import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
-import {
-  METODO_PAGO_ENDPOINT,
-  PLAZO_PAGO_ENDPOINT,
-  SEDE_ENDPOINT,
-} from '../../factura-compra.constants';
+import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-compra.constants';
+import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -46,12 +44,29 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
+import {
+  createCuentaDetalleGroup,
+  type CuentaDetalleGroup,
+} from '@erp/features/documentos/contable/contable-documento-detalle.form';
+import { cuentaDetalleToFormValue } from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
+import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contable-documento-detalle.model';
 import { facturaCompraToFormValue, formValueToPayload } from '../../factura-compra.mapper';
 import type { FacturaCompraRead } from '../../factura-compra.model';
 
-/** Fila del endpoint `plazo-pago/seleccionar/` con los días que aporta el plazo. */
-interface PlazoPagoOption extends ErpSelectOption {
-  readonly dias?: number | null;
+/**
+ * Línea de documento leída al cargar en edición: la tabla `documento-detalle`
+ * mezcla líneas de ítem (comerciales) y de cuenta contable, discriminadas por
+ * `tipo_registro`. La intersección expone los campos de ambas familias (todos
+ * opcionales salvo el esqueleto común) para poder repartirlas al FormArray correcto.
+ */
+type FacturaLineaRead = ComercialDetalleRead & CuentaDetalleRead;
+
+/** Contrato mínimo de una tabla de líneas para el flush/guardado del padre. */
+interface FlushableLineTable {
+  hasInvalidPending(): boolean;
+  pendingCount(): number;
+  saveAll(): Observable<void>;
 }
 
 /**
@@ -79,10 +94,12 @@ interface PlazoPagoOption extends ErpSelectOption {
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    TabsModule,
     FieldErrorComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
+    ContableDocumentoDetallesComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './factura-compra-form.component.html',
@@ -103,10 +120,16 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
 
   protected readonly t = this.i18n.t;
 
-  /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
+  /** Tabla de líneas de ítem: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
-  protected readonly plazoPagoEndpoint = PLAZO_PAGO_ENDPOINT;
+  /** Tabla de líneas de cuenta contable; mismo contrato de flush que la de ítems. */
+  private readonly cuentasTable = viewChild(ContableDocumentoDetallesComponent);
+
+  /** Tab activo del bloque de líneas (Detalles / Cuentas). */
+  protected readonly activeTab = signal<'detalles' | 'cuentas'>('detalles');
+
+  protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
 
@@ -135,9 +158,6 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   });
   protected readonly isSaving = signal(false);
 
-  /** Mapa `idPlazo → días` para autocalcular la fecha de vencimiento. */
-  private readonly plazoDias = new Map<number, number>();
-
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     compraDocumentoBreadcrumb(
       this.t(),
@@ -156,23 +176,22 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     sede: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     detalles: new FormArray<ComercialDetalleGroup>([]),
+    cuentas: new FormArray<CuentaDetalleGroup>([]),
   });
 
   constructor() {
-    // Autocálculo del vencimiento: al cambiar fecha o plazo, vencimiento =
-    // fecha + días del plazo. El campo sigue siendo editable; las ediciones
-    // manuales se conservan hasta el próximo cambio de fecha/plazo.
-    const recompute = () => this.recomputeVencimiento();
-    this.form.controls.fecha.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(recompute);
-    this.form.controls.plazo_pago.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(recompute);
+    // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
+    setupVencimientoAutocompute({
+      fecha: this.form.controls.fecha,
+      plazoPago: this.form.controls.plazo_pago,
+      fechaVence: this.form.controls.fecha_vence,
+      selectData: this.selectData,
+      destroyRef: this.destroyRef,
+      endpoint: this.plazoPagoEndpoint,
+    });
   }
 
   ngOnInit(): void {
-    this.loadPlazoDias();
     const id = this.id();
     if (!id) return;
     // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
@@ -190,22 +209,22 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     if (this.form.invalid || this.form.pending || this.isSaving()) return;
 
     const id = this.id();
-    const detalles = this.detallesTable();
-    // En edición las líneas transaccionan aparte (no viajan en el payload de la
-    // cabecera). Para que no se pierdan, antes de guardar el documento se
-    // flushean las pendientes; si hay líneas incompletas se avisa y se aborta.
-    if (id && detalles) {
-      if (detalles.hasInvalidPending()) {
+    const tables = this.lineTables();
+    // En edición las líneas (ítems y cuentas) transaccionan aparte (no viajan en el
+    // payload de la cabecera). Para que no se pierdan, antes de guardar el documento
+    // se flushean las pendientes de ambas tablas; si hay incompletas se avisa y aborta.
+    if (id && tables.length) {
+      if (tables.some((table) => table.hasInvalidPending())) {
         const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
         this.toast.warn(toast.title, toast.desc);
         return;
       }
-      if (detalles.pendingCount() > 0) {
+      const pending = tables.reduce((total, table) => total + table.pendingCount(), 0);
+      if (pending > 0) {
         this.isSaving.set(true);
         // Flush silencioso: el éxito lo confirma el toast del documento; aquí solo
         // se reporta si el guardado de líneas falla (si no, sería un fallo mudo).
-        detalles
-          .saveAll()
+        forkJoin(tables.map((table) => table.saveAll()))
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: () => this.persistCabecera(id),
@@ -221,6 +240,14 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
 
     this.isSaving.set(true);
     this.persistCabecera(id);
+  }
+
+  /** Tablas de líneas montadas (ítems + cuentas), para el flush y el guard de salida. */
+  private lineTables(): FlushableLineTable[] {
+    return [this.detallesTable(), this.cuentasTable()].filter(
+      (table): table is ComercialDocumentoDetallesComponent | ContableDocumentoDetallesComponent =>
+        table != null,
+    );
   }
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
@@ -261,8 +288,8 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
    * hay pendientes y no molesta). Solo aplica en edición.
    */
   canDeactivate(): boolean | Observable<boolean> {
-    const detalles = this.detallesTable();
-    if (!detalles || detalles.pendingCount() === 0) return true;
+    const pending = this.lineTables().reduce((total, table) => total + table.pendingCount(), 0);
+    if (pending === 0) return true;
 
     const labels = this.t().entities.comercialDetalle;
     return new Observable<boolean>((subscriber) => {
@@ -303,7 +330,7 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      lineas: this.detalleService.listarPorDocumento<FacturaLineaRead>(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -318,7 +345,7 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
   private loadLineas(id: number): void {
     this.detalleService
-      .listarPorDocumento<ComercialDetalleRead>(id)
+      .listarPorDocumento<FacturaLineaRead>(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (lineas) => this.populateLineas(lineas),
@@ -334,49 +361,25 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     this.form.patchValue(facturaCompraToFormValue(read), { emitEvent: false });
   }
 
-  /** Reemplaza el FormArray de detalles con las líneas recibidas. */
-  private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
+  /**
+   * Reparte las líneas recibidas entre sus dos FormArrays según `tipo_registro`:
+   * las `'C'` (cuentas contables) van a `cuentas`, el resto (ítems) a `detalles`.
+   */
+  private populateLineas(lineas: readonly FacturaLineaRead[]): void {
     const detalles = this.form.controls.detalles;
+    const cuentas = this.form.controls.cuentas;
     detalles.clear();
-    for (const line of lineas)
-      detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+    cuentas.clear();
+    for (const line of lineas) {
+      if (line.tipo_registro === 'C')
+        cuentas.push(createCuentaDetalleGroup(cuentaDetalleToFormValue(line)));
+      else detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+    }
   }
 
   private notifyLoadError(): void {
     const toasts = this.t().entities.facturaCompra.form.toasts;
     this.toast.error(toasts.loadError.title, toasts.loadError.desc);
-  }
-
-  /** Carga el mapa `idPlazo → días` para el autocálculo del vencimiento. */
-  private loadPlazoDias(): void {
-    this.selectData
-      .fetchOptions<PlazoPagoOption>(PLAZO_PAGO_ENDPOINT)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (plazos) => {
-          for (const plazo of plazos) {
-            if (plazo.dias != null) this.plazoDias.set(plazo.id, plazo.dias);
-          }
-          // Si ya hay fecha + plazo elegidos, refrescar el vencimiento.
-          this.recomputeVencimiento();
-        },
-        error: () => {
-          // Sin días disponibles el vencimiento queda manual (sigue editable).
-        },
-      });
-  }
-
-  /** vencimiento = fecha + días del plazo (si ambos y los días están disponibles). */
-  private recomputeVencimiento(): void {
-    const fecha = this.form.controls.fecha.value;
-    const plazoId = this.form.controls.plazo_pago.value?.id;
-    if (!fecha || plazoId == null) return;
-    const dias = this.plazoDias.get(plazoId);
-    if (dias == null) return;
-
-    const vencimiento = new Date(fecha);
-    vencimiento.setDate(vencimiento.getDate() + dias);
-    this.form.controls.fecha_vence.setValue(vencimiento, { emitEvent: false });
   }
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */

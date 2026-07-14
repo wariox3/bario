@@ -1,8 +1,11 @@
-import { authEn } from '@reddoc/ui';
+import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
+import { appSwitcherEn, authEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
+  appSwitcher: appSwitcherEn,
+  contenedores: contenedoresEn,
   common: {
     comingSoon: 'Coming soon.',
     actions: {
@@ -294,6 +297,40 @@ export const en: AppDict = {
         },
       },
     },
+    prototipo: {
+      name: 'Prototypes',
+      columns: {
+        id: 'ID',
+        documento: 'Document',
+        puesto: 'Position',
+        contrato: 'Contract',
+        secuencia: 'Sequence',
+        fechaInicio: 'Start date',
+        posicion: 'Position no.',
+      },
+      detail: {
+        eyebrow: 'Prototype',
+        sections: { general: 'Source document', asignacion: 'Assignment' },
+        fields: {
+          documento: 'Document',
+          tipo: 'Type',
+          documentoFecha: 'Document date',
+          puesto: 'Position',
+          fecha: 'Period',
+          contrato: 'Contract',
+          secuencia: 'Sequence',
+          fechaInicio: 'Start date',
+          posicion: 'Position no.',
+        },
+        notFound: {
+          title: 'Prototype not found',
+          desc: 'The prototype you are looking for does not exist or was deleted.',
+        },
+        toasts: {
+          loadError: { title: 'Load error', desc: 'The prototype could not be loaded' },
+        },
+      },
+    },
     secuencia: {
       name: 'Sequences',
       searchPlaceholder: 'Search by name…',
@@ -517,6 +554,10 @@ export const en: AppDict = {
           codigoLabel: 'Code',
           clienteLabel: 'Client',
           puestoLabel: 'Position',
+          detalleAfectadoLabel: 'Contract detail',
+          pedidoDetalleLabel: 'Order detail',
+          sinAfectadoCorto: 'Unassigned',
+          periodoLabel: 'Period',
           columns: {
             contrato: 'Contract',
             secuencia: 'Sequence',
@@ -533,10 +574,20 @@ export const en: AppDict = {
           guardar: 'Save',
           eliminar: 'Delete',
           simular: 'Simulate',
+          limpiar: 'Clear',
           generar: 'Generate',
-          close: 'Close',
+          desgenerar: 'Ungenerate',
           validacion: 'Fill in contract, sequence and start date in every row.',
           sinCambios: 'There are no changes to save.',
+          sinAfectado: 'This position has no affected document; the prototype cannot be saved.',
+          sinGuardar: 'Unsaved changes',
+          descartar: {
+            header: 'Unsaved changes',
+            message:
+              'You have prototype changes that are not saved. Closing will discard them. Discard?',
+            aceptar: 'Discard',
+          },
+          generarErrores: { dias: 'days', cerrar: 'Close' },
           preview: {
             title: 'Preview',
             anio: 'Year',
@@ -561,6 +612,22 @@ export const en: AppDict = {
             deleteError: {
               title: 'Could not delete',
               desc: 'An error occurred while deleting the rows.',
+            },
+            generarSuccess: {
+              title: 'Schedule generated',
+              desc: 'The prototype shifts were generated into the schedule.',
+            },
+            generarError: {
+              title: 'Could not generate',
+              desc: 'An error occurred while generating the schedule.',
+            },
+            desgenerarSuccess: {
+              title: 'Schedule ungenerated',
+              desc: 'The generated schedule for the line was reverted.',
+            },
+            desgenerarError: {
+              title: 'Could not ungenerate',
+              desc: 'An error occurred while ungenerating the schedule.',
             },
           },
         },

@@ -1,0 +1,49 @@
+<!-- Sin apps hermanas configuradas en este entorno no hay nada que ofrecer: no renderizamos el trigger. -->
+@if (apps().length) {
+  <div class="app-switcher" (mouseenter)="onEnter()" (mouseleave)="onLeave()">
+    <button
+      type="button"
+      class="app-switcher__trigger"
+      [class.app-switcher__trigger--active]="open()"
+      (click)="toggle()"
+      aria-haspopup="true"
+      [attr.aria-expanded]="open()"
+      aria-controls="app-switcher-panel"
+      [attr.aria-label]="t().appSwitcher.triggerLabel"
+    >
+      <i class="pi pi-th-large" aria-hidden="true"></i>
+    </button>
+
+    @if (open()) {
+      <div id="app-switcher-panel" class="app-switcher__panel" role="menu">
+        <p class="app-switcher__heading">{{ t().appSwitcher.heading }}</p>
+
+        <div class="app-switcher__grid">
+          @for (app of apps(); track app.id) {
+            <a
+              class="app-switcher__app"
+              role="menuitem"
+              [href]="app.url"
+              [title]="app.description"
+              target="_blank"
+              rel="noopener"
+            >
+              <span class="app-switcher__tile">
+                <i class="{{ app.icon }}" aria-hidden="true"></i>
+              </span>
+              <span class="app-switcher__name">{{ app.name }}</span>
+            </a>
+          }
+
+          <!-- Placeholder de crecimiento: rellena la grilla y anticipa más apps -->
+          <div class="app-switcher__app app-switcher__app--soon" aria-hidden="true">
+            <span class="app-switcher__tile app-switcher__tile--soon">
+              <i class="pi pi-plus"></i>
+            </span>
+            <span class="app-switcher__name">{{ t().appSwitcher.comingSoon }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

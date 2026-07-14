@@ -1,6 +1,8 @@
-import type { AuthTranslationsHost } from '@reddoc/ui';
+import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
+import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
 
-export interface AppDict extends AuthTranslationsHost {
+export interface AppDict
+  extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
   common: {
     comingSoon: string;
     actions: {
@@ -237,6 +239,35 @@ export interface AppDict extends AuthTranslationsHost {
         toasts: { loadError: { title: string; desc: string } };
       };
     };
+    prototipo: {
+      name: string;
+      columns: {
+        id: string;
+        documento: string;
+        puesto: string;
+        contrato: string;
+        secuencia: string;
+        fechaInicio: string;
+        posicion: string;
+      };
+      detail: {
+        eyebrow: string;
+        sections: { general: string; asignacion: string };
+        fields: {
+          documento: string;
+          tipo: string;
+          documentoFecha: string;
+          puesto: string;
+          fecha: string;
+          contrato: string;
+          secuencia: string;
+          fechaInicio: string;
+          posicion: string;
+        };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
     secuencia: {
       name: string;
       searchPlaceholder: string;
@@ -427,6 +458,11 @@ export interface AppDict extends AuthTranslationsHost {
           codigoLabel: string;
           clienteLabel: string;
           puestoLabel: string;
+          detalleAfectadoLabel: string;
+          pedidoDetalleLabel: string;
+          sinAfectadoCorto: string;
+          /** Selector de período (mes/año) de la barra de acciones, para simular. */
+          periodoLabel: string;
           /** Columnas de la tabla editable. */
           columns: {
             contrato: string;
@@ -447,11 +483,21 @@ export interface AppDict extends AuthTranslationsHost {
           eliminar: string;
           /** Simular (preview) y generar (materializar) los turnos del prototipo. */
           simular: string;
+          /** Limpiar la simulación (borra la vista previa en el backend). */
+          limpiar: string;
+          /** Generar (materializar) y desgenerar (revertir) la programación. */
           generar: string;
-          close: string;
+          desgenerar: string;
           /** Avisos de validación / sin cambios. */
           validacion: string;
           sinCambios: string;
+          /** El puesto no tiene documento afectado: no se puede guardar/simular el prototipo. */
+          sinAfectado: string;
+          /** Indicador de cambios sin guardar + confirmación al cerrar con cambios. */
+          sinGuardar: string;
+          descartar: { header: string; message: string; aceptar: string };
+          /** Banner del 400 de generar (errores por día agrupados). */
+          generarErrores: { dias: string; cerrar: string };
           /** Tabla de vista previa (simulación): año/mes/código/empleado + días. */
           preview: {
             title: string;
@@ -466,6 +512,10 @@ export interface AppDict extends AuthTranslationsHost {
             saveError: { title: string; desc: string };
             deleteSuccess: { title: string; desc: string };
             deleteError: { title: string; desc: string };
+            generarSuccess: { title: string; desc: string };
+            generarError: { title: string; desc: string };
+            desgenerarSuccess: { title: string; desc: string };
+            desgenerarError: { title: string; desc: string };
           };
         };
       };

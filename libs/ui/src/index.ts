@@ -20,3 +20,6 @@ export { DetailHeaderComponent } from './lib/components/detail-header/detail-hea
 export { UppercaseDirective } from './lib/directives/uppercase.directive';
 export type { AuthDict, AuthTranslationsHost } from './lib/auth/i18n';
 export { authEs, authEn } from './lib/auth/i18n';
+export { AppSwitcherComponent } from './lib/app-switcher/app-switcher.component';
+export type { AppSwitcherDict, AppSwitcherTranslationsHost } from './lib/app-switcher/i18n';
+export { appSwitcherEs, appSwitcherEn } from './lib/app-switcher/i18n';

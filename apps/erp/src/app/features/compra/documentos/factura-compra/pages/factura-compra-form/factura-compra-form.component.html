@@ -166,32 +166,34 @@
     </div>
   </section>
 
-  <!-- ── Sección: Detalles (líneas comerciales) ───────────────────────────── -->
+  <!-- ── Sección: Líneas (ítems + cuentas contables) ──────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-      <span
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-list text-[1.05rem]"></i>
-      </span>
-      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.comercialDetalle.title }}
-        </h2>
-        <p class="m-0 text-[0.75rem] text-brand-muted">
-          {{ t().entities.comercialDetalle.hint }}
-        </p>
-      </div>
-    </div>
-
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <app-comercial-documento-detalles
-        modo="compra"
-        [detalles]="form.controls.detalles"
-        [documentId]="documentId()"
-        [contactoId]="form.controls.contacto.value?.id ?? null"
-        (imported)="onImported()"
-      />
+      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
+        <p-tablist>
+          <p-tab value="detalles">{{ t().entities.facturaCompra.form.tabs.detalles }}</p-tab>
+          <p-tab value="cuentas">{{ t().entities.facturaCompra.form.tabs.cuentas }}</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="detalles">
+            <app-comercial-documento-detalles
+              modo="compra"
+              [detalles]="form.controls.detalles"
+              [documentId]="documentId()"
+              [contactoId]="form.controls.contacto.value?.id ?? null"
+              (imported)="onImported()"
+            />
+          </p-tabpanel>
+
+          <p-tabpanel value="cuentas">
+            <app-contable-documento-detalles
+              [detalles]="form.controls.cuentas"
+              [documentId]="documentId()"
+            />
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </section>
 </form>

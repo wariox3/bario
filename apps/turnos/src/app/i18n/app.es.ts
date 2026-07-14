@@ -1,8 +1,11 @@
-import { authEs } from '@reddoc/ui';
+import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
+import { appSwitcherEs, authEs } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
   auth: authEs,
+  appSwitcher: appSwitcherEs,
+  contenedores: contenedoresEs,
   common: {
     comingSoon: 'Próximamente disponible.',
     actions: {
@@ -297,6 +300,40 @@ export const es: AppDict = {
         },
       },
     },
+    prototipo: {
+      name: 'Prototipos',
+      columns: {
+        id: 'ID',
+        documento: 'Documento',
+        puesto: 'Puesto',
+        contrato: 'Contrato',
+        secuencia: 'Secuencia',
+        fechaInicio: 'Fecha de inicio',
+        posicion: 'Posición',
+      },
+      detail: {
+        eyebrow: 'Prototipo',
+        sections: { general: 'Documento de origen', asignacion: 'Asignación' },
+        fields: {
+          documento: 'Documento',
+          tipo: 'Tipo',
+          documentoFecha: 'Fecha del documento',
+          puesto: 'Puesto',
+          fecha: 'Período',
+          contrato: 'Contrato',
+          secuencia: 'Secuencia',
+          fechaInicio: 'Fecha de inicio',
+          posicion: 'Posición',
+        },
+        notFound: {
+          title: 'Prototipo no encontrado',
+          desc: 'El prototipo que buscás no existe o fue eliminado.',
+        },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el prototipo' },
+        },
+      },
+    },
     secuencia: {
       name: 'Secuencias',
       searchPlaceholder: 'Buscar por nombre…',
@@ -523,6 +560,10 @@ export const es: AppDict = {
           codigoLabel: 'Código',
           clienteLabel: 'Cliente',
           puestoLabel: 'Puesto',
+          detalleAfectadoLabel: 'Contrato detalle',
+          pedidoDetalleLabel: 'Pedido detalle',
+          sinAfectadoCorto: 'Sin asignar',
+          periodoLabel: 'Período',
           columns: {
             contrato: 'Contrato',
             secuencia: 'Secuencia',
@@ -539,10 +580,20 @@ export const es: AppDict = {
           guardar: 'Guardar',
           eliminar: 'Eliminar',
           simular: 'Simular',
+          limpiar: 'Limpiar',
           generar: 'Generar',
-          close: 'Cerrar',
+          desgenerar: 'Desgenerar',
           validacion: 'Completá contrato, secuencia y fecha de inicio en todas las filas.',
           sinCambios: 'No hay cambios para guardar.',
+          sinAfectado: 'Este puesto no tiene documento afectado, no se puede guardar el prototipo.',
+          sinGuardar: 'Cambios sin guardar',
+          descartar: {
+            header: 'Cambios sin guardar',
+            message:
+              'Tenés cambios en el prototipo que no guardaste. Si cerrás se perderán. ¿Descartar?',
+            aceptar: 'Descartar',
+          },
+          generarErrores: { dias: 'días', cerrar: 'Cerrar' },
           preview: {
             title: 'Vista previa',
             anio: 'Año',
@@ -567,6 +618,22 @@ export const es: AppDict = {
             deleteError: {
               title: 'No se pudo eliminar',
               desc: 'Ocurrió un error al eliminar las filas.',
+            },
+            generarSuccess: {
+              title: 'Programación generada',
+              desc: 'Se generaron los turnos del prototipo en la programación.',
+            },
+            generarError: {
+              title: 'No se pudo generar',
+              desc: 'Ocurrió un error al generar la programación.',
+            },
+            desgenerarSuccess: {
+              title: 'Programación desgenerada',
+              desc: 'Se revirtió la programación generada de la línea.',
+            },
+            desgenerarError: {
+              title: 'No se pudo desgenerar',
+              desc: 'Ocurrió un error al desgenerar la programación.',
             },
           },
         },

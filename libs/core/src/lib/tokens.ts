@@ -8,11 +8,21 @@ import {
   ResendVerificationRequest,
 } from './models/auth.model';
 
+/**
+ * Apps del monorepo alcanzables desde el app-switcher. Es el id estable de cada
+ * app: se usa como clave de i18n, para excluir la app actual de su propia lista
+ * (`CURRENT_APP`) y para resolver su URL en `ReddocEnvironment`.
+ */
+export type ReddocAppId = 'erp' | 'turnos';
+
 export interface ReddocEnvironment {
   apiUrl: string;
   turnstileSiteKey: string;
   landingUrl?: string;
   cuentaUrl?: string;
+  /** URLs de las apps hermanas. Ausente = esa app no se muestra en el switcher. */
+  erpUrl?: string;
+  turnosUrl?: string;
   wompiPublicKey?: string;
   /**
    * Origen al que Wompi va a devolver al usuario tras el checkout (`redirect-url`).
@@ -54,6 +64,8 @@ export interface AppBranding {
 }
 
 export const ENVIRONMENT = new InjectionToken<ReddocEnvironment>('ReddocEnvironment');
+/** Id de la app en la que corre este bundle. Lo provee cada `app.config.ts`. */
+export const CURRENT_APP = new InjectionToken<ReddocAppId>('CurrentApp');
 export const ROUTE_PATHS_TOKEN = new InjectionToken<RoutePaths>('RoutePaths');
 export const AUTH_SERVICE = new InjectionToken<AuthServiceContract>('AuthService');
 export const AUTH_SKIP_URLS = new InjectionToken<string[]>('AuthSkipUrls');

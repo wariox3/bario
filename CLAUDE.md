@@ -48,7 +48,7 @@ apps/
   cliente/      SPA + PrimeNG, port 4207 — portal de clientes
 libs/
   core/         Auth, tokens, theme, i18n, tenant + data-list building blocks (cross-app)
-  ui/           Shared standalone components: TurnstileComponent + auth pages
+  ui/           Shared standalone components: TurnstileComponent + auth pages + AppSwitcherComponent
   feature-base/ DataTableComponent (tonto, cross-app)
   styles/       SCSS design tokens + Tailwind @theme (brand colors, animations)
 ```
@@ -94,11 +94,12 @@ BaseAuthService<TUser extends BaseUsuario>   (libs/core)
 
 | Token               | Purpose                                                                                                              |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `ENVIRONMENT`       | `{ apiUrl, turnstileSiteKey, cuentaUrl? }`                                                                           |
+| `ENVIRONMENT`       | `{ apiUrl, turnstileSiteKey, cuentaUrl?, erpUrl?, turnosUrl? }` — las `<app>Url` alimentan el app-switcher           |
 | `ROUTE_PATHS_TOKEN` | `{ auth: { login, register, forgotPassword, resetPassword, resendVerification, verifyEmail }, dashboard: { root } }` |
 | `AUTH_SERVICE`      | `useExisting: AuthService` — exposes `AuthServiceContract` to interceptors, guards, and shared auth pages            |
 | `AUTH_SKIP_URLS`    | String array of API paths that bypass the 401-refresh logic                                                          |
 | `APP_BRANDING`      | `{ appName, tagline? }` — consumed by the shared auth pages in `@reddoc/ui` to render per-app brand panel            |
+| `CURRENT_APP`       | `ReddocAppId` (`'erp' \| 'turnos'`) — quién soy; el app-switcher lo usa para excluirse de su propia lista            |
 
 **Guards** (`authGuard`, `publicGuard`) inject `AUTH_SERVICE` and `ROUTE_PATHS_TOKEN`.
 
@@ -116,6 +117,7 @@ Cualquier app del monorepo puede usarlos para construir listas paginadas.
 
 - `TurnstileComponent` (`lib-turnstile`) — Cloudflare Turnstile widget. Reads `turnstileSiteKey` from `ENVIRONMENT`. Dev key `1x00000000000000000000AA` always passes.
 - Auth pages (`LoginComponent`, `RegisterComponent`, `ForgotPasswordComponent`, `ResetPasswordComponent`, `ResendVerificationComponent`, `VerifyEmailComponent`) — fully implemented; each app routes to them via eager `component:` (Nx prohibits mixing lazy + static imports of the same lib).
+- `AppSwitcherComponent` (`lib-app-switcher`) — waffle en el header (`app-header__actions`) que salta entre apps hermanas. Requiere que la app provea `CURRENT_APP` y declare las `<app>Url` de sus hermanas en `ENVIRONMENT`. Trae su propio dict (`AppSwitcherTranslationsHost` + `appSwitcherEs/En`), igual que las auth pages. Lo usan erp y turnos.
 - Assets: `src/assets/logos/reddoc.svg` and `reddoc-on-dark.svg` — copied into each app's build via `project.json` assets glob.
 
 ### libs/feature-base — building blocks de listados

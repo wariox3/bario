@@ -65,8 +65,8 @@ interface BandaVm {
 
 /**
  * Modo de guardado del modal:
- *  - `'linea'`: una sola fila → `POST actualizar-programacion` (payload single).
- *  - `'masivo'`: todas las líneas del contrato → `POST actualizar-programacion-masivo`
+ *  - `'linea'`: una sola fila → `POST actualizar` (payload single).
+ *  - `'masivo'`: todas las líneas del contrato → `POST actualizar-masivo`
  *    (un request con `programaciones: []`).
  */
 export type EditarProgramacionModo = 'linea' | 'masivo';
@@ -94,7 +94,7 @@ function nuevoErroresPorPuesto(): ErroresPorPuesto {
  *
  * Se abre desde el botón de editar del grid. Lista una banda por puesto (una línea
  * del contrato) con sus días **editables**, pre-llenados con los turnos actuales, y
- * guarda con una llamada `POST actualizar-programacion` por puesto (`forkJoin`). Las
+ * guarda con una llamada `POST actualizar` por puesto (`forkJoin`). Las
  * `fechas` y las `filas` (ya filtradas por contrato) llegan del detalle, así que no
  * hay HTTP de carga. Al éxito total emite `applied` para que el padre recargue.
  */
@@ -323,8 +323,8 @@ export class ProgramacionEditarContratoModalComponent {
 
   /**
    * Guarda la programación editada. Arma un payload por fila y, según el `modo`,
-   * dispara una sola llamada: `actualizar-programacion` (una línea) o
-   * `actualizar-programacion-masivo` (todas las líneas del contrato). Al éxito cierra
+   * dispara una sola llamada: `actualizar` (una línea) o
+   * `actualizar-masivo` (todas las líneas del contrato). Al éxito cierra
    * y avisa al padre; al error mantiene el modal abierto y muestra un toast (en
    * `'linea'` además resalta las celdas del 400).
    */
@@ -395,7 +395,7 @@ export class ProgramacionEditarContratoModalComponent {
   }
 
   /**
-   * 400 de `actualizar-programacion` (`{ errores: [] }`) → celdas y avisos de puesto de
+   * 400 de `actualizar` (`{ errores: [] }`) → celdas y avisos de puesto de
    * la única fila enviada, keyed por su `documento_detalle_id`.
    */
   private parseErroresLinea(
@@ -409,7 +409,7 @@ export class ProgramacionEditarContratoModalComponent {
   }
 
   /**
-   * 400 de `actualizar-programacion-masivo`. Dos formas posibles:
+   * 400 de `actualizar-masivo`. Dos formas posibles:
    *  - `{ resultados: [{ indice, errores }] }` → celdas/avisos por línea, resolviendo el
    *    `documento_detalle_id` desde `payloads[indice]`.
    *  - `{ detail, errores: [] }` → validación global del batch (sin `indice`, ej. horas

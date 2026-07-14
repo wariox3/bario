@@ -1,6 +1,8 @@
-import type { AuthTranslationsHost } from '@reddoc/ui';
+import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
+import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
 
-export interface AppDict extends AuthTranslationsHost {
+export interface AppDict
+  extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
   common: {
     comingSoon: string;
     actions: {
@@ -152,6 +154,13 @@ export interface AppDict extends AuthTranslationsHost {
       submit: string;
       cancel: string;
       success: { title: string; desc: string };
+      error: { title: string; desc: string };
+    };
+    generarRecurrente: {
+      seleccionadosLabel: string;
+      noSelection: { title: string; desc: string };
+      success: { title: string; desc: string };
+      empty: { title: string; desc: string };
       error: { title: string; desc: string };
     };
     detail: {
@@ -1212,6 +1221,7 @@ export interface AppDict extends AuthTranslationsHost {
           metodoPago: string;
           metodoPagoPlaceholder: string;
         };
+        tabs: { detalles: string; cuentas: string };
         validation: { required: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -1300,6 +1310,184 @@ export interface AppDict extends AuthTranslationsHost {
           resolucion: string;
           ordenCompra: string;
           comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    notaCreditoCompra: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          documentoReferencia: string;
+          centroCosto: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    notaDebitoCompra: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          documentoReferencia: string;
+          centroCosto: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    facturaCompraRecurrente: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        adicionales: { title: string; hint: string };
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          plazoPago: string;
+          formaPago: string;
+          centroCosto: string;
+          sede: string;
+          ordenCompra: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -1402,6 +1590,31 @@ export interface AppDict extends AuthTranslationsHost {
         descuento: string;
         total: string;
       };
+      toasts: {
+        lineSaveSuccess: { title: string; desc: string };
+        lineSaveError: { title: string; desc: string };
+        allSaved: { title: string; desc: string };
+        incompleteLines: { title: string; desc: string };
+      };
+    };
+    cuentaDetalle: {
+      empty: string;
+      addLine: string;
+      removeLine: string;
+      saveLine: string;
+      saveAll: string;
+      pendingSuffix: string;
+      cuentaPlaceholder: string;
+      confirmDeleteLine: string;
+      naturaleza: { debito: string; credito: string };
+      columns: {
+        linea: string;
+        cuenta: string;
+        naturaleza: string;
+        valor: string;
+        acciones: string;
+      };
+      resumen: { debitos: string; creditos: string };
       toasts: {
         lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };
@@ -1625,134 +1838,6 @@ export interface AppDict extends AuthTranslationsHost {
           salario: string;
         };
         notFound: { title: string; desc: string };
-      };
-    };
-  };
-  contenedores: {
-    list: {
-      title: string;
-      subtitle: string;
-      newButton: string;
-      searchPlaceholder: string;
-      enter: string;
-      status: { active: string; inactive: string };
-      summary: {
-        containers: { one: string; other: string };
-        active: { one: string; other: string };
-      };
-      actions: {
-        menuLabel: string;
-        invite: string;
-        edit: string;
-        updateSubscription: string;
-        delete: string;
-      };
-      view: {
-        list: string;
-        grid: string;
-      };
-      empty: {
-        noResults: { title: string; sub: string };
-        noContenedores: { title: string; sub: string; cta: string };
-      };
-      expired: {
-        badge: string;
-        ownerCta: string;
-        memberLocked: string;
-      };
-    };
-    create: {
-      title: string;
-      subtitle: string;
-      fields: {
-        name: string;
-        namePlaceholder: string;
-        phone: string;
-        phonePlaceholder: string;
-        email: string;
-        emailPlaceholder: string;
-      };
-      validation: {
-        nameRequired: string;
-        nameMin2: string;
-        phoneRequired: string;
-        phoneMax20: string;
-        emailRequired: string;
-        emailInvalid: string;
-      };
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    edit: {
-      title: string;
-      subtitle: string;
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    delete: {
-      title: string;
-      subtitle: string;
-      warning: string;
-      containerLabel: string;
-      confirmLabel: string;
-      confirmError: string;
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    invite: {
-      title: string;
-      subtitle: string;
-      tabs: { members: string; pending: string };
-      form: {
-        label: string;
-        placeholder: string;
-        invalid: string;
-        submit: string;
-        sending: string;
-      };
-      pending: {
-        estados: { P: string; A: string; R: string };
-        count: { one: string; other: string };
-        empty: { title: string; sub: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-      members: {
-        title: string;
-        count: { one: string; other: string };
-        empty: { title: string; sub: string };
-        you: string;
-        roles: {
-          propietario: string;
-          administrador: string;
-          usuario: string;
-        };
-        removeAria: string;
-      };
-      remove: {
-        title: string;
-        desc: string;
-        confirm: string;
-        cancel: string;
-      };
-      close: string;
-      toasts: {
-        sent: { title: string; desc: string };
-        sendError: { title: string; desc: string };
-        removed: { title: string; desc: string };
-        removeError: { title: string; desc: string };
-        loadError: { title: string; desc: string };
       };
     };
   };

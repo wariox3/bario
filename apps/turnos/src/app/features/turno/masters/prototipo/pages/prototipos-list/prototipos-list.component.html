@@ -1,0 +1,36 @@
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.prototipo.name">
+  <lib-data-toolbar
+    toolbar
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    [refreshEnabled]="true"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+    (refresh)="onRefresh()"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    [rowActions]="rowActions"
+    [rowClickable]="true"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+    (rowClick)="onRowClick($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>

@@ -1,0 +1,219 @@
+<div class="cl">
+  <div class="cl-panel">
+    <!-- Panel header -->
+    <div class="cl-panel__header">
+      <div class="cl-panel__header-text">
+        <h1 class="cl-panel__title">{{ t().contenedores.list.title }}</h1>
+        @if (!isLoading() && counts().total > 0) {
+          <p class="cl-panel__sub">{{ summaryText() }}</p>
+        } @else {
+          <p class="cl-panel__sub">{{ t().contenedores.list.subtitle }}</p>
+        }
+      </div>
+      @if (capabilities().create) {
+        <p-button
+          icon="pi pi-plus"
+          [label]="t().contenedores.list.newButton"
+          (onClick)="showCreate.set(true)"
+        />
+      }
+    </div>
+
+    <!-- Controls (search + view toggle) -->
+    <div class="cl-panel__controls">
+      <div class="cl-search-wrap">
+        <i class="pi pi-search cl-search-icon"></i>
+        <input
+          #searchInput
+          type="text"
+          class="cl-search"
+          [placeholder]="t().contenedores.list.searchPlaceholder"
+          [value]="searchQuery()"
+          (input)="searchQuery.set(searchInput.value)"
+        />
+        @if (searchQuery()) {
+          <button
+            class="cl-search-clear"
+            type="button"
+            (click)="searchQuery.set(''); searchInput.value = ''"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        }
+      </div>
+      @if (capabilities().viewToggle) {
+        <div
+          class="cl-view-toggle"
+          role="group"
+          [attr.aria-label]="t().contenedores.list.view.list"
+        >
+          <button
+            type="button"
+            class="cl-view-toggle__btn"
+            [class.cl-view-toggle__btn--active]="viewMode() === 'list'"
+            [attr.aria-pressed]="viewMode() === 'list'"
+            [attr.aria-label]="t().contenedores.list.view.list"
+            (click)="viewMode.set('list')"
+          >
+            <i class="pi pi-list" aria-hidden="true"></i>
+          </button>
+          <button
+            type="button"
+            class="cl-view-toggle__btn"
+            [class.cl-view-toggle__btn--active]="viewMode() === 'grid'"
+            [attr.aria-pressed]="viewMode() === 'grid'"
+            [attr.aria-label]="t().contenedores.list.view.grid"
+            (click)="viewMode.set('grid')"
+          >
+            <i class="pi pi-th-large" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- List / grid -->
+    <div class="cl-panel__body">
+      @if (isLoading()) {
+        @if (viewMode() === 'list') {
+          <ul class="cl-list">
+            @for (item of skeletonItems; track $index) {
+              <li class="cl-row-skeleton">
+                <div class="sk-monogram"></div>
+                <div class="cl-row-skeleton__main">
+                  <div class="sk-line sk-line--name"></div>
+                  <div class="sk-line sk-line--meta"></div>
+                </div>
+                <div class="sk-cta"></div>
+                <div class="sk-action"></div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="cl-grid">
+            @for (item of skeletonItems; track $index) {
+              <div class="cl-card-skeleton">
+                <div class="cl-card-skeleton__top">
+                  <div class="sk-monogram sk-monogram--lg"></div>
+                  <div class="sk-action"></div>
+                </div>
+                <div class="cl-card-skeleton__body">
+                  <div class="sk-line sk-line--name"></div>
+                  <div class="sk-line sk-line--meta"></div>
+                </div>
+                <div class="cl-card-skeleton__footer">
+                  <div class="sk-cta"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      @if (!isLoading()) {
+        @if (filteredContenedores().length > 0) {
+          @if (viewMode() === 'list') {
+            <ul class="cl-list">
+              @for (item of filteredContenedores(); track item.cliente_id; let i = $index) {
+                <li>
+                  <lib-contenedor-row-item
+                    [contenedor]="item"
+                    [index]="i"
+                    [showMenu]="hasRowActions()"
+                    [canRenew]="capabilities().subscription"
+                    [menuLabel]="t().contenedores.list.actions.menuLabel"
+                    [enterLabel]="t().contenedores.list.enter"
+                    [renewLabel]="t().contenedores.list.expired.ownerCta"
+                    [memberLockedLabel]="t().contenedores.list.expired.memberLocked"
+                    [expiredBadgeLabel]="t().contenedores.list.expired.badge"
+                    (enter)="enterContenedor(item)"
+                    (renew)="renewContenedor()"
+                    (menuOpen)="openRowMenu($event, item)"
+                  />
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="cl-grid">
+              @for (item of filteredContenedores(); track item.cliente_id; let i = $index) {
+                <lib-contenedor-card-item
+                  [contenedor]="item"
+                  [index]="i"
+                  [showMenu]="hasRowActions()"
+                  [canRenew]="capabilities().subscription"
+                  [menuLabel]="t().contenedores.list.actions.menuLabel"
+                  [enterLabel]="t().contenedores.list.enter"
+                  [renewLabel]="t().contenedores.list.expired.ownerCta"
+                  [memberLockedLabel]="t().contenedores.list.expired.memberLocked"
+                  [expiredBadgeLabel]="t().contenedores.list.expired.badge"
+                  (enter)="enterContenedor(item)"
+                  (renew)="renewContenedor()"
+                  (menuOpen)="openRowMenu($event, item)"
+                />
+              }
+            </div>
+          }
+        } @else if (searchQuery()) {
+          <div class="cl-empty">
+            <span class="cl-empty__icon-wrap">
+              <i class="pi pi-search"></i>
+            </span>
+            <p class="cl-empty__title">{{ t().contenedores.list.empty.noResults.title }}</p>
+            <p class="cl-empty__sub">{{ t().contenedores.list.empty.noResults.sub }}</p>
+          </div>
+        } @else {
+          <div class="cl-empty">
+            <span class="cl-empty__icon-wrap">
+              <i class="pi pi-building"></i>
+            </span>
+            <p class="cl-empty__title">{{ t().contenedores.list.empty.noContenedores.title }}</p>
+            <p class="cl-empty__sub">{{ t().contenedores.list.empty.noContenedores.sub }}</p>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+<p-menu #rowMenu [model]="rowMenuItems" [popup]="true" appendTo="body" styleClass="cl-row-menu" />
+
+@defer (when showCreate()) {
+  @if (showCreate()) {
+    <lib-contenedores-create-dialog
+      [visible]="showCreate()"
+      (visibleChange)="showCreate.set($event)"
+      (created)="onContenedorCreated()"
+    />
+  }
+}
+
+@defer (when showEdit()) {
+  @if (showEdit()) {
+    <lib-contenedores-create-dialog
+      [visible]="showEdit()"
+      [contenedor]="contenedorToEdit()"
+      (visibleChange)="showEdit.set($event)"
+      (updated)="onContenedorUpdated()"
+    />
+  }
+}
+
+@defer (when showDelete()) {
+  @if (showDelete()) {
+    <lib-contenedores-delete-dialog
+      [visible]="showDelete()"
+      (visibleChange)="showDelete.set($event)"
+      [contenedor]="contenedorToDelete()"
+      (deleted)="onContenedorDeleted()"
+    />
+  }
+}
+
+@defer (when showInvite()) {
+  @if (showInvite()) {
+    <lib-contenedores-invite-dialog
+      [visible]="showInvite()"
+      [contenedor]="contenedorToInvite()"
+      (visibleChange)="onInviteClose($event)"
+    />
+  }
+}

@@ -51,6 +51,27 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'nota-credito-compra',
+        loadChildren: () =>
+          import('./documentos/nota-credito-compra/nota-credito-compra.routes').then(
+            (m) => m.NOTA_CREDITO_COMPRA_ROUTES,
+          ),
+      },
+      {
+        path: 'nota-debito-compra',
+        loadChildren: () =>
+          import('./documentos/nota-debito-compra/nota-debito-compra.routes').then(
+            (m) => m.NOTA_DEBITO_COMPRA_ROUTES,
+          ),
+      },
+      {
+        path: 'factura-compra-recurrente',
+        loadChildren: () =>
+          import('./documentos/factura-compra-recurrente/factura-compra-recurrente.routes').then(
+            (m) => m.FACTURA_COMPRA_RECURRENTE_ROUTES,
+          ),
+      },
+      {
         path: 'nota-ajuste',
         loadChildren: () =>
           import('./documentos/nota-ajuste/nota-ajuste.routes').then((m) => m.NOTA_AJUSTE_ROUTES),

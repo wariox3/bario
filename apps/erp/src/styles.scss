@@ -1,3 +1,5 @@
+@use '../../../libs/styles/src/primeng/button';
+
 @import 'primeicons/primeicons.css';
 
 *,
@@ -45,31 +47,10 @@ body {
   align-self: flex-end;
 }
 
-// ─── Button standard ─────────────────────────────────────────────────────────
-.p-button {
-  height: 43px;
-  padding: 0 0.85rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  border-radius: 8px;
-  transition:
-    background 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
-
-  &:not(:disabled):hover {
-    box-shadow: 0 3px 10px rgba(0 158 247 / 0.28);
-  }
-
-  &:not(:disabled):active {
-    transform: scale(0.97);
-  }
-}
-
 // ─── SplitButton: unir las dos mitades como un solo control ───────────────────
-// El override de .p-button de arriba redondea las 4 esquinas de cada mitad y deja
-// el chevron con el padding ancho del botón estándar, partiendo el control en dos.
+// El override de .p-button (en `@reddoc/styles`, importado arriba) redondea las 4
+// esquinas de cada mitad y deja el chevron con el padding ancho del botón
+// estándar, partiendo el control en dos.
 // Aquí la mitad principal redondea solo a la izquierda, el desplegable solo a la
 // derecha, se recorta el padding del chevron y, en outlined, se elimina el doble
 // borde de la costura central.

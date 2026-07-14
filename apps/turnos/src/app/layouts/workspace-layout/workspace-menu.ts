@@ -37,6 +37,7 @@ export const WORKSPACE_MENU: readonly SidebarSection[] = [
           { labelKey: 'entities.turno.name', path: 'turnos' },
           { labelKey: 'entities.secuencia.name', path: 'secuencias' },
           { labelKey: 'entities.programador.name', path: 'programadores' },
+          { labelKey: 'entities.prototipo.name', path: 'prototipos' },
         ],
       },
     ],

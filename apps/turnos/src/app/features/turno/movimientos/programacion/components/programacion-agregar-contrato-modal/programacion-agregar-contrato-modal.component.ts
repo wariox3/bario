@@ -43,7 +43,7 @@ import { ProgramacionSecuenciaPickerComponent } from './programacion-secuencia-p
  * Se abre desde el botón de cada banda de grupo del grid (un puesto =
  * `documento_detalle_id`). El período (mes) a programar lo deriva de la línea del
  * documento (ver `ProgramacionPeriodoStore`); permite elegir un contrato y poner
- * el código de turno de cada día, y envía `POST .../crear-programacion`. Al éxito
+ * el código de turno de cada día, y envía `POST .../crear`. Al éxito
  * emite `applied` para que el padre refresque el grid.
  */
 @Component({
@@ -217,7 +217,7 @@ export class ProgramacionAgregarContratoModalComponent {
     }
   }
 
-  /** Arma el payload y envía `POST crear-programacion`. */
+  /** Arma el payload y envía `POST crear`. */
   protected onAplicar(): void {
     const grupo = this.grupo();
     const periodo = this.periodo();
@@ -258,7 +258,7 @@ export class ProgramacionAgregarContratoModalComponent {
   }
 
   /**
-   * Maneja el 400 de crear-programacion (`{ detail, errores: [{ fecha, mensaje, … }] }`):
+   * Maneja el 400 de crear (`{ detail, errores: [{ fecha, mensaje, … }] }`):
    * resalta las casillas de los días con error (`fecha` → día del período) y muestra en
    * un banner los avisos de puesto (errores sin `fecha`, ej. horas excedidas). Devuelve
    * `true` si el error tenía esta forma (ya manejado); `false` para el toast genérico.

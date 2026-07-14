@@ -4,4 +4,5 @@ export const environment = {
   turnstileSiteKey: '0x4AAAAAADSiAQzHQjzVDw1n',
   landingUrl: 'https://reddoc.uk',
   cuentaUrl: 'https://cuenta.reddoc.uk',
+  turnosUrl: 'https://turno.reddoc.uk',
 };

@@ -35,12 +35,19 @@ export { UserAvatarService } from './lib/services/user-avatar.service';
 export { ReddocPreset } from './lib/theme/reddoc-preset';
 export {
   ENVIRONMENT,
+  CURRENT_APP,
   ROUTE_PATHS_TOKEN,
   AUTH_SERVICE,
   AUTH_SKIP_URLS,
   APP_BRANDING,
 } from './lib/tokens';
-export type { ReddocEnvironment, RoutePaths, AuthServiceContract, AppBranding } from './lib/tokens';
+export type {
+  ReddocEnvironment,
+  ReddocAppId,
+  RoutePaths,
+  AuthServiceContract,
+  AppBranding,
+} from './lib/tokens';
 export {
   extractErrorMessage,
   isUnverifiedAccountError,
@@ -54,6 +61,7 @@ export {
   toHora,
   fromHora,
   daysBetween,
+  addDays,
   formatHorario,
   anioMesDeIso,
   diasDelMes,
@@ -104,6 +112,7 @@ export {
   TenantService,
   tenantGuard,
   tenantAccessGuard,
+  clearTenantGuard,
   rootRedirectGuard,
   TENANT_SCOPED,
   LAST_TENANT_KEY,

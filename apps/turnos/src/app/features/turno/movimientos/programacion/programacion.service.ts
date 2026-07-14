@@ -41,34 +41,28 @@ export class ProgramacionService extends BaseHttpService {
 
   /**
    * Crea la programación de un contrato en un puesto
-   * (`POST /turno/programacion/crear-programacion/`). Devuelve el resumen de la
+   * (`POST /turno/programacion/crear/`). Devuelve el resumen de la
    * operación (`creados`/`actualizados`/`eliminados`).
    */
   crearProgramacion(payload: CrearProgramacionPayload): Observable<ProgramacionMutacionResumen> {
-    return this.post<ProgramacionMutacionResumen>(
-      `${this.resourcePath}crear-programacion/`,
-      payload,
-    );
+    return this.post<ProgramacionMutacionResumen>(`${this.resourcePath}crear/`, payload);
   }
 
   /**
    * Reprograma los turnos de un contrato ya asignado a un puesto
-   * (`POST /turno/programacion/actualizar-programacion/`). Mismo payload que crear;
+   * (`POST /turno/programacion/actualizar/`). Mismo payload que crear;
    * el backend sobrescribe los días existentes de ese contrato y devuelve el resumen
    * de la operación (`creados`/`actualizados`/`eliminados`).
    */
   actualizarProgramacion(
     payload: ActualizarProgramacionPayload,
   ): Observable<ProgramacionMutacionResumen> {
-    return this.post<ProgramacionMutacionResumen>(
-      `${this.resourcePath}actualizar-programacion/`,
-      payload,
-    );
+    return this.post<ProgramacionMutacionResumen>(`${this.resourcePath}actualizar/`, payload);
   }
 
   /**
    * Reprograma **varias líneas** de un contrato en una sola llamada
-   * (`POST /turno/programacion/actualizar-programacion-masivo/`). Se dispara al
+   * (`POST /turno/programacion/actualizar-masivo/`). Se dispara al
    * editar desde el nombre del contrato (todos sus puestos a la vez). Devuelve
    * `resultados[]` con el resumen de cada línea (anclado por `indice`).
    */
@@ -76,36 +70,33 @@ export class ProgramacionService extends BaseHttpService {
     payload: ActualizarProgramacionMasivoPayload,
   ): Observable<ProgramacionMutacionMasivoResumen> {
     return this.post<ProgramacionMutacionMasivoResumen>(
-      `${this.resourcePath}actualizar-programacion-masivo/`,
+      `${this.resourcePath}actualizar-masivo/`,
       payload,
     );
   }
 
   /**
    * Elimina la programación de un contrato en un puesto
-   * (`POST /turno/programacion/eliminar-programacion/`). Borra el mes de turnos
+   * (`POST /turno/programacion/eliminar/`). Borra el mes de turnos
    * de ese contrato en el `documento_detalle_id` y devuelve el resumen de la
    * operación (`creados`/`actualizados`/`eliminados`).
    */
   eliminarProgramacion(
     payload: EliminarProgramacionPayload,
   ): Observable<ProgramacionMutacionResumen> {
-    return this.post<ProgramacionMutacionResumen>(
-      `${this.resourcePath}eliminar-programacion/`,
-      payload,
-    );
+    return this.post<ProgramacionMutacionResumen>(`${this.resourcePath}eliminar/`, payload);
   }
 
   /**
    * Borra **varias líneas** en una sola llamada
-   * (`POST /turno/programacion/eliminar-programacion-masivo/`). Se dispara desde la
+   * (`POST /turno/programacion/eliminar-masivo/`). Se dispara desde la
    * selección con checkboxes del grid. Devuelve el total de celdas-día eliminadas.
    */
   eliminarProgramacionMasivo(
     payload: EliminarProgramacionMasivoPayload,
   ): Observable<ProgramacionEliminacionResumen> {
     return this.post<ProgramacionEliminacionResumen>(
-      `${this.resourcePath}eliminar-programacion-masivo/`,
+      `${this.resourcePath}eliminar-masivo/`,
       payload,
     );
   }

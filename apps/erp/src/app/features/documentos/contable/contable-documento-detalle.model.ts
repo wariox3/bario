@@ -1,0 +1,39 @@
+import type { DocumentoDetalleReadBase } from '@reddoc/core';
+import type { NaturalezaCuenta } from './contable-documento-detalle.types';
+
+/**
+ * Modelos de lectura/escritura de una línea de **cuenta contable**, transversales
+ * a los documentos que soporten asientos manuales. Comparten el endpoint
+ * `/general/documento-detalle/` con las líneas comerciales; el backend las
+ * discrimina por `tipo_registro` (`'C'` = cuenta, `'I'`/otros = ítem).
+ *
+ * ⚠️ Contrato **supuesto** a partir del ERP legacy (nombres de campos, tipos,
+ * cómo se envían/devuelven). Todo el riesgo del contrato queda aislado en este
+ * archivo y en el mapper: cuando el backend confirme, se ajusta en un solo lugar.
+ */
+
+/** Línea de cuenta leída desde la API en edición. */
+export interface CuentaDetalleRead extends DocumentoDetalleReadBase {
+  /** Discriminador de familia de línea; `'C'` para cuentas contables. */
+  readonly tipo_registro?: string | null;
+  /** FK de la cuenta contable imputada. */
+  readonly cuenta?: number | null;
+  readonly cuenta_codigo?: string | null;
+  readonly cuenta_nombre?: string | null;
+  /** Naturaleza contable (`'D'`/`'C'`); el mapper cae a `'D'` si viene ausente. */
+  readonly naturaleza?: string | null;
+}
+
+/** Cuerpo de una línea de cuenta enviada en `POST`/`PATCH`. */
+export interface CuentaDetallePayload {
+  /** Marca la línea como asiento contable (no ítem). */
+  readonly tipo_registro: 'C';
+  /** Las líneas de cuenta no referencian un ítem de inventario. */
+  readonly item: null;
+  readonly cuenta: number | null;
+  readonly naturaleza: NaturalezaCuenta;
+  /** Valor como string con 2 decimales (`"150000.00"`). */
+  readonly precio: string;
+  /** Total de la línea; en el núcleo mínimo (sin base/impuestos) coincide con `precio`. */
+  readonly total: string;
+}
