@@ -582,6 +582,7 @@ export const es: AppDict = {
           simular: 'Simular',
           limpiar: 'Limpiar',
           generar: 'Generar',
+          desgenerar: 'Desgenerar',
           validacion: 'Completá contrato, secuencia y fecha de inicio en todas las filas.',
           sinCambios: 'No hay cambios para guardar.',
           sinAfectado: 'Este puesto no tiene documento afectado, no se puede guardar el prototipo.',
@@ -625,6 +626,14 @@ export const es: AppDict = {
             generarError: {
               title: 'No se pudo generar',
               desc: 'Ocurrió un error al generar la programación.',
+            },
+            desgenerarSuccess: {
+              title: 'Programación desgenerada',
+              desc: 'Se revirtió la programación generada de la línea.',
+            },
+            desgenerarError: {
+              title: 'No se pudo desgenerar',
+              desc: 'Ocurrió un error al desgenerar la programación.',
             },
           },
         },

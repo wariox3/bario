@@ -123,14 +123,18 @@ export interface ProgramacionFila extends ProgramacionHoras {
 }
 
 /**
- * Lectura **mínima** de la línea de documento (pedido servicio) que el modal de
- * agregar contrato necesita: solo `fecha_desde`, de la que deriva el período
- * (mes/año) a programar. Se lee vía `DocumentoDetalleService.obtenerPorId` con
- * este tipo por llamada — así no se acopla al modelo completo de `venta/`.
+ * Lectura **mínima** de la línea de documento (pedido servicio) que los modales
+ * de programación necesitan: `fecha_desde`, de la que deriva el período (mes/año)
+ * a programar, y `generado`, que indica si la programación ya se materializó (lo
+ * usa el modal de prototipo para alternar el botón entre generar y desgenerar).
+ * Se lee vía `DocumentoDetalleService.obtenerPorId` con este tipo por llamada —
+ * así no se acopla al modelo completo de `venta/`.
  */
 export interface ProgramacionLineaRead {
   /** Fecha de inicio de la línea (ISO `YYYY-MM-DD`); define el período. */
   readonly fecha_desde: string | null;
+  /** `true` si la programación de la línea ya se generó (materializó). */
+  readonly generado: boolean;
 }
 
 /** Ítem de día en `crear`. `fecha` en formato ISO `YYYY-MM-DD`. */

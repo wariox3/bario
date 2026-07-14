@@ -124,17 +124,30 @@
             (onClick)="onEliminarSeleccionadas()"
           />
         }
-        <!-- Generar: CTA terminal (materializa el prototipo en la programación). -->
-        <p-button
-          type="button"
-          [label]="m.generar"
-          icon="pi pi-bolt"
-          size="small"
-          [disabled]="
-            !filas.length || cargandoPeriodo() || isSubmitting() || hayCambiosSinGuardar()
-          "
-          (onClick)="onGenerar()"
-        />
+        <!-- Generar / desgenerar: CTA terminal. Alterna según `generado` de la
+             línea — generar materializa el prototipo; desgenerar lo revierte. -->
+        @if (generado()) {
+          <p-button
+            type="button"
+            [label]="m.desgenerar"
+            icon="pi pi-undo"
+            severity="danger"
+            size="small"
+            [disabled]="cargandoPeriodo() || isSubmitting()"
+            (onClick)="onDesgenerar()"
+          />
+        } @else {
+          <p-button
+            type="button"
+            [label]="m.generar"
+            icon="pi pi-bolt"
+            size="small"
+            [disabled]="
+              !filas.length || cargandoPeriodo() || isSubmitting() || hayCambiosSinGuardar()
+            "
+            (onClick)="onGenerar()"
+          />
+        }
         <p-button
           type="button"
           [label]="m.nuevo"

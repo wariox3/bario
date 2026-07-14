@@ -133,6 +133,13 @@ export class ProgramacionPrototipoModalComponent {
   protected readonly periodo = this.periodoStore.periodo;
   protected readonly cargandoPeriodo = this.periodoStore.cargando;
 
+  /**
+   * `true` si la línea ya tiene la programación generada — alterna el botón entre
+   * generar (falso) y desgenerar (verdadero). Deriva de la línea cargada por el
+   * store (mismo GET del que sale el período).
+   */
+  protected readonly generado = this.periodoStore.generado;
+
   /** Endpoint `seleccionar` de secuencias para el `<lib-api-autocomplete>`. */
   protected readonly secuenciaEndpoint = '/turno/secuencia/seleccionar/';
 
@@ -549,9 +556,15 @@ export class ProgramacionPrototipoModalComponent {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
-    // La simulación corre contra la línea del pedido (`documento_detalle_id`), no
-    // contra el detalle afectado (ese solo ancla el CRUD del prototipo).
-    const documentoDetalleId = grupo.documentoDetalleId;
+    // La simulación (dry-run) corre contra el contrato detalle (detalle afectado),
+    // igual que el CRUD del prototipo. Solo generar/desgenerar usan la línea del
+    // pedido. Sin detalle afectado no hay prototipo que simular.
+    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
+    if (documentoDetalleAfectadoId === null) {
+      const m = this.t().entities.programacion.detail.prototipoModal;
+      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
+      return;
+    }
 
     // Período a simular: lo elige el usuario en el selector (sembrado con el
     // período de la línea). Si aún no hay selección, se cae al período derivado.
@@ -562,11 +575,11 @@ export class ProgramacionPrototipoModalComponent {
     this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
-      .simular(documentoDetalleId, anio, mes)
+      .simular(documentoDetalleAfectadoId, anio, mes)
       .pipe(
         // Tras simular (solo devuelve `{ creados }`), se pide el detalle del mismo
         // período con el que se llena la tabla de vista previa.
-        switchMap(() => this.service.detalleSimulacion(documentoDetalleId, anio, mes)),
+        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId, anio, mes)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
       )
@@ -588,9 +601,14 @@ export class ProgramacionPrototipoModalComponent {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
-    // Igual que simular, la limpieza corre contra la línea del pedido
-    // (`documento_detalle_id`), no contra el detalle afectado.
-    const documentoDetalleId = grupo.documentoDetalleId;
+    // Igual que simular, la limpieza corre contra el contrato detalle (detalle
+    // afectado): borra la simulación de ese prototipo, no la línea del pedido.
+    const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
+    if (documentoDetalleAfectadoId === null) {
+      const m = this.t().entities.programacion.detail.prototipoModal;
+      this.toast.error(m.toasts.saveError.title, m.sinAfectado);
+      return;
+    }
 
     // Mismo período del selector para pedir el detalle tras limpiar.
     const periodo = this.periodoActual();
@@ -600,11 +618,11 @@ export class ProgramacionPrototipoModalComponent {
     this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
-      .limpiar(documentoDetalleId)
+      .limpiar(documentoDetalleAfectadoId)
       .pipe(
         // Tras limpiar, se pide el detalle (vacío) del período con el que se
         // repinta la tabla.
-        switchMap(() => this.service.detalleSimulacion(documentoDetalleId, anio, mes)),
+        switchMap(() => this.service.detalleSimulacion(documentoDetalleAfectadoId, anio, mes)),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false)),
       )
@@ -686,6 +704,42 @@ export class ProgramacionPrototipoModalComponent {
             extraerDetalleProgramacion(err) ?? m.toasts.generarError.desc,
           );
         },
+      });
+  }
+
+  /**
+   * Desgenerar: revierte la programación materializada de la línea
+   * (`POST /turno/programacion/desgenerar/` con `{ documento_detalle_id }`). Es el
+   * inverso de `generar`; el botón muestra esta acción cuando la línea está
+   * `generado`. Al éxito avisa al padre (`applied`) para que recargue el grid y
+   * cierra el modal. Corre contra la línea del pedido (`documento_detalle_id`).
+   */
+  protected onDesgenerar(): void {
+    const grupo = this.grupo();
+    if (!grupo || this.isSubmitting()) return;
+
+    const m = this.t().entities.programacion.detail.prototipoModal;
+    const documentoDetalleId = grupo.documentoDetalleId;
+
+    this.generarErrores.set(null);
+    this.isSubmitting.set(true);
+    this.service
+      .desgenerar(documentoDetalleId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success(m.toasts.desgenerarSuccess.title, m.toasts.desgenerarSuccess.desc);
+          this.applied.emit();
+          this.visible.set(false);
+        },
+        error: (err) =>
+          this.toast.error(
+            m.toasts.desgenerarError.title,
+            extraerDetalleProgramacion(err) ?? m.toasts.desgenerarError.desc,
+          ),
       });
   }
 

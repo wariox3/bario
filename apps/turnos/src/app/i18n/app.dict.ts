@@ -485,7 +485,9 @@ export interface AppDict
           simular: string;
           /** Limpiar la simulación (borra la vista previa en el backend). */
           limpiar: string;
+          /** Generar (materializar) y desgenerar (revertir) la programación. */
           generar: string;
+          desgenerar: string;
           /** Avisos de validación / sin cambios. */
           validacion: string;
           sinCambios: string;
@@ -512,6 +514,8 @@ export interface AppDict
             deleteError: { title: string; desc: string };
             generarSuccess: { title: string; desc: string };
             generarError: { title: string; desc: string };
+            desgenerarSuccess: { title: string; desc: string };
+            desgenerarError: { title: string; desc: string };
           };
         };
       };

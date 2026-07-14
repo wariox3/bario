@@ -576,6 +576,7 @@ export const en: AppDict = {
           simular: 'Simulate',
           limpiar: 'Clear',
           generar: 'Generate',
+          desgenerar: 'Ungenerate',
           validacion: 'Fill in contract, sequence and start date in every row.',
           sinCambios: 'There are no changes to save.',
           sinAfectado: 'This position has no affected document; the prototype cannot be saved.',
@@ -619,6 +620,14 @@ export const en: AppDict = {
             generarError: {
               title: 'Could not generate',
               desc: 'An error occurred while generating the schedule.',
+            },
+            desgenerarSuccess: {
+              title: 'Schedule ungenerated',
+              desc: 'The generated schedule for the line was reverted.',
+            },
+            desgenerarError: {
+              title: 'Could not ungenerate',
+              desc: 'An error occurred while ungenerating the schedule.',
             },
           },
         },

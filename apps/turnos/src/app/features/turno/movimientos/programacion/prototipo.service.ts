@@ -103,6 +103,18 @@ export class PrototipoService extends BaseHttpService {
   }
 
   /**
+   * Desgenera (revierte) la programación materializada del puesto:
+   * `POST /turno/programacion/desgenerar/` con `{ documento_detalle_id }`. Es el
+   * inverso de `generar`; el modal alterna entre ambos según el flag `generado`
+   * de la línea. Corre contra la línea del pedido (`documento_detalle_id`).
+   */
+  desgenerar(documentoDetalle: number): Observable<unknown> {
+    return this.post<unknown>('/turno/programacion/desgenerar/', {
+      documento_detalle_id: documentoDetalle,
+    });
+  }
+
+  /**
    * Trae el **detalle** de la simulación de un puesto para el período dado:
    * `GET /turno/programacion-simulacion/detalle/?documento_detalle=<id>&anio=<a>&mes=<m>`.
    * Se llama después de `simular`/`limpiar` para obtener los datos con que se
