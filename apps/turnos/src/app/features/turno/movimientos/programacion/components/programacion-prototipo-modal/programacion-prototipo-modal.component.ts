@@ -601,8 +601,8 @@ export class ProgramacionPrototipoModalComponent {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
-    // Igual que simular, la limpieza corre contra el contrato detalle (detalle
-    // afectado): borra la simulación de ese prototipo, no la línea del pedido.
+    // `limpiar` no lleva body (borra la simulación del contexto). El afectado
+    // solo se usa después para refrescar el detalle (vista previa) de este puesto.
     const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
     if (documentoDetalleAfectadoId === null) {
       const m = this.t().entities.programacion.detail.prototipoModal;
@@ -618,7 +618,7 @@ export class ProgramacionPrototipoModalComponent {
     this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
-      .limpiar(documentoDetalleAfectadoId)
+      .limpiar()
       .pipe(
         // Tras limpiar, se pide el detalle (vacío) del período con el que se
         // repinta la tabla.
