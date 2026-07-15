@@ -4,8 +4,8 @@ import type { ProgramacionFecha, ProgramacionVigencia } from './programacion.mod
 /**
  * Convierte un string ISO `YYYY-MM-DD` (como llegan en
  * `ProgramacionDetalleResponse.fechas`) a la columna normalizada del calendario
- * (`ProgramacionFecha`): día visible, inicial del día de semana y si es fin de
- * semana. Lo comparten la ficha de programación y la vista previa del prototipo.
+ * (`ProgramacionFecha`): día visible e inicial del día de semana. Lo comparten la
+ * ficha de programación y la vista previa del prototipo.
  */
 export function toProgramacionFecha(iso: string): ProgramacionFecha {
   const date = fromIsoDate(iso);
@@ -14,8 +14,25 @@ export function toProgramacionFecha(iso: string): ProgramacionFecha {
     clave: iso,
     etiqueta: iso.slice(8, 10).replace(/^0/, ''),
     inicial: INICIALES_DIA_SEMANA_ES[dow],
-    finDeSemana: dow === 0 || dow === 6,
   };
+}
+
+/** Locale de `Intl` para el idioma activo (`i18n.lang()`). Único lugar del mapeo. */
+export function localeDe(lang: string): string {
+  return lang === 'en' ? 'en-US' : 'es-CO';
+}
+
+/**
+ * Reglas de resaltado de columna de día (dueño único; antes duplicadas en 5
+ * templates). `esFestivoDia` lo aporta el caller según su propio set (claves ISO
+ * en el grid/editar/prototipo, día-número en agregar-contrato): el domingo cuenta
+ * como festivo, y el sábado solo se raya si NO es además festivo.
+ */
+export function esColumnaFestiva(inicial: string, esFestivoDia: boolean): boolean {
+  return inicial === 'D' || esFestivoDia;
+}
+export function esColumnaSabado(inicial: string, esFestivoDia: boolean): boolean {
+  return inicial === 'S' && !esFestivoDia;
 }
 
 /**

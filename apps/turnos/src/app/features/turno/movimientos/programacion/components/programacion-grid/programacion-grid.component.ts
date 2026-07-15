@@ -1,8 +1,23 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { I18nService, formatHorario } from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import type { ProgramacionFecha, ProgramacionFila } from '../../programacion.model';
-import { formatVigenciaRango, vigenciaDe } from '../../programacion.utils';
+import {
+  esColumnaFestiva,
+  esColumnaSabado,
+  formatVigenciaRango,
+  localeDe,
+  vigenciaDe,
+} from '../../programacion.utils';
 
 /** Grupo de filas que comparten `documento_detalle_id` — un puesto. */
 interface GrupoFilas {
@@ -86,10 +101,15 @@ export interface ProgramacionContratoRef {
   standalone: true,
   templateUrl: './programacion-grid.component.html',
   styleUrl: './programacion-grid.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionGridComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
+
+  /** Reglas de resaltado de columna (festivo/sábado), compartidas — ver utils. */
+  protected readonly esColumnaFestiva = esColumnaFestiva;
+  protected readonly esColumnaSabado = esColumnaSabado;
 
   /** Columnas de día del calendario (ya normalizadas a `{ clave, etiqueta }`). */
   readonly fechas = input.required<readonly ProgramacionFecha[]>();
@@ -126,7 +146,7 @@ export class ProgramacionGridComponent {
 
   /** Filas agrupadas por `documento_detalle_id` para renderizar separadores. */
   protected readonly grupos = computed<readonly GrupoFilas[]>(() => {
-    const locale = this.i18n.lang() === 'en' ? 'en-US' : 'es-CO';
+    const locale = localeDe(this.i18n.lang());
     const result: GrupoFilas[] = [];
     for (const fila of this.filas()) {
       const last = result[result.length - 1];

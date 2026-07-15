@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   computed,
@@ -29,7 +30,13 @@ import type { SecuenciaMesCalculado } from '@turnos/features/turno/masters/secue
 import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-grid.component';
 import { ProgramacionService } from '../../programacion.service';
 import type { CrearProgramacionPayload } from '../../programacion.model';
-import { estaEnVigencia, formatVigenciaRango } from '../../programacion.utils';
+import {
+  esColumnaFestiva,
+  esColumnaSabado,
+  estaEnVigencia,
+  formatVigenciaRango,
+  localeDe,
+} from '../../programacion.utils';
 import {
   extraerDetalleProgramacion,
   extraerErroresProgramacion,
@@ -63,6 +70,7 @@ import { ProgramacionSecuenciaPickerComponent } from './programacion-secuencia-p
   templateUrl: './programacion-agregar-contrato-modal.component.html',
   styleUrl: './programacion-agregar-contrato-modal.component.scss',
   providers: [ProgramacionPeriodoStore],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionAgregarContratoModalComponent {
   private readonly fb = inject(NonNullableFormBuilder);
@@ -72,6 +80,10 @@ export class ProgramacionAgregarContratoModalComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
+
+  /** Reglas de resaltado de columna (festivo/sábado), compartidas — ver utils. */
+  protected readonly esColumnaFestiva = esColumnaFestiva;
+  protected readonly esColumnaSabado = esColumnaSabado;
 
   /** Visibilidad del modal (two-way con el padre). */
   readonly visible = model<boolean>(false);
@@ -124,7 +136,7 @@ export class ProgramacionAgregarContratoModalComponent {
 
   /** Rango de vigencia ya formateado para el chip de la banda (`15 de jul - 31 de jul`). */
   protected readonly vigenciaEtiqueta = computed<string | null>(() =>
-    formatVigenciaRango(this.vigencia(), this.i18n.lang() === 'en' ? 'en-US' : 'es-CO'),
+    formatVigenciaRango(this.vigencia(), localeDe(this.i18n.lang())),
   );
 
   /** Endpoint `seleccionar` de secuencias para el `<lib-api-autocomplete>`. */

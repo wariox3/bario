@@ -73,10 +73,10 @@
               <th
                 class="editar-grid__th editar-grid__th--dia"
                 [class.editar-grid__th--festivo]="
-                  fecha.inicial === 'D' || festivoClaves().has(fecha.clave)
+                  esColumnaFestiva(fecha.inicial, festivoClaves().has(fecha.clave))
                 "
                 [class.editar-grid__th--sabado]="
-                  fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
+                  esColumnaSabado(fecha.inicial, festivoClaves().has(fecha.clave))
                 "
                 [class.editar-grid__th--bloqueado]="diaBloqueado(fecha.clave)"
                 [attr.title]="diaBloqueado(fecha.clave) ? mv.hint : null"

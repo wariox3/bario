@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   computed,
@@ -33,7 +34,14 @@ import type {
   ProgramacionFila,
   ProgramacionVigencia,
 } from '../../programacion.model';
-import { estaEnVigencia, formatVigenciaRango, vigenciaDe } from '../../programacion.utils';
+import {
+  esColumnaFestiva,
+  esColumnaSabado,
+  estaEnVigencia,
+  formatVigenciaRango,
+  localeDe,
+  vigenciaDe,
+} from '../../programacion.utils';
 import { ProgramacionVigenciasStore } from '../../programacion-vigencias.store';
 import {
   extraerDetalleProgramacion,
@@ -110,6 +118,7 @@ function nuevoErroresPorContrato(): ErroresPorContrato {
   templateUrl: './programacion-editar-puesto-modal.component.html',
   styleUrl: './programacion-editar-puesto-modal.component.scss',
   providers: [ProgramacionVigenciasStore],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionEditarPuestoModalComponent {
   private readonly fb = inject(NonNullableFormBuilder);
@@ -119,6 +128,10 @@ export class ProgramacionEditarPuestoModalComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
+
+  /** Reglas de resaltado de columna (festivo/sábado), compartidas — ver utils. */
+  protected readonly esColumnaFestiva = esColumnaFestiva;
+  protected readonly esColumnaSabado = esColumnaSabado;
 
   /** Visibilidad del modal (two-way con el padre). */
   readonly visible = model<boolean>(false);
@@ -209,7 +222,7 @@ export class ProgramacionEditarPuestoModalComponent {
     const fechas = this.fechas();
     const vigencias = this.vigenciasPorLinea();
     const arr = this.contratosArray;
-    const locale = this.i18n.lang() === 'en' ? 'en-US' : 'es-CO';
+    const locale = localeDe(this.i18n.lang());
     if (arr.length !== filas.length) return [];
 
     return filas.map((fila, i) => {
@@ -249,7 +262,9 @@ export class ProgramacionEditarPuestoModalComponent {
   protected readonly periodoEtiqueta = computed<string | null>(() => {
     const first = this.fechas()[0];
     const date = first ? fromIsoDate(first.clave) : null;
-    return date ? date.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' }) : null;
+    return date
+      ? date.toLocaleDateString(localeDe(this.i18n.lang()), { month: 'long', year: 'numeric' })
+      : null;
   });
 
   protected readonly isSubmitting = signal(false);

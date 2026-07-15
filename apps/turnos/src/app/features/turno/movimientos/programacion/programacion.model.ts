@@ -77,7 +77,6 @@ export interface ProgramacionFecha {
   readonly etiqueta: string;
   /** Inicial del día de la semana en español (L M X J V S D). */
   readonly inicial: string;
-  readonly finDeSemana: boolean;
 }
 
 /**

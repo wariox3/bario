@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   computed,
@@ -37,7 +38,7 @@ import type {
   ProgramacionDetalleResponse,
   ProgramacionErroresResponse,
 } from '../../programacion.model';
-import { toProgramacionFecha } from '../../programacion.utils';
+import { esColumnaFestiva, esColumnaSabado, toProgramacionFecha } from '../../programacion.utils';
 import {
   extraerDetalleProgramacion,
   extraerErroresProgramacion,
@@ -103,6 +104,7 @@ interface GenerarErroresVista {
   templateUrl: './programacion-prototipo-modal.component.html',
   styleUrl: './programacion-prototipo-modal.component.scss',
   providers: [ProgramacionPeriodoStore, ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionPrototipoModalComponent {
   private readonly fb = inject(NonNullableFormBuilder);
@@ -113,6 +115,10 @@ export class ProgramacionPrototipoModalComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
+
+  /** Reglas de resaltado de columna (festivo/sábado), compartidas — ver utils. */
+  protected readonly esColumnaFestiva = esColumnaFestiva;
+  protected readonly esColumnaSabado = esColumnaSabado;
 
   /** Visibilidad del modal (two-way con el padre). */
   readonly visible = model<boolean>(false);

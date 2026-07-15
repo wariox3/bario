@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   computed,
@@ -43,6 +44,7 @@ interface PosicionSecuencia {
   imports: [ButtonModule],
   templateUrl: './programacion-secuencia-picker.component.html',
   styleUrl: './programacion-secuencia-picker.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionSecuenciaPickerComponent {
   private readonly secuenciaService = inject(SecuenciaService);

@@ -139,10 +139,10 @@
                   <th
                     class="aplicar-dias__th"
                     [class.aplicar-dias__th--festivo]="
-                      d.inicial === 'D' || festivoPorDia().has(d.dia)
+                      esColumnaFestiva(d.inicial, festivoPorDia().has(d.dia))
                     "
                     [class.aplicar-dias__th--sabado]="
-                      d.inicial === 'S' && !festivoPorDia().has(d.dia)
+                      esColumnaSabado(d.inicial, festivoPorDia().has(d.dia))
                     "
                     [class.aplicar-dias__th--error]="celdasError().has(d.dia)"
                     [class.aplicar-dias__th--bloqueado]="diaBloqueado(d.dia)"
@@ -164,10 +164,10 @@
                   <td
                     class="aplicar-dias__td"
                     [class.aplicar-dias__td--festivo]="
-                      dc.inicial === 'D' || festivoPorDia().has(dc.dia)
+                      esColumnaFestiva(dc.inicial, festivoPorDia().has(dc.dia))
                     "
                     [class.aplicar-dias__td--sabado]="
-                      dc.inicial === 'S' && !festivoPorDia().has(dc.dia)
+                      esColumnaSabado(dc.inicial, festivoPorDia().has(dc.dia))
                     "
                     [class.aplicar-dias__td--error]="celdasError().has(dc.dia)"
                     [class.aplicar-dias__td--bloqueado]="diaBloqueado(dc.dia)"

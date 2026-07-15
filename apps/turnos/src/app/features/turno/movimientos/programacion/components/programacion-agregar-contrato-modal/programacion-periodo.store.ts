@@ -2,10 +2,11 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { anioMesDeIso, diasDelMes } from '@reddoc/core';
-import { DocumentoDetalleService } from '@reddoc/core';
+import { DocumentoDetalleService, I18nService } from '@reddoc/core';
+import type { AppDict } from '@turnos/i18n';
 import { FestivoService, type Festivo } from '../../festivo.service';
 import type { ProgramacionLineaRead, ProgramacionVigencia } from '../../programacion.model';
-import { vigenciaDe } from '../../programacion.utils';
+import { localeDe, vigenciaDe } from '../../programacion.utils';
 
 /** Período (mes/año) a programar, ya con su etiqueta legible para el header. */
 export interface ProgramacionPeriodo {
@@ -15,9 +16,9 @@ export interface ProgramacionPeriodo {
   readonly etiqueta: string;
 }
 
-/** `junio de 2026` a partir de año + mes (1-based). */
-function etiquetaMes(anio: number, mes: number): string {
-  return new Date(anio, mes - 1, 1).toLocaleDateString('es-CO', {
+/** `junio de 2026` a partir de año + mes (1-based); `locale` según el idioma activo. */
+function etiquetaMes(anio: number, mes: number, locale: string): string {
+  return new Date(anio, mes - 1, 1).toLocaleDateString(locale, {
     month: 'long',
     year: 'numeric',
   });
@@ -37,6 +38,7 @@ export class ProgramacionPeriodoStore {
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly festivoService = inject(FestivoService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   private readonly _periodo = signal<ProgramacionPeriodo | null>(null);
   private readonly _vigencia = signal<ProgramacionVigencia | null>(null);
@@ -121,7 +123,10 @@ export class ProgramacionPeriodoStore {
             this._festivos.set([]);
             return;
           }
-          this._periodo.set({ ...ym, etiqueta: etiquetaMes(ym.anio, ym.mes) });
+          this._periodo.set({
+            ...ym,
+            etiqueta: etiquetaMes(ym.anio, ym.mes, localeDe(this.i18n.lang())),
+          });
           this.cargarFestivos(ym.anio, ym.mes);
         },
         error: () => {
