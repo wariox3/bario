@@ -428,6 +428,8 @@ export interface AppDict
           secuenciaCalcular: string;
           posicionLabel: string;
           diasSection: string;
+          /** Banda de vigencia: rango de días programables (fecha_desde..fecha_hasta). */
+          vigencia: { label: string; hint: string };
           cargandoDias: string;
           diaAria: string;
           conflictoDia: string;

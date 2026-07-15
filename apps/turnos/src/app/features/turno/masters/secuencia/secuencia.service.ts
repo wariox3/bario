@@ -15,6 +15,13 @@ export interface SecuenciaCalcularMesPayload {
   readonly posicion_inicial: number;
   readonly anio: number;
   readonly mes: number;
+  /**
+   * Subrango de días del mes a calcular (1..N), acotado a la vigencia de la línea:
+   * `dia_desde` = primer día válido, `dia_hasta` = último. Sin vigencia se envía el
+   * mes completo (`1`..último día). El backend los exige.
+   */
+  readonly dia_desde: number;
+  readonly dia_hasta: number;
 }
 
 /** Día calculado por `calcular-mes`. `fecha` en formato ISO `YYYY-MM-DD`. */

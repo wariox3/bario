@@ -66,6 +66,29 @@
   background: rgba(20, 48, 73, 0.035);
 }
 
+// Día fuera de la vigencia de la línea: bloqueado. La columna recede (rayado tenue
+// en el header, fondo apagado en la celda) y su input va deshabilitado: no se puede
+// programar ese día. Va tras finde/festivo para ganarles el fondo.
+.aplicar-dias__th--bloqueado {
+  background: repeating-linear-gradient(-45deg, #f1f3f5, #f1f3f5 3px, #e9ecef 3px, #e9ecef 6px);
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.08);
+}
+
+.aplicar-dias__th--bloqueado .aplicar-dias__num,
+.aplicar-dias__th--bloqueado .aplicar-dias__ini {
+  color: rgba(20, 48, 73, 0.3);
+}
+
+.aplicar-dias__td--bloqueado {
+  background: rgba(20, 48, 73, 0.02);
+}
+
+.aplicar-dias__input:disabled {
+  background: rgba(20, 48, 73, 0.03);
+  color: rgba(20, 48, 73, 0.35);
+  cursor: not-allowed;
+}
+
 // Día ya programado (conflicto al aplicar): rojo fuerte. Gana sobre finde/festivo
 // por ir al final de la hoja.
 .aplicar-dias__th--error {

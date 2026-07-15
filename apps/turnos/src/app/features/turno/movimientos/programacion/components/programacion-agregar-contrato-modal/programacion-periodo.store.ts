@@ -4,7 +4,7 @@ import { finalize } from 'rxjs';
 import { anioMesDeIso, diasDelMes } from '@reddoc/core';
 import { DocumentoDetalleService } from '@reddoc/core';
 import { FestivoService, type Festivo } from '../../festivo.service';
-import type { ProgramacionLineaRead } from '../../programacion.model';
+import type { ProgramacionLineaRead, ProgramacionVigencia } from '../../programacion.model';
 
 /** Período (mes/año) a programar, ya con su etiqueta legible para el header. */
 export interface ProgramacionPeriodo {
@@ -38,12 +38,19 @@ export class ProgramacionPeriodoStore {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly _periodo = signal<ProgramacionPeriodo | null>(null);
+  private readonly _vigencia = signal<ProgramacionVigencia | null>(null);
   private readonly _cargando = signal(false);
   private readonly _festivos = signal<readonly Festivo[]>([]);
   private readonly _generado = signal(false);
 
   /** Período resuelto (`null` mientras carga o si la línea no trae fecha). */
   readonly periodo = this._periodo.asReadonly();
+
+  /**
+   * Vigencia (rango ISO de días válidos) de la línea. `null` mientras carga o si
+   * la línea no trae ambos extremos. Acota la fecha de inicio del prototipo.
+   */
+  readonly vigencia = this._vigencia.asReadonly();
 
   /** `true` mientras se resuelve el período (carga de la línea de documento). */
   readonly cargando = this._cargando.asReadonly();
@@ -80,9 +87,10 @@ export class ProgramacionPeriodoStore {
     return mapa;
   });
 
-  /** Limpia el período, sus festivos y el flag de generado (al reabrir el modal). */
+  /** Limpia el período, la vigencia, los festivos y el flag de generado (al reabrir). */
   reset(): void {
     this._periodo.set(null);
+    this._vigencia.set(null);
     this._festivos.set([]);
     this._generado.set(false);
   }
@@ -104,6 +112,12 @@ export class ProgramacionPeriodoStore {
         next: (linea) => {
           // El flag de generado se conserva aunque la línea no traiga fecha.
           this._generado.set(linea.generado);
+          // La vigencia solo se fija si la línea trae ambos extremos del rango.
+          this._vigencia.set(
+            linea.fecha_desde && linea.fecha_hasta
+              ? { desde: linea.fecha_desde, hasta: linea.fecha_hasta }
+              : null,
+          );
           const ym = anioMesDeIso(linea.fecha_desde);
           if (!ym) {
             this._periodo.set(null);

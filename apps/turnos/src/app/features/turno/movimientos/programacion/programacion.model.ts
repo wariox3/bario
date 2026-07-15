@@ -125,16 +125,32 @@ export interface ProgramacionFila extends ProgramacionHoras {
 /**
  * Lectura **mínima** de la línea de documento (pedido servicio) que los modales
  * de programación necesitan: `fecha_desde`, de la que deriva el período (mes/año)
- * a programar, y `generado`, que indica si la programación ya se materializó (lo
- * usa el modal de prototipo para alternar el botón entre generar y desgenerar).
- * Se lee vía `DocumentoDetalleService.obtenerPorId` con este tipo por llamada —
- * así no se acopla al modelo completo de `venta/`.
+ * a programar; `fecha_hasta`, que junto con `fecha_desde` acota la **vigencia**
+ * (rango de días válidos para la fecha de inicio del prototipo); y `generado`,
+ * que indica si la programación ya se materializó (lo usa el modal de prototipo
+ * para alternar el botón entre generar y desgenerar). Se lee vía
+ * `DocumentoDetalleService.obtenerPorId` con este tipo por llamada — así no se
+ * acopla al modelo completo de `venta/`.
  */
 export interface ProgramacionLineaRead {
   /** Fecha de inicio de la línea (ISO `YYYY-MM-DD`); define el período. */
   readonly fecha_desde: string | null;
+  /** Fecha de fin de la línea (ISO `YYYY-MM-DD`); cierra el rango de vigencia. */
+  readonly fecha_hasta: string | null;
   /** `true` si la programación de la línea ya se generó (materializó). */
   readonly generado: boolean;
+}
+
+/**
+ * Vigencia de una línea de programación: rango ISO `YYYY-MM-DD` de días válidos
+ * (`fecha_desde`..`fecha_hasta`), ambos extremos inclusive. Acota qué días se
+ * pueden programar en las tablas de día de los modales — fuera del rango el input
+ * del día se bloquea. Tipo de dominio compartido por los modales y el store; la
+ * lógica (predicado + formato) vive en `programacion.utils.ts`.
+ */
+export interface ProgramacionVigencia {
+  readonly desde: string;
+  readonly hasta: string;
 }
 
 /** Ítem de día en `crear`. `fecha` en formato ISO `YYYY-MM-DD`. */

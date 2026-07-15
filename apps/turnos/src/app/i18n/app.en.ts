@@ -515,6 +515,10 @@ export const en: AppDict = {
           secuenciaCalcular: 'Calculate',
           posicionLabel: 'Initial position',
           diasSection: 'Days of the month',
+          vigencia: {
+            label: 'Line validity',
+            hint: 'Only days within this range can be scheduled.',
+          },
           cargandoDias: 'Loading period…',
           diaAria: 'Day',
           conflictoDia: 'The employee already has a shift that day in another position.',

@@ -182,6 +182,51 @@ El componente es **agnóstico de app**. Lo único que cambia por app son sus pro
   saltar hay que reelegir empresa. Y reemplazar el monograma por SVG real cuando exista en
   `libs/ui/src/assets/logos/`.
 
+## Patrón: banda de vigencia + tabla de días acotada por rango
+
+Para tablas de "un input por día del mes" (calendario editable) donde solo un **subrango** de
+días es válido (una línea de documento acota `fecha_desde..fecha_hasta`): los días fuera del rango
+se **bloquean** (no editables, no viajan en el payload) y una banda arriba de la tabla anuncia el
+rango vigente. Ejemplo vivo: modal `programacion-agregar-contrato-modal` (apps/turnos) — la tabla de
+días del mes de la programación de un contrato.
+
+- **Lógica compartida, NO en el componente:** el núcleo puro vive en `programacion.utils.ts` y lo
+  reusan todos los modales de día — `estaEnVigencia(iso, vigencia)` (predicado, comparación ISO
+  lexicográfica), `clavesEnVigencia(claves, vigencia)` (Set de claves ISO, para grillas keyed por
+  fecha como `editar-puesto`) y `formatVigenciaRango(vigencia, locale)` (etiqueta del chip). El tipo
+  `ProgramacionVigencia` es de dominio (`programacion.model.ts`). **No** re-implementar la comparación
+  ni el formato dentro de cada componente — eso fue el error inicial (lógica atrapada + acoplada al
+  modelo día-como-número, no reutilizable por la grilla transpuesta keyed por ISO).
+- **Fuente del rango:** un signal `vigencia: ProgramacionVigencia | null` (ISO `YYYY-MM-DD`), derivado
+  del GET de la línea. `null` = sin rango → **degradado seguro**: todos los días habilitados y sin
+  banda. Solo se fija si vienen **ambos** extremos. OJO: el rango suele venir de un GET **por-línea**
+  (`DocumentoDetalleService.obtenerPorId`), no del grid/detalle — si un modal es input-driven y no
+  tiene ese dato, hay que decidir el origen (input del padre vs. carga propia) antes de cablear.
+- **Cálculo de habilitados:** `computed<ReadonlySet<...>>` filtrando con `estaEnVigencia` /
+  `clavesEnVigencia` según la grilla sea por número de día o por clave ISO. Sin vigencia → todos.
+- **Bloqueo real (no solo visual):** en el `effect` que reconstruye el `FormArray` de días, cada
+  control nace `.disable({ emitEvent: false })` si su día no está habilitado. El effect depende de
+  `dias()` **y** `vigencia()`, así reacciona cuando el rango llega async (se reconstruye ya
+  bloqueado). Un control deshabilitado = input no editable y sin aporte al payload. Guardá también
+  los _auto-rellenos_ (ej. picker de secuencia): `if (control?.enabled) control.setValue(...)`.
+- **Banda de vigencia** (arriba de la tabla, `@if (vigenciaEtiqueta())`): misma franja slim del
+  idioma de banda —
+  `flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2`.
+  Ícono navy en contenedor (`h-[1.35rem] w-[1.35rem] rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-primary`,
+  `pi pi-calendar`) + micro-label uppercase muted + **ficha navy** con el rango
+  (`inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold tabular-nums text-brand-text`)
+  - hint muted a la derecha (`ml-auto text-[0.72rem] text-brand-muted`) que **justifica** los días
+    bloqueados. El rango se formatea con `Intl.DateTimeFormat` según `i18n.lang()` (`es-CO`/`en-US`),
+    `day:'2-digit', month:'short'` en el `desde` y con `year` en el `hasta`: `15 jul – 31 jul 2026`.
+- **Feedback de columna bloqueada:** la columna **recede** (no compite con finde/festivo). Header
+  con rayado tenue `repeating-linear-gradient(-45deg, #f1f3f5 0 3px, #e9ecef 3px 6px)` + número/inicial
+  a `rgba(20,48,73,0.3)`; celda `bg-[rgba(20,48,73,0.02)]`; input `:disabled` a
+  `bg rgba(20,48,73,0.03)`, `color rgba(20,48,73,0.35)`, `cursor: not-allowed`. La regla `--bloqueado`
+  va **después** de finde/festivo en la hoja para ganarles el fondo (misma especificidad → orden).
+- **Regla:** el bloqueo debe ser real (control deshabilitado), no solo un estilo — si el input sigue
+  editable o el día sigue viajando en el payload, no está bloqueado. La banda existe para **explicar**
+  por qué hay columnas apagadas; sin ella el bloqueo se lee como bug.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por
