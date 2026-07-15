@@ -181,6 +181,15 @@ export interface AppDict
         editBloqueado: { title: string; desc: string };
       };
     };
+    estados: {
+      aprobado: string;
+      contabilizado: string;
+      electronico: string;
+      enviadoDian: string;
+      notificado: string;
+      generado: string;
+      anulado: string;
+    };
     afectacion: {
       title: string;
       subtitle: string;

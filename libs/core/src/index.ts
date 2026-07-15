@@ -73,6 +73,7 @@ export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/
 export type { TasaImpuesto, ImpuestoLinea, LineaCalculo, ResumenDocumento } from './lib/calculo';
 export type {
   DocumentoListRowBase,
+  DocumentoEstados,
   DocumentoReadBase,
   DocumentoPayloadBase,
   DocumentoDetalleReadBase,

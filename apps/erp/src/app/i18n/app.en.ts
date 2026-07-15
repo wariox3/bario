@@ -251,6 +251,15 @@ export const en: AppDict = {
         },
       },
     },
+    estados: {
+      aprobado: 'Approved',
+      contabilizado: 'Posted',
+      electronico: 'Electronic',
+      enviadoDian: 'Sent to DIAN (awaiting response)',
+      notificado: 'Notified',
+      generado: 'Generated',
+      anulado: 'Voided',
+    },
     afectacion: {
       title: 'Document traceability',
       subtitle: 'The document, its affected document and the details that affect it',

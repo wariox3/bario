@@ -1,5 +1,6 @@
 export type {
   DocumentoListRowBase,
+  DocumentoEstados,
   DocumentoReadBase,
   DocumentoPayloadBase,
   DocumentoDetalleReadBase,

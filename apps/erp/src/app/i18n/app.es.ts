@@ -251,6 +251,15 @@ export const es: AppDict = {
         },
       },
     },
+    estados: {
+      aprobado: 'Aprobado',
+      contabilizado: 'Contabilizado',
+      electronico: 'Electrónico',
+      enviadoDian: 'Enviado DIAN (esperando respuesta)',
+      notificado: 'Notificado',
+      generado: 'Generado',
+      anulado: 'Anulado',
+    },
     afectacion: {
       title: 'Afectación del documento',
       subtitle: 'El documento, su documento afectado y los detalles que lo afectan',
