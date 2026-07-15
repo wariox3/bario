@@ -9,6 +9,7 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  extractErrorMessage,
   calcularResumen,
   type DocumentoEstados,
   type ResumenDocumento,
@@ -190,9 +191,9 @@ export class FacturaVentaDetailComponent implements OnInit {
           this.toast.success(ts.title, ts.desc);
           this.loadDocumento(id);
         },
-        error: () => {
+        error: (err: unknown) => {
           const ts = this.t().documentActions.detail.toasts.aprobarError;
-          this.toast.error(ts.title, ts.desc);
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
       });
   }
@@ -223,9 +224,9 @@ export class FacturaVentaDetailComponent implements OnInit {
           this.toast.success(ts.title, ts.desc);
           this.loadDocumento(id);
         },
-        error: () => {
+        error: (err: unknown) => {
           const ts = this.t().documentActions.detail.toasts.desaprobarError;
-          this.toast.error(ts.title, ts.desc);
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
       });
   }
