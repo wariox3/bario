@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 import { I18nService, formatHorario } from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import type { ProgramacionFecha, ProgramacionFila } from '../../programacion.model';
+import { formatVigenciaRango, vigenciaDe } from '../../programacion.utils';
 
 /** Grupo de filas que comparten `documento_detalle_id` — un puesto. */
 interface GrupoFilas {
@@ -13,6 +14,11 @@ interface GrupoFilas {
   readonly modalidadNombre: string | null;
   /** Franja horaria del puesto ya formateada (`HH:mm - HH:mm`), o `null`. */
   readonly horario: string | null;
+  /**
+   * Vigencia de la línea ya formateada (`15 de jul - 31 de jul`), o `null` si el
+   * detalle no trae ambos extremos (hoy el backend solo manda `fecha_desde`).
+   */
+  readonly rangoVigencia: string | null;
   /**
    * Horas del puesto, **ya calculadas por el backend** (contratadas y
    * programadas, total/diurnas/nocturnas). Vienen agregadas por puesto e
@@ -120,6 +126,7 @@ export class ProgramacionGridComponent {
 
   /** Filas agrupadas por `documento_detalle_id` para renderizar separadores. */
   protected readonly grupos = computed<readonly GrupoFilas[]>(() => {
+    const locale = this.i18n.lang() === 'en' ? 'en-US' : 'es-CO';
     const result: GrupoFilas[] = [];
     for (const fila of this.filas()) {
       const last = result[result.length - 1];
@@ -133,6 +140,10 @@ export class ProgramacionGridComponent {
           puestoNombre: fila.puesto_nombre,
           modalidadNombre: fila.modalidad_nombre,
           horario: formatHorario(fila.hora_desde, fila.hora_hasta),
+          rangoVigencia: formatVigenciaRango(
+            vigenciaDe(fila.fecha_desde, fila.fecha_hasta),
+            locale,
+          ),
           horas: fila.horas,
           horasDiurnas: fila.horas_diurnas,
           horasNocturnas: fila.horas_nocturnas,

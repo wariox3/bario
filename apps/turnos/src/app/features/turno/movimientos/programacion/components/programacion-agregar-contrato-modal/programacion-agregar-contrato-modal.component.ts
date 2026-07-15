@@ -122,7 +122,7 @@ export class ProgramacionAgregarContratoModalComponent {
     return !this.diasHabilitados().has(dia);
   }
 
-  /** Rango de vigencia ya formateado para el chip de la banda (`15 jul – 31 jul 2026`). */
+  /** Rango de vigencia ya formateado para el chip de la banda (`15 de jul - 31 de jul`). */
   protected readonly vigenciaEtiqueta = computed<string | null>(() =>
     formatVigenciaRango(this.vigencia(), this.i18n.lang() === 'en' ? 'en-US' : 'es-CO'),
   );

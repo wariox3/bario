@@ -1,4 +1,5 @@
 @let g = t().entities.programacion.detail.grid;
+@let mv = t().entities.programacion.detail.programacionModal.vigencia;
 
 <div class="max-h-[32rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
   <table class="programacion-grid">
@@ -80,6 +81,14 @@
                 <span class="programacion-grid__group-chip programacion-grid__group-chip--horario">
                   <i class="pi pi-clock text-[0.58rem]"></i>
                   {{ grupo.horario }}
+                </span>
+              }
+              <!-- Vigencia de la línea: ventana de días programables (fecha_desde ->
+                   fecha_hasta). Chip navy con calendario, junto al horario. -->
+              @if (grupo.rangoVigencia; as rango) {
+                <span class="programacion-grid__group-chip" [title]="mv.label">
+                  <i class="pi pi-calendar text-[0.58rem]"></i>
+                  {{ rango }}
                 </span>
               }
               <div class="ml-auto flex shrink-0 items-center gap-2">

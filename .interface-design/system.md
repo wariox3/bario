@@ -231,7 +231,13 @@ días del mes de la programación de un contrato.
   (`inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold tabular-nums text-brand-text`)
   - hint muted a la derecha (`ml-auto text-[0.72rem] text-brand-muted`) que **justifica** los días
     bloqueados. El rango se formatea con `Intl.DateTimeFormat` según `i18n.lang()` (`es-CO`/`en-US`),
-    `day:'2-digit', month:'short'` en el `desde` y con `year` en el `hasta`: `15 jul – 31 jul 2026`.
+    **sin año** y con día+mes corto en ambos extremos: `15 de jul - 31 de jul` (es) / `Jul 15 - Jul
+31` (en) — el año ya se ve en el header/período.
+  - **Variante chip** (grid y group-rows de los modales de edición): el mismo rango pero como pill
+    `group-chip` **navy por defecto** + `pi pi-calendar`, junto al chip de horario. Regla de color:
+    el horario (hora del día) es teal; la vigencia (ventana de fechas) va navy — reutiliza
+    `formatVigenciaRango`, así el rango se lee idéntico en banda y en chip. En el grid degrada a
+    oculto si el detalle no trae `fecha_hasta` (hoy el backend solo manda `fecha_desde`).
 - **Feedback de día bloqueado — el rayado ES la marca** (una sola señal en todas las tablas de día):
   `repeating-linear-gradient(-45deg, #f1f3f5, #f1f3f5 3px, #e9ecef 3px, #e9ecef 6px)`.
   - Bloqueo **por columna** — cuando TODAS las bandas comparten la vigencia (agregar-contrato:

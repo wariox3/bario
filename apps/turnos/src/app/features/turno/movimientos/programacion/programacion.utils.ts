@@ -57,9 +57,19 @@ export function clavesEnVigencia(
 }
 
 /**
- * Rango de vigencia formateado para el chip de la banda: `15 jul – 31 jul 2026`
- * (día+mes en el `desde`; día+mes+año en el `hasta`). `null` si falta la vigencia o
- * alguno de los extremos no parsea. `locale` sale de `i18n.lang()` en el consumidor.
+ * Un extremo del rango como día + mes corto **sin año**: `15 de jul` (es) / `Jul 15`
+ * (en). El mes abreviado va sin el punto final que agregan algunos locales.
+ */
+function formatDiaMes(date: Date, locale: string): string {
+  const dia = date.getDate();
+  const mes = new Intl.DateTimeFormat(locale, { month: 'short' }).format(date).replace(/\.$/, '');
+  return locale.startsWith('es') ? `${dia} de ${mes}` : `${mes} ${dia}`;
+}
+
+/**
+ * Rango de vigencia formateado para la banda/chip: `15 de jul - 31 de jul` (mismo
+ * día+mes en ambos extremos, sin año — el período/año ya se ve en el header). `null`
+ * si falta la vigencia o algún extremo no parsea. `locale` sale de `i18n.lang()`.
  */
 export function formatVigenciaRango(
   vigencia: ProgramacionVigencia | null,
@@ -69,11 +79,5 @@ export function formatVigenciaRango(
   const desde = fromIsoDate(vigencia.desde);
   const hasta = fromIsoDate(vigencia.hasta);
   if (!desde || !hasta) return null;
-  const diaMes = new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' });
-  const diaMesAnio = new Intl.DateTimeFormat(locale, {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-  return `${diaMes.format(desde)} – ${diaMesAnio.format(hasta)}`;
+  return `${formatDiaMes(desde, locale)} - ${formatDiaMes(hasta, locale)}`;
 }

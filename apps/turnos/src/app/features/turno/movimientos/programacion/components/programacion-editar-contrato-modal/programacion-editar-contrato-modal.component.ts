@@ -68,7 +68,7 @@ interface BandaVm {
   readonly puestoNombre: string | null;
   readonly modalidadNombre: string | null;
   readonly horario: string | null;
-  /** Rango de vigencia formateado (`15 jul – 31 jul 2026`) o `null` si la línea no lo trae. */
+  /** Rango de vigencia formateado (`15 de jul - 31 de jul`) o `null` si la línea no lo trae. */
   readonly rangoEtiqueta: string | null;
   readonly dias: readonly DiaControlVm[];
 }
