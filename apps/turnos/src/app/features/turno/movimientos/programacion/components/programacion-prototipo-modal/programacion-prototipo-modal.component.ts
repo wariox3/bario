@@ -34,14 +34,13 @@ import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-gri
 import { ProgramacionPeriodoStore } from '../programacion-agregar-contrato-modal/programacion-periodo.store';
 import { PrototipoService } from '../../prototipo.service';
 import type { Prototipo, PrototipoPayload } from '../../prototipo.model';
-import type {
-  ProgramacionDetalleResponse,
-  ProgramacionErroresResponse,
-} from '../../programacion.model';
+import type { ProgramacionDetalleResponse } from '../../programacion.model';
 import { esColumnaFestiva, esColumnaSabado, toProgramacionFecha } from '../../programacion.utils';
 import {
+  construirGenerarErrores,
   extraerDetalleProgramacion,
   extraerErroresProgramacion,
+  type GenerarErroresVista,
 } from '../../programacion-errores.util';
 
 /** Grupo de formulario de una fila de la tabla de prototipo. */
@@ -55,23 +54,6 @@ type FilaGroup = FormGroup<{
   fechaInicio: FormControl<string>;
   posicion: FormControl<number>;
 }>;
-
-/** Un mensaje de error del generar con los días (número) a los que aplica. */
-interface GenerarErrorGrupo {
-  readonly mensaje: string;
-  readonly dias: readonly string[];
-}
-
-/**
- * Vista del 400 de **generar** ya agrupada para el banner: el `detail` general,
- * los errores por día agrupados por mensaje (dedup de días) y los avisos sin
- * fecha (ej. horas excedidas).
- */
-interface GenerarErroresVista {
-  readonly detail: string;
-  readonly grupos: readonly GenerarErrorGrupo[];
-  readonly avisos: readonly string[];
-}
 
 /**
  * Modal de **prototipo** de turnos de un puesto.
@@ -647,30 +629,6 @@ export class ProgramacionPrototipoModalComponent {
   }
 
   /**
-   * Arma la vista del 400 de generar: agrupa los `errores` con fecha por
-   * `mensaje` (deduplicando días — un día trae una entrada por turno) y separa
-   * los que no tienen fecha como `avisos`. Los días se muestran como número.
-   */
-  private construirGenerarErrores(parsed: ProgramacionErroresResponse): GenerarErroresVista {
-    const porMensaje = new Map<string, Set<string>>();
-    const avisos = new Set<string>();
-    for (const e of parsed.errores) {
-      if (!e.fecha) {
-        avisos.add(e.mensaje);
-        continue;
-      }
-      const fechas = porMensaje.get(e.mensaje) ?? new Set<string>();
-      fechas.add(e.fecha);
-      porMensaje.set(e.mensaje, fechas);
-    }
-    const grupos = [...porMensaje.entries()].map(([mensaje, fechas]) => ({
-      mensaje,
-      dias: [...fechas].sort().map((f) => f.slice(8, 10).replace(/^0/, '')),
-    }));
-    return { detail: parsed.detail, grupos, avisos: [...avisos] };
-  }
-
-  /**
    * Generar: materializa el prototipo en la programación real del puesto
    * (`POST /turno/programacion/generar/` con `{ documento_detalle_id }`). Es la
    * acción terminal: al éxito avisa al padre (`applied`) para que recargue el
@@ -703,7 +661,7 @@ export class ProgramacionPrototipoModalComponent {
         error: (err) => {
           const parsed = extraerErroresProgramacion(err);
           if (parsed && parsed.errores.length) {
-            this.generarErrores.set(this.construirGenerarErrores(parsed));
+            this.generarErrores.set(construirGenerarErrores(parsed));
           }
           this.toast.error(
             m.toasts.generarError.title,

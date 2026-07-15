@@ -29,7 +29,6 @@ import type { ProgramacionContratoRef } from '../programacion-grid/programacion-
 import { ProgramacionService } from '../../programacion.service';
 import type {
   ActualizarProgramacionPayload,
-  ProgramacionErrorItem,
   ProgramacionFecha,
   ProgramacionFila,
   ProgramacionVigencia,
@@ -45,9 +44,8 @@ import {
 import { ProgramacionVigenciasStore } from '../../programacion-vigencias.store';
 import {
   extraerDetalleProgramacion,
-  extraerErroresMasivo,
-  extraerErroresProgramacion,
-  separarErroresProgramacion,
+  mapearErroresLinea,
+  mapearErroresMasivo,
 } from '../../programacion-errores.util';
 
 /**
@@ -88,24 +86,6 @@ interface BandaVm {
  *    (un request con `programaciones: []`).
  */
 export type EditarProgramacionModo = 'linea' | 'masivo';
-
-/**
- * Errores del 400 repartidos por alcance:
- *  - `celdas`: `documento_detalle_id → (día → mensaje)` para resaltar la casilla.
- *  - `avisos`: `documento_detalle_id → mensajes[]` de puesto sin fecha (ej. horas
- *    excedidas) atribuidos a una línea.
- *  - `globales`: mensajes de validación del batch no atribuibles a un puesto (masivo
- *    con `{ errores }` de nivel superior, sin `indice`).
- */
-interface ErroresPorPuesto {
-  readonly celdas: Map<number, ReadonlyMap<string, string>>;
-  readonly avisos: Map<number, readonly string[]>;
-  readonly globales: string[];
-}
-
-function nuevoErroresPorPuesto(): ErroresPorPuesto {
-  return { celdas: new Map(), avisos: new Map(), globales: [] };
-}
 
 /**
  * Modal para **editar la programación de un contrato en todos sus puestos a la vez**.
@@ -498,10 +478,12 @@ export class ProgramacionEditarContratoModalComponent {
    */
   private onGuardadoError(err: unknown, payloads: readonly ActualizarProgramacionPayload[]): void {
     const ts = this.t().entities.programacion.detail.programacionModal.toasts;
+    // El scope de los errores es el puesto (`documento_detalle_id`): masivo resuelve
+    // por `payloads[indice]`; línea, la única fila enviada. Ver `mapearErrores*` (util).
     const { celdas, avisos, globales } =
       this.modo() === 'masivo'
-        ? this.parseErroresMasivo(err, payloads)
-        : this.parseErroresLinea(err, payloads[0]);
+        ? mapearErroresMasivo(err, payloads, (p) => p.documento_detalle_id)
+        : mapearErroresLinea(err, payloads[0].documento_detalle_id);
     this.celdasError.set(celdas);
     this.avisosPuesto.set(avisos);
     this.avisosGlobales.set(globales);
@@ -509,60 +491,6 @@ export class ProgramacionEditarContratoModalComponent {
     const huboDetalle = celdas.size > 0 || avisos.size > 0 || globales.length > 0;
     const desc = huboDetalle ? ts.error.desc : (extraerDetalleProgramacion(err) ?? ts.error.desc);
     this.toast.error(ts.error.title, desc);
-  }
-
-  /**
-   * 400 de `actualizar` (`{ errores: [] }`) → celdas y avisos de puesto de
-   * la única fila enviada, keyed por su `documento_detalle_id`.
-   */
-  private parseErroresLinea(
-    err: unknown,
-    payload: ActualizarProgramacionPayload,
-  ): ErroresPorPuesto {
-    const acc = nuevoErroresPorPuesto();
-    const body = extraerErroresProgramacion(err);
-    if (body) this.acumularErrores(acc, payload.documento_detalle_id, body.errores);
-    return acc;
-  }
-
-  /**
-   * 400 de `actualizar-masivo`. Dos formas posibles:
-   *  - `{ resultados: [{ indice, errores }] }` → celdas/avisos por línea, resolviendo el
-   *    `documento_detalle_id` desde `payloads[indice]`.
-   *  - `{ detail, errores: [] }` → validación global del batch (sin `indice`, ej. horas
-   *    excedidas): no atribuible a un puesto → van a `globales` (banner arriba).
-   */
-  private parseErroresMasivo(
-    err: unknown,
-    payloads: readonly ActualizarProgramacionPayload[],
-  ): ErroresPorPuesto {
-    const acc = nuevoErroresPorPuesto();
-    const masivo = extraerErroresMasivo(err);
-    if (masivo) {
-      for (const linea of masivo.resultados) {
-        const payload = payloads[linea.indice];
-        if (!payload || !Array.isArray(linea.errores)) continue;
-        this.acumularErrores(acc, payload.documento_detalle_id, linea.errores);
-      }
-      return acc;
-    }
-    const global = extraerErroresProgramacion(err);
-    if (global) for (const e of global.errores) acc.globales.push(e.mensaje);
-    return acc;
-  }
-
-  /**
-   * Reparte los `errores` de un puesto en el acumulador: con `fecha` → celda
-   * (`documento_detalle_id → fecha → mensaje`); sin `fecha` → aviso de puesto.
-   */
-  private acumularErrores(
-    acc: ErroresPorPuesto,
-    documentoDetalleId: number,
-    errores: readonly ProgramacionErrorItem[],
-  ): void {
-    const { celdas, avisos } = separarErroresProgramacion(errores);
-    if (celdas.size) acc.celdas.set(documentoDetalleId, celdas);
-    if (avisos.length) acc.avisos.set(documentoDetalleId, avisos);
   }
 
   protected onClose(): void {

@@ -29,7 +29,6 @@ import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-gri
 import { ProgramacionService } from '../../programacion.service';
 import type {
   ActualizarProgramacionPayload,
-  ProgramacionErrorItem,
   ProgramacionFecha,
   ProgramacionFila,
   ProgramacionVigencia,
@@ -43,12 +42,7 @@ import {
   vigenciaDe,
 } from '../../programacion.utils';
 import { ProgramacionVigenciasStore } from '../../programacion-vigencias.store';
-import {
-  extraerDetalleProgramacion,
-  extraerErroresMasivo,
-  extraerErroresProgramacion,
-  separarErroresProgramacion,
-} from '../../programacion-errores.util';
+import { extraerDetalleProgramacion, mapearErroresMasivo } from '../../programacion-errores.util';
 
 /**
  * Celda editable de un día: metadatos para pintar/aria + el `FormControl` real. El
@@ -79,22 +73,6 @@ interface BandaVm {
   /** Rango de vigencia formateado (`15 de jul - 31 de jul`) o `null` si la línea no lo trae. */
   readonly rangoEtiqueta: string | null;
   readonly dias: readonly DiaControlVm[];
-}
-
-/**
- * Errores del 400 repartidos por alcance, keyed por `contrato_id`:
- *  - `celdas`: `contrato_id → (día → mensaje)` para resaltar la casilla.
- *  - `avisos`: `contrato_id → mensajes[]` de línea sin fecha (ej. horas excedidas).
- *  - `globales`: mensajes de validación del batch no atribuibles a un contrato.
- */
-interface ErroresPorContrato {
-  readonly celdas: Map<number, ReadonlyMap<string, string>>;
-  readonly avisos: Map<number, readonly string[]>;
-  readonly globales: string[];
-}
-
-function nuevoErroresPorContrato(): ErroresPorContrato {
-  return { celdas: new Map(), avisos: new Map(), globales: [] };
 }
 
 /**
@@ -430,7 +408,9 @@ export class ProgramacionEditarPuestoModalComponent {
    */
   private onGuardadoError(err: unknown, payloads: readonly ActualizarProgramacionPayload[]): void {
     const ts = this.t().entities.programacion.detail.programacionPuestoModal.toasts;
-    const { celdas, avisos, globales } = this.parseErroresMasivo(err, payloads);
+    // El scope de los errores es el contrato: masivo resuelve por `payloads[indice]`.
+    // Ver `mapearErroresMasivo` (util), compartido con el modal de contrato.
+    const { celdas, avisos, globales } = mapearErroresMasivo(err, payloads, (p) => p.contrato_id);
     this.celdasError.set(celdas);
     this.avisosContrato.set(avisos);
     this.avisosGlobales.set(globales);
@@ -438,46 +418,6 @@ export class ProgramacionEditarPuestoModalComponent {
     const huboDetalle = celdas.size > 0 || avisos.size > 0 || globales.length > 0;
     const desc = huboDetalle ? ts.error.desc : (extraerDetalleProgramacion(err) ?? ts.error.desc);
     this.toast.error(ts.error.title, desc);
-  }
-
-  /**
-   * 400 de `actualizar-masivo`. Dos formas posibles:
-   *  - `{ resultados: [{ indice, errores }] }` → celdas/avisos por línea, resolviendo el
-   *    `contrato_id` desde `payloads[indice]`.
-   *  - `{ detail, errores: [] }` → validación global del batch (sin `indice`): no
-   *    atribuible a un contrato → van a `globales` (banner arriba).
-   */
-  private parseErroresMasivo(
-    err: unknown,
-    payloads: readonly ActualizarProgramacionPayload[],
-  ): ErroresPorContrato {
-    const acc = nuevoErroresPorContrato();
-    const masivo = extraerErroresMasivo(err);
-    if (masivo) {
-      for (const linea of masivo.resultados) {
-        const payload = payloads[linea.indice];
-        if (!payload || !Array.isArray(linea.errores)) continue;
-        this.acumularErrores(acc, payload.contrato_id, linea.errores);
-      }
-      return acc;
-    }
-    const global = extraerErroresProgramacion(err);
-    if (global) for (const e of global.errores) acc.globales.push(e.mensaje);
-    return acc;
-  }
-
-  /**
-   * Reparte los `errores` de una línea en el acumulador: con `fecha` → celda
-   * (`contrato_id → fecha → mensaje`); sin `fecha` → aviso de contrato.
-   */
-  private acumularErrores(
-    acc: ErroresPorContrato,
-    contratoId: number,
-    errores: readonly ProgramacionErrorItem[],
-  ): void {
-    const { celdas, avisos } = separarErroresProgramacion(errores);
-    if (celdas.size) acc.celdas.set(contratoId, celdas);
-    if (avisos.length) acc.avisos.set(contratoId, avisos);
   }
 
   protected onClose(): void {
