@@ -80,11 +80,14 @@
 }
 
 .aplicar-dias__td--bloqueado {
-  background: rgba(20, 48, 73, 0.02);
+  background: repeating-linear-gradient(-45deg, #f1f3f5, #f1f3f5 3px, #e9ecef 3px, #e9ecef 6px);
 }
 
+// El input de una celda bloqueada se funde con el rayado: sin caja propia, solo el
+// valor atenuado (si lo hubiera) sobre las franjas.
 .aplicar-dias__input:disabled {
-  background: rgba(20, 48, 73, 0.03);
+  background: transparent;
+  border-color: transparent;
   color: rgba(20, 48, 73, 0.35);
   cursor: not-allowed;
 }

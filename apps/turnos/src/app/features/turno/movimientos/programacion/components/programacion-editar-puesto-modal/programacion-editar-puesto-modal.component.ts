@@ -8,6 +8,7 @@ import {
   model,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -30,7 +31,10 @@ import type {
   ProgramacionErrorItem,
   ProgramacionFecha,
   ProgramacionFila,
+  ProgramacionVigencia,
 } from '../../programacion.model';
+import { estaEnVigencia, formatVigenciaRango, vigenciaDe } from '../../programacion.utils';
+import { ProgramacionVigenciasStore } from '../../programacion-vigencias.store';
 import {
   extraerDetalleProgramacion,
   extraerErroresMasivo,
@@ -48,12 +52,15 @@ interface DiaControlVm {
   readonly etiqueta: string;
   readonly inicial: string;
   readonly control: FormControl<string>;
+  /** `true` si el día cae fuera de la vigencia de la banda (input bloqueado). */
+  readonly bloqueado: boolean;
 }
 
 /**
  * Banda de un **contrato** (línea) del puesto en el grid editable: metadatos a la
  * izquierda (nombre + identificación del contrato) más sus celdas de día con control.
- * Es el eje transpuesto del modal de contrato (allí la banda es un puesto).
+ * Es el eje transpuesto del modal de contrato (allí la banda es un puesto). Cada
+ * banda tiene su **propia vigencia** (rango de la línea): los días fuera se bloquean.
  */
 interface BandaVm {
   /** `contrato_id` — identidad única de la banda en este eje (para keyear errores). */
@@ -61,6 +68,8 @@ interface BandaVm {
   readonly contratoId: number;
   readonly contratoNombre: string | null;
   readonly identificacion: string | null;
+  /** Rango de vigencia formateado (`15 jul – 31 jul 2026`) o `null` si la línea no lo trae. */
+  readonly rangoEtiqueta: string | null;
   readonly dias: readonly DiaControlVm[];
 }
 
@@ -100,10 +109,12 @@ function nuevoErroresPorContrato(): ErroresPorContrato {
   imports: [ReactiveFormsModule, DialogModule, ButtonModule, InputTextModule, UppercaseDirective],
   templateUrl: './programacion-editar-puesto-modal.component.html',
   styleUrl: './programacion-editar-puesto-modal.component.scss',
+  providers: [ProgramacionVigenciasStore],
 })
 export class ProgramacionEditarPuestoModalComponent {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly service = inject(ProgramacionService);
+  private readonly vigenciasStore = inject(ProgramacionVigenciasStore);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -148,6 +159,45 @@ export class ProgramacionEditarPuestoModalComponent {
   private readonly estructuraVersion = signal(0);
 
   /**
+   * Vigencia **efectiva** por línea (`documento_detalle_id → rango`): la de la fila
+   * si el detalle del grid ya la trae (`fecha_desde`/`fecha_hasta`), con fallback a
+   * la cargada por línea (`ProgramacionVigenciasStore`, GET por id — el detalle hoy
+   * no incluye las fechas). `null` = sin rango → todos los días habilitados.
+   */
+  protected readonly vigenciasPorLinea = computed<ReadonlyMap<number, ProgramacionVigencia | null>>(
+    () => {
+      const cargadas = this.vigenciasStore.vigencias();
+      const map = new Map<number, ProgramacionVigencia | null>();
+      for (const fila of this.filas()) {
+        map.set(
+          fila.documento_detalle_id,
+          vigenciaDe(fila.fecha_desde, fila.fecha_hasta) ??
+            cargadas.get(fila.documento_detalle_id) ??
+            null,
+        );
+      }
+      return map;
+    },
+  );
+
+  /**
+   * Vigencia **única** del puesto: todas las bandas comparten la línea
+   * (`documento_detalle_id` — un puesto, varios contratos), así que acá el bloqueo
+   * es uniforme por columna y el header también puede marcarse (a diferencia de
+   * `editar-contrato`, donde cada banda tiene su propio rango).
+   */
+  protected readonly vigenciaPuesto = computed<ProgramacionVigencia | null>(() => {
+    const fila = this.filas()[0];
+    if (!fila) return null;
+    return this.vigenciasPorLinea().get(fila.documento_detalle_id) ?? null;
+  });
+
+  /** `true` si el día cae fuera de la vigencia del puesto (columna bloqueada). */
+  protected diaBloqueado(clave: string): boolean {
+    return !estaEnVigencia(clave, this.vigenciaPuesto());
+  }
+
+  /**
    * Bandas del grid: metadatos del contrato + celdas de día con su `FormControl` real.
    * Empareja `filas()`/`fechas()` con `contratosArray` (mismo orden). El template ata
    * `[formControl]="dia.control"` y hace `track dia.control`, de modo que al recrear
@@ -157,21 +207,26 @@ export class ProgramacionEditarPuestoModalComponent {
     this.estructuraVersion();
     const filas = this.filas();
     const fechas = this.fechas();
+    const vigencias = this.vigenciasPorLinea();
     const arr = this.contratosArray;
+    const locale = this.i18n.lang() === 'en' ? 'en-US' : 'es-CO';
     if (arr.length !== filas.length) return [];
 
     return filas.map((fila, i) => {
       const dias = arr.at(i);
+      const vigencia = vigencias.get(fila.documento_detalle_id) ?? null;
       return {
         key: fila.contrato_id as number,
         contratoId: fila.contrato_id as number,
         contratoNombre: fila.contrato_contacto_nombre_corto,
         identificacion: fila.contrato_contacto_numero_identificacion,
+        rangoEtiqueta: formatVigenciaRango(vigencia, locale),
         dias: fechas.map((fecha, j) => ({
           clave: fecha.clave,
           etiqueta: fecha.etiqueta,
           inicial: fecha.inicial,
           control: dias.at(j),
+          bloqueado: !estaEnVigencia(fecha.clave, vigencia),
         })),
       };
     });
@@ -246,12 +301,17 @@ export class ProgramacionEditarPuestoModalComponent {
       const fechas = this.fechas();
       const arr = this.contratosArray;
       arr.clear({ emitEvent: false });
+      // Vigencia por línea: los días fuera del rango nacen deshabilitados (input
+      // bloqueado). `untracked` para que la llegada async del GET NO reconstruya el
+      // form (pisaría lo tecleado): eso lo aplica el effect de bloqueo de abajo.
+      const vigencias = untracked(() => this.vigenciasPorLinea());
       for (const fila of filas) {
+        const vigencia = vigencias.get(fila.documento_detalle_id) ?? null;
         const dias = this.fb.array<FormControl<string>>([]);
         for (const fecha of fechas) {
-          dias.push(this.fb.control(fila.dias[fecha.clave]?.turno_codigo ?? ''), {
-            emitEvent: false,
-          });
+          const control = this.fb.control(fila.dias[fecha.clave]?.turno_codigo ?? '');
+          if (!estaEnVigencia(fecha.clave, vigencia)) control.disable({ emitEvent: false });
+          dias.push(control, { emitEvent: false });
         }
         arr.push(dias, { emitEvent: false });
       }
@@ -263,6 +323,38 @@ export class ProgramacionEditarPuestoModalComponent {
       // bumpea a mano `estructuraVersion` para que `bandas` recompute con los controles
       // frescos y el template revincule los inputs por identidad.
       this.estructuraVersion.update((v) => v + 1);
+    });
+
+    // Al abrir (o cambiar las líneas en edición): carga la vigencia de la línea del
+    // puesto — misma lógica de negocio que `agregar-contrato` (el detalle del grid
+    // no trae las fechas; todas las filas comparten la línea, el store deduplica).
+    effect(() => {
+      if (!this.visible()) return;
+      const ids = this.filas().map((fila) => fila.documento_detalle_id);
+      this.vigenciasStore.cargar(ids, () => {
+        const ts = this.t().common.toasts.loadError;
+        this.toast.error(ts.title, ts.desc);
+      });
+    });
+
+    // La vigencia llega async (GET por línea, después de construir el form): al
+    // resolver se aplica el bloqueo sobre los controles EXISTENTES — sin reconstruir,
+    // para no pisar lo tecleado.
+    effect(() => {
+      const vigencias = this.vigenciasPorLinea();
+      const filas = untracked(() => this.filas());
+      const fechas = untracked(() => this.fechas());
+      const arr = this.contratosArray;
+      if (arr.length !== filas.length) return;
+      filas.forEach((fila, i) => {
+        const vigencia = vigencias.get(fila.documento_detalle_id) ?? null;
+        fechas.forEach((fecha, j) => {
+          const control = arr.at(i).at(j);
+          const bloqueado = !estaEnVigencia(fecha.clave, vigencia);
+          if (bloqueado && control.enabled) control.disable({ emitEvent: false });
+          if (!bloqueado && control.disabled) control.enable({ emitEvent: false });
+        });
+      });
     });
 
     // Al tocar cualquier casilla: retira los errores del backend (celda, contrato y globales).

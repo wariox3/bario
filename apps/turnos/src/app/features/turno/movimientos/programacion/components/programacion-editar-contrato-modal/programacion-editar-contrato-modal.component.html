@@ -75,6 +75,8 @@
                 [class.editar-grid__th--sabado]="
                   fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
                 "
+                [class.editar-grid__th--bloqueado]="clavesBloqueadasTodas().has(fecha.clave)"
+                [attr.title]="clavesBloqueadasTodas().has(fecha.clave) ? m.vigencia.hint : null"
               >
                 <span class="editar-grid__dia-num">{{ fecha.etiqueta }}</span>
                 <span class="editar-grid__dia-ini">{{ fecha.inicial }}</span>
@@ -105,6 +107,17 @@
                       {{ banda.horario }}
                     </span>
                   }
+                  <!-- Vigencia de la línea: acota qué días se pueden programar en esta
+                       banda. Empujada a la derecha; el title explica los bloqueados. -->
+                  @if (banda.rangoEtiqueta; as rango) {
+                    <span
+                      class="editar-grid__group-chip ml-auto"
+                      [attr.title]="m.vigencia.label + ' · ' + m.vigencia.hint"
+                    >
+                      <i class="pi pi-calendar text-[0.56rem]"></i>
+                      {{ rango }}
+                    </span>
+                  }
                 </div>
               </td>
             </tr>
@@ -133,6 +146,7 @@
               @for (dia of banda.dias; track dia.control) {
                 <td
                   class="editar-grid__td editar-grid__td--dia"
+                  [class.editar-grid__td--bloqueado]="dia.bloqueado"
                   [class.editar-grid__td--error]="errorCelda(banda.documentoDetalleId, dia.clave)"
                   [class.editar-grid__td--conflicto]="
                     !errorCelda(banda.documentoDetalleId, dia.clave) &&
@@ -147,8 +161,12 @@
                     class="editar-grid__input"
                     [attr.aria-label]="m.diaAria + ' ' + dia.etiqueta + ' ' + dia.inicial"
                     [attr.title]="
-                      errorCelda(banda.documentoDetalleId, dia.clave) ??
-                      (conflictoCelda(banda.documentoDetalleId, dia.clave) ? m.conflictoDia : null)
+                      dia.bloqueado
+                        ? m.vigencia.hint
+                        : (errorCelda(banda.documentoDetalleId, dia.clave) ??
+                          (conflictoCelda(banda.documentoDetalleId, dia.clave)
+                            ? m.conflictoDia
+                            : null))
                     "
                   />
                 </td>

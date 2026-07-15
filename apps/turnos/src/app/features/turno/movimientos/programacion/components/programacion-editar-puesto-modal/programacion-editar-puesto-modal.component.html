@@ -1,5 +1,6 @@
 @let m = t().entities.programacion.detail.programacionPuestoModal;
 @let g = t().entities.programacion.detail.grid;
+@let mv = t().entities.programacion.detail.programacionModal.vigencia;
 
 <p-dialog
   [visible]="visible()"
@@ -77,6 +78,8 @@
                 [class.editar-grid__th--sabado]="
                   fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
                 "
+                [class.editar-grid__th--bloqueado]="diaBloqueado(fecha.clave)"
+                [attr.title]="diaBloqueado(fecha.clave) ? mv.hint : null"
               >
                 <span class="editar-grid__dia-num">{{ fecha.etiqueta }}</span>
                 <span class="editar-grid__dia-ini">{{ fecha.inicial }}</span>
@@ -96,6 +99,17 @@
                     <span class="editar-grid__group-chip font-mono">{{
                       banda.identificacion
                     }}</span>
+                  }
+                  <!-- Vigencia de la línea: acota qué días se pueden programar en esta
+                       banda. Empujada a la derecha; el title explica los bloqueados. -->
+                  @if (banda.rangoEtiqueta; as rango) {
+                    <span
+                      class="editar-grid__group-chip ml-auto"
+                      [attr.title]="mv.label + ' · ' + mv.hint"
+                    >
+                      <i class="pi pi-calendar text-[0.56rem]"></i>
+                      {{ rango }}
+                    </span>
                   }
                 </div>
               </td>
@@ -125,6 +139,7 @@
               @for (dia of banda.dias; track dia.control) {
                 <td
                   class="editar-grid__td editar-grid__td--dia"
+                  [class.editar-grid__td--bloqueado]="dia.bloqueado"
                   [class.editar-grid__td--error]="errorCelda(banda.contratoId, dia.clave)"
                 >
                   <input
@@ -134,7 +149,7 @@
                     [formControl]="dia.control"
                     class="editar-grid__input"
                     [attr.aria-label]="m.diaAria + ' ' + dia.etiqueta + ' ' + dia.inicial"
-                    [attr.title]="errorCelda(banda.contratoId, dia.clave)"
+                    [attr.title]="dia.bloqueado ? mv.hint : errorCelda(banda.contratoId, dia.clave)"
                   />
                 </td>
               }

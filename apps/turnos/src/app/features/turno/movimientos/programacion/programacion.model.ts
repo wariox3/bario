@@ -106,6 +106,14 @@ export interface ProgramacionFila extends ProgramacionHoras {
   readonly documento_detalle_id: number;
   /** Detalle del documento afectado (origen del puesto); informativo. */
   readonly documento_detalle_afectado_id: number | null;
+  /**
+   * Vigencia de la línea (rango ISO `YYYY-MM-DD`) — acota los días programables de
+   * esta banda. Opcionales: si el backend aún no los envía quedan `undefined` y la
+   * tabla degrada a "todos los días habilitados" (sin bloqueo). Ver
+   * `ProgramacionVigencia` + los helpers de `programacion.utils.ts`.
+   */
+  readonly fecha_desde?: string | null;
+  readonly fecha_hasta?: string | null;
   readonly puesto_id: number | null;
   readonly puesto_nombre: string | null;
   /** Modalidad del puesto (ej. `SIN ARMA`). */

@@ -5,6 +5,7 @@ import { anioMesDeIso, diasDelMes } from '@reddoc/core';
 import { DocumentoDetalleService } from '@reddoc/core';
 import { FestivoService, type Festivo } from '../../festivo.service';
 import type { ProgramacionLineaRead, ProgramacionVigencia } from '../../programacion.model';
+import { vigenciaDe } from '../../programacion.utils';
 
 /** Período (mes/año) a programar, ya con su etiqueta legible para el header. */
 export interface ProgramacionPeriodo {
@@ -113,11 +114,7 @@ export class ProgramacionPeriodoStore {
           // El flag de generado se conserva aunque la línea no traiga fecha.
           this._generado.set(linea.generado);
           // La vigencia solo se fija si la línea trae ambos extremos del rango.
-          this._vigencia.set(
-            linea.fecha_desde && linea.fecha_hasta
-              ? { desde: linea.fecha_desde, hasta: linea.fecha_hasta }
-              : null,
-          );
+          this._vigencia.set(vigenciaDe(linea.fecha_desde, linea.fecha_hasta));
           const ym = anioMesDeIso(linea.fecha_desde);
           if (!ym) {
             this._periodo.set(null);

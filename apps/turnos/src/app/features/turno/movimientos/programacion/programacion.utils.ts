@@ -19,6 +19,19 @@ export function toProgramacionFecha(iso: string): ProgramacionFecha {
 }
 
 /**
+ * Construye una `ProgramacionVigencia` a partir de los extremos ISO opcionales de
+ * una línea. `null` si falta alguno — la regla es "rango solo con ambos extremos"
+ * (la comparten el store y las filas del detalle, donde los campos son opcionales
+ * hasta que el backend los envíe).
+ */
+export function vigenciaDe(
+  desde?: string | null,
+  hasta?: string | null,
+): ProgramacionVigencia | null {
+  return desde && hasta ? { desde, hasta } : null;
+}
+
+/**
  * `true` si la fecha ISO `YYYY-MM-DD` cae dentro de la vigencia (ambos extremos
  * inclusive). Sin vigencia (`null`) todo día es válido — degradado seguro. La
  * comparación es **lexicográfica**: las fechas ISO ordenan igual que

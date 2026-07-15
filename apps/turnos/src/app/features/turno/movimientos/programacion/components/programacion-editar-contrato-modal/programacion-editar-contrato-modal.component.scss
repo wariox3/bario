@@ -84,6 +84,19 @@
   background: #eceef1;
 }
 
+// Columna bloqueada en TODAS las bandas (intersección de las vigencias): solo en ese
+// caso el header —compartido— puede rayarse sin mentir. Mismo rayado que el resto de
+// tablas de día. Va tras finde/festivo para ganarles el fondo.
+.editar-grid__th--bloqueado {
+  background: repeating-linear-gradient(-45deg, #f1f3f5, #f1f3f5 3px, #e9ecef 3px, #e9ecef 6px);
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.08);
+
+  .editar-grid__dia-num,
+  .editar-grid__dia-ini {
+    color: rgba(20, 48, 73, 0.3);
+  }
+}
+
 // Input slim por día: llena la celda y se centra.
 .editar-grid__input {
   width: 100%;
@@ -91,6 +104,25 @@
   padding: 0.25rem 0.2rem;
   text-align: center;
   font-size: 0.78rem;
+}
+
+// Día fuera de la vigencia de la línea: bloqueado. Mismo rayado tenue del header
+// bloqueado en agregar-contrato — acá va en la celda porque el bloqueo es por banda
+// (cada línea tiene su rango), no por columna. El selector con :hover evita que el
+// hover de fila (más específico) apague las franjas. Va antes de error/conflicto
+// para que esos estados (más importantes) ganen el fondo si coincidieran.
+.editar-grid__td--bloqueado,
+.editar-grid__row:hover .editar-grid__td--bloqueado {
+  background: repeating-linear-gradient(-45deg, #f1f3f5, #f1f3f5 3px, #e9ecef 3px, #e9ecef 6px);
+}
+
+// El input de una celda bloqueada se funde con el rayado: sin caja propia, solo el
+// valor atenuado (si lo hubiera) sobre las franjas.
+.editar-grid__input:disabled {
+  background: transparent;
+  border-color: transparent;
+  color: rgba(20, 48, 73, 0.35);
+  cursor: not-allowed;
 }
 
 // Casilla con turno inválido (error del backend): rojo fuerte.
