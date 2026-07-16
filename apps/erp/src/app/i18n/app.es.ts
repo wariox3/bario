@@ -290,8 +290,6 @@ export const es: AppDict = {
         empty: 'Este detalle no tiene programaciones.',
         cols: {
           contrato: 'Contrato',
-          horario: 'Horario',
-          vigencia: 'Vigencia',
           horas: 'H',
           horasDiurnas: 'HD',
           horasNocturnas: 'HN',

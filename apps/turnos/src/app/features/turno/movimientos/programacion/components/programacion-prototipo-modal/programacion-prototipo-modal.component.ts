@@ -26,7 +26,15 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { type ErpSelectOption, I18nService, ToastService, toIsoDate } from '@reddoc/core';
+import {
+  type ErpSelectOption,
+  I18nService,
+  ToastService,
+  esColumnaFestiva,
+  esColumnaSabado,
+  toIsoDate,
+  toProgramacionFecha,
+} from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
@@ -35,7 +43,6 @@ import { ProgramacionPeriodoStore } from '../programacion-agregar-contrato-modal
 import { PrototipoService } from '../../prototipo.service';
 import type { Prototipo, PrototipoPayload } from '../../prototipo.model';
 import type { ProgramacionDetalleResponse } from '../../programacion.model';
-import { esColumnaFestiva, esColumnaSabado, toProgramacionFecha } from '../../programacion.utils';
 import {
   construirGenerarErrores,
   extraerDetalleProgramacion,

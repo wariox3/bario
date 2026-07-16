@@ -22,7 +22,14 @@ import { finalize, type Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { I18nService, ToastService, formatHorario, fromIsoDate } from '@reddoc/core';
+import {
+  I18nService,
+  ToastService,
+  esColumnaFestiva,
+  esColumnaSabado,
+  formatHorario,
+  fromIsoDate,
+} from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import { UppercaseDirective } from '@reddoc/ui';
 import type { ProgramacionContratoRef } from '../programacion-grid/programacion-grid.component';
@@ -34,8 +41,6 @@ import type {
   ProgramacionVigencia,
 } from '../../programacion.model';
 import {
-  esColumnaFestiva,
-  esColumnaSabado,
   estaEnVigencia,
   formatVigenciaRango,
   localeDe,

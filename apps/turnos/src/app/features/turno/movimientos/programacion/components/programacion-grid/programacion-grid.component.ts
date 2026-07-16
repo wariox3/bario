@@ -8,16 +8,10 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { I18nService, formatHorario } from '@reddoc/core';
+import { I18nService, esColumnaFestiva, esColumnaSabado, formatHorario } from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import type { ProgramacionFecha, ProgramacionFila } from '../../programacion.model';
-import {
-  esColumnaFestiva,
-  esColumnaSabado,
-  formatVigenciaRango,
-  localeDe,
-  vigenciaDe,
-} from '../../programacion.utils';
+import { formatVigenciaRango, localeDe, vigenciaDe } from '../../programacion.utils';
 
 /** Grupo de filas que comparten `documento_detalle_id` — un puesto. */
 interface GrupoFilas {

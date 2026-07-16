@@ -8,7 +8,7 @@
   [resizable]="false"
   [dismissableMask]="true"
   [focusOnShow]="false"
-  [style]="{ width: '82rem' }"
+  [style]="{ width: '92rem' }"
   [breakpoints]="{ '768px': '95vw' }"
 >
   <ng-template pTemplate="header">
@@ -256,11 +256,26 @@
           <table class="detalle-table">
             <thead>
               <tr>
-                <th class="detalle-table__th">{{ a.programaciones.cols.contrato }}</th>
-                <th class="detalle-table__th">{{ a.cols.puesto }}</th>
-                <th class="detalle-table__th">{{ a.cols.modalidad }}</th>
-                <th class="detalle-table__th">{{ a.programaciones.cols.horario }}</th>
-                <th class="detalle-table__th">{{ a.programaciones.cols.vigencia }}</th>
+                <th class="detalle-table__th detalle-table__th--sticky-left">
+                  {{ a.programaciones.cols.contrato }}
+                </th>
+                <!-- Columnas de día: número + inicial. El resaltado (compartido:
+                     domingo cuenta como festivo, el sábado solo si no lo es) va solo
+                     en el header — las celdas del contrato quedan limpias. -->
+                @for (fecha of programacionFechas(); track fecha.clave) {
+                  <th
+                    class="detalle-table__th detalle-table__th--dia"
+                    [class.detalle-table__th--festivo]="
+                      esColumnaFestiva(fecha.inicial, festivoClaves().has(fecha.clave))
+                    "
+                    [class.detalle-table__th--sabado]="
+                      esColumnaSabado(fecha.inicial, festivoClaves().has(fecha.clave))
+                    "
+                  >
+                    <span class="detalle-table__dia-num">{{ fecha.etiqueta }}</span>
+                    <span class="detalle-table__dia-ini">{{ fecha.inicial }}</span>
+                  </th>
+                }
                 <th class="detalle-table__th text-right">{{ a.programaciones.cols.horas }}</th>
                 <th class="detalle-table__th text-right">
                   {{ a.programaciones.cols.horasDiurnas }}
@@ -273,19 +288,16 @@
             <tbody>
               @for (prog of programaciones(); track $index) {
                 <tr class="detalle-table__row">
-                  <td class="detalle-table__td font-medium text-brand-text">
+                  <td
+                    class="detalle-table__td detalle-table__td--sticky-left font-medium text-brand-text"
+                  >
                     {{ prog.contrato_contacto_nombre_corto || '—' }}
                   </td>
-                  <td class="detalle-table__td text-brand-text">{{ prog.puesto_nombre || '—' }}</td>
-                  <td class="detalle-table__td text-brand-muted">
-                    {{ prog.modalidad_nombre || '—' }}
-                  </td>
-                  <td class="detalle-table__td whitespace-nowrap tabular-nums text-brand-text">
-                    {{ formatHorario(prog.hora_desde, prog.hora_hasta) }}
-                  </td>
-                  <td class="detalle-table__td whitespace-nowrap text-brand-text">
-                    {{ formatVigencia(prog.fecha_desde, prog.fecha_hasta) }}
-                  </td>
+                  @for (fecha of programacionFechas(); track fecha.clave) {
+                    <td class="detalle-table__td detalle-table__td--dia text-center tabular-nums">
+                      {{ celda(prog, fecha.clave) }}
+                    </td>
+                  }
                   <td
                     class="detalle-table__td text-right font-semibold tabular-nums text-brand-text"
                   >
@@ -300,7 +312,10 @@
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="8" class="px-5 py-10 text-center text-sm text-brand-muted">
+                  <td
+                    [attr.colspan]="programacionColspan()"
+                    class="px-5 py-10 text-center text-sm text-brand-muted"
+                  >
                     <i class="pi pi-inbox mr-2"></i>{{ a.programaciones.empty }}
                   </td>
                 </tr>

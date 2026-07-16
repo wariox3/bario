@@ -215,8 +215,6 @@ export interface AppDict
         empty: string;
         cols: {
           contrato: string;
-          horario: string;
-          vigencia: string;
           horas: string;
           horasDiurnas: string;
           horasNocturnas: string;

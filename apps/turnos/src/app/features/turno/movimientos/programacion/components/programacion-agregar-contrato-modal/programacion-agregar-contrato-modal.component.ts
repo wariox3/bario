@@ -21,7 +21,14 @@ import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { type ErpSelectOption, I18nService, ToastService, toIsoDate } from '@reddoc/core';
+import {
+  type ErpSelectOption,
+  I18nService,
+  ToastService,
+  esColumnaFestiva,
+  esColumnaSabado,
+  toIsoDate,
+} from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
@@ -30,13 +37,7 @@ import type { SecuenciaMesCalculado } from '@turnos/features/turno/masters/secue
 import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-grid.component';
 import { ProgramacionService } from '../../programacion.service';
 import type { CrearProgramacionPayload } from '../../programacion.model';
-import {
-  esColumnaFestiva,
-  esColumnaSabado,
-  estaEnVigencia,
-  formatVigenciaRango,
-  localeDe,
-} from '../../programacion.utils';
+import { estaEnVigencia, formatVigenciaRango, localeDe } from '../../programacion.utils';
 import {
   extraerDetalleProgramacion,
   extraerErroresProgramacion,

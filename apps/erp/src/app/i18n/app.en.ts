@@ -290,8 +290,6 @@ export const en: AppDict = {
         empty: 'This detail has no schedules.',
         cols: {
           contrato: 'Contract',
-          horario: 'Schedule',
-          vigencia: 'Validity',
           horas: 'H',
           horasDiurnas: 'DH',
           horasNocturnas: 'NH',

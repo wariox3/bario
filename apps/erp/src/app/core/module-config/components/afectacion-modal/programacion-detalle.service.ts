@@ -4,6 +4,17 @@ import { map } from 'rxjs/operators';
 import { BaseHttpService } from '@reddoc/core';
 
 /**
+ * Celda de un día del calendario, recortada: el modal solo pinta el código del
+ * turno. (El resaltado de festivos NO sale de acá: las celdas solo existen si ese
+ * día tiene programación, así que un festivo sin turno no tendría celda. Los
+ * festivos se piden aparte con `FestivoService`, igual que en la ficha de turnos.)
+ */
+export interface ProgramacionDiaCeldaRead {
+  readonly turno_codigo: string | null;
+  readonly festivo?: boolean | null;
+}
+
+/**
  * Fila del calendario de turno, **recortada** a lo que el modal de afectación pinta.
  *
  * El modelo completo (`ProgramacionFila`) vive en `apps/turnos`, que el ERP no puede
@@ -17,17 +28,8 @@ import { BaseHttpService } from '@reddoc/core';
 export interface ProgramacionFilaRead {
   /** Línea del documento (puesto) a la que pertenece la programación. */
   readonly documento_detalle_id: number;
-  readonly puesto_nombre: string | null;
-  readonly modalidad_nombre: string | null;
-  /** Franja horaria del puesto en formato `HH:mm:ss`. */
-  readonly hora_desde: string | null;
-  readonly hora_hasta: string | null;
-  /** Vigencia de la línea (ISO `YYYY-MM-DD`). Opcionales: el backend puede omitirlas. */
-  readonly fecha_desde?: string | null;
-  readonly fecha_hasta?: string | null;
   /** Contacto del contrato asignado (el empleado que cubre el puesto). */
   readonly contrato_contacto_nombre_corto: string | null;
-  readonly contrato_contacto_numero_identificacion: string | null;
   /**
    * Horas ya programadas (con turno asignado). Se tipan `string | number` y se
    * normalizan con `toFiniteNumber`: turnos las declara `number`, pero el resto de
@@ -36,10 +38,23 @@ export interface ProgramacionFilaRead {
   readonly horas_programadas?: string | number | null;
   readonly horas_diurnas_programadas?: string | number | null;
   readonly horas_nocturnas_programadas?: string | number | null;
+  /** Mapa fecha ISO → celda del día. La clave es la misma que trae `fechas`. */
+  readonly dias?: Record<string, ProgramacionDiaCeldaRead | null>;
 }
 
-/** Respuesta de `detalle/`, recortada: solo se leen las filas del calendario. */
+/**
+ * Calendario de una línea: las columnas (`fechas`, ISO `YYYY-MM-DD`) y una fila
+ * por contrato asignado. Recorte de la respuesta de `detalle/` (su cabecera
+ * `documento` no se usa acá).
+ */
+export interface ProgramacionCalendarioRead {
+  readonly fechas: readonly string[];
+  readonly filas: readonly ProgramacionFilaRead[];
+}
+
+/** Respuesta cruda de `detalle/` (los campos llegan opcionales). */
 interface ProgramacionDetalleResponse {
+  readonly fechas?: readonly string[];
   readonly filas?: readonly ProgramacionFilaRead[];
 }
 
@@ -54,19 +69,20 @@ interface ProgramacionDetalleResponse {
 @Injectable({ providedIn: 'root' })
 export class ProgramacionDetalleService extends BaseHttpService {
   /**
-   * Filas del calendario de una línea del documento
+   * Calendario de una línea del documento
    * (`GET /turno/programacion/detalle/?documento=<id>&documento_detalle=<id>`).
    *
    * El backend filtra las filas por `documento_detalle`; `documento` sigue siendo
-   * obligatorio. Del resto de la respuesta (cabecera y fechas) no se usa nada.
+   * obligatorio. De la respuesta se usan las columnas (`fechas`) y las filas; la
+   * cabecera `documento` no.
    */
-  listarFilasPorDetalle(
+  obtenerCalendarioDelDetalle(
     documentoId: number,
     detalleId: number,
-  ): Observable<readonly ProgramacionFilaRead[]> {
+  ): Observable<ProgramacionCalendarioRead> {
     return this.get<ProgramacionDetalleResponse>('/turno/programacion/detalle/', {
       documento: documentoId,
       documento_detalle: detalleId,
-    }).pipe(map((res) => res.filas ?? []));
+    }).pipe(map((res) => ({ fechas: res.fechas ?? [], filas: res.filas ?? [] })));
   }
 }

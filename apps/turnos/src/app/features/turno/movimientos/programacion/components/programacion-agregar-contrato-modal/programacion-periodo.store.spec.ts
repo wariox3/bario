@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { DocumentoDetalleService, I18nService } from '@reddoc/core';
-import { FestivoService, type Festivo } from '../../festivo.service';
+import { DocumentoDetalleService, FestivoService, I18nService, type Festivo } from '@reddoc/core';
 import type { ProgramacionLineaRead } from '../../programacion.model';
 import { ProgramacionPeriodoStore } from './programacion-periodo.store';
 

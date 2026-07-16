@@ -67,17 +67,11 @@ export interface ProgramacionDetalleResponse {
 }
 
 /**
- * Columna de día del calendario, normalizada en el front a partir del string ISO
- * que llega en `ProgramacionDetalleResponse.fechas`.
- *  - `clave`: la fecha ISO original (`'2026-06-01'`) — índice para `fila.dias`.
- *  - `etiqueta`: número de día visible en el header (`1`..`31`).
+ * Columna de día del calendario. Vive en `@reddoc/core` (`lib/calendario`) desde
+ * que el modal de afectación del ERP también pinta el calendario; se re-exporta
+ * acá para que los consumidores del movimiento la sigan tomando del modelo.
  */
-export interface ProgramacionFecha {
-  readonly clave: string;
-  readonly etiqueta: string;
-  /** Inicial del día de la semana en español (L M X J V S D). */
-  readonly inicial: string;
-}
+export type { ProgramacionFecha } from '@reddoc/core';
 
 /**
  * Celda de un día: el turno asignado (si hay) y sus horas. Las claves del mapa

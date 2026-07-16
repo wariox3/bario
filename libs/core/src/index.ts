@@ -100,6 +100,13 @@ export type {
   DocumentTypeKey,
   EntityDataGateway,
 } from './lib/documento';
+export {
+  toProgramacionFecha,
+  esColumnaFestiva,
+  esColumnaSabado,
+  FestivoService,
+} from './lib/calendario';
+export type { ProgramacionFecha, Festivo } from './lib/calendario';
 export type { ApiError, ApiErrorResponse } from './lib/utils/error.utils';
 export {
   I18nService,

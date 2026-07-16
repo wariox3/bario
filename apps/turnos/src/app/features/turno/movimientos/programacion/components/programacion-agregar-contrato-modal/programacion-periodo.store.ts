@@ -1,10 +1,9 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { anioMesDeIso, diasDelMes } from '@reddoc/core';
+import { anioMesDeIso, diasDelMes, FestivoService, type Festivo } from '@reddoc/core';
 import { DocumentoDetalleService, I18nService } from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
-import { FestivoService, type Festivo } from '../../festivo.service';
 import type { ProgramacionLineaRead, ProgramacionVigencia } from '../../programacion.model';
 import { localeDe, vigenciaDe } from '../../programacion.utils';
 

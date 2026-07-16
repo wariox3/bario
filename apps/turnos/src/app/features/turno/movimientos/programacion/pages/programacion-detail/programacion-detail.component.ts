@@ -13,10 +13,18 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { I18nService, TenantService, ToastService, anioMesDeIso, fromIsoDate } from '@reddoc/core';
+import {
+  FestivoService,
+  I18nService,
+  TenantService,
+  ToastService,
+  anioMesDeIso,
+  fromIsoDate,
+  toProgramacionFecha,
+  type Festivo,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@turnos/i18n';
-import { FestivoService, type Festivo } from '../../festivo.service';
 import { ProgramacionService } from '../../programacion.service';
 import { PROGRAMACION_LIST_PATH } from '../../programacion.constants';
 import type {
@@ -24,7 +32,7 @@ import type {
   ProgramacionFecha,
   ProgramacionFila,
 } from '../../programacion.model';
-import { localeDe, toProgramacionFecha } from '../../programacion.utils';
+import { localeDe } from '../../programacion.utils';
 import {
   ProgramacionGridComponent,
   type ProgramacionContratoRef,
