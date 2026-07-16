@@ -16,6 +16,7 @@ import type { ModuleRegistry } from './module-registry.token';
  *   4. Sumar el acordeón al `menu` del `<id>.module-descriptor.ts`.
  */
 export const ERP_MODULE_REGISTRY = {
+  general: () => import('../../features/general/general.config').then((m) => m.GENERAL_CONFIG),
   venta: () => import('../../features/venta/venta.config').then((m) => m.VENTA_CONFIG),
   compra: () => import('../../features/compra/compra.config').then((m) => m.COMPRA_CONFIG),
   // inventario: () => import('../../features/inventario/inventario.config').then((m) => m.INVENTARIO_CONFIG),

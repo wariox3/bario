@@ -1,22 +1,33 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { activeModuleResolver } from '@erp/core/module-config';
 import { GENERAL_MODULE } from './general.module-descriptor';
 
 /**
  * Rutas del módulo General.
  *
- * Resuelve `erpModuleResolver('general')` en la ruta raíz para que el topbar
- * y el sidebar se sincronicen al activar este módulo. Delega cada master a
- * su propio archivo de rutas dentro de `masters/<entity>/<entity>.routes.ts`
- * — cada master es un bounded context auto-contenido (modelo, servicio,
- * páginas, componentes y utilidades específicas viven juntos).
+ * Encadena dos resolvers ortogonales en la ruta raíz:
+ *  - `erpModuleResolver('general')`: registra el módulo activo en
+ *    `ActiveModuleStore` para que el topbar y el sidebar se sincronicen.
+ *  - `activeModuleResolver('general')`: carga `GENERAL_CONFIG` desde el registry
+ *    y lo deja en `ModuleNavigationStore`, para que los documentos reusados de
+ *    Venta y Compra resuelvan su config con `activeDocumentResolver(...)`.
  *
- * Camino B del enfoque híbrido (ver docs/architecture/erp-module-architecture.md).
+ * Delega cada master a su propio archivo de rutas dentro de
+ * `masters/<entity>/<entity>.routes.ts` — cada master es un bounded context
+ * auto-contenido (modelo, servicio, páginas, componentes y utilidades
+ * específicas viven juntos).
+ *
+ * Camino B del enfoque híbrido, más los documentos compartidos del camino A
+ * (ver docs/architecture/erp-module-architecture.md).
  */
 export const GENERAL_ROUTES: Route[] = [
   {
     path: '',
-    resolve: { _module: erpModuleResolver('general') },
+    resolve: {
+      _navModule: erpModuleResolver('general'),
+      _docModule: activeModuleResolver('general'),
+    },
     children: [
       moduleIndexRoute(GENERAL_MODULE),
       {
@@ -27,6 +38,23 @@ export const GENERAL_ROUTES: Route[] = [
         loadComponent: () =>
           import('@erp/layouts/module-placeholder/module-placeholder.component').then(
             (m) => m.ModulePlaceholderComponent,
+          ),
+      },
+      // Documentos compartidos: el código vive en venta/compra, pero se enrutan
+      // también desde General. Sus páginas derivan el módulo del
+      // `ActiveModuleStore` (fijado arriba), así que la navegación se queda acá.
+      {
+        path: 'factura-venta',
+        loadChildren: () =>
+          import('../venta/documentos/factura-venta/factura-venta.routes').then(
+            (m) => m.FACTURA_VENTA_ROUTES,
+          ),
+      },
+      {
+        path: 'factura-compra',
+        loadChildren: () =>
+          import('../compra/documentos/factura-compra/factura-compra.routes').then(
+            (m) => m.FACTURA_COMPRA_ROUTES,
           ),
       },
       {

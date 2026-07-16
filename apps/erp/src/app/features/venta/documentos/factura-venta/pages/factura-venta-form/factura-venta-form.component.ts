@@ -25,7 +25,7 @@ import {
   ToastService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
+import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
@@ -89,6 +89,7 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -129,7 +130,8 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected readonly isSaving = signal(false);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
-    ventaDocumentoBreadcrumb(
+    documentoBreadcrumb(
+      this.activeModule,
       this.t(),
       this.tenant.currentSlug(),
       this.translateKey(this.document().displayNameKey),
@@ -340,7 +342,7 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, 'venta', ...segments]);
+    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...segments]);
   }
 
   /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */

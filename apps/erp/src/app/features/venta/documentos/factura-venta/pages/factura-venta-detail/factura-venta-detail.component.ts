@@ -15,7 +15,7 @@ import {
   type ResumenDocumento,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
+import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
@@ -80,6 +80,7 @@ export class FacturaVentaDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
@@ -125,7 +126,8 @@ export class FacturaVentaDetailComponent implements OnInit {
 
   /** Migas: módulo Venta → listado del documento → identificador del documento abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
-    ventaDocumentoBreadcrumb(
+    documentoBreadcrumb(
+      this.activeModule,
       this.t(),
       this.tenant.currentSlug(),
       this.translateKey(this.document().displayNameKey),
@@ -299,12 +301,17 @@ export class FacturaVentaDetailComponent implements OnInit {
     return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
-  /** Navega dentro del tenant activo: `/t/<slug>/venta/<...routePath>[/extra]`. */
+  /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */
   private navigate(routePath: string, extra?: string): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     const segments = routePath.split('/').filter(Boolean);
-    const commands: (string | number)[] = ['/t', slug, 'venta', ...segments];
+    const commands: (string | number)[] = [
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...segments,
+    ];
     if (extra) commands.push(extra);
     void this.router.navigate(commands);
   }
