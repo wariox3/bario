@@ -285,6 +285,18 @@ export const en: AppDict = {
         fecha: 'Date',
         contacto: 'Contact',
       },
+      programaciones: {
+        title: 'Detail schedules',
+        empty: 'This detail has no schedules.',
+        cols: {
+          contrato: 'Contract',
+          horario: 'Schedule',
+          vigencia: 'Validity',
+          horas: 'H',
+          horasDiurnas: 'DH',
+          horasNocturnas: 'NH',
+        },
+      },
       close: 'Close',
       loadError: {
         title: 'Could not load',

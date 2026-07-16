@@ -22,6 +22,10 @@ import {
 } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { DocumentoService } from '../../data/documento.service';
+import {
+  ProgramacionDetalleService,
+  type ProgramacionFilaRead,
+} from './programacion-detalle.service';
 
 /**
  * Cabecera de documento (`documento/<id>/`), recortada a lo que el modal pinta.
@@ -81,6 +85,7 @@ interface AfectacionDetalleRead extends DocumentoDetalleReadBase {
 export class AfectacionModalComponent {
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly documentoService = inject(DocumentoService);
+  private readonly programacionService = inject(ProgramacionDetalleService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -104,6 +109,11 @@ export class AfectacionModalComponent {
   protected readonly documentoReferencia = signal<AfectacionDocumentoRead | null>(null);
   /** Id del detalle afectado (`base.documento_detalle_afectado`), para la card 2. */
   protected readonly detalleAfectadoId = signal<number | null>(null);
+  /**
+   * Programaciones del detalle base: un contrato asignado a su puesto por fila.
+   * Vacío cuando el documento no es de servicio (o su programación no se generó).
+   */
+  protected readonly programaciones = signal<readonly ProgramacionFilaRead[]>([]);
 
   protected readonly formatMoney = formatCop;
 
@@ -136,6 +146,27 @@ export class AfectacionModalComponent {
     });
   }
 
+  /** Franja horaria: `'00:00:00'` + `'12:00:00'` → `'00:00 – 12:00'` (sin segundos). */
+  protected formatHorario(desde: string | null, hasta: string | null): string {
+    if (!desde || !hasta) return '—';
+    return `${desde.slice(0, 5)} – ${hasta.slice(0, 5)}`;
+  }
+
+  /** Vigencia de la línea: ambos extremos en formato corto local. */
+  protected formatVigencia(
+    desde: string | null | undefined,
+    hasta: string | null | undefined,
+  ): string {
+    if (!desde && !hasta) return '—';
+    return `${this.formatFecha(desde)} – ${this.formatFecha(hasta)}`;
+  }
+
+  /** Horas como número plano: `"72.00"` → `72`. */
+  protected formatHoras(value: string | number | null | undefined): string {
+    const n = toFiniteNumber(value);
+    return n === null ? '—' : String(n);
+  }
+
   private load(detalleId: number): void {
     this.loading.set(true);
     this.error.set(false);
@@ -143,6 +174,7 @@ export class AfectacionModalComponent {
     this.documento.set(null);
     this.documentoReferencia.set(null);
     this.detalleAfectadoId.set(null);
+    this.programaciones.set([]);
 
     forkJoin({
       // Base: el detalle a consultar (solo se usa su FK `documento`).
@@ -162,8 +194,17 @@ export class AfectacionModalComponent {
                   .obtenerPorId<AfectacionDocumentoRead>(docId)
                   .pipe(catchError(() => of<AfectacionDocumentoRead | null>(null)))
               : of<AfectacionDocumentoRead | null>(null);
-          return documento.pipe(
-            switchMap((doc) => {
+          // Programaciones del detalle base (el backend filtra por `documento_detalle`).
+          // El modal es agnóstico del tipo de documento y solo los de servicio tienen
+          // programación, así que el fallo cae a lista vacía en vez de tumbar la afectación.
+          const programaciones =
+            docId != null
+              ? this.programacionService
+                  .listarFilasPorDetalle(docId, detalleId)
+                  .pipe(catchError(() => of<readonly ProgramacionFilaRead[]>([])))
+              : of<readonly ProgramacionFilaRead[]>([]);
+          return forkJoin({ documento, programaciones }).pipe(
+            switchMap(({ documento: doc, programaciones: programadas }) => {
               const refId = doc?.documento_referencia ?? doc?.documento_referencia_id ?? null;
               const referencia =
                 refId != null
@@ -176,6 +217,7 @@ export class AfectacionModalComponent {
                   filas,
                   doc,
                   ref,
+                  programadas,
                   afectadoId: base.documento_detalle_afectado ?? null,
                 })),
               );
@@ -185,10 +227,11 @@ export class AfectacionModalComponent {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: ({ filas, doc, ref, afectadoId }) => {
+        next: ({ filas, doc, ref, programadas, afectadoId }) => {
           this.filas.set(filas);
           this.documento.set(doc);
           this.documentoReferencia.set(ref);
+          this.programaciones.set(programadas);
           this.detalleAfectadoId.set(afectadoId);
           this.loading.set(false);
         },

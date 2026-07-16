@@ -248,6 +248,67 @@
           </tbody>
         </table>
       </div>
+
+      <!-- ── Lista: programaciones del detalle base ──────────────────────────────── -->
+      <div class="flex flex-col gap-1.5">
+        <span class="afectacion__micro-label">{{ a.programaciones.title }}</span>
+        <div class="max-h-96 overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+          <table class="detalle-table">
+            <thead>
+              <tr>
+                <th class="detalle-table__th">{{ a.programaciones.cols.contrato }}</th>
+                <th class="detalle-table__th">{{ a.cols.puesto }}</th>
+                <th class="detalle-table__th">{{ a.cols.modalidad }}</th>
+                <th class="detalle-table__th">{{ a.programaciones.cols.horario }}</th>
+                <th class="detalle-table__th">{{ a.programaciones.cols.vigencia }}</th>
+                <th class="detalle-table__th text-right">{{ a.programaciones.cols.horas }}</th>
+                <th class="detalle-table__th text-right">
+                  {{ a.programaciones.cols.horasDiurnas }}
+                </th>
+                <th class="detalle-table__th text-right">
+                  {{ a.programaciones.cols.horasNocturnas }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (prog of programaciones(); track $index) {
+                <tr class="detalle-table__row">
+                  <td class="detalle-table__td font-medium text-brand-text">
+                    {{ prog.contrato_contacto_nombre_corto || '—' }}
+                  </td>
+                  <td class="detalle-table__td text-brand-text">{{ prog.puesto_nombre || '—' }}</td>
+                  <td class="detalle-table__td text-brand-muted">
+                    {{ prog.modalidad_nombre || '—' }}
+                  </td>
+                  <td class="detalle-table__td whitespace-nowrap tabular-nums text-brand-text">
+                    {{ formatHorario(prog.hora_desde, prog.hora_hasta) }}
+                  </td>
+                  <td class="detalle-table__td whitespace-nowrap text-brand-text">
+                    {{ formatVigencia(prog.fecha_desde, prog.fecha_hasta) }}
+                  </td>
+                  <td
+                    class="detalle-table__td text-right font-semibold tabular-nums text-brand-text"
+                  >
+                    {{ formatHoras(prog.horas_programadas) }}
+                  </td>
+                  <td class="detalle-table__td text-right tabular-nums text-brand-muted">
+                    {{ formatHoras(prog.horas_diurnas_programadas) }}
+                  </td>
+                  <td class="detalle-table__td text-right tabular-nums text-brand-muted">
+                    {{ formatHoras(prog.horas_nocturnas_programadas) }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="px-5 py-10 text-center text-sm text-brand-muted">
+                    <i class="pi pi-inbox mr-2"></i>{{ a.programaciones.empty }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   }
 

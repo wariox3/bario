@@ -210,6 +210,18 @@ export interface AppDict
       };
       cards: { documento: string; documentoAfectado: string };
       campos: { detalleId: string; documentoId: string; fecha: string; contacto: string };
+      programaciones: {
+        title: string;
+        empty: string;
+        cols: {
+          contrato: string;
+          horario: string;
+          vigencia: string;
+          horas: string;
+          horasDiurnas: string;
+          horasNocturnas: string;
+        };
+      };
       close: string;
       loadError: { title: string; desc: string };
     };
