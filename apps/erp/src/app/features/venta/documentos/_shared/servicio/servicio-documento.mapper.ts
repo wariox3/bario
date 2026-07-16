@@ -75,6 +75,9 @@ export function detalleToFormValue(
     horas: toFiniteNumber(read.horas),
     horas_diurnas: toFiniteNumber(read.horas_diurnas),
     horas_nocturnas: toFiniteNumber(read.horas_nocturnas),
+    horas_programadas: toFiniteNumber(read.horas_programadas),
+    horas_diurnas_programadas: toFiniteNumber(read.horas_diurnas_programadas),
+    horas_nocturnas_programadas: toFiniteNumber(read.horas_nocturnas_programadas),
     precio_minimo: toFiniteNumber(read.precio_minimo),
     documento_detalle_afectado: read.documento_detalle_afectado ?? null,
   };

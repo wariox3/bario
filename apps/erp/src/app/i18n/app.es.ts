@@ -2469,6 +2469,10 @@ export const es: AppDict = {
             impuestos: 'Impuestos',
             impuestosPlaceholder: 'Selecciona impuestos…',
           },
+          lockedCobertura: {
+            title: 'Cobertura bloqueada',
+            hint: 'Esta línea ya tiene horas programadas. Para cambiar fechas, horario, modalidad, salario o días primero debe liberarse la programación.',
+          },
           contactoRequired: 'Selecciona el contacto del documento para agregar líneas',
           sectorRequired: 'Selecciona el sector del documento para agregar líneas',
           estratoRequired: 'Selecciona el estrato del documento para agregar líneas',

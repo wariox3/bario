@@ -2428,6 +2428,10 @@ export const en: AppDict = {
             impuestos: 'Taxes',
             impuestosPlaceholder: 'Select taxes…',
           },
+          lockedCobertura: {
+            title: 'Coverage locked',
+            hint: 'This line already has scheduled hours. To change dates, schedule, modality, salary or days, the shift schedule must be released first.',
+          },
           contactoRequired: 'Select the document contact to add lines',
           sectorRequired: 'Select the document sector to add lines',
           estratoRequired: 'Select the document estrato to add lines',

@@ -96,6 +96,14 @@ export interface ServicioDocumentoDetalleRead extends DocumentoDetalleReadBase {
   readonly horas?: string | null;
   readonly horas_diurnas?: string | null;
   readonly horas_nocturnas?: string | null;
+  /**
+   * Horas ya programadas de la línea (string con cola de ceros: `"72.00"`).
+   * Un valor > 0 significa que la programación de turnos de ese puesto ya existe,
+   * así que la cobertura de la línea no puede moverse sin dejarla inconsistente.
+   */
+  readonly horas_programadas?: string | null;
+  readonly horas_diurnas_programadas?: string | null;
+  readonly horas_nocturnas_programadas?: string | null;
   /** Precio mínimo regulado de la cobertura (string con cola de ceros). */
   readonly precio_minimo?: string | null;
   /** Referencia a la línea afectada en otro documento (trazabilidad). */

@@ -71,6 +71,12 @@ export class ServicioDocumentoDetallesComponent {
    */
   readonly documentId = input<number | null>(null);
 
+  /**
+   * Bloquea la cobertura de las líneas que ya tienen horas programadas. Se
+   * reenvía al modal; solo pedido servicio lo activa.
+   */
+  readonly lockCoberturaOnProgramadas = input<boolean>(false);
+
   /** Espejo reactivo del valor del array para la tabla y los subtotales. */
   protected readonly lines = signal<readonly DetalleFormRawValue[]>([]);
 

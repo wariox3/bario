@@ -21,7 +21,11 @@ import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-bread
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+import {
+  DOCUMENT_TYPE_ID,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import { ConfiguracionService } from '@erp/core/services/configuracion.service';
 import type { AppDict } from '@erp/i18n';
@@ -109,6 +113,15 @@ export class ServicioDocumentoFormComponent implements OnInit {
     return id ? Number(id) : null;
   });
   protected readonly isSaving = signal(false);
+
+  /**
+   * Solo en pedido servicio: una línea con horas ya programadas congela su
+   * cobertura (los turnos del puesto ya existen). El resto de la familia edita
+   * sus líneas sin restricción.
+   */
+  protected readonly lockCoberturaOnProgramadas = computed(
+    () => this.document().documentTypeId === DOCUMENT_TYPE_ID.PEDIDO_SERVICIO,
+  );
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     ventaDocumentoBreadcrumb(

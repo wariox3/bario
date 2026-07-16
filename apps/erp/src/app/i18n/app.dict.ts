@@ -1808,6 +1808,10 @@ export interface AppDict
             impuestos: string;
             impuestosPlaceholder: string;
           };
+          lockedCobertura: {
+            title: string;
+            hint: string;
+          };
           contactoRequired: string;
           sectorRequired: string;
           estratoRequired: string;
