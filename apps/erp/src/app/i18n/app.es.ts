@@ -2188,6 +2188,25 @@ export const es: AppDict = {
         },
       },
     },
+    pago: {
+      name: 'Pago',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        cliente: 'Cliente',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+    },
     comercialDetalle: {
       title: 'Detalles',
       hint: 'Productos y servicios del documento',

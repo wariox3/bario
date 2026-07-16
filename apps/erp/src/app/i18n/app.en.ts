@@ -2147,6 +2147,25 @@ export const en: AppDict = {
         },
       },
     },
+    pago: {
+      name: 'Payment',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        cliente: 'Customer',
+        total: 'Total',
+        aprobado: 'App',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+    },
     comercialDetalle: {
       title: 'Lines',
       hint: 'Products and services of the document',

@@ -4,8 +4,8 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  * Descriptor del módulo Cartera para la capa de navegación.
  *
  * Los `path` del menú son **relativos al módulo** — el `WorkspaceLayout` les
- * prepende `/t/<slug>/cartera/`. Vacío por ahora: sumar entradas cuando se
- * implementen sus masters/documentos.
+ * prepende `/t/<slug>/cartera/`. Sumar entradas cuando se implementen más
+ * masters/documentos.
  */
 export const CARTERA_MODULE: ErpModuleDescriptor = {
   id: 'cartera',
@@ -14,6 +14,18 @@ export const CARTERA_MODULE: ErpModuleDescriptor = {
   defaultChildPath: 'inicio',
   menu: [
     { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
+    {
+      kind: 'accordion',
+      id: 'cartera-documentos',
+      labelKey: 'layout.nav.sections.document',
+      iconClass: 'pi pi-file',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [{ labelKey: 'entities.pago.name', path: 'pago/list' }],
+        },
+      ],
+    },
     {
       kind: 'accordion',
       id: 'cartera-administracion',

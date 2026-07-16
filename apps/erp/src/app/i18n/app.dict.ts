@@ -1574,6 +1574,25 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    pago: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        cliente: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
     comercialDetalle: {
       title: string;
       hint: string;
