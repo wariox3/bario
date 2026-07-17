@@ -123,7 +123,7 @@ export class ServicioDocumentoDetailComponent implements OnInit {
     ventaDocumentoBreadcrumb(
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       `ID ${this.id() ?? ''}`,
     ),
@@ -295,15 +295,5 @@ export class ServicioDocumentoDetailComponent implements OnInit {
     const commands: (string | number)[] = ['/t', slug, 'venta', ...segments];
     if (extra) commands.push(extra);
     void this.router.navigate(commands);
-  }
-
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
   }
 }
