@@ -1651,6 +1651,58 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    egreso: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          cuentaBanco: string;
+          cuentaBancoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          negativeTotal: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          fecha: string;
+          cuentaBanco: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     comercialDetalle: {
       title: string;
       hint: string;

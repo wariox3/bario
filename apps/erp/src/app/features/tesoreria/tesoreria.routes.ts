@@ -1,11 +1,26 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { activeModuleResolver } from '@erp/core/module-config';
 import { TESORERIA_MODULE } from './tesoreria.module-descriptor';
 
+/**
+ * Rutas del módulo Tesorería.
+ *
+ * Encadena dos resolvers ortogonales en la ruta raíz:
+ *  - `erpModuleResolver('tesoreria')`: registra el módulo activo en
+ *    `ActiveModuleStore` para que el topbar y el sidebar se sincronicen.
+ *  - `activeModuleResolver('tesoreria')`: carga `TESORERIA_CONFIG` desde el
+ *    registry y lo deja en `ModuleNavigationStore`, para que
+ *    `activeDocumentResolver(...)` resuelva sus documentos dentro de
+ *    `documentos/<doc>/<doc>.routes.ts`.
+ */
 export const TESORERIA_ROUTES: Route[] = [
   {
     path: '',
-    resolve: { _module: erpModuleResolver('tesoreria') },
+    resolve: {
+      _navModule: erpModuleResolver('tesoreria'),
+      _docModule: activeModuleResolver('tesoreria'),
+    },
     children: [
       moduleIndexRoute(TESORERIA_MODULE),
       {
@@ -15,6 +30,11 @@ export const TESORERIA_ROUTES: Route[] = [
           import('@erp/layouts/module-placeholder/module-placeholder.component').then(
             (m) => m.ModulePlaceholderComponent,
           ),
+      },
+      {
+        path: 'egreso',
+        loadChildren: () =>
+          import('./documentos/egreso/egreso.routes').then((m) => m.EGRESO_ROUTES),
       },
       // Masters reutilizados del módulo General (contacto y cuenta-banco).
       {

@@ -20,6 +20,8 @@ export const ERP_MODULE_REGISTRY = {
   venta: () => import('../../features/venta/venta.config').then((m) => m.VENTA_CONFIG),
   compra: () => import('../../features/compra/compra.config').then((m) => m.COMPRA_CONFIG),
   cartera: () => import('../../features/cartera/cartera.config').then((m) => m.CARTERA_CONFIG),
+  tesoreria: () =>
+    import('../../features/tesoreria/tesoreria.config').then((m) => m.TESORERIA_CONFIG),
   // inventario: () => import('../../features/inventario/inventario.config').then((m) => m.INVENTARIO_CONFIG),
 } as const satisfies ModuleRegistry;
 

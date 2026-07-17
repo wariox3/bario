@@ -2242,6 +2242,73 @@ export const en: AppDict = {
         },
       },
     },
+    egreso: {
+      name: 'Disbursement',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        total: 'Total',
+        aprobado: 'App',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New disbursement',
+        editTitle: 'Edit disbursement',
+        sectionHint: 'Record the disbursement and apply it to the supplier payables',
+        fields: {
+          proveedor: 'Supplier',
+          proveedorPlaceholder: 'Search supplier…',
+          fecha: 'Date',
+          cuentaBanco: 'Bank account',
+          cuentaBancoPlaceholder: 'Select…',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Disbursement created',
+            desc: 'The disbursement was created successfully',
+          },
+          createError: { title: 'Create failed', desc: 'The disbursement could not be created' },
+          editSuccess: {
+            title: 'Disbursement updated',
+            desc: 'The disbursement was updated successfully',
+          },
+          editError: { title: 'Update failed', desc: 'The disbursement could not be updated' },
+          loadError: { title: 'Load failed', desc: 'The disbursement could not be loaded' },
+          negativeTotal: {
+            title: 'Invalid total',
+            desc: 'The disbursement total cannot be negative',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Lines',
+        },
+        labels: {
+          numero: 'Number',
+          proveedor: 'Supplier',
+          fecha: 'Date',
+          cuentaBanco: 'Bank account',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Disbursement not found',
+          desc: 'The disbursement you are looking for does not exist or was deleted.',
+        },
+      },
+    },
     comercialDetalle: {
       title: 'Lines',
       hint: 'Products and services of the document',

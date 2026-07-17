@@ -110,11 +110,17 @@ export function documentoPendienteToFormValue(
 
 /**
  * Acumula débitos y créditos de las líneas de cuenta: suma el `valor` de cada
- * línea en el bucket de su naturaleza, y neto = créditos − débitos. Redondeo de
- * moneda una sola vez, al final: acumular ya redondeado arrastra el error.
+ * línea en el bucket de su naturaleza. Redondeo de moneda una sola vez, al
+ * final: acumular ya redondeado arrastra el error.
+ *
+ * El signo del **neto** depende de la familia de cartera del documento: en un
+ * recaudo (CxC) el neto es `créditos − débitos`; en un desembolso (CxP, el
+ * egreso) es el espejo, `débitos − créditos`. Reglas tomadas del legacy
+ * (pago/egreso).
  */
 export function calcularResumenContable(
   lines: readonly CuentaDetalleFormRawValue[],
+  carteraTipo: CarteraTipo = 'cobrar',
 ): ResumenContable {
   let debitos = 0;
   let creditos = 0;
@@ -126,6 +132,6 @@ export function calcularResumenContable(
   return {
     debitos: redondearMoneda(debitos),
     creditos: redondearMoneda(creditos),
-    total: redondearMoneda(creditos - debitos),
+    total: redondearMoneda(carteraTipo === 'cobrar' ? creditos - debitos : debitos - creditos),
   };
 }

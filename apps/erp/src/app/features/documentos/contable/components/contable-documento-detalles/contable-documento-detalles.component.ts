@@ -136,8 +136,9 @@ export class ContableDocumentoDetallesComponent {
   readonly showBase = input<boolean>(false);
 
   /**
-   * Suma la fila "Total" (`créditos − débitos`) al resumen. Solo tiene sentido
-   * donde el neto es el documento —un recaudo—, no en una pestaña de asientos.
+   * Suma la fila "Total" (el neto según `carteraTipo`) al resumen. Solo tiene
+   * sentido donde el neto es el documento —un recaudo o un desembolso—, no en
+   * una pestaña de asientos.
    */
   readonly showTotal = input<boolean>(false);
 
@@ -148,7 +149,10 @@ export class ContableDocumentoDetallesComponent {
    */
   readonly agregarDocumentoEnabled = input<boolean>(false);
 
-  /** Familia de cartera que cruza el documento: CxC en el pago, CxP en el egreso. */
+  /**
+   * Familia de cartera del documento: CxC en el pago, CxP en el egreso. Acota
+   * los pendientes del cruce y fija el signo del neto del resumen.
+   */
   readonly carteraTipo = input<CarteraTipo>('cobrar');
 
   /**
@@ -204,8 +208,10 @@ export class ContableDocumentoDetallesComponent {
   /** Espejo reactivo del valor del array para la tabla y el resumen. */
   protected readonly lines = signal<readonly CuentaDetalleFormRawValue[]>([]);
 
-  /** Acumulado de débitos/créditos del documento. */
-  protected readonly resumen = computed(() => calcularResumenContable(this.lines()));
+  /** Acumulado de débitos/créditos; el signo del neto lo fija la familia de cartera. */
+  protected readonly resumen = computed(() =>
+    calcularResumenContable(this.lines(), this.carteraTipo()),
+  );
 
   /** Grupo persistiéndose ahora mismo (edición); bloquea su botón. */
   protected readonly savingGroup = signal<CuentaDetalleGroup | null>(null);

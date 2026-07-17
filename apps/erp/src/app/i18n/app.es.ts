@@ -2283,6 +2283,70 @@ export const es: AppDict = {
         },
       },
     },
+    egreso: {
+      name: 'Egreso',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        proveedor: 'Proveedor',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nuevo egreso',
+        editTitle: 'Editar egreso',
+        sectionHint: 'Registra el desembolso y aplícalo a las cuentas por pagar del proveedor',
+        fields: {
+          proveedor: 'Proveedor',
+          proveedorPlaceholder: 'Buscar proveedor…',
+          fecha: 'Fecha',
+          cuentaBanco: 'Cuenta banco',
+          cuentaBancoPlaceholder: 'Seleccionar…',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es obligatorio' },
+        toasts: {
+          createSuccess: { title: 'Egreso creado', desc: 'El egreso se creó correctamente' },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear el egreso' },
+          editSuccess: {
+            title: 'Egreso actualizado',
+            desc: 'El egreso se actualizó correctamente',
+          },
+          editError: { title: 'Error al actualizar', desc: 'No se pudo actualizar el egreso' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el egreso' },
+          negativeTotal: {
+            title: 'Total inválido',
+            desc: 'El total del egreso no puede ser negativo',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          proveedor: 'Proveedor',
+          fecha: 'Fecha',
+          cuentaBanco: 'Cuenta banco',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Egreso no encontrado',
+          desc: 'El egreso que buscas no existe o fue eliminado.',
+        },
+      },
+    },
     comercialDetalle: {
       title: 'Detalles',
       hint: 'Productos y servicios del documento',
