@@ -8,9 +8,10 @@ import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { I18nService, ToastService, formatCop } from '@reddoc/core';
+import { type ErpSelectOption, I18nService, SELECT_ENDPOINTS, ToastService } from '@reddoc/core';
 import { DocumentoDetalleService } from '@erp/core/module-config';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
+import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import {
   createCuentaDetalleGroup,
@@ -23,11 +24,20 @@ import {
 } from '../../contable-documento-detalle.mapper';
 import type { CuentaDetalleRead } from '../../contable-documento-detalle.model';
 import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
+import { ContableDocumentoResumenComponent } from '../contable-documento-resumen/contable-documento-resumen.component';
+
+/** Columnas fijas: nº, cuenta, naturaleza, valor y acciones. */
+const BASE_COLUMN_COUNT = 5;
 
 /**
  * Tabla de **líneas de cuenta contable** (asientos manuales) de un documento.
- * Espeja `ComercialDocumentoDetallesComponent` pero recortada al núcleo mínimo:
+ * Espeja `ComercialDocumentoDetallesComponent` pero sin ítems ni impuestos:
  * cuenta + naturaleza (D/C) + valor, con el acumulado de débitos/créditos.
+ *
+ * Las columnas `contacto`, `centro_costo` y `base` son **opt-in** (`showContacto`,
+ * `showCentroCosto`, `showBase`): un documento las pide solo si su negocio las imputa
+ * —el pago sí, la factura de compra no—. El `FormGroup` siempre las tiene, así
+ * que prenderlas no cambia el shape de la línea ni el mapper.
  *
  * Persistencia idéntica a la familia comercial: en **alta** (`documentId == null`)
  * las líneas viven en el `FormArray` y viajan embebidas al crear el documento; en
@@ -46,6 +56,9 @@ import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle
     TooltipModule,
     ConfirmDialogModule,
     ErpCuentaSelectComponent,
+    ErpContactoSelectComponent,
+    ErpApiSelectComponent,
+    ContableDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './contable-documento-detalles.component.html',
@@ -59,7 +72,6 @@ export class ContableDocumentoDetallesComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
-  protected readonly formatMoney = formatCop;
 
   /** FormArray de líneas de cuenta, propiedad del form padre. */
   readonly detalles = input.required<FormArray<CuentaDetalleGroup>>();
@@ -69,6 +81,37 @@ export class ContableDocumentoDetallesComponent {
    * transaccionan al instante contra `/documento-detalle`.
    */
   readonly documentId = input<number | null>(null);
+
+  /** Muestra la columna de tercero por línea (la imputa el pago; la factura no). */
+  readonly showContacto = input<boolean>(false);
+
+  /**
+   * Tercero con el que nace cada línea nueva. Lo decide el documento padre —el
+   * pago siembra el de su cabecera—; la tabla solo lo aplica al agregar.
+   */
+  readonly contactoPorDefecto = input<ErpSelectOption | null>(null);
+
+  /** Muestra la columna de centro de costo. */
+  readonly showCentroCosto = input<boolean>(false);
+
+  /** Muestra la columna de base gravable. */
+  readonly showBase = input<boolean>(false);
+
+  /**
+   * Suma la fila "Total" (`créditos − débitos`) al resumen. Solo tiene sentido
+   * donde el neto es el documento —un recaudo—, no en una pestaña de asientos.
+   */
+  readonly showTotal = input<boolean>(false);
+
+  /** Endpoint del catálogo de centros de costo (columna `centro_costo`). */
+  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
+
+  /** Nº de columnas de la tabla; alimenta el `colspan` del estado vacío. */
+  protected readonly columnCount = computed(
+    () =>
+      BASE_COLUMN_COUNT +
+      [this.showContacto(), this.showCentroCosto(), this.showBase()].filter(Boolean).length,
+  );
 
   /** Opciones del select de naturaleza (D/C), con etiquetas i18n. */
   protected readonly naturalezaOptions = computed(() => [
@@ -99,7 +142,7 @@ export class ContableDocumentoDetallesComponent {
   }
 
   protected addLinea(): void {
-    this.detalles().push(createCuentaDetalleGroup());
+    this.detalles().push(createCuentaDetalleGroup({ contacto: this.contactoPorDefecto() }));
   }
 
   /** Pide confirmación y, al aceptar, elimina la línea (persiste en edición). */

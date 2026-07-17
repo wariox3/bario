@@ -1592,6 +1592,39 @@ export interface AppDict
         anulado: string;
         contabilizado: string;
       };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          cuentaBanco: string;
+          cuentaBancoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          negativeTotal: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          fecha: string;
+          cuentaBanco: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
     };
     comercialDetalle: {
       title: string;
@@ -1643,16 +1676,21 @@ export interface AppDict
       saveAll: string;
       pendingSuffix: string;
       cuentaPlaceholder: string;
+      contactoPlaceholder: string;
+      centroCostoPlaceholder: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {
         linea: string;
         cuenta: string;
+        contacto: string;
         naturaleza: string;
+        centroCosto: string;
         valor: string;
+        base: string;
         acciones: string;
       };
-      resumen: { debitos: string; creditos: string };
+      resumen: { debitos: string; creditos: string; total: string };
       toasts: {
         lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };

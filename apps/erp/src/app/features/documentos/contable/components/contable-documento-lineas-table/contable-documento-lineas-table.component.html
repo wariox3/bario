@@ -1,0 +1,64 @@
+@let c = t().entities.cuentaDetalle;
+
+<div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <table class="contable-detalle-table">
+    <thead>
+      <tr>
+        <th class="contable-detalle-table__th w-10 text-center">{{ c.columns.linea }}</th>
+        <th class="contable-detalle-table__th min-w-[18rem] text-left">{{ c.columns.cuenta }}</th>
+        @if (showContacto()) {
+          <th class="contable-detalle-table__th min-w-[14rem] text-left">
+            {{ c.columns.contacto }}
+          </th>
+        }
+        <th class="contable-detalle-table__th w-32 text-left">{{ c.columns.naturaleza }}</th>
+        @if (showCentroCosto()) {
+          <th class="contable-detalle-table__th w-44 text-left">{{ c.columns.centroCosto }}</th>
+        }
+        <th class="contable-detalle-table__th w-40 text-right">{{ c.columns.valor }}</th>
+        @if (showBase()) {
+          <th class="contable-detalle-table__th w-36 text-right">{{ c.columns.base }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (line of lines(); track line.id ?? $index; let i = $index) {
+        <tr class="contable-detalle-table__row">
+          <td class="contable-detalle-table__td text-center text-brand-muted tabular-nums">
+            {{ i + 1 }}
+          </td>
+          <td class="contable-detalle-table__td font-medium text-brand-text">
+            {{ line.cuenta?.nombre || '—' }}
+          </td>
+          @if (showContacto()) {
+            <td class="contable-detalle-table__td text-brand-text">
+              {{ line.contacto?.nombre || '—' }}
+            </td>
+          }
+          <td class="contable-detalle-table__td text-brand-text">{{ naturalezaLabel(line) }}</td>
+          @if (showCentroCosto()) {
+            <td class="contable-detalle-table__td text-brand-text">
+              {{ line.centro_costo?.nombre || '—' }}
+            </td>
+          }
+          <td
+            class="contable-detalle-table__td text-right font-semibold tabular-nums text-brand-text"
+          >
+            {{ formatMoney(line.valor ?? 0) }}
+          </td>
+          @if (showBase()) {
+            <td class="contable-detalle-table__td text-right tabular-nums text-brand-muted">
+              {{ formatMoney(line.base ?? 0) }}
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="columnCount()" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -2165,6 +2165,48 @@ export const en: AppDict = {
         anulado: 'Voided',
         contabilizado: 'Posted',
       },
+      form: {
+        createTitle: 'New payment',
+        editTitle: 'Edit payment',
+        sectionHint: 'Record the payment and apply it to the customer receivables',
+        fields: {
+          cliente: 'Customer',
+          clientePlaceholder: 'Search customer…',
+          fecha: 'Date',
+          cuentaBanco: 'Bank account',
+          cuentaBancoPlaceholder: 'Select…',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: { title: 'Payment created', desc: 'The payment was created successfully' },
+          createError: { title: 'Create failed', desc: 'The payment could not be created' },
+          editSuccess: { title: 'Payment updated', desc: 'The payment was updated successfully' },
+          editError: { title: 'Update failed', desc: 'The payment could not be updated' },
+          loadError: { title: 'Load failed', desc: 'The payment could not be loaded' },
+          negativeTotal: {
+            title: 'Invalid total',
+            desc: 'The payment total cannot be negative',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Lines',
+        },
+        labels: {
+          numero: 'Number',
+          cliente: 'Client',
+          fecha: 'Date',
+          cuentaBanco: 'Bank account',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Payment not found',
+          desc: 'The payment you are looking for does not exist or was deleted.',
+        },
+      },
     },
     comercialDetalle: {
       title: 'Lines',
@@ -2228,16 +2270,21 @@ export const en: AppDict = {
       saveAll: 'Save accounts',
       pendingSuffix: 'unsaved',
       cuentaPlaceholder: 'Search account…',
+      contactoPlaceholder: 'Search contact…',
+      centroCostoPlaceholder: 'Select…',
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
         linea: '#',
         cuenta: 'Account',
+        contacto: 'Contact',
         naturaleza: 'Nature',
+        centroCosto: 'Cost center',
         valor: 'Amount',
+        base: 'Base',
         acciones: 'Actions',
       },
-      resumen: { debitos: 'Debits', creditos: 'Credits' },
+      resumen: { debitos: 'Debits', creditos: 'Credits', total: 'Total' },
       toasts: {
         lineSaveSuccess: {
           title: 'Account saved',

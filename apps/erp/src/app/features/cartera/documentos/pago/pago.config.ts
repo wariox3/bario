@@ -41,11 +41,9 @@ export const PAGO_CONFIG: DocumentEntityConfig = {
     detail: 'pago/detalle',
   },
   capabilities: {
-    // Solo el listado por ahora: `canCreate`/`canEdit`/`canView` se encienden
-    // cuando existan el form y el detalle (sus rutas todavía no están).
-    canCreate: false,
-    canEdit: false,
-    canView: false,
+    canCreate: true,
+    canEdit: true,
+    canView: true,
     canDelete: true,
     canSelectRows: true,
     canImport: false,

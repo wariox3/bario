@@ -20,6 +20,15 @@ export function cuentaDetalleToFormValue(read: CuentaDetalleRead): CuentaDetalle
       read.cuenta != null ? { id: read.cuenta, nombre: label || read.cuenta_nombre || '' } : null,
     naturaleza: toNaturaleza(read.naturaleza),
     valor: toFiniteNumber(read.precio) ?? 0,
+    contacto:
+      read.contacto != null
+        ? { id: read.contacto, nombre: read.contacto_nombre_corto ?? '' }
+        : null,
+    centro_costo:
+      read.centro_costo != null
+        ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
+        : null,
+    base: toFiniteNumber(read.base) ?? 0,
   };
 }
 
@@ -33,12 +42,16 @@ export function cuentaDetalleToPayload(raw: CuentaDetalleFormRawValue): CuentaDe
     naturaleza: raw.naturaleza,
     precio: valor,
     total: valor,
+    contacto: raw.contacto?.id ?? null,
+    centro_costo: raw.centro_costo?.id ?? null,
+    base: (raw.base ?? 0).toFixed(2),
   };
 }
 
 /**
  * Acumula débitos y créditos de las líneas de cuenta: suma el `valor` de cada
- * línea en el bucket de su naturaleza. Redondeo de moneda una sola vez, al final.
+ * línea en el bucket de su naturaleza, y neto = créditos − débitos. Redondeo de
+ * moneda una sola vez, al final: acumular ya redondeado arrastra el error.
  */
 export function calcularResumenContable(
   lines: readonly CuentaDetalleFormRawValue[],
@@ -50,5 +63,9 @@ export function calcularResumenContable(
     if (line.naturaleza === 'C') creditos += valor;
     else debitos += valor;
   }
-  return { debitos: redondearMoneda(debitos), creditos: redondearMoneda(creditos) };
+  return {
+    debitos: redondearMoneda(debitos),
+    creditos: redondearMoneda(creditos),
+    total: redondearMoneda(creditos - debitos),
+  };
 }

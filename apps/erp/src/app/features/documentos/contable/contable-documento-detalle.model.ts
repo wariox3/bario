@@ -22,6 +22,14 @@ export interface CuentaDetalleRead extends DocumentoDetalleReadBase {
   readonly cuenta_nombre?: string | null;
   /** Naturaleza contable (`'D'`/`'C'`); el mapper cae a `'D'` si viene ausente. */
   readonly naturaleza?: string | null;
+  /** Tercero de la línea (solo lo imputan los documentos que agrupan por contacto). */
+  readonly contacto?: number | null;
+  readonly contacto_nombre_corto?: string | null;
+  /** FK del centro de costo (`contabilidad/centro-costo`). */
+  readonly centro_costo?: number | null;
+  readonly centro_costo_nombre?: string | null;
+  /** Base gravable de la línea; llega como string con decimales. */
+  readonly base?: string | null;
 }
 
 /** Cuerpo de una línea de cuenta enviada en `POST`/`PATCH`. */
@@ -34,6 +42,12 @@ export interface CuentaDetallePayload {
   readonly naturaleza: NaturalezaCuenta;
   /** Valor como string con 2 decimales (`"150000.00"`). */
   readonly precio: string;
-  /** Total de la línea; en el núcleo mínimo (sin base/impuestos) coincide con `precio`. */
+  /** Total de la línea; sin impuestos por línea coincide con `precio`. */
   readonly total: string;
+  /** Tercero de la línea; `null` en los documentos que no imputan por contacto. */
+  readonly contacto: number | null;
+  /** Centro de costo; `null` si el documento no lo imputa. */
+  readonly centro_costo: number | null;
+  /** Base gravable como string con 2 decimales; `"0.00"` cuando no aplica. */
+  readonly base: string;
 }

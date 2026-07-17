@@ -1,6 +1,18 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 
 /**
+ * Catálogo de cuentas bancarias del select de la cabecera.
+ *
+ * Vive acá (y no en `SELECT_ENDPOINTS`) porque hoy solo lo usa este formulario.
+ *
+ * ⚠️ Endpoint **supuesto**: sigue la convención `seleccionar/` del resto de las
+ * cabeceras del ERP, pero el legacy alimenta este select desde el listado
+ * (`general/cuenta-banco/` con `ordering=id`) y no se pudo verificar contra el
+ * backend. Si no existe, el select llega vacío y el fix es este string.
+ */
+export const CUENTA_BANCO_ENDPOINT = '/general/cuenta-banco/seleccionar/';
+
+/**
  * Columnas visibles del listado de Pago.
  *
  * El pago es un **recaudo de cartera**, no un documento comercial: no tiene

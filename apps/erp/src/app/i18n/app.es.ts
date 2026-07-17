@@ -2206,6 +2206,48 @@ export const es: AppDict = {
         anulado: 'Anulado',
         contabilizado: 'Contabilizado',
       },
+      form: {
+        createTitle: 'Nuevo pago',
+        editTitle: 'Editar pago',
+        sectionHint: 'Registra el recaudo y aplícalo a la cartera del cliente',
+        fields: {
+          cliente: 'Cliente',
+          clientePlaceholder: 'Buscar cliente…',
+          fecha: 'Fecha',
+          cuentaBanco: 'Cuenta banco',
+          cuentaBancoPlaceholder: 'Seleccionar…',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es obligatorio' },
+        toasts: {
+          createSuccess: { title: 'Pago creado', desc: 'El pago se creó correctamente' },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear el pago' },
+          editSuccess: { title: 'Pago actualizado', desc: 'El pago se actualizó correctamente' },
+          editError: { title: 'Error al actualizar', desc: 'No se pudo actualizar el pago' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el pago' },
+          negativeTotal: {
+            title: 'Total inválido',
+            desc: 'El total del pago no puede ser negativo',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          cliente: 'Cliente',
+          fecha: 'Fecha',
+          cuentaBanco: 'Cuenta banco',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Pago no encontrado',
+          desc: 'El pago que buscas no existe o fue eliminado.',
+        },
+      },
     },
     comercialDetalle: {
       title: 'Detalles',
@@ -2269,16 +2311,21 @@ export const es: AppDict = {
       saveAll: 'Guardar cuentas',
       pendingSuffix: 'sin guardar',
       cuentaPlaceholder: 'Buscar cuenta…',
+      contactoPlaceholder: 'Buscar contacto…',
+      centroCostoPlaceholder: 'Seleccionar…',
       confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {
         linea: '#',
         cuenta: 'Cuenta',
+        contacto: 'Contacto',
         naturaleza: 'Naturaleza',
+        centroCosto: 'Centro de costo',
         valor: 'Valor',
+        base: 'Base',
         acciones: 'Acciones',
       },
-      resumen: { debitos: 'Débitos', creditos: 'Créditos' },
+      resumen: { debitos: 'Débitos', creditos: 'Créditos', total: 'Total' },
       toasts: {
         lineSaveSuccess: {
           title: 'Cuenta guardada',
