@@ -20,14 +20,25 @@
         (onClick)="onSaveAllClick()"
       />
     }
-    <p-button
-      type="button"
-      size="small"
-      icon="pi pi-plus"
-      [label]="t().entities.cuentaDetalle.addLine"
-      [outlined]="true"
-      (onClick)="addLinea()"
-    />
+    @if (agregarDocumentoEnabled()) {
+      <p-splitbutton
+        [label]="t().entities.cuentaDetalle.addLine"
+        icon="pi pi-plus"
+        [outlined]="true"
+        size="small"
+        [model]="addLineMenu()"
+        (onClick)="addLinea()"
+      />
+    } @else {
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-plus"
+        [label]="t().entities.cuentaDetalle.addLine"
+        [outlined]="true"
+        (onClick)="addLinea()"
+      />
+    }
   </div>
 
   <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
@@ -37,6 +48,11 @@
           <th class="contable-detalle-table__th w-10 text-center">
             {{ t().entities.cuentaDetalle.columns.linea }}
           </th>
+          @if (showDocumento()) {
+            <th class="contable-detalle-table__th w-44 text-left">
+              {{ t().entities.cuentaDetalle.columns.documento }}
+            </th>
+          }
           <th class="contable-detalle-table__th min-w-[18rem] text-left">
             {{ t().entities.cuentaDetalle.columns.cuenta }}
           </th>
@@ -82,6 +98,26 @@
               }
               {{ i + 1 }}
             </td>
+
+            @if (showDocumento()) {
+              <td class="contable-detalle-table__td">
+                @if (row.controls.documento_afectado.value !== null) {
+                  <div class="flex flex-col gap-0.5">
+                    <span class="text-[0.78rem] font-medium text-brand-text">
+                      {{ row.controls.documento_afectado_tipo.value }}
+                    </span>
+                    <span class="text-[0.72rem] text-brand-muted tabular-nums">
+                      {{
+                        row.controls.documento_afectado_numero.value ??
+                          row.controls.documento_afectado.value
+                      }}
+                    </span>
+                  </div>
+                } @else {
+                  <span class="text-brand-muted">—</span>
+                }
+              </td>
+            }
 
             <td class="contable-detalle-table__td">
               <app-cuenta-select

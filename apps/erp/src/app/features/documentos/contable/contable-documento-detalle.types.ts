@@ -32,6 +32,16 @@ export interface CuentaDetalleFormRawValue {
   readonly centro_costo: ErpSelectOption | null;
   /** Base gravable de la línea. `0` cuando no aplica. */
   readonly base: number | null;
+  /**
+   * Documento cruzado (FK de la cabecera afectada). Solo en líneas nacidas de
+   * "agregar documento": el backend descuenta el `pendiente` del documento
+   * cruzado al aprobar. `null` en asientos manuales.
+   */
+  readonly documento_afectado: number | null;
+  /** Número del documento cruzado — solo display de la columna "Documento". */
+  readonly documento_afectado_numero: string | null;
+  /** Tipo del documento cruzado (nombre) — solo display de la columna "Documento". */
+  readonly documento_afectado_tipo: string | null;
 }
 
 /** Acumulado de débitos y créditos de las líneas de cuenta del documento. */

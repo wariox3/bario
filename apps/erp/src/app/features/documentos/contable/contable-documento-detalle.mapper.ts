@@ -1,4 +1,5 @@
 import { redondearMoneda, toFiniteNumber } from '@reddoc/core';
+import type { CarteraTipo, DocumentoPendienteApi } from '@erp/core/module-config';
 import type { CuentaDetalleRead, CuentaDetallePayload } from './contable-documento-detalle.model';
 import type {
   CuentaDetalleFormRawValue,
@@ -29,6 +30,10 @@ export function cuentaDetalleToFormValue(read: CuentaDetalleRead): CuentaDetalle
         ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
         : null,
     base: toFiniteNumber(read.base) ?? 0,
+    documento_afectado: read.documento_afectado ?? null,
+    documento_afectado_numero:
+      read.documento_afectado_numero != null ? String(read.documento_afectado_numero) : null,
+    documento_afectado_tipo: read.documento_afectado_documento_tipo_nombre ?? null,
   };
 }
 
@@ -45,6 +50,61 @@ export function cuentaDetalleToPayload(raw: CuentaDetalleFormRawValue): CuentaDe
     contacto: raw.contacto?.id ?? null,
     centro_costo: raw.centro_costo?.id ?? null,
     base: (raw.base ?? 0).toFixed(2),
+    documento_afectado: raw.documento_afectado,
+  };
+}
+
+/**
+ * Naturaleza de la línea de cruce según la operación del tipo de documento.
+ *
+ * En un **recaudo** (CxC) una factura (operación `1`) se abona con **crédito**
+ * y una nota crédito (operación `-1`) descuenta con **débito**. En un pago a
+ * proveedor (CxP) es el espejo. Reglas tomadas del legacy (pago/egreso).
+ */
+function naturalezaDeCruce(operacion: number, carteraTipo: CarteraTipo): NaturalezaCuenta {
+  if (carteraTipo === 'cobrar') return operacion === -1 ? 'D' : 'C';
+  return operacion === 1 ? 'D' : 'C';
+}
+
+/** Cuenta de cruce del tipo de documento según la familia de cartera. */
+function cuentaDeCruce(
+  doc: DocumentoPendienteApi,
+  carteraTipo: CarteraTipo,
+): { id: number; codigo: string } | null {
+  const id =
+    carteraTipo === 'cobrar'
+      ? doc.documento_tipo__cuenta_cobrar_id
+      : doc.documento_tipo__cuenta_pagar_id;
+  if (id == null) return null;
+  const codigo =
+    (carteraTipo === 'cobrar'
+      ? doc.documento_tipo__cuenta_cobrar__codigo
+      : doc.documento_tipo__cuenta_pagar__codigo) ?? '';
+  return { id, codigo };
+}
+
+/**
+ * Documento pendiente (fila del modal "agregar documento") → valores de una
+ * línea contable **enlazada**: `documento_afectado` apunta al documento
+ * cruzado, `valor` nace en su `pendiente` (editable: abonos parciales) y la
+ * cuenta/naturaleza las fija el cruce (el form las deshabilita).
+ */
+export function documentoPendienteToFormValue(
+  doc: DocumentoPendienteApi,
+  carteraTipo: CarteraTipo,
+): CuentaDetalleFormRawValue {
+  const cuenta = cuentaDeCruce(doc, carteraTipo);
+  return {
+    id: null,
+    cuenta: cuenta ? { id: cuenta.id, nombre: cuenta.codigo } : null,
+    naturaleza: naturalezaDeCruce(doc.documento_tipo_operacion, carteraTipo),
+    valor: toFiniteNumber(doc.pendiente) ?? 0,
+    contacto: { id: doc.contacto, nombre: doc.contacto__nombre_corto },
+    centro_costo: null,
+    base: 0,
+    documento_afectado: doc.id,
+    documento_afectado_numero: doc.numero != null ? String(doc.numero) : null,
+    documento_afectado_tipo: doc.documento_tipo__nombre,
   };
 }
 

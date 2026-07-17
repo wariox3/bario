@@ -129,6 +129,11 @@
         [showCentroCosto]="true"
         [showBase]="true"
         [showTotal]="true"
+        [showDocumento]="true"
+        [agregarDocumentoEnabled]="true"
+        [carteraTipo]="'cobrar'"
+        [contactoId]="contactoCabecera()?.id ?? null"
+        (imported)="onDocumentosAgregados()"
       />
     </div>
   </section>

@@ -335,6 +335,40 @@ export const en: AppDict = {
       },
     },
   },
+  documentAdd: {
+    buttonLabel: 'Add document',
+    modalHeader: 'Add document',
+    modalSubtitle: 'Select the pending documents you want to settle',
+    showAllContacts: 'Show all contacts',
+    selected: 'selected',
+    totalSelected: 'Selected total',
+    submit: 'Add',
+    cancel: 'Cancel',
+    columns: {
+      tipo: 'Type',
+      numero: 'Number',
+      fecha: 'Date',
+      fechaVence: 'Due',
+      contacto: 'Contact',
+      total: 'Total',
+      afectado: 'Applied',
+      pendiente: 'Pending',
+    },
+    toasts: {
+      loadError: {
+        title: 'Load failed',
+        desc: 'Could not load the pending documents. Please try again.',
+      },
+      addSuccess: {
+        title: 'Documents added',
+        desc: 'The selected documents were added as lines.',
+      },
+      addError: {
+        title: 'Add failed',
+        desc: 'Could not add the documents. Please try again.',
+      },
+    },
+  },
   modules: {
     general: { name: 'General' },
     compra: { name: 'Purchases' },
@@ -2276,6 +2310,7 @@ export const en: AppDict = {
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
         linea: '#',
+        documento: 'Document',
         cuenta: 'Account',
         contacto: 'Contact',
         naturaleza: 'Nature',

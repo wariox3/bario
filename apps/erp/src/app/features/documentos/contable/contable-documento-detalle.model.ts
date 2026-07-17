@@ -30,6 +30,10 @@ export interface CuentaDetalleRead extends DocumentoDetalleReadBase {
   readonly centro_costo_nombre?: string | null;
   /** Base gravable de la línea; llega como string con decimales. */
   readonly base?: string | null;
+  /** Documento cruzado por la línea (cabecera afectada); `null` en asientos manuales. */
+  readonly documento_afectado?: number | null;
+  readonly documento_afectado_numero?: string | number | null;
+  readonly documento_afectado_documento_tipo_nombre?: string | null;
 }
 
 /** Cuerpo de una línea de cuenta enviada en `POST`/`PATCH`. */
@@ -50,4 +54,9 @@ export interface CuentaDetallePayload {
   readonly centro_costo: number | null;
   /** Base gravable como string con 2 decimales; `"0.00"` cuando no aplica. */
   readonly base: string;
+  /**
+   * Documento cruzado: el backend descuenta su `pendiente` al aprobar. `null`
+   * en asientos manuales (líneas libres).
+   */
+  readonly documento_afectado: number | null;
 }

@@ -250,6 +250,16 @@ export class PagoFormComponent implements OnInit, CanComponentDeactivate {
   }
 
   /**
+   * En edición, "agregar documento" persiste las líneas vía `masivo/`; acá se
+   * recargan para reflejar los ids y montos autoritativos del backend. En alta
+   * no aplica: las líneas entran directo al `FormArray`.
+   */
+  protected onDocumentosAgregados(): void {
+    const id = this.id();
+    if (id) this.loadLineas(Number(id));
+  }
+
+  /**
    * Guard de salida: si hay líneas sin guardar, confirma antes de abandonar para
    * no perderlas. Solo aplica en edición.
    */

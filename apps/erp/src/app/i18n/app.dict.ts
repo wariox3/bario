@@ -248,6 +248,31 @@ export interface AppDict
       addError: { title: string; desc: string };
     };
   };
+  documentAdd: {
+    buttonLabel: string;
+    modalHeader: string;
+    modalSubtitle: string;
+    showAllContacts: string;
+    selected: string;
+    totalSelected: string;
+    submit: string;
+    cancel: string;
+    columns: {
+      tipo: string;
+      numero: string;
+      fecha: string;
+      fechaVence: string;
+      contacto: string;
+      total: string;
+      afectado: string;
+      pendiente: string;
+    };
+    toasts: {
+      loadError: { title: string; desc: string };
+      addSuccess: { title: string; desc: string };
+      addError: { title: string; desc: string };
+    };
+  };
   modules: {
     general: { name: string };
     compra: { name: string };
@@ -1682,6 +1707,7 @@ export interface AppDict
       naturaleza: { debito: string; credito: string };
       columns: {
         linea: string;
+        documento: string;
         cuenta: string;
         contacto: string;
         naturaleza: string;

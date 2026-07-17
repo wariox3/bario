@@ -1,15 +1,45 @@
-import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { type Observable, defer, finalize, forkJoin, map, of, tap } from 'rxjs';
+import {
+  EMPTY,
+  type Observable,
+  defer,
+  filter,
+  finalize,
+  forkJoin,
+  from,
+  map,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import type { MenuItem } from 'primeng/api';
+import { DialogService } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { type ErpSelectOption, I18nService, SELECT_ENDPOINTS, ToastService } from '@reddoc/core';
-import { DocumentoDetalleService } from '@erp/core/module-config';
+import {
+  DocumentoDetalleService,
+  type AgregarDocumentoModalData,
+  type CarteraTipo,
+  type DocumentoPendienteApi,
+} from '@erp/core/module-config';
+import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
@@ -21,6 +51,7 @@ import {
   calcularResumenContable,
   cuentaDetalleToFormValue,
   cuentaDetalleToPayload,
+  documentoPendienteToFormValue,
 } from '../../contable-documento-detalle.mapper';
 import type { CuentaDetalleRead } from '../../contable-documento-detalle.model';
 import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
@@ -44,6 +75,11 @@ const BASE_COLUMN_COUNT = 5;
  * **edición** transaccionan al instante contra `/documento-detalle` (✓ por fila,
  * baja inmediata). Expone la misma API pública (`saveAll`, `pendingCount`,
  * `hasInvalidPending`) para que el form padre orqueste ítems y cuentas por igual.
+ *
+ * Con `agregarDocumentoEnabled` la tabla ofrece además **agregar documento**
+ * (cruce de cartera): un modal de documentos con saldo pendiente cuya selección
+ * entra como líneas enlazadas (`documento_afectado`, cuenta/naturaleza
+ * bloqueadas, valor = pendiente). Espejo del "importar desde documento" comercial.
  */
 @Component({
   selector: 'app-contable-documento-detalles',
@@ -51,6 +87,7 @@ const BASE_COLUMN_COUNT = 5;
   imports: [
     ReactiveFormsModule,
     ButtonModule,
+    SplitButtonModule,
     InputNumberModule,
     SelectModule,
     TooltipModule,
@@ -69,6 +106,7 @@ export class ContableDocumentoDetallesComponent {
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(ToastService);
+  private readonly dialog = inject(DialogService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
@@ -103,6 +141,31 @@ export class ContableDocumentoDetallesComponent {
    */
   readonly showTotal = input<boolean>(false);
 
+  /**
+   * Habilita el "agregar documento" (cruce de cartera): el botón de agregar se
+   * vuelve SplitButton con la opción de traer documentos pendientes como líneas
+   * enlazadas. Lo prende cada documento que cruza cartera (pago, futuro egreso).
+   */
+  readonly agregarDocumentoEnabled = input<boolean>(false);
+
+  /** Familia de cartera que cruza el documento: CxC en el pago, CxP en el egreso. */
+  readonly carteraTipo = input<CarteraTipo>('cobrar');
+
+  /**
+   * Contacto de la cabecera (id). Acota los documentos pendientes del modal a
+   * ese tercero; sin contacto la opción se deshabilita.
+   */
+  readonly contactoId = input<number | null>(null);
+
+  /** Muestra la columna "Documento" (tipo + número del cruce) de las líneas enlazadas. */
+  readonly showDocumento = input<boolean>(false);
+
+  /**
+   * Avisa al padre que se agregaron líneas en **edición** (ya persistidas vía
+   * `masivo/`) para que recargue las líneas con los ids autoritativos del backend.
+   */
+  readonly imported = output<void>();
+
   /** Endpoint del catálogo de centros de costo (columna `centro_costo`). */
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
 
@@ -110,8 +173,27 @@ export class ContableDocumentoDetallesComponent {
   protected readonly columnCount = computed(
     () =>
       BASE_COLUMN_COUNT +
-      [this.showContacto(), this.showCentroCosto(), this.showBase()].filter(Boolean).length,
+      [this.showDocumento(), this.showContacto(), this.showCentroCosto(), this.showBase()].filter(
+        Boolean,
+      ).length,
   );
+
+  /** Cruce en curso (modal abierto resolviendo o `masivo/` en vuelo); bloquea reentradas. */
+  protected readonly addingDocumentos = signal(false);
+
+  /**
+   * Acciones del dropdown del botón "Agregar línea" (SplitButton, solo con
+   * `agregarDocumentoEnabled`). Hoy solo "agregar documento"; se deshabilita
+   * sin contacto (los pendientes se acotan al tercero de la cabecera).
+   */
+  protected readonly addLineMenu = computed<MenuItem[]>(() => [
+    {
+      label: this.t().documentAdd.buttonLabel,
+      icon: 'pi pi-file-plus',
+      disabled: this.contactoId() === null,
+      command: () => this.openAgregarDocumento(),
+    },
+  ]);
 
   /** Opciones del select de naturaleza (D/C), con etiquetas i18n. */
   protected readonly naturalezaOptions = computed(() => [
@@ -143,6 +225,75 @@ export class ContableDocumentoDetallesComponent {
 
   protected addLinea(): void {
     this.detalles().push(createCuentaDetalleGroup({ contacto: this.contactoPorDefecto() }));
+  }
+
+  /**
+   * Abre el modal de "agregar documento" (lazy) y, con los documentos
+   * seleccionados, arma las líneas de cruce y las agrega. El modal solo
+   * selecciona; toda la resolución/persistencia ocurre aquí.
+   */
+  protected openAgregarDocumento(): void {
+    if (this.addingDocumentos()) return;
+    const data: AgregarDocumentoModalData = {
+      contactoId: this.contactoId(),
+      carteraTipo: this.carteraTipo(),
+    };
+
+    from(
+      import('@erp/core/module-config/agregar-documento/components/agregar-documento-modal/agregar-documento-modal.component'),
+    )
+      .pipe(
+        switchMap(({ AgregarDocumentoModalComponent }) => {
+          const ref = this.dialog.open(AgregarDocumentoModalComponent, {
+            ...ENTITY_ACTION_DIALOG_DEFAULTS,
+            width: '68rem',
+            data,
+          });
+          return ref ? ref.onClose : EMPTY;
+        }),
+        // El modal cierra con `null` al cancelar: solo seguimos con filas reales.
+        filter(
+          (rows: unknown): rows is DocumentoPendienteApi[] =>
+            Array.isArray(rows) && rows.length > 0,
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((rows) => this.resolveAndAddDocumentos(rows));
+  }
+
+  /**
+   * Construye las líneas enlazadas desde los documentos seleccionados y bifurca
+   * según el modo: alta → push al `FormArray`; edición → alta masiva + recarga
+   * del padre (`imported`).
+   */
+  private resolveAndAddDocumentos(rows: readonly DocumentoPendienteApi[]): void {
+    const formValues = rows.map((row) => documentoPendienteToFormValue(row, this.carteraTipo()));
+    const docId = this.documentId();
+    if (docId == null) {
+      for (const value of formValues) this.detalles().push(createCuentaDetalleGroup(value));
+      const toast = this.t().documentAdd.toasts.addSuccess;
+      this.toast.success(toast.title, toast.desc);
+      return;
+    }
+
+    this.addingDocumentos.set(true);
+    const detalles = formValues.map(cuentaDetalleToPayload);
+    this.detalleService
+      .crearMasivo(docId, detalles)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.addingDocumentos.set(false);
+          const toast = this.t().documentAdd.toasts.addSuccess;
+          this.toast.success(toast.title, toast.desc);
+          this.imported.emit();
+        },
+        error: () => {
+          this.addingDocumentos.set(false);
+          const toast = this.t().documentAdd.toasts.addError;
+          this.toast.error(toast.title, toast.desc);
+        },
+      });
   }
 
   /** Pide confirmación y, al aceptar, elimina la línea (persiste en edición). */

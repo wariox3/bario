@@ -335,6 +335,40 @@ export const es: AppDict = {
       },
     },
   },
+  documentAdd: {
+    buttonLabel: 'Agregar documento',
+    modalHeader: 'Agregar documento',
+    modalSubtitle: 'Selecciona los documentos pendientes que quieres cruzar',
+    showAllContacts: 'Mostrar todos los contactos',
+    selected: 'seleccionados',
+    totalSelected: 'Total seleccionado',
+    submit: 'Agregar',
+    cancel: 'Cancelar',
+    columns: {
+      tipo: 'Tipo',
+      numero: 'Número',
+      fecha: 'Fecha',
+      fechaVence: 'Vence',
+      contacto: 'Contacto',
+      total: 'Total',
+      afectado: 'Afectado',
+      pendiente: 'Pendiente',
+    },
+    toasts: {
+      loadError: {
+        title: 'Error al cargar',
+        desc: 'No se pudieron cargar los documentos pendientes. Intentá de nuevo.',
+      },
+      addSuccess: {
+        title: 'Documentos agregados',
+        desc: 'Los documentos seleccionados se agregaron como líneas.',
+      },
+      addError: {
+        title: 'Error al agregar',
+        desc: 'No se pudieron agregar los documentos. Intentá de nuevo.',
+      },
+    },
+  },
   modules: {
     general: { name: 'General' },
     compra: { name: 'Compra' },
@@ -2317,6 +2351,7 @@ export const es: AppDict = {
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {
         linea: '#',
+        documento: 'Documento',
         cuenta: 'Cuenta',
         contacto: 'Contacto',
         naturaleza: 'Naturaleza',
