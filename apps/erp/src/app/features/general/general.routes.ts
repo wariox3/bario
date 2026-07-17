@@ -63,6 +63,11 @@ export const GENERAL_ROUTES: Route[] = [
           import('../cartera/documentos/pago/pago.routes').then((m) => m.PAGO_ROUTES),
       },
       {
+        path: 'egreso',
+        loadChildren: () =>
+          import('../tesoreria/documentos/egreso/egreso.routes').then((m) => m.EGRESO_ROUTES),
+      },
+      {
         path: 'contactos',
         loadChildren: () =>
           import('./masters/contacto/contacto.routes').then((m) => m.CONTACTO_ROUTES),

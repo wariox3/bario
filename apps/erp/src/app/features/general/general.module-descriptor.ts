@@ -19,6 +19,7 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
             { labelKey: 'entities.facturaVenta.name', path: 'factura-venta/list' },
             { labelKey: 'entities.facturaCompra.name', path: 'factura-compra/list' },
             { labelKey: 'entities.pago.name', path: 'pago/list' },
+            { labelKey: 'entities.egreso.name', path: 'egreso/list' },
           ],
         },
       ],
