@@ -58,6 +58,11 @@ export const GENERAL_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'pago',
+        loadChildren: () =>
+          import('../cartera/documentos/pago/pago.routes').then((m) => m.PAGO_ROUTES),
+      },
+      {
         path: 'contactos',
         loadChildren: () =>
           import('./masters/contacto/contacto.routes').then((m) => m.CONTACTO_ROUTES),
