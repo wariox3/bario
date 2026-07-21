@@ -2534,6 +2534,23 @@ export const es: AppDict = {
         total: 'Total',
       },
     },
+    cuentaCobrar: {
+      name: 'Cuentas por cobrar',
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Tipo',
+        numero: 'Número',
+        fecha: 'Fecha',
+        fechaVence: 'Vence',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        afectado: 'Afectado',
+        pendiente: 'Pendiente',
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:

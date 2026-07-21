@@ -49,6 +49,13 @@ export const CARTERA_ROUTES: Route[] = [
             (m) => m.CUENTA_BANCO_ROUTES,
           ),
       },
+      {
+        path: 'informes/cuenta-cobrar',
+        loadChildren: () =>
+          import('./informes/cuenta-cobrar/cuenta-cobrar.routes').then(
+            (m) => m.CUENTA_COBRAR_ROUTES,
+          ),
+      },
     ],
   },
 ];

@@ -101,6 +101,13 @@ export const GENERAL_ROUTES: Route[] = [
         loadChildren: () =>
           import('../venta/informes/venta-item/venta-item.routes').then((m) => m.VENTA_ITEM_ROUTES),
       },
+      {
+        path: 'informes/cuenta-cobrar',
+        loadChildren: () =>
+          import('../cartera/informes/cuenta-cobrar/cuenta-cobrar.routes').then(
+            (m) => m.CUENTA_COBRAR_ROUTES,
+          ),
+      },
       // Futuros: almacenes, formas-pago, resoluciones.
       // Cada uno delega a su `masters/<entity>/<entity>.routes.ts`.
     ],

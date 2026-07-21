@@ -42,5 +42,22 @@ export const CARTERA_MODULE: ErpModuleDescriptor = {
         },
       ],
     },
+    {
+      kind: 'accordion',
+      id: 'cartera-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.cuentaCobrar.name',
+              path: 'informes/cuenta-cobrar',
+            },
+          ],
+        },
+      ],
+    },
   ],
 };

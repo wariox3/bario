@@ -2496,6 +2496,23 @@ export const en: AppDict = {
         total: 'Total',
       },
     },
+    cuentaCobrar: {
+      name: 'Accounts receivable',
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Type',
+        numero: 'Number',
+        fecha: 'Date',
+        fechaVence: 'Due',
+        identificacion: 'Identification',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        afectado: 'Applied',
+        pendiente: 'Pending',
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:

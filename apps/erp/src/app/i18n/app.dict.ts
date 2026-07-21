@@ -1866,6 +1866,23 @@ export interface AppDict
         total: string;
       };
     };
+    cuentaCobrar: {
+      name: string;
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        fechaVence: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        afectado: string;
+        pendiente: string;
+      };
+    };
     regenerarAfectado: {
       name: string;
       description: string;

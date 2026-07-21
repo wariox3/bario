@@ -37,7 +37,7 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
       id: 'general-administracion',
       labelKey: 'layout.nav.sections.master',
       iconClass: 'pi pi-folder',
-      defaultExpanded: true,
+      defaultExpanded: false,
       groups: [
         {
           items: [
@@ -63,6 +63,10 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
             {
               labelKey: 'entities.ventaItem.name',
               path: 'informes/venta-item',
+            },
+            {
+              labelKey: 'entities.cuentaCobrar.name',
+              path: 'informes/cuenta-cobrar',
             },
           ],
         },
