@@ -108,6 +108,13 @@ export const GENERAL_ROUTES: Route[] = [
             (m) => m.CUENTA_COBRAR_ROUTES,
           ),
       },
+      {
+        path: 'informes/cuenta-pagar',
+        loadChildren: () =>
+          import('../tesoreria/informes/cuenta-pagar/cuenta-pagar.routes').then(
+            (m) => m.CUENTA_PAGAR_ROUTES,
+          ),
+      },
       // Futuros: almacenes, formas-pago, resoluciones.
       // Cada uno delega a su `masters/<entity>/<entity>.routes.ts`.
     ],

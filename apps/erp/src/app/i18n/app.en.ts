@@ -2513,6 +2513,23 @@ export const en: AppDict = {
         pendiente: 'Pending',
       },
     },
+    cuentaPagar: {
+      name: 'Accounts payable',
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Type',
+        numero: 'Number',
+        fecha: 'Date',
+        fechaVence: 'Due',
+        identificacion: 'Identification',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        afectado: 'Applied',
+        pendiente: 'Pending',
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:

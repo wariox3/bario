@@ -68,6 +68,10 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.cuentaCobrar.name',
               path: 'informes/cuenta-cobrar',
             },
+            {
+              labelKey: 'entities.cuentaPagar.name',
+              path: 'informes/cuenta-pagar',
+            },
           ],
         },
       ],

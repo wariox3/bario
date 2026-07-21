@@ -2551,6 +2551,23 @@ export const es: AppDict = {
         pendiente: 'Pendiente',
       },
     },
+    cuentaPagar: {
+      name: 'Cuentas por pagar',
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Tipo',
+        numero: 'Número',
+        fecha: 'Fecha',
+        fechaVence: 'Vence',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        afectado: 'Afectado',
+        pendiente: 'Pendiente',
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:

@@ -51,6 +51,11 @@ export const TESORERIA_ROUTES: Route[] = [
             (m) => m.CUENTA_BANCO_ROUTES,
           ),
       },
+      {
+        path: 'informes/cuenta-pagar',
+        loadChildren: () =>
+          import('./informes/cuenta-pagar/cuenta-pagar.routes').then((m) => m.CUENTA_PAGAR_ROUTES),
+      },
     ],
   },
 ];
