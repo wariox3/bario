@@ -190,7 +190,6 @@
       <app-comercial-documento-detalles
         [detalles]="form.controls.detalles"
         [documentId]="documentId()"
-        [importEnabled]="true"
         [contactoId]="form.controls.contacto.value?.id ?? null"
         (imported)="onImported()"
       />
