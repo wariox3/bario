@@ -44,6 +44,13 @@ export const VENTA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'factura-venta-recurrente',
+        loadChildren: () =>
+          import('./documentos/factura-venta-recurrente/factura-venta-recurrente.routes').then(
+            (m) => m.FACTURA_VENTA_RECURRENTE_ROUTES,
+          ),
+      },
+      {
         path: 'contrato-servicio',
         loadChildren: () =>
           import('./documentos/contrato-servicio/contrato-servicio.routes').then(

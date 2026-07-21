@@ -1229,6 +1229,65 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    facturaVentaRecurrente: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     facturaCompra: {
       name: string;
       columns: {

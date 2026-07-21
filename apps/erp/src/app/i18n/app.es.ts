@@ -1726,6 +1726,86 @@ export const es: AppDict = {
         },
       },
     },
+    facturaVentaRecurrente: {
+      name: 'Factura recurrente',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva factura recurrente',
+        editTitle: 'Editar factura recurrente',
+        sectionHint: 'Plantilla desde la que se generan las facturas de venta',
+        fields: {
+          cliente: 'Cliente',
+          clientePlaceholder: 'Buscar cliente…',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          plazoPagoPlaceholder: 'Selecciona…',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
+          metodoPago: 'Método de pago',
+          metodoPagoPlaceholder: 'Selecciona…',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Factura creada',
+            desc: 'La factura recurrente se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la factura recurrente',
+          },
+          editSuccess: {
+            title: 'Factura actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la factura recurrente',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          cliente: 'Cliente',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          plazoPago: 'Plazo de pago',
+          sede: 'Sede',
+          metodoPago: 'Método de pago',
+        },
+        notFound: {
+          title: 'Factura no encontrada',
+          desc: 'La factura que buscas no existe o fue eliminada.',
+        },
+      },
+    },
     facturaCompra: {
       name: 'Factura de compra',
       columns: {
