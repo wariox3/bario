@@ -122,30 +122,21 @@ export class WorkspaceLayoutComponent {
     return this.buildPath(leaf.path);
   }
 
-  /** Indica si un leaf item debe marcarse como activo según la URL actual. */
+  /**
+   * Indica si un leaf item debe marcarse como activo según la URL actual.
+   *
+   * El match usa `leaf.activeMatch` (la raíz declarada por los documentos) o,
+   * en su defecto, el propio `path`. Así el layout no infiere la raíz recortando
+   * sufijos: cada item declara qué prefijo lo activa.
+   */
   protected isLeafActive(leaf: SidebarLeafItem): boolean {
-    const contextPath = this.buildPath(this.leafContextPath(leaf.path));
+    const contextPath = this.buildPath(leaf.activeMatch ?? leaf.path);
     return this.router.isActive(contextPath, {
       paths: 'subset',
       queryParams: 'ignored',
       matrixParams: 'ignored',
       fragment: 'ignored',
     });
-  }
-
-  /**
-   * Raíz del bounded context de un leaf, para el match de activo. Los leafs de
-   * documentos apuntan a `<doc>/list` pero sus páginas hermanas (`new`, `edit`,
-   * detalle) viven bajo `<doc>/`, así que se recorta solo ese sufijo. Cualquier
-   * otro path (informes, procesos, masters) ya es la raíz de su contexto —
-   * recortar su último segmento marcaría activos a todos los que comparten
-   * prefijo (ej. `informes/*`).
-   */
-  private leafContextPath(relativePath: string): string {
-    const segments = relativePath.split('/');
-    return segments.length > 1 && segments[segments.length - 1] === 'list'
-      ? segments.slice(0, -1).join('/')
-      : relativePath;
   }
 
   private buildPath(relativePath: string): string {

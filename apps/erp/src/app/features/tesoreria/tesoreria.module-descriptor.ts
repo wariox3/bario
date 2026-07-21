@@ -22,7 +22,7 @@ export const TESORERIA_MODULE: ErpModuleDescriptor = {
       defaultExpanded: true,
       groups: [
         {
-          items: [{ labelKey: 'entities.egreso.name', path: 'egreso/list' }],
+          items: [{ labelKey: 'entities.egreso.name', path: 'egreso/list', activeMatch: 'egreso' }],
         },
       ],
     },

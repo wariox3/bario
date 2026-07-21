@@ -16,10 +16,18 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.facturaVenta.name', path: 'factura-venta/list' },
-            { labelKey: 'entities.facturaCompra.name', path: 'factura-compra/list' },
-            { labelKey: 'entities.pago.name', path: 'pago/list' },
-            { labelKey: 'entities.egreso.name', path: 'egreso/list' },
+            {
+              labelKey: 'entities.facturaVenta.name',
+              path: 'factura-venta/list',
+              activeMatch: 'factura-venta',
+            },
+            {
+              labelKey: 'entities.facturaCompra.name',
+              path: 'factura-compra/list',
+              activeMatch: 'factura-compra',
+            },
+            { labelKey: 'entities.pago.name', path: 'pago/list', activeMatch: 'pago' },
+            { labelKey: 'entities.egreso.name', path: 'egreso/list', activeMatch: 'egreso' },
           ],
         },
       ],
