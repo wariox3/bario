@@ -1848,6 +1848,24 @@ export interface AppDict
         valorPendiente: string;
       };
     };
+    ventaItem: {
+      name: string;
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        itemId: string;
+        item: string;
+        cantidad: string;
+        precio: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+      };
+    };
     regenerarAfectado: {
       name: string;
       description: string;

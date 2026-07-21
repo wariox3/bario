@@ -43,5 +43,22 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
         },
       ],
     },
+    {
+      kind: 'accordion',
+      id: 'general-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.ventaItem.name',
+              path: 'informes/venta-item',
+            },
+          ],
+        },
+      ],
+    },
   ],
 };

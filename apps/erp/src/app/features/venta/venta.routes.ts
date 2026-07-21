@@ -72,6 +72,11 @@ export const VENTA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/venta-item',
+        loadChildren: () =>
+          import('./informes/venta-item/venta-item.routes').then((m) => m.VENTA_ITEM_ROUTES),
+      },
+      {
         // Master compartido: el código vive en general/masters/resolucion, pero
         // se enruta desde Venta con `data: { tipo: 'venta' }` para fijar el flag.
         path: 'resoluciones',

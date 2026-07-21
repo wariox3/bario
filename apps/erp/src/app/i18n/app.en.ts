@@ -2478,6 +2478,24 @@ export const en: AppDict = {
         valorPendiente: 'Pending',
       },
     },
+    ventaItem: {
+      name: 'Sales by item',
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Type',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'Identification',
+        contacto: 'Contact',
+        itemId: 'Item ID',
+        item: 'Item',
+        cantidad: 'Qty',
+        precio: 'Price',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:

@@ -93,6 +93,14 @@ export const GENERAL_ROUTES: Route[] = [
         path: 'sedes',
         loadChildren: () => import('./masters/sede/sede.routes').then((m) => m.SEDE_ROUTES),
       },
+      // Informe compartido: el código vive en venta/informes, pero se enruta
+      // también desde General. Su página deriva el módulo del `ActiveModuleStore`
+      // (fijado arriba), así que la navegación se queda acá.
+      {
+        path: 'informes/venta-item',
+        loadChildren: () =>
+          import('../venta/informes/venta-item/venta-item.routes').then((m) => m.VENTA_ITEM_ROUTES),
+      },
       // Futuros: almacenes, formas-pago, resoluciones.
       // Cada uno delega a su `masters/<entity>/<entity>.routes.ts`.
     ],

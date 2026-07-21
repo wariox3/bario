@@ -84,6 +84,10 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.pendienteFacturar.name',
               path: 'informes/pendiente-facturar',
             },
+            {
+              labelKey: 'entities.ventaItem.name',
+              path: 'informes/venta-item',
+            },
           ],
         },
       ],

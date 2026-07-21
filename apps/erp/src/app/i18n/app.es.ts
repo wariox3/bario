@@ -2516,6 +2516,24 @@ export const es: AppDict = {
         valorPendiente: 'Vr pendiente',
       },
     },
+    ventaItem: {
+      name: 'Ventas por ítem',
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Tipo',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        itemId: 'ID ítem',
+        item: 'Ítem',
+        cantidad: 'Cant.',
+        precio: 'Precio',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:
