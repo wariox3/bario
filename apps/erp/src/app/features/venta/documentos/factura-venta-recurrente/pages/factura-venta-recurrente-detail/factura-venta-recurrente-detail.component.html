@@ -33,10 +33,6 @@
   }
 </header>
 
-<p-confirmDialog />
-
-<app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
-
 @if (isLoading()) {
   <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->
   <div
@@ -134,3 +130,7 @@
     </div>
   </section>
 }
+
+<p-confirmDialog />
+
+<app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
