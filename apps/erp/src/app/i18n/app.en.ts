@@ -1673,6 +1673,90 @@ export const en: AppDict = {
         },
       },
     },
+    remision: {
+      name: 'Delivery note',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Voi',
+        contabilizado: 'Pos',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New delivery note',
+        editTitle: 'Edit delivery note',
+        sectionHint: 'Main document details',
+        fields: {
+          cliente: 'Customer',
+          clientePlaceholder: 'Search customer…',
+          fecha: 'Date',
+          sede: 'Branch',
+          sedePlaceholder: 'Select…',
+          almacen: 'Warehouse',
+          almacenPlaceholder: 'Select…',
+          asesor: 'Sales rep',
+          asesorPlaceholder: 'Select…',
+          comentario: 'Comment',
+          comentarioPlaceholder: 'Delivery note remarks…',
+        },
+        validation: {
+          required: 'This field is required',
+          comentarioMax: 'Maximum 500 characters',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Delivery note created',
+            desc: 'The delivery note was created successfully',
+          },
+          createError: {
+            title: 'Creation failed',
+            desc: 'The delivery note could not be created',
+          },
+          editSuccess: {
+            title: 'Delivery note updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The delivery note could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Details',
+        },
+        labels: {
+          numero: 'Number',
+          cliente: 'Customer',
+          fecha: 'Date',
+          sede: 'Branch',
+          almacen: 'Warehouse',
+          asesor: 'Sales rep',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Delivery note not found',
+          desc: 'The delivery note you are looking for does not exist or was deleted.',
+        },
+      },
+    },
     facturaVenta: {
       name: 'Sales invoice',
       columns: {

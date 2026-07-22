@@ -33,6 +33,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'pedido-cliente',
             },
             {
+              labelKey: 'entities.remision.name',
+              path: 'remision/list',
+              activeMatch: 'remision',
+            },
+            {
               labelKey: 'entities.contratoServicio.name',
               path: 'contrato-servicio/list',
               activeMatch: 'contrato-servicio',

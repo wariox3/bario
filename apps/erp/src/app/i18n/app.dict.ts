@@ -1217,6 +1217,66 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    remision: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          sede: string;
+          sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
+        };
+        validation: { required: string; comentarioMax: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          fecha: string;
+          sede: string;
+          almacen: string;
+          asesor: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     facturaVenta: {
       name: string;
       columns: {

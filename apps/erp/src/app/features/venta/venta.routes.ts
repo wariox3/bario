@@ -44,6 +44,11 @@ export const VENTA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'remision',
+        loadChildren: () =>
+          import('./documentos/remision/remision.routes').then((m) => m.REMISION_ROUTES),
+      },
+      {
         path: 'factura-venta',
         loadChildren: () =>
           import('./documentos/factura-venta/factura-venta.routes').then(

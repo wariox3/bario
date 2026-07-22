@@ -1714,6 +1714,90 @@ export const es: AppDict = {
         },
       },
     },
+    remision: {
+      name: 'Remisión',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva remisión',
+        editTitle: 'Editar remisión',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          cliente: 'Cliente',
+          clientePlaceholder: 'Buscar cliente…',
+          fecha: 'Fecha',
+          sede: 'Sede',
+          sedePlaceholder: 'Selecciona…',
+          almacen: 'Almacén',
+          almacenPlaceholder: 'Selecciona…',
+          asesor: 'Asesor',
+          asesorPlaceholder: 'Selecciona…',
+          comentario: 'Comentario',
+          comentarioPlaceholder: 'Observaciones de la remisión…',
+        },
+        validation: {
+          required: 'Este campo es requerido',
+          comentarioMax: 'Máximo 500 caracteres',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Remisión creada',
+            desc: 'La remisión se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la remisión',
+          },
+          editSuccess: {
+            title: 'Remisión actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la remisión',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          cliente: 'Cliente',
+          fecha: 'Fecha',
+          sede: 'Sede',
+          almacen: 'Almacén',
+          asesor: 'Asesor',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Remisión no encontrada',
+          desc: 'La remisión que buscas no existe o fue eliminada.',
+        },
+      },
+    },
     facturaVenta: {
       name: 'Factura de venta',
       columns: {
