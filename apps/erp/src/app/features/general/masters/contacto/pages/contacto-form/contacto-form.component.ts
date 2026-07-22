@@ -127,6 +127,15 @@ export class ContactoFormComponent implements OnInit {
 
   /** El endpoint de precio devuelve listas de venta y compra; filtramos venta. */
   protected readonly precioParams: Record<string, string> = { venta: 'True' };
+
+  /**
+   * El endpoint `asesor/seleccionar/` rompe la convención `{ id, nombre }` y
+   * devuelve `nombre_corto`; sin este `displayWith` el `<lib-api-select>` (que
+   * pinta `nombre`) mostraría la opción en blanco.
+   */
+  protected readonly asesorLabel = (option: ErpSelectOption): string =>
+    (option['nombre_corto'] as string | undefined) ?? option.nombre ?? '';
+
   protected readonly form = this.fb.group({
     tipo_persona: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     responsabilidad: this.fb.control<ErpSelectOption | null>(null, Validators.required),
