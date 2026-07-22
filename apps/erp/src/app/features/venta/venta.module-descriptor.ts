@@ -28,6 +28,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
         {
           items: [
             {
+              labelKey: 'entities.pedidoCliente.name',
+              path: 'pedido-cliente/list',
+              activeMatch: 'pedido-cliente',
+            },
+            {
               labelKey: 'entities.contratoServicio.name',
               path: 'contrato-servicio/list',
               activeMatch: 'contrato-servicio',

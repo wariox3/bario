@@ -1645,6 +1645,75 @@ export const es: AppDict = {
         },
       },
     },
+    pedidoCliente: {
+      name: 'Pedido de cliente',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nuevo pedido de cliente',
+        editTitle: 'Editar pedido de cliente',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          cliente: 'Cliente',
+          clientePlaceholder: 'Buscar cliente…',
+          fecha: 'Fecha',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Pedido creado',
+            desc: 'El pedido de cliente se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear el pedido de cliente',
+          },
+          editSuccess: {
+            title: 'Pedido actualizado',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar el pedido de cliente',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          detalles: 'Detalles',
+        },
+        labels: {
+          numero: 'Número',
+          cliente: 'Cliente',
+          fecha: 'Fecha',
+        },
+        notFound: {
+          title: 'Pedido no encontrado',
+          desc: 'El pedido que buscas no existe o fue eliminado.',
+        },
+      },
+    },
     facturaVenta: {
       name: 'Factura de venta',
       columns: {

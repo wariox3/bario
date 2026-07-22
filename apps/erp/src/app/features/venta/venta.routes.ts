@@ -37,6 +37,13 @@ export const VENTA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'pedido-cliente',
+        loadChildren: () =>
+          import('./documentos/pedido-cliente/pedido-cliente.routes').then(
+            (m) => m.PEDIDO_CLIENTE_ROUTES,
+          ),
+      },
+      {
         path: 'factura-venta',
         loadChildren: () =>
           import('./documentos/factura-venta/factura-venta.routes').then(
