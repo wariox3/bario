@@ -41,7 +41,7 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import { ALMACEN_ENDPOINT, SEDE_ENDPOINT } from '../../remision.constants';
+import { SEDE_ENDPOINT } from '../../remision.constants';
 import { remisionToFormValue, formValueToPayload } from '../../remision.mapper';
 import type { RemisionRead } from '../../remision.model';
 
@@ -55,10 +55,10 @@ import type { RemisionRead } from '../../remision.model';
  * `ENTITY_DATA_GATEWAY`.
  *
  * La remisión es una entrega física (mueve inventario): su cabecera —fiel al
- * legacy— lleva cliente, fecha, sede, **almacén**, asesor y comentario. Sin
- * plazo/vencimiento/método de pago. La **tabla de detalles** —compartida entre
- * documentos comerciales— se compone vía `<app-comercial-documento-detalles>`
- * recibiendo el `FormArray` de líneas.
+ * legacy— lleva cliente, fecha, sede, asesor y comentario. Sin plazo/vencimiento/
+ * método de pago. La **tabla de detalles** —compartida entre documentos
+ * comerciales— se compone vía `<app-comercial-documento-detalles>` recibiendo el
+ * `FormArray` de líneas.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -100,7 +100,6 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
-  protected readonly almacenEndpoint = ALMACEN_ENDPOINT;
   protected readonly asesorEndpoint = SELECT_ENDPOINTS.asesor;
 
   /** Filtra el autocomplete de contacto a clientes. */
@@ -143,7 +142,6 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
     contacto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
-    almacen: this.fb.control<ErpSelectOption | null>(null),
     asesor: this.fb.control<ErpSelectOption | null>(null),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),

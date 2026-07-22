@@ -6,9 +6,10 @@
  * **extienden** el contrato base común a cualquier documento (`Documento*Base` en
  * `@reddoc/core`), agregando lo propio de la remisión.
  *
- * La remisión es una **entrega física** (mueve inventario): de ahí el campo
- * `almacen`. La cabecera replica lo que renderiza el legacy: cliente, fecha, sede,
- * almacén, asesor y comentario. Sin plazo/vencimiento/método de pago.
+ * La remisión es una **entrega física** (mueve inventario). La cabecera replica
+ * lo que renderiza el legacy: cliente, fecha, sede, asesor y comentario. Sin
+ * plazo/vencimiento/método de pago. (Almacén pendiente: el endpoint del legacy
+ * aún no está confirmado en el backend nuevo.)
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
@@ -19,8 +20,6 @@ export interface RemisionRead extends DocumentoReadBase {
   readonly numero: string | null;
   readonly sede: number | null;
   readonly sede_nombre?: string | null;
-  readonly almacen: number | null;
-  readonly almacen_nombre?: string | null;
   readonly asesor: number | null;
   readonly asesor_nombre?: string | null;
   readonly comentario: string | null;
@@ -29,7 +28,6 @@ export interface RemisionRead extends DocumentoReadBase {
 /** Body (POST/PATCH) de una remisión. */
 export interface RemisionPayload extends DocumentoPayloadBase {
   readonly sede: number | null;
-  readonly almacen: number | null;
   readonly asesor: number | null;
   readonly comentario: string | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */

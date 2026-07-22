@@ -2,8 +2,6 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
 
 /** Endpoint `seleccionar` de sedes. */
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
-/** Endpoint `seleccionar` de almacenes (esquema de inventario). */
-export const ALMACEN_ENDPOINT = '/inventario/almacen/seleccionar/';
 
 /**
  * Columnas visibles del listado de Remisión.

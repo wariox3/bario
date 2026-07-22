@@ -15,7 +15,6 @@ export function remisionToFormValue(
       read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
     fecha: fromIsoDate(read.fecha),
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
-    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     asesor: read.asesor != null ? { id: read.asesor, nombre: read.asesor_nombre ?? '' } : null,
     comentario: read.comentario ?? null,
   };
@@ -39,7 +38,6 @@ export function formValueToPayload(
     contacto: raw.contacto?.id ?? null,
     fecha: toIsoDate(raw.fecha),
     sede: raw.sede?.id ?? null,
-    almacen: raw.almacen?.id ?? null,
     asesor: raw.asesor?.id ?? null,
     comentario: comentario ? comentario : null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
