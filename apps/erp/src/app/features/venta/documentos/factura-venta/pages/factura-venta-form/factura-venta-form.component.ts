@@ -160,6 +160,27 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       destroyRef: this.destroyRef,
       endpoint: this.plazoPagoEndpoint,
     });
+
+    // Al elegir cliente, adopta su plazo de pago por defecto. Cambiar el plazo
+    // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
+    // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
+    this.form.controls.contacto.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((contacto) => this.aplicarPlazoDesdeCliente(contacto));
+  }
+
+  /**
+   * Setea `plazo_pago` con el plazo por defecto del cliente (`plazo_pago_id` del
+   * endpoint `contacto/seleccionar/`). Solo el `id` importa: el `<lib-api-select>`
+   * resuelve la etiqueta contra sus opciones cargadas y el autocálculo del
+   * vencimiento deriva los días. No hace nada si el cliente no trae plazo o si ya
+   * es el seleccionado (evita recomputar en vano).
+   */
+  private aplicarPlazoDesdeCliente(contacto: ErpSelectOption | null): void {
+    const plazoId = contacto?.['plazo_pago_id'];
+    if (typeof plazoId !== 'number') return;
+    if (this.form.controls.plazo_pago.value?.id === plazoId) return;
+    this.form.controls.plazo_pago.setValue({ id: plazoId, nombre: '' });
   }
 
   ngOnInit(): void {
