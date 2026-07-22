@@ -13,7 +13,7 @@ import type { CuentaPagar } from './cuenta-pagar.model';
  * Identificador del informe que el backend lee del body para acotar `documento`
  * a las cuentas por pagar aprobadas con saldo pendiente.
  */
-export const CUENTA_PAGAR_INFORME = 'cuenta_pagar';
+export const CUENTA_PAGAR_INFORME = 'pagar_pendiente';
 
 /** Endpoint del informe (acciones: `lista/`, `exportar/`). */
 export const CUENTA_PAGAR_ENDPOINT = '/general/documento-informe/';

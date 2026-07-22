@@ -13,7 +13,7 @@ import type { CuentaCobrar } from './cuenta-cobrar.model';
  * Identificador del informe que el backend lee del body para acotar `documento`
  * a las cuentas por cobrar aprobadas con saldo pendiente.
  */
-export const CUENTA_COBRAR_INFORME = 'cuenta_cobrar';
+export const CUENTA_COBRAR_INFORME = 'cobrar_pendiente';
 
 /** Endpoint del informe (acciones: `lista/`, `exportar/`). */
 export const CUENTA_COBRAR_ENDPOINT = '/general/documento-informe/';
