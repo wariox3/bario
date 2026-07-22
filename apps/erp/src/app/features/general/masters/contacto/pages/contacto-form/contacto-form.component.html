@@ -377,12 +377,7 @@
             <label for="asesor" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.asesor }}
             </label>
-            <lib-api-select
-              inputId="asesor"
-              formControlName="asesor"
-              [endpoint]="endpoints.asesor"
-              [displayWith]="asesorLabel"
-            />
+            <lib-asesor-select inputId="asesor" formControlName="asesor" />
           </div>
 
           <!-- Correo facturación electrónica -->

@@ -104,10 +104,9 @@
           <label for="asesor" class="remision-form__label">
             {{ t().entities.remision.form.fields.asesor }}
           </label>
-          <lib-api-select
+          <lib-asesor-select
             inputId="asesor"
             formControlName="asesor"
-            [endpoint]="asesorEndpoint"
             [placeholder]="t().entities.remision.form.fields.asesorPlaceholder"
           />
         </div>

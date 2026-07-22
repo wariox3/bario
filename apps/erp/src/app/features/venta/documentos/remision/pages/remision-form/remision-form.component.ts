@@ -27,9 +27,12 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
-import { ErpContactoSelectComponent, ErpApiSelectComponent } from '@reddoc/ui';
+import {
+  ErpContactoSelectComponent,
+  ErpApiSelectComponent,
+  ErpAsesorSelectComponent,
+} from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { SELECT_ENDPOINTS } from '@reddoc/core';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
@@ -75,6 +78,7 @@ import type { RemisionRead } from '../../remision.model';
     FieldErrorComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
+    ErpAsesorSelectComponent,
     ComercialDocumentoDetallesComponent,
   ],
   providers: [ConfirmationService],
@@ -100,7 +104,6 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
-  protected readonly asesorEndpoint = SELECT_ENDPOINTS.asesor;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
