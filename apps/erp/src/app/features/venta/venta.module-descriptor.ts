@@ -53,6 +53,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'factura-venta',
             },
             {
+              labelKey: 'entities.facturaPos.name',
+              path: 'factura-pos/list',
+              activeMatch: 'factura-pos',
+            },
+            {
               labelKey: 'entities.facturaVentaRecurrente.name',
               path: 'factura-venta-recurrente/list',
               activeMatch: 'factura-venta-recurrente',

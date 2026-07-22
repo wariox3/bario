@@ -1334,6 +1334,89 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    facturaPos: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          ordenCompra: string;
+          ordenCompraPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
+        };
+        validation: { required: string; ordenCompraMax: string; comentarioMax: string };
+        pagos: {
+          title: string;
+          hint: string;
+          add: string;
+          empty: string;
+          cuentaBanco: string;
+          cuentaBancoPlaceholder: string;
+          monto: string;
+          totalDocumento: string;
+          totalRecibido: string;
+          saldo: string;
+          excedenHint: string;
+          toasts: { exceden: { title: string; desc: string } };
+        };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string; pagos: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+          asesor: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     facturaVentaRecurrente: {
       name: string;
       columns: {

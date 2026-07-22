@@ -1,0 +1,343 @@
+@let f = t().entities.facturaPos.form;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Información general ──────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file-edit text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ isEditMode() ? f.editTitle : f.createTitle }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.sectionHint }}</p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Cliente -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="contacto" class="factura-pos-form__label">
+            {{ f.fields.cliente }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-contacto-select
+            inputId="contacto"
+            formControlName="contacto"
+            [extraParams]="contactoParams"
+            [placeholder]="f.fields.clientePlaceholder"
+            [invalid]="form.controls.contacto.invalid && form.controls.contacto.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.contacto"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Fechas (emisión + vencimiento) -->
+        <div class="grid grid-cols-2 gap-x-4 gap-y-4">
+          <!-- Fecha -->
+          <div class="flex flex-col gap-1.5">
+            <label for="fecha" class="factura-pos-form__label">
+              {{ f.fields.fecha }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-datepicker
+              inputId="fecha"
+              formControlName="fecha"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fecha"
+              [messages]="{ required: f.validation.required }"
+            />
+          </div>
+
+          <!-- Fecha de vencimiento -->
+          <div class="flex flex-col gap-1.5">
+            <label for="fecha_vence" class="factura-pos-form__label">
+              {{ f.fields.fechaVence }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-datepicker
+              inputId="fecha_vence"
+              formControlName="fecha_vence"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fecha_vence"
+              [messages]="{ required: f.validation.required }"
+            />
+          </div>
+        </div>
+
+        <!-- Plazo de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="plazo_pago" class="factura-pos-form__label">
+            {{ f.fields.plazoPago }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="plazo_pago"
+            formControlName="plazo_pago"
+            [endpoint]="plazoPagoEndpoint"
+            [placeholder]="f.fields.plazoPagoPlaceholder"
+            [invalid]="form.controls.plazo_pago.invalid && form.controls.plazo_pago.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.plazo_pago"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Método de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="metodo_pago" class="factura-pos-form__label">
+            {{ f.fields.metodoPago }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="metodo_pago"
+            formControlName="metodo_pago"
+            [endpoint]="metodoPagoEndpoint"
+            [placeholder]="f.fields.metodoPagoPlaceholder"
+            [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.metodo_pago"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Sede -->
+        <div class="flex flex-col gap-1.5">
+          <label for="sede" class="factura-pos-form__label">{{ f.fields.sede }}</label>
+          <lib-api-select
+            inputId="sede"
+            formControlName="sede"
+            [endpoint]="sedeEndpoint"
+            [placeholder]="f.fields.sedePlaceholder"
+          />
+        </div>
+
+        <!-- Asesor -->
+        <div class="flex flex-col gap-1.5">
+          <label for="asesor" class="factura-pos-form__label">{{ f.fields.asesor }}</label>
+          <lib-asesor-select
+            inputId="asesor"
+            formControlName="asesor"
+            [placeholder]="f.fields.asesorPlaceholder"
+          />
+        </div>
+
+        <!-- Orden de compra -->
+        <div class="flex flex-col gap-1.5">
+          <label for="orden_compra" class="factura-pos-form__label">
+            {{ f.fields.ordenCompra }}
+          </label>
+          <input
+            pInputText
+            id="orden_compra"
+            formControlName="orden_compra"
+            [fluid]="true"
+            [placeholder]="f.fields.ordenCompraPlaceholder"
+            [invalid]="form.controls.orden_compra.invalid && form.controls.orden_compra.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.orden_compra"
+            [messages]="{ maxlength: f.validation.ordenCompraMax }"
+          />
+        </div>
+
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="factura-pos-form__label">{{ f.fields.comentario }}</label>
+          <textarea
+            pTextarea
+            id="comentario"
+            formControlName="comentario"
+            rows="3"
+            [fluid]="true"
+            [placeholder]="f.fields.comentarioPlaceholder"
+            [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
+          ></textarea>
+          <lib-field-error
+            [control]="form.controls.comentario"
+            [messages]="{ maxlength: f.validation.comentarioMax }"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sección: Detalles (líneas comerciales) ───────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-list text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ t().entities.comercialDetalle.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ t().entities.comercialDetalle.hint }}</p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <app-comercial-documento-detalles
+        [detalles]="form.controls.detalles"
+        [documentId]="documentId()"
+        [importEnabled]="true"
+        [contactoId]="form.controls.contacto.value?.id ?? null"
+        (imported)="onImported()"
+      />
+    </div>
+  </section>
+
+  <!-- ── Sección: Pagos (punto de venta) ──────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-wallet text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ f.pagos.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.pagos.hint }}</p>
+      </div>
+      <p-button
+        type="button"
+        [label]="f.pagos.add"
+        icon="pi pi-plus"
+        size="small"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="addPago()"
+      />
+    </div>
+
+    <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      @if (pagos.length === 0) {
+        <p class="m-0 py-4 text-center text-[0.8rem] text-brand-muted">{{ f.pagos.empty }}</p>
+      } @else {
+        <div class="flex flex-col gap-3" formArrayName="pagos">
+          @for (pago of pagos.controls; track pago; let i = $index) {
+            <div class="flex items-end gap-3" [formGroupName]="i">
+              <!-- Cuenta de banco -->
+              <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+                <label [for]="'pago-cuenta-' + i" class="factura-pos-form__label">
+                  {{ f.pagos.cuentaBanco }}
+                  <span class="ml-px text-red-500">*</span>
+                </label>
+                <lib-api-select
+                  [inputId]="'pago-cuenta-' + i"
+                  formControlName="cuenta_banco"
+                  [endpoint]="cuentaBancoEndpoint"
+                  [placeholder]="f.pagos.cuentaBancoPlaceholder"
+                  [invalid]="
+                    pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched
+                  "
+                />
+              </div>
+
+              <!-- Monto -->
+              <div class="flex w-40 flex-col gap-1.5">
+                <label [for]="'pago-monto-' + i" class="factura-pos-form__label">
+                  {{ f.pagos.monto }}
+                </label>
+                <p-inputnumber
+                  [inputId]="'pago-monto-' + i"
+                  formControlName="pago"
+                  mode="currency"
+                  currency="COP"
+                  locale="es-CO"
+                  [min]="0"
+                  [fluid]="true"
+                />
+              </div>
+
+              <p-button
+                type="button"
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                [ariaLabel]="t().common.actions.delete"
+                (onClick)="removePago(i)"
+              />
+            </div>
+          }
+        </div>
+
+        <!-- Resumen de pagos -->
+        <dl
+          class="flex flex-col gap-1.5 rounded-lg bg-[rgba(20,48,73,0.03)] px-4 py-3 text-[0.82rem]"
+        >
+          <div class="flex items-center justify-between">
+            <dt class="text-brand-muted">{{ f.pagos.totalDocumento }}</dt>
+            <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(totalGeneral()) }}</dd>
+          </div>
+          <div class="flex items-center justify-between">
+            <dt class="text-brand-muted">{{ f.pagos.totalRecibido }}</dt>
+            <dd class="m-0 font-semibold" [class.text-red-600]="pagosExceden()">
+              {{ formatMoney(totalPagos()) }}
+            </dd>
+          </div>
+          <div
+            class="flex items-center justify-between border-t border-[rgba(20,48,73,0.08)] pt-1.5"
+          >
+            <dt class="text-brand-muted">{{ f.pagos.saldo }}</dt>
+            <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(saldoPendiente()) }}</dd>
+          </div>
+          @if (pagosExceden()) {
+            <p class="m-0 mt-1 text-[0.78rem] text-red-600">{{ f.pagos.excedenHint }}</p>
+          }
+        </dl>
+      }
+    </div>
+  </section>
+</form>
+
+<p-confirmdialog />
