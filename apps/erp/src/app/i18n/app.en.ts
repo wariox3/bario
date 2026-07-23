@@ -1896,6 +1896,23 @@ export const en: AppDict = {
       },
       filters: { aprobado: 'Approved', anulado: 'Voided', contabilizado: 'Posted' },
     },
+    notaDebito: {
+      name: 'Debit note',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Voi',
+        contabilizado: 'Pos',
+      },
+      filters: { aprobado: 'Approved', anulado: 'Voided', contabilizado: 'Posted' },
+    },
     notaVenta: {
       form: {
         createHint: 'Main details of the new note',

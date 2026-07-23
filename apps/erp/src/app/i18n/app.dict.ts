@@ -1406,6 +1406,24 @@ export interface AppDict
       };
       filters: { aprobado: string; anulado: string; contabilizado: string };
     };
+    /** Nota débito de venta (tipo 3). Listado; form/ficha en `notaVenta`. */
+    notaDebito: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: { aprobado: string; anulado: string; contabilizado: string };
+    };
     /**
      * Textos del **form y la ficha compartidos por las notas de venta** (nota
      * crédito, nota débito). El nombre del documento no vive acá: lo resuelve cada

@@ -72,6 +72,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               path: 'nota-credito/list',
               activeMatch: 'nota-credito',
             },
+            {
+              labelKey: 'entities.notaDebito.name',
+              path: 'nota-debito/list',
+              activeMatch: 'nota-debito',
+            },
           ],
         },
       ],
