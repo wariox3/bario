@@ -32,8 +32,8 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { facturaPosToFormValue } from '../../factura-pos.mapper';
-import type { FacturaPosRead } from '../../factura-pos.model';
+import { posDocumentoToFormValue } from '../../pos-documento.mapper';
+import type { PosDocumentoRead } from '../../pos-documento.model';
 
 /** Fila de pago legible para la ficha (cuenta de banco + monto). */
 interface PagoView {
@@ -62,17 +62,19 @@ interface CabeceraView {
 }
 
 /**
- * Ficha (detalle) de una **Factura POS** (familia comercial) — solo lectura.
+ * Ficha (detalle) de un **documento POS** — solo lectura. La comparten todos los
+ * documentos de la familia (factura POS, factura POS electrónica…): la cabecera
+ * es idéntica entre ellos y el documento concreto lo aporta el
+ * `DocumentEntityConfig` inyectado por `activeDocumentResolver`.
  *
- * Camino A del enfoque híbrido: la cabecera comercial es específica de cada
- * documento (de ahí que viva en `factura-pos/` y no en un `_shared`), pero la
- * tabla de líneas y el resumen los aporta la familia comercial. Carga cabecera
- * (`ENTITY_DATA_GATEWAY.getById`) y líneas (`DocumentoDetalleService`) en paralelo
- * —igual que el form— y las muestra sin formularios. Suma la lista de pagos
- * recibidos en el punto de venta. Desde aquí se vuelve a la lista o se edita.
+ * Camino A del enfoque híbrido: la tabla de líneas y el resumen los aporta la
+ * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas
+ * (`DocumentoDetalleService`) en paralelo —igual que el form— y las muestra sin
+ * formularios. Suma la lista de pagos recibidos en el punto de venta. Desde aquí
+ * se vuelve a la lista o se edita.
  */
 @Component({
-  selector: 'app-factura-pos-detail',
+  selector: 'app-pos-documento-detail',
   standalone: true,
   imports: [
     ButtonModule,
@@ -85,10 +87,10 @@ interface CabeceraView {
     AfectacionModalComponent,
   ],
   providers: [ConfirmationService],
-  templateUrl: './factura-pos-detail.component.html',
-  styleUrl: './factura-pos-detail.component.scss',
+  templateUrl: './pos-documento-detail.component.html',
+  styleUrl: './pos-documento-detail.component.scss',
 })
-export class FacturaPosDetailComponent implements OnInit {
+export class PosDocumentoDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly tenant = inject(TenantService);
@@ -272,8 +274,8 @@ export class FacturaPosDetailComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ cabecera, lineas }) => {
-          const read = cabecera as FacturaPosRead;
-          const fv = facturaPosToFormValue(read);
+          const read = cabecera as PosDocumentoRead;
+          const fv = posDocumentoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
             cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
@@ -305,7 +307,7 @@ export class FacturaPosDetailComponent implements OnInit {
         error: () => {
           this.isLoading.set(false);
           this.notFound.set(true);
-          const toasts = this.t().entities.facturaPos.form.toasts;
+          const toasts = this.t().entities.posDocumento.form.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });

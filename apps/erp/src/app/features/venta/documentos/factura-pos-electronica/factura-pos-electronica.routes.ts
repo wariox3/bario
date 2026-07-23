@@ -3,13 +3,13 @@ import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/modu
 import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
 
 /**
- * Rutas de **Factura POS** (punto de venta).
+ * Rutas de **Factura POS electrónica** (punto de venta transmitido a la DIAN).
  *
  * Este documento aporta solo su config y sus rutas: las páginas las pone la
- * familia POS (`documentos/_shared/pos/`), que comparte con la factura POS
- * electrónica. Lo único que los distingue es el `documento_tipo` del config.
+ * familia POS (`documentos/_shared/pos/`), que comparte con la factura POS. Lo
+ * único que los distingue es el `documento_tipo` del config.
  *
- * El `activeDocumentResolver('factura-pos')` deja la config en
+ * El `activeDocumentResolver('factura-pos-electronica')` deja la config en
  * `ModuleNavigationStore` (y la inyecta como `document` por herencia a los
  * hijos) antes de montar la lista — el módulo padre (`venta.routes.ts`) ya cargó
  * `VENTA_CONFIG`.
@@ -17,10 +17,10 @@ import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
  * `nuevo` / `editar` comparten el `PosDocumentoFormComponent` (cabecera + pagos);
  * `detalle` muestra la ficha solo lectura (`PosDocumentoDetailComponent`).
  */
-export const FACTURA_POS_ROUTES: Route[] = [
+export const FACTURA_POS_ELECTRONICA_ROUTES: Route[] = [
   {
     path: '',
-    resolve: { document: activeDocumentResolver('factura-pos') },
+    resolve: { document: activeDocumentResolver('factura-pos-electronica') },
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'list' },
       {

@@ -1897,10 +1897,33 @@ export const es: AppDict = {
         electronico: 'Electrónico',
         contabilizado: 'Contabilizado',
       },
+    },
+    facturaPosElectronica: {
+      name: 'Factura POS electrónica',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        electronico: 'Electrónico',
+        contabilizado: 'Contabilizado',
+      },
+    },
+    posDocumento: {
       form: {
-        createTitle: 'Nueva factura POS',
-        editTitle: 'Editar factura POS',
-        sectionHint: 'Datos principales del documento',
+        createHint: 'Datos principales del nuevo documento',
+        editHint: 'Actualiza los datos del documento',
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -1945,15 +1968,15 @@ export const es: AppDict = {
         },
         toasts: {
           createSuccess: {
-            title: 'Factura creada',
-            desc: 'La factura POS se creó correctamente',
+            title: 'Documento creado',
+            desc: 'El documento se creó correctamente',
           },
           createError: {
             title: 'Error al crear',
-            desc: 'No se pudo crear la factura POS',
+            desc: 'No se pudo crear el documento',
           },
           editSuccess: {
-            title: 'Factura actualizada',
+            title: 'Documento actualizado',
             desc: 'Los cambios se guardaron correctamente',
           },
           editError: {
@@ -1962,7 +1985,7 @@ export const es: AppDict = {
           },
           loadError: {
             title: 'Error al cargar',
-            desc: 'No se pudo cargar la factura POS',
+            desc: 'No se pudo cargar el documento',
           },
         },
       },
@@ -1985,8 +2008,8 @@ export const es: AppDict = {
           comentario: 'Comentario',
         },
         notFound: {
-          title: 'Factura no encontrada',
-          desc: 'La factura que buscas no existe o fue eliminada.',
+          title: 'Documento no encontrado',
+          desc: 'El documento que buscas no existe o fue eliminado.',
         },
       },
     },

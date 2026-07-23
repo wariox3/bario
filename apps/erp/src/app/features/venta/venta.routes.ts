@@ -61,6 +61,13 @@ export const VENTA_ROUTES: Route[] = [
           import('./documentos/factura-pos/factura-pos.routes').then((m) => m.FACTURA_POS_ROUTES),
       },
       {
+        path: 'factura-pos-electronica',
+        loadChildren: () =>
+          import('./documentos/factura-pos-electronica/factura-pos-electronica.routes').then(
+            (m) => m.FACTURA_POS_ELECTRONICA_ROUTES,
+          ),
+      },
+      {
         path: 'factura-venta-recurrente',
         loadChildren: () =>
           import('./documentos/factura-venta-recurrente/factura-venta-recurrente.routes').then(

@@ -1,4 +1,4 @@
-@let det = t().entities.facturaPos.detail;
+@let det = t().entities.posDocumento.detail;
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
@@ -74,53 +74,53 @@
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
       <div class="flex flex-col gap-0.5">
-        <dt class="factura-pos-detail__label">{{ det.labels.numero }}</dt>
-        <dd class="factura-pos-detail__value">{{ c.numero || '—' }}</dd>
+        <dt class="pos-documento-detail__label">{{ det.labels.numero }}</dt>
+        <dd class="pos-documento-detail__value">{{ c.numero || '—' }}</dd>
       </div>
       @if (c.cliente) {
         <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-          <dt class="factura-pos-detail__label">{{ det.labels.cliente }}</dt>
-          <dd class="factura-pos-detail__value">{{ c.cliente }}</dd>
+          <dt class="pos-documento-detail__label">{{ det.labels.cliente }}</dt>
+          <dd class="pos-documento-detail__value">{{ c.cliente }}</dd>
         </div>
       }
       <div class="flex flex-col gap-0.5">
-        <dt class="factura-pos-detail__label">{{ det.labels.fecha }}</dt>
-        <dd class="factura-pos-detail__value">{{ formatFecha(c.fecha) }}</dd>
+        <dt class="pos-documento-detail__label">{{ det.labels.fecha }}</dt>
+        <dd class="pos-documento-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="factura-pos-detail__label">{{ det.labels.fechaVence }}</dt>
-        <dd class="factura-pos-detail__value">{{ formatFecha(c.fechaVence) }}</dd>
+        <dt class="pos-documento-detail__label">{{ det.labels.fechaVence }}</dt>
+        <dd class="pos-documento-detail__value">{{ formatFecha(c.fechaVence) }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="factura-pos-detail__label">{{ det.labels.plazoPago }}</dt>
-        <dd class="factura-pos-detail__value">{{ c.plazoPago || '—' }}</dd>
+        <dt class="pos-documento-detail__label">{{ det.labels.plazoPago }}</dt>
+        <dd class="pos-documento-detail__value">{{ c.plazoPago || '—' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="factura-pos-detail__label">{{ det.labels.metodoPago }}</dt>
-        <dd class="factura-pos-detail__value">{{ c.metodoPago || '—' }}</dd>
+        <dt class="pos-documento-detail__label">{{ det.labels.metodoPago }}</dt>
+        <dd class="pos-documento-detail__value">{{ c.metodoPago || '—' }}</dd>
       </div>
       @if (c.sede) {
         <div class="flex flex-col gap-0.5">
-          <dt class="factura-pos-detail__label">{{ det.labels.sede }}</dt>
-          <dd class="factura-pos-detail__value">{{ c.sede }}</dd>
+          <dt class="pos-documento-detail__label">{{ det.labels.sede }}</dt>
+          <dd class="pos-documento-detail__value">{{ c.sede }}</dd>
         </div>
       }
       @if (c.asesor) {
         <div class="flex flex-col gap-0.5">
-          <dt class="factura-pos-detail__label">{{ det.labels.asesor }}</dt>
-          <dd class="factura-pos-detail__value">{{ c.asesor }}</dd>
+          <dt class="pos-documento-detail__label">{{ det.labels.asesor }}</dt>
+          <dd class="pos-documento-detail__value">{{ c.asesor }}</dd>
         </div>
       }
       @if (c.ordenCompra) {
         <div class="flex flex-col gap-0.5">
-          <dt class="factura-pos-detail__label">{{ det.labels.ordenCompra }}</dt>
-          <dd class="factura-pos-detail__value">{{ c.ordenCompra }}</dd>
+          <dt class="pos-documento-detail__label">{{ det.labels.ordenCompra }}</dt>
+          <dd class="pos-documento-detail__value">{{ c.ordenCompra }}</dd>
         </div>
       }
       @if (c.comentario) {
         <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-          <dt class="factura-pos-detail__label">{{ det.labels.comentario }}</dt>
-          <dd class="factura-pos-detail__value">{{ c.comentario }}</dd>
+          <dt class="pos-documento-detail__label">{{ det.labels.comentario }}</dt>
+          <dd class="pos-documento-detail__value">{{ c.comentario }}</dd>
         </div>
       }
     </dl>

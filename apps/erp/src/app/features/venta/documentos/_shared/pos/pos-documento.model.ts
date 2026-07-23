@@ -1,15 +1,18 @@
 /**
- * Contratos de datos de la **cabecera** de Factura POS (punto de venta).
+ * Contratos de datos de la **cabecera** de los documentos POS (punto de venta):
+ * factura POS (27) y factura POS electrónica (24).
  *
- * Camino A del enfoque híbrido: el documento vive sobre el endpoint genérico
- * `/api/general/documento` discriminado por `documento_tipo` (27). Las interfaces
+ * Camino A del enfoque híbrido: los documentos viven sobre el endpoint genérico
+ * `/api/general/documento` discriminado por `documento_tipo`. Las interfaces
  * **extienden** el contrato base común (`Documento*Base` en `@reddoc/core`),
- * agregando lo propio del POS.
+ * agregando lo propio del POS. La cabecera es idéntica entre los documentos de
+ * la familia: lo único que los distingue es el `documento_tipo`, que aporta el
+ * `DocumentEntityConfig` de cada uno.
  *
- * La factura POS es una factura de venta que además **se cobra en el acto**: de
- * ahí la lista de `pagos` (uno por cuenta de banco) que no tiene la factura de
- * venta normal. Fuera de eso la cabecera es la misma (contacto, fechas, plazo,
- * método de pago, sede) más asesor, orden de compra y comentario.
+ * Un POS es una factura de venta que además **se cobra en el acto**: de ahí la
+ * lista de `pagos` (uno por cuenta de banco) que no tiene la factura de venta
+ * normal. Fuera de eso la cabecera es la misma (contacto, fechas, plazo, método
+ * de pago, sede) más asesor, orden de compra y comentario.
  *
  * Nota: la sección de pagos (`pagos`/`pago`) es una **asunción de contrato**
  * calcada del legacy (`{ cuenta_banco, pago }` embebido en el payload del
@@ -27,8 +30,8 @@ export interface PagoRead {
   readonly pago: string | number | null;
 }
 
-/** Read-model (GET `/documento/:id/`) de la cabecera de una factura POS. */
-export interface FacturaPosRead extends DocumentoReadBase {
+/** Read-model (GET `/documento/:id/`) de la cabecera de un documento POS. */
+export interface PosDocumentoRead extends DocumentoReadBase {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   readonly fecha_vence: string | null;
@@ -53,8 +56,8 @@ export interface PagoPayload {
   readonly pago: string;
 }
 
-/** Body (POST/PATCH) de una factura POS. */
-export interface FacturaPosPayload extends DocumentoPayloadBase {
+/** Body (POST/PATCH) de un documento POS. */
+export interface PosDocumentoPayload extends DocumentoPayloadBase {
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly sede: number | null;

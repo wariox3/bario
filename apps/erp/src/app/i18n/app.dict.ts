@@ -1355,10 +1355,43 @@ export interface AppDict
         electronico: string;
         contabilizado: string;
       };
+    };
+    /**
+     * Factura POS electrónica (tipo 24). Mismo listado que la factura POS: las
+     * páginas (form y detalle) las comparte la familia y viven en
+     * `posDocumento`; acá solo van el nombre visible y las etiquetas del listado.
+     */
+    facturaPosElectronica: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+    };
+    /**
+     * Textos del **form y la ficha compartidos por la familia POS** (factura POS,
+     * factura POS electrónica…). El nombre del documento no vive acá: lo resuelve
+     * cada página desde el `displayNameKey` de su `DocumentEntityConfig`.
+     */
+    posDocumento: {
       form: {
-        createTitle: string;
-        editTitle: string;
-        sectionHint: string;
+        createHint: string;
+        editHint: string;
         fields: {
           cliente: string;
           clientePlaceholder: string;

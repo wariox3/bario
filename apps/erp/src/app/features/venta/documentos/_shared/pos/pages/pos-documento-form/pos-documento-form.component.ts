@@ -53,7 +53,7 @@ import {
   CUENTA_BANCO_ENDPOINT,
   METODO_PAGO_ENDPOINT,
   SEDE_ENDPOINT,
-} from '../../factura-pos.constants';
+} from '../../pos-documento.constants';
 import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
@@ -64,9 +64,9 @@ import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/
 import { toLineaCalculo } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { facturaPosToFormValue, formValueToPayload } from '../../factura-pos.mapper';
-import type { FacturaPosRead, PagoRead } from '../../factura-pos.model';
-import type { PagoFormRawValue } from '../../factura-pos-form.types';
+import { posDocumentoToFormValue, formValueToPayload } from '../../pos-documento.mapper';
+import type { PosDocumentoRead, PagoRead } from '../../pos-documento.model';
+import type { PagoFormRawValue } from '../../pos-documento-form.types';
 
 /** Grupo reactivo de una fila de pago (cuenta de banco + monto). */
 export type PagoGroup = FormGroup<{
@@ -75,14 +75,17 @@ export type PagoGroup = FormGroup<{
 }>;
 
 /**
- * Formulario de alta/edición de la **cabecera** de una Factura POS (punto de venta).
+ * Formulario de alta/edición de la **cabecera** de un documento POS (punto de
+ * venta). Lo comparten todos los documentos de la familia (factura POS, factura
+ * POS electrónica…): la cabecera es idéntica entre ellos y lo único que los
+ * distingue —el `documento_tipo`— sale de la config inyectada.
  *
  * Camino A del enfoque híbrido: el documento vive sobre el endpoint genérico
  * `/api/general/documento` (discriminado por `documento_tipo`). El form recibe el
  * `DocumentEntityConfig` por input binding (resuelto por `activeDocumentResolver`)
- * y deriva de él el `documentTypeId`, las claves i18n y la ruta de la lista.
+ * y deriva de él el `documentTypeId`, el nombre visible y la ruta de la lista.
  *
- * La factura POS es una factura de venta que además **se cobra en el acto**: a la
+ * Un POS es una factura de venta que además **se cobra en el acto**: a la
  * cabecera comercial (contacto, fechas, plazo, método de pago, sede, asesor,
  * orden de compra, comentario) le suma una **sección de pagos** —un `FormArray`
  * de `{ cuenta_banco, monto }`— que no tiene la factura de venta normal. La
@@ -92,7 +95,7 @@ export type PagoGroup = FormGroup<{
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
 @Component({
-  selector: 'app-factura-pos-form',
+  selector: 'app-pos-documento-form',
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -110,10 +113,10 @@ export type PagoGroup = FormGroup<{
     ComercialDocumentoDetallesComponent,
   ],
   providers: [ConfirmationService],
-  templateUrl: './factura-pos-form.component.html',
-  styleUrl: './factura-pos-form.component.scss',
+  templateUrl: './pos-documento-form.component.html',
+  styleUrl: './pos-documento-form.component.scss',
 })
-export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
+export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate {
   private readonly fb = inject(FormBuilder);
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
@@ -182,6 +185,15 @@ export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
   );
   /** `true` cuando lo recibido supera el total del documento (bloquea el guardado). */
   protected readonly pagosExceden = computed(() => this.totalPagos() > this.totalGeneral());
+
+  /**
+   * Nombre del documento activo (Factura POS, Factura POS electrónica…). La
+   * página la comparte toda la familia POS: el título sale de la config, no de
+   * un literal i18n propio de un documento.
+   */
+  protected readonly documentName = computed(() =>
+    this.i18n.translate(this.document().displayNameKey),
+  );
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     documentoBreadcrumb(
@@ -284,7 +296,7 @@ export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
     // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
     const prefetched = this.documentoEdit();
     if (prefetched) {
-      this.applyCabecera(prefetched as FacturaPosRead);
+      this.applyCabecera(prefetched as PosDocumentoRead);
       this.loadLineas(Number(id));
     } else {
       this.loadDocumento(Number(id));
@@ -296,7 +308,7 @@ export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
 
     // Validación propia del POS: lo recibido no puede superar el total.
     if (this.pagosExceden()) {
-      const toast = this.t().entities.facturaPos.form.pagos.toasts.exceden;
+      const toast = this.t().entities.posDocumento.form.pagos.toasts.exceden;
       this.toast.warn(toast.title, toast.desc);
       return;
     }
@@ -337,7 +349,7 @@ export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
   private persistCabecera(id: string | undefined): void {
-    const toasts = this.t().entities.facturaPos.form.toasts;
+    const toasts = this.t().entities.posDocumento.form.toasts;
     // En edición se omiten los detalles del payload: ya transaccionaron en vivo.
     const payload = formValueToPayload(
       this.form.getRawValue(),
@@ -420,7 +432,7 @@ export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ cabecera, lineas }) => {
-          this.applyCabecera(cabecera as FacturaPosRead);
+          this.applyCabecera(cabecera as PosDocumentoRead);
           this.populateLineas(lineas);
         },
         error: () => this.notifyLoadError(),
@@ -443,8 +455,8 @@ export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
    * y respetar el vencimiento que viene del backend. Los pagos se reconstruyen
    * aparte (van en un `FormArray`, no en `patchValue`).
    */
-  private applyCabecera(read: FacturaPosRead): void {
-    const value = facturaPosToFormValue(read);
+  private applyCabecera(read: PosDocumentoRead): void {
+    const value = posDocumentoToFormValue(read);
     this.form.patchValue(value, { emitEvent: false });
     this.populatePagos(read.pagos ?? []);
   }
@@ -476,7 +488,7 @@ export class FacturaPosFormComponent implements OnInit, CanComponentDeactivate {
   }
 
   private notifyLoadError(): void {
-    const toasts = this.t().entities.facturaPos.form.toasts;
+    const toasts = this.t().entities.posDocumento.form.toasts;
     this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
 

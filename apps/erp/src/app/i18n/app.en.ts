@@ -1856,10 +1856,33 @@ export const en: AppDict = {
         electronico: 'Electronic',
         contabilizado: 'Posted',
       },
+    },
+    facturaPosElectronica: {
+      name: 'Electronic POS invoice',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Voi',
+        contabilizado: 'Pos',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        electronico: 'Electronic',
+        contabilizado: 'Posted',
+      },
+    },
+    posDocumento: {
       form: {
-        createTitle: 'New POS invoice',
-        editTitle: 'Edit POS invoice',
-        sectionHint: 'Main document details',
+        createHint: 'Main details of the new document',
+        editHint: 'Update the document details',
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -1904,15 +1927,15 @@ export const en: AppDict = {
         },
         toasts: {
           createSuccess: {
-            title: 'Invoice created',
-            desc: 'The POS invoice was created successfully',
+            title: 'Document created',
+            desc: 'The document was created successfully',
           },
           createError: {
             title: 'Creation failed',
-            desc: 'The POS invoice could not be created',
+            desc: 'The document could not be created',
           },
           editSuccess: {
-            title: 'Invoice updated',
+            title: 'Document updated',
             desc: 'Changes were saved successfully',
           },
           editError: {
@@ -1921,7 +1944,7 @@ export const en: AppDict = {
           },
           loadError: {
             title: 'Load failed',
-            desc: 'The POS invoice could not be loaded',
+            desc: 'The document could not be loaded',
           },
         },
       },
@@ -1944,8 +1967,8 @@ export const en: AppDict = {
           comentario: 'Comment',
         },
         notFound: {
-          title: 'Invoice not found',
-          desc: 'The invoice you are looking for does not exist or was deleted.',
+          title: 'Document not found',
+          desc: 'The document you are looking for does not exist or was deleted.',
         },
       },
     },
