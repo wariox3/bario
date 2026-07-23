@@ -212,137 +212,146 @@
     </div>
   </section>
 
-  <!-- ── Sección: Detalles (líneas comerciales) ───────────────────────────── -->
+  <!-- ── Sección: Líneas y pagos ──────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-      <span
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-list text-[1.05rem]"></i>
-      </span>
-      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.comercialDetalle.title }}
-        </h2>
-        <p class="m-0 text-[0.75rem] text-brand-muted">{{ t().entities.comercialDetalle.hint }}</p>
-      </div>
-    </div>
-
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <app-comercial-documento-detalles
-        [detalles]="form.controls.detalles"
-        [documentId]="documentId()"
-        [importEnabled]="true"
-        [contactoId]="form.controls.contacto.value?.id ?? null"
-        (imported)="onImported()"
-      />
-    </div>
-  </section>
+      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
+        <p-tablist>
+          <p-tab value="detalles">{{ f.tabs.detalles }}</p-tab>
+          <p-tab value="pagos">
+            {{ f.tabs.pagos }}
+            <!-- Los pagos quedan tras un clic, pero el cajero necesita saber si están
+                 en orden desde la pestaña de detalles: el chip lleva el conteo y se
+                 tiñe cuando lo recibido supera el total (lo mismo que bloquea guardar). -->
+            @if (pagos.length > 0) {
+              <span
+                class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+                [class]="
+                  pagosExceden()
+                    ? 'bg-red-50 text-red-600'
+                    : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
+                "
+              >
+                {{ pagos.length }}
+              </span>
+            }
+          </p-tab>
+        </p-tablist>
 
-  <!-- ── Sección: Pagos (punto de venta) ──────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-      <span
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-wallet text-[1.05rem]"></i>
-      </span>
-      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-          {{ f.pagos.title }}
-        </h2>
-        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.pagos.hint }}</p>
-      </div>
-      <p-button
-        type="button"
-        [label]="f.pagos.add"
-        icon="pi pi-plus"
-        size="small"
-        severity="secondary"
-        [outlined]="true"
-        (onClick)="addPago()"
-      />
-    </div>
+        <p-tabpanels>
+          <p-tabpanel value="detalles">
+            <app-comercial-documento-detalles
+              [detalles]="form.controls.detalles"
+              [documentId]="documentId()"
+              [importEnabled]="true"
+              [contactoId]="form.controls.contacto.value?.id ?? null"
+              (imported)="onImported()"
+            />
+          </p-tabpanel>
 
-    <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      @if (pagos.length === 0) {
-        <p class="m-0 py-4 text-center text-[0.8rem] text-brand-muted">{{ f.pagos.empty }}</p>
-      } @else {
-        <div class="flex flex-col gap-3" formArrayName="pagos">
-          @for (pago of pagos.controls; track pago; let i = $index) {
-            <div class="flex items-end gap-3" [formGroupName]="i">
-              <!-- Cuenta de banco -->
-              <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-                <label [for]="'pago-cuenta-' + i" class="pos-documento-form__label">
-                  {{ f.pagos.cuentaBanco }}
-                  <span class="ml-px text-red-500">*</span>
-                </label>
-                <lib-api-select
-                  [inputId]="'pago-cuenta-' + i"
-                  formControlName="cuenta_banco"
-                  [endpoint]="cuentaBancoEndpoint"
-                  [placeholder]="f.pagos.cuentaBancoPlaceholder"
-                  [invalid]="
-                    pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched
-                  "
+          <p-tabpanel value="pagos">
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center gap-3">
+                <p class="m-0 flex-1 text-[0.75rem] text-brand-muted">{{ f.pagos.hint }}</p>
+                <p-button
+                  type="button"
+                  [label]="f.pagos.add"
+                  icon="pi pi-plus"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="addPago()"
                 />
               </div>
 
-              <!-- Monto -->
-              <div class="flex w-40 flex-col gap-1.5">
-                <label [for]="'pago-monto-' + i" class="pos-documento-form__label">
-                  {{ f.pagos.monto }}
-                </label>
-                <p-inputnumber
-                  [inputId]="'pago-monto-' + i"
-                  formControlName="pago"
-                  mode="currency"
-                  currency="COP"
-                  locale="es-CO"
-                  [min]="0"
-                  [fluid]="true"
-                />
-              </div>
+              @if (pagos.length === 0) {
+                <p class="m-0 py-4 text-center text-[0.8rem] text-brand-muted">
+                  {{ f.pagos.empty }}
+                </p>
+              } @else {
+                <div class="flex flex-col gap-3" formArrayName="pagos">
+                  @for (pago of pagos.controls; track pago; let i = $index) {
+                    <div class="flex items-end gap-3" [formGroupName]="i">
+                      <!-- Cuenta de banco -->
+                      <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+                        <label [for]="'pago-cuenta-' + i" class="pos-documento-form__label">
+                          {{ f.pagos.cuentaBanco }}
+                          <span class="ml-px text-red-500">*</span>
+                        </label>
+                        <lib-api-select
+                          [inputId]="'pago-cuenta-' + i"
+                          formControlName="cuenta_banco"
+                          [endpoint]="cuentaBancoEndpoint"
+                          [placeholder]="f.pagos.cuentaBancoPlaceholder"
+                          [invalid]="
+                            pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched
+                          "
+                        />
+                      </div>
 
-              <p-button
-                type="button"
-                icon="pi pi-trash"
-                severity="danger"
-                [text]="true"
-                [rounded]="true"
-                size="small"
-                [ariaLabel]="t().common.actions.delete"
-                (onClick)="removePago(i)"
-              />
+                      <!-- Monto -->
+                      <div class="flex w-40 flex-col gap-1.5">
+                        <label [for]="'pago-monto-' + i" class="pos-documento-form__label">
+                          {{ f.pagos.monto }}
+                        </label>
+                        <p-inputnumber
+                          [inputId]="'pago-monto-' + i"
+                          formControlName="pago"
+                          mode="currency"
+                          currency="COP"
+                          locale="es-CO"
+                          [min]="0"
+                          [fluid]="true"
+                        />
+                      </div>
+
+                      <p-button
+                        type="button"
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [text]="true"
+                        [rounded]="true"
+                        size="small"
+                        [ariaLabel]="t().common.actions.delete"
+                        (onClick)="removePago(i)"
+                      />
+                    </div>
+                  }
+                </div>
+
+                <!-- Resumen de pagos -->
+                <dl
+                  class="flex flex-col gap-1.5 rounded-lg bg-[rgba(20,48,73,0.03)] px-4 py-3 text-[0.82rem]"
+                >
+                  <div class="flex items-center justify-between">
+                    <dt class="text-brand-muted">{{ f.pagos.totalDocumento }}</dt>
+                    <dd class="m-0 font-semibold text-brand-text">
+                      {{ formatMoney(totalGeneral()) }}
+                    </dd>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <dt class="text-brand-muted">{{ f.pagos.totalRecibido }}</dt>
+                    <dd class="m-0 font-semibold" [class.text-red-600]="pagosExceden()">
+                      {{ formatMoney(totalPagos()) }}
+                    </dd>
+                  </div>
+                  <div
+                    class="flex items-center justify-between border-t border-[rgba(20,48,73,0.08)] pt-1.5"
+                  >
+                    <dt class="text-brand-muted">{{ f.pagos.saldo }}</dt>
+                    <dd class="m-0 font-semibold text-brand-text">
+                      {{ formatMoney(saldoPendiente()) }}
+                    </dd>
+                  </div>
+                  @if (pagosExceden()) {
+                    <p class="m-0 mt-1 text-[0.78rem] text-red-600">{{ f.pagos.excedenHint }}</p>
+                  }
+                </dl>
+              }
             </div>
-          }
-        </div>
-
-        <!-- Resumen de pagos -->
-        <dl
-          class="flex flex-col gap-1.5 rounded-lg bg-[rgba(20,48,73,0.03)] px-4 py-3 text-[0.82rem]"
-        >
-          <div class="flex items-center justify-between">
-            <dt class="text-brand-muted">{{ f.pagos.totalDocumento }}</dt>
-            <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(totalGeneral()) }}</dd>
-          </div>
-          <div class="flex items-center justify-between">
-            <dt class="text-brand-muted">{{ f.pagos.totalRecibido }}</dt>
-            <dd class="m-0 font-semibold" [class.text-red-600]="pagosExceden()">
-              {{ formatMoney(totalPagos()) }}
-            </dd>
-          </div>
-          <div
-            class="flex items-center justify-between border-t border-[rgba(20,48,73,0.08)] pt-1.5"
-          >
-            <dt class="text-brand-muted">{{ f.pagos.saldo }}</dt>
-            <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(saldoPendiente()) }}</dd>
-          </div>
-          @if (pagosExceden()) {
-            <p class="m-0 mt-1 text-[0.78rem] text-red-600">{{ f.pagos.excedenHint }}</p>
-          }
-        </dl>
-      }
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </section>
 </form>

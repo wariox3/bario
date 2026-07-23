@@ -25,6 +25,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
 import { FieldErrorComponent } from '@reddoc/ui';
 import {
@@ -105,6 +106,7 @@ export type PagoGroup = FormGroup<{
     DatePickerModule,
     InputNumberModule,
     InputTextModule,
+    TabsModule,
     TextareaModule,
     FieldErrorComponent,
     ErpContactoSelectComponent,
@@ -135,6 +137,13 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
+
+  /**
+   * Tab activo del bloque de líneas (Detalles / Pagos). Mismo patrón que la
+   * factura de compra: los dos bloques de filas del documento comparten una card
+   * en vez de apilarse.
+   */
+  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
@@ -306,8 +315,11 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   protected onSubmit(): void {
     if (this.form.invalid || this.form.pending || this.isSaving()) return;
 
-    // Validación propia del POS: lo recibido no puede superar el total.
+    // Validación propia del POS: lo recibido no puede superar el total. Con los
+    // pagos tras un tab, avisar sin más dejaría al usuario buscando el error:
+    // se abre la pestaña que lo contiene antes de reportarlo.
     if (this.pagosExceden()) {
+      this.activeTab.set('pagos');
       const toast = this.t().entities.posDocumento.form.pagos.toasts.exceden;
       this.toast.warn(toast.title, toast.desc);
       return;
@@ -320,6 +332,8 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
     // flushean las pendientes; si hay líneas incompletas se avisa y se aborta.
     if (id && detalles) {
       if (detalles.hasInvalidPending()) {
+        // Igual que con los pagos: abrir la pestaña del error antes de avisarlo.
+        this.activeTab.set('detalles');
         const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
         this.toast.warn(toast.title, toast.desc);
         return;
