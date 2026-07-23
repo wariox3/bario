@@ -1879,10 +1879,29 @@ export const en: AppDict = {
         contabilizado: 'Posted',
       },
     },
+    documentoPago: {
+      hint: 'Payments received for the document',
+      add: 'Add payment',
+      empty: 'No payments registered',
+      cuentaBanco: 'Bank account',
+      cuentaBancoPlaceholder: 'Select…',
+      monto: 'Amount',
+      totalDocumento: 'Document total',
+      totalRecibido: 'Total received',
+      saldo: 'Outstanding balance',
+      excedenHint: 'Payments exceed the document total',
+      toasts: {
+        exceden: {
+          title: 'Invalid payments',
+          desc: 'The total received cannot exceed the document total',
+        },
+      },
+    },
     posDocumento: {
       form: {
         createHint: 'Main details of the new document',
         editHint: 'Update the document details',
+        pagosHint: 'Payments received at the point of sale',
         tabs: { detalles: 'Details', pagos: 'Payments', informacion: 'More information' },
         fields: {
           cliente: 'Customer',
@@ -1906,25 +1925,6 @@ export const en: AppDict = {
           required: 'This field is required',
           ordenCompraMax: 'Max 50 characters',
           comentarioMax: 'Max 500 characters',
-        },
-        pagos: {
-          title: 'Payments',
-          hint: 'Payments received at the point of sale',
-          add: 'Add payment',
-          empty: 'No payments registered',
-          cuentaBanco: 'Bank account',
-          cuentaBancoPlaceholder: 'Select…',
-          monto: 'Amount',
-          totalDocumento: 'Document total',
-          totalRecibido: 'Total received',
-          saldo: 'Outstanding balance',
-          excedenHint: 'Payments exceed the document total',
-          toasts: {
-            exceden: {
-              title: 'Invalid payments',
-              desc: 'The total received cannot exceed the document total',
-            },
-          },
         },
         toasts: {
           createSuccess: {

@@ -20,15 +20,7 @@
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-
-/** Pago del POS leído desde la API (una fila de la tabla de pagos). */
-export interface PagoRead {
-  readonly id: number | null;
-  readonly cuenta_banco: number | null;
-  readonly cuenta_banco_nombre?: string | null;
-  /** Monto del pago como string con cola de decimales (`"50000.00"`). */
-  readonly pago: string | number | null;
-}
+import type { PagoPayload, PagoRead } from '@erp/features/documentos/pagos/pago.model';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un documento POS. */
 export interface PosDocumentoRead extends DocumentoReadBase {
@@ -47,13 +39,6 @@ export interface PosDocumentoRead extends DocumentoReadBase {
   readonly comentario: string | null;
   /** Pagos recibidos en el punto de venta. */
   readonly pagos?: readonly PagoRead[] | null;
-}
-
-/** Body (POST/PATCH) de un pago del POS. */
-export interface PagoPayload {
-  readonly cuenta_banco: number | null;
-  /** Monto como string con 2 decimales (`"50000.00"`). */
-  readonly pago: string;
 }
 
 /** Body (POST/PATCH) de un documento POS. */

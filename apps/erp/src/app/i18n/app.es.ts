@@ -1920,10 +1920,29 @@ export const es: AppDict = {
         contabilizado: 'Contabilizado',
       },
     },
+    documentoPago: {
+      hint: 'Pagos recibidos del documento',
+      add: 'Agregar pago',
+      empty: 'No hay pagos registrados',
+      cuentaBanco: 'Cuenta de banco',
+      cuentaBancoPlaceholder: 'Selecciona…',
+      monto: 'Monto',
+      totalDocumento: 'Total documento',
+      totalRecibido: 'Total recibido',
+      saldo: 'Saldo pendiente',
+      excedenHint: 'Los pagos superan el total del documento',
+      toasts: {
+        exceden: {
+          title: 'Pagos inválidos',
+          desc: 'El total recibido no puede superar el total del documento',
+        },
+      },
+    },
     posDocumento: {
       form: {
         createHint: 'Datos principales del nuevo documento',
         editHint: 'Actualiza los datos del documento',
+        pagosHint: 'Cobros recibidos en el punto de venta',
         tabs: { detalles: 'Detalles', pagos: 'Pagos', informacion: 'Más información' },
         fields: {
           cliente: 'Cliente',
@@ -1947,25 +1966,6 @@ export const es: AppDict = {
           required: 'Este campo es requerido',
           ordenCompraMax: 'Máximo 50 caracteres',
           comentarioMax: 'Máximo 500 caracteres',
-        },
-        pagos: {
-          title: 'Pagos',
-          hint: 'Cobros recibidos en el punto de venta',
-          add: 'Agregar pago',
-          empty: 'No hay pagos registrados',
-          cuentaBanco: 'Cuenta de banco',
-          cuentaBancoPlaceholder: 'Selecciona…',
-          monto: 'Monto',
-          totalDocumento: 'Total documento',
-          totalRecibido: 'Total recibido',
-          saldo: 'Saldo pendiente',
-          excedenHint: 'Los pagos superan el total del documento',
-          toasts: {
-            exceden: {
-              title: 'Pagos inválidos',
-              desc: 'El total recibido no puede superar el total del documento',
-            },
-          },
         },
         toasts: {
           createSuccess: {

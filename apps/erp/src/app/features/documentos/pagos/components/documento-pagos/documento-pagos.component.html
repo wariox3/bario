@@ -1,0 +1,87 @@
+@let p = t().entities.documentoPago;
+
+<div class="flex flex-col gap-4">
+  <div class="flex items-center gap-3">
+    <p class="m-0 flex-1 text-[0.75rem] text-brand-muted">{{ hint() ?? p.hint }}</p>
+    <p-button
+      type="button"
+      [label]="p.add"
+      icon="pi pi-plus"
+      size="small"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="addPago()"
+    />
+  </div>
+
+  @if (pagos().length === 0) {
+    <p class="m-0 py-4 text-center text-[0.8rem] text-brand-muted">{{ p.empty }}</p>
+  } @else {
+    <div class="flex flex-col gap-3">
+      @for (pago of pagos().controls; track pago; let i = $index) {
+        <div class="flex items-end gap-3" [formGroup]="pago">
+          <!-- Cuenta de banco -->
+          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <label [for]="'pago-cuenta-' + i" class="documento-pagos__label">
+              {{ p.cuentaBanco }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <lib-api-select
+              [inputId]="'pago-cuenta-' + i"
+              formControlName="cuenta_banco"
+              [endpoint]="cuentaBancoEndpoint"
+              [placeholder]="p.cuentaBancoPlaceholder"
+              [invalid]="pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched"
+            />
+          </div>
+
+          <!-- Monto -->
+          <div class="flex w-40 flex-col gap-1.5">
+            <label [for]="'pago-monto-' + i" class="documento-pagos__label">{{ p.monto }}</label>
+            <p-inputnumber
+              [inputId]="'pago-monto-' + i"
+              formControlName="pago"
+              mode="currency"
+              currency="COP"
+              locale="es-CO"
+              [min]="0"
+              [fluid]="true"
+            />
+          </div>
+
+          <p-button
+            type="button"
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            [ariaLabel]="t().common.actions.delete"
+            (onClick)="removePago(i)"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- Resumen de pagos -->
+    <dl class="flex flex-col gap-1.5 rounded-lg bg-[rgba(20,48,73,0.03)] px-4 py-3 text-[0.82rem]">
+      <div class="flex items-center justify-between">
+        <dt class="text-brand-muted">{{ p.totalDocumento }}</dt>
+        <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(documentTotal()) }}</dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt class="text-brand-muted">{{ p.totalRecibido }}</dt>
+        <dd class="m-0 font-semibold" [class.text-red-600]="excede()">
+          {{ formatMoney(totalPagos()) }}
+        </dd>
+      </div>
+      <div class="flex items-center justify-between border-t border-[rgba(20,48,73,0.08)] pt-1.5">
+        <dt class="text-brand-muted">{{ p.saldo }}</dt>
+        <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(saldoPendiente()) }}</dd>
+      </div>
+      @if (excede()) {
+        <p class="m-0 mt-1 text-[0.78rem] text-red-600">{{ p.excedenHint }}</p>
+      }
+    </dl>
+  }
+</div>

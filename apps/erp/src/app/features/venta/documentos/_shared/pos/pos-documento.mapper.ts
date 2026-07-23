@@ -1,5 +1,6 @@
 import { fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { pagosToPayload } from '@erp/features/documentos/pagos/pago.mapper';
 import type { PosDocumentoPayload, PosDocumentoRead } from './pos-documento.model';
 import type { PosDocumentoFormRawValue } from './pos-documento-form.types';
 
@@ -46,10 +47,6 @@ export function formValueToPayload(
 ): PosDocumentoPayload {
   const comentario = raw.comentario?.trim() ?? '';
   const ordenCompra = raw.orden_compra?.trim() ?? '';
-  const pagos = raw.pagos
-    .filter((p) => p.cuenta_banco?.id != null)
-    .map((p) => ({ cuenta_banco: p.cuenta_banco?.id ?? null, pago: (p.pago ?? 0).toFixed(2) }));
-  const totalPagos = raw.pagos.reduce((acc, p) => acc + (p.pago ?? 0), 0);
 
   return {
     documento_tipo: documentTypeId,
@@ -62,8 +59,7 @@ export function formValueToPayload(
     asesor: raw.asesor?.id ?? null,
     orden_compra: ordenCompra ? ordenCompra : null,
     comentario: comentario ? comentario : null,
-    pago: totalPagos.toFixed(2),
-    pagos,
+    ...pagosToPayload(raw.pagos),
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

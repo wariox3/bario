@@ -1388,10 +1388,29 @@ export interface AppDict
      * factura POS electrónica…). El nombre del documento no vive acá: lo resuelve
      * cada página desde el `displayNameKey` de su `DocumentEntityConfig`.
      */
+    /**
+     * Sección de pagos compartida (`<app-documento-pagos>`): factura POS, nota
+     * crédito de venta y demás documentos que se cobran en el acto.
+     */
+    documentoPago: {
+      hint: string;
+      add: string;
+      empty: string;
+      cuentaBanco: string;
+      cuentaBancoPlaceholder: string;
+      monto: string;
+      totalDocumento: string;
+      totalRecibido: string;
+      saldo: string;
+      excedenHint: string;
+      toasts: { exceden: { title: string; desc: string } };
+    };
     posDocumento: {
       form: {
         createHint: string;
         editHint: string;
+        /** Ayuda de la sección de pagos, matiz propio del POS (cobro en el acto). */
+        pagosHint: string;
         tabs: { detalles: string; pagos: string; informacion: string };
         fields: {
           cliente: string;
@@ -1412,20 +1431,6 @@ export interface AppDict
           comentarioPlaceholder: string;
         };
         validation: { required: string; ordenCompraMax: string; comentarioMax: string };
-        pagos: {
-          title: string;
-          hint: string;
-          add: string;
-          empty: string;
-          cuentaBanco: string;
-          cuentaBancoPlaceholder: string;
-          monto: string;
-          totalDocumento: string;
-          totalRecibido: string;
-          saldo: string;
-          excedenHint: string;
-          toasts: { exceden: { title: string; desc: string } };
-        };
         toasts: {
           createSuccess: { title: string; desc: string };
           createError: { title: string; desc: string };

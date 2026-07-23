@@ -1,16 +1,6 @@
 import type { ErpSelectOption } from '@reddoc/core';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-
-/**
- * Fila de pago del formulario de un documento POS (`form.getRawValue()`).
- *
- * `cuenta_banco` guarda la opción completa (`{ id, nombre }`); `pago` es el monto
- * numérico del `<p-inputnumber>`. El mapper la normaliza a `{ cuenta_banco, pago }`.
- */
-export interface PagoFormRawValue {
-  readonly cuenta_banco: ErpSelectOption | null;
-  readonly pago: number;
-}
+import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 
 /**
  * Valores crudos del formulario de un documento POS (`form.getRawValue()`).

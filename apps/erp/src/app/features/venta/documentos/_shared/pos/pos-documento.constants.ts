@@ -9,8 +9,6 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /** Endpoint `seleccionar` de métodos de pago. */
 export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
-/** Endpoint `seleccionar` de cuentas de banco (destino de los pagos del POS). */
-export const CUENTA_BANCO_ENDPOINT = '/general/cuenta-banco/seleccionar/';
 
 /**
  * Construye las columnas del listado de un documento POS para el namespace i18n

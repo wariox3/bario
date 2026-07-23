@@ -10,20 +10,12 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, forkJoin } from 'rxjs';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
@@ -32,7 +24,6 @@ import {
   FormErrorService,
   I18nService,
   calcularResumen,
-  formatCop,
   startOfToday,
   TenantService,
   ToastService,
@@ -50,11 +41,10 @@ import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-c
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
-import {
-  CUENTA_BANCO_ENDPOINT,
-  METODO_PAGO_ENDPOINT,
-  SEDE_ENDPOINT,
-} from '../../pos-documento.constants';
+import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../pos-documento.constants';
+import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
+import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
+import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
@@ -66,14 +56,8 @@ import { toLineaCalculo } from '@erp/features/documentos/comercial/comercial-doc
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { posDocumentoToFormValue, formValueToPayload } from '../../pos-documento.mapper';
-import type { PosDocumentoRead, PagoRead } from '../../pos-documento.model';
-import type { PagoFormRawValue } from '../../pos-documento-form.types';
-
-/** Grupo reactivo de una fila de pago (cuenta de banco + monto). */
-export type PagoGroup = FormGroup<{
-  cuenta_banco: FormControl<ErpSelectOption | null>;
-  pago: FormControl<number>;
-}>;
+import type { PosDocumentoRead } from '../../pos-documento.model';
+import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un documento POS (punto de
@@ -104,7 +88,6 @@ export type PagoGroup = FormGroup<{
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
-    InputNumberModule,
     InputTextModule,
     TabsModule,
     TextareaModule,
@@ -113,6 +96,7 @@ export type PagoGroup = FormGroup<{
     ErpApiSelectComponent,
     ErpAsesorSelectComponent,
     ComercialDocumentoDetallesComponent,
+    DocumentoPagosComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './pos-documento-form.component.html',
@@ -133,10 +117,17 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   private readonly confirmation = inject(ConfirmationService);
 
   protected readonly t = this.i18n.t;
-  protected readonly formatMoney = formatCop;
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
+
+  /**
+   * Sección de pagos (dentro de su tab). El padre le lee `excede()` para bloquear
+   * el guardado y colorear el chip de la pestaña. El panel del tab está montado
+   * aunque no esté activo (PrimeNG no lo destruye), así que `excede()` es legible
+   * desde cualquier pestaña —mismo patrón que las tablas de la factura de compra.
+   */
+  private readonly pagosPanel = viewChild(DocumentoPagosComponent);
 
   /**
    * Tab activo del bloque de líneas (Detalles / Pagos / Más información). Mismo
@@ -148,7 +139,6 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
-  protected readonly cuentaBancoEndpoint = CUENTA_BANCO_ENDPOINT;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -177,23 +167,14 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
 
   /** Espejo reactivo de las líneas para calcular el total del documento. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
-  /** Espejo reactivo de los pagos para el total recibido y el faltante. */
-  protected readonly pagosMirror = signal<readonly PagoFormRawValue[]>([]);
 
   /** Total del documento (mismo kernel que la tabla de detalles y el resumen). */
   protected readonly totalGeneral = computed(
     () => calcularResumen(this.lines().map(toLineaCalculo)).total,
   );
-  /** Total recibido en pagos. */
-  protected readonly totalPagos = computed(() =>
-    this.pagosMirror().reduce((acc, p) => acc + (p.pago ?? 0), 0),
-  );
-  /** Saldo pendiente por cubrir con pagos (nunca negativo para mostrar). */
-  protected readonly saldoPendiente = computed(() =>
-    Math.max(this.totalGeneral() - this.totalPagos(), 0),
-  );
-  /** `true` cuando lo recibido supera el total del documento (bloquea el guardado). */
-  protected readonly pagosExceden = computed(() => this.totalPagos() > this.totalGeneral());
+
+  /** `true` cuando lo recibido supera el total; lo aporta la sección de pagos. */
+  protected readonly pagosExceden = computed(() => this.pagosPanel()?.excede() ?? false);
 
   /**
    * Nombre del documento activo (Factura POS, Factura POS electrónica…). La
@@ -247,13 +228,11 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((contacto) => this.aplicarPlazoDesdeCliente(contacto));
 
-    // Espejos reactivos para el total del documento y el total recibido.
+    // Espejo reactivo de las líneas para el total del documento (el total recibido
+    // en pagos lo calcula la sección de pagos a partir de su `FormArray`).
     this.form.controls.detalles.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.lines.set(this.form.controls.detalles.getRawValue()));
-    this.form.controls.pagos.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.pagosMirror.set(this.form.controls.pagos.getRawValue()));
   }
 
   /**
@@ -270,32 +249,9 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
     this.form.controls.plazo_pago.setValue({ id: plazoId, nombre: '' });
   }
 
-  // ── Pagos ───────────────────────────────────────────────────────────────────
-
-  /** Getter tipado del `FormArray` de pagos (comodidad para el template). */
+  /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña y la carga). */
   protected get pagos(): FormArray<PagoGroup> {
     return this.form.controls.pagos;
-  }
-
-  /** Crea una fila de pago (cuenta de banco requerida, monto ≥ 0). */
-  private createPagoGroup(value?: PagoFormRawValue): PagoGroup {
-    return this.fb.group({
-      cuenta_banco: this.fb.control<ErpSelectOption | null>(
-        value?.cuenta_banco ?? null,
-        Validators.required,
-      ),
-      pago: this.fb.nonNullable.control<number>(value?.pago ?? 0, Validators.min(0)),
-    }) as PagoGroup;
-  }
-
-  /** Agrega una fila de pago vacía. */
-  protected addPago(): void {
-    this.pagos.push(this.createPagoGroup());
-  }
-
-  /** Quita la fila de pago en `index`. */
-  protected removePago(index: number): void {
-    this.pagos.removeAt(index);
   }
 
   ngOnInit(): void {
@@ -320,7 +276,7 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
     // se abre la pestaña que lo contiene antes de reportarlo.
     if (this.pagosExceden()) {
       this.activeTab.set('pagos');
-      const toast = this.t().entities.posDocumento.form.pagos.toasts.exceden;
+      const toast = this.t().entities.documentoPago.toasts.exceden;
       this.toast.warn(toast.title, toast.desc);
       return;
     }
@@ -479,17 +435,7 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   private populatePagos(pagos: readonly PagoRead[]): void {
     const arr = this.form.controls.pagos;
     arr.clear();
-    for (const pago of pagos)
-      arr.push(
-        this.createPagoGroup({
-          cuenta_banco:
-            pago.cuenta_banco != null
-              ? { id: pago.cuenta_banco, nombre: pago.cuenta_banco_nombre ?? '' }
-              : null,
-          pago: Number(pago.pago ?? 0),
-        }),
-      );
-    this.pagosMirror.set(arr.getRawValue());
+    for (const pago of pagos) arr.push(createPagoGroup(pagoReadToFormValue(pago)));
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
