@@ -188,26 +188,6 @@
             [messages]="{ maxlength: f.validation.ordenCompraMax }"
           />
         </div>
-
-        <!-- Comentario -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2">
-          <label for="comentario" class="pos-documento-form__label">{{
-            f.fields.comentario
-          }}</label>
-          <textarea
-            pTextarea
-            id="comentario"
-            formControlName="comentario"
-            rows="3"
-            [fluid]="true"
-            [placeholder]="f.fields.comentarioPlaceholder"
-            [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
-          ></textarea>
-          <lib-field-error
-            [control]="form.controls.comentario"
-            [messages]="{ maxlength: f.validation.comentarioMax }"
-          />
-        </div>
       </div>
     </div>
   </section>
@@ -236,6 +216,7 @@
               </span>
             }
           </p-tab>
+          <p-tab value="informacion">{{ f.tabs.informacion }}</p-tab>
         </p-tablist>
 
         <p-tabpanels>
@@ -348,6 +329,28 @@
                   }
                 </dl>
               }
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="informacion">
+            <!-- Comentario -->
+            <div class="flex flex-col gap-1.5">
+              <label for="comentario" class="pos-documento-form__label">
+                {{ f.fields.comentario }}
+              </label>
+              <textarea
+                pTextarea
+                id="comentario"
+                formControlName="comentario"
+                rows="4"
+                [fluid]="true"
+                [placeholder]="f.fields.comentarioPlaceholder"
+                [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
+              ></textarea>
+              <lib-field-error
+                [control]="form.controls.comentario"
+                [messages]="{ maxlength: f.validation.comentarioMax }"
+              />
             </div>
           </p-tabpanel>
         </p-tabpanels>

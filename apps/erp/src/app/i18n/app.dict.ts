@@ -1392,7 +1392,7 @@ export interface AppDict
       form: {
         createHint: string;
         editHint: string;
-        tabs: { detalles: string; pagos: string };
+        tabs: { detalles: string; pagos: string; informacion: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;

@@ -1883,7 +1883,7 @@ export const en: AppDict = {
       form: {
         createHint: 'Main details of the new document',
         editHint: 'Update the document details',
-        tabs: { detalles: 'Details', pagos: 'Payments' },
+        tabs: { detalles: 'Details', pagos: 'Payments', informacion: 'More information' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',

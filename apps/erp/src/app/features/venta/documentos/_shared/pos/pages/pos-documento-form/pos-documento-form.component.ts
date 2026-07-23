@@ -139,11 +139,11 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   /**
-   * Tab activo del bloque de líneas (Detalles / Pagos). Mismo patrón que la
-   * factura de compra: los dos bloques de filas del documento comparten una card
-   * en vez de apilarse.
+   * Tab activo del bloque de líneas (Detalles / Pagos / Más información). Mismo
+   * patrón que la factura de compra: los bloques del documento comparten una card
+   * en vez de apilarse. "Más información" agrupa los campos secundarios (comentario).
    */
-  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
+  protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;

@@ -1924,7 +1924,7 @@ export const es: AppDict = {
       form: {
         createHint: 'Datos principales del nuevo documento',
         editHint: 'Actualiza los datos del documento',
-        tabs: { detalles: 'Detalles', pagos: 'Pagos' },
+        tabs: { detalles: 'Detalles', pagos: 'Pagos', informacion: 'Más información' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
