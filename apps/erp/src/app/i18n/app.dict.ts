@@ -1388,6 +1388,71 @@ export interface AppDict
      * factura POS electrónica…). El nombre del documento no vive acá: lo resuelve
      * cada página desde el `displayNameKey` de su `DocumentEntityConfig`.
      */
+    /** Nota crédito de venta (tipo 2). Listado; form/ficha en `notaVenta`. */
+    notaCredito: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: { aprobado: string; anulado: string; contabilizado: string };
+    };
+    /**
+     * Textos del **form y la ficha compartidos por las notas de venta** (nota
+     * crédito, nota débito). El nombre del documento no vive acá: lo resuelve cada
+     * página desde el `displayNameKey` de su `DocumentEntityConfig`.
+     */
+    notaVenta: {
+      form: {
+        createHint: string;
+        editHint: string;
+        tabs: { detalles: string; pagos: string; informacion: string };
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          sede: string;
+          sedePlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
+        };
+        validation: { required: string; comentarioMax: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string; pagos: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          fecha: string;
+          documentoReferencia: string;
+          sede: string;
+          metodoPago: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     /**
      * Sección de pagos compartida (`<app-documento-pagos>`): factura POS, nota
      * crédito de venta y demás documentos que se cobran en el acto.

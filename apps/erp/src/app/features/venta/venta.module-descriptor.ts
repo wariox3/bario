@@ -67,6 +67,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               path: 'factura-venta-recurrente/list',
               activeMatch: 'factura-venta-recurrente',
             },
+            {
+              labelKey: 'entities.notaCredito.name',
+              path: 'nota-credito/list',
+              activeMatch: 'nota-credito',
+            },
           ],
         },
       ],

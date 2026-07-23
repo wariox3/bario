@@ -5,6 +5,7 @@ import { FACTURA_VENTA_CONFIG } from './documentos/factura-venta/factura-venta.c
 import { FACTURA_POS_CONFIG } from './documentos/factura-pos/factura-pos.config';
 import { FACTURA_POS_ELECTRONICA_CONFIG } from './documentos/factura-pos-electronica/factura-pos-electronica.config';
 import { FACTURA_VENTA_RECURRENTE_CONFIG } from './documentos/factura-venta-recurrente/factura-venta-recurrente.config';
+import { NOTA_CREDITO_CONFIG } from './documentos/nota-credito/nota-credito.config';
 import { PEDIDO_CLIENTE_CONFIG } from './documentos/pedido-cliente/pedido-cliente.config';
 import { REMISION_CONFIG } from './documentos/remision/remision.config';
 
@@ -28,6 +29,7 @@ export const VENTA_CONFIG: ModuleConfig = {
     FACTURA_POS_CONFIG,
     FACTURA_POS_ELECTRONICA_CONFIG,
     FACTURA_VENTA_RECURRENTE_CONFIG,
+    NOTA_CREDITO_CONFIG,
     CONTRATO_SERVICIO_CONFIG,
     PEDIDO_SERVICIO_CONFIG,
   ],

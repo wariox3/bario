@@ -75,6 +75,13 @@ export const VENTA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'nota-credito',
+        loadChildren: () =>
+          import('./documentos/nota-credito/nota-credito.routes').then(
+            (m) => m.NOTA_CREDITO_ROUTES,
+          ),
+      },
+      {
         path: 'contrato-servicio',
         loadChildren: () =>
           import('./documentos/contrato-servicio/contrato-servicio.routes').then(
