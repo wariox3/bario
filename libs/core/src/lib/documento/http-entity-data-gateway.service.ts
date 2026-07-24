@@ -11,17 +11,9 @@ import {
   type ListResponse,
   type SortSpec,
 } from '../data-list';
+import type { PaginatedResponse } from '../models/pagination.model';
 import type { EntityConfig } from './entity-config.types';
 import type { EntityDataGateway } from './entity-data-gateway';
-
-/**
- * Forma de la respuesta paginada cruda del backend.
- * El gateway la traduce a `ListResponse` (contrato del framework).
- */
-interface PaginatedApiResponse {
-  readonly count: number;
-  readonly results: readonly unknown[];
-}
 
 /**
  * Filtro tal como lo espera el backend de documentos en `POST /lista/`.
@@ -87,7 +79,7 @@ export class HttpEntityDataGateway implements EntityDataGateway {
   list(entity: EntityConfig, query: ListQuery): Observable<ListResponse> {
     const body = this.buildListBody(entity, query);
     return this.http
-      .post<PaginatedApiResponse>(`${entity.endpoint}/lista/`, body, {
+      .post<PaginatedResponse<unknown>>(`${entity.endpoint}/lista/`, body, {
         params: buildHttpParams(buildListParams(query)),
       })
       .pipe(
