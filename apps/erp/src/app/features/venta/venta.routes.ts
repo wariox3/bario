@@ -115,6 +115,13 @@ export const VENTA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'utilidades/enviar-factura-electronica',
+        loadChildren: () =>
+          import('./utilidades/enviar-factura-electronica/enviar-factura-electronica.routes').then(
+            (m) => m.ENVIAR_FACTURA_ELECTRONICA_ROUTES,
+          ),
+      },
+      {
         path: 'informes/pendiente-facturar',
         loadChildren: () =>
           import('./informes/pendiente-facturar/pendiente-facturar.routes').then(

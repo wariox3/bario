@@ -1,0 +1,131 @@
+// Utilidad "Enviar factura electrónica".
+// Reproduce el chrome de <lib-list-shell> (breadcrumb + card + tabla embebida)
+// con los mismos tokens para no fragmentar el sistema visual del ERP; la única
+// pieza propia es el tab-strip interno. Depth borders-only, navy/sky, radios 12px.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// ── Card raíz (idéntica a .list-shell__card) ──────────────────────────────────
+.efe-card {
+  background: #fff;
+  border: 1px solid rgba(19 38 60 / 0.08);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(19 38 60 / 0.04);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__head {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(19 38 60 / 0.08);
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--brand-navy);
+  }
+
+  &__subtitle {
+    margin: 0.15rem 0 0;
+    font-size: 0.8rem;
+    color: var(--brand-muted);
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1rem 1rem;
+  }
+
+  // Recuadro embebido de la tabla (borde un punto más definido que la card).
+  &__table {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(20, 48, 73, 0.12);
+    border-radius: 12px;
+  }
+}
+
+// ── Tab-strip: encadena el flex para que solo la tabla scrollee ───────────────
+.efe-tabs {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  ::ng-deep {
+    .p-tabs,
+    .p-tabpanels {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: transparent;
+    }
+
+    // El panel activo aloja la cadena de alturas hasta la tabla.
+    .p-tabpanels {
+      padding: 0.85rem 0 0;
+    }
+
+    .p-tabpanel {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0;
+    }
+
+    // Tira de tabs: solo un borde inferior sutil, sin fondo (casa con la card).
+    .p-tablist {
+      background: transparent;
+    }
+  }
+}
+
+// ── Toolbar por tab: filtros a la izquierda, acciones batch a la derecha ──────
+.efe-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+
+  &__filters {
+    flex: 1;
+    min-width: 0;
+
+    // Neutraliza el marco propio del toolbar embebido (igual que list-shell):
+    // sin borde inferior ni padding horizontal, para que alinee con el recuadro
+    // de la tabla y las acciones queden en la misma línea.
+    ::ng-deep .lib-data-toolbar {
+      border-bottom: none;
+      padding: 0;
+      min-height: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+}

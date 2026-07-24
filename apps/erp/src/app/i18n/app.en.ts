@@ -2997,6 +2997,76 @@ export const en: AppDict = {
         pendiente: 'Pending',
       },
     },
+    enviarFacturaElectronica: {
+      name: 'Send electronic invoice',
+      subtitle: 'Issue your invoices to the DIAN and notify your customers.',
+      tabs: {
+        emitir: 'Issue',
+        notificar: 'Notify',
+      },
+      actions: {
+        emitir: 'Issue',
+        notificar: 'Notify',
+        descartar: 'Discard',
+      },
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        cliente: 'Customer',
+        total: 'Total',
+        estado: 'Status',
+      },
+      estado: {
+        descartado: 'Discarded',
+        enviado: 'Awaiting response',
+        pendiente: 'Pending',
+      },
+      filters: {
+        notificado: 'Notified',
+        enviado: 'Sent',
+      },
+      descartar: {
+        confirm: {
+          header: 'Discard these documents?',
+          message:
+            'This action cannot be undone. Once discarded, a document can no longer be sent electronically.',
+          accept: 'Yes, discard',
+        },
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Documents issued',
+            desc: 'The selected documents were sent to the DIAN.',
+          },
+          error: {
+            title: 'Error issuing',
+            desc: 'Some documents could not be issued. Please try again.',
+          },
+        },
+        notificar: {
+          success: {
+            title: 'Documents notified',
+            desc: 'The selected documents were notified to the customer.',
+          },
+          error: {
+            title: 'Error notifying',
+            desc: 'Some documents could not be notified. Please try again.',
+          },
+        },
+        descartar: {
+          success: {
+            title: 'Documents discarded',
+            desc: 'The selected documents were discarded successfully.',
+          },
+          error: {
+            title: 'Error discarding',
+            desc: 'Some documents could not be discarded. Please try again.',
+          },
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:

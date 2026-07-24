@@ -125,6 +125,23 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'venta-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.enviarFacturaElectronica.name',
+              path: 'utilidades/enviar-factura-electronica',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'venta-informes',
       labelKey: 'layout.nav.sections.report',
       iconClass: 'pi pi-chart-bar',

@@ -3038,6 +3038,76 @@ export const es: AppDict = {
         pendiente: 'Pendiente',
       },
     },
+    enviarFacturaElectronica: {
+      name: 'Enviar factura electrónica',
+      subtitle: 'Emite tus facturas a la DIAN y notifícalas a tus clientes.',
+      tabs: {
+        emitir: 'Emitir',
+        notificar: 'Notificar',
+      },
+      actions: {
+        emitir: 'Emitir',
+        notificar: 'Notificar',
+        descartar: 'Descartar',
+      },
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        cliente: 'Cliente',
+        total: 'Total',
+        estado: 'Estado',
+      },
+      estado: {
+        descartado: 'Descartado',
+        enviado: 'Esperando respuesta',
+        pendiente: 'Pendiente',
+      },
+      filters: {
+        notificado: 'Notificado',
+        enviado: 'Enviado',
+      },
+      descartar: {
+        confirm: {
+          header: '¿Estás seguro de descartar?',
+          message:
+            'Esta acción no se puede revertir. Si descartas un documento, ya no podrá enviarse electrónicamente en otro momento.',
+          accept: 'Sí, descartar',
+        },
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Documentos emitidos',
+            desc: 'Los documentos seleccionados se enviaron a la DIAN.',
+          },
+          error: {
+            title: 'Error al emitir',
+            desc: 'No se pudieron emitir algunos documentos. Intentá de nuevo.',
+          },
+        },
+        notificar: {
+          success: {
+            title: 'Documentos notificados',
+            desc: 'Los documentos seleccionados se notificaron al cliente.',
+          },
+          error: {
+            title: 'Error al notificar',
+            desc: 'No se pudieron notificar algunos documentos. Intentá de nuevo.',
+          },
+        },
+        descartar: {
+          success: {
+            title: 'Documentos descartados',
+            desc: 'Los documentos seleccionados se descartaron correctamente.',
+          },
+          error: {
+            title: 'Error al descartar',
+            desc: 'No se pudieron descartar algunos documentos. Intentá de nuevo.',
+          },
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:
