@@ -157,6 +157,10 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.ventaItem.name',
               path: 'informes/venta-item',
             },
+            {
+              labelKey: 'entities.cuentaCobrar.name',
+              path: 'informes/cuenta-cobrar',
+            },
           ],
         },
       ],

@@ -134,6 +134,17 @@ export const VENTA_ROUTES: Route[] = [
           import('./informes/venta-item/venta-item.routes').then((m) => m.VENTA_ITEM_ROUTES),
       },
       {
+        // Informe compartido: el código vive en cartera/informes/cuenta-cobrar,
+        // pero es module-agnostic (deriva el módulo activo del `ActiveModuleStore`,
+        // fijado por el `erpModuleResolver('venta')` de la ruta raíz), así que su
+        // navegación se queda dentro de Venta. Reusado igual en cartera y general.
+        path: 'informes/cuenta-cobrar',
+        loadChildren: () =>
+          import('../cartera/informes/cuenta-cobrar/cuenta-cobrar.routes').then(
+            (m) => m.CUENTA_COBRAR_ROUTES,
+          ),
+      },
+      {
         // Master compartido: el código vive en general/masters/resolucion, pero
         // se enruta desde Venta con `data: { tipo: 'venta' }` para fijar el flag.
         path: 'resoluciones',
