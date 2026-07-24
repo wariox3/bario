@@ -2709,6 +2709,9 @@ export const en: AppDict = {
         },
       },
     },
+    saldoInicial: {
+      name: 'Opening balance',
+    },
     egreso: {
       name: 'Disbursement',
       columns: {

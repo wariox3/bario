@@ -2753,6 +2753,9 @@ export const es: AppDict = {
         },
       },
     },
+    saldoInicial: {
+      name: 'Saldo inicial',
+    },
     egreso: {
       name: 'Egreso',
       columns: {

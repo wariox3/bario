@@ -2047,6 +2047,9 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    saldoInicial: {
+      name: string;
+    };
     egreso: {
       name: string;
       columns: {

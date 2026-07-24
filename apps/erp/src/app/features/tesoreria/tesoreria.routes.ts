@@ -36,6 +36,14 @@ export const TESORERIA_ROUTES: Route[] = [
         loadChildren: () =>
           import('./documentos/egreso/egreso.routes').then((m) => m.EGRESO_ROUTES),
       },
+      {
+        // Carcasa: shell vacío, pendiente de implementar como documento.
+        path: 'saldo-inicial',
+        loadChildren: () =>
+          import('./documentos/saldo-inicial/saldo-inicial.routes').then(
+            (m) => m.SALDO_INICIAL_ROUTES,
+          ),
+      },
       // Masters reutilizados del módulo General (contacto y cuenta-banco).
       {
         path: 'contactos',
