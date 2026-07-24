@@ -89,5 +89,22 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
         },
       ],
     },
+    {
+      kind: 'accordion',
+      id: 'compra-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.cuentaPagar.name',
+              path: 'informes/cuenta-pagar',
+            },
+          ],
+        },
+      ],
+    },
   ],
 };

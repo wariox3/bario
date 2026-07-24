@@ -91,6 +91,17 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        // Informe compartido: el código vive en tesoreria/informes/cuenta-pagar,
+        // pero es module-agnostic (deriva el módulo activo del `ActiveModuleStore`,
+        // fijado por el `erpModuleResolver('compra')` de la ruta raíz), así que su
+        // navegación se queda dentro de Compra. Reusado igual en tesoreria y general.
+        path: 'informes/cuenta-pagar',
+        loadChildren: () =>
+          import('../tesoreria/informes/cuenta-pagar/cuenta-pagar.routes').then(
+            (m) => m.CUENTA_PAGAR_ROUTES,
+          ),
+      },
+      {
         path: 'items',
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
