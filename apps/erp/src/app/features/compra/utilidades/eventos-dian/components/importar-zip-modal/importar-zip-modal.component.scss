@@ -1,0 +1,192 @@
+// Wizard "Importar ZIP". Depth borders-only, navy/sky, radios 12px — mismos
+// tokens que el resto de modales/listas del ERP.
+
+.izip-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--brand-text);
+}
+
+// ── Stepper presentacional ────────────────────────────────────────────────────
+.izip-steps {
+  display: flex;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+
+  &__badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(19 38 60 / 0.15);
+    background: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--brand-muted);
+    z-index: 1;
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.15;
+  }
+
+  &__title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--brand-muted);
+    white-space: nowrap;
+  }
+
+  &__desc {
+    font-size: 0.72rem;
+    color: var(--brand-muted);
+    opacity: 0.75;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Conector entre pasos.
+  &__bar {
+    flex: 1;
+    height: 1px;
+    margin: 0 0.5rem;
+    background: rgba(19 38 60 / 0.12);
+  }
+
+  // Activo: badge en sky, títulos en navy.
+  &__item--active &__badge {
+    border-color: var(--brand-sky, #77aad7);
+    background: var(--brand-sky, #77aad7);
+    color: #fff;
+  }
+  &__item--active &__title {
+    color: var(--brand-navy);
+  }
+
+  // Completado: badge navy con check.
+  &__item--done &__badge {
+    border-color: var(--brand-navy);
+    background: var(--brand-navy);
+    color: #fff;
+  }
+  &__item--done &__bar {
+    background: var(--brand-navy);
+    opacity: 0.4;
+  }
+}
+
+// ── Dropzone ──────────────────────────────────────────────────────────────────
+.izip-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  border: 1.5px dashed rgba(19 38 60 / 0.2);
+  border-radius: 12px;
+  background: rgba(119 170 215 / 0.04);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    border-color: var(--brand-sky, #77aad7);
+    background: rgba(119 170 215 / 0.08);
+  }
+}
+
+// ── Resumen del documento (grilla tipo recibo) ────────────────────────────────
+.izip-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 1.25rem 0 0;
+  border: 1px solid rgba(20 48 73 / 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(20 48 73 / 0.12);
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 0.8rem;
+    background: #fff;
+  }
+
+  dt {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--brand-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--brand-text);
+  }
+}
+
+// ── Tabla de detalles ─────────────────────────────────────────────────────────
+.izip-table-wrap {
+  margin-top: 1rem;
+  border: 1px solid rgba(20 48 73 / 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.izip-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(19 38 60 / 0.06);
+  }
+
+  thead th {
+    background: rgba(19 38 60 / 0.03);
+    font-weight: 600;
+    color: var(--brand-text);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  &__num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__empty {
+    text-align: center;
+    color: var(--brand-muted);
+    padding: 1.25rem;
+  }
+}

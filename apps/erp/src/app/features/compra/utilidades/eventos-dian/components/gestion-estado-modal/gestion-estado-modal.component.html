@@ -1,0 +1,136 @@
+@let g = t().entities.eventosDian.gestion;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving()"
+  [dismissableMask]="!saving()"
+  [style]="{ width: '44rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    @if (step(); as s) {
+      <div class="flex items-center gap-3">
+        <span
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+        >
+          <i class="pi pi-check-circle text-[1.05rem]"></i>
+        </span>
+        <div class="flex flex-col gap-[0.1rem]">
+          <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+            {{ g.steps[s.key].title }}
+          </h2>
+          <p class="m-0 text-[0.75rem] text-brand-muted">{{ g.subtitle }}</p>
+        </div>
+      </div>
+    }
+  </ng-template>
+
+  @if (visible() && step()) {
+    <form
+      [formGroup]="form"
+      class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2"
+      (ngSubmit)="submit()"
+    >
+      <div class="flex flex-col gap-1.5">
+        <label for="g-nombre" class="text-[0.8rem] font-medium text-brand-text">
+          {{ g.fields.nombre }}<span class="ml-px text-red-500">*</span>
+        </label>
+        <input id="g-nombre" pInputText formControlName="nombre" autocomplete="off" />
+        <lib-field-error
+          [control]="form.controls.nombre"
+          [messages]="{ required: g.validation.required }"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="g-apellido" class="text-[0.8rem] font-medium text-brand-text">
+          {{ g.fields.apellido }}<span class="ml-px text-red-500">*</span>
+        </label>
+        <input id="g-apellido" pInputText formControlName="apellido" autocomplete="off" />
+        <lib-field-error
+          [control]="form.controls.apellido"
+          [messages]="{ required: g.validation.required }"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="g-identificacion" class="text-[0.8rem] font-medium text-brand-text">
+          {{ g.fields.identificacion }}<span class="ml-px text-red-500">*</span>
+        </label>
+        <p-select
+          inputId="g-identificacion"
+          formControlName="identificacion"
+          [options]="identificacionOptions"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="g-numero" class="text-[0.8rem] font-medium text-brand-text">
+          {{ g.fields.numeroIdentificacion }}<span class="ml-px text-red-500">*</span>
+        </label>
+        <input
+          id="g-numero"
+          pInputText
+          formControlName="numero_identificacion"
+          inputmode="numeric"
+          autocomplete="off"
+        />
+        <lib-field-error
+          [control]="form.controls.numero_identificacion"
+          [messages]="{ required: g.validation.required }"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="g-cargo" class="text-[0.8rem] font-medium text-brand-text">
+          {{ g.fields.cargo }}<span class="ml-px text-red-500">*</span>
+        </label>
+        <input id="g-cargo" pInputText formControlName="cargo" autocomplete="off" />
+        <lib-field-error
+          [control]="form.controls.cargo"
+          [messages]="{ required: g.validation.required }"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="g-area" class="text-[0.8rem] font-medium text-brand-text">
+          {{ g.fields.area }}<span class="ml-px text-red-500">*</span>
+        </label>
+        <input id="g-area" pInputText formControlName="area" autocomplete="off" />
+        <lib-field-error
+          [control]="form.controls.area"
+          [messages]="{ required: g.validation.required }"
+        />
+      </div>
+
+      <p class="col-span-full m-0 text-[0.72rem] leading-relaxed text-brand-muted">
+        {{ g.hint }}
+      </p>
+    </form>
+  }
+
+  <ng-template pTemplate="footer">
+    @if (step(); as s) {
+      <p-button
+        severity="secondary"
+        [text]="true"
+        [label]="t().common.actions.cancel"
+        [disabled]="saving()"
+        (onClick)="visible.set(false)"
+      />
+      <p-button
+        [label]="g.steps[s.key].button"
+        icon="pi pi-check"
+        [loading]="saving()"
+        (onClick)="submit()"
+      />
+    }
+  </ng-template>
+</p-dialog>

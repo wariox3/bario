@@ -84,6 +84,13 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'utilidades/eventos-dian',
+        loadChildren: () =>
+          import('./utilidades/eventos-dian/eventos-dian.routes').then(
+            (m) => m.EVENTOS_DIAN_ROUTES,
+          ),
+      },
+      {
         path: 'items',
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),

@@ -1,0 +1,80 @@
+@let m = t().entities.eventosDian.editar;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving()"
+  [dismissableMask]="!saving()"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-pencil text-[1.05rem]"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.title }}
+          @if (documento(); as doc) {
+            <span class="text-brand-muted">#{{ doc.id }}</span>
+          }
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <form [formGroup]="form" class="flex flex-col gap-4 pt-1" (ngSubmit)="submit()">
+      <div class="flex flex-col gap-1.5">
+        <label for="ref-prefijo" class="text-[0.8rem] font-medium text-brand-text">
+          {{ m.fields.prefijo }}
+        </label>
+        <input
+          id="ref-prefijo"
+          pInputText
+          libUppercase
+          formControlName="referencia_prefijo"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="ref-numero" class="text-[0.8rem] font-medium text-brand-text">
+          {{ m.fields.numero }}
+        </label>
+        <input
+          id="ref-numero"
+          pInputText
+          formControlName="referencia_numero"
+          inputmode="numeric"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="ref-cue" class="text-[0.8rem] font-medium text-brand-text">
+          {{ m.fields.cue }}
+        </label>
+        <input id="ref-cue" pInputText formControlName="referencia_cue" autocomplete="off" />
+      </div>
+    </form>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      severity="secondary"
+      [text]="true"
+      [label]="t().common.actions.cancel"
+      [disabled]="saving()"
+      (onClick)="visible.set(false)"
+    />
+    <p-button [label]="m.save" icon="pi pi-check" [loading]="saving()" (onClick)="submit()" />
+  </ng-template>
+</p-dialog>

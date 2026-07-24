@@ -2997,6 +2997,201 @@ export const en: AppDict = {
         pendiente: 'Pending',
       },
     },
+    eventosDian: {
+      name: 'DIAN events',
+      subtitle:
+        'Receive electronic documents from your suppliers and send their acknowledgements to the DIAN.',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        codigo: 'Code',
+        identificacion: 'ID number',
+        proveedor: 'Supplier',
+        referenciaPrefijo: 'Ref. prefix',
+        referenciaNumero: 'Ref. number',
+        total: 'Total',
+        electronico: 'Electronic',
+        documento: 'Document',
+        recepcion: 'Receipt',
+        aceptacion: 'Acceptance',
+      },
+      eventoEstado: {
+        PE: 'Pending',
+        RZ: 'Rejected',
+        RC: 'Received',
+        AC: 'Accepted',
+        RM: 'Claim',
+        EM: 'Issued',
+        none: '—',
+      },
+      actions: {
+        editar: 'Edit',
+        emitir: 'Issue',
+        gestionar: 'Manage status',
+        descartar: 'Discard',
+      },
+      descartar: {
+        confirm: {
+          header: 'Discard this document?',
+          message: 'This action cannot be undone.',
+          accept: 'Yes, discard',
+        },
+      },
+      editar: {
+        title: 'Edit information',
+        subtitle: 'Fix the document reference prefix, number and CUE.',
+        fields: {
+          prefijo: 'Prefix',
+          numero: 'Number',
+          cue: 'CUE',
+        },
+        save: 'Update',
+      },
+      gestion: {
+        subtitle: 'Confirm your details to register the event with the DIAN.',
+        hint: '* To avoid entering these details for each event, you can edit them in your profile.',
+        steps: {
+          recibirDocumento: {
+            title: 'Invoice receipt acknowledgement',
+            button: 'Receive document',
+          },
+          recibirBien: {
+            title: 'Receipt of goods or service',
+            button: 'Receive goods / service',
+          },
+          aceptar: {
+            title: 'Invoice acceptance',
+            button: 'Accept invoice',
+          },
+        },
+        fields: {
+          nombre: 'First name',
+          apellido: 'Last name',
+          identificacion: 'ID type',
+          numeroIdentificacion: 'ID number',
+          cargo: 'Role',
+          area: 'Area',
+        },
+        validation: { required: 'This field is required.' },
+      },
+      importar: {
+        action: 'Import ZIP',
+        title: 'Import invoice from ZIP',
+        steps: {
+          archivo: { label: 'File', desc: 'Upload the ZIP' },
+          proveedor: { label: 'Supplier', desc: 'Supplier details' },
+          confirmar: { label: 'Confirm', desc: 'Review and create' },
+        },
+        archivo: {
+          dropTitle: 'Drag the ZIP or click to select it',
+          dropHint: '.zip file of the DIAN electronic invoice',
+          importButton: 'Import',
+        },
+        proveedor: {
+          warning:
+            'The supplier for this invoice does not exist. Create it before generating the invoice.',
+          fields: {
+            identificacion: 'ID type',
+            numeroIdentificacion: 'ID number',
+            nombreCorto: 'Name',
+            ciudad: 'City',
+            direccion: 'Address',
+            correo: 'Email',
+            plazoPago: 'Payment term',
+          },
+          save: 'Create supplier',
+        },
+        confirmar: {
+          grupo: 'Accounting group',
+          formaPago: 'Payment method',
+          almacen: 'Warehouse',
+          create: 'Create invoice',
+          resumen: {
+            contacto: 'Supplier',
+            identificacion: 'ID number',
+            numero: 'Number',
+            prefijo: 'Prefix',
+            fecha: 'Date',
+            vence: 'Due',
+            cue: 'CUE',
+            comentario: 'Comment',
+          },
+          detalles: {
+            item: 'Item',
+            cantidad: 'Qty',
+            precio: 'Price',
+            total: 'Total',
+            empty: 'The document has no lines.',
+          },
+        },
+        validation: { required: 'This field is required.' },
+        errors: {
+          read: 'The file could not be read. Please try again.',
+          parse: 'The ZIP could not be processed. Make sure it is a valid electronic invoice.',
+        },
+        toasts: {
+          proveedor: {
+            error: {
+              title: 'Error creating the supplier',
+              desc: 'The supplier could not be created. Please try again.',
+            },
+          },
+          factura: {
+            success: {
+              title: 'Invoice created',
+              desc: 'The invoice was created and approved successfully.',
+            },
+            error: {
+              title: 'Error creating the invoice',
+              desc: 'The invoice could not be created. Please try again.',
+            },
+          },
+        },
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Document issued',
+            desc: 'The document was sent to the DIAN.',
+          },
+          error: {
+            title: 'Error issuing',
+            desc: 'The document could not be issued. Please try again.',
+          },
+        },
+        descartar: {
+          success: {
+            title: 'Document discarded',
+            desc: 'The document was discarded successfully.',
+          },
+          error: {
+            title: 'Error discarding',
+            desc: 'The document could not be discarded. Please try again.',
+          },
+        },
+        editar: {
+          success: {
+            title: 'Information updated',
+            desc: 'The document reference was updated.',
+          },
+          error: {
+            title: 'Error updating',
+            desc: 'The reference could not be updated. Please try again.',
+          },
+        },
+        gestion: {
+          success: {
+            title: 'Event registered',
+            desc: 'The event was sent to the DIAN successfully.',
+          },
+          error: {
+            title: 'Error registering the event',
+            desc: 'The event could not be registered. Please try again.',
+          },
+        },
+      },
+    },
     documentoElectronico: {
       name: 'Electronic document',
       subtitle: 'Issue your purchase electronic documents to the DIAN.',

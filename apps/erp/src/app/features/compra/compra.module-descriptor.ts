@@ -81,6 +81,10 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.documentoElectronico.name',
               path: 'utilidades/documento-electronico',
             },
+            {
+              labelKey: 'entities.eventosDian.name',
+              path: 'utilidades/eventos-dian',
+            },
           ],
         },
       ],
