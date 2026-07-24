@@ -55,6 +55,10 @@ export const CARTERA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.cuentaCobrar.name',
               path: 'informes/cuenta-cobrar',
             },
+            {
+              labelKey: 'entities.cuentaCobrarCorte.name',
+              path: 'informes/cuenta-cobrar-corte',
+            },
           ],
         },
       ],

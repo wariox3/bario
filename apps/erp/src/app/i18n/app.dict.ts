@@ -2279,6 +2279,25 @@ export interface AppDict
         pendiente: string;
       };
     };
+    cuentaCobrarCorte: {
+      name: string;
+      fechaCorte: string;
+      generar: string;
+      empty: { title: string; sub: string };
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        fechaVence: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        saldo: string;
+      };
+    };
     cuentaPagar: {
       name: string;
       columns: {

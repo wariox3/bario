@@ -2980,6 +2980,28 @@ export const en: AppDict = {
         pendiente: 'Pending',
       },
     },
+    cuentaCobrarCorte: {
+      name: 'Accounts receivable as of date',
+      fechaCorte: 'As of date',
+      generar: 'Generate',
+      empty: {
+        title: 'Generate the report',
+        sub: 'Pick an as-of date and press Generate to see receivables as of that date.',
+      },
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Type',
+        numero: 'Number',
+        fecha: 'Date',
+        fechaVence: 'Due',
+        identificacion: 'Identification',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        saldo: 'Balance',
+      },
+    },
     cuentaPagar: {
       name: 'Accounts payable',
       columns: {

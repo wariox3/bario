@@ -1,0 +1,30 @@
+// Toolbar de reporte: la fecha de corte (protagonista) a la izquierda, acciones
+// a la derecha. Vive en el slot [toolbar] de list-shell, que ya aporta el gutter
+// sobre el recuadro de la tabla.
+.cccorte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--brand-navy);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+}

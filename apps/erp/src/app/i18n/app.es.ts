@@ -3021,6 +3021,28 @@ export const es: AppDict = {
         pendiente: 'Pendiente',
       },
     },
+    cuentaCobrarCorte: {
+      name: 'Cuentas por cobrar corte',
+      fechaCorte: 'Corte a la fecha',
+      generar: 'Generar',
+      empty: {
+        title: 'Generá el informe',
+        sub: 'Elegí una fecha de corte y presioná Generar para ver la cartera a esa fecha.',
+      },
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Tipo',
+        numero: 'Número',
+        fecha: 'Fecha',
+        fechaVence: 'Vence',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        saldo: 'Saldo',
+      },
+    },
     cuentaPagar: {
       name: 'Cuentas por pagar',
       columns: {

@@ -56,6 +56,13 @@ export const CARTERA_ROUTES: Route[] = [
             (m) => m.CUENTA_COBRAR_ROUTES,
           ),
       },
+      {
+        path: 'informes/cuenta-cobrar-corte',
+        loadChildren: () =>
+          import('./informes/cuenta-cobrar-corte/cuenta-cobrar-corte.routes').then(
+            (m) => m.CUENTA_COBRAR_CORTE_ROUTES,
+          ),
+      },
     ],
   },
 ];
