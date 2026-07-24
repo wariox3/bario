@@ -1920,6 +1920,23 @@ export const es: AppDict = {
         contabilizado: 'Contabilizado',
       },
     },
+    cuentaCobro: {
+      name: 'Cuenta de cobro',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: { aprobado: 'Aprobado', anulado: 'Anulado', contabilizado: 'Contabilizado' },
+    },
     notaCredito: {
       name: 'Nota crédito',
       columns: {

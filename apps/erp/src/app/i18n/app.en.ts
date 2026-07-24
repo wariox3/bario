@@ -1879,6 +1879,23 @@ export const en: AppDict = {
         contabilizado: 'Posted',
       },
     },
+    cuentaCobro: {
+      name: 'Payment request',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Voi',
+        contabilizado: 'Pos',
+      },
+      filters: { aprobado: 'Approved', anulado: 'Voided', contabilizado: 'Posted' },
+    },
     notaCredito: {
       name: 'Credit note',
       columns: {

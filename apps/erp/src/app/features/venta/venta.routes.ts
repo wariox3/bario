@@ -68,6 +68,13 @@ export const VENTA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'cuenta-cobro',
+        loadChildren: () =>
+          import('./documentos/cuenta-cobro/cuenta-cobro.routes').then(
+            (m) => m.CUENTA_COBRO_ROUTES,
+          ),
+      },
+      {
         path: 'factura-venta-recurrente',
         loadChildren: () =>
           import('./documentos/factura-venta-recurrente/factura-venta-recurrente.routes').then(

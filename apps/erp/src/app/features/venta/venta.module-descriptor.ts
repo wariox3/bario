@@ -63,6 +63,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'factura-pos-electronica',
             },
             {
+              labelKey: 'entities.cuentaCobro.name',
+              path: 'cuenta-cobro/list',
+              activeMatch: 'cuenta-cobro',
+            },
+            {
               labelKey: 'entities.facturaVentaRecurrente.name',
               path: 'factura-venta-recurrente/list',
               activeMatch: 'factura-venta-recurrente',

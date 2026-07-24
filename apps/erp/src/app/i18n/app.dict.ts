@@ -1384,6 +1384,33 @@ export interface AppDict
       };
     };
     /**
+     * Cuenta de cobro (tipo 17). Documento de la familia POS (cabecera + detalles
+     * + pagos) pero sin efecto de inventario ni transmisión electrónica; las
+     * páginas las comparte la familia y viven en `posDocumento`. Acá solo van el
+     * nombre visible y las etiquetas del listado.
+     */
+    cuentaCobro: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
+    /**
      * Textos del **form y la ficha compartidos por la familia POS** (factura POS,
      * factura POS electrónica…). El nombre del documento no vive acá: lo resuelve
      * cada página desde el `displayNameKey` de su `DocumentEntityConfig`.
