@@ -34,6 +34,14 @@ export const CARTERA_ROUTES: Route[] = [
         path: 'pago',
         loadChildren: () => import('./documentos/pago/pago.routes').then((m) => m.PAGO_ROUTES),
       },
+      {
+        // Carcasa: shell vacío, pendiente de implementar como documento (CxC, tipo 18).
+        path: 'saldo-inicial',
+        loadChildren: () =>
+          import('./documentos/saldo-inicial/saldo-inicial.routes').then(
+            (m) => m.SALDO_INICIAL_ROUTES,
+          ),
+      },
       // Masters reutilizados del módulo General (contacto y cuenta-banco).
       {
         path: 'contactos',

@@ -22,7 +22,14 @@ export const CARTERA_MODULE: ErpModuleDescriptor = {
       defaultExpanded: true,
       groups: [
         {
-          items: [{ labelKey: 'entities.pago.name', path: 'pago/list', activeMatch: 'pago' }],
+          items: [
+            { labelKey: 'entities.pago.name', path: 'pago/list', activeMatch: 'pago' },
+            {
+              labelKey: 'entities.saldoInicial.name',
+              path: 'saldo-inicial/list',
+              activeMatch: 'saldo-inicial',
+            },
+          ],
         },
       ],
     },
