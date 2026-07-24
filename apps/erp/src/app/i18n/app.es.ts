@@ -3038,6 +3038,42 @@ export const es: AppDict = {
         pendiente: 'Pendiente',
       },
     },
+    documentoElectronico: {
+      name: 'Documento electrónico',
+      subtitle: 'Emite tus documentos electrónicos de compra a la DIAN.',
+      actions: {
+        emitir: 'Emitir',
+      },
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Tipo',
+        numero: 'Número',
+        fecha: 'Fecha',
+        cliente: 'Cliente',
+        total: 'Total',
+        estado: 'Estado',
+      },
+      estado: {
+        enviado: 'Esperando respuesta',
+        pendiente: 'Pendiente',
+      },
+      filters: {
+        notificado: 'Notificado',
+        enviado: 'Enviado',
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Documentos emitidos',
+            desc: 'Los documentos seleccionados se enviaron a la DIAN.',
+          },
+          error: {
+            title: 'Error al emitir',
+            desc: 'No se pudieron emitir algunos documentos. Intentá de nuevo.',
+          },
+        },
+      },
+    },
     enviarFacturaElectronica: {
       name: 'Enviar factura electrónica',
       subtitle: 'Emite tus facturas a la DIAN y notifícalas a tus clientes.',

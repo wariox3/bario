@@ -2997,6 +2997,42 @@ export const en: AppDict = {
         pendiente: 'Pending',
       },
     },
+    documentoElectronico: {
+      name: 'Electronic document',
+      subtitle: 'Issue your purchase electronic documents to the DIAN.',
+      actions: {
+        emitir: 'Issue',
+      },
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Type',
+        numero: 'Number',
+        fecha: 'Date',
+        cliente: 'Customer',
+        total: 'Total',
+        estado: 'Status',
+      },
+      estado: {
+        enviado: 'Awaiting response',
+        pendiente: 'Pending',
+      },
+      filters: {
+        notificado: 'Notified',
+        enviado: 'Sent',
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Documents issued',
+            desc: 'The selected documents were sent to the DIAN.',
+          },
+          error: {
+            title: 'Error issuing',
+            desc: 'Some documents could not be issued. Please try again.',
+          },
+        },
+      },
+    },
     enviarFacturaElectronica: {
       name: 'Send electronic invoice',
       subtitle: 'Issue your invoices to the DIAN and notify your customers.',

@@ -68,5 +68,22 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
         },
       ],
     },
+    {
+      kind: 'accordion',
+      id: 'compra-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.documentoElectronico.name',
+              path: 'utilidades/documento-electronico',
+            },
+          ],
+        },
+      ],
+    },
   ],
 };

@@ -1,0 +1,13 @@
+// Toolbar de la utilidad: filtros (lib-data-toolbar) a la izquierda, botón Emitir
+// a la derecha, en una sola fila. list-shell ya neutraliza el marco propio del
+// lib-data-toolbar, así que solo hace falta el layout flex.
+.dte-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &__filters {
+    flex: 1;
+    min-width: 0;
+  }
+}

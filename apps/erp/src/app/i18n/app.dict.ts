@@ -2296,6 +2296,36 @@ export interface AppDict
         pendiente: string;
       };
     };
+    documentoElectronico: {
+      name: string;
+      subtitle: string;
+      actions: {
+        emitir: string;
+      };
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        cliente: string;
+        total: string;
+        estado: string;
+      };
+      estado: {
+        enviado: string;
+        pendiente: string;
+      };
+      filters: {
+        notificado: string;
+        enviado: string;
+      };
+      toasts: {
+        emitir: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
+    };
     enviarFacturaElectronica: {
       name: string;
       subtitle: string;
