@@ -2892,10 +2892,30 @@ export const es: AppDict = {
         anulado: 'Anulado',
         contabilizado: 'Contabilizado',
       },
+    },
+    salida: {
+      name: 'Salida',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+    },
+    movimientoInventario: {
       form: {
-        createTitle: 'Nueva entrada',
-        editTitle: 'Editar entrada',
-        sectionHint: 'Datos principales del documento',
+        createHint: 'Datos principales del nuevo documento',
+        editHint: 'Actualiza los datos del documento',
         fields: {
           contacto: 'Contacto',
           contactoPlaceholder: 'Buscar contacto…',
@@ -2907,15 +2927,15 @@ export const es: AppDict = {
         validation: { required: 'Este campo es requerido' },
         toasts: {
           createSuccess: {
-            title: 'Entrada creada',
-            desc: 'La entrada se creó correctamente',
+            title: 'Documento creado',
+            desc: 'El documento se creó correctamente',
           },
           createError: {
             title: 'Error al crear',
-            desc: 'No se pudo crear la entrada',
+            desc: 'No se pudo crear el documento',
           },
           editSuccess: {
-            title: 'Entrada actualizada',
+            title: 'Documento actualizado',
             desc: 'Los cambios se guardaron correctamente',
           },
           editError: {
@@ -2924,7 +2944,7 @@ export const es: AppDict = {
           },
           loadError: {
             title: 'Error al cargar',
-            desc: 'No se pudo cargar la entrada',
+            desc: 'No se pudo cargar el documento',
           },
         },
       },
@@ -2938,7 +2958,7 @@ export const es: AppDict = {
           comentario: 'Comentario',
         },
         notFound: {
-          title: 'Entrada no encontrada',
+          title: 'Documento no encontrado',
           desc: 'El documento no existe o no tienes acceso a él',
         },
       },

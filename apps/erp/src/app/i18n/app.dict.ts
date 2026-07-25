@@ -2162,10 +2162,30 @@ export interface AppDict
         anulado: string;
         contabilizado: string;
       };
+    };
+    salida: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
+    movimientoInventario: {
       form: {
-        createTitle: string;
-        editTitle: string;
-        sectionHint: string;
+        createHint: string;
+        editHint: string;
         fields: {
           contacto: string;
           contactoPlaceholder: string;

@@ -1,4 +1,4 @@
-@let f = t().entities.entrada.form;
+@let f = t().entities.movimientoInventario.form;
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
@@ -34,9 +34,11 @@
       </span>
       <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
         <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-          {{ isEditMode() ? f.editTitle : f.createTitle }}
+          {{ documentName() }}
         </h2>
-        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.sectionHint }}</p>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ isEditMode() ? f.editHint : f.createHint }}
+        </p>
       </div>
     </div>
 
@@ -44,7 +46,7 @@
       <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         <!-- Contacto -->
         <div class="flex flex-col gap-1.5 sm:col-span-2">
-          <label for="contacto" class="entrada-form__label">
+          <label for="contacto" class="movimiento-form__label">
             {{ f.fields.contacto }}
             <span class="ml-px text-red-500">*</span>
           </label>
@@ -62,7 +64,7 @@
 
         <!-- Almacén -->
         <div class="flex flex-col gap-1.5">
-          <label for="almacen" class="entrada-form__label">
+          <label for="almacen" class="movimiento-form__label">
             {{ f.fields.almacen }}
             <span class="ml-px text-red-500">*</span>
           </label>
@@ -82,7 +84,7 @@
 
         <!-- Fecha -->
         <div class="flex flex-col gap-1.5">
-          <label for="fecha" class="entrada-form__label">
+          <label for="fecha" class="movimiento-form__label">
             {{ f.fields.fecha }}
             <span class="ml-px text-red-500">*</span>
           </label>
@@ -103,7 +105,7 @@
 
         <!-- Comentario -->
         <div class="flex flex-col gap-1.5 sm:col-span-2">
-          <label for="comentario" class="entrada-form__label">{{ f.fields.comentario }}</label>
+          <label for="comentario" class="movimiento-form__label">{{ f.fields.comentario }}</label>
           <textarea
             id="comentario"
             pTextarea
@@ -140,6 +142,7 @@
         [detalles]="form.controls.detalles"
         [documentId]="documentId()"
         [almacenPorDefecto]="form.controls.almacen.value"
+        [costoField]="costoField()"
       />
     </div>
   </section>

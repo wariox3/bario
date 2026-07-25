@@ -1,4 +1,4 @@
-@let det = t().entities.entrada.detail;
+@let det = t().entities.movimientoInventario.detail;
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
@@ -68,25 +68,25 @@
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
       <div class="flex flex-col gap-0.5">
-        <dt class="entrada-detail__label">{{ det.labels.numero }}</dt>
-        <dd class="entrada-detail__value">{{ c.numero || '—' }}</dd>
+        <dt class="movimiento-detail__label">{{ det.labels.numero }}</dt>
+        <dd class="movimiento-detail__value">{{ c.numero || '—' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="entrada-detail__label">{{ det.labels.contacto }}</dt>
-        <dd class="entrada-detail__value">{{ c.contacto || '—' }}</dd>
+        <dt class="movimiento-detail__label">{{ det.labels.contacto }}</dt>
+        <dd class="movimiento-detail__value">{{ c.contacto || '—' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="entrada-detail__label">{{ det.labels.almacen }}</dt>
-        <dd class="entrada-detail__value">{{ c.almacen || '—' }}</dd>
+        <dt class="movimiento-detail__label">{{ det.labels.almacen }}</dt>
+        <dd class="movimiento-detail__value">{{ c.almacen || '—' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="entrada-detail__label">{{ det.labels.fecha }}</dt>
-        <dd class="entrada-detail__value">{{ formatFecha(c.fecha) }}</dd>
+        <dt class="movimiento-detail__label">{{ det.labels.fecha }}</dt>
+        <dd class="movimiento-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
       @if (c.comentario) {
         <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-          <dt class="entrada-detail__label">{{ det.labels.comentario }}</dt>
-          <dd class="entrada-detail__value">{{ c.comentario }}</dd>
+          <dt class="movimiento-detail__label">{{ det.labels.comentario }}</dt>
+          <dd class="movimiento-detail__value">{{ c.comentario }}</dd>
         </div>
       }
     </dl>

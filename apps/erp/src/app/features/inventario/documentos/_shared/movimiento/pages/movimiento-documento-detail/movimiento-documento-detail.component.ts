@@ -23,10 +23,10 @@ import type {
   InventarioDetalleFormRawValue,
   ResumenInventario,
 } from '@erp/features/documentos/inventario/inventario-documento-detalle.types';
-import { entradaToFormValue } from '../../entrada.mapper';
-import type { EntradaRead } from '../../entrada.model';
+import { movimientoToFormValue } from '../../movimiento-documento.mapper';
+import type { MovimientoRead } from '../../movimiento-documento.model';
 
-/** Cabecera legible de la entrada para la ficha (solo lo que trae `getById`). */
+/** Cabecera legible del movimiento para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
   readonly numero: string | null;
   readonly contacto: string | null;
@@ -38,14 +38,18 @@ interface CabeceraView {
 }
 
 /**
- * Ficha (detalle) de una **Entrada de almacén** (familia inventario) — solo lectura.
+ * Ficha (detalle) de un **movimiento de inventario** — solo lectura.
+ *
+ * Página **compartida** por los documentos de la familia (entrada, salida y —
+ * cuando se sume— traslado): el nombre del documento sale de la config, no de un
+ * literal i18n.
  *
  * Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas (`DocumentoDetalleService`)
  * en paralelo —igual que el form— y las muestra sin formularios. Desde aquí se
  * vuelve a la lista, se salta a editar o se aprueba/desaprueba el documento.
  */
 @Component({
-  selector: 'app-entrada-detail',
+  selector: 'app-movimiento-documento-detail',
   standalone: true,
   imports: [
     ButtonModule,
@@ -56,10 +60,10 @@ interface CabeceraView {
     DocumentDetailActionsComponent,
   ],
   providers: [ConfirmationService],
-  templateUrl: './entrada-detail.component.html',
-  styleUrl: './entrada-detail.component.scss',
+  templateUrl: './movimiento-documento-detail.component.html',
+  styleUrl: './movimiento-documento-detail.component.scss',
 })
-export class EntradaDetailComponent implements OnInit {
+export class MovimientoDocumentoDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly tenant = inject(TenantService);
@@ -223,8 +227,8 @@ export class EntradaDetailComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ cabecera, lineas }) => {
-          const read = cabecera as EntradaRead;
-          const form = entradaToFormValue(read);
+          const read = cabecera as MovimientoRead;
+          const form = movimientoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
             contacto: form.contacto?.nombre ?? read.contacto_nombre ?? null,
@@ -239,7 +243,7 @@ export class EntradaDetailComponent implements OnInit {
         error: () => {
           this.isLoading.set(false);
           this.notFound.set(true);
-          const toasts = this.t().entities.entrada.form.toasts;
+          const toasts = this.t().entities.movimientoInventario.form.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });

@@ -21,6 +21,11 @@ export const INVENTARIO_MODULE: ErpModuleDescriptor = {
               path: 'entrada/list',
               activeMatch: 'entrada',
             },
+            {
+              labelKey: 'entities.salida.name',
+              path: 'salida/list',
+              activeMatch: 'salida',
+            },
           ],
         },
       ],

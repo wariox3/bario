@@ -96,6 +96,13 @@ export class InventarioDocumentoDetallesComponent {
    */
   readonly almacenPorDefecto = input<ErpSelectOption | null>(null);
 
+  /**
+   * Campo del ítem con el que se valoriza la línea al elegirlo: `costo` (costo
+   * de reposición) o `costo_promedio` (promedio ponderado de las existencias).
+   * Lo decide cada documento — ver `costoFieldFor` en la familia movimiento.
+   */
+  readonly costoField = input<'costo' | 'costo_promedio'>('costo');
+
   /** Espejo reactivo del valor del array para la tabla y los totales. */
   protected readonly lines = signal<readonly InventarioDetalleFormRawValue[]>([]);
 
@@ -281,8 +288,9 @@ export class InventarioDocumentoDetallesComponent {
 
   /**
    * Cablea cada fila nueva: al (re)elegir ítem, autollena el precio con su
-   * **costo**. El autocomplete solo trae el precio de venta, así que el costo se
-   * lee del ítem completo (`GET /general/item/:id/`).
+   * costo (el campo que declare `costoField`). El autocomplete solo trae el
+   * precio de venta, así que el costo se lee del ítem completo
+   * (`GET /general/item/:id/`).
    */
   private wireRows(array: FormArray<InventarioDetalleGroup>): void {
     for (const group of array.controls) {
@@ -294,13 +302,18 @@ export class InventarioDocumentoDetallesComponent {
     }
   }
 
-  /** Trae el costo del ítem elegido y lo deja como precio de la línea. */
+  /**
+   * Trae el costo del ítem elegido y lo deja como precio de la línea. Si el
+   * documento pide `costo_promedio` y el ítem no lo trae (aún sin movimientos, o
+   * el backend no lo expone), cae al `costo`: mejor un valor razonable que 0.
+   */
   private loadItemCosto(group: InventarioDetalleGroup, opt: ItemOption | null): void {
     if (!opt) return;
+    const field = this.costoField();
     this.itemService
       .getById(opt.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((item) => group.controls.precio.setValue(item.costo ?? 0));
+      .subscribe((item) => group.controls.precio.setValue(item[field] ?? item.costo ?? 0));
   }
 
   /** Ejecuta la baja: local en alta/línea no persistida; contra la API en edición. */

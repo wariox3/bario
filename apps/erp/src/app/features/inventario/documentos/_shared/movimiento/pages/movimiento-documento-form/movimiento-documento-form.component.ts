@@ -40,25 +40,32 @@ import {
 } from '@erp/features/documentos/inventario/inventario-documento-detalle.form';
 import { inventarioDetalleToFormValue } from '@erp/features/documentos/inventario/inventario-documento-detalle.mapper';
 import type { InventarioDetalleRead } from '@erp/features/documentos/inventario/inventario-documento-detalle.model';
-import { entradaToFormValue, formValueToPayload } from '../../entrada.mapper';
-import type { EntradaRead } from '../../entrada.model';
+import { costoFieldFor } from '../../movimiento-documento.constants';
+import { movimientoToFormValue, formValueToPayload } from '../../movimiento-documento.mapper';
+import type { MovimientoRead } from '../../movimiento-documento.model';
 
 /**
- * Formulario de alta/edición de la **cabecera** de una Entrada de almacén.
+ * Formulario de alta/edición de la **cabecera** de un movimiento de inventario.
+ *
+ * Página **compartida** por los documentos de la familia (entrada, salida y —
+ * cuando se sume— traslado): comparten cabecera, líneas y flujo; lo único que
+ * los distingue es el `documento_tipo` del config y de qué campo del ítem sale
+ * el costo de la línea (`costoFieldFor`). Por eso el título sale de la config,
+ * no de un literal i18n.
  *
  * Camino A del enfoque híbrido: el documento vive sobre el endpoint genérico
  * `/api/general/documento`. El form recibe el `DocumentEntityConfig` por input
  * binding (resuelto por `activeDocumentResolver` en la ruta padre) y deriva de
- * él el `documentTypeId`, las claves i18n y la ruta de la lista.
+ * él el `documentTypeId`, el nombre visible y la ruta de la lista.
  *
- * Es de la familia inventario: cabecera mínima (contacto, almacén, fecha,
- * comentario) y líneas ítem/almacén/cantidad/costo sin impuestos. El almacén de
- * la cabecera precarga el de cada línea nueva.
+ * Cabecera mínima (contacto, almacén, fecha, comentario) y líneas
+ * ítem/almacén/cantidad/costo sin impuestos. El almacén de la cabecera precarga
+ * el de cada línea nueva.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
 @Component({
-  selector: 'app-entrada-form',
+  selector: 'app-movimiento-documento-form',
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -73,10 +80,10 @@ import type { EntradaRead } from '../../entrada.model';
     InventarioDocumentoDetallesComponent,
   ],
   providers: [ConfirmationService],
-  templateUrl: './entrada-form.component.html',
-  styleUrl: './entrada-form.component.scss',
+  templateUrl: './movimiento-documento-form.component.html',
+  styleUrl: './movimiento-documento-form.component.scss',
 })
-export class EntradaFormComponent implements OnInit, CanComponentDeactivate {
+export class MovimientoDocumentoFormComponent implements OnInit, CanComponentDeactivate {
   private readonly fb = inject(FormBuilder);
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
@@ -117,6 +124,17 @@ export class EntradaFormComponent implements OnInit, CanComponentDeactivate {
   });
   protected readonly isSaving = signal(false);
 
+  /**
+   * Nombre del documento activo (Entrada, Salida…). La página la comparte la
+   * familia: el título sale de la config, no de un literal i18n.
+   */
+  protected readonly documentName = computed(() =>
+    this.i18n.translate(this.document().displayNameKey),
+  );
+
+  /** De qué campo del ítem se valoriza la línea; lo declara cada documento. */
+  protected readonly costoField = computed(() => costoFieldFor(this.document().id));
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     inventarioDocumentoBreadcrumb(
       this.t(),
@@ -148,7 +166,7 @@ export class EntradaFormComponent implements OnInit, CanComponentDeactivate {
     // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
     const prefetched = this.documentoEdit();
     if (prefetched) {
-      this.applyCabecera(prefetched as EntradaRead);
+      this.applyCabecera(prefetched as MovimientoRead);
       this.loadLineas(Number(id));
     } else {
       this.loadDocumento(Number(id));
@@ -192,7 +210,7 @@ export class EntradaFormComponent implements OnInit, CanComponentDeactivate {
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
   private persistCabecera(id: string | undefined): void {
-    const toasts = this.t().entities.entrada.form.toasts;
+    const toasts = this.t().entities.movimientoInventario.form.toasts;
     // En edición se omiten los detalles del payload: ya transaccionaron en vivo.
     const payload = formValueToPayload(
       this.form.getRawValue(),
@@ -260,7 +278,7 @@ export class EntradaFormComponent implements OnInit, CanComponentDeactivate {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ cabecera, lineas }) => {
-          this.applyCabecera(cabecera as EntradaRead);
+          this.applyCabecera(cabecera as MovimientoRead);
           this.populateLineas(lineas);
         },
         error: () => this.notifyLoadError(),
@@ -282,8 +300,8 @@ export class EntradaFormComponent implements OnInit, CanComponentDeactivate {
    * Pobla la cabecera en el form. `emitEvent: false`: cargar el documento no es
    * una edición del usuario y no debe disparar reacciones de los controles.
    */
-  private applyCabecera(read: EntradaRead): void {
-    this.form.patchValue(entradaToFormValue(read), { emitEvent: false });
+  private applyCabecera(read: MovimientoRead): void {
+    this.form.patchValue(movimientoToFormValue(read), { emitEvent: false });
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
@@ -295,7 +313,7 @@ export class EntradaFormComponent implements OnInit, CanComponentDeactivate {
   }
 
   private notifyLoadError(): void {
-    const toasts = this.t().entities.entrada.form.toasts;
+    const toasts = this.t().entities.movimientoInventario.form.toasts;
     this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
 

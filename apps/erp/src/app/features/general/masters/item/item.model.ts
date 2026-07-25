@@ -14,6 +14,12 @@ export interface Item {
   readonly referencia: string | null;
   readonly precio: number;
   readonly costo: number;
+  /**
+   * Costo promedio ponderado de las existencias. Lo usan las salidas de almacén
+   * para valorizar la línea. Opcional: campo **supuesto** a partir del ERP
+   * legacy, pendiente de confirmar en el read del ítem del API nuevo.
+   */
+  readonly costo_promedio?: number | null;
   readonly producto: boolean;
   readonly servicio: boolean;
   readonly inventario: boolean;

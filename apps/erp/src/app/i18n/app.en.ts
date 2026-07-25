@@ -2851,10 +2851,30 @@ export const en: AppDict = {
         anulado: 'Voided',
         contabilizado: 'Posted',
       },
+    },
+    salida: {
+      name: 'Stock issue',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        total: 'Total',
+        aprobado: 'App',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+    },
+    movimientoInventario: {
       form: {
-        createTitle: 'New stock receipt',
-        editTitle: 'Edit stock receipt',
-        sectionHint: 'Main document data',
+        createHint: 'Main data of the new document',
+        editHint: 'Update the document data',
         fields: {
           contacto: 'Contact',
           contactoPlaceholder: 'Search contact…',
@@ -2866,15 +2886,15 @@ export const en: AppDict = {
         validation: { required: 'This field is required' },
         toasts: {
           createSuccess: {
-            title: 'Receipt created',
-            desc: 'The stock receipt was created successfully',
+            title: 'Document created',
+            desc: 'The document was created successfully',
           },
           createError: {
             title: 'Create failed',
-            desc: 'The stock receipt could not be created',
+            desc: 'The document could not be created',
           },
           editSuccess: {
-            title: 'Receipt updated',
+            title: 'Document updated',
             desc: 'Changes were saved successfully',
           },
           editError: {
@@ -2883,7 +2903,7 @@ export const en: AppDict = {
           },
           loadError: {
             title: 'Load failed',
-            desc: 'The stock receipt could not be loaded',
+            desc: 'The document could not be loaded',
           },
         },
       },
@@ -2897,7 +2917,7 @@ export const en: AppDict = {
           comentario: 'Comment',
         },
         notFound: {
-          title: 'Stock receipt not found',
+          title: 'Document not found',
           desc: 'The document does not exist or you do not have access to it',
         },
       },
