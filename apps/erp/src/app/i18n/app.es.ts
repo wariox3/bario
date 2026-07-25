@@ -2874,6 +2874,123 @@ export const es: AppDict = {
         },
       },
     },
+    entrada: {
+      name: 'Entrada',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva entrada',
+        editTitle: 'Editar entrada',
+        sectionHint: 'Datos principales del documento',
+        fields: {
+          contacto: 'Contacto',
+          contactoPlaceholder: 'Buscar contacto…',
+          almacen: 'Almacén',
+          almacenPlaceholder: 'Selecciona…',
+          fecha: 'Fecha',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: {
+            title: 'Entrada creada',
+            desc: 'La entrada se creó correctamente',
+          },
+          createError: {
+            title: 'Error al crear',
+            desc: 'No se pudo crear la entrada',
+          },
+          editSuccess: {
+            title: 'Entrada actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudieron guardar los cambios',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudo cargar la entrada',
+          },
+        },
+      },
+      detail: {
+        sections: { general: 'Información general', detalles: 'Detalles' },
+        labels: {
+          numero: 'Número',
+          contacto: 'Contacto',
+          almacen: 'Almacén',
+          fecha: 'Fecha',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Entrada no encontrada',
+          desc: 'El documento no existe o no tienes acceso a él',
+        },
+      },
+    },
+    inventarioDetalle: {
+      title: 'Detalles',
+      hint: 'Ítems que mueve el documento',
+      empty: 'Aún no hay líneas. Agrega la primera para empezar',
+      addLine: 'Agregar línea',
+      removeLine: 'Eliminar línea',
+      saveLine: 'Guardar línea',
+      saveAll: 'Guardar líneas',
+      pendingSuffix: 'sin guardar',
+      leaveHeader: 'Cambios sin guardar',
+      leaveMessage: 'Hay líneas sin guardar que se perderán. ¿Salir de todos modos?',
+      leaveConfirm: 'Salir sin guardar',
+      itemPlaceholder: 'Buscar ítem…',
+      almacenPlaceholder: 'Selecciona…',
+      confirmDeleteLine: '¿Eliminar esta línea del documento?',
+      columns: {
+        linea: '#',
+        item: 'Ítem',
+        almacen: 'Almacén',
+        cantidad: 'Cant.',
+        costo: 'Costo',
+        total: 'Total',
+        acciones: 'Acciones',
+      },
+      resumen: {
+        cantidad: 'Total cantidad',
+        subtotal: 'Subtotal',
+        total: 'Total',
+      },
+      toasts: {
+        lineSaveSuccess: {
+          title: 'Línea guardada',
+          desc: 'La línea se guardó correctamente',
+        },
+        lineSaveError: {
+          title: 'Error al guardar',
+          desc: 'No se pudo guardar la línea',
+        },
+        allSaved: {
+          title: 'Líneas guardadas',
+          desc: 'Se guardaron las líneas pendientes',
+        },
+        incompleteLines: {
+          title: 'Líneas incompletas',
+          desc: 'Completa o elimina las líneas sin ítem o sin almacén antes de guardar',
+        },
+      },
+    },
     cuentaDetalle: {
       empty: 'Aún no hay cuentas. Agrega la primera para empezar',
       addLine: 'Agregar cuenta',

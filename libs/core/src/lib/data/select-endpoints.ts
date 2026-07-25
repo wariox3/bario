@@ -22,5 +22,6 @@ export const SELECT_ENDPOINTS = {
   banco: '/general/banco/seleccionar/',
   cuentaBancoClase: '/general/cuenta-banco-clase/seleccionar/',
   centroCosto: '/contabilidad/centro-costo/seleccionar/',
+  almacen: '/inventario/almacen/seleccionar/',
   novedadTipo: '/humano/novedad-tipo/seleccionar/',
 } as const;

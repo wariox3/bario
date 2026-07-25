@@ -2833,6 +2833,123 @@ export const en: AppDict = {
         },
       },
     },
+    entrada: {
+      name: 'Stock receipt',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        total: 'Total',
+        aprobado: 'App',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New stock receipt',
+        editTitle: 'Edit stock receipt',
+        sectionHint: 'Main document data',
+        fields: {
+          contacto: 'Contact',
+          contactoPlaceholder: 'Search contact…',
+          almacen: 'Warehouse',
+          almacenPlaceholder: 'Select…',
+          fecha: 'Date',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Receipt created',
+            desc: 'The stock receipt was created successfully',
+          },
+          createError: {
+            title: 'Create failed',
+            desc: 'The stock receipt could not be created',
+          },
+          editSuccess: {
+            title: 'Receipt updated',
+            desc: 'Changes were saved successfully',
+          },
+          editError: {
+            title: 'Update failed',
+            desc: 'Changes could not be saved',
+          },
+          loadError: {
+            title: 'Load failed',
+            desc: 'The stock receipt could not be loaded',
+          },
+        },
+      },
+      detail: {
+        sections: { general: 'General information', detalles: 'Lines' },
+        labels: {
+          numero: 'Number',
+          contacto: 'Contact',
+          almacen: 'Warehouse',
+          fecha: 'Date',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Stock receipt not found',
+          desc: 'The document does not exist or you do not have access to it',
+        },
+      },
+    },
+    inventarioDetalle: {
+      title: 'Lines',
+      hint: 'Items moved by this document',
+      empty: 'No lines yet. Add the first one to get started',
+      addLine: 'Add line',
+      removeLine: 'Remove line',
+      saveLine: 'Save line',
+      saveAll: 'Save lines',
+      pendingSuffix: 'unsaved',
+      leaveHeader: 'Unsaved changes',
+      leaveMessage: 'There are unsaved lines that will be lost. Leave anyway?',
+      leaveConfirm: 'Leave without saving',
+      itemPlaceholder: 'Search item…',
+      almacenPlaceholder: 'Select…',
+      confirmDeleteLine: 'Remove this line from the document?',
+      columns: {
+        linea: '#',
+        item: 'Item',
+        almacen: 'Warehouse',
+        cantidad: 'Qty',
+        costo: 'Cost',
+        total: 'Total',
+        acciones: 'Actions',
+      },
+      resumen: {
+        cantidad: 'Total quantity',
+        subtotal: 'Subtotal',
+        total: 'Total',
+      },
+      toasts: {
+        lineSaveSuccess: {
+          title: 'Line saved',
+          desc: 'The line was saved successfully',
+        },
+        lineSaveError: {
+          title: 'Save failed',
+          desc: 'The line could not be saved',
+        },
+        allSaved: {
+          title: 'Lines saved',
+          desc: 'Pending lines were saved',
+        },
+        incompleteLines: {
+          title: 'Incomplete lines',
+          desc: 'Complete or remove lines without item or warehouse before saving',
+        },
+      },
+    },
     cuentaDetalle: {
       empty: 'No accounts yet. Add the first one to get started',
       addLine: 'Add account',

@@ -2144,6 +2144,93 @@ export interface AppDict
         incompleteLines: { title: string; desc: string };
       };
     };
+    entrada: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
+          fecha: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          almacen: string;
+          fecha: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    inventarioDetalle: {
+      title: string;
+      hint: string;
+      empty: string;
+      addLine: string;
+      removeLine: string;
+      saveLine: string;
+      saveAll: string;
+      pendingSuffix: string;
+      leaveHeader: string;
+      leaveMessage: string;
+      leaveConfirm: string;
+      itemPlaceholder: string;
+      almacenPlaceholder: string;
+      confirmDeleteLine: string;
+      columns: {
+        linea: string;
+        item: string;
+        almacen: string;
+        cantidad: string;
+        costo: string;
+        total: string;
+        acciones: string;
+      };
+      resumen: {
+        cantidad: string;
+        subtotal: string;
+        total: string;
+      };
+      toasts: {
+        lineSaveSuccess: { title: string; desc: string };
+        lineSaveError: { title: string; desc: string };
+        allSaved: { title: string; desc: string };
+        incompleteLines: { title: string; desc: string };
+      };
+    };
     cuentaDetalle: {
       empty: string;
       addLine: string;
