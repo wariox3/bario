@@ -2182,6 +2182,25 @@ export interface AppDict
         contabilizado: string;
       };
     };
+    traslado: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
     movimientoInventario: {
       form: {
         createHint: string;
@@ -2234,10 +2253,16 @@ export interface AppDict
         linea: string;
         item: string;
         almacen: string;
+        operacion: string;
         cantidad: string;
         costo: string;
         total: string;
         acciones: string;
+      };
+      /** Sentido del movimiento por línea; solo lo usa el traslado. */
+      operaciones: {
+        suma: string;
+        resta: string;
       };
       resumen: {
         cantidad: string;

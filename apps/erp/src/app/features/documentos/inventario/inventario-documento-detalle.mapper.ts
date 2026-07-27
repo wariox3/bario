@@ -5,6 +5,7 @@ import type {
 } from './inventario-documento-detalle.model';
 import type {
   InventarioDetalleFormRawValue,
+  OperacionInventario,
   ResumenInventario,
 } from './inventario-documento-detalle.types';
 
@@ -35,6 +36,15 @@ export function resumenInventario(
   return { cantidad, subtotal, total };
 }
 
+/**
+ * Normaliza el sentido del movimiento que llega del backend. Cualquier valor
+ * distinto de `-1` cae a `1` (suma): es el default del legacy y el único sentido
+ * posible en los documentos que no editan la columna.
+ */
+function toOperacionInventario(value: number | null | undefined): OperacionInventario {
+  return value === -1 ? -1 : 1;
+}
+
 /** Read-model (GET) → valores de formulario de una línea de inventario. */
 export function inventarioDetalleToFormValue(
   read: InventarioDetalleRead,
@@ -46,19 +56,29 @@ export function inventarioDetalleToFormValue(
     // solo aporta la etiqueta y el monto vigente es el que ya tiene la línea.
     item: read.item != null ? { id: read.item, nombre: read.item_nombre ?? '', precio } : null,
     almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
+    operacion_inventario: toOperacionInventario(read.operacion_inventario),
     cantidad: toFiniteNumber(read.cantidad),
     precio,
   };
 }
 
-/** Valores del formulario → payload de una línea de inventario (POST/PATCH). */
+/**
+ * Valores del formulario → payload de una línea de inventario (POST/PATCH).
+ *
+ * `incluirOperacion` lo prende solo el documento que edita el sentido del
+ * movimiento (el traslado). En entrada y salida el sentido lo deriva el backend
+ * del tipo de documento: mandarlo sería redundante en el mejor caso y
+ * contradictorio en el peor.
+ */
 export function inventarioDetalleToPayload(
   raw: InventarioDetalleFormRawValue,
+  incluirOperacion = false,
 ): InventarioDetallePayload {
   return {
     tipo_registro: 'I',
     item: raw.item?.id ?? null,
     almacen: raw.almacen?.id ?? null,
+    ...(incluirOperacion ? { operacion_inventario: raw.operacion_inventario } : {}),
     cantidad: raw.cantidad ?? null,
     precio: (raw.precio ?? 0).toFixed(2),
     total: lineTotal(raw).toFixed(2),

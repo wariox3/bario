@@ -9,6 +9,9 @@
         <th class="inventario-detalle-table__th min-w-[11rem] text-left">
           {{ c.columns.almacen }}
         </th>
+        @if (showOperacion()) {
+          <th class="inventario-detalle-table__th w-32 text-left">{{ c.columns.operacion }}</th>
+        }
         <th class="inventario-detalle-table__th w-24 text-right">{{ c.columns.cantidad }}</th>
         <th class="inventario-detalle-table__th w-32 text-right">{{ c.columns.costo }}</th>
         <th class="inventario-detalle-table__th w-32 text-right">{{ c.columns.total }}</th>
@@ -26,6 +29,11 @@
           <td class="inventario-detalle-table__td text-brand-text">
             {{ line.almacen?.nombre || '—' }}
           </td>
+          @if (showOperacion()) {
+            <td class="inventario-detalle-table__td text-brand-text">
+              {{ operacionLabel(line) }}
+            </td>
+          }
           <td class="inventario-detalle-table__td text-right tabular-nums">{{ line.cantidad }}</td>
           <td class="inventario-detalle-table__td text-right tabular-nums">
             {{ formatMoney(line.precio ?? 0) }}
@@ -38,7 +46,10 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="6" class="px-5 py-8 text-center text-sm text-brand-muted">
+          <td
+            [attr.colspan]="showOperacion() ? 7 : 6"
+            class="px-5 py-8 text-center text-sm text-brand-muted"
+          >
             <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
           </td>
         </tr>

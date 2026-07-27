@@ -1,6 +1,6 @@
 /**
  * Contratos de datos de la **cabecera** de un movimiento de inventario
- * (entrada, salida y —cuando se sume— traslado).
+ * (entrada, salida y traslado).
  *
  * Camino A del enfoque híbrido: el documento vive sobre el endpoint genérico
  * `/api/general/documento` discriminado por `documento_tipo`. Las interfaces

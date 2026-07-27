@@ -4,6 +4,7 @@ import { type Observable, defer, finalize, forkJoin, map, of, tap } from 'rxjs';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -33,14 +34,15 @@ import {
 import type { InventarioDetalleRead } from '../../inventario-documento-detalle.model';
 import type {
   InventarioDetalleFormRawValue,
+  OperacionInventario,
   ResumenInventario,
 } from '../../inventario-documento-detalle.types';
 import { InventarioDocumentoResumenComponent } from '../inventario-documento-resumen/inventario-documento-resumen.component';
 
 /**
  * Tabla de **líneas (detalles)** de un documento de inventario. Reutilizable por
- * todos los documentos que mueven stock (entrada hoy; salida y traslado cuando
- * se sumen): recibe el `FormArray` del form padre y lo edita **inline**.
+ * todos los documentos que mueven stock (entrada, salida y traslado): recibe el
+ * `FormArray` del form padre y lo edita **inline**.
  *
  * Frente a la tabla comercial: sin impuestos ni descuento, y con **almacén por
  * línea** (precargado con el de la cabecera). El precio de la línea es el
@@ -59,6 +61,7 @@ import { InventarioDocumentoResumenComponent } from '../inventario-documento-res
     ReactiveFormsModule,
     ButtonModule,
     InputNumberModule,
+    SelectModule,
     TooltipModule,
     ConfirmDialogModule,
     ErpItemAutocompleteComponent,
@@ -102,6 +105,25 @@ export class InventarioDocumentoDetallesComponent {
    * Lo decide cada documento — ver `costoFieldFor` en la familia movimiento.
    */
   readonly costoField = input<'costo' | 'costo_promedio'>('costo');
+
+  /**
+   * Muestra (y envía) la columna **operación**: si la línea suma o resta
+   * existencias en su bodega. Solo la prende el traslado, el único documento que
+   * mueve stock en los dos sentidos dentro del mismo documento.
+   */
+  readonly showOperacion = input(false);
+
+  /** Opciones del select de operación; se rearman al cambiar de idioma. */
+  // Array mutable: `p-select` tipa `options` como `any[]` y rechaza `readonly`.
+  protected readonly operacionOptions = computed<{ label: string; value: OperacionInventario }[]>(
+    () => {
+      const labels = this.t().entities.inventarioDetalle.operaciones;
+      return [
+        { label: labels.suma, value: 1 },
+        { label: labels.resta, value: -1 },
+      ];
+    },
+  );
 
   /** Espejo reactivo del valor del array para la tabla y los totales. */
   protected readonly lines = signal<readonly InventarioDetalleFormRawValue[]>([]);
@@ -197,7 +219,7 @@ export class InventarioDocumentoDetallesComponent {
    */
   private persistRow(group: InventarioDetalleGroup): Observable<InventarioDetalleRead> {
     const docId = this.documentId() as number;
-    const payload = inventarioDetalleToPayload(group.getRawValue());
+    const payload = inventarioDetalleToPayload(group.getRawValue(), this.showOperacion());
     const id = group.controls.id.value;
     const op =
       id != null

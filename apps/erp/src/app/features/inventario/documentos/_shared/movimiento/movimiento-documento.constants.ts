@@ -26,3 +26,19 @@ const COSTO_FIELD_BY_DOCUMENT: Readonly<Record<string, CostoField>> = {
 export function costoFieldFor(documentId: string): CostoField {
   return COSTO_FIELD_BY_DOCUMENT[documentId] ?? 'costo';
 }
+
+/**
+ * Documentos cuyas líneas declaran el **sentido** del movimiento (suma o resta
+ * existencias en la bodega de la línea).
+ *
+ * Solo el traslado: mueve stock entre bodegas, así que necesita las dos
+ * direcciones dentro del mismo documento. En entrada y salida el sentido lo fija
+ * el tipo de documento (`inventoryEffect`), la columna no se muestra y el campo
+ * ni se envía.
+ */
+const DOCUMENTS_CON_OPERACION: ReadonlySet<string> = new Set(['traslado']);
+
+/** `true` si el documento edita y envía `operacion_inventario` por línea. */
+export function usaOperacionInventario(documentId: string): boolean {
+  return DOCUMENTS_CON_OPERACION.has(documentId);
+}

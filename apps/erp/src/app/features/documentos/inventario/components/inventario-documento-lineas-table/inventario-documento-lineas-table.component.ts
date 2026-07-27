@@ -24,7 +24,19 @@ export class InventarioDocumentoLineasTableComponent {
   /** Líneas a renderizar (read mapeado a la forma del front). */
   readonly lines = input.required<readonly InventarioDetalleFormRawValue[]>();
 
+  /**
+   * Muestra la columna **operación** (suma/resta existencias). Solo la prende el
+   * traslado, el único documento que mueve stock en los dos sentidos.
+   */
+  readonly showOperacion = input(false);
+
   protected readonly formatMoney = formatCop;
+
+  /** Etiqueta legible del sentido del movimiento de una línea. */
+  protected operacionLabel(line: InventarioDetalleFormRawValue): string {
+    const labels = this.t().entities.inventarioDetalle.operaciones;
+    return line.operacion_inventario === -1 ? labels.resta : labels.suma;
+  }
 
   /** Valorización de una línea por índice. */
   protected totalOf(index: number): number {

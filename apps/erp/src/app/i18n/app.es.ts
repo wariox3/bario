@@ -2912,6 +2912,25 @@ export const es: AppDict = {
         contabilizado: 'Contabilizado',
       },
     },
+    traslado: {
+      name: 'Traslado',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+    },
     movimientoInventario: {
       form: {
         createHint: 'Datos principales del nuevo documento',
@@ -2982,10 +3001,15 @@ export const es: AppDict = {
         linea: '#',
         item: 'Ítem',
         almacen: 'Almacén',
+        operacion: 'Operación',
         cantidad: 'Cant.',
         costo: 'Costo',
         total: 'Total',
         acciones: 'Acciones',
+      },
+      operaciones: {
+        suma: 'Suma',
+        resta: 'Resta',
       },
       resumen: {
         cantidad: 'Total cantidad',

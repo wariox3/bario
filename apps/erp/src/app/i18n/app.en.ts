@@ -2871,6 +2871,25 @@ export const en: AppDict = {
         contabilizado: 'Posted',
       },
     },
+    traslado: {
+      name: 'Stock transfer',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        total: 'Total',
+        aprobado: 'App',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+    },
     movimientoInventario: {
       form: {
         createHint: 'Main data of the new document',
@@ -2941,10 +2960,15 @@ export const en: AppDict = {
         linea: '#',
         item: 'Item',
         almacen: 'Warehouse',
+        operacion: 'Operation',
         cantidad: 'Qty',
         costo: 'Cost',
         total: 'Total',
         acciones: 'Actions',
+      },
+      operaciones: {
+        suma: 'Add',
+        resta: 'Subtract',
       },
       resumen: {
         cantidad: 'Total quantity',

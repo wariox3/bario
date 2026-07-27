@@ -106,7 +106,7 @@
     </div>
 
     <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <app-inventario-documento-lineas-table [lines]="lines()" />
+      <app-inventario-documento-lineas-table [lines]="lines()" [showOperacion]="showOperacion()" />
 
       @if (lines().length > 0) {
         <app-inventario-documento-resumen [resumen]="resumen()" />

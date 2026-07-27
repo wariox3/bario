@@ -40,18 +40,19 @@ import {
 } from '@erp/features/documentos/inventario/inventario-documento-detalle.form';
 import { inventarioDetalleToFormValue } from '@erp/features/documentos/inventario/inventario-documento-detalle.mapper';
 import type { InventarioDetalleRead } from '@erp/features/documentos/inventario/inventario-documento-detalle.model';
-import { costoFieldFor } from '../../movimiento-documento.constants';
+import { costoFieldFor, usaOperacionInventario } from '../../movimiento-documento.constants';
 import { movimientoToFormValue, formValueToPayload } from '../../movimiento-documento.mapper';
 import type { MovimientoRead } from '../../movimiento-documento.model';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un movimiento de inventario.
  *
- * Página **compartida** por los documentos de la familia (entrada, salida y —
- * cuando se sume— traslado): comparten cabecera, líneas y flujo; lo único que
- * los distingue es el `documento_tipo` del config y de qué campo del ítem sale
- * el costo de la línea (`costoFieldFor`). Por eso el título sale de la config,
- * no de un literal i18n.
+ * Página **compartida** por los documentos de la familia (entrada, salida y
+ * traslado): comparten cabecera, líneas y flujo; lo que los distingue es el
+ * `documento_tipo` del config, de qué campo del ítem sale el costo de la línea
+ * (`costoFieldFor`) y si las líneas declaran el sentido del movimiento
+ * (`usaOperacionInventario`). Por eso el título sale de la config, no de un
+ * literal i18n.
  *
  * Camino A del enfoque híbrido: el documento vive sobre el endpoint genérico
  * `/api/general/documento`. El form recibe el `DocumentEntityConfig` por input
@@ -135,6 +136,12 @@ export class MovimientoDocumentoFormComponent implements OnInit, CanComponentDea
   /** De qué campo del ítem se valoriza la línea; lo declara cada documento. */
   protected readonly costoField = computed(() => costoFieldFor(this.document().id));
 
+  /**
+   * ¿Las líneas declaran el sentido del movimiento? Solo el traslado, que mueve
+   * stock entre bodegas y necesita sumar en una y restar en la otra.
+   */
+  protected readonly showOperacion = computed(() => usaOperacionInventario(this.document().id));
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     inventarioDocumentoBreadcrumb(
       this.t(),
@@ -212,11 +219,10 @@ export class MovimientoDocumentoFormComponent implements OnInit, CanComponentDea
   private persistCabecera(id: string | undefined): void {
     const toasts = this.t().entities.movimientoInventario.form.toasts;
     // En edición se omiten los detalles del payload: ya transaccionaron en vivo.
-    const payload = formValueToPayload(
-      this.form.getRawValue(),
-      this.document().documentTypeId,
-      !id,
-    );
+    const payload = formValueToPayload(this.form.getRawValue(), this.document().documentTypeId, {
+      includeDetalles: !id,
+      incluirOperacion: this.showOperacion(),
+    });
     const operation = id
       ? this.gateway.update(this.document(), Number(id), payload)
       : this.gateway.create(this.document(), payload);

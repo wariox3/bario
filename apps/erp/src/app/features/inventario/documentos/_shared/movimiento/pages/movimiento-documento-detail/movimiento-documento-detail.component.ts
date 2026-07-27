@@ -23,6 +23,7 @@ import type {
   InventarioDetalleFormRawValue,
   ResumenInventario,
 } from '@erp/features/documentos/inventario/inventario-documento-detalle.types';
+import { usaOperacionInventario } from '../../movimiento-documento.constants';
 import { movimientoToFormValue } from '../../movimiento-documento.mapper';
 import type { MovimientoRead } from '../../movimiento-documento.model';
 
@@ -40,9 +41,8 @@ interface CabeceraView {
 /**
  * Ficha (detalle) de un **movimiento de inventario** — solo lectura.
  *
- * Página **compartida** por los documentos de la familia (entrada, salida y —
- * cuando se sume— traslado): el nombre del documento sale de la config, no de un
- * literal i18n.
+ * Página **compartida** por los documentos de la familia (entrada, salida y
+ * traslado): el nombre del documento sale de la config, no de un literal i18n.
  *
  * Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas (`DocumentoDetalleService`)
  * en paralelo —igual que el form— y las muestra sin formularios. Desde aquí se
@@ -101,6 +101,9 @@ export class MovimientoDocumentoDetailComponent implements OnInit {
 
   /** Totales del documento: cantidad acumulada, subtotal y total. */
   protected readonly resumen = computed<ResumenInventario>(() => resumenInventario(this.lines()));
+
+  /** ¿Se muestra el sentido del movimiento por línea? Solo en el traslado. */
+  protected readonly showOperacion = computed(() => usaOperacionInventario(this.document().id));
 
   /** Migas: módulo Inventario → listado del documento → identificador del abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>

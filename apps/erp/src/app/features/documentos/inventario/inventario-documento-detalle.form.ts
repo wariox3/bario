@@ -1,13 +1,17 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import type { ErpSelectOption } from '@reddoc/core';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import type { InventarioDetalleFormRawValue } from './inventario-documento-detalle.types';
+import type {
+  InventarioDetalleFormRawValue,
+  OperacionInventario,
+} from './inventario-documento-detalle.types';
 
 /** `FormGroup` tipado de una línea de detalle de inventario. */
 export type InventarioDetalleGroup = FormGroup<{
   id: FormControl<number | null>;
   item: FormControl<ItemOption | null>;
   almacen: FormControl<ErpSelectOption | null>;
+  operacion_inventario: FormControl<OperacionInventario>;
   cantidad: FormControl<number | null>;
   precio: FormControl<number | null>;
 }>;
@@ -35,6 +39,11 @@ export function createInventarioDetalleGroup(
     }),
     almacen: new FormControl<ErpSelectOption | null>(value?.almacen ?? almacenPorDefecto ?? null, {
       validators: Validators.required,
+    }),
+    // Suma por defecto, como el legacy. Solo el traslado lo muestra y lo edita;
+    // los demás documentos lo dejan en su default y ni lo envían.
+    operacion_inventario: new FormControl<OperacionInventario>(value?.operacion_inventario ?? 1, {
+      nonNullable: true,
     }),
     cantidad: new FormControl<number | null>(value?.cantidad ?? 1, {
       validators: [Validators.required, Validators.min(0.01)],

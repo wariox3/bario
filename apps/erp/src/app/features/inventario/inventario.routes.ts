@@ -30,6 +30,11 @@ export const INVENTARIO_ROUTES: Route[] = [
         loadChildren: () =>
           import('./documentos/salida/salida.routes').then((m) => m.SALIDA_ROUTES),
       },
+      {
+        path: 'traslado',
+        loadChildren: () =>
+          import('./documentos/traslado/traslado.routes').then((m) => m.TRASLADO_ROUTES),
+      },
     ],
   },
 ];
