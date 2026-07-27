@@ -3132,6 +3132,20 @@ export const en: AppDict = {
         disponible: 'Available',
       },
     },
+    inventarioValorizado: {
+      name: 'Valued inventory',
+      columns: {
+        id: 'ID',
+        codigo: 'Code',
+        nombre: 'Name',
+        referencia: 'Reference',
+        existencia: 'On hand',
+        remision: 'Committed',
+        disponible: 'Available',
+        costoPromedio: 'Average cost',
+        costoTotal: 'Total cost',
+      },
+    },
     ventaItem: {
       name: 'Sales by item',
       columns: {

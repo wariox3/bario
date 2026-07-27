@@ -61,6 +61,10 @@ export const INVENTARIO_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.existenciaAlmacen.name',
               path: 'informes/existencia-almacen',
             },
+            {
+              labelKey: 'entities.inventarioValorizado.name',
+              path: 'informes/inventario-valorizado',
+            },
           ],
         },
       ],

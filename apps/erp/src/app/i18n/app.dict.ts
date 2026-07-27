@@ -2402,6 +2402,20 @@ export interface AppDict
         disponible: string;
       };
     };
+    inventarioValorizado: {
+      name: string;
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        referencia: string;
+        existencia: string;
+        remision: string;
+        disponible: string;
+        costoPromedio: string;
+        costoTotal: string;
+      };
+    };
     ventaItem: {
       name: string;
       columns: {

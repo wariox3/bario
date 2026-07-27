@@ -56,6 +56,13 @@ export const INVENTARIO_ROUTES: Route[] = [
             (m) => m.EXISTENCIA_ALMACEN_ROUTES,
           ),
       },
+      {
+        path: 'informes/inventario-valorizado',
+        loadChildren: () =>
+          import('./informes/inventario-valorizado/inventario-valorizado.routes').then(
+            (m) => m.INVENTARIO_VALORIZADO_ROUTES,
+          ),
+      },
     ],
   },
 ];
