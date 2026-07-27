@@ -16,6 +16,18 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
     { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
     {
       kind: 'accordion',
+      id: 'humano-documentos',
+      labelKey: 'layout.nav.sections.document',
+      iconClass: 'pi pi-file',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [{ labelKey: 'entities.nomina.name', path: 'nomina/list', activeMatch: 'nomina' }],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'humano-administracion',
       labelKey: 'layout.nav.sections.master',
       iconClass: 'pi pi-folder',

@@ -2379,6 +2379,80 @@ export interface AppDict
         valorPendiente: string;
       };
     };
+    nomina: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      detail: {
+        sections: { general: string; liquidacion: string; conceptos: string };
+        labels: {
+          numero: string;
+          empleado: string;
+          desde: string;
+          hasta: string;
+          contrato: string;
+          programacionDetalle: string;
+          comentario: string;
+          cue: string;
+          verDian: string;
+          salario: string;
+          basePrestacion: string;
+          baseCotizacion: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+        };
+        tooltips: { basePrestacion: string; baseCotizacion: string };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    nominaDetalle: {
+      empty: string;
+      columns: {
+        linea: string;
+        codigo: string;
+        concepto: string;
+        detalle: string;
+        credito: string;
+        porcentaje: string;
+        horas: string;
+        dias: string;
+        valorHora: string;
+        operacion: string;
+        devengado: string;
+        deduccion: string;
+        basePrestacion: string;
+        baseCotizacion: string;
+        baseImpuesto: string;
+      };
+      tooltips: {
+        credito: string;
+        horas: string;
+        dias: string;
+        basePrestacion: string;
+        baseCotizacion: string;
+      };
+      operaciones: { suma: string; resta: string; neutro: string };
+    };
     existencia: {
       name: string;
       columns: {

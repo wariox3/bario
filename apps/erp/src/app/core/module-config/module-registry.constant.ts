@@ -24,6 +24,7 @@ export const ERP_MODULE_REGISTRY = {
     import('../../features/tesoreria/tesoreria.config').then((m) => m.TESORERIA_CONFIG),
   inventario: () =>
     import('../../features/inventario/inventario.config').then((m) => m.INVENTARIO_CONFIG),
+  humano: () => import('../../features/humano/humano.config').then((m) => m.HUMANO_CONFIG),
 } as const satisfies ModuleRegistry;
 
 /**

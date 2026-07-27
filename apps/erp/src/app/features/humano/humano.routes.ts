@@ -1,11 +1,15 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { activeModuleResolver } from '@erp/core/module-config';
 import { HUMANO_MODULE } from './humano.module-descriptor';
 
 export const HUMANO_ROUTES: Route[] = [
   {
     path: '',
-    resolve: { _module: erpModuleResolver('humano') },
+    resolve: {
+      _navModule: erpModuleResolver('humano'), // topbar + sidebar
+      _docModule: activeModuleResolver('humano'), // carga HUMANO_CONFIG
+    },
     children: [
       moduleIndexRoute(HUMANO_MODULE),
       {
@@ -15,6 +19,11 @@ export const HUMANO_ROUTES: Route[] = [
           import('@erp/layouts/module-placeholder/module-placeholder.component').then(
             (m) => m.ModulePlaceholderComponent,
           ),
+      },
+      {
+        path: 'nomina',
+        loadChildren: () =>
+          import('./documentos/nomina/nomina.routes').then((m) => m.NOMINA_ROUTES),
       },
       {
         path: 'empleados',

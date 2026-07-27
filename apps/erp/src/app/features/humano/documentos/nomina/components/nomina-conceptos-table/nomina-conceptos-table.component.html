@@ -1,0 +1,88 @@
+@let c = t().entities.nominaDetalle;
+
+<div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <table class="nomina-conceptos-table">
+    <thead>
+      <tr>
+        <th class="nomina-conceptos-table__th w-10 text-center">{{ c.columns.linea }}</th>
+        <th class="nomina-conceptos-table__th w-16 text-right">{{ c.columns.codigo }}</th>
+        <th class="nomina-conceptos-table__th min-w-[14rem] text-left">{{ c.columns.concepto }}</th>
+        <th class="nomina-conceptos-table__th min-w-[10rem] text-left">{{ c.columns.detalle }}</th>
+        <th class="nomina-conceptos-table__th w-16 text-right" [title]="c.tooltips.credito">
+          {{ c.columns.credito }}
+        </th>
+        <th class="nomina-conceptos-table__th w-20 text-right">{{ c.columns.porcentaje }}</th>
+        <th class="nomina-conceptos-table__th w-16 text-right" [title]="c.tooltips.horas">
+          {{ c.columns.horas }}
+        </th>
+        <th class="nomina-conceptos-table__th w-16 text-right" [title]="c.tooltips.dias">
+          {{ c.columns.dias }}
+        </th>
+        <th class="nomina-conceptos-table__th w-28 text-right">{{ c.columns.valorHora }}</th>
+        <th class="nomina-conceptos-table__th w-24 text-left">{{ c.columns.operacion }}</th>
+        <th class="nomina-conceptos-table__th w-32 text-right">{{ c.columns.devengado }}</th>
+        <th class="nomina-conceptos-table__th w-32 text-right">{{ c.columns.deduccion }}</th>
+        <th class="nomina-conceptos-table__th w-32 text-right" [title]="c.tooltips.basePrestacion">
+          {{ c.columns.basePrestacion }}
+        </th>
+        <th class="nomina-conceptos-table__th w-32 text-right" [title]="c.tooltips.baseCotizacion">
+          {{ c.columns.baseCotizacion }}
+        </th>
+        <th class="nomina-conceptos-table__th w-32 text-right">{{ c.columns.baseImpuesto }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (line of lines(); track line.id) {
+        <tr class="nomina-conceptos-table__row">
+          <td class="nomina-conceptos-table__td text-center text-brand-muted tabular-nums">
+            {{ line.id }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right text-brand-muted tabular-nums">
+            {{ line.concepto_id ?? '—' }}
+          </td>
+          <td class="nomina-conceptos-table__td font-medium text-brand-text">
+            {{ line.concepto_nombre || '—' }}
+          </td>
+          <td class="nomina-conceptos-table__td text-brand-text">{{ line.detalle || '—' }}</td>
+          <td class="nomina-conceptos-table__td text-right text-brand-muted tabular-nums">
+            {{ line.credito_id ?? '—' }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatNumber(line.porcentaje) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatNumber(line.cantidad) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatNumber(line.dias) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatAmount(line.hora) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-brand-text">{{ operacionLabel(line) }}</td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatAmount(line.devengado) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatAmount(line.deduccion) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatAmount(line.base_prestacion) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatAmount(line.base_cotizacion) }}
+          </td>
+          <td class="nomina-conceptos-table__td text-right tabular-nums">
+            {{ formatAmount(line.base_impuesto) }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="15" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
