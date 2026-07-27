@@ -47,5 +47,17 @@ export const INVENTARIO_MODULE: ErpModuleDescriptor = {
         },
       ],
     },
+    {
+      kind: 'accordion',
+      id: 'inventario-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [{ labelKey: 'entities.existencia.name', path: 'informes/existencia' }],
+        },
+      ],
+    },
   ],
 };

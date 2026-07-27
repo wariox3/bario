@@ -44,6 +44,11 @@ export const INVENTARIO_ROUTES: Route[] = [
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
       },
+      {
+        path: 'informes/existencia',
+        loadChildren: () =>
+          import('./informes/existencia/existencia.routes').then((m) => m.EXISTENCIA_ROUTES),
+      },
     ],
   },
 ];

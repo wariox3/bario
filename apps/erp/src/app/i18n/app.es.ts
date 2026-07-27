@@ -3150,6 +3150,18 @@ export const es: AppDict = {
         valorPendiente: 'Vr pendiente',
       },
     },
+    existencia: {
+      name: 'Existencias',
+      columns: {
+        id: 'ID',
+        codigo: 'Código',
+        nombre: 'Nombre',
+        referencia: 'Referencia',
+        existencia: 'Existencia',
+        remision: 'Remisión',
+        disponible: 'Disponible',
+      },
+    },
     ventaItem: {
       name: 'Ventas por ítem',
       columns: {

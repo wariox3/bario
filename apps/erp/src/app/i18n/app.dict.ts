@@ -2379,6 +2379,18 @@ export interface AppDict
         valorPendiente: string;
       };
     };
+    existencia: {
+      name: string;
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        referencia: string;
+        existencia: string;
+        remision: string;
+        disponible: string;
+      };
+    };
     ventaItem: {
       name: string;
       columns: {

@@ -3109,6 +3109,18 @@ export const en: AppDict = {
         valorPendiente: 'Pending',
       },
     },
+    existencia: {
+      name: 'Stock on hand',
+      columns: {
+        id: 'ID',
+        codigo: 'Code',
+        nombre: 'Name',
+        referencia: 'Reference',
+        existencia: 'On hand',
+        remision: 'Committed',
+        disponible: 'Available',
+      },
+    },
     ventaItem: {
       name: 'Sales by item',
       columns: {
