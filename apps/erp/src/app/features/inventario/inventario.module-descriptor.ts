@@ -55,7 +55,13 @@ export const INVENTARIO_MODULE: ErpModuleDescriptor = {
       defaultExpanded: false,
       groups: [
         {
-          items: [{ labelKey: 'entities.existencia.name', path: 'informes/existencia' }],
+          items: [
+            { labelKey: 'entities.existencia.name', path: 'informes/existencia' },
+            {
+              labelKey: 'entities.existenciaAlmacen.name',
+              path: 'informes/existencia-almacen',
+            },
+          ],
         },
       ],
     },

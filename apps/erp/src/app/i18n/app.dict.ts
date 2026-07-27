@@ -2391,6 +2391,17 @@ export interface AppDict
         disponible: string;
       };
     };
+    existenciaAlmacen: {
+      name: string;
+      columns: {
+        id: string;
+        item: string;
+        almacen: string;
+        existencia: string;
+        remision: string;
+        disponible: string;
+      };
+    };
     ventaItem: {
       name: string;
       columns: {

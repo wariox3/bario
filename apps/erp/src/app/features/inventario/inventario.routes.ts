@@ -49,6 +49,13 @@ export const INVENTARIO_ROUTES: Route[] = [
         loadChildren: () =>
           import('./informes/existencia/existencia.routes').then((m) => m.EXISTENCIA_ROUTES),
       },
+      {
+        path: 'informes/existencia-almacen',
+        loadChildren: () =>
+          import('./informes/existencia-almacen/existencia-almacen.routes').then(
+            (m) => m.EXISTENCIA_ALMACEN_ROUTES,
+          ),
+      },
     ],
   },
 ];

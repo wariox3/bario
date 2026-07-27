@@ -3162,6 +3162,17 @@ export const es: AppDict = {
         disponible: 'Disponible',
       },
     },
+    existenciaAlmacen: {
+      name: 'Existencias por almacén',
+      columns: {
+        id: 'ID',
+        item: 'Ítem',
+        almacen: 'Almacén',
+        existencia: 'Existencia',
+        remision: 'Remisión',
+        disponible: 'Disponible',
+      },
+    },
     ventaItem: {
       name: 'Ventas por ítem',
       columns: {
