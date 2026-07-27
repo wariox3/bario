@@ -35,5 +35,17 @@ export const INVENTARIO_MODULE: ErpModuleDescriptor = {
         },
       ],
     },
+    {
+      kind: 'accordion',
+      id: 'inventario-administracion',
+      labelKey: 'layout.nav.sections.master',
+      iconClass: 'pi pi-folder',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [{ labelKey: 'entities.item.name', path: 'items' }],
+        },
+      ],
+    },
   ],
 };

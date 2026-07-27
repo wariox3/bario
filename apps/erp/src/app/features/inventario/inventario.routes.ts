@@ -35,6 +35,15 @@ export const INVENTARIO_ROUTES: Route[] = [
         loadChildren: () =>
           import('./documentos/traslado/traslado.routes').then((m) => m.TRASLADO_ROUTES),
       },
+      // Master compartido: el ítem vive en General pero se administra desde
+      // cualquier módulo que lo use (venta y compra ya lo montan igual). Sus
+      // páginas derivan el módulo del `ActiveModuleStore`, así que las URLs y
+      // las migas quedan bajo `/t/:slug/inventario/items`.
+      {
+        path: 'items',
+        loadChildren: () =>
+          import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
+      },
     ],
   },
 ];
