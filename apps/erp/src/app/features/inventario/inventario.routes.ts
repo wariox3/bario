@@ -63,6 +63,13 @@ export const INVENTARIO_ROUTES: Route[] = [
             (m) => m.INVENTARIO_VALORIZADO_ROUTES,
           ),
       },
+      {
+        path: 'informes/historial-movimiento',
+        loadChildren: () =>
+          import('./informes/historial-movimiento/historial-movimiento.routes').then(
+            (m) => m.HISTORIAL_MOVIMIENTO_ROUTES,
+          ),
+      },
     ],
   },
 ];

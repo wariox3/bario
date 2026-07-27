@@ -2416,6 +2416,21 @@ export interface AppDict
         costoTotal: string;
       };
     };
+    historialMovimiento: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        documentoTipo: string;
+        fecha: string;
+        contacto: string;
+        item: string;
+        cantidad: string;
+        costo: string;
+        precio: string;
+        subtotal: string;
+      };
+    };
     ventaItem: {
       name: string;
       columns: {

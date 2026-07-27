@@ -3187,6 +3187,21 @@ export const es: AppDict = {
         costoTotal: 'Costo total',
       },
     },
+    historialMovimiento: {
+      name: 'Historial de movimientos',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        documentoTipo: 'Tipo',
+        fecha: 'Fecha',
+        contacto: 'Contacto',
+        item: 'Ítem',
+        cantidad: 'Cantidad',
+        costo: 'Costo',
+        precio: 'Precio',
+        subtotal: 'Subtotal',
+      },
+    },
     ventaItem: {
       name: 'Ventas por ítem',
       columns: {
