@@ -66,6 +66,7 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
+            { labelKey: 'entities.contacto.name', path: 'contactos' },
             { labelKey: 'entities.cuenta.name', path: 'cuentas' },
             { labelKey: 'entities.centroCosto.name', path: 'centros-costo' },
             { labelKey: 'entities.activo.name', path: 'activos' },

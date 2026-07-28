@@ -84,6 +84,15 @@ export const CONTABILIDAD_ROUTES: Route[] = [
             (m) => m.AUXILIAR_CUENTA_ROUTES,
           ),
       },
+      // Master reutilizado del módulo General: los informes contables se abren
+      // por tercero, así que conviene tenerlo a mano sin cambiar de módulo.
+      {
+        path: 'contactos',
+        loadChildren: () =>
+          import('@erp/features/general/masters/contacto/contacto.routes').then(
+            (m) => m.CONTACTO_ROUTES,
+          ),
+      },
       {
         path: 'centros-costo',
         loadChildren: () =>
