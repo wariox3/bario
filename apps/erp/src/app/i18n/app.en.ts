@@ -3243,6 +3243,16 @@ export const en: AppDict = {
     auxiliarCuenta: { name: 'Account ledger' },
     auxiliarGeneral: { name: 'General ledger' },
     auxiliarContacto: { name: 'Ledger by contact' },
+    estadoFinanciero: {
+      columns: {
+        clase: 'Class',
+        grupo: 'Group',
+        cuenta: 'Account',
+        cuentaNombre: 'Account name',
+        saldo: 'Balance',
+      },
+    },
+    estadoResultados: { name: 'Income statement' },
     certificadoRetencion: {
       name: 'Withholding certificate',
       columns: {

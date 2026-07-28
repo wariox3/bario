@@ -7,7 +7,7 @@ import type { BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import type { InformeCuentasService } from './informe-cuentas.service';
-import type { InformeCuentasRangoParams } from './informe-cuentas.types';
+import type { InformeCuentasParams, InformePeriodoParams } from './informe-cuentas.types';
 import { buildInformeCuentasForm, buildInformeCuentasParams } from './informe-cuentas.utils';
 import { rangoFechas } from './informe-cuentas.validators';
 
@@ -29,7 +29,7 @@ import { rangoFechas } from './informe-cuentas.validators';
  */
 export abstract class InformeCuentasPageBase<
   TRow,
-  TParams extends InformeCuentasRangoParams = InformeCuentasRangoParams,
+  TParams extends InformePeriodoParams = InformeCuentasParams,
 > {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);

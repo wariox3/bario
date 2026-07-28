@@ -3284,6 +3284,16 @@ export const es: AppDict = {
     auxiliarCuenta: { name: 'Auxiliar de cuenta' },
     auxiliarGeneral: { name: 'Auxiliar general' },
     auxiliarContacto: { name: 'Auxiliar por contacto' },
+    estadoFinanciero: {
+      columns: {
+        clase: 'Clase',
+        grupo: 'Grupo',
+        cuenta: 'Cuenta',
+        cuentaNombre: 'Nombre de la cuenta',
+        saldo: 'Saldo',
+      },
+    },
+    estadoResultados: { name: 'Estado de resultados' },
     certificadoRetencion: {
       name: 'Certificado de retención',
       columns: {

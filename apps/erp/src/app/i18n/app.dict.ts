@@ -2499,6 +2499,16 @@ export interface AppDict
     auxiliarCuenta: { name: string };
     auxiliarGeneral: { name: string };
     auxiliarContacto: { name: string };
+    estadoFinanciero: {
+      columns: {
+        clase: string;
+        grupo: string;
+        cuenta: string;
+        cuentaNombre: string;
+        saldo: string;
+      };
+    };
+    estadoResultados: { name: string };
     certificadoRetencion: {
       name: string;
       columns: {

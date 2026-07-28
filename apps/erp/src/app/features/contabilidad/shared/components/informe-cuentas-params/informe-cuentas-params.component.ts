@@ -43,4 +43,10 @@ export class InformeCuentasParamsComponent {
    * informes arman sus parámetros con `buildRangoParams`.
    */
   readonly showFlags = input<boolean>(true);
+
+  /**
+   * Muestra el rango de cuentas. Se apaga en los estados financieros, que
+   * cubren las clases que les corresponden y no un rango elegido a mano.
+   */
+  readonly showCuentas = input<boolean>(true);
 }

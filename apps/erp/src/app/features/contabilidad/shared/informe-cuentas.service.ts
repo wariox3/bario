@@ -1,6 +1,10 @@
 import { map, type Observable } from 'rxjs';
 import { BaseHttpService } from '@reddoc/core';
-import type { InformeContableResponse, InformeCuentasRangoParams } from './informe-cuentas.types';
+import type {
+  InformeContableResponse,
+  InformeCuentasParams,
+  InformePeriodoParams,
+} from './informe-cuentas.types';
 
 /**
  * Base de los servicios de informes contables.
@@ -22,7 +26,7 @@ import type { InformeContableResponse, InformeCuentasRangoParams } from './infor
  */
 export abstract class InformeCuentasService<
   TRow,
-  TParams extends InformeCuentasRangoParams = InformeCuentasRangoParams,
+  TParams extends InformePeriodoParams = InformeCuentasParams,
 > extends BaseHttpService {
   /** Path del informe, p. ej. `/contabilidad/movimiento/informe-balance-prueba/`. */
   protected abstract readonly endpoint: string;

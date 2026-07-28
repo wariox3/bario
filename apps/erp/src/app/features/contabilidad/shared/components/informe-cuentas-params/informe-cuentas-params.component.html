@@ -32,27 +32,29 @@
   </div>
 
   <!-- Rango de cuentas (vacío = todo el plan) -->
-  <div class="flex flex-col gap-1.5">
-    <label [for]="p + '-cuenta-desde'" class="informe-params__label">{{
-      d.params.cuentaDesde
-    }}</label>
-    <app-cuenta-select
-      [inputId]="p + '-cuenta-desde'"
-      formControlName="cuenta_desde"
-      [placeholder]="d.params.cuentaPlaceholder"
-    />
-  </div>
+  @if (showCuentas()) {
+    <div class="flex flex-col gap-1.5">
+      <label [for]="p + '-cuenta-desde'" class="informe-params__label">{{
+        d.params.cuentaDesde
+      }}</label>
+      <app-cuenta-select
+        [inputId]="p + '-cuenta-desde'"
+        formControlName="cuenta_desde"
+        [placeholder]="d.params.cuentaPlaceholder"
+      />
+    </div>
 
-  <div class="flex flex-col gap-1.5">
-    <label [for]="p + '-cuenta-hasta'" class="informe-params__label">{{
-      d.params.cuentaHasta
-    }}</label>
-    <app-cuenta-select
-      [inputId]="p + '-cuenta-hasta'"
-      formControlName="cuenta_hasta"
-      [placeholder]="d.params.cuentaPlaceholder"
-    />
-  </div>
+    <div class="flex flex-col gap-1.5">
+      <label [for]="p + '-cuenta-hasta'" class="informe-params__label">{{
+        d.params.cuentaHasta
+      }}</label>
+      <app-cuenta-select
+        [inputId]="p + '-cuenta-hasta'"
+        formControlName="cuenta_hasta"
+        [placeholder]="d.params.cuentaPlaceholder"
+      />
+    </div>
+  }
 
   <!-- Parámetros propios del informe (contacto, comprobante…) -->
   <ng-content />

@@ -31,6 +31,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/estado-resultados',
+        loadChildren: () =>
+          import('./informes/estado-resultados/estado-resultados.routes').then(
+            (m) => m.ESTADO_RESULTADOS_ROUTES,
+          ),
+      },
+      {
         path: 'informes/certificado-retencion',
         loadChildren: () =>
           import('./informes/certificado-retencion/certificado-retencion.routes').then(

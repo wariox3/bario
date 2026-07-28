@@ -20,14 +20,22 @@ import type { ErpSelectOption } from '@reddoc/core';
  */
 
 /**
- * Lo mínimo que declara todo informe contable: el periodo y el rango de
- * cuentas. Los que además ofrecen las dos banderas usan `InformeCuentasParams`.
+ * Lo mínimo que declara **todo** informe contable: el periodo. Es lo único que
+ * mandan los estados financieros, que cubren las clases que les corresponden y
+ * no un rango elegido a mano.
  */
-export interface InformeCuentasRangoParams {
+export interface InformePeriodoParams {
   /** Inicio del periodo (`yyyy-MM-dd`). */
   readonly fecha_desde: string;
   /** Fin del periodo (`yyyy-MM-dd`). */
   readonly fecha_hasta: string;
+}
+
+/**
+ * Periodo + rango de cuentas. Los que además ofrecen las dos banderas usan
+ * `InformeCuentasParams`.
+ */
+export interface InformeCuentasRangoParams extends InformePeriodoParams {
   /** Extremos del rango de cuentas (opcional). El backend recibe id y código. */
   readonly cuenta_desde: number | null;
   readonly cuenta_hasta: number | null;
@@ -115,6 +123,22 @@ export interface InformeCuentasContactoParams extends InformeCuentasParams {
 export interface InformeCuentasMovimientoParams extends InformeCuentasContactoParams {
   readonly numero: number | null;
   readonly comprobante: number | null;
+}
+
+/**
+ * Fila de los **estados financieros** (resultados y situación financiera): una
+ * cuenta con su saldo, ubicada en el plan por clase y grupo.
+ *
+ * Los dos informes comparten forma exacta, por eso el tipo y la tabla viven
+ * acá. `debito` y `credito` los declaraba el ERP anterior pero su tabla no los
+ * mostraba; se omiten hasta saber si el backend los manda.
+ */
+export interface EstadoFinancieroRow {
+  readonly cuenta_clase_nombre: string | null;
+  readonly cuenta_grupo_nombre: string | null;
+  readonly cuenta_codigo: string | null;
+  readonly cuenta_nombre: string | null;
+  readonly saldo: number | string | null;
 }
 
 /** Respuesta de los endpoints de informe: el resultado completo, sin envelope paginado. */
