@@ -29,6 +29,7 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
               path: 'informes/balance-prueba-contacto',
             },
             { labelKey: 'entities.auxiliarCuenta.name', path: 'informes/auxiliar-cuenta' },
+            { labelKey: 'entities.auxiliarContacto.name', path: 'informes/auxiliar-contacto' },
             { labelKey: 'entities.auxiliarGeneral.name', path: 'informes/auxiliar-general' },
           ],
         },

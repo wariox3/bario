@@ -2498,6 +2498,7 @@ export interface AppDict
     balancePruebaContacto: { name: string };
     auxiliarCuenta: { name: string };
     auxiliarGeneral: { name: string };
+    auxiliarContacto: { name: string };
     nominaInforme: {
       name: string;
       columns: {

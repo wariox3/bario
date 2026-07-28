@@ -3242,6 +3242,7 @@ export const en: AppDict = {
     balancePruebaContacto: { name: 'Trial balance by contact' },
     auxiliarCuenta: { name: 'Account ledger' },
     auxiliarGeneral: { name: 'General ledger' },
+    auxiliarContacto: { name: 'Ledger by contact' },
     nominaInforme: {
       name: 'Payroll',
       columns: {

@@ -3283,6 +3283,7 @@ export const es: AppDict = {
     balancePruebaContacto: { name: 'Balance de prueba por contacto' },
     auxiliarCuenta: { name: 'Auxiliar de cuenta' },
     auxiliarGeneral: { name: 'Auxiliar general' },
+    auxiliarContacto: { name: 'Auxiliar por contacto' },
     nominaInforme: {
       name: 'Nómina',
       columns: {

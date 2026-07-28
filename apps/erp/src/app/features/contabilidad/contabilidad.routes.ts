@@ -31,6 +31,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/auxiliar-contacto',
+        loadChildren: () =>
+          import('./informes/auxiliar-contacto/auxiliar-contacto.routes').then(
+            (m) => m.AUXILIAR_CONTACTO_ROUTES,
+          ),
+      },
+      {
         path: 'informes/auxiliar-general',
         loadChildren: () =>
           import('./informes/auxiliar-general/auxiliar-general.routes').then(
