@@ -24,6 +24,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/auxiliar-cuenta',
+        loadChildren: () =>
+          import('./informes/auxiliar-cuenta/auxiliar-cuenta.routes').then(
+            (m) => m.AUXILIAR_CUENTA_ROUTES,
+          ),
+      },
+      {
         path: 'centros-costo',
         loadChildren: () =>
           import('./masters/centro-costo/centro-costo.routes').then((m) => m.CENTRO_COSTO_ROUTES),

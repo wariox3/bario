@@ -22,7 +22,10 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
       defaultExpanded: false,
       groups: [
         {
-          items: [{ labelKey: 'entities.balancePrueba.name', path: 'informes/balance-prueba' }],
+          items: [
+            { labelKey: 'entities.balancePrueba.name', path: 'informes/balance-prueba' },
+            { labelKey: 'entities.auxiliarCuenta.name', path: 'informes/auxiliar-cuenta' },
+          ],
         },
       ],
     },

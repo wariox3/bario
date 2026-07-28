@@ -1,0 +1,24 @@
+<!--
+  Informe "Auxiliar de cuenta".
+  Misma forma que el balance de prueba: panel de parámetros + botonera en el
+  slot [toolbar] de list-shell, y la tabla de saldos, que arranca vacía hasta
+  Generar y no pagina.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params [form]="form" idPrefix="ac" />
+
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </div>
+
+  <app-saldos-cuenta-table table [rows]="rows()" [generated]="generated()" />
+</lib-list-shell>
