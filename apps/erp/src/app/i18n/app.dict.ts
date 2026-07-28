@@ -2477,6 +2477,34 @@ export interface AppDict
       /** Claves = valor crudo de `operacion` (1 suma, -1 resta, 0 neutro). */
       operaciones: { '1': string; '0': string; '-1': string };
     };
+    nominaElectronicaInforme: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        empleado: string;
+        contrato: string;
+        salario: string;
+        baseCotizacion: string;
+        basePrestacion: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+      };
+      filters: {
+        fechaHasta: string;
+        empleadoIdentificacion: string;
+        empleadoNombre: string;
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+      };
+    };
     existencia: {
       name: string;
       columns: {

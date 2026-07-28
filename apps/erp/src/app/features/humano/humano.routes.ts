@@ -33,6 +33,13 @@ export const HUMANO_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/nomina-electronica',
+        loadChildren: () =>
+          import('./informes/nomina-electronica/nomina-electronica.routes').then(
+            (m) => m.NOMINA_ELECTRONICA_INFORME_ROUTES,
+          ),
+      },
+      {
         path: 'empleados',
         loadChildren: () =>
           import('./masters/empleado/empleado.routes').then((m) => m.EMPLEADO_ROUTES),
