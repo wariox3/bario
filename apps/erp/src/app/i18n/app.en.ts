@@ -3253,6 +3253,7 @@ export const en: AppDict = {
       },
     },
     estadoResultados: { name: 'Income statement' },
+    estadoSituacionFinanciera: { name: 'Statement of financial position' },
     certificadoRetencion: {
       name: 'Withholding certificate',
       columns: {

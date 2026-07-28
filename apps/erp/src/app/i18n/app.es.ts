@@ -3294,6 +3294,7 @@ export const es: AppDict = {
       },
     },
     estadoResultados: { name: 'Estado de resultados' },
+    estadoSituacionFinanciera: { name: 'Estado de situación financiera' },
     certificadoRetencion: {
       name: 'Certificado de retención',
       columns: {

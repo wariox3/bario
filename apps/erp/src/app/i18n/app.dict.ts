@@ -2509,6 +2509,7 @@ export interface AppDict
       };
     };
     estadoResultados: { name: string };
+    estadoSituacionFinanciera: { name: string };
     certificadoRetencion: {
       name: string;
       columns: {

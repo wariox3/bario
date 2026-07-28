@@ -1,0 +1,29 @@
+<!--
+  Informe "Estado de situación financiera".
+  Misma pantalla que el estado de resultados con otro endpoint: el panel de
+  parámetros solo muestra el periodo y la tabla es la compartida. Sin PDF.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params
+      [form]="form"
+      idPrefix="esf"
+      [showCuentas]="false"
+      [showFlags]="false"
+    />
+
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="false"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </div>
+
+  <app-estado-financiero-table table [rows]="rows()" [generated]="generated()" />
+</lib-list-shell>

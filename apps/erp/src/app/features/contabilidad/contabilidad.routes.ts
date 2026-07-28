@@ -31,6 +31,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/estado-situacion-financiera',
+        loadChildren: () =>
+          import('./informes/estado-situacion-financiera/estado-situacion-financiera.routes').then(
+            (m) => m.ESTADO_SITUACION_FINANCIERA_ROUTES,
+          ),
+      },
+      {
         path: 'informes/estado-resultados',
         loadChildren: () =>
           import('./informes/estado-resultados/estado-resultados.routes').then(

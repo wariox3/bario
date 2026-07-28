@@ -37,6 +37,10 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
               path: 'informes/certificado-retencion',
             },
             { labelKey: 'entities.estadoResultados.name', path: 'informes/estado-resultados' },
+            {
+              labelKey: 'entities.estadoSituacionFinanciera.name',
+              path: 'informes/estado-situacion-financiera',
+            },
           ],
         },
       ],
