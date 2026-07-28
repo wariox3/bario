@@ -47,6 +47,18 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'contabilidad-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [{ labelKey: 'entities.contabilizar.name', path: 'utilidades/contabilizar' }],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'contabilidad-administracion',
       labelKey: 'layout.nav.sections.master',
       iconClass: 'pi pi-folder',

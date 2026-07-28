@@ -17,6 +17,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'utilidades/contabilizar',
+        loadChildren: () =>
+          import('./utilidades/contabilizar/contabilizar.routes').then(
+            (m) => m.CONTABILIZAR_ROUTES,
+          ),
+      },
+      {
         path: 'informes/balance-prueba',
         loadChildren: () =>
           import('./informes/balance-prueba/balance-prueba.routes').then(

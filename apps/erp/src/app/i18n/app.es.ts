@@ -3284,6 +3284,66 @@ export const es: AppDict = {
     auxiliarCuenta: { name: 'Auxiliar de cuenta' },
     auxiliarGeneral: { name: 'Auxiliar general' },
     auxiliarContacto: { name: 'Auxiliar por contacto' },
+    contabilizar: {
+      name: 'Contabilizar',
+      actions: { contabilizar: 'Contabilizar', descontabilizar: 'Descontabilizar' },
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Tipo',
+        numero: 'Número',
+        fecha: 'Fecha',
+        contacto: 'Contacto',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+      },
+      descontabilizar: {
+        title: 'Descontabilizar',
+        subtitle: 'Revierte la contabilización de los documentos del rango.',
+        submit: 'Descontabilizar',
+        warning:
+          'Se descontabilizarán todos los documentos que caigan en el rango, sin listarlos antes.',
+        fields: {
+          fechaDesde: 'Fecha desde',
+          fechaHasta: 'Fecha hasta',
+          numeroDesde: 'Número desde',
+          numeroHasta: 'Número hasta',
+          documentoTipo: 'Tipo de documento',
+          documentoTipoPlaceholder: 'Todos los tipos',
+        },
+        validation: { rangoInvertido: 'La fecha desde no puede ser mayor a la fecha hasta.' },
+        toasts: {
+          success: {
+            title: 'Documentos descontabilizados',
+            desc: 'Se revirtió la contabilización de los documentos del rango.',
+          },
+          error: {
+            title: 'Error al descontabilizar',
+            desc: 'No se pudieron descontabilizar los documentos. Intentá de nuevo.',
+          },
+          empty: {
+            title: 'Sin documentos',
+            desc: 'Ningún documento contabilizado coincide con el criterio.',
+          },
+          parcial: {
+            title: 'Se procesó solo una parte',
+            desc: 'El criterio abarca {total} documentos y se procesaron {procesados} (tope de {limite}). Repetí la operación para los restantes.',
+          },
+        },
+      },
+      toasts: {
+        contabilizar: {
+          success: {
+            title: 'Documentos contabilizados',
+            desc: 'Los documentos seleccionados se contabilizaron correctamente.',
+          },
+          error: {
+            title: 'Error al contabilizar',
+            desc: 'No se pudieron contabilizar los documentos. Intentá de nuevo.',
+          },
+        },
+      },
+    },
     estadoFinanciero: {
       columns: {
         clase: 'Clase',

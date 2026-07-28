@@ -3243,6 +3243,65 @@ export const en: AppDict = {
     auxiliarCuenta: { name: 'Account ledger' },
     auxiliarGeneral: { name: 'General ledger' },
     auxiliarContacto: { name: 'Ledger by contact' },
+    contabilizar: {
+      name: 'Post to ledger',
+      actions: { contabilizar: 'Post', descontabilizar: 'Unpost' },
+      columns: {
+        id: 'ID',
+        documentoTipo: 'Type',
+        numero: 'Number',
+        fecha: 'Date',
+        contacto: 'Contact',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+      },
+      descontabilizar: {
+        title: 'Unpost',
+        subtitle: 'Reverses the posting of every document in the range.',
+        submit: 'Unpost',
+        warning: 'Every document in the range will be unposted, without listing them first.',
+        fields: {
+          fechaDesde: 'Date from',
+          fechaHasta: 'Date to',
+          numeroDesde: 'Number from',
+          numeroHasta: 'Number to',
+          documentoTipo: 'Document type',
+          documentoTipoPlaceholder: 'All types',
+        },
+        validation: { rangoInvertido: 'The start date cannot be later than the end date.' },
+        toasts: {
+          success: {
+            title: 'Documents unposted',
+            desc: 'The posting was reversed for the documents in the range.',
+          },
+          error: {
+            title: 'Could not unpost',
+            desc: 'The documents could not be unposted. Please try again.',
+          },
+          empty: {
+            title: 'No documents',
+            desc: 'No posted document matches the criteria.',
+          },
+          parcial: {
+            title: 'Only part was processed',
+            desc: 'The criteria covers {total} documents and {procesados} were processed (cap of {limite}). Run it again for the rest.',
+          },
+        },
+      },
+      toasts: {
+        contabilizar: {
+          success: {
+            title: 'Documents posted',
+            desc: 'The selected documents were posted successfully.',
+          },
+          error: {
+            title: 'Could not post',
+            desc: 'The documents could not be posted. Please try again.',
+          },
+        },
+      },
+    },
     estadoFinanciero: {
       columns: {
         clase: 'Class',

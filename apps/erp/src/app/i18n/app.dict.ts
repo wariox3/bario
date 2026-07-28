@@ -2499,6 +2499,47 @@ export interface AppDict
     auxiliarCuenta: { name: string };
     auxiliarGeneral: { name: string };
     auxiliarContacto: { name: string };
+    contabilizar: {
+      name: string;
+      actions: { contabilizar: string; descontabilizar: string };
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+      };
+      descontabilizar: {
+        title: string;
+        subtitle: string;
+        submit: string;
+        warning: string;
+        fields: {
+          fechaDesde: string;
+          fechaHasta: string;
+          numeroDesde: string;
+          numeroHasta: string;
+          documentoTipo: string;
+          documentoTipoPlaceholder: string;
+        };
+        validation: { rangoInvertido: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+          empty: { title: string; desc: string };
+          parcial: { title: string; desc: string };
+        };
+      };
+      toasts: {
+        contabilizar: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
+    };
     estadoFinanciero: {
       columns: {
         clase: string;
