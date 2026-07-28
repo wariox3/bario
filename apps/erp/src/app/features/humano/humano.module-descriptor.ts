@@ -28,6 +28,23 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'humano-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.nominaDetalleInforme.name',
+              path: 'informes/nomina-detalle',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'humano-administracion',
       labelKey: 'layout.nav.sections.master',
       iconClass: 'pi pi-folder',

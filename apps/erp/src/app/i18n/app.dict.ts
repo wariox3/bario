@@ -2453,6 +2453,30 @@ export interface AppDict
       };
       operaciones: { suma: string; resta: string; neutro: string };
     };
+    nominaDetalleInforme: {
+      name: string;
+      columns: {
+        id: string;
+        documento: string;
+        numero: string;
+        identificacion: string;
+        empleado: string;
+        fecha: string;
+        fechaDesde: string;
+        fechaHasta: string;
+        detalle: string;
+        porcentaje: string;
+        dias: string;
+        valorHora: string;
+        operacion: string;
+        pago: string;
+        basePrestacion: string;
+        baseCotizacion: string;
+      };
+      filters: { empleadoIdentificacion: string; empleadoNombre: string };
+      /** Claves = valor crudo de `operacion` (1 suma, -1 resta, 0 neutro). */
+      operaciones: { '1': string; '0': string; '-1': string };
+    };
     existencia: {
       name: string;
       columns: {

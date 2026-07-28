@@ -3198,6 +3198,32 @@ export const en: AppDict = {
       },
       operaciones: { suma: 'Add', resta: 'Subtract', neutro: 'Neutral' },
     },
+    nominaDetalleInforme: {
+      name: 'Payroll detail',
+      columns: {
+        id: 'ID',
+        documento: 'Document',
+        numero: 'Number',
+        identificacion: 'ID number',
+        empleado: 'Employee',
+        fecha: 'Date',
+        fechaDesde: 'From',
+        fechaHasta: 'To',
+        detalle: 'Detail',
+        porcentaje: '%',
+        dias: 'Days',
+        valorHora: 'Hourly rate',
+        operacion: 'Operation',
+        pago: 'Payment',
+        basePrestacion: 'BPI',
+        baseCotizacion: 'BCI',
+      },
+      filters: {
+        empleadoIdentificacion: 'Employee ID number',
+        empleadoNombre: 'Employee name',
+      },
+      operaciones: { '1': 'Add', '0': 'Neutral', '-1': 'Subtract' },
+    },
     existencia: {
       name: 'Stock on hand',
       columns: {

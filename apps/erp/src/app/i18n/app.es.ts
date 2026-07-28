@@ -3239,6 +3239,32 @@ export const es: AppDict = {
       },
       operaciones: { suma: 'Suma', resta: 'Resta', neutro: 'Neutro' },
     },
+    nominaDetalleInforme: {
+      name: 'Nómina detallada',
+      columns: {
+        id: 'ID',
+        documento: 'Documento',
+        numero: 'Número',
+        identificacion: 'Identificación',
+        empleado: 'Empleado',
+        fecha: 'Fecha',
+        fechaDesde: 'Desde',
+        fechaHasta: 'Hasta',
+        detalle: 'Detalle',
+        porcentaje: '%',
+        dias: 'Días',
+        valorHora: 'Valor hora',
+        operacion: 'Operación',
+        pago: 'Pago',
+        basePrestacion: 'IBP',
+        baseCotizacion: 'IBC',
+      },
+      filters: {
+        empleadoIdentificacion: 'Identificación del empleado',
+        empleadoNombre: 'Nombre del empleado',
+      },
+      operaciones: { '1': 'Suma', '0': 'Neutro', '-1': 'Resta' },
+    },
     existencia: {
       name: 'Existencias',
       columns: {
