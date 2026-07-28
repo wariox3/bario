@@ -7,8 +7,8 @@ Cada supuesto vive además como comentario en su archivo; acá está el índice 
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
-y **balance de prueba por contacto** (`d531a2f`). Faltan los otros 6 (ver §4). Lo común vive en
-`features/contabilidad/shared/` desde `3211e91`.
+**balance de prueba por contacto** (`d531a2f`) y **auxiliar general** (`da80fd3`). Faltan los otros
+5 (ver §4). Lo común vive en `features/contabilidad/shared/` desde `3211e91`.
 
 ---
 
@@ -29,15 +29,24 @@ Excel y PDF se piden al **mismo endpoint**, con los mismos `parametros` y una ba
 body: `excel: true` o `pdf: true`. Confirmar, y de paso si el backend respeta `Content-Disposition`
 (si no, queda el `fallbackFilename`).
 
+**El auxiliar general no ofrece PDF**: allá su método `imprimir()` estaba comentado entero, así que
+el botón existía sin hacer nada. Si el endpoint sí lo sirve, se enciende con `[showPdf]="true"`.
+
 ### 1.3 Nombres de los parámetros
 
 Comunes: `fecha_desde`, `fecha_hasta`, `incluir_cierre`, `cuenta_con_movimiento`, `cuenta_desde`,
 `cuenta_hasta`, `cuenta_codigo_desde`, `cuenta_codigo_hasta`. El balance por contacto suma
 `contacto` (id).
 
-No se portaron `numero_identificacion` ni `nombre_corto`, que el balance por contacto declaraba en
-su formulario pero **siempre viajaban vacíos** (su selector solo escribía `contacto`). Si el backend
-los espera de verdad, hay que reponerlos.
+El auxiliar general suma `contacto`, `numero` y `comprobante`.
+
+No se portaron `numero_identificacion` ni `nombre_corto`, que el balance por contacto y el auxiliar
+general declaraban en su formulario pero **siempre viajaban vacíos** (su selector solo escribía
+`contacto`). Si el backend los espera de verdad, hay que reponerlos.
+
+**`comprobante` viaja como número.** Así lo pedía el ERP anterior (un input numérico suelto), pero
+lo natural sería un selector del master de comprobantes — que este ERP todavía no tiene. Confirmar
+si el backend espera el id del comprobante o su código.
 
 **Pregunta concreta**: ¿el backend acota el rango de cuentas por **id** o por **código**? El legacy
 manda los dos. Si le basta el id, sobran los dos `cuenta_codigo_*` y se simplifica la página (ver
@@ -81,7 +90,7 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 ## 4. Informes contables que faltan
 
-Los 6 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
+Los 5 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
 misma forma —`POST` con `{ parametros }` → `{ registros }`— así que se montan sobre
 `features/contabilidad/shared/`: declarar el endpoint, extender `InformeCuentasPageBase` y componer
 el panel de parámetros con los campos extra por `ng-content`.
