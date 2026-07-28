@@ -2464,6 +2464,8 @@ export interface AppDict
         cuentaDesde: string;
         cuentaHasta: string;
         cuentaPlaceholder: string;
+        contacto: string;
+        contactoPlaceholder: string;
         incluirCierre: string;
         soloConMovimiento: string;
       };
@@ -2474,6 +2476,8 @@ export interface AppDict
       columns: {
         cuenta: string;
         nombre: string;
+        identificacion: string;
+        contacto: string;
         saldoAnterior: string;
         debito: string;
         credito: string;
@@ -2486,6 +2490,7 @@ export interface AppDict
       };
     };
     balancePrueba: { name: string };
+    balancePruebaContacto: { name: string };
     auxiliarCuenta: { name: string };
     nominaInforme: {
       name: string;

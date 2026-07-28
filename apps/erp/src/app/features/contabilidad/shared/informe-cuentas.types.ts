@@ -59,6 +59,27 @@ export interface SaldoCuentaRow {
   readonly saldo_actual: number | null;
 }
 
+/**
+ * Fila de los informes que abren el saldo **por tercero**: la misma cuenta
+ * aparece una vez por cada contacto con movimiento en ella.
+ */
+export interface SaldoCuentaContactoRow extends SaldoCuentaRow {
+  readonly contacto_numero_identificacion: string | null;
+  readonly contacto_nombre_corto: string | null;
+}
+
+/**
+ * Lo que acepta la tabla compartida: una fila de saldos que **puede** traer los
+ * datos del tercero. Las columnas de contacto se muestran o no según el
+ * informe, no según la fila.
+ */
+export type SaldoCuentaTableRow = SaldoCuentaRow & Partial<SaldoCuentaContactoRow>;
+
+/** Parámetros de los informes que además acotan por un tercero. */
+export interface InformeCuentasContactoParams extends InformeCuentasParams {
+  readonly contacto: number | null;
+}
+
 /** Respuesta de los endpoints de informe: el resultado completo, sin envelope paginado. */
 export interface InformeContableResponse<TRow> {
   readonly registros: readonly TRow[];

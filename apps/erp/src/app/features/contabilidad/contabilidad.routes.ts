@@ -24,6 +24,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/balance-prueba-contacto',
+        loadChildren: () =>
+          import('./informes/balance-prueba-contacto/balance-prueba-contacto.routes').then(
+            (m) => m.BALANCE_PRUEBA_CONTACTO_ROUTES,
+          ),
+      },
+      {
         path: 'informes/auxiliar-cuenta',
         loadChildren: () =>
           import('./informes/auxiliar-cuenta/auxiliar-cuenta.routes').then(

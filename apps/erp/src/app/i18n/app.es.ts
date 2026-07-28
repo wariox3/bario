@@ -3249,6 +3249,8 @@ export const es: AppDict = {
         cuentaDesde: 'Cuenta desde',
         cuentaHasta: 'Cuenta hasta',
         cuentaPlaceholder: 'Todas las cuentas',
+        contacto: 'Contacto',
+        contactoPlaceholder: 'Todos los contactos',
         incluirCierre: 'Incluir cierre',
         soloConMovimiento: 'Solo cuentas con movimiento',
       },
@@ -3259,6 +3261,8 @@ export const es: AppDict = {
       columns: {
         cuenta: 'Cuenta',
         nombre: 'Nombre',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
         saldoAnterior: 'Saldo anterior',
         debito: 'Débito',
         credito: 'Crédito',
@@ -3271,6 +3275,7 @@ export const es: AppDict = {
       },
     },
     balancePrueba: { name: 'Balance de prueba' },
+    balancePruebaContacto: { name: 'Balance de prueba por contacto' },
     auxiliarCuenta: { name: 'Auxiliar de cuenta' },
     nominaInforme: {
       name: 'Nómina',

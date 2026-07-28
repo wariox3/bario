@@ -3208,6 +3208,8 @@ export const en: AppDict = {
         cuentaDesde: 'Account from',
         cuentaHasta: 'Account to',
         cuentaPlaceholder: 'All accounts',
+        contacto: 'Contact',
+        contactoPlaceholder: 'All contacts',
         incluirCierre: 'Include closing entries',
         soloConMovimiento: 'Only accounts with activity',
       },
@@ -3218,6 +3220,8 @@ export const en: AppDict = {
       columns: {
         cuenta: 'Account',
         nombre: 'Name',
+        identificacion: 'ID number',
+        contacto: 'Contact',
         saldoAnterior: 'Opening balance',
         debito: 'Debit',
         credito: 'Credit',
@@ -3230,6 +3234,7 @@ export const en: AppDict = {
       },
     },
     balancePrueba: { name: 'Trial balance' },
+    balancePruebaContacto: { name: 'Trial balance by contact' },
     auxiliarCuenta: { name: 'Account ledger' },
     nominaInforme: {
       name: 'Payroll',
