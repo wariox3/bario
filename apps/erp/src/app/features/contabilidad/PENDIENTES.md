@@ -8,8 +8,9 @@ sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)`
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
-contacto** (`e0a19eb`), **base** (`504f904`) y **certificado de retención** (`870d607`). Faltan los
-2 estados financieros (ver §4). Lo común vive en `features/contabilidad/shared/` desde `3211e91`.
+contacto** (`e0a19eb`), **base** (`504f904`), **certificado de retención** (`870d607`) y **estado de
+resultados** (`b6d8c63`). Falta solo el **estado de situación financiera** (ver §4). Lo común vive en
+`features/contabilidad/shared/` desde `3211e91`.
 
 ---
 
@@ -81,7 +82,9 @@ falta para agrupar o indentar, están en el modelo del legacy.
 | 7   | Las tres acciones usan el endpoint del propio informe                                           | El PDF del balance por contacto pegaba a `informe-balance-prueba/` en vez de `-tercero/`: descargaba el informe equivocado. Bug del original, corregido acá                     |
 | 8   | El informe _base_ tiene **tabla propia** (`<app-base-movimientos-table>`)                       | No comparte ni una columna de saldos con sus hermanos: no hay saldo anterior ni actual, y sí `base` y `detalle`                                                                 |
 | 9   | El informe _base_ **suma fila de totales**, que el original no tenía                            | En un informe de base gravable el total es justo el dato que se busca (es lo que se declara). Sin él había que exportar a Excel para conocerlo                                  |
-| 10  | `nivel` se tipa pero no se usa                                                                  | El legacy tampoco lo usaba para pintar jerarquía. Queda disponible por si se quiere indentar el plan de cuentas                                                                 |
+| 10  | Los estados financieros **no ofrecen rango de cuentas ni banderas**                             | Su plantilla original tampoco los renderizaba (los controles existían muertos). Un estado financiero cubre las clases que le corresponden, no un rango elegido a mano           |
+| 11  | Los estados financieros van **sin fila de totales**                                             | El saldo mezcla cuentas de naturaleza contraria (ingresos/gastos, activo/pasivo): una suma cruda no es la utilidad ni el patrimonio. Calcularla bien es trabajo del backend     |
+| 12  | `nivel` se tipa pero no se usa                                                                  | El legacy tampoco lo usaba para pintar jerarquía. Queda disponible por si se quiere indentar el plan de cuentas                                                                 |
 
 ---
 
@@ -91,6 +94,9 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 - **Indentar por `nivel`** para que se lea el plan de cuentas como árbol (clase → grupo → cuenta →
   subcuenta) en vez de una lista plana.
+- **Agrupar los estados financieros por clase y grupo** (hoy repiten esas dos columnas en cada
+  fila) y mostrar el subtotal de cada grupo, que es como se lee un estado financiero en papel.
+  Requiere saber si el backend puede darlos o si hay que calcularlos en el front.
 - ~~**Marcar el descuadre**~~ — hecho en `3211e91`: la fila de totales se resalta cuando débito y
   crédito no coinciden.
 
@@ -98,7 +104,7 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 ## 4. Informes contables que faltan
 
-Los 2 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
+El único restante del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
 misma forma —`POST` con `{ parametros }` → `{ registros }`— así que se montan sobre
 `features/contabilidad/shared/`: declarar el endpoint, extender `InformeCuentasPageBase` y componer
 el panel de parámetros con los campos extra por `ng-content`.
