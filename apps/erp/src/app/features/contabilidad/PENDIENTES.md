@@ -8,7 +8,7 @@ sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)`
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
-contacto** (`e0a19eb`). Faltan los otros 4 (ver §4). Lo común vive en
+contacto** (`e0a19eb`) y **base** (`504f904`). Faltan los otros 3 (ver §4). Lo común vive en
 `features/contabilidad/shared/` desde `3211e91`.
 
 ---
@@ -30,9 +30,9 @@ Excel y PDF se piden al **mismo endpoint**, con los mismos `parametros` y una ba
 body: `excel: true` o `pdf: true`. Confirmar, y de paso si el backend respeta `Content-Disposition`
 (si no, queda el `fallbackFilename`).
 
-**Los dos auxiliares no ofrecen PDF** (general y por contacto): allá su método `imprimir()` estaba
-comentado entero, así que el botón existía sin hacer nada. Si el endpoint sí lo sirve, se enciende
-con `[showPdf]="true"`.
+**No ofrecen PDF** los dos auxiliares (general y por contacto) ni el informe _base_: en los
+auxiliares el método `imprimir()` estaba comentado entero —el botón existía sin hacer nada— y en
+base ni siquiera había botón. Si los endpoints sí lo sirven, se encienden con `[showPdf]="true"`.
 
 ### 1.3 Nombres de los parámetros
 
@@ -41,6 +41,10 @@ Comunes: `fecha_desde`, `fecha_hasta`, `incluir_cierre`, `cuenta_con_movimiento`
 `contacto` (id).
 
 El auxiliar general y el auxiliar por contacto suman `contacto`, `numero` y `comprobante`.
+
+**El informe _base_ declara menos y nombra distinto**: solo periodo, rango de cuentas y el tercero,
+que manda como **`contacto_id`** — es el único que usa el sufijo; el resto lo llama `contacto` a
+secas. No manda `incluir_cierre` ni `cuenta_con_movimiento`. Confirmar las dos cosas.
 
 No se portaron `numero_identificacion` ni `nombre_corto`, que el balance por contacto y el auxiliar
 general declaraban en su formulario pero **siempre viajaban vacíos** (su selector solo escribía
@@ -75,7 +79,9 @@ falta para agrupar o indentar, están en el modelo del legacy.
 | 5   | Lo común vive en `features/contabilidad/shared/` (hecho al llegar el segundo informe)           | Servicio base, base de página, panel de parámetros, tabla, botonera y validadores. Cada informe queda en poco más que su endpoint, su nombre y el del archivo                   |
 | 6   | El balance por contacto va **sin fila de totales**                                              | El ERP anterior la quitó a propósito (plantilla comentada, tarea 1517). Al repetirse la cuenta por contacto, sumar la columna no da el movimiento del periodo                   |
 | 7   | Las tres acciones usan el endpoint del propio informe                                           | El PDF del balance por contacto pegaba a `informe-balance-prueba/` en vez de `-tercero/`: descargaba el informe equivocado. Bug del original, corregido acá                     |
-| 8   | `nivel` se tipa pero no se usa                                                                  | El legacy tampoco lo usaba para pintar jerarquía. Queda disponible por si se quiere indentar el plan de cuentas                                                                 |
+| 8   | El informe _base_ tiene **tabla propia** (`<app-base-movimientos-table>`)                       | No comparte ni una columna de saldos con sus hermanos: no hay saldo anterior ni actual, y sí `base` y `detalle`                                                                 |
+| 9   | El informe _base_ **suma fila de totales**, que el original no tenía                            | En un informe de base gravable el total es justo el dato que se busca (es lo que se declara). Sin él había que exportar a Excel para conocerlo                                  |
+| 10  | `nivel` se tipa pero no se usa                                                                  | El legacy tampoco lo usaba para pintar jerarquía. Queda disponible por si se quiere indentar el plan de cuentas                                                                 |
 
 ---
 
@@ -92,7 +98,7 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 ## 4. Informes contables que faltan
 
-Los 4 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
+Los 3 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
 misma forma —`POST` con `{ parametros }` → `{ registros }`— así que se montan sobre
 `features/contabilidad/shared/`: declarar el endpoint, extender `InformeCuentasPageBase` y componer
 el panel de parámetros con los campos extra por `ng-content`.
