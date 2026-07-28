@@ -3741,6 +3741,59 @@ export const es: AppDict = {
         },
       },
     },
+    enviarNominaElectronica: {
+      name: 'Enviar nómina electrónica',
+      actions: {
+        emitir: 'Emitir',
+        descartar: 'Descartar',
+      },
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        empleado: 'Empleado',
+        total: 'Total',
+        estado: 'Estado',
+      },
+      estado: {
+        enviado: 'Esperando respuesta',
+        pendiente: 'Pendiente',
+      },
+      filters: {
+        notificado: 'Notificado',
+        enviado: 'Enviado',
+      },
+      descartar: {
+        confirm: {
+          header: '¿Estás seguro de descartar?',
+          message:
+            'Esta acción no se puede revertir. Si descartas una nómina, ya no podrá enviarse electrónicamente en otro momento.',
+          accept: 'Sí, descartar',
+        },
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Nóminas emitidas',
+            desc: 'Las nóminas seleccionadas se enviaron a la DIAN.',
+          },
+          error: {
+            title: 'Error al emitir',
+            desc: 'No se pudieron emitir algunas nóminas. Intentá de nuevo.',
+          },
+        },
+        descartar: {
+          success: {
+            title: 'Nóminas descartadas',
+            desc: 'Las nóminas seleccionadas se descartaron correctamente.',
+          },
+          error: {
+            title: 'Error al descartar',
+            desc: 'No se pudieron descartar algunas nóminas. Intentá de nuevo.',
+          },
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:

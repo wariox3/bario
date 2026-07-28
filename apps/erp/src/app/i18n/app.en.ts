@@ -3702,6 +3702,59 @@ export const en: AppDict = {
         },
       },
     },
+    enviarNominaElectronica: {
+      name: 'Send electronic payroll',
+      actions: {
+        emitir: 'Issue',
+        descartar: 'Discard',
+      },
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        empleado: 'Employee',
+        total: 'Total',
+        estado: 'Status',
+      },
+      estado: {
+        enviado: 'Awaiting response',
+        pendiente: 'Pending',
+      },
+      filters: {
+        notificado: 'Notified',
+        enviado: 'Sent',
+      },
+      descartar: {
+        confirm: {
+          header: 'Discard these payrolls?',
+          message:
+            'This cannot be undone. A discarded payroll can no longer be sent electronically.',
+          accept: 'Yes, discard',
+        },
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Payrolls issued',
+            desc: 'The selected payrolls were sent to the DIAN.',
+          },
+          error: {
+            title: 'Could not issue',
+            desc: 'Some payrolls could not be issued. Please try again.',
+          },
+        },
+        descartar: {
+          success: {
+            title: 'Payrolls discarded',
+            desc: 'The selected payrolls were discarded.',
+          },
+          error: {
+            title: 'Could not discard',
+            desc: 'Some payrolls could not be discarded. Please try again.',
+          },
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:

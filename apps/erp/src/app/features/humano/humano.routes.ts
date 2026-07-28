@@ -26,6 +26,13 @@ export const HUMANO_ROUTES: Route[] = [
           import('./documentos/nomina/nomina.routes').then((m) => m.NOMINA_ROUTES),
       },
       {
+        path: 'utilidades/enviar-nomina-electronica',
+        loadChildren: () =>
+          import('./utilidades/enviar-nomina-electronica/enviar-nomina-electronica.routes').then(
+            (m) => m.ENVIAR_NOMINA_ELECTRONICA_ROUTES,
+          ),
+      },
+      {
         path: 'informes/nomina',
         loadChildren: () =>
           import('./informes/nomina/nomina.routes').then((m) => m.NOMINA_INFORME_ROUTES),

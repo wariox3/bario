@@ -53,6 +53,23 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'humano-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.enviarNominaElectronica.name',
+              path: 'utilidades/enviar-nomina-electronica',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'humano-administracion',
       labelKey: 'layout.nav.sections.master',
       iconClass: 'pi pi-folder',
