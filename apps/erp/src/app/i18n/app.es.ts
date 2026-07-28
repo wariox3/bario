@@ -3240,9 +3240,9 @@ export const es: AppDict = {
       },
       operaciones: { suma: 'Suma', resta: 'Resta', neutro: 'Neutro' },
     },
-    balancePrueba: {
-      name: 'Balance de prueba',
+    informeCuentas: {
       generar: 'Generar',
+      descuadre: 'El informe no cuadra',
       params: {
         fechaDesde: 'Fecha desde',
         fechaHasta: 'Fecha hasta',
@@ -3266,10 +3266,12 @@ export const es: AppDict = {
         total: 'Total',
       },
       empty: {
-        notGenerated: 'Elegí el periodo y generá el balance.',
+        notGenerated: 'Elegí el periodo y generá el informe.',
         noData: 'No hay movimientos para los parámetros seleccionados.',
       },
     },
+    balancePrueba: { name: 'Balance de prueba' },
+    auxiliarCuenta: { name: 'Auxiliar de cuenta' },
     nominaInforme: {
       name: 'Nómina',
       columns: {

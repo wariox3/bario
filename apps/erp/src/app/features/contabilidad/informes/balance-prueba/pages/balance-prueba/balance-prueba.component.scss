@@ -5,108 +5,11 @@
   min-height: 0;
 }
 
-// ── Panel de parámetros ─────────────────────────────────────────────────────
-// Vive en el slot [toolbar] de list-shell, que ya aporta el gutter sobre el
-// recuadro de la tabla. Es más alto que un toolbar de filtros porque el reporte
-// se define acá: los campos van en grilla y las acciones alineadas a la derecha.
-.balance-params {
+// Panel de parámetros + botonera. Vive en el slot [toolbar] de list-shell, que
+// ya aporta el gutter sobre el recuadro de la tabla; es más alto que un toolbar
+// de filtros porque el reporte se define acá.
+.informe-toolbar {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-
-  &__form {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-    gap: 0.75rem 1rem;
-    align-items: end;
-  }
-
-  &__label {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--brand-navy);
-  }
-
-  &__flags {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-
-  &__error {
-    font-size: 0.8rem;
-    color: var(--p-red-500, #ef4444);
-  }
-
-  &__actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-}
-
-// ── Tabla del balance ───────────────────────────────────────────────────────
-// Tabla propia en vez de <lib-data-table>: el backend devuelve el balance
-// completo (sin paginar) y hace falta una fila de totales, dos cosas que la
-// tabla compartida no cubre.
-.balance-table__wrapper {
-  overflow: auto;
-  max-height: 100%;
-}
-
-.balance-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.82rem;
-}
-
-.balance-table__th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding: 0.5rem 0.6rem;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--brand-muted, #64748b);
-  // Opaco para que las filas no se transparenten bajo el header al scrollear.
-  background: #f8f9fa;
-  // box-shadow en vez de border-bottom: con border-collapse el borde se despega
-  // del header sticky al scrollear; el inset shadow se mantiene fijo.
-  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
-}
-
-.balance-table__td {
-  padding: 0.45rem 0.6rem;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.balance-table__row + .balance-table__row .balance-table__td {
-  border-top: 1px solid rgba(20, 48, 73, 0.07);
-}
-
-.balance-table__row:hover .balance-table__td {
-  background: rgba(20, 48, 73, 0.015);
-}
-
-// Fila de totales: pegada al fondo del scroll para que quede a la vista.
-.balance-table__tf {
-  position: sticky;
-  bottom: 0;
-  padding: 0.55rem 0.6rem;
-  font-weight: 700;
-  white-space: nowrap;
-  background: #f8f9fa;
-  box-shadow: inset 0 1px 0 rgba(20, 48, 73, 0.12);
-}
-
-.balance-table__empty {
-  padding: 2.5rem 0.6rem;
-  text-align: center;
-  color: var(--brand-muted, #64748b);
 }

@@ -1,183 +1,25 @@
 <!--
   Informe "Balance de prueba".
   Chrome estándar (<lib-list-shell>), pero el slot [toolbar] no lleva el toolbar
-  de filtros sino el panel de parámetros del reporte: periodo, rango de cuentas,
-  dos banderas y las acciones. La tabla arranca vacía hasta Generar y no pagina
-  (el backend devuelve el balance completo para que los totales cuadren).
+  de filtros sino el panel de parámetros del reporte y su botonera. La tabla
+  arranca vacía hasta Generar y no pagina (el backend devuelve el informe
+  completo para que los totales cuadren).
 -->
-@let d = t().entities.balancePrueba;
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params [form]="form" idPrefix="bp" />
 
-<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="d.name">
-  <div toolbar class="balance-params">
-    <form [formGroup]="form" class="balance-params__form">
-      <!-- Periodo -->
-      <div class="flex flex-col gap-1.5">
-        <label for="bp-fecha-desde" class="balance-params__label">{{ d.params.fechaDesde }}</label>
-        <p-datepicker
-          inputId="bp-fecha-desde"
-          formControlName="fecha_desde"
-          dateFormat="yy-mm-dd"
-          [showIcon]="true"
-          [readonlyInput]="true"
-          appendTo="body"
-        />
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label for="bp-fecha-hasta" class="balance-params__label">{{ d.params.fechaHasta }}</label>
-        <p-datepicker
-          inputId="bp-fecha-hasta"
-          formControlName="fecha_hasta"
-          dateFormat="yy-mm-dd"
-          [showIcon]="true"
-          [readonlyInput]="true"
-          appendTo="body"
-        />
-      </div>
-
-      <!-- Rango de cuentas (vacío = todo el plan) -->
-      <div class="flex flex-col gap-1.5">
-        <label for="bp-cuenta-desde" class="balance-params__label">{{
-          d.params.cuentaDesde
-        }}</label>
-        <app-cuenta-select
-          inputId="bp-cuenta-desde"
-          formControlName="cuenta_desde"
-          [placeholder]="d.params.cuentaPlaceholder"
-        />
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label for="bp-cuenta-hasta" class="balance-params__label">{{
-          d.params.cuentaHasta
-        }}</label>
-        <app-cuenta-select
-          inputId="bp-cuenta-hasta"
-          formControlName="cuenta_hasta"
-          [placeholder]="d.params.cuentaPlaceholder"
-        />
-      </div>
-
-      <!-- Banderas -->
-      <div class="balance-params__flags">
-        <div class="flex items-center gap-2">
-          <p-checkbox
-            inputId="bp-incluir-cierre"
-            formControlName="incluir_cierre"
-            [binary]="true"
-          />
-          <label for="bp-incluir-cierre" class="text-sm">{{ d.params.incluirCierre }}</label>
-        </div>
-        <div class="flex items-center gap-2">
-          <p-checkbox
-            inputId="bp-con-movimiento"
-            formControlName="cuenta_con_movimiento"
-            [binary]="true"
-          />
-          <label for="bp-con-movimiento" class="text-sm">{{ d.params.soloConMovimiento }}</label>
-        </div>
-      </div>
-    </form>
-
-    <!-- Errores del rango (validador a nivel de formulario) -->
-    @if (form.touched || form.dirty) {
-      @if (form.hasError('rangoInvertido')) {
-        <p class="balance-params__error">{{ d.validation.rangoInvertido }}</p>
-      } @else if (form.hasError('anioDistinto')) {
-        <p class="balance-params__error">{{ d.validation.anioDistinto }}</p>
-      }
-    }
-
-    <div class="balance-params__actions">
-      <p-button
-        icon="pi pi-file-pdf"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [label]="t().common.actions.exportPdf"
-        [loading]="isExportingPdf()"
-        [disabled]="!canExport()"
-        (onClick)="exportPdf()"
-      />
-      <p-button
-        icon="pi pi-file-excel"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [label]="t().common.actions.exportExcel"
-        [loading]="isExportingExcel()"
-        [disabled]="!canExport()"
-        (onClick)="exportExcel()"
-      />
-      <p-button
-        icon="pi pi-bolt"
-        size="small"
-        [label]="d.generar"
-        [loading]="isLoading()"
-        [disabled]="isBusy()"
-        (onClick)="generar()"
-      />
-    </div>
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
   </div>
 
-  <div table class="balance-table__wrapper">
-    <table class="balance-table">
-      <thead>
-        <tr>
-          <th class="balance-table__th w-28 text-left">{{ d.columns.cuenta }}</th>
-          <th class="balance-table__th min-w-[18rem] text-left">{{ d.columns.nombre }}</th>
-          <th class="balance-table__th w-40 text-right">{{ d.columns.saldoAnterior }}</th>
-          <th class="balance-table__th w-40 text-right">{{ d.columns.debito }}</th>
-          <th class="balance-table__th w-40 text-right">{{ d.columns.credito }}</th>
-          <th class="balance-table__th w-40 text-right">{{ d.columns.saldoActual }}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        @for (row of rows(); track row.id) {
-          <tr class="balance-table__row">
-            <td class="balance-table__td tabular-nums">{{ row.codigo }}</td>
-            <td class="balance-table__td whitespace-normal">{{ row.nombre }}</td>
-            <td class="balance-table__td text-right tabular-nums">
-              {{ formatMonto(row.saldo_anterior) }}
-            </td>
-            <td class="balance-table__td text-right tabular-nums">{{ formatMonto(row.debito) }}</td>
-            <td class="balance-table__td text-right tabular-nums">
-              {{ formatMonto(row.credito) }}
-            </td>
-            <td class="balance-table__td text-right tabular-nums">
-              {{ formatMonto(row.saldo_actual) }}
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="6" class="balance-table__empty">
-              {{ generated() ? d.empty.noData : d.empty.notGenerated }}
-            </td>
-          </tr>
-        }
-      </tbody>
-
-      <!--
-        Totales de movimiento: en un balance cuadrado débito y crédito coinciden,
-        así que esta fila es el chequeo visual del informe. Los saldos no se
-        suman — mezclan naturalezas y su total no significaría nada.
-      -->
-      @if (rows().length > 0) {
-        <tfoot>
-          <tr>
-            <td class="balance-table__tf" colspan="2">{{ d.columns.total }}</td>
-            <td class="balance-table__tf"></td>
-            <td class="balance-table__tf text-right tabular-nums">
-              {{ formatMonto(totalDebito()) }}
-            </td>
-            <td class="balance-table__tf text-right tabular-nums">
-              {{ formatMonto(totalCredito()) }}
-            </td>
-            <td class="balance-table__tf"></td>
-          </tr>
-        </tfoot>
-      }
-    </table>
-  </div>
+  <app-saldos-cuenta-table table [rows]="rows()" [generated]="generated()" />
 </lib-list-shell>

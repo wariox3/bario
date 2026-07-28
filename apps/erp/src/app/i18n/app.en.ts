@@ -3199,9 +3199,9 @@ export const en: AppDict = {
       },
       operaciones: { suma: 'Add', resta: 'Subtract', neutro: 'Neutral' },
     },
-    balancePrueba: {
-      name: 'Trial balance',
+    informeCuentas: {
       generar: 'Generate',
+      descuadre: 'Report does not balance',
       params: {
         fechaDesde: 'Date from',
         fechaHasta: 'Date to',
@@ -3225,10 +3225,12 @@ export const en: AppDict = {
         total: 'Total',
       },
       empty: {
-        notGenerated: 'Pick a period and generate the balance.',
+        notGenerated: 'Pick a period and generate the report.',
         noData: 'No entries for the selected parameters.',
       },
     },
+    balancePrueba: { name: 'Trial balance' },
+    auxiliarCuenta: { name: 'Account ledger' },
     nominaInforme: {
       name: 'Payroll',
       columns: {

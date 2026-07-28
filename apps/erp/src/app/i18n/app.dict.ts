@@ -2454,9 +2454,10 @@ export interface AppDict
       };
       operaciones: { suma: string; resta: string; neutro: string };
     };
-    balancePrueba: {
-      name: string;
+    /** Piezas compartidas por los informes contables de saldos por cuenta. */
+    informeCuentas: {
       generar: string;
+      descuadre: string;
       params: {
         fechaDesde: string;
         fechaHasta: string;
@@ -2484,6 +2485,8 @@ export interface AppDict
         noData: string;
       };
     };
+    balancePrueba: { name: string };
+    auxiliarCuenta: { name: string };
     nominaInforme: {
       name: string;
       columns: {

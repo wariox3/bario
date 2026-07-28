@@ -1,0 +1,72 @@
+@let d = t().entities.informeCuentas;
+
+<div class="saldos-table__wrapper">
+  <table class="saldos-table">
+    <thead>
+      <tr>
+        <th class="saldos-table__th w-28 text-left">{{ d.columns.cuenta }}</th>
+        <th class="saldos-table__th min-w-[18rem] text-left">{{ d.columns.nombre }}</th>
+        <th class="saldos-table__th w-40 text-right">{{ d.columns.saldoAnterior }}</th>
+        <th class="saldos-table__th w-40 text-right">{{ d.columns.debito }}</th>
+        <th class="saldos-table__th w-40 text-right">{{ d.columns.credito }}</th>
+        <th class="saldos-table__th w-40 text-right">{{ d.columns.saldoActual }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of rows(); track row.id) {
+        <tr class="saldos-table__row">
+          <td class="saldos-table__td tabular-nums">{{ row.codigo }}</td>
+          <td class="saldos-table__td whitespace-normal">{{ row.nombre }}</td>
+          <td class="saldos-table__td text-right tabular-nums">
+            {{ formatMonto(row.saldo_anterior) }}
+          </td>
+          <td class="saldos-table__td text-right tabular-nums">{{ formatMonto(row.debito) }}</td>
+          <td class="saldos-table__td text-right tabular-nums">{{ formatMonto(row.credito) }}</td>
+          <td class="saldos-table__td text-right tabular-nums">
+            {{ formatMonto(row.saldo_actual) }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="saldos-table__empty">
+            {{ generated() ? d.empty.noData : d.empty.notGenerated }}
+          </td>
+        </tr>
+      }
+    </tbody>
+
+    <!--
+      Fila de totales: el chequeo del informe. Si débito y crédito no coinciden
+      se resalta, porque compararlos a ojo es justo lo que se quiere evitar.
+    -->
+    @if (rows().length > 0) {
+      <tfoot>
+        <tr>
+          <td class="saldos-table__tf" colspan="2">
+            {{ d.columns.total }}
+            @if (descuadrado()) {
+              <span class="saldos-table__warn" [title]="d.descuadre">
+                <i class="pi pi-exclamation-triangle"></i> {{ d.descuadre }}
+              </span>
+            }
+          </td>
+          <td class="saldos-table__tf"></td>
+          <td
+            class="saldos-table__tf text-right tabular-nums"
+            [class.saldos-table__tf--warn]="descuadrado()"
+          >
+            {{ formatMonto(totalDebito()) }}
+          </td>
+          <td
+            class="saldos-table__tf text-right tabular-nums"
+            [class.saldos-table__tf--warn]="descuadrado()"
+          >
+            {{ formatMonto(totalCredito()) }}
+          </td>
+          <td class="saldos-table__tf"></td>
+        </tr>
+      </tfoot>
+    }
+  </table>
+</div>

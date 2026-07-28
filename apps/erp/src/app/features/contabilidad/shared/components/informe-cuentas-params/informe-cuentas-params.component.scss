@@ -1,0 +1,32 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+// Los campos van en grilla fluida: cada informe suma los suyos por ng-content
+// sin tener que recalcular columnas.
+.informe-params__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.75rem 1rem;
+  align-items: end;
+}
+
+.informe-params__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--brand-navy);
+}
+
+.informe-params__flags {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.informe-params__error {
+  font-size: 0.8rem;
+  color: var(--p-red-500, #ef4444);
+}
