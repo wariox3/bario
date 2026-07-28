@@ -36,6 +36,10 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
         {
           items: [
             {
+              labelKey: 'entities.nominaInforme.name',
+              path: 'informes/nomina',
+            },
+            {
               labelKey: 'entities.nominaDetalleInforme.name',
               path: 'informes/nomina-detalle',
             },

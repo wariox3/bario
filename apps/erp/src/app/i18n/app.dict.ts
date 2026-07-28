@@ -2453,6 +2453,29 @@ export interface AppDict
       };
       operaciones: { suma: string; resta: string; neutro: string };
     };
+    nominaInforme: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+      };
+      filters: {
+        empleadoIdentificacion: string;
+        empleadoNombre: string;
+        aprobado: string;
+        anulado: string;
+      };
+    };
     nominaDetalleInforme: {
       name: string;
       columns: {
