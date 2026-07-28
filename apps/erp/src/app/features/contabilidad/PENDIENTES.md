@@ -8,8 +8,8 @@ sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)`
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
-contacto** (`e0a19eb`) y **base** (`504f904`). Faltan los otros 3 (ver §4). Lo común vive en
-`features/contabilidad/shared/` desde `3211e91`.
+contacto** (`e0a19eb`), **base** (`504f904`) y **certificado de retención** (`870d607`). Faltan los
+2 estados financieros (ver §4). Lo común vive en `features/contabilidad/shared/` desde `3211e91`.
 
 ---
 
@@ -98,7 +98,7 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 ## 4. Informes contables que faltan
 
-Los 3 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
+Los 2 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
 misma forma —`POST` con `{ parametros }` → `{ registros }`— así que se montan sobre
 `features/contabilidad/shared/`: declarar el endpoint, extender `InformeCuentasPageBase` y componer
 el panel de parámetros con los campos extra por `ng-content`.
