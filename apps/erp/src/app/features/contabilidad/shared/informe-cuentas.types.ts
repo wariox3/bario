@@ -93,6 +93,19 @@ export interface SaldoCuentaMovimientoRow extends SaldoCuentaContactoRow {
  */
 export type SaldoCuentaTableRow = SaldoCuentaRow & Partial<SaldoCuentaMovimientoRow>;
 
+/**
+ * Rango + tercero, **sin** las dos banderas. Lo usan los informes que trabajan a
+ * nivel de línea (*base*, *certificado de retención*), donde cierre y "solo
+ * cuentas con movimiento" no aplican.
+ *
+ * Ojo con el nombre del campo: estos informes mandan `contacto_id`, mientras que
+ * los de saldos lo llaman `contacto` a secas. Es del ERP anterior, está
+ * pendiente de confirmar con backend.
+ */
+export interface InformeCuentasRangoContactoParams extends InformeCuentasRangoParams {
+  readonly contacto_id: number | null;
+}
+
 /** Parámetros de los informes que además acotan por un tercero. */
 export interface InformeCuentasContactoParams extends InformeCuentasParams {
   readonly contacto: number | null;

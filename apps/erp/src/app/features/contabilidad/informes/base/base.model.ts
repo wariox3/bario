@@ -1,4 +1,4 @@
-import type { InformeCuentasRangoParams } from '../../shared/informe-cuentas.types';
+import type { InformeCuentasRangoContactoParams } from '../../shared/informe-cuentas.types';
 
 /**
  * Modelo del informe **Base**.
@@ -37,7 +37,8 @@ export interface BaseMovimientoRow {
   readonly detalle: string | null;
 }
 
-/** Parámetros del informe: los del rango más el tercero. Sin las dos banderas. */
-export interface InformeBaseParams extends InformeCuentasRangoParams {
-  readonly contacto_id: number | null;
-}
+/**
+ * Parámetros del informe: los del rango más el tercero, sin las dos banderas.
+ * Los comparte con el certificado de retención, por eso viven en `shared/`.
+ */
+export type InformeBaseParams = InformeCuentasRangoContactoParams;

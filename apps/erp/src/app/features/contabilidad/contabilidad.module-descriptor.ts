@@ -32,6 +32,10 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
             { labelKey: 'entities.auxiliarContacto.name', path: 'informes/auxiliar-contacto' },
             { labelKey: 'entities.auxiliarGeneral.name', path: 'informes/auxiliar-general' },
             { labelKey: 'entities.informeBase.name', path: 'informes/base' },
+            {
+              labelKey: 'entities.certificadoRetencion.name',
+              path: 'informes/certificado-retencion',
+            },
           ],
         },
       ],
