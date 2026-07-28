@@ -3243,6 +3243,23 @@ export const en: AppDict = {
     auxiliarCuenta: { name: 'Account ledger' },
     auxiliarGeneral: { name: 'General ledger' },
     auxiliarContacto: { name: 'Ledger by contact' },
+    informeBase: {
+      name: 'Taxable base',
+      columns: {
+        id: 'ID',
+        comprobante: 'Voucher',
+        numero: 'Number',
+        fecha: 'Date',
+        cuenta: 'Account',
+        cuentaNombre: 'Account name',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        debito: 'Debit',
+        credito: 'Credit',
+        base: 'Base',
+        detalle: 'Detail',
+      },
+    },
     nominaInforme: {
       name: 'Payroll',
       columns: {

@@ -58,24 +58,28 @@
   <ng-content />
 
   <!-- Banderas -->
-  <div class="informe-params__flags">
-    <div class="flex items-center gap-2">
-      <p-checkbox
-        [inputId]="p + '-incluir-cierre'"
-        formControlName="incluir_cierre"
-        [binary]="true"
-      />
-      <label [for]="p + '-incluir-cierre'" class="text-sm">{{ d.params.incluirCierre }}</label>
+  @if (showFlags()) {
+    <div class="informe-params__flags">
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          [inputId]="p + '-incluir-cierre'"
+          formControlName="incluir_cierre"
+          [binary]="true"
+        />
+        <label [for]="p + '-incluir-cierre'" class="text-sm">{{ d.params.incluirCierre }}</label>
+      </div>
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          [inputId]="p + '-con-movimiento'"
+          formControlName="cuenta_con_movimiento"
+          [binary]="true"
+        />
+        <label [for]="p + '-con-movimiento'" class="text-sm">{{
+          d.params.soloConMovimiento
+        }}</label>
+      </div>
     </div>
-    <div class="flex items-center gap-2">
-      <p-checkbox
-        [inputId]="p + '-con-movimiento'"
-        formControlName="cuenta_con_movimiento"
-        [binary]="true"
-      />
-      <label [for]="p + '-con-movimiento'" class="text-sm">{{ d.params.soloConMovimiento }}</label>
-    </div>
-  </div>
+  }
 </form>
 
 <!-- Errores del rango (validador a nivel de formulario) -->

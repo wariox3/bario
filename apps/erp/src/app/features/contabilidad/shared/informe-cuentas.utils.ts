@@ -1,6 +1,10 @@
 import type { FormBuilder, ValidatorFn } from '@angular/forms';
 import { toIsoDate, type ErpSelectOption } from '@reddoc/core';
-import type { InformeCuentasForm, InformeCuentasParams } from './informe-cuentas.types';
+import type {
+  InformeCuentasForm,
+  InformeCuentasParams,
+  InformeCuentasRangoParams,
+} from './informe-cuentas.types';
 
 /** Primer día del mes en curso — valor inicial de `fecha_desde`. */
 export function inicioDelMes(): Date {
@@ -55,17 +59,28 @@ export function buildInformeCuentasForm(
   );
 }
 
-/** Traduce el formulario al contrato del backend (fechas ISO, cuentas id + código). */
-export function buildInformeCuentasParams(form: InformeCuentasForm): InformeCuentasParams {
+/**
+ * Periodo + rango de cuentas, en el contrato del backend (fechas ISO, cuentas
+ * id + código). Lo usan los informes que **no** ofrecen las dos banderas.
+ */
+export function buildRangoParams(form: InformeCuentasForm): InformeCuentasRangoParams {
   const value = form.getRawValue();
   return {
     fecha_desde: toIsoDate(value.fecha_desde) ?? '',
     fecha_hasta: toIsoDate(value.fecha_hasta) ?? '',
-    incluir_cierre: value.incluir_cierre,
-    cuenta_con_movimiento: value.cuenta_con_movimiento,
     cuenta_desde: value.cuenta_desde?.id ?? null,
     cuenta_hasta: value.cuenta_hasta?.id ?? null,
     cuenta_codigo_desde: codigoDeCuenta(value.cuenta_desde),
     cuenta_codigo_hasta: codigoDeCuenta(value.cuenta_hasta),
+  };
+}
+
+/** Traduce el formulario completo al contrato del backend. */
+export function buildInformeCuentasParams(form: InformeCuentasForm): InformeCuentasParams {
+  const value = form.getRawValue();
+  return {
+    ...buildRangoParams(form),
+    incluir_cierre: value.incluir_cierre,
+    cuenta_con_movimiento: value.cuenta_con_movimiento,
   };
 }

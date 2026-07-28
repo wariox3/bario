@@ -19,21 +19,28 @@ import type { ErpSelectOption } from '@reddoc/core';
  * base: cada informe lo extiende si necesita más.
  */
 
-/** Parámetros comunes. Viajan dentro de `{ parametros }` en el body del POST. */
-export interface InformeCuentasParams {
+/**
+ * Lo mínimo que declara todo informe contable: el periodo y el rango de
+ * cuentas. Los que además ofrecen las dos banderas usan `InformeCuentasParams`.
+ */
+export interface InformeCuentasRangoParams {
   /** Inicio del periodo (`yyyy-MM-dd`). */
   readonly fecha_desde: string;
   /** Fin del periodo (`yyyy-MM-dd`). */
   readonly fecha_hasta: string;
-  /** Incluir los movimientos del comprobante de cierre del periodo. */
-  readonly incluir_cierre: boolean;
-  /** Ocultar las cuentas que no tuvieron movimiento en el rango. */
-  readonly cuenta_con_movimiento: boolean;
   /** Extremos del rango de cuentas (opcional). El backend recibe id y código. */
   readonly cuenta_desde: number | null;
   readonly cuenta_hasta: number | null;
   readonly cuenta_codigo_desde: string;
   readonly cuenta_codigo_hasta: string;
+}
+
+/** Parámetros comunes. Viajan dentro de `{ parametros }` en el body del POST. */
+export interface InformeCuentasParams extends InformeCuentasRangoParams {
+  /** Incluir los movimientos del comprobante de cierre del periodo. */
+  readonly incluir_cierre: boolean;
+  /** Ocultar las cuentas que no tuvieron movimiento en el rango. */
+  readonly cuenta_con_movimiento: boolean;
 }
 
 /**

@@ -35,4 +35,12 @@ export class InformeCuentasParamsComponent {
 
   /** Prefijo de los `id` de los campos (para el `for` de las etiquetas). */
   readonly idPrefix = input<string>('informe');
+
+  /**
+   * Muestra las banderas *incluir cierre* y *solo cuentas con movimiento*. Se
+   * apagan en los informes que no las ofrecían (el informe *base*): sus
+   * controles siguen en el formulario pero no viajan al backend, porque esos
+   * informes arman sus parámetros con `buildRangoParams`.
+   */
+  readonly showFlags = input<boolean>(true);
 }

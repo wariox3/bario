@@ -7,7 +7,7 @@ import type { BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import type { InformeCuentasService } from './informe-cuentas.service';
-import type { InformeCuentasParams } from './informe-cuentas.types';
+import type { InformeCuentasRangoParams } from './informe-cuentas.types';
 import { buildInformeCuentasForm, buildInformeCuentasParams } from './informe-cuentas.utils';
 import { rangoFechas } from './informe-cuentas.validators';
 
@@ -29,7 +29,7 @@ import { rangoFechas } from './informe-cuentas.validators';
  */
 export abstract class InformeCuentasPageBase<
   TRow,
-  TParams extends InformeCuentasParams = InformeCuentasParams,
+  TParams extends InformeCuentasRangoParams = InformeCuentasRangoParams,
 > {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
@@ -136,10 +136,12 @@ export abstract class InformeCuentasPageBase<
 
   /**
    * Traduce el formulario al contrato del backend. Los informes con parámetros
-   * extra lo sobrescriben y agregan los suyos sobre esta base.
+   * extra lo sobrescriben y agregan los suyos sobre esta base; los que declaran
+   * menos —el informe *base* no ofrece las dos banderas— arman el suyo con
+   * `buildRangoParams`.
    */
   protected buildParams(): TParams {
-    return buildInformeCuentasParams(this.form) as TParams;
+    return buildInformeCuentasParams(this.form) as unknown as TParams;
   }
 
   /**

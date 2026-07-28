@@ -1,0 +1,66 @@
+@let c = t().entities.informeBase.columns;
+@let e = t().entities.informeCuentas.empty;
+
+<div class="base-table__wrapper">
+  <table class="base-table">
+    <thead>
+      <tr>
+        <th class="base-table__th w-20 text-right">{{ c.id }}</th>
+        <th class="base-table__th w-32 text-left">{{ c.comprobante }}</th>
+        <th class="base-table__th w-24 text-right">{{ c.numero }}</th>
+        <th class="base-table__th w-32 text-left">{{ c.fecha }}</th>
+        <th class="base-table__th w-24 text-left">{{ c.cuenta }}</th>
+        <th class="base-table__th min-w-[14rem] text-left">{{ c.cuentaNombre }}</th>
+        <th class="base-table__th w-32 text-left">{{ c.identificacion }}</th>
+        <th class="base-table__th min-w-[12rem] text-left">{{ c.contacto }}</th>
+        <th class="base-table__th w-36 text-right">{{ c.debito }}</th>
+        <th class="base-table__th w-36 text-right">{{ c.credito }}</th>
+        <th class="base-table__th w-36 text-right">{{ c.base }}</th>
+        <th class="base-table__th min-w-[14rem] text-left">{{ c.detalle }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of rows(); track row.id) {
+        <tr class="base-table__row">
+          <td class="base-table__td text-right tabular-nums text-brand-muted">{{ row.id }}</td>
+          <td class="base-table__td">{{ row.comprobante_nombre }}</td>
+          <td class="base-table__td text-right tabular-nums">{{ row.numero }}</td>
+          <td class="base-table__td tabular-nums">{{ formatFecha(row.fecha) }}</td>
+          <td class="base-table__td tabular-nums">{{ row.cuenta_codigo }}</td>
+          <td class="base-table__td whitespace-normal">{{ row.cuenta_nombre }}</td>
+          <td class="base-table__td tabular-nums">{{ row.contacto_numero_identificacion }}</td>
+          <td class="base-table__td whitespace-normal">{{ row.contacto_nombre_corto }}</td>
+          <td class="base-table__td text-right tabular-nums">{{ formatMonto(row.debito) }}</td>
+          <td class="base-table__td text-right tabular-nums">{{ formatMonto(row.credito) }}</td>
+          <td class="base-table__td text-right tabular-nums">{{ formatMonto(row.base) }}</td>
+          <td class="base-table__td whitespace-normal">{{ row.detalle }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="12" class="base-table__empty">
+            {{ generated() ? e.noData : e.notGenerated }}
+          </td>
+        </tr>
+      }
+    </tbody>
+
+    <!--
+      Totales. El informe original no los pintaba, pero en un informe de base
+      gravable el total es justo el dato que se busca.
+    -->
+    @if (rows().length > 0) {
+      <tfoot>
+        <tr>
+          <td class="base-table__tf" colspan="8">
+            {{ t().entities.informeCuentas.columns.total }}
+          </td>
+          <td class="base-table__tf text-right tabular-nums">{{ formatMonto(totalDebito()) }}</td>
+          <td class="base-table__tf text-right tabular-nums">{{ formatMonto(totalCredito()) }}</td>
+          <td class="base-table__tf text-right tabular-nums">{{ formatMonto(totalBase()) }}</td>
+          <td class="base-table__tf"></td>
+        </tr>
+      </tfoot>
+    }
+  </table>
+</div>
