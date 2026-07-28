@@ -16,6 +16,18 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
     { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
     {
       kind: 'accordion',
+      id: 'contabilidad-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [{ labelKey: 'entities.balancePrueba.name', path: 'informes/balance-prueba' }],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'contabilidad-administracion',
       labelKey: 'layout.nav.sections.master',
       iconClass: 'pi pi-folder',

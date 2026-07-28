@@ -25,6 +25,7 @@ export const es: AppDict = {
       clearSearch: 'Limpiar búsqueda',
       refresh: 'Actualizar',
       exportExcel: 'Exportar excel',
+      exportPdf: 'Exportar PDF',
       import: 'Importar',
     },
     search: {
@@ -3238,6 +3239,36 @@ export const es: AppDict = {
         baseCotizacion: 'Ingreso base de cotización',
       },
       operaciones: { suma: 'Suma', resta: 'Resta', neutro: 'Neutro' },
+    },
+    balancePrueba: {
+      name: 'Balance de prueba',
+      generar: 'Generar',
+      params: {
+        fechaDesde: 'Fecha desde',
+        fechaHasta: 'Fecha hasta',
+        cuentaDesde: 'Cuenta desde',
+        cuentaHasta: 'Cuenta hasta',
+        cuentaPlaceholder: 'Todas las cuentas',
+        incluirCierre: 'Incluir cierre',
+        soloConMovimiento: 'Solo cuentas con movimiento',
+      },
+      validation: {
+        rangoInvertido: 'La fecha desde no puede ser mayor a la fecha hasta.',
+        anioDistinto: 'Ambas fechas deben estar en el mismo año.',
+      },
+      columns: {
+        cuenta: 'Cuenta',
+        nombre: 'Nombre',
+        saldoAnterior: 'Saldo anterior',
+        debito: 'Débito',
+        credito: 'Crédito',
+        saldoActual: 'Saldo actual',
+        total: 'Total',
+      },
+      empty: {
+        notGenerated: 'Elegí el periodo y generá el balance.',
+        noData: 'No hay movimientos para los parámetros seleccionados.',
+      },
     },
     nominaInforme: {
       name: 'Nómina',

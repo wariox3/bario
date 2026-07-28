@@ -21,6 +21,7 @@ export interface AppDict
       clearSearch: string;
       refresh: string;
       exportExcel: string;
+      exportPdf: string;
       import: string;
       export: string;
     };
@@ -2452,6 +2453,36 @@ export interface AppDict
         baseCotizacion: string;
       };
       operaciones: { suma: string; resta: string; neutro: string };
+    };
+    balancePrueba: {
+      name: string;
+      generar: string;
+      params: {
+        fechaDesde: string;
+        fechaHasta: string;
+        cuentaDesde: string;
+        cuentaHasta: string;
+        cuentaPlaceholder: string;
+        incluirCierre: string;
+        soloConMovimiento: string;
+      };
+      validation: {
+        rangoInvertido: string;
+        anioDistinto: string;
+      };
+      columns: {
+        cuenta: string;
+        nombre: string;
+        saldoAnterior: string;
+        debito: string;
+        credito: string;
+        saldoActual: string;
+        total: string;
+      };
+      empty: {
+        notGenerated: string;
+        noData: string;
+      };
     };
     nominaInforme: {
       name: string;

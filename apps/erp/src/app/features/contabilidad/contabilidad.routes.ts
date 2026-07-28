@@ -17,6 +17,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'informes/balance-prueba',
+        loadChildren: () =>
+          import('./informes/balance-prueba/balance-prueba.routes').then(
+            (m) => m.BALANCE_PRUEBA_ROUTES,
+          ),
+      },
+      {
         path: 'centros-costo',
         loadChildren: () =>
           import('./masters/centro-costo/centro-costo.routes').then((m) => m.CENTRO_COSTO_ROUTES),
