@@ -8,9 +8,8 @@ sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)`
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
-contacto** (`e0a19eb`), **base** (`504f904`), **certificado de retención** (`870d607`) y **estado de
-resultados** (`b6d8c63`). Falta solo el **estado de situación financiera** (ver §4). Lo común vive en
-`features/contabilidad/shared/` desde `3211e91`.
+Estado: **los 9 informes del ERP anterior están portados\*\* (2026-07-28). Lo común vive en
+`features/contabilidad/shared/` desde `3211e91`; un informe nuevo de esta familia son ~40 líneas.
 
 ---
 
@@ -102,23 +101,26 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 ---
 
-## 4. Informes contables que faltan
+## 4. Mapa de los informes portados
 
-El único restante del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
-misma forma —`POST` con `{ parametros }` → `{ registros }`— así que se montan sobre
-`features/contabilidad/shared/`: declarar el endpoint, extender `InformeCuentasPageBase` y componer
-el panel de parámetros con los campos extra por `ng-content`.
+| Informe                        | Endpoint                               | Parámetros                              | Tabla                         | PDF |
+| ------------------------------ | -------------------------------------- | --------------------------------------- | ----------------------------- | --- |
+| Balance de prueba              | `informe-balance-prueba/`              | completos                               | saldos                        | sí  |
+| Balance de prueba por contacto | `informe-balance-prueba-tercero/`      | completos + `contacto`                  | saldos + tercero, sin totales | sí  |
+| Auxiliar de cuenta             | `informe-auxiliar-cuenta/`             | completos                               | saldos                        | sí  |
+| Auxiliar por contacto          | `informe-auxiliar-tercero/`            | completos + contacto/número/comprobante | saldos + tercero, sin totales | no  |
+| Auxiliar general               | `informe-auxiliar-general/`            | completos + contacto/número/comprobante | saldos + tercero + movimiento | no  |
+| Base                           | `informe-base/`                        | rango + `contacto_id`                   | propia (base gravable)        | no  |
+| Certificado de retención       | `informe-certificado-retencion/`       | rango + `contacto_id`                   | propia (retenciones)          | sí  |
+| Estado de resultados           | `informe-estado-resultados/`           | solo periodo                            | estados financieros           | no  |
+| Estado de situación financiera | `informe-estado-situacion-financiera/` | solo periodo                            | estados financieros           | no  |
 
-| Informe                        | Endpoint                               |
-| ------------------------------ | -------------------------------------- |
-| Auxiliar por tercero           | `informe-auxiliar-tercero/`            |
-| Auxiliar general               | `informe-auxiliar-general/`            |
-| Base                           | `informe-base/`                        |
-| Certificado de retención       | `informe-certificado-retencion/`       |
-| Estado de resultados           | `informe-estado-resultados/`           |
-| Estado de situación financiera | `informe-estado-situacion-financiera/` |
+> "Completos" = periodo + rango de cuentas + las dos banderas.
 
----
+Para agregar uno nuevo de esta familia: declarar el servicio con su endpoint
+(`extends InformeCuentasService`), extender `InformeCuentasPageBase` con `nombre` y `archivo`, y
+componer en la plantilla `<app-informe-cuentas-params>` (con los campos extra por `ng-content`),
+`<app-informe-cuentas-actions>` y la tabla que corresponda.
 
 ## 5. Duda funcional abierta: el auxiliar de cuenta
 
