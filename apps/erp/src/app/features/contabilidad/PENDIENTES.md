@@ -6,8 +6,8 @@ anterior. Nada se ha ejercitado contra `reddocapi.uk`: todo sale de leer el cód
 Cada supuesto vive además como comentario en su archivo; acá está el índice para revisarlos de una
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
-Estado: portados **balance de prueba** (`35754f9`) y **auxiliar de cuenta** (`baaa670`), ambos el
-2026-07-28. Faltan los otros 7 (ver §4). Lo común vive en
+Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
+y **balance de prueba por contacto** (`d531a2f`). Faltan los otros 6 (ver §4). Lo común vive en
 `features/contabilidad/shared/` desde `3211e91`.
 
 ---
@@ -31,8 +31,13 @@ body: `excel: true` o `pdf: true`. Confirmar, y de paso si el backend respeta `C
 
 ### 1.3 Nombres de los parámetros
 
-`fecha_desde`, `fecha_hasta`, `incluir_cierre`, `cuenta_con_movimiento`, `cuenta_desde`,
-`cuenta_hasta`, `cuenta_codigo_desde`, `cuenta_codigo_hasta`.
+Comunes: `fecha_desde`, `fecha_hasta`, `incluir_cierre`, `cuenta_con_movimiento`, `cuenta_desde`,
+`cuenta_hasta`, `cuenta_codigo_desde`, `cuenta_codigo_hasta`. El balance por contacto suma
+`contacto` (id).
+
+No se portaron `numero_identificacion` ni `nombre_corto`, que el balance por contacto declaraba en
+su formulario pero **siempre viajaban vacíos** (su selector solo escribía `contacto`). Si el backend
+los espera de verdad, hay que reponerlos.
 
 **Pregunta concreta**: ¿el backend acota el rango de cuentas por **id** o por **código**? El legacy
 manda los dos. Si le basta el id, sobran los dos `cuenta_codigo_*` y se simplifica la página (ver
@@ -57,7 +62,9 @@ falta para agrupar o indentar, están en el modelo del legacy.
 | 3   | Solo se totalizan **débito y crédito**, no los saldos                                           | En un balance cuadrado débito y crédito coinciden: esa fila es el chequeo visual del informe. Sumar saldos mezcla naturalezas y no significa nada. El legacy hacía lo mismo     |
 | 4   | La tabla distingue "sin generar" de "sin resultados"                                            | El legacy mostraba tabla vacía en los dos casos, que se lee como si el reporte hubiera fallado                                                                                  |
 | 5   | Lo común vive en `features/contabilidad/shared/` (hecho al llegar el segundo informe)           | Servicio base, base de página, panel de parámetros, tabla, botonera y validadores. Cada informe queda en poco más que su endpoint, su nombre y el del archivo                   |
-| 6   | `nivel` se tipa pero no se usa                                                                  | El legacy tampoco lo usaba para pintar jerarquía. Queda disponible por si se quiere indentar el plan de cuentas                                                                 |
+| 6   | El balance por contacto va **sin fila de totales**                                              | El ERP anterior la quitó a propósito (plantilla comentada, tarea 1517). Al repetirse la cuenta por contacto, sumar la columna no da el movimiento del periodo                   |
+| 7   | Las tres acciones usan el endpoint del propio informe                                           | El PDF del balance por contacto pegaba a `informe-balance-prueba/` en vez de `-tercero/`: descargaba el informe equivocado. Bug del original, corregido acá                     |
+| 8   | `nivel` se tipa pero no se usa                                                                  | El legacy tampoco lo usaba para pintar jerarquía. Queda disponible por si se quiere indentar el plan de cuentas                                                                 |
 
 ---
 
@@ -74,20 +81,19 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 ## 4. Informes contables que faltan
 
-Los 7 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
+Los 6 restantes del ERP anterior (`modules/contabilidad/paginas/informes/`). Todos comparten la
 misma forma —`POST` con `{ parametros }` → `{ registros }`— así que se montan sobre
 `features/contabilidad/shared/`: declarar el endpoint, extender `InformeCuentasPageBase` y componer
 el panel de parámetros con los campos extra por `ng-content`.
 
-| Informe                                                            | Endpoint                               |
-| ------------------------------------------------------------------ | -------------------------------------- |
-| Balance de prueba por tercero (carpeta `balance-prueba-contacto/`) | `informe-balance-prueba-tercero/`      |
-| Auxiliar por tercero                                               | `informe-auxiliar-tercero/`            |
-| Auxiliar general                                                   | `informe-auxiliar-general/`            |
-| Base                                                               | `informe-base/`                        |
-| Certificado de retención                                           | `informe-certificado-retencion/`       |
-| Estado de resultados                                               | `informe-estado-resultados/`           |
-| Estado de situación financiera                                     | `informe-estado-situacion-financiera/` |
+| Informe                        | Endpoint                               |
+| ------------------------------ | -------------------------------------- |
+| Auxiliar por tercero           | `informe-auxiliar-tercero/`            |
+| Auxiliar general               | `informe-auxiliar-general/`            |
+| Base                           | `informe-base/`                        |
+| Certificado de retención       | `informe-certificado-retencion/`       |
+| Estado de resultados           | `informe-estado-resultados/`           |
+| Estado de situación financiera | `informe-estado-situacion-financiera/` |
 
 ---
 
