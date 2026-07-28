@@ -69,15 +69,32 @@ export interface SaldoCuentaContactoRow extends SaldoCuentaRow {
 }
 
 /**
- * Lo que acepta la tabla compartida: una fila de saldos que **puede** traer los
- * datos del tercero. Las columnas de contacto se muestran o no según el
- * informe, no según la fila.
+ * Fila de los auxiliares: baja al **movimiento** que produjo el saldo, así que
+ * suma el documento que lo originó.
  */
-export type SaldoCuentaTableRow = SaldoCuentaRow & Partial<SaldoCuentaContactoRow>;
+export interface SaldoCuentaMovimientoRow extends SaldoCuentaContactoRow {
+  readonly comprobante_nombre: string | null;
+  readonly numero: number | string | null;
+  /** Fecha del movimiento (`yyyy-MM-dd`). */
+  readonly fecha: string | null;
+}
+
+/**
+ * Lo que acepta la tabla compartida: una fila de saldos que **puede** traer los
+ * datos del tercero y del movimiento. Qué columnas se pintan lo decide el
+ * informe (por bloques), no la fila.
+ */
+export type SaldoCuentaTableRow = SaldoCuentaRow & Partial<SaldoCuentaMovimientoRow>;
 
 /** Parámetros de los informes que además acotan por un tercero. */
 export interface InformeCuentasContactoParams extends InformeCuentasParams {
   readonly contacto: number | null;
+}
+
+/** Parámetros de los auxiliares: además del tercero, acotan por documento. */
+export interface InformeCuentasMovimientoParams extends InformeCuentasContactoParams {
+  readonly numero: number | null;
+  readonly comprobante: number | null;
 }
 
 /** Respuesta de los endpoints de informe: el resultado completo, sin envelope paginado. */

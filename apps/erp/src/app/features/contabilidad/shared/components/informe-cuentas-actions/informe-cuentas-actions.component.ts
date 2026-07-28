@@ -17,16 +17,18 @@ import type { AppDict } from '@erp/i18n';
   template: `
     @let d = t();
     <div class="flex items-center justify-end gap-2">
-      <p-button
-        icon="pi pi-file-pdf"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [label]="d.common.actions.exportPdf"
-        [loading]="exportingPdf()"
-        [disabled]="!canExport()"
-        (onClick)="pdf.emit()"
-      />
+      @if (showPdf()) {
+        <p-button
+          icon="pi pi-file-pdf"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [label]="d.common.actions.exportPdf"
+          [loading]="exportingPdf()"
+          [disabled]="!canExport()"
+          (onClick)="pdf.emit()"
+        />
+      }
       <p-button
         icon="pi pi-file-excel"
         severity="secondary"
@@ -61,6 +63,12 @@ export class InformeCuentasActionsComponent {
   readonly busy = input<boolean>(false);
   /** Hay un informe generado sobre el que descargar. */
   readonly canExport = input<boolean>(false);
+
+  /**
+   * Ofrecer la descarga en PDF. Se apaga en los informes cuyo endpoint no la
+   * sirve — el ERP anterior dejaba el botón puesto pero sin efecto.
+   */
+  readonly showPdf = input<boolean>(true);
 
   readonly generar = output<void>();
   readonly excel = output<void>();

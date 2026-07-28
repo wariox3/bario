@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { formatDate } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  LOCALE_ID,
+  computed,
+  inject,
+  input,
+} from '@angular/core';
 import { I18nService, formatCop } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { SaldoCuentaTableRow } from '../../informe-cuentas.types';
@@ -23,6 +31,7 @@ import type { SaldoCuentaTableRow } from '../../informe-cuentas.types';
 })
 export class SaldosCuentaTableComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly locale = inject(LOCALE_ID);
   protected readonly t = this.i18n.t;
 
   readonly rows = input.required<readonly SaldoCuentaTableRow[]>();
@@ -37,6 +46,13 @@ export class SaldosCuentaTableComponent {
   readonly showContacto = input<boolean>(false);
 
   /**
+   * Intercala el documento que originó el movimiento (comprobante, número,
+   * fecha). Lo usan los auxiliares, que bajan al movimiento en vez de quedarse
+   * en el saldo agregado.
+   */
+  readonly showMovimiento = input<boolean>(false);
+
+  /**
    * Pinta la fila de totales. Se apaga en los informes abiertos por tercero: la
    * misma cuenta aparece repetida por contacto, así que sumar la columna no da
    * el movimiento del periodo sino un número sin significado contable.
@@ -44,7 +60,9 @@ export class SaldosCuentaTableComponent {
   readonly showTotals = input<boolean>(true);
 
   /** Cantidad de columnas — la usa el `colspan` del estado vacío. */
-  protected readonly columnCount = computed(() => (this.showContacto() ? 8 : 6));
+  protected readonly columnCount = computed(
+    () => 6 + (this.showContacto() ? 2 : 0) + (this.showMovimiento() ? 3 : 0),
+  );
 
   /**
    * Totales de la columna de movimiento. En un informe cuadrado débito y crédito
@@ -65,5 +83,15 @@ export class SaldosCuentaTableComponent {
 
   protected formatMonto(value: number | null | undefined): string {
     return formatCop(value ?? 0);
+  }
+
+  /** Misma presentación de fecha que `<lib-data-table>`, para que se lean igual. */
+  protected formatFecha(value: string | null | undefined): string {
+    if (!value) return '';
+    try {
+      return formatDate(value, 'mediumDate', this.locale);
+    } catch {
+      return value;
+    }
   }
 }

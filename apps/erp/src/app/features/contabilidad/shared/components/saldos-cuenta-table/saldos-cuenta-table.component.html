@@ -10,6 +10,11 @@
           <th class="saldos-table__th w-32 text-left">{{ d.columns.identificacion }}</th>
           <th class="saldos-table__th min-w-[12rem] text-left">{{ d.columns.contacto }}</th>
         }
+        @if (showMovimiento()) {
+          <th class="saldos-table__th w-32 text-left">{{ d.columns.comprobante }}</th>
+          <th class="saldos-table__th w-24 text-right">{{ d.columns.numero }}</th>
+          <th class="saldos-table__th w-32 text-left">{{ d.columns.fecha }}</th>
+        }
         <th class="saldos-table__th w-40 text-right">{{ d.columns.saldoAnterior }}</th>
         <th class="saldos-table__th w-40 text-right">{{ d.columns.debito }}</th>
         <th class="saldos-table__th w-40 text-right">{{ d.columns.credito }}</th>
@@ -25,6 +30,11 @@
           @if (showContacto()) {
             <td class="saldos-table__td tabular-nums">{{ row.contacto_numero_identificacion }}</td>
             <td class="saldos-table__td whitespace-normal">{{ row.contacto_nombre_corto }}</td>
+          }
+          @if (showMovimiento()) {
+            <td class="saldos-table__td">{{ row.comprobante_nombre }}</td>
+            <td class="saldos-table__td text-right tabular-nums">{{ row.numero }}</td>
+            <td class="saldos-table__td tabular-nums">{{ formatFecha(row.fecha) }}</td>
           }
           <td class="saldos-table__td text-right tabular-nums">
             {{ formatMonto(row.saldo_anterior) }}
@@ -61,6 +71,9 @@
           </td>
           @if (showContacto()) {
             <td class="saldos-table__tf" colspan="2"></td>
+          }
+          @if (showMovimiento()) {
+            <td class="saldos-table__tf" colspan="3"></td>
           }
           <td class="saldos-table__tf"></td>
           <td
