@@ -1,0 +1,48 @@
+@let m = t().entities.movimientoContable;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="m.name">
+  <lib-data-toolbar
+    toolbar
+    [trailingActions]="trailingActions"
+    [searchEnabled]="false"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-import-dialog
+  [visible]="importVisible()"
+  (visibleChange)="onImportVisibleChange($event)"
+  [title]="m.import.title"
+  [subtitle]="m.import.subtitle"
+  [importing]="importLoading()"
+  [errors]="importErrors()"
+  [errorSummary]="importErrorSummary()"
+  [errorTotal]="importErrorTotal()"
+  (importRequested)="onImportRequested($event)"
+  [exampleConfig]="exampleConfig"
+/>

@@ -3192,6 +3192,27 @@ export const es: AppDict = {
         contabilizado: 'Contabilizado',
       },
     },
+    movimientoContable: {
+      name: 'Movimientos',
+      import: {
+        title: 'Importar movimientos',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        comprobante: 'Comprobante',
+        fecha: 'Fecha',
+        contacto: 'Contacto',
+        identificacion: 'Identificación',
+        cuenta: 'Cuenta',
+        centroCosto: 'Centro de costo',
+        debito: 'Débito',
+        credito: 'Crédito',
+        base: 'Base',
+        detalle: 'Detalle',
+      },
+    },
     movimientoInventario: {
       form: {
         createHint: 'Datos principales del nuevo documento',

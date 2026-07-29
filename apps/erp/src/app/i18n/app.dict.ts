@@ -2401,6 +2401,24 @@ export interface AppDict
         contabilizado: string;
       };
     };
+    movimientoContable: {
+      name: string;
+      import: { title: string; subtitle: string };
+      columns: {
+        id: string;
+        numero: string;
+        comprobante: string;
+        fecha: string;
+        contacto: string;
+        identificacion: string;
+        cuenta: string;
+        centroCosto: string;
+        debito: string;
+        credito: string;
+        base: string;
+        detalle: string;
+      };
+    };
     movimientoInventario: {
       form: {
         createHint: string;

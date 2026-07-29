@@ -3142,6 +3142,27 @@ export const en: AppDict = {
         contabilizado: 'Posted',
       },
     },
+    movimientoContable: {
+      name: 'Journal entries',
+      import: {
+        title: 'Import entries',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        comprobante: 'Voucher',
+        fecha: 'Date',
+        contacto: 'Contact',
+        identificacion: 'Tax ID',
+        cuenta: 'Account',
+        centroCosto: 'Cost center',
+        debito: 'Debit',
+        credito: 'Credit',
+        base: 'Base',
+        detalle: 'Description',
+      },
+    },
     movimientoInventario: {
       form: {
         createHint: 'Main data of the new document',
