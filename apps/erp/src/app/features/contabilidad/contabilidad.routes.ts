@@ -1,11 +1,26 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { activeModuleResolver } from '@erp/core/module-config';
 import { CONTABILIDAD_MODULE } from './contabilidad.module-descriptor';
 
+/**
+ * Rutas del módulo Contabilidad.
+ *
+ * Encadena dos resolvers ortogonales en la ruta raíz:
+ *  - `erpModuleResolver('contabilidad')`: registra el módulo activo en
+ *    `ActiveModuleStore` para que el topbar y el sidebar se sincronicen.
+ *  - `activeModuleResolver('contabilidad')`: carga `CONTABILIDAD_CONFIG` desde el
+ *    registry y lo deja en `ModuleNavigationStore`, para que
+ *    `activeDocumentResolver(...)` resuelva sus documentos dentro de
+ *    `documentos/<doc>/<doc>.routes.ts`.
+ */
 export const CONTABILIDAD_ROUTES: Route[] = [
   {
     path: '',
-    resolve: { _module: erpModuleResolver('contabilidad') },
+    resolve: {
+      _navModule: erpModuleResolver('contabilidad'),
+      _docModule: activeModuleResolver('contabilidad'),
+    },
     children: [
       moduleIndexRoute(CONTABILIDAD_MODULE),
       {
@@ -15,6 +30,11 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           import('@erp/layouts/module-placeholder/module-placeholder.component').then(
             (m) => m.ModulePlaceholderComponent,
           ),
+      },
+      {
+        path: 'asiento',
+        loadChildren: () =>
+          import('./documentos/asiento/asiento.routes').then((m) => m.ASIENTO_ROUTES),
       },
       {
         path: 'utilidades/contabilizar',
