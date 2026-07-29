@@ -2,14 +2,15 @@ import { Component, DestroyRef, computed, effect, inject, input, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
 import {
   DataFilterModalComponent,
   DataTableComponent,
+  DataToolbarComponent,
   type PageChangeEvent,
+  type ToolbarAction,
 } from '@reddoc/feature-base';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
 import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
@@ -41,9 +42,9 @@ import {
   selector: 'app-conciliacion-soportes-tab',
   standalone: true,
   imports: [
-    ButtonModule,
     ConfirmDialogModule,
     DataTableComponent,
+    DataToolbarComponent,
     DataFilterModalComponent,
     ImportDialogComponent,
   ],
@@ -99,6 +100,43 @@ export class ConciliacionSoportesTabComponent {
 
   protected readonly hasItems = computed(() => this.totalCount() > 0);
 
+  /** Acción destacada: cargar el extracto, que es por donde empieza la pestaña. */
+  protected readonly primaryAction = computed<ToolbarAction | null>(() =>
+    this.canOperate() && !this.isBusy()
+      ? {
+          id: 'cargar',
+          labelKey: 'entities.conciliacion.soporteTab.cargar',
+          iconClass: 'pi pi-upload',
+        }
+      : null,
+  );
+
+  /**
+   * Resto de acciones, en el dropdown "Acciones". Se arman según el estado
+   * —limpiar no aparece sin nada que limpiar— porque `ToolbarAction` no modela
+   * el deshabilitado.
+   */
+  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
+    const children: ToolbarAction[] = [];
+    if (this.hasItems()) {
+      children.push({
+        id: 'export-excel',
+        labelKey: 'common.actions.exportExcel',
+        iconClass: 'pi pi-file-excel',
+      });
+    }
+    if (this.canOperate() && this.hasItems() && !this.isBusy()) {
+      children.push({
+        id: 'limpiar',
+        labelKey: 'entities.conciliacion.soporteTab.limpiar',
+        iconClass: 'pi pi-trash',
+      });
+    }
+    return children.length
+      ? [{ id: 'actions', labelKey: 'common.actions.actions', iconClass: '', children }]
+      : [];
+  });
+
   constructor() {
     effect(() => {
       this.conciliacionId();
@@ -117,12 +155,31 @@ export class ConciliacionSoportesTabComponent {
     this.filtersVisible.set(true);
   }
 
+  protected clearFilters(): void {
+    this.activeFilters.set([]);
+    this.loadPage(0);
+  }
+
+  protected onToolbarAction(actionId: string): void {
+    switch (actionId) {
+      case 'cargar':
+        this.onImportOpen();
+        break;
+      case 'limpiar':
+        this.onLimpiar();
+        break;
+      case 'export-excel':
+        this.onExportExcel();
+        break;
+    }
+  }
+
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
     this.activeFilters.set(filters);
     this.loadPage(0);
   }
 
-  protected onImportOpen(): void {
+  private onImportOpen(): void {
     this.clearImportErrors();
     this.importVisible.set(true);
   }
@@ -160,7 +217,7 @@ export class ConciliacionSoportesTabComponent {
   }
 
   /** Borra todo el extracto cargado, previa confirmación destructiva. */
-  protected onLimpiar(): void {
+  private onLimpiar(): void {
     if (this.isBusy()) return;
     const labels = this.t().entities.conciliacion.soporteTab;
     this.confirmation.confirm({
@@ -174,7 +231,7 @@ export class ConciliacionSoportesTabComponent {
     });
   }
 
-  protected onExportExcel(): void {
+  private onExportExcel(): void {
     this.fileDownload
       .download(this.service.exportSoporteUrl, {
         method: 'POST',

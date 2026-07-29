@@ -73,8 +73,14 @@ export const CONCILIACIONES_ROW_ACTIONS: readonly RowAction[] = [
   { id: 'delete', labelKey: 'common.actions.delete', iconClass: 'pi pi-trash', severity: 'danger' },
 ];
 
+/** Acción destacada del toolbar, como en el resto de masters del ERP. */
+export const CONCILIACIONES_PRIMARY_ACTION: ToolbarAction = {
+  id: 'new',
+  labelKey: 'common.actions.new',
+  iconClass: 'pi pi-plus',
+};
+
 export const CONCILIACIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
-  { id: 'new', labelKey: 'common.actions.new', iconClass: 'pi pi-plus' },
   {
     id: 'actions',
     labelKey: 'common.actions.actions',

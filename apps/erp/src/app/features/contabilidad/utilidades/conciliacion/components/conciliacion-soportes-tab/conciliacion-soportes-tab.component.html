@@ -1,49 +1,16 @@
 @let tab = t().entities.conciliacion.soporteTab;
 
-<div class="flex flex-col gap-4">
-  <div class="flex flex-wrap items-center justify-end gap-2">
-    <p-button
-      type="button"
-      size="small"
-      icon="pi pi-filter"
-      [label]="t().common.actions.filters"
-      severity="secondary"
-      [outlined]="true"
-      [badge]="activeFilters().length ? activeFilters().length.toString() : undefined"
-      (onClick)="openFilters()"
-    />
-    @if (canOperate()) {
-      <p-button
-        type="button"
-        size="small"
-        icon="pi pi-upload"
-        [label]="tab.cargar"
-        [outlined]="true"
-        [disabled]="isBusy()"
-        (onClick)="onImportOpen()"
-      />
-      <p-button
-        type="button"
-        size="small"
-        icon="pi pi-trash"
-        severity="danger"
-        [label]="tab.limpiar"
-        [outlined]="true"
-        [disabled]="isBusy() || !hasItems()"
-        (onClick)="onLimpiar()"
-      />
-    }
-    <p-button
-      type="button"
-      size="small"
-      icon="pi pi-file-excel"
-      [label]="t().common.actions.exportExcel"
-      severity="secondary"
-      [outlined]="true"
-      [disabled]="!hasItems()"
-      (onClick)="onExportExcel()"
-    />
-  </div>
+<div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <lib-data-toolbar
+    [primaryAction]="primaryAction()"
+    [trailingActions]="trailingActions()"
+    [searchEnabled]="false"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+  />
 
   <lib-data-table
     [columns]="columns"

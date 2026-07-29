@@ -32,6 +32,7 @@ import {
   CONCILIACIONES_COLUMNS,
   CONCILIACIONES_FILTER_FIELDS,
   CONCILIACIONES_FILTERS_STORAGE_KEY,
+  CONCILIACIONES_PRIMARY_ACTION,
   CONCILIACIONES_ROW_ACTIONS,
   CONCILIACIONES_TRAILING_ACTIONS,
   CONCILIACION_LIST_PATH,
@@ -100,6 +101,7 @@ export class ConciliacionesListComponent {
   protected readonly columns = CONCILIACIONES_COLUMNS;
   protected readonly filterFields = CONCILIACIONES_FILTER_FIELDS;
   protected readonly rowActions = CONCILIACIONES_ROW_ACTIONS;
+  protected readonly primaryAction = CONCILIACIONES_PRIMARY_ACTION;
   protected readonly trailingActions = CONCILIACIONES_TRAILING_ACTIONS;
 
   constructor() {
