@@ -2757,6 +2757,101 @@ export const es: AppDict = {
     saldoInicial: {
       name: 'Saldo inicial',
     },
+    cierre: {
+      name: 'Cierre',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nuevo cierre',
+        editTitle: 'Editar cierre',
+        sectionHint: 'Cierra el ejercicio trasladando los saldos de las cuentas de resultado',
+        sections: { lineas: 'Líneas del cierre' },
+        lineasHint: 'Las genera el sistema con el rango de cuentas que elijas',
+        cargar: 'Cargar',
+        eliminarTodos: 'Eliminar todos',
+        confirmDeleteAll: {
+          header: 'Eliminar todas las líneas',
+          message: '¿Eliminar todas las líneas del cierre? Esta acción no se puede deshacer.',
+        },
+        fields: {
+          contacto: 'Contacto',
+          contactoPlaceholder: 'Buscar contacto…',
+          fecha: 'Fecha',
+          grupo: 'Grupo',
+          grupoPlaceholder: 'Seleccionar…',
+          comentario: 'Comentario',
+        },
+        validation: {
+          required: 'Este campo es obligatorio',
+          noEs31Diciembre: 'La fecha debe ser un 31 de diciembre',
+        },
+        toasts: {
+          createSuccess: { title: 'Cierre creado', desc: 'Ya puedes cargar las líneas' },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear el cierre' },
+          editSuccess: {
+            title: 'Cierre actualizado',
+            desc: 'El cierre se actualizó correctamente',
+          },
+          editError: { title: 'Error al actualizar', desc: 'No se pudo actualizar el cierre' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el cierre' },
+          cargarSuccess: {
+            title: 'Cierre cargado',
+            desc: 'Se generaron las líneas del documento',
+          },
+          cargarError: { title: 'Error al cargar', desc: 'No se pudieron generar las líneas' },
+          deleteAllSuccess: {
+            title: 'Líneas eliminadas',
+            desc: 'Se eliminaron todas las líneas del cierre',
+          },
+          deleteAllError: {
+            title: 'Error al eliminar',
+            desc: 'No se pudieron eliminar las líneas',
+          },
+        },
+      },
+      cargar: {
+        modalHeader: 'Cargar cierre',
+        modalSubtitle: 'Elige el rango de cuentas a cerrar y la cuenta de cierre',
+        submit: 'Cargar',
+        fields: {
+          cuentaDesde: 'Cuenta desde',
+          cuentaHasta: 'Cuenta hasta',
+          cuentaCierre: 'Cuenta de cierre',
+        },
+        validation: { required: 'Este campo es obligatorio' },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          lineas: 'Líneas del cierre',
+        },
+        labels: {
+          numero: 'Número',
+          contacto: 'Contacto',
+          fecha: 'Fecha',
+          grupo: 'Grupo',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Cierre no encontrado',
+          desc: 'El cierre que buscas no existe o fue eliminado.',
+        },
+      },
+    },
     depreciacion: {
       name: 'Depreciación',
       columns: {

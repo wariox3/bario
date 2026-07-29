@@ -29,6 +29,7 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
               path: 'depreciacion/list',
               activeMatch: 'depreciacion',
             },
+            { labelKey: 'entities.cierre.name', path: 'cierre/list', activeMatch: 'cierre' },
           ],
         },
       ],

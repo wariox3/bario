@@ -1,5 +1,6 @@
 import type { ModuleConfig } from '@erp/core/module-config';
 import { ASIENTO_CONFIG } from './documentos/asiento/asiento.config';
+import { CIERRE_CONFIG } from './documentos/cierre/cierre.config';
 import { DEPRECIACION_CONFIG } from './documentos/depreciacion/depreciacion.config';
 
 /**
@@ -17,5 +18,5 @@ export const CONTABILIDAD_CONFIG: ModuleConfig = {
   id: 'contabilidad',
   displayNameKey: 'modules.contabilidad.name',
   iconClass: 'pi pi-calculator',
-  documents: [ASIENTO_CONFIG, DEPRECIACION_CONFIG],
+  documents: [ASIENTO_CONFIG, DEPRECIACION_CONFIG, CIERRE_CONFIG],
 };

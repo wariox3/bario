@@ -2051,6 +2051,73 @@ export interface AppDict
     saldoInicial: {
       name: string;
     };
+    cierre: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        sections: { lineas: string };
+        lineasHint: string;
+        cargar: string;
+        eliminarTodos: string;
+        confirmDeleteAll: { header: string; message: string };
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          fecha: string;
+          grupo: string;
+          grupoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string; noEs31Diciembre: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          cargarSuccess: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+          deleteAllSuccess: { title: string; desc: string };
+          deleteAllError: { title: string; desc: string };
+        };
+      };
+      cargar: {
+        modalHeader: string;
+        modalSubtitle: string;
+        submit: string;
+        fields: { cuentaDesde: string; cuentaHasta: string; cuentaCierre: string };
+        validation: { required: string };
+      };
+      detail: {
+        sections: { general: string; lineas: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          fecha: string;
+          grupo: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     depreciacion: {
       name: string;
       columns: {

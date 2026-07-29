@@ -44,6 +44,11 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'cierre',
+        loadChildren: () =>
+          import('./documentos/cierre/cierre.routes').then((m) => m.CIERRE_ROUTES),
+      },
+      {
         path: 'utilidades/contabilizar',
         loadChildren: () =>
           import('./utilidades/contabilizar/contabilizar.routes').then(
