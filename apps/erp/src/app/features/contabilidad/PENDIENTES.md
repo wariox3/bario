@@ -6,15 +6,16 @@ anterior. Nada se ha ejercitado contra `reddocapi.uk`: todo sale de leer el cód
 Cada supuesto vive además como comentario en su archivo; acá está el índice para revisarlos de una
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
-Las secciones §1–§5 cubren los **informes**; la §6, el **asiento contable** (primer documento
-transaccional del módulo).
+Las secciones §1–§5 cubren los **informes**; la §6 y la §7, los documentos transaccionales
+(**asiento contable** y **depreciación**).
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
 Estado: **los 9 informes del ERP anterior están portados\*\* (2026-07-28). Lo común vive en
 `features/contabilidad/shared/` desde `3211e91`; un informe nuevo de esta familia son ~40 líneas.
 
-Estado (2026-07-29): portado el **asiento contable** (documento tipo 13) — ver §6.
+Estado (2026-07-29): portados el **asiento contable** (documento tipo 13, §6) y la **depreciación**
+(documento tipo 23, §7).
 
 ---
 
@@ -214,3 +215,67 @@ el legacy no acotaba ninguno de los dos. Ajustar a lo que declare el modelo del 
 `agregarRegistrosEliminar` buscaba el registro con `indexOf(id)` pero empujaba `posicion` (que vale
 `-1` cuando no lo encuentra) en vez de `id`. El array resultante nunca se usaba al guardar: código
 muerto con un bug adentro.
+
+---
+
+## 7. Depreciación (documento tipo 23)
+
+Portado desde `contabilidad/paginas/documento/depreciacion/` del ERP anterior. Segundo documento del
+módulo. Vive en `documentos/depreciacion/`.
+
+Lo que lo separa del resto: **sus líneas no las teclea nadie**. El backend las genera desde los
+activos fijos y el front solo las muestra y las elimina. Por eso no reusa la familia contable
+(editable, de cuenta/naturaleza/valor) sino una tabla propia de solo lectura.
+
+### 7.1 Por confirmar con backend
+
+#### El endpoint que genera las líneas
+
+`POST /general/documento/cargar-activo/` con body `{ id }` (id del documento). Tomado de
+`DepreciacionService.cargarActivos` del legacy, sin verificar.
+
+**Pregunta concreta**: al llamarlo con un documento que **ya tiene líneas**, ¿las reemplaza o las
+acumula? El front no lo sabe, así que pide confirmación al usuario antes de volver a llamar. Si el
+backend reemplaza siempre, esa confirmación sobra.
+
+La respuesta del endpoint **se ignora**: al terminar se recargan las líneas desde
+`documento-detalle`, que es la fuente autoritativa. Si el endpoint ya devuelve las líneas, se ahorra
+una petición.
+
+#### Campos de la línea
+
+`activo`, `activo_codigo`, `activo_nombre` y `dias`, sobre `DocumentoDetalleReadBase` (de donde sale
+`precio`). Salen del `FormGroup` del legacy, **no de una respuesta real**.
+
+Ojo: el legacy pinta `detalle.value.activo` como si fuera el **id** del activo (columna "Activo ID"),
+mientras que el código y el nombre van en columnas aparte. Se portó igual, pero conviene confirmar
+que `activo` es la FK y no otra cosa.
+
+#### El total
+
+Se calcula en el front sumando el `precio` de las líneas y viaja así en la cabecera. El legacy
+**nunca lo calculaba** (su `calcularTotales()` está comentado entero): mostraba el que devolvía el
+backend. Confirmar que el backend acepta el total que le mandamos y que coincide con el suyo; si lo
+recalcula al aprobar, mandarlo es inofensivo.
+
+### 7.2 Decisiones tomadas
+
+| #   | Decisión                                                                          | Por qué                                                                                                                                                                                          |
+| --- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | **Tabla propia** (`<app-depreciacion-lineas-table>`), no la familia contable      | La línea no comparte ni una columna con un asiento: activo, código, nombre y días contra cuenta, naturaleza y valor. Y no se edita: meterla en la tabla contable obligaba a volverla opt-out     |
+| 2   | Al crear, se navega a **editar** el documento nuevo (no a la lista ni al detalle) | Una depreciación recién creada está vacía y cargar los activos necesita su id. Volver a la lista obligaba al usuario a buscar el documento que acaba de crear                                    |
+| 3   | La sección de activos **no existe en alta**                                       | Sin id no se puede generar ni listar nada; mostrar una tabla vacía con un botón muerto es peor que no mostrarla                                                                                  |
+| 4   | El total se **suma en el front** (ver §7.1)                                       | El usuario ve el total apenas carga los activos, sin guardar ni recargar. Las líneas vienen del backend, así que la suma no inventa nada                                                         |
+| 5   | **No** se portan `soporte` ni `comprobante`                                       | El formulario del legacy los declaraba —y hasta pedía el catálogo de comprobantes en `ngOnInit`— pero su plantilla no los renderiza nunca. Son restos de haber copiado el formulario del asiento |
+| 6   | El `comentario` va en la misma sección, no en una segunda pestaña                 | Ningún formulario de este ERP usa pestañas; esconder un solo campo detrás de una no aporta                                                                                                       |
+| 7   | Eliminar una línea pega a `documento-detalle` al instante                         | Es lo que ya hace la familia contable. El `detalles_eliminados` diferido del legacy no aplica                                                                                                    |
+| 8   | **Sin** `unsavedChangesGuard` en la ruta de edición                               | No hay líneas a medio editar que perder: se generan y se persisten del lado del backend                                                                                                          |
+| 9   | `agregarLinea()` del legacy **no se porta**                                       | Existe en el componente pero ningún botón lo llama, y una línea tecleada a mano no tendría activo ni días. Si hace falta, es un cambio de alcance                                                |
+
+### 7.3 Riesgo abierto: el id del documento creado
+
+`extractDocumentoId` (en el form) contempla que el `POST` devuelva el documento **plano** (`{ id }`)
+o **envuelto** (`{ documento: { id } }`, como hacía el legacy), porque el gateway entrega el body
+crudo y no se pudo verificar cuál es. Si no encuentra el id por ninguna de las dos vías, cae a la
+lista en vez de navegar a una URL inválida — pero el usuario pierde el atajo a cargar activos.
+Al confirmar la forma real, se simplifica la función.
