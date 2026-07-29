@@ -1,0 +1,80 @@
+@let tab = t().entities.conciliacion.soporteTab;
+
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-end gap-2">
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-filter"
+      [label]="t().common.actions.filters"
+      severity="secondary"
+      [outlined]="true"
+      [badge]="activeFilters().length ? activeFilters().length.toString() : undefined"
+      (onClick)="openFilters()"
+    />
+    @if (canOperate()) {
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-upload"
+        [label]="tab.cargar"
+        [outlined]="true"
+        [disabled]="isBusy()"
+        (onClick)="onImportOpen()"
+      />
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-trash"
+        severity="danger"
+        [label]="tab.limpiar"
+        [outlined]="true"
+        [disabled]="isBusy() || !hasItems()"
+        (onClick)="onLimpiar()"
+      />
+    }
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-file-excel"
+      [label]="t().common.actions.exportExcel"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="!hasItems()"
+      (onClick)="onExportExcel()"
+    />
+  </div>
+
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage()"
+    (pageChange)="onPageChange($event)"
+  />
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-import-dialog
+  [visible]="importVisible()"
+  (visibleChange)="onImportVisibleChange($event)"
+  [title]="tab.import.title"
+  [subtitle]="tab.import.subtitle"
+  [importing]="importLoading()"
+  [errors]="importErrors()"
+  [errorSummary]="importErrorSummary()"
+  [errorTotal]="importErrorTotal()"
+  [exampleConfig]="exampleConfig()"
+  (importRequested)="onImportRequested($event)"
+/>
+
+<p-confirmDialog />

@@ -2719,6 +2719,94 @@ export interface AppDict
     auxiliarCuenta: { name: string };
     auxiliarGeneral: { name: string };
     auxiliarContacto: { name: string };
+    conciliacion: {
+      name: string;
+      columns: { id: string; fechaDesde: string; fechaHasta: string; cuentaBanco: string };
+      detalleColumns: {
+        id: string;
+        tipo: string;
+        numero: string;
+        fecha: string;
+        cuenta: string;
+        debito: string;
+        credito: string;
+        detalle: string;
+        conciliado: string;
+      };
+      soporteColumns: {
+        id: string;
+        fecha: string;
+        debito: string;
+        credito: string;
+        detalle: string;
+        conciliado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        tabs: { detalles: string; soporte: string };
+        fields: {
+          cuentaBanco: string;
+          cuentaBancoPlaceholder: string;
+          fechaDesde: string;
+          fechaHasta: string;
+        };
+        validation: { required: string; rangoInvalido: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string };
+        tabs: { detalles: string; soporte: string };
+        labels: {
+          id: string;
+          cuentaBanco: string;
+          cuentaContable: string;
+          fechaDesde: string;
+          fechaHasta: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+      detalleTab: {
+        cargar: string;
+        conciliar: string;
+        limpiar: string;
+        confirmLimpiar: { header: string; message: string };
+        toasts: {
+          cargar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          conciliar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          limpiar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      soporteTab: {
+        cargar: string;
+        limpiar: string;
+        plantillaNoDisponible: string;
+        import: { title: string; subtitle: string };
+        confirmLimpiar: { header: string; message: string };
+        toasts: {
+          limpiar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+    };
     contabilizar: {
       name: string;
       actions: { contabilizar: string; descontabilizar: string };

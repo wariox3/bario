@@ -1,0 +1,76 @@
+@let tab = t().entities.conciliacion.detalleTab;
+
+<div class="flex flex-col gap-4">
+  <!-- Acciones: solo en el banco de trabajo, no en la ficha -->
+  <div class="flex flex-wrap items-center justify-end gap-2">
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-filter"
+      [label]="t().common.actions.filters"
+      severity="secondary"
+      [outlined]="true"
+      [badge]="activeFilters().length ? activeFilters().length.toString() : undefined"
+      (onClick)="openFilters()"
+    />
+    @if (canOperate()) {
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-download"
+        [label]="tab.cargar"
+        [outlined]="true"
+        [disabled]="isBusy()"
+        (onClick)="onCargar()"
+      />
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-check-circle"
+        [label]="tab.conciliar"
+        [disabled]="isBusy() || !hasItems()"
+        (onClick)="onConciliar()"
+      />
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-trash"
+        severity="danger"
+        [label]="tab.limpiar"
+        [outlined]="true"
+        [disabled]="isBusy() || !hasItems()"
+        (onClick)="onLimpiar()"
+      />
+    }
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-file-excel"
+      [label]="t().common.actions.exportExcel"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="!hasItems()"
+      (onClick)="onExportExcel()"
+    />
+  </div>
+
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage()"
+    (pageChange)="onPageChange($event)"
+  />
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />

@@ -3573,6 +3573,123 @@ export const es: AppDict = {
     auxiliarCuenta: { name: 'Auxiliar de cuenta' },
     auxiliarGeneral: { name: 'Auxiliar general' },
     auxiliarContacto: { name: 'Auxiliar por contacto' },
+    conciliacion: {
+      name: 'Conciliación',
+      columns: {
+        id: 'ID',
+        fechaDesde: 'Fecha desde',
+        fechaHasta: 'Fecha hasta',
+        cuentaBanco: 'Cuenta banco',
+      },
+      detalleColumns: {
+        id: 'ID',
+        tipo: 'Tipo',
+        numero: 'Número',
+        fecha: 'Fecha',
+        cuenta: 'Cuenta',
+        debito: 'Débito',
+        credito: 'Crédito',
+        detalle: 'Detalle',
+        conciliado: 'Conciliado',
+      },
+      soporteColumns: {
+        id: 'ID',
+        fecha: 'Fecha',
+        debito: 'Débito',
+        credito: 'Crédito',
+        detalle: 'Detalle',
+        conciliado: 'Conciliado',
+      },
+      form: {
+        createTitle: 'Nueva conciliación',
+        editTitle: 'Editar conciliación',
+        sectionHint: 'Elige la cuenta bancaria y el periodo a conciliar',
+        tabs: { detalles: 'Libro', soporte: 'Extracto' },
+        fields: {
+          cuentaBanco: 'Cuenta banco',
+          cuentaBancoPlaceholder: 'Seleccionar…',
+          fechaDesde: 'Fecha desde',
+          fechaHasta: 'Fecha hasta',
+        },
+        validation: {
+          required: 'Este campo es obligatorio',
+          rangoInvalido: 'La fecha desde no puede ser posterior a la fecha hasta',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Conciliación creada',
+            desc: 'Ya puedes cargar el libro y el extracto',
+          },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear la conciliación' },
+          editSuccess: {
+            title: 'Conciliación actualizada',
+            desc: 'La conciliación se actualizó correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudo actualizar la conciliación',
+          },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la conciliación' },
+        },
+      },
+      detail: {
+        sections: { general: 'Información general' },
+        tabs: { detalles: 'Libro', soporte: 'Extracto' },
+        labels: {
+          id: 'ID',
+          cuentaBanco: 'Cuenta banco',
+          cuentaContable: 'Cuenta contable',
+          fechaDesde: 'Fecha desde',
+          fechaHasta: 'Fecha hasta',
+        },
+        notFound: {
+          title: 'Conciliación no encontrada',
+          desc: 'La conciliación que buscas no existe o fue eliminada.',
+        },
+      },
+      detalleTab: {
+        cargar: 'Cargar libro',
+        conciliar: 'Conciliar',
+        limpiar: 'Limpiar libro',
+        confirmLimpiar: {
+          header: 'Limpiar el libro',
+          message: '¿Eliminar todos los movimientos cargados? Esta acción no se puede deshacer.',
+        },
+        toasts: {
+          cargar: {
+            success: { title: 'Libro cargado', desc: 'Se trajeron los movimientos del periodo' },
+            error: { title: 'Error al cargar', desc: 'No se pudieron traer los movimientos' },
+          },
+          conciliar: {
+            success: { title: 'Conciliación ejecutada', desc: 'Se cruzó el libro con el extracto' },
+            error: { title: 'Error al conciliar', desc: 'No se pudo ejecutar el cruce' },
+          },
+          limpiar: {
+            success: { title: 'Libro limpiado', desc: 'Se eliminaron los movimientos cargados' },
+            error: { title: 'Error al limpiar', desc: 'No se pudieron eliminar los movimientos' },
+          },
+        },
+      },
+      soporteTab: {
+        cargar: 'Cargar extracto',
+        limpiar: 'Limpiar extracto',
+        plantillaNoDisponible: 'El backend todavía no expone la plantilla de ejemplo',
+        import: {
+          title: 'Cargar extracto',
+          subtitle: 'Subí el Excel que entrega el banco',
+        },
+        confirmLimpiar: {
+          header: 'Limpiar el extracto',
+          message: '¿Eliminar todas las líneas del extracto? Esta acción no se puede deshacer.',
+        },
+        toasts: {
+          limpiar: {
+            success: { title: 'Extracto limpiado', desc: 'Se eliminaron las líneas del extracto' },
+            error: { title: 'Error al limpiar', desc: 'No se pudieron eliminar las líneas' },
+          },
+        },
+      },
+    },
     contabilizar: {
       name: 'Contabilizar',
       actions: { contabilizar: 'Contabilizar', descontabilizar: 'Descontabilizar' },

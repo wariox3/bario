@@ -3523,6 +3523,123 @@ export const en: AppDict = {
     auxiliarCuenta: { name: 'Account ledger' },
     auxiliarGeneral: { name: 'General ledger' },
     auxiliarContacto: { name: 'Ledger by contact' },
+    conciliacion: {
+      name: 'Bank reconciliation',
+      columns: {
+        id: 'ID',
+        fechaDesde: 'Date from',
+        fechaHasta: 'Date to',
+        cuentaBanco: 'Bank account',
+      },
+      detalleColumns: {
+        id: 'ID',
+        tipo: 'Type',
+        numero: 'Number',
+        fecha: 'Date',
+        cuenta: 'Account',
+        debito: 'Debit',
+        credito: 'Credit',
+        detalle: 'Description',
+        conciliado: 'Reconciled',
+      },
+      soporteColumns: {
+        id: 'ID',
+        fecha: 'Date',
+        debito: 'Debit',
+        credito: 'Credit',
+        detalle: 'Description',
+        conciliado: 'Reconciled',
+      },
+      form: {
+        createTitle: 'New reconciliation',
+        editTitle: 'Edit reconciliation',
+        sectionHint: 'Pick the bank account and the period to reconcile',
+        tabs: { detalles: 'Ledger', soporte: 'Statement' },
+        fields: {
+          cuentaBanco: 'Bank account',
+          cuentaBancoPlaceholder: 'Select…',
+          fechaDesde: 'Date from',
+          fechaHasta: 'Date to',
+        },
+        validation: {
+          required: 'This field is required',
+          rangoInvalido: 'The start date cannot be later than the end date',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Reconciliation created',
+            desc: 'You can now load the ledger and the statement',
+          },
+          createError: { title: 'Create failed', desc: 'The reconciliation could not be created' },
+          editSuccess: {
+            title: 'Reconciliation updated',
+            desc: 'The reconciliation was updated successfully',
+          },
+          editError: { title: 'Update failed', desc: 'The reconciliation could not be updated' },
+          loadError: { title: 'Load failed', desc: 'The reconciliation could not be loaded' },
+        },
+      },
+      detail: {
+        sections: { general: 'General information' },
+        tabs: { detalles: 'Ledger', soporte: 'Statement' },
+        labels: {
+          id: 'ID',
+          cuentaBanco: 'Bank account',
+          cuentaContable: 'Ledger account',
+          fechaDesde: 'Date from',
+          fechaHasta: 'Date to',
+        },
+        notFound: {
+          title: 'Reconciliation not found',
+          desc: 'The reconciliation you are looking for does not exist or was deleted.',
+        },
+      },
+      detalleTab: {
+        cargar: 'Load ledger',
+        conciliar: 'Reconcile',
+        limpiar: 'Clear ledger',
+        confirmLimpiar: {
+          header: 'Clear the ledger',
+          message: 'Delete every loaded entry? This cannot be undone.',
+        },
+        toasts: {
+          cargar: {
+            success: { title: 'Ledger loaded', desc: 'The entries for the period were loaded' },
+            error: { title: 'Load failed', desc: 'The entries could not be loaded' },
+          },
+          conciliar: {
+            success: {
+              title: 'Reconciliation run',
+              desc: 'The ledger was matched against the statement',
+            },
+            error: { title: 'Reconcile failed', desc: 'The matching could not be run' },
+          },
+          limpiar: {
+            success: { title: 'Ledger cleared', desc: 'The loaded entries were deleted' },
+            error: { title: 'Clear failed', desc: 'The entries could not be deleted' },
+          },
+        },
+      },
+      soporteTab: {
+        cargar: 'Load statement',
+        limpiar: 'Clear statement',
+        plantillaNoDisponible: 'The backend does not expose the sample template yet',
+        import: {
+          title: 'Load statement',
+          subtitle: 'Upload the Excel file provided by the bank',
+        },
+        confirmLimpiar: {
+          header: 'Clear the statement',
+          message: 'Delete every statement line? This cannot be undone.',
+        },
+        toasts: {
+          limpiar: {
+            success: { title: 'Statement cleared', desc: 'The statement lines were deleted' },
+            error: { title: 'Clear failed', desc: 'The lines could not be deleted' },
+          },
+        },
+      },
+    },
     contabilizar: {
       name: 'Post to ledger',
       actions: { contabilizar: 'Post', descontabilizar: 'Unpost' },

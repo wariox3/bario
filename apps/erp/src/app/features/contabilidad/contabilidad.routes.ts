@@ -54,6 +54,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           import('./movimiento/movimiento.routes').then((m) => m.MOVIMIENTO_ROUTES),
       },
       {
+        path: 'utilidades/conciliacion',
+        loadChildren: () =>
+          import('./utilidades/conciliacion/conciliacion.routes').then(
+            (m) => m.CONCILIACION_ROUTES,
+          ),
+      },
+      {
         path: 'utilidades/contabilizar',
         loadChildren: () =>
           import('./utilidades/contabilizar/contabilizar.routes').then(

@@ -91,7 +91,14 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
       defaultExpanded: false,
       groups: [
         {
-          items: [{ labelKey: 'entities.contabilizar.name', path: 'utilidades/contabilizar' }],
+          items: [
+            { labelKey: 'entities.contabilizar.name', path: 'utilidades/contabilizar' },
+            {
+              labelKey: 'entities.conciliacion.name',
+              path: 'utilidades/conciliacion',
+              activeMatch: 'utilidades/conciliacion',
+            },
+          ],
         },
       ],
     },
