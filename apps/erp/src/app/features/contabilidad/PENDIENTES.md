@@ -6,16 +6,16 @@ anterior. Nada se ha ejercitado contra `reddocapi.uk`: todo sale de leer el cód
 Cada supuesto vive además como comentario en su archivo; acá está el índice para revisarlos de una
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
-Las secciones §1–§5 cubren los **informes**; la §6 y la §7, los documentos transaccionales
-(**asiento contable** y **depreciación**).
+Las secciones §1–§5 cubren los **informes**; de la §6 en adelante, los documentos transaccionales
+(**asiento contable**, **depreciación** y **cierre**).
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
 Estado: **los 9 informes del ERP anterior están portados\*\* (2026-07-28). Lo común vive en
 `features/contabilidad/shared/` desde `3211e91`; un informe nuevo de esta familia son ~40 líneas.
 
-Estado (2026-07-29): portados el **asiento contable** (documento tipo 13, §6) y la **depreciación**
-(documento tipo 23, §7).
+Estado (2026-07-29): portados el **asiento contable** (documento tipo 13, §6), la **depreciación**
+(documento tipo 23, §7) y el **cierre contable** (documento tipo 25, §8).
 
 ---
 
@@ -279,3 +279,66 @@ o **envuelto** (`{ documento: { id } }`, como hacía el legacy), porque el gatew
 crudo y no se pudo verificar cuál es. Si no encuentra el id por ninguna de las dos vías, cae a la
 lista en vez de navegar a una URL inválida — pero el usuario pierde el atajo a cargar activos.
 Al confirmar la forma real, se simplifica la función.
+
+---
+
+## 8. Cierre contable (documento tipo 25)
+
+Portado desde `contabilidad/paginas/documento/cierre/` del ERP anterior. Tercer documento del
+módulo. Vive en `documentos/cierre/`.
+
+Cierra el ejercicio: traslada los saldos de las cuentas de resultado de un rango a la cuenta de
+cierre. Como la depreciación, **sus líneas las genera el backend**; a diferencia de ella, son
+asientos contables normales, así que reusa `<app-contable-documento-lineas-table>` sin agregarle
+nada — las ocho columnas del legacy ya estaban cubiertas.
+
+### 8.1 Por confirmar con backend
+
+#### Los dos endpoints propios
+
+| Operación      | Endpoint supuesto                                 | Body                                                                 |
+| -------------- | ------------------------------------------------- | -------------------------------------------------------------------- |
+| Generar líneas | `POST /general/documento/cargar-cierre/`          | `{ id, cuenta_desde_codigo, cuenta_hasta_codigo, cuenta_cierre_id }` |
+| Borrar todas   | `POST /general/documento_detalle/eliminar-todos/` | `{ documento_id }`                                                   |
+
+⚠️ **Divergencia de ruta, el riesgo más alto de esta entrega**: el borrado masivo del legacy pega a
+`documento_detalle` con guion **bajo**, mientras que todo el framework de documentos de este ERP
+usa `documento-detalle` con **guion** (y funciona: lo consumen pago, asiento y depreciación). Se
+replicó la ruta del legacy porque es la única evidencia de que ese endpoint existe. Si el backend
+solo expone la forma con guion, "Eliminar todos" responde 404 y el fix es la constante
+`ELIMINAR_DETALLES_ENDPOINT`.
+
+**La asimetría código/id de `cargar-cierre/` también es del legacy**: el rango viaja por **código**
+de cuenta y el destino por **id**. Confirmar que es intencional y no un accidente heredado.
+
+#### El serializador de las líneas
+
+El legacy lee las líneas del cierre con `serializador=lista_detalle_cuenta`, que devuelve los campos
+con doble guion bajo (`contacto__nombre_corto`, `cuenta__codigo`, `grupo__nombre`). Acá se usa el
+read estándar del framework (`CuentaDetalleRead`: `contacto_nombre_corto`, `cuenta_codigo`,
+`grupo_nombre`), que cubre exactamente las mismas columnas. Confirmar que el endpoint estándar sirve
+las líneas del cierre sin pedir ese serializador; si no, hay que sumar un read propio.
+
+#### El total
+
+El cierre **no manda `total`**. El legacy declaraba el control en el formulario, pero su
+`calcularTotales()` recorría un `FormArray` de detalles que ese formulario nunca llena: siempre
+viajaba en 0. Mandar un cero fabricado es peor que no mandar nada. Confirmar que el backend lo
+calcula al generar las líneas.
+
+### 8.2 Decisiones tomadas
+
+| #   | Decisión                                                                                        | Por qué                                                                                                                                                                           |
+| --- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | "Cargar" y "Eliminar todos" viven en el **formulario de edición**, no en la ficha               | En este ERP la ficha es de solo lectura. Mismo criterio que "Cargar activos" de la depreciación, el otro documento que genera líneas desde el backend                             |
+| 2   | Las líneas se traen **paginadas** (`listarPaginadoPorDocumento`, 50 por página)                 | Un cierre cierra todas las cuentas de resultado del ejercicio: es el único documento que puede pasarse del tope de 1000 de `listarPorDocumento`, que además truncaría en silencio |
+| 3   | `<app-cuenta-select>` ahora expone `codigo` además de `id` y `nombre`                           | El rango del cierre viaja por código. La alternativa era recortarlo de la etiqueta (`"1105 - Caja"` → `"1105"`), el apaño que hoy usan los informes y que §2 ya marca como frágil |
+| 4   | Se reusa la tabla contable de solo lectura, sin campos nuevos                                   | Las ocho columnas del legacy (contacto, cuenta, grupo, naturaleza, valor, base, detalle) ya estaban cubiertas — `grupo` entró con el asiento                                      |
+| 5   | La fecha 31 de diciembre **bloquea** el guardado                                                | No es una convención sino la definición del documento: no hay caso legítimo en que otra fecha sirva. A diferencia del descuadre del asiento, que sí avisa sin bloquear            |
+| 6   | La fecha **no trae valor por defecto**                                                          | Sembrar "hoy" dejaría el campo en error apenas se abre el formulario. El legacy lo hacía                                                                                          |
+| 7   | El validador compara sobre el `Date` **local** del datepicker                                   | El legacy parseaba `yyyy-MM-dd` con `new Date(...)` —que lo lee como UTC— y compensaba con `getDate() + 1`; ese truco solo acierta en zonas horarias negativas                    |
+| 8   | Al crear, se navega a **editar** el documento nuevo                                             | Un cierre recién creado está vacío y cargarlo necesita su id. Mismo criterio (y mismo `extractDocumentoId` con el mismo riesgo abierto) que la depreciación — ver §7.3            |
+| 9   | Las dos acciones se deshabilitan si el documento está **aprobado o anulado**                    | Igual que el legacy                                                                                                                                                               |
+| 10  | **No** se portan el `formularioResultado` duplicado del form ni el `CierreService` de selección | Código muerto: el formulario declaraba una copia del formulario del modal que su plantilla nunca renderiza, y un servicio de selección múltiple que nadie llama                   |
+| 11  | **No** se portan `getTotalDebito()` / `getTotalCredito()`                                       | La plantilla del legacy nunca los usó y, al estar las líneas paginadas, habrían sumado solo la página visible                                                                     |
+| 12  | La **importación de líneas por Excel** queda fuera                                              | `general/documento/importar-detalle/`. Mismo criterio que en el asiento: el importador es una pieza transversal que este ERP todavía no tiene                                     |
