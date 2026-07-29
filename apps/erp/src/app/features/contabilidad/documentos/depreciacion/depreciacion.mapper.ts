@@ -8,9 +8,9 @@ export function depreciacionToFormValue(read: DepreciacionRead): Partial<Depreci
     contacto:
       read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
     fecha: fromIsoDate(read.fecha),
-    grupo_contabilidad:
-      read.grupo_contabilidad != null
-        ? { id: read.grupo_contabilidad, nombre: read.grupo_contabilidad_nombre ?? '' }
+    centro_costo:
+      read.centro_costo != null
+        ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
         : null,
     comentario: read.comentario,
   };
@@ -32,7 +32,7 @@ export function formValueToPayload(
     documento_tipo: documentTypeId,
     contacto: raw.contacto?.id ?? null,
     fecha: toIsoDate(raw.fecha),
-    grupo_contabilidad: raw.grupo_contabilidad?.id ?? null,
+    centro_costo: raw.centro_costo?.id ?? null,
     comentario: raw.comentario,
     total: total.toFixed(2),
   };

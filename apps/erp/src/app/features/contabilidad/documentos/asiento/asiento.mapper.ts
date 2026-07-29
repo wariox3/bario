@@ -22,9 +22,9 @@ export function asientoToFormValue(
       read.comprobante != null
         ? { id: read.comprobante, nombre: read.comprobante_nombre ?? '' }
         : null,
-    grupo_contabilidad:
-      read.grupo_contabilidad != null
-        ? { id: read.grupo_contabilidad, nombre: read.grupo_contabilidad_nombre ?? '' }
+    centro_costo:
+      read.centro_costo != null
+        ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
         : null,
     comentario: read.comentario,
   };
@@ -51,7 +51,7 @@ export function formValueToPayload(
     fecha: toIsoDate(raw.fecha),
     soporte: raw.soporte,
     comprobante: raw.comprobante?.id ?? null,
-    grupo_contabilidad: raw.grupo_contabilidad?.id ?? null,
+    centro_costo: raw.centro_costo?.id ?? null,
     comentario: raw.comentario,
     total: calcularResumenContable(raw.detalles).total.toFixed(2),
     ...(includeDetalles ? { detalles: raw.detalles.map(cuentaDetalleToPayload) } : {}),

@@ -74,11 +74,6 @@
               {{ t().entities.cuentaDetalle.columns.centroCosto }}
             </th>
           }
-          @if (showGrupo()) {
-            <th class="contable-detalle-table__th w-44 text-left">
-              {{ t().entities.cuentaDetalle.columns.grupo }}
-            </th>
-          }
           <th class="contable-detalle-table__th w-40 text-right">
             {{ t().entities.cuentaDetalle.columns.valor }}
           </th>
@@ -181,16 +176,6 @@
                   formControlName="centro_costo"
                   [endpoint]="centroCostoEndpoint"
                   [placeholder]="t().entities.cuentaDetalle.centroCostoPlaceholder"
-                />
-              </td>
-            }
-
-            @if (showGrupo()) {
-              <td class="contable-detalle-table__td">
-                <lib-api-select
-                  formControlName="grupo"
-                  [endpoint]="grupoEndpoint"
-                  [placeholder]="t().entities.cuentaDetalle.grupoPlaceholder"
                 />
               </td>
             }

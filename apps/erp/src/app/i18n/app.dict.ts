@@ -2082,8 +2082,8 @@ export interface AppDict
           contacto: string;
           contactoPlaceholder: string;
           fecha: string;
-          grupo: string;
-          grupoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
           comentario: string;
         };
         validation: { required: string; noEs31Diciembre: string };
@@ -2112,7 +2112,7 @@ export interface AppDict
           numero: string;
           contacto: string;
           fecha: string;
-          grupo: string;
+          centroCosto: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2148,8 +2148,8 @@ export interface AppDict
           contacto: string;
           contactoPlaceholder: string;
           fecha: string;
-          grupo: string;
-          grupoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
           comentario: string;
         };
         validation: { required: string };
@@ -2169,7 +2169,7 @@ export interface AppDict
           numero: string;
           contacto: string;
           fecha: string;
-          grupo: string;
+          centroCosto: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2221,9 +2221,9 @@ export interface AppDict
           soportePlaceholder: string;
           comprobante: string;
           comprobantePlaceholder: string;
-          grupo: string;
-          grupoPlaceholder: string;
-          grupoHint: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          centroCostoHint: string;
           comentario: string;
         };
         validation: { required: string };
@@ -2244,7 +2244,7 @@ export interface AppDict
           fecha: string;
           soporte: string;
           comprobante: string;
-          grupo: string;
+          centroCosto: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2486,7 +2486,6 @@ export interface AppDict
       cuentaPlaceholder: string;
       contactoPlaceholder: string;
       centroCostoPlaceholder: string;
-      grupoPlaceholder: string;
       detallePlaceholder: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
@@ -2498,7 +2497,6 @@ export interface AppDict
         contacto: string;
         naturaleza: string;
         centroCosto: string;
-        grupo: string;
         valor: string;
         base: string;
         detalle: string;

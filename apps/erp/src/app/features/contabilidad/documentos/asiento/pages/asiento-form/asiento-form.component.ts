@@ -59,7 +59,7 @@ import type { AsientoRead } from '../../asiento.model';
  *
  * Es el comprobante contable manual: sus líneas son asientos puros (cuenta +
  * naturaleza + valor), así que compone la tabla contable compartida con las
- * columnas que imputa el asiento —contacto, número, grupo, base y glosa—.
+ * columnas que imputa el asiento —contacto, número, centro de costo, base y glosa—.
  *
  * **Cuadre**: un asiento debería cerrar con débitos = créditos. Si no cuadra se
  * avisa con un toast y el resumen marca la diferencia, pero **no se bloquea** el
@@ -109,8 +109,8 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
   protected readonly comprobanteEndpoint = COMPROBANTE_ENDPOINT;
   protected readonly comprobanteParams = COMPROBANTE_PARAMS;
 
-  /** Catálogo de grupos de contabilidad. */
-  protected readonly grupoEndpoint = SELECT_ENDPOINTS.grupoContabilidad;
+  /** Catálogo de centros de costo (el "grupo" del ERP anterior). */
+  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -150,19 +150,19 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     soporte: this.fb.control<string | null>(null, [Validators.required, Validators.maxLength(50)]),
     comprobante: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    grupo_contabilidad: this.fb.control<ErpSelectOption | null>(null),
+    centro_costo: this.fb.control<ErpSelectOption | null>(null),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<CuentaDetalleGroup>([]),
   });
 
   /**
-   * Espejo en signal del contacto y el grupo de la cabecera, para que la tabla
+   * Espejo en signal del contacto y el centro de costo de la cabecera, para que
    * siembre con ellos cada línea nueva. Se escriben en los dos únicos puntos
    * donde cambian —la elección del usuario y la carga en edición—; esta última
    * patchea con `emitEvent: false`, así que no basta con seguir `valueChanges`.
    */
   protected readonly contactoCabecera = signal<ErpSelectOption | null>(null);
-  protected readonly grupoCabecera = signal<ErpSelectOption | null>(null);
+  protected readonly centroCostoCabecera = signal<ErpSelectOption | null>(null);
 
   constructor() {
     this.form.controls.contacto.valueChanges
@@ -172,11 +172,11 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
         this.propagarALineas('contacto', contacto);
       });
 
-    this.form.controls.grupo_contabilidad.valueChanges
+    this.form.controls.centro_costo.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((grupo) => {
-        this.grupoCabecera.set(grupo);
-        this.propagarALineas('grupo', grupo);
+      .subscribe((centroCosto) => {
+        this.centroCostoCabecera.set(centroCosto);
+        this.propagarALineas('centro_costo', centroCosto);
       });
   }
 
@@ -309,11 +309,11 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
   /**
    * Replica un campo de la cabecera en las líneas que aún no se guardaron.
    *
-   * Una línea libre nace con el tercero y el grupo del documento, pero solo
+   * Una línea libre nace con el tercero y el centro de costo del documento, pero
    * mientras sea suya: las ya persistidas conservan los que tengan (cambiarlas
    * es decisión explícita del usuario, fila por fila).
    */
-  private propagarALineas(campo: 'contacto' | 'grupo', valor: ErpSelectOption | null): void {
+  private propagarALineas(campo: 'contacto' | 'centro_costo', valor: ErpSelectOption | null): void {
     for (const group of this.form.controls.detalles.controls) {
       if (group.controls.id.value !== null) continue;
       group.controls[campo].setValue(valor);
@@ -352,16 +352,16 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
 
   /**
    * Pobla la cabecera en el form. `emitEvent: false`: cargar un documento no es
-   * que el usuario haya elegido contacto ni grupo, así que no dispara la
+   * que el usuario haya elegido contacto ni centro de costo, así que no dispara
    * propagación a las líneas (que además llegan con los suyos desde el backend).
    */
   private applyCabecera(read: AsientoRead): void {
     const value = asientoToFormValue(read);
     this.form.patchValue(value, { emitEvent: false });
     // Las líneas que agregue el usuario en edición nacen con el contacto y el
-    // grupo del documento, igual que en alta.
+    // centro de costo del documento, igual que en alta.
     this.contactoCabecera.set(value.contacto ?? null);
-    this.grupoCabecera.set(value.grupo_contabilidad ?? null);
+    this.centroCostoCabecera.set(value.centro_costo ?? null);
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */

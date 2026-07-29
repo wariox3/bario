@@ -18,9 +18,6 @@
         @if (showCentroCosto()) {
           <th class="contable-detalle-table__th w-44 text-left">{{ c.columns.centroCosto }}</th>
         }
-        @if (showGrupo()) {
-          <th class="contable-detalle-table__th w-44 text-left">{{ c.columns.grupo }}</th>
-        }
         <th class="contable-detalle-table__th w-40 text-right">{{ c.columns.valor }}</th>
         @if (showBase()) {
           <th class="contable-detalle-table__th w-36 text-right">{{ c.columns.base }}</th>
@@ -55,11 +52,6 @@
           @if (showCentroCosto()) {
             <td class="contable-detalle-table__td text-brand-text">
               {{ line.centro_costo?.nombre || '—' }}
-            </td>
-          }
-          @if (showGrupo()) {
-            <td class="contable-detalle-table__td text-brand-text">
-              {{ line.grupo?.nombre || '—' }}
             </td>
           }
           <td

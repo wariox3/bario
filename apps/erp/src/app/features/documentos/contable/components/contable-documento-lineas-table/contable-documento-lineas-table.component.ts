@@ -11,9 +11,9 @@ const BASE_COLUMN_COUNT = 4;
  *
  * Gemela read-only de `ContableDocumentoDetallesComponent` (que es editable inline):
  * mismas columnas y misma opción de prenderlas (`showContacto`, `showCentroCosto`,
- * `showBase`, `showNumero`, `showGrupo`, `showDetalle`), pero celdas de texto y sin
- * acciones ni persistencia. La usa la ficha de detalle de cualquier documento con
- * asientos manuales.
+ * `showBase`, `showNumero`, `showDetalle`), pero celdas de texto y sin acciones ni
+ * persistencia. La usa la ficha de detalle de cualquier documento con asientos
+ * manuales.
  */
 @Component({
   selector: 'app-contable-documento-lineas-table',
@@ -40,9 +40,6 @@ export class ContableDocumentoLineasTableComponent {
   /** Muestra la columna de número de referencia de la línea (la imputa el asiento). */
   readonly showNumero = input<boolean>(false);
 
-  /** Muestra la columna de grupo de contabilidad. */
-  readonly showGrupo = input<boolean>(false);
-
   /** Muestra la columna de glosa libre de la línea. */
   readonly showDetalle = input<boolean>(false);
 
@@ -56,7 +53,6 @@ export class ContableDocumentoLineasTableComponent {
         this.showNumero(),
         this.showContacto(),
         this.showCentroCosto(),
-        this.showGrupo(),
         this.showBase(),
         this.showDetalle(),
       ].filter(Boolean).length,

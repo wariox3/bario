@@ -103,8 +103,8 @@ export class CierreFormComponent implements OnInit {
 
   protected readonly t = this.i18n.t;
 
-  /** Catálogo de grupos de contabilidad. */
-  protected readonly grupoEndpoint = SELECT_ENDPOINTS.grupoContabilidad;
+  /** Catálogo de centros de costo (el "grupo" del ERP anterior). */
+  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly pageSize = CIERRE_DETALLE_PAGE_SIZE;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
@@ -154,7 +154,7 @@ export class CierreFormComponent implements OnInit {
     // Sin fecha por defecto: el cierre es siempre un 31 de diciembre, y sembrar
     // "hoy" dejaría el campo en error apenas se abre el formulario.
     fecha: this.fb.control<Date | null>(null, [Validators.required, fecha31Diciembre()]),
-    grupo_contabilidad: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    centro_costo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
   });
 

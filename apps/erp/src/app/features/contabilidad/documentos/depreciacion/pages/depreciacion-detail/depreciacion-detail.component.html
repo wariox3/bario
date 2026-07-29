@@ -82,8 +82,8 @@
         <dd class="depreciacion-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="depreciacion-detail__label">{{ det.labels.grupo }}</dt>
-        <dd class="depreciacion-detail__value">{{ c.grupo || '—' }}</dd>
+        <dt class="depreciacion-detail__label">{{ det.labels.centroCosto }}</dt>
+        <dd class="depreciacion-detail__value">{{ c.centroCosto || '—' }}</dd>
       </div>
       @if (c.comentario) {
         <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">

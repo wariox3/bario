@@ -124,16 +124,16 @@
 
         <!-- Grupo de contabilidad -->
         <div class="flex flex-col gap-1.5">
-          <label for="grupo_contabilidad" class="asiento-form__label">
-            {{ f.fields.grupo }}
+          <label for="centro_costo" class="asiento-form__label">
+            {{ f.fields.centroCosto }}
           </label>
           <lib-api-select
-            inputId="grupo_contabilidad"
-            formControlName="grupo_contabilidad"
-            [endpoint]="grupoEndpoint"
-            [placeholder]="f.fields.grupoPlaceholder"
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
+            [placeholder]="f.fields.centroCostoPlaceholder"
           />
-          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.grupoHint }}</p>
+          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.centroCostoHint }}</p>
         </div>
 
         <!-- Comentario -->
@@ -159,10 +159,10 @@
         [detalles]="form.controls.detalles"
         [documentId]="documentId()"
         [contactoPorDefecto]="contactoCabecera()"
-        [grupoPorDefecto]="grupoCabecera()"
+        [centroCostoPorDefecto]="centroCostoCabecera()"
         [showContacto]="true"
         [showNumero]="true"
-        [showGrupo]="true"
+        [showCentroCosto]="true"
         [showBase]="true"
         [showDetalle]="true"
         [showDescuadre]="true"

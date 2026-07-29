@@ -25,7 +25,7 @@ interface CabeceraView {
   readonly numero: string | null;
   readonly contacto: string | null;
   readonly fecha: Date | null;
-  readonly grupo: string | null;
+  readonly centroCosto: string | null;
   readonly comentario: string | null;
   /** Si ya está aprobado no se puede volver a aprobar (deshabilita la acción). */
   readonly estadoAprobado: boolean;
@@ -231,7 +231,7 @@ export class CierreDetailComponent implements OnInit {
             numero: read.numero ?? null,
             contacto: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
             fecha: fv.fecha ?? null,
-            grupo: fv.grupo_contabilidad?.nombre ?? read.grupo_contabilidad_nombre ?? null,
+            centroCosto: fv.centro_costo?.nombre ?? read.centro_costo_nombre ?? null,
             comentario: read.comentario ?? null,
             estadoAprobado: read.estado_aprobado,
           });

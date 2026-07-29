@@ -66,12 +66,12 @@ const BASE_COLUMN_COUNT = 5;
  * Espeja `ComercialDocumentoDetallesComponent` pero sin ítems ni impuestos:
  * cuenta + naturaleza (D/C) + valor, con el acumulado de débitos/créditos.
  *
- * Las columnas `contacto`, `centro_costo`, `base`, `numero`, `grupo` y `detalle` son
+ * Las columnas `contacto`, `centro_costo`, `base`, `numero` y `detalle` son
  * **opt-in** (`showContacto`, `showCentroCosto`, `showBase`, `showNumero`,
- * `showGrupo`, `showDetalle`): un documento las pide solo si su negocio las imputa
- * —el pago pide tercero y centro de costo, el asiento contable suma número, grupo y
- * glosa—. El `FormGroup` siempre las tiene, así que prenderlas no cambia el shape de
- * la línea ni el mapper.
+ * `showDetalle`): un documento las pide solo si su negocio las imputa —el pago pide
+ * tercero y centro de costo, el asiento contable suma número y glosa—. El
+ * `FormGroup` siempre las tiene, así que prenderlas no cambia el shape de la línea
+ * ni el mapper.
  *
  * Persistencia idéntica a la familia comercial: en **alta** (`documentId == null`)
  * las líneas viven en el `FormArray` y viajan embebidas al crear el documento; en
@@ -133,23 +133,23 @@ export class ContableDocumentoDetallesComponent {
    */
   readonly contactoPorDefecto = input<ErpSelectOption | null>(null);
 
-  /** Muestra la columna de centro de costo. */
+  /**
+   * Muestra la columna de centro de costo. Es lo que el ERP anterior llamaba
+   * "grupo" (de contabilidad) en el asiento y el cierre.
+   */
   readonly showCentroCosto = input<boolean>(false);
+
+  /**
+   * Centro de costo con el que nace cada línea nueva. Mismo rol que
+   * `contactoPorDefecto`: el asiento siembra el de su cabecera.
+   */
+  readonly centroCostoPorDefecto = input<ErpSelectOption | null>(null);
 
   /** Muestra la columna de base gravable. */
   readonly showBase = input<boolean>(false);
 
   /** Muestra la columna de número de referencia de la línea (la imputa el asiento). */
   readonly showNumero = input<boolean>(false);
-
-  /** Muestra la columna de grupo de contabilidad. */
-  readonly showGrupo = input<boolean>(false);
-
-  /**
-   * Grupo con el que nace cada línea nueva. Mismo rol que `contactoPorDefecto`:
-   * el asiento siembra el de su cabecera.
-   */
-  readonly grupoPorDefecto = input<ErpSelectOption | null>(null);
 
   /** Muestra la columna de glosa libre de la línea. */
   readonly showDetalle = input<boolean>(false);
@@ -198,9 +198,6 @@ export class ContableDocumentoDetallesComponent {
   /** Endpoint del catálogo de centros de costo (columna `centro_costo`). */
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
 
-  /** Endpoint del catálogo de grupos de contabilidad (columna `grupo`). */
-  protected readonly grupoEndpoint = SELECT_ENDPOINTS.grupoContabilidad;
-
   /** Nº de columnas de la tabla; alimenta el `colspan` del estado vacío. */
   protected readonly columnCount = computed(
     () =>
@@ -210,7 +207,6 @@ export class ContableDocumentoDetallesComponent {
         this.showDocumento(),
         this.showContacto(),
         this.showCentroCosto(),
-        this.showGrupo(),
         this.showBase(),
         this.showDetalle(),
       ].filter(Boolean).length,
@@ -267,7 +263,7 @@ export class ContableDocumentoDetallesComponent {
     this.detalles().push(
       createCuentaDetalleGroup({
         contacto: this.contactoPorDefecto(),
-        grupo: this.grupoPorDefecto(),
+        centro_costo: this.centroCostoPorDefecto(),
       }),
     );
   }

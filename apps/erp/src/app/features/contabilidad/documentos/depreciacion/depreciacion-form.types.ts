@@ -10,6 +10,6 @@ import type { ErpSelectOption } from '@reddoc/core';
 export interface DepreciacionFormRawValue {
   readonly contacto: ErpSelectOption | null;
   readonly fecha: Date | null;
-  readonly grupo_contabilidad: ErpSelectOption | null;
+  readonly centro_costo: ErpSelectOption | null;
   readonly comentario: string | null;
 }

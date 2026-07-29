@@ -96,8 +96,8 @@ export class DepreciacionFormComponent implements OnInit {
 
   protected readonly t = this.i18n.t;
 
-  /** Catálogo de grupos de contabilidad. */
-  protected readonly grupoEndpoint = SELECT_ENDPOINTS.grupoContabilidad;
+  /** Catálogo de centros de costo (el "grupo" del ERP anterior). */
+  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -144,7 +144,7 @@ export class DepreciacionFormComponent implements OnInit {
   protected readonly form = this.fb.group({
     contacto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
-    grupo_contabilidad: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    centro_costo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
   });
 

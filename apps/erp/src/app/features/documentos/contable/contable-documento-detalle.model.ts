@@ -32,9 +32,6 @@ export interface CuentaDetalleRead extends DocumentoDetalleReadBase {
   readonly base?: string | null;
   /** Número de referencia libre de la línea (solo lo imputa el asiento manual). */
   readonly numero?: number | string | null;
-  /** FK del grupo de contabilidad (`contabilidad/grupo`). */
-  readonly grupo?: number | null;
-  readonly grupo_nombre?: string | null;
   /** Glosa libre de la línea. */
   readonly detalle?: string | null;
   /** Documento cruzado por la línea (cabecera afectada); `null` en asientos manuales. */
@@ -63,8 +60,6 @@ export interface CuentaDetallePayload {
   readonly base: string;
   /** Número de referencia libre; `null` en los documentos que no lo imputan. */
   readonly numero: number | null;
-  /** Grupo de contabilidad; `null` en los documentos que no agrupan. */
-  readonly grupo: number | null;
   /** Glosa libre; `null` en los documentos que no la imputan. */
   readonly detalle: string | null;
   /**

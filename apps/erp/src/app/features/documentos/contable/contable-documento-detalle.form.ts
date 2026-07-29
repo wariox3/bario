@@ -15,7 +15,6 @@ export type CuentaDetalleGroup = FormGroup<{
   centro_costo: FormControl<ErpSelectOption | null>;
   base: FormControl<number | null>;
   numero: FormControl<number | null>;
-  grupo: FormControl<ErpSelectOption | null>;
   detalle: FormControl<string | null>;
   documento_afectado: FormControl<number | null>;
   documento_afectado_numero: FormControl<string | null>;
@@ -30,8 +29,8 @@ export type CuentaDetalleGroup = FormGroup<{
  * estado de formulario. El acumulado de débitos/créditos se deriva fuera, en la
  * tabla, a partir del valor del array.
  *
- * `contacto`, `centro_costo`, `base`, `numero`, `grupo` y `detalle` existen siempre
- * en el grupo aunque la tabla los oculte: así el shape de la línea es uno solo y el
+ * `contacto`, `centro_costo`, `base`, `numero` y `detalle` existen siempre en el
+ * grupo aunque la tabla los oculte: así el shape de la línea es uno solo y el
  * mapper no necesita ramas. Un documento que no los usa los deja en su default nulo.
  * Ninguno es obligatorio —solo `cuenta` y `valor` lo son—, así que prender una
  * columna nunca puede dejar una línea inválida.
@@ -64,7 +63,6 @@ export function createCuentaDetalleGroup(
     centro_costo: new FormControl<ErpSelectOption | null>(value?.centro_costo ?? null),
     base: new FormControl<number | null>(value?.base ?? 0),
     numero: new FormControl<number | null>(value?.numero ?? null),
-    grupo: new FormControl<ErpSelectOption | null>(value?.grupo ?? null),
     detalle: new FormControl<string | null>(value?.detalle ?? null, Validators.maxLength(200)),
     documento_afectado: new FormControl<number | null>(value?.documento_afectado ?? null),
     documento_afectado_numero: new FormControl<string | null>(

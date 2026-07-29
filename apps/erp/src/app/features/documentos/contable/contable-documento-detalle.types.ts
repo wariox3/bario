@@ -13,11 +13,14 @@ export type NaturalezaCuenta = 'D' | 'C';
  * cuenta del PUC con su naturaleza y valor.
  *
  * `cuenta` + `naturaleza` + `valor` son el núcleo que usa cualquier documento con
- * asientos manuales. `contacto`, `centro_costo`, `base`, `numero`, `grupo` y
- * `detalle` son opcionales **en la UI** (la tabla los muestra solo si el documento
- * los pide vía inputs) pero siempre viven en el grupo: un documento que no los usa
- * los deja en su default nulo. El pago imputa tercero y centro de costo; el asiento
- * contable suma número, grupo y glosa.
+ * asientos manuales. `contacto`, `centro_costo`, `base`, `numero` y `detalle` son
+ * opcionales **en la UI** (la tabla los muestra solo si el documento los pide vía
+ * inputs) pero siempre viven en el grupo: un documento que no los usa los deja en
+ * su default nulo. El pago imputa tercero y centro de costo; el asiento contable
+ * suma número y glosa.
+ *
+ * Ojo con el vocabulario del ERP anterior: lo que allá se llama "grupo" (de
+ * contabilidad) es acá el **centro de costo**.
  */
 export interface CuentaDetalleFormRawValue {
   /** Id de la línea persistida (`null` mientras no exista en backend). */
@@ -38,11 +41,6 @@ export interface CuentaDetalleFormRawValue {
    * Lo teclea el usuario en el asiento manual; `null` donde no se imputa.
    */
   readonly numero: number | null;
-  /**
-   * Grupo de contabilidad (`contabilidad/grupo`) al que se imputa la línea.
-   * `null` en los documentos que no agrupan.
-   */
-  readonly grupo: ErpSelectOption | null;
   /** Glosa libre de la línea. `null` donde no se imputa. */
   readonly detalle: string | null;
   /**

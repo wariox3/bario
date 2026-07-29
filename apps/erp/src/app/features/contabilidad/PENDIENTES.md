@@ -159,36 +159,28 @@ egreso. Vive en `documentos/asiento/`.
 
 ### 6.1 Por confirmar con backend
 
-#### Catálogos de la cabecera
+#### El comprobante
 
-Ninguno de los dos existe como master en este ERP; los selects pegan directo a su `seleccionar/`:
-
-| Campo         | Endpoint supuesto                        | Nota                                                    |
-| ------------- | ---------------------------------------- | ------------------------------------------------------- |
-| `comprobante` | `/contabilidad/comprobante/seleccionar/` | Con el filtro `permite_asiento=True`, tomado del legacy |
-| `grupo`       | `/contabilidad/grupo/seleccionar/`       | En `SELECT_ENDPOINTS.grupoContabilidad`                 |
-
-Confirmar que ambos existen y que el filtro `permite_asiento` es un query param válido. Si no lo
-es, el select de comprobante mostraría también los que no admiten asiento manual.
+No existe como master en este ERP; el select pega directo a
+`/contabilidad/comprobante/seleccionar/` con el filtro `permite_asiento=True`, los dos tomados del
+legacy. Confirmar que existe y que el filtro es un query param válido: si no lo es, el select
+mostraría también los comprobantes que no admiten asiento manual.
 
 #### Campos nuevos de la línea contable
 
-`numero`, `grupo` y `detalle` se sumaron a `CuentaDetallePayload` para este documento. Los nombres
-salen del `FormGroup` del legacy, **no de una respuesta real**. Confirmar los tres, y en especial:
+`numero` y `detalle` se sumaron a `CuentaDetallePayload` para este documento. Los nombres salen del
+`FormGroup` del legacy, **no de una respuesta real**.
 
-- **`grupo` viaja como FK del grupo de contabilidad** (id). El legacy mandaba el mismo control tanto
-  en la cabecera (`grupo_contabilidad`) como en la línea (`grupo`) — dos nombres para lo mismo.
-  Confirmar si en la línea también se llama `grupo` o si es `grupo_contabilidad`.
-- **`numero` es un entero libre de la línea**, no el consecutivo del documento. En el legacy no
-  validaba nada ni se mostraba en la ficha; se portó por si el backend lo espera.
+**`numero` es un entero libre de la línea**, no el consecutivo del documento. En el legacy no
+validaba nada ni se mostraba en la ficha; se portó por si el backend lo espera.
 
-⚠️ **Efecto colateral en pago y egreso**: los tres campos viven en el payload compartido, así que
-ahora esos dos documentos mandan `numero: null, grupo: null, detalle: null` en cada línea. Si el
-backend rechaza campos no esperados, se ve ahí primero.
+⚠️ **Efecto colateral en pago y egreso**: los dos campos viven en el payload compartido, así que
+ahora esos documentos mandan `numero: null, detalle: null` en cada línea. Si el backend rechaza
+campos no esperados, se ve ahí primero.
 
 #### Cabecera
 
-`soporte`, `comprobante`, `grupo_contabilidad` y `comentario` sobre `DocumentoPayloadBase`. El
+`soporte`, `comprobante`, `centro_costo` y `comentario` sobre `DocumentoPayloadBase`. El
 `total` viaja como **`créditos − débitos`** (en un asiento cuadrado, `"0.00"`) — es literalmente lo
 que calculaba el legacy. Si el backend espera la magnitud del asiento (la suma de débitos), es un
 cambio de una línea en `asiento.mapper.ts`.
@@ -202,7 +194,8 @@ el legacy no acotaba ninguno de los dos. Ajustar a lo que declare el modelo del 
 
 | #   | Decisión                                                                                     | Por qué                                                                                                                                                                                        |
 | --- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Los 3 campos nuevos se sumaron a la familia contable **compartida**, como columnas opt-in    | Mismo patrón que `showContacto`/`showBase`, que ya existía. Duplicar la familia para el asiento costaba ~800 líneas de mapper y tabla                                                          |
+| 0   | El **"grupo" del legacy es el centro de costo** (`centro_costo`)                             | Vocabulario del ERP anterior, ya resuelto así en los documentos de compra. Aplica a la cabecera y a la línea de los tres documentos contables (§6, §7, §8)                                     |
+| 1   | Los 2 campos nuevos se sumaron a la familia contable **compartida**, como columnas opt-in    | Mismo patrón que `showContacto`/`showBase`, que ya existía. Duplicar la familia para el asiento costaba ~800 líneas de mapper y tabla                                                          |
 | 2   | El descuadre **avisa pero no bloquea** el guardado                                           | El legacy solo rechazaba total negativo, sin exigir cuadre. Endurecerlo a bloqueo puede dejar a un usuario sin poder guardar un asiento a medias; la validación dura es del backend al aprobar |
 | 3   | El resumen suma una fila **"Diferencia"** en ámbar (`showDescuadre`), que el legacy no tenía | Sin ella el descuadre solo se ve restando a ojo dos cifras. Va opt-in: en un recaudo la diferencia _es_ el neto y no hay nada que señalar                                                      |
 | 4   | **Sin** columna de centro de costo en las líneas                                             | El asiento del legacy no la imputaba (sí el pago). La columna existe en el `FormGroup`, prenderla es un input                                                                                  |
@@ -314,9 +307,9 @@ de cuenta y el destino por **id**. Confirmar que es intencional y no un accident
 #### El serializador de las líneas
 
 El legacy lee las líneas del cierre con `serializador=lista_detalle_cuenta`, que devuelve los campos
-con doble guion bajo (`contacto__nombre_corto`, `cuenta__codigo`, `grupo__nombre`). Acá se usa el
-read estándar del framework (`CuentaDetalleRead`: `contacto_nombre_corto`, `cuenta_codigo`,
-`grupo_nombre`), que cubre exactamente las mismas columnas. Confirmar que el endpoint estándar sirve
+con doble guion bajo (`contacto__nombre_corto`, `cuenta__codigo`, `grupo__nombre` — ese "grupo" es
+el centro de costo). Acá se usa el read estándar del framework (`CuentaDetalleRead`:
+`contacto_nombre_corto`, `cuenta_codigo`, `centro_costo_nombre`), que cubre las mismas columnas. Confirmar que el endpoint estándar sirve
 las líneas del cierre sin pedir ese serializador; si no, hay que sumar un read propio.
 
 #### El total
@@ -328,17 +321,17 @@ calcula al generar las líneas.
 
 ### 8.2 Decisiones tomadas
 
-| #   | Decisión                                                                                        | Por qué                                                                                                                                                                           |
-| --- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | "Cargar" y "Eliminar todos" viven en el **formulario de edición**, no en la ficha               | En este ERP la ficha es de solo lectura. Mismo criterio que "Cargar activos" de la depreciación, el otro documento que genera líneas desde el backend                             |
-| 2   | Las líneas se traen **paginadas** (`listarPaginadoPorDocumento`, 50 por página)                 | Un cierre cierra todas las cuentas de resultado del ejercicio: es el único documento que puede pasarse del tope de 1000 de `listarPorDocumento`, que además truncaría en silencio |
-| 3   | `<app-cuenta-select>` ahora expone `codigo` además de `id` y `nombre`                           | El rango del cierre viaja por código. La alternativa era recortarlo de la etiqueta (`"1105 - Caja"` → `"1105"`), el apaño que hoy usan los informes y que §2 ya marca como frágil |
-| 4   | Se reusa la tabla contable de solo lectura, sin campos nuevos                                   | Las ocho columnas del legacy (contacto, cuenta, grupo, naturaleza, valor, base, detalle) ya estaban cubiertas — `grupo` entró con el asiento                                      |
-| 5   | La fecha 31 de diciembre **bloquea** el guardado                                                | No es una convención sino la definición del documento: no hay caso legítimo en que otra fecha sirva. A diferencia del descuadre del asiento, que sí avisa sin bloquear            |
-| 6   | La fecha **no trae valor por defecto**                                                          | Sembrar "hoy" dejaría el campo en error apenas se abre el formulario. El legacy lo hacía                                                                                          |
-| 7   | El validador compara sobre el `Date` **local** del datepicker                                   | El legacy parseaba `yyyy-MM-dd` con `new Date(...)` —que lo lee como UTC— y compensaba con `getDate() + 1`; ese truco solo acierta en zonas horarias negativas                    |
-| 8   | Al crear, se navega a **editar** el documento nuevo                                             | Un cierre recién creado está vacío y cargarlo necesita su id. Mismo criterio (y mismo `extractDocumentoId` con el mismo riesgo abierto) que la depreciación — ver §7.3            |
-| 9   | Las dos acciones se deshabilitan si el documento está **aprobado o anulado**                    | Igual que el legacy                                                                                                                                                               |
-| 10  | **No** se portan el `formularioResultado` duplicado del form ni el `CierreService` de selección | Código muerto: el formulario declaraba una copia del formulario del modal que su plantilla nunca renderiza, y un servicio de selección múltiple que nadie llama                   |
-| 11  | **No** se portan `getTotalDebito()` / `getTotalCredito()`                                       | La plantilla del legacy nunca los usó y, al estar las líneas paginadas, habrían sumado solo la página visible                                                                     |
-| 12  | La **importación de líneas por Excel** queda fuera                                              | `general/documento/importar-detalle/`. Mismo criterio que en el asiento: el importador es una pieza transversal que este ERP todavía no tiene                                     |
+| #   | Decisión                                                                                        | Por qué                                                                                                                                                                                       |
+| --- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | "Cargar" y "Eliminar todos" viven en el **formulario de edición**, no en la ficha               | En este ERP la ficha es de solo lectura. Mismo criterio que "Cargar activos" de la depreciación, el otro documento que genera líneas desde el backend                                         |
+| 2   | Las líneas se traen **paginadas** (`listarPaginadoPorDocumento`, 50 por página)                 | Un cierre cierra todas las cuentas de resultado del ejercicio: es el único documento que puede pasarse del tope de 1000 de `listarPorDocumento`, que además truncaría en silencio             |
+| 3   | `<app-cuenta-select>` ahora expone `codigo` además de `id` y `nombre`                           | El rango del cierre viaja por código. La alternativa era recortarlo de la etiqueta (`"1105 - Caja"` → `"1105"`), el apaño que hoy usan los informes y que §2 ya marca como frágil             |
+| 4   | Se reusa la tabla contable de solo lectura, sin campos nuevos                                   | Las ocho columnas del legacy (contacto, cuenta, centro de costo, naturaleza, valor, base, detalle) ya estaban cubiertas: el "grupo" del legacy es el centro de costo, que la familia ya tenía |
+| 5   | La fecha 31 de diciembre **bloquea** el guardado                                                | No es una convención sino la definición del documento: no hay caso legítimo en que otra fecha sirva. A diferencia del descuadre del asiento, que sí avisa sin bloquear                        |
+| 6   | La fecha **no trae valor por defecto**                                                          | Sembrar "hoy" dejaría el campo en error apenas se abre el formulario. El legacy lo hacía                                                                                                      |
+| 7   | El validador compara sobre el `Date` **local** del datepicker                                   | El legacy parseaba `yyyy-MM-dd` con `new Date(...)` —que lo lee como UTC— y compensaba con `getDate() + 1`; ese truco solo acierta en zonas horarias negativas                                |
+| 8   | Al crear, se navega a **editar** el documento nuevo                                             | Un cierre recién creado está vacío y cargarlo necesita su id. Mismo criterio (y mismo `extractDocumentoId` con el mismo riesgo abierto) que la depreciación — ver §7.3                        |
+| 9   | Las dos acciones se deshabilitan si el documento está **aprobado o anulado**                    | Igual que el legacy                                                                                                                                                                           |
+| 10  | **No** se portan el `formularioResultado` duplicado del form ni el `CierreService` de selección | Código muerto: el formulario declaraba una copia del formulario del modal que su plantilla nunca renderiza, y un servicio de selección múltiple que nadie llama                               |
+| 11  | **No** se portan `getTotalDebito()` / `getTotalCredito()`                                       | La plantilla del legacy nunca los usó y, al estar las líneas paginadas, habrían sumado solo la página visible                                                                                 |
+| 12  | La **importación de líneas por Excel** queda fuera                                              | `general/documento/importar-detalle/`. Mismo criterio que en el asiento: el importador es una pieza transversal que este ERP todavía no tiene                                                 |

@@ -33,7 +33,7 @@ interface CabeceraView {
   readonly fecha: Date | null;
   readonly soporte: string | null;
   readonly comprobante: string | null;
-  readonly grupo: string | null;
+  readonly centroCosto: string | null;
   readonly comentario: string | null;
   /** Si ya está aprobado no se puede volver a aprobar (deshabilita la acción). */
   readonly estadoAprobado: boolean;
@@ -43,8 +43,8 @@ interface CabeceraView {
  * Ficha (detalle) de un **Asiento contable** — solo lectura.
  *
  * Espeja `PagoDetailComponent`: misma familia contable, con la cabecera propia
- * del asiento (soporte, comprobante, grupo) y las líneas con las columnas que
- * imputa —número, contacto, grupo, base y glosa—. Carga cabecera
+ * del asiento (soporte, comprobante, centro de costo) y las líneas con las
+ * columnas que imputa —número, contacto, centro de costo, base y glosa—. Carga
  * (`ENTITY_DATA_GATEWAY`) y líneas (`DocumentoDetalleService`) en paralelo, igual
  * que el form. El resumen marca la diferencia si el asiento no cuadra.
  */
@@ -241,7 +241,7 @@ export class AsientoDetailComponent implements OnInit {
             fecha: fv.fecha ?? null,
             soporte: read.soporte ?? null,
             comprobante: fv.comprobante?.nombre ?? read.comprobante_nombre ?? null,
-            grupo: fv.grupo_contabilidad?.nombre ?? read.grupo_contabilidad_nombre ?? null,
+            centroCosto: fv.centro_costo?.nombre ?? read.centro_costo_nombre ?? null,
             comentario: read.comentario ?? null,
             estadoAprobado: read.estado_aprobado,
           });

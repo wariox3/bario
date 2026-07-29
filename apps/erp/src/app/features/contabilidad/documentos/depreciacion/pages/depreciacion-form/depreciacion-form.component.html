@@ -83,23 +83,21 @@
 
         <!-- Grupo de contabilidad -->
         <div class="flex flex-col gap-1.5">
-          <label for="grupo_contabilidad" class="depreciacion-form__label">
-            {{ f.fields.grupo }}
+          <label for="centro_costo" class="depreciacion-form__label">
+            {{ f.fields.centroCosto }}
             <span class="ml-px text-red-500">*</span>
           </label>
           <!-- suggestedIndex 0: el ERP anterior preseleccionaba el primer grupo. -->
           <lib-api-select
-            inputId="grupo_contabilidad"
-            formControlName="grupo_contabilidad"
-            [endpoint]="grupoEndpoint"
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
             [suggestedIndex]="0"
-            [placeholder]="f.fields.grupoPlaceholder"
-            [invalid]="
-              form.controls.grupo_contabilidad.invalid && form.controls.grupo_contabilidad.touched
-            "
+            [placeholder]="f.fields.centroCostoPlaceholder"
+            [invalid]="form.controls.centro_costo.invalid && form.controls.centro_costo.touched"
           />
           <lib-field-error
-            [control]="form.controls.grupo_contabilidad"
+            [control]="form.controls.centro_costo"
             [messages]="{ required: f.validation.required }"
           />
         </div>

@@ -7,7 +7,7 @@
  * en `@reddoc/core`), agregando solo los campos propios del asiento.
  *
  * La cabecera es corta: tercero, fecha, el soporte (el papel que respalda el
- * asiento), el comprobante donde se registra, el grupo de contabilidad opcional
+ * asiento), el comprobante donde se registra, el centro de costo opcional
  * y el comentario. No tiene vencimiento, plazo ni resolución — no es un
  * documento comercial.
  */
@@ -23,9 +23,9 @@ export interface AsientoRead extends DocumentoReadBase {
   /** Comprobante contable donde se registra el asiento. */
   readonly comprobante: number | null;
   readonly comprobante_nombre?: string | null;
-  /** Grupo de contabilidad de la cabecera; siembra el de las líneas nuevas. */
-  readonly grupo_contabilidad: number | null;
-  readonly grupo_contabilidad_nombre?: string | null;
+  /** Centro de costo de la cabecera; siembra el de las líneas nuevas. */
+  readonly centro_costo: number | null;
+  readonly centro_costo_nombre?: string | null;
   readonly comentario: string | null;
 }
 
@@ -33,7 +33,7 @@ export interface AsientoRead extends DocumentoReadBase {
 export interface AsientoPayload extends DocumentoPayloadBase {
   readonly soporte: string | null;
   readonly comprobante: number | null;
-  readonly grupo_contabilidad: number | null;
+  readonly centro_costo: number | null;
   readonly comentario: string | null;
   /**
    * Neto de las líneas (`créditos − débitos`) como string con 2 decimales. En un

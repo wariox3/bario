@@ -6,8 +6,8 @@
  * **extienden** el contrato base común a cualquier documento (`Documento*Base`
  * en `@reddoc/core`), agregando solo los campos propios del cierre.
  *
- * La cabecera es corta: tercero, fecha (siempre un 31 de diciembre), el grupo de
- * contabilidad y el comentario.
+ * La cabecera es corta: tercero, fecha (siempre un 31 de diciembre), el centro de
+ * costo y el comentario.
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 
@@ -15,9 +15,9 @@ import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 export interface CierreRead extends DocumentoReadBase {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
-  /** Grupo de contabilidad al que se imputa el cierre. */
-  readonly grupo_contabilidad: number | null;
-  readonly grupo_contabilidad_nombre?: string | null;
+  /** Centro de costo al que se imputa el cierre. */
+  readonly centro_costo: number | null;
+  readonly centro_costo_nombre?: string | null;
   readonly comentario: string | null;
 }
 
@@ -28,7 +28,7 @@ export interface CierreRead extends DocumentoReadBase {
  * backend con `cargar-cierre/`.
  */
 export interface CierrePayload extends DocumentoPayloadBase {
-  readonly grupo_contabilidad: number | null;
+  readonly centro_costo: number | null;
   readonly comentario: string | null;
 }
 

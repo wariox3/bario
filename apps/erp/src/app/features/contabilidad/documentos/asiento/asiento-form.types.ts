@@ -13,7 +13,7 @@ export interface AsientoFormRawValue {
   readonly fecha: Date | null;
   readonly soporte: string | null;
   readonly comprobante: ErpSelectOption | null;
-  readonly grupo_contabilidad: ErpSelectOption | null;
+  readonly centro_costo: ErpSelectOption | null;
   readonly comentario: string | null;
   readonly detalles: readonly CuentaDetalleFormRawValue[];
 }
