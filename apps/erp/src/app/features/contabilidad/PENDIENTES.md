@@ -7,7 +7,8 @@ Cada supuesto vive además como comentario en su archivo; acá está el índice 
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
 Las secciones §1–§5 cubren los **informes**; §6–§8, los documentos transaccionales (**asiento
-contable**, **depreciación** y **cierre**); §9, la consulta de **movimientos**.
+contable**, **depreciación** y **cierre**); §9, la consulta de **movimientos**; §10, la
+**conciliación bancaria**.
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
@@ -15,8 +16,8 @@ Estado: **los 9 informes del ERP anterior están portados\*\* (2026-07-28). Lo c
 `features/contabilidad/shared/` desde `3211e91`; un informe nuevo de esta familia son ~40 líneas.
 
 Estado (2026-07-29): portados el **asiento contable** (documento tipo 13, §6), la **depreciación**
-(documento tipo 23, §7), el **cierre contable** (documento tipo 25, §8) y la consulta de
-**movimientos** (§9).
+(documento tipo 23, §7), el **cierre contable** (documento tipo 25, §8), la consulta de
+**movimientos** (§9) y la **conciliación bancaria** (§10).
 
 ---
 
@@ -391,3 +392,86 @@ nombre del campo se conserva porque es el que espera la API. Si el backend lo re
 | 3   | **Sin fila de totales** de débito/crédito                             | La tabla pagina: sumar la página visible se leería como el total del libro. El legacy tampoco los sumaba                                                                                                                       |
 | 4   | **Sin** ficha ni formulario                                           | Un movimiento lo genera la contabilización de un documento, no se teclea. Los `movimiento-formulario`/`movimiento-detalle` del legacy no los enruta nadie y su servicio pega a `contabilidad/cuenta/`: copy-paste sin terminar |
 | 5   | Los valores (débito, crédito, base) **no son ordenables**             | Igual que el legacy. Ordenar el libro por importe no es una lectura contable útil                                                                                                                                              |
+
+---
+
+## 10. Conciliación bancaria
+
+Portada desde `contabilidad/paginas/independientes/conciliacion/` del ERP anterior, donde vivía en
+`/contabilidad/especial/conciliacion`. Vive en `features/contabilidad/utilidades/conciliacion/`,
+junto a Contabilizar.
+
+Es la primera pieza del módulo que **no** es documento ni consulta: un master con endpoint propio
+(camino B) más un proceso encima. Una conciliación es una cuenta bancaria y un periodo, y de ella
+cuelgan dos colecciones que se cruzan: el **libro** (`conciliacion_detalle`) y el **extracto** del
+banco (`conciliacion_soporte`).
+
+El flujo: crear → cargar el libro → importar el extracto en Excel → **Conciliar**, que cruza ambos
+lados y marca `estado_conciliado` en cada fila.
+
+### 10.1 Por confirmar con backend
+
+#### Los endpoints hijos, con guion bajo
+
+`contabilidad/conciliacion_detalle/` y `contabilidad/conciliacion_soporte/` — con guion **bajo**,
+mientras este ERP usa guion en todo (`documento-detalle`, `centro-costo`…). Se replica el legacy
+porque es la única evidencia de que existen. **Es el mismo riesgo que el borrado masivo del cierre
+(§8.1)**: si el backend solo expone la forma con guion, las dos pestañas responden 404 y el fix son
+las dos constantes de `conciliacion.service.ts`.
+
+Que la misma duda aparezca por segunda vez sugiere preguntarle al backend por la convención
+completa, no endpoint por endpoint.
+
+#### Las operaciones
+
+| Operación         | Endpoint supuesto                             | Body                                     |
+| ----------------- | --------------------------------------------- | ---------------------------------------- |
+| Cargar libro      | `POST …/conciliacion_detalle/cargar/`         | `{ conciliacion_id }`                    |
+| Limpiar libro     | `POST …/conciliacion_detalle/limpiar/`        | `{ conciliacion_id }`                    |
+| Importar extracto | `POST …/conciliacion_soporte/cargar-soporte/` | multipart: `archivo` + `conciliacion_id` |
+| Limpiar extracto  | `POST …/conciliacion_soporte/limpiar/`        | `{ conciliacion_id }`                    |
+| Conciliar         | `POST …/conciliacion/conciliar/`              | `{ id }`                                 |
+
+**Sobre `conciliar/`**: no se sabe si es idempotente (¿se puede correr dos veces?) ni si desmarca lo
+que dejó de cuadrar al recargar el libro. El legacy solo recargaba la tabla después. Acá se refrescan
+las dos pestañas, porque el cruce toca ambas colecciones.
+
+#### Cómo se listan las colecciones hijas
+
+Con **GET y `conciliacion_id`** (más `page`, `limit` y `ordering=id`), que es lo que hace el legacy y
+también lo que hace `DocumentoDetalleService` con las líneas de un documento: ahí las dos
+convenciones coinciden. El master, en cambio, se lista con el `POST …lista/` del ERP.
+
+Como los endpoints hijos son GET, sus filtros viajan como query params planos (`campo=valor`), no
+como `{ filtros }`. El helper `toQueryFilters` solo traduce el operador de igualdad — alcanza para el
+único filtro que se ofrece (estado conciliado); si mañana se ofrecen más, hay que ampliarlo.
+
+#### La plantilla del extracto
+
+El legacy no usaba endpoint: apuntaba a un XLSX alojado en DigitalOcean. El botón "Descargar
+ejemplo" del diálogo se muestra **deshabilitado**, con el motivo a la vista, hasta que el backend
+exponga uno. Al confirmarlo, es cambiar `exampleConfig` a `{ mode: 'enabled', endpoint }`.
+
+#### Otros
+
+- `general/cuenta-banco/seleccionar/` para el select de la cabecera: el legacy usa `cuenta_banco`
+  con guion bajo; acá se usa la forma con guion, que es la que ya consume el pago de cartera.
+- Los Excel de las dos tablas van con `{ conciliacion_id, serializador: 'excel' }`.
+- Campos de las filas (`documento__documento_tipo__nombre`, `cuenta__codigo`…): aplanados con doble
+  guion bajo, tomados del legacy.
+
+### 10.2 Decisiones tomadas
+
+| #   | Decisión                                                                         | Por qué                                                                                                                                                        |
+| --- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | El **formulario de edición** es el banco de trabajo; la ficha es de solo lectura | En este ERP la ficha no muta nada. Mismo criterio que la depreciación y el cierre. La ficha monta las mismas dos pestañas con `canOperate` apagado             |
+| 2   | Sección **Utilidades**, junto a Contabilizar                                     | Es lo más parecido que hay: un proceso periódico que el contador ejecuta                                                                                       |
+| 3   | **Pestañas** para libro y extracto                                               | Dos tablas paginadas de 25 filas apiladas hacen una página larguísima. Es lo que hace el legacy y ya lo usan Configuración y Enviar factura electrónica        |
+| 4   | Cada pestaña es **un componente con `canOperate`**                               | El formulario y la ficha montan el mismo componente sin duplicar carga, paginación ni filtrado                                                                 |
+| 5   | Tras conciliar, el padre **fuerza recargar la otra pestaña** (`reloadToken`)     | El cruce marca `estado_conciliado` en las dos colecciones: dejar la otra sin refrescar mostraría datos viejos                                                  |
+| 6   | Al crear, se navega a **editar** el registro nuevo                               | Una conciliación recién creada está vacía y el proceso necesita su id. Mismo criterio que la depreciación y el cierre                                          |
+| 7   | El validador de rango vive **en el grupo**, no en un campo                       | Compara dos controles. Su error se pinta aparte, debajo de los tres campos, porque no pertenece a ninguno                                                      |
+| 8   | **No** se portan los botones PDF y Aprobar de la ficha                           | Sus métodos están vacíos en el legacy (`aprobar() {}`), igual que `generar()`, `desgenerar()` y `notificar()`                                                  |
+| 9   | **No** se porta la selección múltiple de las dos tablas internas                 | Está comentada entera en el legacy —checkboxes, `toggleSelectAll`, `eliminarRegistros`— junto con el `eliminarSoporte(id)` del servicio, que ya no llama nadie |
+| 10  | **No** se porta el estado de nómina del componente de detalle                    | `cargandoEmpleados$`, `busquedaContrato` y un `localStorage.removeItem('documento_programacion')` en el `ngOnDestroy`: copy-paste de la programación de nómina |
+| 11  | Las etiquetas heredadas mal se corrigen                                          | La lista declaraba `[modelo]="'NOMINA'"` y el importador de extractos `modelo: 'HumAdicional'`                                                                 |
