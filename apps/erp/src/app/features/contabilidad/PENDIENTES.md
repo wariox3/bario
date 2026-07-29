@@ -1,15 +1,20 @@
 # Contabilidad — pendientes por revisar
 
-Bitácora de lo que quedó **asumido o decidido** al portar los informes contables desde el ERP
+Bitácora de lo que quedó **asumido o decidido** al portar el módulo de contabilidad desde el ERP
 anterior. Nada se ha ejercitado contra `reddocapi.uk`: todo sale de leer el código legacy.
 
 Cada supuesto vive además como comentario en su archivo; acá está el índice para revisarlos de una
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
+Las secciones §1–§5 cubren los **informes**; la §6, el **asiento contable** (primer documento
+transaccional del módulo).
+
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
 Estado: **los 9 informes del ERP anterior están portados\*\* (2026-07-28). Lo común vive en
 `features/contabilidad/shared/` desde `3211e91`; un informe nuevo de esta familia son ~40 líneas.
+
+Estado (2026-07-29): portado el **asiento contable** (documento tipo 13) — ver §6.
 
 ---
 
@@ -139,3 +144,73 @@ Indicios de que allá quedó a medio hacer:
 Se portó **lo que hace**, no lo que promete el nombre. Si el auxiliar debe mostrar movimientos, es
 un cambio de alcance a definir con backend: qué devuelve realmente `informe-auxiliar-cuenta/`.
 Lo mismo aplica probablemente a _auxiliar por tercero_ y _auxiliar general_.
+
+---
+
+## 6. Asiento contable (documento tipo 13)
+
+Portado desde `contabilidad/paginas/documento/asiento/` del ERP anterior. Es el **primer documento
+transaccional** del módulo: contabilidad entró al framework configuracional (camino A) con este
+asiento, así que ahora tiene `contabilidad.config.ts` y está en `ERP_MODULE_REGISTRY`.
+
+Reusa la familia contable compartida (`features/documentos/contable/`), la misma del pago y el
+egreso. Vive en `documentos/asiento/`.
+
+### 6.1 Por confirmar con backend
+
+#### Catálogos de la cabecera
+
+Ninguno de los dos existe como master en este ERP; los selects pegan directo a su `seleccionar/`:
+
+| Campo         | Endpoint supuesto                        | Nota                                                    |
+| ------------- | ---------------------------------------- | ------------------------------------------------------- |
+| `comprobante` | `/contabilidad/comprobante/seleccionar/` | Con el filtro `permite_asiento=True`, tomado del legacy |
+| `grupo`       | `/contabilidad/grupo/seleccionar/`       | En `SELECT_ENDPOINTS.grupoContabilidad`                 |
+
+Confirmar que ambos existen y que el filtro `permite_asiento` es un query param válido. Si no lo
+es, el select de comprobante mostraría también los que no admiten asiento manual.
+
+#### Campos nuevos de la línea contable
+
+`numero`, `grupo` y `detalle` se sumaron a `CuentaDetallePayload` para este documento. Los nombres
+salen del `FormGroup` del legacy, **no de una respuesta real**. Confirmar los tres, y en especial:
+
+- **`grupo` viaja como FK del grupo de contabilidad** (id). El legacy mandaba el mismo control tanto
+  en la cabecera (`grupo_contabilidad`) como en la línea (`grupo`) — dos nombres para lo mismo.
+  Confirmar si en la línea también se llama `grupo` o si es `grupo_contabilidad`.
+- **`numero` es un entero libre de la línea**, no el consecutivo del documento. En el legacy no
+  validaba nada ni se mostraba en la ficha; se portó por si el backend lo espera.
+
+⚠️ **Efecto colateral en pago y egreso**: los tres campos viven en el payload compartido, así que
+ahora esos dos documentos mandan `numero: null, grupo: null, detalle: null` en cada línea. Si el
+backend rechaza campos no esperados, se ve ahí primero.
+
+#### Cabecera
+
+`soporte`, `comprobante`, `grupo_contabilidad` y `comentario` sobre `DocumentoPayloadBase`. El
+`total` viaja como **`créditos − débitos`** (en un asiento cuadrado, `"0.00"`) — es literalmente lo
+que calculaba el legacy. Si el backend espera la magnitud del asiento (la suma de débitos), es un
+cambio de una línea en `asiento.mapper.ts`.
+
+#### Longitudes
+
+`soporte` quedó con `maxLength(50)` y `detalle` de línea con `maxLength(200)`. **Son inventadas**:
+el legacy no acotaba ninguno de los dos. Ajustar a lo que declare el modelo del backend.
+
+### 6.2 Decisiones tomadas
+
+| #   | Decisión                                                                                     | Por qué                                                                                                                                                                                        |
+| --- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Los 3 campos nuevos se sumaron a la familia contable **compartida**, como columnas opt-in    | Mismo patrón que `showContacto`/`showBase`, que ya existía. Duplicar la familia para el asiento costaba ~800 líneas de mapper y tabla                                                          |
+| 2   | El descuadre **avisa pero no bloquea** el guardado                                           | El legacy solo rechazaba total negativo, sin exigir cuadre. Endurecerlo a bloqueo puede dejar a un usuario sin poder guardar un asiento a medias; la validación dura es del backend al aprobar |
+| 3   | El resumen suma una fila **"Diferencia"** en ámbar (`showDescuadre`), que el legacy no tenía | Sin ella el descuadre solo se ve restando a ojo dos cifras. Va opt-in: en un recaudo la diferencia _es_ el neto y no hay nada que señalar                                                      |
+| 4   | **Sin** columna de centro de costo en las líneas                                             | El asiento del legacy no la imputaba (sí el pago). La columna existe en el `FormGroup`, prenderla es un input                                                                                  |
+| 5   | **Sin** "agregar documento" (cruce de cartera)                                               | El asiento es manual: no cruza CxC/CxP. Las líneas que lleguen enlazadas desde backend se siguen respetando (cuenta y naturaleza bloqueadas, que ya lo resuelve la familia contable)           |
+| 6   | El array `detalles_eliminados` del legacy **no se portó**                                    | Acá las líneas transaccionan contra `documento-detalle` al instante en edición; no hay bajas diferidas que reportar en el payload de la cabecera                                               |
+| 7   | La **importación de líneas por Excel** queda fuera                                           | `general/documento/importar-detalle-cuenta/`. Ningún documento de este ERP tiene importación todavía (`canImport: false` en todos): construir el importador es una pieza transversal aparte    |
+
+### 6.3 Bug del legacy que no se portó
+
+`agregarRegistrosEliminar` buscaba el registro con `indexOf(id)` pero empujaba `posicion` (que vale
+`-1` cuando no lo encuentra) en vez de `id`. El array resultante nunca se usaba al guardar: código
+muerto con un bug adentro.
