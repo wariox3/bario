@@ -48,6 +48,11 @@
           <th class="contable-detalle-table__th w-10 text-center">
             {{ t().entities.cuentaDetalle.columns.linea }}
           </th>
+          @if (showNumero()) {
+            <th class="contable-detalle-table__th w-28 text-left">
+              {{ t().entities.cuentaDetalle.columns.numero }}
+            </th>
+          }
           @if (showDocumento()) {
             <th class="contable-detalle-table__th w-44 text-left">
               {{ t().entities.cuentaDetalle.columns.documento }}
@@ -69,12 +74,22 @@
               {{ t().entities.cuentaDetalle.columns.centroCosto }}
             </th>
           }
+          @if (showGrupo()) {
+            <th class="contable-detalle-table__th w-44 text-left">
+              {{ t().entities.cuentaDetalle.columns.grupo }}
+            </th>
+          }
           <th class="contable-detalle-table__th w-40 text-right">
             {{ t().entities.cuentaDetalle.columns.valor }}
           </th>
           @if (showBase()) {
             <th class="contable-detalle-table__th w-36 text-right">
               {{ t().entities.cuentaDetalle.columns.base }}
+            </th>
+          }
+          @if (showDetalle()) {
+            <th class="contable-detalle-table__th min-w-[14rem] text-left">
+              {{ t().entities.cuentaDetalle.columns.detalle }}
             </th>
           }
           <th class="contable-detalle-table__th w-20 text-center">
@@ -98,6 +113,19 @@
               }
               {{ i + 1 }}
             </td>
+
+            @if (showNumero()) {
+              <td class="contable-detalle-table__td">
+                <p-inputnumber
+                  formControlName="numero"
+                  mode="decimal"
+                  [min]="0"
+                  [useGrouping]="false"
+                  [maxFractionDigits]="0"
+                  [fluid]="true"
+                />
+              </td>
+            }
 
             @if (showDocumento()) {
               <td class="contable-detalle-table__td">
@@ -157,6 +185,16 @@
               </td>
             }
 
+            @if (showGrupo()) {
+              <td class="contable-detalle-table__td">
+                <lib-api-select
+                  formControlName="grupo"
+                  [endpoint]="grupoEndpoint"
+                  [placeholder]="t().entities.cuentaDetalle.grupoPlaceholder"
+                />
+              </td>
+            }
+
             <td class="contable-detalle-table__td">
               <p-inputnumber
                 formControlName="valor"
@@ -181,6 +219,19 @@
                   prefix="$ "
                   [fluid]="true"
                   inputStyleClass="text-right"
+                />
+              </td>
+            }
+
+            @if (showDetalle()) {
+              <td class="contable-detalle-table__td">
+                <input
+                  pInputText
+                  formControlName="detalle"
+                  type="text"
+                  maxlength="200"
+                  class="w-full"
+                  [placeholder]="t().entities.cuentaDetalle.detallePlaceholder"
                 />
               </td>
             }
@@ -230,6 +281,10 @@
   </div>
 
   @if (detalles().controls.length > 0) {
-    <app-contable-documento-resumen [resumen]="resumen()" [showTotal]="showTotal()" />
+    <app-contable-documento-resumen
+      [resumen]="resumen()"
+      [showTotal]="showTotal()"
+      [showDescuadre]="showDescuadre()"
+    />
   }
 </div>

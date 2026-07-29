@@ -22,6 +22,14 @@ export const SELECT_ENDPOINTS = {
   banco: '/general/banco/seleccionar/',
   cuentaBancoClase: '/general/cuenta-banco-clase/seleccionar/',
   centroCosto: '/contabilidad/centro-costo/seleccionar/',
+  /**
+   * Grupos de contabilidad. Cross-form: lo piden la cabecera del asiento contable
+   * y sus líneas (columna `grupo` de la tabla contable compartida).
+   *
+   * ⚠️ Endpoint **supuesto**: tomado del ERP legacy
+   * (`contabilidad/grupo/seleccionar/`), sin verificar contra el backend.
+   */
+  grupoContabilidad: '/contabilidad/grupo/seleccionar/',
   almacen: '/inventario/almacen/seleccionar/',
   novedadTipo: '/humano/novedad-tipo/seleccionar/',
 } as const;

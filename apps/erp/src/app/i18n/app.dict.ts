@@ -2051,6 +2051,66 @@ export interface AppDict
     saldoInicial: {
       name: string;
     };
+    asiento: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        soporte: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          fecha: string;
+          soporte: string;
+          soportePlaceholder: string;
+          comprobante: string;
+          comprobantePlaceholder: string;
+          grupo: string;
+          grupoPlaceholder: string;
+          grupoHint: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          unbalanced: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          fecha: string;
+          soporte: string;
+          comprobante: string;
+          grupo: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
     egreso: {
       name: string;
       columns: {
@@ -2287,20 +2347,25 @@ export interface AppDict
       cuentaPlaceholder: string;
       contactoPlaceholder: string;
       centroCostoPlaceholder: string;
+      grupoPlaceholder: string;
+      detallePlaceholder: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {
         linea: string;
+        numero: string;
         documento: string;
         cuenta: string;
         contacto: string;
         naturaleza: string;
         centroCosto: string;
+        grupo: string;
         valor: string;
         base: string;
+        detalle: string;
         acciones: string;
       };
-      resumen: { debitos: string; creditos: string; total: string };
+      resumen: { debitos: string; creditos: string; total: string; diferencia: string };
       toasts: {
         lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };

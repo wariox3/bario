@@ -2713,6 +2713,81 @@ export const en: AppDict = {
     saldoInicial: {
       name: 'Opening balance',
     },
+    asiento: {
+      name: 'Journal entry',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        soporte: 'Reference',
+        identificacion: 'Tax ID',
+        contacto: 'Contact',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New journal entry',
+        editTitle: 'Edit journal entry',
+        sectionHint: 'Register the accounting voucher and post its accounts',
+        fields: {
+          contacto: 'Contact',
+          contactoPlaceholder: 'Search contact…',
+          fecha: 'Date',
+          soporte: 'Reference',
+          soportePlaceholder: 'Document backing the entry',
+          comprobante: 'Voucher',
+          comprobantePlaceholder: 'Select…',
+          grupo: 'Group',
+          grupoPlaceholder: 'Select…',
+          grupoHint: 'Suggested on every new line',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Journal entry created',
+            desc: 'The journal entry was created successfully',
+          },
+          createError: { title: 'Create failed', desc: 'The journal entry could not be created' },
+          editSuccess: {
+            title: 'Journal entry updated',
+            desc: 'The journal entry was updated successfully',
+          },
+          editError: { title: 'Update failed', desc: 'The journal entry could not be updated' },
+          loadError: { title: 'Load failed', desc: 'The journal entry could not be loaded' },
+          unbalanced: {
+            title: 'Unbalanced entry',
+            desc: 'Debits and credits do not match',
+          },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          detalles: 'Lines',
+        },
+        labels: {
+          numero: 'Number',
+          contacto: 'Contact',
+          fecha: 'Date',
+          soporte: 'Reference',
+          comprobante: 'Voucher',
+          grupo: 'Group',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Journal entry not found',
+          desc: 'The journal entry you are looking for does not exist or was deleted.',
+        },
+      },
+    },
     egreso: {
       name: 'Disbursement',
       columns: {
@@ -3005,20 +3080,30 @@ export const en: AppDict = {
       cuentaPlaceholder: 'Search account…',
       contactoPlaceholder: 'Search contact…',
       centroCostoPlaceholder: 'Select…',
+      grupoPlaceholder: 'Select…',
+      detallePlaceholder: 'Line description',
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
         linea: '#',
+        numero: 'Number',
         documento: 'Document',
         cuenta: 'Account',
         contacto: 'Contact',
         naturaleza: 'Nature',
         centroCosto: 'Cost center',
+        grupo: 'Group',
         valor: 'Amount',
         base: 'Base',
+        detalle: 'Description',
         acciones: 'Actions',
       },
-      resumen: { debitos: 'Debits', creditos: 'Credits', total: 'Total' },
+      resumen: {
+        debitos: 'Debits',
+        creditos: 'Credits',
+        total: 'Total',
+        diferencia: 'Difference',
+      },
       toasts: {
         lineSaveSuccess: {
           title: 'Account saved',

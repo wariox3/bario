@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { I18nService, formatCop } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { ResumenContable } from '../../contable-documento-detalle.types';
@@ -25,6 +25,16 @@ export class ContableDocumentoResumenComponent {
    * es el documento —un recaudo—, no en una pestaña de asientos.
    */
   readonly showTotal = input<boolean>(false);
+
+  /**
+   * Muestra la fila "Diferencia" cuando débitos y créditos no coinciden. La pide
+   * el asiento contable, donde cuadrar es la regla del documento; en un recaudo
+   * la diferencia ES el neto y no hay nada que señalar.
+   */
+  readonly showDescuadre = input<boolean>(false);
+
+  /** Diferencia entre débitos y créditos; `0` cuando el documento cuadra. */
+  protected readonly descuadre = computed(() => this.resumen().debitos - this.resumen().creditos);
 
   protected readonly formatMoney = formatCop;
 }

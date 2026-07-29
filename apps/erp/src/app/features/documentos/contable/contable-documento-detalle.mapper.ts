@@ -30,6 +30,9 @@ export function cuentaDetalleToFormValue(read: CuentaDetalleRead): CuentaDetalle
         ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
         : null,
     base: toFiniteNumber(read.base) ?? 0,
+    numero: toFiniteNumber(read.numero) ?? null,
+    grupo: read.grupo != null ? { id: read.grupo, nombre: read.grupo_nombre ?? '' } : null,
+    detalle: read.detalle ?? null,
     documento_afectado: read.documento_afectado ?? null,
     documento_afectado_numero:
       read.documento_afectado_numero != null ? String(read.documento_afectado_numero) : null,
@@ -50,6 +53,9 @@ export function cuentaDetalleToPayload(raw: CuentaDetalleFormRawValue): CuentaDe
     contacto: raw.contacto?.id ?? null,
     centro_costo: raw.centro_costo?.id ?? null,
     base: (raw.base ?? 0).toFixed(2),
+    numero: raw.numero,
+    grupo: raw.grupo?.id ?? null,
+    detalle: raw.detalle,
     documento_afectado: raw.documento_afectado,
   };
 }
@@ -102,6 +108,11 @@ export function documentoPendienteToFormValue(
     contacto: { id: doc.contacto, nombre: doc.contacto__nombre_corto },
     centro_costo: null,
     base: 0,
+    // El cruce de cartera no imputa número, grupo ni glosa: los pone el usuario
+    // en un asiento manual, no un documento afectado.
+    numero: null,
+    grupo: null,
+    detalle: null,
     documento_afectado: doc.id,
     documento_afectado_numero: doc.numero != null ? String(doc.numero) : null,
     documento_afectado_tipo: doc.documento_tipo__nombre,

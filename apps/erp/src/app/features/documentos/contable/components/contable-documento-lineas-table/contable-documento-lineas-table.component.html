@@ -5,6 +5,9 @@
     <thead>
       <tr>
         <th class="contable-detalle-table__th w-10 text-center">{{ c.columns.linea }}</th>
+        @if (showNumero()) {
+          <th class="contable-detalle-table__th w-24 text-left">{{ c.columns.numero }}</th>
+        }
         <th class="contable-detalle-table__th min-w-[18rem] text-left">{{ c.columns.cuenta }}</th>
         @if (showContacto()) {
           <th class="contable-detalle-table__th min-w-[14rem] text-left">
@@ -15,9 +18,17 @@
         @if (showCentroCosto()) {
           <th class="contable-detalle-table__th w-44 text-left">{{ c.columns.centroCosto }}</th>
         }
+        @if (showGrupo()) {
+          <th class="contable-detalle-table__th w-44 text-left">{{ c.columns.grupo }}</th>
+        }
         <th class="contable-detalle-table__th w-40 text-right">{{ c.columns.valor }}</th>
         @if (showBase()) {
           <th class="contable-detalle-table__th w-36 text-right">{{ c.columns.base }}</th>
+        }
+        @if (showDetalle()) {
+          <th class="contable-detalle-table__th min-w-[14rem] text-left">
+            {{ c.columns.detalle }}
+          </th>
         }
       </tr>
     </thead>
@@ -27,6 +38,11 @@
           <td class="contable-detalle-table__td text-center text-brand-muted tabular-nums">
             {{ i + 1 }}
           </td>
+          @if (showNumero()) {
+            <td class="contable-detalle-table__td text-brand-text tabular-nums">
+              {{ line.numero ?? '—' }}
+            </td>
+          }
           <td class="contable-detalle-table__td font-medium text-brand-text">
             {{ line.cuenta?.nombre || '—' }}
           </td>
@@ -41,6 +57,11 @@
               {{ line.centro_costo?.nombre || '—' }}
             </td>
           }
+          @if (showGrupo()) {
+            <td class="contable-detalle-table__td text-brand-text">
+              {{ line.grupo?.nombre || '—' }}
+            </td>
+          }
           <td
             class="contable-detalle-table__td text-right font-semibold tabular-nums text-brand-text"
           >
@@ -50,6 +71,9 @@
             <td class="contable-detalle-table__td text-right tabular-nums text-brand-muted">
               {{ formatMoney(line.base ?? 0) }}
             </td>
+          }
+          @if (showDetalle()) {
+            <td class="contable-detalle-table__td text-brand-muted">{{ line.detalle || '—' }}</td>
           }
         </tr>
       } @empty {
