@@ -1,0 +1,164 @@
+@let f = t().entities.depreciacion.form;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Información general ──────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-chart-line text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ isEditMode() ? f.editTitle : f.createTitle }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.sectionHint }}</p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Contacto -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="contacto" class="depreciacion-form__label">
+            {{ f.fields.contacto }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-contacto-select
+            inputId="contacto"
+            formControlName="contacto"
+            [placeholder]="f.fields.contactoPlaceholder"
+            [invalid]="form.controls.contacto.invalid && form.controls.contacto.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.contacto"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Fecha -->
+        <div class="flex flex-col gap-1.5">
+          <label for="fecha" class="depreciacion-form__label">
+            {{ f.fields.fecha }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="fecha"
+            formControlName="fecha"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+            [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.fecha"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Grupo de contabilidad -->
+        <div class="flex flex-col gap-1.5">
+          <label for="grupo_contabilidad" class="depreciacion-form__label">
+            {{ f.fields.grupo }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <!-- suggestedIndex 0: el ERP anterior preseleccionaba el primer grupo. -->
+          <lib-api-select
+            inputId="grupo_contabilidad"
+            formControlName="grupo_contabilidad"
+            [endpoint]="grupoEndpoint"
+            [suggestedIndex]="0"
+            [placeholder]="f.fields.grupoPlaceholder"
+            [invalid]="
+              form.controls.grupo_contabilidad.invalid && form.controls.grupo_contabilidad.touched
+            "
+          />
+          <lib-field-error
+            [control]="form.controls.grupo_contabilidad"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="depreciacion-form__label">{{ f.fields.comentario }}</label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            maxlength="500"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sección: Activos depreciados ──────────────────────────────────────── -->
+  <!-- Solo en edición: generar las líneas necesita el id del documento. -->
+  @if (isEditMode()) {
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div
+        class="flex flex-wrap items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+      >
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+        >
+          <i class="pi pi-list text-[1rem]"></i>
+        </span>
+        <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+          <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+            {{ f.sections.activos }}
+          </h2>
+          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.activosHint }}</p>
+        </div>
+        <p-button
+          type="button"
+          size="small"
+          icon="pi pi-download"
+          [label]="f.cargarActivos"
+          [outlined]="true"
+          [loading]="isLoadingActivos()"
+          [disabled]="isLoadingActivos()"
+          (onClick)="onCargarActivos()"
+        />
+      </div>
+
+      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+        <app-depreciacion-lineas-table
+          [lines]="lines()"
+          [canDelete]="true"
+          (remove)="onRemoveLinea($event)"
+        />
+      </div>
+    </section>
+  }
+</form>
+
+<p-confirmdialog />

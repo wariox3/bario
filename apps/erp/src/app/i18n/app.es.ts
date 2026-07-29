@@ -2757,6 +2757,99 @@ export const es: AppDict = {
     saldoInicial: {
       name: 'Saldo inicial',
     },
+    depreciacion: {
+      name: 'Depreciación',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
+      form: {
+        createTitle: 'Nueva depreciación',
+        editTitle: 'Editar depreciación',
+        sectionHint: 'Registra el periodo y carga los activos que se van a depreciar',
+        sections: { activos: 'Activos depreciados' },
+        activosHint: 'Las calcula el sistema a partir de los activos fijos',
+        cargarActivos: 'Cargar activos',
+        confirmReload: {
+          header: 'Volver a cargar',
+          message: 'El documento ya tiene activos cargados. ¿Cargarlos de nuevo?',
+        },
+        fields: {
+          contacto: 'Contacto',
+          contactoPlaceholder: 'Buscar contacto…',
+          fecha: 'Fecha',
+          grupo: 'Grupo',
+          grupoPlaceholder: 'Seleccionar…',
+          comentario: 'Comentario',
+        },
+        validation: { required: 'Este campo es obligatorio' },
+        toasts: {
+          createSuccess: {
+            title: 'Depreciación creada',
+            desc: 'Ya puedes cargar los activos',
+          },
+          createError: { title: 'Error al crear', desc: 'No se pudo crear la depreciación' },
+          editSuccess: {
+            title: 'Depreciación actualizada',
+            desc: 'La depreciación se actualizó correctamente',
+          },
+          editError: {
+            title: 'Error al actualizar',
+            desc: 'No se pudo actualizar la depreciación',
+          },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la depreciación' },
+          cargarSuccess: {
+            title: 'Activos cargados',
+            desc: 'Se generaron las líneas del documento',
+          },
+          cargarError: { title: 'Error al cargar activos', desc: 'No se pudieron cargar' },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'Información general',
+          activos: 'Activos depreciados',
+        },
+        labels: {
+          numero: 'Número',
+          contacto: 'Contacto',
+          fecha: 'Fecha',
+          grupo: 'Grupo',
+          comentario: 'Comentario',
+        },
+        notFound: {
+          title: 'Depreciación no encontrada',
+          desc: 'La depreciación que buscas no existe o fue eliminada.',
+        },
+      },
+    },
+    depreciacionLinea: {
+      empty: 'Aún no hay activos. Usa "Cargar activos" para generarlos',
+      removeLine: 'Eliminar activo',
+      confirmDeleteLine: '¿Eliminar este activo del documento?',
+      total: 'Total',
+      columns: {
+        linea: '#',
+        activo: 'Activo',
+        codigo: 'Código',
+        nombre: 'Nombre',
+        dias: 'Días',
+        valor: 'Valor',
+        acciones: 'Acciones',
+      },
+    },
     asiento: {
       name: 'Asiento',
       columns: {

@@ -1,0 +1,82 @@
+@let c = t().entities.depreciacionLinea;
+
+<div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <table class="depreciacion-linea-table">
+    <thead>
+      <tr>
+        <th class="depreciacion-linea-table__th w-10 text-center">{{ c.columns.linea }}</th>
+        <th class="depreciacion-linea-table__th w-20 text-right">{{ c.columns.activo }}</th>
+        <th class="depreciacion-linea-table__th w-32 text-left">{{ c.columns.codigo }}</th>
+        <th class="depreciacion-linea-table__th min-w-[18rem] text-left">{{ c.columns.nombre }}</th>
+        <th class="depreciacion-linea-table__th w-24 text-right">{{ c.columns.dias }}</th>
+        <th class="depreciacion-linea-table__th w-40 text-right">{{ c.columns.valor }}</th>
+        @if (canDelete()) {
+          <th class="depreciacion-linea-table__th w-20 text-center">{{ c.columns.acciones }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (line of lines(); track line.id ?? $index; let i = $index) {
+        <tr class="depreciacion-linea-table__row">
+          <td class="depreciacion-linea-table__td text-center text-brand-muted tabular-nums">
+            {{ i + 1 }}
+          </td>
+          <td class="depreciacion-linea-table__td text-right text-brand-muted tabular-nums">
+            {{ line.activo ?? '—' }}
+          </td>
+          <td class="depreciacion-linea-table__td text-brand-text tabular-nums">
+            {{ line.codigo || '—' }}
+          </td>
+          <td class="depreciacion-linea-table__td font-medium text-brand-text">
+            {{ line.nombre || '—' }}
+          </td>
+          <td class="depreciacion-linea-table__td text-right text-brand-text tabular-nums">
+            {{ line.dias }}
+          </td>
+          <td
+            class="depreciacion-linea-table__td text-right font-semibold tabular-nums text-brand-text"
+          >
+            {{ formatMoney(line.valor) }}
+          </td>
+          @if (canDelete()) {
+            <td class="depreciacion-linea-table__td">
+              <div class="flex items-center justify-center">
+                <button
+                  type="button"
+                  (click)="remove.emit(line)"
+                  [pTooltip]="c.removeLine"
+                  [attr.aria-label]="c.removeLine"
+                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                >
+                  <i class="pi pi-trash text-[0.78rem]"></i>
+                </button>
+              </div>
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="columnCount()" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
+          </td>
+        </tr>
+      }
+    </tbody>
+    @if (lines().length > 0) {
+      <tfoot>
+        <tr>
+          <!-- Cubre las 5 primeras columnas (nº, activo, código, nombre y días). -->
+          <td colspan="5" class="depreciacion-linea-table__total text-right text-brand-muted">
+            {{ c.total }}
+          </td>
+          <td class="depreciacion-linea-table__total text-right tabular-nums text-brand-text">
+            {{ formatMoney(total()) }}
+          </td>
+          @if (canDelete()) {
+            <td class="depreciacion-linea-table__total"></td>
+          }
+        </tr>
+      </tfoot>
+    }
+  </table>
+</div>

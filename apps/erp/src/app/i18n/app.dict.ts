@@ -2051,6 +2051,78 @@ export interface AppDict
     saldoInicial: {
       name: string;
     };
+    depreciacion: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        sections: { activos: string };
+        activosHint: string;
+        cargarActivos: string;
+        confirmReload: { header: string; message: string };
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          fecha: string;
+          grupo: string;
+          grupoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          cargarSuccess: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; activos: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          fecha: string;
+          grupo: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    depreciacionLinea: {
+      empty: string;
+      removeLine: string;
+      confirmDeleteLine: string;
+      total: string;
+      columns: {
+        linea: string;
+        activo: string;
+        codigo: string;
+        nombre: string;
+        dias: string;
+        valor: string;
+        acciones: string;
+      };
+    };
     asiento: {
       name: string;
       columns: {

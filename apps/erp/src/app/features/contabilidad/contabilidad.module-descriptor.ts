@@ -24,6 +24,11 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
         {
           items: [
             { labelKey: 'entities.asiento.name', path: 'asiento/list', activeMatch: 'asiento' },
+            {
+              labelKey: 'entities.depreciacion.name',
+              path: 'depreciacion/list',
+              activeMatch: 'depreciacion',
+            },
           ],
         },
       ],

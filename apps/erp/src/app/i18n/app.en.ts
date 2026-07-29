@@ -2713,6 +2713,96 @@ export const en: AppDict = {
     saldoInicial: {
       name: 'Opening balance',
     },
+    depreciacion: {
+      name: 'Depreciation',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'Tax ID',
+        contacto: 'Contact',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
+      form: {
+        createTitle: 'New depreciation',
+        editTitle: 'Edit depreciation',
+        sectionHint: 'Register the period and load the assets to depreciate',
+        sections: { activos: 'Depreciated assets' },
+        activosHint: 'Calculated by the system from the fixed assets',
+        cargarActivos: 'Load assets',
+        confirmReload: {
+          header: 'Load again',
+          message: 'This document already has assets loaded. Load them again?',
+        },
+        fields: {
+          contacto: 'Contact',
+          contactoPlaceholder: 'Search contact…',
+          fecha: 'Date',
+          grupo: 'Group',
+          grupoPlaceholder: 'Select…',
+          comentario: 'Comment',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Depreciation created',
+            desc: 'You can now load the assets',
+          },
+          createError: { title: 'Create failed', desc: 'The depreciation could not be created' },
+          editSuccess: {
+            title: 'Depreciation updated',
+            desc: 'The depreciation was updated successfully',
+          },
+          editError: { title: 'Update failed', desc: 'The depreciation could not be updated' },
+          loadError: { title: 'Load failed', desc: 'The depreciation could not be loaded' },
+          cargarSuccess: {
+            title: 'Assets loaded',
+            desc: 'The document lines were generated',
+          },
+          cargarError: { title: 'Load assets failed', desc: 'The assets could not be loaded' },
+        },
+      },
+      detail: {
+        sections: {
+          general: 'General information',
+          activos: 'Depreciated assets',
+        },
+        labels: {
+          numero: 'Number',
+          contacto: 'Contact',
+          fecha: 'Date',
+          grupo: 'Group',
+          comentario: 'Comment',
+        },
+        notFound: {
+          title: 'Depreciation not found',
+          desc: 'The depreciation you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+    depreciacionLinea: {
+      empty: 'No assets yet. Use "Load assets" to generate them',
+      removeLine: 'Remove asset',
+      confirmDeleteLine: 'Remove this asset from the document?',
+      total: 'Total',
+      columns: {
+        linea: '#',
+        activo: 'Asset',
+        codigo: 'Code',
+        nombre: 'Name',
+        dias: 'Days',
+        valor: 'Amount',
+        acciones: 'Actions',
+      },
+    },
     asiento: {
       name: 'Journal entry',
       columns: {

@@ -37,6 +37,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           import('./documentos/asiento/asiento.routes').then((m) => m.ASIENTO_ROUTES),
       },
       {
+        path: 'depreciacion',
+        loadChildren: () =>
+          import('./documentos/depreciacion/depreciacion.routes').then(
+            (m) => m.DEPRECIACION_ROUTES,
+          ),
+      },
+      {
         path: 'utilidades/contabilizar',
         loadChildren: () =>
           import('./utilidades/contabilizar/contabilizar.routes').then(
