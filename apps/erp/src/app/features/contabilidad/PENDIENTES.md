@@ -6,8 +6,8 @@ anterior. Nada se ha ejercitado contra `reddocapi.uk`: todo sale de leer el cód
 Cada supuesto vive además como comentario en su archivo; acá está el índice para revisarlos de una
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
-Las secciones §1–§5 cubren los **informes**; de la §6 en adelante, los documentos transaccionales
-(**asiento contable**, **depreciación** y **cierre**).
+Las secciones §1–§5 cubren los **informes**; §6–§8, los documentos transaccionales (**asiento
+contable**, **depreciación** y **cierre**); §9, la consulta de **movimientos**.
 
 Estado (2026-07-28): portados **balance de prueba** (`35754f9`), **auxiliar de cuenta** (`baaa670`)
 **balance de prueba por contacto** (`d531a2f`), **auxiliar general** (`da80fd3`) y **auxiliar por
@@ -15,7 +15,8 @@ Estado: **los 9 informes del ERP anterior están portados\*\* (2026-07-28). Lo c
 `features/contabilidad/shared/` desde `3211e91`; un informe nuevo de esta familia son ~40 líneas.
 
 Estado (2026-07-29): portados el **asiento contable** (documento tipo 13, §6), la **depreciación**
-(documento tipo 23, §7) y el **cierre contable** (documento tipo 25, §8).
+(documento tipo 23, §7), el **cierre contable** (documento tipo 25, §8) y la consulta de
+**movimientos** (§9).
 
 ---
 
@@ -192,16 +193,16 @@ el legacy no acotaba ninguno de los dos. Ajustar a lo que declare el modelo del 
 
 ### 6.2 Decisiones tomadas
 
-| #   | Decisión                                                                                     | Por qué                                                                                                                                                                                        |
-| --- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0   | El **"grupo" del legacy es el centro de costo** (`centro_costo`)                             | Vocabulario del ERP anterior, ya resuelto así en los documentos de compra. Aplica a la cabecera y a la línea de los tres documentos contables (§6, §7, §8)                                     |
-| 1   | Los 2 campos nuevos se sumaron a la familia contable **compartida**, como columnas opt-in    | Mismo patrón que `showContacto`/`showBase`, que ya existía. Duplicar la familia para el asiento costaba ~800 líneas de mapper y tabla                                                          |
-| 2   | El descuadre **avisa pero no bloquea** el guardado                                           | El legacy solo rechazaba total negativo, sin exigir cuadre. Endurecerlo a bloqueo puede dejar a un usuario sin poder guardar un asiento a medias; la validación dura es del backend al aprobar |
-| 3   | El resumen suma una fila **"Diferencia"** en ámbar (`showDescuadre`), que el legacy no tenía | Sin ella el descuadre solo se ve restando a ojo dos cifras. Va opt-in: en un recaudo la diferencia _es_ el neto y no hay nada que señalar                                                      |
-| 4   | **Sin** columna de centro de costo en las líneas                                             | El asiento del legacy no la imputaba (sí el pago). La columna existe en el `FormGroup`, prenderla es un input                                                                                  |
-| 5   | **Sin** "agregar documento" (cruce de cartera)                                               | El asiento es manual: no cruza CxC/CxP. Las líneas que lleguen enlazadas desde backend se siguen respetando (cuenta y naturaleza bloqueadas, que ya lo resuelve la familia contable)           |
-| 6   | El array `detalles_eliminados` del legacy **no se portó**                                    | Acá las líneas transaccionan contra `documento-detalle` al instante en edición; no hay bajas diferidas que reportar en el payload de la cabecera                                               |
-| 7   | La **importación de líneas por Excel** queda fuera                                           | `general/documento/importar-detalle-cuenta/`. Ningún documento de este ERP tiene importación todavía (`canImport: false` en todos): construir el importador es una pieza transversal aparte    |
+| #   | Decisión                                                                                     | Por qué                                                                                                                                                                                                                                                |
+| --- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0   | El **"grupo" del legacy es el centro de costo** (`centro_costo`)                             | Vocabulario del ERP anterior, ya resuelto así en los documentos de compra. Aplica a la cabecera y a la línea de los tres documentos contables (§6, §7, §8)                                                                                             |
+| 1   | Los 2 campos nuevos se sumaron a la familia contable **compartida**, como columnas opt-in    | Mismo patrón que `showContacto`/`showBase`, que ya existía. Duplicar la familia para el asiento costaba ~800 líneas de mapper y tabla                                                                                                                  |
+| 2   | El descuadre **avisa pero no bloquea** el guardado                                           | El legacy solo rechazaba total negativo, sin exigir cuadre. Endurecerlo a bloqueo puede dejar a un usuario sin poder guardar un asiento a medias; la validación dura es del backend al aprobar                                                         |
+| 3   | El resumen suma una fila **"Diferencia"** en ámbar (`showDescuadre`), que el legacy no tenía | Sin ella el descuadre solo se ve restando a ojo dos cifras. Va opt-in: en un recaudo la diferencia _es_ el neto y no hay nada que señalar                                                                                                              |
+| 4   | **Sin** columna de centro de costo en las líneas                                             | El asiento del legacy no la imputaba (sí el pago). La columna existe en el `FormGroup`, prenderla es un input                                                                                                                                          |
+| 5   | **Sin** "agregar documento" (cruce de cartera)                                               | El asiento es manual: no cruza CxC/CxP. Las líneas que lleguen enlazadas desde backend se siguen respetando (cuenta y naturaleza bloqueadas, que ya lo resuelve la familia contable)                                                                   |
+| 6   | El array `detalles_eliminados` del legacy **no se portó**                                    | Acá las líneas transaccionan contra `documento-detalle` al instante en edición; no hay bajas diferidas que reportar en el payload de la cabecera                                                                                                       |
+| 7   | La **importación de líneas por Excel** queda fuera                                           | `general/documento/importar-detalle-cuenta/`. El ERP tiene diálogo de importación (`ImportDialogComponent`, lo usan los masters), pero importar **líneas dentro de un documento** es otra cosa: ningún documento lo hace (`canImport: false` en todos) |
 
 ### 6.3 Bug del legacy que no se portó
 
@@ -334,4 +335,59 @@ calcula al generar las líneas.
 | 9   | Las dos acciones se deshabilitan si el documento está **aprobado o anulado**                    | Igual que el legacy                                                                                                                                                                           |
 | 10  | **No** se portan el `formularioResultado` duplicado del form ni el `CierreService` de selección | Código muerto: el formulario declaraba una copia del formulario del modal que su plantilla nunca renderiza, y un servicio de selección múltiple que nadie llama                               |
 | 11  | **No** se portan `getTotalDebito()` / `getTotalCredito()`                                       | La plantilla del legacy nunca los usó y, al estar las líneas paginadas, habrían sumado solo la página visible                                                                                 |
-| 12  | La **importación de líneas por Excel** queda fuera                                              | `general/documento/importar-detalle/`. Mismo criterio que en el asiento: el importador es una pieza transversal que este ERP todavía no tiene                                                 |
+| 12  | La **importación de líneas por Excel** queda fuera                                              | `general/documento/importar-detalle/`. Mismo criterio que en el asiento (§6, punto 7): importar líneas dentro de un documento no lo hace todavía ningún documento del ERP                     |
+
+---
+
+## 9. Movimientos contables (consulta)
+
+Portado desde `contabilidad/paginas/independientes/movimiento/` del ERP anterior, donde vivía en
+`/contabilidad/especial/movimiento`. Vive en `features/contabilidad/movimiento/`.
+
+Es el **libro**: la línea ya contabilizada, en una sola página de solo lectura con filtros,
+importación y Excel. No es un documento ni un informe de los que se "generan", así que estrena la
+sección **Movimientos** del sidebar (`layout.nav.sections.movement`, una clave que ya existía en la
+i18n sin que ningún módulo la usara). URL: `/t/<slug>/contabilidad/movimientos`.
+
+### 9.1 Por confirmar con backend
+
+#### Cómo se consulta
+
+El legacy hace `GET contabilidad/movimiento/?serializador=lista` con los filtros como query params.
+Acá se usa la convención del ERP: `POST /contabilidad/movimiento/lista/` con
+`{ filtros, ordenamientos }` y la paginación en query params, igual que todos los demás listados
+(incluidos los informes de inventario, portados con el mismo criterio).
+
+**Es el supuesto más grande de esta entrega**: si el endpoint solo responde en GET, la consulta
+falla entera. El fix está aislado en `MovimientoService.list()`.
+
+#### Exportación e importación
+
+| Acción    | Endpoint supuesto                                | Nota                                                                                                                               |
+| --------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Excel     | `POST /contabilidad/movimiento/excel/`           | Con `serializador: 'informe_movimiento'` en el body; el legacy lo mandaba como query param de un GET, junto a `excel_informe=True` |
+| Importar  | `POST /contabilidad/movimiento/importar/`        | `multipart` con el archivo en `archivo`, convención de los masters                                                                 |
+| Plantilla | `GET /contabilidad/movimiento/importar-ejemplo/` | El legacy **no usaba endpoint**: apuntaba a un XLSX alojado en DigitalOcean                                                        |
+
+Si `importar-ejemplo/` no existe, el botón de plantilla del diálogo queda muerto; se apaga pasando
+`exampleConfig` en modo `disabled` (o a `null` para ocultarlo).
+
+#### Campos de la fila
+
+`id`, `numero`, `fecha`, `comprobante__nombre`, `contacto__nombre_corto`, `cuenta__codigo`,
+`grupo__nombre`, `debito`, `credito`, `base`, `detalle` — con doble guion bajo, tal como los aplana
+el serializador `lista`. Salen del mapeo del legacy, no de una respuesta real.
+
+⚠️ **`grupo__nombre` es el centro de costo** (ver §2, punto 0). Se rotula "Centro de costo" pero el
+nombre del campo se conserva porque es el que espera la API. Si el backend lo renombró, esa cadena
+—en `movimiento.constants.ts`, columna y filtro— es el fix.
+
+### 9.2 Decisiones tomadas
+
+| #   | Decisión                                                              | Por qué                                                                                                                                                                                                                        |
+| --- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Sección **Movimientos** propia, no dentro de Informes                 | Los 9 informes contables son reportes que se generan con parámetros; esto es una lista paginada que se navega. La clave i18n ya existía sin usar                                                                               |
+| 2   | El read **no se mapea**: se consumen los nombres con doble guion bajo | Es solo lectura y no hay formulario que alimentar. Un mapper que solo renombra para maquillar es código sin dueño                                                                                                              |
+| 3   | **Sin fila de totales** de débito/crédito                             | La tabla pagina: sumar la página visible se leería como el total del libro. El legacy tampoco los sumaba                                                                                                                       |
+| 4   | **Sin** ficha ni formulario                                           | Un movimiento lo genera la contabilización de un documento, no se teclea. Los `movimiento-formulario`/`movimiento-detalle` del legacy no los enruta nadie y su servicio pega a `contabilidad/cuenta/`: copy-paste sin terminar |
+| 5   | Los valores (débito, crédito, base) **no son ordenables**             | Igual que el legacy. Ordenar el libro por importe no es una lectura contable útil                                                                                                                                              |
