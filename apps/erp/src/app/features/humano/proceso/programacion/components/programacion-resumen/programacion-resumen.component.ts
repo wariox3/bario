@@ -3,7 +3,7 @@ import { ButtonModule } from 'primeng/button';
 import { I18nService, formatCop, fromIsoDate, toFiniteNumber } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { PROGRAMACION_BANDERAS } from '../../programacion.banderas';
-import { estadoDe, type EstadoProgramacion } from '../../programacion.estado';
+import { estadoDe, type EstadoProceso } from '../../../shared/proceso.estado';
 import type { Programacion } from '../../programacion.model';
 
 /**
@@ -32,7 +32,7 @@ export class ProgramacionResumenComponent {
   protected readonly formatMoney = formatCop;
 
   /** Etapa del ciclo, para el badge. */
-  protected readonly estado = computed<EstadoProgramacion>(() => estadoDe(this.programacion()));
+  protected readonly estado = computed<EstadoProceso>(() => estadoDe(this.programacion()));
 
   protected readonly fechaDesde = computed(() => fromIsoDate(this.programacion().fecha_desde));
   protected readonly fechaHasta = computed(() => fromIsoDate(this.programacion().fecha_hasta));

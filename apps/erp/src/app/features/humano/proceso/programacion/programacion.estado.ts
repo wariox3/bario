@@ -1,6 +1,6 @@
 /**
- * Ciclo de vida de la **programación de nómina** y qué se puede hacer en cada
- * etapa. Módulo **puro**: sin Angular, sin HTTP, testeado en
+ * Qué se puede hacer con una **programación de nómina** en cada etapa de su
+ * ciclo. Módulo **puro**: sin Angular, sin HTTP, testeado en
  * `programacion.estado.spec.ts`.
  *
  * Es la pieza delicada del feature. Generar fabrica documentos de nómina reales,
@@ -11,27 +11,17 @@
  * El ERP anterior repartía la lógica en `[disabled]` compuestos por toda la
  * plantilla (`!programacion.estado_generado || programacion.estado_aprobado`,
  * etc.), imposible de auditar de un vistazo.
- */
-import type { Programacion } from './programacion.model';
-
-/**
- * Etapa del ciclo. Derivada de las dos banderas del backend, nunca almacenada:
- * un estado calculado no puede desincronizarse de su fuente.
  *
- * - `borrador`: se arma. Se edita la cabecera, se cargan y ajustan renglones.
- * - `generada`: ya existen las nóminas. La cabecera y los renglones se congelan.
- * - `aprobada`: las nóminas están aprobadas (contabilizadas).
+ * La etapa en sí (`estadoDe`) es común a todos los procesos de humano y vive en
+ * `../shared/proceso.estado`.
  */
-export type EstadoProgramacion = 'borrador' | 'generada' | 'aprobada';
+import { estadoDe, type ContextoProceso } from '../shared/proceso.estado';
 
 /**
- * Datos mínimos para decidir: las dos banderas de estado y cuántos renglones hay
- * cargados. `Programacion` los cumple, y un test o un caller parcial también,
- * sin tener que fabricar los 30 campos.
+ * Contexto de decisión: las banderas de estado más cuántos renglones hay
+ * cargados. `Programacion` lo cumple, y un test o un caller parcial también.
  */
-export interface ContextoProgramacion {
-  readonly estado_generado: boolean;
-  readonly estado_aprobado: boolean;
+export interface ContextoProgramacion extends ContextoProceso {
   /**
    * Renglones cargados. Generar sin contratos no tiene sentido (el legacy lo
    * bloqueaba con `!arrProgramacionDetalle.length`), así que la capacidad lo
@@ -68,15 +58,6 @@ export interface CapacidadesProgramacion {
   readonly puedeImprimirNominas: boolean;
   /** Eliminar la programación completa. */
   readonly puedeEliminar: boolean;
-}
-
-/** Deriva la etapa del ciclo a partir de las banderas del backend. */
-export function estadoDe(ctx: ContextoProgramacion): EstadoProgramacion {
-  // `aprobado` manda: una programación aprobada está siempre generada, y si el
-  // backend devolviera la combinación imposible (aprobada sin generar) tratarla
-  // como aprobada es lo conservador — bloquea más, no menos.
-  if (ctx.estado_aprobado) return 'aprobada';
-  return ctx.estado_generado ? 'generada' : 'borrador';
 }
 
 /**
@@ -136,13 +117,3 @@ export const CAPACIDADES_VACIAS: CapacidadesProgramacion = capacidadesDe({
   estado_generado: false,
   estado_aprobado: true,
 });
-
-/** ¿La programación ya no admite cambios en su contenido? */
-export function estaCongelada(ctx: ContextoProgramacion): boolean {
-  return estadoDe(ctx) !== 'borrador';
-}
-
-/** Clave i18n del badge de la etapa (`entities.programacion.estados.*`). */
-export function claveEstado(programacion: Programacion): EstadoProgramacion {
-  return estadoDe(programacion);
-}

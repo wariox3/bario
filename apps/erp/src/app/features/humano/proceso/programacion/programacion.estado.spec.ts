@@ -1,8 +1,6 @@
 import {
   CAPACIDADES_VACIAS,
   capacidadesDe,
-  estaCongelada,
-  estadoDe,
   type ContextoProgramacion,
 } from './programacion.estado';
 
@@ -21,24 +19,8 @@ const APROBADA: ContextoProgramacion = {
   renglones: 3,
 };
 
-describe('estadoDe', () => {
-  it('sin banderas es borrador', () => {
-    expect(estadoDe(VACIA)).toBe('borrador');
-  });
-
-  it('generada sin aprobar es generada', () => {
-    expect(estadoDe(GENERADA)).toBe('generada');
-  });
-
-  it('aprobada es aprobada', () => {
-    expect(estadoDe(APROBADA)).toBe('aprobada');
-  });
-
-  it('aprobada sin generar (combinación imposible) se trata como aprobada', () => {
-    // Conservador: ante datos incoherentes bloquea más, no menos.
-    expect(estadoDe({ estado_generado: false, estado_aprobado: true })).toBe('aprobada');
-  });
-});
+// Cómo se deriva la etapa se prueba en `../shared/proceso.estado.spec.ts`; acá
+// solo se fija qué habilita cada una para la programación.
 
 describe('capacidadesDe — borrador', () => {
   it('permite armar la programación', () => {
@@ -130,13 +112,5 @@ describe('CAPACIDADES_VACIAS', () => {
     expect(CAPACIDADES_VACIAS.puedeAprobar).toBe(false);
     expect(CAPACIDADES_VACIAS.puedeEliminar).toBe(false);
     expect(CAPACIDADES_VACIAS.puedeEditarCabecera).toBe(false);
-  });
-});
-
-describe('estaCongelada', () => {
-  it('solo el borrador admite cambios', () => {
-    expect(estaCongelada(BORRADOR)).toBe(false);
-    expect(estaCongelada(GENERADA)).toBe(true);
-    expect(estaCongelada(APROBADA)).toBe(true);
   });
 });
