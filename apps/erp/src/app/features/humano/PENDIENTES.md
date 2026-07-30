@@ -14,6 +14,10 @@ Estado (2026-07-29): portada la **programación de nómina** — el proceso que 
 nómina. Es la pieza más grande del módulo; sus supuestos y decisiones van en §4, aparte de las de los
 documentos e informes.
 
+Estado (2026-07-30): portado el **aporte a seguridad social** — la planilla PILA del periodo. Segundo
+proceso del módulo; sus supuestos van en §5. Con él, `estadoDe` pasó a `proceso/shared/`, compartido
+por los dos procesos.
+
 ---
 
 ## 1. Por confirmar con backend
@@ -115,20 +119,13 @@ Todas deliberadas. Están acá por si alguna hay que revertir.
 
 ## 3. Fuera de alcance
 
-### 3.1 Aporte / PILA
-
-Analizado y **descartado por decisión de producto** (2026-07-27) por su complejidad. No es
-`general/documento` sino un árbol propio (`humano/aporte`, `aporte_contrato`, `aporte_detalle`,
-`aporte_entidad`) con ciclo cargar contratos → generar → aprobar, 3 tabs y un grid PILA de ~45
-columnas. Iría por camino B.
-
-### 3.2 Otros documentos de la familia
+### 3.1 Otros documentos de la familia
 
 **Seguridad social** (legacy `modelo=703`, tipo **22**) no está portada. Si llega, va por camino A
 igual que nómina, y conviene mover `documentos/nomina/components/nomina-conceptos-table/` a
 `documentos/_shared/` para compartirla — como se hizo con la familia de movimientos de inventario.
 
-### 3.3 Contrato
+### 3.2 Contrato
 
 `masters/contrato/pages/contrato-form/` tiene oculta la sección **"Terminación y pagos"**, pendiente
 de definición funcional.
@@ -252,3 +249,139 @@ endpoint o si hay que extender el diálogo de importación.
   comentado), y los **filtros en `localStorage`** leídos a mano.
 - Dos **etiquetas equivocadas**: el botón "Importar nóminas" llamaba a `imprimirNominas()`, y había un
   `<butto>` sin cerrar en el dropdown de Excel.
+
+---
+
+## 5. Aporte a seguridad social (proceso)
+
+Portado desde `humano/paginas/documento/aporte/` del ERP anterior
+(`/humano/proceso/detalle/:id?modelo=HumAporte`), 2026-07-30. Vive en
+`features/humano/proceso/aporte/` y es la segunda entrada de la sección **Proceso**.
+
+> Reemplaza al antiguo §3.1, que lo daba por fuera de alcance.
+
+Es la **planilla PILA** de un periodo: quién entra, cuánto se le liquida a cada uno y cuánto se le
+paga a cada entidad. El entregable no es una pantalla sino el **plano del operador**. Camino B
+(master propio) con un árbol de tres niveles:
+
+| Nivel     | Endpoint                   | Qué es                                        |
+| --------- | -------------------------- | --------------------------------------------- |
+| Cabecera  | `/humano/aporte/`          | Alcance, entidades y los diez acumulados      |
+| Contratos | `/humano/aporte-contrato/` | Quién entra, con su tramo del periodo         |
+| Líneas    | `/humano/aporte-detalle/`  | Lo liquidado: novedades, días, bases, tarifas |
+| Entidades | `/humano/aporte-entidad/`  | A quién se le paga                            |
+
+### 5.1 El ciclo de vida está aislado y testeado
+
+Igual que la programación de nómina, y por el mismo motivo: generar liquida, desgenerar borra esa
+liquidación y aprobar la cierra. La regla vive **solo** en `aporte.estado.ts` (`capacidadesDe`, 9
+capacidades) con 11 tests, y `estadoDe` —común a los dos procesos— en `proceso/shared/proceso.estado.ts`
+con 4 tests propios. Ninguna plantilla combina banderas.
+
+⚠️ **Los tests garantizan que el código hace lo que dice la tabla de reglas, no que la tabla sea
+correcta frente a la norma.** Sale de leer los `[disabled]` del legacy. Los dos casos que conviene
+confirmar: **desgenerar sobre un aporte aprobado está bloqueado** (hay que desaprobar primero), y el
+**plano del operador solo se ofrece una vez generado** — en el legacy el botón existía siempre,
+deshabilitado.
+
+### 5.2 Los dos supuestos que fallan en silencio
+
+Van primero porque no dan error: se ven como una pantalla que "no trae nada".
+
+1. **El endpoint de impresión.** El legacy imprime pegándole a `general/documento/imprimir/` con
+   `documento_tipo_id: 1` fijo y el id del aporte como `documento_id`. El aporte **no es un
+   documento**, así que esa llamada apunta a otra cosa o está rota. Acá se asume
+   `POST /humano/aporte/imprimir/` con `{ id }`. Si no existe, "Imprimir" falla con un toast genérico.
+2. **La ARL por defecto.** Al crear se pide `hum_entidad_riesgo_id` a la configuración de empresa; el
+   legacy pide el mismo dato como `hum_entidad_riesgo`, **sin `_id`**. Si el backend responde con el
+   otro nombre, el campo queda vacío y nadie se entera — el pre-llenado es opcional a propósito.
+
+### 5.3 Por confirmar con backend
+
+#### Endpoints del proceso
+
+Todos con **guion**, que es la convención de este ERP; el legacy los nombra con guion bajo
+(`aporte_contrato`, `aporte_detalle`, `aporte_entidad`).
+
+| Acción           | Endpoint                          | Verbo  | Payload            |
+| ---------------- | --------------------------------- | ------ | ------------------ |
+| Listar           | `/humano/aporte/lista/`           | `POST` | filtros + orden    |
+| Cargar contratos | `/humano/aporte/cargar-contrato/` | `POST` | `{ id }`           |
+| Generar          | `/humano/aporte/generar/`         | `POST` | `{ id }`           |
+| Desgenerar       | `/humano/aporte/desgenerar/`      | `POST` | `{ id }`           |
+| Aprobar          | `/humano/aporte/aprobar/`         | `POST` | `{ id }`           |
+| Desaprobar       | `/humano/aporte/desaprobar/`      | `POST` | `{ id }`           |
+| Plano operador   | `/humano/aporte/plano-operador/`  | `POST` | `{ id }`           |
+| Imprimir         | `/humano/aporte/imprimir/`        | `POST` | `{ id }` — ver 5.2 |
+
+#### ¿Una línea por contrato o varias?
+
+La cabecera distingue `contratos` de `lineas`, así que se asume que un contrato puede producir varias
+líneas (por novedades que parten el periodo). La pestaña de líneas pagina por eso. Conviene
+confirmarlo: si fuera 1:1, la tabla podría mostrarse junto a la de contratos.
+
+#### `presentacion`: única vs sucursal
+
+`'U'` / `'S'`. El legacy solo ofrece los dos valores y no documenta qué cambia en el cálculo —
+presumiblemente si la planilla se agrupa por sucursal o va toda junta. **Cambia la planilla completa**,
+así que conviene entenderlo antes de que alguien lo toque por error.
+
+#### `anio_salud` / `mes_salud`
+
+El backend los devuelve y el legacy **no los muestra en ninguna pantalla**. En PILA el periodo de
+salud puede diferir del de pensión. Están en el modelo (`aporte.model.ts`) para no perder la pregunta;
+si son reales, van al resumen del workspace.
+
+#### Las tres exportaciones
+
+Serializadores `informe_aporte_contrato`, `informe_aporte_detalle` e `informe_aporte_entidad`, con sus
+filtros (`aporte_id`, `aporte_contrato__aporte_id`). Salen del legacy, que los pedía por `GET` con
+query params; acá viajan en el body del `POST …/excel/`, como el resto del ERP.
+
+#### El cruce con las nóminas (modal de trazabilidad)
+
+Serializadores `lista_nomina` (documentos) y `nomina` (líneas) sobre `/general/documento/` y
+`/general/documento-detalle/`, filtrando por `documento_clase_id = 701`. Los nombres de campo del
+cruce (`base_cotizacion`, `base_prestacion`, `concepto__nombre`…) salen del legacy.
+
+#### Filtros por query param
+
+Los tres niveles se listan por `GET`, no por el `POST …/lista/` de los masters, así que los filtros
+van como query params (`campo=valor`, `campo__operador=valor`). Es la convención de
+`serializeListQuery`, replicada en `filtrosComoParams` dentro de `aporte.service.ts` porque aquella
+trae su propia paginación (`page_size`) y estos endpoints usan `limit`.
+
+### 5.4 Decisiones tomadas (divergencias del legacy)
+
+| #   | Decisión                                                                        | Por qué                                                                                                                                                       |
+| --- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `estadoDe` **se comparte** con la programación; las capacidades **no**          | La etapa se deriva igual en los dos procesos; lo que cambia es qué habilita. Unificar también las capacidades daría una tabla llena de condicionales          |
+| 2   | El aporte tiene **workspace propio**, no ficha                                  | Un aporte generado tiene la cabecera congelada y sigue necesitando el banco de trabajo                                                                        |
+| 3   | Las **cuatro** acciones del ciclo confirman, con la consecuencia escrita        | El legacy solo confirmaba aprobar. Desgenerar borra la liquidación y no avisaba                                                                               |
+| 4   | El semáforo de colores se convierte en una **columna "Novedad"**                | El legacy pintaba las celdas de fecha: color sin etiqueta, invisible al exportar. `error_terminacion` gana sobre ingreso/retiro — es lo que hay que corregir  |
+| 5   | Eliminar contratos va en **una sola tanda**: un refresco y un toast             | El legacy disparaba N peticiones y cada una recargaba la tabla y sacaba su propio mensaje                                                                     |
+| 6   | La pestaña de entidades **no pagina** y agrupa con `agruparEntidades` (7 tests) | El legacy agrupaba sobre una página de 50: con más entidades, los subtotales y el total general quedaban por debajo de lo real. Es la plata que se paga       |
+| 7   | Los contratos y las líneas **paginan de verdad** (25 por página)                | El legacy pedía `limit: 1000` y encima mostraba paginador — paginación decorativa                                                                             |
+| 8   | Las 42 columnas de la línea salen de **una sola metadata**                      | De ahí se derivan los `ColumnDef` y la leyenda de abreviaturas, con un test que fija que no diverjan. En el legacy cada sigla vivía en un `ngbTooltip` suelto |
+| 9   | Las nueve banderas de novedad se muestran **`Sí` / `—`**                        | Con el `Sí` / `No` por defecto, nueve columnas de negativos convierten cada fila en ruido                                                                     |
+| 10  | El plano del operador **solo aparece** una vez generado                         | Es el entregable del proceso: sin líneas calculadas no hay nada que entregar                                                                                  |
+| 11  | La sucursal usa `suggestedIndex="0"`                                            | El legacy sembraba `sucursal: 1` fijo, asumiendo que existe en todos los tenants                                                                              |
+| 12  | El cruce con nóminas es un **modal**, no un link a la ficha                     | Hacen falta varias nóminas filtradas por contrato y periodo, con sus conceptos y totales — la ficha muestra una sola                                          |
+| 13  | El servicio del cruce vive **junto al modal**, no en `AporteService`            | No toca ningún endpoint del aporte: pega contra el master de documentos                                                                                       |
+| 14  | Los totales del cruce salen de `totalesDe(filas, campos)`                       | El legacy tenía diez métodos `calcularTotalX()` idénticos salvo el campo                                                                                      |
+| 15  | El listado **no tiene borrado**, igual que el de programaciones                 | Borrar depende del estado (solo borrador) y `<lib-data-table>` no condiciona acciones fila por fila                                                           |
+
+### 5.5 Lo que no se portó
+
+- **`TablaEntidadService`**, un singleton `providedIn: 'root'` que guardaba la lista, los parámetros y
+  los totales del aporte abierto. Mismo anti-patrón que `TablaContratosService` en programación.
+- **La edición de renglones a medias**: `AporteContratoService.actualizarDetalles` no tenía un solo
+  llamador, y `formularioAporteContrato`, `registroSeleccionado` y `registroAdicionalSeleccionado`
+  estaban declarados y nunca usados. **En este proceso no se editan líneas.**
+- El `toggleSelectAll` del legacy, que hacía `selected = !selected` en las **dos** ramas: deseleccionar
+  todos en realidad invertía la selección y desincronizaba el array de ids.
+- Dos `#OpcionesDropdown` con el mismo nombre y dos `id="dropdownBasic1"` en la misma plantilla, y el
+  spinner de "desgenerando" reutilizado como label del botón de plano operador.
+- El `ngOnDestroy` que borraba de `localStorage` una clave (`documento_aporte`) que nadie escribía.
+- La **configuración de cuentas contables por tipo de aporte** (`configuracion_aporte`), que en el
+  legacy vive en otra pantalla (Configuración) y es otro feature.
