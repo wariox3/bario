@@ -5,7 +5,7 @@ import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { SplitButtonModule } from 'primeng/splitbutton';
+import { MenuModule } from 'primeng/menu';
 import { TabsModule } from 'primeng/tabs';
 import type { HttpErrorResponse } from '@angular/common/http';
 import {
@@ -65,7 +65,7 @@ type AccionCiclo = 'generar' | 'desgenerar' | 'aprobar' | 'desaprobar';
   imports: [
     ButtonModule,
     ConfirmDialogModule,
-    SplitButtonModule,
+    MenuModule,
     TabsModule,
     BreadcrumbComponent,
     ImportDialogComponent,

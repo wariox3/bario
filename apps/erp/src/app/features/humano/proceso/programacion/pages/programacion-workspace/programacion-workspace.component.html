@@ -54,15 +54,18 @@
     }
 
     @if (accionesSecundarias().length) {
-      <p-splitbutton
+      <p-button
+        type="button"
         [label]="t().common.actions.actions"
-        icon="pi pi-ellipsis-h"
+        icon="pi pi-chevron-down"
+        iconPos="right"
         severity="secondary"
         [outlined]="true"
         size="small"
-        [model]="accionesSecundarias()"
         [disabled]="estaOcupado()"
+        (onClick)="accionesMenu.toggle($event)"
       />
+      <p-menu #accionesMenu [popup]="true" [model]="accionesSecundarias()" appendTo="body" />
     }
   }
 </header>
