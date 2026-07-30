@@ -1,0 +1,141 @@
+@let m = t().entities.programacion.adicionales;
+
+<div class="flex flex-col gap-5">
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-plus-circle text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ isEditMode() ? m.editTitle : m.createTitle }}
+      </h2>
+      <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ m.subtitle }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+    <!-- Empleado -->
+    <div class="flex flex-col gap-1.5">
+      <label for="contrato" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.contrato }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <lib-contrato-autocomplete
+        inputId="contrato"
+        formControlName="contrato"
+        [placeholder]="m.fields.contratoPlaceholder"
+        [invalid]="form.controls.contrato.invalid && form.controls.contrato.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.contrato"
+        [messages]="{ required: m.validation.required }"
+      />
+    </div>
+
+    <!-- Concepto -->
+    <div class="flex flex-col gap-1.5">
+      <label for="concepto" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.concepto }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <lib-api-autocomplete
+        inputId="concepto"
+        formControlName="concepto"
+        [endpoint]="conceptoEndpoint"
+        [params]="conceptoParams"
+        [placeholder]="m.fields.conceptoPlaceholder"
+        [invalid]="form.controls.concepto.invalid && form.controls.concepto.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.concepto"
+        [messages]="{ required: m.validation.required }"
+      />
+    </div>
+
+    <!-- Valor -->
+    <div class="flex flex-col gap-1.5">
+      <label for="valor" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.valor }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-inputnumber
+        inputId="valor"
+        formControlName="valor"
+        mode="decimal"
+        [min]="0"
+        [maxFractionDigits]="2"
+        prefix="$ "
+        [fluid]="true"
+        [invalid]="form.controls.valor.invalid && form.controls.valor.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.valor"
+        [messages]="{ required: m.validation.required, min: m.validation.valorMinimo }"
+      />
+    </div>
+
+    <!-- Horas -->
+    <div class="flex flex-col gap-1.5">
+      <label for="horas" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.horas }}
+      </label>
+      <p-inputnumber
+        inputId="horas"
+        formControlName="horas"
+        mode="decimal"
+        [min]="0"
+        [maxFractionDigits]="2"
+        [fluid]="true"
+      />
+      <p class="m-0 text-[0.72rem] text-brand-muted">{{ m.fields.horasHint }}</p>
+    </div>
+
+    <!-- Detalle -->
+    <div class="flex flex-col gap-1.5 sm:col-span-2">
+      <label for="detalle" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.detalle }}
+      </label>
+      <input
+        id="detalle"
+        pInputText
+        formControlName="detalle"
+        type="text"
+        maxlength="200"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Aplica día laborado -->
+    <div class="flex items-center gap-2 sm:col-span-2">
+      <p-checkbox
+        inputId="aplica_dia_laborado"
+        [binary]="true"
+        formControlName="aplica_dia_laborado"
+      />
+      <label for="aplica_dia_laborado" class="cursor-pointer text-[0.8rem] text-brand-text">
+        {{ m.fields.aplicaDiaLaborado }}
+      </label>
+    </div>
+  </form>
+
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="button"
+      [label]="t().common.actions.save"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || isSaving()"
+      (onClick)="onSubmit()"
+    />
+  </div>
+</div>

@@ -1,0 +1,238 @@
+@let f = t().entities.programacion.form;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Periodo y alcance ────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-calendar-clock text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ isEditMode() ? f.editTitle : f.createTitle }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.sectionHint }}</p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Tipo de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="pago_tipo" class="programacion-form__label">
+            {{ f.fields.pagoTipo }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="pago_tipo"
+            formControlName="pago_tipo"
+            [endpoint]="pagoTipoEndpoint"
+            [placeholder]="f.fields.seleccionar"
+            [invalid]="form.controls.pago_tipo.invalid && form.controls.pago_tipo.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.pago_tipo"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Grupo -->
+        <div class="flex flex-col gap-1.5">
+          <label for="grupo" class="programacion-form__label">
+            {{ f.fields.grupo }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="grupo"
+            formControlName="grupo"
+            [endpoint]="grupoEndpoint"
+            [placeholder]="f.fields.seleccionar"
+            [invalid]="form.controls.grupo.invalid && form.controls.grupo.touched"
+          />
+          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.grupoHint }}</p>
+          <lib-field-error
+            [control]="form.controls.grupo"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Nombre -->
+        <div class="flex flex-col gap-1.5">
+          <label for="nombre" class="programacion-form__label">{{ f.fields.nombre }}</label>
+          <input
+            id="nombre"
+            pInputText
+            formControlName="nombre"
+            type="text"
+            maxlength="100"
+            class="w-full"
+            [placeholder]="f.fields.nombrePlaceholder"
+          />
+        </div>
+
+        <!-- Fecha desde -->
+        <div class="flex flex-col gap-1.5">
+          <label for="fecha_desde" class="programacion-form__label">
+            {{ f.fields.fechaDesde }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="fecha_desde"
+            formControlName="fecha_desde"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+            [invalid]="form.controls.fecha_desde.invalid && form.controls.fecha_desde.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.fecha_desde"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Fecha hasta -->
+        <div class="flex flex-col gap-1.5">
+          <label for="fecha_hasta" class="programacion-form__label">
+            {{ f.fields.fechaHasta }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="fecha_hasta"
+            formControlName="fecha_hasta"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+            [invalid]="form.controls.fecha_hasta.invalid && form.controls.fecha_hasta.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.fecha_hasta"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Fecha hasta periodo -->
+        <div class="flex flex-col gap-1.5">
+          <label for="fecha_hasta_periodo" class="programacion-form__label">
+            {{ f.fields.fechaHastaPeriodo }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="fecha_hasta_periodo"
+            formControlName="fecha_hasta_periodo"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+            [invalid]="
+              form.controls.fecha_hasta_periodo.invalid && form.controls.fecha_hasta_periodo.touched
+            "
+          />
+          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.fechaHastaPeriodoHint }}</p>
+          <lib-field-error
+            [control]="form.controls.fecha_hasta_periodo"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-3">
+          <label for="comentario" class="programacion-form__label">{{ f.fields.comentario }}</label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="2"
+            maxlength="500"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Errores del grupo: no pertenecen a ningún campo -->
+      @if (form.errors; as errores) {
+        @if (form.controls.fecha_hasta.touched) {
+          @if (errores['rangoFechasInvalido']) {
+            <p class="m-0 mt-3 text-[0.78rem] text-red-600">{{ f.validation.rangoInvalido }}</p>
+          }
+          @if (errores['duracionPeriodo']; as detalle) {
+            <p class="m-0 mt-3 text-[0.78rem] text-red-600">
+              {{ f.validation.duracionPeriodo }} — {{ f.validation.duracionEsperada }}:
+              {{ detalle.requeridos }}, {{ f.validation.duracionActual }}: {{ detalle.duracion }}
+            </p>
+          }
+        }
+      }
+    </div>
+  </section>
+
+  <!-- ── Sección: Qué se liquida ───────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-sliders-h text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ f.sections.conceptos }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.conceptosHint }}</p>
+      </div>
+    </div>
+
+    <div
+      class="grid grid-cols-1 gap-x-8 gap-y-6 px-5 py-5 sm:grid-cols-2 lg:grid-cols-4 max-[576px]:px-4 max-[576px]:py-4"
+    >
+      @for (bloque of gruposBandera; track bloque.grupo) {
+        <div class="flex flex-col gap-2.5">
+          <h3 class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.04em] text-brand-muted">
+            {{ traducir(bloque.labelKey) }}
+          </h3>
+          @for (bandera of banderasDelGrupo(bloque.grupo); track bandera.clave) {
+            <div class="flex items-center gap-2">
+              <p-checkbox
+                [inputId]="bandera.clave"
+                [binary]="true"
+                [formControlName]="bandera.clave"
+              />
+              <label
+                [for]="bandera.clave"
+                class="cursor-pointer text-[0.8rem] leading-tight text-brand-text"
+              >
+                {{ traducir(bandera.labelKey) }}
+              </label>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+</form>

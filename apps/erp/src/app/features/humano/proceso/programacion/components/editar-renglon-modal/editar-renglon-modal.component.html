@@ -1,0 +1,158 @@
+@let m = t().entities.programacion.editarRenglon;
+
+<div class="flex flex-col gap-5">
+  <!-- Header: badge + título + a quién se ajusta -->
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-user-edit text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex min-w-0 flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ m.title }}
+      </h2>
+      <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+        {{ empleado() || m.subtitle }}
+      </p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-12 text-brand-muted">
+      <i class="pi pi-spin pi-spinner text-xl"></i>
+    </div>
+  } @else {
+    <form [formGroup]="form" class="flex flex-col gap-5">
+      <!-- Días de transporte: común a los cuatro tipos -->
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="dias_transporte" class="text-[0.855rem] font-semibold text-brand-text">
+            {{ m.diasTransporte }}
+          </label>
+          <p-inputnumber
+            inputId="dias_transporte"
+            formControlName="dias_transporte"
+            mode="decimal"
+            [min]="0"
+            [maxFractionDigits]="0"
+            [fluid]="true"
+          />
+        </div>
+
+        <!-- Bases: prima, cesantía e interés -->
+        @if (!editaHoras()) {
+          <div class="flex flex-col gap-1.5">
+            <label for="salario" class="text-[0.855rem] font-semibold text-brand-text">
+              {{ m.salario }}
+            </label>
+            <p-inputnumber
+              inputId="salario"
+              formControlName="salario"
+              mode="decimal"
+              [min]="0"
+              [maxFractionDigits]="2"
+              prefix="$ "
+              [fluid]="true"
+            />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="salario_promedio" class="text-[0.855rem] font-semibold text-brand-text">
+              {{ m.salarioPromedio }}
+            </label>
+            <p-inputnumber
+              inputId="salario_promedio"
+              formControlName="salario_promedio"
+              mode="decimal"
+              [min]="0"
+              [maxFractionDigits]="2"
+              prefix="$ "
+              [fluid]="true"
+            />
+          </div>
+
+          @if (campoPropuesto(); as propuesto) {
+            <div class="flex flex-col gap-1.5">
+              <label [for]="propuesto" class="text-[0.855rem] font-semibold text-brand-text">
+                {{ propuesto === 'cesantia_propuesto' ? m.cesantiaPropuesta : m.interesPropuesto }}
+              </label>
+              <p-inputnumber
+                [inputId]="propuesto"
+                [formControlName]="propuesto"
+                mode="decimal"
+                [min]="0"
+                [maxFractionDigits]="2"
+                prefix="$ "
+                [fluid]="true"
+              />
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Horas y recargos: solo la nómina del periodo -->
+      @if (editaHoras()) {
+        <div class="flex flex-col gap-2.5">
+          <h3 class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.04em] text-brand-muted">
+            {{ m.sections.horas }}
+          </h3>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
+            @for (campo of camposHora; track campo) {
+              <div class="flex flex-col gap-1">
+                <label [for]="campo" class="text-[0.75rem] text-brand-text">
+                  {{ etiqueta('horas', campo) }}
+                </label>
+                <p-inputnumber
+                  [inputId]="campo"
+                  [formControlName]="campo"
+                  mode="decimal"
+                  [min]="0"
+                  [maxFractionDigits]="2"
+                  [fluid]="true"
+                />
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Banderas por empleado -->
+      <div class="flex flex-col gap-2.5">
+        <h3 class="m-0 text-[0.7rem] font-bold uppercase tracking-[0.04em] text-brand-muted">
+          {{ m.sections.banderas }}
+        </h3>
+        <p class="m-0 text-[0.72rem] text-brand-muted">{{ m.banderasHint }}</p>
+        <div class="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+          @for (bandera of camposBandera; track bandera) {
+            <div class="flex items-center gap-2">
+              <p-checkbox [inputId]="bandera" [binary]="true" [formControlName]="bandera" />
+              <label [for]="bandera" class="cursor-pointer text-[0.8rem] text-brand-text">
+                {{ etiqueta('banderas', bandera) }}
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+    </form>
+  }
+
+  <!-- Footer -->
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="button"
+      [label]="t().common.actions.save"
+      [loading]="isSaving()"
+      [disabled]="isLoading() || form.invalid || isSaving()"
+      (onClick)="onSubmit()"
+    />
+  </div>
+</div>

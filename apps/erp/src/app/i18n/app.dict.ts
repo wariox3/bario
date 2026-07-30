@@ -2600,6 +2600,260 @@ export interface AppDict
         valorPendiente: string;
       };
     };
+    programacion: {
+      name: string;
+      columns: {
+        id: string;
+        nombre: string;
+        pagoTipo: string;
+        grupo: string;
+        periodo: string;
+        fechaDesde: string;
+        fechaHasta: string;
+        dias: string;
+        contratos: string;
+        total: string;
+        generado: string;
+        aprobado: string;
+      };
+      estados: { borrador: string; generada: string; aprobada: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        conceptosHint: string;
+        sections: { conceptos: string };
+        fields: {
+          pagoTipo: string;
+          grupo: string;
+          grupoHint: string;
+          nombre: string;
+          nombrePlaceholder: string;
+          fechaDesde: string;
+          fechaHasta: string;
+          fechaHastaPeriodo: string;
+          fechaHastaPeriodoHint: string;
+          comentario: string;
+          seleccionar: string;
+        };
+        validation: {
+          required: string;
+          rangoInvalido: string;
+          duracionPeriodo: string;
+          duracionEsperada: string;
+          duracionActual: string;
+        };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          noEditable: { title: string; desc: string };
+        };
+      };
+      resumen: {
+        sinNombre: string;
+        conceptos: string;
+        sinConceptos: string;
+        labels: {
+          fechaDesde: string;
+          fechaHasta: string;
+          contratos: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+          comentario: string;
+        };
+      };
+      workspace: {
+        tabs: { renglones: string; adicionales: string };
+        renglonesHint: string;
+        adicionalesHint: string;
+        notFound: { title: string; desc: string };
+      };
+      editarRenglon: {
+        title: string;
+        subtitle: string;
+        diasTransporte: string;
+        salario: string;
+        salarioPromedio: string;
+        cesantiaPropuesta: string;
+        interesPropuesto: string;
+        banderasHint: string;
+        sections: { horas: string; banderas: string };
+        horas: {
+          diurna: string;
+          nocturna: string;
+          festiva_diurna: string;
+          festiva_nocturna: string;
+          extra_diurna: string;
+          extra_nocturna: string;
+          extra_festiva_diurna: string;
+          extra_festiva_nocturna: string;
+          recargo_nocturno: string;
+          recargo_festivo_diurno: string;
+          recargo_festivo_nocturno: string;
+        };
+        banderas: {
+          pago_horas: string;
+          pago_auxilio_transporte: string;
+          pago_incapacidad: string;
+          pago_licencia: string;
+          pago_vacacion: string;
+          descuento_salud: string;
+          descuento_pension: string;
+          descuento_fondo_solidaridad: string;
+          descuento_retencion_fuente: string;
+          descuento_credito: string;
+          descuento_embargo: string;
+          adicional: string;
+        };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      adicionales: {
+        createTitle: string;
+        editTitle: string;
+        subtitle: string;
+        fields: {
+          contrato: string;
+          contratoPlaceholder: string;
+          concepto: string;
+          conceptoPlaceholder: string;
+          valor: string;
+          horas: string;
+          horasHint: string;
+          detalle: string;
+          aplicaDiaLaborado: string;
+        };
+        validation: { required: string; valorMinimo: string };
+        columns: {
+          id: string;
+          empleado: string;
+          concepto: string;
+          valor: string;
+          horas: string;
+          detalle: string;
+          aplicaDiaLaborado: string;
+        };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+        };
+      };
+      importarHoras: {
+        title: string;
+        subtitle: string;
+        plantillaNoDisponible: string;
+      };
+      acciones: {
+        generar: string;
+        desgenerar: string;
+        aprobar: string;
+        desaprobar: string;
+        notificar: string;
+        importarHoras: string;
+        imprimir: string;
+        imprimirNominas: string;
+        exportRenglones: string;
+        exportNomina: string;
+        exportNominaDetalle: string;
+        confirmaciones: {
+          generar: { header: string; message: string };
+          desgenerar: { header: string; message: string };
+          aprobar: { header: string; message: string };
+          desaprobar: { header: string; message: string };
+          notificar: { header: string; message: string };
+        };
+        toasts: {
+          generar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desgenerar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          aprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desaprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          notificar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      renglones: {
+        cargarContratos: string;
+        verNomina: string;
+        confirmEliminar: { header: string; message: string };
+        confirmRecargar: { header: string; message: string };
+        leyenda: { titulo: string; contenido: string };
+        toasts: {
+          cargarSuccess: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+          sinNomina: { title: string; desc: string };
+        };
+        columns: {
+          id: string;
+          identificacion: string;
+          empleado: string;
+          contrato: string;
+          desde: string;
+          hasta: string;
+          salario: string;
+          diasTransporte: string;
+          dias: string;
+          promedio: string;
+          basePrestacion: string;
+          total: string;
+        };
+        horas: {
+          diurna: string;
+          nocturna: string;
+          festivaDiurna: string;
+          festivaNocturna: string;
+          extraDiurna: string;
+          extraNocturna: string;
+          extraFestivaDiurna: string;
+          extraFestivaNocturna: string;
+          recargoNocturno: string;
+          recargoFestivoDiurno: string;
+          recargoFestivoNocturno: string;
+        };
+      };
+      grupos: { pagos: string; descuentos: string; prestaciones: string; base: string };
+      banderas: {
+        pagoHoras: string;
+        pagoAuxilioTransporte: string;
+        pagoIncapacidad: string;
+        pagoLicencia: string;
+        pagoVacacion: string;
+        pagoPrima: string;
+        pagoCesantia: string;
+        pagoInteres: string;
+        descuentoSalud: string;
+        descuentoPension: string;
+        descuentoFondoSolidaridad: string;
+        descuentoRetencionFuente: string;
+        descuentoCredito: string;
+        descuentoEmbargo: string;
+        adicional: string;
+        basePrestacionMinimo: string;
+        basePrestacionMinimoSalario: string;
+      };
+    };
     nomina: {
       name: string;
       columns: {

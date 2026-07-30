@@ -28,6 +28,24 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'humano-proceso',
+      labelKey: 'layout.nav.sections.process',
+      iconClass: 'pi pi-cog',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.programacion.name',
+              path: 'proceso/programacion',
+              activeMatch: 'proceso/programacion',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'humano-informes',
       labelKey: 'layout.nav.sections.report',
       iconClass: 'pi pi-chart-bar',
