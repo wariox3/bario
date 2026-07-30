@@ -294,14 +294,11 @@ nada — las ocho columnas del legacy ya estaban cubiertas.
 | Operación      | Endpoint supuesto                                 | Body                                                                 |
 | -------------- | ------------------------------------------------- | -------------------------------------------------------------------- |
 | Generar líneas | `POST /general/documento/cargar-cierre/`          | `{ id, cuenta_desde_codigo, cuenta_hasta_codigo, cuenta_cierre_id }` |
-| Borrar todas   | `POST /general/documento_detalle/eliminar-todos/` | `{ documento_id }`                                                   |
+| Borrar todas   | `POST /general/documento-detalle/eliminar-todos/` | `{ documento_id }`                                                   |
 
-⚠️ **Divergencia de ruta, el riesgo más alto de esta entrega**: el borrado masivo del legacy pega a
-`documento_detalle` con guion **bajo**, mientras que todo el framework de documentos de este ERP
-usa `documento-detalle` con **guion** (y funciona: lo consumen pago, asiento y depreciación). Se
-replicó la ruta del legacy porque es la única evidencia de que ese endpoint existe. Si el backend
-solo expone la forma con guion, "Eliminar todos" responde 404 y el fix es la constante
-`ELIMINAR_DETALLES_ENDPOINT`.
+La ruta va con **guion** (`documento-detalle`), la convención de endpoints de este ERP, aunque el
+legacy la nombre con guion bajo. Lo que sigue siendo supuesto es que la acción `eliminar-todos/`
+exista: sale del legacy y no se pudo verificar.
 
 **La asimetría código/id de `cargar-cierre/` también es del legacy**: el rango viaja por **código**
 de cuenta y el destino por **id**. Confirmar que es intencional y no un accidente heredado.
@@ -403,33 +400,29 @@ junto a Contabilizar.
 
 Es la primera pieza del módulo que **no** es documento ni consulta: un master con endpoint propio
 (camino B) más un proceso encima. Una conciliación es una cuenta bancaria y un periodo, y de ella
-cuelgan dos colecciones que se cruzan: el **libro** (`conciliacion_detalle`) y el **extracto** del
-banco (`conciliacion_soporte`).
+cuelgan dos colecciones que se cruzan: el **libro** (`conciliacion-detalle`) y el **extracto** del
+banco (`conciliacion-soporte`).
 
 El flujo: crear → cargar el libro → importar el extracto en Excel → **Conciliar**, que cruza ambos
 lados y marca `estado_conciliado` en cada fila.
 
 ### 10.1 Por confirmar con backend
 
-#### Los endpoints hijos, con guion bajo
+#### Los endpoints hijos
 
-`contabilidad/conciliacion_detalle/` y `contabilidad/conciliacion_soporte/` — con guion **bajo**,
-mientras este ERP usa guion en todo (`documento-detalle`, `centro-costo`…). Se replica el legacy
-porque es la única evidencia de que existen. **Es el mismo riesgo que el borrado masivo del cierre
-(§8.1)**: si el backend solo expone la forma con guion, las dos pestañas responden 404 y el fix son
-las dos constantes de `conciliacion.service.ts`.
+`contabilidad/conciliacion-detalle/` y `contabilidad/conciliacion-soporte/`. El legacy los nombra con
+guion bajo; acá van con **guion**, la convención de endpoints de este ERP.
 
-Que la misma duda aparezca por segunda vez sugiere preguntarle al backend por la convención
-completa, no endpoint por endpoint.
+Que existan sigue siendo supuesto —salen del legacy—, pero la forma del nombre ya no está en duda.
 
 #### Las operaciones
 
 | Operación         | Endpoint supuesto                             | Body                                     |
 | ----------------- | --------------------------------------------- | ---------------------------------------- |
-| Cargar libro      | `POST …/conciliacion_detalle/cargar/`         | `{ conciliacion_id }`                    |
-| Limpiar libro     | `POST …/conciliacion_detalle/limpiar/`        | `{ conciliacion_id }`                    |
-| Importar extracto | `POST …/conciliacion_soporte/cargar-soporte/` | multipart: `archivo` + `conciliacion_id` |
-| Limpiar extracto  | `POST …/conciliacion_soporte/limpiar/`        | `{ conciliacion_id }`                    |
+| Cargar libro      | `POST …/conciliacion-detalle/cargar/`         | `{ conciliacion_id }`                    |
+| Limpiar libro     | `POST …/conciliacion-detalle/limpiar/`        | `{ conciliacion_id }`                    |
+| Importar extracto | `POST …/conciliacion-soporte/cargar-soporte/` | multipart: `archivo` + `conciliacion_id` |
+| Limpiar extracto  | `POST …/conciliacion-soporte/limpiar/`        | `{ conciliacion_id }`                    |
 | Conciliar         | `POST …/conciliacion/conciliar/`              | `{ id }`                                 |
 
 **Sobre `conciliar/`**: no se sabe si es idempotente (¿se puede correr dos veces?) ni si desmarca lo
@@ -454,8 +447,8 @@ exponga uno. Al confirmarlo, es cambiar `exampleConfig` a `{ mode: 'enabled', en
 
 #### Otros
 
-- `general/cuenta-banco/seleccionar/` para el select de la cabecera: el legacy usa `cuenta_banco`
-  con guion bajo; acá se usa la forma con guion, que es la que ya consume el pago de cartera.
+- `general/cuenta-banco/seleccionar/` para el select de la cabecera: el legacy lo nombra con guion
+  bajo; acá va con guion, como todos los endpoints y como ya lo consume el pago de cartera.
 - Los Excel de las dos tablas van con `{ conciliacion_id, serializador: 'excel' }`.
 - Campos de las filas (`documento__documento_tipo__nombre`, `cuenta__codigo`…): aplanados con doble
   guion bajo, tomados del legacy.

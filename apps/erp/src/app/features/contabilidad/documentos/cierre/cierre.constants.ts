@@ -14,14 +14,13 @@ export const CARGAR_CIERRE_ENDPOINT = '/general/documento/cargar-cierre/';
 /**
  * Borra **todas** las líneas del documento de un golpe.
  *
- * ⚠️ **Supuesto y divergencia**: el legacy pega a
- * `general/documento_detalle/eliminar-todos/` — con guion **bajo**—, mientras que
- * todo el framework de documentos de este ERP usa `general/documento-detalle/`
- * con guion. Se replica la ruta del legacy porque es la única evidencia que hay
- * de que este endpoint existe; si el backend solo expone la forma con guion, acá
- * responde 404 y el fix es esta constante.
+ * El legacy pega a `general/documento_detalle/eliminar-todos/` (con guion bajo);
+ * acá va con **guion**, igual que el `DOCUMENTO_DETALLE_ENDPOINT` que usa todo el
+ * framework de documentos.
+ *
+ * ⚠️ Que la acción `eliminar-todos/` exista sigue siendo un supuesto del legacy.
  */
-export const ELIMINAR_DETALLES_ENDPOINT = '/general/documento_detalle/eliminar-todos/';
+export const ELIMINAR_DETALLES_ENDPOINT = '/general/documento-detalle/eliminar-todos/';
 
 /** Líneas por página en la sección de detalles del cierre. */
 export const CIERRE_DETALLE_PAGE_SIZE = 50;

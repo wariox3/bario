@@ -22,14 +22,12 @@ export const CONCILIACION_ENDPOINT = '/contabilidad/conciliacion/';
 /**
  * Endpoints de las dos colecciones hijas.
  *
- * ⚠️ **Guion bajo**: el ERP anterior los nombra `conciliacion_detalle` y
- * `conciliacion_soporte`, mientras que este ERP usa guion en todo
- * (`documento-detalle`, `centro-costo`…). Se replica el legacy porque es la
- * única evidencia de que existen; si el backend solo expone la forma con guion,
- * las dos pestañas responden 404 y el fix son estas dos constantes.
+ * El ERP anterior los nombra `conciliacion_detalle` y `conciliacion_soporte` (con
+ * guion bajo); acá van con **guion**, que es la convención de endpoints de este
+ * ERP — la misma de `documento-detalle` y `centro-costo`.
  */
-export const CONCILIACION_DETALLE_ENDPOINT = '/contabilidad/conciliacion_detalle/';
-export const CONCILIACION_SOPORTE_ENDPOINT = '/contabilidad/conciliacion_soporte/';
+export const CONCILIACION_DETALLE_ENDPOINT = '/contabilidad/conciliacion-detalle/';
+export const CONCILIACION_SOPORTE_ENDPOINT = '/contabilidad/conciliacion-soporte/';
 
 /** Serializador que el backend usa para las descargas de las tablas hijas. */
 export const CONCILIACION_EXCEL_SERIALIZADOR = 'excel';
@@ -42,6 +40,9 @@ export const CONCILIACION_EXCEL_SERIALIZADOR = 'excel';
  * colecciones hijas se listan con **GET y el id del padre**, que es lo que hace
  * el legacy y también lo que hace `DocumentoDetalleService` con las líneas de un
  * documento — las dos convenciones coinciden ahí.
+ *
+ * ⚠️ Que los endpoints existan sigue siendo un supuesto: salen del legacy, con sus
+ * nombres normalizados a guion. Lo que ya no está en duda es la forma del nombre.
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
