@@ -31,6 +31,10 @@ export const HUMANO_ROUTES: Route[] = [
           import('./proceso/programacion/programacion.routes').then((m) => m.PROGRAMACION_ROUTES),
       },
       {
+        path: 'proceso/aporte',
+        loadChildren: () => import('./proceso/aporte/aporte.routes').then((m) => m.APORTE_ROUTES),
+      },
+      {
         path: 'utilidades/enviar-nomina-electronica',
         loadChildren: () =>
           import('./utilidades/enviar-nomina-electronica/enviar-nomina-electronica.routes').then(

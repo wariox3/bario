@@ -40,6 +40,11 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
               path: 'proceso/programacion',
               activeMatch: 'proceso/programacion',
             },
+            {
+              labelKey: 'entities.aporte.name',
+              path: 'proceso/aporte',
+              activeMatch: 'proceso/aporte',
+            },
           ],
         },
       ],

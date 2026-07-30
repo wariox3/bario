@@ -1,0 +1,213 @@
+@let f = t().entities.aporte.form;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Periodo y alcance ────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-calendar-clock text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ isEditMode() ? f.editTitle : f.createTitle }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.sectionHint }}</p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Año -->
+        <div class="flex flex-col gap-1.5">
+          <label for="anio" class="aporte-form__label">
+            {{ f.fields.anio }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-inputnumber
+            inputId="anio"
+            formControlName="anio"
+            [useGrouping]="false"
+            [min]="anioMin"
+            [max]="anioMax"
+            [fluid]="true"
+            [invalid]="form.controls.anio.invalid && form.controls.anio.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.anio"
+            [messages]="{
+              required: f.validation.required,
+              min: f.validation.anioRango,
+              max: f.validation.anioRango,
+            }"
+          />
+        </div>
+
+        <!-- Mes -->
+        <div class="flex flex-col gap-1.5">
+          <label for="mes" class="aporte-form__label">
+            {{ f.fields.mes }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-select
+            inputId="mes"
+            formControlName="mes"
+            [options]="mesOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [placeholder]="f.fields.seleccionar"
+            appendTo="body"
+            [fluid]="true"
+            [invalid]="form.controls.mes.invalid && form.controls.mes.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.mes"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Sucursal -->
+        <div class="flex flex-col gap-1.5">
+          <label for="sucursal" class="aporte-form__label">
+            {{ f.fields.sucursal }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="sucursal"
+            formControlName="sucursal"
+            [endpoint]="sucursalEndpoint"
+            [suggestedIndex]="0"
+            [placeholder]="f.fields.seleccionar"
+            [invalid]="form.controls.sucursal.invalid && form.controls.sucursal.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.sucursal"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Forma de presentación -->
+        <div class="flex flex-col gap-1.5">
+          <label for="presentacion" class="aporte-form__label">{{ f.fields.presentacion }}</label>
+          <p-select
+            inputId="presentacion"
+            formControlName="presentacion"
+            [options]="presentacionOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            [fluid]="true"
+          />
+          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.presentacionHint }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sección: Entidades de la planilla ─────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-building text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ f.entidadesTitle }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.entidadesHint }}</p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- ARL -->
+        <div class="flex flex-col gap-1.5">
+          <label for="entidad_riesgo" class="aporte-form__label">
+            {{ f.fields.entidadRiesgo }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="entidad_riesgo"
+            formControlName="entidad_riesgo"
+            [endpoint]="entidadEndpoint"
+            [params]="entidadRiesgoParams"
+            [placeholder]="f.fields.seleccionar"
+            [invalid]="form.controls.entidad_riesgo.invalid && form.controls.entidad_riesgo.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.entidad_riesgo"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- SENA -->
+        <div class="flex flex-col gap-1.5">
+          <label for="entidad_sena" class="aporte-form__label">
+            {{ f.fields.entidadSena }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="entidad_sena"
+            formControlName="entidad_sena"
+            [endpoint]="entidadEndpoint"
+            [params]="entidadSenaParams"
+            [suggestedIndex]="0"
+            [placeholder]="f.fields.seleccionar"
+            [invalid]="form.controls.entidad_sena.invalid && form.controls.entidad_sena.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.entidad_sena"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- ICBF -->
+        <div class="flex flex-col gap-1.5">
+          <label for="entidad_icbf" class="aporte-form__label">
+            {{ f.fields.entidadIcbf }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="entidad_icbf"
+            formControlName="entidad_icbf"
+            [endpoint]="entidadEndpoint"
+            [params]="entidadIcbfParams"
+            [suggestedIndex]="0"
+            [placeholder]="f.fields.seleccionar"
+            [invalid]="form.controls.entidad_icbf.invalid && form.controls.entidad_icbf.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.entidad_icbf"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+</form>

@@ -1,6 +1,59 @@
 import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
 import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
 
+/**
+ * Los 42 campos de la línea liquidada del aporte a seguridad social.
+ *
+ * Se declara aparte porque el diccionario lo usa dos veces con las mismas claves:
+ * `siglas` (el encabezado corto de la tabla) y `nombres` (qué significa cada uno,
+ * para la leyenda). Tenerlo tipado una sola vez impide que una de las dos se
+ * quede corta. Las claves las consume `aporte.detalles.ts`.
+ */
+export interface AporteDetalleCampos {
+  id: string;
+  identificacion: string;
+  empleado: string;
+  contrato: string;
+  ing: string;
+  ret: string;
+  vsp: string;
+  vst: string;
+  sln: string;
+  ige: string;
+  lma: string;
+  vac: string;
+  lrm: string;
+  dIrp: string;
+  si: string;
+  salario: string;
+  h: string;
+  dP: string;
+  dS: string;
+  dR: string;
+  dC: string;
+  bcP: string;
+  bcS: string;
+  bcR: string;
+  bcC: string;
+  tP: string;
+  tS: string;
+  tR: string;
+  tC: string;
+  tSena: string;
+  tIcbf: string;
+  cP: string;
+  fSol: string;
+  fSub: string;
+  volAfi: string;
+  volApo: string;
+  cS: string;
+  cR: string;
+  cC: string;
+  cSena: string;
+  cIcbf: string;
+  total: string;
+}
+
 export interface AppDict
   extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
   common: {
@@ -28,6 +81,8 @@ export interface AppDict
     search: {
       placeholder: string;
     };
+    /** Meses del año en orden, índices 0..11. */
+    months: string[];
     list: {
       records: string;
       of: string;
@@ -2852,6 +2907,200 @@ export interface AppDict
         adicional: string;
         basePrestacionMinimo: string;
         basePrestacionMinimoSalario: string;
+      };
+    };
+    aporte: {
+      name: string;
+      columns: {
+        id: string;
+        anio: string;
+        mes: string;
+        sucursal: string;
+        empleados: string;
+        contratos: string;
+        lineas: string;
+        cotizacionTotal: string;
+        generado: string;
+        aprobado: string;
+      };
+      estados: { borrador: string; generada: string; aprobada: string };
+      presentaciones: { sucursal: string; unica: string };
+      cotizaciones: {
+        pension: string;
+        solidaridad: string;
+        subsistencia: string;
+        voluntarioAfiliado: string;
+        voluntarioAportante: string;
+        salud: string;
+        riesgos: string;
+        caja: string;
+        sena: string;
+        icbf: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        entidadesTitle: string;
+        entidadesHint: string;
+        fields: {
+          anio: string;
+          mes: string;
+          sucursal: string;
+          presentacion: string;
+          presentacionHint: string;
+          entidadRiesgo: string;
+          entidadSena: string;
+          entidadIcbf: string;
+          seleccionar: string;
+        };
+        validation: { required: string; anioRango: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          noEditable: { title: string; desc: string };
+        };
+      };
+      resumen: {
+        cotizacionesTitle: string;
+        labels: {
+          empleados: string;
+          contratos: string;
+          lineas: string;
+          baseCotizacion: string;
+          entidadRiesgo: string;
+          entidadSena: string;
+          entidadIcbf: string;
+          total: string;
+        };
+      };
+      workspace: {
+        tabs: { contratos: string; detalles: string; entidades: string };
+        contratosHint: string;
+        detallesHint: string;
+        entidadesHint: string;
+        notFound: { title: string; desc: string };
+      };
+      acciones: {
+        generar: string;
+        desgenerar: string;
+        aprobar: string;
+        desaprobar: string;
+        planoOperador: string;
+        imprimir: string;
+        exportContratos: string;
+        exportDetalles: string;
+        exportEntidades: string;
+        confirmaciones: {
+          generar: { header: string; message: string };
+          desgenerar: { header: string; message: string };
+          aprobar: { header: string; message: string };
+          desaprobar: { header: string; message: string };
+        };
+        toasts: {
+          generar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desgenerar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          aprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desaprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      contratos: {
+        cargarContratos: string;
+        leyenda: { titulo: string; contenido: string };
+        confirmEliminar: { header: string; message: string };
+        confirmRecargar: { header: string; message: string };
+        toasts: {
+          cargarSuccess: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+        };
+        columns: {
+          id: string;
+          codigo: string;
+          identificacion: string;
+          empleado: string;
+          contrato: string;
+          desde: string;
+          hasta: string;
+          novedad: string;
+          baseCotizacion: string;
+          dias: string;
+          salario: string;
+        };
+        novedades: {
+          ninguna: string;
+          ingreso: string;
+          retiro: string;
+          ingresoRetiro: string;
+          error: string;
+        };
+      };
+      trazabilidad: {
+        verNominas: string;
+        title: string;
+        subtitle: string;
+        total: string;
+        empty: { title: string; sub: string };
+        nominas: {
+          title: string;
+          columns: {
+            numero: string;
+            desde: string;
+            hasta: string;
+            salario: string;
+            ibc: string;
+            ibp: string;
+            devengado: string;
+            deduccion: string;
+            total: string;
+          };
+        };
+        conceptos: {
+          title: string;
+          empty: string;
+          columns: {
+            nomina: string;
+            concepto: string;
+            dias: string;
+            horas: string;
+            ibc: string;
+            ibp: string;
+            devengado: string;
+            deduccion: string;
+          };
+        };
+      };
+      entidades: {
+        columns: { tipo: string; entidad: string; cotizacion: string };
+        subtotal: string;
+        totalGeneral: string;
+        empty: { title: string; sub: string };
+      };
+      detalles: {
+        columns: { id: string; empleado: string; contrato: string };
+        leyendaTitulo: string;
+        /** Valores de las banderas de novedad en la tabla (`Sí` / `—`). */
+        novedad: { true: string; false: string };
+        /**
+         * Encabezados cortos. Son códigos PILA, iguales en los dos idiomas; su
+         * significado va en `nombres`, con las mismas claves.
+         */
+        siglas: AporteDetalleCampos;
+        nombres: AporteDetalleCampos;
       };
     };
     nomina: {
