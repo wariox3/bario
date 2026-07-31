@@ -22,6 +22,10 @@ Estado (2026-07-30): portada la **liquidación** — el cierre de un contrato te
 proceso; sus supuestos van en §6. Obligó a portar también la **terminación del contrato**, que es lo
 que crea la liquidación, y con eso se cierra el antiguo §3.2.
 
+Estado (2026-07-31): portada la **nómina electrónica** como documento (§7). Estaba en el módulo solo
+como informe y como utilidad de envío, no como el documento que es; el §3.1 daba a entender que la
+familia estaba completa y no lo estaba. Sumó `anular` y `emitir` al gateway compartido de documentos.
+
 ---
 
 ## 1. Por confirmar con backend
@@ -125,8 +129,11 @@ Todas deliberadas. Están acá por si alguna hay que revertir.
 
 ### 3.1 Otros documentos de la familia
 
-**Seguridad social** (legacy `modelo=703`, tipo **22**) no está portada. Si llega, va por camino A
-igual que nómina, y conviene mover `documentos/nomina/components/nomina-conceptos-table/` a
+La familia son tres clases: `701` nómina, `702` nómina electrónica y `703` seguridad social. Las dos
+primeras están portadas (§7 la segunda).
+
+**Seguridad social** (legacy `modelo=703`, tipo **22**) no lo está. Si llega, va por camino A igual
+que las otras dos, y conviene mover `documentos/nomina/components/nomina-conceptos-table/` a
 `documentos/_shared/` para compartirla — como se hizo con la familia de movimientos de inventario.
 
 ### 3.2 Contrato
@@ -507,3 +514,99 @@ conceptos que suman o a los que restan.
 - El `toggleSelectAll` que mutaba en sitio el array del signal, y el `limit: 1000` sin paginar.
 - El selector del componente, que se llamaba `app-nomina-electronica-detalle` por copy/paste, y el
   signal `notificando` declarado y nunca usado.
+
+---
+
+## 7. Nómina electrónica (documento)
+
+El `modelo=702` del ERP anterior. Estaba **medio portado sin que se notara**: existían el informe
+(`informes/nomina-electronica`) y la utilidad de envío (`utilidades/enviar-nomina-electronica`), las
+dos sobre `/general/documento/`, pero no el documento en sí. Faltaban su ficha, su acción "Generar" y
+su entrada en el menú de Documentos.
+
+### 7.1 Qué es
+
+No es la nómina otra vez con otro nombre: es un documento que **agrega**. Apunta hacia atrás a las
+nóminas del periodo de un empleado vía `documento_referencia_id`, así que un mes pagado por quincenas
+son dos nóminas y una sola nómina electrónica. Sus totales son los del periodo completo, y cuando la
+DIAN la acepta el backend escribe el `cue` (el CUNE del portal público).
+
+Convive con las otras dos piezas y cada una responde algo distinto:
+
+| Pieza                                  | Filtra por               | Pregunta que responde    |
+| -------------------------------------- | ------------------------ | ------------------------ |
+| `documentos/nomina-electronica`        | `documento_tipo_id` 15   | "¿qué pasó con esta?"    |
+| `informes/nomina-electronica`          | `documento_clase_id` 702 | "¿cuánto liquidé?"       |
+| `utilidades/enviar-nomina-electronica` | tipo 15 + 4 estados      | "¿qué falta por emitir?" |
+
+Nótese que el informe filtra por **clase** y el documento por **tipo**. Si la clase agrupa más de un
+tipo, el informe es un superconjunto del listado. Vale confirmarlo.
+
+### 7.2 El gateway compartido creció
+
+`anular` y `emitir` entraron a `EntityDataGateway` (`libs/core/documento`), que lo consumen erp y
+turnos. Antes ninguna ficha del ERP nuevo sabía anular, y emitir vivía duplicado dentro de las tres
+utilidades electrónicas (venta, compra, humano).
+
+| Acción     | Endpoint                      | Body               |
+| ---------- | ----------------------------- | ------------------ |
+| aprobar    | `POST <endpoint>/aprobar/`    | `{ id }`           |
+| desaprobar | `POST <endpoint>/desaprobar/` | `{ id }`           |
+| anular     | `POST <endpoint>/anular/`     | `{ id }`           |
+| emitir     | `POST <endpoint>/emitir/`     | `{ documento_id }` |
+
+La asimetría de la última fila es del backend, no un desliz: ya estaba anotada en §1.5 como rareza de
+las utilidades y ahora vive también en el contrato del gateway, que es donde se tropieza.
+
+`DocumentDetailActionsComponent` ganó las dos acciones como **opt-in** (`showAnular` / `showEmitir`,
+apagadas por default). La botonera la comparte todo el ERP; prenderlas por default le pondría botones
+a fichas cuyo backend no los atiende.
+
+### 7.3 Endpoints y supuestos
+
+| Qué                 | Petición                                                     | Estado  |
+| ------------------- | ------------------------------------------------------------ | ------- |
+| Listado             | `POST /general/documento/lista/` (tipo 15, vía el framework) | Asumido |
+| Cabecera            | `GET /general/documento/:id/`                                | Asumido |
+| Nóminas origen      | `GET /general/documento/?documento_referencia_id=:id&limit=` | Asumido |
+| Líneas              | `GET /general/documento-detalle/?documento_id=:id&limit=`    | Asumido |
+| Generar             | `POST /general/documento/generar-nomina-electronica/`        | Asumido |
+| Las cuatro acciones | ver la tabla de §7.2                                         | Asumido |
+
+Cuatro preguntas abiertas:
+
+1. **Los dos serializadores omitidos.** El legacy pide `serializador=detalle_nomina` en la cabecera,
+   `lista_nomina` en las nóminas origen y `nomina` en las líneas. Acá los tres se omiten, igual que
+   en la nómina (14) — que funciona así. Si el backend los necesita, la ficha carga con campos
+   vacíos y hay que sumarlos; `NominaElectronicaService` es el único lugar a tocar para dos de los
+   tres, y el tercero exigiría ensanchar `getById` del gateway con un parámetro de serializador.
+2. **`documento_referencia_id` como query param del `GET` de listado.** Es la única consulta "hacia
+   atrás" del ERP; si el backend solo la acepta como filtro del `POST …/lista/`, cambia la forma.
+3. **Qué es el `resumen`** que devuelve generar. El legacy lo recibe y lo ignora. Si es "cuántas se
+   generaron", vale la pena decirlo en el toast; si es un id, no. Hasta saberlo se trata como opaco.
+4. **Si la clase 702 agrupa más tipos que el 15** (ver §7.1).
+
+### 7.4 Decisiones tomadas (divergencias del legacy)
+
+| #   | Decisión                                                                  | Por qué                                                                                                                                                                                                |
+| --- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Las capacidades salen de una tabla pura y probada, no de los `[disabled]` | Cuatro acciones por tres banderas. En el legacy la condición de anulado está escrita a mano en cada botón y **en "Aprobar" falta**: un documento anulado y sin aprobar deja darle aprobar              |
+| 2   | "Anular" va dentro del dropdown "Acciones", no como botón suelto          | Es irreversible; tenerlo a un click de "Aprobar" es pedir un accidente                                                                                                                                 |
+| 3   | El listado omite `fecha_desde`, `fecha_hasta`, `salario` y `contrato_id`  | El mapeo del legacy para 702 está copiado del de la nómina. Su propia ficha no los muestra y usa `fecha` a secas: un consolidado no tiene _un_ salario ni _un_ contrato                                |
+| 4   | La pestaña "Detalle" pasa de 11 a 7 columnas y suma `concepto_nombre`     | Las cuatro que salen (`documento__*`) son constantes en toda la tabla —es un solo documento— y ya están en la cabecera. El concepto, que es lo que distingue una fila de otra, el legacy no lo pintaba |
+| 5   | Las filas de la pestaña "Nóminas" navegan a su ficha                      | En el legacy son inertes. Es la pregunta natural al mirar de qué se compone el consolidado                                                                                                             |
+| 6   | El CUNE se muestra siempre, con "Aún no emitida" cuando falta             | El legacy pone el `@if` sobre el `<td>` pero no sobre el `<th>`: sin CUNE queda la etiqueta suelta y la celda vacía al lado                                                                            |
+| 7   | El modal de "Generar" usa un datepicker de mes                            | El legacy usa dos `<input type="number">` que aceptan mes 13 y año 20024. Mismo dato, cero validaciones que escribir                                                                                   |
+| 8   | El "¿emitir ahora?" es un modal propio, no un `p-confirmDialog`           | El strategy se provee en root y el único `ConfirmationService` del listado vive a nivel de componente. Habría compilado y fallado en silencio                                                          |
+| 9   | El `activeMatch` de la nómina pasó de `nomina` a `nomina/`                | `nomina` a secas también casa con `nomina-electronica`: las dos entradas del sidebar quedaban marcadas a la vez                                                                                        |
+| 10  | La acción no reusa `GenerarDocumentoActionStrategy` (venta)               | Aquella genera un tipo a partir de otro por el endpoint genérico; esta tiene endpoint propio y no recibe tipos. Comparten forma, no contrato                                                           |
+
+### 7.5 Lo que no se portó
+
+- **`NominaElectronicaService.consultarDetalle`** (`GET …/:id/detalle/`), que existe pero la ficha
+  nunca usa para cargar: solo lo llama tras aprobar, y lee `respuesta.documento` mientras la carga
+  inicial lee la respuesta plana. **Dos shapes distintos para el mismo dato** — un bug latente.
+- **La interfaz `NominaElectronica`** (55 campos con `descuento`, `plazo_pago`, `asesor`, `sede`,
+  `pagos`…), copiada de la factura de venta y sin uso en ninguna de las dos pantallas del legacy.
+- El botón "Eliminar" y la columna de selección, que el listado del legacy deja visibles por omisión
+  aunque el documento no se elimine a mano.
