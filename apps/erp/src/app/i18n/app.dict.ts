@@ -643,6 +643,47 @@ export interface AppDict
         };
       };
     };
+    seguridadSocial: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: { aprobado: string; anulado: string; contabilizado: string };
+      /** Columnas de la tabla de lineas de la ficha. */
+      detalle: { id: string; detalle: string; pago: string };
+      detail: {
+        sections: { general: string; montos: string; aportes: string };
+        fields: {
+          numero: string;
+          desde: string;
+          hasta: string;
+          empleado: string;
+          contrato: string;
+          programacionDetalle: string;
+          salario: string;
+          baseCotizacion: string;
+          basePrestacion: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+          cue: string;
+        };
+        verEnDian: string;
+        notFound: { title: string; desc: string };
+      };
+    };
     sucursal: {
       name: string;
       searchPlaceholder: string;
