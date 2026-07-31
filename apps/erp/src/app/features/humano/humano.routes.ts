@@ -33,6 +33,13 @@ export const HUMANO_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'seguridad-social',
+        loadChildren: () =>
+          import('./documentos/seguridad-social/seguridad-social.routes').then(
+            (m) => m.SEGURIDAD_SOCIAL_ROUTES,
+          ),
+      },
+      {
         path: 'proceso/programacion',
         loadChildren: () =>
           import('./proceso/programacion/programacion.routes').then((m) => m.PROGRAMACION_ROUTES),

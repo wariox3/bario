@@ -31,6 +31,11 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
               path: 'nomina-electronica/list',
               activeMatch: 'nomina-electronica',
             },
+            {
+              labelKey: 'entities.seguridadSocial.name',
+              path: 'seguridad-social/list',
+              activeMatch: 'seguridad-social',
+            },
           ],
         },
       ],
