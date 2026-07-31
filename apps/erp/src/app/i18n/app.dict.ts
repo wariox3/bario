@@ -1216,6 +1216,30 @@ export interface AppDict
           loadError: { title: string; desc: string };
         };
       };
+      terminar: {
+        action: string;
+        title: string;
+        subtitle: string;
+        aviso: string;
+        submit: string;
+        fields: { fecha: string; motivo: string; seleccionar: string };
+        validation: { required: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string };
+        };
+      };
+      parametrosIniciales: {
+        action: string;
+        title: string;
+        subtitle: string;
+        hint: string;
+        fields: { general: string; prima: string; cesantia: string; vacacion: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string };
+        };
+      };
       detail: {
         eyebrow: string;
         sections: { datos: string; remuneracion: string; seguridadSocial: string };

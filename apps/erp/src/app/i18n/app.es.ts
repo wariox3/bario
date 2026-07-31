@@ -1636,6 +1636,40 @@ export const es: AppDict = {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el contrato' },
         },
       },
+      terminar: {
+        action: 'Terminar contrato',
+        title: 'Terminar contrato',
+        subtitle: 'Cierre de la relación laboral',
+        aviso:
+          'Al terminar el contrato se crea la liquidación del empleado con las prestaciones pendientes. Revisá antes las fechas de último pago.',
+        submit: 'Terminar contrato',
+        fields: {
+          fecha: 'Fecha de terminación',
+          motivo: 'Motivo',
+          seleccionar: 'Selecciona…',
+        },
+        validation: { required: 'Este campo es obligatorio' },
+        toasts: {
+          success: { title: 'Contrato terminado', desc: 'Se creó la liquidación del empleado' },
+          error: { title: 'Error al terminar' },
+        },
+      },
+      parametrosIniciales: {
+        action: 'Fechas de último pago',
+        title: 'Fechas de último pago',
+        subtitle: 'Punto de partida de la liquidación',
+        hint: 'Desde estas fechas se liquida cada prestación. Dejá una vacía si no hubo pago previo.',
+        fields: {
+          general: 'Último pago',
+          prima: 'Último pago de prima',
+          cesantia: 'Último pago de cesantías',
+          vacacion: 'Último pago de vacaciones',
+        },
+        toasts: {
+          success: { title: 'Fechas guardadas', desc: 'Los cambios se guardaron' },
+          error: { title: 'Error al guardar' },
+        },
+      },
       detail: {
         eyebrow: 'Contrato',
         sections: {

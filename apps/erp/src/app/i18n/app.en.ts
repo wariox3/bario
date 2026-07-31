@@ -1595,6 +1595,40 @@ export const en: AppDict = {
           loadError: { title: 'Load error', desc: 'Could not load the contract' },
         },
       },
+      terminar: {
+        action: 'End contract',
+        title: 'End contract',
+        subtitle: 'Closing the employment relationship',
+        aviso:
+          "Ending the contract creates the employee's severance settlement with any pending benefits. Check the last-payment dates first.",
+        submit: 'End contract',
+        fields: {
+          fecha: 'End date',
+          motivo: 'Reason',
+          seleccionar: 'Select…',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          success: { title: 'Contract ended', desc: 'The settlement was created' },
+          error: { title: 'Could not end the contract' },
+        },
+      },
+      parametrosIniciales: {
+        action: 'Last-payment dates',
+        title: 'Last-payment dates',
+        subtitle: 'Starting point of the settlement',
+        hint: 'Each benefit is calculated from these dates. Leave one empty if there was no prior payment.',
+        fields: {
+          general: 'Last payment',
+          prima: 'Last bonus payment',
+          cesantia: 'Last severance payment',
+          vacacion: 'Last vacation payment',
+        },
+        toasts: {
+          success: { title: 'Dates saved', desc: 'Changes were saved' },
+          error: { title: 'Could not save' },
+        },
+      },
       detail: {
         eyebrow: 'Contract',
         sections: {
