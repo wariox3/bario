@@ -1,12 +1,15 @@
 # Inventario — pendientes por revisar
 
-Bitácora de lo que quedó **asumido o decidido** al portar los cuatro informes de Inventario desde el
-ERP anterior. Nada se ha ejercitado contra `reddocapi.uk`: todo sale de leer el código legacy.
+Bitácora de lo que quedó **asumido o decidido** al portar Inventario desde el ERP anterior. Nada se
+ha ejercitado contra `reddocapi.uk`: todo sale de leer el código legacy.
 
 Cada supuesto vive además como comentario en su archivo; acá está el índice para revisarlos de una
 sentada. Al confirmar uno, **bórralo de esta lista** y quita el `TODO(backend)` del código.
 
 Portado el 2026-07-27/28. Commits: `46efd2c`, `e7b0eca`, `7c128f1`, `af21897`.
+
+Estado (2026-07-31): portado el master **almacén** (§4). Es el primer master propio del módulo —el
+ítem vive en General y solo se monta acá—, y con él Inventario queda completo.
 
 ---
 
@@ -71,3 +74,46 @@ Todas deliberadas. Están acá por si alguna hay que revertir.
 - **Filtros implícitos de `historial-movimiento`**: `inventario = true` y
   `documento__estado_aprobado = true`. El segundo importa: los borradores todavía no afectaron el
   inventario, así que incluirlos daría un historial que no cuadra con los saldos.
+
+---
+
+## 4. Almacén (master)
+
+El `InvAlmacen` del ERP anterior, sobre `/inventario/almacen/`. El master más chico del ERP: **un
+nombre y nada más**.
+
+### 4.1 El supuesto que importa
+
+**Que el modelo no tenga más campos que `id` y `nombre`.** Es lo único serio por confirmar.
+
+El formulario del legacy edita un solo input y su ficha muestra una sola fila, pero eso **no prueba**
+que el backend no exponga más: un almacén normalmente cuelga de una sede, y bien podría haber un
+`sede_id`, un `codigo` o un `estado_activo` que su formulario simplemente no muestra. Ya vimos en
+Humano que los mapeos del legacy arrastran campos copiados y omiten otros.
+
+Si aparecen campos, el cambio es local: `almacen.model.ts`, el `form` y `ALMACENES_COLUMNS`.
+
+A favor: el endpoint **ya está en uso y verificado** en su forma de lectura — `SELECT_ENDPOINTS.almacen`
+(`/inventario/almacen/seleccionar/`) lo consumen los tres documentos de inventario y las facturas de
+venta y compra. Lo único sin ejercitar es el CRUD.
+
+Los otros dos supuestos, menores: que el listado responde a `POST …/lista/` con la convención
+estándar, y que existe `almacen/excel/` para la exportación.
+
+### 4.2 Decisiones tomadas
+
+| #   | Decisión                                                                   | Por qué                                                                                                                                            |
+| --- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Vive en `inventario/masters/`, no en `general/masters/`                    | Su endpoint es `/inventario/almacen/`. El ítem está en General porque el suyo sí es `/general/item/`; acá el dueño es este módulo                  |
+| 2   | Se monta **solo en Inventario**                                            | El legacy también lo pone en el menú de Venta, pero parece herencia de cuando Venta era el módulo principal. Sumarlo allá después son dos líneas   |
+| 3   | Sin `almacen.mapper.ts` ni tipo de form value                              | Con un solo control el payload sale derecho del `getRawValue()`. Los masters con mapper lo tienen porque mapean varios campos; acá sería ceremonia |
+| 4   | El `maxlength` de 80 se aplica **también en el input**, no solo al validar | El legacy solo lo valida, así que deja escribir 200 caracteres y recién avisa al guardar                                                           |
+
+### 4.3 Lo que no se portó
+
+- El `patchValue` de `empleado`, `empleadoNombre`, `fecha_desde` y `fecha_hasta` que el formulario
+  del legacy ejecuta **después de actualizar** — cuatro campos que ese formulario no tiene. Es un
+  copy/paste de otro master, y como el `patchValue` de Angular ignora las claves desconocidas, nunca
+  falló ni hizo nada.
+- El método `actualizarDatosGrupo` de su servicio, que actualiza un almacén pero se llama como si
+  fuera de grupos — mismo origen.
