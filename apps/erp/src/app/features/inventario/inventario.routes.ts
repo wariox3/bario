@@ -44,6 +44,13 @@ export const INVENTARIO_ROUTES: Route[] = [
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
       },
+      // Master propio del módulo: su endpoint es `/inventario/almacen/`, del que
+      // también cuelga el `seleccionar/` que ya usan los documentos.
+      {
+        path: 'almacenes',
+        loadChildren: () =>
+          import('./masters/almacen/almacen.routes').then((m) => m.ALMACEN_ROUTES),
+      },
       {
         path: 'informes/existencia',
         loadChildren: () =>
