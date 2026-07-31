@@ -22,7 +22,16 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
       defaultExpanded: true,
       groups: [
         {
-          items: [{ labelKey: 'entities.nomina.name', path: 'nomina/list', activeMatch: 'nomina' }],
+          items: [
+            // `activeMatch` exacto: `nomina` a secas tambien casaria con
+            // `nomina-electronica` y quedarian las dos marcadas a la vez.
+            { labelKey: 'entities.nomina.name', path: 'nomina/list', activeMatch: 'nomina/' },
+            {
+              labelKey: 'entities.nominaElectronica.name',
+              path: 'nomina-electronica/list',
+              activeMatch: 'nomina-electronica',
+            },
+          ],
         },
       ],
     },
