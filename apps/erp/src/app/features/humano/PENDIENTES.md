@@ -18,6 +18,10 @@ Estado (2026-07-30): portado el **aporte a seguridad social** — la planilla PI
 proceso del módulo; sus supuestos van en §5. Con él, `estadoDe` pasó a `proceso/shared/`, compartido
 por los dos procesos.
 
+Estado (2026-07-30): portada la **liquidación** — el cierre de un contrato terminado. Tercero y último
+proceso; sus supuestos van en §6. Obligó a portar también la **terminación del contrato**, que es lo
+que crea la liquidación, y con eso se cierra el antiguo §3.2.
+
 ---
 
 ## 1. Por confirmar con backend
@@ -127,8 +131,10 @@ igual que nómina, y conviene mover `documentos/nomina/components/nomina-concept
 
 ### 3.2 Contrato
 
-`masters/contrato/pages/contrato-form/` tiene oculta la sección **"Terminación y pagos"**, pendiente
-de definición funcional.
+`masters/contrato/pages/contrato-form/` sigue con la sección **"Terminación y pagos"** oculta
+(`showTerminacion = false`), y así se queda: **el formulario nunca fue el lugar**. Terminar un
+contrato no es editar un campo, es un evento con consecuencia —crea la liquidación—, así que vive en
+la ficha con sus dos modales, igual que en el ERP anterior. Ver §6.1.
 
 ---
 
@@ -385,3 +391,119 @@ trae su propia paginación (`page_size`) y estos endpoints usan `limit`.
 - El `ngOnDestroy` que borraba de `localStorage` una clave (`documento_aporte`) que nadie escribía.
 - La **configuración de cuentas contables por tipo de aporte** (`configuracion_aporte`), que en el
   legacy vive en otra pantalla (Configuración) y es otro feature.
+
+---
+
+## 6. Liquidación (proceso)
+
+Portada desde `humano/paginas/documento/liquidacion-detalle/` del ERP anterior
+(`/humano/proceso/detalle/:id?modelo=HumLiquidacion`), 2026-07-30. Vive en
+`features/humano/proceso/liquidacion/` y es la tercera entrada de la sección **Proceso**.
+
+Es el **cierre de un contrato**: cesantías, intereses, prima y vacaciones pendientes, más las
+adiciones y deducciones que se carguen a mano. Estructura mucho más simple que los otros dos
+procesos — cabecera y una sola lista de conceptos.
+
+| Nivel     | Endpoint                         | Qué es                              |
+| --------- | -------------------------------- | ----------------------------------- |
+| Cabecera  | `/humano/liquidacion/`           | El cálculo completo, ~25 campos     |
+| Conceptos | `/humano/liquidacion-adicional/` | Lo que suma o resta, cargado a mano |
+
+### 6.1 La liquidación no se crea desde su pantalla
+
+**La fabrica el backend al terminar un contrato.** Por eso el listado no tiene "Nuevo" ni editar, y
+el servicio no expone `create` ni `update` de cabecera: dejar esos métodos "por si acaso" invitaría a
+usarlos.
+
+Eso obligó a portar también la **terminación del contrato**, que estaba pendiente (el antiguo §3.2).
+Vive en la ficha del contrato, no en el formulario, con dos acciones que solo aparecen mientras el
+contrato siga vigente:
+
+| Acción                | Endpoint                          | Qué hace                                     |
+| --------------------- | --------------------------------- | -------------------------------------------- |
+| Fechas de último pago | `PATCH /humano/contrato/:id/`     | Desde cuándo se liquida cada prestación      |
+| Terminar contrato     | `POST /humano/contrato/terminar/` | Cierra el contrato y **crea la liquidación** |
+
+⚠️ **Las fechas de último pago son el supuesto más frágil de esta tanda.** El ERP anterior las lee
+con `serializador=parametros_iniciales` y las guarda con un endpoint aparte; acá se reusa el `PATCH`
+del propio contrato para no inventar uno. Si el backend no acepta la actualización parcial, el modal
+falla con un toast genérico.
+
+### 6.2 El ciclo de vida está aislado y testeado
+
+La regla vive **solo** en `liquidacion.estado.ts` (`capacidadesDe`, 7 capacidades) con 11 tests, sobre
+el `estadoDe` compartido de `proceso/shared/`. Ninguna plantilla combina banderas.
+
+Dos particularidades frente a los otros procesos:
+
+- **Reliquidar** solo existe acá: recalcula sobre el borrador, sin liquidar en firme. Sirve cuando
+  cambian los datos de origen (salario, fechas de último pago).
+- **Imprimir no es una capacidad**: está disponible en las tres etapas, así que declararla sería una
+  constante en `true`. Queda dicho en la tabla de reglas para que no parezca un olvido.
+
+⚠️ Igual que en los otros dos procesos, **los tests garantizan que el código hace lo que dice la tabla,
+no que la tabla sea correcta**. Sale de leer los `[disabled]` del legacy.
+
+### 6.3 Por confirmar con backend
+
+#### Endpoints del proceso
+
+Con **guion**; el legacy nombra `liquidacion_adicional` con guion bajo.
+
+| Acción     | Endpoint                          | Verbo  | Payload                 |
+| ---------- | --------------------------------- | ------ | ----------------------- |
+| Listar     | `/humano/liquidacion/lista/`      | `POST` | filtros                 |
+| Ficha      | `/humano/liquidacion/:id/`        | `GET`  | `?serializador=detalle` |
+| Generar    | `/humano/liquidacion/generar/`    | `POST` | `{ id }`                |
+| Reliquidar | `/humano/liquidacion/reliquidar/` | `POST` | `{ id }`                |
+| Desgenerar | `/humano/liquidacion/desgenerar/` | `POST` | `{ id }`                |
+| Aprobar    | `/humano/liquidacion/aprobar/`    | `POST` | `{ id }`                |
+| Desaprobar | `/humano/liquidacion/desaprobar/` | `POST` | `{ id }`                |
+| Imprimir   | `/humano/liquidacion/imprimir/`   | `POST` | `{ id }`                |
+
+En el legacy el método de reliquidar se llama `reliquiar` (sin la `d`); acá se asume que **la URL sí
+está bien escrita**. Vale confirmarlo: si el endpoint replica el error de tipeo, es un fallo 404 con
+un toast genérico.
+
+#### El serializador de la cabecera
+
+`?serializador=detalle` en el `GET`. Sin él el backend devuelve la liquidación cruda, sin los campos
+del contrato ni del empleado (`contrato__contacto__…`), y la ficha queda sin identidad.
+
+#### El total de conceptos
+
+`adicion`, `deduccion` y `total` de la cabecera los recalcula el backend cuando cambia un concepto.
+La pantalla lo asume: al agregar, editar o borrar uno, recarga la cabecera. Si el backend no
+recalcula al vuelo, esos tres números quedan viejos hasta reliquidar.
+
+#### El catálogo de conceptos
+
+`/humano/concepto/seleccionar/?adicional=True&operacion=1|-1`. La operación acota la lista a los
+conceptos que suman o a los que restan.
+
+### 6.4 Decisiones tomadas (divergencias del legacy)
+
+| #   | Decisión                                                                         | Por qué                                                                                                                                           |
+| --- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Terminar contrato y las fechas de último pago van en la **ficha**, no en el form | Terminar no es editar un campo: es un evento con consecuencia. El aviso de que se crea la liquidación va **arriba** de los campos                 |
+| 2   | Las **cinco** acciones del ciclo confirman                                       | El legacy solo confirma aprobar y desaprobar; generar y desgenerar se disparan de una                                                             |
+| 3   | La botonera se bloquea mientras haya algo en vuelo                               | El botón de generar del legacy lee una bandera de carga que **nunca pone en `true`**: queda habilitado durante la petición y admite doble disparo |
+| 4   | El listado **no tiene "Nuevo" ni editar**                                        | La liquidación la fabrica el backend y sus números los calcula él. Está explicado en el código para que no se lea como un olvido                  |
+| 5   | Los conceptos **se pueden editar**                                               | El endpoint existía en el servicio del legacy sin un solo llamador; corregir un valor obligaba a borrar y volver a cargar                         |
+| 6   | La operación se deduce al reabrir (`operacionDe`)                                | Es lo que permite acotar el catálogo igual que al crear. El reparto adicional/deducción va en tres funciones puras con 14 tests                   |
+| 7   | Borrar conceptos va en **una sola tanda**                                        | El legacy recargaba _fuera_ del `subscribe`: pedía los datos antes de que terminaran los DELETE                                                   |
+| 8   | Los totales se releen tras tocar un concepto                                     | Los recalcula el backend; mostrarlos sin recargar sería mostrar cifras viejas                                                                     |
+| 9   | El resumen muestra por prestación **desde cuándo y cuántos días**                | Es lo que explica cada monto. El legacy los repartía en una tabla de ocho columnas con media docena de celdas vacías para cuadrar la grilla       |
+| 10  | El interés de cesantías va sin fecha ni días                                     | No los tiene: se calcula sobre la cesantía. Las celdas quedan vacías a propósito                                                                  |
+| 11  | El PDF manda **solo el id**                                                      | El legacy le suma `filtros`, `limite`, `desplazar`, `modelo` y `tipo`, que el endpoint no usa                                                     |
+| 12  | Eliminar vive en el workspace, no en el listado                                  | Depende del estado (solo borrador), y `<lib-data-table>` no condiciona acciones fila por fila                                                     |
+| 13  | "Adición" es la acción primaria y "Deducción" la secundaria                      | El toolbar compartido admite una sola primaria. Son conceptualmente pares; si se quieren iguales, hay que ensanchar `ToolbarAction`               |
+
+### 6.5 Lo que no se portó
+
+- **El `signal` de la liquidación abierta en `LiquidacionService`**, `providedIn: 'root'`. Mismo
+  anti-patrón que `TablaContratosService` y `TablaEntidadService`; el estado del workspace vive en el
+  workspace.
+- El `toggleSelectAll` que mutaba en sitio el array del signal, y el `limit: 1000` sin paginar.
+- El selector del componente, que se llamaba `app-nomina-electronica-detalle` por copy/paste, y el
+  signal `notificando` declarado y nunca usado.
