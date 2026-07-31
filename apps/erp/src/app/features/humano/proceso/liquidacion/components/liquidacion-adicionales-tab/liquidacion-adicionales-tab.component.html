@@ -1,0 +1,28 @@
+<div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <lib-data-toolbar
+    [primaryAction]="primaryAction()"
+    [trailingActions]="trailingActions()"
+    [searchEnabled]="false"
+    [filtersEnabled]="false"
+    [deleteSelectedEnabled]="hasSelection() && capacidades().puedeGestionarAdicionales"
+    [deleteSelectedCount]="selectedRows().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (deleteSelected)="removeSelected()"
+  />
+
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="items().length"
+    [loading]="isLoading()"
+    [pageSize]="items().length || 1"
+    [currentPage]="0"
+    [selectionMode]="selectionMode()"
+    [selectedRows]="selectedRows()"
+    [rowActions]="rowActions()"
+    (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+</div>
+
+<p-confirmDialog />

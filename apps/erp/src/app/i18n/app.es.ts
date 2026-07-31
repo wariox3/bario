@@ -3801,6 +3801,158 @@ export const es: AppDict = {
         basePrestacionMinimoSalario: 'Base de prestación mínima por salario',
       },
     },
+    liquidacion: {
+      name: 'Liquidaciones',
+      columns: {
+        id: 'ID',
+        contrato: 'Contrato',
+        identificacion: 'Identificación',
+        empleado: 'Empleado',
+        desde: 'Desde',
+        hasta: 'Hasta',
+        salario: 'Salario',
+        dias: 'Días',
+        cesantia: 'Cesantías',
+        interes: 'Intereses',
+        prima: 'Prima',
+        vacacion: 'Vacaciones',
+        adicion: 'Adiciones',
+        deduccion: 'Deducciones',
+        total: 'Total',
+        generado: 'Generada',
+        aprobado: 'Aprobada',
+      },
+      estados: { borrador: 'Borrador', generada: 'Generada', aprobada: 'Aprobada' },
+      prestaciones: {
+        cesantia: 'Cesantías',
+        interes: 'Intereses de cesantías',
+        prima: 'Prima',
+        vacacion: 'Vacaciones',
+      },
+      resumen: {
+        sinEmpleado: 'Sin empleado',
+        prestacionesTitle: 'Prestaciones liquidadas',
+        labels: {
+          contrato: 'Contrato',
+          fecha: 'Fecha',
+          desde: 'Desde',
+          hasta: 'Hasta',
+          ultimoPago: 'Último pago',
+          dias: 'Días',
+          salario: 'Salario',
+          prestacion: 'Prestación',
+          valor: 'Valor',
+          adicion: 'Adiciones',
+          deduccion: 'Deducciones',
+          total: 'Total a pagar',
+        },
+      },
+      workspace: {
+        adicionalesHint: 'Conceptos que suman o restan al total, cargados a mano.',
+        notFound: {
+          title: 'Liquidación no encontrada',
+          desc: 'La liquidación que buscás no existe o fue eliminada.',
+        },
+      },
+      acciones: {
+        generar: 'Generar',
+        reliquidar: 'Reliquidar',
+        desgenerar: 'Desgenerar',
+        aprobar: 'Aprobar',
+        desaprobar: 'Desaprobar',
+        imprimir: 'Imprimir',
+        confirmaciones: {
+          generar: {
+            header: '¿Generar la liquidación?',
+            message: 'Se calculan las prestaciones y el total a pagar al empleado.',
+          },
+          reliquidar: {
+            header: '¿Reliquidar?',
+            message: 'Se rehace el cálculo con los datos actuales del contrato.',
+          },
+          desgenerar: {
+            header: '¿Desgenerar la liquidación?',
+            message: 'Se borra el cálculo. Vas a tener que generarla de nuevo.',
+          },
+          aprobar: {
+            header: '¿Aprobar la liquidación?',
+            message: 'Queda cerrada y no se puede modificar mientras siga aprobada.',
+          },
+          desaprobar: {
+            header: '¿Desaprobar la liquidación?',
+            message: 'Se revierte el cierre y la liquidación vuelve a quedar generada.',
+          },
+          eliminar: {
+            header: '¿Eliminar la liquidación?',
+            message: 'El contrato terminado queda sin su liquidación.',
+          },
+        },
+        toasts: {
+          generar: {
+            success: { title: 'Liquidación generada', desc: 'Se calcularon las prestaciones' },
+            error: { title: 'Error al generar', desc: 'No se pudo generar la liquidación' },
+          },
+          reliquidar: {
+            success: { title: 'Liquidación recalculada', desc: 'Se rehizo el cálculo' },
+            error: { title: 'Error al reliquidar', desc: 'No se pudo rehacer el cálculo' },
+          },
+          desgenerar: {
+            success: { title: 'Liquidación desgenerada', desc: 'Se borró el cálculo' },
+            error: { title: 'Error al desgenerar', desc: 'No se pudo desgenerar la liquidación' },
+          },
+          aprobar: {
+            success: { title: 'Liquidación aprobada', desc: 'La liquidación quedó cerrada' },
+            error: { title: 'Error al aprobar', desc: 'No se pudo aprobar la liquidación' },
+          },
+          desaprobar: {
+            success: { title: 'Liquidación desaprobada', desc: 'Volvió a quedar generada' },
+            error: { title: 'Error al desaprobar', desc: 'No se pudo desaprobar la liquidación' },
+          },
+        },
+      },
+      adicionales: {
+        nuevaAdicion: 'Adición',
+        nuevaDeduccion: 'Deducción',
+        createAdicionTitle: 'Nueva adición',
+        createDeduccionTitle: 'Nueva deducción',
+        editTitle: 'Editar concepto',
+        subtitleAdicion: 'Suma al total de la liquidación',
+        subtitleDeduccion: 'Resta del total de la liquidación',
+        confirmEliminar: {
+          header: '¿Eliminar los conceptos seleccionados?',
+          message: 'El total de la liquidación se recalcula sin ellos.',
+        },
+        fields: {
+          concepto: 'Concepto',
+          valor: 'Valor',
+          detalle: 'Detalle',
+          detallePlaceholder: 'Opcional',
+          seleccionar: 'Selecciona…',
+        },
+        validation: {
+          required: 'Este campo es obligatorio',
+          valorMinimo: 'El valor debe ser mayor a cero',
+        },
+        toasts: {
+          createSuccess: { title: 'Concepto agregado', desc: 'Se recalculó el total' },
+          createError: { title: 'Error al agregar', desc: 'No se pudo agregar el concepto' },
+          editSuccess: { title: 'Concepto actualizado', desc: 'Se recalculó el total' },
+          editError: { title: 'Error al guardar', desc: 'No se pudo actualizar el concepto' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el concepto' },
+        },
+        columns: {
+          id: 'ID',
+          codigo: 'Código',
+          concepto: 'Concepto',
+          detalle: 'Detalle',
+          adicional: 'Adición',
+          deduccion: 'Deducción',
+        },
+      },
+      toasts: {
+        loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la liquidación' },
+      },
+    },
     aporte: {
       name: 'Seguridad social',
       columns: {

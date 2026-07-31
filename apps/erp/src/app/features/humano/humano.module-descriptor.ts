@@ -45,6 +45,11 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
               path: 'proceso/aporte',
               activeMatch: 'proceso/aporte',
             },
+            {
+              labelKey: 'entities.liquidacion.name',
+              path: 'proceso/liquidacion',
+              activeMatch: 'proceso/liquidacion',
+            },
           ],
         },
       ],

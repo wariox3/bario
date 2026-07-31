@@ -2933,6 +2933,124 @@ export interface AppDict
         basePrestacionMinimoSalario: string;
       };
     };
+    liquidacion: {
+      name: string;
+      columns: {
+        id: string;
+        contrato: string;
+        identificacion: string;
+        empleado: string;
+        desde: string;
+        hasta: string;
+        salario: string;
+        dias: string;
+        cesantia: string;
+        interes: string;
+        prima: string;
+        vacacion: string;
+        adicion: string;
+        deduccion: string;
+        total: string;
+        generado: string;
+        aprobado: string;
+      };
+      estados: { borrador: string; generada: string; aprobada: string };
+      prestaciones: { cesantia: string; interes: string; prima: string; vacacion: string };
+      resumen: {
+        sinEmpleado: string;
+        prestacionesTitle: string;
+        labels: {
+          contrato: string;
+          fecha: string;
+          desde: string;
+          hasta: string;
+          ultimoPago: string;
+          dias: string;
+          salario: string;
+          prestacion: string;
+          valor: string;
+          adicion: string;
+          deduccion: string;
+          total: string;
+        };
+      };
+      workspace: {
+        adicionalesHint: string;
+        notFound: { title: string; desc: string };
+      };
+      acciones: {
+        generar: string;
+        reliquidar: string;
+        desgenerar: string;
+        aprobar: string;
+        desaprobar: string;
+        imprimir: string;
+        confirmaciones: {
+          generar: { header: string; message: string };
+          reliquidar: { header: string; message: string };
+          desgenerar: { header: string; message: string };
+          aprobar: { header: string; message: string };
+          desaprobar: { header: string; message: string };
+          eliminar: { header: string; message: string };
+        };
+        toasts: {
+          generar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          reliquidar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desgenerar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          aprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desaprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      adicionales: {
+        nuevaAdicion: string;
+        nuevaDeduccion: string;
+        createAdicionTitle: string;
+        createDeduccionTitle: string;
+        editTitle: string;
+        subtitleAdicion: string;
+        subtitleDeduccion: string;
+        confirmEliminar: { header: string; message: string };
+        fields: {
+          concepto: string;
+          valor: string;
+          detalle: string;
+          detallePlaceholder: string;
+          seleccionar: string;
+        };
+        validation: { required: string; valorMinimo: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+        columns: {
+          id: string;
+          codigo: string;
+          concepto: string;
+          detalle: string;
+          adicional: string;
+          deduccion: string;
+        };
+      };
+      toasts: { loadError: { title: string; desc: string } };
+    };
     aporte: {
       name: string;
       columns: {

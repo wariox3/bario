@@ -3748,6 +3748,158 @@ export const en: AppDict = {
         basePrestacionMinimoSalario: 'Minimum benefit base by salary',
       },
     },
+    liquidacion: {
+      name: 'Settlements',
+      columns: {
+        id: 'ID',
+        contrato: 'Contract',
+        identificacion: 'ID number',
+        empleado: 'Employee',
+        desde: 'From',
+        hasta: 'To',
+        salario: 'Salary',
+        dias: 'Days',
+        cesantia: 'Severance',
+        interes: 'Severance interest',
+        prima: 'Bonus',
+        vacacion: 'Vacation',
+        adicion: 'Additions',
+        deduccion: 'Deductions',
+        total: 'Total',
+        generado: 'Generated',
+        aprobado: 'Approved',
+      },
+      estados: { borrador: 'Draft', generada: 'Generated', aprobada: 'Approved' },
+      prestaciones: {
+        cesantia: 'Severance',
+        interes: 'Severance interest',
+        prima: 'Bonus',
+        vacacion: 'Vacation',
+      },
+      resumen: {
+        sinEmpleado: 'No employee',
+        prestacionesTitle: 'Calculated benefits',
+        labels: {
+          contrato: 'Contract',
+          fecha: 'Date',
+          desde: 'From',
+          hasta: 'To',
+          ultimoPago: 'Last payment',
+          dias: 'Days',
+          salario: 'Salary',
+          prestacion: 'Benefit',
+          valor: 'Amount',
+          adicion: 'Additions',
+          deduccion: 'Deductions',
+          total: 'Total payable',
+        },
+      },
+      workspace: {
+        adicionalesHint: 'Items that add to or subtract from the total, entered by hand.',
+        notFound: {
+          title: 'Settlement not found',
+          desc: 'The settlement you are looking for does not exist or was deleted.',
+        },
+      },
+      acciones: {
+        generar: 'Generate',
+        reliquidar: 'Recalculate',
+        desgenerar: 'Undo generate',
+        aprobar: 'Approve',
+        desaprobar: 'Undo approval',
+        imprimir: 'Print',
+        confirmaciones: {
+          generar: {
+            header: 'Generate the settlement?',
+            message: 'Benefits and the total payable to the employee are calculated.',
+          },
+          reliquidar: {
+            header: 'Recalculate?',
+            message: 'The calculation is redone with the current contract data.',
+          },
+          desgenerar: {
+            header: 'Undo the generation?',
+            message: 'The calculation is deleted. You will have to generate it again.',
+          },
+          aprobar: {
+            header: 'Approve the settlement?',
+            message: 'It is closed and cannot be modified while approved.',
+          },
+          desaprobar: {
+            header: 'Undo the approval?',
+            message: 'The closing is reverted and the settlement goes back to generated.',
+          },
+          eliminar: {
+            header: 'Delete the settlement?',
+            message: 'The ended contract will be left without its settlement.',
+          },
+        },
+        toasts: {
+          generar: {
+            success: { title: 'Settlement generated', desc: 'Benefits were calculated' },
+            error: { title: 'Generate failed', desc: 'The settlement could not be generated' },
+          },
+          reliquidar: {
+            success: { title: 'Settlement recalculated', desc: 'The calculation was redone' },
+            error: { title: 'Recalculate failed', desc: 'The calculation could not be redone' },
+          },
+          desgenerar: {
+            success: { title: 'Generation undone', desc: 'The calculation was deleted' },
+            error: { title: 'Undo failed', desc: 'The generation could not be undone' },
+          },
+          aprobar: {
+            success: { title: 'Settlement approved', desc: 'The settlement was closed' },
+            error: { title: 'Approve failed', desc: 'The settlement could not be approved' },
+          },
+          desaprobar: {
+            success: { title: 'Approval undone', desc: 'It is generated again' },
+            error: { title: 'Undo failed', desc: 'The approval could not be undone' },
+          },
+        },
+      },
+      adicionales: {
+        nuevaAdicion: 'Addition',
+        nuevaDeduccion: 'Deduction',
+        createAdicionTitle: 'New addition',
+        createDeduccionTitle: 'New deduction',
+        editTitle: 'Edit item',
+        subtitleAdicion: 'Adds to the settlement total',
+        subtitleDeduccion: 'Subtracts from the settlement total',
+        confirmEliminar: {
+          header: 'Delete the selected items?',
+          message: 'The settlement total is recalculated without them.',
+        },
+        fields: {
+          concepto: 'Item',
+          valor: 'Amount',
+          detalle: 'Detail',
+          detallePlaceholder: 'Optional',
+          seleccionar: 'Select…',
+        },
+        validation: {
+          required: 'This field is required',
+          valorMinimo: 'The amount must be greater than zero',
+        },
+        toasts: {
+          createSuccess: { title: 'Item added', desc: 'The total was recalculated' },
+          createError: { title: 'Add failed', desc: 'The item could not be added' },
+          editSuccess: { title: 'Item updated', desc: 'The total was recalculated' },
+          editError: { title: 'Save failed', desc: 'The item could not be updated' },
+          loadError: { title: 'Load failed', desc: 'The item could not be loaded' },
+        },
+        columns: {
+          id: 'ID',
+          codigo: 'Code',
+          concepto: 'Item',
+          detalle: 'Detail',
+          adicional: 'Addition',
+          deduccion: 'Deduction',
+        },
+      },
+      toasts: {
+        loadError: { title: 'Load failed', desc: 'The settlement could not be loaded' },
+      },
+    },
     aporte: {
       name: 'Social security',
       columns: {
