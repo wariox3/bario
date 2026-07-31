@@ -26,6 +26,10 @@ Estado (2026-07-31): portada la **nómina electrónica** como documento (§7). E
 como informe y como utilidad de envío, no como el documento que es; el §3.1 daba a entender que la
 familia estaba completa y no lo estaba. Sumó `anular` y `emitir` al gateway compartido de documentos.
 
+Estado (2026-07-31): portado el **aporte a seguridad social** como documento (§8). Con él se cierra
+la familia —`701`, `702` y `703`— y con ella el §3.1. El módulo Humano queda completo salvo lo que
+sigue anotado como supuesto.
+
 ---
 
 ## 1. Por confirmar con backend
@@ -127,14 +131,16 @@ Todas deliberadas. Están acá por si alguna hay que revertir.
 
 ## 3. Fuera de alcance
 
-### 3.1 Otros documentos de la familia
+### 3.1 Otros documentos de la familia — cerrado
 
-La familia son tres clases: `701` nómina, `702` nómina electrónica y `703` seguridad social. Las dos
-primeras están portadas (§7 la segunda).
+La familia son tres clases y **las tres están portadas**: `701` nómina, `702` nómina electrónica
+(§7) y `703` seguridad social (§8). No queda nada pendiente por acá.
 
-**Seguridad social** (legacy `modelo=703`, tipo **22**) no lo está. Si llega, va por camino A igual
-que las otras dos, y conviene mover `documentos/nomina/components/nomina-conceptos-table/` a
-`documentos/_shared/` para compartirla — como se hizo con la familia de movimientos de inventario.
+Nota para quien busque reutilización: `documentos/nomina/components/nomina-conceptos-table/` **no**
+se movió a `documentos/_shared/`. Se pensó, pero las líneas de los tres documentos no son la misma
+cosa —la nómina tiene conceptos con `operacion`, `porcentaje`, `dias`, `hora` y tres bases; el
+aporte tiene una descripción y un monto—, así que compartir la tabla habría sido compartir la forma,
+no el contenido. No es el caso de los movimientos de inventario, donde sí lo era.
 
 ### 3.2 Contrato
 
@@ -610,3 +616,59 @@ Cuatro preguntas abiertas:
   `pagos`…), copiada de la factura de venta y sin uso en ninguna de las dos pantallas del legacy.
 - El botón "Eliminar" y la columna de selección, que el listado del legacy deja visibles por omisión
   aunque el documento no se elimine a mano.
+
+---
+
+## 8. Aporte a seguridad social (documento)
+
+El `modelo=703` del ERP anterior, `documento_tipo_id = 22`. El más chico de los tres documentos de
+la familia, y el que la cierra.
+
+### 8.1 Qué es
+
+**No confundirlo con el proceso `proceso/aporte/`** (§5), que se llama casi igual. Aquel es la
+planilla PILA del periodo, con sus contratos, sus detalles y sus entidades; este es el documento por
+empleado que queda como resultado. El proceso fabrica, el documento registra.
+
+Comparte casi toda su cabecera con la nómina —periodo, contrato, `programacion_detalle_id`, salario,
+IBC, IBP, devengado, deducción, total— pero **sus líneas son otra cosa**: `id`, `detalle` y `pago`.
+Tres campos contra los trece de un concepto de nómina. Por eso no reusa `nomina-conceptos-table` y
+trae su propia tabla (ver §3.1).
+
+### 8.2 Endpoints y supuestos
+
+| Qué      | Petición                                                     | Estado  |
+| -------- | ------------------------------------------------------------ | ------- |
+| Listado  | `POST /general/documento/lista/` (tipo 22, vía el framework) | Asumido |
+| Cabecera | `GET /general/documento/:id/`                                | Asumido |
+| Líneas   | `GET /general/documento-detalle/?documento_id=:id`           | Asumido |
+| Acciones | `aprobar` / `desaprobar` / `imprimir` del gateway            | Asumido |
+
+Tres preguntas abiertas:
+
+1. **La forma de la lectura de cabecera.** El legacy lee por `GET …/:id/detalle/` y saca
+   `respuesta.documento`; acá se usa el `getById` plano del gateway, como las otras dos fichas del
+   módulo. Es la misma divergencia anotada en §7.5, y se resuelve igual en las tres o en ninguna.
+2. **Los tres campos de la línea** (`id`, `detalle`, `pago`), tomados del template del legacy sin
+   más contrato que ese.
+3. **Si `fecha` es el inicio del periodo** también en este documento. El mapeo del legacy lo rotula
+   "DESDE", igual que en los informes (§1.4), así que parece del serializador y no un desliz.
+
+### 8.3 Decisiones tomadas (divergencias del legacy)
+
+| #   | Decisión                                                            | Por qué                                                                                                                                    |
+| --- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | La ficha expone **aprobar y desaprobar**; el legacy solo desaprobar | Mismo agujero que tenía la nómina (decisión #1 del §2): sin aprobar, desaprobar es un camino sin retorno. Ambas bloqueadas si está anulado |
+| 2   | **No** se ofrece "Anular", aunque el gateway ya sabe hacerlo        | El legacy no lo expone para este documento y no hay motivo para inventarlo. `showAnular` es opt-in justamente para esto                    |
+| 3   | El PDF manda **solo el id**                                         | El legacy le suma `filtros`, `limite`, `desplazar`, `ordenamientos`, `limite_conteo`, `modelo` y `tipo`, que el endpoint no usa            |
+| 4   | Se omite la columna del FK crudo del contacto                       | Redundante con la identificación y el nombre que van al lado (misma decisión #7 del §2)                                                    |
+| 5   | **No hay módulo de estado con tests**                               | Son dos capacidades sobre dos banderas, como en la ficha de nómina —que tampoco lo tiene—. Un archivo puro acá sería ceremonia             |
+
+### 8.4 Lo que no se portó
+
+- **`PagoService`**, que la ficha inyecta para usar un solo método (`consultarDetalle`) mientras los
+  otros tres (`actualizarDatosProgramacion`, `cargarContratos`, `generar`) apuntan a
+  `humano/programacion/` y no tienen nada que ver con este documento. Es el servicio de la
+  programación reusado por conveniencia.
+- El `selector` del componente, que se llama `app-nomina-electronica-detalle` por copy/paste — el
+  mismo desliz que ya estaba anotado en §6.5.
