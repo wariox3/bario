@@ -36,7 +36,7 @@ export const appRoutes: Route[] = [
         (m) => m.WorkspaceLayoutComponent,
       ),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      { path: '', pathMatch: 'full', redirectTo: 'general/inicio' },
       {
         path: 'dashboard',
         // Ruta global (no-módulo): limpia el módulo activo para ocultar el sidebar.
