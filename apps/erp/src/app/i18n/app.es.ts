@@ -421,6 +421,48 @@ export const es: AppDict = {
     humano: { name: 'Humano' },
   },
   entities: {
+    almacen: {
+      name: 'Almacén',
+      searchPlaceholder: 'Buscar por nombre',
+      columns: { id: 'ID', nombre: 'Nombre' },
+      form: {
+        createTitle: 'Nuevo almacén',
+        editTitle: 'Editar almacén',
+        createSubtitle: 'Registra una bodega para mover el inventario.',
+        editSubtitle: 'Actualiza los datos del almacén.',
+        fields: { nombre: 'Nombre' },
+        validation: {
+          required: 'Este campo es obligatorio.',
+          maxLength: 'El nombre no puede superar los 80 caracteres.',
+        },
+        toasts: {
+          createSuccess: { title: 'Almacén creado', desc: 'El almacén se guardó correctamente.' },
+          createError: { title: 'No se pudo crear', desc: 'Revisa los datos e intenta de nuevo.' },
+          editSuccess: {
+            title: 'Almacén actualizado',
+            desc: 'Los cambios se guardaron correctamente.',
+          },
+          editError: { title: 'No se pudo guardar', desc: 'Revisa los datos e intenta de nuevo.' },
+          loadError: {
+            title: 'No se pudo cargar',
+            desc: 'Ocurrió un error al consultar el almacén.',
+          },
+        },
+      },
+      detail: {
+        eyebrow: 'Almacén',
+        notFound: {
+          title: 'Almacén no encontrado',
+          desc: 'El almacén no existe o fue eliminado.',
+        },
+        toasts: {
+          loadError: {
+            title: 'No se pudo cargar',
+            desc: 'Ocurrió un error al consultar el almacén.',
+          },
+        },
+      },
+    },
     asesor: {
       name: 'Asesores',
       searchPlaceholder: 'Buscar por nombre…',

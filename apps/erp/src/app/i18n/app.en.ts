@@ -421,6 +421,48 @@ export const en: AppDict = {
     humano: { name: 'Human' },
   },
   entities: {
+    almacen: {
+      name: 'Warehouse',
+      searchPlaceholder: 'Search by name',
+      columns: { id: 'ID', nombre: 'Name' },
+      form: {
+        createTitle: 'New warehouse',
+        editTitle: 'Edit warehouse',
+        createSubtitle: 'Register a warehouse to move inventory against.',
+        editSubtitle: 'Update the warehouse details.',
+        fields: { nombre: 'Name' },
+        validation: {
+          required: 'This field is required.',
+          maxLength: 'The name cannot exceed 80 characters.',
+        },
+        toasts: {
+          createSuccess: {
+            title: 'Warehouse created',
+            desc: 'The warehouse was saved successfully.',
+          },
+          createError: { title: 'Could not create', desc: 'Check the data and try again.' },
+          editSuccess: { title: 'Warehouse updated', desc: 'The changes were saved successfully.' },
+          editError: { title: 'Could not save', desc: 'Check the data and try again.' },
+          loadError: {
+            title: 'Could not load',
+            desc: 'An error occurred while fetching the warehouse.',
+          },
+        },
+      },
+      detail: {
+        eyebrow: 'Warehouse',
+        notFound: {
+          title: 'Warehouse not found',
+          desc: 'The warehouse does not exist or was deleted.',
+        },
+        toasts: {
+          loadError: {
+            title: 'Could not load',
+            desc: 'An error occurred while fetching the warehouse.',
+          },
+        },
+      },
+    },
     asesor: {
       name: 'Advisors',
       searchPlaceholder: 'Search by name…',

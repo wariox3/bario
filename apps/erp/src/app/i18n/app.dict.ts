@@ -348,6 +348,31 @@ export interface AppDict
     humano: { name: string };
   };
   entities: {
+    almacen: {
+      name: string;
+      searchPlaceholder: string;
+      columns: { id: string; nombre: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: { nombre: string };
+        validation: { required: string; maxLength: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        eyebrow: string;
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
     asesor: {
       name: string;
       searchPlaceholder: string;
