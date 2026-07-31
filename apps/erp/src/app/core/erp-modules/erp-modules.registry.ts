@@ -17,11 +17,11 @@ import type { ErpModuleDescriptor } from './erp-module.types';
  */
 export const ERP_MODULES: readonly ErpModuleDescriptor[] = [
   GENERAL_MODULE,
-  COMPRA_MODULE,
   VENTA_MODULE,
-  INVENTARIO_MODULE,
-  CONTABILIDAD_MODULE,
+  COMPRA_MODULE,
   TESORERIA_MODULE,
   CARTERA_MODULE,
+  INVENTARIO_MODULE,
   HUMANO_MODULE,
+  CONTABILIDAD_MODULE,
 ] as const;
