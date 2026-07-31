@@ -3587,6 +3587,90 @@ export interface AppDict
       /** Claves = valor crudo de `operacion` (1 suma, -1 resta, 0 neutro). */
       operaciones: { '1': string; '0': string; '-1': string };
     };
+    nominaElectronica: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        empleado: string;
+        baseCotizacion: string;
+        basePrestacion: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+      /** Columnas de la pestaña con las nóminas que componen el consolidado. */
+      origen: {
+        id: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+      };
+      /** Columnas de la pestaña con los conceptos consolidados. */
+      detalle: {
+        id: string;
+        concepto: string;
+        baseCotizacion: string;
+        basePrestacion: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+      };
+      detail: {
+        sections: { general: string; montos: string; composicion: string };
+        tabs: { origen: string; detalle: string };
+        fields: {
+          numero: string;
+          fecha: string;
+          empleado: string;
+          identificacion: string;
+          baseCotizacion: string;
+          basePrestacion: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+          cune: string;
+        };
+        verEnDian: string;
+        sinCune: string;
+        emptyOrigen: string;
+        emptyDetalle: string;
+        notFound: { title: string; desc: string };
+      };
+      /** Acción "Generar" del toolbar de la lista. */
+      generar: {
+        buttonLabel: string;
+        title: string;
+        subtitle: string;
+        periodo: string;
+        submit: string;
+        submitting: string;
+        validation: { required: string };
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+        emitirAhora: { header: string; message: string; accept: string; reject: string };
+      };
+    };
     nominaElectronicaInforme: {
       name: string;
       columns: {
