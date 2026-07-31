@@ -155,6 +155,25 @@ export class HttpEntityDataGateway implements EntityDataGateway {
     });
   }
 
+  /** Anula el documento: `POST <endpoint>/anular/` con `{ id }`. */
+  anular(entity: EntityConfig, id: string | number): Observable<unknown> {
+    return this.http.post(`${entity.endpoint}/anular/`, {
+      id,
+    });
+  }
+
+  /**
+   * Emite el documento a la DIAN: `POST <endpoint>/emitir/` con
+   * **`{ documento_id }`** — no `{ id }` como el resto de las acciones. El
+   * backend nombra así este parámetro y solo este; ver el comentario del
+   * contrato.
+   */
+  emitir(entity: EntityConfig, id: string | number): Observable<unknown> {
+    return this.http.post(`${entity.endpoint}/emitir/`, {
+      documento_id: id,
+    });
+  }
+
   /**
    * Descarga el PDF del documento vía `POST <endpoint>/imprimir/` con el id en
    * `{ filtros: [{ propiedad: 'id', operador: '=', valor: id }] }` (misma

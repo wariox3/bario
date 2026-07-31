@@ -231,6 +231,8 @@ export const es: AppDict = {
       imprimir: 'Imprimir',
       opciones: 'Opciones',
       archivos: 'Archivos',
+      anular: 'Anular',
+      emitir: 'Emitir',
       confirmAprobar: {
         message: '¿Confirmas la aprobación de este documento?',
         header: 'Aprobar documento',
@@ -238,6 +240,14 @@ export const es: AppDict = {
       confirmDesaprobar: {
         message: '¿Confirmas desaprobar este documento?',
         header: 'Desaprobar documento',
+      },
+      confirmAnular: {
+        message: 'Anular es irreversible: el documento queda congelado. ¿Continuar?',
+        header: 'Anular documento',
+      },
+      confirmEmitir: {
+        message: '¿Confirmas emitir este documento a la DIAN?',
+        header: 'Emitir documento',
       },
       toasts: {
         aprobarSuccess: {
@@ -255,6 +265,22 @@ export const es: AppDict = {
         desaprobarError: {
           title: 'No se pudo desaprobar',
           desc: 'Ocurrió un error al desaprobar el documento.',
+        },
+        anularSuccess: {
+          title: 'Documento anulado',
+          desc: 'El documento se anuló correctamente.',
+        },
+        anularError: {
+          title: 'No se pudo anular',
+          desc: 'Ocurrió un error al anular el documento.',
+        },
+        emitirSuccess: {
+          title: 'Documento emitido',
+          desc: 'El documento se envió a la DIAN.',
+        },
+        emitirError: {
+          title: 'No se pudo emitir',
+          desc: 'Ocurrió un error al emitir el documento.',
         },
         imprimirError: {
           title: 'No se pudo imprimir',

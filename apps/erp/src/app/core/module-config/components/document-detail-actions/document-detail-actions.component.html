@@ -20,6 +20,19 @@
   (onClick)="imprimir.emit()"
 />
 
+@if (showEmitir()) {
+  <p-button
+    type="button"
+    [label]="a.emitir"
+    icon="pi pi-send"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    [disabled]="!canEmitir()"
+    (onClick)="emitir.emit()"
+  />
+}
+
 <p-button
   type="button"
   [label]="a.acciones"

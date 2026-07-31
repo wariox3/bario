@@ -226,13 +226,21 @@ export interface AppDict
       imprimir: string;
       opciones: string;
       archivos: string;
+      anular: string;
+      emitir: string;
       confirmAprobar: { message: string; header: string };
       confirmDesaprobar: { message: string; header: string };
+      confirmAnular: { message: string; header: string };
+      confirmEmitir: { message: string; header: string };
       toasts: {
         aprobarSuccess: { title: string; desc: string };
         aprobarError: { title: string; desc: string };
         desaprobarSuccess: { title: string; desc: string };
         desaprobarError: { title: string; desc: string };
+        anularSuccess: { title: string; desc: string };
+        anularError: { title: string; desc: string };
+        emitirSuccess: { title: string; desc: string };
+        emitirError: { title: string; desc: string };
         imprimirError: { title: string; desc: string };
         editBloqueado: { title: string; desc: string };
       };

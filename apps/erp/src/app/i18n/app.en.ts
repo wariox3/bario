@@ -231,6 +231,8 @@ export const en: AppDict = {
       imprimir: 'Print',
       opciones: 'Options',
       archivos: 'Files',
+      anular: 'Void',
+      emitir: 'Issue',
       confirmAprobar: {
         message: 'Do you confirm the approval of this document?',
         header: 'Approve document',
@@ -238,6 +240,14 @@ export const en: AppDict = {
       confirmDesaprobar: {
         message: 'Do you confirm unapproving this document?',
         header: 'Unapprove document',
+      },
+      confirmAnular: {
+        message: 'Voiding is irreversible: the document will be frozen. Continue?',
+        header: 'Void document',
+      },
+      confirmEmitir: {
+        message: 'Do you confirm issuing this document to the DIAN?',
+        header: 'Issue document',
       },
       toasts: {
         aprobarSuccess: {
@@ -255,6 +265,22 @@ export const en: AppDict = {
         desaprobarError: {
           title: 'Could not unapprove',
           desc: 'An error occurred while unapproving the document.',
+        },
+        anularSuccess: {
+          title: 'Document voided',
+          desc: 'The document was voided successfully.',
+        },
+        anularError: {
+          title: 'Could not void',
+          desc: 'An error occurred while voiding the document.',
+        },
+        emitirSuccess: {
+          title: 'Document issued',
+          desc: 'The document was sent to the DIAN.',
+        },
+        emitirError: {
+          title: 'Could not issue',
+          desc: 'An error occurred while issuing the document.',
         },
         imprimirError: {
           title: 'Could not print',

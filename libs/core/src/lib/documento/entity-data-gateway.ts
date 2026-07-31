@@ -57,6 +57,23 @@ export interface EntityDataGateway {
   desaprobar(entity: EntityConfig, id: string | number): Observable<unknown>;
 
   /**
+   * Anula un documento vía `POST <endpoint>/anular/` con body `{ id }`.
+   *
+   * **Irreversible**: un documento anulado queda congelado (no se aprueba, no se
+   * desaprueba, no se emite). El caller confirma antes de llamar.
+   */
+  anular(entity: EntityConfig, id: string | number): Observable<unknown>;
+
+  /**
+   * Emite un documento electrónico a la DIAN vía `POST <endpoint>/emitir/`.
+   *
+   * Ojo: el body va con **`documento_id`**, no `id` como el resto de las
+   * acciones. La asimetría es del backend, no un desliz de acá — las tres
+   * utilidades electrónicas del ERP (venta, compra, humano) la replican igual.
+   */
+  emitir(entity: EntityConfig, id: string | number): Observable<unknown>;
+
+  /**
    * Descarga el PDF de un documento vía `POST <endpoint>/imprimir/` (id en
    * `filtros`) y dispara la descarga en el navegador. Devuelve `Observable<void>`:
    * el caller solo necesita saber cuándo terminó.
