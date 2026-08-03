@@ -4,8 +4,8 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  * Descriptor del módulo Tesorería para la capa de navegación.
  *
  * Los `path` del menú son **relativos al módulo** — el `WorkspaceLayout` les
- * prepende `/t/<slug>/tesoreria/`. Vacío por ahora: sumar entradas cuando se
- * implementen sus masters/documentos.
+ * prepende `/t/<slug>/tesoreria/`. Sumar entradas cuando se implementen más
+ * masters/documentos.
  */
 export const TESORERIA_MODULE: ErpModuleDescriptor = {
   id: 'tesoreria',
@@ -14,6 +14,25 @@ export const TESORERIA_MODULE: ErpModuleDescriptor = {
   defaultChildPath: 'inicio',
   menu: [
     { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
+    {
+      kind: 'accordion',
+      id: 'tesoreria-documentos',
+      labelKey: 'layout.nav.sections.document',
+      iconClass: 'pi pi-file',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [
+            { labelKey: 'entities.egreso.name', path: 'egreso/list', activeMatch: 'egreso' },
+            {
+              labelKey: 'entities.saldoInicial.name',
+              path: 'saldo-inicial/list',
+              activeMatch: 'saldo-inicial',
+            },
+          ],
+        },
+      ],
+    },
     {
       kind: 'accordion',
       id: 'tesoreria-administracion',
@@ -26,6 +45,23 @@ export const TESORERIA_MODULE: ErpModuleDescriptor = {
           items: [
             { labelKey: 'entities.contacto.name', path: 'contactos' },
             { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'tesoreria-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.cuentaPagar.name',
+              path: 'informes/cuenta-pagar',
+            },
           ],
         },
       ],

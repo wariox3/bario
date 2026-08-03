@@ -356,9 +356,11 @@
               <th
                 class="prototipo-preview__th prototipo-preview__th--dia"
                 [class.prototipo-preview__th--festivo]="
-                  festivos().has(f.clave) || f.inicial === 'D'
+                  esColumnaFestiva(f.inicial, festivos().has(f.clave))
                 "
-                [class.prototipo-preview__th--sabado]="f.inicial === 'S'"
+                [class.prototipo-preview__th--sabado]="
+                  esColumnaSabado(f.inicial, festivos().has(f.clave))
+                "
               >
                 <span class="prototipo-preview__dia-num">{{ f.etiqueta }}</span>
                 <span class="prototipo-preview__dia-ini">{{ f.inicial }}</span>

@@ -1,0 +1,103 @@
+@let m = t().entities.contrato.parametrosIniciales;
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- Header: badge + título + de quién es el contrato -->
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-calendar-clock text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex min-w-0 flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ m.title }}
+      </h2>
+      <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+        {{ datos.empleado || m.subtitle }}
+      </p>
+    </div>
+  </div>
+
+  <p class="m-0 text-[0.78rem] leading-relaxed text-brand-muted">{{ m.hint }}</p>
+
+  <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+    <div class="flex flex-col gap-1.5">
+      <label for="fecha_ultimo_pago" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.general }}
+      </label>
+      <p-datepicker
+        inputId="fecha_ultimo_pago"
+        formControlName="fecha_ultimo_pago"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        [showClear]="true"
+        appendTo="body"
+        [fluid]="true"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="fecha_ultimo_pago_prima" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.prima }}
+      </label>
+      <p-datepicker
+        inputId="fecha_ultimo_pago_prima"
+        formControlName="fecha_ultimo_pago_prima"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        [showClear]="true"
+        appendTo="body"
+        [fluid]="true"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="fecha_ultimo_pago_cesantia" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.cesantia }}
+      </label>
+      <p-datepicker
+        inputId="fecha_ultimo_pago_cesantia"
+        formControlName="fecha_ultimo_pago_cesantia"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        [showClear]="true"
+        appendTo="body"
+        [fluid]="true"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="fecha_ultimo_pago_vacacion" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.vacacion }}
+      </label>
+      <p-datepicker
+        inputId="fecha_ultimo_pago_vacacion"
+        formControlName="fecha_ultimo_pago_vacacion"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        [showClear]="true"
+        appendTo="body"
+        [fluid]="true"
+      />
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      [loading]="isSaving()"
+      [disabled]="isSaving()"
+    />
+  </div>
+</form>

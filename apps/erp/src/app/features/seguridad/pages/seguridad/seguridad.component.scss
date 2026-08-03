@@ -1,0 +1,55 @@
+// Seguridad del contenedor: solo la cadena de alturas del tab-strip vive aquí
+// (necesita ::ng-deep sobre PrimeNG); la card va con utilidades Tailwind en el
+// template. Mismos valores que la utilidad "Enviar factura electrónica" para no
+// fragmentar el sistema visual.
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  // Mismo ancho acotado que Configuración: ambas se entran por el user-menu y son
+  // páginas de administración, no listas operativas (esas sí van a todo el ancho).
+  // Con 3 columnas, la tabla a ancho completo se lee vacía.
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+// Encadena el flex para que solo el cuerpo de la tabla scrollee.
+.seguridad-tabs {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  ::ng-deep {
+    .p-tabs,
+    .p-tabpanels {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: transparent;
+    }
+
+    // El panel activo aloja la cadena de alturas hasta la tabla.
+    .p-tabpanels {
+      padding: 0.85rem 0 0;
+    }
+
+    .p-tabpanel {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0;
+    }
+
+    // Tira de tabs: solo el borde inferior sutil, sin fondo (casa con la card).
+    .p-tablist {
+      background: transparent;
+    }
+  }
+}

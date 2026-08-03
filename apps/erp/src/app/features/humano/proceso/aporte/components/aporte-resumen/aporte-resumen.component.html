@@ -1,0 +1,86 @@
+@let a = aporte();
+@let res = t().entities.aporte.resumen;
+@let estados = t().entities.aporte.estados;
+
+<section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+  <div class="flex flex-wrap items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+    <span
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+    >
+      <i class="pi pi-shield text-[1rem]"></i>
+    </span>
+    <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+      <h2 class="m-0 truncate text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ periodo() }}
+      </h2>
+      <p class="m-0 text-[0.72rem] text-brand-muted">
+        {{ a.sucursal_nombre || '—' }} · {{ presentacionLabel() }}
+      </p>
+    </div>
+
+    <!-- Etapa del ciclo: es la información que decide qué se puede hacer -->
+    <span
+      class="rounded-full px-2.5 py-1 text-[0.7rem] font-bold uppercase tracking-[0.03em]"
+      [class]="
+        estado() === 'aprobada'
+          ? 'bg-emerald-50 text-emerald-700'
+          : estado() === 'generada'
+            ? 'bg-sky-50 text-sky-700'
+            : 'bg-amber-50 text-amber-700'
+      "
+    >
+      {{ estados[estado()] }}
+    </span>
+  </div>
+
+  <!-- Contadores y alcance -->
+  <dl class="grid grid-cols-2 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div class="flex flex-col gap-0.5">
+      <dt class="aporte-resumen__label">{{ res.labels.empleados }}</dt>
+      <dd class="aporte-resumen__value tabular-nums">{{ a.empleados ?? 0 }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="aporte-resumen__label">{{ res.labels.contratos }}</dt>
+      <dd class="aporte-resumen__value tabular-nums">{{ a.contratos ?? 0 }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="aporte-resumen__label">{{ res.labels.lineas }}</dt>
+      <dd class="aporte-resumen__value tabular-nums">{{ a.lineas ?? 0 }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="aporte-resumen__label">{{ res.labels.baseCotizacion }}</dt>
+      <dd class="aporte-resumen__value tabular-nums">{{ formatMoney(baseCotizacion()) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="aporte-resumen__label">{{ res.labels.entidadRiesgo }}</dt>
+      <dd class="aporte-resumen__value">{{ a.entidad_riesgo_nombre || '—' }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="aporte-resumen__label">{{ res.labels.entidadSena }}</dt>
+      <dd class="aporte-resumen__value">{{ a.entidad_sena_nombre || '—' }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="aporte-resumen__label">{{ res.labels.entidadIcbf }}</dt>
+      <dd class="aporte-resumen__value">{{ a.entidad_icbf_nombre || '—' }}</dd>
+    </div>
+  </dl>
+
+  <!-- Acumulados de cotización: lo que se va a pagar, desglosado -->
+  <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+    <p class="m-0 mb-3 text-[0.72rem] font-semibold uppercase tracking-[0.03em] text-brand-muted">
+      {{ res.cotizacionesTitle }}
+    </p>
+    <dl class="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 lg:grid-cols-5">
+      @for (cotizacion of cotizaciones(); track cotizacion.label) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="aporte-resumen__label">{{ cotizacion.label }}</dt>
+          <dd class="aporte-resumen__value tabular-nums">{{ formatMoney(cotizacion.valor) }}</dd>
+        </div>
+      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="aporte-resumen__label">{{ res.labels.total }}</dt>
+        <dd class="aporte-resumen__value font-bold tabular-nums">{{ formatMoney(total()) }}</dd>
+      </div>
+    </dl>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+<!--
+  Informe "Balance de prueba por contacto".
+  Misma forma que el balance de prueba, con dos diferencias: el panel de
+  parámetros suma el selector de contacto (proyectado en su ng-content) y la
+  tabla muestra las columnas del tercero sin fila de totales.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params [form]="form" idPrefix="bpc">
+      <div class="flex flex-col gap-1.5">
+        <label for="bpc-contacto" class="informe-params__label">{{ d.params.contacto }}</label>
+        <lib-contacto-select
+          inputId="bpc-contacto"
+          [formControl]="contacto"
+          [placeholder]="d.params.contactoPlaceholder"
+        />
+      </div>
+    </app-informe-cuentas-params>
+
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </div>
+
+  <app-saldos-cuenta-table
+    table
+    [rows]="rows()"
+    [generated]="generated()"
+    [showContacto]="true"
+    [showTotals]="false"
+  />
+</lib-list-shell>

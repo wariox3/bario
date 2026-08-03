@@ -71,12 +71,37 @@
     <app-programacion-secuencia-picker
       [secuencia]="secuenciaValue()"
       [periodo]="periodo()"
+      [vigencia]="vigencia()"
       (calculado)="onSecuenciaCalculada($event)"
     />
 
     <!-- ── Días del mes ────────────────────────────────────────────────────────── -->
     <div class="flex flex-col gap-2">
       <span class="text-[0.78rem] font-medium text-brand-muted">{{ m.diasSection }}</span>
+
+      <!-- Banda de vigencia: el rango de días programables (fecha_desde..fecha_hasta)
+           que gobierna la tabla. El chip navy lleva el rango; el hint a la derecha
+           explica por qué los días fuera del rango quedan bloqueados. -->
+      @if (vigenciaEtiqueta(); as rango) {
+        <div
+          class="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2"
+        >
+          <span
+            class="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-[0.7rem] text-brand-primary"
+          >
+            <i class="pi pi-calendar"></i>
+          </span>
+          <span class="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
+            {{ m.vigencia.label }}
+          </span>
+          <span
+            class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold tabular-nums text-brand-text"
+          >
+            {{ rango }}
+          </span>
+          <span class="ml-auto text-[0.72rem] text-brand-muted">{{ m.vigencia.hint }}</span>
+        </div>
+      }
 
       <!-- Aviso de rechazo del backend a nivel de puesto (ej. horas excedidas) -->
       @if (avisosPuesto().length) {
@@ -114,13 +139,18 @@
                   <th
                     class="aplicar-dias__th"
                     [class.aplicar-dias__th--festivo]="
-                      d.inicial === 'D' || festivoPorDia().has(d.dia)
+                      esColumnaFestiva(d.inicial, festivoPorDia().has(d.dia))
                     "
                     [class.aplicar-dias__th--sabado]="
-                      d.inicial === 'S' && !festivoPorDia().has(d.dia)
+                      esColumnaSabado(d.inicial, festivoPorDia().has(d.dia))
                     "
                     [class.aplicar-dias__th--error]="celdasError().has(d.dia)"
-                    [attr.title]="errorDia(d.dia) ?? festivoPorDia().get(d.dia)"
+                    [class.aplicar-dias__th--bloqueado]="diaBloqueado(d.dia)"
+                    [attr.title]="
+                      diaBloqueado(d.dia)
+                        ? m.vigencia.hint
+                        : (errorDia(d.dia) ?? festivoPorDia().get(d.dia))
+                    "
                   >
                     <span class="aplicar-dias__num">{{ d.dia }}</span>
                     <span class="aplicar-dias__ini">{{ d.inicial }}</span>
@@ -134,12 +164,13 @@
                   <td
                     class="aplicar-dias__td"
                     [class.aplicar-dias__td--festivo]="
-                      dc.inicial === 'D' || festivoPorDia().has(dc.dia)
+                      esColumnaFestiva(dc.inicial, festivoPorDia().has(dc.dia))
                     "
                     [class.aplicar-dias__td--sabado]="
-                      dc.inicial === 'S' && !festivoPorDia().has(dc.dia)
+                      esColumnaSabado(dc.inicial, festivoPorDia().has(dc.dia))
                     "
                     [class.aplicar-dias__td--error]="celdasError().has(dc.dia)"
+                    [class.aplicar-dias__td--bloqueado]="diaBloqueado(dc.dia)"
                   >
                     <input
                       pInputText
@@ -148,7 +179,7 @@
                       [formControl]="dc.control"
                       class="aplicar-dias__input"
                       [attr.aria-label]="m.diaAria + ' ' + dc.dia + ' ' + dc.inicial"
-                      [attr.title]="errorDia(dc.dia)"
+                      [attr.title]="diaBloqueado(dc.dia) ? m.vigencia.hint : errorDia(dc.dia)"
                     />
                   </td>
                 }

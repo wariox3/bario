@@ -9,17 +9,20 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  extractErrorMessage,
   calcularResumen,
+  type DocumentoEstados,
   type ResumenDocumento,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
+import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos/comercial/components/comercial-documento-lineas-table/comercial-documento-lineas-table.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
+import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
 import {
   comercialDetalleToFormValue,
@@ -39,8 +42,11 @@ interface CabeceraView {
   readonly plazoPago: string | null;
   readonly sede: string | null;
   readonly metodoPago: string | null;
-  /** Si ya está aprobado no se puede volver a aprobar (deshabilita la acción). */
-  readonly estadoAprobado: boolean;
+  /**
+   * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
+   * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
+   */
+  readonly estados: DocumentoEstados;
 }
 
 /**
@@ -63,6 +69,7 @@ interface CabeceraView {
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
     DocumentDetailActionsComponent,
+    DocumentEstadosComponent,
     AfectacionModalComponent,
   ],
   providers: [ConfirmationService],
@@ -73,6 +80,7 @@ export class FacturaVentaDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
@@ -108,7 +116,7 @@ export class FacturaVentaDetailComponent implements OnInit {
     if (!cab) return false;
     const canEditRow = this.document().canEditRow;
     if (!canEditRow) return true;
-    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estadoAprobado });
+    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
   });
 
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
@@ -118,10 +126,11 @@ export class FacturaVentaDetailComponent implements OnInit {
 
   /** Migas: módulo Venta → listado del documento → identificador del documento abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
-    ventaDocumentoBreadcrumb(
+    documentoBreadcrumb(
+      this.activeModule,
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       `ID ${this.id() ?? ''}`,
     ),
@@ -184,9 +193,9 @@ export class FacturaVentaDetailComponent implements OnInit {
           this.toast.success(ts.title, ts.desc);
           this.loadDocumento(id);
         },
-        error: () => {
+        error: (err: unknown) => {
           const ts = this.t().documentActions.detail.toasts.aprobarError;
-          this.toast.error(ts.title, ts.desc);
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
       });
   }
@@ -217,9 +226,9 @@ export class FacturaVentaDetailComponent implements OnInit {
           this.toast.success(ts.title, ts.desc);
           this.loadDocumento(id);
         },
-        error: () => {
+        error: (err: unknown) => {
           const ts = this.t().documentActions.detail.toasts.desaprobarError;
-          this.toast.error(ts.title, ts.desc);
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
       });
   }
@@ -264,7 +273,15 @@ export class FacturaVentaDetailComponent implements OnInit {
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
-            estadoAprobado: read.estado_aprobado,
+            estados: {
+              estado_aprobado: read.estado_aprobado,
+              estado_anulado: read.estado_anulado,
+              estado_contabilizado: read.estado_contabilizado,
+              estado_electronico: read.estado_electronico,
+              estado_electronico_enviado: read.estado_electronico_enviado,
+              estado_electronico_notificado: read.estado_electronico_notificado,
+              estado_generado: read.estado_generado,
+            },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
           this.isLoading.set(false);
@@ -284,23 +301,18 @@ export class FacturaVentaDetailComponent implements OnInit {
     return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
-  /** Navega dentro del tenant activo: `/t/<slug>/venta/<...routePath>[/extra]`. */
+  /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */
   private navigate(routePath: string, extra?: string): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     const segments = routePath.split('/').filter(Boolean);
-    const commands: (string | number)[] = ['/t', slug, 'venta', ...segments];
+    const commands: (string | number)[] = [
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...segments,
+    ];
     if (extra) commands.push(extra);
     void this.router.navigate(commands);
-  }
-
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
   }
 }

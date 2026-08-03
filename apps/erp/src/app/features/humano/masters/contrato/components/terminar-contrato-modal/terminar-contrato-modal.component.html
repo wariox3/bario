@@ -1,0 +1,91 @@
+@let m = t().entities.contrato.terminar;
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- Header: badge + título + a quién se le termina -->
+  <div class="flex items-center gap-3.5">
+    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-amber-100">
+      <i class="pi pi-ban text-[1.1rem] text-amber-700"></i>
+    </span>
+    <div class="flex min-w-0 flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ m.title }}
+      </h2>
+      <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+        {{ datos.empleado || m.subtitle }}
+      </p>
+    </div>
+  </div>
+
+  <!-- La consecuencia, antes de los campos: esto crea la liquidación -->
+  <p
+    class="m-0 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-[0.78rem] leading-relaxed text-amber-900"
+  >
+    <i class="pi pi-info-circle mr-1.5"></i>{{ m.aviso }}
+  </p>
+
+  <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+    <!-- Fecha de terminación -->
+    <div class="flex flex-col gap-1.5">
+      <label for="fecha_terminacion" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.fecha }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-datepicker
+        inputId="fecha_terminacion"
+        formControlName="fecha_terminacion"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        appendTo="body"
+        [fluid]="true"
+        [invalid]="
+          form.controls.fecha_terminacion.invalid && form.controls.fecha_terminacion.touched
+        "
+      />
+      <lib-field-error
+        [control]="form.controls.fecha_terminacion"
+        [messages]="{ required: m.validation.required }"
+      />
+    </div>
+
+    <!-- Motivo -->
+    <div class="flex flex-col gap-1.5">
+      <label for="motivo_terminacion" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ m.fields.motivo }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <lib-api-select
+        inputId="motivo_terminacion"
+        formControlName="motivo_terminacion"
+        [endpoint]="motivoEndpoint"
+        [placeholder]="m.fields.seleccionar"
+        [invalid]="
+          form.controls.motivo_terminacion.invalid && form.controls.motivo_terminacion.touched
+        "
+      />
+      <lib-field-error
+        [control]="form.controls.motivo_terminacion"
+        [messages]="{ required: m.validation.required }"
+      />
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="m.submit"
+      severity="danger"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || isSaving()"
+    />
+  </div>
+</form>

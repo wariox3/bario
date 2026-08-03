@@ -37,6 +37,15 @@ export interface SidebarLeafItem {
    * Ej: `'contactos'` resuelve a `'/t/acme/contactos'`.
    */
   readonly path: string;
+  /**
+   * Prefijo de URL que marca este item como activo. Default: `path`.
+   *
+   * Solo lo declaran los documentos: su link apunta a `<doc>/list`, pero las
+   * páginas hermanas (`new`, `edit`, detalle) cuelgan de `<doc>/`, así que aquí
+   * se declara la raíz (`<doc>`) para que todas resalten el mismo item. El resto
+   * de items (masters, informes, procesos) ya es raíz de su contexto y lo omite.
+   */
+  readonly activeMatch?: string;
 }
 
 /** Sub-grupo opcional dentro de un acordeón (p. ej. "Documentos" o "Utilidades"). */

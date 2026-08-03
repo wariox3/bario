@@ -182,6 +182,84 @@ El componente es **agnóstico de app**. Lo único que cambia por app son sus pro
   saltar hay que reelegir empresa. Y reemplazar el monograma por SVG real cuando exista en
   `libs/ui/src/assets/logos/`.
 
+## Patrón: banda de vigencia + tabla de días acotada por rango
+
+Para tablas de "un input por día del mes" (calendario editable) donde solo un **subrango** de
+días es válido (una línea de documento acota `fecha_desde..fecha_hasta`): los días fuera del rango
+se **bloquean** (no editables, no viajan en el payload) y una banda arriba de la tabla anuncia el
+rango vigente. Ejemplo vivo: modal `programacion-agregar-contrato-modal` (apps/turnos) — la tabla de
+días del mes de la programación de un contrato.
+
+- **Lógica compartida, NO en el componente:** el núcleo puro vive en `programacion.utils.ts` y lo
+  reusan todos los modales de día — `estaEnVigencia(iso, vigencia)` (predicado, comparación ISO
+  lexicográfica), `clavesEnVigencia(claves, vigencia)` (Set de claves ISO, para grillas keyed por
+  fecha como `editar-puesto`) y `formatVigenciaRango(vigencia, locale)` (etiqueta del chip). El tipo
+  `ProgramacionVigencia` es de dominio (`programacion.model.ts`). **No** re-implementar la comparación
+  ni el formato dentro de cada componente — eso fue el error inicial (lógica atrapada + acoplada al
+  modelo día-como-número, no reutilizable por la grilla transpuesta keyed por ISO).
+- **Fuente del rango:** un `ProgramacionVigencia | null` (ISO `YYYY-MM-DD`), armado con
+  `vigenciaDe(desde, hasta)` (regla "rango solo con ambos extremos"). `null` = sin rango →
+  **degradado seguro**: todos los días habilitados y sin banda. Dos orígenes vistos:
+  - **Rango único del modal** (agregar-contrato): viene de un GET **por-línea**
+    (`DocumentoDetalleService.obtenerPorId`) que hace el store → un signal `vigencia`.
+  - **Rango por-banda** (editar-contrato / editar-puesto, input-driven): cada banda es una línea
+    (`documento_detalle_id`) con su **propia** vigencia, así que un solo `[vigencia]` del padre NO
+    sirve. Fuente primaria: `fecha_desde?`/`fecha_hasta?` **opcionales** en `ProgramacionFila`
+    (cero HTTP si el backend los manda). Fallback real: `ProgramacionVigenciasStore`
+    (`programacion-vigencias.store.ts`, provisto por modal) — `cargar(ids)` hace GET por línea
+    deduplicado y expone `Map<documento_detalle_id, vigencia|null>`; el componente los combina en un
+    computed `vigenciasPorLinea` (fila `??` store). Como el GET llega **después** de construir el
+    form, el effect de build lee la vigencia con `untracked` y un **segundo effect** aplica
+    `disable()/enable()` sobre los controles existentes (sin reconstruir → no pisa lo tecleado),
+    bumpeando las versiones que relean `enabled`. El chip de rango va **por banda** (group-row).
+- **Cálculo de habilitados:** `computed<ReadonlySet<...>>` filtrando con `estaEnVigencia` /
+  `clavesEnVigencia` según la grilla sea por número de día o por clave ISO. Sin vigencia → todos.
+- **Bloqueo real (no solo visual):** en el `effect` que reconstruye el `FormArray` de días, cada
+  control nace `.disable({ emitEvent: false })` si su día no está habilitado. El effect depende de
+  `dias()` **y** `vigencia()`, así reacciona cuando el rango llega async (se reconstruye ya
+  bloqueado). Un control deshabilitado = input no editable y sin aporte al payload. Guardá también
+  los _auto-rellenos_ (ej. picker de secuencia): `if (control?.enabled) control.setValue(...)`, y
+  **excluí las celdas deshabilitadas de las validaciones cliente-side** (ej. la regla "un turno por
+  día entre puestos" en editar-contrato: `if (control.enabled && control.value.trim())`) — si no, un
+  día bloqueado con valor pre-cargado marca un conflicto que traba el guardado y no se puede corregir
+  (input deshabilitado).
+- **Banda de vigencia** (arriba de la tabla, `@if (vigenciaEtiqueta())`): misma franja slim del
+  idioma de banda —
+  `flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2`.
+  Ícono navy en contenedor (`h-[1.35rem] w-[1.35rem] rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-primary`,
+  `pi pi-calendar`) + micro-label uppercase muted + **ficha navy** con el rango
+  (`inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold tabular-nums text-brand-text`)
+  - hint muted a la derecha (`ml-auto text-[0.72rem] text-brand-muted`) que **justifica** los días
+    bloqueados. El rango se formatea con `Intl.DateTimeFormat` según `i18n.lang()` (`es-CO`/`en-US`),
+    **sin año** y con día+mes corto en ambos extremos: `15 de jul - 31 de jul` (es) / `Jul 15 - Jul
+31` (en) — el año ya se ve en el header/período.
+  - **Variante chip** (grid y group-rows de los modales de edición): el mismo rango pero como pill
+    `group-chip` **navy por defecto** + `pi pi-calendar`, junto al chip de horario. Regla de color:
+    el horario (hora del día) es teal; la vigencia (ventana de fechas) va navy — reutiliza
+    `formatVigenciaRango`, así el rango se lee idéntico en banda y en chip. En el grid degrada a
+    oculto si el detalle no trae `fecha_hasta` (hoy el backend solo manda `fecha_desde`).
+- **Feedback de día bloqueado — el rayado ES la marca** (una sola señal en todas las tablas de día):
+  `repeating-linear-gradient(-45deg, #f1f3f5, #f1f3f5 3px, #e9ecef 3px, #e9ecef 6px)`.
+  - Bloqueo **por columna** — cuando TODAS las bandas comparten la vigencia (agregar-contrato:
+    una sola línea; editar-puesto: varias bandas pero una misma línea): rayado en el `th`
+    (+ número/inicial a `rgba(20,48,73,0.3)`) **y** en el `td`.
+  - Bloqueo **por banda** — cuando cada banda tiene su propio rango (editar-contrato: un contrato
+    en varios puestos/líneas): rayado por `td`, y el header —compartido— raya solo la
+    **intersección**: un computed `Set` de claves bloqueadas en TODAS las bandas
+    (`filas.every(...)`); con una sola banda equivale a su vigencia. Si la tabla tiene hover de
+    fila que pinta `td`, duplicar el selector (`.x__td--bloqueado, .x__row:hover
+.x__td--bloqueado`) para que el hover (más específico) no apague las franjas.
+  - La regla del header: rayarlo **solo si el bloqueo de esa columna es verdad para todas las
+    filas** — nunca marcar el header con el rango de una sola banda.
+  - El input `:disabled` **se funde con el rayado**: `background: transparent; border-color:
+transparent; color: rgba(20,48,73,0.35); cursor: not-allowed` — sin caja propia, solo el valor
+    atenuado sobre las franjas.
+  - La regla `--bloqueado` va **después** de finde/festivo (les gana el fondo) y **antes** de
+    error/conflicto (esos estados, más importantes, la ganan a ella). Misma especificidad → orden.
+- **Regla:** el bloqueo debe ser real (control deshabilitado), no solo un estilo — si el input sigue
+  editable o el día sigue viajando en el payload, no está bloqueado. La banda existe para **explicar**
+  por qué hay columnas apagadas; sin ella el bloqueo se lee como bug.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

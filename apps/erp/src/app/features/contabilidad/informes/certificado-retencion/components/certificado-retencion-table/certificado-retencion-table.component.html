@@ -1,0 +1,60 @@
+@let c = t().entities.certificadoRetencion.columns;
+@let e = t().entities.informeCuentas.empty;
+
+<div class="retencion-table__wrapper">
+  <table class="retencion-table">
+    <thead>
+      <tr>
+        <th class="retencion-table__th w-36 text-left">{{ c.identificacion }}</th>
+        <th class="retencion-table__th min-w-[16rem] text-left">{{ c.contacto }}</th>
+        <th class="retencion-table__th w-28 text-left">{{ c.cuenta }}</th>
+        <th class="retencion-table__th min-w-[16rem] text-left">{{ c.cuentaNombre }}</th>
+        <th class="retencion-table__th w-44 text-right">{{ c.baseRetenido }}</th>
+        <th class="retencion-table__th w-40 text-right">{{ c.retenido }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of rows(); track $index) {
+        <tr class="retencion-table__row">
+          <td class="retencion-table__td tabular-nums">{{ row.contacto_numero_identificacion }}</td>
+          <td class="retencion-table__td whitespace-normal">{{ row.contacto_nombre_corto }}</td>
+          <td class="retencion-table__td tabular-nums">{{ row.cuenta_codigo }}</td>
+          <td class="retencion-table__td whitespace-normal">{{ row.cuenta_nombre }}</td>
+          <td class="retencion-table__td text-right tabular-nums">
+            {{ formatMonto(row.base_retenido) }}
+          </td>
+          <td class="retencion-table__td text-right tabular-nums">
+            {{ formatMonto(row.retenido) }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="retencion-table__empty">
+            {{ generated() ? e.noData : e.notGenerated }}
+          </td>
+        </tr>
+      }
+    </tbody>
+
+    <!--
+      Totales. El informe original no los pintaba, pero son la cifra de control
+      del periodo: lo que se declara.
+    -->
+    @if (rows().length > 0) {
+      <tfoot>
+        <tr>
+          <td class="retencion-table__tf" colspan="4">
+            {{ t().entities.informeCuentas.columns.total }}
+          </td>
+          <td class="retencion-table__tf text-right tabular-nums">
+            {{ formatMonto(totalBase()) }}
+          </td>
+          <td class="retencion-table__tf text-right tabular-nums">
+            {{ formatMonto(totalRetenido()) }}
+          </td>
+        </tr>
+      </tfoot>
+    }
+  </table>
+</div>

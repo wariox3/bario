@@ -60,15 +60,31 @@ export interface DocumentoListRowBase {
   readonly estado_contabilizado: boolean;
 }
 
+/**
+ * Banderas de **estado** (ciclo de vida) comunes a cualquier documento. El
+ * backend las devuelve tanto en la fila del listado como en el read del detalle.
+ * Solo `estado_aprobado` es transversal a todo documento; el resto es opcional
+ * porque no toda familia las usa (p. ej. las electrónicas solo aplican a los que
+ * se emiten a la DIAN). La ficha de detalle las pinta como badges.
+ */
+export interface DocumentoEstados {
+  readonly estado_aprobado: boolean;
+  readonly estado_anulado?: boolean;
+  readonly estado_contabilizado?: boolean;
+  readonly estado_electronico?: boolean;
+  readonly estado_electronico_enviado?: boolean;
+  readonly estado_electronico_notificado?: boolean;
+  readonly estado_generado?: boolean;
+}
+
 /** Cabecera de un documento leída desde la API en edición (`GET …/documento/:id/`). */
-export interface DocumentoReadBase {
+export interface DocumentoReadBase extends DocumentoEstados {
   readonly id: number;
   readonly contacto: number | null;
   /** Nombre del contacto para etiquetar el autocomplete al cargar en edición. */
   readonly contacto_nombre?: string | null;
   /** Fecha en formato `yyyy-MM-dd`. */
   readonly fecha: string | null;
-  readonly estado_aprobado: boolean;
 }
 
 /** Cuerpo común enviado en `POST`/`PATCH` de la cabecera de un documento. */

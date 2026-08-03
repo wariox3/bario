@@ -1,0 +1,130 @@
+@let acc = t().entities.aporte.acciones;
+@let det = t().entities.aporte.workspace;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Botonera: todo sale de capacidades() ──────────────────────────────────── -->
+<header class="flex flex-wrap items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+
+  @if (aporte()) {
+    @if (capacidades().puedeEditarCabecera) {
+      <p-button
+        type="button"
+        [label]="t().common.actions.edit"
+        icon="pi pi-pencil"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [disabled]="estaOcupado()"
+        (onClick)="onEdit()"
+      />
+    }
+
+    @if (capacidades().puedeGenerar) {
+      <p-button
+        type="button"
+        [label]="acc.generar"
+        icon="pi pi-cog"
+        size="small"
+        [loading]="accionEnCurso() === 'generar'"
+        [disabled]="estaOcupado()"
+        (onClick)="onGenerar()"
+      />
+    }
+
+    @if (capacidades().puedeAprobar) {
+      <p-button
+        type="button"
+        [label]="acc.aprobar"
+        icon="pi pi-check-circle"
+        size="small"
+        [loading]="accionEnCurso() === 'aprobar'"
+        [disabled]="estaOcupado()"
+        (onClick)="onAprobar()"
+      />
+    }
+
+    @if (accionesSecundarias().length) {
+      <p-button
+        type="button"
+        [label]="t().common.actions.actions"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [disabled]="estaOcupado()"
+        (onClick)="accionesMenu.toggle($event)"
+      />
+      <p-menu #accionesMenu [popup]="true" [model]="accionesSecundarias()" appendTo="body" />
+    }
+  }
+</header>
+
+@if (isLoading()) {
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ det.notFound.title }}</p>
+    <p class="m-0 mt-1 max-w-[280px] text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ det.notFound.desc }}
+    </p>
+  </div>
+} @else if (aporte(); as a) {
+  <app-aporte-resumen [aporte]="a" />
+
+  <!-- ── Los tres niveles del aporte ─────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
+        <p-tablist>
+          <p-tab value="contratos">{{ det.tabs.contratos }}</p-tab>
+          <p-tab value="detalles">{{ det.tabs.detalles }}</p-tab>
+          <p-tab value="entidades">{{ det.tabs.entidades }}</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="contratos">
+            <p class="m-0 mb-3 text-[0.72rem] text-brand-muted">{{ det.contratosHint }}</p>
+            <app-aporte-contratos-tab
+              [aporteId]="aporteId()"
+              [fechaDesde]="a.fecha_desde"
+              [fechaHasta]="a.fecha_hasta"
+              [capacidades]="capacidades()"
+              [reloadToken]="reloadToken()"
+              (totalChange)="onContratosChange($event)"
+            />
+          </p-tabpanel>
+
+          <p-tabpanel value="detalles">
+            <p class="m-0 mb-3 text-[0.72rem] text-brand-muted">{{ det.detallesHint }}</p>
+            <app-aporte-detalles-tab [aporteId]="aporteId()" [reloadToken]="reloadToken()" />
+          </p-tabpanel>
+
+          <p-tabpanel value="entidades">
+            <p class="m-0 mb-3 text-[0.72rem] text-brand-muted">{{ det.entidadesHint }}</p>
+            <app-aporte-entidades-tab [aporteId]="aporteId()" [reloadToken]="reloadToken()" />
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    </div>
+  </section>
+}
+
+<p-confirmDialog />

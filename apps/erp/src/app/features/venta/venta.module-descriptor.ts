@@ -27,9 +27,61 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.contratoServicio.name', path: 'contrato-servicio/list' },
-            { labelKey: 'entities.pedidoServicio.name', path: 'pedido-servicio/list' },
-            { labelKey: 'entities.facturaVenta.name', path: 'factura-venta/list' },
+            {
+              labelKey: 'entities.pedidoCliente.name',
+              path: 'pedido-cliente/list',
+              activeMatch: 'pedido-cliente',
+            },
+            {
+              labelKey: 'entities.remision.name',
+              path: 'remision/list',
+              activeMatch: 'remision',
+            },
+            {
+              labelKey: 'entities.contratoServicio.name',
+              path: 'contrato-servicio/list',
+              activeMatch: 'contrato-servicio',
+            },
+            {
+              labelKey: 'entities.pedidoServicio.name',
+              path: 'pedido-servicio/list',
+              activeMatch: 'pedido-servicio',
+            },
+            {
+              labelKey: 'entities.facturaVenta.name',
+              path: 'factura-venta/list',
+              activeMatch: 'factura-venta',
+            },
+            {
+              labelKey: 'entities.facturaPos.name',
+              path: 'factura-pos/list',
+              activeMatch: 'factura-pos',
+            },
+            {
+              labelKey: 'entities.facturaPosElectronica.name',
+              path: 'factura-pos-electronica/list',
+              activeMatch: 'factura-pos-electronica',
+            },
+            {
+              labelKey: 'entities.cuentaCobro.name',
+              path: 'cuenta-cobro/list',
+              activeMatch: 'cuenta-cobro',
+            },
+            {
+              labelKey: 'entities.facturaVentaRecurrente.name',
+              path: 'factura-venta-recurrente/list',
+              activeMatch: 'factura-venta-recurrente',
+            },
+            {
+              labelKey: 'entities.notaCredito.name',
+              path: 'nota-credito/list',
+              activeMatch: 'nota-credito',
+            },
+            {
+              labelKey: 'entities.notaDebito.name',
+              path: 'nota-debito/list',
+              activeMatch: 'nota-debito',
+            },
           ],
         },
       ],
@@ -73,6 +125,23 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'venta-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.enviarFacturaElectronica.name',
+              path: 'utilidades/enviar-factura-electronica',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'venta-informes',
       labelKey: 'layout.nav.sections.report',
       iconClass: 'pi pi-chart-bar',
@@ -83,6 +152,14 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
             {
               labelKey: 'entities.pendienteFacturar.name',
               path: 'informes/pendiente-facturar',
+            },
+            {
+              labelKey: 'entities.ventaItem.name',
+              path: 'informes/venta-item',
+            },
+            {
+              labelKey: 'entities.cuentaCobrar.name',
+              path: 'informes/cuenta-cobrar',
             },
           ],
         },

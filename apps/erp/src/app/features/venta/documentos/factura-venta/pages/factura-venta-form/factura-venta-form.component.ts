@@ -25,7 +25,7 @@ import {
   ToastService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
+import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
@@ -89,6 +89,7 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -129,10 +130,11 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected readonly isSaving = signal(false);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
-    ventaDocumentoBreadcrumb(
+    documentoBreadcrumb(
+      this.activeModule,
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
     ),
@@ -158,6 +160,27 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       destroyRef: this.destroyRef,
       endpoint: this.plazoPagoEndpoint,
     });
+
+    // Al elegir cliente, adopta su plazo de pago por defecto. Cambiar el plazo
+    // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
+    // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
+    this.form.controls.contacto.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((contacto) => this.aplicarPlazoDesdeCliente(contacto));
+  }
+
+  /**
+   * Setea `plazo_pago` con el plazo por defecto del cliente (`plazo_pago_id` del
+   * endpoint `contacto/seleccionar/`). Solo el `id` importa: el `<lib-api-select>`
+   * resuelve la etiqueta contra sus opciones cargadas y el autocálculo del
+   * vencimiento deriva los días. No hace nada si el cliente no trae plazo o si ya
+   * es el seleccionado (evita recomputar en vano).
+   */
+  private aplicarPlazoDesdeCliente(contacto: ErpSelectOption | null): void {
+    const plazoId = contacto?.['plazo_pago_id'];
+    if (typeof plazoId !== 'number') return;
+    if (this.form.controls.plazo_pago.value?.id === plazoId) return;
+    this.form.controls.plazo_pago.setValue({ id: plazoId, nombre: '' });
   }
 
   ngOnInit(): void {
@@ -340,16 +363,6 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, 'venta', ...segments]);
-  }
-
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
+    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...segments]);
   }
 }

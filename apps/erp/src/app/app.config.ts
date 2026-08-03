@@ -100,7 +100,7 @@ export const appConfig: ApplicationConfig = {
       useValue: {
         contenedoresRoot: ROUTE_PATHS.contenedores.root,
         login: ROUTE_PATHS.auth.login,
-        tenantHome: (slug: string) => ROUTE_PATHS.tenant.dashboard(slug),
+        tenantHome: (slug: string) => ROUTE_PATHS.tenant.home(slug),
       },
     },
     { provide: MODULE_REGISTRY, useValue: ERP_MODULE_REGISTRY },

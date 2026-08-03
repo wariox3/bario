@@ -1,0 +1,44 @@
+@let d = t().entities.aporte.detalles;
+
+<div class="flex flex-col gap-3">
+  <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <lib-data-toolbar
+      [searchEnabled]="false"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+    />
+
+    <lib-data-table
+      [columns]="columns"
+      [items]="items()"
+      [totalCount]="totalCount()"
+      [loading]="isLoading()"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage()"
+      (pageChange)="onPageChange($event)"
+    />
+  </div>
+
+  <!-- Leyenda de las abreviaturas: sale de la misma metadata que los encabezados -->
+  <details class="text-[0.72rem] leading-relaxed text-brand-muted">
+    <summary class="cursor-pointer font-semibold">{{ d.leyendaTitulo }}</summary>
+    <dl class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
+      @for (abreviatura of abreviaturas(); track abreviatura.sigla) {
+        <div class="flex gap-1.5">
+          <dt class="font-semibold text-brand-text">{{ abreviatura.sigla }}</dt>
+          <dd class="m-0">{{ abreviatura.nombre }}</dd>
+        </div>
+      }
+    </dl>
+  </details>
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>

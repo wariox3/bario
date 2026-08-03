@@ -1,0 +1,64 @@
+<!--
+  Informe "Auxiliar general".
+  Misma forma que sus hermanos, con tres parámetros propios proyectados en el
+  panel (contacto, número, comprobante) y la tabla en modo movimiento. Sin
+  botón de PDF: el endpoint del ERP anterior no lo servía.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params [form]="form" idPrefix="ag">
+      <div class="flex flex-col gap-1.5">
+        <label for="ag-contacto" class="informe-params__label">{{ d.params.contacto }}</label>
+        <lib-contacto-select
+          inputId="ag-contacto"
+          [formControl]="contacto"
+          [placeholder]="d.params.contactoPlaceholder"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="ag-numero" class="informe-params__label">{{ d.params.numero }}</label>
+        <p-inputnumber
+          inputId="ag-numero"
+          [formControl]="numero"
+          [useGrouping]="false"
+          [min]="0"
+          [fluid]="true"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="ag-comprobante" class="informe-params__label">{{ d.params.comprobante }}</label>
+        <p-inputnumber
+          inputId="ag-comprobante"
+          [formControl]="comprobante"
+          [useGrouping]="false"
+          [min]="0"
+          [fluid]="true"
+        />
+      </div>
+    </app-informe-cuentas-params>
+
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="false"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </div>
+
+  <app-saldos-cuenta-table
+    table
+    [rows]="rows()"
+    [generated]="generated()"
+    [showContacto]="true"
+    [showMovimiento]="true"
+  />
+</lib-list-shell>

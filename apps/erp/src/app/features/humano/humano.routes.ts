@@ -1,11 +1,15 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { activeModuleResolver } from '@erp/core/module-config';
 import { HUMANO_MODULE } from './humano.module-descriptor';
 
 export const HUMANO_ROUTES: Route[] = [
   {
     path: '',
-    resolve: { _module: erpModuleResolver('humano') },
+    resolve: {
+      _navModule: erpModuleResolver('humano'), // topbar + sidebar
+      _docModule: activeModuleResolver('humano'), // carga HUMANO_CONFIG
+    },
     children: [
       moduleIndexRoute(HUMANO_MODULE),
       {
@@ -14,6 +18,65 @@ export const HUMANO_ROUTES: Route[] = [
         loadComponent: () =>
           import('@erp/layouts/module-placeholder/module-placeholder.component').then(
             (m) => m.ModulePlaceholderComponent,
+          ),
+      },
+      {
+        path: 'nomina',
+        loadChildren: () =>
+          import('./documentos/nomina/nomina.routes').then((m) => m.NOMINA_ROUTES),
+      },
+      {
+        path: 'nomina-electronica',
+        loadChildren: () =>
+          import('./documentos/nomina-electronica/nomina-electronica.routes').then(
+            (m) => m.NOMINA_ELECTRONICA_ROUTES,
+          ),
+      },
+      {
+        path: 'seguridad-social',
+        loadChildren: () =>
+          import('./documentos/seguridad-social/seguridad-social.routes').then(
+            (m) => m.SEGURIDAD_SOCIAL_ROUTES,
+          ),
+      },
+      {
+        path: 'proceso/programacion',
+        loadChildren: () =>
+          import('./proceso/programacion/programacion.routes').then((m) => m.PROGRAMACION_ROUTES),
+      },
+      {
+        path: 'proceso/aporte',
+        loadChildren: () => import('./proceso/aporte/aporte.routes').then((m) => m.APORTE_ROUTES),
+      },
+      {
+        path: 'proceso/liquidacion',
+        loadChildren: () =>
+          import('./proceso/liquidacion/liquidacion.routes').then((m) => m.LIQUIDACION_ROUTES),
+      },
+      {
+        path: 'utilidades/enviar-nomina-electronica',
+        loadChildren: () =>
+          import('./utilidades/enviar-nomina-electronica/enviar-nomina-electronica.routes').then(
+            (m) => m.ENVIAR_NOMINA_ELECTRONICA_ROUTES,
+          ),
+      },
+      {
+        path: 'informes/nomina',
+        loadChildren: () =>
+          import('./informes/nomina/nomina.routes').then((m) => m.NOMINA_INFORME_ROUTES),
+      },
+      {
+        path: 'informes/nomina-detalle',
+        loadChildren: () =>
+          import('./informes/nomina-detalle/nomina-detalle.routes').then(
+            (m) => m.NOMINA_DETALLE_INFORME_ROUTES,
+          ),
+      },
+      {
+        path: 'informes/nomina-electronica',
+        loadChildren: () =>
+          import('./informes/nomina-electronica/nomina-electronica.routes').then(
+            (m) => m.NOMINA_ELECTRONICA_INFORME_ROUTES,
           ),
       },
       {

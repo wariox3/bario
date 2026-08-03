@@ -37,6 +37,9 @@ export type DetalleGroup = FormGroup<{
   horas: FormControl<number | null>;
   horas_diurnas: FormControl<number | null>;
   horas_nocturnas: FormControl<number | null>;
+  horas_programadas: FormControl<number | null>;
+  horas_diurnas_programadas: FormControl<number | null>;
+  horas_nocturnas_programadas: FormControl<number | null>;
   precio_minimo: FormControl<number | null>;
   documento_detalle_afectado: FormControl<number | null>;
 }>;
@@ -102,6 +105,14 @@ export function createDetalleGroup(value?: Partial<DetalleFormRawValue>): Detall
     horas: new FormControl<number | null>(value?.horas ?? null),
     horas_diurnas: new FormControl<number | null>(value?.horas_diurnas ?? null),
     horas_nocturnas: new FormControl<number | null>(value?.horas_nocturnas ?? null),
+    // Horas ya programadas (backend): bloquean la cobertura de la línea.
+    horas_programadas: new FormControl<number | null>(value?.horas_programadas ?? null),
+    horas_diurnas_programadas: new FormControl<number | null>(
+      value?.horas_diurnas_programadas ?? null,
+    ),
+    horas_nocturnas_programadas: new FormControl<number | null>(
+      value?.horas_nocturnas_programadas ?? null,
+    ),
     precio_minimo: new FormControl<number | null>(value?.precio_minimo ?? null),
     documento_detalle_afectado: new FormControl<number | null>(
       value?.documento_detalle_afectado ?? null,

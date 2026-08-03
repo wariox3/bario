@@ -1,0 +1,152 @@
+@let f = t().entities.movimientoInventario.form;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Información general ──────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file-edit text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ documentName() }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ isEditMode() ? f.editHint : f.createHint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Contacto -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="contacto" class="movimiento-form__label">
+            {{ f.fields.contacto }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-contacto-select
+            inputId="contacto"
+            formControlName="contacto"
+            [placeholder]="f.fields.contactoPlaceholder"
+            [invalid]="form.controls.contacto.invalid && form.controls.contacto.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.contacto"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Almacén -->
+        <div class="flex flex-col gap-1.5">
+          <label for="almacen" class="movimiento-form__label">
+            {{ f.fields.almacen }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="almacen"
+            formControlName="almacen"
+            [endpoint]="almacenEndpoint"
+            [suggestedIndex]="almacenSuggestedIndex()"
+            [placeholder]="f.fields.almacenPlaceholder"
+            [invalid]="form.controls.almacen.invalid && form.controls.almacen.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.almacen"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Fecha -->
+        <div class="flex flex-col gap-1.5">
+          <label for="fecha" class="movimiento-form__label">
+            {{ f.fields.fecha }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="fecha"
+            formControlName="fecha"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+            [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.fecha"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="movimiento-form__label">{{ f.fields.comentario }}</label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            maxlength="500"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sección: Detalles (líneas de inventario) ─────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-list text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ t().entities.inventarioDetalle.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ t().entities.inventarioDetalle.hint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <app-inventario-documento-detalles
+        [detalles]="form.controls.detalles"
+        [documentId]="documentId()"
+        [almacenPorDefecto]="form.controls.almacen.value"
+        [costoField]="costoField()"
+        [showOperacion]="showOperacion()"
+      />
+    </div>
+  </section>
+</form>
+
+<p-confirmdialog />

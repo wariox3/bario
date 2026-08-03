@@ -19,13 +19,34 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
             {
               labelKey: 'entities.facturaCompraRecurrente.name',
               path: 'factura-compra-recurrente/list',
+              activeMatch: 'factura-compra-recurrente',
             },
-            { labelKey: 'entities.facturaCompra.name', path: 'factura-compra/list' },
-            { labelKey: 'entities.documentoSoporte.name', path: 'documento-soporte/list' },
-            { labelKey: 'entities.notaCreditoCompra.name', path: 'nota-credito-compra/list' },
-            { labelKey: 'entities.notaDebitoCompra.name', path: 'nota-debito-compra/list' },
+            {
+              labelKey: 'entities.facturaCompra.name',
+              path: 'factura-compra/list',
+              activeMatch: 'factura-compra',
+            },
+            {
+              labelKey: 'entities.documentoSoporte.name',
+              path: 'documento-soporte/list',
+              activeMatch: 'documento-soporte',
+            },
+            {
+              labelKey: 'entities.notaCreditoCompra.name',
+              path: 'nota-credito-compra/list',
+              activeMatch: 'nota-credito-compra',
+            },
+            {
+              labelKey: 'entities.notaDebitoCompra.name',
+              path: 'nota-debito-compra/list',
+              activeMatch: 'nota-debito-compra',
+            },
 
-            { labelKey: 'entities.notaAjuste.name', path: 'nota-ajuste/list' },
+            {
+              labelKey: 'entities.notaAjuste.name',
+              path: 'nota-ajuste/list',
+              activeMatch: 'nota-ajuste',
+            },
           ],
         },
       ],
@@ -43,6 +64,44 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
             { labelKey: 'entities.contacto.name', path: 'contactos' },
             { labelKey: 'entities.resolucion.name', path: 'resoluciones' },
             { labelKey: 'entities.formaPago.name', path: 'formas-pago' },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'compra-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.documentoElectronico.name',
+              path: 'utilidades/documento-electronico',
+            },
+            {
+              labelKey: 'entities.eventosDian.name',
+              path: 'utilidades/eventos-dian',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'compra-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.cuentaPagar.name',
+              path: 'informes/cuenta-pagar',
+            },
           ],
         },
       ],

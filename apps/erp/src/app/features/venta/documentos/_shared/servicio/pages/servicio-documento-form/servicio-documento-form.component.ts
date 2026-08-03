@@ -21,7 +21,11 @@ import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-bread
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+import {
+  DOCUMENT_TYPE_ID,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import { ConfiguracionService } from '@erp/core/services/configuracion.service';
 import type { AppDict } from '@erp/i18n';
@@ -110,11 +114,20 @@ export class ServicioDocumentoFormComponent implements OnInit {
   });
   protected readonly isSaving = signal(false);
 
+  /**
+   * Solo en pedido servicio: una línea con horas ya programadas congela su
+   * cobertura (los turnos del puesto ya existen). El resto de la familia edita
+   * sus líneas sin restricción.
+   */
+  protected readonly lockCoberturaOnProgramadas = computed(
+    () => this.document().documentTypeId === DOCUMENT_TYPE_ID.PEDIDO_SERVICIO,
+  );
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     ventaDocumentoBreadcrumb(
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
     ),
@@ -285,15 +298,5 @@ export class ServicioDocumentoFormComponent implements OnInit {
     if (!slug) return;
     const segments = this.document().routes.list.split('/').filter(Boolean);
     void this.router.navigate(['/t', slug, 'venta', ...segments]);
-  }
-
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
   }
 }

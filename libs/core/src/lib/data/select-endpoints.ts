@@ -11,7 +11,6 @@
  * centralizarlos no quita duplicación.
  */
 export const SELECT_ENDPOINTS = {
-  // catálogos generales (cross-form)
   ciudad: '/general/ciudad/seleccionar/',
   identificacion: '/general/identificacion/seleccionar/',
   tipoPersona: '/general/tipo-persona/seleccionar/',
@@ -22,8 +21,11 @@ export const SELECT_ENDPOINTS = {
   asesor: '/general/asesor/seleccionar/',
   banco: '/general/banco/seleccionar/',
   cuentaBancoClase: '/general/cuenta-banco-clase/seleccionar/',
-  // contabilidad (cross-form)
+  /**
+   * Centros de costo. Ojo con el vocabulario del ERP anterior: lo que allá se
+   * llama "grupo" (de contabilidad) es acá el centro de costo.
+   */
   centroCosto: '/contabilidad/centro-costo/seleccionar/',
-  // humano (cross-form: novedad + turno)
+  almacen: '/inventario/almacen/seleccionar/',
   novedadTipo: '/humano/novedad-tipo/seleccionar/',
 } as const;

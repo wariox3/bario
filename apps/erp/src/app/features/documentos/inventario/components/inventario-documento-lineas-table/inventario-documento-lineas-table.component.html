@@ -1,0 +1,59 @@
+@let c = t().entities.inventarioDetalle;
+
+<div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <table class="inventario-detalle-table">
+    <thead>
+      <tr>
+        <th class="inventario-detalle-table__th w-10 text-center">{{ c.columns.linea }}</th>
+        <th class="inventario-detalle-table__th min-w-[16rem] text-left">{{ c.columns.item }}</th>
+        <th class="inventario-detalle-table__th min-w-[11rem] text-left">
+          {{ c.columns.almacen }}
+        </th>
+        @if (showOperacion()) {
+          <th class="inventario-detalle-table__th w-32 text-left">{{ c.columns.operacion }}</th>
+        }
+        <th class="inventario-detalle-table__th w-24 text-right">{{ c.columns.cantidad }}</th>
+        <th class="inventario-detalle-table__th w-32 text-right">{{ c.columns.costo }}</th>
+        <th class="inventario-detalle-table__th w-32 text-right">{{ c.columns.total }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (line of lines(); track line.id ?? $index) {
+        <tr class="inventario-detalle-table__row">
+          <td class="inventario-detalle-table__td text-center text-brand-muted tabular-nums">
+            {{ line.id ?? '—' }}
+          </td>
+          <td class="inventario-detalle-table__td font-medium text-brand-text">
+            {{ line.item?.nombre || '—' }}
+          </td>
+          <td class="inventario-detalle-table__td text-brand-text">
+            {{ line.almacen?.nombre || '—' }}
+          </td>
+          @if (showOperacion()) {
+            <td class="inventario-detalle-table__td text-brand-text">
+              {{ operacionLabel(line) }}
+            </td>
+          }
+          <td class="inventario-detalle-table__td text-right tabular-nums">{{ line.cantidad }}</td>
+          <td class="inventario-detalle-table__td text-right tabular-nums">
+            {{ formatMoney(line.precio ?? 0) }}
+          </td>
+          <td
+            class="inventario-detalle-table__td text-right font-semibold tabular-nums text-brand-text"
+          >
+            {{ formatMoney(totalOf($index)) }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td
+            [attr.colspan]="showOperacion() ? 7 : 6"
+            class="px-5 py-8 text-center text-sm text-brand-muted"
+          >
+            <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

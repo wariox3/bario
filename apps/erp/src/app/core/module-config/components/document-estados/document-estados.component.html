@@ -1,0 +1,12 @@
+@if (badges().length) {
+  <div class="flex flex-wrap items-center gap-1.5">
+    @for (badge of badges(); track badge.key) {
+      <span
+        class="rounded-full px-2.5 py-0.5 text-[0.7rem] font-semibold whitespace-nowrap"
+        [class]="badgeClasses[badge.severity]"
+      >
+        {{ badge.label }}
+      </span>
+    }
+  </div>
+}

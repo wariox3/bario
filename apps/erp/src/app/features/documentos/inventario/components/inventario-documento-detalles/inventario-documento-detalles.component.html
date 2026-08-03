@@ -1,0 +1,186 @@
+@let labels = t().entities.inventarioDetalle;
+
+<p-confirmdialog />
+
+<div class="flex flex-col gap-4">
+  <!-- Toolbar -->
+  <div class="flex items-center justify-end gap-2">
+    @if (documentId() !== null && pendingCount() > 0) {
+      <span
+        class="mr-auto inline-flex items-center gap-1.5 text-[0.74rem] font-medium text-amber-600"
+      >
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        {{ pendingCount() }} {{ labels.pendingSuffix }}
+      </span>
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-save"
+        [label]="labels.saveAll + ' (' + pendingCount() + ')'"
+        [loading]="savingAll()"
+        [disabled]="savingAll()"
+        (onClick)="onSaveAllClick()"
+      />
+    }
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-plus"
+      [label]="labels.addLine"
+      [outlined]="true"
+      (onClick)="addLinea()"
+    />
+  </div>
+
+  <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <table class="inventario-detalle-table">
+      <thead>
+        <tr>
+          <th class="inventario-detalle-table__th w-10 text-center">{{ labels.columns.linea }}</th>
+          <th class="inventario-detalle-table__th min-w-[16rem] text-left">
+            {{ labels.columns.item }}
+          </th>
+          <th class="inventario-detalle-table__th min-w-[11rem] text-left">
+            {{ labels.columns.almacen }}
+          </th>
+          @if (showOperacion()) {
+            <th class="inventario-detalle-table__th w-32 text-left">
+              {{ labels.columns.operacion }}
+            </th>
+          }
+          <th class="inventario-detalle-table__th w-24 text-right">
+            {{ labels.columns.cantidad }}
+          </th>
+          <th class="inventario-detalle-table__th w-32 text-right">{{ labels.columns.costo }}</th>
+          <th class="inventario-detalle-table__th w-32 text-right">{{ labels.columns.total }}</th>
+          <th class="inventario-detalle-table__th w-20 text-center">
+            {{ labels.columns.acciones }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of detalles().controls; track row; let i = $index) {
+          <tr
+            [formGroup]="row"
+            class="inventario-detalle-table__row"
+            [class.inventario-detalle-table__row--pending]="isPending(row)"
+          >
+            <td class="inventario-detalle-table__td text-center text-brand-muted tabular-nums">
+              @if (isPending(row)) {
+                <span
+                  class="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 align-middle"
+                  [pTooltip]="labels.pendingSuffix"
+                ></span>
+              }
+              {{ i + 1 }}
+            </td>
+
+            <td class="inventario-detalle-table__td">
+              <app-item-autocomplete
+                formControlName="item"
+                [placeholder]="labels.itemPlaceholder"
+                [invalid]="row.controls.item.invalid && row.controls.item.touched"
+              />
+            </td>
+
+            <td class="inventario-detalle-table__td">
+              <lib-api-select
+                formControlName="almacen"
+                [endpoint]="almacenEndpoint"
+                [placeholder]="labels.almacenPlaceholder"
+                [invalid]="row.controls.almacen.invalid && row.controls.almacen.touched"
+              />
+            </td>
+
+            @if (showOperacion()) {
+              <td class="inventario-detalle-table__td">
+                <p-select
+                  formControlName="operacion_inventario"
+                  [options]="operacionOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  size="small"
+                  appendTo="body"
+                  [fluid]="true"
+                />
+              </td>
+            }
+
+            <td class="inventario-detalle-table__td">
+              <p-inputnumber
+                formControlName="cantidad"
+                mode="decimal"
+                [min]="0"
+                [maxFractionDigits]="2"
+                [fluid]="true"
+                inputStyleClass="text-right"
+              />
+            </td>
+
+            <td class="inventario-detalle-table__td">
+              <p-inputnumber
+                formControlName="precio"
+                mode="decimal"
+                [min]="0"
+                [minFractionDigits]="0"
+                [maxFractionDigits]="2"
+                prefix="$ "
+                [fluid]="true"
+                inputStyleClass="text-right"
+              />
+            </td>
+
+            <td
+              class="inventario-detalle-table__td text-right font-semibold tabular-nums text-brand-text"
+            >
+              {{ formatMoney(totalOf(i)) }}
+            </td>
+
+            <td class="inventario-detalle-table__td">
+              <div class="flex items-center justify-center gap-0.5">
+                @if (canSaveRow(row)) {
+                  <button
+                    type="button"
+                    (click)="saveLinea(row)"
+                    [disabled]="isSavingRow(row)"
+                    [pTooltip]="labels.saveLine"
+                    [attr.aria-label]="labels.saveLine"
+                    class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
+                  >
+                    @if (isSavingRow(row)) {
+                      <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+                    } @else {
+                      <i class="pi pi-check text-[0.78rem]"></i>
+                    }
+                  </button>
+                }
+                <button
+                  type="button"
+                  (click)="removeLinea(row)"
+                  [pTooltip]="labels.removeLine"
+                  [attr.aria-label]="labels.removeLine"
+                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                >
+                  <i class="pi pi-trash text-[0.78rem]"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td
+              [attr.colspan]="showOperacion() ? 8 : 7"
+              class="px-5 py-8 text-center text-sm text-brand-muted"
+            >
+              <i class="pi pi-inbox mr-2"></i>{{ labels.empty }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (detalles().controls.length > 0) {
+    <app-inventario-documento-resumen [resumen]="resumen()" />
+  }
+</div>

@@ -1,0 +1,60 @@
+<!--
+  Informe "Cuentas por cobrar corte".
+  Chrome estándar (<lib-list-shell>), pero el toolbar de filtros se reemplaza por
+  un toolbar de reporte: la fecha de corte es el parámetro protagonista, con
+  Generar (primario) y Exportar Excel. La tabla arranca vacía hasta Generar.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.cuentaCobrarCorte.name">
+  <div toolbar class="cccorte-toolbar">
+    <div class="cccorte-toolbar__field">
+      <label for="cccorte-fecha" class="cccorte-toolbar__label">
+        {{ t().entities.cuentaCobrarCorte.fechaCorte }}
+      </label>
+      <p-datepicker
+        inputId="cccorte-fecha"
+        [ngModel]="fecha()"
+        (ngModelChange)="fecha.set($event)"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        [readonlyInput]="true"
+        appendTo="body"
+        styleClass="cccorte-toolbar__date"
+      />
+    </div>
+
+    <div class="cccorte-toolbar__actions">
+      <p-button
+        icon="pi pi-file-excel"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [label]="t().common.actions.exportExcel"
+        [loading]="isExportingExcel()"
+        [disabled]="!canExport()"
+        (onClick)="exportExcel()"
+      />
+      <p-button
+        icon="pi pi-bolt"
+        size="small"
+        [label]="t().entities.cuentaCobrarCorte.generar"
+        [loading]="isLoading()"
+        (onClick)="generar()"
+      />
+    </div>
+  </div>
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    emptyTitleKey="entities.cuentaCobrarCorte.empty.title"
+    emptySubKey="entities.cuentaCobrarCorte.empty.sub"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+  />
+</lib-list-shell>

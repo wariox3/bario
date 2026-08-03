@@ -1,13 +1,30 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { I18nService, TenantService, ToastService, anioMesDeIso, fromIsoDate } from '@reddoc/core';
+import {
+  FestivoService,
+  I18nService,
+  TenantService,
+  ToastService,
+  anioMesDeIso,
+  fromIsoDate,
+  toProgramacionFecha,
+  type Festivo,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@turnos/i18n';
-import { FestivoService, type Festivo } from '../../festivo.service';
 import { ProgramacionService } from '../../programacion.service';
 import { PROGRAMACION_LIST_PATH } from '../../programacion.constants';
 import type {
@@ -15,7 +32,7 @@ import type {
   ProgramacionFecha,
   ProgramacionFila,
 } from '../../programacion.model';
-import { toProgramacionFecha } from '../../programacion.utils';
+import { localeDe } from '../../programacion.utils';
 import {
   ProgramacionGridComponent,
   type ProgramacionContratoRef,
@@ -73,6 +90,7 @@ interface GridView {
   templateUrl: './programacion-detail.component.html',
   styleUrl: './programacion-detail.component.scss',
   providers: [ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionDetailComponent implements OnInit {
   private readonly service = inject(ProgramacionService);
@@ -326,7 +344,11 @@ export class ProgramacionDetailComponent implements OnInit {
   /** Fecha larga de la cabecera (`20 de junio de 2026`). */
   protected formatFecha(date: Date | null): string {
     if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return date.toLocaleDateString(localeDe(this.i18n.lang()), {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
   }
 
   /**

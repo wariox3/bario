@@ -14,7 +14,7 @@
     size="small"
     (onClick)="onBack()"
   />
-  @if (contrato()) {
+  @if (contrato(); as c) {
     <p-button
       type="button"
       [label]="t().common.actions.edit"
@@ -22,6 +22,28 @@
       size="small"
       (onClick)="onEdit()"
     />
+
+    <!-- Las dos acciones de cierre: solo mientras el contrato siga vigente -->
+    @if (!c.estado_terminado) {
+      <p-button
+        type="button"
+        [label]="t().entities.contrato.parametrosIniciales.action"
+        icon="pi pi-calendar-clock"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onParametrosIniciales()"
+      />
+      <p-button
+        type="button"
+        [label]="t().entities.contrato.terminar.action"
+        icon="pi pi-ban"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onTerminar()"
+      />
+    }
   }
 </header>
 

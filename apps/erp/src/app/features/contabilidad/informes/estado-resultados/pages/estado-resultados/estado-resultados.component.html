@@ -1,0 +1,30 @@
+<!--
+  Informe "Estado de resultados".
+  El más simple de la familia: el panel de parámetros solo muestra el periodo
+  (sin rango de cuentas ni banderas) y la tabla la comparte con el estado de
+  situación financiera. Sin PDF.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params
+      [form]="form"
+      idPrefix="er"
+      [showCuentas]="false"
+      [showFlags]="false"
+    />
+
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="false"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </div>
+
+  <app-estado-financiero-table table [rows]="rows()" [generated]="generated()" />
+</lib-list-shell>

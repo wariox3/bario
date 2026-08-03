@@ -12,5 +12,7 @@ export const ROUTE_PATHS = {
   },
   tenant: {
     dashboard: (slug: string) => `/t/${slug}/dashboard`,
+    /** Puerta de entrada al tenant: el inicio del módulo General. */
+    home: (slug: string) => `/t/${slug}/general/inicio`,
   },
 };

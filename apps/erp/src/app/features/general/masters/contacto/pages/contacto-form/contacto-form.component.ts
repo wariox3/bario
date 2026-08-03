@@ -24,7 +24,7 @@ import {
   ToastService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, ErpAsesorSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
@@ -55,6 +55,7 @@ import {
     CheckboxModule,
     FieldErrorComponent,
     ErpApiSelectComponent,
+    ErpAsesorSelectComponent,
     ErpApiAutocompleteComponent,
   ],
   templateUrl: './contacto-form.component.html',
@@ -127,6 +128,7 @@ export class ContactoFormComponent implements OnInit {
 
   /** El endpoint de precio devuelve listas de venta y compra; filtramos venta. */
   protected readonly precioParams: Record<string, string> = { venta: 'True' };
+
   protected readonly form = this.fb.group({
     tipo_persona: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     responsabilidad: this.fb.control<ErpSelectOption | null>(null, Validators.required),

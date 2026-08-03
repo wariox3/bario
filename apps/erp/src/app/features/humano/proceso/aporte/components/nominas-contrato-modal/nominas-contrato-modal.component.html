@@ -1,0 +1,185 @@
+@let m = t().entities.aporte.trazabilidad;
+
+<div class="flex flex-col gap-5">
+  <!-- Header: badge + título + de quién es el cruce -->
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-file-check text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex min-w-0 flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ m.title }}
+      </h2>
+      <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+        {{ datos.empleado || m.subtitle }}
+      </p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-16 text-brand-muted">
+      <i class="pi pi-spin pi-spinner text-xl"></i>
+    </div>
+  } @else if (sinNominas()) {
+    <div class="flex flex-col items-center px-6 py-14 text-center">
+      <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+      <p class="m-0 text-[0.9rem] font-bold text-brand-text">{{ m.empty.title }}</p>
+      <p class="m-0 mt-1 max-w-[340px] text-[0.8rem] leading-relaxed text-brand-muted">
+        {{ m.empty.sub }}
+      </p>
+    </div>
+  } @else {
+    <!-- Las nóminas del contrato en el periodo -->
+    <section class="flex flex-col gap-2">
+      <h3 class="m-0 text-[0.8rem] font-bold text-brand-text">{{ m.nominas.title }}</h3>
+      <div class="overflow-x-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+        <table class="w-full border-collapse text-[0.8rem]">
+          <thead>
+            <tr class="border-b border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.03)]">
+              <th class="px-3 py-2 text-left font-semibold">{{ m.nominas.columns.numero }}</th>
+              <th class="px-3 py-2 text-left font-semibold">{{ m.nominas.columns.desde }}</th>
+              <th class="px-3 py-2 text-left font-semibold">{{ m.nominas.columns.hasta }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ m.nominas.columns.salario }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ m.nominas.columns.ibc }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ m.nominas.columns.ibp }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ m.nominas.columns.devengado }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ m.nominas.columns.deduccion }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ m.nominas.columns.total }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (nomina of nominas(); track nomina.id) {
+              <tr class="border-b border-[rgba(20,48,73,0.06)]">
+                <td class="px-3 py-2">{{ nomina.numero ?? '—' }}</td>
+                <td class="px-3 py-2">{{ nomina.fecha_desde || nomina.fecha || '—' }}</td>
+                <td class="px-3 py-2">{{ nomina.fecha_hasta || '—' }}</td>
+                <td class="px-3 py-2 text-right tabular-nums">{{ formatMoney(nomina.salario) }}</td>
+                <td class="px-3 py-2 text-right tabular-nums">
+                  {{ formatMoney(nomina.base_cotizacion) }}
+                </td>
+                <td class="px-3 py-2 text-right tabular-nums">
+                  {{ formatMoney(nomina.base_prestacion) }}
+                </td>
+                <td class="px-3 py-2 text-right tabular-nums">
+                  {{ formatMoney(nomina.devengado) }}
+                </td>
+                <td class="px-3 py-2 text-right tabular-nums">
+                  {{ formatMoney(nomina.deduccion) }}
+                </td>
+                <td class="px-3 py-2 text-right tabular-nums">{{ formatMoney(nomina.total) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="bg-[rgba(20,48,73,0.05)] font-bold">
+              <td class="px-3 py-2.5" colspan="3">{{ m.total }}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums">
+                {{ formatMoney(totalesNomina().salario) }}
+              </td>
+              <td class="px-3 py-2.5 text-right tabular-nums">
+                {{ formatMoney(totalesNomina().base_cotizacion) }}
+              </td>
+              <td class="px-3 py-2.5 text-right tabular-nums">
+                {{ formatMoney(totalesNomina().base_prestacion) }}
+              </td>
+              <td class="px-3 py-2.5 text-right tabular-nums">
+                {{ formatMoney(totalesNomina().devengado) }}
+              </td>
+              <td class="px-3 py-2.5 text-right tabular-nums">
+                {{ formatMoney(totalesNomina().deduccion) }}
+              </td>
+              <td class="px-3 py-2.5 text-right tabular-nums">
+                {{ formatMoney(totalesNomina().total) }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- Los conceptos que las componen -->
+    <section class="flex flex-col gap-2">
+      <h3 class="m-0 text-[0.8rem] font-bold text-brand-text">{{ m.conceptos.title }}</h3>
+      @if (lineas().length === 0) {
+        <p class="m-0 text-[0.78rem] text-brand-muted">{{ m.conceptos.empty }}</p>
+      } @else {
+        <div class="overflow-x-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+          <table class="w-full border-collapse text-[0.8rem]">
+            <thead>
+              <tr class="border-b border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.03)]">
+                <th class="px-3 py-2 text-left font-semibold">{{ m.conceptos.columns.nomina }}</th>
+                <th class="px-3 py-2 text-left font-semibold">
+                  {{ m.conceptos.columns.concepto }}
+                </th>
+                <th class="px-3 py-2 text-right font-semibold">{{ m.conceptos.columns.dias }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ m.conceptos.columns.horas }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ m.conceptos.columns.ibc }}</th>
+                <th class="px-3 py-2 text-right font-semibold">{{ m.conceptos.columns.ibp }}</th>
+                <th class="px-3 py-2 text-right font-semibold">
+                  {{ m.conceptos.columns.devengado }}
+                </th>
+                <th class="px-3 py-2 text-right font-semibold">
+                  {{ m.conceptos.columns.deduccion }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (linea of lineas(); track linea.id) {
+                <tr class="border-b border-[rgba(20,48,73,0.06)]">
+                  <td class="px-3 py-2 text-brand-muted">{{ linea.documento__numero ?? '—' }}</td>
+                  <td class="px-3 py-2">{{ linea.concepto__nombre || '—' }}</td>
+                  <td class="px-3 py-2 text-right tabular-nums">{{ linea.dias ?? '—' }}</td>
+                  <td class="px-3 py-2 text-right tabular-nums">{{ linea.hora ?? '—' }}</td>
+                  <td class="px-3 py-2 text-right tabular-nums">
+                    {{ formatMoney(linea.base_cotizacion) }}
+                  </td>
+                  <td class="px-3 py-2 text-right tabular-nums">
+                    {{ formatMoney(linea.base_prestacion) }}
+                  </td>
+                  <td class="px-3 py-2 text-right tabular-nums">
+                    {{ formatMoney(linea.devengado) }}
+                  </td>
+                  <td class="px-3 py-2 text-right tabular-nums">
+                    {{ formatMoney(linea.deduccion) }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="bg-[rgba(20,48,73,0.05)] font-bold">
+                <td class="px-3 py-2.5" colspan="4">{{ m.total }}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums">
+                  {{ formatMoney(totalesLinea().base_cotizacion) }}
+                </td>
+                <td class="px-3 py-2.5 text-right tabular-nums">
+                  {{ formatMoney(totalesLinea().base_prestacion) }}
+                </td>
+                <td class="px-3 py-2.5 text-right tabular-nums">
+                  {{ formatMoney(totalesLinea().devengado) }}
+                </td>
+                <td class="px-3 py-2.5 text-right tabular-nums">
+                  {{ formatMoney(totalesLinea().deduccion) }}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      }
+    </section>
+  }
+
+  <!-- Footer -->
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onClose()"
+    />
+  </div>
+</div>

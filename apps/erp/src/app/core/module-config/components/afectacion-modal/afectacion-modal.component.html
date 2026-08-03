@@ -8,7 +8,7 @@
   [resizable]="false"
   [dismissableMask]="true"
   [focusOnShow]="false"
-  [style]="{ width: '82rem' }"
+  [style]="{ width: '92rem' }"
   [breakpoints]="{ '768px': '95vw' }"
 >
   <ng-template pTemplate="header">
@@ -247,6 +247,82 @@
             }
           </tbody>
         </table>
+      </div>
+
+      <!-- ── Lista: programaciones del detalle base ──────────────────────────────── -->
+      <div class="flex flex-col gap-1.5">
+        <span class="afectacion__micro-label">{{ a.programaciones.title }}</span>
+        <div class="max-h-96 overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+          <table class="detalle-table">
+            <thead>
+              <tr>
+                <th class="detalle-table__th detalle-table__th--sticky-left">
+                  {{ a.programaciones.cols.contrato }}
+                </th>
+                <!-- Columnas de día: número + inicial. El resaltado (compartido:
+                     domingo cuenta como festivo, el sábado solo si no lo es) va solo
+                     en el header — las celdas del contrato quedan limpias. -->
+                @for (fecha of programacionFechas(); track fecha.clave) {
+                  <th
+                    class="detalle-table__th detalle-table__th--dia"
+                    [class.detalle-table__th--festivo]="
+                      esColumnaFestiva(fecha.inicial, festivoClaves().has(fecha.clave))
+                    "
+                    [class.detalle-table__th--sabado]="
+                      esColumnaSabado(fecha.inicial, festivoClaves().has(fecha.clave))
+                    "
+                  >
+                    <span class="detalle-table__dia-num">{{ fecha.etiqueta }}</span>
+                    <span class="detalle-table__dia-ini">{{ fecha.inicial }}</span>
+                  </th>
+                }
+                <th class="detalle-table__th text-right">{{ a.programaciones.cols.horas }}</th>
+                <th class="detalle-table__th text-right">
+                  {{ a.programaciones.cols.horasDiurnas }}
+                </th>
+                <th class="detalle-table__th text-right">
+                  {{ a.programaciones.cols.horasNocturnas }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (prog of programaciones(); track $index) {
+                <tr class="detalle-table__row">
+                  <td
+                    class="detalle-table__td detalle-table__td--sticky-left font-medium text-brand-text"
+                  >
+                    {{ prog.contrato_contacto_nombre_corto || '—' }}
+                  </td>
+                  @for (fecha of programacionFechas(); track fecha.clave) {
+                    <td class="detalle-table__td detalle-table__td--dia text-center tabular-nums">
+                      {{ celda(prog, fecha.clave) }}
+                    </td>
+                  }
+                  <td
+                    class="detalle-table__td text-right font-semibold tabular-nums text-brand-text"
+                  >
+                    {{ formatHoras(prog.horas_programadas) }}
+                  </td>
+                  <td class="detalle-table__td text-right tabular-nums text-brand-muted">
+                    {{ formatHoras(prog.horas_diurnas_programadas) }}
+                  </td>
+                  <td class="detalle-table__td text-right tabular-nums text-brand-muted">
+                    {{ formatHoras(prog.horas_nocturnas_programadas) }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td
+                    [attr.colspan]="programacionColspan()"
+                    class="px-5 py-10 text-center text-sm text-brand-muted"
+                  >
+                    <i class="pi pi-inbox mr-2"></i>{{ a.programaciones.empty }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   }

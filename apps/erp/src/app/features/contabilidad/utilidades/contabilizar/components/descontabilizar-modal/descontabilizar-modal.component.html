@@ -1,0 +1,136 @@
+@let m = t().entities.contabilizar.descontabilizar;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!processing()"
+  [dismissableMask]="!processing()"
+  [style]="{ width: '44rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-red-50 text-red-600"
+      >
+        <i class="pi pi-undo text-[1.05rem]"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <form [formGroup]="form" class="flex flex-col gap-4 pt-1">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <div class="flex flex-col gap-1.5">
+          <label for="dc-fecha-desde" class="text-[0.8rem] font-medium text-brand-text">
+            {{ m.fields.fechaDesde }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="dc-fecha-desde"
+            formControlName="fecha_desde"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            [readonlyInput]="true"
+            appendTo="body"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="dc-fecha-hasta" class="text-[0.8rem] font-medium text-brand-text">
+            {{ m.fields.fechaHasta }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-datepicker
+            inputId="dc-fecha-hasta"
+            formControlName="fecha_hasta"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            [readonlyInput]="true"
+            appendTo="body"
+          />
+        </div>
+      </div>
+
+      @if ((form.touched || form.dirty) && form.hasError('rangoInvertido')) {
+        <p class="m-0 text-[0.8rem] text-red-500">{{ m.validation.rangoInvertido }}</p>
+      }
+
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="dc-numero-desde" class="text-[0.8rem] font-medium text-brand-text">
+            {{ m.fields.numeroDesde }}
+          </label>
+          <p-inputnumber
+            inputId="dc-numero-desde"
+            formControlName="numero_desde"
+            [useGrouping]="false"
+            [min]="0"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="dc-numero-hasta" class="text-[0.8rem] font-medium text-brand-text">
+            {{ m.fields.numeroHasta }}
+          </label>
+          <p-inputnumber
+            inputId="dc-numero-hasta"
+            formControlName="numero_hasta"
+            [useGrouping]="false"
+            [min]="0"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="dc-documento-tipo" class="text-[0.8rem] font-medium text-brand-text">
+            {{ m.fields.documentoTipo }}
+          </label>
+          <lib-api-select
+            inputId="dc-documento-tipo"
+            formControlName="documento_tipo"
+            [endpoint]="documentoTipoEndpoint"
+            [params]="documentoTipoParams"
+            [placeholder]="m.fields.documentoTipoPlaceholder"
+          />
+        </div>
+      </div>
+
+      <!--
+        La operación es irreversible y afecta a documentos que el usuario no ve.
+        Mientras eso siga así (ver SUGERENCIAS.md), al menos que quede dicho.
+      -->
+      <p class="m-0 rounded-lg bg-amber-50 px-3 py-2 text-[0.78rem] text-amber-800">
+        <i class="pi pi-exclamation-triangle mr-1.5"></i>{{ m.warning }}
+      </p>
+    </form>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      severity="secondary"
+      [text]="true"
+      [label]="t().common.actions.cancel"
+      [disabled]="processing()"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      severity="danger"
+      icon="pi pi-undo"
+      [label]="m.submit"
+      [loading]="processing()"
+      [disabled]="!canSubmit()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>

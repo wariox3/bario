@@ -4,10 +4,21 @@ export type TenantSlug = string;
 
 export const LAST_TENANT_KEY = 'reddoc-last-tenant';
 
+/**
+ * Subconjunto de `Contenedor` que el tenant activo mantiene en memoria.
+ *
+ * Todos los productores (`tenantAccessGuard`, `rootRedirectGuard`, la lista de
+ * contenedores) alimentan esto con un `Contenedor` completo de
+ * `/contenedor/cliente/lista-usuario/`, así que `cliente_id` y `rol_id` siempre
+ * vienen: el primero identifica al contenedor en los endpoints del schema
+ * público, el segundo dice qué puede administrar el usuario aquí dentro.
+ */
 export interface ContenedorAccess {
   schema_name: string;
   nombre: string;
   activo: boolean;
+  cliente_id: number;
+  rol_id: number;
 }
 
 /**

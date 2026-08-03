@@ -1,10 +1,11 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { anioMesDeIso, diasDelMes } from '@reddoc/core';
-import { DocumentoDetalleService } from '@reddoc/core';
-import { FestivoService, type Festivo } from '../../festivo.service';
-import type { ProgramacionLineaRead } from '../../programacion.model';
+import { anioMesDeIso, diasDelMes, FestivoService, type Festivo } from '@reddoc/core';
+import { DocumentoDetalleService, I18nService } from '@reddoc/core';
+import type { AppDict } from '@turnos/i18n';
+import type { ProgramacionLineaRead, ProgramacionVigencia } from '../../programacion.model';
+import { localeDe, vigenciaDe } from '../../programacion.utils';
 
 /** Período (mes/año) a programar, ya con su etiqueta legible para el header. */
 export interface ProgramacionPeriodo {
@@ -14,9 +15,9 @@ export interface ProgramacionPeriodo {
   readonly etiqueta: string;
 }
 
-/** `junio de 2026` a partir de año + mes (1-based). */
-function etiquetaMes(anio: number, mes: number): string {
-  return new Date(anio, mes - 1, 1).toLocaleDateString('es-CO', {
+/** `junio de 2026` a partir de año + mes (1-based); `locale` según el idioma activo. */
+function etiquetaMes(anio: number, mes: number, locale: string): string {
+  return new Date(anio, mes - 1, 1).toLocaleDateString(locale, {
     month: 'long',
     year: 'numeric',
   });
@@ -36,14 +37,22 @@ export class ProgramacionPeriodoStore {
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly festivoService = inject(FestivoService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   private readonly _periodo = signal<ProgramacionPeriodo | null>(null);
+  private readonly _vigencia = signal<ProgramacionVigencia | null>(null);
   private readonly _cargando = signal(false);
   private readonly _festivos = signal<readonly Festivo[]>([]);
   private readonly _generado = signal(false);
 
   /** Período resuelto (`null` mientras carga o si la línea no trae fecha). */
   readonly periodo = this._periodo.asReadonly();
+
+  /**
+   * Vigencia (rango ISO de días válidos) de la línea. `null` mientras carga o si
+   * la línea no trae ambos extremos. Acota la fecha de inicio del prototipo.
+   */
+  readonly vigencia = this._vigencia.asReadonly();
 
   /** `true` mientras se resuelve el período (carga de la línea de documento). */
   readonly cargando = this._cargando.asReadonly();
@@ -80,9 +89,10 @@ export class ProgramacionPeriodoStore {
     return mapa;
   });
 
-  /** Limpia el período, sus festivos y el flag de generado (al reabrir el modal). */
+  /** Limpia el período, la vigencia, los festivos y el flag de generado (al reabrir). */
   reset(): void {
     this._periodo.set(null);
+    this._vigencia.set(null);
     this._festivos.set([]);
     this._generado.set(false);
   }
@@ -104,13 +114,18 @@ export class ProgramacionPeriodoStore {
         next: (linea) => {
           // El flag de generado se conserva aunque la línea no traiga fecha.
           this._generado.set(linea.generado);
+          // La vigencia solo se fija si la línea trae ambos extremos del rango.
+          this._vigencia.set(vigenciaDe(linea.fecha_desde, linea.fecha_hasta));
           const ym = anioMesDeIso(linea.fecha_desde);
           if (!ym) {
             this._periodo.set(null);
             this._festivos.set([]);
             return;
           }
-          this._periodo.set({ ...ym, etiqueta: etiquetaMes(ym.anio, ym.mes) });
+          this._periodo.set({
+            ...ym,
+            etiqueta: etiquetaMes(ym.anio, ym.mes, localeDe(this.i18n.lang())),
+          });
           this.cargarFestivos(ym.anio, ym.mes);
         },
         error: () => {

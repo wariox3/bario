@@ -1,0 +1,135 @@
+<!--
+  Utilidad "Enviar factura electrónica".
+  Sigue el estándar de listas del ERP (mismo chrome que <lib-list-shell>):
+  breadcrumb + card con header de título + cuerpo con la tabla embebida en su
+  recuadro. La única diferencia es el tab-strip interno (Emitir / Notificar): un
+  sub-navegador que reusa toda la maquinaria por tab (toolbar de filtros +
+  acciones batch + tabla con selección múltiple). Depth borders-only, navy/sky,
+  radios 12px — tokens compartidos con el resto de listas.
+-->
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<section class="efe-card">
+  <header class="efe-card__head">
+    <h1 class="efe-card__title">{{ t().entities.enviarFacturaElectronica.name }}</h1>
+    <p class="efe-card__subtitle">{{ t().entities.enviarFacturaElectronica.subtitle }}</p>
+  </header>
+
+  <div class="efe-card__body">
+    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))" class="efe-tabs">
+      <p-tablist>
+        <p-tab value="emitir">{{ t().entities.enviarFacturaElectronica.tabs.emitir }}</p-tab>
+        <p-tab value="notificar">{{ t().entities.enviarFacturaElectronica.tabs.notificar }}</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <!-- ── Tab Emitir ────────────────────────────────────────────────── -->
+        <p-tabpanel value="emitir">
+          <div class="efe-toolbar">
+            <lib-data-toolbar
+              class="efe-toolbar__filters"
+              [filtersEnabled]="true"
+              [activeFiltersCount]="emitir.activeFilters().length"
+              (filtersToggle)="emitir.openFilters()"
+              (filtersClear)="emitir.clearFilters()"
+            />
+            <div class="efe-toolbar__actions">
+              <p-button
+                severity="danger"
+                [outlined]="true"
+                size="small"
+                icon="pi pi-ban"
+                [label]="t().entities.enviarFacturaElectronica.actions.descartar"
+                [disabled]="!canDescartar()"
+                (onClick)="onDescartar()"
+              />
+              <p-button
+                size="small"
+                icon="pi pi-send"
+                [label]="t().entities.enviarFacturaElectronica.actions.emitir"
+                [loading]="isProcessing()"
+                [disabled]="!canEmitir()"
+                (onClick)="onEmitir()"
+              />
+            </div>
+          </div>
+
+          <div class="efe-card__table">
+            <lib-data-table
+              [columns]="emitirColumns"
+              [items]="emitir.items()"
+              [totalCount]="emitir.totalCount()"
+              [loading]="emitir.isLoading()"
+              [pageSize]="emitir.pageSize()"
+              [currentPage]="emitir.currentPage()"
+              [sort]="emitir.sort()"
+              selectionMode="multiple"
+              [selectedRows]="emitir.selectedRows()"
+              (pageChange)="emitir.onPageChange($event)"
+              (sortChange)="emitir.onSortChange($event)"
+              (selectionChange)="emitir.onSelectionChange($event)"
+            />
+          </div>
+        </p-tabpanel>
+
+        <!-- ── Tab Notificar ─────────────────────────────────────────────── -->
+        <p-tabpanel value="notificar">
+          <div class="efe-toolbar">
+            <lib-data-toolbar
+              class="efe-toolbar__filters"
+              [filtersEnabled]="true"
+              [activeFiltersCount]="notificar.activeFilters().length"
+              (filtersToggle)="notificar.openFilters()"
+              (filtersClear)="notificar.clearFilters()"
+            />
+            <div class="efe-toolbar__actions">
+              <p-button
+                size="small"
+                icon="pi pi-bell"
+                [label]="t().entities.enviarFacturaElectronica.actions.notificar"
+                [loading]="isProcessing()"
+                [disabled]="!canNotificar()"
+                (onClick)="onNotificar()"
+              />
+            </div>
+          </div>
+
+          <div class="efe-card__table">
+            <lib-data-table
+              [columns]="notificarColumns"
+              [items]="notificar.items()"
+              [totalCount]="notificar.totalCount()"
+              [loading]="notificar.isLoading()"
+              [pageSize]="notificar.pageSize()"
+              [currentPage]="notificar.currentPage()"
+              [sort]="notificar.sort()"
+              selectionMode="multiple"
+              [selectedRows]="notificar.selectedRows()"
+              (pageChange)="notificar.onPageChange($event)"
+              (sortChange)="notificar.onSortChange($event)"
+              (selectionChange)="notificar.onSelectionChange($event)"
+            />
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</section>
+
+<lib-data-filter-modal
+  [fields]="emitirFilterFields"
+  [value]="emitir.activeFilters()"
+  [visible]="emitir.filtersVisible()"
+  (visibleChange)="emitir.filtersVisible.set($event)"
+  (apply)="emitir.applyFilters($event)"
+/>
+
+<lib-data-filter-modal
+  [fields]="notificarFilterFields"
+  [value]="notificar.activeFilters()"
+  [visible]="notificar.filtersVisible()"
+  (visibleChange)="notificar.filtersVisible.set($event)"
+  (apply)="notificar.applyFilters($event)"
+/>
+
+<p-confirmDialog />

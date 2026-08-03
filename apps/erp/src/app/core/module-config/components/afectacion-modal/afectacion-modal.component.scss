@@ -44,3 +44,65 @@
 .detalle-table__row:hover .detalle-table__td {
   background: rgba(20, 48, 73, 0.015);
 }
+
+// ── Calendario de la tabla de programaciones ─────────────────────────────────
+// Replica el look del grid de turnos (programacion-grid.component.scss): sus
+// estilos también viven scoped en su componente, así que se replican acá.
+
+// Primera columna (contrato): fija al hacer scroll horizontal sobre los días.
+.detalle-table__th--sticky-left {
+  left: 0;
+  z-index: 2;
+  min-width: 11rem;
+}
+
+.detalle-table__td--sticky-left {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 11rem;
+  background: var(--brand-surface, #fff);
+}
+
+.detalle-table__row:hover .detalle-table__td--sticky-left {
+  background: #fbfcfd;
+}
+
+// Columnas de día: angostas, con ancho mínimo para que el scroll respire.
+.detalle-table__th--dia,
+.detalle-table__td--dia {
+  min-width: 2.1rem;
+  padding-inline: 0.25rem;
+  text-align: center;
+}
+
+.detalle-table__th--dia {
+  line-height: 1.1;
+}
+
+.detalle-table__dia-num {
+  display: block;
+  font-size: 0.7rem;
+}
+
+.detalle-table__dia-ini {
+  display: block;
+  font-size: 0.55rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+// Día festivo (el domingo cuenta como tal): azul claro. El sábado, un gris tenue.
+// Solo en el header: las celdas del contrato quedan limpias para que se lea el turno.
+.detalle-table__th--festivo {
+  background: #e8f1fb;
+  box-shadow: inset 0 -1px 0 rgba(37, 99, 235, 0.25);
+
+  .detalle-table__dia-num {
+    color: #2563eb;
+  }
+}
+
+.detalle-table__th--sabado {
+  background: #eceef1;
+}

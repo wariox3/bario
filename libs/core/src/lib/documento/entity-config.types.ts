@@ -17,6 +17,9 @@ export type EntityKind = 'document';
  * Efecto del documento sobre el inventario.
  * - `inflow`:  aumenta stock (compra, devolución de venta).
  * - `outflow`: disminuye stock (venta, devolución de compra).
+ *
+ * Los documentos que no mueven inventario (recaudos y demás movimientos
+ * puramente contables) omiten el campo — ver `DocumentEntityConfig`.
  */
 export type InventoryEffect = 'inflow' | 'outflow';
 
@@ -90,8 +93,12 @@ export interface DocumentEntityConfig {
   readonly endpoint: string;
   /** Discriminador para el backend genérico. Único across todo el ERP. */
   readonly documentTypeId: number;
-  /** Efecto sobre el inventario. */
-  readonly inventoryEffect: InventoryEffect;
+  /**
+   * Efecto sobre el inventario. Metadata para forms/inventario — la lista no la
+   * usa. Se omite en los documentos que no mueven stock (p. ej. el pago, que es
+   * un recaudo: sus líneas son movimientos contables, no ítems).
+   */
+  readonly inventoryEffect?: InventoryEffect;
   /**
    * Versión del schema. Se usa como sufijo en la clave de localStorage
    * para invalidar filtros guardados cuando el shape cambia.

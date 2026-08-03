@@ -34,10 +34,16 @@ const BASE_PARAMS: Record<string, ParamValue> = {
   ordering: 'codigo',
 };
 
-/** Construye la etiqueta visible `código - nombre` (cae a lo disponible). */
+/**
+ * Construye la opción: etiqueta visible `código - nombre` (cae a lo disponible)
+ * y el **código suelto**, para los formularios cuyo backend lo pide en vez del id
+ * (p. ej. el rango de cuentas del cierre contable). `ErpSelectOption` admite
+ * campos extra, así que exponerlo no rompe a nadie: quien no lo necesite sigue
+ * leyendo `id` y `nombre`.
+ */
 function toOption(row: CuentaApiRow): ErpSelectOption {
   const label = [row.codigo, row.nombre].filter(Boolean).join(' - ');
-  return { id: row.id, nombre: label || row.nombre || '' };
+  return { id: row.id, nombre: label || row.nombre || '', codigo: row.codigo ?? '' };
 }
 
 /**
@@ -50,9 +56,10 @@ function toOption(row: CuentaApiRow): ErpSelectOption {
  * - Muestra cada cuenta como `código - nombre`.
  *
  * Implementa `ControlValueAccessor`: el valor del control es un `ErpSelectOption`
- * (`{ id, nombre }`) donde `nombre` ya es la etiqueta `código - nombre` —misma
- * convención que produce `item.mapper`, por lo que es intercambiable con
- * `lib-api-autocomplete` en los campos de cuenta.
+ * (`{ id, nombre, codigo }`) donde `nombre` ya es la etiqueta `código - nombre`
+ * —misma convención que produce `item.mapper`, por lo que es intercambiable con
+ * `lib-api-autocomplete` en los campos de cuenta— y `codigo` viene suelto para
+ * los backends que piden el código en vez del id.
  */
 @Component({
   selector: 'app-cuenta-select',

@@ -26,7 +26,7 @@ import {
   ToastService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
+import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
@@ -113,6 +113,7 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -159,10 +160,11 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   protected readonly isSaving = signal(false);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
-    compraDocumentoBreadcrumb(
+    documentoBreadcrumb(
+      this.activeModule,
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
     ),
@@ -387,16 +389,6 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, 'compra', ...segments]);
-  }
-
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
+    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...segments]);
   }
 }

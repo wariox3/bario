@@ -14,6 +14,7 @@ export { UserAvatarComponent } from './lib/components/user-avatar/user-avatar.co
 export { ErpApiSelectComponent } from './lib/components/api-select/erp-api-select.component';
 export { ErpApiAutocompleteComponent } from './lib/components/api-autocomplete/erp-api-autocomplete.component';
 export { ErpContactoSelectComponent } from './lib/components/contacto-select/erp-contacto-select.component';
+export { ErpAsesorSelectComponent } from './lib/components/asesor-select/erp-asesor-select.component';
 export { ContratoAutocompleteComponent } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export type { ContratoOption } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export { DetailHeaderComponent } from './lib/components/detail-header/detail-header.component';

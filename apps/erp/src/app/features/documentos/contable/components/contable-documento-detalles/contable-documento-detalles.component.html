@@ -20,14 +20,25 @@
         (onClick)="onSaveAllClick()"
       />
     }
-    <p-button
-      type="button"
-      size="small"
-      icon="pi pi-plus"
-      [label]="t().entities.cuentaDetalle.addLine"
-      [outlined]="true"
-      (onClick)="addLinea()"
-    />
+    @if (agregarDocumentoEnabled()) {
+      <p-splitbutton
+        [label]="t().entities.cuentaDetalle.addLine"
+        icon="pi pi-plus"
+        [outlined]="true"
+        size="small"
+        [model]="addLineMenu()"
+        (onClick)="addLinea()"
+      />
+    } @else {
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-plus"
+        [label]="t().entities.cuentaDetalle.addLine"
+        [outlined]="true"
+        (onClick)="addLinea()"
+      />
+    }
   </div>
 
   <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
@@ -37,15 +48,45 @@
           <th class="contable-detalle-table__th w-10 text-center">
             {{ t().entities.cuentaDetalle.columns.linea }}
           </th>
-          <th class="contable-detalle-table__th min-w-[20rem] text-left">
+          @if (showNumero()) {
+            <th class="contable-detalle-table__th w-28 text-left">
+              {{ t().entities.cuentaDetalle.columns.numero }}
+            </th>
+          }
+          @if (showDocumento()) {
+            <th class="contable-detalle-table__th w-44 text-left">
+              {{ t().entities.cuentaDetalle.columns.documento }}
+            </th>
+          }
+          <th class="contable-detalle-table__th min-w-[18rem] text-left">
             {{ t().entities.cuentaDetalle.columns.cuenta }}
           </th>
+          @if (showContacto()) {
+            <th class="contable-detalle-table__th min-w-[14rem] text-left">
+              {{ t().entities.cuentaDetalle.columns.contacto }}
+            </th>
+          }
           <th class="contable-detalle-table__th w-40 text-left">
             {{ t().entities.cuentaDetalle.columns.naturaleza }}
           </th>
+          @if (showCentroCosto()) {
+            <th class="contable-detalle-table__th w-44 text-left">
+              {{ t().entities.cuentaDetalle.columns.centroCosto }}
+            </th>
+          }
           <th class="contable-detalle-table__th w-40 text-right">
             {{ t().entities.cuentaDetalle.columns.valor }}
           </th>
+          @if (showBase()) {
+            <th class="contable-detalle-table__th w-36 text-right">
+              {{ t().entities.cuentaDetalle.columns.base }}
+            </th>
+          }
+          @if (showDetalle()) {
+            <th class="contable-detalle-table__th min-w-[14rem] text-left">
+              {{ t().entities.cuentaDetalle.columns.detalle }}
+            </th>
+          }
           <th class="contable-detalle-table__th w-20 text-center">
             {{ t().entities.cuentaDetalle.columns.acciones }}
           </th>
@@ -68,6 +109,39 @@
               {{ i + 1 }}
             </td>
 
+            @if (showNumero()) {
+              <td class="contable-detalle-table__td">
+                <p-inputnumber
+                  formControlName="numero"
+                  mode="decimal"
+                  [min]="0"
+                  [useGrouping]="false"
+                  [maxFractionDigits]="0"
+                  [fluid]="true"
+                />
+              </td>
+            }
+
+            @if (showDocumento()) {
+              <td class="contable-detalle-table__td">
+                @if (row.controls.documento_afectado.value !== null) {
+                  <div class="flex flex-col gap-0.5">
+                    <span class="text-[0.78rem] font-medium text-brand-text">
+                      {{ row.controls.documento_afectado_tipo.value }}
+                    </span>
+                    <span class="text-[0.72rem] text-brand-muted tabular-nums">
+                      {{
+                        row.controls.documento_afectado_numero.value ??
+                          row.controls.documento_afectado.value
+                      }}
+                    </span>
+                  </div>
+                } @else {
+                  <span class="text-brand-muted">—</span>
+                }
+              </td>
+            }
+
             <td class="contable-detalle-table__td">
               <app-cuenta-select
                 formControlName="cuenta"
@@ -76,15 +150,35 @@
               />
             </td>
 
+            @if (showContacto()) {
+              <td class="contable-detalle-table__td">
+                <lib-contacto-select
+                  formControlName="contacto"
+                  [placeholder]="t().entities.cuentaDetalle.contactoPlaceholder"
+                />
+              </td>
+            }
+
             <td class="contable-detalle-table__td">
               <p-select
                 formControlName="naturaleza"
                 [options]="naturalezaOptions()"
                 optionLabel="label"
                 optionValue="value"
+                appendTo="body"
                 [fluid]="true"
               />
             </td>
+
+            @if (showCentroCosto()) {
+              <td class="contable-detalle-table__td">
+                <lib-api-select
+                  formControlName="centro_costo"
+                  [endpoint]="centroCostoEndpoint"
+                  [placeholder]="t().entities.cuentaDetalle.centroCostoPlaceholder"
+                />
+              </td>
+            }
 
             <td class="contable-detalle-table__td">
               <p-inputnumber
@@ -98,6 +192,34 @@
                 inputStyleClass="text-right"
               />
             </td>
+
+            @if (showBase()) {
+              <td class="contable-detalle-table__td">
+                <p-inputnumber
+                  formControlName="base"
+                  mode="decimal"
+                  [min]="0"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  prefix="$ "
+                  [fluid]="true"
+                  inputStyleClass="text-right"
+                />
+              </td>
+            }
+
+            @if (showDetalle()) {
+              <td class="contable-detalle-table__td">
+                <input
+                  pInputText
+                  formControlName="detalle"
+                  type="text"
+                  maxlength="200"
+                  class="w-full"
+                  [placeholder]="t().entities.cuentaDetalle.detallePlaceholder"
+                />
+              </td>
+            }
 
             <td class="contable-detalle-table__td">
               <div class="flex items-center justify-center gap-0.5">
@@ -131,7 +253,10 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <td
+              [attr.colspan]="columnCount()"
+              class="px-5 py-8 text-center text-sm text-brand-muted"
+            >
               <i class="pi pi-inbox mr-2"></i>{{ t().entities.cuentaDetalle.empty }}
             </td>
           </tr>
@@ -141,21 +266,10 @@
   </div>
 
   @if (detalles().controls.length > 0) {
-    <div class="flex justify-end">
-      <div
-        class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
-      >
-        <div class="flex flex-col gap-1.5">
-          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-            <span class="text-brand-muted">{{ t().entities.cuentaDetalle.resumen.debitos }}</span>
-            <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().debitos) }}</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-            <span class="text-brand-muted">{{ t().entities.cuentaDetalle.resumen.creditos }}</span>
-            <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().creditos) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <app-contable-documento-resumen
+      [resumen]="resumen()"
+      [showTotal]="showTotal()"
+      [showDescuadre]="showDescuadre()"
+    />
   }
 </div>

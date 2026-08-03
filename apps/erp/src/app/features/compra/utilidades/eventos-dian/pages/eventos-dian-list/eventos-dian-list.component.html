@@ -1,0 +1,56 @@
+<!--
+  Utilidad "Eventos DIAN" (Compra).
+  Chrome estándar de <lib-list-shell> (breadcrumb + card + tabla embebida).
+  Toolbar solo con filtros (el importar ZIP del legacy queda para otra fase).
+  Acciones por fila condicionadas por estado; editar y gestionar abren su modal.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.eventosDian.name">
+  <lib-data-toolbar
+    toolbar
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    [primaryAction]="primaryAction"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+    (actionInvoked)="onToolbarAction($event)"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    [rowActions]="rowActions"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-editar-referencia-modal
+  [(visible)]="editarVisible"
+  [documento]="activeRow()"
+  (saved)="onModalSaved()"
+/>
+
+<app-gestion-estado-modal
+  [(visible)]="gestionVisible"
+  [documento]="activeRow()"
+  (saved)="onModalSaved()"
+/>
+
+<app-importar-zip-modal [(visible)]="importarVisible" (saved)="onModalSaved()" />
+
+<p-confirmDialog />

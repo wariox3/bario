@@ -1,0 +1,63 @@
+@let e = t().entities.aporte.entidades;
+
+@if (isLoading()) {
+  <div class="flex items-center justify-center py-16 text-brand-muted">
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (isEmpty()) {
+  <div class="flex flex-col items-center px-6 py-16 text-center">
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.9rem] font-bold text-brand-text">{{ e.empty.title }}</p>
+    <p class="m-0 mt-1 max-w-[320px] text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ e.empty.sub }}
+    </p>
+  </div>
+} @else {
+  <div class="overflow-x-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <table class="w-full border-collapse text-[0.82rem]">
+      <thead>
+        <tr class="border-b border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.03)]">
+          <th class="px-4 py-2.5 text-left font-semibold text-brand-text">{{ e.columns.tipo }}</th>
+          <th class="px-4 py-2.5 text-left font-semibold text-brand-text">
+            {{ e.columns.entidad }}
+          </th>
+          <th class="px-4 py-2.5 text-right font-semibold text-brand-text">
+            {{ e.columns.cotizacion }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (grupo of agrupado().grupos; track grupo.tipo) {
+          @for (entidad of grupo.entidades; track entidad.id) {
+            <tr class="border-b border-[rgba(20,48,73,0.06)]">
+              <td class="px-4 py-2 text-brand-muted">{{ entidad.tipo }}</td>
+              <td class="px-4 py-2 text-brand-text">{{ entidad.entidad__nombre || '—' }}</td>
+              <td class="px-4 py-2 text-right tabular-nums text-brand-text">
+                {{ formatMoney(entidad.cotizacion) }}
+              </td>
+            </tr>
+          }
+          <!-- Subtotal del subsistema -->
+          <tr class="border-b border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)]">
+            <td class="px-4 py-2"></td>
+            <td class="px-4 py-2 font-semibold text-brand-text">
+              {{ e.subtotal }} {{ grupo.tipo }}
+            </td>
+            <td class="px-4 py-2 text-right font-semibold tabular-nums text-brand-text">
+              {{ formatMoney(grupo.subtotal) }}
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr class="bg-[rgba(20,48,73,0.05)]">
+          <td class="px-4 py-3"></td>
+          <td class="px-4 py-3 font-bold text-brand-text">{{ e.totalGeneral }}</td>
+          <td class="px-4 py-3 text-right font-bold tabular-nums text-brand-text">
+            {{ formatMoney(agrupado().total) }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+}

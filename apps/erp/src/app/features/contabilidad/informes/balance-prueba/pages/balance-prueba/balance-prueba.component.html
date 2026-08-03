@@ -1,0 +1,25 @@
+<!--
+  Informe "Balance de prueba".
+  Chrome estándar (<lib-list-shell>), pero el slot [toolbar] no lleva el toolbar
+  de filtros sino el panel de parámetros del reporte y su botonera. La tabla
+  arranca vacía hasta Generar y no pagina (el backend devuelve el informe
+  completo para que los totales cuadren).
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params [form]="form" idPrefix="bp" />
+
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </div>
+
+  <app-saldos-cuenta-table table [rows]="rows()" [generated]="generated()" />
+</lib-list-shell>

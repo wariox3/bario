@@ -67,18 +67,11 @@ export interface ProgramacionDetalleResponse {
 }
 
 /**
- * Columna de día del calendario, normalizada en el front a partir del string ISO
- * que llega en `ProgramacionDetalleResponse.fechas`.
- *  - `clave`: la fecha ISO original (`'2026-06-01'`) — índice para `fila.dias`.
- *  - `etiqueta`: número de día visible en el header (`1`..`31`).
+ * Columna de día del calendario. Vive en `@reddoc/core` (`lib/calendario`) desde
+ * que el modal de afectación del ERP también pinta el calendario; se re-exporta
+ * acá para que los consumidores del movimiento la sigan tomando del modelo.
  */
-export interface ProgramacionFecha {
-  readonly clave: string;
-  readonly etiqueta: string;
-  /** Inicial del día de la semana en español (L M X J V S D). */
-  readonly inicial: string;
-  readonly finDeSemana: boolean;
-}
+export type { ProgramacionFecha } from '@reddoc/core';
 
 /**
  * Celda de un día: el turno asignado (si hay) y sus horas. Las claves del mapa
@@ -106,6 +99,14 @@ export interface ProgramacionFila extends ProgramacionHoras {
   readonly documento_detalle_id: number;
   /** Detalle del documento afectado (origen del puesto); informativo. */
   readonly documento_detalle_afectado_id: number | null;
+  /**
+   * Vigencia de la línea (rango ISO `YYYY-MM-DD`) — acota los días programables de
+   * esta banda. Opcionales: si el backend aún no los envía quedan `undefined` y la
+   * tabla degrada a "todos los días habilitados" (sin bloqueo). Ver
+   * `ProgramacionVigencia` + los helpers de `programacion.utils.ts`.
+   */
+  readonly fecha_desde?: string | null;
+  readonly fecha_hasta?: string | null;
   readonly puesto_id: number | null;
   readonly puesto_nombre: string | null;
   /** Modalidad del puesto (ej. `SIN ARMA`). */
@@ -125,16 +126,32 @@ export interface ProgramacionFila extends ProgramacionHoras {
 /**
  * Lectura **mínima** de la línea de documento (pedido servicio) que los modales
  * de programación necesitan: `fecha_desde`, de la que deriva el período (mes/año)
- * a programar, y `generado`, que indica si la programación ya se materializó (lo
- * usa el modal de prototipo para alternar el botón entre generar y desgenerar).
- * Se lee vía `DocumentoDetalleService.obtenerPorId` con este tipo por llamada —
- * así no se acopla al modelo completo de `venta/`.
+ * a programar; `fecha_hasta`, que junto con `fecha_desde` acota la **vigencia**
+ * (rango de días válidos para la fecha de inicio del prototipo); y `generado`,
+ * que indica si la programación ya se materializó (lo usa el modal de prototipo
+ * para alternar el botón entre generar y desgenerar). Se lee vía
+ * `DocumentoDetalleService.obtenerPorId` con este tipo por llamada — así no se
+ * acopla al modelo completo de `venta/`.
  */
 export interface ProgramacionLineaRead {
   /** Fecha de inicio de la línea (ISO `YYYY-MM-DD`); define el período. */
   readonly fecha_desde: string | null;
+  /** Fecha de fin de la línea (ISO `YYYY-MM-DD`); cierra el rango de vigencia. */
+  readonly fecha_hasta: string | null;
   /** `true` si la programación de la línea ya se generó (materializó). */
   readonly generado: boolean;
+}
+
+/**
+ * Vigencia de una línea de programación: rango ISO `YYYY-MM-DD` de días válidos
+ * (`fecha_desde`..`fecha_hasta`), ambos extremos inclusive. Acota qué días se
+ * pueden programar en las tablas de día de los modales — fuera del rango el input
+ * del día se bloquea. Tipo de dominio compartido por los modales y el store; la
+ * lógica (predicado + formato) vive en `programacion.utils.ts`.
+ */
+export interface ProgramacionVigencia {
+  readonly desde: string;
+  readonly hasta: string;
 }
 
 /** Ítem de día en `crear`. `fecha` en formato ISO `YYYY-MM-DD`. */

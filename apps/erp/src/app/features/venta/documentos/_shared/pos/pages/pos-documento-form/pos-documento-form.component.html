@@ -1,0 +1,268 @@
+@let f = t().entities.posDocumento.form;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
+  <header class="flex items-center gap-2">
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving()"
+    />
+  </header>
+
+  <!-- ── Sección: Información general ──────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file-edit text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <!-- El título es el nombre del documento activo (Factura POS, Factura POS
+             electrónica…): la página la comparte toda la familia, así que no puede
+             venir de un literal. El modo (nuevo/editar) lo aporta la miga y el hint. -->
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ documentName() }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ isEditMode() ? f.editHint : f.createHint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Cliente -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="contacto" class="pos-documento-form__label">
+            {{ f.fields.cliente }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-contacto-select
+            inputId="contacto"
+            formControlName="contacto"
+            [extraParams]="contactoParams"
+            [placeholder]="f.fields.clientePlaceholder"
+            [invalid]="form.controls.contacto.invalid && form.controls.contacto.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.contacto"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Fechas (emisión + vencimiento) -->
+        <div class="grid grid-cols-2 gap-x-4 gap-y-4">
+          <!-- Fecha -->
+          <div class="flex flex-col gap-1.5">
+            <label for="fecha" class="pos-documento-form__label">
+              {{ f.fields.fecha }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-datepicker
+              inputId="fecha"
+              formControlName="fecha"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fecha"
+              [messages]="{ required: f.validation.required }"
+            />
+          </div>
+
+          <!-- Fecha de vencimiento -->
+          <div class="flex flex-col gap-1.5">
+            <label for="fecha_vence" class="pos-documento-form__label">
+              {{ f.fields.fechaVence }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-datepicker
+              inputId="fecha_vence"
+              formControlName="fecha_vence"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fecha_vence"
+              [messages]="{ required: f.validation.required }"
+            />
+          </div>
+        </div>
+
+        <!-- Plazo de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="plazo_pago" class="pos-documento-form__label">
+            {{ f.fields.plazoPago }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="plazo_pago"
+            formControlName="plazo_pago"
+            [endpoint]="plazoPagoEndpoint"
+            [placeholder]="f.fields.plazoPagoPlaceholder"
+            [invalid]="form.controls.plazo_pago.invalid && form.controls.plazo_pago.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.plazo_pago"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Método de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="metodo_pago" class="pos-documento-form__label">
+            {{ f.fields.metodoPago }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="metodo_pago"
+            formControlName="metodo_pago"
+            [endpoint]="metodoPagoEndpoint"
+            [placeholder]="f.fields.metodoPagoPlaceholder"
+            [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.metodo_pago"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Sede -->
+        <div class="flex flex-col gap-1.5">
+          <label for="sede" class="pos-documento-form__label">{{ f.fields.sede }}</label>
+          <lib-api-select
+            inputId="sede"
+            formControlName="sede"
+            [endpoint]="sedeEndpoint"
+            [placeholder]="f.fields.sedePlaceholder"
+          />
+        </div>
+
+        <!-- Asesor -->
+        <div class="flex flex-col gap-1.5">
+          <label for="asesor" class="pos-documento-form__label">{{ f.fields.asesor }}</label>
+          <lib-asesor-select
+            inputId="asesor"
+            formControlName="asesor"
+            [placeholder]="f.fields.asesorPlaceholder"
+          />
+        </div>
+
+        <!-- Orden de compra -->
+        <div class="flex flex-col gap-1.5">
+          <label for="orden_compra" class="pos-documento-form__label">
+            {{ f.fields.ordenCompra }}
+          </label>
+          <input
+            pInputText
+            id="orden_compra"
+            formControlName="orden_compra"
+            [fluid]="true"
+            [placeholder]="f.fields.ordenCompraPlaceholder"
+            [invalid]="form.controls.orden_compra.invalid && form.controls.orden_compra.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.orden_compra"
+            [messages]="{ maxlength: f.validation.ordenCompraMax }"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sección: Líneas y pagos ──────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
+        <p-tablist>
+          <p-tab value="detalles">{{ f.tabs.detalles }}</p-tab>
+          <p-tab value="pagos">
+            {{ f.tabs.pagos }}
+            <!-- Los pagos quedan tras un clic, pero el cajero necesita saber si están
+                 en orden desde la pestaña de detalles: el chip lleva el conteo y se
+                 tiñe cuando lo recibido supera el total (lo mismo que bloquea guardar). -->
+            @if (pagos.length > 0) {
+              <span
+                class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+                [class]="
+                  pagosExceden()
+                    ? 'bg-red-50 text-red-600'
+                    : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
+                "
+              >
+                {{ pagos.length }}
+              </span>
+            }
+          </p-tab>
+          <p-tab value="informacion">{{ f.tabs.informacion }}</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="detalles">
+            <app-comercial-documento-detalles
+              [detalles]="form.controls.detalles"
+              [documentId]="documentId()"
+              [importEnabled]="true"
+              [contactoId]="form.controls.contacto.value?.id ?? null"
+              (imported)="onImported()"
+            />
+          </p-tabpanel>
+
+          <p-tabpanel value="pagos">
+            <app-documento-pagos
+              [pagos]="form.controls.pagos"
+              [documentTotal]="totalGeneral()"
+              [hint]="f.pagosHint"
+            />
+          </p-tabpanel>
+
+          <p-tabpanel value="informacion">
+            <!-- Comentario -->
+            <div class="flex flex-col gap-1.5">
+              <label for="comentario" class="pos-documento-form__label">
+                {{ f.fields.comentario }}
+              </label>
+              <textarea
+                pTextarea
+                id="comentario"
+                formControlName="comentario"
+                rows="4"
+                [fluid]="true"
+                [placeholder]="f.fields.comentarioPlaceholder"
+                [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
+              ></textarea>
+              <lib-field-error
+                [control]="form.controls.comentario"
+                [messages]="{ maxlength: f.validation.comentarioMax }"
+              />
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    </div>
+  </section>
+</form>
+
+<p-confirmdialog />

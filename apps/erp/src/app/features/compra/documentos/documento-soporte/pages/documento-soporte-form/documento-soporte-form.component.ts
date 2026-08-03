@@ -142,7 +142,7 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
     compraDocumentoBreadcrumb(
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
     ),
@@ -350,15 +350,5 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
     if (!slug) return;
     const segments = this.document().routes.list.split('/').filter(Boolean);
     void this.router.navigate(['/t', slug, 'compra', ...segments]);
-  }
-
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
   }
 }

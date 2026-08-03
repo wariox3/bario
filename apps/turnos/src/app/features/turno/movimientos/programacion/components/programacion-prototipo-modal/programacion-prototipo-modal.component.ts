@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   computed,
@@ -25,7 +26,15 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { type ErpSelectOption, I18nService, ToastService, toIsoDate } from '@reddoc/core';
+import {
+  type ErpSelectOption,
+  I18nService,
+  ToastService,
+  esColumnaFestiva,
+  esColumnaSabado,
+  toIsoDate,
+  toProgramacionFecha,
+} from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
@@ -33,14 +42,12 @@ import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-gri
 import { ProgramacionPeriodoStore } from '../programacion-agregar-contrato-modal/programacion-periodo.store';
 import { PrototipoService } from '../../prototipo.service';
 import type { Prototipo, PrototipoPayload } from '../../prototipo.model';
-import type {
-  ProgramacionDetalleResponse,
-  ProgramacionErroresResponse,
-} from '../../programacion.model';
-import { toProgramacionFecha } from '../../programacion.utils';
+import type { ProgramacionDetalleResponse } from '../../programacion.model';
 import {
+  construirGenerarErrores,
   extraerDetalleProgramacion,
   extraerErroresProgramacion,
+  type GenerarErroresVista,
 } from '../../programacion-errores.util';
 
 /** Grupo de formulario de una fila de la tabla de prototipo. */
@@ -54,23 +61,6 @@ type FilaGroup = FormGroup<{
   fechaInicio: FormControl<string>;
   posicion: FormControl<number>;
 }>;
-
-/** Un mensaje de error del generar con los días (número) a los que aplica. */
-interface GenerarErrorGrupo {
-  readonly mensaje: string;
-  readonly dias: readonly string[];
-}
-
-/**
- * Vista del 400 de **generar** ya agrupada para el banner: el `detail` general,
- * los errores por día agrupados por mensaje (dedup de días) y los avisos sin
- * fecha (ej. horas excedidas).
- */
-interface GenerarErroresVista {
-  readonly detail: string;
-  readonly grupos: readonly GenerarErrorGrupo[];
-  readonly avisos: readonly string[];
-}
 
 /**
  * Modal de **prototipo** de turnos de un puesto.
@@ -103,6 +93,7 @@ interface GenerarErroresVista {
   templateUrl: './programacion-prototipo-modal.component.html',
   styleUrl: './programacion-prototipo-modal.component.scss',
   providers: [ProgramacionPeriodoStore, ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionPrototipoModalComponent {
   private readonly fb = inject(NonNullableFormBuilder);
@@ -113,6 +104,10 @@ export class ProgramacionPrototipoModalComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
+
+  /** Reglas de resaltado de columna (festivo/sábado), compartidas — ver utils. */
+  protected readonly esColumnaFestiva = esColumnaFestiva;
+  protected readonly esColumnaSabado = esColumnaSabado;
 
   /** Visibilidad del modal (two-way con el padre). */
   readonly visible = model<boolean>(false);
@@ -601,8 +596,8 @@ export class ProgramacionPrototipoModalComponent {
     const grupo = this.grupo();
     if (!grupo || this.isSubmitting()) return;
 
-    // Igual que simular, la limpieza corre contra el contrato detalle (detalle
-    // afectado): borra la simulación de ese prototipo, no la línea del pedido.
+    // `limpiar` no lleva body (borra la simulación del contexto). El afectado
+    // solo se usa después para refrescar el detalle (vista previa) de este puesto.
     const documentoDetalleAfectadoId = grupo.documentoDetalleAfectadoId;
     if (documentoDetalleAfectadoId === null) {
       const m = this.t().entities.programacion.detail.prototipoModal;
@@ -618,7 +613,7 @@ export class ProgramacionPrototipoModalComponent {
     this.generarErrores.set(null);
     this.isSubmitting.set(true);
     this.service
-      .limpiar(documentoDetalleAfectadoId)
+      .limpiar()
       .pipe(
         // Tras limpiar, se pide el detalle (vacío) del período con el que se
         // repinta la tabla.
@@ -638,30 +633,6 @@ export class ProgramacionPrototipoModalComponent {
   /** Cierra el banner de errores de generación (botón X del banner). */
   protected cerrarGenerarErrores(): void {
     this.generarErrores.set(null);
-  }
-
-  /**
-   * Arma la vista del 400 de generar: agrupa los `errores` con fecha por
-   * `mensaje` (deduplicando días — un día trae una entrada por turno) y separa
-   * los que no tienen fecha como `avisos`. Los días se muestran como número.
-   */
-  private construirGenerarErrores(parsed: ProgramacionErroresResponse): GenerarErroresVista {
-    const porMensaje = new Map<string, Set<string>>();
-    const avisos = new Set<string>();
-    for (const e of parsed.errores) {
-      if (!e.fecha) {
-        avisos.add(e.mensaje);
-        continue;
-      }
-      const fechas = porMensaje.get(e.mensaje) ?? new Set<string>();
-      fechas.add(e.fecha);
-      porMensaje.set(e.mensaje, fechas);
-    }
-    const grupos = [...porMensaje.entries()].map(([mensaje, fechas]) => ({
-      mensaje,
-      dias: [...fechas].sort().map((f) => f.slice(8, 10).replace(/^0/, '')),
-    }));
-    return { detail: parsed.detail, grupos, avisos: [...avisos] };
   }
 
   /**
@@ -697,7 +668,7 @@ export class ProgramacionPrototipoModalComponent {
         error: (err) => {
           const parsed = extraerErroresProgramacion(err);
           if (parsed && parsed.errores.length) {
-            this.generarErrores.set(this.construirGenerarErrores(parsed));
+            this.generarErrores.set(construirGenerarErrores(parsed));
           }
           this.toast.error(
             m.toasts.generarError.title,

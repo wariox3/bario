@@ -1,0 +1,47 @@
+@let tab = t().entities.conciliacion.soporteTab;
+
+<div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <lib-data-toolbar
+    [primaryAction]="primaryAction()"
+    [trailingActions]="trailingActions()"
+    [searchEnabled]="false"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+  />
+
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage()"
+    (pageChange)="onPageChange($event)"
+  />
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-import-dialog
+  [visible]="importVisible()"
+  (visibleChange)="onImportVisibleChange($event)"
+  [title]="tab.import.title"
+  [subtitle]="tab.import.subtitle"
+  [importing]="importLoading()"
+  [errors]="importErrors()"
+  [errorSummary]="importErrorSummary()"
+  [errorTotal]="importErrorTotal()"
+  [exampleConfig]="exampleConfig()"
+  (importRequested)="onImportRequested($event)"
+/>
+
+<p-confirmDialog />

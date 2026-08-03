@@ -521,6 +521,10 @@ export const es: AppDict = {
           secuenciaCalcular: 'Calcular',
           posicionLabel: 'Posición inicial',
           diasSection: 'Días del mes',
+          vigencia: {
+            label: 'Vigencia de la línea',
+            hint: 'Solo se pueden programar los días dentro de este rango.',
+          },
           cargandoDias: 'Cargando el período…',
           diaAria: 'Día',
           conflictoDia: 'El empleado ya tiene un turno ese día en otro puesto.',

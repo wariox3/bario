@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   computed,
@@ -20,7 +21,14 @@ import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { type ErpSelectOption, I18nService, ToastService, toIsoDate } from '@reddoc/core';
+import {
+  type ErpSelectOption,
+  I18nService,
+  ToastService,
+  esColumnaFestiva,
+  esColumnaSabado,
+  toIsoDate,
+} from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
@@ -29,6 +37,7 @@ import type { SecuenciaMesCalculado } from '@turnos/features/turno/masters/secue
 import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-grid.component';
 import { ProgramacionService } from '../../programacion.service';
 import type { CrearProgramacionPayload } from '../../programacion.model';
+import { estaEnVigencia, formatVigenciaRango, localeDe } from '../../programacion.utils';
 import {
   extraerDetalleProgramacion,
   extraerErroresProgramacion,
@@ -62,6 +71,7 @@ import { ProgramacionSecuenciaPickerComponent } from './programacion-secuencia-p
   templateUrl: './programacion-agregar-contrato-modal.component.html',
   styleUrl: './programacion-agregar-contrato-modal.component.scss',
   providers: [ProgramacionPeriodoStore],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgramacionAgregarContratoModalComponent {
   private readonly fb = inject(NonNullableFormBuilder);
@@ -71,6 +81,10 @@ export class ProgramacionAgregarContratoModalComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
+
+  /** Reglas de resaltado de columna (festivo/sábado), compartidas — ver utils. */
+  protected readonly esColumnaFestiva = esColumnaFestiva;
+  protected readonly esColumnaSabado = esColumnaSabado;
 
   /** Visibilidad del modal (two-way con el padre). */
   readonly visible = model<boolean>(false);
@@ -90,6 +104,41 @@ export class ProgramacionAgregarContratoModalComponent {
   protected readonly cargandoPeriodo = this.periodoStore.cargando;
   protected readonly dias = this.periodoStore.dias;
   protected readonly festivoPorDia = this.periodoStore.festivoPorDia;
+
+  /**
+   * Vigencia de la línea (rango ISO `desde`..`hasta`): los únicos días programables
+   * del mes. Fuera de este rango el input del día se **bloquea** (control deshabilitado)
+   * y la columna se atenúa. `null` = la línea no acotó rango → todos los días abiertos.
+   */
+  protected readonly vigencia = this.periodoStore.vigencia;
+
+  /**
+   * Números de día (1..N) dentro de la vigencia. Sin vigencia, todos los días del
+   * mes quedan habilitados (degradado seguro). Comparación lexicográfica de fechas
+   * ISO `YYYY-MM-DD` (ordenan igual que cronológicamente).
+   */
+  protected readonly diasHabilitados = computed<ReadonlySet<number>>(() => {
+    const dias = this.dias();
+    const v = this.vigencia();
+    const p = this.periodo();
+    // Sin período no hay fechas que construir; sin vigencia todos quedan habilitados.
+    if (!p) return new Set(dias.map((d) => d.dia));
+    const set = new Set<number>();
+    for (const d of dias) {
+      if (estaEnVigencia(toIsoDate(new Date(p.anio, p.mes - 1, d.dia)), v)) set.add(d.dia);
+    }
+    return set;
+  });
+
+  /** `true` si el día cae fuera de la vigencia (input bloqueado + columna atenuada). */
+  protected diaBloqueado(dia: number): boolean {
+    return !this.diasHabilitados().has(dia);
+  }
+
+  /** Rango de vigencia ya formateado para el chip de la banda (`15 de jul - 31 de jul`). */
+  protected readonly vigenciaEtiqueta = computed<string | null>(() =>
+    formatVigenciaRango(this.vigencia(), localeDe(this.i18n.lang())),
+  );
 
   /** Endpoint `seleccionar` de secuencias para el `<lib-api-autocomplete>`. */
   protected readonly secuenciaEndpoint = '/turno/secuencia/seleccionar/';
@@ -170,13 +219,20 @@ export class ProgramacionAgregarContratoModalComponent {
 
   constructor() {
     // Reconstruye el FormArray de días cuando cambia el período (cada mes tiene
-    // distinto número de días). `emitEvent: false` para no disparar el
-    // `valueChanges` que limpia los días ocupados.
+    // distinto número de días) o la vigencia (llega async con la línea). Los días
+    // fuera de la vigencia nacen **deshabilitados**: su input queda bloqueado y no
+    // aporta valor al payload. `emitEvent: false` para no disparar el `valueChanges`
+    // que limpia los días ocupados.
     effect(() => {
-      const total = this.dias().length;
+      const dias = this.dias();
+      const habilitados = this.diasHabilitados();
       const arr = this.diasArray;
       arr.clear({ emitEvent: false });
-      for (let i = 0; i < total; i++) arr.push(this.fb.control(''), { emitEvent: false });
+      for (const d of dias) {
+        const control = this.fb.control('');
+        if (!habilitados.has(d.dia)) control.disable({ emitEvent: false });
+        arr.push(control, { emitEvent: false });
+      }
       // Gatilla `diasControles` contra los controles recién creados (los effects
       // corren tras el render, así que sin esto leería los viejos).
       this.estructuraVersion.update((v) => v + 1);
@@ -213,7 +269,10 @@ export class ProgramacionAgregarContratoModalComponent {
   protected onSecuenciaCalculada(res: SecuenciaMesCalculado): void {
     const controls = this.diasArray.controls;
     for (const d of res.dias) {
-      controls[d.dia - 1]?.setValue(d.turno_codigo);
+      // Los días fuera de la vigencia están bloqueados: no se rellenan aunque la
+      // secuencia calcule un turno para ellos.
+      const control = controls[d.dia - 1];
+      if (control?.enabled) control.setValue(d.turno_codigo);
     }
   }
 

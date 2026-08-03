@@ -80,15 +80,13 @@ export class PrototipoService extends BaseHttpService {
   }
 
   /**
-   * Limpia la simulación del puesto (borra los registros dry-run):
-   * `POST /turno/programacion-simulacion/limpiar/` con `{ documento_detalle_id }`.
+   * Limpia la simulación (borra los registros dry-run):
+   * `POST /turno/programacion-simulacion/limpiar/` **sin body** → `{ eliminados }`.
    * Tras limpiar, el `detalle` vuelve vacío — el modal lo pide de nuevo para
    * refrescar la tabla de vista previa.
    */
-  limpiar(documentoDetalleId: number): Observable<unknown> {
-    return this.post<unknown>('/turno/programacion-simulacion/limpiar/', {
-      documento_detalle_id: documentoDetalleId,
-    });
+  limpiar(): Observable<{ eliminados: number }> {
+    return this.post<{ eliminados: number }>('/turno/programacion-simulacion/limpiar/', null);
   }
 
   /**

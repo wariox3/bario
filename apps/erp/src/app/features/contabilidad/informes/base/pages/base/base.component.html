@@ -1,0 +1,35 @@
+<!--
+  Informe "Base".
+  Panel de parámetros compartido pero sin las dos banderas, con el selector de
+  contacto proyectado, y tabla propia de movimientos con base gravable. Sin PDF.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <div toolbar class="informe-toolbar">
+    <app-informe-cuentas-params [form]="form" idPrefix="ib" [showFlags]="false">
+      <div class="flex flex-col gap-1.5">
+        <label for="ib-contacto" class="informe-params__label">{{ d.params.contacto }}</label>
+        <lib-contacto-select
+          inputId="ib-contacto"
+          [formControl]="contacto"
+          [placeholder]="d.params.contactoPlaceholder"
+        />
+      </div>
+    </app-informe-cuentas-params>
+
+    <app-informe-cuentas-actions
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [exportingPdf]="isExportingPdf()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="false"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </div>
+
+  <app-base-movimientos-table table [rows]="rows()" [generated]="generated()" />
+</lib-list-shell>

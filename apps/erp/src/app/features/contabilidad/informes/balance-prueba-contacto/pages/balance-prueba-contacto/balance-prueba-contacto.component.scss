@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+// Panel de parámetros + botonera. Vive en el slot [toolbar] de list-shell, que
+// ya aporta el gutter sobre el recuadro de la tabla.
+.informe-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// La etiqueta del campo proyectado copia el estilo de las del panel: al
+// proyectarse por ng-content no hereda sus estilos encapsulados.
+.informe-params__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--brand-navy);
+}

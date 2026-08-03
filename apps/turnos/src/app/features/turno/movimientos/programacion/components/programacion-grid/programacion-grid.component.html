@@ -1,4 +1,5 @@
 @let g = t().entities.programacion.detail.grid;
+@let mv = t().entities.programacion.detail.programacionModal.vigencia;
 
 <div class="max-h-[32rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
   <table class="programacion-grid">
@@ -21,10 +22,10 @@
           <th
             class="programacion-grid__th programacion-grid__th--dia"
             [class.programacion-grid__th--festivo]="
-              fecha.inicial === 'D' || festivoClaves().has(fecha.clave)
+              esColumnaFestiva(fecha.inicial, festivoClaves().has(fecha.clave))
             "
             [class.programacion-grid__th--sabado]="
-              fecha.inicial === 'S' && !festivoClaves().has(fecha.clave)
+              esColumnaSabado(fecha.inicial, festivoClaves().has(fecha.clave))
             "
           >
             <span class="programacion-grid__dia-num">{{ fecha.etiqueta }}</span>
@@ -50,7 +51,7 @@
     </thead>
 
     <tbody>
-      @for (grupo of grupos(); track grupo.documentoDetalleId + '_' + $index) {
+      @for (grupo of grupos(); track grupo.documentoDetalleId) {
         <tr class="programacion-grid__group-row">
           <!-- Banda principal: puesto + stats a la derecha -->
           <td [attr.colspan]="colspan() - 2" class="programacion-grid__group-cell">
@@ -80,6 +81,14 @@
                 <span class="programacion-grid__group-chip programacion-grid__group-chip--horario">
                   <i class="pi pi-clock text-[0.58rem]"></i>
                   {{ grupo.horario }}
+                </span>
+              }
+              <!-- Vigencia de la línea: ventana de días programables (fecha_desde ->
+                   fecha_hasta). Chip navy con calendario, junto al horario. -->
+              @if (grupo.rangoVigencia; as rango) {
+                <span class="programacion-grid__group-chip" [title]="mv.label">
+                  <i class="pi pi-calendar text-[0.58rem]"></i>
+                  {{ rango }}
                 </span>
               }
               <div class="ml-auto flex shrink-0 items-center gap-2">
@@ -134,7 +143,7 @@
           </td>
         </tr>
 
-        @for (fila of grupo.items; track fila.documento_detalle_id + '_' + $index) {
+        @for (fila of grupo.items; track fila.documento_detalle_id + '|' + fila.contrato_id) {
           <tr
             class="programacion-grid__row"
             [class.programacion-grid__row--selected]="estaSeleccionada(fila)"

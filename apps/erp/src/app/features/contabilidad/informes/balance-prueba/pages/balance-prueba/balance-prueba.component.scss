@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+// Panel de parámetros + botonera. Vive en el slot [toolbar] de list-shell, que
+// ya aporta el gutter sobre el recuadro de la tabla; es más alto que un toolbar
+// de filtros porque el reporte se define acá.
+.informe-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}

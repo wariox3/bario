@@ -11,17 +11,9 @@ import {
   type ListResponse,
   type SortSpec,
 } from '../data-list';
+import type { PaginatedResponse } from '../models/pagination.model';
 import type { EntityConfig } from './entity-config.types';
 import type { EntityDataGateway } from './entity-data-gateway';
-
-/**
- * Forma de la respuesta paginada cruda del backend.
- * El gateway la traduce a `ListResponse` (contrato del framework).
- */
-interface PaginatedApiResponse {
-  readonly count: number;
-  readonly results: readonly unknown[];
-}
 
 /**
  * Filtro tal como lo espera el backend de documentos en `POST /lista/`.
@@ -87,7 +79,7 @@ export class HttpEntityDataGateway implements EntityDataGateway {
   list(entity: EntityConfig, query: ListQuery): Observable<ListResponse> {
     const body = this.buildListBody(entity, query);
     return this.http
-      .post<PaginatedApiResponse>(`${entity.endpoint}/lista/`, body, {
+      .post<PaginatedResponse<unknown>>(`${entity.endpoint}/lista/`, body, {
         params: buildHttpParams(buildListParams(query)),
       })
       .pipe(
@@ -160,6 +152,25 @@ export class HttpEntityDataGateway implements EntityDataGateway {
   desaprobar(entity: EntityConfig, id: string | number): Observable<unknown> {
     return this.http.post(`${entity.endpoint}/desaprobar/`, {
       id,
+    });
+  }
+
+  /** Anula el documento: `POST <endpoint>/anular/` con `{ id }`. */
+  anular(entity: EntityConfig, id: string | number): Observable<unknown> {
+    return this.http.post(`${entity.endpoint}/anular/`, {
+      id,
+    });
+  }
+
+  /**
+   * Emite el documento a la DIAN: `POST <endpoint>/emitir/` con
+   * **`{ documento_id }`** — no `{ id }` como el resto de las acciones. El
+   * backend nombra así este parámetro y solo este; ver el comentario del
+   * contrato.
+   */
+  emitir(entity: EntityConfig, id: string | number): Observable<unknown> {
+    return this.http.post(`${entity.endpoint}/emitir/`, {
+      documento_id: id,
     });
   }
 

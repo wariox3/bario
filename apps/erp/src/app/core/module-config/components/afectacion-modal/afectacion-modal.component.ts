@@ -1,6 +1,7 @@
 import {
   Component,
   DestroyRef,
+  computed,
   effect,
   inject,
   input,
@@ -9,19 +10,33 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, of, switchMap, type Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import {
+  anioMesDeIso,
   type DocumentoDetalleReadBase,
   DocumentoDetalleService,
+  esColumnaFestiva,
+  esColumnaSabado,
+  FestivoService,
   formatCop,
   I18nService,
+  type ProgramacionFecha,
   ToastService,
   toFiniteNumber,
+  toProgramacionFecha,
 } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { DocumentoService } from '../../data/documento.service';
+import {
+  ProgramacionDetalleService,
+  type ProgramacionCalendarioRead,
+  type ProgramacionFilaRead,
+} from './programacion-detalle.service';
+
+/** Calendario sin programaciones: degradado de la carga (documento no-servicio o fallo). */
+const CALENDARIO_VACIO: ProgramacionCalendarioRead = { fechas: [], filas: [] };
 
 /**
  * Cabecera de documento (`documento/<id>/`), recortada a lo que el modal pinta.
@@ -81,6 +96,8 @@ interface AfectacionDetalleRead extends DocumentoDetalleReadBase {
 export class AfectacionModalComponent {
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly documentoService = inject(DocumentoService);
+  private readonly programacionService = inject(ProgramacionDetalleService);
+  private readonly festivoService = inject(FestivoService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -104,8 +121,26 @@ export class AfectacionModalComponent {
   protected readonly documentoReferencia = signal<AfectacionDocumentoRead | null>(null);
   /** Id del detalle afectado (`base.documento_detalle_afectado`), para la card 2. */
   protected readonly detalleAfectadoId = signal<number | null>(null);
+  /**
+   * Programaciones del detalle base: un contrato asignado a su puesto por fila.
+   * Vacío cuando el documento no es de servicio (o su programación no se generó).
+   */
+  protected readonly programaciones = signal<readonly ProgramacionFilaRead[]>([]);
+  /** Columnas de día del calendario de las programaciones (vacío si no hay). */
+  protected readonly programacionFechas = signal<readonly ProgramacionFecha[]>([]);
+  /** Claves ISO festivas del período — resaltan la columna del día. */
+  protected readonly festivoClaves = signal<ReadonlySet<string>>(new Set());
+
+  /**
+   * Columnas de la tabla de programaciones, para el `colspan` del estado vacío:
+   * la del contrato + los días + 3 de horas (H, HD, HN).
+   */
+  protected readonly programacionColspan = computed(() => 1 + this.programacionFechas().length + 3);
 
   protected readonly formatMoney = formatCop;
+  /** Reglas de resaltado de columna (festivo/sábado), compartidas — ver `@reddoc/core`. */
+  protected readonly esColumnaFestiva = esColumnaFestiva;
+  protected readonly esColumnaSabado = esColumnaSabado;
 
   constructor() {
     // Al abrir, carga la afectación del detalle base. El id se lee con `untracked`
@@ -136,6 +171,38 @@ export class AfectacionModalComponent {
     });
   }
 
+  /** Código del turno de ese día, vacío si no tiene programación. */
+  protected celda(fila: ProgramacionFilaRead, clave: string): string {
+    return fila.dias?.[clave]?.turno_codigo ?? '';
+  }
+
+  /** Horas como número plano: `"72.00"` → `72`. */
+  protected formatHoras(value: string | number | null | undefined): string {
+    const n = toFiniteNumber(value);
+    return n === null ? '—' : String(n);
+  }
+
+  /**
+   * Festivos del período del calendario, como set de claves ISO para resaltar la
+   * columna. Los festivos **no viajan** en la respuesta de programación (y el flag
+   * de la celda no sirve: un festivo sin turno no tiene celda), así que se piden
+   * aparte, igual que la ficha de turnos.
+   *
+   * Solo se pide si la línea tiene programaciones: así abrir el modal en una
+   * factura de compra no dispara la llamada. Si falla, cae a set vacío (se pierde
+   * el resaltado, no el modal).
+   */
+  private festivosDelPeriodo(
+    calendario: ProgramacionCalendarioRead,
+  ): Observable<ReadonlySet<string>> {
+    const periodo = calendario.filas.length > 0 ? anioMesDeIso(calendario.fechas[0]) : null;
+    if (!periodo) return of<ReadonlySet<string>>(new Set());
+    return this.festivoService.getDelMes(periodo.anio, periodo.mes).pipe(
+      map((festivos) => new Set(festivos.map((f) => f.fecha)) as ReadonlySet<string>),
+      catchError(() => of<ReadonlySet<string>>(new Set())),
+    );
+  }
+
   private load(detalleId: number): void {
     this.loading.set(true);
     this.error.set(false);
@@ -143,6 +210,9 @@ export class AfectacionModalComponent {
     this.documento.set(null);
     this.documentoReferencia.set(null);
     this.detalleAfectadoId.set(null);
+    this.programaciones.set([]);
+    this.programacionFechas.set([]);
+    this.festivoClaves.set(new Set());
 
     forkJoin({
       // Base: el detalle a consultar (solo se usa su FK `documento`).
@@ -162,8 +232,17 @@ export class AfectacionModalComponent {
                   .obtenerPorId<AfectacionDocumentoRead>(docId)
                   .pipe(catchError(() => of<AfectacionDocumentoRead | null>(null)))
               : of<AfectacionDocumentoRead | null>(null);
-          return documento.pipe(
-            switchMap((doc) => {
+          // Calendario del detalle base (el backend filtra por `documento_detalle`).
+          // El modal es agnóstico del tipo de documento y solo los de servicio tienen
+          // programación, así que el fallo cae a vacío en vez de tumbar la afectación.
+          const programaciones =
+            docId != null
+              ? this.programacionService
+                  .obtenerCalendarioDelDetalle(docId, detalleId)
+                  .pipe(catchError(() => of(CALENDARIO_VACIO)))
+              : of(CALENDARIO_VACIO);
+          return forkJoin({ documento, programaciones }).pipe(
+            switchMap(({ documento: doc, programaciones: calendario }) => {
               const refId = doc?.documento_referencia ?? doc?.documento_referencia_id ?? null;
               const referencia =
                 refId != null
@@ -171,11 +250,16 @@ export class AfectacionModalComponent {
                       .obtenerPorId<AfectacionDocumentoRead>(refId)
                       .pipe(catchError(() => of<AfectacionDocumentoRead | null>(null)))
                   : of<AfectacionDocumentoRead | null>(null);
-              return referencia.pipe(
-                map((ref) => ({
+              return forkJoin({
+                referencia,
+                festivos: this.festivosDelPeriodo(calendario),
+              }).pipe(
+                map(({ referencia: ref, festivos }) => ({
                   filas,
                   doc,
                   ref,
+                  calendario,
+                  festivos,
                   afectadoId: base.documento_detalle_afectado ?? null,
                 })),
               );
@@ -185,10 +269,13 @@ export class AfectacionModalComponent {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: ({ filas, doc, ref, afectadoId }) => {
+        next: ({ filas, doc, ref, calendario, festivos, afectadoId }) => {
           this.filas.set(filas);
           this.documento.set(doc);
           this.documentoReferencia.set(ref);
+          this.programaciones.set(calendario.filas);
+          this.programacionFechas.set(calendario.fechas.map(toProgramacionFecha));
+          this.festivoClaves.set(festivos);
           this.detalleAfectadoId.set(afectadoId);
           this.loading.set(false);
         },

@@ -25,16 +25,22 @@ interface ContactoApiRow {
   readonly numero_identificacion?: string;
   readonly nombre_corto?: string;
   readonly nombre?: string;
+  /** Campos extra del contacto (p. ej. `plazo_pago_id`, `precio_id`) que el consumidor puede leer. */
+  readonly [key: string]: unknown;
 }
 
 /** Endpoint de selección de contactos. */
 const ENDPOINT = '/general/contacto/seleccionar/';
 
-/** Construye la etiqueta visible `identificación - nombre` (cae a lo disponible). */
+/**
+ * Construye la etiqueta visible `identificación - nombre` (cae a lo disponible) y
+ * conserva los campos extra del endpoint (`plazo_pago_id`, `precio_id`, etc.) para
+ * que el consumidor pueda derivar valores por defecto tras seleccionar el contacto.
+ */
 function toOption(row: ContactoApiRow): ErpSelectOption {
   const name = row.nombre_corto ?? row.nombre ?? '';
   const label = [row.numero_identificacion, name].filter(Boolean).join(' - ');
-  return { id: row.id, nombre: label || name };
+  return { ...row, id: row.id, nombre: label || name };
 }
 
 /**

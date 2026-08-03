@@ -1,0 +1,48 @@
+@let c = t().entities.aporte.contratos;
+
+<div class="flex flex-col gap-3">
+  <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <lib-data-toolbar
+      [primaryAction]="primaryAction()"
+      [searchEnabled]="false"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      [deleteSelectedEnabled]="hasSelection() && capacidades().puedeEliminarContrato"
+      [deleteSelectedCount]="selectedRows().length"
+      (actionInvoked)="onToolbarAction($event)"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+      (deleteSelected)="removeSelected()"
+    />
+
+    <lib-data-table
+      [columns]="columns"
+      [items]="items()"
+      [totalCount]="totalCount()"
+      [loading]="isLoading()"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage()"
+      [selectionMode]="selectionMode()"
+      [selectedRows]="selectedRows()"
+      [rowActions]="rowActions"
+      (pageChange)="onPageChange($event)"
+      (selectionChange)="onSelectionChange($event)"
+      (rowActionInvoked)="onRowAction($event)"
+    />
+  </div>
+
+  <!-- Qué mirar antes de generar -->
+  <p class="m-0 text-[0.72rem] leading-relaxed text-brand-muted">
+    <span class="font-semibold">{{ c.leyenda.titulo }}:</span> {{ c.leyenda.contenido }}
+  </p>
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />

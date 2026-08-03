@@ -1,10 +1,13 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { EMPTY, filter, from, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { DialogService } from 'primeng/dynamicdialog';
 import { I18nService, TenantService, ToastService, formatCop, fromIsoDate } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { DetailHeaderComponent } from '@reddoc/ui';
+import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
 import { CONTRATO_LIST_PATH } from '../../contrato.constants';
@@ -23,11 +26,13 @@ import type { Contrato } from '../../contrato.model';
   selector: 'app-contrato-detail',
   standalone: true,
   imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  providers: [DialogService],
   templateUrl: './contrato-detail.component.html',
   styleUrl: './contrato-detail.component.scss',
 })
 export class ContratoDetailComponent implements OnInit {
   private readonly service = inject(ContratoService);
+  private readonly dialog = inject(DialogService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -80,6 +85,62 @@ export class ContratoDetailComponent implements OnInit {
     const c = this.contrato();
     if (!c) return;
     this.navigate('editar', c.id);
+  }
+
+  // ── Terminación ───────────────────────────────────────────────────────────
+
+  /**
+   * Abre el modal de terminación (lazy: solo se usa al cerrar un contrato).
+   *
+   * Terminar **crea la liquidación** del empleado en el backend, así que al
+   * volver se recarga la ficha para ver el contrato ya cerrado.
+   */
+  protected onTerminar(): void {
+    const c = this.contrato();
+    if (!c) return;
+
+    from(import('../../components/terminar-contrato-modal/terminar-contrato-modal.component'))
+      .pipe(
+        switchMap(({ TerminarContratoModalComponent }) => {
+          const ref = this.dialog.open(TerminarContratoModalComponent, {
+            ...ENTITY_ACTION_DIALOG_DEFAULTS,
+            width: '40rem',
+            data: { contratoId: c.id, empleado: c.contacto_nombre, fechaHasta: c.fecha_hasta },
+          });
+          return ref ? ref.onClose : EMPTY;
+        }),
+        filter((termino: unknown): termino is true => termino === true),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.loadContrato(c.id));
+  }
+
+  /** Abre las cuatro fechas de último pago, con las que arranca la liquidación. */
+  protected onParametrosIniciales(): void {
+    const c = this.contrato();
+    if (!c) return;
+
+    from(import('../../components/parametros-iniciales-modal/parametros-iniciales-modal.component'))
+      .pipe(
+        switchMap(({ ParametrosInicialesModalComponent }) => {
+          const ref = this.dialog.open(ParametrosInicialesModalComponent, {
+            ...ENTITY_ACTION_DIALOG_DEFAULTS,
+            width: '44rem',
+            data: {
+              contratoId: c.id,
+              empleado: c.contacto_nombre,
+              fechaUltimoPago: c.fecha_ultimo_pago,
+              fechaUltimoPagoPrima: c.fecha_ultimo_pago_prima,
+              fechaUltimoPagoCesantia: c.fecha_ultimo_pago_cesantia,
+              fechaUltimoPagoVacacion: c.fecha_ultimo_pago_vacacion,
+            },
+          });
+          return ref ? ref.onClose : EMPTY;
+        }),
+        filter((guardo: unknown): guardo is true => guardo === true),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.loadContrato(c.id));
   }
 
   private loadContrato(id: number): void {

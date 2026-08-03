@@ -77,6 +77,31 @@ export const COMPRA_ROUTES: Route[] = [
           import('./documentos/nota-ajuste/nota-ajuste.routes').then((m) => m.NOTA_AJUSTE_ROUTES),
       },
       {
+        path: 'utilidades/documento-electronico',
+        loadChildren: () =>
+          import('./utilidades/documento-electronico/documento-electronico.routes').then(
+            (m) => m.DOCUMENTO_ELECTRONICO_ROUTES,
+          ),
+      },
+      {
+        path: 'utilidades/eventos-dian',
+        loadChildren: () =>
+          import('./utilidades/eventos-dian/eventos-dian.routes').then(
+            (m) => m.EVENTOS_DIAN_ROUTES,
+          ),
+      },
+      {
+        // Informe compartido: el código vive en tesoreria/informes/cuenta-pagar,
+        // pero es module-agnostic (deriva el módulo activo del `ActiveModuleStore`,
+        // fijado por el `erpModuleResolver('compra')` de la ruta raíz), así que su
+        // navegación se queda dentro de Compra. Reusado igual en tesoreria y general.
+        path: 'informes/cuenta-pagar',
+        loadChildren: () =>
+          import('../tesoreria/informes/cuenta-pagar/cuenta-pagar.routes').then(
+            (m) => m.CUENTA_PAGAR_ROUTES,
+          ),
+      },
+      {
         path: 'items',
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),

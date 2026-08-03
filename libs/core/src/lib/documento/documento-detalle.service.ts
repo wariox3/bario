@@ -42,6 +42,31 @@ export class DocumentoDetalleService extends BaseHttpService {
     }).pipe(map((res) => [...res.results]));
   }
 
+  /**
+   * Igual que `listarPorDocumento` pero **paginado de verdad**: devuelve la
+   * respuesta completa (`count` + `results`) para que la vista pueda pintar un
+   * paginador.
+   *
+   * Lo pide el cierre contable, el único documento que puede traer más líneas de
+   * las que cabe mostrar de una: cierra todas las cuentas de resultado y, según
+   * cómo se configure, las abre por tercero. El resto de los documentos siguen
+   * con `listarPorDocumento`, que trae todo en una sola página.
+   *
+   * `page` es **1-based**, como espera el backend (misma convención que
+   * `LIST_PAGINATION_PARAMS` en los listados).
+   */
+  listarPaginadoPorDocumento<TRead = unknown>(
+    documentoId: number,
+    page: number,
+    limit: number,
+  ): Observable<PaginatedResponse<TRead>> {
+    return this.get<PaginatedResponse<TRead>>(DOCUMENTO_DETALLE_ENDPOINT, {
+      documento_id: documentoId,
+      page,
+      limit,
+    });
+  }
+
   /** Trae una línea por su `id` (`GET …documento-detalle/<id>/`). */
   obtenerPorId<TRead = unknown>(id: number): Observable<TRead> {
     return this.get<TRead>(`${DOCUMENTO_DETALLE_ENDPOINT}${id}/`);

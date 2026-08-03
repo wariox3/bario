@@ -38,6 +38,7 @@ import type { Item } from '@erp/features/general/masters/item/item.model';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { MODALIDAD_ENDPOINT, PUESTO_ENDPOINT } from '../../servicio-documento.constants';
 import { createDetalleGroup, type DetalleGroup } from '../../servicio-documento-detalle.form';
+import { tieneHorasProgramadas } from '../../servicio-documento-detalle.utils';
 import type { DetalleFormRawValue } from '../../servicio-documento-detalle.types';
 import { ServicioDocumentoService } from '../../servicio-documento.service';
 import type {
@@ -100,11 +101,27 @@ export class ServicioDocumentoDetalleModalComponent {
    * botones y el descarte del diálogo; el padre cierra el modal solo al éxito.
    */
   readonly saving = input<boolean>(false);
+  /**
+   * Habilita el bloqueo de la cobertura en las líneas que ya tienen horas
+   * programadas. Solo lo activa pedido servicio; apagado por defecto para no
+   * cambiar el comportamiento de los demás documentos de la familia.
+   */
+  readonly lockCoberturaOnProgramadas = input<boolean>(false);
   /** Emite el valor crudo validado al confirmar. */
   readonly save = output<DetalleFormRawValue>();
 
   protected readonly isEditMode = computed(() => this.value() !== null);
   protected readonly group = signal<DetalleGroup>(createDetalleGroup());
+
+  /**
+   * Cobertura bloqueada: la línea ya tiene turnos programados, así que fechas,
+   * horario, modalidad, salario y días no pueden moverse (dejaría la programación
+   * existente inconsistente). Lo comercial de la línea sigue editable.
+   */
+  protected readonly coberturaBloqueada = computed(() => {
+    const value = this.value();
+    return this.lockCoberturaOnProgramadas() && value !== null && tieneHorasProgramadas(value);
+  });
 
   protected readonly puestoParams = computed(() => {
     const params: Record<string, string> = {};
@@ -244,6 +261,7 @@ export class ServicioDocumentoDetalleModalComponent {
   }
 
   protected toggleDia(dia: number): void {
+    if (this.coberturaBloqueada()) return;
     const ctrl = this.group().controls.dias_semana;
     const current = [...ctrl.value];
     const idx = current.indexOf(dia);
@@ -257,6 +275,7 @@ export class ServicioDocumentoDetalleModalComponent {
   }
 
   protected toggleFestivo(): void {
+    if (this.coberturaBloqueada()) return;
     const ctrl = this.group().controls.festivo;
     ctrl.setValue(!ctrl.value);
   }
@@ -277,6 +296,17 @@ export class ServicioDocumentoDetalleModalComponent {
       }
       if (!isEditMode) {
         group.controls.salario.setValue(untracked(this.salario));
+      }
+      // Línea con turnos ya programados: la cobertura se congela. Los controles
+      // deshabilitados igual viajan en `getRawValue()`, así que el PATCH conserva
+      // sus valores originales.
+      if (untracked(this.coberturaBloqueada)) {
+        group.controls.fecha_desde.disable();
+        group.controls.fecha_hasta.disable();
+        group.controls.hora_desde.disable();
+        group.controls.hora_hasta.disable();
+        group.controls.modalidad.disable();
+        group.controls.salario.disable();
       }
       this.group.set(group);
     });

@@ -1,0 +1,128 @@
+@let l = liquidacion();
+@let res = t().entities.liquidacion.resumen;
+@let estados = t().entities.liquidacion.estados;
+
+<section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+  <div class="flex flex-wrap items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+    <span
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+    >
+      <i class="pi pi-user-minus text-[1rem]"></i>
+    </span>
+    <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+      <h2 class="m-0 truncate text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ l.contrato__contacto__nombre_corto || res.sinEmpleado }}
+      </h2>
+      <p class="m-0 text-[0.72rem] text-brand-muted">
+        {{ l.contrato__contacto__numero_identificacion || '—' }} · {{ res.labels.contrato }}
+        {{ l.contrato_id ?? '—' }}
+      </p>
+    </div>
+
+    <!-- Etapa del ciclo: es la información que decide qué se puede hacer -->
+    <span
+      class="rounded-full px-2.5 py-1 text-[0.7rem] font-bold uppercase tracking-[0.03em]"
+      [class]="
+        estado() === 'aprobada'
+          ? 'bg-emerald-50 text-emerald-700'
+          : estado() === 'generada'
+            ? 'bg-sky-50 text-sky-700'
+            : 'bg-amber-50 text-amber-700'
+      "
+    >
+      {{ estados[estado()] }}
+    </span>
+  </div>
+
+  <!-- Periodo liquidado y base -->
+  <dl class="grid grid-cols-2 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.fecha }}</dt>
+      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.desde }}</dt>
+      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha_desde) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.hasta }}</dt>
+      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha_hasta) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.ultimoPago }}</dt>
+      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha_ultimo_pago) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.dias }}</dt>
+      <dd class="liquidacion-resumen__value tabular-nums">{{ l.dias ?? 0 }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.salario }}</dt>
+      <dd class="liquidacion-resumen__value tabular-nums">{{ formatMoney(salario()) }}</dd>
+    </div>
+  </dl>
+
+  <!-- Las cuatro prestaciones, con lo que explica cada monto -->
+  <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+    <p class="m-0 mb-3 text-[0.72rem] font-semibold uppercase tracking-[0.03em] text-brand-muted">
+      {{ res.prestacionesTitle }}
+    </p>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse text-[0.82rem]">
+        <thead>
+          <tr class="border-b border-[rgba(20,48,73,0.1)]">
+            <th class="py-2 pr-4 text-left font-semibold text-brand-text">
+              {{ res.labels.prestacion }}
+            </th>
+            <th class="px-4 py-2 text-left font-semibold text-brand-text">
+              {{ res.labels.ultimoPago }}
+            </th>
+            <th class="px-4 py-2 text-right font-semibold text-brand-text">
+              {{ res.labels.dias }}
+            </th>
+            <th class="py-2 pl-4 text-right font-semibold text-brand-text">
+              {{ res.labels.valor }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (prestacion of prestaciones(); track prestacion.label) {
+            <tr class="border-b border-[rgba(20,48,73,0.06)]">
+              <td class="py-2 pr-4 text-brand-text">{{ prestacion.label }}</td>
+              <!-- El interés no tiene fecha ni días propios: sale de la cesantía -->
+              <td class="px-4 py-2 text-brand-muted">{{ prestacion.ultimoPago ?? '—' }}</td>
+              <td class="px-4 py-2 text-right tabular-nums text-brand-muted">
+                {{ prestacion.dias ?? '—' }}
+              </td>
+              <td class="py-2 pl-4 text-right tabular-nums text-brand-text">
+                {{ formatMoney(prestacion.valor) }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Cierre: lo cargado a mano y el neto -->
+  <dl class="grid grid-cols-3 gap-x-6 gap-y-3 border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.adicion }}</dt>
+      <dd class="liquidacion-resumen__value tabular-nums">{{ formatMoney(adicion()) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.deduccion }}</dt>
+      <dd class="liquidacion-resumen__value tabular-nums">{{ formatMoney(deduccion()) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="liquidacion-resumen__label">{{ res.labels.total }}</dt>
+      <dd class="liquidacion-resumen__value font-bold tabular-nums">{{ formatMoney(total()) }}</dd>
+    </div>
+  </dl>
+
+  @if (l.comentario) {
+    <p class="m-0 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-[0.78rem] text-brand-muted">
+      {{ l.comentario }}
+    </p>
+  }
+</section>

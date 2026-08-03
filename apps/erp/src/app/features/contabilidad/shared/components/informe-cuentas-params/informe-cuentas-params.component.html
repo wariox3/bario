@@ -1,0 +1,94 @@
+@let d = t().entities.informeCuentas;
+@let p = idPrefix();
+
+<form [formGroup]="form()" class="informe-params__grid">
+  <!-- Periodo -->
+  <div class="flex flex-col gap-1.5">
+    <label [for]="p + '-fecha-desde'" class="informe-params__label">{{
+      d.params.fechaDesde
+    }}</label>
+    <p-datepicker
+      [inputId]="p + '-fecha-desde'"
+      formControlName="fecha_desde"
+      dateFormat="yy-mm-dd"
+      [showIcon]="true"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label [for]="p + '-fecha-hasta'" class="informe-params__label">{{
+      d.params.fechaHasta
+    }}</label>
+    <p-datepicker
+      [inputId]="p + '-fecha-hasta'"
+      formControlName="fecha_hasta"
+      dateFormat="yy-mm-dd"
+      [showIcon]="true"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </div>
+
+  <!-- Rango de cuentas (vacío = todo el plan) -->
+  @if (showCuentas()) {
+    <div class="flex flex-col gap-1.5">
+      <label [for]="p + '-cuenta-desde'" class="informe-params__label">{{
+        d.params.cuentaDesde
+      }}</label>
+      <app-cuenta-select
+        [inputId]="p + '-cuenta-desde'"
+        formControlName="cuenta_desde"
+        [placeholder]="d.params.cuentaPlaceholder"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label [for]="p + '-cuenta-hasta'" class="informe-params__label">{{
+        d.params.cuentaHasta
+      }}</label>
+      <app-cuenta-select
+        [inputId]="p + '-cuenta-hasta'"
+        formControlName="cuenta_hasta"
+        [placeholder]="d.params.cuentaPlaceholder"
+      />
+    </div>
+  }
+
+  <!-- Parámetros propios del informe (contacto, comprobante…) -->
+  <ng-content />
+
+  <!-- Banderas -->
+  @if (showFlags()) {
+    <div class="informe-params__flags">
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          [inputId]="p + '-incluir-cierre'"
+          formControlName="incluir_cierre"
+          [binary]="true"
+        />
+        <label [for]="p + '-incluir-cierre'" class="text-sm">{{ d.params.incluirCierre }}</label>
+      </div>
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          [inputId]="p + '-con-movimiento'"
+          formControlName="cuenta_con_movimiento"
+          [binary]="true"
+        />
+        <label [for]="p + '-con-movimiento'" class="text-sm">{{
+          d.params.soloConMovimiento
+        }}</label>
+      </div>
+    </div>
+  }
+</form>
+
+<!-- Errores del rango (validador a nivel de formulario) -->
+@if (form().touched || form().dirty) {
+  @if (form().hasError('rangoInvertido')) {
+    <p class="informe-params__error">{{ d.validation.rangoInvertido }}</p>
+  } @else if (form().hasError('anioDistinto')) {
+    <p class="informe-params__error">{{ d.validation.anioDistinto }}</p>
+  }
+}

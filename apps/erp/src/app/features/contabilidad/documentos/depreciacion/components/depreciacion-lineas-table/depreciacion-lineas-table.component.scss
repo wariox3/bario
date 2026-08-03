@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.depreciacion-linea-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+// Cabecera: etiquetas discretas en mayúscula, sticky al hacer scroll (mismo
+// tratamiento que las tablas de detalle de los demás documentos).
+.depreciacion-linea-table__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--brand-muted, #64748b);
+  // Opaco para que las filas no se transparenten bajo el header al scrollear.
+  background: #f8f9fa;
+  // box-shadow en vez de border-bottom: con border-collapse el borde se despega
+  // del header sticky al scrollear; el inset shadow se mantiene fijo.
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
+}
+
+.depreciacion-linea-table__td {
+  padding: 0.45rem 0.6rem;
+  vertical-align: middle;
+}
+
+// Separador entre filas (no border-bottom en cada celda): más limpio al scrollear.
+.depreciacion-linea-table__row + .depreciacion-linea-table__row .depreciacion-linea-table__td {
+  border-top: 1px solid rgba(20, 48, 73, 0.07);
+}
+
+.depreciacion-linea-table__row:hover .depreciacion-linea-table__td {
+  background: rgba(20, 48, 73, 0.015);
+}
+
+// Fila de total: separada del cuerpo y con más peso, es el dato que se busca.
+.depreciacion-linea-table__total {
+  padding: 0.55rem 0.6rem;
+  font-weight: 700;
+  border-top: 2px solid rgba(20, 48, 73, 0.12);
+}

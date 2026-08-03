@@ -73,3 +73,104 @@ export function separarErroresProgramacion(errores: readonly ProgramacionErrorIt
   }
   return { celdas, avisos };
 }
+
+/**
+ * Errores del 400 masivo mapeados por **scope** (id de puesto o de contrato,
+ * según qué modal edite). Estructura común que consumen los modales de edición.
+ */
+export interface ErroresMasivoMapeados {
+  /** scopeId → (fecha ISO → mensaje) para resaltar celdas del día. */
+  readonly celdas: Map<number, Map<string, string>>;
+  /** scopeId → mensajes sin fecha (avisos de la banda). */
+  readonly avisos: Map<number, readonly string[]>;
+  /** Validación global del batch (sin `indice` atribuible a un scope). */
+  readonly globales: string[];
+}
+
+function acumularPorScope(
+  acc: ErroresMasivoMapeados,
+  scopeId: number,
+  errores: readonly ProgramacionErrorItem[],
+): void {
+  const { celdas, avisos } = separarErroresProgramacion(errores);
+  if (celdas.size) acc.celdas.set(scopeId, celdas);
+  if (avisos.length) acc.avisos.set(scopeId, avisos);
+}
+
+/**
+ * Mapea el 400 de `actualizar-masivo` a errores por scope. Dos formas:
+ *  - `{ resultados: [{ indice, errores }] }` → celdas/avisos por línea, resolviendo
+ *    el scope desde `payloads[indice]` con `scopeOf`.
+ *  - `{ detail, errores }` sin `indice` (validación global del batch) → `globales`.
+ * Puro: los modales lo comparten cambiando solo `scopeOf` (puesto vs contrato).
+ */
+export function mapearErroresMasivo<P>(
+  err: unknown,
+  payloads: readonly P[],
+  scopeOf: (payload: P) => number,
+): ErroresMasivoMapeados {
+  const acc: ErroresMasivoMapeados = { celdas: new Map(), avisos: new Map(), globales: [] };
+  const masivo = extraerErroresMasivo(err);
+  if (masivo) {
+    for (const linea of masivo.resultados) {
+      const payload = payloads[linea.indice];
+      if (!payload || !Array.isArray(linea.errores)) continue;
+      acumularPorScope(acc, scopeOf(payload), linea.errores);
+    }
+    return acc;
+  }
+  const global = extraerErroresProgramacion(err);
+  if (global) for (const e of global.errores) acc.globales.push(e.mensaje);
+  return acc;
+}
+
+/**
+ * Mapea el 400 de `actualizar` (una sola línea) a errores del `scopeId` dado.
+ * Espejo de `mapearErroresMasivo` para el modo "línea" del modal de contrato.
+ */
+export function mapearErroresLinea(err: unknown, scopeId: number): ErroresMasivoMapeados {
+  const acc: ErroresMasivoMapeados = { celdas: new Map(), avisos: new Map(), globales: [] };
+  const body = extraerErroresProgramacion(err);
+  if (body) acumularPorScope(acc, scopeId, body.errores);
+  return acc;
+}
+
+/** Un mensaje de error del generar con los días (número) a los que aplica. */
+export interface GenerarErrorGrupo {
+  readonly mensaje: string;
+  readonly dias: readonly string[];
+}
+
+/**
+ * Vista del 400 de **generar** ya agrupada para el banner: el `detail` general,
+ * los errores por día agrupados por mensaje (dedup de días) y los avisos sin fecha.
+ */
+export interface GenerarErroresVista {
+  readonly detail: string;
+  readonly grupos: readonly GenerarErrorGrupo[];
+  readonly avisos: readonly string[];
+}
+
+/**
+ * Agrupa los `errores` del 400 de generar por `mensaje` (deduplicando días — un
+ * día trae una entrada por turno) y separa los que no tienen fecha como `avisos`.
+ * Los días se emiten como número (`f.slice(8,10)` sin cero a la izquierda). Puro.
+ */
+export function construirGenerarErrores(parsed: ProgramacionErroresResponse): GenerarErroresVista {
+  const porMensaje = new Map<string, Set<string>>();
+  const avisos = new Set<string>();
+  for (const e of parsed.errores) {
+    if (!e.fecha) {
+      avisos.add(e.mensaje);
+      continue;
+    }
+    const fechas = porMensaje.get(e.mensaje) ?? new Set<string>();
+    fechas.add(e.fecha);
+    porMensaje.set(e.mensaje, fechas);
+  }
+  const grupos = [...porMensaje.entries()].map(([mensaje, fechas]) => ({
+    mensaje,
+    dias: [...fechas].sort().map((f) => f.slice(8, 10).replace(/^0/, '')),
+  }));
+  return { detail: parsed.detail, grupos, avisos: [...avisos] };
+}

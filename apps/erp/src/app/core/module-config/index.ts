@@ -67,6 +67,16 @@ export type {
   ImportarDocumentoModalData,
 } from './importar-documento/importar-documento.types';
 
+// Agregar documento (cruce de cartera: servicio + tipos; el modal NO se exporta
+// para no arrastrar PrimeNG al bundle inicial — se carga vía import() dinámico).
+export { AgregarDocumentoService } from './agregar-documento/agregar-documento.service';
+export type { DocumentosPendientesPage } from './agregar-documento/agregar-documento.service';
+export type {
+  CarteraTipo,
+  DocumentoPendienteApi,
+  AgregarDocumentoModalData,
+} from './agregar-documento/agregar-documento.types';
+
 // Acciones extra (Strategy + registro)
 // NOTA: se exportan SOLO el contrato, el token y los providers. Los strategies
 // y sus modales NO se exportan desde aquí para no arrastrar PrimeNG (datepicker,
