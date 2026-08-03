@@ -1,22 +1,39 @@
-<header>
-  <h1 class="m-0 text-2xl font-bold tracking-tight text-brand-text">
-    {{ t().configuracion.title }}
-  </h1>
-  <p class="m-0 mt-1 text-sm text-brand-muted">{{ t().configuracion.subtitle }}</p>
-</header>
+<!--
+  Configuración de la empresa.
+  Mismo chrome que Seguridad y que <lib-list-shell>: card con header de título +
+  cuerpo con las pestañas. A diferencia de las listas, el ancho va acotado
+  (`max-w-[1200px]` en el host) y la card crece con el contenido en vez de llenar
+  el alto: son formularios, scrollean con la página.
+-->
+<section
+  class="overflow-hidden rounded-xl border border-[rgba(19,38,60,0.08)] bg-white shadow-[0_1px_2px_rgba(19,38,60,0.04)]"
+>
+  <header class="min-w-0 border-b border-[rgba(19,38,60,0.08)] px-4 py-[0.85rem]">
+    <h1 class="m-0 text-[1.125rem] font-bold tracking-[-0.02em] text-brand-navy">
+      {{ t().configuracion.title }}
+    </h1>
+    <p class="m-0 mt-[0.15rem] text-[0.8rem] text-brand-muted">{{ t().configuracion.subtitle }}</p>
+  </header>
 
-<p-tabs [value]="activeSeccion()" (valueChange)="onTabChange($any($event))">
-  <p-tablist>
-    <p-tab value="general">{{ t().configuracion.tabs.general }}</p-tab>
-    <p-tab value="humano">{{ t().configuracion.tabs.humano }}</p-tab>
-  </p-tablist>
+  <div class="px-4 pt-2 pb-4">
+    <p-tabs
+      [value]="activeSeccion()"
+      (valueChange)="onTabChange($any($event))"
+      class="configuracion-tabs"
+    >
+      <p-tablist>
+        <p-tab value="general">{{ t().configuracion.tabs.general }}</p-tab>
+        <p-tab value="humano">{{ t().configuracion.tabs.humano }}</p-tab>
+      </p-tablist>
 
-  <p-tabpanels>
-    <p-tabpanel value="general">
-      <app-general-config />
-    </p-tabpanel>
-    <p-tabpanel value="humano">
-      <app-humano-config />
-    </p-tabpanel>
-  </p-tabpanels>
-</p-tabs>
+      <p-tabpanels>
+        <p-tabpanel value="general">
+          <app-general-config />
+        </p-tabpanel>
+        <p-tabpanel value="humano">
+          <app-humano-config />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
+</section>

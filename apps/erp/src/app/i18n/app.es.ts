@@ -184,6 +184,7 @@ export const es: AppDict = {
       label: 'Menú de usuario',
       myContainers: 'Mis contenedores',
       manageAccount: 'Gestionar cuenta',
+      security: 'Seguridad',
       settings: 'Configuración',
       logout: 'Cerrar sesión',
     },
@@ -5565,6 +5566,30 @@ export const es: AppDict = {
         notFound: {
           title: 'Documento no encontrado',
           desc: 'El documento que buscas no existe o fue eliminado.',
+        },
+      },
+    },
+  },
+  seguridad: {
+    title: 'Seguridad',
+    subtitle: 'Usuarios y accesos del contenedor',
+    tabs: { usuarios: 'Usuarios' },
+    usuarios: {
+      hint: 'Personas con acceso a esta empresa. Para invitar o retirar usuarios, entra a Mis contenedores.',
+      columns: { nombre: 'Nombre', correo: 'Correo', rol: 'Rol' },
+      roles: {
+        propietario: 'Propietario',
+        administrador: 'Administrador',
+        usuario: 'Usuario',
+      },
+      empty: {
+        title: 'Sin usuarios',
+        sub: 'Este contenedor todavía no tiene usuarios con acceso.',
+      },
+      toasts: {
+        loadError: {
+          title: 'No se pudo cargar',
+          desc: 'No pudimos traer los usuarios del contenedor.',
         },
       },
     },

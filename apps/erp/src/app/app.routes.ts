@@ -2,6 +2,7 @@ import { Route } from '@angular/router';
 import { authGuard, rootRedirectGuard, tenantAccessGuard } from '@reddoc/core';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
 import { erpModuleResolver } from '@erp/core/erp-modules';
+import { contenedorAdminGuard } from '@erp/core/guards/contenedor-admin.guard';
 
 export const appRoutes: Route[] = [
   { path: '', pathMatch: 'full', canActivate: [rootRedirectGuard], children: [] },
@@ -52,6 +53,16 @@ export const appRoutes: Route[] = [
           import('./features/configuracion/configuracion.routes').then(
             (m) => m.CONFIGURACION_ROUTES,
           ),
+      },
+      {
+        path: 'seguridad',
+        // Administrar el contenedor es de propietario/administrador; el user-menu
+        // ya la esconde, esto cierra la puerta de la URL directa.
+        canActivate: [contenedorAdminGuard],
+        // Ruta global (no-módulo): limpia el módulo activo para ocultar el sidebar.
+        resolve: { _module: erpModuleResolver(null) },
+        loadChildren: () =>
+          import('./features/seguridad/seguridad.routes').then((m) => m.SEGURIDAD_ROUTES),
       },
       {
         path: 'general',

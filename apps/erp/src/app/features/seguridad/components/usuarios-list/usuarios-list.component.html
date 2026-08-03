@@ -1,0 +1,22 @@
+<!--
+  Hint arriba (ocupa el lugar del toolbar en las listas del ERP) y la tabla en su
+  recuadro embebido: borde un punto más definido que la card (0.12 vs 0.08), que
+  es la jerarquía por capas del sistema.
+-->
+<p class="m-0 shrink-0 text-[0.78rem] text-brand-muted">{{ t().seguridad.usuarios.hint }}</p>
+
+<div
+  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]"
+>
+  <lib-data-table
+    [columns]="columns"
+    [items]="pageItems()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    emptyTitleKey="seguridad.usuarios.empty.title"
+    emptySubKey="seguridad.usuarios.empty.sub"
+    (pageChange)="onPageChange($event)"
+  />
+</div>

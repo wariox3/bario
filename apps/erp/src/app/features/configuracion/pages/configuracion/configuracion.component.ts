@@ -18,7 +18,10 @@ import { HumanoConfigComponent } from '../../components/humano-config/humano-con
   standalone: true,
   imports: [TabsModule, GeneralConfigComponent, HumanoConfigComponent],
   templateUrl: './configuracion.component.html',
-  host: { class: 'mx-auto flex w-full max-w-[1200px] flex-col gap-6' },
+  styleUrl: './configuracion.component.scss',
+  // Ancho acotado a propósito: son formularios, no tablas. Las listas del ERP
+  // van a todo el ancho; esta página se lee mejor en una columna de 1200px.
+  host: { class: 'mx-auto flex w-full max-w-[1200px] flex-col' },
 })
 export class ConfiguracionComponent {
   private readonly router = inject(Router);

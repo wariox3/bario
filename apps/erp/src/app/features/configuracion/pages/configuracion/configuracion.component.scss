@@ -1,0 +1,26 @@
+// Configuración: solo el ajuste del tab-strip de PrimeNG (necesita ::ng-deep);
+// la card va con utilidades Tailwind en el template. Sin cadena de alturas —
+// aquí el contenido son formularios que crecen y scrollean con la página.
+.configuracion-tabs {
+  display: block;
+
+  ::ng-deep {
+    .p-tabs,
+    .p-tabpanels,
+    .p-tablist {
+      background: transparent;
+    }
+
+    // Aire entre la tira de tabs y la card del área: iguala la separación que hay
+    // en Seguridad entre la pestaña y el recuadro de la tabla (0.85rem de padding
+    // + la línea de hint + 0.75rem de gap). Acá el hueco va vacío, así que el
+    // valor viaja completo en el padding.
+    .p-tabpanels {
+      padding: 2.75rem 0 0;
+    }
+
+    .p-tabpanel {
+      padding: 0;
+    }
+  }
+}

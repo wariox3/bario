@@ -197,6 +197,7 @@ export interface AppDict
       label: string;
       myContainers: string;
       manageAccount: string;
+      security: string;
       settings: string;
       logout: string;
     };
@@ -4304,6 +4305,18 @@ export interface AppDict
         };
         notFound: { title: string; desc: string };
       };
+    };
+  };
+  seguridad: {
+    title: string;
+    subtitle: string;
+    tabs: { usuarios: string };
+    usuarios: {
+      hint: string;
+      columns: { nombre: string; correo: string; rol: string };
+      roles: { propietario: string; administrador: string; usuario: string };
+      empty: { title: string; sub: string };
+      toasts: { loadError: { title: string; desc: string } };
     };
   };
   configuracion: {

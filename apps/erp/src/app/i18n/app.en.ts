@@ -184,6 +184,7 @@ export const en: AppDict = {
       label: 'User menu',
       myContainers: 'My containers',
       manageAccount: 'Manage account',
+      security: 'Security',
       settings: 'Settings',
       logout: 'Sign out',
     },
@@ -5513,6 +5514,30 @@ export const en: AppDict = {
         notFound: {
           title: 'Document not found',
           desc: 'The document you are looking for does not exist or was deleted.',
+        },
+      },
+    },
+  },
+  seguridad: {
+    title: 'Security',
+    subtitle: 'Container users and access',
+    tabs: { usuarios: 'Users' },
+    usuarios: {
+      hint: 'People with access to this company. To invite or remove users, go to My containers.',
+      columns: { nombre: 'Name', correo: 'Email', rol: 'Role' },
+      roles: {
+        propietario: 'Owner',
+        administrador: 'Administrator',
+        usuario: 'User',
+      },
+      empty: {
+        title: 'No users',
+        sub: 'This container has no users with access yet.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Could not load',
+          desc: 'We could not fetch the container users.',
         },
       },
     },
