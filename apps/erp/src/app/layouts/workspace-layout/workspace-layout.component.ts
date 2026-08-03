@@ -60,24 +60,27 @@ export class WorkspaceLayoutComponent {
     () => this.activeDescriptor()?.menu ?? [],
   );
 
-  /** Ids de acordeones expandidos. Reinicia al cambiar de módulo. */
-  private readonly expandedAccordionIds = signal<ReadonlySet<string>>(new Set());
+  /**
+   * Id del único acordeón expandido, o `null` si están todos cerrados.
+   * Solo uno puede estar abierto a la vez: abrir uno cierra el anterior.
+   */
+  private readonly expandedAccordionId = signal<string | null>(null);
 
   protected readonly drawerVisible = signal(false);
 
   constructor() {
-    // Cada vez que cambia el módulo activo, sembramos como expandidos solo los
-    // acordeones marcados `defaultExpanded: true`. El resto arranca cerrado.
+    // Cada vez que cambia el módulo activo, sembramos el acordeón que contiene
+    // la ruta actual; si ninguno la contiene, el primero marcado
+    // `defaultExpanded: true`. El resto arranca cerrado.
     effect(() => {
-      const expandedIds = this.sections()
-        .filter((s): s is SidebarAccordion => s.kind === 'accordion')
-        .filter(
-          (s) =>
-            s.defaultExpanded === true ||
-            s.groups.some((g) => g.items.some((leaf) => this.isLeafActive(leaf))),
-        )
-        .map((s) => s.id);
-      this.expandedAccordionIds.set(new Set(expandedIds));
+      const accordions = this.sections().filter(
+        (s): s is SidebarAccordion => s.kind === 'accordion',
+      );
+      const withActiveLeaf = accordions.find((s) =>
+        s.groups.some((g) => g.items.some((leaf) => this.isLeafActive(leaf))),
+      );
+      const seed = withActiveLeaf ?? accordions.find((s) => s.defaultExpanded === true);
+      this.expandedAccordionId.set(seed?.id ?? null);
     });
   }
 
@@ -92,16 +95,12 @@ export class WorkspaceLayoutComponent {
   }
 
   protected isExpanded(accordionId: string): boolean {
-    return this.expandedAccordionIds().has(accordionId);
+    return this.expandedAccordionId() === accordionId;
   }
 
+  /** Abre el acordeón y cierra el que estuviera abierto; re-click lo cierra. */
   protected toggleAccordion(accordionId: string): void {
-    this.expandedAccordionIds.update((current) => {
-      const next = new Set(current);
-      if (next.has(accordionId)) next.delete(accordionId);
-      else next.add(accordionId);
-      return next;
-    });
+    this.expandedAccordionId.update((current) => (current === accordionId ? null : accordionId));
   }
 
   protected toggleDrawer(): void {
