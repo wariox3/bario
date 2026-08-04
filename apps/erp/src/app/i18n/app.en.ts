@@ -17,6 +17,7 @@ export const en: AppDict = {
       deleteSelected: 'Delete selected',
       cancel: 'Cancel',
       back: 'Back',
+      close: 'Close',
       save: 'Save',
       menuLabel: 'Options',
       filters: 'Filters',
@@ -5521,23 +5522,84 @@ export const en: AppDict = {
   seguridad: {
     title: 'Security',
     subtitle: 'Container users and access',
-    tabs: { usuarios: 'Users' },
+    menuLabel: 'Security sections',
+    menu: { usuarios: 'Users' },
     usuarios: {
-      hint: 'People with access to this company. To invite or remove users, go to My containers.',
+      searchPlaceholder: 'Search by name or email...',
       columns: { nombre: 'Name', correo: 'Email', rol: 'Role' },
       roles: {
         propietario: 'Owner',
         administrador: 'Administrator',
         usuario: 'User',
       },
+      actions: {
+        invitar: 'Invite user',
+        cambiarRol: 'Change role',
+      },
       empty: {
         title: 'No users',
         sub: 'This container has no users with access yet.',
+      },
+      invitar: {
+        title: 'Invite user',
+        subtitle: 'Give access to this company',
+        fields: {
+          usuario: 'User',
+          usuarioPlaceholder: 'Search by email...',
+          usuarioHint: 'Type at least 3 characters. The person must already have a RedDoc account.',
+          rol: 'Role',
+        },
+        submit: 'Send invitation',
+      },
+      cambiarRol: {
+        title: 'Change role',
+        field: 'Role',
+        hint: 'The role defines what the person can manage within the company.',
+        propietarioLock: "The company owner's role cannot be changed from here.",
+      },
+      detalle: {
+        eyebrow: 'Container user',
+        fields: { usuarioId: 'User ID' },
+        rolHint:
+          'Access is granted by role: owner and administrator manage the company, everyone else only operates it.',
+        notFound: {
+          title: 'User not found',
+          desc: 'Their access to this company may have been removed.',
+        },
+      },
+      confirms: {
+        deleteHeader: 'Remove access',
+        deleteOne: 'Remove access for {usuario}?',
+        deleteMany: 'Remove access for {count} users?',
       },
       toasts: {
         loadError: {
           title: 'Could not load',
           desc: 'We could not fetch the container users.',
+        },
+        deleteSuccess: {
+          title: 'Access removed',
+          desc: 'The user no longer has access to this company.',
+        },
+        deleteError: {
+          title: 'Could not remove',
+          desc: 'We could not remove the access. Please try again.',
+        },
+        inviteSuccess: {
+          title: 'Invitation sent',
+          desc: 'The user will get access once they accept the invitation.',
+        },
+        inviteError: {
+          title: 'Could not invite',
+          desc: 'We could not send the invitation. Please try again.',
+        },
+        rolSuccess: {
+          title: 'Role updated',
+          desc: 'The user now has their new role in this company.',
+        },
+        rolError: {
+          title: 'Could not change the role',
+          desc: 'We could not update the role. Please try again.',
         },
       },
     },

@@ -67,6 +67,7 @@ export interface AppDict
       deleteSelected: string;
       cancel: string;
       back: string;
+      close: string;
       save: string;
       menuLabel: string;
       filters: string;
@@ -4310,13 +4311,42 @@ export interface AppDict
   seguridad: {
     title: string;
     subtitle: string;
-    tabs: { usuarios: string };
+    menuLabel: string;
+    menu: { usuarios: string };
     usuarios: {
-      hint: string;
+      searchPlaceholder: string;
       columns: { nombre: string; correo: string; rol: string };
       roles: { propietario: string; administrador: string; usuario: string };
+      actions: { invitar: string; cambiarRol: string };
       empty: { title: string; sub: string };
-      toasts: { loadError: { title: string; desc: string } };
+      invitar: {
+        title: string;
+        subtitle: string;
+        fields: {
+          usuario: string;
+          usuarioPlaceholder: string;
+          usuarioHint: string;
+          rol: string;
+        };
+        submit: string;
+      };
+      cambiarRol: { title: string; field: string; hint: string; propietarioLock: string };
+      detalle: {
+        eyebrow: string;
+        fields: { usuarioId: string };
+        rolHint: string;
+        notFound: { title: string; desc: string };
+      };
+      confirms: { deleteHeader: string; deleteOne: string; deleteMany: string };
+      toasts: {
+        loadError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        inviteSuccess: { title: string; desc: string };
+        inviteError: { title: string; desc: string };
+        rolSuccess: { title: string; desc: string };
+        rolError: { title: string; desc: string };
+      };
     };
   };
   configuracion: {

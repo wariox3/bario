@@ -1,9 +1,9 @@
 <!--
   Seguridad del contenedor.
-  Mismo chrome que <lib-list-shell> / la utilidad "Enviar factura electrónica":
-  card con header de título + cuerpo con la tabla embebida en su propio recuadro.
-  Sin breadcrumb porque no cuelga de ningún módulo (se entra por el user-menu,
-  igual que Configuración). Depth borders-only, navy, radios 12px.
+  Card con header de título + cuerpo partido en dos: menú lateral de secciones a
+  la izquierda y el <router-outlet> de la sección activa a la derecha. Sin
+  breadcrumb porque no cuelga de ningún módulo (se entra por el user-menu, igual
+  que Configuración). Depth borders-only, navy, radios 12px.
 -->
 <section
   class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[rgba(19,38,60,0.08)] bg-white shadow-[0_1px_2px_rgba(19,38,60,0.04)]"
@@ -15,21 +15,29 @@
     <p class="m-0 mt-[0.15rem] text-[0.8rem] text-brand-muted">{{ t().seguridad.subtitle }}</p>
   </header>
 
-  <div class="flex min-h-0 flex-1 flex-col px-4 pt-2 pb-4">
-    <p-tabs
-      [value]="activeSeccion()"
-      (valueChange)="onTabChange($any($event))"
-      class="seguridad-tabs"
+  <div class="flex min-h-0 flex-1 flex-col overflow-hidden sm:flex-row">
+    <!--
+      Menú lateral. En pantallas angostas pasa a una tira horizontal scrolleable
+      arriba del contenido, que es lo que hace el sidebar del workspace en móvil.
+    -->
+    <nav
+      class="flex shrink-0 gap-1 overflow-x-auto border-b border-[rgba(19,38,60,0.08)] p-2 sm:w-56 sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:border-r sm:border-b-0 sm:p-3"
+      [attr.aria-label]="t().seguridad.menuLabel"
     >
-      <p-tablist>
-        <p-tab value="usuarios">{{ t().seguridad.tabs.usuarios }}</p-tab>
-      </p-tablist>
+      @for (item of menu; track item.id) {
+        <a
+          class="flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-[0.82rem] font-medium text-brand-text no-underline transition-colors hover:bg-[rgba(19,38,60,0.05)]"
+          [routerLink]="item.path"
+          routerLinkActive="bg-brand-blue/12 !text-brand-navy font-bold"
+        >
+          <i class="{{ item.iconClass }} text-[0.9rem] opacity-70"></i>
+          <span>{{ translate(item) }}</span>
+        </a>
+      }
+    </nav>
 
-      <p-tabpanels>
-        <p-tabpanel value="usuarios">
-          <app-usuarios-list />
-        </p-tabpanel>
-      </p-tabpanels>
-    </p-tabs>
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4">
+      <router-outlet />
+    </div>
   </div>
 </section>

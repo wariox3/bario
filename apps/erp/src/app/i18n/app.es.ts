@@ -17,6 +17,7 @@ export const es: AppDict = {
       deleteSelected: 'Eliminar seleccionados',
       cancel: 'Cancelar',
       back: 'Volver',
+      close: 'Cerrar',
       save: 'Guardar',
       menuLabel: 'Opciones',
       filters: 'Filtros',
@@ -5573,23 +5574,84 @@ export const es: AppDict = {
   seguridad: {
     title: 'Seguridad',
     subtitle: 'Usuarios y accesos del contenedor',
-    tabs: { usuarios: 'Usuarios' },
+    menuLabel: 'Secciones de seguridad',
+    menu: { usuarios: 'Usuarios' },
     usuarios: {
-      hint: 'Personas con acceso a esta empresa. Para invitar o retirar usuarios, entra a Mis contenedores.',
+      searchPlaceholder: 'Buscar por nombre o correo...',
       columns: { nombre: 'Nombre', correo: 'Correo', rol: 'Rol' },
       roles: {
         propietario: 'Propietario',
         administrador: 'Administrador',
         usuario: 'Usuario',
       },
+      actions: {
+        invitar: 'Invitar usuario',
+        cambiarRol: 'Cambiar rol',
+      },
       empty: {
         title: 'Sin usuarios',
         sub: 'Este contenedor todavía no tiene usuarios con acceso.',
+      },
+      invitar: {
+        title: 'Invitar usuario',
+        subtitle: 'Dale acceso a esta empresa',
+        fields: {
+          usuario: 'Usuario',
+          usuarioPlaceholder: 'Buscar por correo...',
+          usuarioHint: 'Escribe al menos 3 caracteres. La persona ya debe tener cuenta en RedDoc.',
+          rol: 'Rol',
+        },
+        submit: 'Enviar invitación',
+      },
+      cambiarRol: {
+        title: 'Cambiar rol',
+        field: 'Rol',
+        hint: 'El rol define qué puede administrar la persona dentro de la empresa.',
+        propietarioLock: 'El propietario de la empresa no cambia de rol desde aquí.',
+      },
+      detalle: {
+        eyebrow: 'Usuario del contenedor',
+        fields: { usuarioId: 'ID de usuario' },
+        rolHint:
+          'Los accesos se otorgan por rol: propietario y administrador gestionan la empresa, el resto solo la opera.',
+        notFound: {
+          title: 'Usuario no encontrado',
+          desc: 'Puede que le hayan quitado el acceso a esta empresa.',
+        },
+      },
+      confirms: {
+        deleteHeader: 'Quitar acceso',
+        deleteOne: '¿Seguro que quieres quitarle el acceso a {usuario}?',
+        deleteMany: '¿Seguro que quieres quitarle el acceso a {count} usuarios?',
       },
       toasts: {
         loadError: {
           title: 'No se pudo cargar',
           desc: 'No pudimos traer los usuarios del contenedor.',
+        },
+        deleteSuccess: {
+          title: 'Acceso retirado',
+          desc: 'El usuario ya no tiene acceso a esta empresa.',
+        },
+        deleteError: {
+          title: 'No se pudo quitar',
+          desc: 'No pudimos retirar el acceso. Intenta de nuevo.',
+        },
+        inviteSuccess: {
+          title: 'Invitación enviada',
+          desc: 'El usuario tendrá acceso cuando acepte la invitación.',
+        },
+        inviteError: {
+          title: 'No se pudo invitar',
+          desc: 'No pudimos enviar la invitación. Intenta de nuevo.',
+        },
+        rolSuccess: {
+          title: 'Rol actualizado',
+          desc: 'El usuario ya tiene su nuevo rol en esta empresa.',
+        },
+        rolError: {
+          title: 'No se pudo cambiar el rol',
+          desc: 'No pudimos actualizar el rol. Intenta de nuevo.',
         },
       },
     },

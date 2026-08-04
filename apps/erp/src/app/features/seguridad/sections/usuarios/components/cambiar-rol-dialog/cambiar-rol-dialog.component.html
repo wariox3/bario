@@ -1,0 +1,83 @@
+@let rol = t().seguridad.usuarios.cambiarRol;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '420px' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+      >
+        <i class="pi pi-shield text-[1.1rem] text-brand-blue"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+        >
+          {{ rol.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ usuario()?.usuario_nombre_corto || usuario()?.usuario_email }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <form (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5 pt-1">
+      @if (esPropietario()) {
+        <p
+          class="m-0 rounded-lg bg-amber-50 px-3 py-2.5 text-[0.78rem] leading-relaxed text-amber-800"
+        >
+          {{ rol.propietarioLock }}
+        </p>
+      } @else {
+        <div class="flex flex-col gap-1.5">
+          <label for="cambiar-rol" class="text-[0.8rem] font-medium text-brand-text">
+            {{ rol.field }}
+          </label>
+          <p-select
+            inputId="cambiar-rol"
+            [ngModel]="rolId()"
+            (ngModelChange)="rolId.set($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [options]="rolOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            fluid
+          />
+          <span class="text-[0.72rem] leading-relaxed text-brand-muted">{{ rol.hint }}</span>
+        </div>
+      }
+
+      <div class="flex justify-end gap-2">
+        <p-button
+          type="button"
+          [label]="esPropietario() ? t().common.actions.close : t().common.actions.cancel"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="onCancel()"
+        />
+        @if (!esPropietario()) {
+          <p-button
+            type="submit"
+            [label]="t().common.actions.save"
+            icon="pi pi-check"
+            size="small"
+            [loading]="isSaving()"
+            [disabled]="!puedeGuardar() || isSaving()"
+          />
+        }
+      </div>
+    </form>
+  }
+</p-dialog>

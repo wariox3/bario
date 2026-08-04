@@ -33,7 +33,11 @@ export type ContenedorInvitacionesPendientesResponse =
 export interface SendInviteRequest {
   cliente_id: number;
   usuario_id: number;
-  rol_id: number;
+  /**
+   * Opcional: Seguridad del ERP invita sin rol (queda pendiente de definir si
+   * el rol se manda en la invitación o se asigna después de aceptarla).
+   */
+  rol_id?: number;
 }
 
 export interface Contenedor {

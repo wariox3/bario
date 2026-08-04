@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { BaseHttpService } from '../services/base-http.service';
+import { BaseHttpService, type ParamValue } from '../services/base-http.service';
 import {
   Contenedor,
   ContenedorInvitacionesPendientesResponse,
+  ContenedorMember,
   ContenedorMembersResponse,
   ContenedoresResponse,
   CreateContenedorRequest,
@@ -45,10 +46,21 @@ export class ContenedorService extends BaseHttpService {
     return this.delete(`/contenedor/cliente/${id}/`);
   }
 
-  getMembers(contenedorId: number): Observable<ContenedorMembersResponse> {
-    return this.get<ContenedorMembersResponse>(
-      `/seguridad/usuario-cliente/lista-cliente/?cliente_id=${contenedorId}`,
-    );
+  /**
+   * Miembros de un contenedor.
+   *
+   * `params` viaja tal cual como query params junto al `cliente_id`: es lo que
+   * usa Seguridad del ERP para filtrar y buscar **en el backend** en vez de en
+   * memoria. Sin `params` el comportamiento es el de siempre (todo el listado).
+   */
+  getMembers(
+    contenedorId: number,
+    params?: Record<string, ParamValue>,
+  ): Observable<ContenedorMembersResponse> {
+    return this.get<ContenedorMembersResponse>('/seguridad/usuario-cliente/lista-cliente/', {
+      cliente_id: contenedorId,
+      ...params,
+    });
   }
 
   getPendingInvitations(
@@ -65,6 +77,19 @@ export class ContenedorService extends BaseHttpService {
 
   removeMember(membershipId: number): Observable<unknown> {
     return this.delete(`/seguridad/usuario-cliente/${membershipId}/`);
+  }
+
+  /**
+   * Cambia el rol de un miembro dentro del contenedor.
+   *
+   * SUPUESTO pendiente de confirmar con backend: se asume el `PATCH` estándar
+   * del recurso `usuario-cliente` aceptando `rol_id`. Si el backend expone una
+   * acción dedicada, solo cambia esta línea.
+   */
+  updateMemberRol(membershipId: number, rolId: number): Observable<ContenedorMember> {
+    return this.patch<ContenedorMember>(`/seguridad/usuario-cliente/${membershipId}/`, {
+      rol_id: rolId,
+    });
   }
 
   searchUsers(query: string): Observable<UserSearchResult[]> {

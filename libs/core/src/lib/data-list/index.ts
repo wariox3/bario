@@ -37,6 +37,7 @@ export type {
 export { FILTER_OPERATORS, getOperatorsForType, getOperatorDef } from './filters/filter-operators';
 export type { FilterOperatorDef, FilterValueKind } from './filters/filter-operators';
 export { quickSearchCondition } from './filters/quick-search';
+export { applyClientFilters, matchesCondition } from './filters/match-conditions';
 
 // Query serialization
 export { serializeListQuery } from './data/serialize-list-query';

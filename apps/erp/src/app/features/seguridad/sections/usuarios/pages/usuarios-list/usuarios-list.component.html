@@ -1,0 +1,66 @@
+<!--
+  Toolbar arriba y la tabla en su recuadro embebido: borde un punto más definido
+  que la card del shell (0.12 vs 0.08), que es la jerarquía por capas del sistema.
+-->
+<lib-data-toolbar
+  [primaryAction]="primaryAction"
+  [trailingActions]="trailingActions"
+  [searchEnabled]="true"
+  [searchValue]="searchValue()"
+  searchPlaceholderKey="seguridad.usuarios.searchPlaceholder"
+  [filtersEnabled]="true"
+  [activeFiltersCount]="activeFilters().length"
+  [deleteSelectedEnabled]="eliminables().length > 0"
+  [deleteSelectedCount]="eliminables().length"
+  (searched)="onSearch($event)"
+  (actionInvoked)="onToolbarAction($event)"
+  (filtersToggle)="openFilters()"
+  (filtersClear)="clearFilters()"
+  (deleteSelected)="removeSelected()"
+/>
+
+<div
+  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]"
+>
+  <lib-data-table
+    [columns]="columns"
+    [items]="pageItems()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    [rowActions]="rowActions"
+    [rowClickable]="true"
+    emptyTitleKey="seguridad.usuarios.empty.title"
+    emptySubKey="seguridad.usuarios.empty.sub"
+    (pageChange)="onPageChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+    (rowClick)="onRowClick($event)"
+  />
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-invitar-usuario-dialog
+  [visible]="inviteVisible()"
+  (visibleChange)="inviteVisible.set($event)"
+  (invited)="onChanged()"
+/>
+
+<app-cambiar-rol-dialog
+  [visible]="rolDialogVisible()"
+  (visibleChange)="rolDialogVisible.set($event)"
+  [usuario]="usuarioEnEdicion()"
+  (saved)="onChanged()"
+/>
+
+<p-confirmDialog />
