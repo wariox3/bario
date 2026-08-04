@@ -126,6 +126,13 @@ export const COMPRA_ROUTES: Route[] = [
             (m) => m.FORMA_PAGO_ROUTES,
           ),
       },
+      {
+        // El master vive en inventario (su endpoint es `/inventario/almacen/`),
+        // pero es module-agnostic igual que los de general.
+        path: 'almacenes',
+        loadChildren: () =>
+          import('../inventario/masters/almacen/almacen.routes').then((m) => m.ALMACEN_ROUTES),
+      },
     ],
   },
 ];

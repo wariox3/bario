@@ -169,6 +169,13 @@ export const VENTA_ROUTES: Route[] = [
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
       },
       {
+        // El master vive en inventario (su endpoint es `/inventario/almacen/`),
+        // pero es module-agnostic igual que los de general.
+        path: 'almacenes',
+        loadChildren: () =>
+          import('../inventario/masters/almacen/almacen.routes').then((m) => m.ALMACEN_ROUTES),
+      },
+      {
         path: 'precios',
         loadChildren: () =>
           import('../general/masters/precio/precio.routes').then((m) => m.PRECIO_ROUTES),

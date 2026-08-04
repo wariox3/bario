@@ -43,8 +43,8 @@ export const TESORERIA_MODULE: ErpModuleDescriptor = {
         {
           // Masters compartidos con el módulo General (no propios de tesorería).
           items: [
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
             { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
+            { labelKey: 'entities.contacto.name', path: 'contactos' },
           ],
         },
       ],

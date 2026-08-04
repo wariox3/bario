@@ -28,6 +28,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
         {
           items: [
             {
+              labelKey: 'entities.facturaVentaRecurrente.name',
+              path: 'factura-venta-recurrente/list',
+              activeMatch: 'factura-venta-recurrente',
+            },
+            {
               labelKey: 'entities.pedidoCliente.name',
               path: 'pedido-cliente/list',
               activeMatch: 'pedido-cliente',
@@ -38,24 +43,9 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'remision',
             },
             {
-              labelKey: 'entities.contratoServicio.name',
-              path: 'contrato-servicio/list',
-              activeMatch: 'contrato-servicio',
-            },
-            {
-              labelKey: 'entities.pedidoServicio.name',
-              path: 'pedido-servicio/list',
-              activeMatch: 'pedido-servicio',
-            },
-            {
               labelKey: 'entities.facturaVenta.name',
               path: 'factura-venta/list',
               activeMatch: 'factura-venta',
-            },
-            {
-              labelKey: 'entities.facturaPos.name',
-              path: 'factura-pos/list',
-              activeMatch: 'factura-pos',
             },
             {
               labelKey: 'entities.facturaPosElectronica.name',
@@ -63,14 +53,9 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'factura-pos-electronica',
             },
             {
-              labelKey: 'entities.cuentaCobro.name',
-              path: 'cuenta-cobro/list',
-              activeMatch: 'cuenta-cobro',
-            },
-            {
-              labelKey: 'entities.facturaVentaRecurrente.name',
-              path: 'factura-venta-recurrente/list',
-              activeMatch: 'factura-venta-recurrente',
+              labelKey: 'entities.facturaPos.name',
+              path: 'factura-pos/list',
+              activeMatch: 'factura-pos',
             },
             {
               labelKey: 'entities.notaCredito.name',
@@ -81,6 +66,22 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.notaDebito.name',
               path: 'nota-debito/list',
               activeMatch: 'nota-debito',
+            },
+            {
+              labelKey: 'entities.cuentaCobro.name',
+              path: 'cuenta-cobro/list',
+              activeMatch: 'cuenta-cobro',
+            },
+            // Los de servicio quedan al final: no venían en el orden pedido.
+            {
+              labelKey: 'entities.contratoServicio.name',
+              path: 'contrato-servicio/list',
+              activeMatch: 'contrato-servicio',
+            },
+            {
+              labelKey: 'entities.pedidoServicio.name',
+              path: 'pedido-servicio/list',
+              activeMatch: 'pedido-servicio',
             },
           ],
         },
@@ -97,7 +98,8 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
           items: [
             { labelKey: 'entities.contacto.name', path: 'contactos' },
             { labelKey: 'entities.item.name', path: 'items' },
-            // sede: pendiente (el master aún no existe)
+            { labelKey: 'entities.almacen.name', path: 'almacenes' },
+            // sede: pendiente (el master aún no existe); va acá cuando se cree.
             { labelKey: 'entities.precio.name', path: 'precios' },
             { labelKey: 'entities.asesor.name', path: 'asesores' },
             { labelKey: 'entities.resolucion.name', path: 'resoluciones' },

@@ -27,11 +27,6 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'factura-compra',
             },
             {
-              labelKey: 'entities.documentoSoporte.name',
-              path: 'documento-soporte/list',
-              activeMatch: 'documento-soporte',
-            },
-            {
               labelKey: 'entities.notaCreditoCompra.name',
               path: 'nota-credito-compra/list',
               activeMatch: 'nota-credito-compra',
@@ -41,7 +36,11 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
               path: 'nota-debito-compra/list',
               activeMatch: 'nota-debito-compra',
             },
-
+            {
+              labelKey: 'entities.documentoSoporte.name',
+              path: 'documento-soporte/list',
+              activeMatch: 'documento-soporte',
+            },
             {
               labelKey: 'entities.notaAjuste.name',
               path: 'nota-ajuste/list',
@@ -64,6 +63,7 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
             { labelKey: 'entities.contacto.name', path: 'contactos' },
             { labelKey: 'entities.resolucion.name', path: 'resoluciones' },
             { labelKey: 'entities.formaPago.name', path: 'formas-pago' },
+            { labelKey: 'entities.almacen.name', path: 'almacenes' },
           ],
         },
       ],
