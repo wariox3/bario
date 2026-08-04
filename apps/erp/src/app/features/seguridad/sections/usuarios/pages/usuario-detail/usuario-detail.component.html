@@ -1,6 +1,8 @@
 @let dict = t().seguridad.usuarios;
 @let det = dict.detalle;
 
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
 <!-- Volver + acciones sobre el miembro. -->
 <header class="flex shrink-0 flex-wrap items-center gap-2">
   <p-button

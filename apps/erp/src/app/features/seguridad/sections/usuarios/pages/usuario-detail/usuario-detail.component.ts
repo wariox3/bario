@@ -6,6 +6,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { finalize } from 'rxjs';
 import { I18nService, TenantService, ToastService, getInitials } from '@reddoc/core';
+import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { CONTENEDOR_ROL } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CambiarRolDialogComponent } from '../../components/cambiar-rol-dialog/cambiar-rol-dialog.component';
@@ -24,10 +25,10 @@ import { toUsuarioRow } from '../../usuarios.utils';
 @Component({
   selector: 'app-usuario-detail',
   standalone: true,
-  imports: [ButtonModule, ConfirmDialogModule, CambiarRolDialogComponent],
+  imports: [ButtonModule, ConfirmDialogModule, BreadcrumbComponent, CambiarRolDialogComponent],
   providers: [ConfirmationService],
   templateUrl: './usuario-detail.component.html',
-  host: { class: 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto' },
+  styleUrl: './usuario-detail.component.scss',
 })
 export class UsuarioDetailComponent {
   private readonly service = inject(SeguridadUsuariosService);
@@ -47,6 +48,20 @@ export class UsuarioDetailComponent {
   protected readonly isLoading = signal(false);
   protected readonly notFound = signal(false);
   protected readonly rolDialogVisible = signal(false);
+
+  /** Seguridad → Usuarios → <persona>. La hoja no lleva link (es esta página). */
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
+    const slug = this.tenant.currentSlug();
+    const usuario = this.usuario();
+    return [
+      { label: this.t().seguridad.title, routerLink: slug ? ['/t', slug, 'seguridad'] : undefined },
+      {
+        label: this.t().seguridad.menu.usuarios,
+        routerLink: slug ? ['/t', slug, ...SEGURIDAD_USUARIOS_PATH] : undefined,
+      },
+      { label: usuario ? usuario.usuario_nombre_corto || usuario.usuario_email : '…' },
+    ];
+  });
 
   protected readonly esPropietario = computed(
     () => this.usuario()?.rol_id === CONTENEDOR_ROL.propietario,

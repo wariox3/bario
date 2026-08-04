@@ -1,21 +1,32 @@
 import type { Routes } from '@angular/router';
+import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { SEGURIDAD_MODULE } from './seguridad.module-descriptor';
 
 /**
- * Rutas de Seguridad del contenedor.
+ * Rutas de Seguridad del contenedor (`/t/:slug/seguridad`).
  *
- * Feature tradicional bajo `/t/:slug/seguridad` (hermana de `configuracion`,
- * fuera del framework de módulos). El shell aloja el **menú lateral** y un
- * `<router-outlet>`: cada sección es una ruta hija real —no un query-param—,
- * así el deep-link, el back del navegador y el lazy-loading por sección salen
- * gratis. Sumar una sección = una entrada en `SEGURIDAD_MENU` + una ruta acá.
+ * Se enruta como un módulo: el `erpModuleResolver` la marca como área activa y
+ * el sidebar del workspace pinta sus secciones. Por eso no hay shell propio —
+ * el chrome lo pone el layout, igual que en Venta o Inventario.
+ *
+ * Sumar una sección = una entrada en el `menu` del descriptor + una ruta hija
+ * acá.
  */
 export const SEGURIDAD_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./pages/seguridad/seguridad.component').then((m) => m.SeguridadComponent),
+    resolve: { _module: erpModuleResolver(SEGURIDAD_MODULE.id) },
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'usuarios' },
+      moduleIndexRoute(SEGURIDAD_MODULE),
+      {
+        // Inicio vacío por ahora: mismo placeholder que estrenan los módulos
+        // hasta que tienen su propio panel.
+        path: 'inicio',
+        loadComponent: () =>
+          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
+            (m) => m.ModulePlaceholderComponent,
+          ),
+      },
       {
         path: 'usuarios',
         loadChildren: () =>

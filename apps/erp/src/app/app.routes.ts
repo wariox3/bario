@@ -59,8 +59,8 @@ export const appRoutes: Route[] = [
         // Administrar el contenedor es de propietario/administrador; el user-menu
         // ya la esconde, esto cierra la puerta de la URL directa.
         canActivate: [contenedorAdminGuard],
-        // Ruta global (no-módulo): limpia el módulo activo para ocultar el sidebar.
-        resolve: { _module: erpModuleResolver(null) },
+        // El módulo activo lo fija `SEGURIDAD_ROUTES`: Seguridad sí trae sidebar
+        // propio, aunque no salga en el topbar.
         loadChildren: () =>
           import('./features/seguridad/seguridad.routes').then((m) => m.SEGURIDAD_ROUTES),
       },

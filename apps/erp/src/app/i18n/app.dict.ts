@@ -4310,8 +4310,6 @@ export interface AppDict
   };
   seguridad: {
     title: string;
-    subtitle: string;
-    menuLabel: string;
     menu: { usuarios: string };
     usuarios: {
       searchPlaceholder: string;

@@ -16,6 +16,8 @@ import {
   DataFilterModalComponent,
   DataTableComponent,
   DataToolbarComponent,
+  ListShellComponent,
+  type BreadcrumbItem,
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
@@ -39,6 +41,10 @@ import { toUsuarioRow } from '../../usuarios.utils';
 /**
  * Usuarios con acceso al contenedor activo.
  *
+ * Página de lista estándar del ERP: `<lib-list-shell>` (breadcrumb + card con
+ * título y la tabla en su recuadro) con la toolbar y la tabla proyectadas. El
+ * menú de secciones lo pone el sidebar del workspace, no la página.
+ *
  * **La búsqueda y los filtros los resuelve el backend**: cada cambio recarga
  * `lista-cliente/` con la consulta como query params (el toolbar ya emite el
  * término debounced, así que tipear no dispara una petición por tecla).
@@ -53,6 +59,7 @@ import { toUsuarioRow } from '../../usuarios.utils';
   selector: 'app-usuarios-list',
   standalone: true,
   imports: [
+    ListShellComponent,
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
@@ -62,9 +69,7 @@ import { toUsuarioRow } from '../../usuarios.utils';
   ],
   providers: [ConfirmationService],
   templateUrl: './usuarios-list.component.html',
-  // Releva la cadena de alturas del shell hasta la tabla: solo el cuerpo de la
-  // tabla scrollea (mismo contrato que las páginas de lista del ERP).
-  host: { class: 'flex min-h-0 flex-1 flex-col gap-3' },
+  styleUrl: './usuarios-list.component.scss',
 })
 export class UsuariosListComponent {
   private readonly service = inject(SeguridadUsuariosService);
@@ -100,6 +105,15 @@ export class UsuariosListComponent {
   protected readonly inviteVisible = signal(false);
   protected readonly rolDialogVisible = signal(false);
   protected readonly usuarioEnEdicion = signal<UsuarioRow | null>(null);
+
+  /** Seguridad → Usuarios. La raíz redirige a esta misma sección (es la única). */
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
+    const slug = this.tenant.currentSlug();
+    return [
+      { label: this.t().seguridad.title, routerLink: slug ? ['/t', slug, 'seguridad'] : undefined },
+      { label: this.t().seguridad.menu.usuarios },
+    ];
+  });
 
   /** Filas devueltas por el backend, con el rol ya resuelto a texto. */
   private readonly rows = computed<readonly UsuarioRow[]>(() => {

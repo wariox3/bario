@@ -1,28 +1,24 @@
-<!--
-  Toolbar arriba y la tabla en su recuadro embebido: borde un punto más definido
-  que la card del shell (0.12 vs 0.08), que es la jerarquía por capas del sistema.
--->
-<lib-data-toolbar
-  [primaryAction]="primaryAction"
-  [trailingActions]="trailingActions"
-  [searchEnabled]="true"
-  [searchValue]="searchValue()"
-  searchPlaceholderKey="seguridad.usuarios.searchPlaceholder"
-  [filtersEnabled]="true"
-  [activeFiltersCount]="activeFilters().length"
-  [deleteSelectedEnabled]="eliminables().length > 0"
-  [deleteSelectedCount]="eliminables().length"
-  (searched)="onSearch($event)"
-  (actionInvoked)="onToolbarAction($event)"
-  (filtersToggle)="openFilters()"
-  (filtersClear)="clearFilters()"
-  (deleteSelected)="removeSelected()"
-/>
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().seguridad.menu.usuarios">
+  <lib-data-toolbar
+    toolbar
+    [primaryAction]="primaryAction"
+    [trailingActions]="trailingActions"
+    [searchEnabled]="true"
+    [searchValue]="searchValue()"
+    searchPlaceholderKey="seguridad.usuarios.searchPlaceholder"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    [deleteSelectedEnabled]="eliminables().length > 0"
+    [deleteSelectedCount]="eliminables().length"
+    (searched)="onSearch($event)"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+    (deleteSelected)="removeSelected()"
+  />
 
-<div
-  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]"
->
   <lib-data-table
+    table
     [columns]="columns"
     [items]="pageItems()"
     [totalCount]="totalCount()"
@@ -40,7 +36,7 @@
     (rowActionInvoked)="onRowAction($event)"
     (rowClick)="onRowClick($event)"
   />
-</div>
+</lib-list-shell>
 
 <lib-data-filter-modal
   [fields]="filterFields"

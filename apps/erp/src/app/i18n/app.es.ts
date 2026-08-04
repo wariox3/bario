@@ -5573,8 +5573,6 @@ export const es: AppDict = {
   },
   seguridad: {
     title: 'Seguridad',
-    subtitle: 'Usuarios y accesos del contenedor',
-    menuLabel: 'Secciones de seguridad',
     menu: { usuarios: 'Usuarios' },
     usuarios: {
       searchPlaceholder: 'Buscar por nombre o correo...',
