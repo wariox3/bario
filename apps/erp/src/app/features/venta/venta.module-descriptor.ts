@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 /**
  * Descriptor del módulo Venta para la capa de navegación.
@@ -10,9 +11,16 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  * Acordeones: "Documentos" (contrato/pedido/factura de servicio), "Proceso" e
  * "Informes" (Pendiente por facturar). Sumar entradas a `items` (o nuevos
  * grupos/acordeones) cuando se implementen más documentos, procesos o informes.
+ *
+ * Las entradas que el backend sabe permisar declaran su `modelo`, el mismo que
+ * `venta.routes.ts` le pasa a `withPermission`. Las que no lo declaran quedan
+ * abiertas: los documentos comparten un único modelo (`general.documento`) y
+ * almacén todavía no está catalogado. "Inicio" tampoco lleva: es el landing del
+ * módulo, si el módulo se ve el inicio se ve.
  */
 export const VENTA_MODULE: ErpModuleDescriptor = {
   id: 'venta',
+  accessFlag: 'acceso_venta',
   displayNameKey: 'modules.venta.name',
   iconClass: 'pi pi-tag',
   defaultChildPath: 'inicio',
@@ -96,14 +104,41 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.item.name', path: 'items' },
-            { labelKey: 'entities.almacen.name', path: 'almacenes' },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.item.name',
+              path: 'items',
+              modelo: MODELO.general.item,
+            },
+            {
+              labelKey: 'entities.almacen.name',
+              path: 'almacenes',
+            },
             // sede: pendiente (el master aún no existe); va acá cuando se cree.
-            { labelKey: 'entities.precio.name', path: 'precios' },
-            { labelKey: 'entities.asesor.name', path: 'asesores' },
-            { labelKey: 'entities.resolucion.name', path: 'resoluciones' },
-            { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
+            {
+              labelKey: 'entities.precio.name',
+              path: 'precios',
+              modelo: MODELO.general.precio,
+            },
+            {
+              labelKey: 'entities.asesor.name',
+              path: 'asesores',
+              modelo: MODELO.general.asesor,
+            },
+            {
+              labelKey: 'entities.resolucion.name',
+              path: 'resoluciones',
+              modelo: MODELO.general.resolucion,
+            },
+            {
+              labelKey: 'entities.cuentaBanco.name',
+              path: 'cuentas-banco',
+              modelo: MODELO.general.cuentaBanco,
+            },
           ],
         },
       ],

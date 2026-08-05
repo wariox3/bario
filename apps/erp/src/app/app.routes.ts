@@ -3,6 +3,7 @@ import { authGuard, rootRedirectGuard, tenantAccessGuard } from '@reddoc/core';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
 import { erpModuleResolver } from '@erp/core/erp-modules';
 import { contenedorAdminGuard } from '@erp/core/guards/contenedor-admin.guard';
+import { withModuleAccess } from '@erp/core/permissions';
 
 export const appRoutes: Route[] = [
   { path: '', pathMatch: 'full', canActivate: [rootRedirectGuard], children: [] },
@@ -69,38 +70,38 @@ export const appRoutes: Route[] = [
         loadChildren: () =>
           import('./features/general/general.routes').then((m) => m.GENERAL_ROUTES),
       },
-      {
+      ...withModuleAccess('compra', {
         path: 'compra',
         loadChildren: () => import('./features/compra/compra.routes').then((m) => m.COMPRA_ROUTES),
-      },
-      {
+      }),
+      ...withModuleAccess('venta', {
         path: 'venta',
         loadChildren: () => import('./features/venta/venta.routes').then((m) => m.VENTA_ROUTES),
-      },
-      {
+      }),
+      ...withModuleAccess('inventario', {
         path: 'inventario',
         loadChildren: () =>
           import('./features/inventario/inventario.routes').then((m) => m.INVENTARIO_ROUTES),
-      },
-      {
+      }),
+      ...withModuleAccess('contabilidad', {
         path: 'contabilidad',
         loadChildren: () =>
           import('./features/contabilidad/contabilidad.routes').then((m) => m.CONTABILIDAD_ROUTES),
-      },
-      {
+      }),
+      ...withModuleAccess('tesoreria', {
         path: 'tesoreria',
         loadChildren: () =>
           import('./features/tesoreria/tesoreria.routes').then((m) => m.TESORERIA_ROUTES),
-      },
-      {
+      }),
+      ...withModuleAccess('cartera', {
         path: 'cartera',
         loadChildren: () =>
           import('./features/cartera/cartera.routes').then((m) => m.CARTERA_ROUTES),
-      },
-      {
+      }),
+      ...withModuleAccess('humano', {
         path: 'humano',
         loadChildren: () => import('./features/humano/humano.routes').then((m) => m.HUMANO_ROUTES),
-      },
+      }),
     ],
   },
 

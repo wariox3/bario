@@ -34,6 +34,13 @@ import type {
 } from '@erp/core/components/import-dialog/import-dialog.types';
 import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import {
+  MODELO,
+  PermissionsService,
+  visibleActions,
+  visiblePrimaryAction,
+  type PermissionAction,
+} from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
 import type { Contacto } from '../../contacto.model';
@@ -79,6 +86,7 @@ export class ContactosListComponent {
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
+  private readonly permissions = inject(PermissionsService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
@@ -134,9 +142,26 @@ export class ContactosListComponent {
 
   protected readonly columns = CONTACTOS_COLUMNS;
   protected readonly filterFields = CONTACTOS_FILTER_FIELDS;
-  protected readonly rowActions = CONTACTOS_ROW_ACTIONS;
-  protected readonly primaryAction = CONTACTOS_PRIMARY_ACTION;
-  protected readonly trailingActions = CONTACTOS_TRAILING_ACTIONS;
+
+  /**
+   * Acciones podadas a lo que el usuario puede hacer sobre el modelo `contacto`.
+   *
+   * Los grants ya están en cache: los trajo el `permissionGuard` al entrar, así
+   * que estos botones nacen con la decisión tomada y no parpadean. El permiso es
+   * del **modelo**, que es global, así que vale igual se haya entrado desde
+   * General, Venta o Compra.
+   */
+  private readonly can = (accion: PermissionAction) =>
+    this.permissions.can(MODELO.general.contacto, accion);
+
+  protected readonly rowActions = computed(() => visibleActions(CONTACTOS_ROW_ACTIONS, this.can));
+  protected readonly primaryAction = computed(() =>
+    visiblePrimaryAction(CONTACTOS_PRIMARY_ACTION, this.can),
+  );
+  protected readonly trailingActions = computed(() =>
+    visibleActions(CONTACTOS_TRAILING_ACTIONS, this.can),
+  );
+  protected readonly puedeEliminar = computed(() => this.can('eliminar'));
 
   constructor() {
     this.loadList();

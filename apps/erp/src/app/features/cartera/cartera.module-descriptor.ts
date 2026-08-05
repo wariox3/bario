@@ -9,6 +9,7 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  */
 export const CARTERA_MODULE: ErpModuleDescriptor = {
   id: 'cartera',
+  accessFlag: 'acceso_cartera',
   displayNameKey: 'modules.cartera.name',
   iconClass: 'pi pi-credit-card',
   defaultChildPath: 'inicio',

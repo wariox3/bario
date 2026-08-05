@@ -2,6 +2,7 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
 
 export const INVENTARIO_MODULE: ErpModuleDescriptor = {
   id: 'inventario',
+  accessFlag: 'acceso_inventario',
   displayNameKey: 'modules.inventario.name',
   iconClass: 'pi pi-box',
   defaultChildPath: 'inicio',

@@ -9,6 +9,7 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  */
 export const TESORERIA_MODULE: ErpModuleDescriptor = {
   id: 'tesoreria',
+  accessFlag: 'acceso_tesoreria',
   displayNameKey: 'modules.tesoreria.name',
   iconClass: 'pi pi-wallet',
   defaultChildPath: 'inicio',

@@ -1,6 +1,7 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
 import { activeModuleResolver } from '@erp/core/module-config';
+import { MODELO, withPermission } from '@erp/core/permissions';
 import { VENTA_MODULE } from './venta.module-descriptor';
 
 /**
@@ -144,7 +145,7 @@ export const VENTA_ROUTES: Route[] = [
             (m) => m.CUENTA_COBRAR_ROUTES,
           ),
       },
-      {
+      ...withPermission(MODELO.general.resolucion, {
         // Master compartido: el código vive en general/masters/resolucion, pero
         // se enruta desde Venta con `data: { tipo: 'venta' }` para fijar el flag.
         path: 'resoluciones',
@@ -153,21 +154,21 @@ export const VENTA_ROUTES: Route[] = [
           import('../general/masters/resolucion/resolucion.routes').then(
             (m) => m.RESOLUCION_ROUTES,
           ),
-      },
+      }),
       // Masters compartidos de general, reusados en Venta. Son module-agnostic:
       // derivan el módulo activo del `ActiveModuleStore` (fijado por el
       // `erpModuleResolver('venta')` de la ruta raíz), así que su navegación se
       // queda dentro de Venta. (sede: pendiente, el master aún no existe.)
-      {
+      ...withPermission(MODELO.general.contacto, {
         path: 'contactos',
         loadChildren: () =>
           import('../general/masters/contacto/contacto.routes').then((m) => m.CONTACTO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.general.item, {
         path: 'items',
         loadChildren: () =>
           import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
-      },
+      }),
       {
         // El master vive en inventario (su endpoint es `/inventario/almacen/`),
         // pero es module-agnostic igual que los de general.
@@ -175,23 +176,23 @@ export const VENTA_ROUTES: Route[] = [
         loadChildren: () =>
           import('../inventario/masters/almacen/almacen.routes').then((m) => m.ALMACEN_ROUTES),
       },
-      {
+      ...withPermission(MODELO.general.precio, {
         path: 'precios',
         loadChildren: () =>
           import('../general/masters/precio/precio.routes').then((m) => m.PRECIO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.general.asesor, {
         path: 'asesores',
         loadChildren: () =>
           import('../general/masters/asesor/asesor.routes').then((m) => m.ASESOR_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.general.cuentaBanco, {
         path: 'cuentas-banco',
         loadChildren: () =>
           import('../general/masters/cuenta-banco/cuenta-banco.routes').then(
             (m) => m.CUENTA_BANCO_ROUTES,
           ),
-      },
+      }),
     ],
   },
 ];

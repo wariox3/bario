@@ -9,6 +9,7 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  */
 export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
   id: 'contabilidad',
+  accessFlag: 'acceso_contabilidad',
   displayNameKey: 'modules.contabilidad.name',
   iconClass: 'pi pi-calculator',
   defaultChildPath: 'inicio',

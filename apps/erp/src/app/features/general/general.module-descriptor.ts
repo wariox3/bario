@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 export const GENERAL_MODULE: ErpModuleDescriptor = {
   id: 'general',
@@ -41,10 +42,26 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.item.name', path: 'items' },
-            { labelKey: 'entities.sede.name', path: 'sedes' },
-            { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.item.name',
+              path: 'items',
+              modelo: MODELO.general.item,
+            },
+            {
+              labelKey: 'entities.sede.name',
+              path: 'sedes',
+              modelo: MODELO.general.sede,
+            },
+            {
+              labelKey: 'entities.cuentaBanco.name',
+              path: 'cuentas-banco',
+              modelo: MODELO.general.cuentaBanco,
+            },
           ],
         },
       ],
