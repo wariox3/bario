@@ -27,6 +27,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CuentaBancoService } from '../../cuenta-banco.service';
 import type { CuentaBanco } from '../../cuenta-banco.model';
@@ -98,9 +99,11 @@ export class CuentasBancoListComponent {
 
   protected readonly columns = CUENTAS_BANCO_COLUMNS;
   protected readonly filterFields = CUENTAS_BANCO_FILTER_FIELDS;
-  protected readonly rowActions = CUENTAS_BANCO_ROW_ACTIONS;
-  protected readonly primaryAction = CUENTAS_BANCO_PRIMARY_ACTION;
-  protected readonly trailingActions = CUENTAS_BANCO_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.cuentaBanco, {
+    row: CUENTAS_BANCO_ROW_ACTIONS,
+    primary: CUENTAS_BANCO_PRIMARY_ACTION,
+    trailing: CUENTAS_BANCO_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

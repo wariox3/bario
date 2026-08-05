@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { SedeService } from '../../sede.service';
 import type { Sede } from '../../sede.model';
@@ -103,9 +104,11 @@ export class SedesListComponent {
 
   protected readonly columns = SEDES_COLUMNS;
   protected readonly filterFields = SEDES_FILTER_FIELDS;
-  protected readonly rowActions = SEDES_ROW_ACTIONS;
-  protected readonly primaryAction = SEDES_PRIMARY_ACTION;
-  protected readonly trailingActions = SEDES_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.sede, {
+    row: SEDES_ROW_ACTIONS,
+    primary: SEDES_PRIMARY_ACTION,
+    trailing: SEDES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

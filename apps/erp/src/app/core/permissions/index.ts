@@ -21,4 +21,6 @@ export {
   type PermissionPredicate,
 } from './menu-visibility';
 export { ACTION_PERMISSION_BY_ID, visibleActions, visiblePrimaryAction } from './action-visibility';
+export { masterActions } from './master-actions';
+export type { MasterActions, MasterActionsConfig } from './master-actions';
 export { HasPermissionDirective } from './has-permission.directive';

@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { NovedadService } from '../../novedad.service';
 import type { Novedad } from '../../novedad.model';
@@ -96,9 +97,11 @@ export class NovedadesListComponent {
 
   protected readonly columns = NOVEDADES_COLUMNS;
   protected readonly filterFields = NOVEDADES_FILTER_FIELDS;
-  protected readonly rowActions = NOVEDADES_ROW_ACTIONS;
-  protected readonly primaryAction = NOVEDADES_PRIMARY_ACTION;
-  protected readonly trailingActions = NOVEDADES_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.humano.novedad, {
+    row: NOVEDADES_ROW_ACTIONS,
+    primary: NOVEDADES_PRIMARY_ACTION,
+    trailing: NOVEDADES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

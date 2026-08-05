@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CreditoService } from '../../credito.service';
 import type { Credito } from '../../credito.model';
@@ -96,9 +97,11 @@ export class CreditosListComponent {
 
   protected readonly columns = CREDITOS_COLUMNS;
   protected readonly filterFields = CREDITOS_FILTER_FIELDS;
-  protected readonly rowActions = CREDITOS_ROW_ACTIONS;
-  protected readonly primaryAction = CREDITOS_PRIMARY_ACTION;
-  protected readonly trailingActions = CREDITOS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.humano.credito, {
+    row: CREDITOS_ROW_ACTIONS,
+    primary: CREDITOS_PRIMARY_ACTION,
+    trailing: CREDITOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

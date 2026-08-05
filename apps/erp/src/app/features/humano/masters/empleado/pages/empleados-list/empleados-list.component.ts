@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '@erp/features/general/masters/contacto/contacto.service';
 import type { Empleado } from '../../empleado.model';
@@ -104,9 +105,12 @@ export class EmpleadosListComponent {
 
   protected readonly columns = EMPLEADOS_COLUMNS;
   protected readonly filterFields = EMPLEADOS_FILTER_FIELDS;
-  protected readonly rowActions = EMPLEADOS_ROW_ACTIONS;
-  protected readonly primaryAction = EMPLEADOS_PRIMARY_ACTION;
-  protected readonly trailingActions = EMPLEADOS_TRAILING_ACTIONS;
+  // Empleados usa `ContactoService`: lo gobierna el modelo de Contactos.
+  protected readonly acciones = masterActions(MODELO.general.contacto, {
+    row: EMPLEADOS_ROW_ACTIONS,
+    primary: EMPLEADOS_PRIMARY_ACTION,
+    trailing: EMPLEADOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

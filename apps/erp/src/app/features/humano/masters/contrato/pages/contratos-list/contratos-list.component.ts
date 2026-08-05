@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
 import type { Contrato } from '../../contrato.model';
@@ -96,9 +97,11 @@ export class ContratosListComponent {
 
   protected readonly columns = CONTRATOS_COLUMNS;
   protected readonly filterFields = CONTRATOS_FILTER_FIELDS;
-  protected readonly rowActions = CONTRATOS_ROW_ACTIONS;
-  protected readonly primaryAction = CONTRATOS_PRIMARY_ACTION;
-  protected readonly trailingActions = CONTRATOS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.humano.contrato, {
+    row: CONTRATOS_ROW_ACTIONS,
+    primary: CONTRATOS_PRIMARY_ACTION,
+    trailing: CONTRATOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

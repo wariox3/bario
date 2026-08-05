@@ -1,12 +1,12 @@
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.adicional.name">
   <lib-data-toolbar
     toolbar
-    [primaryAction]="primaryAction"
-    [trailingActions]="trailingActions"
+    [primaryAction]="acciones.primaryAction()"
+    [trailingActions]="acciones.trailingActions()"
     [searchPlaceholderKey]="'entities.adicional.searchPlaceholder'"
     [filtersEnabled]="true"
     [activeFiltersCount]="activeFilters().length"
-    [deleteSelectedEnabled]="hasSelection()"
+    [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
     [deleteSelectedCount]="selectedRows().length"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
@@ -25,7 +25,7 @@
     [sort]="sort()"
     selectionMode="multiple"
     [selectedRows]="selectedRows()"
-    [rowActions]="rowActions"
+    [rowActions]="acciones.rowActions()"
     [rowClickable]="true"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"

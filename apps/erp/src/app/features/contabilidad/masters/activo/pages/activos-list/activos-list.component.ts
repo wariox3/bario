@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
 import type { Activo } from '../../activo.model';
@@ -96,9 +97,11 @@ export class ActivosListComponent {
 
   protected readonly columns = ACTIVOS_COLUMNS;
   protected readonly filterFields = ACTIVOS_FILTER_FIELDS;
-  protected readonly rowActions = ACTIVOS_ROW_ACTIONS;
-  protected readonly primaryAction = ACTIVOS_PRIMARY_ACTION;
-  protected readonly trailingActions = ACTIVOS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.contabilidad.activo, {
+    row: ACTIVOS_ROW_ACTIONS,
+    primary: ACTIVOS_PRIMARY_ACTION,
+    trailing: ACTIVOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
