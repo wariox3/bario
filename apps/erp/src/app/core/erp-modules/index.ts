@@ -1,4 +1,11 @@
 export type { ErpModuleDescriptor } from './erp-module.types';
+export type {
+  SidebarAccordion,
+  SidebarGroup,
+  SidebarLeafItem,
+  SidebarSection,
+  SidebarSimpleItem,
+} from './sidebar-menu.types';
 export { ERP_MODULES, ERP_HIDDEN_MODULES, ERP_ALL_MODULES } from './erp-modules.registry';
 export { ActiveModuleStore } from './active-module.store';
 export { currentModuleId, resolveModuleName } from './active-module-nav';

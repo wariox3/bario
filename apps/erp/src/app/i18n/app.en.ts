@@ -8,6 +8,15 @@ export const en: AppDict = {
   contenedores: contenedoresEn,
   common: {
     comingSoon: 'Coming soon.',
+    accessDenied: {
+      title: 'You do not have access',
+      sub: 'This section is only for container administrators. Ask the company owner for access.',
+      subPermission:
+        'You do not have permission to view this section. Ask your container administrator for access.',
+      subModule:
+        "This module is not included in the company's plan. Talk to the owner to enable it.",
+      back: 'Back to home',
+    },
     actions: {
       new: 'New',
       actions: 'Actions',

@@ -1,4 +1,4 @@
-import type { SidebarSection } from '../../layouts/sidebar/sidebar-menu.types';
+import type { SidebarSection } from './sidebar-menu.types';
 
 /**
  * Descriptor de un módulo del ERP como **contexto de navegación**.
@@ -25,8 +25,15 @@ export interface ErpModuleDescriptor {
    * Si es `null`, el módulo redirige a su placeholder (sin contenido todavía).
    */
   readonly defaultChildPath: string | null;
-  /** Flag opcional del plan del tenant que habilita este módulo (futuro). */
-  readonly requiredPlanFlag?: string;
+  /**
+   * Flag del contenedor que habilita este módulo, p. ej. `'acceso_venta'`.
+   *
+   * Es el eje **plan del tenant**: qué contrató la empresa, no qué puede hacer
+   * el usuario (eso son los `PermissionCode` del menú). Sin declarar, el módulo
+   * está siempre disponible — es el caso de General, que es la base, y de las
+   * áreas ocultas como Seguridad.
+   */
+  readonly accessFlag?: string;
   /** Entradas del sidebar mostradas cuando este módulo está activo. */
   readonly menu: readonly SidebarSection[];
 }

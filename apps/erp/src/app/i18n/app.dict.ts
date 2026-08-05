@@ -58,6 +58,13 @@ export interface AppDict
   extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
   common: {
     comingSoon: string;
+    accessDenied: {
+      title: string;
+      sub: string;
+      subPermission: string;
+      subModule: string;
+      back: string;
+    };
     actions: {
       new: string;
       actions: string;

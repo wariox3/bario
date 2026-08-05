@@ -30,7 +30,17 @@
   }
 
   <main class="workspace-main">
-    <router-outlet />
+    <!--
+      Un 403 sobre el listado de la pantalla la reemplaza entera: el contenido no
+      se destruye (el outlet sigue montado, solo oculto) para no reactivar la ruta
+      al volver. El sidebar y el topbar quedan intactos: el usuario sigue ubicado.
+    -->
+    @if (forbiddenMessage(); as motivo) {
+      <app-access-denied-page [message]="motivo" />
+    }
+    <div [class]="forbiddenMessage() ? 'hidden' : 'contents'">
+      <router-outlet />
+    </div>
   </main>
 </div>
 

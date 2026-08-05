@@ -2,19 +2,21 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
-import { I18nService, TenantService } from '@reddoc/core';
+import { ForbiddenPageStore, I18nService, TenantService } from '@reddoc/core';
 import { AppSwitcherComponent } from '@reddoc/ui';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
+import { PermissionsService, visibleSections } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ModuleBarComponent } from '../module-bar/module-bar.component';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
+import { AccessDeniedPageComponent } from '@erp/core/components/access-denied/access-denied.page';
 import type {
   SidebarAccordion,
   SidebarLeafItem,
   SidebarSection,
   SidebarSimpleItem,
-} from '../sidebar/sidebar-menu.types';
+} from '@erp/core/erp-modules';
 
 /**
  * Layout principal del workspace de un tenant.
@@ -37,6 +39,7 @@ import type {
     AppSwitcherComponent,
     ModuleBarComponent,
     TenantBadgeComponent,
+    AccessDeniedPageComponent,
   ],
   templateUrl: './workspace-layout.component.html',
   styleUrl: './workspace-layout.component.scss',
@@ -45,9 +48,17 @@ export class WorkspaceLayoutComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly tenant = inject(TenantService);
   private readonly activeModuleStore = inject(ActiveModuleStore);
+  private readonly permissions = inject(PermissionsService);
+  private readonly forbiddenPage = inject(ForbiddenPageStore);
   private readonly router = inject(Router);
 
   protected readonly t = this.i18n.t;
+
+  /**
+   * Motivo del 403 que bloqueó la pantalla actual, o `null` si no hay bloqueo.
+   * Lo escribe el `errorInterceptor` y se limpia solo al navegar.
+   */
+  protected readonly forbiddenMessage = this.forbiddenPage.message;
 
   /** Slug del tenant activo; necesario para resolver paths absolutos. */
   protected readonly tenantSlug = this.tenant.currentSlug;
@@ -55,9 +66,16 @@ export class WorkspaceLayoutComponent {
   /** Descriptor del módulo activo, o `null` si estamos en una ruta global. */
   protected readonly activeDescriptor = this.activeModuleStore.activeDescriptor;
 
-  /** Secciones del sidebar: las del módulo activo, o vacío si no hay módulo. */
-  protected readonly sections = computed<readonly SidebarSection[]>(
-    () => this.activeDescriptor()?.menu ?? [],
+  /**
+   * Secciones del sidebar: las del módulo activo podadas a lo que el usuario
+   * puede ver, o vacío si no hay módulo. Un link que el usuario no puede abrir
+   * no se ofrece — el `permissionGuard` de la ruta es la otra mitad, para quien
+   * llega por URL directa.
+   */
+  protected readonly sections = computed<readonly SidebarSection[]>(() =>
+    visibleSections(this.activeDescriptor()?.menu ?? [], (modelo) =>
+      this.permissions.canShowInMenu(modelo),
+    ),
   );
 
   /**

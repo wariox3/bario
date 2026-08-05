@@ -1,5 +1,14 @@
+// Import profundo y `type`-only a propósito: el barrel de permisos importa de
+// vuelta estos tipos para filtrar el menú, y pasar por él acá cerraría el ciclo.
+import type { ModeloId } from '../permissions/modelo.catalog';
+
 /**
  * Tipos del menú del sidebar declarativo.
+ *
+ * Viven en `core/erp-modules` y no en `layouts/` porque el menú es parte del
+ * contrato del `ErpModuleDescriptor`: lo declaran los módulos y lo consumen el
+ * layout (para pintarlo) y `core/permissions` (para podarlo). Tenerlos en
+ * `layouts/` obligaba a que core importara de layouts — la dependencia al revés.
  *
  * Dos clases de entradas de primer nivel:
  *   1. `SidebarSimpleItem` — un enlace directo (Dashboard, Reportes, etc.).
@@ -27,6 +36,11 @@ export interface SidebarSimpleItem {
    * Ej: `'dashboard'` resuelve a `'/t/acme/dashboard'`.
    */
   readonly path: string;
+  /**
+   * Modelo del backend que hace visible el item. Sin declarar, siempre visible.
+   * Debe ser **el mismo** que protege su ruta vía `withPermission`.
+   */
+  readonly modelo?: ModeloId;
 }
 
 /** Item navegable dentro de un grupo (Contactos, Ítems, etc.). */
@@ -46,6 +60,12 @@ export interface SidebarLeafItem {
    * de items (masters, informes, procesos) ya es raíz de su contexto y lo omite.
    */
   readonly activeMatch?: string;
+  /**
+   * Modelo del backend que hace visible el item. Sin declarar, siempre visible.
+   * Debe ser **el mismo** que protege su ruta vía `withPermission`: si el menú
+   * y la ruta divergen, el sidebar ofrece un link que rebota al acceso denegado.
+   */
+  readonly modelo?: ModeloId;
 }
 
 /** Sub-grupo opcional dentro de un acordeón (p. ej. "Documentos" o "Utilidades"). */

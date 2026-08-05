@@ -8,6 +8,15 @@ export const es: AppDict = {
   contenedores: contenedoresEs,
   common: {
     comingSoon: 'Próximamente disponible.',
+    accessDenied: {
+      title: 'No tienes acceso',
+      sub: 'Esta sección es solo para administradores del contenedor. Pídele acceso al propietario de la empresa.',
+      subPermission:
+        'No tienes permiso para ver esta sección. Pídele acceso al administrador del contenedor.',
+      subModule:
+        'Este módulo no está incluido en el plan de la empresa. Habla con el propietario para activarlo.',
+      back: 'Volver al inicio',
+    },
     actions: {
       new: 'Nuevo',
       actions: 'Acciones',
