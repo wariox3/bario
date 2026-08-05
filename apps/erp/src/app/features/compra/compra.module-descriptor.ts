@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 export const COMPRA_MODULE: ErpModuleDescriptor = {
   id: 'compra',
@@ -60,10 +61,22 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.item.name', path: 'items' },
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.resolucion.name', path: 'resoluciones' },
-            { labelKey: 'entities.formaPago.name', path: 'formas-pago' },
+            { labelKey: 'entities.item.name', path: 'items', modelo: MODELO.general.item },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.resolucion.name',
+              path: 'resoluciones',
+              modelo: MODELO.general.resolucion,
+            },
+            {
+              labelKey: 'entities.formaPago.name',
+              path: 'formas-pago',
+              modelo: MODELO.general.formaPago,
+            },
             { labelKey: 'entities.almacen.name', path: 'almacenes' },
           ],
         },

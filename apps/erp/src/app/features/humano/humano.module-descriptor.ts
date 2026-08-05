@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 /**
  * Descriptor del módulo Humano para la capa de navegación.
@@ -78,14 +79,31 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.empleado.name', path: 'empleados' },
-            { labelKey: 'entities.contrato.name', path: 'contratos' },
-            { labelKey: 'entities.cargo.name', path: 'cargos' },
-            { labelKey: 'entities.grupo.name', path: 'grupos' },
-            { labelKey: 'entities.sucursal.name', path: 'sucursales' },
-            { labelKey: 'entities.adicional.name', path: 'adicionales' },
-            { labelKey: 'entities.credito.name', path: 'creditos' },
-            { labelKey: 'entities.novedad.name', path: 'novedades' },
+            // Empleados usa `ContactoService`: mismo modelo que Contactos.
+            {
+              labelKey: 'entities.empleado.name',
+              path: 'empleados',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.contrato.name',
+              path: 'contratos',
+              modelo: MODELO.humano.contrato,
+            },
+            { labelKey: 'entities.cargo.name', path: 'cargos', modelo: MODELO.humano.cargo },
+            { labelKey: 'entities.grupo.name', path: 'grupos', modelo: MODELO.humano.grupo },
+            {
+              labelKey: 'entities.sucursal.name',
+              path: 'sucursales',
+              modelo: MODELO.humano.sucursal,
+            },
+            {
+              labelKey: 'entities.adicional.name',
+              path: 'adicionales',
+              modelo: MODELO.humano.adicional,
+            },
+            { labelKey: 'entities.credito.name', path: 'creditos', modelo: MODELO.humano.credito },
+            { labelKey: 'entities.novedad.name', path: 'novedades', modelo: MODELO.humano.novedad },
           ],
         },
       ],

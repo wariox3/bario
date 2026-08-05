@@ -1,4 +1,11 @@
 import type { Route } from '@angular/router';
+import {
+  rutaAlmacenes,
+  rutaContactos,
+  rutaFormasPago,
+  rutaItems,
+  rutaResoluciones,
+} from '../masters-compartidos.routes';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
 import { activeModuleResolver } from '@erp/core/module-config';
 import { COMPRA_MODULE } from './compra.module-descriptor';
@@ -101,38 +108,12 @@ export const COMPRA_ROUTES: Route[] = [
             (m) => m.CUENTA_PAGAR_ROUTES,
           ),
       },
-      {
-        path: 'items',
-        loadChildren: () =>
-          import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
-      },
-      {
-        path: 'contactos',
-        loadChildren: () =>
-          import('../general/masters/contacto/contacto.routes').then((m) => m.CONTACTO_ROUTES),
-      },
-      {
-        path: 'resoluciones',
-        data: { tipo: 'compra' },
-        loadChildren: () =>
-          import('../general/masters/resolucion/resolucion.routes').then(
-            (m) => m.RESOLUCION_ROUTES,
-          ),
-      },
-      {
-        path: 'formas-pago',
-        loadChildren: () =>
-          import('../general/masters/forma-pago/forma-pago.routes').then(
-            (m) => m.FORMA_PAGO_ROUTES,
-          ),
-      },
-      {
-        // El master vive en inventario (su endpoint es `/inventario/almacen/`),
-        // pero es module-agnostic igual que los de general.
-        path: 'almacenes',
-        loadChildren: () =>
-          import('../inventario/masters/almacen/almacen.routes').then((m) => m.ALMACEN_ROUTES),
-      },
+      // Masters compartidos (ver `masters-compartidos.routes.ts`).
+      ...rutaItems(),
+      ...rutaContactos(),
+      ...rutaResoluciones({ tipo: 'compra' }),
+      ...rutaFormasPago(),
+      ...rutaAlmacenes(),
     ],
   },
 ];

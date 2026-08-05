@@ -1,7 +1,19 @@
 import type { Route, Routes } from '@angular/router';
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { CARTERA_MODULE } from '@erp/features/cartera/cartera.module-descriptor';
+import { CARTERA_ROUTES } from '@erp/features/cartera/cartera.routes';
+import { COMPRA_MODULE } from '@erp/features/compra/compra.module-descriptor';
+import { COMPRA_ROUTES } from '@erp/features/compra/compra.routes';
+import { CONTABILIDAD_MODULE } from '@erp/features/contabilidad/contabilidad.module-descriptor';
+import { CONTABILIDAD_ROUTES } from '@erp/features/contabilidad/contabilidad.routes';
 import { GENERAL_MODULE } from '@erp/features/general/general.module-descriptor';
 import { GENERAL_ROUTES } from '@erp/features/general/general.routes';
+import { HUMANO_MODULE } from '@erp/features/humano/humano.module-descriptor';
+import { HUMANO_ROUTES } from '@erp/features/humano/humano.routes';
+import { INVENTARIO_MODULE } from '@erp/features/inventario/inventario.module-descriptor';
+import { INVENTARIO_ROUTES } from '@erp/features/inventario/inventario.routes';
+import { TESORERIA_MODULE } from '@erp/features/tesoreria/tesoreria.module-descriptor';
+import { TESORERIA_ROUTES } from '@erp/features/tesoreria/tesoreria.routes';
 import { VENTA_MODULE } from '@erp/features/venta/venta.module-descriptor';
 import { VENTA_ROUTES } from '@erp/features/venta/venta.routes';
 import type { ModeloId } from './modelo.catalog';
@@ -27,6 +39,12 @@ import type { SidebarSection } from '../erp-modules/sidebar-menu.types';
 const MODULOS: readonly { readonly descriptor: ErpModuleDescriptor; readonly rutas: Routes }[] = [
   { descriptor: GENERAL_MODULE, rutas: GENERAL_ROUTES },
   { descriptor: VENTA_MODULE, rutas: VENTA_ROUTES },
+  { descriptor: COMPRA_MODULE, rutas: COMPRA_ROUTES },
+  { descriptor: CARTERA_MODULE, rutas: CARTERA_ROUTES },
+  { descriptor: TESORERIA_MODULE, rutas: TESORERIA_ROUTES },
+  { descriptor: INVENTARIO_MODULE, rutas: INVENTARIO_ROUTES },
+  { descriptor: CONTABILIDAD_MODULE, rutas: CONTABILIDAD_ROUTES },
+  { descriptor: HUMANO_MODULE, rutas: HUMANO_ROUTES },
 ];
 
 /**
