@@ -122,6 +122,7 @@ export {
   TenantService,
   tenantGuard,
   tenantAccessGuard,
+  tenantSlugMatchGuard,
   clearTenantGuard,
   rootRedirectGuard,
   TENANT_SCOPED,

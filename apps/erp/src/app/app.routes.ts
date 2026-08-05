@@ -1,5 +1,10 @@
 import { Route } from '@angular/router';
-import { authGuard, rootRedirectGuard, tenantAccessGuard } from '@reddoc/core';
+import {
+  authGuard,
+  rootRedirectGuard,
+  tenantAccessGuard,
+  tenantSlugMatchGuard,
+} from '@reddoc/core';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
 import { erpModuleResolver } from '@erp/core/erp-modules';
 import { contenedorAdminGuard } from '@erp/core/guards/contenedor-admin.guard';
@@ -32,6 +37,10 @@ export const appRoutes: Route[] = [
   // Workspace layout (sidebar + main) — anidado bajo el tenant slug
   {
     path: 't/:tenantSlug',
+    // El slug se fija al **matchear**, no al activar: los `canMatch` anidados
+    // (el guard de permisos) corren antes que cualquier `canActivate`, y sin
+    // esto sus peticiones saldrían sin `X-Tenant` en una recarga dura.
+    canMatch: [tenantSlugMatchGuard],
     canActivate: [authGuard, tenantAccessGuard],
     loadComponent: () =>
       import('./layouts/workspace-layout/workspace-layout.component').then(
