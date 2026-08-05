@@ -3,11 +3,14 @@
   ninguna acción que ofrecer. El panel ocupa el recuadro de la tabla, así que la
   página conserva su marco (breadcrumb, título, sidebar) y el usuario sigue
   ubicado.
+
+  Van dos bloques y no un `@if/@else` con los dos adentro: un bloque de control
+  de flujo solo proyecta a un slot si tiene **un único nodo raíz**. Con la
+  toolbar y la tabla juntas, ninguna llegaba a su slot y el cuerpo del shell
+  quedaba vacío (NG8011).
 -->
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().seguridad.menu.usuarios">
-  @if (forbiddenMessage(); as motivo) {
-    <app-access-denied table [message]="motivo" [backLink]="inicioLink()" />
-  } @else {
+  @if (!forbiddenMessage()) {
     <lib-data-toolbar
       toolbar
       [primaryAction]="primaryAction"
@@ -25,7 +28,11 @@
       (filtersClear)="clearFilters()"
       (deleteSelected)="removeSelected()"
     />
+  }
 
+  @if (forbiddenMessage(); as motivo) {
+    <app-access-denied table [message]="motivo" [backLink]="inicioLink()" />
+  } @else {
     <lib-data-table
       table
       [columns]="columns"
