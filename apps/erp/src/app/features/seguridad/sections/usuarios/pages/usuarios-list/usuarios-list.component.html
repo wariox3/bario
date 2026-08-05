@@ -1,41 +1,51 @@
+<!--
+  Sin acceso no se dibuja ni la toolbar ni la tabla: no hay nada que filtrar ni
+  ninguna acción que ofrecer. El panel ocupa el recuadro de la tabla, así que la
+  página conserva su marco (breadcrumb, título, sidebar) y el usuario sigue
+  ubicado.
+-->
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().seguridad.menu.usuarios">
-  <lib-data-toolbar
-    toolbar
-    [primaryAction]="primaryAction"
-    [trailingActions]="trailingActions"
-    [searchEnabled]="true"
-    [searchValue]="searchValue()"
-    searchPlaceholderKey="seguridad.usuarios.searchPlaceholder"
-    [filtersEnabled]="true"
-    [activeFiltersCount]="activeFilters().length"
-    [deleteSelectedEnabled]="eliminables().length > 0"
-    [deleteSelectedCount]="eliminables().length"
-    (searched)="onSearch($event)"
-    (actionInvoked)="onToolbarAction($event)"
-    (filtersToggle)="openFilters()"
-    (filtersClear)="clearFilters()"
-    (deleteSelected)="removeSelected()"
-  />
+  @if (forbiddenMessage(); as motivo) {
+    <app-access-denied table [message]="motivo" [backLink]="inicioLink()" />
+  } @else {
+    <lib-data-toolbar
+      toolbar
+      [primaryAction]="primaryAction"
+      [trailingActions]="trailingActions"
+      [searchEnabled]="true"
+      [searchValue]="searchValue()"
+      searchPlaceholderKey="seguridad.usuarios.searchPlaceholder"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      [deleteSelectedEnabled]="eliminables().length > 0"
+      [deleteSelectedCount]="eliminables().length"
+      (searched)="onSearch($event)"
+      (actionInvoked)="onToolbarAction($event)"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+      (deleteSelected)="removeSelected()"
+    />
 
-  <lib-data-table
-    table
-    [columns]="columns"
-    [items]="pageItems()"
-    [totalCount]="totalCount()"
-    [loading]="isLoading()"
-    [pageSize]="pageSize()"
-    [currentPage]="currentPage()"
-    selectionMode="multiple"
-    [selectedRows]="selectedRows()"
-    [rowActions]="rowActions"
-    [rowClickable]="true"
-    emptyTitleKey="seguridad.usuarios.empty.title"
-    emptySubKey="seguridad.usuarios.empty.sub"
-    (pageChange)="onPageChange($event)"
-    (selectionChange)="onSelectionChange($event)"
-    (rowActionInvoked)="onRowAction($event)"
-    (rowClick)="onRowClick($event)"
-  />
+    <lib-data-table
+      table
+      [columns]="columns"
+      [items]="pageItems()"
+      [totalCount]="totalCount()"
+      [loading]="isLoading()"
+      [pageSize]="pageSize()"
+      [currentPage]="currentPage()"
+      selectionMode="multiple"
+      [selectedRows]="selectedRows()"
+      [rowActions]="rowActions"
+      [rowClickable]="true"
+      emptyTitleKey="seguridad.usuarios.empty.title"
+      emptySubKey="seguridad.usuarios.empty.sub"
+      (pageChange)="onPageChange($event)"
+      (selectionChange)="onSelectionChange($event)"
+      (rowActionInvoked)="onRowAction($event)"
+      (rowClick)="onRowClick($event)"
+    />
+  }
 </lib-list-shell>
 
 <lib-data-filter-modal

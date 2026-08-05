@@ -48,7 +48,11 @@ export class SeguridadUsuariosService {
     const clienteId = this.clienteId();
     if (clienteId == null) return of([]);
     return this.contenedor
-      .getMembers(clienteId, usuariosQueryParams(search, filtros))
+      .getMembers(clienteId, usuariosQueryParams(search, filtros), {
+        // Sin toast: la pantalla renderiza el error (un 403 se ve como el panel
+        // de "no tienes acceso", no como un aviso que se va solo).
+        errorToast: false,
+      })
       .pipe(map((response) => response.results ?? []));
   }
 

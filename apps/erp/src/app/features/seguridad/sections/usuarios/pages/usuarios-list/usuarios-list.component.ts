@@ -1,4 +1,5 @@
 import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
@@ -9,9 +10,11 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  normalizeHttpError,
   type ContenedorMember,
   type FilterCondition,
 } from '@reddoc/core';
+import { AccessDeniedComponent } from '@erp/core/components/access-denied/access-denied.component';
 import {
   DataFilterModalComponent,
   DataTableComponent,
@@ -60,6 +63,7 @@ import { toUsuarioRow } from '../../usuarios.utils';
   standalone: true,
   imports: [
     ListShellComponent,
+    AccessDeniedComponent,
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
@@ -92,6 +96,8 @@ export class UsuariosListComponent {
   private readonly members = signal<readonly ContenedorMember[]>([]);
   /** Última petición disparada; las respuestas que no la traen se ignoran. */
   private lastRequestId = 0;
+  /** Motivo del 403 del backend, o `null` si hay acceso. */
+  protected readonly forbiddenMessage = signal<string | null>(null);
   protected readonly isLoading = signal(false);
   protected readonly isExportingExcel = signal(false);
   protected readonly currentPage = signal(0);
@@ -105,6 +111,12 @@ export class UsuariosListComponent {
   protected readonly inviteVisible = signal(false);
   protected readonly rolDialogVisible = signal(false);
   protected readonly usuarioEnEdicion = signal<UsuarioRow | null>(null);
+
+  /** Salida del panel de acceso denegado: el inicio del área. */
+  protected readonly inicioLink = computed<readonly string[] | null>(() => {
+    const slug = this.tenant.currentSlug();
+    return slug ? ['/t', slug, 'seguridad', 'inicio'] : null;
+  });
 
   /** Seguridad → Usuarios. La raíz redirige a esta misma sección (es la única). */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -308,13 +320,27 @@ export class UsuariosListComponent {
       .subscribe({
         next: (members) => {
           if (requestId !== this.lastRequestId) return;
+          this.forbiddenMessage.set(null);
           this.members.set(members);
           this.selectedRows.set([]);
           this.currentPage.set(0);
         },
-        error: () => {
+        error: (err: unknown) => {
           if (requestId !== this.lastRequestId) return;
           this.members.set([]);
+          this.selectedRows.set([]);
+
+          // 403: el backend es la autoridad sobre quién administra el
+          // contenedor. No es un fallo de carga —es una puerta cerrada—, así que
+          // se muestra en la pantalla con el motivo que dio el backend, no en un
+          // toast que se va solo.
+          const normalized = err instanceof HttpErrorResponse ? normalizeHttpError(err) : null;
+          if (normalized?.kind === 'forbidden') {
+            this.forbiddenMessage.set(normalized.message);
+            return;
+          }
+
+          this.forbiddenMessage.set(null);
           const toasts = this.t().seguridad.usuarios.toasts.loadError;
           this.toast.error(toasts.title, toasts.desc);
         },
