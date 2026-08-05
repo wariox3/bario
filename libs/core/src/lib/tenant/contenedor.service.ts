@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { BaseHttpService, type ParamValue } from '../services/base-http.service';
+import {
+  BaseHttpService,
+  type ParamValue,
+  type RequestOptions,
+} from '../services/base-http.service';
 import {
   Contenedor,
   ContenedorInvitacionesPendientesResponse,
@@ -56,11 +60,13 @@ export class ContenedorService extends BaseHttpService {
   getMembers(
     contenedorId: number,
     params?: Record<string, ParamValue>,
+    opts?: RequestOptions,
   ): Observable<ContenedorMembersResponse> {
-    return this.get<ContenedorMembersResponse>('/seguridad/usuario-cliente/lista-cliente/', {
-      cliente_id: contenedorId,
-      ...params,
-    });
+    return this.get<ContenedorMembersResponse>(
+      '/seguridad/usuario-cliente/lista-cliente/',
+      { cliente_id: contenedorId, ...params },
+      opts,
+    );
   }
 
   getPendingInvitations(

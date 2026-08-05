@@ -8,6 +8,7 @@ export { authGuard } from './lib/guards/auth.guard';
 export { publicGuard } from './lib/guards/public.guard';
 export { authInterceptor } from './lib/interceptors/auth.interceptor';
 export { errorInterceptor } from './lib/interceptors/error.interceptor';
+export { ERROR_TOAST } from './lib/interceptors/error-http-context';
 export { tenantInterceptor } from './lib/interceptors/tenant.interceptor';
 export type { PaginatedResponse } from './lib/models/pagination.model';
 export type {
@@ -21,7 +22,7 @@ export type {
   RegisterResponse,
 } from './lib/models/auth.model';
 export { BaseHttpService, buildHttpParams } from './lib/services/base-http.service';
-export type { ParamValue } from './lib/services/base-http.service';
+export type { ParamValue, RequestOptions } from './lib/services/base-http.service';
 export { FileDownloadService } from './lib/http/file-download.service';
 export type { FileDownloadOptions } from './lib/http/file-download.service';
 export { parseFilename, triggerBrowserDownload } from './lib/http/file-download.utils';
@@ -108,6 +109,7 @@ export {
 } from './lib/calendario';
 export type { ProgramacionFecha, Festivo } from './lib/calendario';
 export type { ApiError, ApiErrorResponse } from './lib/utils/error.utils';
+export { ForbiddenPageStore } from './lib/errors/forbidden-page.store';
 export {
   I18nService,
   provideI18n,

@@ -2,9 +2,20 @@ import { inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ENVIRONMENT } from '../tokens';
+import { ERROR_TOAST } from '../interceptors/error-http-context';
 import { TENANT_SCOPED } from '../tenant/tenant-http-context';
 
 export type ParamValue = string | number | boolean | null | undefined;
+
+/** Ajustes por petición, para los casos que se salen del default del servicio. */
+export interface RequestOptions {
+  /**
+   * `false` = el `errorInterceptor` no muestra su toast: la pantalla renderiza
+   * el error por su cuenta (ver `ERROR_TOAST`). El error sigue llegando al
+   * `error:` del suscriptor.
+   */
+  readonly errorToast?: boolean;
+}
 
 export function buildHttpParams(params: Record<string, ParamValue>): HttpParams {
   let httpParams = new HttpParams();
@@ -30,15 +41,23 @@ export abstract class BaseHttpService {
    */
   protected readonly tenantScoped: boolean = true;
 
-  /** Context HTTP con el scope de tenant declarado por el servicio. */
-  private context(): HttpContext {
-    return new HttpContext().set(TENANT_SCOPED, this.tenantScoped);
+  /**
+   * Context HTTP con el scope de tenant del servicio y, si el llamador lo pide,
+   * el opt-out del toast de error (cuando la pantalla muestra el error ella).
+   */
+  private context(opts?: RequestOptions): HttpContext {
+    const context = new HttpContext().set(TENANT_SCOPED, this.tenantScoped);
+    return opts?.errorToast === false ? context.set(ERROR_TOAST, false) : context;
   }
 
-  protected get<T>(path: string, params?: Record<string, ParamValue>): Observable<T> {
+  protected get<T>(
+    path: string,
+    params?: Record<string, ParamValue>,
+    opts?: RequestOptions,
+  ): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}${path}`, {
       params: buildHttpParams(params ?? {}),
-      context: this.context(),
+      context: this.context(opts),
     });
   }
 
