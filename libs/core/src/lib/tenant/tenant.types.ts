@@ -1,4 +1,5 @@
 import { InjectionToken } from '@angular/core';
+import type { ContenedorAccesoFlags } from './contenedor.model';
 
 export type TenantSlug = string;
 
@@ -12,8 +13,11 @@ export const LAST_TENANT_KEY = 'reddoc-last-tenant';
  * `/contenedor/cliente/lista-usuario/`, así que `cliente_id` y `rol_id` siempre
  * vienen: el primero identifica al contenedor en los endpoints del schema
  * público, el segundo dice qué puede administrar el usuario aquí dentro.
+ *
+ * Hereda los `acceso_*` por lo mismo: vienen en la misma respuesta y son lo que
+ * decide qué módulos se le muestran al usuario en este contenedor.
  */
-export interface ContenedorAccess {
+export interface ContenedorAccess extends ContenedorAccesoFlags {
   schema_name: string;
   nombre: string;
   activo: boolean;
