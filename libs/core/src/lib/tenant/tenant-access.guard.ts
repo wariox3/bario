@@ -1,32 +1,46 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { type CanMatchFn, Router, type Route, type UrlSegment } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
+import { AUTH_SERVICE } from '../tokens';
 import { ToastService } from '../services/toast.service';
 import { TenantService } from './tenant.service';
 import { TENANT_ROUTES } from './tenant.types';
 import { ContenedorService } from './contenedor.service';
+import { tenantSlugFromSegments } from './tenant-slug.utils';
 
 /**
- * Marca el tenant activo a partir del slug de la URL `/t/:tenantSlug` y **valida** que el
- * usuario tenga acceso al contenedor antes de pintar.
+ * Valida que el usuario tenga acceso al contenedor de la URL, y deja el
+ * contenedor activo poblado antes de que se monte nada.
  *
- * Reemplaza al `tenantGuard` de `@reddoc/core` (que confía en el rechazo tardío del backend):
- * sin esto, entrar por URL directa a un tenant ajeno renderiza la pantalla y solo dispara un
- * toast de 403, dejando al usuario atrapado en una URL prohibida.
+ * **Es `canMatch`, no `canActivate`, y eso es esencial.** El router evalúa todos
+ * los `canMatch` antes del primer `canActivate`, así que un guard anidado que
+ * dependa del contenedor —el de acceso a módulos del ERP, que lee las flags
+ * `acceso_*`— corría antes de que este lo poblara. Con el contenedor todavía en
+ * `null`, "no hay flags" se lee como "sin restricción" y un módulo fuera del plan
+ * se abría por URL directa. Solo en recarga dura: navegando, ya estaba cargado —
+ * el mismo link se comportaba distinto según cómo llegaras.
  *
- * Si `currentContenedor` ya coincide con el slug, no revalida (entró vía la página de
- * contenedores o ya se validó esta sesión). Tras recarga dura `currentContenedor` es null
- * —solo se persiste el slug— así que revalida una vez, que es justo el caso del bug.
+ * Si `currentContenedor` ya coincide con el slug, no revalida (se entró vía la
+ * página de contenedores o ya se validó esta sesión). Tras recarga dura es
+ * `null` —solo se persiste el slug— así que revalida una vez.
+ *
+ * **Sin sesión no pide nada**: devuelve `true` sin tocar el backend y deja que
+ * `authGuard` (en `canActivate`) redirija al login conservando el `returnUrl`.
+ * Pedir accesos para un usuario que va a terminar en el login es una petición
+ * que solo puede fallar.
  */
-export const tenantAccessGuard: CanActivateFn = (route) => {
+export const tenantAccessGuard: CanMatchFn = (route: Route, segments: UrlSegment[]) => {
   const router = inject(Router);
   const tenant = inject(TenantService);
   const contenedorService = inject(ContenedorService);
   const toast = inject(ToastService);
   const routes = inject(TENANT_ROUTES);
+  const auth = inject(AUTH_SERVICE);
 
-  const slug = route.paramMap.get('tenantSlug');
+  const slug = tenantSlugFromSegments(route, segments);
   if (!slug) return router.createUrlTree([routes.contenedoresRoot]);
+
+  if (!auth.isAuthenticated()) return true;
 
   if (tenant.currentContenedor()?.schema_name === slug) {
     tenant.setSlug(slug);

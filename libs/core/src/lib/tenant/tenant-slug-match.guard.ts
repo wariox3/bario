@@ -1,9 +1,7 @@
 import { inject } from '@angular/core';
 import type { CanMatchFn, Route, UrlSegment } from '@angular/router';
 import { TenantService } from './tenant.service';
-
-/** Nombre del parámetro de ruta que lleva el slug, en `t/:tenantSlug`. */
-const PARAM = ':tenantSlug';
+import { tenantSlugFromSegments } from './tenant-slug.utils';
 
 /**
  * Fija el tenant activo **durante el matching**, no al activar.
@@ -12,33 +10,22 @@ const PARAM = ':tenantSlug';
  * y hace falta que así sea. El router evalúa **todos** los `canMatch` (de arriba
  * hacia abajo) antes del primer `canActivate`, de modo que un guard `canMatch`
  * anidado —el de permisos del ERP, que consulta al backend— corre antes de que
- * `tenantAccessGuard` alcance a marcar el tenant. Su petición sale sin la
- * cabecera `X-Tenant`, el backend la resuelve contra el schema público y
- * responde 404. Solo pasa en recarga dura: navegando, el tenant ya estaba.
+ * un `canActivate` alcance a marcar el tenant. Su petición saldría sin la
+ * cabecera `X-Tenant`, el backend la resolvería contra el schema público y
+ * respondería 404. Solo pasa en recarga dura: navegando, el tenant ya estaba.
  *
- * Este guard cierra esa ventana. Siempre deja pasar: no valida nada, y quien
- * valida el acceso real sigue siendo `tenantAccessGuard` en su `canActivate`
- * (que además limpia el tenant si el usuario no tiene acceso).
+ * Es la mitad **sincrónica y barata** del par: dice *quién* es el tenant. Quién
+ * valida que puedas entrar —y quién puebla el contenedor con sus flags— es
+ * `tenantAccessGuard`, que corre después en el mismo `canMatch`.
  *
- * Se pone junto a `canActivate` en la ruta `t/:tenantSlug`:
+ * Siempre deja pasar: no valida nada.
  *
  * ```ts
- * { path: 't/:tenantSlug', canMatch: [tenantSlugMatchGuard], canActivate: [...] }
+ * { path: 't/:tenantSlug', canMatch: [tenantSlugMatchGuard, tenantAccessGuard] }
  * ```
  */
 export const tenantSlugMatchGuard: CanMatchFn = (route: Route, segments: UrlSegment[]) => {
-  const slug = slugDeLaUrl(route, segments);
+  const slug = tenantSlugFromSegments(route, segments);
   if (slug) inject(TenantService).setSlug(slug);
   return true;
 };
-
-/**
- * Ubica el slug cruzando el `path` declarado por la ruta con los segmentos de la
- * URL. Se deriva la posición en vez de hardcodearla para que mover el prefijo
- * (`t/` → `tenant/`) no rompa esto en silencio.
- */
-function slugDeLaUrl(route: Route, segments: UrlSegment[]): string | null {
-  const indice = (route.path ?? '').split('/').indexOf(PARAM);
-  if (indice < 0) return null;
-  return segments[indice]?.path ?? null;
-}

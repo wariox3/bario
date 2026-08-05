@@ -37,11 +37,13 @@ export const appRoutes: Route[] = [
   // Workspace layout (sidebar + main) — anidado bajo el tenant slug
   {
     path: 't/:tenantSlug',
-    // El slug se fija al **matchear**, no al activar: los `canMatch` anidados
-    // (el guard de permisos) corren antes que cualquier `canActivate`, y sin
-    // esto sus peticiones saldrían sin `X-Tenant` en una recarga dura.
-    canMatch: [tenantSlugMatchGuard],
-    canActivate: [authGuard, tenantAccessGuard],
+    // El tenant se resuelve al **matchear**, no al activar: los `canMatch`
+    // anidados (acceso a módulos, permisos) corren antes que cualquier
+    // `canActivate`, así que necesitan el slug y el contenedor ya puestos. Sin
+    // esto, en recarga dura las peticiones salían sin `X-Tenant` y un módulo
+    // fuera del plan se abría por URL directa.
+    canMatch: [tenantSlugMatchGuard, tenantAccessGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./layouts/workspace-layout/workspace-layout.component').then(
         (m) => m.WorkspaceLayoutComponent,
