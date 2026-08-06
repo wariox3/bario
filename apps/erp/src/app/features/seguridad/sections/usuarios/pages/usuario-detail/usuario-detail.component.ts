@@ -12,6 +12,7 @@ import {
   type UsuarioClientePermiso,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { CONTENEDOR_ROL } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { UsuarioGruposPanelComponent } from '../../components/usuario-grupos-panel/usuario-grupos-panel.component';
 import { UsuarioPermisosPanelComponent } from '../../components/usuario-permisos-panel/usuario-permisos-panel.component';
@@ -71,6 +72,15 @@ export class UsuarioDetailComponent {
   protected readonly permisoRow = signal<UsuarioClientePermiso | null>(null);
   protected readonly isLoadingPermiso = signal(false);
 
+  /**
+   * El propietario no se gestiona: los caminos de la lista están podados, pero
+   * la URL directa igual llega acá — se muestra el panel explicativo en vez
+   * del detalle.
+   */
+  protected readonly esPropietario = computed(
+    () => this.usuario()?.rol_id === CONTENEDOR_ROL.propietario,
+  );
+
   /** Seguridad → Usuarios → <persona>. La hoja no lleva link (es esta página). */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
@@ -129,7 +139,10 @@ export class UsuarioDetailComponent {
           const member = members.find((m) => m.id === membershipId);
           this.usuario.set(member ? toUsuarioRow(member, roles) : null);
           this.notFound.set(!member);
-          if (member) this.loadPermisos(member.usuario_id);
+          // Al propietario no se le piden permisos: no se va a mostrar nada.
+          if (member && member.rol_id !== CONTENEDOR_ROL.propietario) {
+            this.loadPermisos(member.usuario_id);
+          }
         },
         error: () => {
           this.usuario.set(null);

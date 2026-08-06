@@ -5571,6 +5571,10 @@ export const en: AppDict = {
       detalle: {
         eyebrow: 'Container user',
         tabs: { grupos: 'Groups', permisos: 'Permissions' },
+        propietario: {
+          title: 'The owner is not managed from here',
+          desc: 'The owner account has full control of the company; their groups and permissions are not administered.',
+        },
         grupos: {
           count: {
             zero: 'Does not belong to any group yet. Tap one to assign it.',

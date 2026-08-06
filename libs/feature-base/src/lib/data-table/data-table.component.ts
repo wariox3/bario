@@ -79,6 +79,18 @@ export class DataTableComponent {
    * defecto `false` para no insinuar interactividad en tablas que no navegan.
    */
   readonly rowClickable = input<boolean>(false);
+  /**
+   * Predicado opcional que decide si una fila concreta responde al click
+   * (cursor + `rowClick`). Solo aplica con `rowClickable` activo. Default:
+   * todas las filas.
+   */
+  readonly rowClickableFor = input<((row: unknown) => boolean) | undefined>(undefined);
+  /**
+   * Predicado opcional que decide si una fila concreta es seleccionable. Las
+   * filas excluidas no pintan checkbox y quedan fuera del "seleccionar todo"
+   * del header (vía `rowSelectable` de PrimeNG). Default: todas las filas.
+   */
+  readonly selectableFor = input<((row: unknown) => boolean) | undefined>(undefined);
   readonly dataKey = input<string>('id');
   readonly emptyTitleKey = input<string>('common.list.empty.title');
   readonly emptySubKey = input<string>('common.list.empty.sub');
@@ -214,6 +226,14 @@ export class DataTableComponent {
     return action.visibleFor?.(row) ?? true;
   }
 
+  /**
+   * ¿La fila tiene al menos una acción de menú visible? Si no, el botón ⋮ no
+   * se pinta: un menú que abre vacío es peor que ningún menú.
+   */
+  protected hasMenuActionsFor(row: unknown): boolean {
+    return this.menuActions().some((action) => this.isActionVisible(action, row));
+  }
+
   /** Emite la invocación de una acción inline (botón siempre visible). */
   protected invokeRowAction(action: RowAction, row: unknown): void {
     this.rowActionInvoked.emit({ actionId: action.id, row });
@@ -260,13 +280,31 @@ export class DataTableComponent {
     this.selectionChange.emit(Array.isArray(rows) ? rows : [rows]);
   }
 
+  /** ¿Esta fila responde al click? (global `rowClickable` + predicado por fila). */
+  protected isRowClickable(row: unknown): boolean {
+    return this.rowClickable() && (this.rowClickableFor()?.(row) ?? true);
+  }
+
+  /** ¿Esta fila es seleccionable? (predicado por fila; sin predicado, todas). */
+  protected isRowSelectable(row: unknown): boolean {
+    return this.selectableFor()?.(row) ?? true;
+  }
+
   /**
-   * Click sobre una fila. Solo emite si `rowClickable` está activo. Las celdas
-   * de selección y de acciones detienen la propagación en el template, así que
-   * usar el checkbox o el menú no dispara la navegación.
+   * Adaptador para `[rowSelectable]` de p-table: protege también el
+   * "seleccionar todo" del header. Arrow property para conservar `this`.
+   */
+  protected readonly primeRowSelectable = (event: { data: unknown }): boolean =>
+    this.isRowSelectable(event.data);
+
+  /**
+   * Click sobre una fila. Solo emite si `rowClickable` está activo y la fila
+   * pasa `rowClickableFor`. Las celdas de selección y de acciones detienen la
+   * propagación en el template, así que usar el checkbox o el menú no dispara
+   * la navegación.
    */
   protected onRowClicked(row: unknown): void {
-    if (!this.rowClickable()) return;
+    if (!this.isRowClickable(row)) return;
     this.rowClick.emit(row);
   }
 

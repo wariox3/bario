@@ -36,6 +36,7 @@ import {
   SEGURIDAD_USUARIOS_PRIMARY_ACTION,
   SEGURIDAD_USUARIOS_ROW_ACTIONS,
   SEGURIDAD_USUARIOS_TRAILING_ACTIONS,
+  noEsPropietario,
 } from '../../usuarios.constants';
 import type { UsuarioRow } from '../../usuarios.model';
 import { SeguridadUsuariosService } from '../../usuarios.service';
@@ -90,6 +91,8 @@ export class UsuariosListComponent {
   protected readonly columns = SEGURIDAD_USUARIOS_COLUMNS;
   protected readonly filterFields = SEGURIDAD_USUARIOS_FILTER_FIELDS;
   protected readonly rowActions = SEGURIDAD_USUARIOS_ROW_ACTIONS;
+  /** El propietario no se navega ni se selecciona: la tabla poda ambas vías. */
+  protected readonly noEsPropietario = noEsPropietario;
   protected readonly primaryAction = SEGURIDAD_USUARIOS_PRIMARY_ACTION;
   protected readonly trailingActions = SEGURIDAD_USUARIOS_TRAILING_ACTIONS;
 
@@ -234,6 +237,8 @@ export class UsuariosListComponent {
   // ── Interno ───────────────────────────────────────────────────────────────
 
   private verDetalle(usuario: UsuarioRow): void {
+    // Respaldo del predicado de la tabla: el propietario no tiene detalle.
+    if (usuario.rol_id === CONTENEDOR_ROL.propietario) return;
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...SEGURIDAD_USUARIOS_PATH, 'detalle', usuario.id]);

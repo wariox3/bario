@@ -5630,6 +5630,10 @@ export const es: AppDict = {
           title: 'Usuario no encontrado',
           desc: 'Puede que le hayan quitado el acceso a esta empresa.',
         },
+        propietario: {
+          title: 'El propietario no se gestiona desde aquí',
+          desc: 'La cuenta propietaria tiene control total de la empresa; sus grupos y permisos no se administran.',
+        },
         grupos: {
           count: {
             zero: 'Todavía no pertenece a ningún grupo. Toca uno para asignarlo.',

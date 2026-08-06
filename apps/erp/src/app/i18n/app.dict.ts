@@ -4346,6 +4346,7 @@ export interface AppDict
         fields: { usuarioId: string };
         rolHint: string;
         notFound: { title: string; desc: string };
+        propietario: { title: string; desc: string };
         grupos: {
           count: { zero: string; one: string; other: string };
           emptyCatalog: string;

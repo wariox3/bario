@@ -76,12 +76,21 @@ export const SEGURIDAD_USUARIOS_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'rol_nombre', displayNameKey: 'seguridad.usuarios.columns.rol', type: 'string' },
 ];
 
-/** ¿La fila es la del propietario? Su rol no se cambia ni se lo saca de acá. */
-const noEsPropietario = (row: unknown): boolean =>
+/**
+ * ¿La fila es la del propietario? Su rol no se cambia, no se lo saca de acá y
+ * su detalle no se gestiona: sin ojo, sin click de fila y sin checkbox.
+ */
+export const noEsPropietario = (row: unknown): boolean =>
   (row as { rol_id?: number | null }).rol_id !== CONTENEDOR_ROL.propietario;
 
 export const SEGURIDAD_USUARIOS_ROW_ACTIONS: readonly RowAction[] = [
-  { id: 'view', labelKey: 'common.actions.view', iconClass: 'pi pi-eye', inline: true },
+  {
+    id: 'view',
+    labelKey: 'common.actions.view',
+    iconClass: 'pi pi-eye',
+    inline: true,
+    visibleFor: noEsPropietario,
+  },
   {
     id: 'rol',
     labelKey: 'seguridad.usuarios.actions.cambiarRol',
