@@ -2,6 +2,7 @@ import {
   Component,
   DestroyRef,
   computed,
+  effect,
   inject,
   input,
   output,
@@ -17,11 +18,13 @@ import {
   AutoCompleteModule,
 } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
+import { MultiSelectModule } from 'primeng/multiselect';
 import {
   Contenedor,
   ContenedorService,
   extractErrorMessage,
   getInitials,
+  GrupoSeguridad,
   I18nService,
   ToastService,
   UserSearchResult,
@@ -33,7 +36,7 @@ const ROL_ID_DEFAULT = 9;
 @Component({
   selector: 'lib-contenedor-invite-form',
   standalone: true,
-  imports: [FormsModule, ButtonModule, AutoCompleteModule],
+  imports: [FormsModule, ButtonModule, AutoCompleteModule, MultiSelectModule],
   templateUrl: './contenedor-invite-form.component.html',
 })
 export class ContenedorInviteFormComponent {
@@ -58,6 +61,35 @@ export class ContenedorInviteFormComponent {
   readonly userSuggestions = signal<UserSearchResult[]>([]);
   readonly isSearching = signal(false);
   readonly isSending = signal(false);
+
+  // Mutable a propósito: `<p-multiselect [options]>` no acepta `readonly`.
+  readonly grupos = signal<GrupoSeguridad[]>([]);
+  readonly selectedGrupoIds = signal<number[]>([]);
+  readonly isLoadingGrupos = signal(false);
+
+  constructor() {
+    // Los grupos son verticales del schema público (globales): se cargan una
+    // sola vez. Al cambiar de contenedor solo se descarta la selección.
+    effect(() => {
+      this.contenedor();
+      this.selectedGrupoIds.set([]);
+    });
+
+    this.isLoadingGrupos.set(true);
+    this.contenedorService
+      .getGrupos()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (grupos) => {
+          this.grupos.set([...grupos]);
+          this.isLoadingGrupos.set(false);
+        },
+        error: () => {
+          this.grupos.set([]);
+          this.isLoadingGrupos.set(false);
+        },
+      });
+  }
 
   userInitials(user: UserSearchResult): string {
     return getInitials(user.nombre_corto || user.email);
@@ -94,8 +126,14 @@ export class ContenedorInviteFormComponent {
     if (!c || !user || this.isSending()) return;
 
     this.isSending.set(true);
+    const grupoIds = this.selectedGrupoIds();
     this.contenedorService
-      .sendInvitation({ cliente_id: c.cliente_id, usuario_id: user.id, rol_id: ROL_ID_DEFAULT })
+      .sendInvitation({
+        cliente_id: c.cliente_id,
+        usuario_id: user.id,
+        rol_id: ROL_ID_DEFAULT,
+        ...(grupoIds.length > 0 ? { grupo_ids: grupoIds } : {}),
+      })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -104,6 +142,7 @@ export class ContenedorInviteFormComponent {
           this.toastService.success(toasts.title, toasts.desc);
           this.autocompleteValue.set('');
           this.userSuggestions.set([]);
+          this.selectedGrupoIds.set([]);
           this.autocomplete().clear();
           this.invited.emit();
         },

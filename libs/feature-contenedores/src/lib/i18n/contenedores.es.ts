@@ -112,6 +112,11 @@ export const contenedoresEs: ContenedoresDict = {
       invalid: 'Ingresá un correo válido.',
       submit: 'Enviar invitación',
       sending: 'Enviando…',
+      grupos: {
+        label: 'Grupos',
+        placeholder: 'Seleccioná los grupos (opcional)',
+        empty: 'No hay grupos disponibles.',
+      },
     },
     pending: {
       estados: { P: 'Pendiente', A: 'Aceptada', R: 'Rechazada' },

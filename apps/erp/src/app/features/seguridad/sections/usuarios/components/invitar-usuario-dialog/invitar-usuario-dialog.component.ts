@@ -17,11 +17,13 @@ import {
 } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { MultiSelectModule } from 'primeng/multiselect';
 import {
   I18nService,
   ToastService,
   extractErrorMessage,
   getInitials,
+  type GrupoSeguridad,
   type UserSearchResult,
 } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
@@ -39,11 +41,13 @@ const SEARCH_MIN_LENGTH = 3;
  *
  * **El rol no se pide ni se manda** mientras se confirma si viaja en la
  * invitación o se asigna al aceptarla; se cambia desde la fila del listado.
+ * Los **grupos de seguridad** sí se piden (multiselect opcional) y viajan como
+ * `grupo_ids` en la invitación.
  */
 @Component({
   selector: 'app-invitar-usuario-dialog',
   standalone: true,
-  imports: [FormsModule, DialogModule, ButtonModule, AutoCompleteModule],
+  imports: [FormsModule, DialogModule, ButtonModule, AutoCompleteModule, MultiSelectModule],
   templateUrl: './invitar-usuario-dialog.component.html',
 })
 export class InvitarUsuarioDialogComponent {
@@ -72,15 +76,40 @@ export class InvitarUsuarioDialogComponent {
     return typeof value === 'object' && value !== null ? value : null;
   });
 
+  // Mutable a propósito: `<p-multiselect [options]>` no acepta `readonly`.
+  protected readonly grupos = signal<GrupoSeguridad[]>([]);
+  protected readonly selectedGrupoIds = signal<number[]>([]);
+  protected readonly isLoadingGrupos = signal(false);
+
   constructor() {
-    // Cada apertura arranca limpia: no arrastra el intento anterior.
+    // Cada apertura arranca limpia: no arrastra el intento anterior. Los
+    // grupos se piden en cada apertura por si cambiaron desde la última vez.
     effect(() => {
       if (this.visible()) {
         this.selection.set('');
         this.suggestions.set([]);
+        this.selectedGrupoIds.set([]);
         this.isSending.set(false);
+        this.loadGrupos();
       }
     });
+  }
+
+  private loadGrupos(): void {
+    this.isLoadingGrupos.set(true);
+    this.service
+      .getGrupos()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (grupos) => {
+          this.grupos.set([...grupos]);
+          this.isLoadingGrupos.set(false);
+        },
+        error: () => {
+          this.grupos.set([]);
+          this.isLoadingGrupos.set(false);
+        },
+      });
   }
 
   protected initials(user: UserSearchResult): string {
@@ -123,7 +152,7 @@ export class InvitarUsuarioDialogComponent {
     this.isSending.set(true);
     const toasts = this.t().seguridad.usuarios.toasts;
     this.service
-      .invite(user.id)
+      .invite(user.id, this.selectedGrupoIds())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

@@ -18,6 +18,7 @@ export type {
   ContenedorInvitacionPendiente,
   ContenedorInvitacionesPendientesResponse,
   SendInviteRequest,
+  GrupoSeguridad,
   ContenedoresResponse,
   CreateContenedorRequest,
   UserSearchResult,

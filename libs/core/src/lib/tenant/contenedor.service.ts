@@ -6,6 +6,7 @@ import {
   type ParamValue,
   type RequestOptions,
 } from '../services/base-http.service';
+import type { PaginatedResponse } from '../models/pagination.model';
 import {
   Contenedor,
   ContenedorInvitacionesPendientesResponse,
@@ -13,6 +14,7 @@ import {
   ContenedorMembersResponse,
   ContenedoresResponse,
   CreateContenedorRequest,
+  GrupoSeguridad,
   SendInviteRequest,
   UserSearchResult,
 } from './contenedor.model';
@@ -79,6 +81,20 @@ export class ContenedorService extends BaseHttpService {
 
   sendInvitation(payload: SendInviteRequest): Observable<unknown> {
     return this.post('/contenedor/invitacion/', payload);
+  }
+
+  /**
+   * Grupos de seguridad disponibles para asignar en la invitación.
+   *
+   * Los grupos son verticales del schema público: globales, no dependen del
+   * contenedor. SUPUESTO pendiente de confirmar con backend: el shape de la
+   * respuesta — se tolera tanto un array plano como el envelope paginado de
+   * DRF.
+   */
+  getGrupos(): Observable<readonly GrupoSeguridad[]> {
+    return this.get<GrupoSeguridad[] | PaginatedResponse<GrupoSeguridad>>('/seguridad/grupo/').pipe(
+      map((r) => (Array.isArray(r) ? r : (r.results ?? []))),
+    );
   }
 
   removeMember(membershipId: number): Observable<unknown> {

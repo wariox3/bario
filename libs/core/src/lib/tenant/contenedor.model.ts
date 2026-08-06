@@ -38,6 +38,20 @@ export interface SendInviteRequest {
    * el rol se manda en la invitación o se asigna después de aceptarla).
    */
   rol_id?: number;
+  /** Grupos de seguridad a los que pertenecerá el invitado al aceptar. */
+  grupo_ids?: readonly number[];
+}
+
+/**
+ * Grupo de seguridad de `/seguridad/grupo/`.
+ *
+ * SUPUESTO pendiente de confirmar con backend: shape mínimo `{ id, nombre }`.
+ * Si la respuesta real trae otros campos o nombres, solo se ajusta acá y en
+ * `ContenedorService.getGrupos`.
+ */
+export interface GrupoSeguridad {
+  readonly id: number;
+  readonly nombre: string;
 }
 
 /**

@@ -4332,6 +4332,10 @@ export interface AppDict
           usuarioPlaceholder: string;
           usuarioHint: string;
           rol: string;
+          grupos: string;
+          gruposPlaceholder: string;
+          gruposHint: string;
+          gruposEmpty: string;
         };
         submit: string;
       };

@@ -7,6 +7,7 @@ import {
   buildFiltros,
   type ContenedorMember,
   type FilterCondition,
+  type GrupoSeguridad,
   type UserSearchResult,
 } from '@reddoc/core';
 import { ContenedorNoResueltoError } from '../../seguridad.errors';
@@ -61,15 +62,22 @@ export class SeguridadUsuariosService {
     return this.contenedor.searchUsers(term);
   }
 
+  /** Grupos de seguridad (verticales, globales) para asignar en la invitación. */
+  getGrupos(): Observable<readonly GrupoSeguridad[]> {
+    return this.contenedor.getGrupos();
+  }
+
   /**
    * Invita a un usuario al contenedor. **Sin rol**: está pendiente de confirmar
    * si el rol viaja en la invitación o se asigna después de aceptarla, así que
-   * por ahora no se manda `rol_id` (el backend aplica su default).
+   * por ahora no se manda `rol_id` (el backend aplica su default). Los grupos
+   * sí viajan (`grupo_ids`), solo cuando se eligió alguno.
    */
-  invite(usuarioId: number): Observable<unknown> {
+  invite(usuarioId: number, grupoIds: readonly number[] = []): Observable<unknown> {
     return this.contenedor.sendInvitation({
       cliente_id: this.requireClienteId(),
       usuario_id: usuarioId,
+      ...(grupoIds.length > 0 ? { grupo_ids: grupoIds } : {}),
     });
   }
 

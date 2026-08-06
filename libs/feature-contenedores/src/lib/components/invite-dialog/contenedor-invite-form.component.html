@@ -1,11 +1,11 @@
-<form (ngSubmit)="onSubmit()" class="flex flex-col gap-1.5">
-  <label
-    for="invite-email"
-    class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
-  >
-    {{ t().contenedores.invite.form.label }}
-  </label>
-  <div class="flex items-stretch gap-2">
+<form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <div class="flex flex-col gap-1.5">
+    <label
+      for="invite-email"
+      class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
+    >
+      {{ t().contenedores.invite.form.label }}
+    </label>
     <p-autocomplete
       inputId="invite-email"
       [ngModel]="autocompleteValue()"
@@ -18,7 +18,7 @@
       [minLength]="3"
       [delay]="300"
       appendTo="body"
-      class="flex-1"
+      class="w-full"
       inputStyleClass="w-full"
       [placeholder]="t().contenedores.invite.form.placeholder"
       autocomplete="off"
@@ -41,6 +41,42 @@
         </div>
       </ng-template>
     </p-autocomplete>
+    @if (!selectedUser() && autocompleteValue()) {
+      <span class="flex items-center gap-1.5 text-[0.7rem] tracking-[0.01em] text-red-600">
+        <i class="pi pi-times-circle text-[0.7rem]"></i>
+        {{ t().contenedores.invite.form.invalid }}
+      </span>
+    }
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label
+      for="invite-grupos"
+      class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
+    >
+      {{ t().contenedores.invite.form.grupos.label }}
+    </label>
+    <p-multiselect
+      inputId="invite-grupos"
+      [options]="grupos()"
+      [ngModel]="selectedGrupoIds()"
+      (ngModelChange)="selectedGrupoIds.set($event ?? [])"
+      [ngModelOptions]="{ standalone: true }"
+      optionLabel="nombre"
+      optionValue="id"
+      dataKey="id"
+      display="chip"
+      [maxSelectedLabels]="3"
+      [showClear]="true"
+      [loading]="isLoadingGrupos()"
+      [placeholder]="t().contenedores.invite.form.grupos.placeholder"
+      [emptyMessage]="t().contenedores.invite.form.grupos.empty"
+      appendTo="body"
+      [fluid]="true"
+    />
+  </div>
+
+  <div class="flex justify-end">
     <p-button
       type="submit"
       size="small"
@@ -52,10 +88,4 @@
       [disabled]="!selectedUser() || isSending()"
     />
   </div>
-  @if (!selectedUser() && autocompleteValue()) {
-    <span class="flex items-center gap-1.5 text-[0.7rem] tracking-[0.01em] text-red-600">
-      <i class="pi pi-times-circle text-[0.7rem]"></i>
-      {{ t().contenedores.invite.form.invalid }}
-    </span>
-  }
 </form>
