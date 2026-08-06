@@ -5596,8 +5596,32 @@ export const en: AppDict = {
         },
         permisos: {
           flags: { superuser: 'Superuser', staff: 'Staff' },
-          empty: 'No direct permissions. Permissions come from the groups they belong to.',
+          agregar: 'Add permissions',
+          empty: {
+            title: 'No direct permissions',
+            desc: 'Everything they can do comes from their groups. Add specific permissions when they need something extra.',
+          },
+          dialog: {
+            title: 'Add permissions',
+            subtitle: 'Click a cell to assign or remove',
+          },
+          quitarHint: 'Remove {permiso}',
+          agregarHint: 'Assign {permiso}',
+          search: 'Search permission or model',
+          todas: 'All',
+          modeloHeader: 'Model',
+          acciones: { view: 'View', add: 'Add', change: 'Change', delete: 'Delete' },
+          count: {
+            zero: 'No direct permissions',
+            one: 'Has 1 direct permission',
+            other: 'Has {n} direct permissions',
+          },
+          noResults: 'No permission matches your search.',
           hint: 'Direct permissions add to the ones inherited from their groups.',
+          toasts: {
+            added: { title: 'Permission assigned', desc: 'The person now has "{permiso}".' },
+            removed: { title: 'Permission removed', desc: 'The person no longer has "{permiso}".' },
+          },
         },
         fields: { usuarioId: 'User ID' },
         rolHint:

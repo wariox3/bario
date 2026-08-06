@@ -15,6 +15,8 @@ import {
   ContenedoresResponse,
   CreateContenedorRequest,
   GrupoSeguridad,
+  PermisoCatalogoFiltros,
+  PermisoSeguridad,
   SendInviteRequest,
   UserSearchResult,
   UsuarioClientePermiso,
@@ -99,6 +101,28 @@ export class ContenedorService extends BaseHttpService {
   }
 
   /**
+   * Una página del catálogo de permisos individuales asignables, con filtros
+   * **y paginación** resueltos en el backend (`app`, `modelo`, `accion`,
+   * `search`, `page`, `limit` como query params). Devuelve el envelope DRF tal
+   * cual: el caller pagina con `count`.
+   *
+   * Como los grupos, son verticales del schema público: globales, sin
+   * `X-Tenant`.
+   */
+  getPermisos(
+    filtros: PermisoCatalogoFiltros = {},
+  ): Observable<PaginatedResponse<PermisoSeguridad>> {
+    const params: Record<string, ParamValue> = {};
+    if (filtros.app) params['app'] = filtros.app;
+    if (filtros.modelo) params['modelo'] = filtros.modelo;
+    if (filtros.accion) params['accion'] = filtros.accion;
+    if (filtros.search) params['search'] = filtros.search;
+    if (filtros.page) params['page'] = filtros.page;
+    if (filtros.limit) params['limit'] = filtros.limit;
+    return this.get<PaginatedResponse<PermisoSeguridad>>('/seguridad/permiso/', params);
+  }
+
+  /**
    * Membresía + permiso efectivo (grupos y permisos directos) de un usuario.
    *
    * Excepción dentro de este servicio global: este endpoint sí es
@@ -127,6 +151,34 @@ export class ContenedorService extends BaseHttpService {
     return this.post(
       '/seguridad/usuario-cliente-permiso/quitar-grupo/',
       { usuario_id: usuarioId, grupo_id: grupoId },
+      undefined,
+      { tenantScoped: true },
+    );
+  }
+
+  /**
+   * Asigna un permiso individual al usuario. Tenant-scoped, como el listado.
+   * SUPUESTO pendiente de confirmar con backend: el body `{ usuario_id,
+   * permiso_id }`, espejo del `{ usuario_id, grupo_id }` de los grupos.
+   */
+  addMemberPermiso(usuarioId: number, permisoId: number): Observable<unknown> {
+    return this.post(
+      '/seguridad/usuario-cliente-permiso/agregar-permiso/',
+      { usuario_id: usuarioId, permiso_id: permisoId },
+      undefined,
+      { tenantScoped: true },
+    );
+  }
+
+  /**
+   * Quita un permiso individual al usuario. SUPUESTO pendiente de confirmar
+   * con backend: se asume `quitar-permiso/` espejo de `agregar-permiso/`
+   * (como el par de grupos).
+   */
+  removeMemberPermiso(usuarioId: number, permisoId: number): Observable<unknown> {
+    return this.post(
+      '/seguridad/usuario-cliente-permiso/quitar-permiso/',
+      { usuario_id: usuarioId, permiso_id: permisoId },
       undefined,
       { tenantScoped: true },
     );

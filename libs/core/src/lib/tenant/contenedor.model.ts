@@ -55,12 +55,48 @@ export interface GrupoSeguridad {
 
 /**
  * Permiso directo de un usuario (`permiso.permisos` de
- * `/seguridad/usuario-cliente-permiso/`). SUPUESTO pendiente de confirmar con
- * backend: shape mínimo `{ id, nombre }` — el ejemplo llegó con la lista vacía.
+ * `/seguridad/usuario-cliente-permiso/`), shape **confirmado**: versión
+ * compacta del catálogo — sin `modelo_label` ni `nombre`, la acción se deriva
+ * del prefijo del `codename` (`view_…`, `add_…`).
  */
 export interface PermisoAsignado {
   readonly id: number;
+  readonly app: string;
+  readonly modelo: string;
+  readonly codename: string;
+}
+
+/**
+ * Permiso individual del catálogo `/seguridad/permiso/` (shape confirmado):
+ * un permiso de Django por modelo y acción, con etiquetas listas para pintar.
+ *
+ * `accion` queda abierto a `string` porque además de las cuatro estándar
+ * (`view`/`add`/`change`/`delete`) pueden existir permisos custom.
+ */
+export interface PermisoSeguridad {
+  readonly id: number;
+  readonly app: string;
+  readonly modelo: string;
+  readonly modelo_label: string;
+  readonly accion: string;
+  readonly codename: string;
   readonly nombre: string;
+}
+
+/**
+ * Consulta de `/seguridad/permiso/` que el backend resuelve como query params
+ * (`?app=general&modelo=gencontacto&accion=view&search=…&page=&limit=`).
+ * Todos opcionales y combinables.
+ */
+export interface PermisoCatalogoFiltros {
+  readonly app?: string;
+  readonly modelo?: string;
+  readonly accion?: string;
+  readonly search?: string;
+  /** Página 1-based; sin ella el backend responde la primera. */
+  readonly page?: number;
+  /** Tamaño de página; sin él aplica el default del backend (~25). */
+  readonly limit?: number;
 }
 
 /** Bloque `permiso` de `/seguridad/usuario-cliente-permiso/`. */

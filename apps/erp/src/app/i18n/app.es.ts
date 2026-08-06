@@ -5655,9 +5655,32 @@ export const es: AppDict = {
         },
         permisos: {
           flags: { superuser: 'Superusuario', staff: 'Staff' },
-          empty:
-            'Sin permisos directos. Los permisos le llegan por los grupos a los que pertenece.',
+          agregar: 'Agregar permisos',
+          empty: {
+            title: 'Sin permisos directos',
+            desc: 'Todo lo que puede hacer le llega por sus grupos. Agrega permisos puntuales cuando necesite algo extra.',
+          },
+          dialog: {
+            title: 'Agregar permisos',
+            subtitle: 'Toca una casilla para asignar o quitar',
+          },
+          quitarHint: 'Quitar {permiso}',
+          agregarHint: 'Asignar {permiso}',
+          search: 'Buscar permiso o modelo',
+          todas: 'Todas',
+          modeloHeader: 'Modelo',
+          acciones: { view: 'Ver', add: 'Agregar', change: 'Cambiar', delete: 'Eliminar' },
+          count: {
+            zero: 'Sin permisos directos',
+            one: 'Tiene 1 permiso directo',
+            other: 'Tiene {n} permisos directos',
+          },
+          noResults: 'Ningún permiso coincide con la búsqueda.',
           hint: 'Los permisos directos se suman a los que hereda de sus grupos.',
+          toasts: {
+            added: { title: 'Permiso asignado', desc: 'La persona ahora tiene "{permiso}".' },
+            removed: { title: 'Permiso quitado', desc: 'La persona ya no tiene "{permiso}".' },
+          },
         },
       },
       confirms: {

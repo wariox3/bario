@@ -126,12 +126,19 @@
 
           <p-tabpanel value="permisos">
             <div class="pt-7">
-              @if (isLoadingPermiso()) {
-                <div class="flex items-center justify-center py-10 text-brand-muted">
-                  <i class="pi pi-spin pi-spinner text-xl" aria-hidden="true"></i>
-                </div>
-              } @else {
-                <app-usuario-permisos-panel [permiso]="permisoRow()?.permiso ?? null" />
+              <!-- Montado solo con la pestaña activa: así el panel dispara
+                   /seguridad/permiso/ al entrar a la tab, no al cargar la página. -->
+              @if (activeTab() === 'permisos') {
+                @if (isLoadingPermiso()) {
+                  <div class="flex items-center justify-center py-10 text-brand-muted">
+                    <i class="pi pi-spin pi-spinner text-xl" aria-hidden="true"></i>
+                  </div>
+                } @else {
+                  <app-usuario-permisos-panel
+                    [usuarioId]="u.usuario_id"
+                    [permiso]="permisoRow()?.permiso ?? null"
+                  />
+                }
               }
             </div>
           </p-tabpanel>

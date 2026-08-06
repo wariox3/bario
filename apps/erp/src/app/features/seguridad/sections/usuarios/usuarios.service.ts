@@ -1,5 +1,5 @@
 import { Injectable, computed, inject } from '@angular/core';
-import { Observable, forkJoin, map, of } from 'rxjs';
+import { Observable, forkJoin, map, of, tap } from 'rxjs';
 import {
   ContenedorService,
   FileDownloadService,
@@ -8,6 +8,9 @@ import {
   type ContenedorMember,
   type FilterCondition,
   type GrupoSeguridad,
+  type PaginatedResponse,
+  type PermisoCatalogoFiltros,
+  type PermisoSeguridad,
   type UserSearchResult,
   type UsuarioClientePermiso,
 } from '@reddoc/core';
@@ -37,6 +40,9 @@ export class SeguridadUsuariosService {
   readonly clienteId = computed<number | null>(
     () => this.tenant.currentContenedor()?.cliente_id ?? null,
   );
+
+  /** Cache por consulta del catálogo de permisos (ver `getCatalogoPermisos`). */
+  private readonly catalogoPermisosCache = new Map<string, PaginatedResponse<PermisoSeguridad>>();
 
   /**
    * Miembros del contenedor activo, con la búsqueda y los filtros **resueltos
@@ -69,6 +75,24 @@ export class SeguridadUsuariosService {
   }
 
   /**
+   * Una página del catálogo de permisos individuales (verticales, globales)
+   * asignables, con filtros y paginación resueltos en el backend. Se cachea
+   * por combinación de filtros + página: es un catálogo estático que solo
+   * cambia con un deploy del backend, así que volver a una página ya visitada
+   * no repite la petición.
+   */
+  getCatalogoPermisos(
+    filtros: PermisoCatalogoFiltros = {},
+  ): Observable<PaginatedResponse<PermisoSeguridad>> {
+    const clave = `${filtros.app ?? ''}|${filtros.modelo ?? ''}|${filtros.accion ?? ''}|${filtros.search ?? ''}|${filtros.page ?? ''}|${filtros.limit ?? ''}`;
+    const cacheado = this.catalogoPermisosCache.get(clave);
+    if (cacheado) return of(cacheado);
+    return this.contenedor
+      .getPermisos(filtros)
+      .pipe(tap((pagina) => this.catalogoPermisosCache.set(clave, pagina)));
+  }
+
+  /**
    * Permiso efectivo del miembro (grupos y permisos directos). SUPUESTO
    * pendiente de confirmar con backend: la consulta por `usuario_id` devuelve
    * una sola fila (la fila no trae `cliente_id` para desambiguar), así que se
@@ -86,6 +110,16 @@ export class SeguridadUsuariosService {
   /** Quita un grupo de seguridad al miembro. */
   removeGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
     return this.contenedor.removeMemberGrupo(usuarioId, grupoId);
+  }
+
+  /** Asigna un permiso individual al miembro. */
+  addPermiso(usuarioId: number, permisoId: number): Observable<unknown> {
+    return this.contenedor.addMemberPermiso(usuarioId, permisoId);
+  }
+
+  /** Quita un permiso individual al miembro. */
+  removePermiso(usuarioId: number, permisoId: number): Observable<unknown> {
+    return this.contenedor.removeMemberPermiso(usuarioId, permisoId);
   }
 
   /**

@@ -145,6 +145,8 @@ export type {
   SendInviteRequest,
   GrupoSeguridad,
   PermisoAsignado,
+  PermisoCatalogoFiltros,
+  PermisoSeguridad,
   UsuarioPermiso,
   UsuarioClientePermiso,
   ContenedoresResponse,

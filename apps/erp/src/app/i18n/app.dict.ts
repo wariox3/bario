@@ -4358,8 +4358,22 @@ export interface AppDict
         };
         permisos: {
           flags: { superuser: string; staff: string };
-          empty: string;
+          agregar: string;
+          empty: { title: string; desc: string };
+          dialog: { title: string; subtitle: string };
+          quitarHint: string;
+          agregarHint: string;
+          search: string;
+          todas: string;
+          modeloHeader: string;
+          acciones: { view: string; add: string; change: string; delete: string };
+          count: { zero: string; one: string; other: string };
+          noResults: string;
           hint: string;
+          toasts: {
+            added: { title: string; desc: string };
+            removed: { title: string; desc: string };
+          };
         };
       };
       confirms: { deleteHeader: string; deleteOne: string; deleteMany: string };
