@@ -5622,12 +5622,28 @@ export const es: AppDict = {
       },
       detalle: {
         eyebrow: 'Usuario del contenedor',
+        tabs: { grupos: 'Grupos', permisos: 'Permisos' },
         fields: { usuarioId: 'ID de usuario' },
         rolHint:
           'Los accesos se otorgan por rol: propietario y administrador gestionan la empresa, el resto solo la opera.',
         notFound: {
           title: 'Usuario no encontrado',
           desc: 'Puede que le hayan quitado el acceso a esta empresa.',
+        },
+        grupos: {
+          count: {
+            zero: 'Todavía no pertenece a ningún grupo. Toca uno para asignarlo.',
+            one: 'Pertenece a 1 de {total} grupos',
+            other: 'Pertenece a {n} de {total} grupos',
+          },
+          emptyCatalog: 'No hay grupos disponibles.',
+          hint: 'Los grupos son verticales de la plataforma: definen a qué áreas accede la persona dentro de la empresa. Toca una ficha para asignar o quitar.',
+        },
+        permisos: {
+          flags: { superuser: 'Superusuario', staff: 'Staff' },
+          empty:
+            'Sin permisos directos. Los permisos le llegan por los grupos a los que pertenece.',
+          hint: 'Los permisos directos se suman a los que hereda de sus grupos.',
         },
       },
       confirms: {

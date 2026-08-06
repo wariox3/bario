@@ -15,6 +15,13 @@ export interface RequestOptions {
    * `error:` del suscriptor.
    */
   readonly errorToast?: boolean;
+  /**
+   * Override puntual del scope de tenant del servicio, para servicios con
+   * endpoints mixtos (ej. `ContenedorService` es global pero
+   * `usuario-cliente-permiso/` viaja con `X-Tenant`). Sin valor, manda el
+   * `tenantScoped` de la clase.
+   */
+  readonly tenantScoped?: boolean;
 }
 
 export function buildHttpParams(params: Record<string, ParamValue>): HttpParams {
@@ -46,7 +53,7 @@ export abstract class BaseHttpService {
    * el opt-out del toast de error (cuando la pantalla muestra el error ella).
    */
   private context(opts?: RequestOptions): HttpContext {
-    const context = new HttpContext().set(TENANT_SCOPED, this.tenantScoped);
+    const context = new HttpContext().set(TENANT_SCOPED, opts?.tenantScoped ?? this.tenantScoped);
     return opts?.errorToast === false ? context.set(ERROR_TOAST, false) : context;
   }
 
@@ -65,10 +72,11 @@ export abstract class BaseHttpService {
     path: string,
     body: unknown,
     params?: Record<string, ParamValue>,
+    opts?: RequestOptions,
   ): Observable<T> {
     return this.http.post<T>(`${this.baseUrl}${path}`, body, {
       params: buildHttpParams(params ?? {}),
-      context: this.context(),
+      context: this.context(opts),
     });
   }
 

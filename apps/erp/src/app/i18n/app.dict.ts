@@ -4342,9 +4342,20 @@ export interface AppDict
       cambiarRol: { title: string; field: string; hint: string; propietarioLock: string };
       detalle: {
         eyebrow: string;
+        tabs: { grupos: string; permisos: string };
         fields: { usuarioId: string };
         rolHint: string;
         notFound: { title: string; desc: string };
+        grupos: {
+          count: { zero: string; one: string; other: string };
+          emptyCatalog: string;
+          hint: string;
+        };
+        permisos: {
+          flags: { superuser: string; staff: string };
+          empty: string;
+          hint: string;
+        };
       };
       confirms: { deleteHeader: string; deleteOne: string; deleteMany: string };
       toasts: {

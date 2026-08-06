@@ -3,7 +3,6 @@
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<!-- Volver + acciones sobre el miembro. -->
 <header class="flex shrink-0 flex-wrap items-center gap-2">
   <p-button
     type="button"
@@ -14,35 +13,17 @@
     size="small"
     (onClick)="onBack()"
   />
-  @if (usuario() && !esPropietario()) {
-    <p-button
-      type="button"
-      [label]="dict.actions.cambiarRol"
-      icon="pi pi-shield"
-      size="small"
-      (onClick)="openRolDialog()"
-    />
-    <p-button
-      type="button"
-      [label]="t().common.actions.delete"
-      icon="pi pi-trash"
-      severity="danger"
-      [outlined]="true"
-      size="small"
-      (onClick)="confirmRemove()"
-    />
-  }
 </header>
 
 @if (isLoading()) {
   <div
-    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] py-20 text-brand-muted"
+    class="flex items-center justify-center rounded-xl border border-[rgba(19,38,60,0.08)] bg-white py-20 text-brand-muted"
   >
     <i class="pi pi-spin pi-spinner text-xl"></i>
   </div>
 } @else if (notFound()) {
   <div
-    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] px-6 py-16 text-center"
+    class="flex flex-col items-center rounded-xl border border-[rgba(19,38,60,0.08)] bg-white px-6 py-16 text-center"
   >
     <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
     <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ det.notFound.title }}</p>
@@ -51,20 +32,26 @@
     </p>
   </div>
 } @else if (usuario(); as u) {
-  <section class="flex flex-col gap-4 rounded-xl border border-[rgba(20,48,73,0.12)] p-5">
+  <!-- La información del miembro, por fuera de las pestañas. -->
+  <section
+    class="flex flex-col gap-4 rounded-xl border border-[rgba(19,38,60,0.08)] bg-white p-5 shadow-[0_1px_2px_rgba(19,38,60,0.04)]"
+  >
     <div class="flex items-center gap-4">
       <span
-        class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[rgba(20,48,73,0.06)] text-[1.1rem] font-bold text-brand-navy"
+        class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand-navy text-[1.1rem] font-bold text-white"
       >
         {{ initials() }}
       </span>
       <div class="flex min-w-0 flex-col gap-0.5">
-        <span class="text-[0.7rem] font-medium tracking-[0.08em] text-brand-muted uppercase">
+        <span class="text-[0.68rem] font-medium tracking-[0.08em] text-brand-muted uppercase">
           {{ det.eyebrow }}
         </span>
         <h2 class="m-0 truncate text-[1.15rem] font-bold tracking-[-0.02em] text-brand-navy">
           {{ u.usuario_nombre_corto || u.usuario_email }}
         </h2>
+        @if (u.usuario_nombre_corto) {
+          <span class="truncate text-[0.8rem] text-brand-muted">{{ u.usuario_email }}</span>
+        }
       </div>
     </div>
 
@@ -97,13 +84,48 @@
 
     <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">{{ det.rolHint }}</p>
   </section>
+
+  <!-- Debajo, la card de acceso: grupos y permisos de usuario-cliente-permiso. -->
+  <section
+    class="overflow-hidden rounded-xl border border-[rgba(19,38,60,0.08)] bg-white shadow-[0_1px_2px_rgba(19,38,60,0.04)]"
+  >
+    <div class="px-5 pt-3 pb-6">
+      <p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))" class="detalle-tabs">
+        <p-tablist>
+          <p-tab value="grupos">{{ det.tabs.grupos }}</p-tab>
+          <p-tab value="permisos">{{ det.tabs.permisos }}</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="grupos">
+            <!-- El aire bajo la tira vive aquí (pt-7): el padding de .p-tabpanels no es confiable. -->
+            <div class="pt-7">
+              @if (isLoadingPermiso()) {
+                <div class="flex items-center justify-center py-10 text-brand-muted">
+                  <i class="pi pi-spin pi-spinner text-xl" aria-hidden="true"></i>
+                </div>
+              } @else {
+                <app-usuario-grupos-panel
+                  [usuarioId]="u.usuario_id"
+                  [asignados]="permisoRow()?.permiso?.grupos ?? []"
+                />
+              }
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="permisos">
+            <div class="pt-7">
+              @if (isLoadingPermiso()) {
+                <div class="flex items-center justify-center py-10 text-brand-muted">
+                  <i class="pi pi-spin pi-spinner text-xl" aria-hidden="true"></i>
+                </div>
+              } @else {
+                <app-usuario-permisos-panel [permiso]="permisoRow()?.permiso ?? null" />
+              }
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    </div>
+  </section>
 }
-
-<app-cambiar-rol-dialog
-  [visible]="rolDialogVisible()"
-  (visibleChange)="rolDialogVisible.set($event)"
-  [usuario]="usuario()"
-  (saved)="onRolSaved()"
-/>
-
-<p-confirmDialog />

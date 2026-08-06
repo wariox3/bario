@@ -1,0 +1,46 @@
+@let p = t().seguridad.usuarios.detalle.permisos;
+
+<div class="flex flex-col gap-4">
+  <!-- Flags especiales: solo se pintan cuando aplican. -->
+  @if (tieneFlags()) {
+    <div class="flex flex-wrap gap-2">
+      @if (permiso()?.is_superuser) {
+        <span
+          class="inline-flex items-center gap-1.5 rounded-md bg-brand-navy px-2.5 py-1 text-[0.78rem] font-medium text-white"
+        >
+          <i class="pi pi-shield text-[0.7rem]" aria-hidden="true"></i>
+          {{ p.flags.superuser }}
+        </span>
+      }
+      @if (permiso()?.is_staff) {
+        <span
+          class="inline-flex items-center gap-1.5 rounded-md bg-[rgba(20,48,73,0.06)] px-2.5 py-1 text-[0.78rem] font-medium text-brand-navy"
+        >
+          <i class="pi pi-id-card text-[0.7rem]" aria-hidden="true"></i>
+          {{ p.flags.staff }}
+        </span>
+      }
+    </div>
+  }
+
+  @if (permisos().length > 0) {
+    <ul class="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2 lg:grid-cols-3">
+      @for (permisoItem of permisos(); track permisoItem.id) {
+        <li class="flex items-center gap-3 rounded-lg bg-[rgba(19,38,60,0.03)] px-3.5 py-3">
+          <i class="pi pi-key shrink-0 text-[0.8rem] text-brand-muted" aria-hidden="true"></i>
+          <span class="min-w-0 truncate text-[0.85rem] font-medium text-brand-text">
+            {{ permisoItem.nombre }}
+          </span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div
+      class="rounded-lg bg-[rgba(19,38,60,0.03)] px-4 py-6 text-center text-[0.8rem] text-brand-muted"
+    >
+      {{ p.empty }}
+    </div>
+  }
+
+  <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">{{ p.hint }}</p>
+</div>

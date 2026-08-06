@@ -9,6 +9,7 @@ import {
   type FilterCondition,
   type GrupoSeguridad,
   type UserSearchResult,
+  type UsuarioClientePermiso,
 } from '@reddoc/core';
 import { ContenedorNoResueltoError } from '../../seguridad.errors';
 import { SEGURIDAD_USUARIOS_EXPORT_URL } from './usuarios.constants';
@@ -65,6 +66,26 @@ export class SeguridadUsuariosService {
   /** Grupos de seguridad (verticales, globales) para asignar en la invitación. */
   getGrupos(): Observable<readonly GrupoSeguridad[]> {
     return this.contenedor.getGrupos();
+  }
+
+  /**
+   * Permiso efectivo del miembro (grupos y permisos directos). SUPUESTO
+   * pendiente de confirmar con backend: la consulta por `usuario_id` devuelve
+   * una sola fila (la fila no trae `cliente_id` para desambiguar), así que se
+   * toma la primera.
+   */
+  getPermisos(usuarioId: number): Observable<UsuarioClientePermiso | null> {
+    return this.contenedor.getMemberPermisos(usuarioId).pipe(map((r) => r.results[0] ?? null));
+  }
+
+  /** Asigna un grupo de seguridad al miembro. */
+  addGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
+    return this.contenedor.addMemberGrupo(usuarioId, grupoId);
+  }
+
+  /** Quita un grupo de seguridad al miembro. */
+  removeGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
+    return this.contenedor.removeMemberGrupo(usuarioId, grupoId);
   }
 
   /**

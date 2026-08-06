@@ -5570,6 +5570,21 @@ export const en: AppDict = {
       },
       detalle: {
         eyebrow: 'Container user',
+        tabs: { grupos: 'Groups', permisos: 'Permissions' },
+        grupos: {
+          count: {
+            zero: 'Does not belong to any group yet. Tap one to assign it.',
+            one: 'Belongs to 1 of {total} groups',
+            other: 'Belongs to {n} of {total} groups',
+          },
+          emptyCatalog: 'No groups available.',
+          hint: 'Groups are platform verticals: they define which areas the person can access within the company. Tap a tile to assign or remove.',
+        },
+        permisos: {
+          flags: { superuser: 'Superuser', staff: 'Staff' },
+          empty: 'No direct permissions. Permissions come from the groups they belong to.',
+          hint: 'Direct permissions add to the ones inherited from their groups.',
+        },
         fields: { usuarioId: 'User ID' },
         rolHint:
           'Access is granted by role: owner and administrator manage the company, everyone else only operates it.',

@@ -17,6 +17,7 @@ import {
   GrupoSeguridad,
   SendInviteRequest,
   UserSearchResult,
+  UsuarioClientePermiso,
 } from './contenedor.model';
 
 export interface UpdateContenedorRequest {
@@ -94,6 +95,40 @@ export class ContenedorService extends BaseHttpService {
   getGrupos(): Observable<readonly GrupoSeguridad[]> {
     return this.get<GrupoSeguridad[] | PaginatedResponse<GrupoSeguridad>>('/seguridad/grupo/').pipe(
       map((r) => (Array.isArray(r) ? r : (r.results ?? []))),
+    );
+  }
+
+  /**
+   * Membresía + permiso efectivo (grupos y permisos directos) de un usuario.
+   *
+   * Excepción dentro de este servicio global: este endpoint sí es
+   * tenant-scoped (viaja con `X-Tenant`), por eso el override por petición.
+   */
+  getMemberPermisos(usuarioId: number): Observable<PaginatedResponse<UsuarioClientePermiso>> {
+    return this.get<PaginatedResponse<UsuarioClientePermiso>>(
+      '/seguridad/usuario-cliente-permiso/',
+      { usuario_id: usuarioId },
+      { tenantScoped: true },
+    );
+  }
+
+  /** Asigna un grupo de seguridad al usuario. Tenant-scoped, como el listado. */
+  addMemberGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
+    return this.post(
+      '/seguridad/usuario-cliente-permiso/agregar-grupo/',
+      { usuario_id: usuarioId, grupo_id: grupoId },
+      undefined,
+      { tenantScoped: true },
+    );
+  }
+
+  /** Quita un grupo de seguridad al usuario. Tenant-scoped, como el listado. */
+  removeMemberGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
+    return this.post(
+      '/seguridad/usuario-cliente-permiso/quitar-grupo/',
+      { usuario_id: usuarioId, grupo_id: grupoId },
+      undefined,
+      { tenantScoped: true },
     );
   }
 

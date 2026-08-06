@@ -45,13 +45,43 @@ export interface SendInviteRequest {
 /**
  * Grupo de seguridad de `/seguridad/grupo/`.
  *
- * SUPUESTO pendiente de confirmar con backend: shape mínimo `{ id, nombre }`.
- * Si la respuesta real trae otros campos o nombres, solo se ajusta acá y en
- * `ContenedorService.getGrupos`.
+ * Shape confirmado por `/seguridad/usuario-cliente-permiso/` (`permiso.grupos`
+ * llega como `{ id, nombre }`).
  */
 export interface GrupoSeguridad {
   readonly id: number;
   readonly nombre: string;
+}
+
+/**
+ * Permiso directo de un usuario (`permiso.permisos` de
+ * `/seguridad/usuario-cliente-permiso/`). SUPUESTO pendiente de confirmar con
+ * backend: shape mínimo `{ id, nombre }` — el ejemplo llegó con la lista vacía.
+ */
+export interface PermisoAsignado {
+  readonly id: number;
+  readonly nombre: string;
+}
+
+/** Bloque `permiso` de `/seguridad/usuario-cliente-permiso/`. */
+export interface UsuarioPermiso {
+  readonly id: number;
+  readonly profile_id: number;
+  readonly is_superuser: boolean;
+  readonly is_staff: boolean;
+  readonly grupos: readonly GrupoSeguridad[];
+  readonly permisos: readonly PermisoAsignado[];
+}
+
+/** Fila de `/seguridad/usuario-cliente-permiso/`: membresía + permiso efectivo. */
+export interface UsuarioClientePermiso {
+  readonly id: number;
+  readonly usuario_id: number;
+  readonly usuario_nombre_corto: string | null;
+  readonly usuario_email: string;
+  readonly rol_id: number;
+  readonly rol_nombre: string;
+  readonly permiso: UsuarioPermiso;
 }
 
 /**

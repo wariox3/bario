@@ -3,3 +3,34 @@
   flex-direction: column;
   gap: 1rem;
 }
+
+// Solo el ajuste del tab-strip de PrimeNG (necesita ::ng-deep); el resto del
+// detalle va con utilidades Tailwind en el template. Misma receta que
+// Configuración: fondos transparentes y el aire del panel controlado acá.
+.detalle-tabs {
+  display: block;
+
+  ::ng-deep {
+    .p-tabs,
+    .p-tabpanels,
+    .p-tablist {
+      background: transparent;
+    }
+
+    // Tabs slim: dentro de la card compacta del detalle, el tamaño default de
+    // PrimeNG pesa demasiado frente a la ficha de datos que gobierna.
+    .p-tab {
+      padding: 0.65rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    // El aire bajo la tira vive en el template (pt-7 en el contenido de cada
+    // panel); acá solo se neutraliza el padding default de PrimeNG para que el
+    // contenido alinee con la cabecera de la card.
+    .p-tabpanels,
+    .p-tabpanel {
+      padding: 0;
+    }
+  }
+}
