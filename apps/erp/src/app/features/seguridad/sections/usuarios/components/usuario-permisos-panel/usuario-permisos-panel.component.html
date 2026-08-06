@@ -92,7 +92,7 @@
               <tr class="transition-colors hover:bg-[rgba(20,48,73,0.02)]">
                 <td class="border-b border-[rgba(20,48,73,0.04)] py-2 pr-3">
                   <span class="block truncate text-[0.85rem] text-brand-text">
-                    {{ fila.modelo }}
+                    {{ fila.label }}
                   </span>
                   @if (fila.extras.length > 0) {
                     <span class="mt-1 flex flex-wrap gap-1">
@@ -101,11 +101,11 @@
                           type="button"
                           [class]="extraChipClass(true)"
                           [disabled]="estaPendiente(extra.id)"
-                          [title]="p.quitarHint.replace('{permiso}', extra.codename)"
+                          [title]="p.quitarHint.replace('{permiso}', extra.nombre)"
                           (click)="toggle(extra)"
                         >
                           <i class="pi pi-check text-[0.55rem]" aria-hidden="true"></i>
-                          {{ extra.codename }}
+                          {{ extra.accion }}
                         </button>
                       }
                     </span>
@@ -118,8 +118,8 @@
                         type="button"
                         [class]="celdaClass(true)"
                         [disabled]="estaPendiente(celda.id)"
-                        [attr.aria-label]="celda.codename"
-                        [title]="p.quitarHint.replace('{permiso}', celda.codename)"
+                        [attr.aria-label]="celda.nombre"
+                        [title]="p.quitarHint.replace('{permiso}', celda.nombre)"
                         (click)="toggle(celda)"
                       >
                         <i class="pi pi-check text-[0.55rem]" aria-hidden="true"></i>

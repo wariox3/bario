@@ -55,16 +55,10 @@ export interface GrupoSeguridad {
 
 /**
  * Permiso directo de un usuario (`permiso.permisos` de
- * `/seguridad/usuario-cliente-permiso/`), shape **confirmado**: versión
- * compacta del catálogo — sin `modelo_label` ni `nombre`, la acción se deriva
- * del prefijo del `codename` (`view_…`, `add_…`).
+ * `/seguridad/usuario-cliente-permiso/`). Confirmado: el backend manda el
+ * mismo serializador del catálogo (`PermisoSeguridad`), etiquetas incluidas.
  */
-export interface PermisoAsignado {
-  readonly id: number;
-  readonly app: string;
-  readonly modelo: string;
-  readonly codename: string;
-}
+export type PermisoAsignado = PermisoSeguridad;
 
 /**
  * Permiso individual del catálogo `/seguridad/permiso/` (shape confirmado):

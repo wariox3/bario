@@ -75,6 +75,7 @@ interface PermisoAppGrupo {
  */
 interface AsignadoModeloFila {
   readonly modelo: string;
+  readonly label: string;
   readonly porAccion: ReadonlyMap<AccionColumna, PermisoAsignado>;
   /** Permisos activos con acción fuera de las cuatro estándar. */
   readonly extras: readonly PermisoAsignado[];
@@ -92,9 +93,8 @@ function claveDe(filtros: PermisoCatalogoFiltros): string {
 
 /**
  * Permisos directos del miembro: la tab responde primero "¿qué tiene?" — la
- * lista de `permiso.permisos` agrupada app → modelo, con cada permiso como
- * chip quitable (los asignados no traen `nombre` ni `modelo_label`, así que se
- * muestra el modelo en mono y la acción derivada del prefijo del `codename`).
+ * matriz de `permiso.permisos` agrupada app → modelo × acción (el backend
+ * manda el mismo serializador del catálogo, con `modelo_label` y `nombre`).
  * Entrar a la tab no dispara peticiones: los asignados ya vienen con el
  * detalle.
  *
@@ -200,16 +200,20 @@ export class UsuarioPermisosPanelComponent {
   protected readonly misPermisos = computed<readonly AsignadoAppGrupo[]>(() => {
     const porApp = new Map<
       string,
-      Map<string, { porAccion: Map<AccionColumna, PermisoAsignado>; extras: PermisoAsignado[] }>
+      Map<
+        string,
+        { label: string; porAccion: Map<AccionColumna, PermisoAsignado>; extras: PermisoAsignado[] }
+      >
     >();
     for (const p of this.asignados()) {
       let modelos = porApp.get(p.app);
       if (!modelos) porApp.set(p.app, (modelos = new Map()));
       let fila = modelos.get(p.modelo);
-      if (!fila) modelos.set(p.modelo, (fila = { porAccion: new Map(), extras: [] }));
-      const accion = p.codename.split('_')[0];
-      if ((ACCIONES as readonly string[]).includes(accion)) {
-        fila.porAccion.set(accion as AccionColumna, p);
+      if (!fila) {
+        modelos.set(p.modelo, (fila = { label: p.modelo_label, porAccion: new Map(), extras: [] }));
+      }
+      if ((ACCIONES as readonly string[]).includes(p.accion)) {
+        fila.porAccion.set(p.accion as AccionColumna, p);
       } else {
         fila.extras.push(p);
       }
@@ -322,17 +326,12 @@ export class UsuarioPermisosPanelComponent {
   }
 
   /** Toggle optimista (celda de la matriz principal o del picker). */
-  protected toggle(permisoItem: PermisoSeguridad | PermisoAsignado): void {
+  protected toggle(permisoItem: PermisoSeguridad): void {
     if (this.estaPendiente(permisoItem.id)) return;
     const usuarioId = this.usuarioId();
     const teniaPermiso = this.tieneAsignado(permisoItem.id);
-    const etiqueta = 'nombre' in permisoItem ? permisoItem.nombre : permisoItem.codename;
-    const entrada: PermisoAsignado = {
-      id: permisoItem.id,
-      app: permisoItem.app,
-      modelo: permisoItem.modelo,
-      codename: permisoItem.codename,
-    };
+    const etiqueta = permisoItem.nombre;
+    const entrada: PermisoAsignado = permisoItem;
 
     // Optimista: la lista cambia ya; si el backend falla, se revierte abajo.
     this.asignados.update((lista) =>
