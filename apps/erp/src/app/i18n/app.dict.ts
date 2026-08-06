@@ -4351,6 +4351,10 @@ export interface AppDict
           count: { zero: string; one: string; other: string };
           emptyCatalog: string;
           hint: string;
+          toasts: {
+            added: { title: string; desc: string };
+            removed: { title: string; desc: string };
+          };
         };
         permisos: {
           flags: { superuser: string; staff: string };

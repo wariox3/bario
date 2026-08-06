@@ -5642,6 +5642,16 @@ export const es: AppDict = {
           },
           emptyCatalog: 'No hay grupos disponibles.',
           hint: 'Los grupos son verticales de la plataforma: definen a qué áreas accede la persona dentro de la empresa. Toca una ficha para asignar o quitar.',
+          toasts: {
+            added: {
+              title: 'Grupo asignado',
+              desc: 'La persona ahora pertenece a {grupo}.',
+            },
+            removed: {
+              title: 'Grupo quitado',
+              desc: 'La persona ya no pertenece a {grupo}.',
+            },
+          },
         },
         permisos: {
           flags: { superuser: 'Superusuario', staff: 'Staff' },

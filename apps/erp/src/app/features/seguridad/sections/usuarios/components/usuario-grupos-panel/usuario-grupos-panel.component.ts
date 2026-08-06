@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { I18nService, type GrupoSeguridad } from '@reddoc/core';
+import { I18nService, ToastService, type GrupoSeguridad } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { SeguridadUsuariosService } from '../../usuarios.service';
 
@@ -34,6 +34,7 @@ import { SeguridadUsuariosService } from '../../usuarios.service';
 export class UsuarioGruposPanelComponent {
   private readonly service = inject(SeguridadUsuariosService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toast = inject(ToastService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
@@ -99,6 +100,7 @@ export class UsuarioGruposPanelComponent {
     if (this.estaPendiente(id)) return;
     const usuarioId = this.usuarioId();
     const eraMiembro = this.esMiembro(id);
+    const nombre = this.items().find((g) => g.id === id)?.nombre ?? '';
 
     // Optimista: la ficha cambia ya; si el backend falla, se revierte abajo.
     this.asignadosIds.update((ids) => (eraMiembro ? ids.filter((i) => i !== id) : [...ids, id]));
@@ -109,7 +111,12 @@ export class UsuarioGruposPanelComponent {
       : this.service.addGrupo(usuarioId, id);
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => this.pendientes.update((ids) => ids.filter((i) => i !== id)),
+      next: () => {
+        this.pendientes.update((ids) => ids.filter((i) => i !== id));
+        const toasts = this.t().seguridad.usuarios.detalle.grupos.toasts;
+        const toast = eraMiembro ? toasts.removed : toasts.added;
+        this.toast.success(toast.title, toast.desc.replace('{grupo}', nombre));
+      },
       error: () => {
         this.pendientes.update((ids) => ids.filter((i) => i !== id));
         this.asignadosIds.update((ids) =>

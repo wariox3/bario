@@ -5583,6 +5583,16 @@ export const en: AppDict = {
           },
           emptyCatalog: 'No groups available.',
           hint: 'Groups are platform verticals: they define which areas the person can access within the company. Tap a tile to assign or remove.',
+          toasts: {
+            added: {
+              title: 'Group assigned',
+              desc: 'The person now belongs to {grupo}.',
+            },
+            removed: {
+              title: 'Group removed',
+              desc: 'The person no longer belongs to {grupo}.',
+            },
+          },
         },
         permisos: {
           flags: { superuser: 'Superuser', staff: 'Staff' },
