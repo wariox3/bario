@@ -24,9 +24,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
-import { CONTENEDOR_ROL } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
-import { CambiarRolDialogComponent } from '../../components/cambiar-rol-dialog/cambiar-rol-dialog.component';
 import { InvitarUsuarioDialogComponent } from '../../components/invitar-usuario-dialog/invitar-usuario-dialog.component';
 import {
   SEGURIDAD_USUARIOS_COLUMNS,
@@ -38,9 +36,7 @@ import {
   SEGURIDAD_USUARIOS_TRAILING_ACTIONS,
   noEsPropietario,
 } from '../../usuarios.constants';
-import type { UsuarioRow } from '../../usuarios.model';
 import { SeguridadUsuariosService } from '../../usuarios.service';
-import { toUsuarioRow } from '../../usuarios.utils';
 
 /**
  * Usuarios con acceso al contenedor activo.
@@ -70,7 +66,6 @@ import { toUsuarioRow } from '../../usuarios.utils';
     DataFilterModalComponent,
     ConfirmDialogModule,
     InvitarUsuarioDialogComponent,
-    CambiarRolDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './usuarios-list.component.html',
@@ -106,14 +101,12 @@ export class UsuariosListComponent {
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(25);
   protected readonly searchValue = signal('');
-  protected readonly selectedRows = signal<readonly UsuarioRow[]>([]);
+  protected readonly selectedRows = signal<readonly ContenedorMember[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
     this.filterStorage.read(SEGURIDAD_USUARIOS_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
   protected readonly inviteVisible = signal(false);
-  protected readonly rolDialogVisible = signal(false);
-  protected readonly usuarioEnEdicion = signal<UsuarioRow | null>(null);
 
   /** Salida del panel de acceso denegado: el inicio del área. */
   protected readonly inicioLink = computed<readonly string[] | null>(() => {
@@ -130,22 +123,16 @@ export class UsuariosListComponent {
     ];
   });
 
-  /** Filas devueltas por el backend, con el rol ya resuelto a texto. */
-  private readonly rows = computed<readonly UsuarioRow[]>(() => {
-    const roles = this.t().seguridad.usuarios.roles;
-    return this.members().map((member) => toUsuarioRow(member, roles));
-  });
+  protected readonly totalCount = computed(() => this.members().length);
 
-  protected readonly totalCount = computed(() => this.rows().length);
-
-  protected readonly pageItems = computed<readonly UsuarioRow[]>(() => {
+  protected readonly pageItems = computed<readonly ContenedorMember[]>(() => {
     const start = this.currentPage() * this.pageSize();
-    return this.rows().slice(start, start + this.pageSize());
+    return this.members().slice(start, start + this.pageSize());
   });
 
   /** Seleccionados que sí se pueden quitar (el propietario nunca). */
   protected readonly eliminables = computed(() =>
-    this.selectedRows().filter((row) => row.rol_id !== CONTENEDOR_ROL.propietario),
+    this.selectedRows().filter((row) => !row.propietario),
   );
 
   constructor() {
@@ -202,22 +189,18 @@ export class UsuariosListComponent {
   }
 
   protected onSelectionChange(rows: unknown[]): void {
-    this.selectedRows.set(rows as UsuarioRow[]);
+    this.selectedRows.set(rows as ContenedorMember[]);
   }
 
   protected onRowClick(row: unknown): void {
-    this.verDetalle(row as UsuarioRow);
+    this.verDetalle(row as ContenedorMember);
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
-    const usuario = event.row as UsuarioRow;
+    const usuario = event.row as ContenedorMember;
     switch (event.actionId) {
       case 'view':
         this.verDetalle(usuario);
-        break;
-      case 'rol':
-        this.usuarioEnEdicion.set(usuario);
-        this.rolDialogVisible.set(true);
         break;
       case 'delete':
         this.confirmRemove([usuario]);
@@ -229,22 +212,22 @@ export class UsuariosListComponent {
     this.confirmRemove(this.eliminables());
   }
 
-  /** Recarga tras invitar o cambiar un rol. */
+  /** Recarga tras invitar. */
   protected onChanged(): void {
     this.load();
   }
 
   // ── Interno ───────────────────────────────────────────────────────────────
 
-  private verDetalle(usuario: UsuarioRow): void {
+  private verDetalle(usuario: ContenedorMember): void {
     // Respaldo del predicado de la tabla: el propietario no tiene detalle.
-    if (usuario.rol_id === CONTENEDOR_ROL.propietario) return;
+    if (usuario.propietario) return;
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...SEGURIDAD_USUARIOS_PATH, 'detalle', usuario.id]);
   }
 
-  private confirmRemove(usuarios: readonly UsuarioRow[]): void {
+  private confirmRemove(usuarios: readonly ContenedorMember[]): void {
     if (usuarios.length === 0) return;
     const dict = this.t().seguridad.usuarios;
     this.confirmation.confirm({

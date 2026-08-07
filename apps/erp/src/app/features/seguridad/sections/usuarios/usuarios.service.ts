@@ -148,10 +148,6 @@ export class SeguridadUsuariosService {
     });
   }
 
-  updateRol(membershipId: number, rolId: number): Observable<unknown> {
-    return this.contenedor.updateMemberRol(membershipId, rolId);
-  }
-
   /**
    * Quita uno o varios miembros. El backend borra de a uno, así que el lote se
    * dispara en paralelo y el caller ve un único resultado; si alguna falla, el

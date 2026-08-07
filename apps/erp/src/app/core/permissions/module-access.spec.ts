@@ -7,7 +7,7 @@ const CONTENEDOR = {
   schema_name: 'seguridad',
   nombre: 'Seguridad',
   activo: true,
-  rol_id: 1,
+  propietario: true,
   acceso_venta: true,
   acceso_compra: true,
   acceso_tesoreria: false,
@@ -31,7 +31,7 @@ describe('readModuleAccessFlags', () => {
   });
 
   it('sin ninguna flag no restringe (null), para no vaciar el topbar', () => {
-    expect(readModuleAccessFlags({ cliente_id: 13, rol_id: 1 })).toBeNull();
+    expect(readModuleAccessFlags({ cliente_id: 13, propietario: true })).toBeNull();
     expect(readModuleAccessFlags(null)).toBeNull();
   });
 

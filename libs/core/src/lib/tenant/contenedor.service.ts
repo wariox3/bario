@@ -10,7 +10,6 @@ import type { PaginatedResponse } from '../models/pagination.model';
 import {
   Contenedor,
   ContenedorInvitacionesPendientesResponse,
-  ContenedorMember,
   ContenedorMembersResponse,
   ContenedoresResponse,
   CreateContenedorRequest,
@@ -186,19 +185,6 @@ export class ContenedorService extends BaseHttpService {
 
   removeMember(membershipId: number): Observable<unknown> {
     return this.delete(`/seguridad/usuario-cliente/${membershipId}/`);
-  }
-
-  /**
-   * Cambia el rol de un miembro dentro del contenedor.
-   *
-   * SUPUESTO pendiente de confirmar con backend: se asume el `PATCH` estándar
-   * del recurso `usuario-cliente` aceptando `rol_id`. Si el backend expone una
-   * acción dedicada, solo cambia esta línea.
-   */
-  updateMemberRol(membershipId: number, rolId: number): Observable<ContenedorMember> {
-    return this.patch<ContenedorMember>(`/seguridad/usuario-cliente/${membershipId}/`, {
-      rol_id: rolId,
-    });
   }
 
   searchUsers(query: string): Observable<UserSearchResult[]> {

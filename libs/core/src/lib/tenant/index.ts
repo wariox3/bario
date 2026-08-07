@@ -11,7 +11,6 @@ export { ContenedorService } from './contenedor.service';
 export type { UpdateContenedorRequest } from './contenedor.service';
 export type {
   Contenedor,
-  ContenedorRol,
   ContenedorAccesoFlags,
   ContenedorMember,
   ContenedorMembersResponse,

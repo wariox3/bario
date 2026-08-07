@@ -71,11 +71,4 @@
   (invited)="onChanged()"
 />
 
-<app-cambiar-rol-dialog
-  [visible]="rolDialogVisible()"
-  (visibleChange)="rolDialogVisible.set($event)"
-  [usuario]="usuarioEnEdicion()"
-  (saved)="onChanged()"
-/>
-
 <p-confirmDialog />

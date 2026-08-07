@@ -1,6 +1,6 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
-import { CONTENEDOR_ROL, MODULE_ACCESS_PREFIX } from '@erp/core/permissions';
+import { MODULE_ACCESS_PREFIX } from '@erp/core/permissions';
 
 /** Segmentos de ruta de la sección, relativos al tenant. */
 export const SEGURIDAD_USUARIOS_PATH = ['seguridad', 'usuarios'] as const;
@@ -28,27 +28,6 @@ export const SEGURIDAD_USUARIOS_EXPORT_URL = '/seguridad/usuario-cliente/excel/'
 /** Orden fijo de columnas de la matriz: las cuatro acciones estándar de Django. */
 export const ACCIONES_PERMISO = ['view', 'add', 'change', 'delete'] as const;
 export type AccionColumna = (typeof ACCIONES_PERMISO)[number];
-
-/** Clave i18n del rol por id, para cuando el backend no manda `rol_nombre`. */
-export const ROL_LABEL_KEY_BY_ID: Readonly<
-  Record<number, 'propietario' | 'administrador' | 'usuario'>
-> = {
-  [CONTENEDOR_ROL.propietario]: 'propietario',
-  [CONTENEDOR_ROL.administrador]: 'administrador',
-  [CONTENEDOR_ROL.usuario]: 'usuario',
-};
-
-/**
- * Roles que se pueden **asignar** desde esta pantalla.
- *
- * "Propietario" queda afuera a propósito: transferir la propiedad del
- * contenedor no es cambiarle el rol a alguien, y el backend todavía no expone
- * esa operación.
- */
-export const ROLES_ASIGNABLES: readonly number[] = [
-  CONTENEDOR_ROL.administrador,
-  CONTENEDOR_ROL.usuario,
-];
 
 /**
  * Accesos por módulo que se pueden otorgar al invitar.
@@ -100,10 +79,11 @@ export const SEGURIDAD_USUARIOS_COLUMNS: readonly ColumnDef[] = [
   },
   { field: 'usuario_email', headerKey: 'seguridad.usuarios.columns.correo', type: 'text' },
   {
-    field: 'rol_nombre',
-    headerKey: 'seguridad.usuarios.columns.rol',
-    type: 'text',
-    width: '200px',
+    field: 'propietario',
+    headerKey: 'seguridad.usuarios.columns.propietario',
+    type: 'boolean',
+    booleanKeyPrefix: 'seguridad.usuarios.propietarioBadge',
+    width: '160px',
   },
 ];
 
@@ -119,15 +99,19 @@ export const SEGURIDAD_USUARIOS_FILTER_FIELDS: readonly FilterField[] = [
     type: 'string',
   },
   { name: 'usuario_email', displayNameKey: 'seguridad.usuarios.columns.correo', type: 'string' },
-  { name: 'rol_nombre', displayNameKey: 'seguridad.usuarios.columns.rol', type: 'string' },
+  {
+    name: 'propietario',
+    displayNameKey: 'seguridad.usuarios.columns.propietario',
+    type: 'boolean',
+  },
 ];
 
 /**
- * ¿La fila es la del propietario? Su rol no se cambia, no se lo saca de acá y
+ * ¿La fila **no** es la del propietario? Al propietario no se lo saca de acá y
  * su detalle no se gestiona: sin ojo, sin click de fila y sin checkbox.
  */
 export const noEsPropietario = (row: unknown): boolean =>
-  (row as { rol_id?: number | null }).rol_id !== CONTENEDOR_ROL.propietario;
+  (row as { propietario?: boolean }).propietario !== true;
 
 export const SEGURIDAD_USUARIOS_ROW_ACTIONS: readonly RowAction[] = [
   {
@@ -135,12 +119,6 @@ export const SEGURIDAD_USUARIOS_ROW_ACTIONS: readonly RowAction[] = [
     labelKey: 'common.actions.view',
     iconClass: 'pi pi-eye',
     inline: true,
-    visibleFor: noEsPropietario,
-  },
-  {
-    id: 'rol',
-    labelKey: 'seguridad.usuarios.actions.cambiarRol',
-    iconClass: 'pi pi-shield',
     visibleFor: noEsPropietario,
   },
   {

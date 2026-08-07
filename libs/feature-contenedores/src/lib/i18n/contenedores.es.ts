@@ -39,6 +39,10 @@ export const contenedoresEs: ContenedoresDict = {
       ownerCta: 'Renovar suscripción',
       memberLocked: 'Solo el propietario puede renovar',
     },
+    roles: {
+      propietario: 'Propietario',
+      miembro: 'Miembro',
+    },
   },
   create: {
     title: 'Nuevo contenedor',
@@ -142,8 +146,7 @@ export const contenedoresEs: ContenedoresDict = {
       you: 'tú',
       roles: {
         propietario: 'Propietario',
-        administrador: 'Administrador',
-        usuario: 'Miembro',
+        miembro: 'Miembro',
       },
       removeAria: 'Quitar miembro',
     },

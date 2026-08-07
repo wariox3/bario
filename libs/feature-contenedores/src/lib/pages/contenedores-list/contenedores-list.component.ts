@@ -126,7 +126,7 @@ export class ContenedoresListComponent {
 
   enterContenedor(item: Contenedor): void {
     if (isSuscripcionExpired(item.suscripcion_fecha_fin)) {
-      if (item.rol_id === 1) this.renewContenedor(item.suscripcion_id);
+      if (item.propietario) this.renewContenedor(item.suscripcion_id);
       return;
     }
     this.tenant.setCurrent(item);

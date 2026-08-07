@@ -4320,9 +4320,10 @@ export interface AppDict
     menu: { usuarios: string };
     usuarios: {
       searchPlaceholder: string;
-      columns: { nombre: string; correo: string; rol: string };
-      roles: { propietario: string; administrador: string; usuario: string };
-      actions: { invitar: string; cambiarRol: string };
+      columns: { nombre: string; correo: string; propietario: string };
+      /** Labels de la columna booleana `propietario` (`booleanKeyPrefix`). */
+      propietarioBadge: { true: string; false: string };
+      actions: { invitar: string };
       empty: { title: string; sub: string };
       invitar: {
         title: string;
@@ -4354,12 +4355,11 @@ export interface AppDict
         };
         submit: string;
       };
-      cambiarRol: { title: string; field: string; hint: string; propietarioLock: string };
       detalle: {
         eyebrow: string;
         tabs: { grupos: string; permisos: string };
         fields: { usuarioId: string };
-        rolHint: string;
+        accesoHint: string;
         notFound: { title: string; desc: string };
         propietario: { title: string; desc: string };
         grupos: {
@@ -4398,8 +4398,6 @@ export interface AppDict
         deleteError: { title: string; desc: string };
         inviteSuccess: { title: string; desc: string };
         inviteError: { title: string; desc: string };
-        rolSuccess: { title: string; desc: string };
-        rolError: { title: string; desc: string };
       };
     };
   };

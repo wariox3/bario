@@ -5585,15 +5585,10 @@ export const es: AppDict = {
     menu: { usuarios: 'Usuarios' },
     usuarios: {
       searchPlaceholder: 'Buscar por nombre o correo...',
-      columns: { nombre: 'Nombre', correo: 'Correo', rol: 'Rol' },
-      roles: {
-        propietario: 'Propietario',
-        administrador: 'Administrador',
-        usuario: 'Usuario',
-      },
+      columns: { nombre: 'Nombre', correo: 'Correo', propietario: 'Propietario' },
+      propietarioBadge: { true: 'Propietario', false: 'Miembro' },
       actions: {
         invitar: 'Invitar usuario',
-        cambiarRol: 'Cambiar rol',
       },
       empty: {
         title: 'Sin usuarios',
@@ -5629,18 +5624,12 @@ export const es: AppDict = {
         },
         submit: 'Enviar invitación',
       },
-      cambiarRol: {
-        title: 'Cambiar rol',
-        field: 'Rol',
-        hint: 'El rol define qué puede administrar la persona dentro de la empresa.',
-        propietarioLock: 'El propietario de la empresa no cambia de rol desde aquí.',
-      },
       detalle: {
         eyebrow: 'Usuario del contenedor',
         tabs: { grupos: 'Grupos', permisos: 'Permisos' },
         fields: { usuarioId: 'ID de usuario' },
-        rolHint:
-          'Los accesos se otorgan por rol: propietario y administrador gestionan la empresa, el resto solo la opera.',
+        accesoHint:
+          'El propietario administra la empresa; el resto solo la opera. Los módulos a los que entra esta persona se definen al invitarla.',
         notFound: {
           title: 'Usuario no encontrado',
           desc: 'Puede que le hayan quitado el acceso a esta empresa.',
@@ -5723,14 +5712,6 @@ export const es: AppDict = {
         inviteError: {
           title: 'No se pudo invitar',
           desc: 'No pudimos enviar la invitación. Intenta de nuevo.',
-        },
-        rolSuccess: {
-          title: 'Rol actualizado',
-          desc: 'El usuario ya tiene su nuevo rol en esta empresa.',
-        },
-        rolError: {
-          title: 'No se pudo cambiar el rol',
-          desc: 'No pudimos actualizar el rol. Intenta de nuevo.',
         },
       },
     },

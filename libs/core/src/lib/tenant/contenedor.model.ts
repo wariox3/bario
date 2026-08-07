@@ -1,15 +1,19 @@
 import type { PaginatedResponse } from '../models/pagination.model';
 
-export type ContenedorRol = 'propietario' | 'administrador' | 'usuario';
-
-export interface ContenedorMember {
+/**
+ * Miembro del contenedor (`/seguridad/usuario-cliente/lista-cliente/`).
+ *
+ * El miembro **no tiene rol**: desde 2026-08-07 el backend cambió `rol_id`/
+ * `rol_nombre` por la bandera `propietario` y sumó las flags `acceso_*` de esa
+ * persona, que son las mismas que se otorgan al invitar (`SendInviteRequest`).
+ */
+export interface ContenedorMember extends ContenedorAccesoFlags {
   id: number;
   usuario_id: number;
   usuario_nombre_corto: string | null;
   usuario_email: string;
   cliente_id: number;
-  rol_id: number | null;
-  rol_nombre: string | null;
+  propietario: boolean;
 }
 
 export type ContenedorMembersResponse = PaginatedResponse<ContenedorMember>;
@@ -41,12 +45,6 @@ export type ContenedorInvitacionesPendientesResponse =
 export interface SendInviteRequest extends ContenedorAccesoFlags {
   cliente_id: number;
   usuario_id: number;
-  /**
-   * Opcional: Seguridad del ERP invita **sin rol** — el rol se cambia desde la
-   * fila del listado, no al invitar. Otras pantallas (contenedores) sí lo
-   * mandan.
-   */
-  rol_id?: number;
   /** Grupos de seguridad a los que pertenecerá el invitado al aceptar. */
   grupo_ids?: readonly number[];
 }
@@ -118,8 +116,8 @@ export interface UsuarioClientePermiso {
   readonly usuario_id: number;
   readonly usuario_nombre_corto: string | null;
   readonly usuario_email: string;
-  readonly rol_id: number;
-  readonly rol_nombre: string;
+  /** Como en `ContenedorMember`: el rol se fue, quedó la bandera. */
+  readonly propietario: boolean;
   readonly permiso: UsuarioPermiso;
 }
 
@@ -164,8 +162,16 @@ export interface Contenedor extends ContenedorAccesoFlags {
   suscripcion_fecha_fin?: string;
   suscripcion_frecuencia?: 'P' | 'M' | 'A';
   suscripcion_suscripcion_tipo_nombre?: string;
-  rol_id: number;
-  rol_nombre: string;
+  /**
+   * ¿El usuario es el propietario de esta empresa?
+   *
+   * Reemplaza al par `rol_id`/`rol_nombre` que mandaba antes
+   * `/contenedor/cliente/lista-usuario/`: a nivel contenedor la única distinción
+   * que hace el backend es propietario o no. Los tres roles (propietario /
+   * administrador / usuario) siguen existiendo pero **por membresía**, en
+   * `ContenedorMember.rol_id`, que es otro endpoint.
+   */
+  propietario: boolean;
 }
 
 export type ContenedoresResponse = PaginatedResponse<Contenedor>;

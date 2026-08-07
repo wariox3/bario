@@ -9,7 +9,7 @@
  * No confundir con dos cosas vecinas:
  *  - `PermissionsService.enabledModuleIds` — qué módulos **compró el tenant**
  *    (plan). Es del contenedor, no del usuario.
- *  - `CONTENEDOR_ROL` — quién administra el contenedor en sí. Gobierna la
+ *  - `propietario` del contenedor — quién administra la empresa en sí. Gobierna la
  *    pantalla de Seguridad, no el trabajo operativo.
  *
  * Los tres ejes son ortogonales: el acceso final es su intersección.

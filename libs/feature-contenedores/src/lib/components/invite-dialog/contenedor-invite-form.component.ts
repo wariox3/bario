@@ -31,8 +31,6 @@ import {
 } from '@reddoc/core';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
-const ROL_ID_DEFAULT = 9;
-
 @Component({
   selector: 'lib-contenedor-invite-form',
   standalone: true,
@@ -131,7 +129,6 @@ export class ContenedorInviteFormComponent {
       .sendInvitation({
         cliente_id: c.cliente_id,
         usuario_id: user.id,
-        rol_id: ROL_ID_DEFAULT,
         ...(grupoIds.length > 0 ? { grupo_ids: grupoIds } : {}),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))

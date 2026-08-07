@@ -7,7 +7,7 @@ import {
 } from '@reddoc/core';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
 import { erpModuleResolver } from '@erp/core/erp-modules';
-import { contenedorAdminGuard } from '@erp/core/guards/contenedor-admin.guard';
+import { contenedorPropietarioGuard } from '@erp/core/guards/contenedor-propietario.guard';
 import { withModuleAccess } from '@erp/core/permissions';
 
 export const appRoutes: Route[] = [
@@ -70,7 +70,7 @@ export const appRoutes: Route[] = [
         path: 'seguridad',
         // Administrar el contenedor es de propietario/administrador; el user-menu
         // ya la esconde, esto cierra la puerta de la URL directa.
-        canActivate: [contenedorAdminGuard],
+        canActivate: [contenedorPropietarioGuard],
         // El módulo activo lo fija `SEGURIDAD_ROUTES`: Seguridad sí trae sidebar
         // propio, aunque no salga en el topbar.
         loadChildren: () =>

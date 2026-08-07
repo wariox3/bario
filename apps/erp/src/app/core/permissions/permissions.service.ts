@@ -2,7 +2,6 @@ import { Injectable, computed, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { TenantService } from '@reddoc/core';
 import { ERP_MODULES } from '@erp/core/erp-modules';
-import { ROL_ADMIN_IDS } from './contenedor-rol.constants';
 import type { ModeloId } from './modelo.catalog';
 import { ModelPermissionsService } from './model-permissions.service';
 import { readModuleAccessFlags } from './module-access';
@@ -25,7 +24,8 @@ const GRANTS_COMPLETOS = false;
  *     Depende del plan del contenedor, no de quién sos.
  *  2. **¿Qué puede hacer este usuario?** — `can` / `canResolve`, sobre los
  *     modelos del backend (`ModelPermissionsService`).
- *  3. **¿Administra el contenedor?** — `isContenedorAdmin`, del `rol_id`.
+ *  3. **¿Administra el contenedor?** — `isContenedorPropietario`, de la bandera
+ *     `propietario` del contenedor activo.
  *     Gobierna la pantalla de Seguridad, no el trabajo operativo.
  *
  * Nada de esto es seguridad: es UX. El backend sigue siendo el que responde
@@ -120,17 +120,22 @@ export class PermissionsService {
   }
 
   /**
-   * ¿El usuario administra el contenedor activo (propietario o administrador)?
+   * ¿El usuario es el propietario del contenedor activo?
    *
    * Gobierna todo lo que sea administrar el contenedor en sí —hoy la pantalla de
-   * Seguridad— y no depende del backend: el rol ya viaja en el contenedor activo,
-   * que `tenantAccessGuard` repuebla antes de pintar (sobrevive reload duro).
+   * Seguridad— y no depende del backend: la bandera ya viaja en el contenedor
+   * activo, que `tenantAccessGuard` repuebla antes de pintar (sobrevive reload
+   * duro).
+   *
+   * A nivel contenedor **solo hay propietario o no**: `/contenedor/cliente/lista-usuario/`
+   * dejó de mandar `rol_id`/`rol_nombre` y manda `propietario`. Antes también
+   * calificaba el rol "administrador"; ese rol sigue existiendo por membresía
+   * (`ContenedorMember.rol_id`) pero ya no dice quién administra la empresa.
    *
    * Sin contenedor en memoria responde `false`: mejor esconder de más que
    * mostrar una pantalla de administración a quien no le toca.
    */
-  readonly isContenedorAdmin = computed<boolean>(() => {
-    const rolId = this.tenant.currentContenedor()?.rol_id;
-    return rolId != null && ROL_ADMIN_IDS.has(rolId);
-  });
+  readonly isContenedorPropietario = computed<boolean>(
+    () => this.tenant.currentContenedor()?.propietario === true,
+  );
 }

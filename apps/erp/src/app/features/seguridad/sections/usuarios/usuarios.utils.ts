@@ -1,34 +1,14 @@
 import type {
-  ContenedorMember,
   FilterCondition,
   ParamValue,
   PermisoCatalogoFiltros,
   PermisoSeguridad,
 } from '@reddoc/core';
-import { CONTENEDOR_ROL } from '@erp/core/permissions';
 import {
   ACCIONES_PERMISO,
-  ROL_LABEL_KEY_BY_ID,
   SEGURIDAD_USUARIOS_SEARCH_PARAM,
   type AccionColumna,
 } from './usuarios.constants';
-import type { UsuarioRow } from './usuarios.model';
-
-/** Diccionario de nombres de rol; lo aporta el i18n de la app. */
-export type RolesDict = Readonly<Record<'propietario' | 'administrador' | 'usuario', string>>;
-
-/** Nombre legible del rol: el del backend, con respaldo por id si viene vacío. */
-export function rolNombre(member: ContenedorMember, roles: RolesDict): string {
-  return (
-    member.rol_nombre?.trim() ||
-    roles[ROL_LABEL_KEY_BY_ID[member.rol_id ?? CONTENEDOR_ROL.usuario] ?? 'usuario']
-  );
-}
-
-/** Miembro → fila de tabla, con el rol ya resuelto a texto. */
-export function toUsuarioRow(member: ContenedorMember, roles: RolesDict): UsuarioRow {
-  return { ...member, rol_nombre: rolNombre(member, roles) };
-}
 
 /**
  * Búsqueda + filtros de la pantalla → **query params** de `lista-cliente/`.
@@ -43,8 +23,8 @@ export function toUsuarioRow(member: ContenedorMember, roles: RolesDict): Usuari
  *  - La búsqueda rápida viaja como `search=` (el `SearchFilter` genérico de DRF,
  *    ya en uso en `/seguridad/usuario/seleccionar/`). Es lo único que conserva
  *    el OR sobre nombre y correo que tenía la búsqueda en memoria.
- *  - `rol_nombre` se filtra por el mismo nombre con el que viene en la
- *    respuesta; si el backend expone el rol por relación, será `rol__nombre`.
+ *  - `propietario` se filtra por el mismo nombre con el que viene en la
+ *    respuesta, con el `true`/`false` que serializa el constructor de filtros.
  */
 export function usuariosQueryParams(
   search: string,

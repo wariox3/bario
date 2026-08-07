@@ -136,7 +136,6 @@ export type {
   TenantRoutes,
   UpdateContenedorRequest,
   Contenedor,
-  ContenedorRol,
   ContenedorAccesoFlags,
   ContenedorMember,
   ContenedorMembersResponse,

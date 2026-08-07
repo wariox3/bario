@@ -5533,15 +5533,10 @@ export const en: AppDict = {
     menu: { usuarios: 'Users' },
     usuarios: {
       searchPlaceholder: 'Search by name or email...',
-      columns: { nombre: 'Name', correo: 'Email', rol: 'Role' },
-      roles: {
-        propietario: 'Owner',
-        administrador: 'Administrator',
-        usuario: 'User',
-      },
+      columns: { nombre: 'Name', correo: 'Email', propietario: 'Owner' },
+      propietarioBadge: { true: 'Owner', false: 'Member' },
       actions: {
         invitar: 'Invite user',
-        cambiarRol: 'Change role',
       },
       empty: {
         title: 'No users',
@@ -5576,12 +5571,6 @@ export const en: AppDict = {
           },
         },
         submit: 'Send invitation',
-      },
-      cambiarRol: {
-        title: 'Change role',
-        field: 'Role',
-        hint: 'The role defines what the person can manage within the company.',
-        propietarioLock: "The company owner's role cannot be changed from here.",
       },
       detalle: {
         eyebrow: 'Container user',
@@ -5639,8 +5628,8 @@ export const en: AppDict = {
           },
         },
         fields: { usuarioId: 'User ID' },
-        rolHint:
-          'Access is granted by role: owner and administrator manage the company, everyone else only operates it.',
+        accesoHint:
+          'The owner manages the company; everyone else only operates it. The modules this person can open are set when inviting them.',
         notFound: {
           title: 'User not found',
           desc: 'Their access to this company may have been removed.',
@@ -5671,14 +5660,6 @@ export const en: AppDict = {
         inviteError: {
           title: 'Could not invite',
           desc: 'We could not send the invitation. Please try again.',
-        },
-        rolSuccess: {
-          title: 'Role updated',
-          desc: 'The user now has their new role in this company.',
-        },
-        rolError: {
-          title: 'Could not change the role',
-          desc: 'We could not update the role. Please try again.',
         },
       },
     },

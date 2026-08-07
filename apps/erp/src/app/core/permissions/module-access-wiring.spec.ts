@@ -27,7 +27,7 @@ const CONTENEDOR = {
   schema_name: 'seguridad',
   nombre: 'Seguridad',
   activo: true,
-  rol_id: 1,
+  propietario: true,
   acceso_venta: false,
   acceso_tesoreria: true,
 };

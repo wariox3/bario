@@ -18,17 +18,15 @@ import {
   TenantService,
   ToastService,
   getInitials,
+  type ContenedorMember,
   type UsuarioClientePermiso,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { CONTENEDOR_ROL } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { UsuarioGruposPanelComponent } from '../../components/usuario-grupos-panel/usuario-grupos-panel.component';
 import { UsuarioPermisosPanelComponent } from '../../components/usuario-permisos-panel/usuario-permisos-panel.component';
 import { SEGURIDAD_USUARIOS_PATH } from '../../usuarios.constants';
-import type { UsuarioRow } from '../../usuarios.model';
 import { SeguridadUsuariosService } from '../../usuarios.service';
-import { toUsuarioRow } from '../../usuarios.utils';
 
 /**
  * Detalle de un usuario del contenedor.
@@ -74,7 +72,7 @@ export class UsuarioDetailComponent {
   readonly tab = input<string>();
   protected readonly activeTab = computed(() => this.tab() || 'grupos');
 
-  protected readonly usuario = signal<UsuarioRow | null>(null);
+  protected readonly usuario = signal<ContenedorMember | null>(null);
   protected readonly isLoading = signal(false);
   protected readonly notFound = signal(false);
 
@@ -87,9 +85,7 @@ export class UsuarioDetailComponent {
    * la URL directa igual llega acá — se muestra el panel explicativo en vez
    * del detalle.
    */
-  protected readonly esPropietario = computed(
-    () => this.usuario()?.rol_id === CONTENEDOR_ROL.propietario,
-  );
+  protected readonly esPropietario = computed(() => this.usuario()?.propietario === true);
 
   /** Seguridad → Usuarios → <persona>. La hoja no lleva link (es esta página). */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -137,7 +133,6 @@ export class UsuarioDetailComponent {
   private load(membershipId: number): void {
     this.isLoading.set(true);
     this.notFound.set(false);
-    const roles = this.t().seguridad.usuarios.roles;
     this.service
       .list()
       .pipe(
@@ -147,10 +142,10 @@ export class UsuarioDetailComponent {
       .subscribe({
         next: (members) => {
           const member = members.find((m) => m.id === membershipId);
-          this.usuario.set(member ? toUsuarioRow(member, roles) : null);
+          this.usuario.set(member ?? null);
           this.notFound.set(!member);
           // Al propietario no se le piden permisos: no se va a mostrar nada.
-          if (member && member.rol_id !== CONTENEDOR_ROL.propietario) {
+          if (member && !member.propietario) {
             this.loadPermisos(member.usuario_id);
           }
         },

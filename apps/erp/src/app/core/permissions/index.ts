@@ -1,5 +1,4 @@
 export { PermissionsService } from './permissions.service';
-export { CONTENEDOR_ROL, ROL_ADMIN_IDS, type ContenedorRolId } from './contenedor-rol.constants';
 export type { ActionPredicate, ModelGrants, PermissionAction } from './permission.types';
 export { MODELO, type ModeloId } from './modelo.catalog';
 export { ModelPermissionsService } from './model-permissions.service';
