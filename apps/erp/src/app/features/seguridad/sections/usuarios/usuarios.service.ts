@@ -16,7 +16,7 @@ import {
 } from '@reddoc/core';
 import { ContenedorNoResueltoError } from '../../seguridad.errors';
 import { SEGURIDAD_USUARIOS_EXPORT_URL } from './usuarios.constants';
-import { usuariosQueryParams } from './usuarios.utils';
+import { permisoCatalogoKey, usuariosQueryParams } from './usuarios.utils';
 
 /**
  * Operaciones sobre los usuarios del contenedor activo.
@@ -84,7 +84,7 @@ export class SeguridadUsuariosService {
   getCatalogoPermisos(
     filtros: PermisoCatalogoFiltros = {},
   ): Observable<PaginatedResponse<PermisoSeguridad>> {
-    const clave = `${filtros.app ?? ''}|${filtros.modelo ?? ''}|${filtros.accion ?? ''}|${filtros.search ?? ''}|${filtros.page ?? ''}|${filtros.limit ?? ''}`;
+    const clave = permisoCatalogoKey(filtros);
     const cacheado = this.catalogoPermisosCache.get(clave);
     if (cacheado) return of(cacheado);
     return this.contenedor
@@ -98,7 +98,7 @@ export class SeguridadUsuariosService {
    * una sola fila (la fila no trae `cliente_id` para desambiguar), así que se
    * toma la primera.
    */
-  getPermisos(usuarioId: number): Observable<UsuarioClientePermiso | null> {
+  getPermisoMiembro(usuarioId: number): Observable<UsuarioClientePermiso | null> {
     return this.contenedor.getMemberPermisos(usuarioId).pipe(map((r) => r.results[0] ?? null));
   }
 

@@ -25,6 +25,10 @@ export const SEGURIDAD_USUARIOS_SEARCH_PARAM = 'search';
  */
 export const SEGURIDAD_USUARIOS_EXPORT_URL = '/seguridad/usuario-cliente/excel/';
 
+/** Orden fijo de columnas de la matriz: las cuatro acciones estándar de Django. */
+export const ACCIONES_PERMISO = ['view', 'add', 'change', 'delete'] as const;
+export type AccionColumna = (typeof ACCIONES_PERMISO)[number];
+
 /** Clave i18n del rol por id, para cuando el backend no manda `rol_nombre`. */
 export const ROL_LABEL_KEY_BY_ID: Readonly<
   Record<number, 'propietario' | 'administrador' | 'usuario'>

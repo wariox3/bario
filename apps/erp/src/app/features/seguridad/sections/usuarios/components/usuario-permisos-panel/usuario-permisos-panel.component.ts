@@ -33,11 +33,9 @@ import {
 } from '@reddoc/core';
 import { MODELO } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
+import { ACCIONES_PERMISO, type AccionColumna } from '../../usuarios.constants';
 import { SeguridadUsuariosService } from '../../usuarios.service';
-
-/** Orden fijo de columnas: las cuatro acciones estándar de Django. */
-const ACCIONES = ['view', 'add', 'change', 'delete'] as const;
-type AccionColumna = (typeof ACCIONES)[number];
+import { agruparPermisos, permisoCatalogoKey, type PermisoAppGrupo } from '../../usuarios.utils';
 
 /**
  * Apps del backend para las pills. Salen del espejo `MODELO` (mismo criterio
@@ -54,42 +52,6 @@ const PAGINA_VACIA: PaginatedResponse<PermisoSeguridad> = {
   previous: null,
   results: [],
 };
-
-/** Fila de la matriz del picker: un modelo con su permiso por acción. */
-interface PermisoModeloFila {
-  readonly modelo: string;
-  readonly label: string;
-  readonly porAccion: ReadonlyMap<AccionColumna, PermisoSeguridad>;
-  /** Permisos custom fuera de las cuatro acciones estándar. */
-  readonly extras: readonly PermisoSeguridad[];
-}
-
-interface PermisoAppGrupo {
-  readonly app: string;
-  readonly modelos: readonly PermisoModeloFila[];
-}
-
-/**
- * Fila de la lista de asignados: un modelo con su permiso activo por acción
- * (misma forma que la matriz del picker, para que ambas se pinten igual).
- */
-interface AsignadoModeloFila {
-  readonly modelo: string;
-  readonly label: string;
-  readonly porAccion: ReadonlyMap<AccionColumna, PermisoAsignado>;
-  /** Permisos activos con acción fuera de las cuatro estándar. */
-  readonly extras: readonly PermisoAsignado[];
-}
-
-interface AsignadoAppGrupo {
-  readonly app: string;
-  readonly modelos: readonly AsignadoModeloFila[];
-}
-
-/** Identidad de una consulta, para dedupe del stream. */
-function claveDe(filtros: PermisoCatalogoFiltros): string {
-  return `${filtros.app ?? ''}|${filtros.accion ?? ''}|${filtros.search ?? ''}|${filtros.page ?? ''}|${filtros.limit ?? ''}`;
-}
 
 /**
  * Permisos directos del miembro: la tab responde primero "¿qué tiene?" — la
@@ -127,7 +89,7 @@ export class UsuarioPermisosPanelComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
-  protected readonly acciones = ACCIONES;
+  protected readonly acciones = ACCIONES_PERMISO;
   protected readonly limitesOpciones = [25, 50, 100];
 
   /** `usuario_id` del miembro (el que espera `agregar-permiso/`). */
@@ -197,64 +159,14 @@ export class UsuarioPermisosPanelComponent {
   protected readonly pendientesCeldas = signal<readonly string[]>([]);
 
   /** Matriz principal: los permisos activos agrupados app → modelo × acción. */
-  protected readonly misPermisos = computed<readonly AsignadoAppGrupo[]>(() => {
-    const porApp = new Map<
-      string,
-      Map<
-        string,
-        { label: string; porAccion: Map<AccionColumna, PermisoAsignado>; extras: PermisoAsignado[] }
-      >
-    >();
-    for (const p of this.asignados()) {
-      let modelos = porApp.get(p.app);
-      if (!modelos) porApp.set(p.app, (modelos = new Map()));
-      let fila = modelos.get(p.modelo);
-      if (!fila) {
-        modelos.set(p.modelo, (fila = { label: p.modelo_label, porAccion: new Map(), extras: [] }));
-      }
-      if ((ACCIONES as readonly string[]).includes(p.accion)) {
-        fila.porAccion.set(p.accion as AccionColumna, p);
-      } else {
-        fila.extras.push(p);
-      }
-    }
-    return [...porApp].map(([app, modelos]) => ({
-      app,
-      modelos: [...modelos].map(([modelo, fila]) => ({ modelo, ...fila })),
-    }));
-  });
+  protected readonly misPermisos = computed<readonly PermisoAppGrupo[]>(() =>
+    agruparPermisos(this.asignados()),
+  );
 
   /** Matriz del picker agrupada app → modelo de la página visible. */
-  protected readonly grupos = computed<readonly PermisoAppGrupo[]>(() => {
-    const porApp = new Map<
-      string,
-      Map<
-        string,
-        {
-          label: string;
-          porAccion: Map<AccionColumna, PermisoSeguridad>;
-          extras: PermisoSeguridad[];
-        }
-      >
-    >();
-    for (const p of this.resultado()) {
-      let modelos = porApp.get(p.app);
-      if (!modelos) porApp.set(p.app, (modelos = new Map()));
-      let fila = modelos.get(p.modelo);
-      if (!fila) {
-        modelos.set(p.modelo, (fila = { label: p.modelo_label, porAccion: new Map(), extras: [] }));
-      }
-      if ((ACCIONES as readonly string[]).includes(p.accion)) {
-        fila.porAccion.set(p.accion as AccionColumna, p);
-      } else {
-        fila.extras.push(p);
-      }
-    }
-    return [...porApp].map(([nombre, modelos]) => ({
-      app: nombre,
-      modelos: [...modelos].map(([modelo, fila]) => ({ modelo, ...fila })),
-    }));
-  });
+  protected readonly grupos = computed<readonly PermisoAppGrupo[]>(() =>
+    agruparPermisos(this.resultado()),
+  );
 
   protected readonly countLabel = computed(() => {
     const dict = this.t().seguridad.usuarios.detalle.permisos.count;
@@ -270,7 +182,7 @@ export class UsuarioPermisosPanelComponent {
       .pipe(
         filter(({ abierto }) => abierto),
         map(({ filtros }) => filtros),
-        distinctUntilChanged((a, b) => claveDe(a) === claveDe(b)),
+        distinctUntilChanged((a, b) => permisoCatalogoKey(a) === permisoCatalogoKey(b)),
         tap(() => this.isBuscando.set(true)),
         switchMap((filtros) =>
           this.service.getCatalogoPermisos(filtros).pipe(catchError(() => of(PAGINA_VACIA))),
@@ -331,29 +243,28 @@ export class UsuarioPermisosPanelComponent {
     const usuarioId = this.usuarioId();
     const teniaPermiso = this.tieneAsignado(permisoItem.id);
     const etiqueta = permisoItem.nombre;
-    const entrada: PermisoAsignado = permisoItem;
 
     // Optimista: la lista cambia ya; si el backend falla, se revierte abajo.
     this.asignados.update((lista) =>
-      teniaPermiso ? lista.filter((p) => p.id !== entrada.id) : [...lista, entrada],
+      teniaPermiso ? lista.filter((p) => p.id !== permisoItem.id) : [...lista, permisoItem],
     );
-    this.pendientes.update((ids) => [...ids, entrada.id]);
+    this.pendientes.update((ids) => [...ids, permisoItem.id]);
 
     const request = teniaPermiso
-      ? this.service.removePermiso(usuarioId, entrada.id)
-      : this.service.addPermiso(usuarioId, entrada.id);
+      ? this.service.removePermiso(usuarioId, permisoItem.id)
+      : this.service.addPermiso(usuarioId, permisoItem.id);
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
-        this.pendientes.update((ids) => ids.filter((i) => i !== entrada.id));
+        this.pendientes.update((ids) => ids.filter((i) => i !== permisoItem.id));
         const toasts = this.t().seguridad.usuarios.detalle.permisos.toasts;
         const toast = teniaPermiso ? toasts.removed : toasts.added;
         this.toast.success(toast.title, toast.desc.replace('{permiso}', etiqueta));
       },
       error: () => {
-        this.pendientes.update((ids) => ids.filter((i) => i !== entrada.id));
+        this.pendientes.update((ids) => ids.filter((i) => i !== permisoItem.id));
         this.asignados.update((lista) =>
-          teniaPermiso ? [...lista, entrada] : lista.filter((p) => p.id !== entrada.id),
+          teniaPermiso ? [...lista, permisoItem] : lista.filter((p) => p.id !== permisoItem.id),
         );
       },
     });

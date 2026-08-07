@@ -1,6 +1,17 @@
-import type { ContenedorMember, FilterCondition, ParamValue } from '@reddoc/core';
+import type {
+  ContenedorMember,
+  FilterCondition,
+  ParamValue,
+  PermisoCatalogoFiltros,
+  PermisoSeguridad,
+} from '@reddoc/core';
 import { CONTENEDOR_ROL } from '@erp/core/permissions';
-import { ROL_LABEL_KEY_BY_ID, SEGURIDAD_USUARIOS_SEARCH_PARAM } from './usuarios.constants';
+import {
+  ACCIONES_PERMISO,
+  ROL_LABEL_KEY_BY_ID,
+  SEGURIDAD_USUARIOS_SEARCH_PARAM,
+  type AccionColumna,
+} from './usuarios.constants';
 import type { UsuarioRow } from './usuarios.model';
 
 /** Diccionario de nombres de rol; lo aporta el i18n de la app. */
@@ -50,4 +61,66 @@ export function usuariosQueryParams(
   }
 
   return params;
+}
+
+/**
+ * Identidad de una consulta al catálogo de permisos: la comparten la cache del
+ * servicio y el dedupe del stream del picker, para que no puedan divergir (una
+ * clave que ignore un filtro se traga consultas en silencio).
+ */
+export function permisoCatalogoKey(filtros: PermisoCatalogoFiltros): string {
+  return [filtros.app, filtros.modelo, filtros.accion, filtros.search, filtros.page, filtros.limit]
+    .map((valor) => valor ?? '')
+    .join('|');
+}
+
+/** Fila de la matriz de permisos: un modelo con su permiso por acción. */
+export interface PermisoModeloFila {
+  readonly modelo: string;
+  readonly label: string;
+  readonly porAccion: ReadonlyMap<AccionColumna, PermisoSeguridad>;
+  /** Permisos custom fuera de las cuatro acciones estándar. */
+  readonly extras: readonly PermisoSeguridad[];
+}
+
+export interface PermisoAppGrupo {
+  readonly app: string;
+  readonly modelos: readonly PermisoModeloFila[];
+}
+
+/**
+ * Permisos → matriz app → modelo × acción. La usan tanto la lista de asignados
+ * como el picker del catálogo: ambos reciben el mismo serializador del backend
+ * y se pintan con la misma tabla.
+ */
+export function agruparPermisos(permisos: readonly PermisoSeguridad[]): readonly PermisoAppGrupo[] {
+  const porApp = new Map<
+    string,
+    Map<
+      string,
+      { label: string; porAccion: Map<AccionColumna, PermisoSeguridad>; extras: PermisoSeguridad[] }
+    >
+  >();
+
+  for (const permiso of permisos) {
+    let modelos = porApp.get(permiso.app);
+    if (!modelos) porApp.set(permiso.app, (modelos = new Map()));
+    let fila = modelos.get(permiso.modelo);
+    if (!fila) {
+      modelos.set(
+        permiso.modelo,
+        (fila = { label: permiso.modelo_label, porAccion: new Map(), extras: [] }),
+      );
+    }
+    if ((ACCIONES_PERMISO as readonly string[]).includes(permiso.accion)) {
+      fila.porAccion.set(permiso.accion as AccionColumna, permiso);
+    } else {
+      fila.extras.push(permiso);
+    }
+  }
+
+  return [...porApp].map(([app, modelos]) => ({
+    app,
+    modelos: [...modelos].map(([modelo, fila]) => ({ modelo, ...fila })),
+  }));
 }

@@ -1,4 +1,13 @@
-import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -45,6 +54,7 @@ import { toUsuarioRow } from '../../usuarios.utils';
   ],
   templateUrl: './usuario-detail.component.html',
   styleUrl: './usuario-detail.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuarioDetailComponent {
   private readonly service = inject(SeguridadUsuariosService);
@@ -160,7 +170,7 @@ export class UsuarioDetailComponent {
   private loadPermisos(usuarioId: number): void {
     this.isLoadingPermiso.set(true);
     this.service
-      .getPermisos(usuarioId)
+      .getPermisoMiembro(usuarioId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoadingPermiso.set(false)),
