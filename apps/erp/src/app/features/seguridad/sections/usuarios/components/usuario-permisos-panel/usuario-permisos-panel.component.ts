@@ -90,7 +90,6 @@ export class UsuarioPermisosPanelComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly acciones = ACCIONES_PERMISO;
-  protected readonly limitesOpciones = [25, 50, 100];
 
   /** `usuario_id` del miembro (el que espera `agregar-permiso/`). */
   readonly usuarioId = input.required<number>();
@@ -104,8 +103,9 @@ export class UsuarioPermisosPanelComponent {
   protected readonly busqueda = signal('');
   /** App de la pill activa; `null` = todas. */
   protected readonly appActiva = signal<string | null>(null);
-  /** Página 1-based y tamaño de página del `p-paginator`. */
+  /** Página 1-based del `p-paginator`. */
   protected readonly pagina = signal(1);
+  /** Tamaño de página fijo: el paginador no expone el selector. */
   protected readonly limite = signal(LIMITE_DEFAULT);
 
   /** Página visible de la consulta activa (ya filtrada por el backend). */
@@ -280,9 +280,9 @@ export class UsuarioPermisosPanelComponent {
     this.pagina.set(1);
   }
 
+  /** Solo cambia de página: el tamaño es fijo, el paginador no lo ofrece. */
   protected onPage(event: PaginatorState): void {
     this.pagina.set((event.page ?? 0) + 1);
-    this.limite.set(event.rows ?? this.limite());
   }
 
   protected pillClass(activa: boolean): string {
