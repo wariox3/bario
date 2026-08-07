@@ -278,9 +278,29 @@
                 @for (fila of grupo.modelos; track fila.modelo) {
                   <tr class="transition-colors hover:bg-[rgba(20,48,73,0.02)]">
                     <td class="border-b border-[rgba(20,48,73,0.04)] py-2 pr-3">
-                      <span class="block truncate text-[0.85rem] text-brand-text">
-                        {{ fila.label }}
-                      </span>
+                      <div class="flex items-center gap-2">
+                        <span class="min-w-0 flex-1 truncate text-[0.85rem] text-brand-text">
+                          {{ fila.label }}
+                        </span>
+                        <!-- Contador n/total: dice cuántas tiene y da todas de un
+                             clic (o las quita, si ya las tiene todas). Con una
+                             sola acción en la fila no aporta nada y no se pinta. -->
+                        @if (filaTotal(fila) > 1) {
+                          @let asignadas = filaAsignadas(fila);
+                          @let total = filaTotal(fila);
+                          <button
+                            type="button"
+                            [class]="filaTodoClass(asignadas, total)"
+                            [disabled]="filaPendiente(fila)"
+                            [attr.aria-pressed]="asignadas === total"
+                            [title]="filaTitulo(fila)"
+                            [attr.aria-label]="filaTitulo(fila)"
+                            (click)="toggleFila(fila)"
+                          >
+                            {{ asignadas }}/{{ total }}
+                          </button>
+                        }
+                      </div>
                       <!-- Permisos custom del modelo (fuera de las 4 acciones
                            estándar). El ícono siempre reserva su espacio. -->
                       @if (fila.extras.length > 0) {

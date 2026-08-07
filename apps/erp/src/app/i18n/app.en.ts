@@ -5607,10 +5607,14 @@ export const en: AppDict = {
           },
           dialog: {
             title: 'Add permissions',
-            subtitle: 'Click a cell to assign or remove',
+            subtitle: 'Click a cell, or the row counter to grant the whole model',
           },
           quitarHint: 'Remove {permiso}',
           agregarHint: 'Assign {permiso}',
+          fila: {
+            darHint: 'Grant all {total} actions on {modelo}',
+            quitarHint: 'Remove all {total} actions on {modelo}',
+          },
           search: 'Search permission or model',
           todas: 'All',
           modeloHeader: 'Model',
@@ -5625,6 +5629,14 @@ export const en: AppDict = {
           toasts: {
             added: { title: 'Permission assigned', desc: 'The person now has "{permiso}".' },
             removed: { title: 'Permission removed', desc: 'The person no longer has "{permiso}".' },
+            filaAdded: {
+              title: 'Permissions assigned',
+              desc: 'The person now has {n} actions on {modelo}.',
+            },
+            filaRemoved: {
+              title: 'Permissions removed',
+              desc: 'The person no longer has {n} actions on {modelo}.',
+            },
           },
         },
         fields: { usuarioId: 'User ID' },

@@ -5666,10 +5666,14 @@ export const es: AppDict = {
           },
           dialog: {
             title: 'Agregar permisos',
-            subtitle: 'Toca una casilla para asignar o quitar',
+            subtitle: 'Toca una casilla, o el contador de la fila para dar todo el modelo',
           },
           quitarHint: 'Quitar {permiso}',
           agregarHint: 'Asignar {permiso}',
+          fila: {
+            darHint: 'Dar las {total} acciones de {modelo}',
+            quitarHint: 'Quitar las {total} acciones de {modelo}',
+          },
           search: 'Buscar permiso o modelo',
           todas: 'Todas',
           modeloHeader: 'Modelo',
@@ -5684,6 +5688,14 @@ export const es: AppDict = {
           toasts: {
             added: { title: 'Permiso asignado', desc: 'La persona ahora tiene "{permiso}".' },
             removed: { title: 'Permiso quitado', desc: 'La persona ya no tiene "{permiso}".' },
+            filaAdded: {
+              title: 'Permisos asignados',
+              desc: 'La persona ahora tiene {n} acciones sobre {modelo}.',
+            },
+            filaRemoved: {
+              title: 'Permisos quitados',
+              desc: 'La persona ya no tiene {n} acciones sobre {modelo}.',
+            },
           },
         },
       },

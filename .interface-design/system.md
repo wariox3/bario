@@ -260,6 +260,45 @@ transparent; color: rgba(20,48,73,0.35); cursor: not-allowed` — sin caja propi
   editable o el día sigue viajando en el payload, no está bloqueado. La banda existe para **explicar**
   por qué hay columnas apagadas; sin ella el bloqueo se lee como bug.
 
+## Patrón: matriz de toggles con contador de fila (`n/total`)
+
+Para matrices `entidad × acción` donde cada celda es un toggle independiente y el caso común es
+"dale todas las acciones de esta fila". Ejemplo vivo: picker de permisos de
+`usuario-permisos-panel` (modelo × ver/agregar/cambiar/eliminar).
+
+- **Celda:** caja **idéntica en ambos estados** — `inline-flex h-5 w-5 rounded-full border`, ícono
+  `pi pi-check` siempre presente; solo cambia la tinta (asignado: `border-brand-navy bg-brand-navy
+text-white`; libre: borde `rgba(20,48,73,0.2)`, texto transparente, el check se **insinúa** al
+  hover). Así el toggle no salta de tamaño ni de posición.
+- **Contador de fila = estado + switch:** en la celda de la entidad, alineado a la derecha, una
+  **ficha mono** `n/total` (`rounded-md border px-1.5 py-0.5 font-mono text-[0.68rem] font-semibold
+tabular-nums`). El número dice qué hay, el clic dice qué hacer. Tres estados, **misma geometría**:
+  - `0/n` → borde `rgba(20,48,73,0.12)` + texto muted (hover sube borde a `0.35` y texto a `text`).
+  - parcial → `border-transparent bg-[rgba(20,48,73,0.06)] text-brand-text` (ficha navy tenue).
+  - `n/n` → `border-brand-navy bg-brand-navy text-white` (sólido = lleno, mismo tinte que las celdas).
+  - Es el idioma "ficha navy = tiene valor" de la tira calendario, aplicado a un agregado.
+- **Denominador real:** `total` = las celdas que **trajo la consulta**, no un número fijo. Si la
+  fila no tiene una acción, dice `0/3` y no promete algo que no existe. Con `total <= 1` el contador
+  **no se pinta**: ahí el atajo no ahorra nada.
+- **Alcance del barrido:** solo las columnas estándar de la matriz. Lo custom (chips `extras`) queda
+  afuera — es puntual y no es "todo lo normal sobre esta entidad".
+- **Truncado:** celda como `flex items-center gap-2`, etiqueta `min-w-0 flex-1 truncate`, contador
+  `shrink-0`. Sin `min-w-0` el nombre largo desborda y empuja la ficha fuera de la columna.
+- **Lote sobre backend de a uno:** las peticiones salen en paralelo con `forkJoin`, pero **cada una
+  con su `catchError`** (`map(() => ({celda, ok:true}))` / `of({celda, ok:false})`) — nunca un
+  `forkJoin` que aborta al primer error: si 3 entran y 1 falla, se revierte **solo la que falló** y
+  la matriz queda mostrando lo que de verdad se guardó. Al dar, solo se piden las que faltan.
+- **Un solo toast por lote** (`{n}` + `{entidad}`), no uno por celda. El toggle individual conserva
+  su toast propio.
+- **Bloqueo mientras vuela:** los ids del lote entran al set `pendientes`; el contador y sus celdas
+  van `disabled:cursor-wait disabled:opacity-40`.
+- **Descubrimiento:** un número no grita "soy un botón". El `title`/`aria-label` dice la acción
+  ("Dar las 4 acciones de Contacto" / "Quitar las…") y el **subtítulo del modal** la anuncia
+  ("Toca una casilla, o el contador de la fila para dar todo el modelo"). `[attr.aria-pressed]` con
+  el estado lleno.
+- **Cuándo NO:** si el barrido es destructivo o costoso (bulk por columna = decenas de escrituras de
+  un clic), no va como toggle directo — eso pide confirmación explícita.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

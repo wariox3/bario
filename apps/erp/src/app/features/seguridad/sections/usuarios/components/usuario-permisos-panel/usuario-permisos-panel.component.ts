@@ -17,6 +17,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  forkJoin,
   map,
   of,
   switchMap,
@@ -35,7 +36,12 @@ import { MODELO } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ACCIONES_PERMISO, type AccionColumna } from '../../usuarios.constants';
 import { SeguridadUsuariosService } from '../../usuarios.service';
-import { agruparPermisos, permisoCatalogoKey, type PermisoAppGrupo } from '../../usuarios.utils';
+import {
+  agruparPermisos,
+  permisoCatalogoKey,
+  type PermisoAppGrupo,
+  type PermisoModeloFila,
+} from '../../usuarios.utils';
 
 /**
  * Apps del backend para las pills. Salen del espejo `MODELO` (mismo criterio
@@ -305,6 +311,129 @@ export class UsuarioPermisosPanelComponent {
       ? base + 'border-brand-navy bg-brand-navy text-white'
       : base +
           'border-[rgba(20,48,73,0.2)] bg-transparent text-transparent hover:border-[rgba(20,48,73,0.45)] hover:bg-[rgba(20,48,73,0.04)] hover:text-[rgba(20,48,73,0.35)]';
+  }
+
+  // ── Fila completa (el contador n/4 del picker) ─────────────────────────────
+
+  /**
+   * Celdas estándar de la fila, en el orden de las columnas.
+   *
+   * Solo las cuatro acciones de la matriz: los permisos **custom** (`extras`) se
+   * quedan afuera a propósito — son puntuales y no forman parte de "todo lo
+   * normal sobre este modelo", así que no se barren de un clic.
+   */
+  private celdasDeFila(fila: PermisoModeloFila): readonly PermisoSeguridad[] {
+    return ACCIONES_PERMISO.map((accion) => fila.porAccion.get(accion)).filter(
+      (permiso): permiso is PermisoSeguridad => permiso !== undefined,
+    );
+  }
+
+  /** Cuántas de las acciones de la fila ya tiene el miembro. */
+  protected filaAsignadas(fila: PermisoModeloFila): number {
+    return this.celdasDeFila(fila).filter((celda) => this.tieneAsignado(celda.id)).length;
+  }
+
+  /** Cuántas acciones trajo la consulta para esta fila (denominador del contador). */
+  protected filaTotal(fila: PermisoModeloFila): number {
+    return this.celdasDeFila(fila).length;
+  }
+
+  protected filaCompleta(fila: PermisoModeloFila): boolean {
+    const total = this.filaTotal(fila);
+    return total > 0 && this.filaAsignadas(fila) === total;
+  }
+
+  /** Qué hace el contador si lo tocás — es el único texto que lo explica. */
+  protected filaTitulo(fila: PermisoModeloFila): string {
+    const dict = this.t().seguridad.usuarios.detalle.permisos.fila;
+    const plantilla = this.filaCompleta(fila) ? dict.quitarHint : dict.darHint;
+    return plantilla
+      .replace('{total}', String(this.filaTotal(fila)))
+      .replace('{modelo}', fila.label);
+  }
+
+  protected filaPendiente(fila: PermisoModeloFila): boolean {
+    return this.celdasDeFila(fila).some((celda) => this.estaPendiente(celda.id));
+  }
+
+  /**
+   * Otorga de un golpe todas las acciones del modelo, o las quita todas si ya
+   * las tiene. Es el atajo de la fila: dar "ver + agregar + cambiar + eliminar"
+   * sobre un modelo es lo que se hace el 90% de las veces, y de a una son cuatro
+   * clics y cuatro toasts.
+   *
+   * El backend agrega de a uno, así que el lote sale en paralelo. Cada petición
+   * se resuelve por separado (no `forkJoin` que aborta al primer error): las que
+   * fallan se revierten una por una y las que entraron se quedan, para que la
+   * matriz muestre lo que de verdad quedó guardado. Un solo toast al final.
+   */
+  protected toggleFila(fila: PermisoModeloFila): void {
+    const celdas = this.celdasDeFila(fila);
+    if (celdas.length === 0 || this.filaPendiente(fila)) return;
+
+    const quitando = this.filaCompleta(fila);
+    // Al dar, solo las que faltan: repetir las que ya tiene sería ruido.
+    const objetivo = quitando ? celdas : celdas.filter((celda) => !this.tieneAsignado(celda.id));
+    if (objetivo.length === 0) return;
+
+    const usuarioId = this.usuarioId();
+    const objetivoIds = new Set(objetivo.map((celda) => celda.id));
+
+    this.asignados.update((lista) =>
+      quitando ? lista.filter((permiso) => !objetivoIds.has(permiso.id)) : [...lista, ...objetivo],
+    );
+    this.pendientes.update((ids) => [...ids, ...objetivoIds]);
+
+    forkJoin(
+      objetivo.map((celda) =>
+        (quitando
+          ? this.service.removePermiso(usuarioId, celda.id)
+          : this.service.addPermiso(usuarioId, celda.id)
+        ).pipe(
+          map(() => ({ celda, ok: true })),
+          catchError(() => of({ celda, ok: false })),
+        ),
+      ),
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((resultados) => {
+        this.pendientes.update((ids) => ids.filter((id) => !objetivoIds.has(id)));
+
+        const fallidas = resultados.filter((r) => !r.ok).map((r) => r.celda);
+        if (fallidas.length > 0) {
+          const fallidasIds = new Set(fallidas.map((celda) => celda.id));
+          this.asignados.update((lista) =>
+            quitando
+              ? [...lista, ...fallidas]
+              : lista.filter((permiso) => !fallidasIds.has(permiso.id)),
+          );
+        }
+
+        const aplicadas = resultados.length - fallidas.length;
+        if (aplicadas === 0) return;
+        const toasts = this.t().seguridad.usuarios.detalle.permisos.toasts;
+        const toast = quitando ? toasts.filaRemoved : toasts.filaAdded;
+        this.toast.success(
+          toast.title,
+          toast.desc.replace('{n}', String(aplicadas)).replace('{modelo}', fila.label),
+        );
+      });
+  }
+
+  /**
+   * Contador de la fila: mismo recuadro en los tres estados (vacía, parcial,
+   * completa) y solo cambia la tinta — el número dice qué hay, el clic dice qué
+   * hacer. Ficha navy del sistema: tinte = tiene valor, sólido = está lleno.
+   */
+  protected filaTodoClass(asignadas: number, total: number): string {
+    const base =
+      'inline-flex shrink-0 cursor-pointer items-center rounded-md border px-1.5 py-0.5 font-mono text-[0.68rem] font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(20,48,73,0.4)] disabled:cursor-wait disabled:opacity-40 ';
+    if (asignadas === total) return base + 'border-brand-navy bg-brand-navy text-white';
+    if (asignadas > 0) return base + 'border-transparent bg-[rgba(20,48,73,0.06)] text-brand-text';
+    return (
+      base +
+      'border-[rgba(20,48,73,0.12)] text-brand-muted hover:border-[rgba(20,48,73,0.35)] hover:bg-[rgba(20,48,73,0.04)] hover:text-brand-text'
+    );
   }
 
   /** Chip de permiso custom del picker: mismo criterio — geometría fija. */

@@ -4378,6 +4378,8 @@ export interface AppDict
           dialog: { title: string; subtitle: string };
           quitarHint: string;
           agregarHint: string;
+          /** Contador n/4 de la fila: dar o quitar todas las acciones del modelo. */
+          fila: { darHint: string; quitarHint: string };
           search: string;
           todas: string;
           modeloHeader: string;
@@ -4388,6 +4390,8 @@ export interface AppDict
           toasts: {
             added: { title: string; desc: string };
             removed: { title: string; desc: string };
+            filaAdded: { title: string; desc: string };
+            filaRemoved: { title: string; desc: string };
           };
         };
       };
