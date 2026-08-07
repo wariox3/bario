@@ -137,6 +137,7 @@ export type {
   UpdateContenedorRequest,
   Contenedor,
   ContenedorRol,
+  ContenedorAccesoFlags,
   ContenedorMember,
   ContenedorMembersResponse,
   ContenedorInvitacionEstado,

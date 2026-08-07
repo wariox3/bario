@@ -30,12 +30,21 @@ export interface ContenedorInvitacionPendiente {
 export type ContenedorInvitacionesPendientesResponse =
   PaginatedResponse<ContenedorInvitacionPendiente>;
 
-export interface SendInviteRequest {
+/**
+ * Invitación a un contenedor (`POST /contenedor/invitacion/`).
+ *
+ * Además de a quién se invita, la invitación lleva **con qué entra**: los
+ * grupos de seguridad y las flags `acceso_*` de los módulos que va a poder
+ * abrir. Son las mismas flags que describen el plan del contenedor
+ * (`ContenedorAccesoFlags`), acá aplicadas a la persona.
+ */
+export interface SendInviteRequest extends ContenedorAccesoFlags {
   cliente_id: number;
   usuario_id: number;
   /**
-   * Opcional: Seguridad del ERP invita sin rol (queda pendiente de definir si
-   * el rol se manda en la invitación o se asigna después de aceptarla).
+   * Opcional: Seguridad del ERP invita **sin rol** — el rol se cambia desde la
+   * fila del listado, no al invitar. Otras pantallas (contenedores) sí lo
+   * mandan.
    */
   rol_id?: number;
   /** Grupos de seguridad a los que pertenecerá el invitado al aceptar. */
@@ -127,6 +136,10 @@ export interface UsuarioClientePermiso {
  * "vinieron en `false`". Ver `readModuleAccessFlags` en el ERP.
  *
  * `general` no tiene flag: es el módulo base, siempre disponible.
+ *
+ * `acceso_turno` no corresponde a un módulo del ERP sino a la app hermana de
+ * turnos; viaja en la misma bolsa porque el contrato es del contenedor, no de
+ * una app.
  */
 export interface ContenedorAccesoFlags {
   acceso_venta?: boolean;
@@ -136,6 +149,7 @@ export interface ContenedorAccesoFlags {
   acceso_inventario?: boolean;
   acceso_humano?: boolean;
   acceso_contabilidad?: boolean;
+  acceso_turno?: boolean;
 }
 
 export interface Contenedor extends ContenedorAccesoFlags {

@@ -4331,11 +4331,26 @@ export interface AppDict
           usuario: string;
           usuarioPlaceholder: string;
           usuarioHint: string;
-          rol: string;
           grupos: string;
           gruposPlaceholder: string;
           gruposHint: string;
           gruposEmpty: string;
+        };
+        accesos: {
+          label: string;
+          todos: string;
+          ninguno: string;
+          hint: string;
+          flags: {
+            venta: string;
+            compra: string;
+            tesoreria: string;
+            cartera: string;
+            inventario: string;
+            humano: string;
+            contabilidad: string;
+            turno: string;
+          };
         };
         submit: string;
       };

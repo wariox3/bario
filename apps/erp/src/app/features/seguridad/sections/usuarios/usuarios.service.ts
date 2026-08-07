@@ -5,6 +5,7 @@ import {
   FileDownloadService,
   TenantService,
   buildFiltros,
+  type ContenedorAccesoFlags,
   type ContenedorMember,
   type FilterCondition,
   type GrupoSeguridad,
@@ -123,16 +124,27 @@ export class SeguridadUsuariosService {
   }
 
   /**
-   * Invita a un usuario al contenedor. **Sin rol**: está pendiente de confirmar
-   * si el rol viaja en la invitación o se asigna después de aceptarla, así que
-   * por ahora no se manda `rol_id` (el backend aplica su default). Los grupos
-   * sí viajan (`grupo_ids`), solo cuando se eligió alguno.
+   * Invita a un usuario al contenedor con lo que entra: sus grupos y sus
+   * accesos por módulo.
+   *
+   * **Sin rol**: el rol no viaja en la invitación, se cambia desde la fila del
+   * listado. Los grupos solo viajan cuando se eligió alguno; los accesos viajan
+   * con su booleano explícito (incluido `false`) para que el backend no tenga
+   * que adivinar qué significa una flag ausente.
    */
-  invite(usuarioId: number, grupoIds: readonly number[] = []): Observable<unknown> {
+  invite(
+    usuarioId: number,
+    opciones: {
+      readonly grupoIds?: readonly number[];
+      readonly accesos?: ContenedorAccesoFlags;
+    } = {},
+  ): Observable<unknown> {
+    const grupoIds = opciones.grupoIds ?? [];
     return this.contenedor.sendInvitation({
       cliente_id: this.requireClienteId(),
       usuario_id: usuarioId,
       ...(grupoIds.length > 0 ? { grupo_ids: grupoIds } : {}),
+      ...opciones.accesos,
     });
   }
 
