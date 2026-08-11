@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ToastService } from '@reddoc/core';
+import { AccesosCardComponent } from './components/accesos-card/accesos-card.component';
 import { CambiarPasswordDialogComponent } from './components/cambiar-password-dialog/cambiar-password-dialog.component';
 import { MfaMetodosCardComponent } from './components/mfa-metodos-card/mfa-metodos-card.component';
 import { MfaMetodoFila } from './models/mfa-metodo.model';
@@ -8,7 +9,12 @@ import { MfaMetodoFila } from './models/mfa-metodo.model';
 @Component({
   selector: 'app-seguridad',
   standalone: true,
-  imports: [ButtonModule, CambiarPasswordDialogComponent, MfaMetodosCardComponent],
+  imports: [
+    ButtonModule,
+    AccesosCardComponent,
+    CambiarPasswordDialogComponent,
+    MfaMetodosCardComponent,
+  ],
   templateUrl: './seguridad.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

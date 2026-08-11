@@ -39,6 +39,9 @@
       (activado)="onMfaActivado($event)"
       (desactivado)="onMfaDesactivado($event)"
     />
+
+    <!-- Bitácora de accesos: va al final porque se consulta, no se configura -->
+    <app-accesos-card (cambiarPassword)="openDialog()" />
   </div>
 </div>
 

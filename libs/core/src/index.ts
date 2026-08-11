@@ -76,6 +76,7 @@ export {
   daysBetween,
   addDays,
   formatHorario,
+  formatRecencia,
   anioMesDeIso,
   diasDelMes,
   INICIALES_DIA_SEMANA_ES,
