@@ -9,6 +9,7 @@ import {
   rutaItems,
   rutaPrecios,
   rutaResoluciones,
+  rutaSedes,
 } from '../masters-compartidos.routes';
 import { VENTA_MODULE } from './venta.module-descriptor';
 
@@ -153,12 +154,12 @@ export const VENTA_ROUTES: Route[] = [
             (m) => m.CUENTA_COBRAR_ROUTES,
           ),
       },
-      // Masters compartidos (ver `masters-compartidos.routes.ts`). Sede queda
-      // pendiente en Venta: el master existe, falta sumarlo al menú.
+      // Masters compartidos (ver `masters-compartidos.routes.ts`).
       ...rutaResoluciones({ tipo: 'venta' }),
       ...rutaContactos(),
       ...rutaItems(),
       ...rutaAlmacenes(),
+      ...rutaSedes(),
       ...rutaPrecios(),
       ...rutaAsesores(),
       ...rutaCuentasBanco(),

@@ -118,7 +118,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.almacen.name',
               path: 'almacenes',
             },
-            // sede: pendiente (el master aún no existe); va acá cuando se cree.
+            {
+              labelKey: 'entities.sede.name',
+              path: 'sedes',
+              modelo: MODELO.general.sede,
+            },
             {
               labelKey: 'entities.precio.name',
               path: 'precios',
