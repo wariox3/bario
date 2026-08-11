@@ -513,7 +513,7 @@ export const es: AppDict = {
       },
     },
     cuentaBanco: {
-      name: 'Cuentas de banco',
+      name: 'Cuentas banco',
       searchPlaceholder: 'Buscar por nombre…',
       columns: {
         id: 'ID',
@@ -806,7 +806,7 @@ export const es: AppDict = {
       },
     },
     item: {
-      name: 'Items',
+      name: 'Ítems',
       searchPlaceholder: 'Buscar por nombre…',
       columns: {
         id: 'ID',
@@ -1134,7 +1134,7 @@ export const es: AppDict = {
       },
     },
     formaPago: {
-      name: 'Formas de pago',
+      name: 'Formas pago',
       searchPlaceholder: 'Buscar por nombre…',
       columns: {
         id: 'ID',
@@ -2372,7 +2372,7 @@ export const es: AppDict = {
       },
     },
     facturaCompra: {
-      name: 'Factura de compra',
+      name: 'Compra',
       columns: {
         id: 'ID',
         numero: 'Número',
@@ -2699,7 +2699,7 @@ export const es: AppDict = {
       },
     },
     facturaCompraRecurrente: {
-      name: 'Factura recurrente',
+      name: 'Compra recurrente',
       columns: {
         id: 'ID',
         numero: 'Número',
@@ -2784,7 +2784,7 @@ export const es: AppDict = {
       },
     },
     notaAjuste: {
-      name: 'Nota ajuste',
+      name: 'Nota de ajuste',
       columns: {
         id: 'ID',
         numero: 'Número',
@@ -4521,9 +4521,9 @@ export const es: AppDict = {
     },
     balancePrueba: { name: 'Balance de prueba' },
     balancePruebaContacto: { name: 'Balance de prueba por contacto' },
-    auxiliarCuenta: { name: 'Auxiliar de cuenta' },
+    auxiliarCuenta: { name: 'Auxiliar cuenta' },
     auxiliarGeneral: { name: 'Auxiliar general' },
-    auxiliarContacto: { name: 'Auxiliar por contacto' },
+    auxiliarContacto: { name: 'Auxiliar contacto' },
     conciliacion: {
       name: 'Conciliación',
       columns: {
@@ -4710,10 +4710,10 @@ export const es: AppDict = {
         saldo: 'Saldo',
       },
     },
-    estadoResultados: { name: 'Estado de resultados' },
-    estadoSituacionFinanciera: { name: 'Estado de situación financiera' },
+    estadoResultados: { name: 'Estado resultados' },
+    estadoSituacionFinanciera: { name: 'Estado situación financiera' },
     certificadoRetencion: {
-      name: 'Certificado de retención',
+      name: 'Certificado retención',
       columns: {
         identificacion: 'Identificación',
         contacto: 'Contacto',
@@ -4917,7 +4917,7 @@ export const es: AppDict = {
       },
     },
     existencia: {
-      name: 'Existencias',
+      name: 'Existencia',
       columns: {
         id: 'ID',
         codigo: 'Código',
@@ -4929,7 +4929,7 @@ export const es: AppDict = {
       },
     },
     existenciaAlmacen: {
-      name: 'Existencias por almacén',
+      name: 'Existencia almacén',
       columns: {
         id: 'ID',
         item: 'Ítem',
@@ -4954,7 +4954,7 @@ export const es: AppDict = {
       },
     },
     historialMovimiento: {
-      name: 'Historial de movimientos',
+      name: 'Historial movimientos',
       columns: {
         id: 'ID',
         numero: 'Número',

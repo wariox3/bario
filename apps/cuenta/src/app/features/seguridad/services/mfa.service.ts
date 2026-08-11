@@ -7,26 +7,6 @@ import {
   MfaMetodoCatalogo,
 } from '../models/mfa-metodo.model';
 
-/*
- * ─── MOCK (en pausa, NO borrar) ─────────────────────────────────────────────
- * Respuesta real de `GET /seguridad/mfa/metodos/`, capturada el 2026-08-11.
- * Sirve para maquetar sin backend: descomentar los imports y la constante, y
- * cambiar el cuerpo de `listarMetodos()` por el bloque comentado del final.
- *
- * import { of } from 'rxjs';
- * import { delay } from 'rxjs/operators';
- *
- * const MFA_METODOS_MOCK: readonly MfaMetodoCatalogo[] = [
- *   { codigo: 'correo', nombre: 'Código por correo' },
- *   { codigo: 'sms', nombre: 'Código por SMS' },
- *   { codigo: 'totp', nombre: 'App autenticadora' },
- * ];
- *
- * // Latencia simulada para que el estado de carga sea real durante el desarrollo.
- * const MOCK_DELAY_MS = 450;
- * ────────────────────────────────────────────────────────────────────────────
- */
-
 @Injectable({ providedIn: 'root' })
 export class MfaService extends BaseHttpService {
   /**
@@ -36,9 +16,6 @@ export class MfaService extends BaseHttpService {
    */
   listarMetodos(): Observable<readonly MfaMetodoCatalogo[]> {
     return this.get<readonly MfaMetodoCatalogo[]>('/seguridad/mfa/metodos/');
-
-    // MOCK (ver bloque de arriba): descomentar para trabajar sin backend.
-    // return of(MFA_METODOS_MOCK).pipe(delay(MOCK_DELAY_MS));
   }
 
   /**

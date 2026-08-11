@@ -2328,7 +2328,7 @@ export const en: AppDict = {
       },
     },
     facturaCompra: {
-      name: 'Purchase invoice',
+      name: 'Purchase',
       columns: {
         id: 'ID',
         numero: 'Number',
@@ -2655,7 +2655,7 @@ export const en: AppDict = {
       },
     },
     facturaCompraRecurrente: {
-      name: 'Recurring invoice',
+      name: 'Recurring purchase',
       columns: {
         id: 'ID',
         numero: 'Number',

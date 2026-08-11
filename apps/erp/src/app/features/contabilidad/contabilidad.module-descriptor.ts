@@ -18,26 +18,6 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
     { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
     {
       kind: 'accordion',
-      id: 'contabilidad-documentos',
-      labelKey: 'layout.nav.sections.document',
-      iconClass: 'pi pi-file',
-      defaultExpanded: true,
-      groups: [
-        {
-          items: [
-            { labelKey: 'entities.asiento.name', path: 'asiento/list', activeMatch: 'asiento' },
-            {
-              labelKey: 'entities.depreciacion.name',
-              path: 'depreciacion/list',
-              activeMatch: 'depreciacion',
-            },
-            { labelKey: 'entities.cierre.name', path: 'cierre/list', activeMatch: 'cierre' },
-          ],
-        },
-      ],
-    },
-    {
-      kind: 'accordion',
       id: 'contabilidad-movimientos',
       labelKey: 'layout.nav.sections.movement',
       iconClass: 'pi pi-arrow-right-arrow-left',
@@ -56,50 +36,20 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
-      id: 'contabilidad-informes',
-      labelKey: 'layout.nav.sections.report',
-      iconClass: 'pi pi-chart-bar',
-      defaultExpanded: false,
+      id: 'contabilidad-documentos',
+      labelKey: 'layout.nav.sections.document',
+      iconClass: 'pi pi-file',
+      defaultExpanded: true,
       groups: [
         {
           items: [
-            { labelKey: 'entities.balancePrueba.name', path: 'informes/balance-prueba' },
+            { labelKey: 'entities.asiento.name', path: 'asiento/list', activeMatch: 'asiento' },
             {
-              labelKey: 'entities.balancePruebaContacto.name',
-              path: 'informes/balance-prueba-contacto',
+              labelKey: 'entities.depreciacion.name',
+              path: 'depreciacion/list',
+              activeMatch: 'depreciacion',
             },
-            { labelKey: 'entities.auxiliarCuenta.name', path: 'informes/auxiliar-cuenta' },
-            { labelKey: 'entities.auxiliarContacto.name', path: 'informes/auxiliar-contacto' },
-            { labelKey: 'entities.auxiliarGeneral.name', path: 'informes/auxiliar-general' },
-            { labelKey: 'entities.informeBase.name', path: 'informes/base' },
-            {
-              labelKey: 'entities.certificadoRetencion.name',
-              path: 'informes/certificado-retencion',
-            },
-            { labelKey: 'entities.estadoResultados.name', path: 'informes/estado-resultados' },
-            {
-              labelKey: 'entities.estadoSituacionFinanciera.name',
-              path: 'informes/estado-situacion-financiera',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      kind: 'accordion',
-      id: 'contabilidad-utilidades',
-      labelKey: 'layout.nav.sections.utility',
-      iconClass: 'pi pi-bolt',
-      defaultExpanded: false,
-      groups: [
-        {
-          items: [
-            { labelKey: 'entities.contabilizar.name', path: 'utilidades/contabilizar' },
-            {
-              labelKey: 'entities.conciliacion.name',
-              path: 'utilidades/conciliacion',
-              activeMatch: 'utilidades/conciliacion',
-            },
+            { labelKey: 'entities.cierre.name', path: 'cierre/list', activeMatch: 'cierre' },
           ],
         },
       ],
@@ -139,6 +89,56 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
               // La ruta es `periodo`; el menú entra por su subruta de años.
               activeMatch: 'periodo',
               modelo: MODELO.contabilidad.periodo,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'contabilidad-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            { labelKey: 'entities.contabilizar.name', path: 'utilidades/contabilizar' },
+            {
+              labelKey: 'entities.conciliacion.name',
+              path: 'utilidades/conciliacion',
+              activeMatch: 'utilidades/conciliacion',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'contabilidad-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            { labelKey: 'entities.balancePrueba.name', path: 'informes/balance-prueba' },
+            {
+              labelKey: 'entities.balancePruebaContacto.name',
+              path: 'informes/balance-prueba-contacto',
+            },
+            { labelKey: 'entities.auxiliarCuenta.name', path: 'informes/auxiliar-cuenta' },
+            { labelKey: 'entities.auxiliarContacto.name', path: 'informes/auxiliar-contacto' },
+            { labelKey: 'entities.auxiliarGeneral.name', path: 'informes/auxiliar-general' },
+            { labelKey: 'entities.informeBase.name', path: 'informes/base' },
+            {
+              labelKey: 'entities.certificadoRetencion.name',
+              path: 'informes/certificado-retencion',
+            },
+            { labelKey: 'entities.estadoResultados.name', path: 'informes/estado-resultados' },
+            {
+              labelKey: 'entities.estadoSituacionFinanciera.name',
+              path: 'informes/estado-situacion-financiera',
             },
           ],
         },
