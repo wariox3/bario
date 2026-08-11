@@ -1,6 +1,14 @@
 import type { Route } from '@angular/router';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
 import { activeModuleResolver } from '@erp/core/module-config';
+import {
+  rutaAsesores,
+  rutaContactos,
+  rutaCuentasBanco,
+  rutaItems,
+  rutaPrecios,
+  rutaSedes,
+} from '../masters-compartidos.routes';
 import { GENERAL_MODULE } from './general.module-descriptor';
 
 /**
@@ -67,32 +75,12 @@ export const GENERAL_ROUTES: Route[] = [
         loadChildren: () =>
           import('../tesoreria/documentos/egreso/egreso.routes').then((m) => m.EGRESO_ROUTES),
       },
-      {
-        path: 'contactos',
-        loadChildren: () =>
-          import('./masters/contacto/contacto.routes').then((m) => m.CONTACTO_ROUTES),
-      },
-      {
-        path: 'items',
-        loadChildren: () => import('./masters/item/item.routes').then((m) => m.ITEM_ROUTES),
-      },
-      {
-        path: 'asesores',
-        loadChildren: () => import('./masters/asesor/asesor.routes').then((m) => m.ASESOR_ROUTES),
-      },
-      {
-        path: 'cuentas-banco',
-        loadChildren: () =>
-          import('./masters/cuenta-banco/cuenta-banco.routes').then((m) => m.CUENTA_BANCO_ROUTES),
-      },
-      {
-        path: 'precios',
-        loadChildren: () => import('./masters/precio/precio.routes').then((m) => m.PRECIO_ROUTES),
-      },
-      {
-        path: 'sedes',
-        loadChildren: () => import('./masters/sede/sede.routes').then((m) => m.SEDE_ROUTES),
-      },
+      ...rutaContactos(),
+      ...rutaItems(),
+      ...rutaAsesores(),
+      ...rutaCuentasBanco(),
+      ...rutaPrecios(),
+      ...rutaSedes(),
       // Informe compartido: el código vive en venta/informes, pero se enruta
       // también desde General. Su página deriva el módulo del `ActiveModuleStore`
       // (fijado arriba), así que la navegación se queda acá.

@@ -1,0 +1,118 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isVerifying()"
+  [closeOnEscape]="!isVerifying()"
+  [style]="{ width: '440px' }"
+  [breakpoints]="{ '576px': '92vw' }"
+  appendTo="body"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+      >
+        <i
+          [class]="
+            esDesactivar() ? 'pi pi-power-off' : (metodo()?.presentacion?.icono ?? 'pi pi-shield')
+          "
+          class="text-[1.1rem] text-brand-blue"
+        ></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          Confirma que eres tú
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{
+            esDesactivar()
+              ? 'Para desactivar la verificación'
+              : (metodo()?.nombre ?? 'Verificación')
+          }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <div class="flex flex-col gap-[1.1rem]">
+      <!-- Desactivar baja la protección: se dice antes de teclear, no después -->
+      @if (esDesactivar()) {
+        <div
+          class="flex items-start gap-2.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2.5"
+        >
+          <span
+            class="mt-[0.05rem] flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-navy"
+          >
+            <i class="pi pi-exclamation-triangle text-[0.7rem]"></i>
+          </span>
+          <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">
+            Al confirmar, tu cuenta vuelve a quedar protegida solo por la contraseña y tus códigos
+            de respaldo dejan de servir.
+          </p>
+        </div>
+      }
+
+      @if (esDesactivar()) {
+        <div class="flex flex-col">
+          <label
+            for="mfa-desactivar-password"
+            class="mb-1.5 text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy"
+          >
+            Tu contraseña <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-password
+            inputId="mfa-desactivar-password"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            [toggleMask]="true"
+            [feedback]="false"
+            fluid
+            autocomplete="current-password"
+          />
+        </div>
+      }
+
+      <lib-mfa-codigo-input
+        [codigo]="codigo()"
+        (codigoChange)="onCodigoChange($event)"
+        [destino]="destino()"
+        [esTotp]="esTotp()"
+        [restante]="restante()"
+        [esperaReenvio]="esperaReenvio()"
+        [permiteRespaldo]="esDesactivar()"
+        [ocupado]="isVerifying()"
+        [error]="errorMensaje()"
+        (completado)="onCodigoCompletado($event)"
+        (reenviar)="onReenviar()"
+      />
+    </div>
+  }
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end gap-2 pt-2">
+      <p-button
+        label="Cancelar"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onCancel()"
+        [disabled]="isVerifying()"
+      />
+      <p-button
+        [label]="esDesactivar() ? 'Desactivar' : 'Verificar'"
+        [icon]="esDesactivar() ? 'pi pi-power-off' : 'pi pi-check'"
+        [severity]="esDesactivar() ? 'danger' : 'primary'"
+        [loading]="isVerifying()"
+        [disabled]="!puedeConfirmar()"
+        (onClick)="verificar()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

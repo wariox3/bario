@@ -4,16 +4,29 @@ export {
   AUTH_DEFAULT_SKIP_URLS,
 } from './lib/auth/base-auth.service';
 export type { AuthApiEndpoints } from './lib/auth/base-auth.service';
+export { SesionNoConfirmadaError } from './lib/auth/auth.errors';
+export {
+  MFA_CODIGO_LARGO,
+  MFA_CODIGO_RESPALDO_LARGO,
+  MFA_CODIGO_VIGENCIA_SEGUNDOS,
+  MFA_REENVIO_ESPERA_SEGUNDOS,
+  formatSegundos,
+} from './lib/mfa/mfa.constants';
+export { RelojMfa, crearRelojMfa } from './lib/mfa/reloj-mfa';
 export { authGuard } from './lib/guards/auth.guard';
 export { publicGuard } from './lib/guards/public.guard';
 export { authInterceptor } from './lib/interceptors/auth.interceptor';
 export { errorInterceptor } from './lib/interceptors/error.interceptor';
+export { ERROR_TOAST } from './lib/interceptors/error-http-context';
 export { tenantInterceptor } from './lib/interceptors/tenant.interceptor';
 export type { PaginatedResponse } from './lib/models/pagination.model';
 export type {
   BaseUsuario,
   Usuario,
+  LoginMfaRequest,
   LoginRequest,
+  LoginResult,
+  MfaDesafio,
   AuthResponse,
   ResendVerificationRequest,
   RegisterRequest,
@@ -21,7 +34,7 @@ export type {
   RegisterResponse,
 } from './lib/models/auth.model';
 export { BaseHttpService, buildHttpParams } from './lib/services/base-http.service';
-export type { ParamValue } from './lib/services/base-http.service';
+export type { ParamValue, RequestOptions } from './lib/services/base-http.service';
 export { FileDownloadService } from './lib/http/file-download.service';
 export type { FileDownloadOptions } from './lib/http/file-download.service';
 export { parseFilename, triggerBrowserDownload } from './lib/http/file-download.utils';
@@ -108,6 +121,7 @@ export {
 } from './lib/calendario';
 export type { ProgramacionFecha, Festivo } from './lib/calendario';
 export type { ApiError, ApiErrorResponse } from './lib/utils/error.utils';
+export { ForbiddenPageStore } from './lib/errors/forbidden-page.store';
 export {
   I18nService,
   provideI18n,
@@ -120,6 +134,7 @@ export {
   TenantService,
   tenantGuard,
   tenantAccessGuard,
+  tenantSlugMatchGuard,
   clearTenantGuard,
   rootRedirectGuard,
   TENANT_SCOPED,
@@ -133,13 +148,19 @@ export type {
   TenantRoutes,
   UpdateContenedorRequest,
   Contenedor,
-  ContenedorRol,
+  ContenedorAccesoFlags,
   ContenedorMember,
   ContenedorMembersResponse,
   ContenedorInvitacionEstado,
   ContenedorInvitacionPendiente,
   ContenedorInvitacionesPendientesResponse,
   SendInviteRequest,
+  GrupoSeguridad,
+  PermisoAsignado,
+  PermisoCatalogoFiltros,
+  PermisoSeguridad,
+  UsuarioPermiso,
+  UsuarioClientePermiso,
   ContenedoresResponse,
   CreateContenedorRequest,
   UserSearchResult,

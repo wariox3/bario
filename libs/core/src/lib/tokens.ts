@@ -2,7 +2,9 @@ import { InjectionToken, Signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   BaseUsuario,
+  LoginMfaRequest,
   LoginRequest,
+  LoginResult,
   RegisterRequest,
   RegisterResponse,
   ResendVerificationRequest,
@@ -50,7 +52,9 @@ export interface AuthServiceContract {
   isAuthenticated: () => boolean;
   refresh: () => Observable<unknown>;
   clearSession: () => void;
-  login: (data: LoginRequest) => Observable<unknown>;
+  login: (data: LoginRequest) => Observable<LoginResult<BaseUsuario>>;
+  loginMfa: (data: LoginMfaRequest) => Observable<BaseUsuario | null>;
+  loginMfaReenviar: (mfaToken: string) => Observable<void>;
   register: (data: RegisterRequest) => Observable<RegisterResponse>;
   forgotPassword: (email: string, captchaToken?: string) => Observable<void>;
   resetPassword: (token: string, password: string, captchaToken?: string) => Observable<void>;

@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { rutaAlmacenes, rutaItems } from '../masters-compartidos.routes';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
 import { activeModuleResolver } from '@erp/core/module-config';
 import { INVENTARIO_MODULE } from './inventario.module-descriptor';
@@ -39,18 +40,10 @@ export const INVENTARIO_ROUTES: Route[] = [
       // cualquier módulo que lo use (venta y compra ya lo montan igual). Sus
       // páginas derivan el módulo del `ActiveModuleStore`, así que las URLs y
       // las migas quedan bajo `/t/:slug/inventario/items`.
-      {
-        path: 'items',
-        loadChildren: () =>
-          import('../general/masters/item/item.routes').then((m) => m.ITEM_ROUTES),
-      },
+      ...rutaItems(),
       // Master propio del módulo: su endpoint es `/inventario/almacen/`, del que
       // también cuelga el `seleccionar/` que ya usan los documentos.
-      {
-        path: 'almacenes',
-        loadChildren: () =>
-          import('./masters/almacen/almacen.routes').then((m) => m.ALMACEN_ROUTES),
-      },
+      ...rutaAlmacenes(),
       {
         path: 'informes/existencia',
         loadChildren: () =>

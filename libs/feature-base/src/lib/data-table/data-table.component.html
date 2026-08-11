@@ -11,6 +11,7 @@
   [scrollHeight]="scrollHeight()"
   [selectionMode]="selectionMode() === 'none' ? null : 'multiple'"
   [selection]="mutableSelection()"
+  [rowSelectable]="primeRowSelectable"
   (selectionChange)="onSelectionEvent($event)"
   (onPage)="onPageEvent($event)"
   sortMode="multiple"
@@ -52,10 +53,13 @@
   </ng-template>
 
   <ng-template pTemplate="body" let-row>
-    <tr [class.lib-data-table__row--clickable]="rowClickable()" (click)="onRowClicked(row)">
+    <tr [class.lib-data-table__row--clickable]="isRowClickable(row)" (click)="onRowClicked(row)">
       @if (hasSelection()) {
         <td class="lib-data-table__select-col" (click)="$event.stopPropagation()">
-          <p-tableCheckbox [value]="row" />
+          <!-- Fila no seleccionable → celda vacía (no un checkbox gris que nunca sirve). -->
+          @if (isRowSelectable(row)) {
+            <p-tableCheckbox [value]="row" />
+          }
         </td>
       }
       @for (col of columns(); track col.field) {
@@ -121,14 +125,17 @@
       }
       @if (menuActions().length > 0) {
         <td class="lib-data-table__actions-col" (click)="$event.stopPropagation()">
-          <button
-            type="button"
-            class="lib-data-table__row-action"
-            [attr.aria-label]="translate(rowMenuLabelKey())"
-            (click)="openRowMenu($event, row)"
-          >
-            <i class="pi pi-ellipsis-v"></i>
-          </button>
+          <!-- La celda queda (alineación de columnas); el botón solo si hay algo que abrir. -->
+          @if (hasMenuActionsFor(row)) {
+            <button
+              type="button"
+              class="lib-data-table__row-action"
+              [attr.aria-label]="translate(rowMenuLabelKey())"
+              (click)="openRowMenu($event, row)"
+            >
+              <i class="pi pi-ellipsis-v"></i>
+            </button>
+          }
         </td>
       }
     </tr>

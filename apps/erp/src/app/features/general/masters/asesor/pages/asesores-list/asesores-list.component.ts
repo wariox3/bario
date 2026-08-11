@@ -27,6 +27,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { AsesorService } from '../../asesor.service';
 import type { Asesor } from '../../asesor.model';
@@ -98,9 +99,11 @@ export class AsesoresListComponent {
 
   protected readonly columns = ASESORES_COLUMNS;
   protected readonly filterFields = ASESORES_FILTER_FIELDS;
-  protected readonly rowActions = ASESORES_ROW_ACTIONS;
-  protected readonly primaryAction = ASESORES_PRIMARY_ACTION;
-  protected readonly trailingActions = ASESORES_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.asesor, {
+    row: ASESORES_ROW_ACTIONS,
+    primary: ASESORES_PRIMARY_ACTION,
+    trailing: ASESORES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 /**
  * Descriptor del módulo Contabilidad para la capa de navegación.
@@ -9,6 +10,7 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  */
 export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
   id: 'contabilidad',
+  accessFlag: 'acceso_contabilidad',
   displayNameKey: 'modules.contabilidad.name',
   iconClass: 'pi pi-calculator',
   defaultChildPath: 'inicio',
@@ -111,11 +113,33 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.cuenta.name', path: 'cuentas' },
-            { labelKey: 'entities.centroCosto.name', path: 'centros-costo' },
-            { labelKey: 'entities.activo.name', path: 'activos' },
-            { labelKey: 'entities.periodo.name', path: 'periodo/anio' },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.cuenta.name',
+              path: 'cuentas',
+              modelo: MODELO.contabilidad.cuenta,
+            },
+            {
+              labelKey: 'entities.centroCosto.name',
+              path: 'centros-costo',
+              modelo: MODELO.contabilidad.centroCosto,
+            },
+            {
+              labelKey: 'entities.activo.name',
+              path: 'activos',
+              modelo: MODELO.contabilidad.activo,
+            },
+            {
+              labelKey: 'entities.periodo.name',
+              path: 'periodo/anio',
+              // La ruta es `periodo`; el menú entra por su subruta de años.
+              activeMatch: 'periodo',
+              modelo: MODELO.contabilidad.periodo,
+            },
           ],
         },
       ],

@@ -33,6 +33,7 @@ import type {
   MasterTouched,
 } from '@erp/core/components/import-dialog/import-dialog.types';
 import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CentroCostoService } from '../../centro-costo.service';
 import type { CentroCosto } from '../../centro-costo.model';
@@ -116,9 +117,11 @@ export class CentrosCostoListComponent {
 
   protected readonly columns = CENTROS_COSTO_COLUMNS;
   protected readonly filterFields = CENTROS_COSTO_FILTER_FIELDS;
-  protected readonly rowActions = CENTROS_COSTO_ROW_ACTIONS;
-  protected readonly primaryAction = CENTROS_COSTO_PRIMARY_ACTION;
-  protected readonly trailingActions = CENTROS_COSTO_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.contabilidad.centroCosto, {
+    row: CENTROS_COSTO_ROW_ACTIONS,
+    primary: CENTROS_COSTO_PRIMARY_ACTION,
+    trailing: CENTROS_COSTO_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

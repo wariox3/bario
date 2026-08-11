@@ -1,0 +1,216 @@
+<div class="bg-brand-surface border border-[rgba(20,48,73,0.1)] rounded-xl overflow-hidden">
+  <!-- Card header -->
+  <div class="flex items-center gap-3 px-5 py-4 border-b border-[rgba(20,48,73,0.08)]">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+    >
+      <i class="pi pi-verified text-[1.05rem]"></i>
+    </span>
+    <div class="flex flex-1 flex-col gap-[0.1rem] min-w-0">
+      <h2 class="m-0 text-[0.95rem] font-bold text-brand-text tracking-tight">
+        Autenticación en varias fases
+      </h2>
+      <p class="m-0 text-[0.75rem] text-brand-muted">
+        Un paso más al iniciar sesión, además de tu contraseña
+      </p>
+    </div>
+    <!-- Estado global: uno solo, sí o no. No es un contador. -->
+    <span
+      class="shrink-0 rounded-md border px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.04em]"
+      [class]="
+        protegida()
+          ? 'border-brand-navy bg-brand-navy text-white'
+          : 'border-[rgba(20,48,73,0.12)] text-brand-muted'
+      "
+    >
+      {{ protegida() ? 'Activa' : 'Inactiva' }}
+    </span>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    @for (item of skeletons; track item) {
+      <div
+        class="flex items-center gap-3 px-5 py-4 max-[576px]:px-4"
+        [class]="$first ? '' : 'border-t border-[rgba(20,48,73,0.08)]'"
+      >
+        <p-skeleton shape="circle" size="2.25rem" />
+        <div class="flex flex-1 flex-col gap-1.5 min-w-0">
+          <p-skeleton width="9rem" height="0.85rem" />
+          <p-skeleton width="14rem" height="0.7rem" />
+        </div>
+        <p-skeleton width="6rem" height="2rem" borderRadius="6px" />
+      </div>
+    }
+  } @else if (hasError()) {
+    <!-- Error -->
+    <div class="flex flex-col items-center gap-2.5 px-5 py-10 text-center">
+      <span
+        class="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[rgba(20,48,73,0.06)] text-brand-muted"
+      >
+        <i class="pi pi-exclamation-triangle text-[1.05rem]"></i>
+      </span>
+      <p class="m-0 text-[0.85rem] font-semibold text-brand-text">No pudimos cargar tus métodos</p>
+      <p class="m-0 text-[0.75rem] text-brand-muted">Revisa tu conexión e inténtalo de nuevo</p>
+      <p-button
+        label="Reintentar"
+        icon="pi pi-refresh"
+        [text]="true"
+        size="small"
+        (onClick)="cargar()"
+      />
+    </div>
+  } @else {
+    <!-- Banda de contexto: qué significa el estado de arriba -->
+    @if (!protegida()) {
+      <div
+        class="flex items-start gap-2.5 border-b border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] px-5 py-3 max-[576px]:px-4"
+      >
+        <i class="pi pi-info-circle mt-[0.1rem] text-[0.8rem] text-brand-muted"></i>
+        <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">
+          Hoy tu contraseña es lo único que protege tu cuenta. Elige un método para pedir un paso
+          más al iniciar sesión.
+        </p>
+      </div>
+    } @else if (activoDesconocido()) {
+      <div
+        class="flex items-start gap-2.5 border-b border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] px-5 py-3 max-[576px]:px-4 max-[576px]:flex-wrap"
+      >
+        <i class="pi pi-exclamation-triangle mt-[0.1rem] text-[0.8rem] text-brand-muted"></i>
+        <p class="m-0 flex-1 text-[0.75rem] leading-relaxed text-brand-muted">
+          Tienes la verificación activa con un método que ya no está disponible. Elige uno de la
+          lista para reemplazarlo, o desactívala.
+        </p>
+        <!-- Sin esto no hay salida: el "Desactivar" de la lista cuelga de una fila activa,
+             y en este estado no hay ninguna. -->
+        <p-button
+          [label]="
+            tieneCodigoVivo(filaDesconocida(), 'desactivar') ? 'Ingresar código' : 'Desactivar'
+          "
+          [icon]="
+            tieneCodigoVivo(filaDesconocida(), 'desactivar') ? 'pi pi-pencil' : 'pi pi-power-off'
+          "
+          [text]="true"
+          severity="secondary"
+          size="small"
+          [loading]="pendiente() === filaDesconocida().codigo"
+          [disabled]="pendiente() !== null"
+          class="shrink-0 max-[576px]:w-full"
+          styleClass="max-[576px]:w-full"
+          (onClick)="onDesactivar(filaDesconocida())"
+        />
+      </div>
+    }
+
+    <!-- Métodos: solo uno puede estar activo a la vez -->
+    @for (fila of filas(); track fila.codigo) {
+      <div
+        class="flex items-center gap-3 px-5 py-4 max-[576px]:flex-wrap max-[576px]:gap-y-3 max-[576px]:px-4"
+        [class]="$first ? '' : 'border-t border-[rgba(20,48,73,0.08)]'"
+      >
+        <!-- Glifo: el contenedor lleva el estado -->
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+          [class]="
+            fila.activo
+              ? 'bg-brand-navy text-white'
+              : fila.habilitado
+                ? 'bg-[rgba(20,48,73,0.06)] text-brand-muted'
+                : 'border border-dashed border-[rgba(20,48,73,0.2)] text-[rgba(20,48,73,0.35)]'
+          "
+        >
+          <i [class]="fila.presentacion.icono" class="text-[0.95rem]"></i>
+        </span>
+
+        <div class="flex flex-1 flex-col gap-[0.15rem] min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <span
+              class="text-[0.85rem] font-semibold tracking-tight"
+              [class]="fila.habilitado ? 'text-brand-text' : 'text-brand-muted'"
+            >
+              {{ fila.nombre }}
+            </span>
+
+            @if (!fila.habilitado) {
+              <span
+                class="rounded-md border border-dashed border-[rgba(20,48,73,0.2)] px-1.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.04em] text-brand-muted"
+              >
+                Próximamente
+              </span>
+            } @else if (fila.activo) {
+              <span
+                class="rounded-md bg-[rgba(20,48,73,0.06)] px-1.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.04em] text-brand-text"
+              >
+                En uso
+              </span>
+            } @else if (fila.sugerido) {
+              <span
+                class="rounded-md border border-[rgba(20,48,73,0.15)] px-1.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.04em] text-brand-muted"
+              >
+                Recomendado
+              </span>
+            }
+          </div>
+
+          <p class="m-0 truncate text-[0.75rem] text-brand-muted">
+            {{ fila.presentacion.descripcion }}
+          </p>
+        </div>
+
+        @if (fila.activo) {
+          <p-button
+            [label]="tieneCodigoVivo(fila, 'desactivar') ? 'Ingresar código' : 'Desactivar'"
+            [icon]="tieneCodigoVivo(fila, 'desactivar') ? 'pi pi-pencil' : 'pi pi-power-off'"
+            [outlined]="true"
+            severity="secondary"
+            size="small"
+            [loading]="pendiente() === fila.codigo"
+            [disabled]="pendiente() !== null"
+            class="shrink-0 max-[576px]:w-full"
+            styleClass="max-[576px]:w-full"
+            (onClick)="onDesactivar(fila)"
+          />
+        } @else if (fila.habilitado) {
+          <!-- Con un código todavía vivo, el botón invita a usarlo en vez de pedir otro -->
+          <p-button
+            [label]="
+              tieneCodigoVivo(fila) ? 'Ingresar código' : protegida() ? 'Usar este' : 'Activar'
+            "
+            [icon]="
+              tieneCodigoVivo(fila)
+                ? 'pi pi-pencil'
+                : protegida()
+                  ? 'pi pi-arrow-right-arrow-left'
+                  : 'pi pi-plus'
+            "
+            [outlined]="true"
+            size="small"
+            [loading]="pendiente() === fila.codigo"
+            [disabled]="pendiente() !== null"
+            class="shrink-0 max-[576px]:w-full"
+            styleClass="max-[576px]:w-full"
+            (onClick)="onConfigurar(fila)"
+          />
+        }
+      </div>
+    }
+  }
+</div>
+
+<app-mfa-verificar-dialog
+  [visible]="modalAbierto()"
+  [metodo]="filaEnIntento()"
+  [mfaToken]="intento()?.token ?? null"
+  [modo]="intento()?.modo ?? 'activar'"
+  [restante]="restante()"
+  [esperaReenvio]="esperaReenvio()"
+  (visibleChange)="$event ? null : cerrarModal()"
+  (reenviar)="onReenviar($event)"
+  (verificado)="onVerificado($event)"
+/>
+
+<app-mfa-codigos-respaldo-dialog
+  [visible]="codigosRespaldo().length > 0"
+  [codigos]="codigosRespaldo()"
+  (confirmado)="onCodigosGuardados()"
+/>

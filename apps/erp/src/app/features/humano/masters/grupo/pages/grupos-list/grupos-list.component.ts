@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { GrupoService } from '../../grupo.service';
 import type { Grupo } from '../../grupo.model';
@@ -96,9 +97,11 @@ export class GruposListComponent {
 
   protected readonly columns = GRUPOS_COLUMNS;
   protected readonly filterFields = GRUPOS_FILTER_FIELDS;
-  protected readonly rowActions = GRUPOS_ROW_ACTIONS;
-  protected readonly primaryAction = GRUPOS_PRIMARY_ACTION;
-  protected readonly trailingActions = GRUPOS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.humano.grupo, {
+    row: GRUPOS_ROW_ACTIONS,
+    primary: GRUPOS_PRIMARY_ACTION,
+    trailing: GRUPOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

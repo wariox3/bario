@@ -21,6 +21,8 @@ export class ContenedorRowItemComponent {
   readonly renewLabel = input<string>('Renovar suscripción');
   readonly memberLockedLabel = input<string>('Pide al propietario que renueve la suscripción');
   readonly expiredBadgeLabel = input<string>('Vencida');
+  readonly ownerLabel = input<string>('Propietario');
+  readonly memberLabel = input<string>('Miembro');
   /** Muestra el botón de acciones de fila. La app lo apaga si no habilita ninguna. */
   readonly showMenu = input<boolean>(true);
   /** Muestra el CTA de renovación al propietario con la suscripción vencida. */
@@ -41,7 +43,7 @@ export class ContenedorRowItemComponent {
     getSuscripcionExpiryLabel(this.contenedor().suscripcion_fecha_fin),
   );
 
-  readonly isOwner = computed(() => this.contenedor().rol_id === 1);
+  readonly isOwner = computed(() => this.contenedor().propietario);
 
   readonly isExpired = computed(() =>
     isSuscripcionExpired(this.contenedor().suscripcion_fecha_fin),

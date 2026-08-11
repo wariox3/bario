@@ -27,6 +27,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ResolucionService } from '../../resolucion.service';
 import type { Resolucion, ResolucionTipo } from '../../resolucion.model';
@@ -106,9 +107,11 @@ export class ResolucionesListComponent {
 
   protected readonly columns = RESOLUCIONES_COLUMNS;
   protected readonly filterFields = RESOLUCIONES_FILTER_FIELDS;
-  protected readonly rowActions = RESOLUCIONES_ROW_ACTIONS;
-  protected readonly primaryAction = RESOLUCIONES_PRIMARY_ACTION;
-  protected readonly trailingActions = RESOLUCIONES_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.resolucion, {
+    row: RESOLUCIONES_ROW_ACTIONS,
+    primary: RESOLUCIONES_PRIMARY_ACTION,
+    trailing: RESOLUCIONES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

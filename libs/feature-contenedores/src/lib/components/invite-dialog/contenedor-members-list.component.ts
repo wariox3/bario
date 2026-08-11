@@ -21,12 +21,6 @@ import {
 } from '@reddoc/core';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
-const ROLE_ORDER: Record<number, number> = {
-  1: 0, // propietario
-  2: 1, // administrador
-  3: 2, // usuario
-};
-
 @Component({
   selector: 'lib-contenedor-members-list',
   standalone: true,
@@ -53,9 +47,10 @@ export class ContenedorMembersListComponent {
 
   readonly currentUserId = computed(() => this.authService.currentUser()?.id ?? null);
 
+  /** Propietario primero, después el resto por nombre. */
   readonly sortedMembers = computed(() =>
     [...this.members()].sort((a, b) => {
-      const r = (ROLE_ORDER[a.rol_id ?? 99] ?? 99) - (ROLE_ORDER[b.rol_id ?? 99] ?? 99);
+      const r = Number(b.propietario) - Number(a.propietario);
       if (r !== 0) return r;
       return (a.usuario_nombre_corto ?? a.usuario_email).localeCompare(
         b.usuario_nombre_corto ?? b.usuario_email,
@@ -82,30 +77,32 @@ export class ContenedorMembersListComponent {
   }
 
   canRemove(member: ContenedorMember): boolean {
-    return member.rol_id !== 1 && !this.isYou(member);
+    return !member.propietario && !this.isYou(member);
   }
 
-  roleLabel(rolId: number | null): string {
+  /**
+   * Etiqueta de la pill. El backend ya no manda nombre de rol: a nivel
+   * contenedor solo dice si la persona es la propietaria.
+   */
+  roleLabel(member: ContenedorMember): string {
     const roles = this.t().contenedores.invite.members.roles;
-    if (rolId === 1) return roles.propietario;
-    if (rolId === 2) return roles.administrador;
-    return roles.usuario;
+    return member.propietario ? roles.propietario : roles.miembro;
   }
 
   monogramClass(member: ContenedorMember): string {
-    return member.rol_id === 1
+    return member.propietario
       ? 'bg-amber-100 text-amber-800'
       : 'bg-[rgba(20,48,73,0.06)] text-brand-navy';
   }
 
   rowClass(member: ContenedorMember): string {
-    return member.rol_id === 1 ? 'bg-amber-50/40' : '';
+    return member.propietario ? 'bg-amber-50/40' : '';
   }
 
-  pillClass(rolId: number | null): string {
-    if (rolId === 1) return 'bg-amber-50 text-amber-700 border-amber-200';
-    if (rolId === 2) return 'bg-sky-50 text-sky-700 border-sky-200';
-    return 'bg-slate-50 text-slate-700 border-slate-200';
+  pillClass(member: ContenedorMember): string {
+    return member.propietario
+      ? 'bg-amber-50 text-amber-700 border-amber-200'
+      : 'bg-slate-50 text-slate-700 border-slate-200';
   }
 
   requestRemove(member: ContenedorMember): void {

@@ -33,6 +33,7 @@ import type {
   MasterTouched,
 } from '@erp/core/components/import-dialog/import-dialog.types';
 import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CuentaService } from '../../cuenta.service';
 import type { Cuenta } from '../../cuenta.model';
@@ -116,9 +117,11 @@ export class CuentasListComponent {
 
   protected readonly columns = CUENTAS_COLUMNS;
   protected readonly filterFields = CUENTAS_FILTER_FIELDS;
-  protected readonly rowActions = CUENTAS_ROW_ACTIONS;
-  protected readonly primaryAction = CUENTAS_PRIMARY_ACTION;
-  protected readonly trailingActions = CUENTAS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.contabilidad.cuenta, {
+    row: CUENTAS_ROW_ACTIONS,
+    primary: CUENTAS_PRIMARY_ACTION,
+    trailing: CUENTAS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

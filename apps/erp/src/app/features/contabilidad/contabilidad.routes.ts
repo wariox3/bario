@@ -1,4 +1,6 @@
 import type { Route } from '@angular/router';
+import { MODELO, withPermission } from '@erp/core/permissions';
+import { rutaContactos } from '../masters-compartidos.routes';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
 import { activeModuleResolver } from '@erp/core/module-config';
 import { CONTABILIDAD_MODULE } from './contabilidad.module-descriptor';
@@ -128,33 +130,27 @@ export const CONTABILIDAD_ROUTES: Route[] = [
             (m) => m.AUXILIAR_CUENTA_ROUTES,
           ),
       },
-      // Master reutilizado del módulo General: los informes contables se abren
-      // por tercero, así que conviene tenerlo a mano sin cambiar de módulo.
-      {
-        path: 'contactos',
-        loadChildren: () =>
-          import('@erp/features/general/masters/contacto/contacto.routes').then(
-            (m) => m.CONTACTO_ROUTES,
-          ),
-      },
-      {
+      // Master compartido: los informes contables se abren por tercero, así que
+      // conviene tenerlo a mano sin cambiar de módulo.
+      ...rutaContactos(),
+      ...withPermission(MODELO.contabilidad.centroCosto, {
         path: 'centros-costo',
         loadChildren: () =>
           import('./masters/centro-costo/centro-costo.routes').then((m) => m.CENTRO_COSTO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.contabilidad.cuenta, {
         path: 'cuentas',
         loadChildren: () => import('./masters/cuenta/cuenta.routes').then((m) => m.CUENTA_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.contabilidad.activo, {
         path: 'activos',
         loadChildren: () => import('./masters/activo/activo.routes').then((m) => m.ACTIVO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.contabilidad.periodo, {
         path: 'periodo',
         loadChildren: () =>
           import('./masters/periodo/periodo.routes').then((m) => m.PERIODO_ROUTES),
-      },
+      }),
     ],
   },
 ];

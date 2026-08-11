@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { rutaContactos, rutaCuentasBanco } from '../masters-compartidos.routes';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
 import { activeModuleResolver } from '@erp/core/module-config';
 import { TESORERIA_MODULE } from './tesoreria.module-descriptor';
@@ -44,21 +45,9 @@ export const TESORERIA_ROUTES: Route[] = [
             (m) => m.SALDO_INICIAL_ROUTES,
           ),
       },
-      // Masters reutilizados del módulo General (contacto y cuenta-banco).
-      {
-        path: 'contactos',
-        loadChildren: () =>
-          import('@erp/features/general/masters/contacto/contacto.routes').then(
-            (m) => m.CONTACTO_ROUTES,
-          ),
-      },
-      {
-        path: 'cuentas-banco',
-        loadChildren: () =>
-          import('@erp/features/general/masters/cuenta-banco/cuenta-banco.routes').then(
-            (m) => m.CUENTA_BANCO_ROUTES,
-          ),
-      },
+      // Masters compartidos (ver `masters-compartidos.routes.ts`).
+      ...rutaContactos(),
+      ...rutaCuentasBanco(),
       {
         path: 'informes/cuenta-pagar',
         loadChildren: () =>

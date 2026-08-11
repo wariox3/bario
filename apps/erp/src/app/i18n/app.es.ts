@@ -8,6 +8,15 @@ export const es: AppDict = {
   contenedores: contenedoresEs,
   common: {
     comingSoon: 'Próximamente disponible.',
+    accessDenied: {
+      title: 'No tienes acceso',
+      sub: 'Esta sección es solo para administradores del contenedor. Pídele acceso al propietario de la empresa.',
+      subPermission:
+        'No tienes permiso para ver esta sección. Pídele acceso al administrador del contenedor.',
+      subModule:
+        'Este módulo no está incluido en el plan de la empresa. Habla con el propietario para activarlo.',
+      back: 'Volver al inicio',
+    },
     actions: {
       new: 'Nuevo',
       actions: 'Acciones',
@@ -17,6 +26,7 @@ export const es: AppDict = {
       deleteSelected: 'Eliminar seleccionados',
       cancel: 'Cancelar',
       back: 'Volver',
+      close: 'Cerrar',
       save: 'Guardar',
       menuLabel: 'Opciones',
       filters: 'Filtros',
@@ -5572,24 +5582,148 @@ export const es: AppDict = {
   },
   seguridad: {
     title: 'Seguridad',
-    subtitle: 'Usuarios y accesos del contenedor',
-    tabs: { usuarios: 'Usuarios' },
+    menu: { usuarios: 'Usuarios' },
     usuarios: {
-      hint: 'Personas con acceso a esta empresa. Para invitar o retirar usuarios, entra a Mis contenedores.',
-      columns: { nombre: 'Nombre', correo: 'Correo', rol: 'Rol' },
-      roles: {
-        propietario: 'Propietario',
-        administrador: 'Administrador',
-        usuario: 'Usuario',
+      searchPlaceholder: 'Buscar por nombre o correo...',
+      columns: { nombre: 'Nombre', correo: 'Correo', propietario: 'Propietario' },
+      propietarioBadge: { true: 'Propietario', false: 'Miembro' },
+      actions: {
+        invitar: 'Invitar usuario',
       },
       empty: {
         title: 'Sin usuarios',
         sub: 'Este contenedor todavía no tiene usuarios con acceso.',
       },
+      invitar: {
+        title: 'Invitar usuario',
+        subtitle: 'Dale acceso a esta empresa',
+        fields: {
+          usuario: 'Usuario',
+          usuarioPlaceholder: 'Buscar por correo...',
+          usuarioHint: 'Escribe al menos 3 caracteres. La persona ya debe tener cuenta en RedDoc.',
+          grupos: 'Grupos',
+          gruposPlaceholder: 'Selecciona los grupos...',
+          gruposHint: 'Opcional. La persona pertenecerá a estos grupos al aceptar la invitación.',
+          gruposEmpty: 'No hay grupos disponibles.',
+        },
+        accesos: {
+          label: 'Accesos',
+          todos: 'Marcar todos',
+          ninguno: 'Quitar todos',
+          hint: 'Opcional. Solo aparecen los módulos que esta empresa tiene contratados.',
+          flags: {
+            venta: 'Venta',
+            compra: 'Compra',
+            tesoreria: 'Tesorería',
+            cartera: 'Cartera',
+            inventario: 'Inventario',
+            humano: 'Humano',
+            contabilidad: 'Contabilidad',
+            turno: 'Turnos',
+          },
+        },
+        submit: 'Enviar invitación',
+      },
+      detalle: {
+        eyebrow: 'Usuario del contenedor',
+        tabs: { grupos: 'Grupos', permisos: 'Permisos' },
+        fields: { usuarioId: 'ID de usuario' },
+        accesoHint:
+          'El propietario administra la empresa; el resto solo la opera. Los módulos a los que entra esta persona se definen al invitarla.',
+        notFound: {
+          title: 'Usuario no encontrado',
+          desc: 'Puede que le hayan quitado el acceso a esta empresa.',
+        },
+        propietario: {
+          title: 'El propietario no se gestiona desde aquí',
+          desc: 'La cuenta propietaria tiene control total de la empresa; sus grupos y permisos no se administran.',
+        },
+        grupos: {
+          count: {
+            zero: 'Todavía no pertenece a ningún grupo. Toca uno para asignarlo.',
+            one: 'Pertenece a 1 de {total} grupos',
+            other: 'Pertenece a {n} de {total} grupos',
+          },
+          emptyCatalog: 'No hay grupos disponibles.',
+          hint: 'Los grupos son verticales de la plataforma: definen a qué áreas accede la persona dentro de la empresa. Toca una ficha para asignar o quitar.',
+          toasts: {
+            added: {
+              title: 'Grupo asignado',
+              desc: 'La persona ahora pertenece a {grupo}.',
+            },
+            removed: {
+              title: 'Grupo quitado',
+              desc: 'La persona ya no pertenece a {grupo}.',
+            },
+          },
+        },
+        permisos: {
+          flags: { superuser: 'Superusuario', staff: 'Staff' },
+          agregar: 'Agregar permisos',
+          empty: {
+            title: 'Sin permisos directos',
+            desc: 'Todo lo que puede hacer le llega por sus grupos. Agrega permisos puntuales cuando necesite algo extra.',
+          },
+          dialog: {
+            title: 'Agregar permisos',
+            subtitle: 'Toca una casilla, o el contador de la fila para dar todo el modelo',
+          },
+          quitarHint: 'Quitar {permiso}',
+          agregarHint: 'Asignar {permiso}',
+          fila: {
+            darHint: 'Dar las {total} acciones de {modelo}',
+            quitarHint: 'Quitar las {total} acciones de {modelo}',
+          },
+          search: 'Buscar permiso o modelo',
+          todas: 'Todas',
+          modeloHeader: 'Modelo',
+          acciones: { view: 'Ver', add: 'Agregar', change: 'Cambiar', delete: 'Eliminar' },
+          count: {
+            zero: 'Sin permisos directos',
+            one: 'Tiene 1 permiso directo',
+            other: 'Tiene {n} permisos directos',
+          },
+          noResults: 'Ningún permiso coincide con la búsqueda.',
+          hint: 'Los permisos directos se suman a los que hereda de sus grupos.',
+          toasts: {
+            added: { title: 'Permiso asignado', desc: 'La persona ahora tiene "{permiso}".' },
+            removed: { title: 'Permiso quitado', desc: 'La persona ya no tiene "{permiso}".' },
+            filaAdded: {
+              title: 'Permisos asignados',
+              desc: 'La persona ahora tiene {n} acciones sobre {modelo}.',
+            },
+            filaRemoved: {
+              title: 'Permisos quitados',
+              desc: 'La persona ya no tiene {n} acciones sobre {modelo}.',
+            },
+          },
+        },
+      },
+      confirms: {
+        deleteHeader: 'Quitar acceso',
+        deleteOne: '¿Seguro que quieres quitarle el acceso a {usuario}?',
+        deleteMany: '¿Seguro que quieres quitarle el acceso a {count} usuarios?',
+      },
       toasts: {
         loadError: {
           title: 'No se pudo cargar',
           desc: 'No pudimos traer los usuarios del contenedor.',
+        },
+        deleteSuccess: {
+          title: 'Acceso retirado',
+          desc: 'El usuario ya no tiene acceso a esta empresa.',
+        },
+        deleteError: {
+          title: 'No se pudo quitar',
+          desc: 'No pudimos retirar el acceso. Intenta de nuevo.',
+        },
+        inviteSuccess: {
+          title: 'Invitación enviada',
+          desc: 'El usuario tendrá acceso cuando acepte la invitación.',
+        },
+        inviteError: {
+          title: 'No se pudo invitar',
+          desc: 'No pudimos enviar la invitación. Intenta de nuevo.',
         },
       },
     },

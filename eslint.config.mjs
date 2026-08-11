@@ -83,6 +83,34 @@ export default [
     },
   },
   {
+    // Los descriptores de módulo no pueden entrar por el barrel de permisos.
+    //
+    // El ciclo: `@erp/core/permissions` → `permissions.service.ts` →
+    // `@erp/core/erp-modules` → el registry → los descriptores → de vuelta al
+    // barrel. Como el descriptor evalúa `MODELO` en el literal de su menú, el
+    // ciclo se cierra en runtime y revienta al arrancar (TDZ), no al compilar.
+    //
+    // Por eso el import va **profundo**, a `modelo.catalog`, que es una hoja sin
+    // dependencias. Los `import type` sí pueden ir por el barrel: se borran en
+    // la compilación y no participan del ciclo.
+    files: ['apps/erp/**/*.module-descriptor.ts'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@erp/core/permissions',
+              message:
+                'Import profundo en los descriptores: usá @erp/core/permissions/modelo.catalog. El barrel arrastra PermissionsService → ERP_MODULES → los descriptores, y ese ciclo revienta al arrancar.',
+              allowTypeImports: true,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: [
       '**/*.ts',
       '**/*.tsx',

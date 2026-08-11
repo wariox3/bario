@@ -176,7 +176,7 @@ El `BaseDocumentListComponent` se importa **siempre vía `loadComponent`** desde
 - **Topbar** (`apps/erp/src/app/layouts/module-bar/`): renderiza un link por cada módulo habilitado por `PermissionsService`. Highlight al activo.
 - **Sidebar** (`apps/erp/src/app/layouts/workspace-layout/`): se filtra al módulo activo leyendo `ActiveModuleStore.activeDescriptor().menu`. Empty state cuando no hay módulo activo (ej: `/t/:slug/dashboard`).
 - **Active module store** (`apps/erp/src/app/core/erp-modules/active-module.store.ts`): signal escrito por `erpModuleResolver(id)` puesto en la ruta raíz de cada `<modulo>.routes.ts`.
-- **Permisos** (`apps/erp/src/app/core/permissions/permissions.service.ts`): stub que retorna todos los ids. Cuando el backend exponga flags `plan_*` en `Contenedor`, solo cambia el `computed`.
+- **Permisos** (`apps/erp/src/app/core/permissions/`): tres ejes ortogonales — qué módulos compró el tenant (flags `acceso_*` del contenedor), qué puede hacer el usuario sobre cada modelo del backend (`GET /general/modelo/<id>/permiso/`, pedido al entrar al feature) y si administra el contenedor (`rol_id`). Ver `docs/guides/permisos-erp.md` antes de tocarlo.
 
 **Estructura de carpetas dentro de un módulo (camino B)**: cada master es un bounded context auto-contenido bajo `masters/<entity>/`:
 
@@ -258,4 +258,5 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - `docs/architecture/erp-module-architecture.md` — decisión arquitectónica completa del framework de módulos del ERP (enfoque híbrido v2.0). Leerlo antes de agregar masters o documentos al ERP.
 - `docs/guides/agregar-modulo-erp.md` — guía paso a paso (recetario) para agregar un módulo nuevo al ERP sin perderse: esqueleto navegable en 5 pasos + cómo sumar masters/documentos y el menú del sidebar.
 - `docs/guides/agregar-documento-erp.md` — guía paso a paso para agregar un documento transaccional (camino A): `DocumentEntityConfig`, registro en el `ModuleConfig`/registry, rutas con resolvers y capabilities. Incluye el caso "primer documento del módulo".
+- `docs/guides/permisos-erp.md` — cómo se decide qué ve y qué puede abrir un usuario dentro del tenant, explicado como recorrido en 6 pasos (de dónde salen los permisos → topbar → sidebar → ruta → botones → 403 del backend). Cubre los tres ejes (plan del tenant / permisos del usuario / rol de contenedor), el catálogo de modelos del backend (`MODELO`, espejo de `gen_modelo`), `withPermission` y el `ForbiddenPageStore`. Leerlo antes de tocar permisos o de sumar un master a un módulo ya migrado.
 - `docs/guides/agregar-accion-extra-erp.md` — guía paso a paso para agregar una **acción extra** a un documento (botón en el dropdown "Acciones" que abre su propio modal y endpoint): patrón `EntityActionStrategy` + registro en `ENTITY_ACTION_PROVIDERS` + `extraActionIds`. Ejemplo vivo: "Generar" en pedido-servicio.

@@ -35,6 +35,11 @@ export interface ContenedoresDict {
       ownerCta: string;
       memberLocked: string;
     };
+    /** Pill de la tarjeta/fila: el backend solo distingue propietario o no. */
+    roles: {
+      propietario: string;
+      miembro: string;
+    };
   };
   create: {
     title: string;
@@ -96,6 +101,11 @@ export interface ContenedoresDict {
       invalid: string;
       submit: string;
       sending: string;
+      grupos: {
+        label: string;
+        placeholder: string;
+        empty: string;
+      };
     };
     pending: {
       estados: { P: string; A: string; R: string };
@@ -110,8 +120,7 @@ export interface ContenedoresDict {
       you: string;
       roles: {
         propietario: string;
-        administrador: string;
-        usuario: string;
+        miembro: string;
       };
       removeAria: string;
     };

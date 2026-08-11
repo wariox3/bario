@@ -58,6 +58,13 @@ export interface AppDict
   extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
   common: {
     comingSoon: string;
+    accessDenied: {
+      title: string;
+      sub: string;
+      subPermission: string;
+      subModule: string;
+      back: string;
+    };
     actions: {
       new: string;
       actions: string;
@@ -67,6 +74,7 @@ export interface AppDict
       deleteSelected: string;
       cancel: string;
       back: string;
+      close: string;
       save: string;
       menuLabel: string;
       filters: string;
@@ -4309,14 +4317,92 @@ export interface AppDict
   };
   seguridad: {
     title: string;
-    subtitle: string;
-    tabs: { usuarios: string };
+    menu: { usuarios: string };
     usuarios: {
-      hint: string;
-      columns: { nombre: string; correo: string; rol: string };
-      roles: { propietario: string; administrador: string; usuario: string };
+      searchPlaceholder: string;
+      columns: { nombre: string; correo: string; propietario: string };
+      /** Labels de la columna booleana `propietario` (`booleanKeyPrefix`). */
+      propietarioBadge: { true: string; false: string };
+      actions: { invitar: string };
       empty: { title: string; sub: string };
-      toasts: { loadError: { title: string; desc: string } };
+      invitar: {
+        title: string;
+        subtitle: string;
+        fields: {
+          usuario: string;
+          usuarioPlaceholder: string;
+          usuarioHint: string;
+          grupos: string;
+          gruposPlaceholder: string;
+          gruposHint: string;
+          gruposEmpty: string;
+        };
+        accesos: {
+          label: string;
+          todos: string;
+          ninguno: string;
+          hint: string;
+          flags: {
+            venta: string;
+            compra: string;
+            tesoreria: string;
+            cartera: string;
+            inventario: string;
+            humano: string;
+            contabilidad: string;
+            turno: string;
+          };
+        };
+        submit: string;
+      };
+      detalle: {
+        eyebrow: string;
+        tabs: { grupos: string; permisos: string };
+        fields: { usuarioId: string };
+        accesoHint: string;
+        notFound: { title: string; desc: string };
+        propietario: { title: string; desc: string };
+        grupos: {
+          count: { zero: string; one: string; other: string };
+          emptyCatalog: string;
+          hint: string;
+          toasts: {
+            added: { title: string; desc: string };
+            removed: { title: string; desc: string };
+          };
+        };
+        permisos: {
+          flags: { superuser: string; staff: string };
+          agregar: string;
+          empty: { title: string; desc: string };
+          dialog: { title: string; subtitle: string };
+          quitarHint: string;
+          agregarHint: string;
+          /** Contador n/4 de la fila: dar o quitar todas las acciones del modelo. */
+          fila: { darHint: string; quitarHint: string };
+          search: string;
+          todas: string;
+          modeloHeader: string;
+          acciones: { view: string; add: string; change: string; delete: string };
+          count: { zero: string; one: string; other: string };
+          noResults: string;
+          hint: string;
+          toasts: {
+            added: { title: string; desc: string };
+            removed: { title: string; desc: string };
+            filaAdded: { title: string; desc: string };
+            filaRemoved: { title: string; desc: string };
+          };
+        };
+      };
+      confirms: { deleteHeader: string; deleteOne: string; deleteMany: string };
+      toasts: {
+        loadError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        inviteSuccess: { title: string; desc: string };
+        inviteError: { title: string; desc: string };
+      };
     };
   };
   configuracion: {

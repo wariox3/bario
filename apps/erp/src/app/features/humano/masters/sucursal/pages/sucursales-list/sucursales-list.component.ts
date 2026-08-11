@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { SucursalService } from '../../sucursal.service';
 import type { Sucursal } from '../../sucursal.model';
@@ -96,9 +97,11 @@ export class SucursalesListComponent {
 
   protected readonly columns = SUCURSALES_COLUMNS;
   protected readonly filterFields = SUCURSALES_FILTER_FIELDS;
-  protected readonly rowActions = SUCURSALES_ROW_ACTIONS;
-  protected readonly primaryAction = SUCURSALES_PRIMARY_ACTION;
-  protected readonly trailingActions = SUCURSALES_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.humano.sucursal, {
+    row: SUCURSALES_ROW_ACTIONS,
+    primary: SUCURSALES_PRIMARY_ACTION,
+    trailing: SUCURSALES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

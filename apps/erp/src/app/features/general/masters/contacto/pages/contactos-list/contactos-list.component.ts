@@ -34,6 +34,7 @@ import type {
 } from '@erp/core/components/import-dialog/import-dialog.types';
 import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
 import type { Contacto } from '../../contacto.model';
@@ -134,9 +135,12 @@ export class ContactosListComponent {
 
   protected readonly columns = CONTACTOS_COLUMNS;
   protected readonly filterFields = CONTACTOS_FILTER_FIELDS;
-  protected readonly rowActions = CONTACTOS_ROW_ACTIONS;
-  protected readonly primaryAction = CONTACTOS_PRIMARY_ACTION;
-  protected readonly trailingActions = CONTACTOS_TRAILING_ACTIONS;
+
+  protected readonly acciones = masterActions(MODELO.general.contacto, {
+    row: CONTACTOS_ROW_ACTIONS,
+    primary: CONTACTOS_PRIMARY_ACTION,
+    trailing: CONTACTOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

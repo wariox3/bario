@@ -27,6 +27,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ItemService } from '../../item.service';
 import type { Item } from '../../item.model';
@@ -114,9 +115,11 @@ export class ItemsListComponent {
 
   protected readonly columns = ITEMS_COLUMNS;
   protected readonly filterFields = ITEMS_FILTER_FIELDS;
-  protected readonly rowActions = ITEMS_ROW_ACTIONS;
-  protected readonly primaryAction = ITEMS_PRIMARY_ACTION;
-  protected readonly trailingActions = ITEMS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.item, {
+    row: ITEMS_ROW_ACTIONS,
+    primary: ITEMS_PRIMARY_ACTION,
+    trailing: ITEMS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

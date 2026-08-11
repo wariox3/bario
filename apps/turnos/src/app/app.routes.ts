@@ -1,5 +1,10 @@
 import { Route } from '@angular/router';
-import { authGuard, rootRedirectGuard, tenantAccessGuard } from '@reddoc/core';
+import {
+  authGuard,
+  rootRedirectGuard,
+  tenantAccessGuard,
+  tenantSlugMatchGuard,
+} from '@reddoc/core';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
 
 export const appRoutes: Route[] = [
@@ -29,7 +34,10 @@ export const appRoutes: Route[] = [
   // Workspace layout (sidebar + main) — anidado bajo el tenant slug
   {
     path: 't/:tenantSlug',
-    canActivate: [authGuard, tenantAccessGuard],
+    // El tenant se resuelve al matchear (ver `tenantAccessGuard`): los guards
+    // anidados que dependan de él corren antes que cualquier `canActivate`.
+    canMatch: [tenantSlugMatchGuard, tenantAccessGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./layouts/workspace-layout/workspace-layout.component').then(
         (m) => m.WorkspaceLayoutComponent,

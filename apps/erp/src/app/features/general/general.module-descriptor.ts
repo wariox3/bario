@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 export const GENERAL_MODULE: ErpModuleDescriptor = {
   id: 'general',
@@ -21,12 +22,12 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
               path: 'factura-venta/list',
               activeMatch: 'factura-venta',
             },
+            { labelKey: 'entities.pago.name', path: 'pago/list', activeMatch: 'pago' },
             {
               labelKey: 'entities.facturaCompra.name',
               path: 'factura-compra/list',
               activeMatch: 'factura-compra',
             },
-            { labelKey: 'entities.pago.name', path: 'pago/list', activeMatch: 'pago' },
             { labelKey: 'entities.egreso.name', path: 'egreso/list', activeMatch: 'egreso' },
           ],
         },
@@ -41,12 +42,26 @@ export const GENERAL_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.item.name', path: 'items' },
-            { labelKey: 'entities.asesor.name', path: 'asesores' },
-            { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
-            { labelKey: 'entities.precio.name', path: 'precios' },
-            { labelKey: 'entities.sede.name', path: 'sedes' },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.item.name',
+              path: 'items',
+              modelo: MODELO.general.item,
+            },
+            {
+              labelKey: 'entities.sede.name',
+              path: 'sedes',
+              modelo: MODELO.general.sede,
+            },
+            {
+              labelKey: 'entities.cuentaBanco.name',
+              path: 'cuentas-banco',
+              modelo: MODELO.general.cuentaBanco,
+            },
           ],
         },
       ],

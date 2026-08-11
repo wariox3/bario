@@ -8,6 +8,15 @@ export const en: AppDict = {
   contenedores: contenedoresEn,
   common: {
     comingSoon: 'Coming soon.',
+    accessDenied: {
+      title: 'You do not have access',
+      sub: 'This section is only for container administrators. Ask the company owner for access.',
+      subPermission:
+        'You do not have permission to view this section. Ask your container administrator for access.',
+      subModule:
+        "This module is not included in the company's plan. Talk to the owner to enable it.",
+      back: 'Back to home',
+    },
     actions: {
       new: 'New',
       actions: 'Actions',
@@ -17,6 +26,7 @@ export const en: AppDict = {
       deleteSelected: 'Delete selected',
       cancel: 'Cancel',
       back: 'Back',
+      close: 'Close',
       save: 'Save',
       menuLabel: 'Options',
       filters: 'Filters',
@@ -5520,24 +5530,148 @@ export const en: AppDict = {
   },
   seguridad: {
     title: 'Security',
-    subtitle: 'Container users and access',
-    tabs: { usuarios: 'Users' },
+    menu: { usuarios: 'Users' },
     usuarios: {
-      hint: 'People with access to this company. To invite or remove users, go to My containers.',
-      columns: { nombre: 'Name', correo: 'Email', rol: 'Role' },
-      roles: {
-        propietario: 'Owner',
-        administrador: 'Administrator',
-        usuario: 'User',
+      searchPlaceholder: 'Search by name or email...',
+      columns: { nombre: 'Name', correo: 'Email', propietario: 'Owner' },
+      propietarioBadge: { true: 'Owner', false: 'Member' },
+      actions: {
+        invitar: 'Invite user',
       },
       empty: {
         title: 'No users',
         sub: 'This container has no users with access yet.',
       },
+      invitar: {
+        title: 'Invite user',
+        subtitle: 'Give access to this company',
+        fields: {
+          usuario: 'User',
+          usuarioPlaceholder: 'Search by email...',
+          usuarioHint: 'Type at least 3 characters. The person must already have a RedDoc account.',
+          grupos: 'Groups',
+          gruposPlaceholder: 'Select groups...',
+          gruposHint: 'Optional. The person will belong to these groups once they accept.',
+          gruposEmpty: 'No groups available.',
+        },
+        accesos: {
+          label: 'Access',
+          todos: 'Select all',
+          ninguno: 'Clear all',
+          hint: 'Optional. Only the modules this company has purchased are listed.',
+          flags: {
+            venta: 'Sales',
+            compra: 'Purchasing',
+            tesoreria: 'Treasury',
+            cartera: 'Receivables',
+            inventario: 'Inventory',
+            humano: 'HR',
+            contabilidad: 'Accounting',
+            turno: 'Shifts',
+          },
+        },
+        submit: 'Send invitation',
+      },
+      detalle: {
+        eyebrow: 'Container user',
+        tabs: { grupos: 'Groups', permisos: 'Permissions' },
+        propietario: {
+          title: 'The owner is not managed from here',
+          desc: 'The owner account has full control of the company; their groups and permissions are not administered.',
+        },
+        grupos: {
+          count: {
+            zero: 'Does not belong to any group yet. Tap one to assign it.',
+            one: 'Belongs to 1 of {total} groups',
+            other: 'Belongs to {n} of {total} groups',
+          },
+          emptyCatalog: 'No groups available.',
+          hint: 'Groups are platform verticals: they define which areas the person can access within the company. Tap a tile to assign or remove.',
+          toasts: {
+            added: {
+              title: 'Group assigned',
+              desc: 'The person now belongs to {grupo}.',
+            },
+            removed: {
+              title: 'Group removed',
+              desc: 'The person no longer belongs to {grupo}.',
+            },
+          },
+        },
+        permisos: {
+          flags: { superuser: 'Superuser', staff: 'Staff' },
+          agregar: 'Add permissions',
+          empty: {
+            title: 'No direct permissions',
+            desc: 'Everything they can do comes from their groups. Add specific permissions when they need something extra.',
+          },
+          dialog: {
+            title: 'Add permissions',
+            subtitle: 'Click a cell, or the row counter to grant the whole model',
+          },
+          quitarHint: 'Remove {permiso}',
+          agregarHint: 'Assign {permiso}',
+          fila: {
+            darHint: 'Grant all {total} actions on {modelo}',
+            quitarHint: 'Remove all {total} actions on {modelo}',
+          },
+          search: 'Search permission or model',
+          todas: 'All',
+          modeloHeader: 'Model',
+          acciones: { view: 'View', add: 'Add', change: 'Change', delete: 'Delete' },
+          count: {
+            zero: 'No direct permissions',
+            one: 'Has 1 direct permission',
+            other: 'Has {n} direct permissions',
+          },
+          noResults: 'No permission matches your search.',
+          hint: 'Direct permissions add to the ones inherited from their groups.',
+          toasts: {
+            added: { title: 'Permission assigned', desc: 'The person now has "{permiso}".' },
+            removed: { title: 'Permission removed', desc: 'The person no longer has "{permiso}".' },
+            filaAdded: {
+              title: 'Permissions assigned',
+              desc: 'The person now has {n} actions on {modelo}.',
+            },
+            filaRemoved: {
+              title: 'Permissions removed',
+              desc: 'The person no longer has {n} actions on {modelo}.',
+            },
+          },
+        },
+        fields: { usuarioId: 'User ID' },
+        accesoHint:
+          'The owner manages the company; everyone else only operates it. The modules this person can open are set when inviting them.',
+        notFound: {
+          title: 'User not found',
+          desc: 'Their access to this company may have been removed.',
+        },
+      },
+      confirms: {
+        deleteHeader: 'Remove access',
+        deleteOne: 'Remove access for {usuario}?',
+        deleteMany: 'Remove access for {count} users?',
+      },
       toasts: {
         loadError: {
           title: 'Could not load',
           desc: 'We could not fetch the container users.',
+        },
+        deleteSuccess: {
+          title: 'Access removed',
+          desc: 'The user no longer has access to this company.',
+        },
+        deleteError: {
+          title: 'Could not remove',
+          desc: 'We could not remove the access. Please try again.',
+        },
+        inviteSuccess: {
+          title: 'Invitation sent',
+          desc: 'The user will get access once they accept the invitation.',
+        },
+        inviteError: {
+          title: 'Could not invite',
+          desc: 'We could not send the invitation. Please try again.',
         },
       },
     },

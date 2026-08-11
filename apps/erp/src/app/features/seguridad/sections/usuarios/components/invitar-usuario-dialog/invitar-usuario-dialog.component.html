@@ -1,0 +1,160 @@
+@let inv = t().seguridad.usuarios.invitar;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '460px' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+      >
+        <i class="pi pi-user-plus text-[1.1rem] text-brand-blue"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+        >
+          {{ inv.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ inv.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <form (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5 pt-1">
+      <div class="flex flex-col gap-1.5">
+        <label for="invitar-usuario" class="text-[0.8rem] font-medium text-brand-text">
+          {{ inv.fields.usuario }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <p-autocomplete
+          inputId="invitar-usuario"
+          [ngModel]="selection()"
+          (ngModelChange)="selection.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [suggestions]="suggestions()"
+          (completeMethod)="onSearch($event)"
+          (onSelect)="onSelect($event)"
+          optionLabel="email"
+          [forceSelection]="true"
+          [minLength]="3"
+          [delay]="300"
+          appendTo="body"
+          inputStyleClass="w-full"
+          [placeholder]="inv.fields.usuarioPlaceholder"
+        >
+          <ng-template pTemplate="item" let-user>
+            <div class="flex items-center gap-2.5 py-0.5">
+              <span
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[rgba(20,48,73,0.06)] text-[0.65rem] font-bold text-brand-navy"
+              >
+                {{ initials(user) }}
+              </span>
+              <div class="flex flex-col leading-tight">
+                <span class="text-[0.82rem] font-semibold text-brand-navy">
+                  {{ user.nombre_corto ?? user.email }}
+                </span>
+                @if (user.nombre_corto) {
+                  <span class="text-[0.7rem] text-brand-muted">{{ user.email }}</span>
+                }
+              </div>
+            </div>
+          </ng-template>
+        </p-autocomplete>
+        <span class="text-[0.72rem] text-brand-muted">{{ inv.fields.usuarioHint }}</span>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="invitar-grupos" class="text-[0.8rem] font-medium text-brand-text">
+          {{ inv.fields.grupos }}
+        </label>
+        <p-multiselect
+          inputId="invitar-grupos"
+          [options]="grupos()"
+          [ngModel]="selectedGrupoIds()"
+          (ngModelChange)="selectedGrupoIds.set($event ?? [])"
+          [ngModelOptions]="{ standalone: true }"
+          optionLabel="nombre"
+          optionValue="id"
+          dataKey="id"
+          display="chip"
+          [maxSelectedLabels]="3"
+          [showClear]="true"
+          [loading]="isLoadingGrupos()"
+          [placeholder]="inv.fields.gruposPlaceholder"
+          [emptyMessage]="inv.fields.gruposEmpty"
+          appendTo="body"
+          [fluid]="true"
+        />
+        <span class="text-[0.72rem] text-brand-muted">{{ inv.fields.gruposHint }}</span>
+      </div>
+
+      <!--
+        El rol no se pide acá a propósito: se cambia desde la fila del listado.
+      -->
+
+      @if (accesosDisponibles().length > 0) {
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="text-[0.8rem] font-medium text-brand-text">{{ inv.accesos.label }}</span>
+            <button
+              type="button"
+              class="text-[0.72rem] font-semibold text-brand-blue hover:underline"
+              (click)="toggleTodosLosAccesos()"
+            >
+              {{ todosLosAccesos() ? inv.accesos.ninguno : inv.accesos.todos }}
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 rounded-lg border border-[rgba(20,48,73,0.1)] p-2">
+            @for (acceso of accesosDisponibles(); track acceso.id) {
+              <label
+                [for]="'invitar-acceso-' + acceso.id"
+                class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-[rgba(20,48,73,0.04)]"
+              >
+                <p-checkbox
+                  [binary]="true"
+                  [ngModel]="isAccesoSelected(acceso.id)"
+                  (ngModelChange)="toggleAcceso(acceso.id)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [inputId]="'invitar-acceso-' + acceso.id"
+                />
+                <i [class]="acceso.iconClass" class="text-[0.8rem] text-brand-muted"></i>
+                <span class="text-[0.8rem] text-brand-text">
+                  {{ inv.accesos.flags[acceso.id] }}
+                </span>
+              </label>
+            }
+          </div>
+          <span class="text-[0.72rem] text-brand-muted">{{ inv.accesos.hint }}</span>
+        </div>
+      }
+
+      <div class="flex justify-end gap-2">
+        <p-button
+          type="button"
+          [label]="t().common.actions.cancel"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="onCancel()"
+        />
+        <p-button
+          type="submit"
+          [label]="inv.submit"
+          icon="pi pi-send"
+          size="small"
+          [loading]="isSending()"
+          [disabled]="!selectedUser() || isSending()"
+        />
+      </div>
+    </form>
+  }
+</p-dialog>

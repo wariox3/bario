@@ -1,4 +1,5 @@
 export { TurnstileComponent } from './lib/turnstile/turnstile.component';
+export { MfaCodigoInputComponent } from './lib/mfa/mfa-codigo-input/mfa-codigo-input.component';
 export { AuthSuccessStateComponent } from './lib/auth/auth-success-state/auth-success-state.component';
 export { LoginComponent } from './lib/auth/login/login.component';
 export { RegisterComponent } from './lib/auth/register/register.component';

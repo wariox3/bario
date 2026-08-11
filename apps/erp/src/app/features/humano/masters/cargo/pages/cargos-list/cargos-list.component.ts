@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CargoService } from '../../cargo.service';
 import type { Cargo } from '../../cargo.model';
@@ -96,9 +97,11 @@ export class CargosListComponent {
 
   protected readonly columns = CARGOS_COLUMNS;
   protected readonly filterFields = CARGOS_FILTER_FIELDS;
-  protected readonly rowActions = CARGOS_ROW_ACTIONS;
-  protected readonly primaryAction = CARGOS_PRIMARY_ACTION;
-  protected readonly trailingActions = CARGOS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.humano.cargo, {
+    row: CARGOS_ROW_ACTIONS,
+    primary: CARGOS_PRIMARY_ACTION,
+    trailing: CARGOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

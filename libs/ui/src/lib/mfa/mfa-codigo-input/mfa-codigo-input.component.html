@@ -1,0 +1,138 @@
+<div class="flex flex-col gap-[1.1rem]">
+  <!-- Banda: a dónde fue el código y cuánto le queda de vida -->
+  <div
+    class="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2"
+  >
+    <span
+      class="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-navy"
+    >
+      <i [class]="esTotp() ? 'pi pi-mobile' : 'pi pi-send'" class="text-[0.7rem]"></i>
+    </span>
+
+    @if (esTotp()) {
+      <span class="text-[0.75rem] text-brand-muted">{{ t().auth.mfaCodigo.totpHint }}</span>
+    } @else if (destino()) {
+      <span class="text-[0.72rem] uppercase tracking-[0.04em] text-brand-muted">
+        {{ t().auth.mfaCodigo.sentToLabel }}
+      </span>
+      <span
+        class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold text-brand-text"
+      >
+        {{ destino() }}
+      </span>
+    } @else {
+      <span class="text-[0.75rem] text-brand-muted">{{ t().auth.mfaCodigo.sentGeneric }}</span>
+    }
+
+    <!-- Reloj: el código vence, y eso manda sobre lo que se puede hacer acá -->
+    <span
+      class="ml-auto shrink-0 rounded-md border px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+      [class]="
+        expirado()
+          ? 'border-dashed border-[rgba(20,48,73,0.25)] text-brand-muted'
+          : 'border-transparent bg-[rgba(20,48,73,0.06)] text-brand-text'
+      "
+      [title]="expirado() ? t().auth.mfaCodigo.expiredTitle : t().auth.mfaCodigo.remainingTitle"
+    >
+      {{ expirado() ? t().auth.mfaCodigo.expiredBadge : restanteEtiqueta() }}
+    </span>
+  </div>
+
+  <!-- El código: casillas, o el de respaldo si ya no tiene acceso a su método -->
+  <div class="flex flex-col items-center gap-2.5 py-1">
+    <!-- `span` y no `label`: el OTP son 6 inputs, no hay un único control al que apuntar
+         con `for`. Se asocia por `aria-labelledby`. -->
+    <span id="mfa-codigo-label" class="text-[0.78rem] font-semibold text-brand-navy">
+      @if (usarRespaldo()) {
+        {{ t().auth.mfaCodigo.backupLabel }}
+      } @else {
+        {{ t().auth.mfaCodigo.codeLabelPrefix }} {{ largo }}
+        {{ t().auth.mfaCodigo.codeLabelSuffix }}
+      }
+    </span>
+
+    @if (usarRespaldo()) {
+      <!-- También muere con el reloj: el respaldo viaja junto al `mfa_token` del desafío,
+           así que vencido este el backend lo rechaza igual. Dejarlo escribible sería
+           pedir 10 caracteres para nada. -->
+      <input
+        pInputText
+        [ngModel]="codigo()"
+        (ngModelChange)="onRespaldoChange($event)"
+        [maxlength]="largoRespaldo"
+        [disabled]="expirado() || ocupado()"
+        aria-labelledby="mfa-codigo-label"
+        autocomplete="one-time-code"
+        spellcheck="false"
+        placeholder="GIKV5U2WTS"
+        class="w-[13rem] text-center font-mono text-[0.95rem] font-semibold uppercase tracking-[0.18em]"
+      />
+    } @else {
+      <p-inputOtp
+        [ngModel]="codigo()"
+        (ngModelChange)="onOtpChange($event)"
+        [length]="largo"
+        [integerOnly]="true"
+        [disabled]="expirado() || ocupado()"
+        [autofocus]="true"
+        aria-labelledby="mfa-codigo-label"
+      />
+    }
+
+    @if (error(); as mensaje) {
+      <p class="m-0 flex items-center gap-1.5 text-[0.75rem] text-red-600">
+        <i class="pi pi-exclamation-circle text-[0.75rem]"></i>
+        {{ mensaje }}
+      </p>
+    } @else if (expirado()) {
+      <!-- El vencimiento manda sobre todo lo demás, también en modo respaldo: es la
+           razón por la que el campo está bloqueado. -->
+      <p class="m-0 text-[0.75rem] text-brand-muted">
+        @if (esTotp() || !reenvioRenueva()) {
+          <!-- Sin renovación no hay nada que pedir: el desafío entero ya no sirve. -->
+          {{ t().auth.mfaCodigo.expiredRestart }}
+        } @else {
+          {{ t().auth.mfaCodigo.expiredResend }}
+        }
+      </p>
+    } @else if (usarRespaldo()) {
+      <p class="m-0 text-[0.75rem] text-brand-muted">{{ t().auth.mfaCodigo.backupOnce }}</p>
+    }
+  </div>
+
+  <!-- Salida de emergencia: si perdió el acceso al método, el respaldo es su única vía -->
+  @if (permiteRespaldo()) {
+    <div class="flex items-center justify-center text-[0.75rem]">
+      <button
+        type="button"
+        class="font-semibold text-brand-navy underline underline-offset-2 transition-opacity hover:opacity-70"
+        [disabled]="ocupado()"
+        (click)="alternarRespaldo()"
+      >
+        @if (usarRespaldo()) {
+          {{ t().auth.mfaCodigo.useCodePrefix }} {{ largo }} {{ t().auth.mfaCodigo.useCodeSuffix }}
+        } @else {
+          {{ t().auth.mfaCodigo.useBackup }}
+        }
+      </button>
+    </div>
+  }
+
+  <!-- Reenvío: la espera va DENTRO del botón, que es lo que está bloqueado -->
+  @if (!esTotp() && !usarRespaldo()) {
+    <div class="flex items-center justify-center gap-1.5 text-[0.75rem]">
+      <span class="text-brand-muted">{{ t().auth.mfaCodigo.notReceived }}</span>
+      <button
+        type="button"
+        class="font-semibold text-brand-navy underline underline-offset-2 transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:text-brand-muted disabled:no-underline disabled:opacity-60"
+        [disabled]="!puedeReenviar()"
+        (click)="onReenviar()"
+      >
+        {{ t().auth.mfaCodigo.resend }}
+        @if (esperaReenvio() > 0) {
+          <span class="ml-1 font-mono tabular-nums">({{ esperaEtiqueta() }})</span>
+        }
+      </button>
+    </div>
+  }
+</div>

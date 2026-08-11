@@ -16,8 +16,39 @@ export interface Usuario extends BaseUsuario {
   imagen: string | null;
   imagen_thumbnail: string | null;
   is_verified: boolean;
+  /** ¿El usuario tiene activa la autenticación en varias fases? */
+  mfa_activo: boolean;
+  /** `codigo` del método activo (`totp`, `sms`, `correo`). `null` si `mfa_activo` es `false`. */
+  mfa_metodo: string | null;
   fecha_creacion: string;
 }
+
+/**
+ * Desafío de segundo factor: el backend ya validó la contraseña pero **no emitió
+ * cookies**. Hasta que no se confirme el código, no hay sesión.
+ */
+export interface MfaDesafio {
+  readonly mfa_token: string;
+  /** `codigo` del método por el que se mandó el código (`correo`, `sms`, `totp`). */
+  readonly metodo: string;
+}
+
+/** Cuerpo de `POST /seguridad/login/mfa/`. */
+export interface LoginMfaRequest {
+  mfa_token: string;
+  codigo: string;
+  /** Deja una cookie de 30 días para no volver a pedir código en este navegador. */
+  recordar_dispositivo?: boolean;
+}
+
+/**
+ * Resultado de `login()`. Son dos desenlaces distintos, no un valor opcional:
+ * o quedó sesión iniciada, o falta el segundo paso. Modelarlo como unión obliga a
+ * quien llame a decidir qué hace en cada caso.
+ */
+export type LoginResult<TUser> =
+  | { readonly estado: 'sesion'; readonly usuario: TUser | null }
+  | { readonly estado: 'mfa'; readonly desafio: MfaDesafio };
 
 export interface LoginRequest {
   email: string;

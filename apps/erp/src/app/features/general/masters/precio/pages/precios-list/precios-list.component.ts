@@ -27,6 +27,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { PrecioService } from '../../precio.service';
 import type { Precio } from '../../precio.model';
@@ -98,9 +99,11 @@ export class PreciosListComponent {
 
   protected readonly columns = PRECIOS_COLUMNS;
   protected readonly filterFields = PRECIOS_FILTER_FIELDS;
-  protected readonly rowActions = PRECIOS_ROW_ACTIONS;
-  protected readonly primaryAction = PRECIOS_PRIMARY_ACTION;
-  protected readonly trailingActions = PRECIOS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.precio, {
+    row: PRECIOS_ROW_ACTIONS,
+    primary: PRECIOS_PRIMARY_ACTION,
+    trailing: PRECIOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

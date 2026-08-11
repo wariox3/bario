@@ -26,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
 import type { Adicional } from '../../adicional.model';
@@ -96,9 +97,11 @@ export class AdicionalesListComponent {
 
   protected readonly columns = ADICIONALES_COLUMNS;
   protected readonly filterFields = ADICIONALES_FILTER_FIELDS;
-  protected readonly rowActions = ADICIONALES_ROW_ACTIONS;
-  protected readonly primaryAction = ADICIONALES_PRIMARY_ACTION;
-  protected readonly trailingActions = ADICIONALES_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.humano.adicional, {
+    row: ADICIONALES_ROW_ACTIONS,
+    primary: ADICIONALES_PRIMARY_ACTION,
+    trailing: ADICIONALES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

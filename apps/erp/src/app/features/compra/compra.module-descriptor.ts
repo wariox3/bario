@@ -1,7 +1,9 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 export const COMPRA_MODULE: ErpModuleDescriptor = {
   id: 'compra',
+  accessFlag: 'acceso_compra',
   displayNameKey: 'modules.compra.name',
   iconClass: 'pi pi-shopping-cart',
   defaultChildPath: 'inicio',
@@ -27,11 +29,6 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'factura-compra',
             },
             {
-              labelKey: 'entities.documentoSoporte.name',
-              path: 'documento-soporte/list',
-              activeMatch: 'documento-soporte',
-            },
-            {
               labelKey: 'entities.notaCreditoCompra.name',
               path: 'nota-credito-compra/list',
               activeMatch: 'nota-credito-compra',
@@ -41,7 +38,11 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
               path: 'nota-debito-compra/list',
               activeMatch: 'nota-debito-compra',
             },
-
+            {
+              labelKey: 'entities.documentoSoporte.name',
+              path: 'documento-soporte/list',
+              activeMatch: 'documento-soporte',
+            },
             {
               labelKey: 'entities.notaAjuste.name',
               path: 'nota-ajuste/list',
@@ -60,10 +61,23 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.item.name', path: 'items' },
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.resolucion.name', path: 'resoluciones' },
-            { labelKey: 'entities.formaPago.name', path: 'formas-pago' },
+            { labelKey: 'entities.item.name', path: 'items', modelo: MODELO.general.item },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.resolucion.name',
+              path: 'resoluciones',
+              modelo: MODELO.general.resolucion,
+            },
+            {
+              labelKey: 'entities.formaPago.name',
+              path: 'formas-pago',
+              modelo: MODELO.general.formaPago,
+            },
+            { labelKey: 'entities.almacen.name', path: 'almacenes' },
           ],
         },
       ],

@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 /**
  * Descriptor del módulo Tesorería para la capa de navegación.
@@ -9,6 +10,7 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  */
 export const TESORERIA_MODULE: ErpModuleDescriptor = {
   id: 'tesoreria',
+  accessFlag: 'acceso_tesoreria',
   displayNameKey: 'modules.tesoreria.name',
   iconClass: 'pi pi-wallet',
   defaultChildPath: 'inicio',
@@ -43,8 +45,16 @@ export const TESORERIA_MODULE: ErpModuleDescriptor = {
         {
           // Masters compartidos con el módulo General (no propios de tesorería).
           items: [
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
+            {
+              labelKey: 'entities.cuentaBanco.name',
+              path: 'cuentas-banco',
+              modelo: MODELO.general.cuentaBanco,
+            },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
           ],
         },
       ],

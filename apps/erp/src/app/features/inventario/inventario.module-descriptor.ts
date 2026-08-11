@@ -1,7 +1,9 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 export const INVENTARIO_MODULE: ErpModuleDescriptor = {
   id: 'inventario',
+  accessFlag: 'acceso_inventario',
   displayNameKey: 'modules.inventario.name',
   iconClass: 'pi pi-box',
   defaultChildPath: 'inicio',
@@ -44,7 +46,7 @@ export const INVENTARIO_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.item.name', path: 'items' },
+            { labelKey: 'entities.item.name', path: 'items', modelo: MODELO.general.item },
             { labelKey: 'entities.almacen.name', path: 'almacenes' },
           ],
         },

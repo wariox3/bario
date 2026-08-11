@@ -1,4 +1,5 @@
 import type { Route } from '@angular/router';
+import { MODELO, withPermission } from '@erp/core/permissions';
 import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
 import { activeModuleResolver } from '@erp/core/module-config';
 import { HUMANO_MODULE } from './humano.module-descriptor';
@@ -79,44 +80,46 @@ export const HUMANO_ROUTES: Route[] = [
             (m) => m.NOMINA_ELECTRONICA_INFORME_ROUTES,
           ),
       },
-      {
+      // Empleados no tiene servicio propio: usa `ContactoService`, así que lo
+      // gobierna el mismo modelo que Contactos.
+      ...withPermission(MODELO.general.contacto, {
         path: 'empleados',
         loadChildren: () =>
           import('./masters/empleado/empleado.routes').then((m) => m.EMPLEADO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.humano.contrato, {
         path: 'contratos',
         loadChildren: () =>
           import('./masters/contrato/contrato.routes').then((m) => m.CONTRATO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.humano.credito, {
         path: 'creditos',
         loadChildren: () =>
           import('./masters/credito/credito.routes').then((m) => m.CREDITO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.humano.adicional, {
         path: 'adicionales',
         loadChildren: () =>
           import('./masters/adicional/adicional.routes').then((m) => m.ADICIONAL_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.humano.novedad, {
         path: 'novedades',
         loadChildren: () =>
           import('./masters/novedad/novedad.routes').then((m) => m.NOVEDAD_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.humano.cargo, {
         path: 'cargos',
         loadChildren: () => import('./masters/cargo/cargo.routes').then((m) => m.CARGO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.humano.grupo, {
         path: 'grupos',
         loadChildren: () => import('./masters/grupo/grupo.routes').then((m) => m.GRUPO_ROUTES),
-      },
-      {
+      }),
+      ...withPermission(MODELO.humano.sucursal, {
         path: 'sucursales',
         loadChildren: () =>
           import('./masters/sucursal/sucursal.routes').then((m) => m.SUCURSAL_ROUTES),
-      },
+      }),
     ],
   },
 ];

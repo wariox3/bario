@@ -74,102 +74,163 @@
         <h2
           class="text-[1.75rem] font-extrabold tracking-tight text-brand-text m-0 mb-2 leading-[1.15]"
         >
-          {{ t().auth.login.title }}
+          {{ desafioMfa() ? t().auth.login.mfa.title : t().auth.login.title }}
         </h2>
-        <p class="text-sm text-brand-muted m-0">{{ t().auth.login.subtitle }}</p>
+        <p class="text-sm text-brand-muted m-0">
+          {{ desafioMfa() ? t().auth.login.mfa.subtitle : t().auth.login.subtitle }}
+        </p>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="flex flex-col gap-5">
-        @if (errorMessage()) {
-          <p-message severity="error" [text]="errorMessage()!" styleClass="w-full" />
-        }
-
-        <div class="flex flex-col gap-1.5">
-          <label for="email" class="text-[0.855rem] font-semibold text-brand-text tracking-tight">
-            {{ t().auth.fields.email }}
-          </label>
-          <input
-            pInputText
-            id="email"
-            type="email"
-            formControlName="email"
-            fluid
-            [placeholder]="t().auth.fields.emailPlaceholder"
-            [invalid]="emailControl.invalid && emailControl.touched"
-            aria-describedby="email-error"
+      <!-- Paso 2: la contraseña ya se validó, pero todavía no hay sesión.
+           Reemplaza al formulario en vez de abrirse encima: no hay nada detrás que
+           valga la pena seguir mostrando. -->
+      @if (desafioMfa()) {
+        <div class="flex flex-col gap-5">
+          <!-- `reenvioRenueva=false`: reenviar acá manda otro correo con el MISMO desafío
+               —la expiración no se reinicia—, así que vencido el código no hay nada que
+               pedir y la única salida honesta es volver a empezar. -->
+          <lib-mfa-codigo-input
+            [(codigo)]="codigoMfa"
+            [esTotp]="esTotpMfa()"
+            [restante]="restanteMfa()"
+            [esperaReenvio]="esperaReenvioMfa()"
+            [reenvioRenueva]="false"
+            [ocupado]="isLoading() || reenviando()"
+            [error]="mfaError()"
+            (completado)="confirmarMfa()"
+            (reenviar)="reenviarMfa()"
           />
-          @if (emailControl.invalid && emailControl.touched) {
-            <small id="email-error" class="text-[0.78rem] text-red-500">
-              @if (emailControl.hasError('required')) {
-                {{ t().auth.validation.emailRequired }}
-              } @else if (emailControl.hasError('email')) {
-                {{ t().auth.validation.emailInvalid }}
-              }
-            </small>
-          }
-        </div>
 
-        <div class="flex flex-col gap-1.5">
           <label
-            for="password"
-            class="text-[0.855rem] font-semibold text-brand-text tracking-tight"
+            for="mfa-recordar"
+            class="flex cursor-pointer items-start gap-2.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] px-3.5 py-2.5 transition-colors hover:bg-[rgba(20,48,73,0.02)]"
           >
-            {{ t().auth.fields.password }}
+            <p-checkbox
+              inputId="mfa-recordar"
+              [ngModel]="recordarDispositivo()"
+              (ngModelChange)="recordarDispositivo.set($event)"
+              [binary]="true"
+            />
+            <span class="flex flex-col gap-[0.1rem]">
+              <span class="text-[0.8rem] font-medium text-brand-text">
+                {{ t().auth.login.mfa.remember }}
+              </span>
+              <span class="text-[0.72rem] text-brand-muted">
+                {{ t().auth.login.mfa.rememberHint }}
+              </span>
+            </span>
           </label>
-          <p-password
-            inputId="password"
-            formControlName="password"
+
+          <p-button
+            [label]="t().auth.login.mfa.submit"
             fluid
-            [feedback]="false"
-            [toggleMask]="true"
-            [placeholder]="t().auth.fields.passwordPlaceholder"
-            [invalid]="passwordControl.invalid && passwordControl.touched"
-            aria-describedby="password-error"
+            [loading]="isLoading()"
+            [disabled]="isLoading() || !codigoMfa()"
+            (onClick)="confirmarMfa()"
           />
-          @if (passwordControl.invalid && passwordControl.touched) {
-            <small id="password-error" class="text-[0.78rem] text-red-500">
-              @if (passwordControl.hasError('required')) {
-                {{ t().auth.validation.passwordRequired }}
-              } @else if (passwordControl.hasError('minlength')) {
-                {{ t().auth.validation.passwordMin6 }}
-              }
-            </small>
+
+          <button
+            type="button"
+            class="mx-auto text-[0.8rem] font-medium text-brand-muted underline underline-offset-2 transition-colors hover:text-brand-text"
+            [disabled]="isLoading()"
+            (click)="volverAlLogin()"
+          >
+            {{ t().auth.login.mfa.back }}
+          </button>
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="flex flex-col gap-5">
+          @if (errorMessage()) {
+            <p-message severity="error" [text]="errorMessage()!" styleClass="w-full" />
           }
-        </div>
 
-        <div class="flex justify-end -mt-2">
-          <a
-            routerLink="/auth/forgot-password"
-            class="text-[0.8rem] font-medium text-brand-muted no-underline transition-colors hover:text-brand-text"
-          >
-            {{ t().auth.login.forgotLink }}
-          </a>
-        </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="email" class="text-[0.855rem] font-semibold text-brand-text tracking-tight">
+              {{ t().auth.fields.email }}
+            </label>
+            <input
+              pInputText
+              id="email"
+              type="email"
+              formControlName="email"
+              fluid
+              [placeholder]="t().auth.fields.emailPlaceholder"
+              [invalid]="emailControl.invalid && emailControl.touched"
+              aria-describedby="email-error"
+            />
+            @if (emailControl.invalid && emailControl.touched) {
+              <small id="email-error" class="text-[0.78rem] text-red-500">
+                @if (emailControl.hasError('required')) {
+                  {{ t().auth.validation.emailRequired }}
+                } @else if (emailControl.hasError('email')) {
+                  {{ t().auth.validation.emailInvalid }}
+                }
+              </small>
+            }
+          </div>
 
-        <lib-turnstile
-          (verified)="captchaToken.set($event)"
-          (expired)="captchaToken.set(null)"
-          (errored)="captchaToken.set(null)"
-        />
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="password"
+              class="text-[0.855rem] font-semibold text-brand-text tracking-tight"
+            >
+              {{ t().auth.fields.password }}
+            </label>
+            <p-password
+              inputId="password"
+              formControlName="password"
+              fluid
+              [feedback]="false"
+              [toggleMask]="true"
+              [placeholder]="t().auth.fields.passwordPlaceholder"
+              [invalid]="passwordControl.invalid && passwordControl.touched"
+              aria-describedby="password-error"
+            />
+            @if (passwordControl.invalid && passwordControl.touched) {
+              <small id="password-error" class="text-[0.78rem] text-red-500">
+                @if (passwordControl.hasError('required')) {
+                  {{ t().auth.validation.passwordRequired }}
+                } @else if (passwordControl.hasError('minlength')) {
+                  {{ t().auth.validation.passwordMin6 }}
+                }
+              </small>
+            }
+          </div>
 
-        <p-button
-          type="submit"
-          [label]="t().auth.login.submit"
-          fluid
-          [loading]="isLoading()"
-          [disabled]="isLoading() || !captchaToken()"
-        />
+          <div class="flex justify-end -mt-2">
+            <a
+              routerLink="/auth/forgot-password"
+              class="text-[0.8rem] font-medium text-brand-muted no-underline transition-colors hover:text-brand-text"
+            >
+              {{ t().auth.login.forgotLink }}
+            </a>
+          </div>
 
-        <p class="text-center text-[0.8rem] text-brand-muted m-0">
-          {{ t().auth.login.noAccount }}
-          <a
-            routerLink="/auth/register"
-            class="font-semibold text-brand-blue no-underline transition-opacity hover:opacity-75"
-          >
-            {{ t().auth.login.registerLink }}
-          </a>
-        </p>
-      </form>
+          <lib-turnstile
+            (verified)="captchaToken.set($event)"
+            (expired)="captchaToken.set(null)"
+            (errored)="captchaToken.set(null)"
+          />
+
+          <p-button
+            type="submit"
+            [label]="t().auth.login.submit"
+            fluid
+            [loading]="isLoading()"
+            [disabled]="isLoading() || !captchaToken()"
+          />
+
+          <p class="text-center text-[0.8rem] text-brand-muted m-0">
+            {{ t().auth.login.noAccount }}
+            <a
+              routerLink="/auth/register"
+              class="font-semibold text-brand-blue no-underline transition-opacity hover:opacity-75"
+            >
+              {{ t().auth.login.registerLink }}
+            </a>
+          </p>
+        </form>
+      }
     </div>
   </div>
 </div>

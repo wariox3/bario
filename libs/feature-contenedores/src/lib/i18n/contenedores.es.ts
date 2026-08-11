@@ -39,6 +39,10 @@ export const contenedoresEs: ContenedoresDict = {
       ownerCta: 'Renovar suscripción',
       memberLocked: 'Solo el propietario puede renovar',
     },
+    roles: {
+      propietario: 'Propietario',
+      miembro: 'Miembro',
+    },
   },
   create: {
     title: 'Nuevo contenedor',
@@ -112,6 +116,11 @@ export const contenedoresEs: ContenedoresDict = {
       invalid: 'Ingresá un correo válido.',
       submit: 'Enviar invitación',
       sending: 'Enviando…',
+      grupos: {
+        label: 'Grupos',
+        placeholder: 'Seleccioná los grupos (opcional)',
+        empty: 'No hay grupos disponibles.',
+      },
     },
     pending: {
       estados: { P: 'Pendiente', A: 'Aceptada', R: 'Rechazada' },
@@ -137,8 +146,7 @@ export const contenedoresEs: ContenedoresDict = {
       you: 'tú',
       roles: {
         propietario: 'Propietario',
-        administrador: 'Administrador',
-        usuario: 'Miembro',
+        miembro: 'Miembro',
       },
       removeAria: 'Quitar miembro',
     },

@@ -78,7 +78,7 @@
         @if (isOwner()) {
           <i class="pi pi-crown text-[0.6rem]" aria-hidden="true"></i>
         }
-        {{ contenedor().rol_nombre }}
+        {{ isOwner() ? ownerLabel() : memberLabel() }}
       </span>
       @if (!contenedor().activo) {
         <span

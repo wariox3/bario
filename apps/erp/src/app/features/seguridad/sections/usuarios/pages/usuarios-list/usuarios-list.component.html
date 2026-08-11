@@ -1,0 +1,74 @@
+<!--
+  Sin acceso no se dibuja ni la toolbar ni la tabla: no hay nada que filtrar ni
+  ninguna acción que ofrecer. El panel ocupa el recuadro de la tabla, así que la
+  página conserva su marco (breadcrumb, título, sidebar) y el usuario sigue
+  ubicado.
+
+  Van dos bloques y no un `@if/@else` con los dos adentro: un bloque de control
+  de flujo solo proyecta a un slot si tiene **un único nodo raíz**. Con la
+  toolbar y la tabla juntas, ninguna llegaba a su slot y el cuerpo del shell
+  quedaba vacío (NG8011).
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().seguridad.menu.usuarios">
+  @if (!forbiddenMessage()) {
+    <lib-data-toolbar
+      toolbar
+      [primaryAction]="primaryAction"
+      [trailingActions]="trailingActions"
+      [searchEnabled]="true"
+      [searchValue]="searchValue()"
+      searchPlaceholderKey="seguridad.usuarios.searchPlaceholder"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      [deleteSelectedEnabled]="eliminables().length > 0"
+      [deleteSelectedCount]="eliminables().length"
+      (searched)="onSearch($event)"
+      (actionInvoked)="onToolbarAction($event)"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+      (deleteSelected)="removeSelected()"
+    />
+  }
+
+  @if (forbiddenMessage(); as motivo) {
+    <app-access-denied table [message]="motivo" [backLink]="inicioLink()" />
+  } @else {
+    <lib-data-table
+      table
+      [columns]="columns"
+      [items]="pageItems()"
+      [totalCount]="totalCount()"
+      [loading]="isLoading()"
+      [pageSize]="pageSize()"
+      [currentPage]="currentPage()"
+      selectionMode="multiple"
+      [selectedRows]="selectedRows()"
+      [selectableFor]="noEsPropietario"
+      [rowActions]="rowActions"
+      [rowClickable]="true"
+      [rowClickableFor]="noEsPropietario"
+      emptyTitleKey="seguridad.usuarios.empty.title"
+      emptySubKey="seguridad.usuarios.empty.sub"
+      (pageChange)="onPageChange($event)"
+      (selectionChange)="onSelectionChange($event)"
+      (rowActionInvoked)="onRowAction($event)"
+      (rowClick)="onRowClick($event)"
+    />
+  }
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-invitar-usuario-dialog
+  [visible]="inviteVisible()"
+  (visibleChange)="inviteVisible.set($event)"
+  (invited)="onChanged()"
+/>
+
+<p-confirmDialog />

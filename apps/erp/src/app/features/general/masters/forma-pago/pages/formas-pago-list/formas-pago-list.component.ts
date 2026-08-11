@@ -27,6 +27,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { FormaPagoService } from '../../forma-pago.service';
 import type { FormaPago } from '../../forma-pago.model';
@@ -107,9 +108,11 @@ export class FormasPagoListComponent {
 
   protected readonly columns = FORMAS_PAGO_COLUMNS;
   protected readonly filterFields = FORMAS_PAGO_FILTER_FIELDS;
-  protected readonly rowActions = FORMAS_PAGO_ROW_ACTIONS;
-  protected readonly primaryAction = FORMAS_PAGO_PRIMARY_ACTION;
-  protected readonly trailingActions = FORMAS_PAGO_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.formaPago, {
+    row: FORMAS_PAGO_ROW_ACTIONS,
+    primary: FORMAS_PAGO_PRIMARY_ACTION,
+    trailing: FORMAS_PAGO_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();

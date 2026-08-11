@@ -1,4 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 /**
  * Descriptor del módulo Venta para la capa de navegación.
@@ -10,9 +11,16 @@ import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
  * Acordeones: "Documentos" (contrato/pedido/factura de servicio), "Proceso" e
  * "Informes" (Pendiente por facturar). Sumar entradas a `items` (o nuevos
  * grupos/acordeones) cuando se implementen más documentos, procesos o informes.
+ *
+ * Las entradas que el backend sabe permisar declaran su `modelo`, el mismo que
+ * `venta.routes.ts` le pasa a `withPermission`. Las que no lo declaran quedan
+ * abiertas: los documentos comparten un único modelo (`general.documento`) y
+ * almacén todavía no está catalogado. "Inicio" tampoco lleva: es el landing del
+ * módulo, si el módulo se ve el inicio se ve.
  */
 export const VENTA_MODULE: ErpModuleDescriptor = {
   id: 'venta',
+  accessFlag: 'acceso_venta',
   displayNameKey: 'modules.venta.name',
   iconClass: 'pi pi-tag',
   defaultChildPath: 'inicio',
@@ -28,6 +36,11 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
         {
           items: [
             {
+              labelKey: 'entities.facturaVentaRecurrente.name',
+              path: 'factura-venta-recurrente/list',
+              activeMatch: 'factura-venta-recurrente',
+            },
+            {
               labelKey: 'entities.pedidoCliente.name',
               path: 'pedido-cliente/list',
               activeMatch: 'pedido-cliente',
@@ -38,24 +51,9 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'remision',
             },
             {
-              labelKey: 'entities.contratoServicio.name',
-              path: 'contrato-servicio/list',
-              activeMatch: 'contrato-servicio',
-            },
-            {
-              labelKey: 'entities.pedidoServicio.name',
-              path: 'pedido-servicio/list',
-              activeMatch: 'pedido-servicio',
-            },
-            {
               labelKey: 'entities.facturaVenta.name',
               path: 'factura-venta/list',
               activeMatch: 'factura-venta',
-            },
-            {
-              labelKey: 'entities.facturaPos.name',
-              path: 'factura-pos/list',
-              activeMatch: 'factura-pos',
             },
             {
               labelKey: 'entities.facturaPosElectronica.name',
@@ -63,14 +61,9 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               activeMatch: 'factura-pos-electronica',
             },
             {
-              labelKey: 'entities.cuentaCobro.name',
-              path: 'cuenta-cobro/list',
-              activeMatch: 'cuenta-cobro',
-            },
-            {
-              labelKey: 'entities.facturaVentaRecurrente.name',
-              path: 'factura-venta-recurrente/list',
-              activeMatch: 'factura-venta-recurrente',
+              labelKey: 'entities.facturaPos.name',
+              path: 'factura-pos/list',
+              activeMatch: 'factura-pos',
             },
             {
               labelKey: 'entities.notaCredito.name',
@@ -81,6 +74,22 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.notaDebito.name',
               path: 'nota-debito/list',
               activeMatch: 'nota-debito',
+            },
+            {
+              labelKey: 'entities.cuentaCobro.name',
+              path: 'cuenta-cobro/list',
+              activeMatch: 'cuenta-cobro',
+            },
+            // Los de servicio quedan al final: no venían en el orden pedido.
+            {
+              labelKey: 'entities.contratoServicio.name',
+              path: 'contrato-servicio/list',
+              activeMatch: 'contrato-servicio',
+            },
+            {
+              labelKey: 'entities.pedidoServicio.name',
+              path: 'pedido-servicio/list',
+              activeMatch: 'pedido-servicio',
             },
           ],
         },
@@ -95,13 +104,41 @@ export const VENTA_MODULE: ErpModuleDescriptor = {
       groups: [
         {
           items: [
-            { labelKey: 'entities.contacto.name', path: 'contactos' },
-            { labelKey: 'entities.item.name', path: 'items' },
-            // sede: pendiente (el master aún no existe)
-            { labelKey: 'entities.precio.name', path: 'precios' },
-            { labelKey: 'entities.asesor.name', path: 'asesores' },
-            { labelKey: 'entities.resolucion.name', path: 'resoluciones' },
-            { labelKey: 'entities.cuentaBanco.name', path: 'cuentas-banco' },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.item.name',
+              path: 'items',
+              modelo: MODELO.general.item,
+            },
+            {
+              labelKey: 'entities.almacen.name',
+              path: 'almacenes',
+            },
+            // sede: pendiente (el master aún no existe); va acá cuando se cree.
+            {
+              labelKey: 'entities.precio.name',
+              path: 'precios',
+              modelo: MODELO.general.precio,
+            },
+            {
+              labelKey: 'entities.asesor.name',
+              path: 'asesores',
+              modelo: MODELO.general.asesor,
+            },
+            {
+              labelKey: 'entities.resolucion.name',
+              path: 'resoluciones',
+              modelo: MODELO.general.resolucion,
+            },
+            {
+              labelKey: 'entities.cuentaBanco.name',
+              path: 'cuentas-banco',
+              modelo: MODELO.general.cuentaBanco,
+            },
           ],
         },
       ],
