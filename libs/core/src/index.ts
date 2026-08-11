@@ -4,6 +4,15 @@ export {
   AUTH_DEFAULT_SKIP_URLS,
 } from './lib/auth/base-auth.service';
 export type { AuthApiEndpoints } from './lib/auth/base-auth.service';
+export { SesionNoConfirmadaError } from './lib/auth/auth.errors';
+export {
+  MFA_CODIGO_LARGO,
+  MFA_CODIGO_RESPALDO_LARGO,
+  MFA_CODIGO_VIGENCIA_SEGUNDOS,
+  MFA_REENVIO_ESPERA_SEGUNDOS,
+  formatSegundos,
+} from './lib/mfa/mfa.constants';
+export { RelojMfa, crearRelojMfa } from './lib/mfa/reloj-mfa';
 export { authGuard } from './lib/guards/auth.guard';
 export { publicGuard } from './lib/guards/public.guard';
 export { authInterceptor } from './lib/interceptors/auth.interceptor';
@@ -14,7 +23,10 @@ export type { PaginatedResponse } from './lib/models/pagination.model';
 export type {
   BaseUsuario,
   Usuario,
+  LoginMfaRequest,
   LoginRequest,
+  LoginResult,
+  MfaDesafio,
   AuthResponse,
   ResendVerificationRequest,
   RegisterRequest,

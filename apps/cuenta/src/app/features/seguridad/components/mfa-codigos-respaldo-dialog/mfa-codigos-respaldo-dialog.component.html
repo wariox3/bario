@@ -34,7 +34,9 @@
 
   @if (visible()) {
     <div class="flex flex-col gap-[1.1rem]">
-      <!-- Para qué sirven: sin esto son 10 strings sin sentido -->
+      <!-- Cómo se guardan. NO se promete que sirvan para entrar: hoy el login no acepta
+           códigos de respaldo, y prometerlo dejaría afuera a quien pierda su método
+           creyendo que tiene una salida. Revisar este texto cuando el backend los acepte. -->
       <div
         class="flex items-start gap-2.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2.5"
       >
@@ -44,7 +46,7 @@
           <i class="pi pi-info-circle text-[0.7rem]"></i>
         </span>
         <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">
-          Si pierdes acceso a tu correo, cada uno de estos códigos te deja entrar
+          Cada uno de estos códigos sirve
           <strong class="font-semibold text-brand-text">una sola vez</strong>. Guárdalos donde
           guardarías una llave: no en la misma cuenta de correo.
         </p>

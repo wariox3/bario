@@ -11,22 +11,15 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { InputOtpModule } from 'primeng/inputotp';
-import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { extractErrorMessage } from '@reddoc/core';
+import { MfaCodigoInputComponent } from '@reddoc/ui';
 import { AuthService } from '../../../auth/services/auth.service';
-import {
-  MFA_CODIGO_LARGO,
-  MFA_CODIGO_RESPALDO_LARGO,
-  MfaActivarResponse,
-  MfaIntentoModo,
-  MfaMetodoFila,
-  formatSegundos,
-} from '../../models/mfa-metodo.model';
+import { MfaIntentoModo, MfaMetodoFila } from '../../models/mfa-metodo.model';
 import { MfaService } from '../../services/mfa.service';
 
 /** `sebastian.h.piedrahita@gmail.com` → `s•••@gmail.com`. */
@@ -45,14 +38,7 @@ function enmascararCelular(celular: string): string {
 @Component({
   selector: 'app-mfa-verificar-dialog',
   standalone: true,
-  imports: [
-    DialogModule,
-    ButtonModule,
-    InputOtpModule,
-    InputTextModule,
-    PasswordModule,
-    FormsModule,
-  ],
+  imports: [DialogModule, ButtonModule, PasswordModule, FormsModule, MfaCodigoInputComponent],
   templateUrl: './mfa-verificar-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -93,15 +79,7 @@ export class MfaVerificarDialogComponent {
 
   /** Solo al desactivar: el backend exige la contraseña además del código. */
   readonly password = signal('');
-  /** Solo al desactivar: el backend acepta un código de respaldo en lugar del de 6 dígitos. */
-  readonly usarRespaldo = signal(false);
-
-  readonly largo = MFA_CODIGO_LARGO;
-  readonly largoRespaldo = MFA_CODIGO_RESPALDO_LARGO;
-
   readonly expirado = computed(() => this.restante() === 0);
-  readonly restanteEtiqueta = computed(() => formatSegundos(this.restante()));
-  readonly esperaEtiqueta = computed(() => formatSegundos(this.esperaReenvio()));
 
   /** El código de la app autenticadora no lo enviamos nosotros: no hay destino ni reenvío. */
   readonly esTotp = computed(() => this.metodo()?.codigo === 'totp');
@@ -117,18 +95,10 @@ export class MfaVerificarDialogComponent {
     return usuario.email ? enmascararEmail(usuario.email) : null;
   });
 
-  readonly puedeReenviar = computed(
-    () => !this.esTotp() && !this.isVerifying() && this.esperaReenvio() === 0,
-  );
-
   readonly esDesactivar = computed(() => this.modo() === 'desactivar');
 
-  /** El código está completo según el formato que se esté usando. */
-  readonly codigoCompleto = computed(() =>
-    this.usarRespaldo()
-      ? this.codigo().trim().length === this.largoRespaldo
-      : this.codigo().length === this.largo,
-  );
+  /** El código quedó completo: lo avisa el componente compartido. */
+  readonly codigoCompleto = signal(false);
 
   /** Todo lo que el endpoint necesita está puesto. */
   readonly puedeConfirmar = computed(
@@ -145,40 +115,39 @@ export class MfaVerificarDialogComponent {
     effect(() => {
       this.mfaToken();
       this.codigo.set('');
+      this.codigoCompleto.set(false);
       this.errorMensaje.set(null);
     });
   }
 
-  /** Cambiar de formato limpia el campo: un código de 6 no es prefijo de uno de 10. */
-  alternarRespaldo(): void {
-    this.usarRespaldo.update((valor) => !valor);
-    this.codigo.set('');
-    this.errorMensaje.set(null);
-  }
-
-  onRespaldoChange(valor: string): void {
-    this.codigo.set((valor ?? '').toUpperCase());
-    this.errorMensaje.set(null);
-  }
-
-  /**
-   * Se completaron las casillas: confirmamos sin obligar a apretar el botón. Solo si no
-   * falta nada más — con la contraseña vacía, auto-enviar sería un error garantizado.
-   */
+  /** El código cambió: se pierde el error anterior y se recalcula si ya está completo. */
   onCodigoChange(valor: string): void {
     this.codigo.set(valor ?? '');
     this.errorMensaje.set(null);
+    this.codigoCompleto.set(false);
+  }
+
+  /**
+   * Se completó el código: confirmamos sin obligar a apretar el botón. Solo si no falta
+   * nada más — con la contraseña vacía, auto-enviar sería un error garantizado.
+   */
+  onCodigoCompletado(valor: string): void {
+    this.codigo.set(valor);
+    this.codigoCompleto.set(true);
     if (this.puedeConfirmar()) this.verificar();
   }
 
   onCancel(): void {
     if (this.isVerifying()) return;
+    // El componente vive mientras viva la card: sin esto la contraseña queda en memoria
+    // y reaparece escrita en la próxima apertura.
+    this.password.set('');
     this.visibleChange.emit(false);
   }
 
   onReenviar(): void {
     const metodo = this.metodo();
-    if (!metodo || !this.puedeReenviar()) return;
+    if (!metodo || this.esperaReenvio() > 0 || this.isVerifying()) return;
 
     this.errorMensaje.set(null);
     this.reenviar.emit(metodo);
@@ -193,28 +162,44 @@ export class MfaVerificarDialogComponent {
     this.errorMensaje.set(null);
 
     const codigo = this.codigo().trim();
-    const confirmar$ = this.esDesactivar()
-      ? this.mfaService.desactivar(this.password(), token, codigo)
-      : this.mfaService.activar(token, codigo);
+    // Los dos flujos van por separado y tipados: al mezclarlos en un solo observable el
+    // tipo colapsaba a `unknown` y un `codigos_respaldo` ausente se volvía `[]` en
+    // silencio — códigos perdidos sin que nadie se entere.
+    const confirmar$: Observable<readonly string[]> = this.esDesactivar()
+      ? // Desactivar no genera códigos de respaldo: los invalida.
+        this.mfaService.desactivar(this.password(), token, codigo).pipe(map(() => []))
+      : this.mfaService.activar(token, codigo).pipe(map((r) => r.codigos_respaldo ?? []));
 
     confirmar$
       .pipe(
         // Cambió el estado del MFA: releemos `/me` para que la card lo refleje, pero
-        // conservando la respuesta — al activar, los códigos de respaldo vienen ahí
-        // y no se repiten.
-        switchMap((respuesta) => this.authService.me().pipe(map(() => respuesta))),
+        // conservando los códigos — al activar vienen en esa respuesta y no se repiten.
+        //
+        // Si `/me` falla, se sigue igual: la operación ya se hizo, y perder los códigos
+        // por un blip de red sería irreversible. La card se reacomoda al recargar.
+        switchMap((codigosRespaldo) =>
+          this.authService.me().pipe(
+            catchError(() => of(null)),
+            map(() => codigosRespaldo),
+          ),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: (respuesta) => {
+        next: (codigosRespaldo) => {
           this.isVerifying.set(false);
-          this.verificado.emit({
-            metodo,
-            // Desactivar no genera códigos de respaldo: los invalida.
-            codigosRespaldo: this.esDesactivar()
-              ? []
-              : ((respuesta as MfaActivarResponse)?.codigos_respaldo ?? []),
-          });
+          this.password.set('');
+
+          // Activar sin códigos es una anomalía del backend, no un caso normal: se avisa
+          // en vez de cerrar como si todo hubiera salido bien.
+          if (!this.esDesactivar() && codigosRespaldo.length === 0) {
+            this.errorMensaje.set(
+              'Se activó la verificación, pero no recibimos tus códigos de respaldo. Contacta a soporte.',
+            );
+            return;
+          }
+
+          this.verificado.emit({ metodo, codigosRespaldo });
         },
         error: (err) => {
           this.isVerifying.set(false);
@@ -225,6 +210,7 @@ export class MfaVerificarDialogComponent {
           );
           // Se limpia el código, no la contraseña: casi siempre el que falla es el código.
           this.codigo.set('');
+          this.codigoCompleto.set(false);
         },
       });
   }

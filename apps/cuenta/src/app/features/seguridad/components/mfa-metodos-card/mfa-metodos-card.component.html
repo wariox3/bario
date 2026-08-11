@@ -74,13 +74,31 @@
       </div>
     } @else if (activoDesconocido()) {
       <div
-        class="flex items-start gap-2.5 border-b border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] px-5 py-3 max-[576px]:px-4"
+        class="flex items-start gap-2.5 border-b border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] px-5 py-3 max-[576px]:px-4 max-[576px]:flex-wrap"
       >
         <i class="pi pi-exclamation-triangle mt-[0.1rem] text-[0.8rem] text-brand-muted"></i>
-        <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">
+        <p class="m-0 flex-1 text-[0.75rem] leading-relaxed text-brand-muted">
           Tienes la verificación activa con un método que ya no está disponible. Elige uno de la
-          lista para reemplazarlo.
+          lista para reemplazarlo, o desactívala.
         </p>
+        <!-- Sin esto no hay salida: el "Desactivar" de la lista cuelga de una fila activa,
+             y en este estado no hay ninguna. -->
+        <p-button
+          [label]="
+            tieneCodigoVivo(filaDesconocida(), 'desactivar') ? 'Ingresar código' : 'Desactivar'
+          "
+          [icon]="
+            tieneCodigoVivo(filaDesconocida(), 'desactivar') ? 'pi pi-pencil' : 'pi pi-power-off'
+          "
+          [text]="true"
+          severity="secondary"
+          size="small"
+          [loading]="pendiente() === filaDesconocida().codigo"
+          [disabled]="pendiente() !== null"
+          class="shrink-0 max-[576px]:w-full"
+          styleClass="max-[576px]:w-full"
+          (onClick)="onDesactivar(filaDesconocida())"
+        />
       </div>
     }
 

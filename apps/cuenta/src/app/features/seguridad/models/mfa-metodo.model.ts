@@ -1,4 +1,10 @@
 /**
+ * Tipos del segundo factor propios de esta app. Las constantes (vigencia, espera de
+ * reenvío, largos de código) y `formatSegundos` viven en `@reddoc/core`: las comparte
+ * con el login de `libs/ui` y tener dos copias significaba dos relojes distintos.
+ */
+
+/**
  * Un método de autenticación en varias fases, tal como lo lista
  * `GET /seguridad/mfa/metodos/`.
  *
@@ -32,45 +38,23 @@ export interface MfaActivarResponse {
   readonly codigos_respaldo: readonly string[];
 }
 
-/** Vigencia del código, según el correo que manda el backend ("vence en 5 minutos"). */
-export const MFA_CODIGO_VIGENCIA_SEGUNDOS = 300;
-
-/** Largo del código de verificación. */
-export const MFA_CODIGO_LARGO = 6;
-
-/** Largo de un código de respaldo (`GIKV5U2WTS`). Sirve donde el backend lo permita. */
-export const MFA_CODIGO_RESPALDO_LARGO = 10;
-
-/**
- * Espera mínima entre envíos de código.
- *
- * Es UX, no seguridad: vive en memoria y se evade recargando la página. El límite de
- * verdad tiene que ponerlo el backend (429 + `retry_after`). Esto solo evita que el
- * usuario honesto se dispare correos de más por impaciencia.
- */
-export const MFA_REENVIO_ESPERA_SEGUNDOS = 60;
-
 /**
  * Para qué se pidió el código. Las dos operaciones comparten modal y relojes; lo único
  * que cambia es el endpoint que lo confirma y el texto que lee el usuario.
  */
 export type MfaIntentoModo = 'activar' | 'desactivar';
 
-/** Intento en curso: qué método, para qué, con qué token y desde cuándo. */
+/**
+ * Intento en curso: qué método, para qué y con qué token.
+ *
+ * Cuándo se pidió no vive acá: lo lleva el `RelojMfa` de la card, que es quien sabe qué
+ * marca reiniciar en cada envío.
+ */
 export interface MfaIntento {
   /** `codigo` del método involucrado. */
   readonly metodo: string;
   readonly modo: MfaIntentoModo;
   readonly token: string;
-  /** Epoch en ms del envío que generó este token. */
-  readonly pedidoEn: number;
-}
-
-/** `152` → `2:32`. El minuto adelante para que se lea como reloj. */
-export function formatSegundos(total: number): string {
-  const minutos = Math.floor(total / 60);
-  const segundos = total % 60;
-  return `${minutos}:${segundos.toString().padStart(2, '0')}`;
 }
 
 /**

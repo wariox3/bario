@@ -42,43 +42,6 @@
 
   @if (visible()) {
     <div class="flex flex-col gap-[1.1rem]">
-      <!-- Banda: a dónde fue el código y cuánto le queda de vida -->
-      <div
-        class="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2"
-      >
-        <span
-          class="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-navy"
-        >
-          <i [class]="esTotp() ? 'pi pi-mobile' : 'pi pi-send'" class="text-[0.7rem]"></i>
-        </span>
-
-        @if (esTotp()) {
-          <span class="text-[0.75rem] text-brand-muted">Código de tu app autenticadora</span>
-        } @else if (destino()) {
-          <span class="text-[0.72rem] uppercase tracking-[0.04em] text-brand-muted">Enviado a</span>
-          <span
-            class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold text-brand-text"
-          >
-            {{ destino() }}
-          </span>
-        } @else {
-          <span class="text-[0.75rem] text-brand-muted">Te enviamos un código</span>
-        }
-
-        <!-- Reloj: el código vence, y eso manda sobre lo que se puede hacer acá -->
-        <span
-          class="ml-auto shrink-0 rounded-md border px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
-          [class]="
-            expirado()
-              ? 'border-dashed border-[rgba(20,48,73,0.25)] text-brand-muted'
-              : 'border-transparent bg-[rgba(20,48,73,0.06)] text-brand-text'
-          "
-          [title]="expirado() ? 'El código venció' : 'Tiempo restante del código'"
-        >
-          {{ expirado() ? 'Venció' : restanteEtiqueta() }}
-        </span>
-      </div>
-
       <!-- Desactivar baja la protección: se dice antes de teclear, no después -->
       @if (esDesactivar()) {
         <div
@@ -116,97 +79,19 @@
         </div>
       }
 
-      <!-- El código: 6 casillas, o el de respaldo si el usuario ya no tiene su correo -->
-      <div class="flex flex-col items-center gap-2.5 py-1">
-        <!-- `span` y no `label`: el OTP son 6 inputs, no hay un único control al que apuntar
-             con `for`. Se asocia por `aria-labelledby` desde el propio componente. -->
-        <span id="mfa-codigo-label" class="text-[0.78rem] font-semibold text-brand-navy">
-          @if (usarRespaldo()) {
-            Ingresa uno de tus códigos de respaldo
-          } @else {
-            Ingresa el código de {{ largo }} dígitos
-          }
-        </span>
-
-        @if (usarRespaldo()) {
-          <input
-            pInputText
-            id="mfa-codigo-respaldo"
-            [ngModel]="codigo()"
-            (ngModelChange)="onRespaldoChange($event)"
-            [maxlength]="largoRespaldo"
-            [disabled]="isVerifying()"
-            aria-labelledby="mfa-codigo-label"
-            autocomplete="one-time-code"
-            spellcheck="false"
-            placeholder="GIKV5U2WTS"
-            class="w-[13rem] text-center font-mono text-[0.95rem] font-semibold tracking-[0.18em] uppercase"
-          />
-        } @else {
-          <p-inputOtp
-            [ngModel]="codigo()"
-            (ngModelChange)="onCodigoChange($event)"
-            [length]="largo"
-            [integerOnly]="true"
-            [disabled]="expirado() || isVerifying()"
-            [autofocus]="true"
-            aria-labelledby="mfa-codigo-label"
-          />
-        }
-
-        @if (errorMensaje(); as mensaje) {
-          <p class="m-0 flex items-center gap-1.5 text-[0.75rem] text-red-600">
-            <i class="pi pi-exclamation-circle text-[0.75rem]"></i>
-            {{ mensaje }}
-          </p>
-        } @else if (usarRespaldo()) {
-          <p class="m-0 text-[0.75rem] text-brand-muted">
-            Cada código de respaldo sirve una sola vez
-          </p>
-        } @else if (expirado()) {
-          <p class="m-0 text-[0.75rem] text-brand-muted">
-            @if (esTotp()) {
-              Vuelve a intentarlo desde la lista de métodos.
-            } @else {
-              Pide otro código para continuar.
-            }
-          </p>
-        } @else if (!esDesactivar()) {
-          <p class="m-0 text-[0.75rem] text-brand-muted">Se verifica solo al completarlo</p>
-        }
-      </div>
-
-      <!-- Salida de emergencia: si perdió el acceso al correo, el respaldo es su única vía -->
-      @if (esDesactivar()) {
-        <div class="flex items-center justify-center text-[0.75rem]">
-          <button
-            type="button"
-            class="font-semibold text-brand-navy underline underline-offset-2 transition-opacity hover:opacity-70"
-            [disabled]="isVerifying()"
-            (click)="alternarRespaldo()"
-          >
-            {{ usarRespaldo() ? 'Usar el código de 6 dígitos' : 'Usar un código de respaldo' }}
-          </button>
-        </div>
-      }
-
-      <!-- Reenvío: la espera va DENTRO del botón, que es lo que está bloqueado -->
-      @if (!esTotp() && !usarRespaldo()) {
-        <div class="flex items-center justify-center gap-1.5 text-[0.75rem]">
-          <span class="text-brand-muted">¿No te llegó?</span>
-          <button
-            type="button"
-            class="font-semibold text-brand-navy underline underline-offset-2 transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:text-brand-muted disabled:no-underline disabled:opacity-60"
-            [disabled]="!puedeReenviar()"
-            (click)="onReenviar()"
-          >
-            Enviar otro código
-            @if (esperaReenvio() > 0) {
-              <span class="ml-1 font-mono tabular-nums">({{ esperaEtiqueta() }})</span>
-            }
-          </button>
-        </div>
-      }
+      <lib-mfa-codigo-input
+        [codigo]="codigo()"
+        (codigoChange)="onCodigoChange($event)"
+        [destino]="destino()"
+        [esTotp]="esTotp()"
+        [restante]="restante()"
+        [esperaReenvio]="esperaReenvio()"
+        [permiteRespaldo]="esDesactivar()"
+        [ocupado]="isVerifying()"
+        [error]="errorMensaje()"
+        (completado)="onCodigoCompletado($event)"
+        (reenviar)="onReenviar()"
+      />
     </div>
   }
 

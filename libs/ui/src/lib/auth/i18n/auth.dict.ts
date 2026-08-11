@@ -35,6 +35,41 @@ export interface AuthDict {
     noAccount: string;
     registerLink: string;
     errors: { invalidCredentials: string };
+    mfa: {
+      title: string;
+      subtitle: string;
+      remember: string;
+      rememberHint: string;
+      submit: string;
+      back: string;
+      errors: { invalidCode: string; sessionUnconfirmed: string };
+    };
+  };
+  /**
+   * Textos de `lib-mfa-codigo-input`. Va suelto y no bajo `login` porque el mismo
+   * componente se usa fuera del login (el modal de seguridad de `cuenta`).
+   *
+   * Los `…Prefix`/`…Suffix` son para intercalar el largo del código, que sale de una
+   * constante y no del diccionario.
+   */
+  mfaCodigo: {
+    totpHint: string;
+    sentToLabel: string;
+    sentGeneric: string;
+    expiredBadge: string;
+    expiredTitle: string;
+    remainingTitle: string;
+    codeLabelPrefix: string;
+    codeLabelSuffix: string;
+    backupLabel: string;
+    backupOnce: string;
+    expiredRestart: string;
+    expiredResend: string;
+    useBackup: string;
+    useCodePrefix: string;
+    useCodeSuffix: string;
+    notReceived: string;
+    resend: string;
   };
   register: {
     title: string;

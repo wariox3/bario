@@ -13,9 +13,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { MfaCodigosRespaldoDialogComponent } from '../mfa-codigos-respaldo-dialog/mfa-codigos-respaldo-dialog.component';
 import { MfaVerificarDialogComponent } from '../mfa-verificar-dialog/mfa-verificar-dialog.component';
 import { AuthService } from '../../../auth/services/auth.service';
+import { crearRelojMfa } from '@reddoc/core';
 import {
-  MFA_CODIGO_VIGENCIA_SEGUNDOS,
-  MFA_REENVIO_ESPERA_SEGUNDOS,
   MfaIntento,
   MfaIntentoModo,
   MfaMetodoCatalogo,
@@ -67,24 +66,18 @@ export class MfaMetodosCardComponent {
    */
   readonly codigosRespaldo = signal<readonly string[]>([]);
 
-  /** Reloj de la card: avanza mientras haya un intento, y de él cuelgan las dos cuentas. */
-  private readonly ahora = signal(Date.now());
-  private intervalo: ReturnType<typeof setInterval> | null = null;
-
-  private readonly transcurrido = computed(() => {
-    const intento = this.intento();
-    return intento === null ? 0 : Math.floor((this.ahora() - intento.pedidoEn) / 1000);
-  });
+  /**
+   * Reloj de la card. Acá cada envío es un `configurar/` nuevo —token y vigencia
+   * nuevos—, así que siempre se marca el desafío completo: las dos cuentas arrancan
+   * juntas de cero.
+   */
+  private readonly reloj = crearRelojMfa();
 
   /** Segundos que le quedan de vida al código enviado. */
-  readonly restante = computed(() =>
-    Math.max(0, MFA_CODIGO_VIGENCIA_SEGUNDOS - this.transcurrido()),
-  );
+  readonly restante = this.reloj.restante;
 
   /** Segundos que faltan para poder pedir otro código. */
-  readonly esperaReenvio = computed(() =>
-    Math.max(0, MFA_REENVIO_ESPERA_SEGUNDOS - this.transcurrido()),
-  );
+  readonly esperaReenvio = this.reloj.esperaReenvio;
 
   /** Hay un código vivo: volver a "Activar" no debe pedir uno nuevo. */
   readonly intentoVigente = computed(() => this.intento() !== null && this.restante() > 0);
@@ -127,9 +120,14 @@ export class MfaMetodosCardComponent {
   /** La fila del intento en curso — la que alimenta el modal. */
   readonly filaEnIntento = computed(() => {
     const intento = this.intento();
-    return intento === null
-      ? null
-      : (this.filas().find((f) => f.codigo === intento.metodo) ?? null);
+    if (intento === null) return null;
+
+    const delCatalogo = this.filas().find((f) => f.codigo === intento.metodo);
+    if (delCatalogo) return delCatalogo;
+
+    // Desactivación del método desconocido: sin esta rama el modal se quedaría sin
+    // `metodo` y `verificar()` cortaría antes de llamar al endpoint.
+    return this.activoDesconocido() ? this.filaDesconocida() : null;
   });
 
   /**
@@ -140,29 +138,27 @@ export class MfaMetodosCardComponent {
     () => this.protegida() && !this.isLoading() && !this.hasError() && this.filaActiva() === null,
   );
 
+  /**
+   * Fila sintética para el método activo que no está en el catálogo.
+   *
+   * Sin esto no habría forma de apagar el MFA en ese estado: el botón "Desactivar" cuelga
+   * de `fila.activo` y acá no hay ninguna. `desafio/` no necesita saber el método —el
+   * backend ya sabe cuál es el activo—, así que lo único que falta es algo que pintar.
+   */
+  readonly filaDesconocida = computed<MfaMetodoFila>(() => ({
+    codigo: this.usuario()?.mfa_metodo ?? 'desconocido',
+    nombre: 'Tu método actual',
+    presentacion: MFA_METODO_FALLBACK,
+    activo: true,
+    habilitado: true,
+    sugerido: false,
+  }));
+
   /** Filas de esqueleto mientras carga — mismo alto que las reales, sin salto de layout. */
   readonly skeletons = [0, 1, 2];
 
   constructor() {
     this.cargar();
-    this.destroyRef.onDestroy(() => this.detenerReloj());
-  }
-
-  private arrancarReloj(): void {
-    this.ahora.set(Date.now());
-    if (this.intervalo !== null) return;
-    this.intervalo = setInterval(() => {
-      this.ahora.set(Date.now());
-      // Sin intento vivo no hay nada que contar: el reloj se apaga solo.
-      if (this.restante() === 0 && this.esperaReenvio() === 0) this.detenerReloj();
-    }, 1000);
-  }
-
-  private detenerReloj(): void {
-    if (this.intervalo !== null) {
-      clearInterval(this.intervalo);
-      this.intervalo = null;
-    }
   }
 
   cargar(): void {
@@ -202,7 +198,6 @@ export class MfaMetodosCardComponent {
       return;
     }
 
-    this.pendiente.set(fila.codigo);
     this.solicitarCodigo(fila, 'activar', () => this.modalAbierto.set(true));
   }
 
@@ -218,13 +213,18 @@ export class MfaMetodosCardComponent {
       return;
     }
 
-    this.pendiente.set(fila.codigo);
     this.solicitarCodigo(fila, 'desactivar', () => this.modalAbierto.set(true));
   }
 
-  /** Reenvío desde el modal: token nuevo, y las dos cuentas vuelven a empezar. */
+  /**
+   * Reenvío desde el modal: token nuevo, y las dos cuentas vuelven a empezar.
+   *
+   * El guard mira `pendiente`, no solo la espera: esta sigue en 0 hasta que llega la
+   * respuesta, así que sin esto dos clics seguidos son dos correos — y el `intento` se
+   * queda con el último token, dejando muerto el código del primero.
+   */
   onReenviar(fila: MfaMetodoFila): void {
-    if (this.esperaReenvio() > 0) return;
+    if (this.esperaReenvio() > 0 || this.pendiente() !== null) return;
     this.solicitarCodigo(fila, this.intento()?.modo ?? 'activar');
   }
 
@@ -233,19 +233,18 @@ export class MfaMetodosCardComponent {
     modo: MfaIntentoModo,
     alLograrlo?: () => void,
   ): void {
+    // Se marca acá y no en cada llamador: es lo que bloquea el doble envío, y olvidarlo
+    // en una sola de las entradas alcanza para romperlo.
+    this.pendiente.set(fila.codigo);
+
     const peticion$ =
       modo === 'desactivar' ? this.mfaService.desafio() : this.mfaService.configurar(fila.codigo);
 
     peticion$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (respuesta) => {
         this.pendiente.set(null);
-        this.intento.set({
-          metodo: fila.codigo,
-          modo,
-          token: respuesta.mfa_token,
-          pedidoEn: Date.now(),
-        });
-        this.arrancarReloj();
+        this.intento.set({ metodo: fila.codigo, modo, token: respuesta.mfa_token });
+        this.reloj.marcarDesafio();
         alLograrlo?.();
       },
       // El toast del error lo pone el `errorInterceptor`.
@@ -258,7 +257,7 @@ export class MfaMetodosCardComponent {
     readonly codigosRespaldo: readonly string[];
   }): void {
     const modo = this.intento()?.modo ?? 'activar';
-    this.detenerReloj();
+    this.reloj.reiniciar();
     this.intento.set(null);
     this.modalAbierto.set(false);
 
