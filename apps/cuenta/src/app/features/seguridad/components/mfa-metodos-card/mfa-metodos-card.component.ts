@@ -17,6 +17,7 @@ import {
   MFA_CODIGO_VIGENCIA_SEGUNDOS,
   MFA_REENVIO_ESPERA_SEGUNDOS,
   MfaIntento,
+  MfaIntentoModo,
   MfaMetodoCatalogo,
   MfaMetodoFila,
 } from '../../models/mfa-metodo.model';
@@ -47,8 +48,8 @@ export class MfaMetodosCardComponent {
 
   /** El método quedó activo (código verificado). */
   readonly activado = output<MfaMetodoFila>();
-  /** El usuario pidió apagar la autenticación en varias fases. */
-  readonly desactivar = output<MfaMetodoFila>();
+  /** La autenticación en varias fases quedó apagada. */
+  readonly desactivado = output<MfaMetodoFila>();
 
   /** `codigo` del método cuya activación está en vuelo. Bloquea toda la lista. */
   readonly pendiente = signal<string | null>(null);
@@ -183,9 +184,10 @@ export class MfaMetodosCardComponent {
       });
   }
 
-  /** ¿Esta fila ya tiene un código vivo esperando que lo escriban? */
-  tieneCodigoVivo(fila: MfaMetodoFila): boolean {
-    return this.intentoVigente() && this.intento()?.metodo === fila.codigo;
+  /** ¿Esta fila ya tiene un código vivo, para este mismo fin, esperando que lo escriban? */
+  tieneCodigoVivo(fila: MfaMetodoFila, modo: MfaIntentoModo = 'activar'): boolean {
+    const intento = this.intento();
+    return this.intentoVigente() && intento?.metodo === fila.codigo && intento?.modo === modo;
   }
 
   /**
@@ -201,42 +203,70 @@ export class MfaMetodosCardComponent {
     }
 
     this.pendiente.set(fila.codigo);
-    this.solicitarCodigo(fila, () => this.modalAbierto.set(true));
+    this.solicitarCodigo(fila, 'activar', () => this.modalAbierto.set(true));
+  }
+
+  /**
+   * Desactivar también exige código: `desafio/` lo manda al método activo. Mismo modal,
+   * mismos relojes; solo cambia qué endpoint confirma al final.
+   */
+  onDesactivar(fila: MfaMetodoFila): void {
+    if (this.pendiente() !== null) return;
+
+    if (this.tieneCodigoVivo(fila, 'desactivar')) {
+      this.modalAbierto.set(true);
+      return;
+    }
+
+    this.pendiente.set(fila.codigo);
+    this.solicitarCodigo(fila, 'desactivar', () => this.modalAbierto.set(true));
   }
 
   /** Reenvío desde el modal: token nuevo, y las dos cuentas vuelven a empezar. */
   onReenviar(fila: MfaMetodoFila): void {
     if (this.esperaReenvio() > 0) return;
-    this.solicitarCodigo(fila);
+    this.solicitarCodigo(fila, this.intento()?.modo ?? 'activar');
   }
 
-  private solicitarCodigo(fila: MfaMetodoFila, alLograrlo?: () => void): void {
-    this.mfaService
-      .configurar(fila.codigo)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (respuesta) => {
-          this.pendiente.set(null);
-          this.intento.set({
-            metodo: fila.codigo,
-            token: respuesta.mfa_token,
-            pedidoEn: Date.now(),
-          });
-          this.arrancarReloj();
-          alLograrlo?.();
-        },
-        // El toast del error lo pone el `errorInterceptor`.
-        error: () => this.pendiente.set(null),
-      });
+  private solicitarCodigo(
+    fila: MfaMetodoFila,
+    modo: MfaIntentoModo,
+    alLograrlo?: () => void,
+  ): void {
+    const peticion$ =
+      modo === 'desactivar' ? this.mfaService.desafio() : this.mfaService.configurar(fila.codigo);
+
+    peticion$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (respuesta) => {
+        this.pendiente.set(null);
+        this.intento.set({
+          metodo: fila.codigo,
+          modo,
+          token: respuesta.mfa_token,
+          pedidoEn: Date.now(),
+        });
+        this.arrancarReloj();
+        alLograrlo?.();
+      },
+      // El toast del error lo pone el `errorInterceptor`.
+      error: () => this.pendiente.set(null),
+    });
   }
 
   onVerificado(evento: {
     readonly metodo: MfaMetodoFila;
     readonly codigosRespaldo: readonly string[];
   }): void {
+    const modo = this.intento()?.modo ?? 'activar';
     this.detenerReloj();
     this.intento.set(null);
     this.modalAbierto.set(false);
+
+    if (modo === 'desactivar') {
+      this.desactivado.emit(evento.metodo);
+      return;
+    }
+
     // Del modal de código al de respaldo, sin pasar por la lista: los códigos son
     // consecuencia directa de lo que el usuario acaba de hacer.
     this.codigosRespaldo.set(evento.codigosRespaldo);
@@ -251,9 +281,5 @@ export class MfaMetodosCardComponent {
   /** Cerrar el modal NO cancela el intento: el código sigue vivo y la espera sigue corriendo. */
   cerrarModal(): void {
     this.modalAbierto.set(false);
-  }
-
-  onDesactivar(fila: MfaMetodoFila): void {
-    this.desactivar.emit(fila);
   }
 }

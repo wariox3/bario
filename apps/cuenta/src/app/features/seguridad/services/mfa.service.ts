@@ -50,6 +50,16 @@ export class MfaService extends BaseHttpService {
   }
 
   /**
+   * Pide un código para una operación sensible sobre el MFA ya activo (hoy: desactivarlo).
+   *
+   * Va sin body: el backend sabe cuál es el método activo del usuario. Devuelve el mismo
+   * par `{ mfa_token, metodo }` que `configurar()`, así el modal de código no distingue.
+   */
+  desafio(): Observable<MfaConfigurarResponse> {
+    return this.post<MfaConfigurarResponse>('/seguridad/mfa/desafio/', {});
+  }
+
+  /**
    * Confirma el código que recibió el usuario y deja el método activo.
    *
    * El `mfa_token` es el que devolvió `configurar()` para este intento.
@@ -60,6 +70,22 @@ export class MfaService extends BaseHttpService {
       { mfa_token: mfaToken, codigo },
       undefined,
       // El modal muestra el error junto al campo; el toast global quedaría detrás.
+      { errorToast: false },
+    );
+  }
+
+  /**
+   * Apaga la autenticación en varias fases.
+   *
+   * Pide **contraseña además del código**: es una operación que baja la protección, así que
+   * no alcanza con tener la sesión abierta. El `codigo` acepta el de 6 dígitos del desafío
+   * o uno de respaldo de 10 caracteres.
+   */
+  desactivar(password: string, mfaToken: string, codigo: string): Observable<unknown> {
+    return this.post<unknown>(
+      '/seguridad/mfa/desactivar/',
+      { password, mfa_token: mfaToken, codigo },
+      undefined,
       { errorToast: false },
     );
   }

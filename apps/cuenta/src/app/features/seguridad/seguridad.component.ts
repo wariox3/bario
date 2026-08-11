@@ -28,8 +28,10 @@ export class SeguridadComponent {
     );
   }
 
-  onDesactivarMfa(fila: MfaMetodoFila): void {
-    // TODO(backend): confirmar y llamar al endpoint de desactivación.
-    this.toast.info(fila.nombre, 'La desactivación estará disponible muy pronto.');
+  onMfaDesactivado(fila: MfaMetodoFila): void {
+    this.toast.success(
+      'Verificación desactivada',
+      `Ya no te pediremos el código de ${fila.nombre.toLowerCase()} al iniciar sesión.`,
+    );
   }
 }

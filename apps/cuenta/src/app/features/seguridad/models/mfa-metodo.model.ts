@@ -38,6 +38,9 @@ export const MFA_CODIGO_VIGENCIA_SEGUNDOS = 300;
 /** Largo del código de verificación. */
 export const MFA_CODIGO_LARGO = 6;
 
+/** Largo de un código de respaldo (`GIKV5U2WTS`). Sirve donde el backend lo permita. */
+export const MFA_CODIGO_RESPALDO_LARGO = 10;
+
 /**
  * Espera mínima entre envíos de código.
  *
@@ -47,10 +50,17 @@ export const MFA_CODIGO_LARGO = 6;
  */
 export const MFA_REENVIO_ESPERA_SEGUNDOS = 60;
 
-/** Intento de activación en curso: qué método, con qué token y desde cuándo. */
+/**
+ * Para qué se pidió el código. Las dos operaciones comparten modal y relojes; lo único
+ * que cambia es el endpoint que lo confirma y el texto que lee el usuario.
+ */
+export type MfaIntentoModo = 'activar' | 'desactivar';
+
+/** Intento en curso: qué método, para qué, con qué token y desde cuándo. */
 export interface MfaIntento {
-  /** `codigo` del método que se está activando. */
+  /** `codigo` del método involucrado. */
   readonly metodo: string;
+  readonly modo: MfaIntentoModo;
   readonly token: string;
   /** Epoch en ms del envío que generó este token. */
   readonly pedidoEn: number;

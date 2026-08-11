@@ -141,11 +141,12 @@
 
         @if (fila.activo) {
           <p-button
-            label="Desactivar"
-            icon="pi pi-power-off"
+            [label]="tieneCodigoVivo(fila, 'desactivar') ? 'Ingresar código' : 'Desactivar'"
+            [icon]="tieneCodigoVivo(fila, 'desactivar') ? 'pi pi-pencil' : 'pi pi-power-off'"
             [outlined]="true"
             severity="secondary"
             size="small"
+            [loading]="pendiente() === fila.codigo"
             [disabled]="pendiente() !== null"
             class="shrink-0 max-[576px]:w-full"
             styleClass="max-[576px]:w-full"
@@ -182,6 +183,7 @@
   [visible]="modalAbierto()"
   [metodo]="filaEnIntento()"
   [mfaToken]="intento()?.token ?? null"
+  [modo]="intento()?.modo ?? 'activar'"
   [restante]="restante()"
   [esperaReenvio]="esperaReenvio()"
   (visibleChange)="$event ? null : cerrarModal()"

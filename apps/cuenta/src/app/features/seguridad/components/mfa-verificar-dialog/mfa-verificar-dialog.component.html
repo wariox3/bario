@@ -17,7 +17,9 @@
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
       >
         <i
-          [class]="metodo()?.presentacion?.icono ?? 'pi pi-shield'"
+          [class]="
+            esDesactivar() ? 'pi pi-power-off' : (metodo()?.presentacion?.icono ?? 'pi pi-shield')
+          "
           class="text-[1.1rem] text-brand-blue"
         ></i>
       </span>
@@ -28,7 +30,11 @@
           Confirma que eres tú
         </h2>
         <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">
-          {{ metodo()?.nombre ?? 'Verificación' }}
+          {{
+            esDesactivar()
+              ? 'Para desactivar la verificación'
+              : (metodo()?.nombre ?? 'Verificación')
+          }}
         </p>
       </div>
     </div>
@@ -73,27 +79,89 @@
         </span>
       </div>
 
-      <!-- Las 6 casillas: el único foco del modal -->
+      <!-- Desactivar baja la protección: se dice antes de teclear, no después -->
+      @if (esDesactivar()) {
+        <div
+          class="flex items-start gap-2.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2.5"
+        >
+          <span
+            class="mt-[0.05rem] flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-navy"
+          >
+            <i class="pi pi-exclamation-triangle text-[0.7rem]"></i>
+          </span>
+          <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">
+            Al confirmar, tu cuenta vuelve a quedar protegida solo por la contraseña y tus códigos
+            de respaldo dejan de servir.
+          </p>
+        </div>
+      }
+
+      @if (esDesactivar()) {
+        <div class="flex flex-col">
+          <label
+            for="mfa-desactivar-password"
+            class="mb-1.5 text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy"
+          >
+            Tu contraseña <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-password
+            inputId="mfa-desactivar-password"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            [toggleMask]="true"
+            [feedback]="false"
+            fluid
+            autocomplete="current-password"
+          />
+        </div>
+      }
+
+      <!-- El código: 6 casillas, o el de respaldo si el usuario ya no tiene su correo -->
       <div class="flex flex-col items-center gap-2.5 py-1">
         <!-- `span` y no `label`: el OTP son 6 inputs, no hay un único control al que apuntar
              con `for`. Se asocia por `aria-labelledby` desde el propio componente. -->
         <span id="mfa-codigo-label" class="text-[0.78rem] font-semibold text-brand-navy">
-          Ingresa el código de {{ largo }} dígitos
+          @if (usarRespaldo()) {
+            Ingresa uno de tus códigos de respaldo
+          } @else {
+            Ingresa el código de {{ largo }} dígitos
+          }
         </span>
-        <p-inputOtp
-          [ngModel]="codigo()"
-          (ngModelChange)="onCodigoChange($event)"
-          [length]="largo"
-          [integerOnly]="true"
-          [disabled]="expirado() || isVerifying()"
-          [autofocus]="true"
-          aria-labelledby="mfa-codigo-label"
-        />
+
+        @if (usarRespaldo()) {
+          <input
+            pInputText
+            id="mfa-codigo-respaldo"
+            [ngModel]="codigo()"
+            (ngModelChange)="onRespaldoChange($event)"
+            [maxlength]="largoRespaldo"
+            [disabled]="isVerifying()"
+            aria-labelledby="mfa-codigo-label"
+            autocomplete="one-time-code"
+            spellcheck="false"
+            placeholder="GIKV5U2WTS"
+            class="w-[13rem] text-center font-mono text-[0.95rem] font-semibold tracking-[0.18em] uppercase"
+          />
+        } @else {
+          <p-inputOtp
+            [ngModel]="codigo()"
+            (ngModelChange)="onCodigoChange($event)"
+            [length]="largo"
+            [integerOnly]="true"
+            [disabled]="expirado() || isVerifying()"
+            [autofocus]="true"
+            aria-labelledby="mfa-codigo-label"
+          />
+        }
 
         @if (errorMensaje(); as mensaje) {
           <p class="m-0 flex items-center gap-1.5 text-[0.75rem] text-red-600">
             <i class="pi pi-exclamation-circle text-[0.75rem]"></i>
             {{ mensaje }}
+          </p>
+        } @else if (usarRespaldo()) {
+          <p class="m-0 text-[0.75rem] text-brand-muted">
+            Cada código de respaldo sirve una sola vez
           </p>
         } @else if (expirado()) {
           <p class="m-0 text-[0.75rem] text-brand-muted">
@@ -103,13 +171,27 @@
               Pide otro código para continuar.
             }
           </p>
-        } @else {
+        } @else if (!esDesactivar()) {
           <p class="m-0 text-[0.75rem] text-brand-muted">Se verifica solo al completarlo</p>
         }
       </div>
 
+      <!-- Salida de emergencia: si perdió el acceso al correo, el respaldo es su única vía -->
+      @if (esDesactivar()) {
+        <div class="flex items-center justify-center text-[0.75rem]">
+          <button
+            type="button"
+            class="font-semibold text-brand-navy underline underline-offset-2 transition-opacity hover:opacity-70"
+            [disabled]="isVerifying()"
+            (click)="alternarRespaldo()"
+          >
+            {{ usarRespaldo() ? 'Usar el código de 6 dígitos' : 'Usar un código de respaldo' }}
+          </button>
+        </div>
+      }
+
       <!-- Reenvío: la espera va DENTRO del botón, que es lo que está bloqueado -->
-      @if (!esTotp()) {
+      @if (!esTotp() && !usarRespaldo()) {
         <div class="flex items-center justify-center gap-1.5 text-[0.75rem]">
           <span class="text-brand-muted">¿No te llegó?</span>
           <button
@@ -139,10 +221,11 @@
         [disabled]="isVerifying()"
       />
       <p-button
-        label="Verificar"
-        icon="pi pi-check"
+        [label]="esDesactivar() ? 'Desactivar' : 'Verificar'"
+        [icon]="esDesactivar() ? 'pi pi-power-off' : 'pi pi-check'"
+        [severity]="esDesactivar() ? 'danger' : 'primary'"
         [loading]="isVerifying()"
-        [disabled]="codigo().length !== largo || expirado() || isVerifying()"
+        [disabled]="!puedeConfirmar()"
         (onClick)="verificar()"
       />
     </div>
