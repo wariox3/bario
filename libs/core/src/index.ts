@@ -10,7 +10,6 @@ export {
   MFA_CODIGO_RESPALDO_LARGO,
   MFA_CODIGO_VIGENCIA_SEGUNDOS,
   MFA_REENVIO_ESPERA_SEGUNDOS,
-  formatSegundos,
 } from './lib/mfa/mfa.constants';
 export { RelojMfa, crearRelojMfa } from './lib/mfa/reloj-mfa';
 export { authGuard } from './lib/guards/auth.guard';
@@ -27,6 +26,7 @@ export type {
   LoginRequest,
   LoginResult,
   MfaDesafio,
+  MfaDesafioResponse,
   AuthResponse,
   ResendVerificationRequest,
   RegisterRequest,
@@ -66,7 +66,7 @@ export {
   isUnverifiedAccountError,
   parseApiError,
 } from './lib/utils/error.utils';
-export { getInitials } from './lib/utils/string.utils';
+export { getInitials, enmascararEmail, enmascararCelular } from './lib/utils/string.utils';
 export {
   startOfToday,
   toIsoDate,
@@ -77,6 +77,7 @@ export {
   addDays,
   formatHorario,
   formatRecencia,
+  formatSegundos,
   anioMesDeIso,
   diasDelMes,
   INICIALES_DIA_SEMANA_ES,

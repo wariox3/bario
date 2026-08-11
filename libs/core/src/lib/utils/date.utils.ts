@@ -78,6 +78,16 @@ export function formatHorario(desde: string | null, hasta: string | null): strin
   return d && h ? `${d} - ${h}` : null;
 }
 
+/**
+ * Duración en segundos como reloj: `152` → `2:32`. El minuto adelante para que se lea
+ * como cuenta regresiva.
+ */
+export function formatSegundos(total: number): string {
+  const minutos = Math.floor(total / 60);
+  const segundos = total % 60;
+  return `${minutos}:${segundos.toString().padStart(2, '0')}`;
+}
+
 const SEGUNDOS_MINUTO = 60;
 const SEGUNDOS_HORA = 60 * SEGUNDOS_MINUTO;
 const SEGUNDOS_DIA = 24 * SEGUNDOS_HORA;

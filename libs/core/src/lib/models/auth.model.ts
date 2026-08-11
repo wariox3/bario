@@ -24,14 +24,37 @@ export interface Usuario extends BaseUsuario {
 }
 
 /**
- * Desafío de segundo factor: el backend ya validó la contraseña pero **no emitió
- * cookies**. Hasta que no se confirme el código, no hay sesión.
+ * Lo que responde `POST /seguridad/login/` cuando la cuenta pide segundo factor:
+ *
+ * ```json
+ * { "mfa_requerido": true, "mfa_token": "ImI3NWEx…:1wtrfP:XOVH0k…", "metodo": "correo" }
+ * ```
+ *
+ * El **mismo** endpoint responde esto o emite las cookies de sesión, sin discriminante en
+ * el status: `mfa_requerido` es lo único que los separa. Por eso `login()` no tipa la
+ * respuesta directamente —tiparla sería afirmar algo que no se verificó— sino que la lee
+ * con un guard que valida estos campos en runtime.
  */
-export interface MfaDesafio {
+export interface MfaDesafioResponse {
+  /** Presente y en `true` solo en esta rama. Es el discriminante.  */
+  readonly mfa_requerido: true;
+  /**
+   * Identifica el desafío en los pasos siguientes (`login/mfa/`, `login/mfa/reenviar/`).
+   * Es un valor firmado por el backend: opaco, no se parsea ni se guarda.
+   */
   readonly mfa_token: string;
   /** `codigo` del método por el que se mandó el código (`correo`, `sms`, `totp`). */
   readonly metodo: string;
 }
+
+/**
+ * El desafío ya validado, tal como circula por el front: la respuesta **sin** el
+ * discriminante, que después de leerla no aporta nada.
+ *
+ * Se deriva del tipo del cable a propósito: los nombres de los campos se declaran una sola
+ * vez, y agregar uno al backend obliga a decidir qué hacer con él acá.
+ */
+export type MfaDesafio = Omit<MfaDesafioResponse, 'mfa_requerido'>;
 
 /** Cuerpo de `POST /seguridad/login/mfa/`. */
 export interface LoginMfaRequest {
