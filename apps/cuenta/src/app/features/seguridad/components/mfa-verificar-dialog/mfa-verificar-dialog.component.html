@@ -1,0 +1,150 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isVerifying()"
+  [closeOnEscape]="!isVerifying()"
+  [style]="{ width: '440px' }"
+  [breakpoints]="{ '576px': '92vw' }"
+  appendTo="body"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+      >
+        <i
+          [class]="metodo()?.presentacion?.icono ?? 'pi pi-shield'"
+          class="text-[1.1rem] text-brand-blue"
+        ></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          Confirma que eres tú
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ metodo()?.nombre ?? 'Verificación' }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <div class="flex flex-col gap-[1.1rem]">
+      <!-- Banda: a dónde fue el código y cuánto le queda de vida -->
+      <div
+        class="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2"
+      >
+        <span
+          class="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-navy"
+        >
+          <i [class]="esTotp() ? 'pi pi-mobile' : 'pi pi-send'" class="text-[0.7rem]"></i>
+        </span>
+
+        @if (esTotp()) {
+          <span class="text-[0.75rem] text-brand-muted">Código de tu app autenticadora</span>
+        } @else if (destino()) {
+          <span class="text-[0.72rem] uppercase tracking-[0.04em] text-brand-muted">Enviado a</span>
+          <span
+            class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.8rem] font-semibold text-brand-text"
+          >
+            {{ destino() }}
+          </span>
+        } @else {
+          <span class="text-[0.75rem] text-brand-muted">Te enviamos un código</span>
+        }
+
+        <!-- Reloj: el código vence, y eso manda sobre lo que se puede hacer acá -->
+        <span
+          class="ml-auto shrink-0 rounded-md border px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+          [class]="
+            expirado()
+              ? 'border-dashed border-[rgba(20,48,73,0.25)] text-brand-muted'
+              : 'border-transparent bg-[rgba(20,48,73,0.06)] text-brand-text'
+          "
+          [title]="expirado() ? 'El código venció' : 'Tiempo restante del código'"
+        >
+          {{ expirado() ? 'Venció' : restanteEtiqueta() }}
+        </span>
+      </div>
+
+      <!-- Las 6 casillas: el único foco del modal -->
+      <div class="flex flex-col items-center gap-2.5 py-1">
+        <!-- `span` y no `label`: el OTP son 6 inputs, no hay un único control al que apuntar
+             con `for`. Se asocia por `aria-labelledby` desde el propio componente. -->
+        <span id="mfa-codigo-label" class="text-[0.78rem] font-semibold text-brand-navy">
+          Ingresa el código de {{ largo }} dígitos
+        </span>
+        <p-inputOtp
+          [ngModel]="codigo()"
+          (ngModelChange)="onCodigoChange($event)"
+          [length]="largo"
+          [integerOnly]="true"
+          [disabled]="expirado() || isVerifying()"
+          [autofocus]="true"
+          aria-labelledby="mfa-codigo-label"
+        />
+
+        @if (errorMensaje(); as mensaje) {
+          <p class="m-0 flex items-center gap-1.5 text-[0.75rem] text-red-600">
+            <i class="pi pi-exclamation-circle text-[0.75rem]"></i>
+            {{ mensaje }}
+          </p>
+        } @else if (expirado()) {
+          <p class="m-0 text-[0.75rem] text-brand-muted">
+            @if (esTotp()) {
+              Vuelve a intentarlo desde la lista de métodos.
+            } @else {
+              Pide otro código para continuar.
+            }
+          </p>
+        } @else {
+          <p class="m-0 text-[0.75rem] text-brand-muted">Se verifica solo al completarlo</p>
+        }
+      </div>
+
+      <!-- Reenvío: la espera va DENTRO del botón, que es lo que está bloqueado -->
+      @if (!esTotp()) {
+        <div class="flex items-center justify-center gap-1.5 text-[0.75rem]">
+          <span class="text-brand-muted">¿No te llegó?</span>
+          <button
+            type="button"
+            class="font-semibold text-brand-navy underline underline-offset-2 transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:text-brand-muted disabled:no-underline disabled:opacity-60"
+            [disabled]="!puedeReenviar()"
+            (click)="onReenviar()"
+          >
+            Enviar otro código
+            @if (esperaReenvio() > 0) {
+              <span class="ml-1 font-mono tabular-nums">({{ esperaEtiqueta() }})</span>
+            }
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end gap-2 pt-2">
+      <p-button
+        label="Cancelar"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onCancel()"
+        [disabled]="isVerifying()"
+      />
+      <p-button
+        label="Verificar"
+        icon="pi pi-check"
+        [loading]="isVerifying()"
+        [disabled]="codigo().length !== largo || expirado() || isVerifying()"
+        (onClick)="verificar()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

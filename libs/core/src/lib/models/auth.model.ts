@@ -16,6 +16,10 @@ export interface Usuario extends BaseUsuario {
   imagen: string | null;
   imagen_thumbnail: string | null;
   is_verified: boolean;
+  /** ¿El usuario tiene activa la autenticación en varias fases? */
+  mfa_activo: boolean;
+  /** `codigo` del método activo (`totp`, `sms`, `correo`). `null` si `mfa_activo` es `false`. */
+  mfa_metodo: string | null;
   fecha_creacion: string;
 }
 

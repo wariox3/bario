@@ -6,9 +6,9 @@
   </div>
 
   <div class="flex flex-col gap-5 animate-fade-up">
-    <!-- Security status card -->
+    <!-- Security status card: estado + la única acción de la página -->
     <div class="bg-brand-surface border border-[rgba(20,48,73,0.1)] rounded-xl overflow-hidden">
-      <div class="flex items-center gap-3 px-5 py-4">
+      <div class="flex items-center gap-3 px-5 py-4 max-[576px]:flex-wrap max-[576px]:gap-y-3.5">
         <span
           class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
         >
@@ -22,129 +22,27 @@
             Actualiza tu contraseña periódicamente para mantener tu cuenta segura
           </p>
         </div>
+        <p-button
+          label="Cambiar contraseña"
+          icon="pi pi-lock"
+          [outlined]="true"
+          size="small"
+          class="shrink-0 max-[576px]:w-full"
+          styleClass="max-[576px]:w-full"
+          (onClick)="openDialog()"
+        />
       </div>
     </div>
 
-    <!-- Change password form card -->
-    <div class="bg-brand-surface border border-[rgba(20,48,73,0.1)] rounded-xl overflow-hidden">
-      <!-- Card header -->
-      <div class="flex items-center gap-3 px-5 py-4 border-b border-[rgba(20,48,73,0.08)]">
-        <span
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-        >
-          <i class="pi pi-lock text-[1.05rem]"></i>
-        </span>
-        <div class="flex flex-1 flex-col gap-[0.1rem] min-w-0">
-          <h2 class="m-0 text-[0.95rem] font-bold text-brand-text tracking-tight">
-            Cambiar contraseña
-          </h2>
-          <p class="m-0 text-[0.75rem] text-brand-muted">
-            Elige una contraseña segura que no uses en otros sitios
-          </p>
-        </div>
-      </div>
-
-      <!-- Form body -->
-      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-          <div class="flex flex-col gap-5">
-            <!-- Contraseña actual -->
-            <div class="grid grid-cols-2 max-[576px]:grid-cols-1 gap-1.5">
-              <div>
-                <label
-                  for="seg-actual"
-                  class="text-[0.855rem] font-semibold text-brand-text tracking-tight"
-                >
-                  Contraseña actual <span class="text-red-500 ml-px">*</span>
-                </label>
-                <p-password
-                  inputId="seg-actual"
-                  formControlName="passwordActual"
-                  [toggleMask]="true"
-                  [feedback]="false"
-                  fluid
-                  [invalid]="actualControl.invalid && actualControl.touched"
-                />
-                @if (actualControl.invalid && actualControl.touched) {
-                  <small class="text-[0.78rem] text-red-500"
-                    >La contraseña actual es obligatoria.</small
-                  >
-                }
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-5 max-[576px]:grid-cols-1">
-              <!-- Nueva contraseña -->
-              <div class="flex flex-col gap-1.5">
-                <label
-                  for="seg-nueva"
-                  class="text-[0.855rem] font-semibold text-brand-text tracking-tight"
-                >
-                  Nueva contraseña <span class="text-red-500 ml-px">*</span>
-                </label>
-                <p-password
-                  inputId="seg-nueva"
-                  formControlName="passwordNueva"
-                  [toggleMask]="true"
-                  [feedback]="true"
-                  promptLabel="Ingresa una contraseña"
-                  weakLabel="Débil"
-                  mediumLabel="Media"
-                  strongLabel="Fuerte"
-                  fluid
-                  [invalid]="nuevaControl.invalid && nuevaControl.touched"
-                />
-                @if (nuevaControl.invalid && nuevaControl.touched) {
-                  <small class="text-[0.78rem] text-red-500">
-                    @if (nuevaControl.hasError('required')) {
-                      La nueva contraseña es obligatoria.
-                    } @else if (nuevaControl.hasError('minlength')) {
-                      Mínimo 8 caracteres.
-                    }
-                  </small>
-                }
-              </div>
-
-              <!-- Confirmar contraseña -->
-              <div class="flex flex-col gap-1.5">
-                <label
-                  for="seg-confirmar"
-                  class="text-[0.855rem] font-semibold text-brand-text tracking-tight"
-                >
-                  Confirmar contraseña <span class="text-red-500 ml-px">*</span>
-                </label>
-                <p-password
-                  inputId="seg-confirmar"
-                  formControlName="passwordConfirmar"
-                  [toggleMask]="true"
-                  [feedback]="false"
-                  fluid
-                  [invalid]="confirmarControl.invalid && confirmarControl.touched"
-                />
-                @if (confirmarControl.invalid && confirmarControl.touched) {
-                  <small class="text-[0.78rem] text-red-500">
-                    @if (confirmarControl.hasError('required')) {
-                      Debes confirmar la contraseña.
-                    } @else if (confirmarControl.hasError('notMatching')) {
-                      Las contraseñas no coinciden.
-                    }
-                  </small>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="flex justify-end pt-6 mt-1">
-            <p-button
-              type="submit"
-              label="Actualizar contraseña"
-              icon="pi pi-check"
-              [loading]="isSaving()"
-              [disabled]="form.invalid || isSaving()"
-            />
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Autenticación en varias fases -->
+    <app-mfa-metodos-card
+      (activado)="onMfaActivado($event)"
+      (desactivar)="onDesactivarMfa($event)"
+    />
   </div>
 </div>
+
+<app-cambiar-password-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+/>

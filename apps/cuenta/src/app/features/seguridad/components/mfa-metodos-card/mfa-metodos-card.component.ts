@@ -1,0 +1,259 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ButtonModule } from 'primeng/button';
+import { SkeletonModule } from 'primeng/skeleton';
+import { MfaCodigosRespaldoDialogComponent } from '../mfa-codigos-respaldo-dialog/mfa-codigos-respaldo-dialog.component';
+import { MfaVerificarDialogComponent } from '../mfa-verificar-dialog/mfa-verificar-dialog.component';
+import { AuthService } from '../../../auth/services/auth.service';
+import {
+  MFA_CODIGO_VIGENCIA_SEGUNDOS,
+  MFA_REENVIO_ESPERA_SEGUNDOS,
+  MfaIntento,
+  MfaMetodoCatalogo,
+  MfaMetodoFila,
+} from '../../models/mfa-metodo.model';
+import { MfaService } from '../../services/mfa.service';
+import {
+  MFA_METODOS_HABILITADOS,
+  MFA_METODO_FALLBACK,
+  MFA_METODO_PRESENTACION,
+} from './mfa-metodos.constants';
+
+@Component({
+  selector: 'app-mfa-metodos-card',
+  standalone: true,
+  imports: [
+    ButtonModule,
+    SkeletonModule,
+    MfaVerificarDialogComponent,
+    MfaCodigosRespaldoDialogComponent,
+  ],
+  templateUrl: './mfa-metodos-card.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class MfaMetodosCardComponent {
+  private readonly mfaService = inject(MfaService);
+  private readonly authService = inject(AuthService);
+  /** Explícito: `cargar()` también se llama desde "Reintentar", fuera del contexto de inyección. */
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** El método quedó activo (código verificado). */
+  readonly activado = output<MfaMetodoFila>();
+  /** El usuario pidió apagar la autenticación en varias fases. */
+  readonly desactivar = output<MfaMetodoFila>();
+
+  /** `codigo` del método cuya activación está en vuelo. Bloquea toda la lista. */
+  readonly pendiente = signal<string | null>(null);
+
+  /**
+   * Intento de activación en curso. Vive **acá y no en el modal** a propósito: cerrar el
+   * modal ya no tira el código a la basura ni reinicia la espera de reenvío.
+   */
+  readonly intento = signal<MfaIntento | null>(null);
+  readonly modalAbierto = signal(false);
+
+  /**
+   * Códigos de respaldo recién generados. El backend los manda una única vez, así que
+   * viven acá hasta que el usuario confirme que los guardó.
+   */
+  readonly codigosRespaldo = signal<readonly string[]>([]);
+
+  /** Reloj de la card: avanza mientras haya un intento, y de él cuelgan las dos cuentas. */
+  private readonly ahora = signal(Date.now());
+  private intervalo: ReturnType<typeof setInterval> | null = null;
+
+  private readonly transcurrido = computed(() => {
+    const intento = this.intento();
+    return intento === null ? 0 : Math.floor((this.ahora() - intento.pedidoEn) / 1000);
+  });
+
+  /** Segundos que le quedan de vida al código enviado. */
+  readonly restante = computed(() =>
+    Math.max(0, MFA_CODIGO_VIGENCIA_SEGUNDOS - this.transcurrido()),
+  );
+
+  /** Segundos que faltan para poder pedir otro código. */
+  readonly esperaReenvio = computed(() =>
+    Math.max(0, MFA_REENVIO_ESPERA_SEGUNDOS - this.transcurrido()),
+  );
+
+  /** Hay un código vivo: volver a "Activar" no debe pedir uno nuevo. */
+  readonly intentoVigente = computed(() => this.intento() !== null && this.restante() > 0);
+
+  readonly isLoading = signal(true);
+  readonly hasError = signal(false);
+  private readonly catalogo = signal<readonly MfaMetodoCatalogo[]>([]);
+
+  /**
+   * Estado del usuario, desde `/me`. Es la única fuente de "qué está activo":
+   * el catálogo solo dice qué existe.
+   */
+  private readonly usuario = this.authService.currentUser;
+  readonly protegida = computed(() => this.usuario()?.mfa_activo === true);
+  private readonly metodoActivo = computed(() =>
+    this.protegida() ? (this.usuario()?.mfa_metodo ?? null) : null,
+  );
+
+  readonly filas = computed<readonly MfaMetodoFila[]>(() => {
+    const activo = this.metodoActivo();
+    const hayActivo = activo !== null;
+
+    return this.catalogo().map((metodo) => {
+      const presentacion = MFA_METODO_PRESENTACION[metodo.codigo] ?? MFA_METODO_FALLBACK;
+      const habilitado = MFA_METODOS_HABILITADOS.has(metodo.codigo);
+      return {
+        ...metodo,
+        presentacion,
+        habilitado,
+        activo: metodo.codigo === activo,
+        // No sugerimos lo que no se puede activar todavía.
+        sugerido: !hayActivo && habilitado && presentacion.recomendado,
+      };
+    });
+  });
+
+  /** La fila activa, para la banda de estado del header. */
+  readonly filaActiva = computed(() => this.filas().find((fila) => fila.activo) ?? null);
+
+  /** La fila del intento en curso — la que alimenta el modal. */
+  readonly filaEnIntento = computed(() => {
+    const intento = this.intento();
+    return intento === null
+      ? null
+      : (this.filas().find((f) => f.codigo === intento.metodo) ?? null);
+  });
+
+  /**
+   * `mfa_activo` en `true` pero con un `mfa_metodo` que no está en el catálogo
+   * (o viene `null`). No inventamos: lo decimos.
+   */
+  readonly activoDesconocido = computed(
+    () => this.protegida() && !this.isLoading() && !this.hasError() && this.filaActiva() === null,
+  );
+
+  /** Filas de esqueleto mientras carga — mismo alto que las reales, sin salto de layout. */
+  readonly skeletons = [0, 1, 2];
+
+  constructor() {
+    this.cargar();
+    this.destroyRef.onDestroy(() => this.detenerReloj());
+  }
+
+  private arrancarReloj(): void {
+    this.ahora.set(Date.now());
+    if (this.intervalo !== null) return;
+    this.intervalo = setInterval(() => {
+      this.ahora.set(Date.now());
+      // Sin intento vivo no hay nada que contar: el reloj se apaga solo.
+      if (this.restante() === 0 && this.esperaReenvio() === 0) this.detenerReloj();
+    }, 1000);
+  }
+
+  private detenerReloj(): void {
+    if (this.intervalo !== null) {
+      clearInterval(this.intervalo);
+      this.intervalo = null;
+    }
+  }
+
+  cargar(): void {
+    this.isLoading.set(true);
+    this.hasError.set(false);
+
+    this.mfaService
+      .listarMetodos()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (metodos) => {
+          this.catalogo.set(metodos);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.hasError.set(true);
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  /** ¿Esta fila ya tiene un código vivo esperando que lo escriban? */
+  tieneCodigoVivo(fila: MfaMetodoFila): boolean {
+    return this.intentoVigente() && this.intento()?.metodo === fila.codigo;
+  }
+
+  /**
+   * Paso 1: conseguir un código. Si el de esta fila **sigue vivo**, no pedimos otro:
+   * reabrimos el modal con el mismo. Cerrar y volver a entrar no gasta un correo.
+   */
+  onConfigurar(fila: MfaMetodoFila): void {
+    if (!fila.habilitado || this.pendiente() !== null) return;
+
+    if (this.tieneCodigoVivo(fila)) {
+      this.modalAbierto.set(true);
+      return;
+    }
+
+    this.pendiente.set(fila.codigo);
+    this.solicitarCodigo(fila, () => this.modalAbierto.set(true));
+  }
+
+  /** Reenvío desde el modal: token nuevo, y las dos cuentas vuelven a empezar. */
+  onReenviar(fila: MfaMetodoFila): void {
+    if (this.esperaReenvio() > 0) return;
+    this.solicitarCodigo(fila);
+  }
+
+  private solicitarCodigo(fila: MfaMetodoFila, alLograrlo?: () => void): void {
+    this.mfaService
+      .configurar(fila.codigo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (respuesta) => {
+          this.pendiente.set(null);
+          this.intento.set({
+            metodo: fila.codigo,
+            token: respuesta.mfa_token,
+            pedidoEn: Date.now(),
+          });
+          this.arrancarReloj();
+          alLograrlo?.();
+        },
+        // El toast del error lo pone el `errorInterceptor`.
+        error: () => this.pendiente.set(null),
+      });
+  }
+
+  onVerificado(evento: {
+    readonly metodo: MfaMetodoFila;
+    readonly codigosRespaldo: readonly string[];
+  }): void {
+    this.detenerReloj();
+    this.intento.set(null);
+    this.modalAbierto.set(false);
+    // Del modal de código al de respaldo, sin pasar por la lista: los códigos son
+    // consecuencia directa de lo que el usuario acaba de hacer.
+    this.codigosRespaldo.set(evento.codigosRespaldo);
+    this.activado.emit(evento.metodo);
+  }
+
+  /** El usuario declaró que guardó los códigos: recién ahí los soltamos. */
+  onCodigosGuardados(): void {
+    this.codigosRespaldo.set([]);
+  }
+
+  /** Cerrar el modal NO cancela el intento: el código sigue vivo y la espera sigue corriendo. */
+  cerrarModal(): void {
+    this.modalAbierto.set(false);
+  }
+
+  onDesactivar(fila: MfaMetodoFila): void {
+    this.desactivar.emit(fila);
+  }
+}
