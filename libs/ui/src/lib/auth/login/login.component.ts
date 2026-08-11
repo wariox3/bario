@@ -16,6 +16,7 @@ import {
   isUnverifiedAccountError,
   SesionNoConfirmadaError,
   crearRelojMfa,
+  enmascararEmail,
 } from '@reddoc/core';
 import type { MfaDesafio } from '@reddoc/core';
 import { TurnstileComponent } from '../../turnstile/turnstile.component';
@@ -63,6 +64,13 @@ export class LoginComponent {
    * pero todavía no hay sesión: la vista pasa al paso del código.
    */
   readonly desafioMfa = signal<MfaDesafio | null>(null);
+  /**
+   * A dónde se mandó el código, enmascarado. Sale del correo que la persona acaba de
+   * tipear: el backend no manda destino y acá todavía no hay sesión que consultar. `null`
+   * cuando el método no es correo —el celular no lo sabemos antes de entrar—, y ahí el
+   * componente lo dice en genérico.
+   */
+  readonly destinoMfa = signal<string | null>(null);
   readonly codigoMfa = signal('');
   readonly recordarDispositivo = signal(false);
   readonly mfaError = signal<string | null>(null);
@@ -110,6 +118,9 @@ export class LoginComponent {
           // guard rebotaría de vuelta al login, en un bucle sin explicación.
           if (resultado.estado === 'mfa') {
             this.desafioMfa.set(resultado.desafio);
+            this.destinoMfa.set(
+              resultado.desafio.metodo === 'correo' && email ? enmascararEmail(email) : null,
+            );
             this.reloj.marcarDesafio();
             this.isLoading.set(false);
             return;
@@ -228,6 +239,7 @@ export class LoginComponent {
   volverAlLogin(): void {
     this.reloj.reiniciar();
     this.desafioMfa.set(null);
+    this.destinoMfa.set(null);
     this.codigoMfa.set('');
     this.mfaError.set(null);
     this.reenviando.set(false);

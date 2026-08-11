@@ -16,24 +16,11 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { PasswordModule } from 'primeng/password';
-import { extractErrorMessage } from '@reddoc/core';
+import { enmascararCelular, enmascararEmail, extractErrorMessage } from '@reddoc/core';
 import { MfaCodigoInputComponent } from '@reddoc/ui';
 import { AuthService } from '../../../auth/services/auth.service';
 import { MfaIntentoModo, MfaMetodoFila } from '../../models/mfa-metodo.model';
 import { MfaService } from '../../services/mfa.service';
-
-/** `sebastian.h.piedrahita@gmail.com` → `s•••@gmail.com`. */
-function enmascararEmail(email: string): string {
-  const [usuario, dominio] = email.split('@');
-  if (!dominio) return email;
-  return `${usuario.slice(0, 1)}•••@${dominio}`;
-}
-
-/** `3001234821` → `••• ••• 4821`. */
-function enmascararCelular(celular: string): string {
-  const digitos = celular.replace(/\D/g, '');
-  return digitos.length < 4 ? '•••' : `••• ••• ${digitos.slice(-4)}`;
-}
 
 @Component({
   selector: 'app-mfa-verificar-dialog',

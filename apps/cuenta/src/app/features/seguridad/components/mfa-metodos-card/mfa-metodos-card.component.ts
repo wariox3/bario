@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
+import { CardEstadoComponent } from '../../../../shared/card-estado/card-estado.component';
 import { MfaCodigosRespaldoDialogComponent } from '../mfa-codigos-respaldo-dialog/mfa-codigos-respaldo-dialog.component';
 import { MfaVerificarDialogComponent } from '../mfa-verificar-dialog/mfa-verificar-dialog.component';
 import { AuthService } from '../../../auth/services/auth.service';
@@ -33,6 +34,7 @@ import {
   imports: [
     ButtonModule,
     SkeletonModule,
+    CardEstadoComponent,
     MfaVerificarDialogComponent,
     MfaCodigosRespaldoDialogComponent,
   ],

@@ -1,0 +1,170 @@
+<div class="bg-brand-surface border border-[rgba(20,48,73,0.1)] rounded-xl overflow-hidden">
+  <!-- Card header -->
+  <div class="flex items-center gap-3 px-5 py-4 border-b border-[rgba(20,48,73,0.08)]">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+    >
+      <i class="pi pi-history text-[1.05rem]"></i>
+    </span>
+    <div class="flex flex-1 flex-col gap-[0.1rem] min-w-0">
+      <h2 class="m-0 text-[0.95rem] font-bold text-brand-text tracking-tight">
+        Accesos a tu cuenta
+      </h2>
+      <p class="m-0 text-[0.75rem] text-brand-muted">
+        Desde dónde y cuándo se inició sesión, lo más reciente primero
+      </p>
+    </div>
+
+    <!-- Lo único que amerita resumen: un contador de accesos normales no le sirve a nadie -->
+    @if (incompletos() > 0) {
+      <span
+        class="shrink-0 rounded-md border border-amber-500/40 bg-amber-50 px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-amber-700"
+      >
+        {{ incompletos() }} sin completar
+      </span>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="flex flex-col gap-[1.15rem] px-5 py-4 max-[576px]:px-4">
+      @for (item of skeletons; track item) {
+        <div class="flex gap-3.5">
+          <p-skeleton shape="circle" size="0.9rem" styleClass="mt-[0.3rem] shrink-0" />
+          <div class="flex flex-1 flex-col gap-1.5 min-w-0">
+            <p-skeleton width="11rem" height="0.85rem" />
+            <p-skeleton width="15rem" height="0.7rem" />
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (hasError()) {
+    <app-card-estado
+      icono="pi pi-exclamation-triangle"
+      titulo="No pudimos cargar tus accesos"
+      descripcion="Revisa tu conexión e inténtalo de nuevo"
+      accion="Reintentar"
+      (accionar)="cargar()"
+    />
+  } @else if (vacia()) {
+    <!-- Vacío: no es un error, es una cuenta recién estrenada — por eso no hay acción -->
+    <app-card-estado
+      icono="pi pi-inbox"
+      titulo="Todavía no hay accesos"
+      descripcion="Acá va a aparecer cada inicio de sesión, con el equipo desde el que se hizo."
+    />
+  } @else {
+    <!-- El hilo: el orden cronológico ES el dato, así que la estructura lo dice -->
+    <ol class="m-0 list-none px-5 py-4 max-[576px]:px-4">
+      @for (fila of visibles(); track fila.id) {
+        <li class="group relative flex gap-3.5 pb-[1.15rem] last:pb-0">
+          <!-- Hilo que enhebra las entradas. En la última no cuelga hacia la nada. -->
+          <span
+            class="absolute bottom-0 left-[0.44rem] top-[1.35rem] w-px bg-[rgba(20,48,73,0.1)] group-last:hidden"
+            aria-hidden="true"
+          ></span>
+
+          <!-- Nodo: anillo tenue = entró (rutina); ámbar = miralo; punteado = no sé qué fue -->
+          <span
+            class="relative mt-[0.35rem] h-[0.9rem] w-[0.9rem] shrink-0 rounded-full"
+            [class]="
+              fila.tipo === 'incompleto'
+                ? 'border-2 border-amber-500/60 bg-amber-50'
+                : fila.tipo === 'otro'
+                  ? 'border-2 border-dashed border-[rgba(20,48,73,0.3)] bg-brand-surface'
+                  : 'border-2 border-[rgba(20,48,73,0.2)] bg-brand-surface'
+            "
+            aria-hidden="true"
+          ></span>
+
+          <div class="min-w-0 flex-1">
+            <!-- Lo primero que se lee: desde qué equipo. Es como uno se reconoce. -->
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <i [class]="fila.icono" class="text-[0.8rem] text-brand-muted" aria-hidden="true"></i>
+              <span class="text-[0.85rem] font-semibold tracking-tight text-brand-text">
+                {{ fila.equipo }}
+              </span>
+
+              <!-- Un `resultado` que el front no conoce: se muestra crudo antes que
+                   traducirlo mal. Que se vea raro es la señal de que falta cablearlo. -->
+              @if (fila.tipo === 'otro') {
+                <span
+                  class="rounded-md bg-[rgba(20,48,73,0.06)] px-1.5 py-0.5 text-[0.68rem] font-semibold text-brand-muted"
+                  [title]="fila.resultadoCrudo"
+                >
+                  {{ fila.resultadoNombre }}
+                </span>
+              }
+            </div>
+
+            <!-- La letra chica que confirma: cuándo, dónde, desde qué IP -->
+            <div
+              class="mt-[0.2rem] flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.72rem] text-brand-muted"
+            >
+              <span [title]="fila.fechaExacta">{{ fila.recencia }}</span>
+
+              <span aria-hidden="true">·</span>
+              <span class="font-mono tabular-nums">{{ fila.ip }}</span>
+
+              @if (fila.comoEntro) {
+                <span aria-hidden="true">·</span>
+                <span>{{ fila.comoEntro }}</span>
+              }
+            </div>
+
+            <!-- Único renglón teñido de toda la lista, y lo que dice es lo que importa:
+                 la contraseña era correcta. Que no hayan entrado no lo vuelve inofensivo. -->
+            @if (fila.tipo === 'incompleto') {
+              <p
+                class="m-0 mt-1.5 flex items-start gap-1.5 rounded-[7px] border border-amber-500/25 bg-amber-50/70 px-2 py-1 text-[0.72rem] leading-relaxed text-amber-800"
+              >
+                <i
+                  class="pi pi-exclamation-circle mt-[0.15rem] text-[0.72rem]"
+                  aria-hidden="true"
+                ></i>
+                <span>
+                  Se pidió el código de verificación y nadie lo ingresó. La contraseña sí era
+                  correcta: si no fuiste tú, cámbiala.
+                </span>
+              </p>
+            }
+          </div>
+        </li>
+      }
+    </ol>
+
+    <!-- Banda de disclosure: colapsada cuesta una sola línea -->
+    @if (!mostrarTodos() && ocultos() > 0) {
+      <button
+        type="button"
+        class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-left transition-colors hover:bg-[rgba(20,48,73,0.04)] max-[576px]:px-4"
+        (click)="verTodos()"
+      >
+        <i class="pi pi-chevron-down text-[0.7rem] text-brand-muted" aria-hidden="true"></i>
+        <span class="text-[0.85rem] font-medium text-brand-muted">
+          Ver {{ ocultos() }} {{ ocultos() === 1 ? 'acceso anterior' : 'accesos anteriores' }}
+        </span>
+      </button>
+    }
+
+    <!-- La salida: reconocer no sirve de nada si no se puede hacer algo al respecto -->
+    <div
+      class="flex items-center gap-2 border-t border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] px-5 py-2.5 max-[576px]:flex-wrap max-[576px]:px-4"
+    >
+      <span class="text-[0.72rem] text-brand-muted">¿No reconoces alguno de estos accesos?</span>
+
+      <!-- Solo los más recientes: decirlo evita que la lista se lea como el historial entero -->
+      @if (hayMas() && mostrarTodos()) {
+        <span class="text-[0.72rem] text-brand-muted" aria-hidden="true">·</span>
+        <span class="text-[0.72rem] text-brand-muted">Se muestran los más recientes</span>
+      }
+      <p-button
+        label="Cambia tu contraseña"
+        [link]="true"
+        size="small"
+        styleClass="p-0 text-[0.72rem] font-semibold"
+        (onClick)="cambiarPassword.emit()"
+      />
+    </div>
+  }
+</div>

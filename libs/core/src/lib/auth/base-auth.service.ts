@@ -9,6 +9,7 @@ import {
   LoginRequest,
   LoginResult,
   MfaDesafio,
+  MfaDesafioResponse,
   RegisterRequest,
   RegisterResponse,
   ResendVerificationRequest,
@@ -65,16 +66,25 @@ export const AUTH_DEFAULT_SKIP_URLS: string[] = [
  * Lee el desafío de la respuesta del login. Devuelve `null` cuando la respuesta es la de
  * siempre (sesión iniciada), sin asumir nada de su forma.
  */
+/**
+ * ¿Esta respuesta de `login/` es un desafío de segundo factor? Ver `MfaDesafioResponse`:
+ * el mismo endpoint responde esto o emite cookies, y solo `mfa_requerido` los distingue.
+ *
+ * Valida en runtime en vez de castear: confundir las dos ramas manda al dashboard sin
+ * sesión, y el guard rebota de vuelta al login en un bucle sin explicación. Sin
+ * `mfa_token` no hay desafío posible, así que ahí devuelve `null`; un `metodo` ausente sí
+ * se tolera —solo cambia el texto que se lee— y cae en `''`.
+ */
 function leerDesafioMfa(respuesta: unknown): MfaDesafio | null {
   if (respuesta === null || typeof respuesta !== 'object') return null;
 
-  const cuerpo = respuesta as Record<string, unknown>;
-  if (cuerpo['mfa_requerido'] !== true) return null;
-  if (typeof cuerpo['mfa_token'] !== 'string') return null;
+  const cuerpo = respuesta as Partial<Record<keyof MfaDesafioResponse, unknown>>;
+  if (cuerpo.mfa_requerido !== true) return null;
+  if (typeof cuerpo.mfa_token !== 'string') return null;
 
   return {
-    mfa_token: cuerpo['mfa_token'],
-    metodo: typeof cuerpo['metodo'] === 'string' ? cuerpo['metodo'] : '',
+    mfa_token: cuerpo.mfa_token,
+    metodo: typeof cuerpo.metodo === 'string' ? cuerpo.metodo : '',
   };
 }
 

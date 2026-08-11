@@ -78,6 +78,49 @@ export function formatHorario(desde: string | null, hasta: string | null): strin
   return d && h ? `${d} - ${h}` : null;
 }
 
+/**
+ * Duración en segundos como reloj: `152` → `2:32`. El minuto adelante para que se lea
+ * como cuenta regresiva.
+ */
+export function formatSegundos(total: number): string {
+  const minutos = Math.floor(total / 60);
+  const segundos = total % 60;
+  return `${minutos}:${segundos.toString().padStart(2, '0')}`;
+}
+
+const SEGUNDOS_MINUTO = 60;
+const SEGUNDOS_HORA = 60 * SEGUNDOS_MINUTO;
+const SEGUNDOS_DIA = 24 * SEGUNDOS_HORA;
+
+const HORA_CORTA_ES = new Intl.DateTimeFormat('es-CO', { hour: '2-digit', minute: '2-digit' });
+const FECHA_CORTA_ES = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short' });
+
+/**
+ * Distancia hasta un instante pasado, en castellano: `hace un momento`, `hace 5 minutos`,
+ * `hace 3 horas`, `ayer, 12:03`, `8 ago, 09:41`.
+ *
+ * La escala se abre con la distancia: lo de hoy se mide en minutos y horas —que es como uno
+ * recuerda lo que hizo— y de ayer para atrás pesa más la fecha que el "hace". Es una
+ * etiqueta cómoda, no precisa: si el momento exacto importa, va aparte (un `title`).
+ *
+ * `ahora` se recibe en vez de leer el reloj adentro para que sea pura y testeable.
+ */
+export function formatRecencia(fecha: Date, ahora: number): string {
+  const segundos = Math.max(0, Math.floor((ahora - fecha.getTime()) / 1000));
+
+  if (segundos < SEGUNDOS_MINUTO) return 'hace un momento';
+  if (segundos < SEGUNDOS_HORA) {
+    const minutos = Math.floor(segundos / SEGUNDOS_MINUTO);
+    return `hace ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+  }
+  if (segundos < SEGUNDOS_DIA) {
+    const horas = Math.floor(segundos / SEGUNDOS_HORA);
+    return `hace ${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+  }
+  if (segundos < 2 * SEGUNDOS_DIA) return `ayer, ${HORA_CORTA_ES.format(fecha)}`;
+  return `${FECHA_CORTA_ES.format(fecha)}, ${HORA_CORTA_ES.format(fecha)}`;
+}
+
 /** Año y mes (1-based) extraídos de una fecha ISO `yyyy-MM-dd`. */
 export interface AnioMes {
   readonly anio: number;

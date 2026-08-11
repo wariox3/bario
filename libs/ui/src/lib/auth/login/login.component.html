@@ -91,6 +91,7 @@
                pedir y la única salida honesta es volver a empezar. -->
           <lib-mfa-codigo-input
             [(codigo)]="codigoMfa"
+            [destino]="destinoMfa()"
             [esTotp]="esTotpMfa()"
             [restante]="restanteMfa()"
             [esperaReenvio]="esperaReenvioMfa()"

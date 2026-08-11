@@ -20,10 +20,3 @@ export const MFA_CODIGO_VIGENCIA_SEGUNDOS = 300;
  * usuario honesto se dispare correos de más por impaciencia.
  */
 export const MFA_REENVIO_ESPERA_SEGUNDOS = 60;
-
-/** `152` → `2:32`. El minuto adelante para que se lea como reloj. */
-export function formatSegundos(total: number): string {
-  const minutos = Math.floor(total / 60);
-  const segundos = total % 60;
-  return `${minutos}:${segundos.toString().padStart(2, '0')}`;
-}
