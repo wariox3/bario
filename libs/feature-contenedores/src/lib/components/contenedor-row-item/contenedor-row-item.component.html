@@ -110,10 +110,14 @@
   }
 
   <!-- Acción -->
-  @if (isOwner() && showMenu()) {
+  @if (showMenu()) {
     <button
       type="button"
       class="cl-row__action"
+      [class.invisible]="!isOwner()"
+      [disabled]="!isOwner()"
+      [attr.aria-hidden]="!isOwner() ? true : null"
+      [attr.tabindex]="isOwner() ? 0 : -1"
       [attr.aria-label]="menuLabel()"
       (click)="$event.stopPropagation(); menuOpen.emit($event)"
       (keydown.enter)="$event.stopPropagation()"
