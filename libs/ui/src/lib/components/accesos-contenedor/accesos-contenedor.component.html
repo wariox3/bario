@@ -1,0 +1,37 @@
+@if (disponibles().length > 0) {
+  @let dict = t().accesosContenedor;
+
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-baseline justify-between gap-2">
+      <span class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted">
+        {{ dict.label }}
+      </span>
+      <button
+        type="button"
+        class="text-[0.72rem] font-semibold text-brand-blue hover:underline"
+        (click)="toggleTodos()"
+      >
+        {{ todos() ? dict.ninguno : dict.todos }}
+      </button>
+    </div>
+    <div class="grid grid-cols-2 gap-1.5 rounded-lg border border-[rgba(20,48,73,0.1)] p-2">
+      @for (acceso of disponibles(); track acceso.id) {
+        <label
+          [for]="inputIdPrefix() + '-' + acceso.id"
+          class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-[rgba(20,48,73,0.04)]"
+        >
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="isSelected(acceso.id)"
+            (ngModelChange)="toggle(acceso.id)"
+            [ngModelOptions]="{ standalone: true }"
+            [inputId]="inputIdPrefix() + '-' + acceso.id"
+          />
+          <i [class]="acceso.iconClass" class="text-[0.8rem] text-brand-muted"></i>
+          <span class="text-[0.8rem] text-brand-text">{{ dict.flags[acceso.id] }}</span>
+        </label>
+      }
+    </div>
+    <span class="text-[0.72rem] text-brand-muted">{{ dict.hint }}</span>
+  </div>
+}

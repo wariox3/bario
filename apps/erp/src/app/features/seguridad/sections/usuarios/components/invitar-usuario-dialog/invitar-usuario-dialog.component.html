@@ -8,30 +8,37 @@
   [resizable]="false"
   [closable]="true"
   [dismissableMask]="true"
-  [style]="{ width: '460px' }"
+  [style]="{ width: '640px', maxWidth: '94vw' }"
+  styleClass="rd-invite-dialog"
 >
+  <!-- Header -->
   <ng-template pTemplate="header">
     <div class="flex items-center gap-3.5">
-      <span
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
-      >
-        <i class="pi pi-user-plus text-[1.1rem] text-brand-blue"></i>
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50">
+        <i class="pi pi-send text-[1.05rem] text-sky-700"></i>
       </span>
       <div class="flex flex-col gap-[0.1rem]">
         <h2
           class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
         >
           {{ inv.title }}
+          @if (contenedor(); as empresa) {
+            <span class="ml-1 font-semibold text-brand-muted">· {{ empresa.nombre }}</span>
+          }
         </h2>
         <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ inv.subtitle }}</p>
       </div>
     </div>
   </ng-template>
 
+  <!-- Body -->
   @if (visible()) {
-    <form (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5 pt-1">
+    <form (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-4">
       <div class="flex flex-col gap-1.5">
-        <label for="invitar-usuario" class="text-[0.8rem] font-medium text-brand-text">
+        <label
+          for="invitar-usuario"
+          class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
+        >
           {{ inv.fields.usuario }}
           <span class="ml-px text-red-500">*</span>
         </label>
@@ -69,11 +76,21 @@
             </div>
           </ng-template>
         </p-autocomplete>
-        <span class="text-[0.72rem] text-brand-muted">{{ inv.fields.usuarioHint }}</span>
+        @if (!selectedUser() && selection()) {
+          <span class="flex items-center gap-1.5 text-[0.7rem] tracking-[0.01em] text-red-600">
+            <i class="pi pi-times-circle text-[0.7rem]"></i>
+            {{ inv.fields.usuarioInvalid }}
+          </span>
+        } @else {
+          <span class="text-[0.72rem] text-brand-muted">{{ inv.fields.usuarioHint }}</span>
+        }
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label for="invitar-grupos" class="text-[0.8rem] font-medium text-brand-text">
+        <label
+          for="invitar-grupos"
+          class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
+        >
           {{ inv.fields.grupos }}
         </label>
         <p-multiselect
@@ -101,56 +118,22 @@
         El rol no se pide acá a propósito: se cambia desde la fila del listado.
       -->
 
-      @if (accesosDisponibles().length > 0) {
-        <div class="flex flex-col gap-1.5">
-          <div class="flex items-baseline justify-between gap-2">
-            <span class="text-[0.8rem] font-medium text-brand-text">{{ inv.accesos.label }}</span>
-            <button
-              type="button"
-              class="text-[0.72rem] font-semibold text-brand-blue hover:underline"
-              (click)="toggleTodosLosAccesos()"
-            >
-              {{ todosLosAccesos() ? inv.accesos.ninguno : inv.accesos.todos }}
-            </button>
-          </div>
-          <div class="grid grid-cols-2 gap-1.5 rounded-lg border border-[rgba(20,48,73,0.1)] p-2">
-            @for (acceso of accesosDisponibles(); track acceso.id) {
-              <label
-                [for]="'invitar-acceso-' + acceso.id"
-                class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-[rgba(20,48,73,0.04)]"
-              >
-                <p-checkbox
-                  [binary]="true"
-                  [ngModel]="isAccesoSelected(acceso.id)"
-                  (ngModelChange)="toggleAcceso(acceso.id)"
-                  [ngModelOptions]="{ standalone: true }"
-                  [inputId]="'invitar-acceso-' + acceso.id"
-                />
-                <i [class]="acceso.iconClass" class="text-[0.8rem] text-brand-muted"></i>
-                <span class="text-[0.8rem] text-brand-text">
-                  {{ inv.accesos.flags[acceso.id] }}
-                </span>
-              </label>
-            }
-          </div>
-          <span class="text-[0.72rem] text-brand-muted">{{ inv.accesos.hint }}</span>
-        </div>
-      }
+      <lib-accesos-contenedor
+        [contenedor]="contenedor()"
+        [(selected)]="selectedAccesoIds"
+        inputIdPrefix="invitar-acceso"
+      />
 
-      <div class="flex justify-end gap-2">
-        <p-button
-          type="button"
-          [label]="t().common.actions.cancel"
-          severity="secondary"
-          [outlined]="true"
-          size="small"
-          (onClick)="onCancel()"
-        />
+      <!--
+        Sin botón de cancelar: la única acción es enviar. Para salir está la X
+        del encabezado (y el click afuera), como en cualquier diálogo.
+      -->
+      <div class="flex justify-end pb-1">
         <p-button
           type="submit"
-          [label]="inv.submit"
-          icon="pi pi-send"
           size="small"
+          icon="pi pi-send"
+          [label]="isSending() ? inv.sending : inv.submit"
           [loading]="isSending()"
           [disabled]="!selectedUser() || isSending()"
         />

@@ -1,10 +1,9 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
-import { TenantService } from '@reddoc/core';
+import { TenantService, readModuleAccessFlags } from '@reddoc/core';
 import { ERP_MODULES } from '@erp/core/erp-modules';
 import type { ModeloId } from './modelo.catalog';
 import { ModelPermissionsService } from './model-permissions.service';
-import { readModuleAccessFlags } from './module-access';
 import type { PermissionAction } from './permission.types';
 
 /**

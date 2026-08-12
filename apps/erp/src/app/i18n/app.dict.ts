@@ -1,5 +1,9 @@
 import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
-import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
+import type {
+  AccesosContenedorTranslationsHost,
+  AppSwitcherTranslationsHost,
+  AuthTranslationsHost,
+} from '@reddoc/ui';
 
 /**
  * Los 42 campos de la línea liquidada del aporte a seguridad social.
@@ -55,7 +59,11 @@ export interface AporteDetalleCampos {
 }
 
 export interface AppDict
-  extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
+  extends
+    AuthTranslationsHost,
+    AppSwitcherTranslationsHost,
+    ContenedoresTranslationsHost,
+    AccesosContenedorTranslationsHost {
   common: {
     comingSoon: string;
     accessDenied: {
@@ -4332,28 +4340,14 @@ export interface AppDict
           usuario: string;
           usuarioPlaceholder: string;
           usuarioHint: string;
+          usuarioInvalid: string;
           grupos: string;
           gruposPlaceholder: string;
           gruposHint: string;
           gruposEmpty: string;
         };
-        accesos: {
-          label: string;
-          todos: string;
-          ninguno: string;
-          hint: string;
-          flags: {
-            venta: string;
-            compra: string;
-            tesoreria: string;
-            cartera: string;
-            inventario: string;
-            humano: string;
-            contabilidad: string;
-            turno: string;
-          };
-        };
         submit: string;
+        sending: string;
       };
       detalle: {
         eyebrow: string;
