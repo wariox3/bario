@@ -4,8 +4,13 @@ import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 export const SEDES_FILTERS_STORAGE_KEY = 'sedes:filters:v1';
 export const SEDES_QUICK_SEARCH_FIELD = 'nombre';
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const SEDE_LIST_PATH = ['general', 'sedes'] as const;
+/**
+ * Segmento de ruta del master, tal como lo declara `rutaSedes()`.
+ *
+ * Sin módulo a propósito: sedes se abre desde general y desde venta, y el
+ * módulo lo pone `masterNav` con el que esté activo.
+ */
+export const SEDE_SEGMENT = 'sedes';
 
 /** Endpoint `seleccionar/` de centros de costo para el autocomplete buscable. */
 export const CENTRO_COSTO_SELECT_ENDPOINT = SELECT_ENDPOINTS.centroCosto;

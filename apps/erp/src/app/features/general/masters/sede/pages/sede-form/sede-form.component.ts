@@ -1,17 +1,17 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
+import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
+import { masterNav } from '@erp/core/erp-modules';
 import { SedeService } from '../../sede.service';
-import { CENTRO_COSTO_SELECT_ENDPOINT, SEDE_LIST_PATH } from '../../sede.constants';
+import { CENTRO_COSTO_SELECT_ENDPOINT, SEDE_SEGMENT } from '../../sede.constants';
 import { formValueToPayload, sedeToFormValue } from '../../sede.mapper';
 
 /**
@@ -42,12 +42,12 @@ export class SedeFormComponent implements OnInit {
   private readonly service = inject(SedeService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
-  private readonly tenant = inject(TenantService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  private readonly nav = masterNav(SEDE_SEGMENT);
 
   /** Id de la sede a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -57,20 +57,11 @@ export class SedeFormComponent implements OnInit {
 
   protected readonly centroCostoEndpoint = CENTRO_COSTO_SELECT_ENDPOINT;
 
-  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
-    const slug = this.tenant.currentSlug();
-    return [
-      {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
-      },
-      {
-        label: this.t().entities.sede.name,
-        routerLink: slug ? ['/t', slug, ...SEDE_LIST_PATH] : undefined,
-      },
-      { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
-    ];
-  });
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
+    this.nav.crumbs(this.t().entities.sede.name, {
+      label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
+    }),
+  );
 
   protected readonly form = this.fb.group({
     nombre: this.fb.control<string>('', [Validators.required, Validators.maxLength(100)]),
@@ -96,7 +87,7 @@ export class SedeFormComponent implements OnInit {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        this.nav.ir();
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -107,7 +98,7 @@ export class SedeFormComponent implements OnInit {
   }
 
   protected onCancel(): void {
-    this.navigateToList();
+    this.nav.ir();
   }
 
   private loadSede(id: number): void {
@@ -121,11 +112,5 @@ export class SedeFormComponent implements OnInit {
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });
-  }
-
-  private navigateToList(): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return;
-    void this.router.navigate(['/t', slug, ...SEDE_LIST_PATH]);
   }
 }

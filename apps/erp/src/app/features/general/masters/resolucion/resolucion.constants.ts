@@ -4,6 +4,16 @@ import type { ResolucionTipo } from './resolucion.model';
 
 export const RESOLUCIONES_QUICK_SEARCH_FIELD = 'prefijo';
 
+/**
+ * Segmento de ruta del master, tal como lo declara `rutaResoluciones()`.
+ *
+ * Sin módulo a propósito: resoluciones se abre desde venta y compra, y el
+ * módulo lo pone `masterNav` con el que esté activo. Ojo: el `tipo` del master
+ * es un flag de negocio (qué resoluciones se ven y qué payload se manda), no la
+ * ubicación en la URL — hoy coinciden, pero no son lo mismo.
+ */
+export const RESOLUCION_SEGMENT = 'resoluciones';
+
 /** Cota superior de un entero (int32 del backend) para los consecutivos. */
 export const CONSECUTIVO_MAX = 2147483647;
 
