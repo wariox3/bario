@@ -19,7 +19,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -92,6 +92,7 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
     TabsModule,
     TextareaModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ErpAsesorSelectComponent,
