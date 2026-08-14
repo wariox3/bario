@@ -123,22 +123,25 @@
               {{ c.tipo_persona_nombre || '—' }}
             </dd>
           </div>
-          <!-- Tipo + número + DV en un solo campo; el número en monoespaciada
-               porque es un identificador que se compara y se copia. -->
+          <!-- Tipo + número + DV en un solo campo: `CC 1118260344`. La abreviatura
+               cabe en la misma línea que el número, que va en monoespaciada porque
+               es un identificador que se compara y se copia. -->
           <div class="flex flex-col gap-0.5">
             <dt class="contacto-detail__label">
               {{ t().entities.contacto.detail.labels.documento }}
             </dt>
             <dd
               class="contacto-detail__value"
-              [class.contacto-detail__value--empty]="!c.identificacion_nombre && !numeroDocumento()"
+              [class.contacto-detail__value--empty]="
+                !c.identificacion_abreviatura && !numeroDocumento()
+              "
             >
-              @if (c.identificacion_nombre || numeroDocumento()) {
-                @if (c.identificacion_nombre) {
-                  {{ c.identificacion_nombre }}
+              @if (c.identificacion_abreviatura || numeroDocumento()) {
+                @if (c.identificacion_abreviatura) {
+                  {{ c.identificacion_abreviatura }}
                 }
                 @if (numeroDocumento()) {
-                  <span class="block font-mono tabular-nums">{{ numeroDocumento() }}</span>
+                  <span class="font-mono tabular-nums">{{ numeroDocumento() }}</span>
                 }
               } @else {
                 —
