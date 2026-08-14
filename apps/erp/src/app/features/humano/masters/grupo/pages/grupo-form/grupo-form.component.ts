@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
@@ -34,6 +34,7 @@ import { grupoToFormValue, formValueToPayload } from '../../grupo.mapper';
     InputTextModule,
     SelectModule,
     FieldErrorComponent,
+    PageActionsComponent,
   ],
   templateUrl: './grupo-form.component.html',
   styleUrl: './grupo-form.component.scss',

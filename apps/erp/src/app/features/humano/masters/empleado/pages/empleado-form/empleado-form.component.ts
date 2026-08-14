@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -45,6 +45,7 @@ import { empleadoToFormValue, formValueToPayload } from '../../empleado.mapper';
     ButtonModule,
     InputTextModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
     ErpApiAutocompleteComponent,
   ],

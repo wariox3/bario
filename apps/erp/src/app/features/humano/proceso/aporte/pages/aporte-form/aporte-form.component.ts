@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { ErpApiSelectComponent, FieldErrorComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -66,6 +66,7 @@ const CAMPO_ENTIDAD_RIESGO = 'hum_entidad_riesgo_id';
     InputNumberModule,
     SelectModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
   ],
   templateUrl: './aporte-form.component.html',
