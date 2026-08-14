@@ -8,7 +8,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   ErpSelectDataService,
   type ErpSelectOption,
@@ -44,6 +44,7 @@ import { formValueToPayload, itemToFormValue } from '../../item.mapper';
     RadioButtonModule,
     MultiSelectModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpCuentaSelectComponent,
   ],
   templateUrl: './item-form.component.html',

@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -39,6 +39,7 @@ import { precioToFormValue, formValueToPayload } from '../../precio.mapper';
     DatePickerModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
   ],
   templateUrl: './precio-form.component.html',
   styleUrl: './precio-form.component.scss',
