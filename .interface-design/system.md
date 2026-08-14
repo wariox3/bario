@@ -299,6 +299,51 @@ tabular-nums`). El número dice qué hay, el clic dice qué hacer. Tres estados,
 - **Cuándo NO:** si el barrido es destructivo o costoso (bulk por columna = decenas de escrituras de
   un clic), no va como toggle directo — eso pide confirmación explícita.
 
+## Patrón: barra de acciones pegajosa (`<lib-page-actions>`)
+
+`libs/ui/src/lib/components/page-actions/` (vía `@reddoc/ui`) — la fila de botones de una página
+(volver / guardar / editar). Se pega bajo el header al hacer scroll y **solo entonces** se viste de
+chrome; en reposo es una fila de botones más. En un formulario largo, guardar no puede quedar
+arriba fuera de vista. Se usa envolviendo los botones, sin nada más:
+
+```html
+<lib-page-actions>
+  <p-button [label]="…" (onClick)="onCancel()" />
+  <p-button type="submit" [label]="…" />
+</lib-page-actions>
+```
+
+- **`top: 0` basta:** en los workspace-layout el documento **no** scrollea (`:host` con
+  `overflow:hidden`), scrollea `.workspace-main`, y el `.app-header` es su hermano de arriba. Un
+  sticky dentro del main se pega en el borde del scrollport, que es la línea del header — sin
+  calcular sus 56px ni romperse si el header cambia de alto.
+- **El scrollport no lleva `padding-top`.** Los navegadores no acuerdan desde dónde ancla un sticky
+  cuando su scrollport tiene padding superior: Gecko lo suma al `top` (la barra ancla bajo el
+  padding) y Blink/WebKit no. Por eso los `.workspace-main` aportan el gutter de arriba como
+  **espaciador en el flujo** (`&::before` con `height: var(--page-gutter)`) y padding solo en los
+  otros tres lados: visualmente idéntico, y todos los navegadores anclan en la línea del header —
+  que es también lo que asume el umbral de detección del componente. Comprobado en Firefox
+  headless: con padding-top la barra ancla 28px más abajo y `is-stuck` no dispara nunca.
+- **La caja no cambia nunca.** El fondo lo pinta un `::before` desbordado, no padding del elemento.
+  Si el padding apareciera al pegarse, la página saltaría 24px y el pegado podría entrar en bucle
+  (crece → deja de estar pegada → encoge → vuelve a pegarse). Lo único que muta es una `opacity`.
+- **`--page-gutter`:** el sangrado lateral sale de esa variable, que **cada layout declara sobre su
+  scrollport** con el mismo valor que su padding (`.workspace-main`: `1.75rem`, `1.25rem` bajo
+  768px). Así la banda llega a los bordes en vez de leerse como una tarjeta flotando, y el
+  componente no repite ni el número ni el breakpoint de ningún layout. Un layout nuevo solo declara
+  la suya; el default es `1.75rem`.
+- **`--page-actions-air`** (`0.5rem`) alimenta a la vez el `top` del sticky, el desborde vertical
+  de la banda y el umbral de detección: son el mismo valor. Se puede subir/bajar por página.
+- **Detección — no usar `IntersectionObserver` con `threshold: [1]`.** Ese umbral exige que el ratio
+  vuelva a valer **1 exacto** y con posiciones fraccionarias se queda en 0.999…: detecta el pegado y
+  **nunca** el despegado. Va con comparación de rects (`barra.top <= scrollport.top + aire`) en el
+  `scroll` del contenedor, pasivo. El scrollport se busca subiendo por el DOM hasta un
+  `overflow-y: auto|scroll`, no por selector, para no acoplar el componente a un layout.
+- **La clase se aplica a mano** (`classList.toggle`), no por binding: corre en cada evento de scroll
+  y no vale despertar la detección de cambios para alternar una clase en el propio host.
+- El contenido proyectado queda dentro del `<form>` en el DOM real: un botón `type="submit"` sigue
+  enviando. Para algo alineado a la derecha, un `<div class="ml-auto">` dentro.
+
 ## Patrón: ficha de detalle en grupos (card única)
 
 Para las páginas `*-detail` de un master con muchos campos de lectura. En vez de una card por

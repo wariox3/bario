@@ -19,6 +19,7 @@ export { ErpAsesorSelectComponent } from './lib/components/asesor-select/erp-ase
 export { ContratoAutocompleteComponent } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export type { ContratoOption } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export { DetailHeaderComponent } from './lib/components/detail-header/detail-header.component';
+export { PageActionsComponent } from './lib/components/page-actions/page-actions.component';
 export { UppercaseDirective } from './lib/directives/uppercase.directive';
 export type { AuthDict, AuthTranslationsHost } from './lib/auth/i18n';
 export { authEs, authEn } from './lib/auth/i18n';
