@@ -4,12 +4,19 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
-import { CONTACTO_LIST_PATH } from '../../contacto.constants';
+import { CONTACTO_LIST_PATH, TIPO_PERSONA } from '../../contacto.constants';
 import type { Contacto } from '../../contacto.model';
+
+/** Une las partes con valor descartando nulos y vacíos; '' si no queda ninguna. */
+function unir(partes: readonly (string | null | undefined)[], separador: string): string {
+  return partes
+    .map((parte) => parte?.trim())
+    .filter((parte): parte is string => !!parte)
+    .join(separador);
+}
 
 /** Rol comercial activo del contacto, con su clave i18n y color de pill. */
 interface ContactoRol {
@@ -22,14 +29,19 @@ interface ContactoRol {
  *
  * Master del módulo General (camino B). Llega desde el listado (`detalle/:id`)
  * para verificar de un vistazo identidad, contacto y rol comercial antes de
- * editar/llamar/facturar. Solo muestra campos con valor legible: los FK que el
- * backend devuelve únicamente como id (plazo de pago, precio, asesor, etc.) se
- * omiten porque su `_nombre` no viaja en `getById`.
+ * editar/llamar/facturar. Ningún campo se oculta por venir vacío: se pinta con
+ * «—» atenuado para que la ficha conserve siempre la misma forma. Lo que sí
+ * queda fuera del template son los FK que el backend devuelve únicamente como
+ * id, sin su `_nombre` acompañante: no hay nada legible que mostrar.
+ *
+ * A diferencia del resto de los detalles, no usa `<lib-detail-header>`: esa
+ * card gastaba alto en repetir el documento y el nombre que ya están entre los
+ * campos. La identidad la dan la miga, el `h1` accesible y el propio grupo.
  */
 @Component({
   selector: 'app-contacto-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './contacto-detail.component.html',
   styleUrl: './contacto-detail.component.scss',
 })
@@ -70,32 +82,46 @@ export class ContactoDetailComponent implements OnInit {
     return items;
   });
 
-  /** Iniciales para el monograma: nombre1+apellido1 o, si no, nombre_corto. */
-  protected readonly iniciales = computed(() => {
+  /**
+   * Número de identificación con su dígito de verificación: `900123456-7`.
+   *
+   * El DV es el checksum módulo-11 del **NIT**: una cédula no lo tiene. En
+   * persona natural no se pinta aunque el registro lo traiga — el form calcula
+   * el DV a partir del número sin mirar el tipo de persona y lo persiste
+   * (`contacto.mapper.ts`, vía `getRawValue()` sobre el control deshabilitado),
+   * así que hay contactos naturales con un DV guardado que no les corresponde.
+   * Acá solo se deja de mostrar; limpiar lo guardado es tarea del backend.
+   */
+  protected readonly numeroDocumento = computed(() => {
     const c = this.contacto();
-    if (!c) return '';
-    const desde = (...partes: (string | null)[]): string =>
-      partes
-        .map((p) => p?.trim()?.[0] ?? '')
-        .join('')
-        .toUpperCase();
-    const porNombre = desde(c.nombre1, c.apellido1);
-    if (porNombre) return porNombre;
-    return (c.nombre_corto ?? '')
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((w) => w[0] ?? '')
-      .join('')
-      .toUpperCase();
+    if (!c?.numero_identificacion) return '';
+    const dv = c.tipo_persona === TIPO_PERSONA.NATURAL ? null : c.digito_verificacion;
+    return dv ? `${c.numero_identificacion}-${dv}` : c.numero_identificacion;
   });
 
-  /** Documento legible: `CC 1118260345` (+ `-1` si hay dígito de verificación). */
-  protected readonly documento = computed(() => {
+  /**
+   * Nombre completo en una sola línea. Las partes desglosadas solo llegan en
+   * persona natural; en jurídica el nombre real es `nombre_corto`, así que cae
+   * ahí — si no, la ficha de una empresa no mostraría su nombre en ningún lado.
+   */
+  protected readonly nombreCompleto = computed(() => {
     const c = this.contacto();
     if (!c) return '';
-    const abrev = c.identificacion_abreviatura ? `${c.identificacion_abreviatura} ` : '';
-    const dv = c.digito_verificacion ? `-${c.digito_verificacion}` : '';
-    return `${abrev}${c.numero_identificacion}${dv}`;
+    return unir([c.nombre1, c.nombre2, c.apellido1, c.apellido2], ' ') || c.nombre_corto || '';
+  });
+
+  /**
+   * Ubicación como bloque de sobre en vez de cuatro campos sueltos: calle y
+   * barrio arriba, ciudad/departamento y código postal abajo. Se arma acá para
+   * que el template no encadene un `@if` por cada separador.
+   */
+  protected readonly direccionLineas = computed<readonly string[]>(() => {
+    const c = this.contacto();
+    if (!c) return [];
+    const ciudad = unir([c.ciudad_nombre, c.departamento_nombre], ' — ');
+    return [unir([c.direccion, c.barrio], ' · '), unir([ciudad, c.codigo_postal], ' · ')].filter(
+      (linea) => !!linea,
+    );
   });
 
   /** Pills de rol activas según los flags del contacto. */

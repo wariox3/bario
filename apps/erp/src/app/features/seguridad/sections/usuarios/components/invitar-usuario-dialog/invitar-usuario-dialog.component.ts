@@ -16,28 +16,22 @@ import {
   type AutoCompleteSelectEvent,
 } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { MultiSelectModule } from 'primeng/multiselect';
 import {
   I18nService,
   TenantService,
   ToastService,
+  buildAccesoFlags,
   extractErrorMessage,
   getInitials,
-  type ContenedorAccesoFlags,
+  type ContenedorAccesoId,
   type GrupoSeguridad,
   type UserSearchResult,
 } from '@reddoc/core';
-import { readModuleAccessFlags } from '@erp/core/permissions';
+import { AccesosContenedorComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { SeguridadUsuariosService } from '../../usuarios.service';
-import {
-  INVITACION_ACCESOS,
-  accesoFlag,
-  type InvitacionAcceso,
-  type InvitacionAccesoId,
-} from '../../usuarios.constants';
 
 /** Mínimo de caracteres antes de pegarle al buscador de usuarios. */
 const SEARCH_MIN_LENGTH = 3;
@@ -66,7 +60,7 @@ const SEARCH_MIN_LENGTH = 3;
     ButtonModule,
     AutoCompleteModule,
     MultiSelectModule,
-    CheckboxModule,
+    AccesosContenedorComponent,
   ],
   templateUrl: './invitar-usuario-dialog.component.html',
 })
@@ -102,25 +96,11 @@ export class InvitarUsuarioDialogComponent {
   protected readonly selectedGrupoIds = signal<number[]>([]);
   protected readonly isLoadingGrupos = signal(false);
 
-  /**
-   * Accesos que se pueden otorgar: los del plan del contenedor.
-   *
-   * Si el contenedor no trae ninguna flag `acceso_*` no hay contra qué filtrar
-   * (ver `readModuleAccessFlags`), y se ofrecen todos — quedarse sin ninguna
-   * casilla por un campo que faltó sería peor que ofrecer de más.
-   */
-  protected readonly accesosDisponibles = computed<readonly InvitacionAcceso[]>(() => {
-    const contratados = readModuleAccessFlags(this.tenant.currentContenedor());
-    if (contratados === null) return INVITACION_ACCESOS;
-    return INVITACION_ACCESOS.filter((acceso) => contratados.has(accesoFlag(acceso.id)));
-  });
+  /** Contenedor al que se invita: el activo. Recorta los accesos ofrecidos. */
+  protected readonly contenedor = this.tenant.currentContenedor;
 
   /** Accesos marcados. Arranca vacío: se otorga lo que se marque, nada más. */
-  protected readonly selectedAccesoIds = signal<readonly InvitacionAccesoId[]>([]);
-
-  protected readonly todosLosAccesos = computed(
-    () => this.selectedAccesoIds().length === this.accesosDisponibles().length,
-  );
+  protected readonly selectedAccesoIds = signal<readonly ContenedorAccesoId[]>([]);
 
   constructor() {
     // Cada apertura arranca limpia: no arrastra el intento anterior. Los
@@ -183,40 +163,6 @@ export class InvitarUsuarioDialogComponent {
     this.selection.set(event.value as UserSearchResult);
   }
 
-  protected onCancel(): void {
-    this.visibleChange.emit(false);
-  }
-
-  protected isAccesoSelected(id: InvitacionAccesoId): boolean {
-    return this.selectedAccesoIds().includes(id);
-  }
-
-  protected toggleAcceso(id: InvitacionAccesoId): void {
-    this.selectedAccesoIds.update((ids) =>
-      ids.includes(id) ? ids.filter((actual) => actual !== id) : [...ids, id],
-    );
-  }
-
-  /** Atajo del encabezado: marca todos los disponibles o los desmarca todos. */
-  protected toggleTodosLosAccesos(): void {
-    this.selectedAccesoIds.set(
-      this.todosLosAccesos() ? [] : this.accesosDisponibles().map((acceso) => acceso.id),
-    );
-  }
-
-  /**
-   * Flags tal como las espera el backend: **todos** los accesos ofrecidos, con
-   * su booleano explícito. Los que el plan del contenedor no incluye no viajan;
-   * ese permiso no es de la persona sino de la empresa.
-   */
-  private accesosPayload(): ContenedorAccesoFlags {
-    const flags: Record<string, boolean> = {};
-    for (const acceso of this.accesosDisponibles()) {
-      flags[accesoFlag(acceso.id)] = this.isAccesoSelected(acceso.id);
-    }
-    return flags as ContenedorAccesoFlags;
-  }
-
   protected onSubmit(): void {
     const user = this.selectedUser();
     if (!user || this.isSending()) return;
@@ -226,7 +172,7 @@ export class InvitarUsuarioDialogComponent {
     this.service
       .invite(user.id, {
         grupoIds: this.selectedGrupoIds(),
-        accesos: this.accesosPayload(),
+        accesos: buildAccesoFlags(this.contenedor(), this.selectedAccesoIds()),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

@@ -4,6 +4,19 @@
   gap: 1.25rem;
 }
 
+// Micro-encabezado de un grupo dentro de una card (identificación / contacto /
+// ubicación). Se distingue de la etiqueta de campo por caja y peso, no por color:
+// mismo idioma que el group-label del panel del app-switcher.
+.contacto-detail__group {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
 // Etiqueta de cada dato de la ficha (término de la definition list).
 .contacto-detail__label {
   font-size: 0.7rem;
@@ -20,6 +33,14 @@
   line-height: 1.35;
   color: var(--brand-text);
   word-break: break-word;
+}
+
+// Campo sin dato: la raya se atenúa para que no compita con los valores reales
+// al escanear la columna, pero el campo sigue ocupando su lugar en la ficha.
+.contacto-detail__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
 }
 
 // Enlaces de contacto (correo / teléfono).

@@ -1,11 +1,12 @@
 import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
-import { appSwitcherEn, authEn } from '@reddoc/ui';
+import { accesosContenedorEn, appSwitcherEn, authEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
   appSwitcher: appSwitcherEn,
   contenedores: contenedoresEn,
+  accesosContenedor: accesosContenedorEn,
   common: {
     comingSoon: 'Coming soon.',
     actions: {

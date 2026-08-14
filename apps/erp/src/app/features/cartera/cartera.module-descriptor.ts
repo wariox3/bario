@@ -46,14 +46,14 @@ export const CARTERA_MODULE: ErpModuleDescriptor = {
           // Masters compartidos con el módulo General (no propios de cartera).
           items: [
             {
-              labelKey: 'entities.contacto.name',
-              path: 'contactos',
-              modelo: MODELO.general.contacto,
-            },
-            {
               labelKey: 'entities.cuentaBanco.name',
               path: 'cuentas-banco',
               modelo: MODELO.general.cuentaBanco,
+            },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
             },
           ],
         },

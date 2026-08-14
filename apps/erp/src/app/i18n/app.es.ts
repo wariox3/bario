@@ -1,11 +1,12 @@
 import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
-import { appSwitcherEs, authEs } from '@reddoc/ui';
+import { accesosContenedorEs, appSwitcherEs, authEs } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
   auth: authEs,
   appSwitcher: appSwitcherEs,
   contenedores: contenedoresEs,
+  accesosContenedor: accesosContenedorEs,
   common: {
     comingSoon: 'Próximamente disponible.',
     accessDenied: {
@@ -785,19 +786,20 @@ export const es: AppDict = {
         },
       },
       detail: {
-        title: 'Detalle del contacto',
-        subtitle: 'Información y datos comerciales',
-        eyebrow: 'Contacto',
-        sections: {
-          general: 'Información general',
+        groups: {
+          identificacion: 'Identificación',
           contacto: 'Contacto',
           ubicacion: 'Ubicación',
+        },
+        sections: {
+          general: 'Información general',
           cliente: 'Información de cliente',
           proveedor: 'Información de proveedor',
         },
         labels: {
           codigoCiiu: 'Código CIIU',
-          codigoPostal: 'Código postal',
+          documento: 'Documento',
+          nombreCompleto: 'Nombre completo',
         },
         notFound: {
           title: 'Contacto no encontrado',
@@ -5595,34 +5597,20 @@ export const es: AppDict = {
         sub: 'Este contenedor todavía no tiene usuarios con acceso.',
       },
       invitar: {
-        title: 'Invitar usuario',
-        subtitle: 'Dale acceso a esta empresa',
+        title: 'Invitar al contenedor',
+        subtitle: 'Comparte este espacio con tu equipo por correo electrónico.',
         fields: {
-          usuario: 'Usuario',
-          usuarioPlaceholder: 'Buscar por correo...',
+          usuario: 'Correo del invitado',
+          usuarioPlaceholder: 'nombre@empresa.com',
           usuarioHint: 'Escribe al menos 3 caracteres. La persona ya debe tener cuenta en RedDoc.',
+          usuarioInvalid: 'Elige a alguien de la lista.',
           grupos: 'Grupos',
-          gruposPlaceholder: 'Selecciona los grupos...',
+          gruposPlaceholder: 'Selecciona los grupos (opcional)',
           gruposHint: 'Opcional. La persona pertenecerá a estos grupos al aceptar la invitación.',
           gruposEmpty: 'No hay grupos disponibles.',
         },
-        accesos: {
-          label: 'Accesos',
-          todos: 'Marcar todos',
-          ninguno: 'Quitar todos',
-          hint: 'Opcional. Solo aparecen los módulos que esta empresa tiene contratados.',
-          flags: {
-            venta: 'Venta',
-            compra: 'Compra',
-            tesoreria: 'Tesorería',
-            cartera: 'Cartera',
-            inventario: 'Inventario',
-            humano: 'Humano',
-            contabilidad: 'Contabilidad',
-            turno: 'Turnos',
-          },
-        },
         submit: 'Enviar invitación',
+        sending: 'Enviando…',
       },
       detalle: {
         eyebrow: 'Usuario del contenedor',

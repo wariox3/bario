@@ -303,6 +303,7 @@ export class ContactoFormComponent implements OnInit {
       const esProveedor = v ?? false;
       const seActivo = esProveedor && !this.esProveedor();
       this.esProveedor.set(esProveedor);
+      this.applyProveedorValidators(esProveedor);
       if (seActivo) this.scrollToSection(this.proveedorSection);
     });
 
@@ -326,8 +327,9 @@ export class ContactoFormComponent implements OnInit {
       controls.numero_identificacion.updateValueAndValidity();
     });
 
-    // Estado inicial del requerido de plazo_pago según el flag cliente.
+    // Estado inicial de los requeridos según los flags cliente/proveedor.
     this.applyClienteValidators(controls.cliente.value ?? false);
+    this.applyProveedorValidators(controls.proveedor.value ?? false);
   }
 
   /**
@@ -339,6 +341,18 @@ export class ContactoFormComponent implements OnInit {
     const { plazo_pago } = this.form.controls;
     plazo_pago.setValidators(esCliente ? [Validators.required] : []);
     plazo_pago.updateValueAndValidity();
+  }
+
+  /**
+   * `plazo_pago_proveedor` solo es obligatorio cuando el contacto es proveedor:
+   * de él salen los días de vencimiento de la factura de compra (entre otros, la
+   * importación de eventos DIAN lo usa para armar el documento). Fuera de ese
+   * caso la card se oculta y exigirlo dejaría el form inválido sin campo visible.
+   */
+  private applyProveedorValidators(esProveedor: boolean): void {
+    const { plazo_pago_proveedor } = this.form.controls;
+    plazo_pago_proveedor.setValidators(esProveedor ? [Validators.required] : []);
+    plazo_pago_proveedor.updateValueAndValidity();
   }
 
   /**

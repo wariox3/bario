@@ -3,7 +3,7 @@ import type { ContenedoresDict } from './contenedores.dict';
 export const contenedoresEs: ContenedoresDict = {
   list: {
     title: 'Tus contenedores de empresa',
-    subtitle: 'Seleccioná un espacio de trabajo para continuar',
+    subtitle: 'Selecciona un espacio de trabajo para continuar',
     newButton: 'Nuevo contenedor',
     searchPlaceholder: 'Buscar...',
     enter: 'Ingresar',
@@ -46,7 +46,7 @@ export const contenedoresEs: ContenedoresDict = {
   },
   create: {
     title: 'Nuevo contenedor',
-    subtitle: 'Configurá el nuevo espacio de trabajo',
+    subtitle: 'Configura el nuevo espacio de trabajo',
     fields: {
       name: 'Nombre del contenedor',
       namePlaceholder: 'Acme Corp',
@@ -61,7 +61,7 @@ export const contenedoresEs: ContenedoresDict = {
       phoneRequired: 'El teléfono es obligatorio.',
       phoneMax20: 'Máximo 20 caracteres.',
       emailRequired: 'El correo es obligatorio.',
-      emailInvalid: 'Ingresá un correo válido.',
+      emailInvalid: 'Ingresa un correo válido.',
     },
     submit: 'Crear contenedor',
     cancel: 'Cancelar',
@@ -69,20 +69,20 @@ export const contenedoresEs: ContenedoresDict = {
       success: { title: 'Contenedor creado', desc: 'El contenedor fue creado correctamente.' },
       error: {
         title: 'Error al crear',
-        desc: 'No se pudo crear el contenedor. Intentá de nuevo.',
+        desc: 'No se pudo crear el contenedor. Intenta de nuevo.',
       },
     },
   },
   edit: {
     title: 'Editar contenedor',
-    subtitle: 'Actualizá los datos del contenedor',
+    subtitle: 'Actualiza los datos del contenedor',
     submit: 'Guardar cambios',
     cancel: 'Cancelar',
     toasts: {
       success: { title: 'Empresa actualizada', desc: 'Los cambios se guardaron correctamente.' },
       error: {
         title: 'Error al actualizar',
-        desc: 'No se pudo actualizar la empresa. Intentá de nuevo.',
+        desc: 'No se pudo actualizar la empresa. Intenta de nuevo.',
       },
     },
   },
@@ -102,23 +102,23 @@ export const contenedoresEs: ContenedoresDict = {
       },
       error: {
         title: 'Error al eliminar',
-        desc: 'No se pudo eliminar el contenedor. Intentá de nuevo.',
+        desc: 'No se pudo eliminar el contenedor. Intenta de nuevo.',
       },
     },
   },
   invite: {
     title: 'Invitar al contenedor',
-    subtitle: 'Compartí este espacio con tu equipo por correo electrónico.',
+    subtitle: 'Comparte este espacio con tu equipo por correo electrónico.',
     tabs: { members: 'Miembros', pending: 'Invitaciones' },
     form: {
       label: 'Correo del invitado',
       placeholder: 'nombre@empresa.com',
-      invalid: 'Ingresá un correo válido.',
+      invalid: 'Ingresa un correo válido.',
       submit: 'Enviar invitación',
       sending: 'Enviando…',
       grupos: {
         label: 'Grupos',
-        placeholder: 'Seleccioná los grupos (opcional)',
+        placeholder: 'Selecciona los grupos (opcional)',
         empty: 'No hay grupos disponibles.',
       },
     },
@@ -127,7 +127,7 @@ export const contenedoresEs: ContenedoresDict = {
       count: { one: 'invitación', other: 'invitaciones' },
       empty: {
         title: 'Sin invitaciones',
-        sub: 'Las invitaciones que envíes aparecerán acá.',
+        sub: 'Las invitaciones que envíes aparecerán aquí.',
       },
       toasts: {
         loadError: {
@@ -141,7 +141,7 @@ export const contenedoresEs: ContenedoresDict = {
       count: { one: 'miembro', other: 'miembros' },
       empty: {
         title: 'Aún nadie más',
-        sub: 'Invitá a alguien por correo y aparecerá acá.',
+        sub: 'Invita a alguien por correo y aparecerá aquí.',
       },
       you: 'tú',
       roles: {
@@ -164,7 +164,7 @@ export const contenedoresEs: ContenedoresDict = {
       },
       sendError: {
         title: 'No se pudo invitar',
-        desc: 'Intentá nuevamente en unos segundos.',
+        desc: 'Intenta nuevamente en unos segundos.',
       },
       removed: {
         title: 'Miembro quitado',
@@ -172,7 +172,7 @@ export const contenedoresEs: ContenedoresDict = {
       },
       removeError: {
         title: 'No se pudo quitar',
-        desc: 'Intentá nuevamente en unos segundos.',
+        desc: 'Intenta nuevamente en unos segundos.',
       },
       loadError: {
         title: 'Error al cargar miembros',

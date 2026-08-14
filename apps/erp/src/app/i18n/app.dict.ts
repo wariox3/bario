@@ -1,5 +1,9 @@
 import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
-import type { AppSwitcherTranslationsHost, AuthTranslationsHost } from '@reddoc/ui';
+import type {
+  AccesosContenedorTranslationsHost,
+  AppSwitcherTranslationsHost,
+  AuthTranslationsHost,
+} from '@reddoc/ui';
 
 /**
  * Los 42 campos de la línea liquidada del aporte a seguridad social.
@@ -55,7 +59,11 @@ export interface AporteDetalleCampos {
 }
 
 export interface AppDict
-  extends AuthTranslationsHost, AppSwitcherTranslationsHost, ContenedoresTranslationsHost {
+  extends
+    AuthTranslationsHost,
+    AppSwitcherTranslationsHost,
+    ContenedoresTranslationsHost,
+    AccesosContenedorTranslationsHost {
   common: {
     comingSoon: string;
     accessDenied: {
@@ -595,17 +603,10 @@ export interface AppDict
         };
       };
       detail: {
-        title: string;
-        subtitle: string;
-        eyebrow: string;
-        sections: {
-          general: string;
-          contacto: string;
-          ubicacion: string;
-          cliente: string;
-          proveedor: string;
-        };
-        labels: { codigoCiiu: string; codigoPostal: string };
+        /** Micro-encabezados de los grupos dentro de la card de la ficha. */
+        groups: { identificacion: string; contacto: string; ubicacion: string };
+        sections: { general: string; cliente: string; proveedor: string };
+        labels: { codigoCiiu: string; documento: string; nombreCompleto: string };
         notFound: { title: string; desc: string };
       };
     };
@@ -4332,28 +4333,14 @@ export interface AppDict
           usuario: string;
           usuarioPlaceholder: string;
           usuarioHint: string;
+          usuarioInvalid: string;
           grupos: string;
           gruposPlaceholder: string;
           gruposHint: string;
           gruposEmpty: string;
         };
-        accesos: {
-          label: string;
-          todos: string;
-          ninguno: string;
-          hint: string;
-          flags: {
-            venta: string;
-            compra: string;
-            tesoreria: string;
-            cartera: string;
-            inventario: string;
-            humano: string;
-            contabilidad: string;
-            turno: string;
-          };
-        };
         submit: string;
+        sending: string;
       };
       detalle: {
         eyebrow: string;

@@ -1,5 +1,4 @@
-import { ERP_MODULES } from '@erp/core/erp-modules';
-import { readModuleAccessFlags } from './module-access';
+import { accesosDisponibles, buildAccesoFlags, readModuleAccessFlags } from './contenedor-acceso';
 
 /** Contenedor tal como llega de `/contenedor/cliente/lista-usuario/`. */
 const CONTENEDOR = {
@@ -44,28 +43,34 @@ describe('readModuleAccessFlags', () => {
   });
 });
 
-describe('accessFlag de los descriptores', () => {
-  // Un typo acá (`acceso_ventas`) escondería el módulo para siempre sin error:
-  // la flag no coincide, el filtro lo saca y nadie se entera.
-  it('coincide con las flags que manda el backend', () => {
-    // Todas en `true`: acá interesa que la flag exista, no si está concedida.
-    const todasConcedidas = Object.fromEntries(
-      Object.keys(CONTENEDOR)
-        .filter((key) => key.startsWith('acceso_'))
-        .map((key) => [key, true]),
-    );
-    const delBackend = readModuleAccessFlags(todasConcedidas);
-    const declaradas = ERP_MODULES.map((m) => m.accessFlag).filter(
-      (flag): flag is string => flag !== undefined,
-    );
-
-    expect(declaradas.length).toBeGreaterThan(0);
-    for (const flag of declaradas) {
-      expect(delBackend?.has(flag)).toBe(true);
-    }
+describe('accesosDisponibles', () => {
+  it('ofrece solo los módulos del plan del contenedor', () => {
+    expect(accesosDisponibles(CONTENEDOR).map((a) => a.id)).toEqual([
+      'venta',
+      'compra',
+      'cartera',
+      'humano',
+      'contabilidad',
+    ]);
   });
 
-  it('General no declara flag: es la base, no se contrata aparte', () => {
-    expect(ERP_MODULES.find((m) => m.id === 'general')?.accessFlag).toBeUndefined();
+  it('sin flags ofrece el catálogo completo, no una lista vacía', () => {
+    expect(accesosDisponibles(null).length).toBeGreaterThan(0);
+  });
+});
+
+describe('buildAccesoFlags', () => {
+  it('manda el booleano explícito de cada acceso ofrecido, marcado o no', () => {
+    expect(buildAccesoFlags(CONTENEDOR, ['venta', 'humano'])).toEqual({
+      acceso_venta: true,
+      acceso_compra: false,
+      acceso_cartera: false,
+      acceso_humano: true,
+      acceso_contabilidad: false,
+    });
+  });
+
+  it('no manda los accesos fuera del plan aunque se los pida', () => {
+    expect(buildAccesoFlags(CONTENEDOR, ['inventario'])).not.toHaveProperty('acceso_inventario');
   });
 });

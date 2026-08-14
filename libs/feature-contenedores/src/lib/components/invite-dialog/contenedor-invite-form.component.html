@@ -76,6 +76,12 @@
     />
   </div>
 
+  <lib-accesos-contenedor
+    [contenedor]="contenedor()"
+    [(selected)]="selectedAccesoIds"
+    inputIdPrefix="invite-acceso"
+  />
+
   <div class="flex justify-end">
     <p-button
       type="submit"

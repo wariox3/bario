@@ -1,11 +1,12 @@
 import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
-import { appSwitcherEn, authEn } from '@reddoc/ui';
+import { accesosContenedorEn, appSwitcherEn, authEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
   appSwitcher: appSwitcherEn,
   contenedores: contenedoresEn,
+  accesosContenedor: accesosContenedorEn,
   common: {
     comingSoon: 'Coming soon.',
     accessDenied: {
@@ -785,19 +786,20 @@ export const en: AppDict = {
         },
       },
       detail: {
-        title: 'Contact detail',
-        subtitle: 'Information and commercial data',
-        eyebrow: 'Contact',
-        sections: {
-          general: 'General information',
+        groups: {
+          identificacion: 'Identification',
           contacto: 'Contact',
           ubicacion: 'Location',
+        },
+        sections: {
+          general: 'General information',
           cliente: 'Customer information',
           proveedor: 'Supplier information',
         },
         labels: {
           codigoCiiu: 'CIIU code',
-          codigoPostal: 'Postal code',
+          documento: 'Document',
+          nombreCompleto: 'Full name',
         },
         notFound: {
           title: 'Contact not found',
@@ -5543,34 +5545,20 @@ export const en: AppDict = {
         sub: 'This container has no users with access yet.',
       },
       invitar: {
-        title: 'Invite user',
-        subtitle: 'Give access to this company',
+        title: 'Invite to the container',
+        subtitle: 'Share this workspace with your team by email.',
         fields: {
-          usuario: 'User',
-          usuarioPlaceholder: 'Search by email...',
+          usuario: 'Guest email',
+          usuarioPlaceholder: 'name@company.com',
           usuarioHint: 'Type at least 3 characters. The person must already have a RedDoc account.',
+          usuarioInvalid: 'Pick someone from the list.',
           grupos: 'Groups',
-          gruposPlaceholder: 'Select groups...',
+          gruposPlaceholder: 'Select the groups (optional)',
           gruposHint: 'Optional. The person will belong to these groups once they accept.',
           gruposEmpty: 'No groups available.',
         },
-        accesos: {
-          label: 'Access',
-          todos: 'Select all',
-          ninguno: 'Clear all',
-          hint: 'Optional. Only the modules this company has purchased are listed.',
-          flags: {
-            venta: 'Sales',
-            compra: 'Purchasing',
-            tesoreria: 'Treasury',
-            cartera: 'Receivables',
-            inventario: 'Inventory',
-            humano: 'HR',
-            contabilidad: 'Accounting',
-            turno: 'Shifts',
-          },
-        },
         submit: 'Send invitation',
+        sending: 'Sending…',
       },
       detalle: {
         eyebrow: 'Container user',

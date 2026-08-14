@@ -470,6 +470,7 @@
           <div class="flex flex-col gap-1.5">
             <label for="plazo_pago_proveedor" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.plazoPagoProveedor }}
+              <span class="ml-px text-red-500">*</span>
             </label>
             <lib-api-select
               inputId="plazo_pago_proveedor"
@@ -479,6 +480,10 @@
                 form.controls.plazo_pago_proveedor.invalid &&
                 form.controls.plazo_pago_proveedor.touched
               "
+            />
+            <lib-field-error
+              [control]="form.controls.plazo_pago_proveedor"
+              [messages]="{ required: t().entities.contacto.form.validation.required }"
             />
           </div>
         </div>

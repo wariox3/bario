@@ -20,7 +20,9 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { MultiSelectModule } from 'primeng/multiselect';
 import {
+  buildAccesoFlags,
   Contenedor,
+  ContenedorAccesoId,
   ContenedorService,
   extractErrorMessage,
   getInitials,
@@ -29,12 +31,19 @@ import {
   ToastService,
   UserSearchResult,
 } from '@reddoc/core';
+import { AccesosContenedorComponent } from '@reddoc/ui';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
 @Component({
   selector: 'lib-contenedor-invite-form',
   standalone: true,
-  imports: [FormsModule, ButtonModule, AutoCompleteModule, MultiSelectModule],
+  imports: [
+    FormsModule,
+    ButtonModule,
+    AutoCompleteModule,
+    MultiSelectModule,
+    AccesosContenedorComponent,
+  ],
   templateUrl: './contenedor-invite-form.component.html',
 })
 export class ContenedorInviteFormComponent {
@@ -65,12 +74,21 @@ export class ContenedorInviteFormComponent {
   readonly selectedGrupoIds = signal<number[]>([]);
   readonly isLoadingGrupos = signal(false);
 
+  /**
+   * Accesos por módulo con los que entra la persona. Arranca vacío: se otorga
+   * lo que se marque, nada más. El catálogo lo recorta `<lib-accesos-contenedor>`
+   * al plan del contenedor elegido.
+   */
+  readonly selectedAccesoIds = signal<readonly ContenedorAccesoId[]>([]);
+
   constructor() {
     // Los grupos son verticales del schema público (globales): se cargan una
-    // sola vez. Al cambiar de contenedor solo se descarta la selección.
+    // sola vez. Al cambiar de contenedor se descarta lo elegido: los accesos
+    // ofrecidos son los de su plan, y los del anterior no aplican acá.
     effect(() => {
       this.contenedor();
       this.selectedGrupoIds.set([]);
+      this.selectedAccesoIds.set([]);
     });
 
     this.isLoadingGrupos.set(true);
@@ -130,6 +148,9 @@ export class ContenedorInviteFormComponent {
         cliente_id: c.cliente_id,
         usuario_id: user.id,
         ...(grupoIds.length > 0 ? { grupo_ids: grupoIds } : {}),
+        // Con su booleano explícito (incluido `false`) para que el backend no
+        // tenga que adivinar qué significa una flag ausente.
+        ...buildAccesoFlags(c, this.selectedAccesoIds()),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -140,6 +161,7 @@ export class ContenedorInviteFormComponent {
           this.autocompleteValue.set('');
           this.userSuggestions.set([]);
           this.selectedGrupoIds.set([]);
+          this.selectedAccesoIds.set([]);
           this.autocomplete().clear();
           this.invited.emit();
         },
