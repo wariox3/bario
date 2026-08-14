@@ -1,6 +1,6 @@
 export { PermissionsService } from './permissions.service';
 export type { ActionPredicate, ModelGrants, PermissionAction } from './permission.types';
-export { MODELO, type ModeloId } from './modelo.catalog';
+export { MODELO, PERMISO_APPS, type ModeloId } from './modelo.catalog';
 export { ModelPermissionsService } from './model-permissions.service';
 export { PERMISSION_ROUTE_DATA_KEY, permissionGuard } from './permission.guard';
 export { withPermission } from './with-permission';
