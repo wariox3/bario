@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -48,6 +48,7 @@ import { activoToFormValue, formValueToPayload } from '../../activo.mapper';
     InputNumberModule,
     DatePickerModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
     ErpCuentaSelectComponent,
   ],

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -50,6 +50,7 @@ import { rangoFechasValido } from '../../conciliacion.validators';
     DatePickerModule,
     TabsModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
     ConciliacionDetallesTabComponent,
     ConciliacionSoportesTabComponent,
