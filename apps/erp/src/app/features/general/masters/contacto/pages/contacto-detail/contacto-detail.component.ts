@@ -7,7 +7,7 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
-import { CONTACTO_LIST_PATH } from '../../contacto.constants';
+import { CONTACTO_LIST_PATH, TIPO_PERSONA } from '../../contacto.constants';
 import type { Contacto } from '../../contacto.model';
 
 /** Une las partes con valor descartando nulos y vacíos; '' si no queda ninguna. */
@@ -82,13 +82,21 @@ export class ContactoDetailComponent implements OnInit {
     return items;
   });
 
-  /** Número de identificación con su dígito de verificación: `1118260345-1`. */
+  /**
+   * Número de identificación con su dígito de verificación: `900123456-7`.
+   *
+   * El DV es el checksum módulo-11 del **NIT**: una cédula no lo tiene. En
+   * persona natural no se pinta aunque el registro lo traiga — el form calcula
+   * el DV a partir del número sin mirar el tipo de persona y lo persiste
+   * (`contacto.mapper.ts`, vía `getRawValue()` sobre el control deshabilitado),
+   * así que hay contactos naturales con un DV guardado que no les corresponde.
+   * Acá solo se deja de mostrar; limpiar lo guardado es tarea del backend.
+   */
   protected readonly numeroDocumento = computed(() => {
     const c = this.contacto();
     if (!c?.numero_identificacion) return '';
-    return c.digito_verificacion
-      ? `${c.numero_identificacion}-${c.digito_verificacion}`
-      : c.numero_identificacion;
+    const dv = c.tipo_persona === TIPO_PERSONA.NATURAL ? null : c.digito_verificacion;
+    return dv ? `${c.numero_identificacion}-${dv}` : c.numero_identificacion;
   });
 
   /**
