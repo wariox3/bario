@@ -299,6 +299,56 @@ tabular-nums`). El número dice qué hay, el clic dice qué hacer. Tres estados,
 - **Cuándo NO:** si el barrido es destructivo o costoso (bulk por columna = decenas de escrituras de
   un clic), no va como toggle directo — eso pide confirmación explícita.
 
+## Patrón: ficha de detalle en grupos (card única)
+
+Para las páginas `*-detail` de un master con muchos campos de lectura. En vez de una card por
+tema apilada verticalmente (que multiplica el chrome y obliga a hacer scroll), **una sola card**
+con los campos repartidos en **grupos semánticos lado a lado**. Ejemplo vivo:
+`general/masters/contacto/pages/contacto-detail` (identificación · contacto · ubicación).
+
+- **Barra de título** (la de siempre): `flex flex-wrap items-center gap-x-3 gap-y-2 border-b
+border-[rgba(20,48,73,0.08)] px-5 py-3.5` con chip de ícono
+  (`h-9 w-9 rounded-[10px] bg-sky-50 text-sky-700`) + `<h2 class="text-[0.9rem] font-bold
+tracking-tight text-brand-text">`. Los **badges de estado** de la entidad (pills de rol, activo/
+  inactivo) van en esa misma fila con `ml-auto`: no cuestan alto propio y evitan tener que bajar a
+  buscarlos.
+- **Cuerpo en columnas:** `grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)]
+lg:grid-cols-[1.15fr_1fr_1fr] lg:divide-x lg:divide-y-0`. Lado a lado el alto de la card es el del
+  **grupo más alto**, no la suma; apilado en móvil el mismo filete pasa a horizontal. La primera
+  fracción va más ancha si ese grupo tiene los valores largos.
+- **Micro-encabezado de grupo** (`__group`): uppercase `0.65rem/600`, `letter-spacing .06em`,
+  `--brand-muted` con `opacity .7` — el mismo `group-label` del panel del app-switcher. Se distingue
+  de la etiqueta de campo por caja y peso, **no por color**. Dentro, `<dl class="mt-3 flex flex-col
+gap-3">` con pares `<dt>`/`<dd>` (`__label` `0.7rem/500` muted, `__value` `0.85rem/500` text).
+- **Vacío = raya, nunca ocultar:** un campo sin dato se pinta con `—`. Si se oculta, el lector no
+  puede distinguir "no tiene" de "no lo miré". Convención única para no repetir markup — el
+  modificador va en el `<dd>` y el contenido cae al guion:
+  `<dd class="__value" [class.__value--empty]="!x">{{ x || '—' }}</dd>`; con enlace
+  (`mailto:`/`tel:`), el mismo modificador con `@if/@else`. `--empty` = `font-weight:400`,
+  `color: var(--brand-muted)`, `opacity:.55` — presente pero sin competir al escanear la columna.
+- **Colapsar lo que se lee junto** (es lo que de verdad achica la ficha, y no pierde ningún valor):
+  - Identificador compuesto → **un** campo (`Documento` = tipo + número + DV), con el número en
+    `font-mono tabular-nums`. Regla del sistema: el dato identificador siempre en monoespaciada.
+  - Dirección → **bloque de sobre** en `<address class="not-italic">`, no cuatro campos sueltos:
+    `dirección · barrio` / `ciudad — departamento · código postal`. Ahí el `—` aplica al bloque
+    entero, no a cada parte. Armar las líneas en un `computed` del componente, no encadenando un
+    `@if` por separador en el template.
+- **Concatenar sin huecos:** unir partes (`número` + `-DV`) **en el componente**, nunca con dos
+  interpolaciones vecinas en el HTML — al formatear, prettier las parte en líneas distintas y el
+  colapso de espacios mete un blanco: `1118260345 -1`.
+- **Cuándo NO usar `<lib-detail-header>`:** si esa cabecera solo repetiría campos que ya están en la
+  ficha (nombre, identificador), es una card entera de alto por cero información. Se omite y la
+  identidad la dan la miga + un `<h1 class="sr-only">` con el nombre — la página necesita su título
+  accesible aunque no lo pinte. Si en cambio la entidad tiene un identificador que **no** es un
+  campo más (número de documento transaccional, estado del flujo), el header sí gana su espacio.
+- **Iniciales/monograma en una ficha: no.** El monograma es identidad donde el nombre **no** está
+  (tenant-badge en el header, tiles del app-switcher). Al lado del nombre no aporta nada.
+- **Ubicación de un campo = donde lo captura el form.** Si el formulario pide
+  `correo_facturacion_electronica` dentro de «Información cliente», en el detalle va en la card de
+  cliente, no entre los canales de contacto generales. Antes de agrupar, mirar el form.
+- **Cards de rol aparte:** lo condicional a un flag (`cliente`, `proveedor`) se queda en su propia
+  card bajo la ficha — son datos comerciales, no básicos, y su ausencia es significativa.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

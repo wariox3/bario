@@ -43,22 +43,32 @@
     </p>
   </div>
 } @else if (contacto(); as c) {
-  <!-- ── Encabezado de identidad (ficha estándar) ────────────────────────────── -->
-  <lib-detail-header [eyebrow]="t().entities.contacto.detail.eyebrow" [title]="c.nombre_corto">
-    <!-- Monograma de iniciales -->
-    <span
-      detailHeaderMedia
-      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-50 text-[1.05rem] font-bold tracking-tight text-sky-700"
+  <!-- Título accesible de la página: la identidad ya no se pinta arriba (vive en
+       los campos), pero el documento necesita un h1 y el lector de pantalla,
+       saber de quién es esta ficha. -->
+  <h1 class="sr-only">{{ c.nombre_corto }}</h1>
+
+  <!-- ── Información general (identificación · contacto · ubicación) ──────────── -->
+  <!-- Ningún campo se oculta: el que no tiene valor se pinta con «—» atenuado
+       (`__value--empty`), para que la ficha conserve siempre la misma forma y se
+       pueda leer por posición sin dudar si el dato falta o no se cargó. -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
     >
-      {{ iniciales() }}
-    </span>
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-id-card text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.contacto.detail.sections.general }}
+      </h2>
 
-    <!-- Documento + pills de rol -->
-    <div detailHeaderSubtitle class="flex flex-col gap-2">
-      <span class="text-[0.85rem] font-medium text-brand-muted">{{ documento() }}</span>
-
+      <!-- Rol comercial a la derecha del título: es el "qué es para nosotros" y
+           no cuesta alto propio al ir en una fila que ya existe. -->
       @if (roles().length > 0) {
-        <div class="flex flex-wrap gap-1.5">
+        <div class="ml-auto flex flex-wrap gap-1.5">
           @for (rol of roles(); track rol.key) {
             @switch (rol.tone) {
               @case ('emerald') {
@@ -90,195 +100,144 @@
         </div>
       }
     </div>
-  </lib-detail-header>
 
-  <!-- ── Información general ──────────────────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-      <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-id-card text-[1rem]"></i>
-      </span>
-      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ t().entities.contacto.detail.sections.general }}
-      </h2>
-    </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      @if (c.tipo_persona_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">
-            {{ t().entities.contacto.form.fields.tipoPersona }}
-          </dt>
-          <dd class="contacto-detail__value">{{ c.tipo_persona_nombre }}</dd>
-        </div>
-      }
-      @if (c.identificacion_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">
-            {{ t().entities.contacto.form.fields.identificacion }}
-          </dt>
-          <dd class="contacto-detail__value">{{ c.identificacion_nombre }}</dd>
-        </div>
-      }
-      @if (c.numero_identificacion) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">
-            {{ t().entities.contacto.form.fields.numeroIdentificacion }}
-          </dt>
-          <dd class="contacto-detail__value">
-            {{ c.numero_identificacion }}
-            @if (c.digito_verificacion) {
-              <span class="text-brand-muted">-{{ c.digito_verificacion }}</span>
-            }
-          </dd>
-        </div>
-      }
-      @if (c.nombre1) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.nombre1 }}</dt>
-          <dd class="contacto-detail__value">{{ c.nombre1 }}</dd>
-        </div>
-      }
-      @if (c.nombre2) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.nombre2 }}</dt>
-          <dd class="contacto-detail__value">{{ c.nombre2 }}</dd>
-        </div>
-      }
-      @if (c.apellido1) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.apellido1 }}</dt>
-          <dd class="contacto-detail__value">{{ c.apellido1 }}</dd>
-        </div>
-      }
-      @if (c.apellido2) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.apellido2 }}</dt>
-          <dd class="contacto-detail__value">{{ c.apellido2 }}</dd>
-        </div>
-      }
-      @if (c.responsabilidad_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">
-            {{ t().entities.contacto.form.fields.responsabilidad }}
-          </dt>
-          <dd class="contacto-detail__value">{{ c.responsabilidad_nombre }}</dd>
-        </div>
-      }
-      @if (c.codigo_ciuu) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">
-            {{ t().entities.contacto.detail.labels.codigoCiiu }}
-          </dt>
-          <dd class="contacto-detail__value">{{ c.codigo_ciuu }}</dd>
-        </div>
-      }
-    </dl>
-  </section>
-
-  <!-- ── Contacto ────────────────────────────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-      <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
-      >
-        <i class="pi pi-envelope text-[1rem]"></i>
-      </span>
-      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ t().entities.contacto.detail.sections.contacto }}
-      </h2>
-    </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      @if (c.correo) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2">
-          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.correo }}</dt>
-          <dd class="contacto-detail__value">
-            <a [href]="'mailto:' + c.correo" class="contacto-detail__link">{{ c.correo }}</a>
-          </dd>
-        </div>
-      }
-      @if (c.correo_facturacion_electronica) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-          <dt class="contacto-detail__label">
-            {{ t().entities.contacto.form.fields.correoFacturacion }}
-          </dt>
-          <dd class="contacto-detail__value">
-            <a [href]="'mailto:' + c.correo_facturacion_electronica" class="contacto-detail__link">
-              {{ c.correo_facturacion_electronica }}
-            </a>
-          </dd>
-        </div>
-      }
-      @if (c.celular) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.celular }}</dt>
-          <dd class="contacto-detail__value">
-            <a [href]="'tel:' + c.celular" class="contacto-detail__link">{{ c.celular }}</a>
-          </dd>
-        </div>
-      }
-      @if (c.telefono) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.telefono }}</dt>
-          <dd class="contacto-detail__value">
-            <a [href]="'tel:' + c.telefono" class="contacto-detail__link">{{ c.telefono }}</a>
-          </dd>
-        </div>
-      }
-    </dl>
-  </section>
-
-  <!-- ── Ubicación ───────────────────────────────────────────────────────────── -->
-  @if (c.direccion || c.barrio || c.ciudad_nombre || c.codigo_postal) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
-        >
-          <i class="pi pi-map-marker text-[1rem]"></i>
-        </span>
-        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.contacto.detail.sections.ubicacion }}
-        </h2>
-      </div>
-      <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-        @if (c.ciudad_nombre) {
+    <!-- Los tres grupos van lado a lado en lg (alto = el grupo más alto, no la
+         suma) y apilados debajo, separados siempre por el filete estándar. -->
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1.15fr_1fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- Grupo: identificación -->
+      <div class="px-5 py-4">
+        <p class="contacto-detail__group">
+          {{ t().entities.contacto.detail.groups.identificacion }}
+        </p>
+        <dl class="mt-3 flex flex-col gap-3">
           <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.ciudad }}</dt>
-            <dd class="contacto-detail__value">
-              {{ c.ciudad_nombre }}
-              @if (c.departamento_nombre) {
-                <span class="text-brand-muted"> — {{ c.departamento_nombre }}</span>
+            <dt class="contacto-detail__label">
+              {{ t().entities.contacto.form.fields.tipoPersona }}
+            </dt>
+            <dd
+              class="contacto-detail__value"
+              [class.contacto-detail__value--empty]="!c.tipo_persona_nombre"
+            >
+              {{ c.tipo_persona_nombre || '—' }}
+            </dd>
+          </div>
+          <!-- Tipo + número + DV en un solo campo; el número en monoespaciada
+               porque es un identificador que se compara y se copia. -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="contacto-detail__label">
+              {{ t().entities.contacto.detail.labels.documento }}
+            </dt>
+            <dd
+              class="contacto-detail__value"
+              [class.contacto-detail__value--empty]="!c.identificacion_nombre && !numeroDocumento()"
+            >
+              @if (c.identificacion_nombre || numeroDocumento()) {
+                @if (c.identificacion_nombre) {
+                  {{ c.identificacion_nombre }}
+                }
+                @if (numeroDocumento()) {
+                  <span class="block font-mono tabular-nums">{{ numeroDocumento() }}</span>
+                }
+              } @else {
+                —
               }
             </dd>
           </div>
-        }
-        @if (c.direccion) {
-          <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-            <dt class="contacto-detail__label">
-              {{ t().entities.contacto.form.fields.direccion }}
-            </dt>
-            <dd class="contacto-detail__value">{{ c.direccion }}</dd>
-          </div>
-        }
-        @if (c.barrio) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.barrio }}</dt>
-            <dd class="contacto-detail__value">{{ c.barrio }}</dd>
-          </div>
-        }
-        @if (c.codigo_postal) {
           <div class="flex flex-col gap-0.5">
             <dt class="contacto-detail__label">
-              {{ t().entities.contacto.detail.labels.codigoPostal }}
+              {{ t().entities.contacto.detail.labels.nombreCompleto }}
             </dt>
-            <dd class="contacto-detail__value">{{ c.codigo_postal }}</dd>
+            <dd
+              class="contacto-detail__value"
+              [class.contacto-detail__value--empty]="!nombreCompleto()"
+            >
+              {{ nombreCompleto() || '—' }}
+            </dd>
           </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contacto-detail__label">
+              {{ t().entities.contacto.form.fields.responsabilidad }}
+            </dt>
+            <dd
+              class="contacto-detail__value"
+              [class.contacto-detail__value--empty]="!c.responsabilidad_nombre"
+            >
+              {{ c.responsabilidad_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contacto-detail__label">
+              {{ t().entities.contacto.detail.labels.codigoCiiu }}
+            </dt>
+            <dd
+              class="contacto-detail__value"
+              [class.contacto-detail__value--empty]="!c.codigo_ciuu"
+            >
+              {{ c.codigo_ciuu || '—' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Grupo: contacto — canales generales. El correo de facturación
+           electrónica NO va acá: el form lo captura dentro de «Información
+           cliente», así que se pinta en esa card. -->
+      <div class="px-5 py-4">
+        <p class="contacto-detail__group">
+          {{ t().entities.contacto.detail.groups.contacto }}
+        </p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.correo }}</dt>
+            <dd class="contacto-detail__value" [class.contacto-detail__value--empty]="!c.correo">
+              @if (c.correo) {
+                <a [href]="'mailto:' + c.correo" class="contacto-detail__link">{{ c.correo }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.celular }}</dt>
+            <dd class="contacto-detail__value" [class.contacto-detail__value--empty]="!c.celular">
+              @if (c.celular) {
+                <a [href]="'tel:' + c.celular" class="contacto-detail__link">{{ c.celular }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.telefono }}</dt>
+            <dd class="contacto-detail__value" [class.contacto-detail__value--empty]="!c.telefono">
+              @if (c.telefono) {
+                <a [href]="'tel:' + c.telefono" class="contacto-detail__link">{{ c.telefono }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Grupo: ubicación — la dirección se lee como un bloque, no como campos,
+           así que el «—» aplica al bloque entero, no a cada parte. -->
+      <div class="px-5 py-4">
+        <p class="contacto-detail__group">{{ t().entities.contacto.detail.groups.ubicacion }}</p>
+        @if (direccionLineas().length) {
+          <address class="mt-3 not-italic">
+            @for (linea of direccionLineas(); track $index) {
+              <span class="contacto-detail__value block">{{ linea }}</span>
+            }
+          </address>
+        } @else {
+          <p class="contacto-detail__value contacto-detail__value--empty mt-3">—</p>
         }
-      </dl>
-    </section>
-  }
+      </div>
+    </div>
+  </section>
 
   <!-- ── Información de cliente ───────────────────────────────────────────────── -->
   @if (c.cliente) {
@@ -294,26 +253,53 @@
         </h2>
       </div>
       <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-        @if (c.plazo_pago_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">
-              {{ t().entities.contacto.form.fields.plazoPago }}
-            </dt>
-            <dd class="contacto-detail__value">{{ c.plazo_pago_nombre }}</dd>
-          </div>
-        }
-        @if (c.precio_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.precio }}</dt>
-            <dd class="contacto-detail__value">{{ c.precio_nombre }}</dd>
-          </div>
-        }
-        @if (c.asesor_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.asesor }}</dt>
-            <dd class="contacto-detail__value">{{ c.asesor_nombre }}</dd>
-          </div>
-        }
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.plazoPago }}</dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.plazo_pago_nombre"
+          >
+            {{ c.plazo_pago_nombre || '—' }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.precio }}</dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.precio_nombre"
+          >
+            {{ c.precio_nombre || '—' }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.asesor }}</dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.asesor_nombre"
+          >
+            {{ c.asesor_nombre || '—' }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">
+            {{ t().entities.contacto.form.fields.correoFacturacion }}
+          </dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.correo_facturacion_electronica"
+          >
+            @if (c.correo_facturacion_electronica) {
+              <a
+                [href]="'mailto:' + c.correo_facturacion_electronica"
+                class="contacto-detail__link"
+              >
+                {{ c.correo_facturacion_electronica }}
+              </a>
+            } @else {
+              —
+            }
+          </dd>
+        </div>
       </dl>
     </section>
   }
@@ -332,36 +318,48 @@
         </h2>
       </div>
       <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-        @if (c.banco_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.banco }}</dt>
-            <dd class="contacto-detail__value">{{ c.banco_nombre }}</dd>
-          </div>
-        }
-        @if (c.numero_cuenta) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">
-              {{ t().entities.contacto.form.fields.numeroCuenta }}
-            </dt>
-            <dd class="contacto-detail__value">{{ c.numero_cuenta }}</dd>
-          </div>
-        }
-        @if (c.cuenta_banco_clase_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">
-              {{ t().entities.contacto.form.fields.cuentaBancoClase }}
-            </dt>
-            <dd class="contacto-detail__value">{{ c.cuenta_banco_clase_nombre }}</dd>
-          </div>
-        }
-        @if (c.plazo_pago_proveedor_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="contacto-detail__label">
-              {{ t().entities.contacto.form.fields.plazoPagoProveedor }}
-            </dt>
-            <dd class="contacto-detail__value">{{ c.plazo_pago_proveedor_nombre }}</dd>
-          </div>
-        }
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.banco }}</dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.banco_nombre"
+          >
+            {{ c.banco_nombre || '—' }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">
+            {{ t().entities.contacto.form.fields.numeroCuenta }}
+          </dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.numero_cuenta"
+          >
+            {{ c.numero_cuenta || '—' }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">
+            {{ t().entities.contacto.form.fields.cuentaBancoClase }}
+          </dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.cuenta_banco_clase_nombre"
+          >
+            {{ c.cuenta_banco_clase_nombre || '—' }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="contacto-detail__label">
+            {{ t().entities.contacto.form.fields.plazoPagoProveedor }}
+          </dt>
+          <dd
+            class="contacto-detail__value"
+            [class.contacto-detail__value--empty]="!c.plazo_pago_proveedor_nombre"
+          >
+            {{ c.plazo_pago_proveedor_nombre || '—' }}
+          </dd>
+        </div>
       </dl>
     </section>
   }

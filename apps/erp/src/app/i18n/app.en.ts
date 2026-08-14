@@ -786,19 +786,20 @@ export const en: AppDict = {
         },
       },
       detail: {
-        title: 'Contact detail',
-        subtitle: 'Information and commercial data',
-        eyebrow: 'Contact',
-        sections: {
-          general: 'General information',
+        groups: {
+          identificacion: 'Identification',
           contacto: 'Contact',
           ubicacion: 'Location',
+        },
+        sections: {
+          general: 'General information',
           cliente: 'Customer information',
           proveedor: 'Supplier information',
         },
         labels: {
           codigoCiiu: 'CIIU code',
-          codigoPostal: 'Postal code',
+          documento: 'Document',
+          nombreCompleto: 'Full name',
         },
         notFound: {
           title: 'Contact not found',

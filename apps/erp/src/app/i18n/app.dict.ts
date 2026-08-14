@@ -603,17 +603,10 @@ export interface AppDict
         };
       };
       detail: {
-        title: string;
-        subtitle: string;
-        eyebrow: string;
-        sections: {
-          general: string;
-          contacto: string;
-          ubicacion: string;
-          cliente: string;
-          proveedor: string;
-        };
-        labels: { codigoCiiu: string; codigoPostal: string };
+        /** Micro-encabezados de los grupos dentro de la card de la ficha. */
+        groups: { identificacion: string; contacto: string; ubicacion: string };
+        sections: { general: string; cliente: string; proveedor: string };
+        labels: { codigoCiiu: string; documento: string; nombreCompleto: string };
         notFound: { title: string; desc: string };
       };
     };
