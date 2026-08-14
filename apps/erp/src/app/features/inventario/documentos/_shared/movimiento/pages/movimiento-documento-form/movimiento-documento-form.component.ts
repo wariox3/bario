@@ -17,7 +17,12 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { ErpApiSelectComponent, ErpContactoSelectComponent, FieldErrorComponent } from '@reddoc/ui';
+import {
+  ErpApiSelectComponent,
+  ErpContactoSelectComponent,
+  FieldErrorComponent,
+  PageActionsComponent,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -76,6 +81,7 @@ import type { MovimientoRead } from '../../movimiento-documento.model';
     DatePickerModule,
     TextareaModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     InventarioDocumentoDetallesComponent,

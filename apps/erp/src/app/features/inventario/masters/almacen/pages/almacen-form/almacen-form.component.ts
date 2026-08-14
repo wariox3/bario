@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
@@ -33,6 +33,7 @@ const NOMBRE_MAX_LENGTH = 80;
     ButtonModule,
     InputTextModule,
     FieldErrorComponent,
+    PageActionsComponent,
   ],
   templateUrl: './almacen-form.component.html',
   styleUrl: './almacen-form.component.scss',
