@@ -17,7 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -79,6 +79,7 @@ import { SELECT_ENDPOINTS } from '@reddoc/core';
     InputTextModule,
     TextareaModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
