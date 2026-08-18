@@ -143,12 +143,10 @@ export class ConciliacionService extends BaseHttpService {
    * como lo mandaba el legacy.
    */
   importarSoporte(conciliacionId: number, file: File): Observable<ConciliacionSoporteImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    form.append('conciliacion_id', String(conciliacionId));
-    return this.post<ConciliacionSoporteImportResult>(
+    return this.postFile<ConciliacionSoporteImportResult>(
       `${CONCILIACION_SOPORTE_ENDPOINT}cargar-soporte/`,
-      form,
+      file,
+      { conciliacion_id: conciliacionId },
     );
   }
 

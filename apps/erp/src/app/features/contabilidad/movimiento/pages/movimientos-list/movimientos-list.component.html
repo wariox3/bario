@@ -35,15 +35,15 @@
 />
 
 <app-import-dialog
-  [visible]="importVisible()"
-  (visibleChange)="onImportVisibleChange($event)"
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
   [title]="m.import.title"
   [subtitle]="m.import.subtitle"
-  [importing]="importLoading()"
-  [errors]="importErrors()"
-  [errorSummary]="importErrorSummary()"
-  [errorTotal]="importErrorTotal()"
-  [masters]="importMasters"
-  (importRequested)="onImportRequested($event)"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
+  (importRequested)="importar.submit($event)"
   [exampleConfig]="exampleConfig"
 />

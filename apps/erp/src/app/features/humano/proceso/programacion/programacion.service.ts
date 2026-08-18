@@ -155,10 +155,9 @@ export class ProgramacionService extends BaseHttpService {
    * resto de los endpoints. El `programacion_id` viaja como campo del multipart.
    */
   importarHoras(id: number, file: File): Observable<unknown> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    form.append('programacion_id', String(id));
-    return this.post<unknown>(`${this.resourcePath}importar-horas/`, form);
+    return this.postFile<unknown>(`${this.resourcePath}importar-horas/`, file, {
+      programacion_id: id,
+    });
   }
 
   /** URL del PDF de la programación (la usa `FileDownloadService`). */

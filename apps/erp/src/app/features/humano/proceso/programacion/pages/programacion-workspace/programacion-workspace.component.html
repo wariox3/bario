@@ -127,14 +127,14 @@
 <p-confirmDialog />
 
 <app-import-dialog
-  [visible]="importVisible()"
-  (visibleChange)="onImportVisibleChange($event)"
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
   [title]="t().entities.programacion.importarHoras.title"
   [subtitle]="t().entities.programacion.importarHoras.subtitle"
-  [importing]="importLoading()"
-  [errors]="importErrors()"
-  [errorSummary]="importErrorSummary()"
-  [errorTotal]="importErrorTotal()"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
   [exampleConfig]="exampleConfig()"
-  (importRequested)="onImportRequested($event)"
+  (importRequested)="importar.submit($event)"
 />

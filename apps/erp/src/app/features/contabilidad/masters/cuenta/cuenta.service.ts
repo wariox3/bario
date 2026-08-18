@@ -33,17 +33,9 @@ export class CuentaService extends BaseHttpService {
     return this.put<Cuenta>(`${this.resourcePath}${id}/`, payload);
   }
 
-  /**
-   * Importación masiva desde un archivo Excel.
-   *
-   * HttpClient detecta el `FormData` y arma el `multipart/form-data` con el
-   * boundary correcto — no hay que setear `Content-Type` manualmente. El campo
-   * `archivo` es el contrato que espera el backend.
-   */
+  /** Importación masiva desde un archivo Excel. */
   importar(file: File): Observable<CuentaImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    return this.post<CuentaImportResult>(`${this.resourcePath}importar/`, form);
+    return this.postFile<CuentaImportResult>(`${this.resourcePath}importar/`, file);
   }
 
   remove(ids: readonly number[]): Observable<void> {

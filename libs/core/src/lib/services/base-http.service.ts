@@ -80,6 +80,30 @@ export abstract class BaseHttpService {
     });
   }
 
+  /**
+   * POST multipart de **un archivo**, para los endpoints de importación.
+   *
+   * El backend recibe el archivo en el campo `archivo` en todos los recursos, así
+   * que la convención se declara una vez acá y no en cada servicio. `fields` suma
+   * los campos de contexto que pida el endpoint (`conciliacion_id`, etc.); los
+   * `null`/`undefined` se omiten, igual que en `buildHttpParams`.
+   *
+   * No se fija `Content-Type` a propósito: con un `FormData`, el navegador tiene
+   * que ponerlo él para incluir el `boundary`.
+   */
+  protected postFile<T>(
+    path: string,
+    file: File,
+    fields?: Record<string, ParamValue>,
+  ): Observable<T> {
+    const form = new FormData();
+    form.append('archivo', file, file.name);
+    for (const [key, value] of Object.entries(fields ?? {})) {
+      if (value != null) form.append(key, String(value));
+    }
+    return this.post<T>(path, form);
+  }
+
   protected put<T>(path: string, body: unknown): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}${path}`, body, { context: this.context() });
   }

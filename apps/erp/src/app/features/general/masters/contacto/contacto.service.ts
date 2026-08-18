@@ -71,17 +71,9 @@ export class ContactoService extends BaseHttpService {
     return this.get<ConsultaDianResponse>(`${this.resourcePath}consulta-dian/`, params);
   }
 
-  /**
-   * Importación masiva desde un archivo Excel.
-   *
-   * HttpClient detecta el `FormData` y arma el `multipart/form-data` con el
-   * boundary correcto — no hay que setear `Content-Type` manualmente. El campo
-   * `archivo` es el contrato que espera el backend.
-   */
+  /** Importación masiva desde un archivo Excel. */
   importar(file: File): Observable<ContactoImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    return this.post<ContactoImportResult>(`${this.resourcePath}importar/`, form);
+    return this.postFile<ContactoImportResult>(`${this.resourcePath}importar/`, file);
   }
 
   /**

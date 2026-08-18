@@ -73,8 +73,6 @@ export class MovimientoService extends BaseHttpService {
    * desde un XLSX alojado fuera del backend.
    */
   importar(file: File): Observable<MovimientoImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    return this.post<MovimientoImportResult>(`${this.resourcePath}importar/`, form);
+    return this.postFile<MovimientoImportResult>(`${this.resourcePath}importar/`, file);
   }
 }

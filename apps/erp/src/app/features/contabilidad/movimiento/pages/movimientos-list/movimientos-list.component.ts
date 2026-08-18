@@ -1,6 +1,5 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import type { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 import {
   FileDownloadService,
@@ -24,11 +23,8 @@ import {
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
-import type {
-  ExampleConfig,
-  ImportError,
-} from '@erp/core/components/import-dialog/import-dialog.types';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
 import { MovimientoService, MOVIMIENTO_SERIALIZADOR } from '../../movimiento.service';
 import type { Movimiento } from '../../movimiento.model';
@@ -94,11 +90,18 @@ export class MovimientosListComponent {
   protected readonly isExportingExcel = signal(false);
 
   // ── Importación ───────────────────────────────────────────────────────────
-  protected readonly importVisible = signal(false);
-  protected readonly importLoading = signal(false);
-  protected readonly importErrors = signal<readonly ImportError[]>([]);
-  protected readonly importErrorSummary = signal('');
-  protected readonly importErrorTotal = signal(0);
+  /**
+   * Estado del diálogo de importación. Vuelve a la primera página al terminar:
+   * las líneas importadas entran al libro y desplazan lo que se estaba viendo.
+   */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => {
+      this.currentPage.set(0);
+      this.loadList();
+    },
+    masters: MOVIMIENTO_IMPORT_MASTERS,
+  });
 
   /** Plantilla de ejemplo de la importación (endpoint supuesto — ver servicio). */
   protected readonly exampleConfig: ExampleConfig = {
@@ -123,9 +126,6 @@ export class MovimientosListComponent {
   protected readonly columns = MOVIMIENTO_COLUMNS;
   protected readonly filterFields = MOVIMIENTO_FILTER_FIELDS;
   protected readonly trailingActions = MOVIMIENTO_TRAILING_ACTIONS;
-
-  /** Archivos de referencia del diálogo de importación (tab "Maestros"). */
-  protected readonly importMasters = MOVIMIENTO_IMPORT_MASTERS;
 
   constructor() {
     this.loadList();
@@ -166,9 +166,7 @@ export class MovimientosListComponent {
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
       case 'import':
-        // Abre siempre limpio: descarta el resultado del intento anterior.
-        this.clearImportErrors();
-        this.importVisible.set(true);
+        this.importar.open();
         break;
       case 'export-excel':
         this.exportExcel();
@@ -176,60 +174,7 @@ export class MovimientosListComponent {
     }
   }
 
-  protected onImportVisibleChange(value: boolean): void {
-    this.importVisible.set(value);
-  }
-
-  protected onImportRequested(file: File): void {
-    if (this.importLoading()) return;
-    this.importLoading.set(true);
-    this.clearImportErrors();
-    this.service
-      .importar(file)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.importLoading.set(false)),
-      )
-      .subscribe({
-        next: (result) => {
-          // El backend puede reportar los errores de validación en un 200; si los
-          // trae, se muestran en vez de tratarlo como éxito.
-          if (this.applyImportErrors(parseImportErrors(result))) return;
-          const toasts = this.t().common.import.toasts;
-          this.toast.success(toasts.success.title, toasts.success.desc);
-          this.importVisible.set(false);
-          this.clearImportErrors();
-          this.currentPage.set(0);
-          this.loadList();
-        },
-        error: (err: HttpErrorResponse) => {
-          if (!this.applyImportErrors(parseImportErrors(err.error))) {
-            const toasts = this.t().common.import.toasts;
-            this.toast.error(toasts.error.title, toasts.error.desc);
-          }
-        },
-      });
-  }
-
   // ── Internos ──────────────────────────────────────────────────────────────
-
-  /**
-   * Vuelca los errores parseados en los signals del diálogo. Devuelve `true` si
-   * había errores/resumen (para que el llamador no siga el camino de éxito).
-   */
-  private applyImportErrors(parsed: ReturnType<typeof parseImportErrors>): boolean {
-    if (parsed.errors.length === 0 && !parsed.summary) return false;
-    this.importErrors.set(parsed.errors);
-    this.importErrorSummary.set(parsed.summary);
-    this.importErrorTotal.set(parsed.total);
-    return true;
-  }
-
-  private clearImportErrors(): void {
-    this.importErrors.set([]);
-    this.importErrorSummary.set('');
-    this.importErrorTotal.set(0);
-  }
 
   private exportExcel(): void {
     if (this.isExportingExcel()) return;
