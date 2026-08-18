@@ -93,6 +93,7 @@ export interface AppDict
       exportPdf: string;
       import: string;
       export: string;
+      options: string;
     };
     search: {
       placeholder: string;
@@ -151,6 +152,39 @@ export interface AppDict
         menorIgual: string;
         esVerdadero: string;
         esFalso: string;
+      };
+    };
+    /**
+     * Diálogo de **archivos adjuntos** (`ArchivosDialogComponent`), que abre el
+     * menú "Opciones → Archivos" de las fichas de detalle.
+     */
+    archivos: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      columns: { fecha: string; nombre: string; tamano: string; acciones: string };
+      dropzone: {
+        primary: string;
+        /** Soporta el placeholder `{max}` (tamaño máximo en MB). */
+        hint: string;
+        invalidType: string;
+        tooLarge: string;
+      };
+      uploading: string;
+      download: string;
+      delete: string;
+      confirmDelete: {
+        header: string;
+        /** Soporta el placeholder `{nombre}`. */
+        message: string;
+      };
+      toasts: {
+        loadError: { title: string; desc: string };
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        downloadError: { title: string; desc: string };
       };
     };
     import: {

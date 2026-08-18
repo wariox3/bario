@@ -1,10 +1,23 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { Menu, MenuModule } from 'primeng/menu';
+import type { MenuItem } from 'primeng/api';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
+import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
 import { CONTACTO_LIST_PATH, TIPO_PERSONA } from '../../contacto.constants';
@@ -41,7 +54,7 @@ interface ContactoRol {
 @Component({
   selector: 'app-contacto-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, MenuModule, BreadcrumbComponent, ArchivosDialogComponent],
   templateUrl: './contacto-detail.component.html',
   styleUrl: './contacto-detail.component.scss',
 })
@@ -62,6 +75,31 @@ export class ContactoDetailComponent implements OnInit {
   protected readonly contacto = signal<Contacto | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  /** Diálogo de archivos adjuntos, que abre "Opciones → Archivos". */
+  protected readonly archivosVisible = signal(false);
+
+  private readonly opcionesMenu = viewChild.required<Menu>('opcionesMenu');
+
+  /**
+   * Entradas del menú "Opciones". Es un `computed` —y no un array armado en el
+   * template— para que la referencia sea estable entre change detections: si
+   * `p-menu` recibe un modelo nuevo en cada CD, pierde el primer click. Solo
+   * cambia al cambiar el idioma.
+   */
+  protected readonly opcionesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().common.archivos.title,
+      icon: 'pi pi-folder',
+      command: () => this.archivosVisible.set(true),
+    },
+  ]);
+
+  /** Dueño de los archivos: este contacto. `null` hasta que la ficha carga. */
+  protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
+    const c = this.contacto();
+    return c ? { kind: 'modelo', modelo: 'contacto', codigo: c.id } : null;
+  });
 
   /** Migas: módulo General → listado de contactos → nombre del contacto abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -148,6 +186,10 @@ export class ContactoDetailComponent implements OnInit {
 
   protected onBack(): void {
     this.navigate(...CONTACTO_LIST_PATH);
+  }
+
+  protected toggleOpciones(event: Event): void {
+    this.opcionesMenu().toggle(event);
   }
 
   protected onEdit(): void {

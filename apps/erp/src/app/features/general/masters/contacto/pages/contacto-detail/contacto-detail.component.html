@@ -19,8 +19,21 @@
       size="small"
       (onClick)="onEdit()"
     />
+    <p-button
+      type="button"
+      [label]="t().common.actions.options"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleOpciones($event)"
+    />
+    <p-menu #opcionesMenu [popup]="true" [model]="opcionesItems()" appendTo="body" />
   }
 </header>
+
+<app-archivos-dialog [(visible)]="archivosVisible" [owner]="archivosOwner()" />
 
 @if (isLoading()) {
   <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->

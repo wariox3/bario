@@ -18,6 +18,7 @@ import { TabsModule } from 'primeng/tabs';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileDownloadService, I18nService, toHora, ToastService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
+import { formatBytes } from '@erp/core/utils/format-bytes';
 import type { ExampleConfig, ImportError, ImportMaster } from './import-dialog.types';
 
 /**
@@ -310,14 +311,4 @@ export class ImportDialogComponent {
     this.selectedFile.set(file);
     this.uploadedAt.set(toHora(new Date()));
   }
-}
-
-// ── Helpers locales ─────────────────────────────────────────────────────────
-
-/** Formatea bytes a "B" / "KB" / "MB" con 1 decimal donde corresponde. */
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  const kb = n / 1024;
-  if (kb < 1024) return `${kb.toFixed(1)} KB`;
-  return `${(kb / 1024).toFixed(2)} MB`;
 }

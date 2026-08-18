@@ -1,0 +1,168 @@
+@let dict = t().common.archivos;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isBusy()"
+  [dismissableMask]="!isBusy()"
+  [style]="{ width: '620px', maxWidth: '94vw' }"
+  styleClass="cp-archivos-dialog"
+>
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-folder text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ headerTitle() }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ dict.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ── Body ─────────────────────────────────────────────────────────────── -->
+  @if (visible()) {
+    <div class="flex flex-col gap-4">
+      <!-- Zona de carga -->
+      <input
+        #fileInput
+        type="file"
+        [accept]="accept()"
+        class="hidden"
+        (change)="onFileInputChange($event)"
+      />
+
+      <div
+        class="cp-archivos-dialog__dropzone"
+        [class.is-drag-over]="dragOver()"
+        [class.is-error]="errorMessage() !== null"
+        [class.is-busy]="isBusy()"
+        role="button"
+        tabindex="0"
+        [attr.aria-label]="dict.dropzone.primary"
+        (click)="openFilePicker()"
+        (keydown)="onDropzoneKeydown($event)"
+        (dragover)="onDragOver($event)"
+        (dragenter)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        @if (isUploading()) {
+          <i class="pi pi-spin pi-spinner text-[1.1rem] text-sky-700"></i>
+          <span class="text-[0.85rem] font-semibold text-brand-text">{{ dict.uploading }}</span>
+        } @else {
+          <i class="pi pi-cloud-upload text-[1.1rem] text-sky-700"></i>
+          <span class="text-[0.85rem] font-semibold text-brand-text">
+            {{ dict.dropzone.primary }}
+          </span>
+          <span class="text-[0.75rem] text-brand-muted">{{ dropzoneHint() }}</span>
+        }
+      </div>
+
+      @if (errorMessage(); as msg) {
+        <p class="m-0 text-[0.78rem] font-medium text-red-700">
+          <i class="pi pi-exclamation-circle mr-1 text-[0.78rem]"></i>
+          {{ msg }}
+        </p>
+      }
+
+      <!-- Lista -->
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-10 text-brand-muted">
+          <i class="pi pi-spin pi-spinner text-lg"></i>
+        </div>
+      } @else if (items().length === 0) {
+        <div class="cp-archivos-dialog__empty">
+          <i class="pi pi-inbox text-[1.1rem] text-brand-muted opacity-60"></i>
+          <p class="m-0 text-[0.8rem] text-brand-muted">{{ dict.empty }}</p>
+        </div>
+      } @else {
+        <div class="cp-archivos-dialog__table-wrap">
+          <table class="cp-archivos-dialog__table">
+            <thead>
+              <tr>
+                <th class="cp-archivos-dialog__col-fecha">{{ dict.columns.fecha }}</th>
+                <th>{{ dict.columns.nombre }}</th>
+                <th class="cp-archivos-dialog__col-tamano">{{ dict.columns.tamano }}</th>
+                <th class="cp-archivos-dialog__col-acciones">
+                  <span class="sr-only">{{ dict.columns.acciones }}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (archivo of items(); track archivo.id) {
+                <tr>
+                  <td class="cp-archivos-dialog__col-fecha whitespace-nowrap tabular-nums">
+                    {{ archivo.fecha | date: 'yyyy-MM-dd HH:mm' }}
+                  </td>
+                  <td class="cp-archivos-dialog__name" [title]="archivo.nombre">
+                    {{ archivo.nombre }}
+                  </td>
+                  <td class="cp-archivos-dialog__col-tamano whitespace-nowrap tabular-nums">
+                    {{ formatTamano(archivo.tamano) }}
+                  </td>
+                  <td class="cp-archivos-dialog__col-acciones">
+                    <div class="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        class="cp-archivos-dialog__action"
+                        [attr.aria-label]="dict.download + ': ' + archivo.nombre"
+                        [disabled]="isBusy()"
+                        (click)="descargar(archivo)"
+                      >
+                        <i class="pi pi-download text-[0.8rem]"></i>
+                      </button>
+                      @if (deletingId() === archivo.id) {
+                        <span class="cp-archivos-dialog__action">
+                          <i class="pi pi-spin pi-spinner text-[0.8rem] text-red-600"></i>
+                        </span>
+                      } @else {
+                        <button
+                          type="button"
+                          class="cp-archivos-dialog__action cp-archivos-dialog__action--danger"
+                          [attr.aria-label]="dict.delete + ': ' + archivo.nombre"
+                          [disabled]="isBusy()"
+                          (click)="confirmarEliminar(archivo)"
+                        >
+                          <i class="pi pi-trash text-[0.8rem]"></i>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.close"
+        [outlined]="true"
+        severity="secondary"
+        [disabled]="isBusy()"
+        (onClick)="onClose()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog />

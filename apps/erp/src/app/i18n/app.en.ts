@@ -37,6 +37,7 @@ export const en: AppDict = {
       exportExcel: 'Export excel',
       exportPdf: 'Export PDF',
       import: 'Import',
+      options: 'Options',
       export: 'Export',
     },
     search: {
@@ -126,6 +127,51 @@ export const en: AppDict = {
         menorIgual: 'less or equal than',
         esVerdadero: 'is yes',
         esFalso: 'is no',
+      },
+    },
+    archivos: {
+      title: 'Files',
+      subtitle: 'Documents attached to this record',
+      empty: 'No files attached yet.',
+      columns: { fecha: 'Date', nombre: 'Name', tamano: 'Size', acciones: 'Actions' },
+      dropzone: {
+        primary: 'Drag a file here or click to select one',
+        hint: 'Up to {max} MB',
+        invalidType: 'The file format is not valid.',
+        tooLarge: 'The file exceeds the maximum allowed size.',
+      },
+      uploading: 'Uploading file…',
+      download: 'Download',
+      delete: 'Delete',
+      confirmDelete: {
+        header: 'Confirm deletion',
+        message: 'Delete “{nombre}”? This action cannot be undone.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Loading error',
+          desc: 'The files could not be retrieved. Try again.',
+        },
+        uploadSuccess: {
+          title: 'File uploaded',
+          desc: 'The file was attached successfully.',
+        },
+        uploadError: {
+          title: 'Could not upload',
+          desc: 'Check the file and try again.',
+        },
+        deleteSuccess: {
+          title: 'File deleted',
+          desc: 'The file was deleted successfully.',
+        },
+        deleteError: {
+          title: 'Could not delete',
+          desc: 'Try again in a few seconds.',
+        },
+        downloadError: {
+          title: 'Could not download',
+          desc: 'Try again in a few seconds.',
+        },
       },
     },
     import: {

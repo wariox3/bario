@@ -1,0 +1,174 @@
+// ── Dialog shell — mismo chrome que el resto de los diálogos del ERP:
+//    radius 16px, sombra suave + larga, paddings propios. Gemelo del
+//    `cp-import-dialog`, que es su vecino conceptual (ambos manejan archivos).
+:host ::ng-deep .cp-archivos-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(20 48 73 / 0.04),
+    0 20px 60px rgba(20 48 73 / 0.14) !important;
+
+  .p-dialog-header {
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: none;
+  }
+
+  .p-dialog-content {
+    padding: 1.25rem 1.5rem 0.75rem;
+  }
+
+  .p-dialog-footer {
+    padding: 0 1.5rem 1.1rem;
+  }
+}
+
+// ── Dropzone — más baja que la del diálogo de importar: acá la carga acompaña
+//    a la lista, no es el acto principal de la pantalla.
+.cp-archivos-dialog__dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 1.15rem 1.25rem;
+  border: 2px dashed rgba(20, 48, 73, 0.15);
+  border-radius: 12px;
+  background: rgba(240, 249, 255, 0.4); // sky-50/40
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+
+  &:hover:not(.is-busy) {
+    background: rgba(240, 249, 255, 0.7); // sky-50/70
+    border-color: #7dd3fc; // sky-300
+  }
+
+  &:focus-visible {
+    outline: 2px solid #38bdf8; // sky-400
+    outline-offset: 2px;
+  }
+
+  &.is-drag-over {
+    background: #e0f2fe; // sky-100
+    border-color: #0ea5e9; // sky-500
+  }
+
+  &.is-error {
+    background: rgba(254, 242, 242, 0.5); // red-50/50
+    border-color: #fca5a5; // red-300
+  }
+
+  &.is-busy {
+    cursor: default;
+    opacity: 0.75;
+  }
+}
+
+// ── Empty state — copy explicativo, no "sin datos".
+.cp-archivos-dialog__empty {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 1.25rem 0.25rem;
+}
+
+// ── Tabla — misma caja borders-only que la de errores del diálogo de importar:
+//    header pegajoso y scroll propio cuando el adjunto se acumula.
+.cp-archivos-dialog__table-wrap {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid rgba(20, 48, 73, 0.1);
+  border-radius: 10px;
+}
+
+.cp-archivos-dialog__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--brand-surface, #fff);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--brand-muted);
+    border-bottom: 1px solid rgba(20, 48, 73, 0.1);
+  }
+
+  tbody td {
+    padding: 0.45rem 0.75rem;
+    vertical-align: middle;
+    color: var(--brand-text);
+    border-bottom: 1px solid rgba(20, 48, 73, 0.06);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.cp-archivos-dialog__col-fecha {
+  width: 9.5rem;
+}
+
+.cp-archivos-dialog__col-tamano {
+  width: 5.5rem;
+  text-align: right;
+}
+
+.cp-archivos-dialog__col-acciones {
+  width: 4.5rem;
+}
+
+// El nombre es lo único elástico de la fila: se trunca antes de empujar al resto.
+.cp-archivos-dialog__name {
+  max-width: 0; // fuerza al `table-layout` a repartir el sobrante acá
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Acciones de fila — iconos ghost; el borrado se tiñe solo al pasar por encima.
+.cp-archivos-dialog__action {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-brand-muted);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(20, 48, 73, 0.06);
+    color: var(--color-brand-text);
+  }
+
+  &--danger:hover:not(:disabled) {
+    background: #fef2f2; // red-50
+    color: #b91c1c; // red-700
+  }
+
+  &:focus-visible {
+    outline: 2px solid #38bdf8; // sky-400
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

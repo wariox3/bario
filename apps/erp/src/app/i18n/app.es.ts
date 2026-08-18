@@ -38,6 +38,7 @@ export const es: AppDict = {
       exportExcel: 'Exportar excel',
       exportPdf: 'Exportar PDF',
       import: 'Importar',
+      options: 'Opciones',
     },
     search: {
       placeholder: 'Buscar...',
@@ -126,6 +127,51 @@ export const es: AppDict = {
         menorIgual: 'menor o igual que',
         esVerdadero: 'es sí',
         esFalso: 'es no',
+      },
+    },
+    archivos: {
+      title: 'Archivos',
+      subtitle: 'Documentos adjuntos a este registro',
+      empty: 'Todavía no hay archivos adjuntos.',
+      columns: { fecha: 'Fecha', nombre: 'Nombre', tamano: 'Tamaño', acciones: 'Acciones' },
+      dropzone: {
+        primary: 'Arrastrá un archivo o hacé clic para elegirlo',
+        hint: 'Hasta {max} MB',
+        invalidType: 'El archivo no tiene un formato válido.',
+        tooLarge: 'El archivo supera el tamaño máximo permitido.',
+      },
+      uploading: 'Subiendo archivo…',
+      download: 'Descargar',
+      delete: 'Eliminar',
+      confirmDelete: {
+        header: 'Confirmar eliminación',
+        message: '¿Querés eliminar «{nombre}»? Esta acción no se puede revertir.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron obtener los archivos. Intentá de nuevo.',
+        },
+        uploadSuccess: {
+          title: 'Archivo cargado',
+          desc: 'El archivo se adjuntó correctamente.',
+        },
+        uploadError: {
+          title: 'No se pudo cargar',
+          desc: 'Revisá el archivo y volvé a intentarlo.',
+        },
+        deleteSuccess: {
+          title: 'Archivo eliminado',
+          desc: 'El archivo se eliminó correctamente.',
+        },
+        deleteError: {
+          title: 'No se pudo eliminar',
+          desc: 'Intentá de nuevo en unos segundos.',
+        },
+        downloadError: {
+          title: 'No se pudo descargar',
+          desc: 'Intentá de nuevo en unos segundos.',
+        },
       },
     },
     import: {
