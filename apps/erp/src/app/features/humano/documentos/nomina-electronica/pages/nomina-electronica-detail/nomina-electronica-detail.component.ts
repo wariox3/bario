@@ -223,10 +223,6 @@ export class NominaElectronicaDetailComponent implements OnInit {
       });
   }
 
-  protected onArchivos(): void {
-    // Sin endpoint todavía; el boton queda visible para no romper la botonera.
-  }
-
   /**
    * Las cuatro acciones de estado se comportan igual: confirmar, llamar al
    * gateway, avisar y recargar. Solo cambian el texto y la llamada, así que van

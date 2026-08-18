@@ -23,12 +23,12 @@
       (onClick)="onEdit()"
     />
     <app-document-detail-actions
+      [documentoId]="id()"
       [canAprobar]="!cabecera()?.estados?.estado_aprobado"
       [canDesaprobar]="!!cabecera()?.estados?.estado_aprobado"
       (aprobar)="onAprobar()"
       (desaprobar)="onDesaprobar()"
       (imprimir)="onImprimir()"
-      (archivos)="onArchivos()"
     />
   }
 </header>

@@ -225,10 +225,6 @@ export class NominaDetailComponent implements OnInit {
       });
   }
 
-  protected onArchivos(): void {
-    this.toast.info(this.t().common.comingSoon);
-  }
-
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),

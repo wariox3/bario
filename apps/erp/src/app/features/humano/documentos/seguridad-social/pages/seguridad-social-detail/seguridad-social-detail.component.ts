@@ -183,10 +183,6 @@ export class SeguridadSocialDetailComponent implements OnInit {
       });
   }
 
-  protected onArchivos(): void {
-    // Sin endpoint todavía; el boton queda visible para no romper la botonera.
-  }
-
   /** Aprobar y desaprobar difieren solo en el texto y la llamada. */
   private confirmarYEjecutar(
     confirmKey: 'confirmAprobar' | 'confirmDesaprobar',

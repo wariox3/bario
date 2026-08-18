@@ -1,8 +1,10 @@
-import { Component, computed, inject, input, output, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
 import { I18nService } from '@reddoc/core';
+import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
+import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import type { AppDict } from '@erp/i18n';
 
 /**
@@ -11,9 +13,17 @@ import type { AppDict } from '@erp/i18n';
  * dropdown "Opciones" (hoy con "Archivos"). Compartida por todas las fichas de
  * detalle (servicio, factura de venta y futuras).
  *
- * Es **presentacional**: renderiza los botones y emite eventos; cada ficha decide
- * qué hacer. Los botones se deshabilitan según el estado del documento vía los
- * inputs `can*` (todos habilitados por default; las fichas los cablearán a su estado).
+ * Es **presentacional** salvo por una acción: renderiza los botones y emite
+ * eventos, y cada ficha decide qué hacer. Los botones se deshabilitan según el
+ * estado del documento vía los inputs `can*` (todos habilitados por default; las
+ * fichas los cablearán a su estado).
+ *
+ * La excepción es **Archivos**, que trae su propio diálogo. Es la única acción
+ * cuyo comportamiento es idéntico en las 22 fichas —el mismo recurso
+ * `general/archivo/`, discriminado solo por el id del documento—, así que
+ * emitirla hacia afuera obligaba a repetir el mismo estado y el mismo handler en
+ * cada una. Las demás (aprobar, imprimir, anular) sí cambian de endpoint según el
+ * documento y siguen siendo del host.
  *
  * Dos acciones son **opt-in** vía `showAnular` / `showEmitir`, apagadas por
  * default: no todo documento se anula ni se emite a la DIAN, y esta botonera la
@@ -23,13 +33,24 @@ import type { AppDict } from '@erp/i18n';
 @Component({
   selector: 'app-document-detail-actions',
   standalone: true,
-  imports: [ButtonModule, MenuModule],
+  imports: [ButtonModule, MenuModule, ArchivosDialogComponent],
   templateUrl: './document-detail-actions.component.html',
   styleUrl: './document-detail-actions.component.scss',
 })
 export class DocumentDetailActionsComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
+
+  /**
+   * Id del documento abierto, dueño de los archivos adjuntos.
+   *
+   * Las fichas lo pasan directo desde el parámetro de ruta, que llega como
+   * `string | undefined`; el `transform` lo normaliza acá para que ninguna tenga
+   * que convertirlo. Sin un id válido, la opción "Archivos" queda deshabilitada.
+   */
+  readonly documentoId = input<number | null, number | string | null | undefined>(null, {
+    transform: toDocumentoId,
+  });
 
   /** Habilita cada acción. Default `true`; las fichas los atan al estado del documento. */
   readonly canAprobar = input<boolean>(true);
@@ -46,12 +67,19 @@ export class DocumentDetailActionsComponent {
   readonly aprobar = output<void>();
   readonly desaprobar = output<void>();
   readonly imprimir = output<void>();
-  readonly archivos = output<void>();
   readonly anular = output<void>();
   readonly emitir = output<void>();
 
   private readonly accionesMenu = viewChild.required<Menu>('accionesMenu');
   private readonly opcionesMenu = viewChild.required<Menu>('opcionesMenu');
+
+  protected readonly archivosVisible = signal(false);
+
+  /** Dueño de los archivos: el documento abierto. `null` mientras no hay id válido. */
+  protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
+    const id = this.documentoId();
+    return id === null ? null : { kind: 'documento', documentoId: id };
+  });
 
   /**
    * Entradas del dropdown "Acciones". Mismo patrón `computed` que "Opciones"
@@ -91,8 +119,8 @@ export class DocumentDetailActionsComponent {
     {
       label: this.t().documentActions.detail.archivos,
       icon: 'pi pi-folder',
-      disabled: !this.canArchivos(),
-      command: () => this.archivos.emit(),
+      disabled: !this.canArchivos() || this.archivosOwner() === null,
+      command: () => this.archivosVisible.set(true),
     },
   ]);
 
@@ -103,4 +131,11 @@ export class DocumentDetailActionsComponent {
   protected toggleOpciones(event: Event): void {
     this.opcionesMenu().toggle(event);
   }
+}
+
+/** Normaliza el id de documento a número; `null` si no es un id utilizable. */
+function toDocumentoId(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const id = Number(value);
+  return Number.isFinite(id) && id > 0 ? id : null;
 }
