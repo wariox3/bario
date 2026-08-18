@@ -19,13 +19,14 @@ usuario, lo emite, y el listado decide qué hacer con él.
 <app-import-dialog>                    ← UI: dropzone, validación local, tabs, footer
    │  (importRequested)=$event: File
    ▼
-<x>-list.component.ts                  ← arma el estado y llama a su servicio
-   │  service.importar(file)
+importState({ upload, onImported })    ← el estado: visible/loading/errores + el flujo
+   │  upload(file)
    ▼
-<x>.service.ts  extends BaseHttpService ← POST multipart a `<recurso>/importar/`
+<x>.service.ts  extends BaseHttpService ← postFile() → multipart a `<recurso>/importar/`
    │
-   ├── 2xx  → toast de éxito + recargar la lista
-   └── 4xx  → parseImportErrors(err.error) → alimenta el tab "Errores"
+   ├── 2xx sin errores → toast de éxito + onImported()
+   ├── 2xx con errores → alimenta el tab "Errores" (el backend los reporta así a veces)
+   └── 4xx             → parseImportErrors(err.error) → mismo tab
 ```
 
 Y en el diálogo conviven **tres archivos distintos**, que se confunden fácil:
@@ -48,14 +49,18 @@ una columna `ciudad`; el maestro de ciudades dice que Medellín es `05001`.
 ```ts
 // <entity>.service.ts
 importar(file: File): Observable<<Entity>ImportResult> {
-  const form = new FormData();
-  form.append('archivo', file, file.name);
-  return this.post<<Entity>ImportResult>(`${this.resourcePath}importar/`, form);
+  return this.postFile<<Entity>ImportResult>(`${this.resourcePath}importar/`, file);
 }
 ```
 
-Multipart con el archivo en `archivo` es la convención del backend para todos los
-masters. Nada de base64 (eso era el ERP legacy).
+`postFile` (en `BaseHttpService`) arma el multipart con el archivo en el campo `archivo`
+—la convención del backend para todos los recursos— y acepta campos de contexto extra:
+
+```ts
+return this.postFile<T>(`${ENDPOINT}cargar-soporte/`, file, { conciliacion_id: id });
+```
+
+Nada de base64: eso era el ERP legacy.
 
 **2. La acción del toolbar** — en `<entity>.constants.ts`, dentro del dropdown
 "Acciones":
@@ -66,29 +71,44 @@ masters. Nada de base64 (eso era el ERP legacy).
 
 `masterActions()` la poda sola si el usuario no tiene permiso sobre el modelo.
 
-**3. El estado en el componente** — cinco signals y tres handlers. Copiá el bloque de
-`contactos-list.component.ts` (`onImportRequested` / `applyImportErrors` /
-`clearImportErrors`) y cambiá el servicio. El punto no obvio: `parseImportErrors` se
-llama **en las dos ramas**, porque el backend puede reportar errores de validación con
-200 o con 4xx.
+**3. El estado en el componente** — una línea, con `importState()`:
+
+```ts
+protected readonly importar = importState({
+  upload: (file) => this.service.importar(file),
+  onImported: () => this.loadList(),
+  masters: CONTACTOS_IMPORT_MASTERS,   // opcional
+});
+```
+
+Y en el toolbar, `case 'import': this.importar.open();`.
+
+El helper trae la visibilidad, el progreso, los errores y el matiz que se pierde al
+copiar y pegar: `parseImportErrors` corre **en las dos ramas** de la suscripción, porque
+el backend puede reportar errores de validación con 200 o con 4xx. `onImported` se llama
+solo tras un éxito real y hace lo que esa pantalla necesite —`loadList()`, volver a la
+página 0, incrementar un token de recarga.
 
 **4. El template**:
 
 ```html
 <app-import-dialog
-  [visible]="importVisible()"
-  (visibleChange)="onImportVisibleChange($event)"
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
   [title]="t().entities.<entity>.import.title"
   [subtitle]="t().entities.<entity>.import.subtitle"
-  [importing]="importLoading()"
-  [errors]="importErrors()"
-  [errorSummary]="importErrorSummary()"
-  [errorTotal]="importErrorTotal()"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
   [exampleConfig]="exampleConfig"
-  [masters]="importMasters"
-  (importRequested)="onImportRequested($event)"
+  (importRequested)="importar.submit($event)"
 />
 ```
+
+El título, el subtítulo y la plantilla siguen siendo del consumidor: son texto y
+endpoint de su dominio.
 
 **5. Las claves i18n** `entities.<entity>.import.{title,subtitle}` en `app.es.ts` /
 `app.en.ts` (y su tipo en `app.dict.ts`).
@@ -179,8 +199,10 @@ Muestra hasta 100 filas y avisa del truncado con el total real. Su spec vive en
 
 - **Importar líneas dentro de un documento** (agregar detalles a una factura desde
   Excel). Es otro flujo; hoy ningún documento lo hace.
-- **Camino A del framework configuracional**: `DocumentCapabilities.canImport` e
-  `ImportDescriptor` están declarados en `libs/core/documento/entity-config.types.ts`
-  pero **no los implementa nadie** — los 29 documentos tienen `canImport: false` y
-  `BaseDocumentListComponent` no tiene handler de import. Si vas a activar importación
-  en un documento, primero hay que implementarlo ahí (o borrar esos dos campos).
+- **Importar en un documento del camino A** (factura, nota crédito…). El framework
+  configuracional no expone importación: `BaseDocumentListComponent` no tiene handler y
+  el `DocumentEntityConfig` no declara nada al respecto. Hasta agosto de 2026 sí había
+  un `canImport` y un `ImportDescriptor` declarados en los tipos, pero ningún documento
+  los usaba y nada los leía; se borraron para que el config no prometa lo que no hace.
+  Si aparece el requerimiento, el camino es sumar la capability **y** su handler en el
+  mismo cambio, reusando este diálogo.

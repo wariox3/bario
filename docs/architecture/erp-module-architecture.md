@@ -319,7 +319,6 @@ export interface DocumentCapabilities {
   readonly canEdit: boolean;
   readonly canDelete: boolean;
   readonly canSelectRows: boolean;
-  readonly canImport: boolean;
   readonly canExportExcel: boolean;
   readonly canExportZip: boolean;
   readonly canGenerate: boolean;
@@ -352,7 +351,6 @@ export interface DocumentEntityConfig {
   readonly routes: EntityRoutes;
   readonly capabilities: DocumentCapabilities;
   readonly extraActionIds?: readonly string[];
-  readonly importDescriptor?: ImportDescriptor;
 }
 
 export type EntityConfig = DocumentEntityConfig;
@@ -606,7 +604,7 @@ Cada llamador construye su clave: documentos vía helper `buildDocumentStorageKe
 
 #### 6.C.6 Tipos compartidos
 
-`ColumnDef`, `FilterField`, `ListQuery`, `ListResponse`, `FilterCondition`, `SortSpec`, `FilterOperator`, `ImportDescriptor`. Viven en `@reddoc/core` para que cualquier feature los importe.
+`ColumnDef`, `FilterField`, `ListQuery`, `ListResponse`, `FilterCondition`, `SortSpec`, `FilterOperator`. Viven en `@reddoc/core` para que cualquier feature los importe.
 
 ### 6.D Sidebar filtrado al módulo activo
 

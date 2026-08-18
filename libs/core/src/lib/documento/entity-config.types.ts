@@ -34,7 +34,6 @@ export interface DocumentCapabilities {
   readonly canView: boolean;
   readonly canDelete: boolean;
   readonly canSelectRows: boolean;
-  readonly canImport: boolean;
   readonly canExportExcel: boolean;
   readonly canExportZip: boolean;
   readonly canGenerate: boolean;
@@ -61,19 +60,6 @@ export interface EntityRoutes {
   readonly new: string;
   readonly edit: string;
   readonly detail: string;
-}
-
-/**
- * Descriptor de importación masiva opcional para un documento.
- * Se declara cuando `capabilities.canImport` es true.
- */
-export interface ImportDescriptor {
-  /** Clave i18n del nombre del archivo de ejemplo. */
-  readonly templateNameKey: string;
-  /** Ruta absoluta al archivo de ejemplo descargable. */
-  readonly templateUrl: string;
-  /** Parámetros adicionales que se envían junto al archivo importado. */
-  readonly extraPayload?: Readonly<Record<string, string | number | boolean>>;
 }
 
 /**
@@ -141,7 +127,6 @@ export interface DocumentEntityConfig {
    * Cada id debe corresponder a un `EntityActionStrategy` registrado.
    */
   readonly extraActionIds?: readonly string[];
-  readonly importDescriptor?: ImportDescriptor;
 }
 
 /**

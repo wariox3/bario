@@ -39,7 +39,6 @@ export const SALIDA_CONFIG: DocumentEntityConfig = {
     canDelete: true,
     canSelectRows: true,
     // La importación de líneas por Excel del legacy queda fuera de esta versión.
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,

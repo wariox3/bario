@@ -39,7 +39,6 @@ export const DOCUMENTO_SOPORTE_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: true,
     canSelectRows: true,
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,

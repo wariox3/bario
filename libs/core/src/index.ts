@@ -107,7 +107,6 @@ export type {
   DocumentCapabilities,
   EditableRowContext,
   EntityRoutes,
-  ImportDescriptor,
   DocumentEntityConfig,
   EntityConfig,
   ModuleConfig,

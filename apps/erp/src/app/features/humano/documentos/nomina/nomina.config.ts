@@ -40,7 +40,6 @@ export const NOMINA_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: false,
     canSelectRows: false,
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,

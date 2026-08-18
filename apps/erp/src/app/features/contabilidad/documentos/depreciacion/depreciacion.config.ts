@@ -42,7 +42,6 @@ export const DEPRECIACION_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: true,
     canSelectRows: true,
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
