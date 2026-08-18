@@ -26,6 +26,8 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
@@ -35,6 +37,7 @@ import {
   ITEMS_COLUMNS,
   ITEMS_FILTER_FIELDS,
   ITEMS_FILTERS_STORAGE_KEY,
+  ITEMS_IMPORT_MASTERS,
   ITEMS_QUICK_SEARCH_FIELD,
   ITEMS_PRIMARY_ACTION,
   ITEMS_ROW_ACTIONS,
@@ -59,6 +62,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './items-list.component.html',
@@ -94,6 +98,19 @@ export class ItemsListComponent {
   protected readonly filtersVisible = signal(false);
 
   protected readonly isExportingExcel = signal(false);
+
+  /** Plantilla de ejemplo que sirve el backend para armar el archivo. */
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/general/item/importar-ejemplo/',
+  };
+
+  /** Estado del diálogo de importación (visibilidad, progreso, errores, maestros). */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: ITEMS_IMPORT_MASTERS,
+  });
 
   // ── Derivados ─────────────────────────────────────────────────────────────
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
@@ -192,6 +209,9 @@ export class ItemsListComponent {
     switch (actionId) {
       case 'new':
         this.router.navigate(this.buildRouteCommands('nuevo'));
+        break;
+      case 'import':
+        this.importar.open();
         break;
       case 'export-excel':
         this.exportExcel();

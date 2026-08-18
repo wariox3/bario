@@ -673,6 +673,7 @@ export interface AppDict
     item: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         codigo: string;

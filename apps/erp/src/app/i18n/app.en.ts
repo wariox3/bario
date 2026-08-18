@@ -876,6 +876,10 @@ export const en: AppDict = {
     item: {
       name: 'Items',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import items',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         id: 'ID',
         codigo: 'Code',
