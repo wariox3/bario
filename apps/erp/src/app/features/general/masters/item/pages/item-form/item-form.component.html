@@ -45,6 +45,19 @@
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
       <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Nombre -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="nombre" class="item-form__label">
+            {{ t().entities.item.form.fields.nombre }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <input id="nombre" pInputText type="text" formControlName="nombre" fluid />
+          <lib-field-error
+            [control]="form.controls.nombre"
+            [messages]="{ required: t().entities.item.form.validation.required }"
+          />
+        </div>
+
         <!-- Código -->
         <div class="flex flex-col gap-1.5">
           <label for="codigo" class="item-form__label">
@@ -67,21 +80,8 @@
           <lib-field-error [control]="form.controls.referencia" />
         </div>
 
-        <!-- Nombre -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2">
-          <label for="nombre" class="item-form__label">
-            {{ t().entities.item.form.fields.nombre }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <input id="nombre" pInputText type="text" formControlName="nombre" fluid />
-          <lib-field-error
-            [control]="form.controls.nombre"
-            [messages]="{ required: t().entities.item.form.validation.required }"
-          />
-        </div>
-
         <!-- Tipo: producto / servicio -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <div class="flex flex-col gap-1.5">
           <span class="item-form__label">{{ t().entities.item.form.fields.tipo }}</span>
           <div class="mt-1 flex flex-wrap gap-x-6 gap-y-2.5">
             <label for="tipo-producto" class="flex cursor-pointer items-center gap-2">
@@ -98,44 +98,45 @@
             </label>
           </div>
         </div>
-      </div>
 
-      <!-- Clasificación / flags -->
-      <div class="mt-5 border-t border-[rgba(20,48,73,0.08)] pt-4">
-        <span class="item-form__label">{{ t().entities.item.form.clasificacion }}</span>
-        <div class="mt-2.5 flex flex-wrap gap-x-6 gap-y-2.5">
-          @if (!esServicio()) {
-            <label for="inventario" class="flex cursor-pointer items-center gap-2">
-              <p-checkbox inputId="inventario" formControlName="inventario" [binary]="true" />
+        <!-- Opciones: banderas del ítem. Comparten fila con Tipo, que es la otra
+             decisión de la misma naturaleza — qué es el ítem y cómo se comporta. -->
+        <div class="flex flex-col gap-1.5">
+          <span class="item-form__label">{{ t().entities.item.form.clasificacion }}</span>
+          <div class="mt-1 flex flex-wrap gap-x-6 gap-y-2.5">
+            @if (!esServicio()) {
+              <label for="inventario" class="flex cursor-pointer items-center gap-2">
+                <p-checkbox inputId="inventario" formControlName="inventario" [binary]="true" />
+                <span class="text-[0.85rem] text-brand-text">
+                  {{ t().entities.item.form.fields.inventario }}
+                </span>
+              </label>
+              <label for="negativo" class="flex cursor-pointer items-center gap-2">
+                <p-checkbox inputId="negativo" formControlName="negativo" [binary]="true" />
+                <span class="text-[0.85rem] text-brand-text">
+                  {{ t().entities.item.form.fields.negativo }}
+                </span>
+              </label>
+            }
+            <label for="venta" class="flex cursor-pointer items-center gap-2">
+              <p-checkbox inputId="venta" formControlName="venta" [binary]="true" />
               <span class="text-[0.85rem] text-brand-text">
-                {{ t().entities.item.form.fields.inventario }}
+                {{ t().entities.item.form.fields.venta }}
               </span>
             </label>
-            <label for="negativo" class="flex cursor-pointer items-center gap-2">
-              <p-checkbox inputId="negativo" formControlName="negativo" [binary]="true" />
+            <label for="favorito" class="flex cursor-pointer items-center gap-2">
+              <p-checkbox inputId="favorito" formControlName="favorito" [binary]="true" />
               <span class="text-[0.85rem] text-brand-text">
-                {{ t().entities.item.form.fields.negativo }}
+                {{ t().entities.item.form.fields.favorito }}
               </span>
             </label>
-          }
-          <label for="venta" class="flex cursor-pointer items-center gap-2">
-            <p-checkbox inputId="venta" formControlName="venta" [binary]="true" />
-            <span class="text-[0.85rem] text-brand-text">
-              {{ t().entities.item.form.fields.venta }}
-            </span>
-          </label>
-          <label for="favorito" class="flex cursor-pointer items-center gap-2">
-            <p-checkbox inputId="favorito" formControlName="favorito" [binary]="true" />
-            <span class="text-[0.85rem] text-brand-text">
-              {{ t().entities.item.form.fields.favorito }}
-            </span>
-          </label>
-          <label for="inactivo" class="flex cursor-pointer items-center gap-2">
-            <p-checkbox inputId="inactivo" formControlName="inactivo" [binary]="true" />
-            <span class="text-[0.85rem] text-brand-text">
-              {{ t().entities.item.form.fields.inactivo }}
-            </span>
-          </label>
+            <label for="inactivo" class="flex cursor-pointer items-center gap-2">
+              <p-checkbox inputId="inactivo" formControlName="inactivo" [binary]="true" />
+              <span class="text-[0.85rem] text-brand-text">
+                {{ t().entities.item.form.fields.inactivo }}
+              </span>
+            </label>
+          </div>
         </div>
       </div>
     </div>
