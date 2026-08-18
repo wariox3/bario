@@ -7,7 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { Item, ItemImportResult, ItemPayload } from './item.model';
+import type { Item, ItemPayload } from './item.model';
 
 /**
  * Servicio HTTP de items.
@@ -44,8 +44,8 @@ export class ItemService extends BaseHttpService {
   }
 
   /** Importación masiva desde un archivo Excel. */
-  importar(file: File): Observable<ItemImportResult> {
-    return this.postFile<ItemImportResult>(`${this.resourcePath}importar/`, file);
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
   }
 
   /**

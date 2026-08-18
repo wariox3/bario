@@ -7,11 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type {
-  CentroCosto,
-  CentroCostoImportResult,
-  CentroCostoPayload,
-} from './centro-costo.model';
+import type { CentroCosto, CentroCostoPayload } from './centro-costo.model';
 
 @Injectable({ providedIn: 'root' })
 export class CentroCostoService extends BaseHttpService {
@@ -38,8 +34,8 @@ export class CentroCostoService extends BaseHttpService {
   }
 
   /** Importación masiva desde un archivo Excel. */
-  importar(file: File): Observable<CentroCostoImportResult> {
-    return this.postFile<CentroCostoImportResult>(`${this.resourcePath}importar/`, file);
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
   }
 
   remove(ids: readonly number[]): Observable<void> {

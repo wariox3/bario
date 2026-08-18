@@ -48,8 +48,8 @@ una columna `ciudad`; el maestro de ciudades dice que Medellín es `05001`.
 
 ```ts
 // <entity>.service.ts
-importar(file: File): Observable<<Entity>ImportResult> {
-  return this.postFile<<Entity>ImportResult>(`${this.resourcePath}importar/`, file);
+importar(file: File): Observable<unknown> {
+  return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
 }
 ```
 
@@ -57,10 +57,16 @@ importar(file: File): Observable<<Entity>ImportResult> {
 —la convención del backend para todos los recursos— y acepta campos de contexto extra:
 
 ```ts
-return this.postFile<T>(`${ENDPOINT}cargar-soporte/`, file, { conciliacion_id: id });
+return this.postFile<unknown>(`${ENDPOINT}cargar-soporte/`, file, { conciliacion_id: id });
 ```
 
 Nada de base64: eso era el ERP legacy.
+
+**El retorno es `unknown` a propósito**: lo único que se hace con la respuesta es pasarla
+por `parseImportErrors`, que la acepta así porque el backend puede reportar los errores de
+validación con 200 o con 4xx. Un tipo más específico acá no tiparía nada —se descarta en
+la primera línea del handler— y sí invitaría a escribir código contra campos que nadie
+verificó. Si algún día la respuesta se consume de verdad, el tipo nace con ese uso.
 
 **2. La acción del toolbar** — en `<entity>.constants.ts`, dentro del dropdown
 "Acciones":

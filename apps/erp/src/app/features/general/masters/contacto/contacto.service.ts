@@ -7,12 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type {
-  ConsultaDianResponse,
-  Contacto,
-  ContactoImportResult,
-  ContactoPayload,
-} from './contacto.model';
+import type { ConsultaDianResponse, Contacto, ContactoPayload } from './contacto.model';
 
 /**
  * Servicio HTTP de contactos.
@@ -72,8 +67,8 @@ export class ContactoService extends BaseHttpService {
   }
 
   /** Importación masiva desde un archivo Excel. */
-  importar(file: File): Observable<ContactoImportResult> {
-    return this.postFile<ContactoImportResult>(`${this.resourcePath}importar/`, file);
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
   }
 
   /**

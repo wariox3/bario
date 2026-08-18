@@ -60,16 +60,3 @@ export interface ConciliacionSoporte {
   /** `true` cuando el cruce encontró su contraparte en el libro. */
   readonly estado_conciliado: boolean;
 }
-
-/**
- * Resultado de importar el extracto. Shape provisional: crece cuando el backend
- * defina su contrato (mismo criterio que el resto de importaciones del ERP).
- */
-export interface ConciliacionSoporteImportResult {
-  readonly imported_count: number;
-  readonly errors?: ReadonlyArray<{
-    readonly row: number;
-    readonly field?: string;
-    readonly message: string;
-  }>;
-}

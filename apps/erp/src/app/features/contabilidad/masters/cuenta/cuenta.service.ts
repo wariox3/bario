@@ -7,7 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { Cuenta, CuentaImportResult, CuentaPayload } from './cuenta.model';
+import type { Cuenta, CuentaPayload } from './cuenta.model';
 
 @Injectable({ providedIn: 'root' })
 export class CuentaService extends BaseHttpService {
@@ -34,8 +34,8 @@ export class CuentaService extends BaseHttpService {
   }
 
   /** Importación masiva desde un archivo Excel. */
-  importar(file: File): Observable<CuentaImportResult> {
-    return this.postFile<CuentaImportResult>(`${this.resourcePath}importar/`, file);
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
   }
 
   remove(ids: readonly number[]): Observable<void> {
