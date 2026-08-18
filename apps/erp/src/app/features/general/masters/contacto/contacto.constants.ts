@@ -1,7 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
-import { IMPORT_MASTER } from '@erp/core/components/import-dialog/import-masters.constant';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const CONTACTOS_FILTERS_STORAGE_KEY = 'contactos:filters:v1';
 
@@ -119,15 +119,12 @@ export const CONTACTOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
 ];
 
 /**
- * Maestros que ofrece el diálogo de importación de contactos.
+ * Maestros que ofrece el diálogo de importación de contactos: **todos**.
  *
- * Son los catálogos cuyos códigos el archivo tiene que traer escritos: la
- * ciudad, y —para los contactos con datos bancarios— el banco y la clase de
- * cuenta. El resto del catálogo global (cotizantes, depreciación…) no aplica
- * acá y por eso no se ofrece.
+ * El contacto es la entidad más transversal del ERP —el mismo registro es cliente,
+ * proveedor y empleado— y su archivo puede traer desde la ciudad y los datos
+ * bancarios hasta el tipo de cotizante, el tipo de contrato o el tipo de costo. Una
+ * lista corta acá dejaría al usuario sin el archivo que justo necesita, así que se
+ * ofrece el catálogo completo.
  */
-export const CONTACTOS_IMPORT_MASTERS: readonly ImportMaster[] = [
-  IMPORT_MASTER.ciudad,
-  IMPORT_MASTER.banco,
-  IMPORT_MASTER.cuentaBancoClase,
-];
+export const CONTACTOS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;

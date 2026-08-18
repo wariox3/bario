@@ -19,20 +19,20 @@ const MAESTROS_BASE_URL = 'https://semantica.sfo3.digitaloceanspaces.com/renio/m
  * usuario baja `gen_ciudades.xlsx` para saber qué código escribir en la columna
  * `ciudad` de su archivo. Por eso el diálogo los ofrece **antes** de importar.
  *
- * Cada lista declara solo los maestros que su archivo necesita — el listado de
- * contactos no tiene por qué ofrecer "Método depreciación":
+ * Cada lista declara los maestros que su archivo necesita — el libro contable no
+ * tiene por qué ofrecer "Método depreciación":
  *
  * ```ts
- * // contacto.constants.ts
- * export const CONTACTOS_IMPORT_MASTERS: readonly ImportMaster[] = [
- *   IMPORT_MASTER.ciudad,
- *   IMPORT_MASTER.banco,
+ * // movimiento.constants.ts
+ * export const MOVIMIENTO_IMPORT_MASTERS: readonly ImportMaster[] = [
+ *   IMPORT_MASTER.comprobanteCodigo,
+ *   IMPORT_MASTER.comprobante,
  * ];
  * ```
  *
- * ```html
- * <app-import-dialog [masters]="CONTACTOS_IMPORT_MASTERS" ... />
- * ```
+ * Los listados transversales, cuyo archivo puede pedir cualquier catálogo, usan
+ * `IMPORT_MASTERS_ALL` (ver abajo). En ambos casos el consumidor lo pasa por el
+ * `masters` de `importState()`.
  *
  * `satisfies` fuerza que estén los 13 ids y que ninguna entrada mienta sobre el
  * suyo; los nombres visibles viven en `common.import.masters.names`.
@@ -61,3 +61,14 @@ export const IMPORT_MASTER = {
   tipoContrato: { id: 'tipoContrato', url: `${MAESTROS_BASE_URL}/hum_contrato_tipo.xlsx` },
   costoTipo: { id: 'costoTipo', url: `${MAESTROS_BASE_URL}/hum_costo_tipo.xlsx` },
 } as const satisfies Record<ImportMasterId, ImportMaster>;
+
+/**
+ * **Todos** los maestros, en el orden de declaración.
+ *
+ * Para los listados cuyo archivo cruza medio ERP y no admite una lista corta —el
+ * contacto es cliente, proveedor y empleado a la vez, así que su Excel puede pedir
+ * tanto la ciudad como el tipo de cotizante o el tipo de contrato—. El resto de
+ * los listados declara los suyos uno por uno: ofrecer trece archivos donde hacen
+ * falta dos no ayuda a nadie.
+ */
+export const IMPORT_MASTERS_ALL: readonly ImportMaster[] = Object.values(IMPORT_MASTER);

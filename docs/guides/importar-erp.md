@@ -144,25 +144,30 @@ comprobantes contables, los tipos de cotizante. No dependen del tenant y el back
 los sirve, así que viven como URLs en
 `core/components/import-dialog/import-masters.constant.ts`.
 
-Cada listado declara **solo los suyos**:
+Cada listado declara los suyos y los pasa por el `masters` de `importState()`:
 
 ```ts
-// contacto.constants.ts
-export const CONTACTOS_IMPORT_MASTERS: readonly ImportMaster[] = [
-  IMPORT_MASTER.ciudad,
-  IMPORT_MASTER.banco,
-  IMPORT_MASTER.cuentaBancoClase,
+// movimiento.constants.ts
+export const MOVIMIENTO_IMPORT_MASTERS: readonly ImportMaster[] = [
+  IMPORT_MASTER.comprobanteCodigo,
+  IMPORT_MASTER.comprobante,
 ];
 ```
 
+La regla es **ofrecer lo que el archivo de ese listado necesita**: trece archivos donde
+hacen falta dos no ayudan a nadie. Un listado sin maestros no pasa el input y el tab
+queda con su empty state.
+
+La excepción son los listados transversales, que usan `IMPORT_MASTERS_ALL`:
+
 ```ts
-// contactos-list.component.ts
-protected readonly importMasters = CONTACTOS_IMPORT_MASTERS;
+// contacto.constants.ts — el contacto es cliente, proveedor y empleado a la vez
+export const CONTACTOS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;
 ```
 
-Un listado sin maestros no pasa el input: el tab queda con su empty state. Es la regla:
-**se ofrece lo que el archivo de ese listado necesita**, no el catálogo entero — el ERP
-legacy mostraba los trece a todo el mundo y nadie sabía cuáles miraba.
+Su archivo puede traer desde la ciudad y los datos bancarios hasta el tipo de cotizante
+o el tipo de contrato, así que acotar la lista dejaría al usuario sin el archivo que
+justo necesita.
 
 ### Agregar un maestro nuevo
 
