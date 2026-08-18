@@ -28,10 +28,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import type {
-  ImportError,
-  MasterTouched,
-} from '@erp/core/components/import-dialog/import-dialog.types';
+import type { ImportError } from '@erp/core/components/import-dialog/import-dialog.types';
 import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
@@ -100,7 +97,6 @@ export class CentrosCostoListComponent {
   protected readonly importErrors = signal<readonly ImportError[]>([]);
   protected readonly importErrorSummary = signal('');
   protected readonly importErrorTotal = signal(0);
-  protected readonly importMasters = signal<readonly MasterTouched[]>([]);
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
@@ -246,12 +242,11 @@ export class CentrosCostoListComponent {
     return true;
   }
 
-  /** Resetea el resultado de la importación (tabla de errores, resumen y masters). */
+  /** Resetea el resultado de la importación (tabla de errores y resumen). */
   private clearImportErrors(): void {
     this.importErrors.set([]);
     this.importErrorSummary.set('');
     this.importErrorTotal.set(0);
-    this.importMasters.set([]);
   }
 
   protected onRefresh(): void {

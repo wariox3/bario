@@ -27,12 +27,41 @@ export interface ImportError {
 }
 
 /**
- * Resumen de qué pasó con cada master/catálogo durante la importación
- * (registros creados/actualizados, referencias resueltas, etc.).
- * Shape mínimo, pensado para crecer.
+ * Identificadores de los **maestros**: los archivos de referencia que el usuario
+ * descarga para saber qué códigos escribir en su archivo de importación.
+ *
+ * Cada id tiene dos contrapartes que TypeScript obliga a mantener en sincronía:
+ *  - su URL, en `IMPORT_MASTER` (`import-masters.constant.ts`);
+ *  - su nombre traducido, en `common.import.masters.names` del diccionario.
+ *
+ * Agregar un maestro = sumar el id acá, su URL en la constante y su nombre en
+ * los dos diccionarios. Si falta cualquiera de las tres, el build lo dice.
  */
-export interface MasterTouched {
-  readonly entity: string;
-  readonly created: number;
-  readonly updated: number;
+export type ImportMasterId =
+  | 'ciudad'
+  | 'comprobanteCodigo'
+  | 'comprobante'
+  | 'impuesto'
+  | 'banco'
+  | 'cuentaBancoClase'
+  | 'activoGrupo'
+  | 'metodoDepreciacion'
+  | 'tipoCotizante'
+  | 'subtipoCotizante'
+  | 'entidad'
+  | 'tipoContrato'
+  | 'costoTipo';
+
+/**
+ * Un maestro concreto tal como lo consume el diálogo: qué es (`id`, del que sale
+ * su nombre traducido) y de dónde se baja (`url`).
+ *
+ * El consumidor nunca escribe esta estructura a mano — declara
+ * `[IMPORT_MASTER.ciudad, IMPORT_MASTER.banco]` y con eso la URL queda en un
+ * único lugar del código.
+ */
+export interface ImportMaster {
+  readonly id: ImportMasterId;
+  /** URL absoluta y pública del XLSX. Se abre en una pestaña nueva. */
+  readonly url: string;
 }

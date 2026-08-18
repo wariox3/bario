@@ -149,14 +149,18 @@
 }
 
 // Tabla scrolleable (hasta 100 filas) con header pegajoso; borders-only.
-.cp-import-dialog__errors {
+// Errores y maestros comparten la caja: son la misma lectura tabular dentro del
+// mismo diálogo, y separarlas solo produciría dos estilos que se desincronizan.
+.cp-import-dialog__errors,
+.cp-import-dialog__masters {
   max-height: 240px;
   overflow-y: auto;
   border: 1px solid rgba(20, 48, 73, 0.1);
   border-radius: 10px;
 }
 
-.cp-import-dialog__errors-table {
+.cp-import-dialog__errors-table,
+.cp-import-dialog__masters-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8rem;
@@ -210,6 +214,40 @@
 .cp-import-dialog__errors-msg {
   color: var(--brand-text);
   line-height: 1.4;
+}
+
+// ── Maestros ──────────────────────────────────────────────────────────────
+// Columna de acción: solo el botón de descarga, angosta y alineada a la derecha.
+.cp-import-dialog__masters-actioncol {
+  width: 3rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+// Descarga directa a una URL pública externa: es un enlace de verdad
+// (`<a target="_blank">`), no un botón que simula uno — así el navegador ofrece
+// "abrir en pestaña nueva" y el usuario ve a dónde va.
+.cp-import-dialog__masters-download {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  color: var(--color-brand-muted);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &:hover {
+    background: rgba(240, 249, 255, 0.9); // sky-50/90
+    color: #0369a1; // sky-700
+  }
+
+  &:focus-visible {
+    outline: 2px solid #38bdf8; // sky-400
+    outline-offset: 2px;
+  }
 }
 
 // ── Botón "Descargar ejemplo" — auxiliar, ghost; vive a la izquierda del footer.

@@ -36,6 +36,7 @@ import {
   MOVIMIENTO_COLUMNS,
   MOVIMIENTO_FILTER_FIELDS,
   MOVIMIENTO_FILTERS_STORAGE_KEY,
+  MOVIMIENTO_IMPORT_MASTERS,
   MOVIMIENTO_TRAILING_ACTIONS,
 } from '../../movimiento.constants';
 
@@ -122,6 +123,9 @@ export class MovimientosListComponent {
   protected readonly columns = MOVIMIENTO_COLUMNS;
   protected readonly filterFields = MOVIMIENTO_FILTER_FIELDS;
   protected readonly trailingActions = MOVIMIENTO_TRAILING_ACTIONS;
+
+  /** Archivos de referencia del diálogo de importación (tab "Maestros"). */
+  protected readonly importMasters = MOVIMIENTO_IMPORT_MASTERS;
 
   constructor() {
     this.loadList();

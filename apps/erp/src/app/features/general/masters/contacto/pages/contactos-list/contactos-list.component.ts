@@ -28,10 +28,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import type {
-  ImportError,
-  MasterTouched,
-} from '@erp/core/components/import-dialog/import-dialog.types';
+import type { ImportError } from '@erp/core/components/import-dialog/import-dialog.types';
 import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import { MODELO, masterActions } from '@erp/core/permissions';
@@ -43,6 +40,7 @@ import {
   CONTACTOS_FILTER_FIELDS,
   CONTACTOS_FILTERS_STORAGE_KEY,
   CONTACTOS_QUICK_SEARCH_FIELD,
+  CONTACTOS_IMPORT_MASTERS,
   CONTACTOS_PRIMARY_ACTION,
   CONTACTOS_ROW_ACTIONS,
   CONTACTOS_TRAILING_ACTIONS,
@@ -107,13 +105,15 @@ export class ContactosListComponent {
     endpoint: '/general/contacto/importar-ejemplo/',
   };
 
+  /** Archivos de referencia del diálogo de importación (tab "Maestros"). */
+  protected readonly importMasters = CONTACTOS_IMPORT_MASTERS;
+
   protected readonly isExportingExcel = signal(false);
   protected readonly importVisible = signal(false);
   protected readonly importLoading = signal(false);
   protected readonly importErrors = signal<readonly ImportError[]>([]);
   protected readonly importErrorSummary = signal('');
   protected readonly importErrorTotal = signal(0);
-  protected readonly importMasters = signal<readonly MasterTouched[]>([]);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
@@ -275,12 +275,11 @@ export class ContactosListComponent {
     return true;
   }
 
-  /** Resetea el resultado de la importación (tabla de errores, resumen y masters). */
+  /** Resetea el resultado de la importación (tabla de errores y resumen). */
   private clearImportErrors(): void {
     this.importErrors.set([]);
     this.importErrorSummary.set('');
     this.importErrorTotal.set(0);
-    this.importMasters.set([]);
   }
 
   protected onSearchChange(value: string): void {

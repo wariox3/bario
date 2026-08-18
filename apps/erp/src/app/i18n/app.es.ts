@@ -141,7 +141,27 @@ export const es: AppDict = {
       tabs: { errors: 'Errores', masters: 'Maestros' },
       emptyStates: {
         errors: 'Los errores aparecerán aquí después de importar el archivo.',
-        masters: 'El resumen de los maestros aparecerá aquí después de importar.',
+        masters: 'Este listado no tiene archivos de referencia para descargar.',
+      },
+      masters: {
+        hint: 'Descargá estos archivos para consultar los códigos válidos que debe usar tu archivo.',
+        nameHeader: 'Archivo',
+        download: 'Descargar',
+        names: {
+          ciudad: 'Ciudades',
+          comprobanteCodigo: 'Códigos comprobantes',
+          comprobante: 'Comprobantes',
+          impuesto: 'Impuestos',
+          banco: 'Bancos',
+          cuentaBancoClase: 'Clases de cuenta bancaria',
+          activoGrupo: 'Grupos de activo',
+          metodoDepreciacion: 'Métodos de depreciación',
+          tipoCotizante: 'Tipos de cotizante',
+          subtipoCotizante: 'Subtipos de cotizante',
+          entidad: 'Entidades',
+          tipoContrato: 'Tipos de contrato',
+          costoTipo: 'Tipos de costo',
+        },
       },
       errors: {
         rowHeader: 'Fila',

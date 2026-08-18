@@ -18,7 +18,7 @@ import { TabsModule } from 'primeng/tabs';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileDownloadService, I18nService, toHora, ToastService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import type { ExampleConfig, ImportError, MasterTouched } from './import-dialog.types';
+import type { ExampleConfig, ImportError, ImportMaster } from './import-dialog.types';
 
 /**
  * Dialog modal de importación de archivos para masters del ERP.
@@ -31,14 +31,17 @@ import type { ExampleConfig, ImportError, MasterTouched } from './import-dialog.
  * - Validación local de tipo y tamaño antes de aceptar el archivo.
  * - Descarga del archivo "Ejemplo" reusando `FileDownloadService` de `@reddoc/core`
  *   (cookies HTTP-only y `X-Tenant` ya van por interceptores).
+ * - Tab "Maestros": los archivos de referencia que el consumidor declara por
+ *   `masters` se ofrecen como descarga directa (son URLs públicas externas, no
+ *   pasan por el API — por eso no usan `FileDownloadService`).
  * - Reset del estado al cerrarse (al reabrir vuelve limpio).
  *
  * Lo que delega al consumidor:
  * - HTTP del upload: recibe el `File` por `(importRequested)` y el consumidor
  *   arma `FormData` y postea contra su endpoint específico.
  * - Estado de progreso: el consumidor setea `importing` durante el upload.
- * - Resultados: el consumidor alimenta `errors` y `mastersTouched` para
- *   poblar los tabs cuando el backend responda.
+ * - Resultados: el consumidor alimenta `errors` (+ `errorSummary`/`errorTotal`)
+ *   con lo que responda el backend para poblar el tab "Errores".
  *
  * Ejemplo de uso:
  * ```html
@@ -49,6 +52,7 @@ import type { ExampleConfig, ImportError, MasterTouched } from './import-dialog.
  *   [exampleConfig]="{ mode: 'enabled', endpoint: '/general/contacto/plantilla/' }"
  *   [importing]="importLoading()"
  *   [errors]="importErrors()"
+ *   [masters]="CONTACTOS_IMPORT_MASTERS"
  *   (importRequested)="onImportRequested($event)"
  * />
  * ```
@@ -101,8 +105,12 @@ export class ImportDialogComponent {
   /** Total real de errores; si supera a los mostrados se indica el truncado. */
   readonly errorTotal = input<number>(0);
 
-  /** Resumen por master/catálogo; alimenta el tab "Maestros". */
-  readonly mastersTouched = input<readonly MasterTouched[]>([]);
+  /**
+   * Maestros del listado: archivos de referencia descargables que alimentan el
+   * tab "Maestros". Cada lista declara los suyos con `IMPORT_MASTER.*`
+   * (ver `import-masters.constant.ts`); vacío ⇒ el tab muestra su empty state.
+   */
+  readonly masters = input<readonly ImportMaster[]>([]);
 
   /** Emitido cuando el usuario hace click en "Importar" con un archivo válido. */
   readonly importRequested = output<File>();
@@ -125,6 +133,10 @@ export class ImportDialogComponent {
   protected readonly dragOver = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly exampleDownloading = signal(false);
+  /**
+   * Tab visible. Arranca en errores y el reset de cierre lo recalcula: con
+   * maestros declarados, la primera apertura muestra "Maestros" (ver constructor).
+   */
   protected readonly activeTab = signal<'errors' | 'masters'>('errors');
 
   // ── Derivados ─────────────────────────────────────────────────────────────
@@ -172,7 +184,10 @@ export class ImportDialogComponent {
         this.uploadedAt.set('');
         this.dragOver.set(false);
         this.errorMessage.set(null);
-        this.activeTab.set('errors');
+        // Antes de importar, lo útil son los maestros (qué códigos escribir); los
+        // errores todavía no existen. Si el listado no declara maestros, el tab de
+        // errores es el único con contenido posible.
+        this.activeTab.set(this.masters().length > 0 ? 'masters' : 'errors');
       }
     });
 

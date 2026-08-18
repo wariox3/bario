@@ -122,10 +122,8 @@
           </p-tab>
           <p-tab value="masters">
             {{ t().common.import.tabs.masters }}
-            @if (mastersTouched().length > 0) {
-              <span class="ml-1 font-semibold text-brand-muted">
-                ({{ mastersTouched().length }})
-              </span>
+            @if (masters().length > 0) {
+              <span class="ml-1 font-semibold text-brand-muted">({{ masters().length }})</span>
             }
           </p-tab>
         </p-tablist>
@@ -193,15 +191,57 @@
           </p-tabpanel>
 
           <p-tabpanel value="masters">
-            @if (mastersTouched().length === 0) {
+            @if (masters().length === 0) {
               <div class="cp-import-dialog__empty">
                 <i class="pi pi-info-circle text-[0.95rem] text-brand-muted"></i>
                 <p class="m-0 text-[0.8rem] text-brand-muted">
                   {{ t().common.import.emptyStates.masters }}
                 </p>
               </div>
+            } @else {
+              <div class="flex flex-col gap-3">
+                <!-- Para qué sirve el tab: sin esta línea el usuario no sabe
+                     por qué le ofrecemos archivos justo antes de subir el suyo. -->
+                <p class="m-0 text-[0.78rem] leading-relaxed text-brand-muted">
+                  {{ t().common.import.masters.hint }}
+                </p>
+
+                <div class="cp-import-dialog__masters">
+                  <table class="cp-import-dialog__masters-table">
+                    <thead>
+                      <tr>
+                        <th>{{ t().common.import.masters.nameHeader }}</th>
+                        <th class="cp-import-dialog__masters-actioncol">
+                          <span class="sr-only">{{ t().common.import.masters.download }}</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (master of masters(); track master.id) {
+                        <tr>
+                          <td>{{ t().common.import.masters.names[master.id] }}</td>
+                          <td class="cp-import-dialog__masters-actioncol">
+                            <a
+                              class="cp-import-dialog__masters-download"
+                              [href]="master.url"
+                              target="_blank"
+                              rel="noopener"
+                              [attr.aria-label]="
+                                t().common.import.masters.download +
+                                ': ' +
+                                t().common.import.masters.names[master.id]
+                              "
+                            >
+                              <i class="pi pi-download text-[0.8rem]"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             }
-            <!-- TODO(import-results): renderizar resumen de maestros tocados cuando el backend lo exponga. -->
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>

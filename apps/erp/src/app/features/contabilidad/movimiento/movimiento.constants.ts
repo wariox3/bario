@@ -1,5 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
+import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
+import { IMPORT_MASTER } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const MOVIMIENTO_FILTERS_STORAGE_KEY = 'movimientoContable:filters:v1';
 
@@ -144,4 +146,17 @@ export const MOVIMIENTO_TRAILING_ACTIONS: readonly ToolbarAction[] = [
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
     ],
   },
+];
+
+/**
+ * Maestros que ofrece el diálogo de importación del libro.
+ *
+ * El archivo de movimientos identifica el comprobante por código, así que se
+ * ofrecen las dos tablas del catálogo contable. La cuenta y el centro de costo
+ * no están acá porque son datos **del tenant**: el usuario los consulta en sus
+ * propias listas del módulo, no en un archivo global.
+ */
+export const MOVIMIENTO_IMPORT_MASTERS: readonly ImportMaster[] = [
+  IMPORT_MASTER.comprobanteCodigo,
+  IMPORT_MASTER.comprobante,
 ];

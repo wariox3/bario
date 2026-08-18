@@ -1,5 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
+import { IMPORT_MASTER } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const CONTACTOS_FILTERS_STORAGE_KEY = 'contactos:filters:v1';
 
@@ -114,4 +116,18 @@ export const CONTACTOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
     ],
   },
+];
+
+/**
+ * Maestros que ofrece el diálogo de importación de contactos.
+ *
+ * Son los catálogos cuyos códigos el archivo tiene que traer escritos: la
+ * ciudad, y —para los contactos con datos bancarios— el banco y la clase de
+ * cuenta. El resto del catálogo global (cotizantes, depreciación…) no aplica
+ * acá y por eso no se ofrece.
+ */
+export const CONTACTOS_IMPORT_MASTERS: readonly ImportMaster[] = [
+  IMPORT_MASTER.ciudad,
+  IMPORT_MASTER.banco,
+  IMPORT_MASTER.cuentaBancoClase,
 ];

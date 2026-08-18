@@ -169,6 +169,32 @@ export interface AppDict
       removeFile: string;
       tabs: { errors: string; masters: string };
       emptyStates: { errors: string; masters: string };
+      /**
+       * Tab "Maestros": los archivos de referencia descargables que acompañan a
+       * una importación. Las claves de `names` son los `ImportMasterId` de
+       * `import-dialog.types.ts`; el diálogo indexa este objeto con el id, así
+       * que agregar un maestro sin su nombre acá rompe el build.
+       */
+      masters: {
+        hint: string;
+        nameHeader: string;
+        download: string;
+        names: {
+          ciudad: string;
+          comprobanteCodigo: string;
+          comprobante: string;
+          impuesto: string;
+          banco: string;
+          cuentaBancoClase: string;
+          activoGrupo: string;
+          metodoDepreciacion: string;
+          tipoCotizante: string;
+          subtipoCotizante: string;
+          entidad: string;
+          tipoContrato: string;
+          costoTipo: string;
+        };
+      };
       errors: {
         rowHeader: string;
         messageHeader: string;
