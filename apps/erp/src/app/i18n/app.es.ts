@@ -528,7 +528,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Almacén',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Almacén no encontrado',
           desc: 'El almacén no existe o fue eliminado.',
@@ -1300,7 +1300,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Sede',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Sede no encontrada',
           desc: 'La sede que buscás no existe o fue eliminada.',

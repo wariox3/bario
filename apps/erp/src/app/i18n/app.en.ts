@@ -528,7 +528,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Warehouse',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Warehouse not found',
           desc: 'The warehouse does not exist or was deleted.',
@@ -1271,7 +1271,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Branch',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Branch not found',
           desc: 'The branch you are looking for does not exist or was deleted.',

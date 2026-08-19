@@ -3,7 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { masterNav } from '@erp/core/erp-modules';
 import { AlmacenService } from '../../almacen.service';
@@ -14,7 +13,7 @@ import type { Almacen } from '../../almacen.model';
 @Component({
   selector: 'app-almacen-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './almacen-detail.component.html',
   styleUrl: './almacen-detail.component.scss',
 })

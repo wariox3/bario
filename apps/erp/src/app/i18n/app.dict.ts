@@ -445,7 +445,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -952,7 +952,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };

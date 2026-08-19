@@ -3,7 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { masterNav } from '@erp/core/erp-modules';
 import { SedeService } from '../../sede.service';
@@ -13,7 +12,7 @@ import type { Sede } from '../../sede.model';
 @Component({
   selector: 'app-sede-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './sede-detail.component.html',
   styleUrl: './sede-detail.component.scss',
 })
