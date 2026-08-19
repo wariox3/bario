@@ -648,8 +648,6 @@ export const es: AppDict = {
         editSubtitle: 'Modificá la información de la lista de precios',
         fields: {
           nombre: 'Nombre',
-          venta: 'Aplica para venta',
-          compra: 'Aplica para compra',
           fechaVence: 'Fecha de vencimiento',
         },
         validation: { required: 'Este campo es requerido' },

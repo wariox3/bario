@@ -21,18 +21,6 @@ export const PRECIOS_COLUMNS: readonly ColumnDef[] = [
     type: 'text',
   },
   {
-    field: 'venta',
-    headerKey: 'entities.precio.columns.venta',
-    type: 'boolean',
-    align: 'center',
-  },
-  {
-    field: 'compra',
-    headerKey: 'entities.precio.columns.compra',
-    type: 'boolean',
-    align: 'center',
-  },
-  {
     field: 'fecha_vence',
     headerKey: 'entities.precio.columns.fechaVence',
     type: 'date',

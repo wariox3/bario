@@ -519,7 +519,7 @@ export interface AppDict
         editTitle: string;
         createSubtitle: string;
         editSubtitle: string;
-        fields: { nombre: string; venta: string; compra: string; fechaVence: string };
+        fields: { nombre: string; fechaVence: string };
         validation: { required: string };
         toasts: {
           createSuccess: { title: string; desc: string };

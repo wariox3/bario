@@ -79,10 +79,12 @@ export class PrecioFormComponent implements OnInit {
     ];
   });
 
+  /**
+   * `venta` y `compra` no son campos del formulario: los fija el mapper. Ver
+   * `formValueToPayload`.
+   */
   protected readonly form = this.fb.group({
     nombre: ['', Validators.required],
-    venta: [false],
-    compra: [false],
     fecha_vence: [startOfToday() as Date | null, Validators.required],
   });
 
