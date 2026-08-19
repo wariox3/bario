@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, SoloDigitosDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -58,6 +58,7 @@ import {
     ErpApiSelectComponent,
     ErpAsesorSelectComponent,
     ErpApiAutocompleteComponent,
+    SoloDigitosDirective,
   ],
   templateUrl: './contacto-form.component.html',
   styleUrl: './contacto-form.component.scss',

@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, SoloDigitosDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -48,6 +48,7 @@ import { empleadoToFormValue, formValueToPayload } from '../../empleado.mapper';
     PageActionsComponent,
     ErpApiSelectComponent,
     ErpApiAutocompleteComponent,
+    SoloDigitosDirective,
   ],
   templateUrl: './empleado-form.component.html',
   styleUrl: './empleado-form.component.scss',

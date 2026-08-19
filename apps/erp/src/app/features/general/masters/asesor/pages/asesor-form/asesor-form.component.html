@@ -66,7 +66,20 @@
             {{ t().entities.asesor.form.fields.celular }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <input id="celular" pInputText type="text" formControlName="celular" fluid />
+          <!-- Solo dígitos y tope de 15 (el máximo internacional): el número se
+               guarda pelado para poder compararse, y un celular de otro país
+               sigue entrando. El formato con guiones se aplica al leerlo. -->
+          <input
+            id="celular"
+            pInputText
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel"
+            libSoloDigitos
+            maxlength="15"
+            formControlName="celular"
+            fluid
+          />
           <lib-field-error
             [control]="form.controls.celular"
             [messages]="{ required: t().entities.asesor.form.validation.required }"

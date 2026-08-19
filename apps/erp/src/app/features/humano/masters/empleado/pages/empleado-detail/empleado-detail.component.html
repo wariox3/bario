@@ -138,7 +138,9 @@
         <div class="flex flex-col gap-0.5">
           <dt class="empleado-detail__label">{{ f.celular }}</dt>
           <dd class="empleado-detail__value">
-            <a [href]="'tel:' + c.celular" class="empleado-detail__link">{{ c.celular }}</a>
+            <a [href]="'tel:' + c.celular" class="empleado-detail__link">
+              {{ c.celular | libTelefono }}
+            </a>
           </dd>
         </div>
       }

@@ -83,6 +83,7 @@ export {
   INICIALES_DIA_SEMANA_ES,
 } from './lib/utils/date.utils';
 export type { DiaDelMes, AnioMes } from './lib/utils/date.utils';
+export { formatTelefono } from './lib/utils/telefono.utils';
 export { formatCop, toFiniteNumber } from './lib/utils/currency.utils';
 export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/calculo';
 export type { TasaImpuesto, ImpuestoLinea, LineaCalculo, ResumenDocumento } from './lib/calculo';

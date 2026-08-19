@@ -219,7 +219,9 @@
             <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.celular }}</dt>
             <dd class="contacto-detail__value" [class.contacto-detail__value--empty]="!c.celular">
               @if (c.celular) {
-                <a [href]="'tel:' + c.celular" class="contacto-detail__link">{{ c.celular }}</a>
+                <a [href]="'tel:' + c.celular" class="contacto-detail__link">
+                  {{ c.celular | libTelefono }}
+                </a>
               } @else {
                 —
               }

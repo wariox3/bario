@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { TelefonoPipe } from '@reddoc/ui';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
@@ -54,7 +55,7 @@ interface ContactoRol {
 @Component({
   selector: 'app-contacto-detail',
   standalone: true,
-  imports: [ButtonModule, MenuModule, BreadcrumbComponent, ArchivosDialogComponent],
+  imports: [ButtonModule, MenuModule, BreadcrumbComponent, ArchivosDialogComponent, TelefonoPipe],
   templateUrl: './contacto-detail.component.html',
   styleUrl: './contacto-detail.component.scss',
 })
