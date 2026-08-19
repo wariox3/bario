@@ -906,6 +906,10 @@ export const es: AppDict = {
           cuentas: 'Cuentas para contabilizar el item',
         },
         clasificacion: 'Opciones',
+        enUso: {
+          titulo: 'Este ítem ya se usó en documentos',
+          hint: 'Su tipo y el manejo de inventario no se pueden cambiar; el resto sí.',
+        },
         fields: {
           codigo: 'Código',
           nombre: 'Nombre',
@@ -957,9 +961,17 @@ export const es: AppDict = {
       detail: {
         eyebrow: 'Ítem',
         sections: {
+          general: 'Información general',
+          preciosImpuestos: 'Precios e impuestos',
           precios: 'Precios',
           impuestos: 'Impuestos',
           cuentas: 'Cuentas contables',
+        },
+        groups: { identificacion: 'Identificación', clasificacion: 'Clasificación' },
+        opciones: { imagenes: 'Imágenes', archivos: 'Archivos' },
+        opcionesHint: {
+          imagenes: 'Fotos del ítem, además de la principal',
+          archivos: 'Documentos adjuntos a este ítem',
         },
         labels: {
           impuestosVenta: 'Impuestos de venta',

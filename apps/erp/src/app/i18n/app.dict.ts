@@ -692,6 +692,8 @@ export interface AppDict
         sections: { principal: string; preciosImpuestos: string; cuentas: string };
         sectionsHint: { principal: string; preciosImpuestos: string; cuentas: string };
         clasificacion: string;
+        /** Aviso del ítem ya movido en documentos (bloquea tipo e inventario). */
+        enUso: { titulo: string; hint: string };
         fields: {
           codigo: string;
           nombre: string;
@@ -728,7 +730,19 @@ export interface AppDict
       };
       detail: {
         eyebrow: string;
-        sections: { precios: string; impuestos: string; cuentas: string };
+        sections: {
+          general: string;
+          preciosImpuestos: string;
+          precios: string;
+          impuestos: string;
+          cuentas: string;
+        };
+        /** Micro-encabezados de los grupos de la card de información general. */
+        groups: { identificacion: string; clasificacion: string };
+        /** Entradas del menú "Opciones" del detalle. */
+        opciones: { imagenes: string; archivos: string };
+        /** Subtítulos de los dos diálogos de archivos del ítem. */
+        opcionesHint: { imagenes: string; archivos: string };
         labels: { impuestosVenta: string; impuestosCompra: string; sinImpuestos: string };
         notFound: { title: string; desc: string };
         toasts: {

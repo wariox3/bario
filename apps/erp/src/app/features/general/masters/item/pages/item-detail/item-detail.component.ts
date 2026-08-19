@@ -1,47 +1,86 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { Menu, MenuModule } from 'primeng/menu';
+import type { MenuItem } from 'primeng/api';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
+import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
+import { ARCHIVO_TIPO } from '@erp/core/components/archivos-dialog/archivo.service';
+import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ItemService } from '../../item.service';
 import { ITEM_LIST_PATH } from '../../item.constants';
 import type { Item, ItemImpuesto } from '../../item.model';
 
-/** Badge de estado del item, con su clave i18n y color. */
-interface ItemBadge {
-  readonly labelKey: 'venta' | 'favorito' | 'inventario' | 'negativo' | 'inactivo';
-  readonly tone: 'emerald' | 'amber' | 'sky' | 'slate' | 'rose';
+/**
+ * Bandera del ítem como **campo**, no como pill.
+ *
+ * Las pills solo se pintaban cuando el flag estaba activo, así que un ítem que
+ * no maneja inventario se veía igual que uno del que nadie lo definió. Como
+ * campo `Sí`/`No` la ausencia se lee como ausencia.
+ */
+interface ItemFlag {
+  readonly labelKey: 'inventario' | 'negativo' | 'venta' | 'favorito';
+  readonly value: boolean;
 }
 
-/** Cuenta contable mostrable: etiqueta i18n + valor `código - nombre`. */
+/**
+ * Qué administra el diálogo de archivos abierto. Los dos comparten componente y
+ * registro dueño, y se distinguen por el tipo de archivo del backend: la galería
+ * de imágenes del ítem (tipo 2, restringida a png/jpg) y sus adjuntos de
+ * cualquier extensión (tipo 1). `null` = cerrado.
+ */
+type ArchivosModo = 'imagenes' | 'archivos';
+
+/**
+ * Cuenta contable mostrable: etiqueta i18n + valor `código - nombre`.
+ * `value` es `null` cuando el ítem no tiene esa cuenta asignada — la fila se
+ * pinta igual, con una raya.
+ */
 interface CuentaRow {
   readonly labelKey: 'cuentaVenta' | 'cuentaCompra' | 'cuentaCostoVenta' | 'cuentaInventario';
-  readonly value: string;
+  readonly value: string | null;
 }
 
 /**
  * Detalle (ficha) de un item — solo lectura, salvo la imagen.
  *
  * Master del módulo General (camino B). Llega desde el listado (`detalle/:id`)
- * para verificar de un vistazo qué es el item (código, nombre, imagen, tipo,
- * estado), sus precios, impuestos y cuentas contables antes de vender/editar.
- * La imagen sí es editable: se carga/elimina vía el componente reusable.
+ * para verificar de un vistazo qué es el item (imagen, nombre, código, tipo,
+ * clasificación), sus precios, impuestos y cuentas contables antes de
+ * vender/editar. La imagen sí es editable: se carga/elimina vía el componente
+ * reusable.
+ *
+ * Sigue el patrón "ficha de detalle en grupos" del sistema (ver
+ * `.interface-design/system.md`), igual que la ficha del contacto: **una** card
+ * con los campos repartidos en grupos lado a lado, y sin `<lib-detail-header>`
+ * —esa cabecera solo repetiría el nombre y el código, que ya son campos del
+ * primer grupo—. La identidad la dan la miga y un `<h1>` accesible.
  */
 @Component({
   selector: 'app-item-detail',
   standalone: true,
   imports: [
     ButtonModule,
+    MenuModule,
     BreadcrumbComponent,
     CurrencyPipe,
     ErpImageUploadComponent,
-    DetailHeaderComponent,
+    ArchivosDialogComponent,
   ],
   templateUrl: './item-detail.component.html',
   styleUrl: './item-detail.component.scss',
@@ -64,6 +103,60 @@ export class ItemDetailComponent implements OnInit {
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
   protected readonly isSavingImage = signal(false);
+
+  /** Diálogo de archivos abierto, o `null`. Ver `ArchivosModo`. */
+  protected readonly archivosModo = signal<ArchivosModo | null>(null);
+
+  private readonly opcionesMenu = viewChild.required<Menu>('opcionesMenu');
+
+  /**
+   * Entradas del menú "Opciones". `computed` para que la referencia sea estable
+   * entre change detections: con un modelo nuevo en cada CD, `p-menu` pierde el
+   * primer click. Solo cambia al cambiar de idioma.
+   */
+  protected readonly opcionesItems = computed<MenuItem[]>(() => {
+    const dict = this.t().entities.item.detail.opciones;
+    return [
+      {
+        label: dict.imagenes,
+        icon: 'pi pi-images',
+        command: () => this.archivosModo.set('imagenes'),
+      },
+      {
+        label: dict.archivos,
+        icon: 'pi pi-folder',
+        command: () => this.archivosModo.set('archivos'),
+      },
+    ];
+  });
+
+  /** Dueño de los archivos: este ítem. `null` hasta que la ficha carga. */
+  protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
+    const it = this.item();
+    return it ? { kind: 'modelo', modelo: 'item', codigo: it.id } : null;
+  });
+
+  /**
+   * Config del diálogo según el modo abierto. Las imágenes se acotan a los
+   * formatos que el backend acepta como tal (tipo 2); los adjuntos no se acotan.
+   */
+  protected readonly archivosTipo = computed(() =>
+    this.archivosModo() === 'imagenes' ? ARCHIVO_TIPO.IMAGEN : ARCHIVO_TIPO.ADJUNTO,
+  );
+
+  protected readonly archivosAccept = computed(() =>
+    this.archivosModo() === 'imagenes' ? '.png,.jpg,.jpeg' : '',
+  );
+
+  protected readonly archivosTitulo = computed(() => {
+    const dict = this.t().entities.item.detail.opciones;
+    return this.archivosModo() === 'imagenes' ? dict.imagenes : dict.archivos;
+  });
+
+  protected readonly archivosSubtitulo = computed(() => {
+    const dict = this.t().entities.item.detail.opcionesHint;
+    return this.archivosModo() === 'imagenes' ? dict.imagenes : dict.archivos;
+  });
 
   /** Migas: módulo General → listado de items → nombre del item abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -97,18 +190,26 @@ export class ItemDetailComponent implements OnInit {
     return it.servicio ? 'servicio' : 'producto';
   });
 
-  /** Badges de estado activos (solo se muestran los que aplican). */
-  protected readonly badges = computed<readonly ItemBadge[]>(() => {
+  /**
+   * Banderas del ítem, con su valor. Las de inventario solo aplican a productos
+   * —el formulario tampoco las captura para un servicio—, así que en un servicio
+   * no se listan en vez de decir "No" sobre algo que no se le pregunta.
+   */
+  protected readonly clasificacion = computed<readonly ItemFlag[]>(() => {
     const it = this.item();
     if (!it) return [];
-    const badges: ItemBadge[] = [];
-    if (it.venta) badges.push({ labelKey: 'venta', tone: 'emerald' });
-    if (it.favorito) badges.push({ labelKey: 'favorito', tone: 'amber' });
-    if (it.inventario) badges.push({ labelKey: 'inventario', tone: 'sky' });
-    if (it.negativo) badges.push({ labelKey: 'negativo', tone: 'slate' });
-    if (it.inactivo) badges.push({ labelKey: 'inactivo', tone: 'rose' });
-    return badges;
+    const flags: ItemFlag[] = [];
+    if (!it.servicio) {
+      flags.push({ labelKey: 'inventario', value: it.inventario });
+      flags.push({ labelKey: 'negativo', value: it.negativo });
+    }
+    flags.push({ labelKey: 'venta', value: it.venta });
+    flags.push({ labelKey: 'favorito', value: it.favorito });
+    return flags;
   });
+
+  /** El ítem inactivo es la excepción que merece un badge: se ve sin leer. */
+  protected readonly inactivo = computed(() => this.item()?.inactivo ?? false);
 
   protected readonly impuestosVenta = computed<readonly ItemImpuesto[]>(() =>
     (this.item()?.impuestos ?? []).filter((i) => i.impuesto_venta),
@@ -118,23 +219,26 @@ export class ItemDetailComponent implements OnInit {
   );
 
   /** Cuentas contables con valor, formateadas `código - nombre`. */
+  /**
+   * Las **cuatro** cuentas contables del ítem, siempre, aunque no estén
+   * asignadas: la que falta vale `null` y la ficha la pinta con una raya. Si se
+   * omitieran, el lector no podría distinguir "este ítem no imputa inventario"
+   * de "no me fijé si lo imputa", y la ficha cambiaría de forma según el ítem.
+   */
   protected readonly cuentas = computed<readonly CuentaRow[]>(() => {
     const it = this.item();
     if (!it) return [];
-    const rows: CuentaRow[] = [];
-    const push = (
+    const fila = (
       labelKey: CuentaRow['labelKey'],
       codigo?: string | null,
       nombre?: string | null,
-    ) => {
-      const value = [codigo, nombre].filter(Boolean).join(' - ');
-      if (value) rows.push({ labelKey, value });
-    };
-    push('cuentaVenta', it.cuenta_venta_codigo, it.cuenta_venta_nombre);
-    push('cuentaCompra', it.cuenta_compra_codigo, it.cuenta_compra_nombre);
-    push('cuentaCostoVenta', it.cuenta_costo_venta_codigo, it.cuenta_costo_venta_nombre);
-    push('cuentaInventario', it.cuenta_inventario_codigo, it.cuenta_inventario_nombre);
-    return rows;
+    ): CuentaRow => ({ labelKey, value: [codigo, nombre].filter(Boolean).join(' - ') || null });
+    return [
+      fila('cuentaVenta', it.cuenta_venta_codigo, it.cuenta_venta_nombre),
+      fila('cuentaCompra', it.cuenta_compra_codigo, it.cuenta_compra_nombre),
+      fila('cuentaCostoVenta', it.cuenta_costo_venta_codigo, it.cuenta_costo_venta_nombre),
+      fila('cuentaInventario', it.cuenta_inventario_codigo, it.cuenta_inventario_nombre),
+    ];
   });
 
   ngOnInit(): void {
@@ -146,6 +250,15 @@ export class ItemDetailComponent implements OnInit {
       return;
     }
     this.loadItem(id);
+  }
+
+  protected toggleOpciones(event: Event): void {
+    this.opcionesMenu().toggle(event);
+  }
+
+  /** El diálogo cierra solo: al bajar `visible`, el modo vuelve a `null`. */
+  protected onArchivosVisibleChange(visible: boolean): void {
+    if (!visible) this.archivosModo.set(null);
   }
 
   protected onBack(): void {

@@ -906,6 +906,10 @@ export const en: AppDict = {
           cuentas: 'Accounts to post the item',
         },
         clasificacion: 'Options',
+        enUso: {
+          titulo: 'This item has been used in documents',
+          hint: 'Its type and inventory handling can no longer change; everything else can.',
+        },
         fields: {
           codigo: 'Code',
           nombre: 'Name',
@@ -948,9 +952,17 @@ export const en: AppDict = {
       detail: {
         eyebrow: 'Item',
         sections: {
+          general: 'General information',
+          preciosImpuestos: 'Prices and taxes',
           precios: 'Prices',
           impuestos: 'Taxes',
           cuentas: 'Accounting accounts',
+        },
+        groups: { identificacion: 'Identification', clasificacion: 'Classification' },
+        opciones: { imagenes: 'Images', archivos: 'Files' },
+        opcionesHint: {
+          imagenes: 'Item photos, beyond the main one',
+          archivos: 'Documents attached to this item',
         },
         labels: {
           impuestosVenta: 'Sales taxes',

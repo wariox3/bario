@@ -43,10 +43,20 @@ interface ArchivoListResponse {
 export class ArchivoService extends BaseHttpService {
   private readonly fileDownload = inject(FileDownloadService);
 
-  listar(owner: ArchivoOwner): Observable<readonly Archivo[]> {
-    return this.get<ArchivoListResponse>(ARCHIVO_ENDPOINT, ownerParams(owner)).pipe(
-      map((response) => response.results ?? []),
-    );
+  /**
+   * Archivos del dueño, acotados al tipo que administra quien pregunta: la
+   * galería de imágenes de un ítem no debe listar sus adjuntos, ni al revés.
+   *
+   * **Supuesto**: que `general/archivo/` filtre por `archivo_tipo_id`. El ERP
+   * anterior no lo pedía —cada modelo tenía un solo punto de carga, así que la
+   * lista no se mezclaba— y si el backend ignora el parámetro, el diálogo
+   * muestra todos los archivos del registro en vez de solo los suyos.
+   */
+  listar(owner: ArchivoOwner, archivoTipoId: number): Observable<readonly Archivo[]> {
+    return this.get<ArchivoListResponse>(ARCHIVO_ENDPOINT, {
+      ...ownerParams(owner),
+      archivo_tipo_id: archivoTipoId,
+    }).pipe(map((response) => response.results ?? []));
   }
 
   cargar(

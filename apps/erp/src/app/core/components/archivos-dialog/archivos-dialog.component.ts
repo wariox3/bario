@@ -68,6 +68,13 @@ export class ArchivosDialogComponent {
   readonly title = input<string>('');
 
   /**
+   * Subtítulo del header. Por defecto describe adjuntos genéricos; un diálogo
+   * acotado a un tipo (la galería de imágenes de un ítem) pasa el suyo, para que
+   * el encabezado no prometa una cosa y la lista muestre otra.
+   */
+  readonly subtitle = input<string>('');
+
+  /**
    * Extensiones aceptadas (formato del atributo `accept`, ej. `.pdf,.xlsx`).
    * Vacío = cualquier archivo, que es el caso de los adjuntos.
    */
@@ -76,7 +83,12 @@ export class ArchivosDialogComponent {
   /** Tamaño máximo por archivo, en MB. */
   readonly maxSizeMB = input<number>(10);
 
-  /** Tipo de archivo del backend. Ver `ARCHIVO_TIPO`. */
+  /**
+   * Tipo de archivo que este diálogo administra. Gobierna **las dos** puntas:
+   * lista solo los de ese tipo y sube con ese tipo. Así un mismo registro puede
+   * tener dos diálogos que no se pisan — la galería de imágenes de un ítem y
+   * sus adjuntos. Ver `ARCHIVO_TIPO`.
+   */
   readonly archivoTipo = input<number>(ARCHIVO_TIPO.ADJUNTO);
 
   // ── Colaboradores ─────────────────────────────────────────────────────────
@@ -105,6 +117,10 @@ export class ArchivosDialogComponent {
 
   protected readonly headerTitle = computed(() => this.title() || this.t().common.archivos.title);
 
+  protected readonly headerSubtitle = computed(
+    () => this.subtitle() || this.t().common.archivos.subtitle,
+  );
+
   /** Mientras hay una operación en curso, el diálogo no se cierra ni acepta otra. */
   protected readonly isBusy = computed(() => this.isUploading() || this.deletingId() !== null);
 
@@ -120,6 +136,9 @@ export class ArchivosDialogComponent {
     effect(() => {
       const abierto = this.visible();
       const owner = this.owner();
+      // El tipo se lee acá —no dentro del `untracked`— porque cambiarlo cambia
+      // qué archivos hay que traer, igual que cambiar de dueño.
+      this.archivoTipo();
       untracked(() => {
         this.errorMessage.set(null);
         this.dragOver.set(false);
@@ -218,7 +237,7 @@ export class ArchivosDialogComponent {
   private cargarLista(owner: ArchivoOwner): void {
     this.isLoading.set(true);
     this.service
-      .listar(owner)
+      .listar(owner, this.archivoTipo())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
