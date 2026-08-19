@@ -43,6 +43,26 @@ export class ItemService extends BaseHttpService {
     return this.put<Item>(`${this.resourcePath}${id}/`, payload);
   }
 
+  /**
+   * ¿El ítem ya se movió en documentos?
+   *
+   * Lo consulta el formulario en edición para bloquear lo que ya no se puede
+   * cambiar: el tipo (producto/servicio) y el manejo de inventario. No es una
+   * regla cosmética — un ítem con movimientos que pasa a servicio deja su kardex
+   * colgando de algo que ya no maneja existencias, y desde el front no hay forma
+   * de recomponerlo.
+   *
+   * **Supuesto pendiente de confirmar con backend**: el ERP anterior pega contra
+   * `POST general/item/validar-uso/` con `{ id }` y recibe `{ uso: boolean }`.
+   * El llamador degrada a `false` si el endpoint no existe (ver `loadItem` del
+   * formulario), así que un 404 no rompe la pantalla: solo deja de proteger.
+   */
+  validarUso(id: number): Observable<boolean> {
+    return this.post<{ uso: boolean }>(`${this.resourcePath}validar-uso/`, { id }).pipe(
+      map((respuesta) => respuesta.uso === true),
+    );
+  }
+
   /** Importación masiva desde un archivo Excel. */
   importar(file: File): Observable<unknown> {
     return this.postFile<unknown>(`${this.resourcePath}importar/`, file);

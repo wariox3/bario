@@ -44,6 +44,28 @@
     </div>
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <!-- Ítem ya movido en documentos: Tipo y "Maneja inventario" quedan
+           bloqueados. La banda existe para explicar por qué — sin ella, dos
+           campos apagados sin motivo se leen como un bug. Va arriba del grid,
+           para leerse antes de intentar tocarlos. -->
+      @if (enUso()) {
+        <div
+          class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2"
+        >
+          <span
+            class="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-text"
+          >
+            <i class="pi pi-lock text-[0.7rem]"></i>
+          </span>
+          <span class="text-[0.8rem] font-medium text-brand-text">
+            {{ t().entities.item.form.enUso.titulo }}
+          </span>
+          <span class="text-[0.75rem] text-brand-muted">
+            {{ t().entities.item.form.enUso.hint }}
+          </span>
+        </div>
+      }
+
       <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         <!-- Nombre -->
         <div class="flex flex-col gap-1.5 sm:col-span-2">
