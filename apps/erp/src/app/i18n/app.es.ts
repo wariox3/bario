@@ -641,6 +641,43 @@ export const es: AppDict = {
         compra: 'Compra',
         fechaVence: 'Fecha de vencimiento',
       },
+      items: {
+        title: 'Ítems de la lista',
+        addLine: 'Agregar ítem',
+        empty: {
+          title: 'La lista no tiene ítems',
+          desc: 'Agregá un ítem para fijarle un precio dentro de esta lista.',
+        },
+        columns: { linea: '#', item: 'Ítem', precio: 'Precio', acciones: 'Acciones' },
+        itemPlaceholder: 'Buscá un ítem…',
+        import: {
+          title: 'Importar detalles',
+          subtitle: 'Subí un Excel con los ítems y sus precios para esta lista',
+          notice:
+            'Al importar se recarga la tabla: las filas que todavía no tienen ítem se pierden.',
+        },
+        confirmDelete: {
+          header: 'Quitar ítem',
+          message: '¿Querés quitar «{item}» de esta lista de precios?',
+        },
+        toasts: {
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudieron obtener los ítems de la lista.',
+          },
+          createSuccess: { title: 'Ítem agregado', desc: 'El ítem se agregó a la lista.' },
+          createError: {
+            title: 'No se pudo agregar',
+            desc: 'Revisá el ítem y volvé a intentarlo.',
+          },
+          updateError: {
+            title: 'No se pudo guardar el precio',
+            desc: 'El valor volvió al último guardado.',
+          },
+          deleteSuccess: { title: 'Ítem quitado', desc: 'El ítem salió de la lista.' },
+          deleteError: { title: 'No se pudo quitar', desc: 'Intentá de nuevo en unos segundos.' },
+        },
+      },
       form: {
         createTitle: 'Nueva lista de precios',
         editTitle: 'Editar lista de precios',
@@ -666,7 +703,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Lista de precios',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Lista de precios no encontrada',
           desc: 'La lista de precios que buscás no existe o fue eliminada.',

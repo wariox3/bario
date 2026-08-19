@@ -641,6 +641,36 @@ export const en: AppDict = {
         compra: 'Purchases',
         fechaVence: 'Expiry date',
       },
+      items: {
+        title: 'Items in this list',
+        addLine: 'Add item',
+        empty: {
+          title: 'This list has no items',
+          desc: 'Add an item to set its price within this list.',
+        },
+        columns: { linea: '#', item: 'Item', precio: 'Price', acciones: 'Actions' },
+        itemPlaceholder: 'Search for an item…',
+        import: {
+          title: 'Import details',
+          subtitle: 'Upload an Excel with the items and their prices for this list',
+          notice: 'Importing reloads the table: rows without an item yet will be lost.',
+        },
+        confirmDelete: {
+          header: 'Remove item',
+          message: 'Remove “{item}” from this price list?',
+        },
+        toasts: {
+          loadError: { title: 'Loading error', desc: 'Could not load the items in this list.' },
+          createSuccess: { title: 'Item added', desc: 'The item was added to the list.' },
+          createError: { title: 'Could not add', desc: 'Check the item and try again.' },
+          updateError: {
+            title: 'Could not save the price',
+            desc: 'The value went back to the last saved one.',
+          },
+          deleteSuccess: { title: 'Item removed', desc: 'The item left the list.' },
+          deleteError: { title: 'Could not remove', desc: 'Try again in a few seconds.' },
+        },
+      },
       form: {
         createTitle: 'New price list',
         editTitle: 'Edit price list',
@@ -666,7 +696,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Price list',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Price list not found',
           desc: 'The price list you are looking for does not exist or was deleted.',

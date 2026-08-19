@@ -514,6 +514,33 @@ export interface AppDict
       name: string;
       searchPlaceholder: string;
       columns: { id: string; nombre: string; venta: string; compra: string; fechaVence: string };
+      /** Tabla de ítems de la lista (`PrecioItemsComponent`). */
+      items: {
+        title: string;
+        addLine: string;
+        empty: { title: string; desc: string };
+        columns: { linea: string; item: string; precio: string; acciones: string };
+        itemPlaceholder: string;
+        import: {
+          title: string;
+          subtitle: string;
+          /** Solo se muestra si hay filas sin guardar. */
+          notice: string;
+        };
+        confirmDelete: {
+          header: string;
+          /** Soporta el placeholder `{item}`. */
+          message: string;
+        };
+        toasts: {
+          loadError: { title: string; desc: string };
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          updateError: { title: string; desc: string };
+          deleteSuccess: { title: string; desc: string };
+          deleteError: { title: string; desc: string };
+        };
+      };
       form: {
         createTitle: string;
         editTitle: string;
@@ -530,7 +557,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };

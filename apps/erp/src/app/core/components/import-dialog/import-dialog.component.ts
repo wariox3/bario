@@ -12,6 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgTemplateOutlet } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TabsModule } from 'primeng/tabs';
@@ -61,7 +62,7 @@ import type { ExampleConfig, ImportError, ImportMaster } from './import-dialog.t
 @Component({
   selector: 'app-import-dialog',
   standalone: true,
-  imports: [DialogModule, ButtonModule, TabsModule, TooltipModule],
+  imports: [NgTemplateOutlet, DialogModule, ButtonModule, TabsModule, TooltipModule],
   templateUrl: './import-dialog.component.html',
   styleUrl: './import-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -99,6 +100,14 @@ export class ImportDialogComponent {
 
   /** Errores reportados por el backend (ya capados a 100); alimentan el tab "Errores". */
   readonly errors = input<readonly ImportError[]>([]);
+
+  /**
+   * Advertencia sobre lo que la importación va a hacer, mostrada antes de subir.
+   * Vacío ⇒ no se pinta. La usan las importaciones que **reemplazan** lo que hay
+   * en pantalla; el consumidor decide cuándo mostrarla, para que no se vuelva un
+   * cartel permanente que nadie lee.
+   */
+  readonly notice = input<string>('');
 
   /** Mensaje resumen del error (el `detail` del backend); se muestra como banner. */
   readonly errorSummary = input<string>('');
@@ -150,9 +159,23 @@ export class ImportDialogComponent {
 
   protected readonly exampleVisible = computed(() => this.exampleConfig() !== null);
 
+  /**
+   * El tab "Maestros" existe solo si hay maestros que ofrecer. Una importación
+   * de líneas nunca los tiene, y una pestaña que siempre lleva a un vacío
+   * promete algo que no llega. Sin ella queda un solo panel, y un tab solitario
+   * es chrome sin función: los errores se muestran sin pestañera.
+   */
+  protected readonly mastersVisible = computed(() => this.masters().length > 0);
+
   protected readonly exampleEnabled = computed(() => {
     const cfg = this.exampleConfig();
     return cfg !== null && cfg.mode === 'enabled' && !this.exampleDownloading();
+  });
+
+  /** URL pública de la plantilla, cuando no la sirve el backend. */
+  protected readonly exampleExternalUrl = computed(() => {
+    const cfg = this.exampleConfig();
+    return cfg !== null && cfg.mode === 'external' ? cfg.url : null;
   });
 
   protected readonly exampleDisabledReason = computed(() => {
@@ -188,7 +211,7 @@ export class ImportDialogComponent {
         // Antes de importar, lo útil son los maestros (qué códigos escribir); los
         // errores todavía no existen. Si el listado no declara maestros, el tab de
         // errores es el único con contenido posible.
-        this.activeTab.set(this.masters().length > 0 ? 'masters' : 'errors');
+        this.activeTab.set(this.mastersVisible() ? 'masters' : 'errors');
       }
     });
 

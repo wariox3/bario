@@ -126,6 +126,20 @@
   padding: 0.85rem 0.25rem;
 }
 
+// ── Aviso previo — franja informativa, no de error: anuncia lo que va a pasar.
+.cp-import-dialog__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(20, 48, 73, 0.12);
+  border-radius: 10px;
+  background: rgba(20, 48, 73, 0.02);
+  color: var(--brand-text);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
 // ── Errores de importación ────────────────────────────────────────────────
 // Banner de resumen (el `detail` del backend): rojo tenue, una sola línea de
 // contexto antes de la tabla.

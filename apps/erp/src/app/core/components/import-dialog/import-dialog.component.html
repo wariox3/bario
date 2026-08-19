@@ -35,6 +35,16 @@
   <!-- ── Body ─────────────────────────────────────────────────────────────── -->
   @if (visible()) {
     <div class="flex flex-col gap-4">
+      <!-- Advertencia de lo que la importación va a hacer. Va antes del
+           dropzone porque avisa sobre el acto que el usuario está por empezar,
+           no sobre su resultado. -->
+      @if (notice(); as aviso) {
+        <div class="cp-import-dialog__notice">
+          <i class="pi pi-info-circle mt-[0.1rem] shrink-0 text-[0.85rem]"></i>
+          <span>{{ aviso }}</span>
+        </div>
+      }
+
       <!-- Hidden input para el click-to-pick -->
       <input
         #fileInput
@@ -111,140 +121,155 @@
         }
       }
 
-      <!-- Tabs (errores / maestros) — siempre visibles -->
-      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
-        <p-tablist>
-          <p-tab value="errors">
-            {{ t().common.import.tabs.errors }}
-            @if (errors().length > 0) {
-              <span class="ml-1 font-semibold text-red-600">({{ errors().length }})</span>
-            }
-          </p-tab>
-          <p-tab value="masters">
-            {{ t().common.import.tabs.masters }}
-            @if (masters().length > 0) {
-              <span class="ml-1 font-semibold text-brand-muted">({{ masters().length }})</span>
-            }
-          </p-tab>
-        </p-tablist>
-
-        <p-tabpanels>
-          <p-tabpanel value="errors">
-            @if (errors().length === 0 && !errorSummary()) {
-              <div class="cp-import-dialog__empty">
-                <i class="pi pi-info-circle text-[0.95rem] text-brand-muted"></i>
-                <p class="m-0 text-[0.8rem] text-brand-muted">
-                  {{ t().common.import.emptyStates.errors }}
-                </p>
+      <!-- Errores y maestros. El bloque de errores se declara una vez y se
+           consume desde los dos armados: con maestros va en pestañas; sin
+           maestros no hay nada que separar y va directo, sin pestañera. -->
+      <ng-template #panelErrores>
+        @if (errors().length === 0 && !errorSummary()) {
+          <div class="cp-import-dialog__empty">
+            <i class="pi pi-info-circle text-[0.95rem] text-brand-muted"></i>
+            <p class="m-0 text-[0.8rem] text-brand-muted">
+              {{ t().common.import.emptyStates.errors }}
+            </p>
+          </div>
+        } @else {
+          <div class="flex flex-col gap-3">
+            <!-- Banner de resumen (detail del backend) -->
+            @if (errorSummary(); as summary) {
+              <div class="cp-import-dialog__error-banner">
+                <i class="pi pi-exclamation-triangle text-[0.85rem]"></i>
+                <span>{{ summary }}</span>
               </div>
-            } @else {
-              <div class="flex flex-col gap-3">
-                <!-- Banner de resumen (detail del backend) -->
-                @if (errorSummary(); as summary) {
-                  <div class="cp-import-dialog__error-banner">
-                    <i class="pi pi-exclamation-triangle text-[0.85rem]"></i>
-                    <span>{{ summary }}</span>
-                  </div>
-                }
+            }
 
-                <!-- Tabla de errores: fila + mensaje -->
-                @if (errors().length > 0) {
-                  <div class="cp-import-dialog__errors">
-                    <table class="cp-import-dialog__errors-table">
+            <!-- Tabla de errores: fila + mensaje -->
+            @if (errors().length > 0) {
+              <div class="cp-import-dialog__errors">
+                <table class="cp-import-dialog__errors-table">
+                  <thead>
+                    <tr>
+                      <th class="cp-import-dialog__errors-rowcol">
+                        {{ t().common.import.errors.rowHeader }}
+                      </th>
+                      <th>{{ t().common.import.errors.messageHeader }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (err of errors(); track $index) {
+                      <tr>
+                        <td class="cp-import-dialog__errors-rowcol">
+                          @if (err.row !== undefined) {
+                            <span class="cp-import-dialog__row-chip">{{ err.row }}</span>
+                          } @else {
+                            <span class="text-brand-muted">—</span>
+                          }
+                        </td>
+                        <td class="cp-import-dialog__errors-msg">{{ err.message }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (errorTruncated()) {
+                <p class="m-0 text-[0.72rem] text-brand-muted">
+                  {{
+                    t()
+                      .common.import.errors.truncated.replace('{shown}', errors().length + '')
+                      .replace('{total}', errorTotal() + '')
+                  }}
+                </p>
+              }
+            }
+          </div>
+        }
+      </ng-template>
+
+      @if (mastersVisible()) {
+        <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
+          <p-tablist>
+            <p-tab value="errors">
+              {{ t().common.import.tabs.errors }}
+              @if (errors().length > 0) {
+                <span class="ml-1 font-semibold text-red-600">({{ errors().length }})</span>
+              }
+            </p-tab>
+            <p-tab value="masters">
+              {{ t().common.import.tabs.masters }}
+              @if (masters().length > 0) {
+                <span class="ml-1 font-semibold text-brand-muted">({{ masters().length }})</span>
+              }
+            </p-tab>
+          </p-tablist>
+
+          <p-tabpanels>
+            <p-tabpanel value="errors">
+              <ng-container [ngTemplateOutlet]="panelErrores" />
+            </p-tabpanel>
+
+            <p-tabpanel value="masters">
+              @if (masters().length === 0) {
+                <div class="cp-import-dialog__empty">
+                  <i class="pi pi-info-circle text-[0.95rem] text-brand-muted"></i>
+                  <p class="m-0 text-[0.8rem] text-brand-muted">
+                    {{ t().common.import.emptyStates.masters }}
+                  </p>
+                </div>
+              } @else {
+                <div class="flex flex-col gap-3">
+                  <!-- Para qué sirve el tab: sin esta línea el usuario no sabe
+                     por qué le ofrecemos archivos justo antes de subir el suyo. -->
+                  <p class="m-0 text-[0.78rem] leading-relaxed text-brand-muted">
+                    {{ t().common.import.masters.hint }}
+                  </p>
+
+                  <div class="cp-import-dialog__masters">
+                    <table class="cp-import-dialog__masters-table">
                       <thead>
                         <tr>
-                          <th class="cp-import-dialog__errors-rowcol">
-                            {{ t().common.import.errors.rowHeader }}
+                          <th>{{ t().common.import.masters.nameHeader }}</th>
+                          <th class="cp-import-dialog__masters-actioncol">
+                            <span class="sr-only">{{ t().common.import.masters.download }}</span>
                           </th>
-                          <th>{{ t().common.import.errors.messageHeader }}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @for (err of errors(); track $index) {
+                        @for (master of masters(); track master.id) {
                           <tr>
-                            <td class="cp-import-dialog__errors-rowcol">
-                              @if (err.row !== undefined) {
-                                <span class="cp-import-dialog__row-chip">{{ err.row }}</span>
-                              } @else {
-                                <span class="text-brand-muted">—</span>
-                              }
+                            <td>{{ t().common.import.masters.names[master.id] }}</td>
+                            <td class="cp-import-dialog__masters-actioncol">
+                              <a
+                                class="cp-import-dialog__masters-download"
+                                [href]="master.url"
+                                target="_blank"
+                                rel="noopener"
+                                [attr.aria-label]="
+                                  t().common.import.masters.download +
+                                  ': ' +
+                                  t().common.import.masters.names[master.id]
+                                "
+                              >
+                                <i class="pi pi-download text-[0.8rem]"></i>
+                              </a>
                             </td>
-                            <td class="cp-import-dialog__errors-msg">{{ err.message }}</td>
                           </tr>
                         }
                       </tbody>
                     </table>
                   </div>
-
-                  @if (errorTruncated()) {
-                    <p class="m-0 text-[0.72rem] text-brand-muted">
-                      {{
-                        t()
-                          .common.import.errors.truncated.replace('{shown}', errors().length + '')
-                          .replace('{total}', errorTotal() + '')
-                      }}
-                    </p>
-                  }
-                }
-              </div>
-            }
-          </p-tabpanel>
-
-          <p-tabpanel value="masters">
-            @if (masters().length === 0) {
-              <div class="cp-import-dialog__empty">
-                <i class="pi pi-info-circle text-[0.95rem] text-brand-muted"></i>
-                <p class="m-0 text-[0.8rem] text-brand-muted">
-                  {{ t().common.import.emptyStates.masters }}
-                </p>
-              </div>
-            } @else {
-              <div class="flex flex-col gap-3">
-                <!-- Para qué sirve el tab: sin esta línea el usuario no sabe
-                     por qué le ofrecemos archivos justo antes de subir el suyo. -->
-                <p class="m-0 text-[0.78rem] leading-relaxed text-brand-muted">
-                  {{ t().common.import.masters.hint }}
-                </p>
-
-                <div class="cp-import-dialog__masters">
-                  <table class="cp-import-dialog__masters-table">
-                    <thead>
-                      <tr>
-                        <th>{{ t().common.import.masters.nameHeader }}</th>
-                        <th class="cp-import-dialog__masters-actioncol">
-                          <span class="sr-only">{{ t().common.import.masters.download }}</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (master of masters(); track master.id) {
-                        <tr>
-                          <td>{{ t().common.import.masters.names[master.id] }}</td>
-                          <td class="cp-import-dialog__masters-actioncol">
-                            <a
-                              class="cp-import-dialog__masters-download"
-                              [href]="master.url"
-                              target="_blank"
-                              rel="noopener"
-                              [attr.aria-label]="
-                                t().common.import.masters.download +
-                                ': ' +
-                                t().common.import.masters.names[master.id]
-                              "
-                            >
-                              <i class="pi pi-download text-[0.8rem]"></i>
-                            </a>
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
                 </div>
-              </div>
-            }
-          </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
+              }
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
+      } @else {
+        <div class="flex flex-col gap-2">
+          <p class="m-0 text-[0.68rem] font-semibold uppercase tracking-[0.06em] text-brand-muted">
+            {{ t().common.import.tabs.errors }}
+          </p>
+          <ng-container [ngTemplateOutlet]="panelErrores" />
+        </div>
+      }
     </div>
   }
 
@@ -252,7 +277,14 @@
   <ng-template pTemplate="footer">
     <div class="flex items-center justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] pt-4">
       <!-- Acción auxiliar: descargar ejemplo (3 estados: oculto / habilitado / bloqueado) -->
-      @if (exampleVisible()) {
+      @if (exampleExternalUrl(); as url) {
+        <!-- Archivo público: es un enlace de verdad, no un botón que simula uno.
+             Así el navegador ofrece "abrir en pestaña nueva" y se ve el destino. -->
+        <a class="cp-import-dialog__example" [href]="url" target="_blank" rel="noopener" download>
+          <i class="pi pi-download text-[0.8rem]"></i>
+          <span>{{ t().common.import.example.download }}</span>
+        </a>
+      } @else if (exampleVisible()) {
         <button
           type="button"
           class="cp-import-dialog__example"

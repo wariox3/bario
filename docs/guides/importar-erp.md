@@ -126,11 +126,14 @@ endpoint de su dominio.
 Tres estados, decididos por el consumidor:
 
 ```ts
-// Visible y funcional
+// Servida por el backend: va con cookies y X-Tenant, así que puede traer datos del tenant
 protected readonly exampleConfig = {
   mode: 'enabled' as const,
   endpoint: '/general/contacto/importar-ejemplo/',
 };
+
+// Archivo público en el bucket, cuando el backend todavía no la expone
+{ mode: 'external', url: IMPORT_PLANTILLA.precioDetalle }
 
 // Visible pero bloqueado, con el motivo en un tooltip
 { mode: 'disabled', reason: 'Plantilla no configurada para este tenant' }
@@ -138,8 +141,11 @@ protected readonly exampleConfig = {
 // Oculto: no pasar el input (default null)
 ```
 
-La descarga pasa por `FileDownloadService` de `@reddoc/core`, así que va con cookies y
-`X-Tenant` — la plantilla puede traer datos del tenant.
+`enabled` descarga por `FileDownloadService`. `external` se renderiza como un enlace real a
+pestaña nueva —igual que los maestros— porque un archivo público no lleva cookies ni
+`X-Tenant` y conviene que se vea a dónde va; sus URLs viven en `IMPORT_PLANTILLA`
+(`import-plantillas.constant.ts`). Preferí `enabled` siempre que exista el endpoint: la
+plantilla del backend puede venir con los datos del tenant, la del bucket no.
 
 ---
 

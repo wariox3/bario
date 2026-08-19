@@ -1,0 +1,135 @@
+@let dict = t().entities.precio.items;
+
+<!-- La card la dibuja el componente, no la página: el chrome es parte de la
+     sección, y así el detalle solo la coloca. Misma barra de título que el resto
+     de las cards del ERP (chip de ícono + h2), con el contador y la acción a la
+     derecha — no cuestan alto propio ahí. -->
+<section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+  <div
+    class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+  >
+    <span
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+    >
+      <i class="pi pi-list text-[1rem]"></i>
+    </span>
+    <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">{{ dict.title }}</h2>
+    @if (!isLoading() && total() > 0) {
+      <span
+        class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums text-brand-text"
+      >
+        {{ total() }}
+      </span>
+    }
+    <p-button
+      type="button"
+      class="ml-auto"
+      size="small"
+      icon="pi pi-plus"
+      [label]="dict.addLine"
+      [outlined]="true"
+      [disabled]="isLoading()"
+      (onClick)="agregar()"
+    />
+  </div>
+
+  <div class="px-5 py-4 max-[576px]:px-4">
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-12 text-brand-muted">
+        <i class="pi pi-spin pi-spinner text-xl"></i>
+      </div>
+    } @else if (total() === 0) {
+      <div
+        class="flex flex-col items-center rounded-xl border border-dashed border-[rgba(20,48,73,0.18)] px-6 py-10 text-center"
+      >
+        <i class="pi pi-tag mb-2 text-xl text-brand-muted opacity-50"></i>
+        <p class="m-0 text-[0.85rem] font-semibold text-brand-text">{{ dict.empty.title }}</p>
+        <p class="m-0 mt-1 max-w-80 text-[0.78rem] leading-relaxed text-brand-muted">
+          {{ dict.empty.desc }}
+        </p>
+      </div>
+    } @else {
+      <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+        <table class="precio-items-table">
+          <thead>
+            <tr>
+              <th class="precio-items-table__th w-10 text-center">{{ dict.columns.linea }}</th>
+              <th class="precio-items-table__th min-w-[18rem] text-left">
+                {{ dict.columns.item }}
+              </th>
+              <th class="precio-items-table__th w-40 text-right">{{ dict.columns.precio }}</th>
+              <th class="precio-items-table__th w-16 text-center">
+                <span class="sr-only">{{ dict.columns.acciones }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (linea of lineas(); track linea; let i = $index) {
+              <tr [formGroup]="linea" class="precio-items-table__row">
+                <td class="precio-items-table__td text-center tabular-nums text-brand-muted">
+                  {{ i + 1 }}
+                </td>
+
+                <!-- Elegir el ítem es lo que crea la línea: hasta que hay ítem, la
+                     fila solo existe en pantalla. -->
+                <td class="precio-items-table__td">
+                  <app-item-autocomplete
+                    formControlName="item"
+                    [placeholder]="dict.itemPlaceholder"
+                  />
+                </td>
+
+                <td class="precio-items-table__td">
+                  <p-inputnumber
+                    formControlName="vr_precio"
+                    mode="decimal"
+                    [min]="0"
+                    [minFractionDigits]="0"
+                    [maxFractionDigits]="2"
+                    prefix="$ "
+                    [fluid]="true"
+                    inputStyleClass="text-right"
+                    (onBlur)="onPrecioBlur(i)"
+                  />
+                </td>
+
+                <td class="precio-items-table__td text-center">
+                  @if (estaOcupada(i)) {
+                    <span class="precio-items-table__action">
+                      <i class="pi pi-spin pi-spinner text-[0.8rem]"></i>
+                    </span>
+                  } @else {
+                    <button
+                      type="button"
+                      class="precio-items-table__action precio-items-table__action--danger"
+                      [attr.aria-label]="dict.columns.acciones"
+                      (click)="confirmarEliminar(i)"
+                    >
+                      <i class="pi pi-trash text-[0.8rem]"></i>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
+
+<app-import-dialog
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
+  [title]="dict.import.title"
+  [subtitle]="dict.import.subtitle"
+  [notice]="importNotice()"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [exampleConfig]="exampleConfig"
+  (importRequested)="importar.submit($event)"
+/>
+
+<p-confirmDialog />
