@@ -1569,12 +1569,18 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Employee',
-        sections: {
-          general: 'General information',
+        groups: {
+          identificacion: 'Identification',
           contacto: 'Contact',
           ubicacion: 'Location',
+        },
+        sections: {
+          general: 'General information',
           banca: 'Bank details',
+        },
+        labels: {
+          documento: 'Document',
+          nombreCompleto: 'Full name',
         },
         notFound: {
           title: 'Employee not found',

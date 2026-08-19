@@ -1181,8 +1181,11 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
-        sections: { general: string; contacto: string; ubicacion: string; banca: string };
+        /** Micro-encabezados de los grupos de la card de información general. */
+        groups: { identificacion: string; contacto: string; ubicacion: string };
+        sections: { general: string; banca: string };
+        /** Campos compuestos, que no salen de un solo campo del backend. */
+        labels: { documento: string; nombreCompleto: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };

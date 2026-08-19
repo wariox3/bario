@@ -4,21 +4,35 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent, TelefonoPipe } from '@reddoc/ui';
+import { TelefonoPipe } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '@erp/features/general/masters/contacto/contacto.service';
+import {
+  direccionLineasDe,
+  nombreCompletoDe,
+  numeroDocumentoDe,
+} from '@erp/features/general/masters/contacto/contacto.format';
 import type { Empleado } from '../../empleado.model';
 import { EMPLEADO_LIST_PATH } from '../../empleado.constants';
 
 /**
  * Ficha (detalle) de un empleado — solo lectura. Empleado = contacto con
- * `empleado=true`; reutiliza `ContactoService.getById`. Muestra identidad,
- * contacto, ubicación y datos bancarios.
+ * `empleado=true`; reutiliza `ContactoService.getById`.
+ *
+ * Sigue el patrón "ficha de detalle en grupos" del sistema, igual que la ficha
+ * del contacto: **una** card con identificación, contacto y ubicación lado a
+ * lado, y los datos bancarios en su propia card. Sin `<lib-detail-header>` —esa
+ * cabecera repetía el nombre y el documento que ya son campos de la ficha—; la
+ * identidad la dan la miga y un `<h1>` accesible.
+ *
+ * El formato de los tres campos compuestos (documento, nombre completo,
+ * dirección) sale de `contacto.format`, compartido con la ficha del contacto:
+ * es el mismo modelo, y duplicarlo dejaría las dos lecturas divergiendo.
  */
 @Component({
   selector: 'app-empleado-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent, TelefonoPipe],
+  imports: [ButtonModule, BreadcrumbComponent, TelefonoPipe],
   templateUrl: './empleado-detail.component.html',
   styleUrl: './empleado-detail.component.scss',
 })
@@ -55,32 +69,22 @@ export class EmpleadoDetailComponent implements OnInit {
     return items;
   });
 
-  /** Iniciales para el monograma: nombre1+apellido1 o, si no, nombre_corto. */
-  protected readonly iniciales = computed(() => {
+  /** Ver `numeroDocumentoDe`: el DV solo aplica al NIT, no a una cédula. */
+  protected readonly numeroDocumento = computed(() => {
     const c = this.empleado();
-    if (!c) return '';
-    const desde = (...partes: (string | null)[]): string =>
-      partes
-        .map((p) => p?.trim()?.[0] ?? '')
-        .join('')
-        .toUpperCase();
-    const porNombre = desde(c.nombre1, c.apellido1);
-    if (porNombre) return porNombre;
-    return (c.nombre_corto ?? '')
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((w) => w[0] ?? '')
-      .join('')
-      .toUpperCase();
+    return c ? numeroDocumentoDe(c) : '';
   });
 
-  /** Documento legible: `CC 1118260345` (+ `-1` si hay dígito de verificación). */
-  protected readonly documento = computed(() => {
+  /** Ver `nombreCompletoDe`: arma el nombre desde las partes desglosadas. */
+  protected readonly nombreCompleto = computed(() => {
     const c = this.empleado();
-    if (!c) return '';
-    const abrev = c.identificacion_abreviatura ? `${c.identificacion_abreviatura} ` : '';
-    const dv = c.digito_verificacion ? `-${c.digito_verificacion}` : '';
-    return `${abrev}${c.numero_identificacion}${dv}`;
+    return c ? nombreCompletoDe(c) : '';
+  });
+
+  /** Ver `direccionLineasDe`: la ubicación se lee como bloque, no como campos. */
+  protected readonly direccionLineas = computed<readonly string[]>(() => {
+    const c = this.empleado();
+    return c ? direccionLineasDe(c) : [];
   });
 
   ngOnInit(): void {

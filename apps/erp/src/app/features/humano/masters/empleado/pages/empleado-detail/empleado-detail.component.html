@@ -41,24 +41,17 @@
     </p>
   </div>
 } @else if (empleado(); as c) {
-  <!-- ── Identidad ───────────────────────────────────────────────────────── -->
-  <lib-detail-header [eyebrow]="d.eyebrow" [title]="c.nombre_corto">
-    <!-- Monograma de iniciales -->
-    <span
-      detailHeaderMedia
-      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-50 text-[1.05rem] font-bold tracking-tight text-sky-700"
-    >
-      {{ iniciales() }}
-    </span>
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos": una card con los campos repartidos en
+       grupos lado a lado, en vez de tres cards apiladas que multiplican el chrome
+       y obligan a bajar. Sin `<lib-detail-header>` — repetía el nombre y el
+       documento que ya son campos de acá. -->
+  <h1 class="sr-only">{{ c.nombre_corto }}</h1>
 
-    <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
-      {{ documento() }}
-    </p>
-  </lib-detail-header>
-
-  <!-- ── Información general ──────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
       <span
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
       >
@@ -68,162 +61,149 @@
         {{ d.sections.general }}
       </h2>
     </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      @if (c.identificacion_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.identificacion }}</dt>
-          <dd class="empleado-detail__value">{{ c.identificacion_nombre }}</dd>
-        </div>
-      }
-      @if (c.numero_identificacion) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.numeroIdentificacion }}</dt>
-          <dd class="empleado-detail__value">
-            {{ c.numero_identificacion }}
-            @if (c.digito_verificacion) {
-              <span class="text-brand-muted">-{{ c.digito_verificacion }}</span>
+
+    <!-- Los tres grupos van lado a lado en lg (alto = el grupo más alto, no la
+         suma) y apilados debajo, separados siempre por el mismo filete. -->
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1.15fr_1fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- Grupo: identificación -->
+      <div class="px-5 py-4">
+        <p class="empleado-detail__group">{{ d.groups.identificacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <!-- Tipo + número + DV en un solo campo: `CC 1118260344`. El número va
+               en monoespaciada porque es un identificador que se compara. -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ d.labels.documento }}</dt>
+            <dd
+              class="empleado-detail__value"
+              [class.empleado-detail__value--empty]="
+                !c.identificacion_abreviatura && !numeroDocumento()
+              "
+            >
+              @if (c.identificacion_abreviatura || numeroDocumento()) {
+                @if (c.identificacion_abreviatura) {
+                  {{ c.identificacion_abreviatura }}
+                }
+                @if (numeroDocumento()) {
+                  <span class="font-mono tabular-nums">{{ numeroDocumento() }}</span>
+                }
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ d.labels.nombreCompleto }}</dt>
+            <dd
+              class="empleado-detail__value"
+              [class.empleado-detail__value--empty]="!nombreCompleto()"
+            >
+              {{ nombreCompleto() || '—' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Grupo: contacto -->
+      <div class="px-5 py-4">
+        <p class="empleado-detail__group">{{ d.groups.contacto }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.correo }}</dt>
+            <dd class="empleado-detail__value" [class.empleado-detail__value--empty]="!c.correo">
+              @if (c.correo) {
+                <a [href]="'mailto:' + c.correo" class="empleado-detail__link">{{ c.correo }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.celular }}</dt>
+            <dd class="empleado-detail__value" [class.empleado-detail__value--empty]="!c.celular">
+              @if (c.celular) {
+                <a [href]="'tel:' + c.celular" class="empleado-detail__link">
+                  {{ c.celular | libTelefono }}
+                </a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="empleado-detail__label">{{ f.telefono }}</dt>
+            <dd class="empleado-detail__value" [class.empleado-detail__value--empty]="!c.telefono">
+              @if (c.telefono) {
+                <a [href]="'tel:' + c.telefono" class="empleado-detail__link">{{ c.telefono }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Grupo: ubicación — se lee como bloque de sobre, no como campos sueltos,
+           así que el «—» aplica al bloque entero. -->
+      <div class="px-5 py-4">
+        <p class="empleado-detail__group">{{ d.groups.ubicacion }}</p>
+        @if (direccionLineas().length) {
+          <address class="mt-3 not-italic">
+            @for (linea of direccionLineas(); track $index) {
+              <span class="empleado-detail__value block">{{ linea }}</span>
             }
-          </dd>
-        </div>
-      }
-      @if (c.nombre1) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.nombre1 }}</dt>
-          <dd class="empleado-detail__value">{{ c.nombre1 }}</dd>
-        </div>
-      }
-      @if (c.nombre2) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.nombre2 }}</dt>
-          <dd class="empleado-detail__value">{{ c.nombre2 }}</dd>
-        </div>
-      }
-      @if (c.apellido1) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.apellido1 }}</dt>
-          <dd class="empleado-detail__value">{{ c.apellido1 }}</dd>
-        </div>
-      }
-      @if (c.apellido2) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.apellido2 }}</dt>
-          <dd class="empleado-detail__value">{{ c.apellido2 }}</dd>
-        </div>
-      }
-    </dl>
+          </address>
+        } @else {
+          <p class="empleado-detail__value empleado-detail__value--empty mt-3">—</p>
+        }
+      </div>
+    </div>
   </section>
 
-  <!-- ── Contacto ────────────────────────────────────────────────────────── -->
+  <!-- ── Datos bancarios ─────────────────────────────────────────────────────── -->
+  <!-- Card propia: es a dónde se le paga, no un dato de identidad, y se consulta
+       por sí solo. Va siempre, aunque esté vacía: en una ficha de empleado, «no
+       tiene cuenta cargada» es justamente lo que hay que poder ver. -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
       <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
       >
-        <i class="pi pi-envelope text-[1rem]"></i>
+        <i class="pi pi-wallet text-[1rem]"></i>
       </span>
       <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ d.sections.contacto }}
+        {{ d.sections.banca }}
       </h2>
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      @if (c.correo) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2">
-          <dt class="empleado-detail__label">{{ f.correo }}</dt>
-          <dd class="empleado-detail__value">
-            <a [href]="'mailto:' + c.correo" class="empleado-detail__link">{{ c.correo }}</a>
-          </dd>
-        </div>
-      }
-      @if (c.celular) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.celular }}</dt>
-          <dd class="empleado-detail__value">
-            <a [href]="'tel:' + c.celular" class="empleado-detail__link">
-              {{ c.celular | libTelefono }}
-            </a>
-          </dd>
-        </div>
-      }
-      @if (c.telefono) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="empleado-detail__label">{{ f.telefono }}</dt>
-          <dd class="empleado-detail__value">
-            <a [href]="'tel:' + c.telefono" class="empleado-detail__link">{{ c.telefono }}</a>
-          </dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="empleado-detail__label">{{ f.banco }}</dt>
+        <dd class="empleado-detail__value" [class.empleado-detail__value--empty]="!c.banco_nombre">
+          {{ c.banco_nombre || '—' }}
+        </dd>
+      </div>
+      <!-- El número de cuenta se dicta y se compara: monoespaciada, como todo
+           identificador del sistema. -->
+      <div class="flex flex-col gap-0.5">
+        <dt class="empleado-detail__label">{{ f.numeroCuenta }}</dt>
+        <dd class="empleado-detail__value" [class.empleado-detail__value--empty]="!c.numero_cuenta">
+          @if (c.numero_cuenta) {
+            <span class="font-mono tabular-nums">{{ c.numero_cuenta }}</span>
+          } @else {
+            —
+          }
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="empleado-detail__label">{{ f.cuentaBancoClase }}</dt>
+        <dd
+          class="empleado-detail__value"
+          [class.empleado-detail__value--empty]="!c.cuenta_banco_clase_nombre"
+        >
+          {{ c.cuenta_banco_clase_nombre || '—' }}
+        </dd>
+      </div>
     </dl>
   </section>
-
-  <!-- ── Ubicación ───────────────────────────────────────────────────────── -->
-  @if (c.direccion || c.barrio || c.ciudad_nombre) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
-        >
-          <i class="pi pi-map-marker text-[1rem]"></i>
-        </span>
-        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-          {{ d.sections.ubicacion }}
-        </h2>
-      </div>
-      <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-        @if (c.ciudad_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="empleado-detail__label">{{ f.ciudad }}</dt>
-            <dd class="empleado-detail__value">{{ c.ciudad_nombre }}</dd>
-          </div>
-        }
-        @if (c.direccion) {
-          <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-            <dt class="empleado-detail__label">{{ f.direccion }}</dt>
-            <dd class="empleado-detail__value">{{ c.direccion }}</dd>
-          </div>
-        }
-        @if (c.barrio) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="empleado-detail__label">{{ f.barrio }}</dt>
-            <dd class="empleado-detail__value">{{ c.barrio }}</dd>
-          </div>
-        }
-      </dl>
-    </section>
-  }
-
-  <!-- ── Datos bancarios ─────────────────────────────────────────────────── -->
-  @if (c.banco_nombre || c.numero_cuenta || c.cuenta_banco_clase_nombre) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
-        >
-          <i class="pi pi-wallet text-[1rem]"></i>
-        </span>
-        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-          {{ d.sections.banca }}
-        </h2>
-      </div>
-      <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-        @if (c.banco_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="empleado-detail__label">{{ f.banco }}</dt>
-            <dd class="empleado-detail__value">{{ c.banco_nombre }}</dd>
-          </div>
-        }
-        @if (c.numero_cuenta) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="empleado-detail__label">{{ f.numeroCuenta }}</dt>
-            <dd class="empleado-detail__value">{{ c.numero_cuenta }}</dd>
-          </div>
-        }
-        @if (c.cuenta_banco_clase_nombre) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="empleado-detail__label">{{ f.cuentaBancoClase }}</dt>
-            <dd class="empleado-detail__value">{{ c.cuenta_banco_clase_nombre }}</dd>
-          </div>
-        }
-      </dl>
-    </section>
-  }
 }

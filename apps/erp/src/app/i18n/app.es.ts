@@ -1620,12 +1620,18 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Empleado',
-        sections: {
-          general: 'Información general',
+        groups: {
+          identificacion: 'Identificación',
           contacto: 'Contacto',
           ubicacion: 'Ubicación',
+        },
+        sections: {
+          general: 'Información general',
           banca: 'Datos bancarios',
+        },
+        labels: {
+          documento: 'Documento',
+          nombreCompleto: 'Nombre completo',
         },
         notFound: {
           title: 'Empleado no encontrado',
