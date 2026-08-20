@@ -110,6 +110,8 @@ export class ArchivosDialogComponent {
   protected readonly isUploading = signal(false);
   /** Id del archivo que se está borrando; solo su fila muestra el spinner. */
   protected readonly deletingId = signal<number | null>(null);
+  /** Id del archivo que se está descargando; solo su fila muestra el spinner. */
+  protected readonly downloadingId = signal<number | null>(null);
   protected readonly dragOver = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
@@ -204,6 +206,28 @@ export class ArchivosDialogComponent {
     if (this.isBusy()) return;
     const file = event.dataTransfer?.files?.[0] ?? null;
     if (file) this.subir(file);
+  }
+
+  /**
+   * Descarga el archivo. No entra en `isBusy`: es una lectura, no bloquea subir
+   * ni borrar, y solo deshabilita su propio botón mientras viaja.
+   */
+  protected descargar(archivo: Archivo): void {
+    if (this.downloadingId() !== null) return;
+
+    this.downloadingId.set(archivo.id);
+    this.service
+      .descargar(archivo)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.downloadingId.set(null)),
+      )
+      .subscribe({
+        error: () => {
+          const toast = this.t().common.archivos.toasts.downloadError;
+          this.toast.error(toast.title, toast.desc);
+        },
+      });
   }
 
   protected confirmarEliminar(archivo: Archivo): void {

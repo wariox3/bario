@@ -115,19 +115,24 @@
                   </td>
                   <td class="cp-archivos-dialog__col-acciones">
                     <div class="flex items-center justify-end gap-1">
-                      <!-- El backend devuelve la URL del archivo, así que la
-                           descarga es un enlace de verdad: el navegador ofrece
-                           "abrir en pestaña nueva" y se ve el destino. -->
-                      <a
-                        class="cp-archivos-dialog__action"
-                        [href]="archivo.url"
-                        target="_blank"
-                        rel="noopener"
-                        download
-                        [attr.aria-label]="dict.download + ': ' + archivo.nombre"
-                      >
-                        <i class="pi pi-download text-[0.8rem]"></i>
-                      </a>
+                      <!-- La descarga va por el endpoint del backend, no por
+                           `archivo.url`: es tenant-scoped y necesita cookie +
+                           `X-Tenant`, cabeceras que un `<a href>` no manda. -->
+                      @if (downloadingId() === archivo.id) {
+                        <span class="cp-archivos-dialog__action">
+                          <i class="pi pi-spin pi-spinner text-[0.8rem]"></i>
+                        </span>
+                      } @else {
+                        <button
+                          type="button"
+                          class="cp-archivos-dialog__action"
+                          [attr.aria-label]="dict.download + ': ' + archivo.nombre"
+                          [disabled]="downloadingId() !== null"
+                          (click)="descargar(archivo)"
+                        >
+                          <i class="pi pi-download text-[0.8rem]"></i>
+                        </button>
+                      }
                       @if (deletingId() === archivo.id) {
                         <span class="cp-archivos-dialog__action">
                           <i class="pi pi-spin pi-spinner text-[0.8rem] text-red-600"></i>

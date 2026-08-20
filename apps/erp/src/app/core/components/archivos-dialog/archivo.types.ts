@@ -17,7 +17,12 @@ export interface Archivo {
   readonly tipo: string | null;
   /** Tamaño en bytes. */
   readonly tamano: number;
-  /** Dónde está el archivo. El diálogo enlaza directo acá para descargarlo. */
+  /**
+   * Dónde está el archivo en el almacenamiento. El diálogo **no** enlaza acá
+   * para descargar —eso va por `general/archivo/<id>/descargar/`, que sí
+   * viaja autenticado y con `X-Tenant`—; queda por si alguna pantalla
+   * necesita la ubicación (previsualizar una imagen, por ejemplo).
+   */
   readonly url: string;
 }
 

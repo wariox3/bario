@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { map, type Observable } from 'rxjs';
-import { BaseHttpService, type ParamValue } from '@reddoc/core';
+import { BaseHttpService, FileDownloadService, type ParamValue } from '@reddoc/core';
 import type { Archivo, ArchivoOwner } from './archivo.types';
 
 /** Recurso de archivos adjuntos. Único para todo el ERP. */
@@ -32,6 +32,8 @@ interface ArchivoListResponse {
  */
 @Injectable({ providedIn: 'root' })
 export class ArchivoService extends BaseHttpService {
+  private readonly fileDownload = inject(FileDownloadService);
+
   /**
    * Archivos del dueño, acotados al tipo que administra quien pregunta: la
    * galería de imágenes de un ítem no debe listar sus adjuntos, ni al revés.
@@ -50,10 +52,11 @@ export class ArchivoService extends BaseHttpService {
   /**
    * Sube un archivo al registro.
    *
-   * **Supuesto pendiente**: el backend todavía no definió el cuerpo del `POST`.
-   * Se manda multipart con el archivo en `archivo` —la convención del resto del
-   * ERP— más los tres campos que identifican al dueño y al tipo, que son los
-   * mismos con los que el listado filtra.
+   * El `POST` es `multipart/form-data` con el contrato que definió el backend:
+   * `archivo` (binario), `modelo` y `objeto_id` obligatorios —los mismos dos
+   * campos con los que el listado filtra— y `archivo_tipo` opcional, que acá
+   * siempre se manda para no dejar el archivo fuera de la galería o de los
+   * adjuntos.
    */
   cargar(
     owner: ArchivoOwner,
@@ -63,6 +66,20 @@ export class ArchivoService extends BaseHttpService {
     return this.postFile<unknown>(ARCHIVO_ENDPOINT, file, {
       ...ownerParams(owner),
       archivo_tipo: archivoTipo,
+    });
+  }
+
+  /**
+   * Descarga el archivo por el endpoint del backend, no por `archivo.url`.
+   *
+   * `general/archivo/<id>/descargar/` es tenant-scoped y va con cookie, y un
+   * `<a href>` no puede mandar la cabecera `X-Tenant`: la petición tiene que
+   * pasar por `HttpClient`. `FileDownloadService` ya resuelve eso —blob +
+   * `Content-Disposition`— y deja el nombre del archivo como fallback.
+   */
+  descargar(archivo: Archivo): Observable<void> {
+    return this.fileDownload.download(`${ARCHIVO_ENDPOINT}${archivo.id}/descargar/`, {
+      fallbackFilename: archivo.nombre,
     });
   }
 

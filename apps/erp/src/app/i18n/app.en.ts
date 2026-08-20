@@ -168,6 +168,10 @@ export const en: AppDict = {
           title: 'Could not delete',
           desc: 'Try again in a few seconds.',
         },
+        downloadError: {
+          title: 'Could not download',
+          desc: 'Try again in a few seconds.',
+        },
       },
     },
     import: {
