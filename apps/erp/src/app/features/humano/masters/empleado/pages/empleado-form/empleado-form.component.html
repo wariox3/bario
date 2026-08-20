@@ -199,8 +199,10 @@
           <input id="barrio" pInputText type="text" formControlName="barrio" fluid />
         </div>
 
-        <!-- Correo -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <!-- Correo. A la par de Barrio, no a lo ancho: con el ancho completo
+             quedaba una fila desbalanceada —barrio solo a la izquierda y un campo
+             estirado debajo— y el formulario perdía su ritmo de dos columnas. -->
+        <div class="flex flex-col gap-1.5">
           <label for="correo" class="empleado-form__label">
             {{ f.fields.correo }}<span class="ml-px text-red-500">*</span>
           </label>
