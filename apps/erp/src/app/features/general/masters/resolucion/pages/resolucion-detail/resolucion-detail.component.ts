@@ -1,6 +1,5 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -18,7 +17,7 @@ function formatearFecha(iso: string): string {
 @Component({
   selector: 'app-resolucion-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './resolucion-detail.component.html',
   styleUrl: './resolucion-detail.component.scss',
 })

@@ -1,6 +1,5 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
@@ -18,7 +17,7 @@ function unirCuenta(codigo?: string | null, nombre?: string | null): string {
 @Component({
   selector: 'app-activo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './activo-detail.component.html',
   styleUrl: './activo-detail.component.scss',
 })

@@ -1,6 +1,5 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
@@ -13,7 +12,7 @@ import type { Credito } from '../../credito.model';
 @Component({
   selector: 'app-credito-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './credito-detail.component.html',
   styleUrl: './credito-detail.component.scss',
 })
