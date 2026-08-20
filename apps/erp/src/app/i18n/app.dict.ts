@@ -184,7 +184,6 @@ export interface AppDict
         uploadError: { title: string; desc: string };
         deleteSuccess: { title: string; desc: string };
         deleteError: { title: string; desc: string };
-        downloadError: { title: string; desc: string };
       };
     };
     import: {

@@ -18,6 +18,7 @@ import { TelefonoPipe } from '@reddoc/ui';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
+import { MODELO } from '@erp/core/permissions';
 import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
@@ -92,7 +93,7 @@ export class ContactoDetailComponent implements OnInit {
   /** Dueño de los archivos: este contacto. `null` hasta que la ficha carga. */
   protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
     const c = this.contacto();
-    return c ? { kind: 'modelo', modelo: 'contacto', codigo: c.id } : null;
+    return c ? { modelo: MODELO.general.contacto, objetoId: c.id } : null;
   });
 
   /** Migas: módulo General → listado de contactos → nombre del contacto abierto. */

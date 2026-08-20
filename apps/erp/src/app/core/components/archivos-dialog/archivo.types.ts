@@ -1,29 +1,43 @@
+import type { ModeloId } from '@erp/core/permissions';
+
 /**
  * Archivo adjunto tal como lo sirve `general/archivo/`.
  *
- * El backend devuelve algunos campos más (`tipo`, `almacenamiento_id`); acá solo
- * viven los que la ficha muestra o necesita para operar.
+ * El recurso devuelve más campos de los que la ficha usa —`archivo_tipo_codigo`,
+ * `modelo_app`, `modelo_clase`, `almacenamiento_id`, `uuid`—; acá viven solo los
+ * que el diálogo muestra o necesita para operar. Sumar uno es agregarlo cuando
+ * haya una pantalla que lo pinte.
  */
 export interface Archivo {
   readonly id: number;
   /** Fecha de carga en ISO. */
   readonly fecha: string;
   readonly nombre: string;
+  /** Extensión o mime que reporta el backend. */
+  readonly tipo: string | null;
   /** Tamaño en bytes. */
   readonly tamano: number;
+  /** Dónde está el archivo. El diálogo enlaza directo acá para descargarlo. */
+  readonly url: string;
 }
 
 /**
- * A qué se adjunta el archivo. El backend distingue dos dueños posibles: un
- * documento transaccional o un registro de un master cualquiera.
+ * A qué registro pertenece un archivo.
  *
- * Es una unión discriminada y no dos campos opcionales porque los dos modos son
- * **excluyentes**: el ERP anterior los pasaba como `@Input` sueltos
- * (`documentoId` por un lado, `modeloNombre` + `codigo` por el otro) y resolvía
- * con un `if/else` que nada impedía dejar sin rama. Acá el estado inválido —los
- * dos a la vez, o ninguno— no se puede ni escribir, y la traducción a
- * query-params vive en un solo lugar (`ArchivoService`).
+ * El backend lo identifica con dos datos: el **modelo** (id de `gen_modelo`) y
+ * el **id del registro** dentro de ese modelo. Es la misma numeración que ya
+ * usan los permisos, así que el dueño se declara con el catálogo `MODELO` en vez
+ * de con un string suelto:
+ *
+ * ```ts
+ * { modelo: MODELO.general.contacto, objetoId: contacto.id }
+ * ```
+ *
+ * Un documento no es un caso aparte: es el modelo `general.documento` con su id.
  */
-export type ArchivoOwner =
-  | { readonly kind: 'documento'; readonly documentoId: number }
-  | { readonly kind: 'modelo'; readonly modelo: string; readonly codigo: number };
+export interface ArchivoOwner {
+  /** Id de `gen_modelo`. Ver el catálogo `MODELO`. */
+  readonly modelo: ModeloId;
+  /** Id del registro dueño, dentro de ese modelo. */
+  readonly objetoId: number | string;
+}

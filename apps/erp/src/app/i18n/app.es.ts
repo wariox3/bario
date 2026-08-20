@@ -168,10 +168,6 @@ export const es: AppDict = {
           title: 'No se pudo eliminar',
           desc: 'Intentá de nuevo en unos segundos.',
         },
-        downloadError: {
-          title: 'No se pudo descargar',
-          desc: 'Intentá de nuevo en unos segundos.',
-        },
       },
     },
     import: {

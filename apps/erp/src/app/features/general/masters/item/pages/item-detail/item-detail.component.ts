@@ -19,6 +19,7 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
 import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
 import { ARCHIVO_TIPO } from '@erp/core/components/archivos-dialog/archivo.service';
+import { MODELO } from '@erp/core/permissions';
 import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
@@ -133,7 +134,7 @@ export class ItemDetailComponent implements OnInit {
   /** Dueño de los archivos: este ítem. `null` hasta que la ficha carga. */
   protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
     const it = this.item();
-    return it ? { kind: 'modelo', modelo: 'item', codigo: it.id } : null;
+    return it ? { modelo: MODELO.general.item, objetoId: it.id } : null;
   });
 
   /**

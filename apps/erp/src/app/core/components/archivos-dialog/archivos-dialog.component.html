@@ -115,15 +115,19 @@
                   </td>
                   <td class="cp-archivos-dialog__col-acciones">
                     <div class="flex items-center justify-end gap-1">
-                      <button
-                        type="button"
+                      <!-- El backend devuelve la URL del archivo, así que la
+                           descarga es un enlace de verdad: el navegador ofrece
+                           "abrir en pestaña nueva" y se ve el destino. -->
+                      <a
                         class="cp-archivos-dialog__action"
+                        [href]="archivo.url"
+                        target="_blank"
+                        rel="noopener"
+                        download
                         [attr.aria-label]="dict.download + ': ' + archivo.nombre"
-                        [disabled]="isBusy()"
-                        (click)="descargar(archivo)"
                       >
                         <i class="pi pi-download text-[0.8rem]"></i>
-                      </button>
+                      </a>
                       @if (deletingId() === archivo.id) {
                         <span class="cp-archivos-dialog__action">
                           <i class="pi pi-spin pi-spinner text-[0.8rem] text-red-600"></i>

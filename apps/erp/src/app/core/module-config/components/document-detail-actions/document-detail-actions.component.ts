@@ -4,6 +4,7 @@ import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
 import { I18nService } from '@reddoc/core';
 import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
+import { MODELO } from '@erp/core/permissions';
 import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import type { AppDict } from '@erp/i18n';
 
@@ -78,7 +79,7 @@ export class DocumentDetailActionsComponent {
   /** Dueño de los archivos: el documento abierto. `null` mientras no hay id válido. */
   protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
     const id = this.documentoId();
-    return id === null ? null : { kind: 'documento', documentoId: id };
+    return id === null ? null : { modelo: MODELO.general.documento, objetoId: id };
   });
 
   /**

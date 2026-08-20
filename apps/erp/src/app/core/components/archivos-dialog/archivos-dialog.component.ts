@@ -206,18 +206,6 @@ export class ArchivosDialogComponent {
     if (file) this.subir(file);
   }
 
-  protected descargar(archivo: Archivo): void {
-    this.service
-      .descargar(archivo)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => {
-          const toast = this.t().common.archivos.toasts.downloadError;
-          this.toast.error(toast.title, toast.desc);
-        },
-      });
-  }
-
   protected confirmarEliminar(archivo: Archivo): void {
     if (this.isBusy()) return;
     const dict = this.t().common.archivos.confirmDelete;
