@@ -1158,7 +1158,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Position',
+        sections: { general: 'General information' },
         activo: 'Active',
         notFound: {
           title: 'Position not found',

@@ -1184,7 +1184,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cargo',
+        sections: { general: 'Información general' },
         activo: 'Activo',
         notFound: {
           title: 'Cargo no encontrado',

@@ -891,7 +891,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
