@@ -519,7 +519,13 @@ export interface AppDict
         title: string;
         addLine: string;
         empty: { title: string; desc: string };
-        columns: { linea: string; item: string; precio: string; acciones: string };
+        columns: {
+          id: string;
+          item: string;
+          referencia: string;
+          precio: string;
+          acciones: string;
+        };
         itemPlaceholder: string;
         import: {
           title: string;

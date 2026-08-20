@@ -18,6 +18,8 @@ import type { ExampleConfig } from '@erp/core/components/import-dialog/import-di
 import type { AppDict } from '@erp/i18n';
 import { PrecioDetalleService } from '../../precio-detalle.service';
 import type { PrecioDetalle } from '../../precio-detalle.model';
+import { precioDetalleToItemOption, toPrecioDetallePayload } from '../../precio-detalle.mapper';
+import { VR_PRECIO_MAX } from '../../precio.constants';
 
 /**
  * Una fila de la tabla.
@@ -35,6 +37,12 @@ type LineaForm = FormGroup<{
   item: FormControl<ItemOption | null>;
   vr_precio: FormControl<number | null>;
   precioGuardado: FormControl<number | null>;
+  /**
+   * Referencia del ítem, para la columna homónima. No se edita: la manda el
+   * backend al leer la línea y al confirmarla, porque el autocomplete solo
+   * conoce id, etiqueta y precio.
+   */
+  itemReferencia: FormControl<string>;
 }>;
 
 /**
@@ -93,10 +101,15 @@ export class PrecioItemsComponent {
 
   protected readonly total = computed(() => this.lineas().length);
 
+  /** Tope del importe, para que el input no deje escribir lo que el backend rechaza. */
+  protected readonly vrPrecioMax = VR_PRECIO_MAX;
+
   /**
    * La plantilla la publica el bucket, no el backend: es el XLSX que el ERP
    * anterior ofrece para esta misma importación. Pasa a `{ mode: 'enabled' }`
-   * el día que exista un `precio_detalle/importar-ejemplo/`.
+   * el día que exista un `precio-detalle/importar-ejemplo/` — el que hoy
+   * declara el esquema es `precio/importar-ejemplo/`, que es la plantilla de
+   * las **listas** de precio, no la de sus líneas.
    */
   protected readonly exampleConfig: ExampleConfig = {
     mode: 'external',
@@ -219,13 +232,12 @@ export class PrecioItemsComponent {
   private nuevaLinea(detalle?: PrecioDetalle): LineaForm {
     const linea: LineaForm = new FormGroup({
       id: new FormControl<number | null>(detalle?.id ?? null),
-      item: new FormControl<ItemOption | null>(
-        detalle
-          ? { id: detalle.item, nombre: detalle.item__nombre, precio: detalle.vr_precio }
-          : null,
-      ),
-      vr_precio: new FormControl<number | null>(detalle?.vr_precio ?? null),
-      precioGuardado: new FormControl<number | null>(detalle?.vr_precio ?? null),
+      item: new FormControl<ItemOption | null>(precioDetalleToItemOption(detalle)),
+      vr_precio: new FormControl<number | null>(detalle?.vrPrecio ?? null),
+      precioGuardado: new FormControl<number | null>(detalle?.vrPrecio ?? null),
+      itemReferencia: new FormControl<string>(detalle?.itemReferencia ?? '', {
+        nonNullable: true,
+      }),
     });
 
     // El índice se resuelve al disparar el evento, no acá: borrar una línea
@@ -265,11 +277,7 @@ export class PrecioItemsComponent {
 
     this.ocupar(index, true);
     this.service
-      .crear({
-        precio: this.precioId(),
-        item: item.id,
-        vr_precio: linea.controls.vr_precio.value ?? 0,
-      })
+      .crear(toPrecioDetallePayload(this.precioId(), item.id, linea.controls.vr_precio.value))
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.ocupar(index, false)),
@@ -278,6 +286,8 @@ export class PrecioItemsComponent {
         next: (creada) => {
           linea.controls.id.setValue(creada.id);
           linea.controls.precioGuardado.setValue(linea.controls.vr_precio.value);
+          // La referencia solo la sabe el backend: el autocomplete no la trae.
+          linea.controls.itemReferencia.setValue(creada.itemReferencia);
           const toast = this.t().entities.precio.items.toasts.createSuccess;
           this.toast.success(toast.title, toast.desc);
         },
@@ -303,17 +313,19 @@ export class PrecioItemsComponent {
 
     this.ocupar(index, true);
     this.service
-      .actualizar(id, {
-        precio: this.precioId(),
-        item: item.id,
-        vr_precio: linea.controls.vr_precio.value ?? 0,
-      })
+      .actualizar(
+        id,
+        toPrecioDetallePayload(this.precioId(), item.id, linea.controls.vr_precio.value),
+      )
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.ocupar(index, false)),
       )
       .subscribe({
-        next: () => linea.controls.precioGuardado.setValue(linea.controls.vr_precio.value),
+        next: (guardada) => {
+          linea.controls.precioGuardado.setValue(linea.controls.vr_precio.value);
+          linea.controls.itemReferencia.setValue(guardada.itemReferencia);
+        },
         error: (err: unknown) => {
           linea.controls.vr_precio.setValue(linea.controls.precioGuardado.value);
           const toast = this.t().entities.precio.items.toasts.updateError;

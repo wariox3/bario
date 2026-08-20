@@ -648,7 +648,13 @@ export const en: AppDict = {
           title: 'This list has no items',
           desc: 'Add an item to set its price within this list.',
         },
-        columns: { linea: '#', item: 'Item', precio: 'Price', acciones: 'Actions' },
+        columns: {
+          id: 'ID',
+          item: 'Item',
+          referencia: 'Reference',
+          precio: 'Price',
+          acciones: 'Actions',
+        },
         itemPlaceholder: 'Search for an item…',
         import: {
           title: 'Import details',

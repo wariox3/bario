@@ -53,10 +53,11 @@
         <table class="precio-items-table">
           <thead>
             <tr>
-              <th class="precio-items-table__th w-10 text-center">{{ dict.columns.linea }}</th>
+              <th class="precio-items-table__th w-20 text-left">{{ dict.columns.id }}</th>
               <th class="precio-items-table__th min-w-[18rem] text-left">
                 {{ dict.columns.item }}
               </th>
+              <th class="precio-items-table__th w-40 text-left">{{ dict.columns.referencia }}</th>
               <th class="precio-items-table__th w-40 text-right">{{ dict.columns.precio }}</th>
               <th class="precio-items-table__th w-16 text-center">
                 <span class="sr-only">{{ dict.columns.acciones }}</span>
@@ -66,8 +67,17 @@
           <tbody>
             @for (linea of lineas(); track linea; let i = $index) {
               <tr [formGroup]="linea" class="precio-items-table__row">
-                <td class="precio-items-table__td text-center tabular-nums text-brand-muted">
-                  {{ i + 1 }}
+                <!-- El id real de la línea, no su posición: es el dato con el que se
+                     la busca en el backend, y la posición ya la da el orden visual.
+                     La fila que todavía no se guardó no tiene id: va raya. -->
+                <td class="precio-items-table__td">
+                  @if (linea.controls.id.value; as id) {
+                    <span class="font-mono text-[0.78rem] tabular-nums text-brand-text">
+                      {{ id }}
+                    </span>
+                  } @else {
+                    <span class="text-brand-muted opacity-60">—</span>
+                  }
                 </td>
 
                 <!-- Elegir el ítem es lo que crea la línea: hasta que hay ítem, la
@@ -79,11 +89,25 @@
                   />
                 </td>
 
+                <!-- La referencia identifica al ítem cuando el código no alcanza; es
+                     dato del backend, no se edita acá. Vacía = raya, para no
+                     confundirla con una columna que no cargó. -->
+                <td class="precio-items-table__td">
+                  @if (linea.controls.itemReferencia.value; as referencia) {
+                    <span class="font-mono text-[0.78rem] tabular-nums text-brand-text">
+                      {{ referencia }}
+                    </span>
+                  } @else {
+                    <span class="text-brand-muted opacity-60">—</span>
+                  }
+                </td>
+
                 <td class="precio-items-table__td">
                   <p-inputnumber
                     formControlName="vr_precio"
                     mode="decimal"
                     [min]="0"
+                    [max]="vrPrecioMax"
                     [minFractionDigits]="0"
                     [maxFractionDigits]="2"
                     prefix="$ "
