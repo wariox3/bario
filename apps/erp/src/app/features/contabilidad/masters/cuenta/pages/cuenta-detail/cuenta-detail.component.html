@@ -42,72 +42,105 @@
   </div>
 } @else if (cuenta(); as c) {
   <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
-  <lib-detail-header
-    icon="pi pi-book"
-    [eyebrow]="t().entities.cuenta.detail.eyebrow"
-    [title]="c.nombre"
-  >
-    <div detailHeaderSubtitle class="flex flex-col gap-2">
-      @if (c.codigo) {
-        <span class="text-[0.8rem] font-medium text-brand-muted">
-          {{ t().entities.cuenta.columns.codigo }}: {{ c.codigo }}
-        </span>
-      }
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos": tres grupos lado a lado. La jerarquía
+       y las condiciones no se mostraban en ningún lado —el encabezado solo tenía
+       nombre, código y las banderas activas—, así que no se podía saber de qué
+       clase cuelga la cuenta ni qué exige al imputarla. -->
+  <h1 class="sr-only">{{ c.nombre }}</h1>
 
-      <div class="flex flex-wrap gap-2">
-        @if (c.permite_movimiento) {
-          <span
-            class="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
-          >
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-            {{ t().entities.cuenta.form.fields.permiteMovimiento }}
-          </span>
-        }
-        @if (c.exige_base) {
-          <span
-            class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-          >
-            {{ t().entities.cuenta.form.fields.exigeBase }}
-          </span>
-        }
-        @if (c.exige_contacto) {
-          <span
-            class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-          >
-            {{ t().entities.cuenta.form.fields.exigeContacto }}
-          </span>
-        }
-        @if (c.exige_grupo) {
-          <span
-            class="inline-flex w-fit items-center rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-          >
-            {{ t().entities.cuenta.form.fields.exigeGrupo }}
-          </span>
-        }
-      </div>
-    </div>
-  </lib-detail-header>
-
-  <!-- ── Clasificación contable ───────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="grid grid-cols-1 gap-x-5 gap-y-4 px-5 py-5 sm:grid-cols-3 max-[576px]:px-4">
-      <div class="flex flex-col gap-1">
-        <span class="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
-          {{ t().entities.cuenta.form.fields.cuentaClase }}
-        </span>
-        <span class="text-[0.9rem] text-brand-text">{{ c.cuenta_clase_nombre || '—' }}</span>
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-book text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.cuenta.detail.sections.general }}
+      </h2>
+    </div>
+
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1.1fr_1fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- Grupo: identificación -->
+      <div class="px-5 py-4">
+        <p class="cuenta-detail__group">{{ t().entities.cuenta.detail.groups.identificacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="cuenta-detail__label">{{ t().entities.cuenta.columns.nombre }}</dt>
+            <dd class="cuenta-detail__value" [class.cuenta-detail__value--empty]="!c.nombre">
+              {{ c.nombre || '—' }}
+            </dd>
+          </div>
+          <!-- El código del PUC se compara dígito a dígito: monoespaciada. -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="cuenta-detail__label">{{ t().entities.cuenta.columns.codigo }}</dt>
+            <dd
+              class="cuenta-detail__value cuenta-detail__value--mono"
+              [class.cuenta-detail__value--empty]="!c.codigo"
+            >
+              {{ c.codigo || '—' }}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <div class="flex flex-col gap-1">
-        <span class="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
-          {{ t().entities.cuenta.form.fields.cuentaGrupo }}
-        </span>
-        <span class="text-[0.9rem] text-brand-text">{{ c.cuenta_grupo_nombre || '—' }}</span>
+
+      <!-- Grupo: jerarquía — de qué cuelga la cuenta dentro del PUC. -->
+      <div class="px-5 py-4">
+        <p class="cuenta-detail__group">{{ t().entities.cuenta.detail.groups.jerarquia }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="cuenta-detail__label">{{ t().entities.cuenta.form.fields.cuentaClase }}</dt>
+            <dd
+              class="cuenta-detail__value"
+              [class.cuenta-detail__value--empty]="!c.cuenta_clase_nombre"
+            >
+              {{ c.cuenta_clase_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="cuenta-detail__label">{{ t().entities.cuenta.form.fields.cuentaGrupo }}</dt>
+            <dd
+              class="cuenta-detail__value"
+              [class.cuenta-detail__value--empty]="!c.cuenta_grupo_nombre"
+            >
+              {{ c.cuenta_grupo_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="cuenta-detail__label">{{ t().entities.cuenta.form.fields.cuentaCuenta }}</dt>
+            <dd
+              class="cuenta-detail__value"
+              [class.cuenta-detail__value--empty]="!c.cuenta_cuenta_nombre"
+            >
+              {{ c.cuenta_cuenta_nombre || '—' }}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <div class="flex flex-col gap-1">
-        <span class="text-[0.7rem] font-semibold uppercase tracking-wide text-brand-muted">
-          {{ t().entities.cuenta.form.fields.cuentaCuenta }}
-        </span>
-        <span class="text-[0.9rem] text-brand-text">{{ c.cuenta_cuenta_nombre || '—' }}</span>
+
+      <!-- Grupo: condiciones. Van como campos Sí/No y no como pills: las pills
+           solo se pintaban cuando la bandera estaba activa, así que «no exige
+           contacto» se leía igual que «nadie lo definió». -->
+      <div class="px-5 py-4">
+        <p class="cuenta-detail__group">{{ t().entities.cuenta.detail.groups.condiciones }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          @for (flag of condiciones(); track flag.labelKey) {
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="cuenta-detail__label">
+                {{ t().entities.cuenta.form.fields[flag.labelKey] }}
+              </dt>
+              <dd
+                class="cuenta-detail__value shrink-0"
+                [class.cuenta-detail__value--off]="!flag.value"
+              >
+                {{ flag.value ? t().common.boolean.true : t().common.boolean.false }}
+              </dd>
+            </div>
+          }
+        </dl>
       </div>
     </div>
   </section>

@@ -469,7 +469,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -504,7 +504,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -572,6 +572,8 @@ export interface AppDict
         consecutivoHasta: string;
         fechaDesde: string;
         fechaHasta: string;
+        venta: string;
+        compra: string;
       };
       form: {
         createTitle: string;
@@ -603,7 +605,9 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        /** Campo compuesto: a qué documentos aplica la resolución. */
+        labels: { aplicaA: string };
         vigencia: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
@@ -840,7 +844,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -866,7 +870,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -923,7 +927,8 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -948,7 +953,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1031,7 +1036,8 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        groups: { identificacion: string; jerarquia: string; condiciones: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };

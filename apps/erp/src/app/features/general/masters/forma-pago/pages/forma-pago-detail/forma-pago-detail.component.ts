@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { FormaPagoService } from '../../forma-pago.service';
@@ -14,7 +13,7 @@ import type { FormaPago } from '../../forma-pago.model';
 @Component({
   selector: 'app-forma-pago-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './forma-pago-detail.component.html',
   styleUrl: './forma-pago-detail.component.scss',
 })
@@ -32,6 +31,16 @@ export class FormaPagoDetailComponent implements OnInit {
   readonly id = input<string>();
 
   protected readonly formaPago = signal<FormaPago | null>(null);
+  /**
+   * Cuenta contable como `código - nombre`. Se arma acá y no en el template
+   * porque dos interpolaciones vecinas quedan en líneas distintas al formatear y
+   * el colapso de espacios mete un blanco de más.
+   */
+  protected readonly cuentaContable = computed(() => {
+    const m = this.formaPago();
+    if (!m?.cuenta) return '';
+    return [m.cuenta_codigo, m.cuenta_nombre].filter(Boolean).join(' - ');
+  });
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 

@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { GrupoService } from '../../grupo.service';
 import { GRUPO_LIST_PATH } from '../../grupo.constants';
@@ -13,7 +12,7 @@ import type { Grupo } from '../../grupo.model';
 @Component({
   selector: 'app-grupo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './grupo-detail.component.html',
   styleUrl: './grupo-detail.component.scss',
 })

@@ -565,7 +565,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Advisor',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Advisor not found',
           desc: 'The advisor you are looking for does not exist or was deleted.',
@@ -617,7 +617,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Bank account',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Bank account not found',
           desc: 'The bank account you are looking for does not exist or was deleted.',
@@ -713,6 +713,8 @@ export const en: AppDict = {
         consecutivoHasta: 'Consecutive to',
         fechaDesde: 'Date from',
         fechaHasta: 'Date to',
+        venta: 'Sales',
+        compra: 'Purchases',
       },
       form: {
         createTitle: 'New resolution',
@@ -750,7 +752,8 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Resolution',
+        sections: { general: 'General information' },
+        labels: { aplicaA: 'Applies to' },
         vigencia: 'Validity',
         notFound: {
           title: 'Resolution not found',
@@ -1085,7 +1088,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Branch office',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Branch not found',
           desc: 'The branch you are looking for does not exist or was deleted.',
@@ -1120,7 +1123,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Group',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Group not found',
           desc: 'The group you are looking for does not exist or was deleted.',
@@ -1206,7 +1209,8 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cost center',
+        sections: { general: 'General information' },
+        activo: 'Active',
         notFound: {
           title: 'Cost center not found',
           desc: 'The cost center you are looking for does not exist or was deleted.',
@@ -1249,7 +1253,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Payment method',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Payment form not found',
           desc: 'The payment form you are looking for does not exist or was deleted.',
@@ -1359,7 +1363,12 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Account',
+        sections: { general: 'General information' },
+        groups: {
+          identificacion: 'Identification',
+          jerarquia: 'Hierarchy',
+          condiciones: 'Conditions',
+        },
         notFound: {
           title: 'Account not found',
           desc: 'The account you are looking for does not exist or was deleted.',

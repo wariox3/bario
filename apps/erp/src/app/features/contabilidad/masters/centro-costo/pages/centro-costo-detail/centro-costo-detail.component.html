@@ -42,31 +42,64 @@
   </div>
 } @else if (centroCosto(); as c) {
   <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
-  <lib-detail-header
-    icon="pi pi-calculator"
-    [eyebrow]="t().entities.centroCosto.detail.eyebrow"
-    [title]="c.nombre"
-  >
-    <div detailHeaderSubtitle class="flex flex-col gap-2">
-      <span class="text-[0.8rem] font-medium text-brand-muted">
-        {{ t().entities.centroCosto.columns.codigo }}: {{ c.codigo }}
-      </span>
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos" del sistema, como contacto e ítem. Sin
+       `<lib-detail-header>`: repetía el nombre que ya es un campo de acá. La
+       identidad la dan la miga y el `<h1>` accesible. -->
+  <h1 class="sr-only">{{ c.nombre }}</h1>
 
-      @if (c.estado_inactivo) {
-        <span
-          class="inline-flex w-fit items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-rose-700"
-        >
-          <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
-          {{ t().entities.centroCosto.columns.estado }}
-        </span>
-      } @else {
-        <span
-          class="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
-        >
-          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-          Activo
-        </span>
-      }
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-calculator text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.centroCosto.detail.sections.general }}
+      </h2>
+
+      <!-- El estado va en la barra: se busca sin leer y no cuesta alto propio. -->
+      <div class="ml-auto">
+        @if (c.estado_inactivo) {
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-rose-700"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+            {{ t().entities.centroCosto.columns.estado }}
+          </span>
+        } @else {
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            {{ t().entities.centroCosto.detail.activo }}
+          </span>
+        }
+      </div>
     </div>
-  </lib-detail-header>
+
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="centro-costo-detail__label">{{ t().entities.centroCosto.columns.nombre }}</dt>
+        <dd
+          class="centro-costo-detail__value"
+          [class.centro-costo-detail__value--empty]="!c.nombre"
+        >
+          {{ c.nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="centro-costo-detail__label">{{ t().entities.centroCosto.columns.codigo }}</dt>
+        <dd
+          class="centro-costo-detail__value centro-costo-detail__value--mono"
+          [class.centro-costo-detail__value--empty]="!c.codigo"
+        >
+          {{ c.codigo || '—' }}
+        </dd>
+      </div>
+    </dl>
+  </section>
 }

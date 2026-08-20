@@ -565,7 +565,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Asesor',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Asesor no encontrado',
           desc: 'El asesor que buscás no existe o fue eliminado.',
@@ -617,7 +617,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cuenta de banco',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Cuenta de banco no encontrada',
           desc: 'La cuenta de banco que buscás no existe o fue eliminada.',
@@ -720,6 +720,8 @@ export const es: AppDict = {
         consecutivoHasta: 'Consecutivo hasta',
         fechaDesde: 'Fecha desde',
         fechaHasta: 'Fecha hasta',
+        venta: 'Venta',
+        compra: 'Compra',
       },
       form: {
         createTitle: 'Nueva resolución',
@@ -757,7 +759,8 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Resolución',
+        sections: { general: 'Información general' },
+        labels: { aplicaA: 'Aplica a' },
         vigencia: 'Vigencia',
         notFound: {
           title: 'Resolución no encontrada',
@@ -1104,7 +1107,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Sucursal',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Sucursal no encontrada',
           desc: 'La sucursal que buscás no existe o fue eliminada.',
@@ -1146,7 +1149,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Grupo',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Grupo no encontrado',
           desc: 'El grupo que buscás no existe o fue eliminado.',
@@ -1235,7 +1238,8 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Centro de costo',
+        sections: { general: 'Información general' },
+        activo: 'Activo',
         notFound: {
           title: 'Centro de costo no encontrado',
           desc: 'El centro de costo que buscás no existe o fue eliminado.',
@@ -1282,7 +1286,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Forma de pago',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Forma de pago no encontrada',
           desc: 'La forma de pago que buscás no existe o fue eliminada.',
@@ -1398,7 +1402,12 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cuenta',
+        sections: { general: 'Información general' },
+        groups: {
+          identificacion: 'Identificación',
+          jerarquia: 'Jerarquía',
+          condiciones: 'Condiciones',
+        },
         notFound: {
           title: 'Cuenta no encontrada',
           desc: 'La cuenta que buscás no existe o fue eliminada.',

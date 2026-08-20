@@ -4,16 +4,21 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { CuentaService } from '../../cuenta.service';
 import { CUENTA_LIST_PATH } from '../../cuenta.constants';
 import type { Cuenta } from '../../cuenta.model';
 
+/** Bandera de la cuenta como campo: etiqueta i18n + su valor. */
+interface CuentaCondicion {
+  readonly labelKey: 'permiteMovimiento' | 'exigeBase' | 'exigeContacto' | 'exigeGrupo';
+  readonly value: boolean;
+}
+
 @Component({
   selector: 'app-cuenta-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './cuenta-detail.component.html',
   styleUrl: './cuenta-detail.component.scss',
 })
@@ -30,6 +35,24 @@ export class CuentaDetailComponent implements OnInit {
   readonly id = input<string>();
 
   protected readonly cuenta = signal<Cuenta | null>(null);
+
+  /**
+   * Condiciones que la cuenta impone al imputarla, como campos con valor.
+   *
+   * Antes eran pills que solo aparecían cuando la bandera estaba activa, así que
+   * «no exige contacto» y «nadie lo definió» se veían igual. Como campos Sí/No la
+   * ausencia se lee como ausencia.
+   */
+  protected readonly condiciones = computed<readonly CuentaCondicion[]>(() => {
+    const c = this.cuenta();
+    if (!c) return [];
+    return [
+      { labelKey: 'permiteMovimiento', value: c.permite_movimiento },
+      { labelKey: 'exigeBase', value: c.exige_base },
+      { labelKey: 'exigeContacto', value: c.exige_contacto },
+      { labelKey: 'exigeGrupo', value: c.exige_grupo },
+    ];
+  });
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
