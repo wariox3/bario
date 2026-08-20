@@ -1109,7 +1109,7 @@ export const en: AppDict = {
       },
     },
     grupo: {
-      name: 'Payroll groups',
+      name: 'Groups',
       searchPlaceholder: 'Search by name…',
       columns: {
         id: 'ID',
@@ -1118,18 +1118,15 @@ export const en: AppDict = {
       },
       periodos: { 1: 'Biweekly', 2: 'Monthly' },
       form: {
-        createTitle: 'New payroll group',
-        editTitle: 'Edit payroll group',
-        createSubtitle: 'Fill in the payroll group information',
-        editSubtitle: 'Update the payroll group information',
+        createTitle: 'New group',
+        editTitle: 'Edit group',
+        createSubtitle: 'Fill in the group information',
+        editSubtitle: 'Update the group information',
         fields: { nombre: 'Name', periodo: 'Period', periodoPlaceholder: 'Select a period' },
         validation: { required: 'This field is required' },
         toasts: {
-          createSuccess: {
-            title: 'Payroll group created',
-            desc: 'The group was created successfully',
-          },
-          editSuccess: { title: 'Payroll group updated', desc: 'Changes were saved successfully' },
+          createSuccess: { title: 'Group created', desc: 'The group was created successfully' },
+          editSuccess: { title: 'Group updated', desc: 'Changes were saved successfully' },
           createError: { title: 'Create error', desc: 'The group could not be created' },
           editError: { title: 'Save error', desc: 'Changes could not be saved' },
           loadError: { title: 'Load error', desc: 'The group could not be loaded' },
@@ -1138,7 +1135,7 @@ export const en: AppDict = {
       detail: {
         sections: { general: 'General information' },
         notFound: {
-          title: 'Payroll group not found',
+          title: 'Group not found',
           desc: 'The group you are looking for does not exist or was deleted.',
         },
         toasts: {
@@ -1826,7 +1823,7 @@ export const en: AppDict = {
           contactoPlaceholder: 'Search employee…',
           contratoTipo: 'Contract type',
           cargo: 'Role',
-          grupo: 'Payroll group',
+          grupo: 'Group',
           sucursal: 'Branch',
           tiempo: 'Time',
           fechaDesde: 'Start date',
