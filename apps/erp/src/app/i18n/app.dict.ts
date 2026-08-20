@@ -1091,7 +1091,9 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string; contabilizacion: string };
+        groups: { identificacion: string; depreciacion: string; vida: string };
+        dadoDeBaja: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1242,7 +1244,8 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        groups: { asignacion: string; saldo: string; cuotas: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1287,7 +1290,10 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        groups: { asignacion: string; valores: string; condiciones: string };
+        labels: { programacion: string };
+        activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };

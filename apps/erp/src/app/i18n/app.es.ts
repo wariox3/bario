@@ -1472,7 +1472,13 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Activo fijo',
+        sections: { general: 'Información general', contabilizacion: 'Contabilización' },
+        groups: {
+          identificacion: 'Identificación',
+          depreciacion: 'Depreciación',
+          vida: 'Compra y vida útil',
+        },
+        dadoDeBaja: 'Dado de baja',
         notFound: {
           title: 'Activo no encontrado',
           desc: 'El activo que buscás no existe o fue eliminado.',
@@ -1698,7 +1704,8 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Crédito',
+        sections: { general: 'Información general' },
+        groups: { asignacion: 'Asignación', saldo: 'Saldo', cuotas: 'Cuotas' },
         notFound: {
           title: 'Crédito no encontrado',
           desc: 'El crédito que buscás no existe o fue eliminado.',
@@ -1754,7 +1761,10 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Adicional',
+        sections: { general: 'Información general' },
+        groups: { asignacion: 'Asignación', valores: 'Valores', condiciones: 'Condiciones' },
+        labels: { programacion: 'Programación' },
+        activo: 'Activo',
         notFound: {
           title: 'Adicional no encontrado',
           desc: 'El adicional que buscás no existe o fue eliminado.',

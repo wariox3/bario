@@ -1433,7 +1433,13 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Fixed asset',
+        sections: { general: 'General information', contabilizacion: 'Accounting' },
+        groups: {
+          identificacion: 'Identification',
+          depreciacion: 'Depreciation',
+          vida: 'Purchase and useful life',
+        },
+        dadoDeBaja: 'Written off',
         notFound: {
           title: 'Asset not found',
           desc: 'The asset you are looking for does not exist or was deleted.',
@@ -1647,7 +1653,8 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Credit',
+        sections: { general: 'General information' },
+        groups: { asignacion: 'Assignment', saldo: 'Balance', cuotas: 'Instalments' },
         notFound: {
           title: 'Credit not found',
           desc: 'The credit you are looking for does not exist or was deleted.',
@@ -1706,7 +1713,10 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Additional',
+        sections: { general: 'General information' },
+        groups: { asignacion: 'Assignment', valores: 'Values', condiciones: 'Conditions' },
+        labels: { programacion: 'Payroll run' },
+        activo: 'Active',
         notFound: {
           title: 'Additional not found',
           desc: 'The additional you are looking for does not exist or was deleted.',

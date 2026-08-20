@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
 import { I18nService, TenantService, ToastService, formatCop, fromIsoDate } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
@@ -25,7 +24,7 @@ import type { Contrato } from '../../contrato.model';
 @Component({
   selector: 'app-contrato-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   providers: [DialogService],
   templateUrl: './contrato-detail.component.html',
   styleUrl: './contrato-detail.component.scss',
