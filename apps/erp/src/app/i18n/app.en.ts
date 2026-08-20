@@ -983,11 +983,8 @@ export const en: AppDict = {
           cuentas: 'Accounting accounts',
         },
         groups: { identificacion: 'Identification', clasificacion: 'Classification' },
-        opciones: { imagenes: 'Images', archivos: 'Files' },
-        opcionesHint: {
-          imagenes: 'Item photos, beyond the main one',
-          archivos: 'Documents attached to this item',
-        },
+        opciones: { imagenes: 'Images' },
+        opcionesHint: { imagenes: 'Item photos, beyond the main one' },
         labels: {
           impuestosVenta: 'Sales taxes',
           impuestosCompra: 'Purchase taxes',

@@ -288,11 +288,11 @@
 }
 
 <app-archivos-dialog
-  [visible]="archivosModo() !== null"
+  [visible]="imagenesVisible()"
   (visibleChange)="onArchivosVisibleChange($event)"
   [owner]="archivosOwner()"
-  [title]="archivosTitulo()"
-  [subtitle]="archivosSubtitulo()"
-  [accept]="archivosAccept()"
-  [archivoTipo]="archivosTipo()"
+  [title]="t().entities.item.detail.opciones.imagenes"
+  [subtitle]="t().entities.item.detail.opcionesHint.imagenes"
+  [accept]="archivosAccept"
+  [archivoTipo]="archivosTipo"
 />

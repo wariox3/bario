@@ -40,14 +40,6 @@ interface ItemFlag {
 }
 
 /**
- * Qué administra el diálogo de archivos abierto. Los dos comparten componente y
- * registro dueño, y se distinguen por el tipo de archivo del backend: la galería
- * de imágenes del ítem (tipo 2, restringida a png/jpg) y sus adjuntos de
- * cualquier extensión (tipo 1). `null` = cerrado.
- */
-type ArchivosModo = 'imagenes' | 'archivos';
-
-/**
  * Cuenta contable mostrable: etiqueta i18n + valor `código - nombre`.
  * `value` es `null` cuando el ítem no tiene esa cuenta asignada — la fila se
  * pinta igual, con una raya.
@@ -105,8 +97,8 @@ export class ItemDetailComponent implements OnInit {
   protected readonly notFound = signal(false);
   protected readonly isSavingImage = signal(false);
 
-  /** Diálogo de archivos abierto, o `null`. Ver `ArchivosModo`. */
-  protected readonly archivosModo = signal<ArchivosModo | null>(null);
+  /** Visibilidad de la galería de imágenes del ítem. */
+  protected readonly imagenesVisible = signal(false);
 
   private readonly opcionesMenu = viewChild.required<Menu>('opcionesMenu');
 
@@ -115,21 +107,13 @@ export class ItemDetailComponent implements OnInit {
    * entre change detections: con un modelo nuevo en cada CD, `p-menu` pierde el
    * primer click. Solo cambia al cambiar de idioma.
    */
-  protected readonly opcionesItems = computed<MenuItem[]>(() => {
-    const dict = this.t().entities.item.detail.opciones;
-    return [
-      {
-        label: dict.imagenes,
-        icon: 'pi pi-images',
-        command: () => this.archivosModo.set('imagenes'),
-      },
-      {
-        label: dict.archivos,
-        icon: 'pi pi-folder',
-        command: () => this.archivosModo.set('archivos'),
-      },
-    ];
-  });
+  protected readonly opcionesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.item.detail.opciones.imagenes,
+      icon: 'pi pi-images',
+      command: () => this.imagenesVisible.set(true),
+    },
+  ]);
 
   /** Dueño de los archivos: este ítem. `null` hasta que la ficha carga. */
   protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
@@ -138,26 +122,13 @@ export class ItemDetailComponent implements OnInit {
   });
 
   /**
-   * Config del diálogo según el modo abierto. Las imágenes se acotan a los
-   * formatos que el backend acepta como tal (tipo 2); los adjuntos no se acotan.
+   * La galería del ítem administra el tipo **imagen** del backend: lista y sube
+   * solo esas, y por eso el picker se acota a los formatos que el backend acepta
+   * como tal. La imagen principal es otra cosa —vive en el encabezado y va por
+   * `item/cargar-imagen/`—; esta guarda las demás fotos del ítem.
    */
-  protected readonly archivosTipo = computed(() =>
-    this.archivosModo() === 'imagenes' ? ARCHIVO_TIPO.IMAGEN : ARCHIVO_TIPO.ADJUNTO,
-  );
-
-  protected readonly archivosAccept = computed(() =>
-    this.archivosModo() === 'imagenes' ? '.png,.jpg,.jpeg' : '',
-  );
-
-  protected readonly archivosTitulo = computed(() => {
-    const dict = this.t().entities.item.detail.opciones;
-    return this.archivosModo() === 'imagenes' ? dict.imagenes : dict.archivos;
-  });
-
-  protected readonly archivosSubtitulo = computed(() => {
-    const dict = this.t().entities.item.detail.opcionesHint;
-    return this.archivosModo() === 'imagenes' ? dict.imagenes : dict.archivos;
-  });
+  protected readonly archivosTipo = ARCHIVO_TIPO.IMAGEN;
+  protected readonly archivosAccept = '.png,.jpg,.jpeg';
 
   /** Migas: módulo General → listado de items → nombre del item abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -257,9 +228,8 @@ export class ItemDetailComponent implements OnInit {
     this.opcionesMenu().toggle(event);
   }
 
-  /** El diálogo cierra solo: al bajar `visible`, el modo vuelve a `null`. */
   protected onArchivosVisibleChange(visible: boolean): void {
-    if (!visible) this.archivosModo.set(null);
+    this.imagenesVisible.set(visible);
   }
 
   protected onBack(): void {

@@ -766,9 +766,9 @@ export interface AppDict
         /** Micro-encabezados de los grupos de la card de información general. */
         groups: { identificacion: string; clasificacion: string };
         /** Entradas del menú "Opciones" del detalle. */
-        opciones: { imagenes: string; archivos: string };
-        /** Subtítulos de los dos diálogos de archivos del ítem. */
-        opcionesHint: { imagenes: string; archivos: string };
+        /** Entrada del menú "Opciones" y su subtítulo en el diálogo. */
+        opciones: { imagenes: string };
+        opcionesHint: { imagenes: string };
         labels: { impuestosVenta: string; impuestosCompra: string; sinImpuestos: string };
         notFound: { title: string; desc: string };
         toasts: {

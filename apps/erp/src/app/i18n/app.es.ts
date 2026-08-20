@@ -999,11 +999,8 @@ export const es: AppDict = {
           cuentas: 'Cuentas contables',
         },
         groups: { identificacion: 'Identificación', clasificacion: 'Clasificación' },
-        opciones: { imagenes: 'Imágenes', archivos: 'Archivos' },
-        opcionesHint: {
-          imagenes: 'Fotos del ítem, además de la principal',
-          archivos: 'Documentos adjuntos a este ítem',
-        },
+        opciones: { imagenes: 'Imágenes' },
+        opcionesHint: { imagenes: 'Fotos del ítem, además de la principal' },
         labels: {
           impuestosVenta: 'Impuestos de venta',
           impuestosCompra: 'Impuestos de compra',
