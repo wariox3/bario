@@ -8,6 +8,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import {
+  CIUDAD_FUENTE,
   FormErrorService,
   I18nService,
   TenantService,
@@ -15,9 +16,8 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { CiudadAutocompleteComponent, FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
-import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import { EmpleadoAutocompleteComponent } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
 import type { EmpleadoOption } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
 import type { ErpSelectOption } from '@reddoc/core';
@@ -36,8 +36,8 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
  *
  * Todas las FK están cableadas a sus endpoints `seleccionar/` vía `<lib-api-select>`
  * (`contacto` usa `<app-empleado-autocomplete>`, que pinta la identificación al lado;
- * `ciudad_contrato` / `ciudad_labora` usan `<lib-api-autocomplete>` con búsqueda contra
- * `/general/ciudad/seleccionar/`). Las FK de humano apuntan a `/humano/<slug>/seleccionar/`
+ * `ciudad_contrato` / `ciudad_labora` usan `<lib-ciudad-autocomplete>`, que muestra el
+ * departamento para desambiguar municipios homónimos). Las FK de humano apuntan a `/humano/<slug>/seleccionar/`
  * y `centro_costo` a `/contabilidad/centro-costo/seleccionar/`. Las cuatro entidades de
  * seguridad social (`entidad_salud`, `entidad_pension`, `entidad_cesantias`, `entidad_caja`)
  * comparten el endpoint `/humano/entidad/seleccionar/` discriminado por el query param
@@ -63,8 +63,8 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
     FieldErrorComponent,
     PageActionsComponent,
     ErpApiSelectComponent,
-    ErpApiAutocompleteComponent,
     EmpleadoAutocompleteComponent,
+    CiudadAutocompleteComponent,
   ],
   templateUrl: './contrato-form.component.html',
   styleUrl: './contrato-form.component.scss',
@@ -81,6 +81,9 @@ export class ContratoFormComponent implements OnInit {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  /** Ciudades dentro del tenant: el ERP siempre trabaja dentro de uno. */
+  protected readonly ciudadFuente = CIUDAD_FUENTE.erp;
 
   /** Endpoints `seleccionar` de catálogos compartidos, para los `<app-api-*>` del template. */
   protected readonly endpoints = SELECT_ENDPOINTS;

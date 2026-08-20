@@ -166,10 +166,10 @@
           <label for="ciudad" class="empleado-form__label">
             {{ f.fields.ciudad }}<span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-ciudad-autocomplete
             inputId="ciudad"
             formControlName="ciudad"
-            [endpoint]="endpoints.ciudad"
+            [fuente]="ciudadFuente"
             [placeholder]="f.fields.ciudadPlaceholder"
             [invalid]="form.controls.ciudad.invalid && form.controls.ciudad.touched"
           />

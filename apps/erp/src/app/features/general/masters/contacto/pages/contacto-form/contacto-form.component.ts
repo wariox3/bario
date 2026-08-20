@@ -15,8 +15,14 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent, PageActionsComponent, SoloDigitosDirective } from '@reddoc/ui';
 import {
+  CiudadAutocompleteComponent,
+  FieldErrorComponent,
+  PageActionsComponent,
+  SoloDigitosDirective,
+} from '@reddoc/ui';
+import {
+  CIUDAD_FUENTE,
   FormErrorService,
   I18nService,
   SELECT_ENDPOINTS,
@@ -59,6 +65,7 @@ import {
     ErpAsesorSelectComponent,
     ErpApiAutocompleteComponent,
     SoloDigitosDirective,
+    CiudadAutocompleteComponent,
   ],
   templateUrl: './contacto-form.component.html',
   styleUrl: './contacto-form.component.scss',
@@ -75,6 +82,9 @@ export class ContactoFormComponent implements OnInit {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  /** Ciudades dentro del tenant: el ERP siempre trabaja dentro de uno. */
+  protected readonly ciudadFuente = CIUDAD_FUENTE.erp;
 
   /** Endpoints `seleccionar` de catálogos compartidos, para los `<app-api-*>` del template. */
   protected readonly endpoints = SELECT_ENDPOINTS;

@@ -446,10 +446,10 @@
             {{ t().entities.contrato.form.fields.ciudadContrato }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-ciudad-autocomplete
             inputId="ciudad_contrato"
             formControlName="ciudad_contrato"
-            [endpoint]="endpoints.ciudad"
+            [fuente]="ciudadFuente"
             [placeholder]="t().entities.contrato.form.fields.ciudadPlaceholder"
             [invalid]="
               form.controls.ciudad_contrato.invalid && form.controls.ciudad_contrato.touched
@@ -462,10 +462,10 @@
             {{ t().entities.contrato.form.fields.ciudadLabora }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-ciudad-autocomplete
             inputId="ciudad_labora"
             formControlName="ciudad_labora"
-            [endpoint]="endpoints.ciudad"
+            [fuente]="ciudadFuente"
             [placeholder]="t().entities.contrato.form.fields.ciudadPlaceholder"
             [invalid]="form.controls.ciudad_labora.invalid && form.controls.ciudad_labora.touched"
           />

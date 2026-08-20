@@ -10,7 +10,21 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
-import { Ciudad, CiudadService } from '@reddoc/core';
+import { CIUDAD_FUENTE, Ciudad, CiudadFuente, CiudadService, formatCiudad } from '@reddoc/core';
+
+/**
+ * Ciudad lista para el desplegable: la del catálogo más la `etiqueta` que ve el
+ * usuario (`Albania — La Guajira`). El valor que viaja al formulario la conserva,
+ * así el campo muestra el departamento tanto al elegir como al reabrir.
+ */
+export interface CiudadOpcion extends Ciudad {
+  readonly etiqueta: string;
+}
+
+/** Agrega la etiqueta visible a una ciudad del catálogo. */
+function aOpcion(ciudad: Ciudad): CiudadOpcion {
+  return { ...ciudad, etiqueta: formatCiudad(ciudad.nombre, ciudad.departamento_nombre) };
+}
 
 @Component({
   selector: 'lib-ciudad-autocomplete',
@@ -29,7 +43,7 @@ import { Ciudad, CiudadService } from '@reddoc/core';
         (onBlur)="onTouchedFn()"
         [suggestions]="suggestions()"
         (completeMethod)="onSearch($event)"
-        [optionLabel]="'nombre'"
+        [optionLabel]="'etiqueta'"
         [forceSelection]="true"
         [minLength]="2"
         [delay]="300"
@@ -43,10 +57,19 @@ import { Ciudad, CiudadService } from '@reddoc/core';
         styleClass="w-full"
         inputStyleClass="w-full !pl-9"
       >
+        <!-- El departamento en segunda línea es lo que separa a las tres
+             «Albania» del país: sin él, la lista muestra opciones idénticas. -->
         <ng-template pTemplate="item" let-ciudad>
           <div class="flex items-center gap-2 py-0.5">
             <i class="pi pi-map-marker text-[0.7rem] text-brand-muted"></i>
-            <span class="text-[0.85rem] text-brand-text">{{ ciudad.nombre }}</span>
+            <span class="flex min-w-0 flex-col">
+              <span class="text-[0.85rem] leading-tight text-brand-text">{{ ciudad.nombre }}</span>
+              @if (ciudad.departamento_nombre) {
+                <span class="text-[0.72rem] leading-tight text-brand-muted">
+                  {{ ciudad.departamento_nombre }}
+                </span>
+              }
+            </span>
           </div>
         </ng-template>
         <ng-template pTemplate="empty">
@@ -70,22 +93,32 @@ export class CiudadAutocompleteComponent implements ControlValueAccessor {
   private readonly ciudadService = inject(CiudadService);
   private readonly destroyRef = inject(DestroyRef);
 
+  /**
+   * De dónde traer las ciudades. Default: el catálogo global, que es el que
+   * sirve a la app de cuenta; el ERP pasa `CIUDAD_FUENTE.erp`.
+   */
+  readonly fuente = input<CiudadFuente>(CIUDAD_FUENTE.contenedor);
+
   readonly placeholder = input<string>('Buscar ciudad…');
   readonly inputId = input<string>('');
   readonly invalid = input<boolean>(false);
 
-  readonly value = signal<Ciudad | null>(null);
+  readonly value = signal<CiudadOpcion | null>(null);
   readonly disabled = signal(false);
-  readonly suggestions = signal<Ciudad[]>([]);
+  readonly suggestions = signal<CiudadOpcion[]>([]);
 
-  private onChangeFn: (value: Ciudad | null) => void = () => undefined;
+  private onChangeFn: (value: CiudadOpcion | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
 
+  /**
+   * El valor guardado llega con el `nombre` que el registro tenga; se le calcula
+   * la `etiqueta` para que el input muestre lo mismo al reabrir que al elegir.
+   */
   writeValue(value: Ciudad | null): void {
-    this.value.set(value ?? null);
+    this.value.set(value ? aOpcion(value) : null);
   }
 
-  registerOnChange(fn: (value: Ciudad | null) => void): void {
+  registerOnChange(fn: (value: CiudadOpcion | null) => void): void {
     this.onChangeFn = fn;
   }
 
@@ -97,7 +130,7 @@ export class CiudadAutocompleteComponent implements ControlValueAccessor {
     this.disabled.set(isDisabled);
   }
 
-  onValueChange(next: Ciudad | null): void {
+  onValueChange(next: CiudadOpcion | null): void {
     this.value.set(next);
     this.onChangeFn(next);
   }
@@ -105,10 +138,10 @@ export class CiudadAutocompleteComponent implements ControlValueAccessor {
   onSearch(event: AutoCompleteCompleteEvent): void {
     const query = event.query?.trim() ?? '';
     this.ciudadService
-      .search(query)
+      .search(query, this.fuente())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (items) => this.suggestions.set(items),
+        next: (items) => this.suggestions.set(items.map(aOpcion)),
         error: () => this.suggestions.set([]),
       });
   }

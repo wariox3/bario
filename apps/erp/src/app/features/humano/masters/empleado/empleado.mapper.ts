@@ -27,7 +27,13 @@ export function empleadoToFormValue(c: Empleado): Partial<EmpleadoFormRawValue> 
     apellido2: c.apellido2 ?? '',
     telefono: c.telefono ?? '',
     celular: c.celular ?? '',
-    ciudad: { id: c.ciudad, nombre: c.ciudad_nombre },
+    // Ver el mapper de contacto: el departamento acompaña a la ciudad para que
+    // el campo la muestre completa al reabrir el registro.
+    ciudad: {
+      id: c.ciudad,
+      nombre: c.ciudad_nombre,
+      departamento_nombre: c.departamento_nombre ?? null,
+    },
     direccion: c.direccion ?? '',
     barrio: c.barrio ?? '',
     correo: c.correo ?? '',
