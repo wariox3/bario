@@ -1118,7 +1118,7 @@ export const es: AppDict = {
       },
     },
     grupo: {
-      name: 'Grupos',
+      name: 'Grupos de nómina',
       searchPlaceholder: 'Buscar por nombre…',
       columns: {
         id: 'ID',
@@ -1127,10 +1127,10 @@ export const es: AppDict = {
       },
       periodos: { 1: 'Quincenal', 2: 'Mensual' },
       form: {
-        createTitle: 'Nuevo grupo',
-        editTitle: 'Editar grupo',
-        createSubtitle: 'Completá la información del grupo',
-        editSubtitle: 'Modificá la información del grupo',
+        createTitle: 'Nuevo grupo de nómina',
+        editTitle: 'Editar grupo de nómina',
+        createSubtitle: 'Completá la información del grupo de nómina',
+        editSubtitle: 'Modificá la información del grupo de nómina',
         fields: {
           nombre: 'Nombre',
           periodo: 'Período',
@@ -1138,9 +1138,12 @@ export const es: AppDict = {
         },
         validation: { required: 'Este campo es requerido' },
         toasts: {
-          createSuccess: { title: 'Grupo creado', desc: 'El grupo se creó correctamente' },
+          createSuccess: {
+            title: 'Grupo de nómina creado',
+            desc: 'El grupo se creó correctamente',
+          },
           editSuccess: {
-            title: 'Grupo actualizado',
+            title: 'Grupo de nómina actualizado',
             desc: 'Los cambios se guardaron correctamente',
           },
           createError: { title: 'Error al crear', desc: 'No se pudo crear el grupo' },
@@ -1151,8 +1154,8 @@ export const es: AppDict = {
       detail: {
         sections: { general: 'Información general' },
         notFound: {
-          title: 'Grupo no encontrado',
-          desc: 'El grupo que buscás no existe o fue eliminado.',
+          title: 'Grupo de nómina no encontrado',
+          desc: 'El grupo de nómina que buscás no existe o fue eliminado.',
         },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el grupo' },
@@ -1861,7 +1864,7 @@ export const es: AppDict = {
           contactoPlaceholder: 'Buscar empleado…',
           contratoTipo: 'Tipo de contrato',
           cargo: 'Cargo',
-          grupo: 'Grupo',
+          grupo: 'Grupo de nómina',
           sucursal: 'Sucursal',
           tiempo: 'Tiempo',
           fechaDesde: 'Fecha desde',
