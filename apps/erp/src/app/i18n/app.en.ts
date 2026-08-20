@@ -1518,6 +1518,10 @@ export const en: AppDict = {
     empleado: {
       name: 'Employees',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import employees',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         id: 'ID',
         identificacion: 'ID number',

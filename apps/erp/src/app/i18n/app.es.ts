@@ -1569,6 +1569,10 @@ export const es: AppDict = {
     empleado: {
       name: 'Empleados',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar empleados',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
         id: 'ID',
         identificacion: 'Identificación',

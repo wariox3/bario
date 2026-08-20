@@ -1133,6 +1133,7 @@ export interface AppDict
     empleado: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         identificacion: string;
