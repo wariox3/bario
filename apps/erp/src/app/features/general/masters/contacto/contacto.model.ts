@@ -48,18 +48,24 @@ export interface Contacto {
   readonly responsabilidad: number | null;
   readonly responsabilidad_nombre: string | null;
   /**
-   * Nombres de los FK comerciales que el endpoint de detalle (`getById`)
-   * acompaña al id. Opcionales: el shape de lista no los trae. Las claves
-   * siguen la convención `<campo>_nombre`; verificar contra una respuesta real
-   * si alguno llega vacío en la ficha de detalle.
+   * Nombres de los FK que **solo el detalle** (`getById`) acompaña al id: el
+   * serializador de lista no los trae, por eso son opcionales. Verificados
+   * contra una respuesta real del backend.
+   *
+   * Ojo con el asesor: no sigue la convención `<campo>_nombre` de los demás,
+   * porque un asesor es un contacto y lo que se muestra es su `nombre_corto`.
    */
   readonly plazo_pago_nombre?: string | null;
   readonly precio_nombre?: string | null;
-  readonly asesor_nombre?: string | null;
-  readonly cuenta_banco_clase_nombre?: string | null;
+  readonly asesor_nombre_corto?: string | null;
   readonly plazo_pago_proveedor_nombre?: string | null;
   readonly departamento_nombre?: string | null;
-  readonly activo?: boolean;
+  /**
+   * **No** viene en la respuesta de detalle de hoy, aunque `cuenta_banco_clase`
+   * sí: las fichas que lo muestran caen a «—». Pendiente de que el backend lo
+   * agregue al serializador.
+   */
+  readonly cuenta_banco_clase_nombre?: string | null;
 }
 
 /** Payload para crear o actualizar un contacto. */

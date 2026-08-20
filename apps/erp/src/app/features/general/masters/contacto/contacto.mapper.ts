@@ -37,7 +37,7 @@ export function contactoToFormValue(c: Contacto): Partial<ContactoFormRawValue> 
     empleado: c.empleado,
     plazo_pago: c.plazo_pago != null ? { id: c.plazo_pago, nombre: '' } : null,
     precio: c.precio != null ? { id: c.precio, nombre: '' } : null,
-    asesor: c.asesor != null ? { id: c.asesor, nombre: c.asesor_nombre ?? '' } : null,
+    asesor: c.asesor != null ? { id: c.asesor, nombre: c.asesor_nombre_corto ?? '' } : null,
     correo_facturacion_electronica: c.correo_facturacion_electronica ?? '',
     banco: c.banco != null ? { id: c.banco, nombre: c.banco_nombre ?? '' } : null,
     numero_cuenta: c.numero_cuenta ?? '',

@@ -293,9 +293,9 @@
           <dt class="contacto-detail__label">{{ t().entities.contacto.form.fields.asesor }}</dt>
           <dd
             class="contacto-detail__value"
-            [class.contacto-detail__value--empty]="!c.asesor_nombre"
+            [class.contacto-detail__value--empty]="!c.asesor_nombre_corto"
           >
-            {{ c.asesor_nombre || '—' }}
+            {{ c.asesor_nombre_corto || '—' }}
           </dd>
         </div>
         <div class="flex flex-col gap-0.5">
