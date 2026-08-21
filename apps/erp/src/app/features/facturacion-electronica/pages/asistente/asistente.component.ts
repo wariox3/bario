@@ -75,6 +75,10 @@ export class AsistenteComponent {
   protected readonly emisor = signal<number | null | undefined>(undefined);
 
   constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.copiadoTimer) clearTimeout(this.copiadoTimer);
+    });
+
     effect(() => {
       if (this.activeStep().id !== 'empresa') return;
       this.cargarEmisor();
@@ -101,6 +105,32 @@ export class AsistenteComponent {
    * trabajar — el backend rechaza igual si el alta ya existe.
    */
   protected readonly tieneEmisor = computed(() => typeof this.emisor() === 'number');
+
+  /** Feedback efímero del botón de copiar: el ícono pasa a visto y vuelve. */
+  protected readonly emisorCopiado = signal(false);
+  private copiadoTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Copia el id del emisor al portapapeles.
+   *
+   * Es el número que el usuario va a tener que citarle a soporte, y
+   * transcribirlo a mano de la pantalla es justo donde se equivoca.
+   */
+  protected copiarEmisor(): void {
+    const emisor = this.emisor();
+    if (typeof emisor !== 'number') return;
+
+    void navigator.clipboard
+      .writeText(String(emisor))
+      .then(() => {
+        this.emisorCopiado.set(true);
+        if (this.copiadoTimer) clearTimeout(this.copiadoTimer);
+        this.copiadoTimer = setTimeout(() => this.emisorCopiado.set(false), 2000);
+      })
+      // Sin portapapeles (contexto inseguro o permiso denegado) el número sigue
+      // a la vista para copiarlo a mano; no vale un toast por eso.
+      .catch(() => undefined);
+  }
 
   protected isCompletado(id: AsistenteStepId): boolean {
     return this.completados().has(id);

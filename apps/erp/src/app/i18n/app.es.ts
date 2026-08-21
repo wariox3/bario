@@ -5760,6 +5760,8 @@ export const es: AppDict = {
       emisorCreado: {
         title: 'Tu empresa ya está registrada para facturar electrónicamente',
         desc: 'Estos datos ya se enviaron al proveedor, así que no se pueden cambiar desde acá. Si algo quedó mal, escribinos.',
+        emisorLabel: 'Emisor',
+        copiar: 'Copiar el id del emisor',
       },
       pendiente: { title: 'Este paso todavía no está disponible' },
       actions: { guardarYContinuar: 'Guardar y continuar', continuar: 'Continuar' },

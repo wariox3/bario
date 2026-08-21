@@ -5701,6 +5701,8 @@ export const en: AppDict = {
       emisorCreado: {
         title: 'Your company is already registered for electronic invoicing',
         desc: 'These details were already sent to the provider, so they cannot be changed here. Contact us if something is wrong.',
+        emisorLabel: 'Issuer',
+        copiar: 'Copy issuer id',
       },
       pendiente: { title: 'This step is not available yet' },
       actions: { guardarYContinuar: 'Save and continue', continuar: 'Continue' },

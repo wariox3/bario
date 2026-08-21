@@ -4463,7 +4463,7 @@ export interface AppDict
         toasts: { success: { title: string; desc: string } };
       };
       /** Aviso de solo lectura cuando la empresa ya es emisor. */
-      emisorCreado: { title: string; desc: string };
+      emisorCreado: { title: string; desc: string; emisorLabel: string; copiar: string };
       /** Panel de un paso todavía sin contenido. */
       pendiente: { title: string };
       actions: { guardarYContinuar: string; continuar: string };
