@@ -39,12 +39,10 @@ export const VENTA_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(VENTA_MODULE),
       {
-        // Inicio del módulo (vacío por ahora — sin endpoints de estadísticas).
+        // Inicio del módulo: hoy solo la invitación a facturar electrónicamente.
         path: 'inicio',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
+          import('./inicio/venta-inicio.component').then((m) => m.VentaInicioComponent),
       },
       {
         path: 'pedido-cliente',

@@ -1,0 +1,38 @@
+<!--
+  Invitación a facturar electrónicamente.
+
+  Tira horizontal, no card de empty-state centrada: el operador entró a Venta a
+  trabajar, no a hacer onboarding. Chip de ícono + copy a la izquierda y la
+  acción a la derecha se leen en una barrida y dejan libre el resto del inicio.
+  Idioma de las fichas del ERP (borders-only, chip sky, radius 12px) — nada de
+  banda de alerta: no hay nada roto, hay algo disponible.
+-->
+@if (mostrarInvitacion()) {
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-4">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file-check text-[1rem]" aria-hidden="true"></i>
+      </span>
+
+      <div class="min-w-[15rem] flex-1">
+        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+          {{ t().inicio.venta.facturaElectronica.title }}
+        </h2>
+        <p class="m-0 mt-0.5 text-[0.8rem] leading-relaxed text-brand-muted">
+          {{ t().inicio.venta.facturaElectronica.desc }}
+        </p>
+      </div>
+
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [label]="t().inicio.venta.facturaElectronica.actions.completar"
+        (onClick)="onCompletar()"
+      />
+    </div>
+  </section>
+}

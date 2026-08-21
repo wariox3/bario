@@ -4440,6 +4440,16 @@ export interface AppDict
       };
     };
   };
+  /** Copy de los inicios (landing) de cada módulo. */
+  inicio: {
+    venta: {
+      facturaElectronica: {
+        title: string;
+        desc: string;
+        actions: { completar: string };
+      };
+    };
+  };
   seguridad: {
     title: string;
     menu: { usuarios: string };

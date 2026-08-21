@@ -5672,6 +5672,15 @@ export const en: AppDict = {
       },
     },
   },
+  inicio: {
+    venta: {
+      facturaElectronica: {
+        title: 'Electronic invoicing',
+        desc: 'Complete your company information and start invoicing electronically.',
+        actions: { completar: 'Complete' },
+      },
+    },
+  },
   seguridad: {
     title: 'Security',
     menu: { usuarios: 'Users' },

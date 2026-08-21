@@ -5731,6 +5731,15 @@ export const es: AppDict = {
       },
     },
   },
+  inicio: {
+    venta: {
+      facturaElectronica: {
+        title: 'Facturación electrónica',
+        desc: 'Completa la información de tu empresa y empieza a facturar electrónicamente.',
+        actions: { completar: 'Completar' },
+      },
+    },
+  },
   seguridad: {
     title: 'Seguridad',
     menu: { usuarios: 'Usuarios' },
