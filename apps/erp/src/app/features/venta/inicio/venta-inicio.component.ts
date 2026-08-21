@@ -1,7 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
-import { I18nService } from '@reddoc/core';
+import { I18nService, TenantService } from '@reddoc/core';
 import { ParametroService } from '@erp/core/services/parametro.service';
 import type { AppDict } from '@erp/i18n';
 
@@ -25,6 +26,8 @@ import type { AppDict } from '@erp/i18n';
 export class VentaInicioComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly parametro = inject(ParametroService);
+  private readonly tenant = inject(TenantService);
+  private readonly router = inject(Router);
 
   protected readonly t = this.i18n.t;
 
@@ -52,8 +55,13 @@ export class VentaInicioComponent {
       });
   }
 
+  /**
+   * Al asistente de facturación electrónica, que vive fuera del módulo: lo que
+   * completa son datos de la **empresa**, no de Venta.
+   */
   protected onCompletar(): void {
-    // TODO(producto): destino pendiente de definir (¿pestaña Empresa de
-    // configuración, wizard propio?). Se decide en el siguiente paso.
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate(['/t', slug, 'facturacion-electronica']);
   }
 }

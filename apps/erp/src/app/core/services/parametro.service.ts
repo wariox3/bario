@@ -42,18 +42,36 @@ export class ParametroService extends BaseHttpService {
   }
 
   /**
-   * ¿La facturación electrónica ya está activa en este contenedor?
+   * Consulta silenciosa: igual que `getCampos` pero con `errorToast: false`.
    *
-   * Sonda de fondo: viaja con `errorToast: false` porque quien la consulta la
-   * usa para decidir si ofrece algo, no para mostrar datos. Si falla, el
-   * llamador degrada — no tiene sentido interrumpir la pantalla con un toast
-   * por una invitación que simplemente no se muestra.
+   * La usan las sondas de abajo, que sirven para **decidir si ofrecer algo**, no
+   * para mostrar datos. Si fallan, el llamador degrada: no tiene sentido
+   * interrumpir la pantalla con un toast por algo que el usuario no pidió ver.
    */
-  facturaElectronicaActiva(): Observable<boolean> {
+  private sonda(campos: readonly ParametroCampo[]): Observable<Partial<ParametroRead>> {
     return this.get<Partial<ParametroRead>>(
       `${this.resourcePath}campos/`,
-      { campos: 'gen_factura_electronica_activa' },
+      { campos: campos.join(',') },
       { errorToast: false },
-    ).pipe(map((parametro) => parametro.gen_factura_electronica_activa === true));
+    );
+  }
+
+  /** ¿La facturación electrónica ya está activa en este contenedor? */
+  facturaElectronicaActiva(): Observable<boolean> {
+    return this.sonda(['gen_factura_electronica_activa']).pipe(
+      map((parametro) => parametro.gen_factura_electronica_activa === true),
+    );
+  }
+
+  /**
+   * Emisor con el que el contenedor quedó habilitado ante la DIAN.
+   *
+   * `null` = consultado y todavía no hay emisor. El campo es de solo lectura:
+   * lo escribe el flujo de habilitación, nunca el front.
+   */
+  facturaElectronicaEmisor(): Observable<number | null> {
+    return this.sonda(['gen_factura_electronica_emisor']).pipe(
+      map((parametro) => parametro.gen_factura_electronica_emisor ?? null),
+    );
   }
 }

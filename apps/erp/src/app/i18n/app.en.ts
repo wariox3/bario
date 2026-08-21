@@ -5672,6 +5672,40 @@ export const en: AppDict = {
       },
     },
   },
+  facturacionElectronica: {
+    asistente: {
+      eyebrow: 'Setup',
+      title: 'Electronic invoicing',
+      subtitle: 'Complete your company details to start issuing.',
+      pasos: {
+        empresa: { label: 'Company details', hint: 'Identity, contact and location' },
+        emisor: { label: 'Electronic invoicing', hint: 'DIAN enablement' },
+        resolucion: { label: 'Resolution', hint: 'Authorized invoice numbering' },
+        finalizar: { label: 'Finish', hint: 'Review and activation' },
+      },
+      crearEmisor: {
+        confirm: {
+          header: 'Register your company',
+          subtitle: 'With the electronic invoicing provider',
+          intro: 'Your details are saved. We will register your company with this identity:',
+          warning: 'Once registered, these details cannot be changed from the ERP.',
+          accept: 'Register',
+        },
+        toasts: {
+          success: {
+            title: 'Company registered',
+            desc: 'You can now continue with electronic invoicing.',
+          },
+        },
+      },
+      emisorCreado: {
+        title: 'Your company is already registered for electronic invoicing',
+        desc: 'These details were already sent to the provider, so they cannot be changed here. Contact us if something is wrong.',
+      },
+      pendiente: { title: 'This step is not available yet' },
+      actions: { guardarYContinuar: 'Save and continue', continuar: 'Continue' },
+    },
+  },
   inicio: {
     venta: {
       facturaElectronica: {

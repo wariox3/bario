@@ -67,6 +67,17 @@ export const appRoutes: Route[] = [
           ),
       },
       {
+        path: 'facturacion-electronica',
+        // Ruta global (no-módulo): limpia el módulo activo para ocultar el
+        // sidebar. Configura la empresa, no un módulo — se entra desde el
+        // inicio de Venta, pero no pertenece a Venta.
+        resolve: { _module: erpModuleResolver(null) },
+        loadChildren: () =>
+          import('./features/facturacion-electronica/facturacion-electronica.routes').then(
+            (m) => m.FACTURACION_ELECTRONICA_ROUTES,
+          ),
+      },
+      {
         path: 'seguridad',
         // Administrar el contenedor es de propietario/administrador; el user-menu
         // ya la esconde, esto cierra la puerta de la URL directa.

@@ -5731,6 +5731,40 @@ export const es: AppDict = {
       },
     },
   },
+  facturacionElectronica: {
+    asistente: {
+      eyebrow: 'Asistente',
+      title: 'Facturación electrónica',
+      subtitle: 'Completa los datos de tu empresa para empezar a emitir.',
+      pasos: {
+        empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
+        emisor: { label: 'Facturación electrónica', hint: 'Habilitación ante la DIAN' },
+        resolucion: { label: 'Resolución', hint: 'Numeración autorizada para facturar' },
+        finalizar: { label: 'Terminar', hint: 'Revisión y activación' },
+      },
+      crearEmisor: {
+        confirm: {
+          header: 'Registrar tu empresa',
+          subtitle: 'Ante el proveedor de facturación electrónica',
+          intro: 'Guardamos tus datos. Vamos a dar de alta tu empresa con esta identidad:',
+          warning: 'Una vez registrada, estos datos no se pueden cambiar desde el ERP.',
+          accept: 'Registrar',
+        },
+        toasts: {
+          success: {
+            title: 'Empresa registrada',
+            desc: 'Ya podés continuar con la facturación electrónica.',
+          },
+        },
+      },
+      emisorCreado: {
+        title: 'Tu empresa ya está registrada para facturar electrónicamente',
+        desc: 'Estos datos ya se enviaron al proveedor, así que no se pueden cambiar desde acá. Si algo quedó mal, escribinos.',
+      },
+      pendiente: { title: 'Este paso todavía no está disponible' },
+      actions: { guardarYContinuar: 'Guardar y continuar', continuar: 'Continuar' },
+    },
+  },
   inicio: {
     venta: {
       facturaElectronica: {
