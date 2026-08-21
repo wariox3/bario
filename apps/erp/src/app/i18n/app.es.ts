@@ -5742,9 +5742,9 @@ export const es: AppDict = {
           'Cargá el nuevo antes de que caduque: sin certificado vigente no vas a poder emitir.',
         vencidoTitle: 'Tu certificado venció',
         vencidoDesc: 'No vas a poder emitir facturas electrónicas hasta que cargues uno nuevo.',
-        faltan: 'Faltan {dias} días',
+        faltan: { one: 'Falta 1 día', other: 'Faltan {dias} días' },
         venceHoy: 'Vence hoy',
-        vencidoHace: 'Venció hace {dias} días',
+        vencidoHace: { one: 'Venció hace 1 día', other: 'Venció hace {dias} días' },
       },
       upload: {
         title: 'Certificado digital',

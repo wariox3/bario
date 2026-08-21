@@ -4450,9 +4450,10 @@ export interface AppDict
         porVencerDesc: string;
         vencidoTitle: string;
         vencidoDesc: string;
-        faltan: string;
+        /** Cuánto falta / hace cuánto venció; `one` es 1 día, `other` lleva `{dias}`. */
+        faltan: { one: string; other: string };
         venceHoy: string;
-        vencidoHace: string;
+        vencidoHace: { one: string; other: string };
       };
       upload: {
         title: string;

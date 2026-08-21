@@ -125,9 +125,14 @@ export class CertificadoStepComponent {
     const dias = this.dias();
     if (dias === null) return '';
     const dict = this.t().facturacionElectronica.certificado.estado;
-    if (dias < 0) return dict.vencidoHace.replace('{dias}', String(Math.abs(dias)));
+    if (dias < 0) {
+      const abs = Math.abs(dias);
+      return abs === 1
+        ? dict.vencidoHace.one
+        : dict.vencidoHace.other.replace('{dias}', String(abs));
+    }
     if (dias === 0) return dict.venceHoy;
-    return dict.faltan.replace('{dias}', String(dias));
+    return dias === 1 ? dict.faltan.one : dict.faltan.other.replace('{dias}', String(dias));
   });
 
   constructor() {

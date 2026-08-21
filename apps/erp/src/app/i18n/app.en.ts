@@ -5683,9 +5683,9 @@ export const en: AppDict = {
           'Upload the new one before it lapses: without a valid certificate you cannot issue.',
         vencidoTitle: 'Your certificate expired',
         vencidoDesc: 'You cannot issue electronic invoices until you upload a new one.',
-        faltan: '{dias} days left',
+        faltan: { one: '1 day left', other: '{dias} days left' },
         venceHoy: 'Expires today',
-        vencidoHace: 'Expired {dias} days ago',
+        vencidoHace: { one: 'Expired 1 day ago', other: 'Expired {dias} days ago' },
       },
       upload: {
         title: 'Digital certificate',
