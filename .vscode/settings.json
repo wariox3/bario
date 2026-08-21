@@ -1,0 +1,42 @@
+{
+  // Carpetas generadas: no vigilar cambios ni indexar.
+  // .nx y node_modules generan miles de eventos de fs que inflan
+  // el proceso de watcher y disparan reindexados de tsserver.
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.nx/**": true,
+    "**/.angular/**": true,
+    "**/dist/**": true,
+    "**/tmp/**": true,
+    "**/coverage/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.nx": true,
+    "**/.angular": true,
+    "**/dist": true,
+    "**/tmp": true,
+    "**/coverage": true,
+    "**/package-lock.json": true
+  },
+  // Fuera del explorador: son artefactos, no código del repo.
+  "files.exclude": {
+    "**/.nx": true,
+    "**/.angular": true
+  },
+  // No sugerir imports desde artefactos de build.
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "**/dist/**",
+    "**/.nx/**",
+    "**/.angular/**"
+  ],
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEventsOnParentDirectory",
+    "watchDirectory": "useFsEvents"
+  },
+  // El monorepo usa la versión de TS del workspace, no la que trae VSCode.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.workingDirectories": [{ "mode": "auto" }]
+}
