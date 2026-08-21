@@ -7,6 +7,7 @@ import {
   inject,
   input,
   signal,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -77,17 +78,25 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
 
   constructor() {
     effect(() => {
-      // Sin fetch mientras el control está deshabilitado (p. ej. un select en
-      // cascada cuyo padre aún no se eligió): evita consultas prematuras y se
-      // re-dispara solo cuando se habilita. Si hay un valor seleccionado (caso
-      // de un select bloqueado en edición), se siembra como única opción para
-      // que el p-select pueda pintar su label —sin la opción en la lista, el
-      // valor saldría en blanco—. Sin valor (cascada) queda vacío, igual que antes.
-      if (this.disabled()) {
-        const current = this.value();
-        this.options.set(current ? [current] : []);
+      const disabled = this.disabled();
+      // El valor se lee sin trackear a propósito: si el efecto dependiera de
+      // él, cada selección del usuario volvería a pedir el catálogo entero.
+      const current = untracked(() => this.value());
+
+      // Cascada (deshabilitado porque su padre aún no se eligió): no hay valor
+      // que pintar ni motivo para consultar. Se re-dispara al habilitarse.
+      if (disabled && !current) {
+        this.options.set([]);
         return;
       }
+
+      // Deshabilitado **con** valor (select bloqueado en edición): se siembra
+      // para que el p-select tenga qué pintar ya mismo, pero se pide el
+      // catálogo igual. Un valor cargado por id —`{ id, nombre: '' }`, como lo
+      // arma quien solo recibe la FK del backend— no trae etiqueta: sin el
+      // catálogo el campo se ve **vacío**, que es peor que verse deshabilitado.
+      if (disabled && current) this.options.set([current]);
+
       const params = this.params();
       const endpoint = this.endpoint();
       this.loading.set(true);
