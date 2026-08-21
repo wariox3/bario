@@ -222,9 +222,9 @@ export class ItemFormComponent implements OnInit {
    * Trae el ítem y su estado de uso **juntos**, para que el formulario nazca ya
    * bloqueado en vez de habilitar los campos y apagarlos un instante después.
    *
-   * La consulta de uso degrada a `false` ante cualquier error: si el backend no
-   * expone `validar-uso/`, el formulario se comporta como antes en lugar de
-   * dejar la pantalla sin cargar. Deja de proteger, pero no rompe.
+   * La consulta de uso degrada a `false` ante cualquier error: si `validar-uso/`
+   * falla, el formulario abre igual en vez de dejar la pantalla sin cargar.
+   * Deja de proteger, pero no rompe.
    */
   private loadItem(id: number): void {
     forkJoin({

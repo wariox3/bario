@@ -52,14 +52,12 @@ export class ItemService extends BaseHttpService {
    * colgando de algo que ya no maneja existencias, y desde el front no hay forma
    * de recomponerlo.
    *
-   * **Supuesto pendiente de confirmar con backend**: el ERP anterior pega contra
-   * `POST general/item/validar-uso/` con `{ id }` y recibe `{ uso: boolean }`.
-   * El llamador degrada a `false` si el endpoint no existe (ver `loadItem` del
-   * formulario), así que un 404 no rompe la pantalla: solo deja de proteger.
+   * `GET /general/item/{id}/validar-uso/` → `{ uso: boolean }`
+   * (operación `general_item_validar_uso_retrieve` del schema del contenedor).
    */
   validarUso(id: number): Observable<boolean> {
-    return this.post<{ uso: boolean }>(`${this.resourcePath}validar-uso/`, { id }).pipe(
-      map((respuesta) => respuesta.uso === true),
+    return this.get<{ uso: boolean }>(`${this.resourcePath}${id}/validar-uso/`).pipe(
+      map((respuesta) => respuesta.uso),
     );
   }
 
