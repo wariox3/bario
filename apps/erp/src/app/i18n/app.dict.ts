@@ -4441,13 +4441,40 @@ export interface AppDict
     };
   };
   facturacionElectronica: {
+    certificado: {
+      estado: {
+        venceLabel: string;
+        vigenteTitle: string;
+        vigenteDesc: string;
+        porVencerTitle: string;
+        porVencerDesc: string;
+        vencidoTitle: string;
+        vencidoDesc: string;
+        faltan: string;
+        venceHoy: string;
+        vencidoHace: string;
+      };
+      upload: {
+        title: string;
+        hint: string;
+        dropzone: { primary: string; secondary: string; hint: string };
+      };
+      fields: { clave: string; claveHint: string };
+      validation: { required: string };
+      errors: { tipo: string; tamano: string };
+      actions: { cargar: string; reemplazar: string; quitar: string };
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string };
+      };
+    };
     asistente: {
       eyebrow: string;
       title: string;
       subtitle: string;
       pasos: {
         empresa: { label: string; hint: string };
-        emisor: { label: string; hint: string };
+        certificado: { label: string; hint: string };
         resolucion: { label: string; hint: string };
         finalizar: { label: string; hint: string };
       };

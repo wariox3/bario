@@ -5673,13 +5673,58 @@ export const en: AppDict = {
     },
   },
   facturacionElectronica: {
+    certificado: {
+      estado: {
+        venceLabel: 'Expires',
+        vigenteTitle: 'Digital certificate uploaded',
+        vigenteDesc: 'Your certificate is valid. Nothing to do here.',
+        porVencerTitle: 'Your certificate is about to expire',
+        porVencerDesc:
+          'Upload the new one before it lapses: without a valid certificate you cannot issue.',
+        vencidoTitle: 'Your certificate expired',
+        vencidoDesc: 'You cannot issue electronic invoices until you upload a new one.',
+        faltan: '{dias} days left',
+        venceHoy: 'Expires today',
+        vencidoHace: 'Expired {dias} days ago',
+      },
+      upload: {
+        title: 'Digital certificate',
+        hint: 'The file your certification authority issued, along with the password protecting it.',
+        dropzone: {
+          primary: 'Drag your certificate or click to choose it',
+          secondary: 'It is sent encrypted and never stored in the browser.',
+          hint: '.p12 or .pfx files · up to 5 MB',
+        },
+      },
+      fields: {
+        clave: 'Certificate password',
+        claveHint: 'The one protecting the file. We do not store it.',
+      },
+      validation: { required: 'This field is required' },
+      errors: {
+        tipo: 'The file must be {tipos}.',
+        tamano: 'The file cannot exceed {max} MB.',
+      },
+      actions: {
+        cargar: 'Upload certificate',
+        reemplazar: 'Replace certificate',
+        quitar: 'Remove file',
+      },
+      toasts: {
+        success: {
+          title: 'Certificate uploaded',
+          desc: 'It is registered along with its expiry date.',
+        },
+        error: { title: 'We could not upload the certificate' },
+      },
+    },
     asistente: {
       eyebrow: 'Setup',
       title: 'Electronic invoicing',
       subtitle: 'Complete your company details to start issuing.',
       pasos: {
         empresa: { label: 'Company details', hint: 'Identity, contact and location' },
-        emisor: { label: 'Electronic invoicing', hint: 'DIAN enablement' },
+        certificado: { label: 'Digital certificate', hint: '.p12 file and its password' },
         resolucion: { label: 'Resolution', hint: 'Authorized invoice numbering' },
         finalizar: { label: 'Finish', hint: 'Review and activation' },
       },

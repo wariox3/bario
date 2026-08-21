@@ -9,6 +9,7 @@ import type { AppDict } from '@erp/i18n';
 import { EmpresaConfigComponent } from '@erp/features/configuracion/components/empresa-config/empresa-config.component';
 import type { EmpresaConfigFormValue } from '@erp/features/configuracion/configuracion.mapper';
 import { CrearEmisorDialogComponent } from '../../components/crear-emisor-dialog/crear-emisor-dialog.component';
+import { CertificadoStepComponent } from '../../steps/certificado/certificado-step.component';
 import {
   ASISTENTE_STEPS,
   type AsistenteStep,
@@ -27,7 +28,12 @@ import {
 @Component({
   selector: 'app-asistente-facturacion-electronica',
   standalone: true,
-  imports: [EmpresaConfigComponent, CrearEmisorDialogComponent, ButtonModule],
+  imports: [
+    EmpresaConfigComponent,
+    CrearEmisorDialogComponent,
+    CertificadoStepComponent,
+    ButtonModule,
+  ],
   templateUrl: './asistente.component.html',
   // Ancho acotado como Configuración: son formularios, no tablas. La grilla de
   // dos columnas la arma el template; el host solo centra y acota.

@@ -24,4 +24,15 @@ export class FacturaElectronicaService extends BaseHttpService {
   crearEmisor(): Observable<void> {
     return this.post<void>(`${this.resourcePath}crear-emisor/`, null);
   }
+
+  /**
+   * Sube el certificado digital con su clave (multipart `archivo` + `clave`).
+   *
+   * El vencimiento no se envía: lo lee el backend del propio certificado y lo
+   * deja en `gen_certificado_vence`. Por eso, después de subir, el estado se
+   * relee en vez de darlo por sabido.
+   */
+  cargarCertificado(archivo: File, clave: string): Observable<void> {
+    return this.postFile<void>(`${this.resourcePath}cargar-certificado/`, archivo, { clave });
+  }
 }

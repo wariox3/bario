@@ -5732,13 +5732,58 @@ export const es: AppDict = {
     },
   },
   facturacionElectronica: {
+    certificado: {
+      estado: {
+        venceLabel: 'Vence',
+        vigenteTitle: 'Certificado digital cargado',
+        vigenteDesc: 'Tu certificado está vigente. No hace falta que hagas nada.',
+        porVencerTitle: 'Tu certificado está por vencer',
+        porVencerDesc:
+          'Cargá el nuevo antes de que caduque: sin certificado vigente no vas a poder emitir.',
+        vencidoTitle: 'Tu certificado venció',
+        vencidoDesc: 'No vas a poder emitir facturas electrónicas hasta que cargues uno nuevo.',
+        faltan: 'Faltan {dias} días',
+        venceHoy: 'Vence hoy',
+        vencidoHace: 'Venció hace {dias} días',
+      },
+      upload: {
+        title: 'Certificado digital',
+        hint: 'El archivo que te entregó la entidad certificadora, junto con la clave que lo protege.',
+        dropzone: {
+          primary: 'Arrastrá tu certificado o hacé clic para elegirlo',
+          secondary: 'Se envía cifrado y no queda guardado en el navegador.',
+          hint: 'Archivos .p12 o .pfx · hasta 5 MB',
+        },
+      },
+      fields: {
+        clave: 'Clave del certificado',
+        claveHint: 'La misma con la que se protege el archivo. No la guardamos.',
+      },
+      validation: { required: 'Este campo es obligatorio' },
+      errors: {
+        tipo: 'El archivo debe ser {tipos}.',
+        tamano: 'El archivo no puede pesar más de {max} MB.',
+      },
+      actions: {
+        cargar: 'Cargar certificado',
+        reemplazar: 'Reemplazar certificado',
+        quitar: 'Quitar el archivo',
+      },
+      toasts: {
+        success: {
+          title: 'Certificado cargado',
+          desc: 'Ya quedó registrado con su fecha de vencimiento.',
+        },
+        error: { title: 'No pudimos cargar el certificado' },
+      },
+    },
     asistente: {
       eyebrow: 'Asistente',
       title: 'Facturación electrónica',
       subtitle: 'Completa los datos de tu empresa para empezar a emitir.',
       pasos: {
         empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
-        emisor: { label: 'Facturación electrónica', hint: 'Habilitación ante la DIAN' },
+        certificado: { label: 'Certificado digital', hint: 'Archivo .p12 y su clave' },
         resolucion: { label: 'Resolución', hint: 'Numeración autorizada para facturar' },
         finalizar: { label: 'Terminar', hint: 'Revisión y activación' },
       },

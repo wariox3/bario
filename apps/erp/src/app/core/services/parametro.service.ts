@@ -18,6 +18,8 @@ export interface ParametroRead {
   readonly gen_factura_electronica_activa: boolean;
   /** Emisor con el que quedó habilitado; `null` mientras no lo esté. */
   readonly gen_factura_electronica_emisor: number | null;
+  /** Vencimiento del certificado digital (`AAAA-MM-DD`); `null` si no hay. */
+  readonly gen_certificado_vence: string | null;
 }
 
 /** Nombre de campo pedible (todo menos el `id`). */
@@ -72,6 +74,18 @@ export class ParametroService extends BaseHttpService {
   facturaElectronicaEmisor(): Observable<number | null> {
     return this.sonda(['gen_factura_electronica_emisor']).pipe(
       map((parametro) => parametro.gen_factura_electronica_emisor ?? null),
+    );
+  }
+
+  /**
+   * Vencimiento del certificado digital, `null` si el contenedor no tiene uno.
+   *
+   * Lo escribe `cargar-certificado/` leyéndolo del propio archivo: el front no
+   * lo manda ni lo puede corregir.
+   */
+  certificadoVence(): Observable<string | null> {
+    return this.sonda(['gen_certificado_vence']).pipe(
+      map((parametro) => parametro.gen_certificado_vence ?? null),
     );
   }
 }

@@ -164,6 +164,9 @@
           </div>
         }
       }
+      @case ('certificado') {
+        <app-certificado-step (avanzar)="avanzarDesde('certificado')" />
+      }
       @default {
         <!--
           Andamio: el paso está declarado y se puede recorrer, pero su pantalla

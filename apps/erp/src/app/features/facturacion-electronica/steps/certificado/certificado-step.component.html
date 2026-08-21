@@ -1,0 +1,256 @@
+@let c = t().facturacionElectronica.certificado;
+
+<!--
+  Paso «Certificado digital».
+
+  Dos piezas: la **tarjeta de estado** (si ya hay certificado) y la **zona de
+  carga** (si corresponde subir uno). El estado no es un dato más: un
+  certificado vencido es una empresa que no puede facturar, así que el color
+  cambia con la urgencia —navy tranquilo, ámbar cuando quedan días, rojo cuando
+  ya caducó— y el texto dice qué significa, no solo la fecha.
+-->
+@if (loading()) {
+  <div class="h-40 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+} @else {
+  <div class="flex flex-col gap-5">
+    @if (estado() !== 'sin-certificado') {
+      @let vencido = estado() === 'vencido';
+      @let porVencer = estado() === 'por-vencer';
+
+      <section
+        class="overflow-hidden rounded-xl border bg-brand-surface"
+        [class]="
+          vencido
+            ? 'border-red-200'
+            : porVencer
+              ? 'border-amber-200'
+              : 'border-[rgba(20,48,73,0.1)]'
+        "
+      >
+        <div class="flex flex-wrap items-start gap-x-3 gap-y-4 px-5 py-4">
+          <span
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px]"
+            [class]="
+              vencido
+                ? 'bg-red-50 text-red-600'
+                : porVencer
+                  ? 'bg-amber-50 text-amber-700'
+                  : 'bg-sky-50 text-sky-700'
+            "
+          >
+            <i
+              class="pi text-[1.05rem]"
+              [class.pi-shield]="!vencido && !porVencer"
+              [class.pi-exclamation-triangle]="porVencer"
+              [class.pi-times-circle]="vencido"
+              aria-hidden="true"
+            ></i>
+          </span>
+
+          <div class="min-w-0 flex-1">
+            <p class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+              {{
+                vencido
+                  ? c.estado.vencidoTitle
+                  : porVencer
+                    ? c.estado.porVencerTitle
+                    : c.estado.vigenteTitle
+              }}
+            </p>
+            <p class="m-0 mt-1 text-[0.78rem] leading-relaxed text-brand-muted">
+              {{
+                vencido
+                  ? c.estado.vencidoDesc
+                  : porVencer
+                    ? c.estado.porVencerDesc
+                    : c.estado.vigenteDesc
+              }}
+            </p>
+          </div>
+
+          <!-- El vencimiento, que es el dato por el que se entra a este paso. -->
+          <div class="ml-auto flex shrink-0 flex-col items-end gap-0.5">
+            <span
+              class="text-[0.62rem] font-semibold tracking-[0.08em] text-brand-muted uppercase opacity-70"
+            >
+              {{ c.estado.venceLabel }}
+            </span>
+            <span class="text-[0.85rem] font-semibold text-brand-text">{{ venceTexto() }}</span>
+            <span
+              class="text-[0.72rem] font-medium"
+              [class]="vencido ? 'text-red-600' : porVencer ? 'text-amber-700' : 'text-brand-muted'"
+            >
+              {{ diasTexto() }}
+            </span>
+          </div>
+        </div>
+
+        @if (puedeReemplazar()) {
+          <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-3">
+            <p-button
+              type="button"
+              size="small"
+              severity="secondary"
+              [outlined]="true"
+              icon="pi pi-refresh"
+              [label]="c.actions.reemplazar"
+              (onClick)="onReemplazar()"
+            />
+          </div>
+        }
+      </section>
+    }
+
+    @if (puedeCargar()) {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+        <section
+          class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+        >
+          <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+            <h2
+              class="m-0 text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
+            >
+              {{ c.upload.title }}
+            </h2>
+            <p class="m-0 mt-1 text-[0.75rem] leading-relaxed text-brand-muted">
+              {{ c.upload.hint }}
+            </p>
+
+            <input
+              #fileInput
+              type="file"
+              [accept]="accept"
+              class="hidden"
+              (change)="onFileInputChange($event)"
+            />
+
+            <div class="mt-4 flex flex-col gap-4">
+              @if (selectedFile(); as file) {
+                <div
+                  class="flex items-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] px-4 py-3 transition-opacity"
+                  [class.opacity-60]="subiendo()"
+                >
+                  <span
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+                  >
+                    <i class="pi pi-shield text-[1.2rem]" aria-hidden="true"></i>
+                  </span>
+                  <p
+                    class="m-0 min-w-0 flex-1 truncate text-[0.875rem] font-semibold text-brand-text"
+                  >
+                    {{ file.name }}
+                  </p>
+                  <button
+                    type="button"
+                    class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-brand-muted transition-colors hover:bg-[rgba(19,38,60,0.06)] hover:text-brand-navy"
+                    [disabled]="subiendo()"
+                    [attr.aria-label]="c.actions.quitar"
+                    (click)="quitarArchivo()"
+                  >
+                    <i class="pi pi-times text-[0.8rem]" aria-hidden="true"></i>
+                  </button>
+                </div>
+              } @else {
+                <!-- Dropzone: mismo idioma que el de importar (sky punteado). -->
+                <div
+                  class="flex cursor-pointer flex-col items-center justify-center rounded-[14px] border-2 border-dashed px-6 py-9 text-center transition-colors"
+                  [class]="
+                    fileError()
+                      ? 'border-red-300 bg-red-50/40'
+                      : dragOver()
+                        ? 'border-sky-300 bg-sky-50/70'
+                        : 'border-[rgba(20,48,73,0.15)] bg-sky-50/40 hover:border-sky-300 hover:bg-sky-50/70'
+                  "
+                  role="button"
+                  tabindex="0"
+                  [attr.aria-label]="c.upload.dropzone.primary"
+                  (click)="openFilePicker(fileInput)"
+                  (keydown.enter)="openFilePicker(fileInput)"
+                  (keydown.space)="openFilePicker(fileInput)"
+                  (dragover)="onDragOver($event)"
+                  (dragenter)="onDragOver($event)"
+                  (dragleave)="onDragLeave($event)"
+                  (drop)="onDrop($event)"
+                >
+                  <span
+                    class="inline-flex h-14 w-14 items-center justify-center rounded-[14px]"
+                    [class]="fileError() ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-700'"
+                  >
+                    <i class="pi pi-shield text-[1.6rem]" aria-hidden="true"></i>
+                  </span>
+                  <p class="m-0 mt-3 text-[0.9rem] font-semibold text-brand-text">
+                    {{ c.upload.dropzone.primary }}
+                  </p>
+                  <p class="m-0 mt-1 text-[0.8rem] text-brand-muted">
+                    {{ c.upload.dropzone.secondary }}
+                  </p>
+                  <p class="m-0 mt-3 text-[0.72rem] text-brand-muted">
+                    {{ c.upload.dropzone.hint }}
+                  </p>
+                </div>
+
+                @if (fileError(); as msg) {
+                  <p class="m-0 text-[0.78rem] font-medium text-red-700">
+                    <i class="pi pi-exclamation-circle mr-1 text-[0.78rem]" aria-hidden="true"></i>
+                    {{ msg }}
+                  </p>
+                }
+              }
+
+              <div class="flex flex-col gap-1.5">
+                <label
+                  for="clave"
+                  class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+                >
+                  {{ c.fields.clave }}
+                  <span class="ml-px text-red-500">*</span>
+                </label>
+                <!--
+                  `new-password` y no `off`: los navegadores ignoran `off` en
+                  campos de contraseña y ofrecen igual las credenciales
+                  guardadas. Esta clave no es la del usuario —es la del archivo
+                  que le dio la certificadora—, así que autocompletarla con la
+                  de su cuenta solo produce un intento fallido.
+                -->
+                <p-password
+                  inputId="clave"
+                  formControlName="clave"
+                  autocomplete="new-password"
+                  [feedback]="false"
+                  [toggleMask]="true"
+                  [fluid]="true"
+                  [invalid]="form.controls.clave.invalid && form.controls.clave.touched"
+                />
+                <lib-field-error
+                  [control]="form.controls.clave"
+                  [messages]="{ required: c.validation.required }"
+                />
+                <p class="m-0 mt-0.5 text-[0.72rem] text-brand-muted">{{ c.fields.claveHint }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="flex items-center justify-end pb-1">
+          <p-button
+            type="submit"
+            icon="pi pi-upload"
+            [label]="c.actions.cargar"
+            [loading]="subiendo()"
+            [disabled]="!puedeSubir()"
+          />
+        </div>
+      </form>
+    } @else {
+      <div class="flex items-center justify-end pb-1">
+        <p-button
+          type="button"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          [label]="t().facturacionElectronica.asistente.actions.continuar"
+          (onClick)="avanzar.emit()"
+        />
+      </div>
+    }
+  </div>
+}
