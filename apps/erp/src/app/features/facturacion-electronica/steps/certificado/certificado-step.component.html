@@ -166,7 +166,7 @@
                   [attr.aria-label]="c.upload.dropzone.primary"
                   (click)="openFilePicker(fileInput)"
                   (keydown.enter)="openFilePicker(fileInput)"
-                  (keydown.space)="openFilePicker(fileInput)"
+                  (keydown.space)="$event.preventDefault(); openFilePicker(fileInput)"
                   (dragover)="onDragOver($event)"
                   (dragenter)="onDragOver($event)"
                   (dragleave)="onDragLeave($event)"

@@ -13,7 +13,7 @@
 -->
 <p-dialog
   [visible]="visible()"
-  (visibleChange)="visible.set($event)"
+  (visibleChange)="onVisibleChange($event)"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"

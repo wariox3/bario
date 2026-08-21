@@ -40,6 +40,7 @@
           <button
             type="button"
             class="group flex w-full min-w-0 cursor-pointer gap-3.5 border-0 bg-transparent p-0 text-left"
+            [attr.aria-current]="isActivo(step.id) ? 'step' : null"
             (click)="irA(step.id)"
           >
             <span
@@ -51,7 +52,6 @@
                     ? 'bg-brand-navy text-white ring-4 ring-[rgba(19,38,60,0.08)]'
                     : 'border border-[rgba(20,48,73,0.18)] bg-brand-surface text-brand-muted group-hover:border-[rgba(20,48,73,0.35)]'
               "
-              [attr.aria-current]="isActivo(step.id) ? 'step' : null"
             >
               @if (isCompletado(step.id)) {
                 <i class="pi pi-check text-[0.72rem]" aria-hidden="true"></i>
