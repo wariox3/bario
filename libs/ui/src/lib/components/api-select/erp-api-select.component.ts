@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   effect,
   forwardRef,
   inject,
@@ -9,7 +8,6 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
@@ -51,7 +49,6 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
 })
 export class ErpApiSelectComponent implements ControlValueAccessor {
   private readonly dataService = inject(ErpSelectDataService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly endpoint = input.required<string>();
   readonly params = input<Record<string, string>>({});
@@ -77,11 +74,15 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   onTouchedFn: () => void = () => undefined;
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       const disabled = this.disabled();
-      // El valor se lee sin trackear a propósito: si el efecto dependiera de
-      // él, cada selección del usuario volvería a pedir el catálogo entero.
-      const current = untracked(() => this.value());
+      // Habilitado, el valor cambia con cada selección del usuario: se lee sin
+      // trackear para no volver a pedir el catálogo entero en cada clic.
+      // Deshabilitado solo lo cambia `writeValue` — la precarga por id de un
+      // form que llega **después** del disable—, y ahí sí hay que reaccionar:
+      // sin el re-disparo, ese valor tardío se quedaría sin catálogo que le
+      // ponga etiqueta.
+      const current = disabled ? this.value() : untracked(() => this.value());
 
       // Cascada (deshabilitado porque su padre aún no se eligió): no hay valor
       // que pintar ni motivo para consultar. Se re-dispara al habilitarse.
@@ -100,20 +101,21 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
       const params = this.params();
       const endpoint = this.endpoint();
       this.loading.set(true);
-      this.dataService
-        .fetchOptions(endpoint, params)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (options) => {
-            this.options.set(options);
-            this.loading.set(false);
-            this.applySuggestion(options);
-          },
-          error: () => {
-            this.options.set([]);
-            this.loading.set(false);
-          },
-        });
+      const fetch = this.dataService.fetchOptions(endpoint, params).subscribe({
+        next: (options) => {
+          this.options.set(options);
+          this.loading.set(false);
+          this.applySuggestion(options);
+        },
+        error: () => {
+          this.options.set([]);
+          this.loading.set(false);
+        },
+      });
+      // Si el efecto se re-dispara con una consulta en vuelo, la vieja se
+      // cancela: su respuesta podía llegar última y pisar las opciones del
+      // endpoint/params vigentes. El cleanup corre también al destruir.
+      onCleanup(() => fetch.unsubscribe());
     });
   }
 
