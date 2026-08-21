@@ -5912,19 +5912,21 @@ export const es: AppDict = {
         },
       },
       fields: {
-        nombreCorto: 'Nombre comercial',
+        razonSocial: 'Razón social',
         tipoPersona: 'Tipo de persona',
         identificacion: 'Tipo de identificación',
         numeroIdentificacion: 'Número de identificación',
         digitoVerificacion: 'Dígito de verificación',
         direccion: 'Dirección',
         ciudad: 'Ciudad',
+        ciudadPlaceholder: 'Buscar ciudad…',
         telefono: 'Teléfono',
         correo: 'Correo electrónico',
       },
       validation: {
         required: 'Este campo es obligatorio',
         emailInvalid: 'Ingresa un correo válido',
+        onlyDigits: 'Solo números',
       },
     },
     toasts: {

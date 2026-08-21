@@ -1,8 +1,15 @@
+<!--
+  Datos de la empresa.
+
+  **Una sola card** con los campos repartidos en grupos semánticos separados por
+  un filete — el patrón "ficha en grupos" del sistema, aplicado a un formulario.
+  Dos cards apiladas multiplicaban el chrome (dos bordes, dos cabeceras, dos
+  chips) para separar lo que un micro-encabezado ya separa.
+
+  Campos: los mismos del ERP anterior. Sin régimen, que la API nueva no expone.
+-->
 @if (loading()) {
-  <div class="flex flex-col gap-5">
-    <div class="h-44 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
-    <div class="h-44 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
-  </div>
+  <div class="h-[28rem] animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
 } @else if (loadFailed()) {
   <div
     class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
@@ -20,43 +27,41 @@
   </div>
 } @else {
   <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
-    <!-- Identidad de la empresa -->
     <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-        <span
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      <!-- ── Grupo: identidad ──────────────────────────────────────────────── -->
+      <div
+        role="group"
+        aria-labelledby="grupo-identidad"
+        class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4"
+      >
+        <h2
+          id="grupo-identidad"
+          class="m-0 text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
         >
-          <i class="pi pi-building text-[1.05rem]"></i>
-        </span>
-        <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-          <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-            {{ t().configuracion.empresa.sections.identidad.title }}
-          </h2>
-          <p class="m-0 text-[0.75rem] text-brand-muted">
-            {{ t().configuracion.empresa.sections.identidad.hint }}
-          </p>
-        </div>
-      </div>
+          {{ t().configuracion.empresa.sections.identidad.title }}
+        </h2>
+        <p class="m-0 mt-1 text-[0.75rem] leading-relaxed text-brand-muted">
+          {{ t().configuracion.empresa.sections.identidad.hint }}
+        </p>
 
-      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-        <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <div class="mt-4 grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1.5 sm:col-span-2">
             <label
-              for="nombre_corto"
+              for="razon_social"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >
-              {{ t().configuracion.empresa.fields.nombreCorto }}
+              {{ t().configuracion.empresa.fields.razonSocial }}
               <span class="ml-px text-red-500">*</span>
             </label>
             <input
               pInputText
-              id="nombre_corto"
-              formControlName="nombre_corto"
+              id="razon_social"
+              formControlName="razon_social"
               fluid
-              [invalid]="form.controls.nombre_corto.invalid && form.controls.nombre_corto.touched"
+              [invalid]="form.controls.razon_social.invalid && form.controls.razon_social.touched"
             />
             <lib-field-error
-              [control]="form.controls.nombre_corto"
+              [control]="form.controls.razon_social"
               [messages]="{ required: t().configuracion.empresa.validation.required }"
             />
           </div>
@@ -123,7 +128,10 @@
             />
             <lib-field-error
               [control]="form.controls.numero_identificacion"
-              [messages]="{ required: t().configuracion.empresa.validation.required }"
+              [messages]="{
+                required: t().configuracion.empresa.validation.required,
+                pattern: t().configuracion.empresa.validation.onlyDigits,
+              }"
             />
           </div>
 
@@ -143,49 +151,72 @@
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- Contacto y ubicación -->
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-        <span
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      <!-- ── Grupo: contacto y ubicación ───────────────────────────────────── -->
+      <div
+        role="group"
+        aria-labelledby="grupo-contacto"
+        class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4"
+      >
+        <h2
+          id="grupo-contacto"
+          class="m-0 text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
         >
-          <i class="pi pi-map-marker text-[1.05rem]"></i>
-        </span>
-        <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-          <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-            {{ t().configuracion.empresa.sections.contacto.title }}
-          </h2>
-          <p class="m-0 text-[0.75rem] text-brand-muted">
-            {{ t().configuracion.empresa.sections.contacto.hint }}
-          </p>
-        </div>
-      </div>
+          {{ t().configuracion.empresa.sections.contacto.title }}
+        </h2>
+        <p class="m-0 mt-1 text-[0.75rem] leading-relaxed text-brand-muted">
+          {{ t().configuracion.empresa.sections.contacto.hint }}
+        </p>
 
-      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-        <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <div class="mt-4 grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1.5 sm:col-span-2">
             <label
               for="direccion"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >
               {{ t().configuracion.empresa.fields.direccion }}
+              <span class="ml-px text-red-500">*</span>
             </label>
-            <input pInputText id="direccion" formControlName="direccion" fluid />
+            <input
+              pInputText
+              id="direccion"
+              formControlName="direccion"
+              fluid
+              [invalid]="form.controls.direccion.invalid && form.controls.direccion.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.direccion"
+              [messages]="{ required: t().configuracion.empresa.validation.required }"
+            />
           </div>
 
+          <!--
+            TODO(backend): `GenConfiguracion` solo devuelve el id de la ciudad,
+            así que al reabrir con una ciudad guardada el input se ve vacío —el
+            autocomplete arma su etiqueta desde el propio valor—. El id viaja
+            igual, así que guardar sin tocar el campo no la borra. Se arregla
+            cuando el serializer sume `gen_empresa_ciudad_nombre` y
+            `gen_empresa_departamento_nombre`, el mismo patrón que ya usa
+            `hum_entidad_riesgo_nombre` ahí al lado.
+          -->
           <div class="flex flex-col gap-1.5">
             <label
               for="ciudad"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >
               {{ t().configuracion.empresa.fields.ciudad }}
+              <span class="ml-px text-red-500">*</span>
             </label>
-            <lib-api-select
+            <lib-ciudad-autocomplete
               inputId="ciudad"
               formControlName="ciudad"
-              [endpoint]="endpoints.ciudad"
+              [fuente]="ciudadFuente"
+              [placeholder]="t().configuracion.empresa.fields.ciudadPlaceholder"
+              [invalid]="form.controls.ciudad.invalid && form.controls.ciudad.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.ciudad"
+              [messages]="{ required: t().configuracion.empresa.validation.required }"
             />
           </div>
 
@@ -196,7 +227,17 @@
             >
               {{ t().configuracion.empresa.fields.telefono }}
             </label>
-            <input pInputText id="telefono" formControlName="telefono" fluid />
+            <input
+              pInputText
+              id="telefono"
+              formControlName="telefono"
+              fluid
+              [invalid]="form.controls.telefono.invalid && form.controls.telefono.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.telefono"
+              [messages]="{ pattern: t().configuracion.empresa.validation.onlyDigits }"
+            />
           </div>
 
           <div class="flex flex-col gap-1.5 sm:col-span-2">
@@ -205,6 +246,7 @@
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >
               {{ t().configuracion.empresa.fields.correo }}
+              <span class="ml-px text-red-500">*</span>
             </label>
             <input
               pInputText
@@ -216,7 +258,10 @@
             />
             <lib-field-error
               [control]="form.controls.correo"
-              [messages]="{ email: t().configuracion.empresa.validation.emailInvalid }"
+              [messages]="{
+                required: t().configuracion.empresa.validation.required,
+                email: t().configuracion.empresa.validation.emailInvalid,
+              }"
             />
           </div>
         </div>
@@ -224,20 +269,22 @@
     </section>
 
     <!-- Acciones -->
-    <div class="flex items-center justify-end gap-3 pb-1">
-      @if (form.dirty) {
-        <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
-          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-          {{ t().configuracion.unsavedChanges }}
-        </span>
-      }
-      <p-button
-        type="submit"
-        [label]="t().configuracion.actions.save"
-        icon="pi pi-check"
-        [loading]="isSaving()"
-        [disabled]="form.invalid || isSaving()"
-      />
-    </div>
+    @if (!readonly()) {
+      <div class="flex items-center justify-end gap-3 pb-1">
+        @if (form.dirty) {
+          <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
+            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+            {{ t().configuracion.unsavedChanges }}
+          </span>
+        }
+        <p-button
+          type="submit"
+          [label]="submitLabel() ?? t().configuracion.actions.save"
+          icon="pi pi-check"
+          [loading]="isSaving()"
+          [disabled]="form.invalid || isSaving()"
+        />
+      </div>
+    }
   </form>
 }

@@ -4547,17 +4547,18 @@ export interface AppDict
         contacto: { title: string; hint: string };
       };
       fields: {
-        nombreCorto: string;
+        razonSocial: string;
         tipoPersona: string;
         identificacion: string;
         numeroIdentificacion: string;
         digitoVerificacion: string;
         direccion: string;
         ciudad: string;
+        ciudadPlaceholder: string;
         telefono: string;
         correo: string;
       };
-      validation: { required: string; emailInvalid: string };
+      validation: { required: string; emailInvalid: string; onlyDigits: string };
     };
     toasts: {
       saveSuccess: { title: string; desc: string };

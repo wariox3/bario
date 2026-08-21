@@ -5853,19 +5853,21 @@ export const en: AppDict = {
         },
       },
       fields: {
-        nombreCorto: 'Trade name',
+        razonSocial: 'Legal name',
         tipoPersona: 'Person type',
         identificacion: 'ID type',
         numeroIdentificacion: 'ID number',
         digitoVerificacion: 'Check digit',
         direccion: 'Address',
         ciudad: 'City',
+        ciudadPlaceholder: 'Search city…',
         telefono: 'Phone',
         correo: 'Email',
       },
       validation: {
         required: 'This field is required',
         emailInvalid: 'Enter a valid email',
+        onlyDigits: 'Digits only',
       },
     },
     toasts: {
