@@ -26,6 +26,8 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
@@ -34,6 +36,7 @@ import {
   CONTRATOS_COLUMNS,
   CONTRATOS_FILTER_FIELDS,
   CONTRATOS_FILTERS_STORAGE_KEY,
+  CONTRATOS_IMPORT_MASTERS,
   CONTRATOS_PRIMARY_ACTION,
   CONTRATOS_QUICK_SEARCH_FIELD,
   CONTRATOS_ROW_ACTIONS,
@@ -49,6 +52,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './contratos-list.component.html',
@@ -97,6 +101,20 @@ export class ContratosListComponent {
 
   protected readonly columns = CONTRATOS_COLUMNS;
   protected readonly filterFields = CONTRATOS_FILTER_FIELDS;
+
+  /** Plantilla de ejemplo que sirve el backend para armar el archivo. */
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/humano/contrato/importar-ejemplo/',
+  };
+
+  /** Estado del diálogo de importación masiva. */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: CONTRATOS_IMPORT_MASTERS,
+  });
+
   protected readonly acciones = masterActions(MODELO.humano.contrato, {
     row: CONTRATOS_ROW_ACTIONS,
     primary: CONTRATOS_PRIMARY_ACTION,
@@ -164,6 +182,9 @@ export class ContratosListComponent {
     switch (actionId) {
       case 'new':
         this.navigateTo('nuevo');
+        break;
+      case 'import':
+        this.importar.open();
         break;
       case 'export-excel':
         this.exportExcel();

@@ -1,5 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const CONTRATOS_FILTERS_STORAGE_KEY = 'contratos:filters:v1';
 export const CONTRATOS_QUICK_SEARCH_FIELD = 'contacto_nombre';
@@ -68,7 +70,19 @@ export const CONTRATOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
     labelKey: 'common.actions.actions',
     iconClass: '',
     children: [
+      { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
     ],
   },
 ];
+
+/**
+ * Maestros del diálogo de importación de contratos: los catálogos que el archivo
+ * del contrato realmente necesita.
+ *
+ * El contrato referencia tipo de contrato, ciudades (de contrato y de labor), los
+ * catálogos de seguridad social —tipo y subtipo de cotizante, entidades— y el tipo
+ * de costo. El resto del catálogo (bancos, comprobantes, activos) no aparece en su
+ * archivo, así que no se ofrece.
+ */
+export const CONTRATOS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;

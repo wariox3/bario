@@ -1789,6 +1789,10 @@ export const en: AppDict = {
     contrato: {
       name: 'Contracts',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import contracts',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         empleado: 'Employee',
         contratoTipo: 'Contract type',

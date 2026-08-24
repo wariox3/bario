@@ -1351,6 +1351,7 @@ export interface AppDict
     contrato: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         empleado: string;
         contratoTipo: string;
