@@ -1905,7 +1905,13 @@ export const es: AppDict = {
           fechaUltimoPagoVacacion: 'Fecha último pago vacación',
           comentario: 'Comentario',
         },
-        validation: { required: 'Este campo es requerido' },
+        validation: {
+          required: 'Este campo es requerido',
+          cotizanteAprendizRequerido:
+            'El contrato de aprendiz del SENA exige un tipo de cotizante de aprendiz (código 12 o 19)',
+          cotizanteAprendizNoAplica:
+            'Este tipo de contrato no admite los tipos de cotizante de aprendiz del SENA',
+        },
         toasts: {
           createSuccess: { title: 'Contrato creado', desc: 'El contrato se creó correctamente' },
           editSuccess: {

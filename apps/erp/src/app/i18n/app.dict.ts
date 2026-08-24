@@ -1416,7 +1416,11 @@ export interface AppDict
           fechaUltimoPagoVacacion: string;
           comentario: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          cotizanteAprendizRequerido: string;
+          cotizanteAprendizNoAplica: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };

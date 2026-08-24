@@ -419,8 +419,17 @@
             formControlName="tipo_cotizante"
             endpoint="/humano/tipo-cotizante/seleccionar/"
             [params]="{ limit: '100' }"
-            [suggestedIndex]="0"
             [invalid]="form.controls.tipo_cotizante.invalid && form.controls.tipo_cotizante.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.tipo_cotizante"
+            [messages]="{
+              required: t().entities.contrato.form.validation.required,
+              cotizanteAprendizRequerido:
+                t().entities.contrato.form.validation.cotizanteAprendizRequerido,
+              cotizanteAprendizNoAplica:
+                t().entities.contrato.form.validation.cotizanteAprendizNoAplica,
+            }"
           />
         </div>
 

@@ -1857,7 +1857,13 @@ export const en: AppDict = {
           fechaUltimoPagoVacacion: 'Last vacation payment date',
           comentario: 'Comment',
         },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          cotizanteAprendizRequerido:
+            'A SENA apprentice contract requires an apprentice contributor type (code 12 or 19)',
+          cotizanteAprendizNoAplica:
+            'This contract type does not allow the SENA apprentice contributor types',
+        },
         toasts: {
           createSuccess: {
             title: 'Contract created',

@@ -111,6 +111,25 @@ informe.
 > `modelo=701` que aparece en las URLs del legacy es otra cosa más — una clave interna de su mapa de
 > imports.
 
+### 1.7 Ids del catálogo de tipo de cotizante
+
+La regla de coherencia entre tipo de contrato y tipo de cotizante
+(`contrato.constants.ts`) hardcodea ids leídos de `reddocapi.uk`:
+
+| Constante                        | Id  | Código PILA | Nombre                               |
+| -------------------------------- | --- | ----------- | ------------------------------------ |
+| `CONTRATO_TIPO_APRENDIZ_SENA_ID` | 4   | —           | Aprendíz del Sena (tipo de contrato) |
+| `TIPO_COTIZANTE_DEPENDIENTE`     | 1   | `01`        | Dependiente                          |
+| `TIPO_COTIZANTE_APRENDIZ_IDS`    | 5   | `12`        | Aprendiz SENA en etapa lectiva       |
+| `TIPO_COTIZANTE_APRENDIZ_IDS`    | 9   | `19`        | Aprendices SENA en etapa productiva  |
+
+Asume que ambos catálogos son **globales**, con ids estables entre tenants —el mismo supuesto que
+ya traía `CONTRATO_TIPO_INDEFINIDO_ID = 1`. Si el backend los siembra por tenant, la regla se cae en
+silencio y hay que pasarla a matchear por `codigo` (el endpoint de tipo de cotizante ya lo devuelve;
+el de tipo de contrato **no**).
+
+---
+
 ---
 
 ## 2. Decisiones tomadas (divergencias del legacy)

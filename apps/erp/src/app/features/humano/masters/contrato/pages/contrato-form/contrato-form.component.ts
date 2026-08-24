@@ -25,7 +25,14 @@ import { SELECT_ENDPOINTS } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionService } from '@erp/core/services/configuracion.service';
 import { ContratoService } from '../../contrato.service';
-import { CONTRATO_LIST_PATH, CONTRATO_TIPO_INDEFINIDO_ID } from '../../contrato.constants';
+import {
+  CONTRATO_LIST_PATH,
+  CONTRATO_TIPO_APRENDIZ_SENA_ID,
+  CONTRATO_TIPO_INDEFINIDO_ID,
+  TIPO_COTIZANTE_DEPENDIENTE,
+  esTipoCotizanteAprendiz,
+} from '../../contrato.constants';
+import { cotizanteCoherenteValidator } from '../../utils/cotizante-coherente.validator';
 import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
 
 /**
@@ -48,6 +55,11 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
  * el requerido, pero se le fija la fecha de hoy porque el backend no acepta
  * nulo. Solo en alta, al iniciar, se sugiere la fecha de hoy en
  * `fecha_desde` / `fecha_hasta`.
+ *
+ * Regla del tipo de cotizante: los códigos de aprendiz del SENA solo van con el
+ * contrato de aprendiz — ver `syncTipoCotizante()` y
+ * `cotizanteCoherenteValidator`. En alta se siembra "Dependiente" (código `01`),
+ * que es lo que cotiza cualquier otro vínculo.
  */
 @Component({
   selector: 'app-contrato-form',
@@ -105,6 +117,11 @@ export class ContratoFormComponent implements OnInit {
     () => this.contratoTipo()?.id === CONTRATO_TIPO_INDEFINIDO_ID,
   );
 
+  /** `true` cuando el tipo de contrato es el de aprendiz del SENA. */
+  private readonly isAprendizSena = computed(
+    () => this.contratoTipo()?.id === CONTRATO_TIPO_APRENDIZ_SENA_ID,
+  );
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     return [
@@ -146,7 +163,10 @@ export class ContratoFormComponent implements OnInit {
     entidad_cesantias: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     entidad_caja: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     riesgo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    tipo_cotizante: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    tipo_cotizante: this.fb.control<ErpSelectOption | null>(null, [
+      Validators.required,
+      cotizanteCoherenteValidator,
+    ]),
     subtipo_cotizante: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     ciudad_contrato: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     ciudad_labora: this.fb.control<ErpSelectOption | null>(null, Validators.required),
@@ -174,6 +194,7 @@ export class ContratoFormComponent implements OnInit {
     } else {
       this.prefillRemuneracion();
       this.suggestToday();
+      this.form.controls.tipo_cotizante.setValue(TIPO_COTIZANTE_DEPENDIENTE);
     }
   }
 
@@ -195,6 +216,44 @@ export class ContratoFormComponent implements OnInit {
     }
 
     fechaHasta.updateValueAndValidity({ emitEvent: false });
+    this.syncTipoCotizante();
+  }
+
+  /**
+   * Regla de negocio del tipo de cotizante: los códigos de aprendiz del SENA
+   * (`12` lectiva y `19` productiva) solo corresponden al contrato de aprendiz,
+   * y ese contrato no admite ningún otro. Al cambiar el vínculo laboral se
+   * descarta la selección que dejó de corresponder:
+   *
+   * - hacia aprendiz → se limpia, para que el usuario elija entre lectiva y
+   *   productiva (nada permite adivinar en cuál etapa entra);
+   * - saliendo de aprendiz → pasa a "Dependiente" (código `01`), que es lo que
+   *   cotiza cualquier otro vínculo. También cubre el campo **vacío**: es el
+   *   estado en el que lo deja el paso anterior, y sin esto un ida y vuelta por
+   *   aprendiz terminaba sin cotizante.
+   *
+   * Un cotizante que no es de aprendiz y ya estaba elegido (p. ej. "Estudiantes",
+   * código `23`) se respeta: la regla descarta lo que dejó de corresponder, no
+   * impone Dependiente sobre una elección válida.
+   *
+   * En edición no reescribe nada: `contratoToFormValue` parchea `contrato_tipo`
+   * **antes** que `tipo_cotizante`, así que el valor guardado pisa lo que haga
+   * esta regla. Una combinación incoherente ya guardada la denuncia
+   * `cotizanteCoherenteValidator` en vez de corregirse en silencio.
+   */
+  private syncTipoCotizante(): void {
+    const control = this.form.controls.tipo_cotizante;
+    const actualEsAprendiz = esTipoCotizanteAprendiz(control.value?.id);
+
+    if (this.isAprendizSena()) {
+      if (control.value && !actualEsAprendiz) control.setValue(null);
+    } else if (actualEsAprendiz || !control.value) {
+      control.setValue(TIPO_COTIZANTE_DEPENDIENTE);
+    }
+
+    // El validador lee `contrato_tipo`, que acaba de cambiar: sin esto el error
+    // quedaría calculado contra el vínculo laboral anterior.
+    control.updateValueAndValidity({ emitEvent: false });
   }
 
   /**
