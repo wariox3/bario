@@ -16,7 +16,8 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
 import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { map } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ErpSelectDataService, type ParamValue } from '@reddoc/core';
 
 /**
@@ -56,7 +57,8 @@ function toOption(row: EmpleadoApiRow): EmpleadoOption {
  * Selector de empleado con identificación al lado (input group).
  *
  * Autocomplete sobre `general/contacto/seleccionar/?empleado=True` que:
- * - Trae los primeros resultados al enfocar (sin término de búsqueda).
+ * - Recarga la lista completa (sin término de búsqueda) en cada enfoque y cada vez
+ *   que se vacía el input, para que el desplegable no quede pegado al último filtro.
  * - Busca con el parámetro genérico DRF `?search=<query>` (el back resuelve contra
  *   identificación y nombre).
  * - Muestra cada empleado a **dos líneas** (nombre + `C.C. <identificación>`) para
@@ -81,8 +83,8 @@ function toOption(row: EmpleadoApiRow): EmpleadoOption {
         [inputId]="inputId()"
         [ngModel]="value()"
         (onSelect)="onValueChange($event.value)"
-        (onClear)="onValueChange(null)"
-        (onBlur)="onTouchedFn()"
+        (onClear)="onCleared()"
+        (onBlur)="onBlurred()"
         [suggestions]="suggestions()"
         (completeMethod)="onSearch($event)"
         (onFocus)="onFocusInput()"
@@ -179,17 +181,40 @@ export class EmpleadoAutocompleteComponent implements ControlValueAccessor {
   private onChangeFn: (value: EmpleadoOption | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
   private skipNextFocus = false;
+  private focused = false;
+  private reopenTimer?: ReturnType<typeof setTimeout>;
+
+  /** Términos de búsqueda (enfoque, limpieza y tecleo); la última consulta gana. */
+  private readonly query$ = new Subject<string>();
 
   constructor() {
+    // Una sola tubería para todas las consultas: `switchMap` cancela la petición en
+    // vuelo cuando llega un término nuevo (si no, la respuesta vieja podría pisar la
+    // lista), y `catchError` deja `[]` para que PrimeNG apague su `loading` y muestre
+    // el `emptyMessage` en vez de quedarse colgado.
+    this.query$
+      .pipe(
+        switchMap((query) =>
+          this.fetchEmpleados(query).pipe(catchError(() => of<EmpleadoOption[]>([]))),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((options) => this.suggestions.set(options));
+
+    this.destroyRef.onDestroy(() => clearTimeout(this.reopenTimer));
+
     // Sugerencia opcional: auto-selecciona la opción en `suggestedIndex` al cargar
     // las primeras opciones, solo si el control sigue vacío. El valor se lee sin
     // trackear para no re-disparar el efecto al seleccionar.
     effect(() => {
       const index = this.suggestedIndex();
       if (index === null || untracked(this.value) !== null) return;
-      this.fetchEmpleados('').subscribe((options) => {
-        const option = options[index];
-        if (option && untracked(this.value) === null) this.onValueChange(option);
+      this.fetchEmpleados('').subscribe({
+        next: (options) => {
+          const option = options[index];
+          if (option && untracked(this.value) === null) this.onValueChange(option);
+        },
+        error: () => undefined,
       });
     });
   }
@@ -216,24 +241,51 @@ export class EmpleadoAutocompleteComponent implements ControlValueAccessor {
     if (next !== null) this.skipNextFocus = true;
   }
 
+  /**
+   * Cada enfoque relanza la búsqueda sin filtro. `suggestions` guarda el último
+   * resultado —casi siempre el de un término tecleado—, así que reusarlo dejaría el
+   * desplegable pegado a ese filtro. `search()` con `source` ≠ `'input'` marca
+   * `loading`, emite `completeMethod('')` y deja que PrimeNG abra el panel solo
+   * cuando lleguen las sugerencias.
+   */
   onFocusInput(): void {
+    this.focused = true;
+    // El enfoque ya recarga: sobra la reapertura diferida que pudo agendar `onCleared`.
+    clearTimeout(this.reopenTimer);
+    // Tras seleccionar, PrimeNG devuelve el foco al input; eso no debe reabrir el panel.
     if (this.skipNextFocus) {
       this.skipNextFocus = false;
       return;
     }
-    if (this.suggestions().length > 0) {
-      this.ac?.show();
-      return;
-    }
-    this.fetchEmpleados('').subscribe((options) => {
-      this.suggestions.set(options);
-      setTimeout(() => this.ac?.show());
-    });
+    this.ac?.search(undefined, '', 'focus');
+  }
+
+  /**
+   * Al vaciar el input PrimeNG **no** busca —descarta los términos en blanco cuyo
+   * `source` es `'input'`— y, si se vació con Backspace, agenda cerrar el panel en
+   * `delay/2`. Relanzamos la búsqueda sin filtro justo después de ese cierre para que
+   * vuelva a verse la lista completa. Con la "x" el foco vuelve al input y la recarga
+   * ya la hace `onFocusInput`, que de paso cancela este timer.
+   */
+  onCleared(): void {
+    this.onValueChange(null);
+    clearTimeout(this.reopenTimer);
+    this.reopenTimer = setTimeout(
+      () => {
+        if (this.focused) this.ac?.search(undefined, '', 'reopen');
+      },
+      this.delay() / 2 + 60,
+    );
+  }
+
+  onBlurred(): void {
+    this.focused = false;
+    clearTimeout(this.reopenTimer);
+    this.onTouchedFn();
   }
 
   onSearch(event: AutoCompleteCompleteEvent): void {
-    const query = event.query?.trim() ?? '';
-    this.fetchEmpleados(query).subscribe((options) => this.suggestions.set(options));
+    this.query$.next(event.query?.trim() ?? '');
   }
 
   // ── Internos ────────────────────────────────────────────────────────────────
