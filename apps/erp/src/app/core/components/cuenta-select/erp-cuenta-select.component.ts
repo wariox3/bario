@@ -12,7 +12,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
-import { map } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ErpSelectDataService, ErpSelectOption, type ParamValue } from '@reddoc/core';
 
 /** Fila cruda del endpoint `contabilidad/cuenta/seleccionar/`. */
@@ -50,7 +51,8 @@ function toOption(row: CuentaApiRow): ErpSelectOption {
  * Selector de cuentas contables.
  *
  * Autocomplete sobre `contabilidad/cuenta/seleccionar/` que:
- * - Trae primeros resultados al enfocar (`codigo__startswith=''`).
+ * - Recarga la lista inicial (`codigo__startswith=''`) en cada enfoque y cada vez
+ *   que se vacía el input, para que el desplegable no quede pegado al último filtro.
  * - Busca discriminando entrada numérica (`codigo__startswith`) de texto
  *   (`nombre__icontains`), siempre acotado a `permite_movimiento=True`.
  * - Muestra cada cuenta como `código - nombre`.
@@ -70,8 +72,8 @@ function toOption(row: CuentaApiRow): ErpSelectOption {
       [inputId]="inputId()"
       [ngModel]="value()"
       (onSelect)="onValueChange($event.value)"
-      (onClear)="onValueChange(null)"
-      (onBlur)="onTouchedFn()"
+      (onClear)="onCleared()"
+      (onBlur)="onBlurred()"
       [suggestions]="suggestions()"
       (completeMethod)="onSearch($event)"
       (onFocus)="onFocusInput()"
@@ -125,15 +127,40 @@ export class ErpCuentaSelectComponent implements ControlValueAccessor {
   private onChangeFn: (value: ErpSelectOption | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
   private skipNextFocus = false;
+  private focused = false;
+  private reopenTimer?: ReturnType<typeof setTimeout>;
+
+  /** Términos de búsqueda (enfoque, limpieza y tecleo); la última consulta gana. */
+  private readonly query$ = new Subject<string>();
 
   constructor() {
+    // Una sola tubería para todas las consultas: `switchMap` cancela la petición en
+    // vuelo cuando llega un término nuevo (si no, la respuesta vieja podría pisar la
+    // lista), y `catchError` deja `[]` para que PrimeNG apague su `loading` y muestre
+    // el `emptyMessage` en vez de quedarse colgado.
+    this.query$
+      .pipe(
+        switchMap((query) =>
+          this.fetchCuentas(this.searchParams(query)).pipe(
+            catchError(() => of<ErpSelectOption[]>([])),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((options) => this.suggestions.set(options));
+
+    this.destroyRef.onDestroy(() => clearTimeout(this.reopenTimer));
+
     // Carga eager solo cuando se pide sugerir: necesita los resultados sin esperar
     // el foco para poder preseleccionar el primero.
     effect(() => {
       if (!this.suggestFirst()) return;
-      this.fetchInitial().subscribe((options) => {
-        this.suggestions.set(options);
-        this.applySuggestion(options);
+      this.fetchInitial().subscribe({
+        next: (options) => {
+          this.suggestions.set(options);
+          this.applySuggestion(options);
+        },
+        error: () => undefined,
       });
     });
   }
@@ -160,26 +187,73 @@ export class ErpCuentaSelectComponent implements ControlValueAccessor {
     if (next !== null) this.skipNextFocus = true;
   }
 
+  /**
+   * Cada enfoque relanza la búsqueda sin filtro. `suggestions` guarda el último
+   * resultado —casi siempre el de un término tecleado—, así que reusarlo dejaría el
+   * desplegable pegado a ese filtro. `search()` con `source` ≠ `'input'` marca
+   * `loading`, emite `completeMethod('')` y deja que PrimeNG abra el panel solo
+   * cuando lleguen las sugerencias.
+   */
   onFocusInput(): void {
+    this.focused = true;
+    // El enfoque ya recarga: sobra la reapertura diferida que pudo agendar `onCleared`.
+    clearTimeout(this.reopenTimer);
+    // Red de seguridad: salda el descuadre que `onBlurred` no pudo saldar por tener
+    // el panel abierto (salir con Tab sin elegir nada).
+    this.reconcileForceSelection();
+    // Tras seleccionar, PrimeNG devuelve el foco al input; eso no debe reabrir el panel.
     if (this.skipNextFocus) {
       this.skipNextFocus = false;
       return;
     }
-    if (this.suggestions().length > 0) {
-      this.ac?.show();
-      return;
-    }
-    this.fetchInitial().subscribe((options) => {
-      this.suggestions.set(options);
-      setTimeout(() => this.ac?.show());
-    });
+    this.ac?.search(undefined, '', 'focus');
+  }
+
+  /**
+   * Al vaciar el input PrimeNG **no** busca —descarta los términos en blanco cuyo
+   * `source` es `'input'`— y, si se vació con Backspace, agenda cerrar el panel en
+   * `delay/2`. Relanzamos la búsqueda sin filtro justo después de ese cierre para que
+   * vuelva a verse la lista completa. Con la "x" el foco vuelve al input y la recarga
+   * ya la hace `onFocusInput`, que de paso cancela este timer.
+   */
+  onCleared(): void {
+    this.onValueChange(null);
+    clearTimeout(this.reopenTimer);
+    this.reopenTimer = setTimeout(
+      () => {
+        if (this.focused) this.ac?.search(undefined, '', 'reopen');
+      },
+      this.delay() / 2 + 60,
+    );
+  }
+
+  onBlurred(): void {
+    this.focused = false;
+    clearTimeout(this.reopenTimer);
+    this.reconcileForceSelection();
+    this.onTouchedFn();
   }
 
   onSearch(event: AutoCompleteCompleteEvent): void {
-    const query = event.query?.trim() ?? '';
-    this.fetchCuentas(this.searchParams(query)).subscribe((options) =>
-      this.suggestions.set(options),
-    );
+    this.query$.next(event.query?.trim() ?? '');
+  }
+
+  /**
+   * `forceSelection` descarta el texto que no coincide **exacto** con una opción: al
+   * salir del campo, PrimeNG vacía el input y su modelo interno, pero como el
+   * `[ngModel]` es de una vía no avisa hacia afuera. Sin esto el control se quedaría
+   * con la opción anterior mientras el input se ve vacío, y un guardado enviaría el
+   * valor viejo.
+   *
+   * Con el panel abierto el blur viene de un clic sobre una opción —el `mousedown`
+   * desenfoca antes de que llegue el `click`—, así que la selección está en camino y
+   * no hay nada que reconciliar: limpiar aquí propagaría un `null` intermedio al
+   * formulario.
+   */
+  private reconcileForceSelection(): void {
+    if (this.value() === null || this.ac?.overlayVisible) return;
+    const input: HTMLInputElement | undefined = this.ac?.inputEL?.nativeElement;
+    if (input && input.value.trim() === '') this.onValueChange(null);
   }
 
   // ── Internos ────────────────────────────────────────────────────────────────
