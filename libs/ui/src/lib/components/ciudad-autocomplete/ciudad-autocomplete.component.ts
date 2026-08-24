@@ -10,6 +10,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
+import { Subject, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { CIUDAD_FUENTE, Ciudad, CiudadFuente, CiudadService, formatCiudad } from '@reddoc/core';
 
 /**
@@ -110,6 +112,26 @@ export class CiudadAutocompleteComponent implements ControlValueAccessor {
   private onChangeFn: (value: CiudadOpcion | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
 
+  /** Términos tecleados; la última consulta gana. */
+  private readonly query$ = new Subject<string>();
+
+  constructor() {
+    // `switchMap` cancela la consulta en vuelo al llegar un término nuevo: sin él,
+    // la respuesta de un prefijo corto puede llegar tarde y pisar la del término
+    // completo. `catchError` deja `[]` para que PrimeNG apague su `loading`.
+    this.query$
+      .pipe(
+        switchMap((query) =>
+          this.ciudadService.search(query, this.fuente()).pipe(
+            map((items) => items.map(aOpcion)),
+            catchError(() => of<CiudadOpcion[]>([])),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((opciones) => this.suggestions.set(opciones));
+  }
+
   /**
    * El valor guardado llega con el `nombre` que el registro tenga; se le calcula
    * la `etiqueta` para que el input muestre lo mismo al reabrir que al elegir.
@@ -136,13 +158,6 @@ export class CiudadAutocompleteComponent implements ControlValueAccessor {
   }
 
   onSearch(event: AutoCompleteCompleteEvent): void {
-    const query = event.query?.trim() ?? '';
-    this.ciudadService
-      .search(query, this.fuente())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (items) => this.suggestions.set(items.map(aOpcion)),
-        error: () => this.suggestions.set([]),
-      });
+    this.query$.next(event.query?.trim() ?? '');
   }
 }

@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import {
   AutoComplete,
   AutoCompleteCompleteEvent,
@@ -81,7 +83,27 @@ export class ContenedorInviteFormComponent {
    */
   readonly selectedAccesoIds = signal<readonly ContenedorAccesoId[]>([]);
 
+  /** Términos tecleados; la última consulta gana. */
+  private readonly search$ = new Subject<string>();
+
   constructor() {
+    // `switchMap` cancela la búsqueda en vuelo al llegar un término nuevo: sin él,
+    // la respuesta de un prefijo corto puede llegar tarde y pisar la del completo.
+    this.search$
+      .pipe(
+        tap(() => this.isSearching.set(true)),
+        switchMap((query) =>
+          this.contenedorService
+            .searchUsers(query)
+            .pipe(catchError(() => of<UserSearchResult[]>([]))),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((results) => {
+        this.userSuggestions.set(results);
+        this.isSearching.set(false);
+      });
+
     // Los grupos son verticales del schema público (globales): se cargan una
     // sola vez. Al cambiar de contenedor se descarta lo elegido: los accesos
     // ofrecidos son los de su plan, y los del anterior no aplican acá.
@@ -116,20 +138,7 @@ export class ContenedorInviteFormComponent {
       this.userSuggestions.set([]);
       return;
     }
-    this.isSearching.set(true);
-    this.contenedorService
-      .searchUsers(event.query)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (r) => {
-          this.userSuggestions.set(r);
-          this.isSearching.set(false);
-        },
-        error: () => {
-          this.userSuggestions.set([]);
-          this.isSearching.set(false);
-        },
-      });
+    this.search$.next(event.query);
   }
 
   onUserSelected(event: AutoCompleteSelectEvent): void {
