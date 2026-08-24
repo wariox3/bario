@@ -201,9 +201,9 @@
         <dt class="contrato-detail__label">{{ f.centroCosto }}</dt>
         <dd
           class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.centro_costo_nombre"
+          [class.contrato-detail__value--empty]="!c.grupo_contabilidad_nombre"
         >
-          {{ c.centro_costo_nombre || '—' }}
+          {{ c.grupo_contabilidad_nombre || '—' }}
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">

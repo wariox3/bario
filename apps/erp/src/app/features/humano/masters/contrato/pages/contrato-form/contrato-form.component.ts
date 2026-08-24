@@ -61,6 +61,16 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
  * `cotizanteCoherenteValidator`. En alta se siembra "Dependiente" (código `01`),
  * que es lo que cotiza cualquier otro vínculo.
  */
+/**
+ * Campo del backend → control del formulario, para los que no se llaman igual.
+ *
+ * Solo uno: en la UI el campo es «centro de costo», que es como lo llama todo
+ * el ERP, pero en `HumContrato` viaja como `grupo_contabilidad`. Sin este mapa
+ * un error del backend sobre ese campo terminaría en un toast en vez de debajo
+ * del select.
+ */
+const CONTRATO_FIELD_MAP = { grupo_contabilidad: 'centro_costo' };
+
 @Component({
   selector: 'app-contrato-form',
   standalone: true,
@@ -286,7 +296,7 @@ export class ContratoFormComponent implements OnInit {
       error: (err: unknown) => {
         this.isSaving.set(false);
         const fail = id ? toasts.editError : toasts.createError;
-        this.formErrors.handle(this.form, err, fail.title);
+        this.formErrors.handle(this.form, err, fail.title, CONTRATO_FIELD_MAP);
       },
     });
   }
