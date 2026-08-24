@@ -233,6 +233,9 @@ export class ContratoAutocompleteComponent implements ControlValueAccessor {
     this.focused = true;
     // El enfoque ya recarga: sobra la reapertura diferida que pudo agendar `onCleared`.
     clearTimeout(this.reopenTimer);
+    // Red de seguridad: salda el descuadre que `onBlurred` no pudo saldar por tener
+    // el panel abierto (salir con Tab sin elegir nada).
+    this.reconcileForceSelection();
     // Tras seleccionar, PrimeNG devuelve el foco al input; eso no debe reabrir el panel.
     if (this.skipNextFocus) {
       this.skipNextFocus = false;
@@ -262,11 +265,30 @@ export class ContratoAutocompleteComponent implements ControlValueAccessor {
   onBlurred(): void {
     this.focused = false;
     clearTimeout(this.reopenTimer);
+    this.reconcileForceSelection();
     this.onTouchedFn();
   }
 
   onSearch(event: AutoCompleteCompleteEvent): void {
     this.query$.next(event.query?.trim() ?? '');
+  }
+
+  /**
+   * `forceSelection` descarta el texto que no coincide **exacto** con una opción: al
+   * salir del campo, PrimeNG vacía el input y su modelo interno, pero como el
+   * `[ngModel]` es de una vía no avisa hacia afuera. Sin esto el control se quedaría
+   * con la opción anterior mientras el input se ve vacío, y un guardado enviaría el
+   * valor viejo.
+   *
+   * Con el panel abierto el blur viene de un clic sobre una opción —el `mousedown`
+   * desenfoca antes de que llegue el `click`—, así que la selección está en camino y
+   * no hay nada que reconciliar: limpiar aquí propagaría un `null` intermedio al
+   * formulario.
+   */
+  private reconcileForceSelection(): void {
+    if (this.value() === null || this.ac?.overlayVisible) return;
+    const input: HTMLInputElement | undefined = this.ac?.inputEL?.nativeElement;
+    if (input && input.value.trim() === '') this.onValueChange(null);
   }
 
   // ── Internos ────────────────────────────────────────────────────────────────
