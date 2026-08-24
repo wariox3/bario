@@ -33,6 +33,7 @@ import {
   esTipoCotizanteAprendiz,
 } from '../../contrato.constants';
 import { cotizanteCoherenteValidator } from '../../utils/cotizante-coherente.validator';
+import { salarioPositivo } from '../../utils/salario-positivo.validator';
 import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
 
 /**
@@ -160,7 +161,7 @@ export class ContratoFormComponent implements OnInit {
     // Habilita que este contrato entre en la programación de turnos.
     habilitado_turno: this.fb.control<boolean>(false),
     // Remuneración
-    salario: this.fb.control<number | null>(null, Validators.required),
+    salario: this.fb.control<number | null>(null, [Validators.required, salarioPositivo]),
     auxilio_transporte: this.fb.control<boolean>(true),
     salario_integral: this.fb.control<boolean>(false),
     tipo_costo: this.fb.control<ErpSelectOption | null>(null),
@@ -330,7 +331,10 @@ export class ContratoFormComponent implements OnInit {
       .subscribe({
         next: (campos) => {
           const salario = campos['hum_salario_minimo'];
-          if (salario != null) this.form.controls.salario.setValue(salario);
+          // Un contenedor sin salario mínimo configurado devuelve 0. Sembrarlo
+          // dejaría el formulario inválido de entrada, con el botón de guardar
+          // apagado y sin nada tocado que explique por qué.
+          if (salario != null && salario > 0) this.form.controls.salario.setValue(salario);
         },
         error: () => {
           // Pre-llenado opcional: si falla, el usuario digita los valores manualmente.

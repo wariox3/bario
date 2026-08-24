@@ -1418,6 +1418,7 @@ export interface AppDict
         };
         validation: {
           required: string;
+          salarioPositivo: string;
           cotizanteAprendizRequerido: string;
           cotizanteAprendizNoAplica: string;
         };

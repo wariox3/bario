@@ -1859,6 +1859,7 @@ export const en: AppDict = {
         },
         validation: {
           required: 'This field is required',
+          salarioPositivo: 'The salary must be greater than zero',
           cotizanteAprendizRequerido:
             'A SENA apprentice contract requires an apprentice contributor type (code 12 or 19)',
           cotizanteAprendizNoAplica:

@@ -229,7 +229,10 @@
           />
           <lib-field-error
             [control]="form.controls.salario"
-            [messages]="{ required: t().entities.contrato.form.validation.required }"
+            [messages]="{
+              required: t().entities.contrato.form.validation.required,
+              salarioPositivo: t().entities.contrato.form.validation.salarioPositivo,
+            }"
           />
         </div>
 
