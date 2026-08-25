@@ -427,6 +427,7 @@
             formControlName="riesgo"
             endpoint="/humano/riesgo/seleccionar/"
             [params]="{ limit: '100' }"
+            [displayWith]="riesgoLabel"
             [invalid]="form.controls.riesgo.invalid && form.controls.riesgo.touched"
           />
         </div>

@@ -1,4 +1,14 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  LOCALE_ID,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { formatNumber } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -102,6 +112,7 @@ export class ContratoFormComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly configuracion = inject(ConfiguracionService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly locale = inject(LOCALE_ID);
 
   protected readonly t = this.i18n.t;
 
@@ -110,6 +121,22 @@ export class ContratoFormComponent implements OnInit {
 
   /** Endpoints `seleccionar` de catálogos compartidos, para los `<app-api-*>` del template. */
   protected readonly endpoints = SELECT_ENDPOINTS;
+
+  /**
+   * Etiqueta `I – 0,522 %` para la clase de riesgo laboral.
+   *
+   * El endpoint ya manda `nombre` como `"I - 0.522"`, pero con punto decimal y
+   * sin unidad: así la tarifa se lee como si fuera parte del código de la clase.
+   * Se recompone desde `codigo` y `porcentaje` —los cinco porcentajes de ley
+   * traen tres decimales, de ahí el `1.3-3` fijo— y ante cualquier fila que no
+   * traiga ambos campos cae al `nombre` crudo antes que dejar la opción coja.
+   */
+  protected readonly riesgoLabel = (option: ErpSelectOption): string => {
+    const codigo = option['codigo'];
+    const porcentaje = Number(option['porcentaje']);
+    if (typeof codigo !== 'string' || !Number.isFinite(porcentaje)) return option.nombre;
+    return `${codigo} – ${formatNumber(porcentaje, this.locale, '1.3-3')} %`;
+  };
 
   /** Id del contrato a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
