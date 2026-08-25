@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ErpApiSelectComponent, FieldErrorComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -43,6 +43,7 @@ const MOTIVO_TERMINACION_ENDPOINT = '/humano/motivo-terminacion/seleccionar/';
   selector: 'app-terminar-contrato-modal',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     ButtonModule,
     DatePickerModule,
@@ -81,10 +82,7 @@ export class TerminarContratoModalComponent {
   });
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.isSaving()) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (this.form.invalid || this.isSaving()) return;
 
     const raw = this.form.getRawValue();
     const toasts = this.t().entities.contrato.terminar.toasts;

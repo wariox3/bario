@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -32,6 +32,7 @@ import { puestoToFormValue, formValueToPayload } from '../../puesto.mapper';
   selector: 'app-puesto-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

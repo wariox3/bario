@@ -1,6 +1,12 @@
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
   <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
   <lib-page-actions>
     <p-button
@@ -18,7 +24,7 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
   </lib-page-actions>
   <!-- ── Sección 1: Información principal ──────────────────────────────────── -->

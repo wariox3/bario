@@ -26,7 +26,12 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { CiudadAutocompleteComponent, FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import {
+  CiudadAutocompleteComponent,
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+} from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import { EmpleadoAutocompleteComponent } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
 import type { EmpleadoOption } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
@@ -95,6 +100,7 @@ const CONTRATO_FIELD_MAP = { grupo_contabilidad: 'centro_costo' };
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,
+    FocusInvalidDirective,
     ErpApiSelectComponent,
     EmpleadoAutocompleteComponent,
     CiudadAutocompleteComponent,
@@ -305,6 +311,12 @@ export class ContratoFormComponent implements OnInit {
     if (!this.form.controls.fecha_hasta.value) this.form.controls.fecha_hasta.setValue(today);
   }
 
+  /**
+   * El botón de guardar **no** se deshabilita por formulario inválido: un botón
+   * muerto no explica qué falta ni deja avanzar. El intento en blanco es el que
+   * revela — `libFocusInvalid` en el `<form>` marca todo como tocado y salta al
+   * primer campo con error; acá solo se corta.
+   */
   protected onSubmit(): void {
     if (this.form.invalid || this.form.pending || this.isSaving()) return;
     this.isSaving.set(true);

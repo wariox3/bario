@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { PeriodoService } from '../../periodo.service';
@@ -21,7 +21,14 @@ const ANIO_MAX = 2100;
 @Component({
   selector: 'app-periodo-anio-nuevo-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, DialogModule, ButtonModule, InputTextModule, FieldErrorComponent],
+  imports: [
+    ReactiveFormsModule,
+    DialogModule,
+    ButtonModule,
+    InputTextModule,
+    FieldErrorComponent,
+    FocusInvalidDirective,
+  ],
   templateUrl: './periodo-anio-nuevo-dialog.component.html',
 })
 export class PeriodoAnioNuevoDialogComponent {
