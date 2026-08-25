@@ -37,6 +37,12 @@
     "watchDirectory": "useFsEvents"
   },
   // El monorepo usa la versión de TS del workspace, no la que trae VSCode.
+  // Ojo: `tsdk` solo la ofrece. Hay que aceptarla una vez por workspace con
+  // «TypeScript: Select TypeScript Version → Use Workspace Version»; si se
+  // contesta que no, tsserver corre con el TS de VSCode y muere el
+  // go-to-definition (imports y templates). `enablePromptUseWorkspaceTsdk`
+  // vuelve a preguntar al abrir el repo.
   "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
   "eslint.workingDirectories": [{ "mode": "auto" }]
 }
