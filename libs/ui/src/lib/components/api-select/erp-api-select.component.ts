@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   forwardRef,
   inject,
@@ -27,6 +28,10 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
       [disabled]="disabled() || loading()"
       [invalid]="invalid()"
       [loading]="loading()"
+      [filter]="showFilter()"
+      [filterBy]="filterBy()"
+      [filterPlaceholder]="filterPlaceholder()"
+      [resetFilterOnHide]="true"
       optionLabel="nombre"
       dataKey="id"
       appendTo="body"
@@ -64,11 +69,31 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
    * endpoint vía el genérico `T`.
    */
   readonly displayWith = input<((option: ErpSelectOption) => string) | null>(null);
+  /**
+   * A partir de cuántas opciones el desplegable muestra su buscador. Un catálogo
+   * corto (dos o tres opciones) se lee de un vistazo y el input solo estorba;
+   * uno largo se vuelve inmanejable sin él. `null` lo desactiva siempre.
+   */
+  readonly filterThreshold = input<number | null>(10);
+  /**
+   * Campos por los que filtra el buscador, separados por coma. El default alcanza
+   * salvo que `displayWith` componga la etiqueta con otros campos del endpoint: ahí
+   * hay que nombrarlos (p. ej. `'nombre,codigo'`) o el usuario teclearía lo que ve
+   * sin obtener resultados.
+   */
+  readonly filterBy = input<string>('nombre');
+  readonly filterPlaceholder = input<string>('Buscar…');
 
   readonly value = signal<ErpSelectOption | null>(null);
   readonly disabled = signal(false);
   readonly options = signal<ErpSelectOption[]>([]);
   readonly loading = signal(false);
+
+  /** El buscador filtra en cliente sobre el catálogo ya cargado; no consulta de nuevo. */
+  readonly showFilter = computed(() => {
+    const threshold = this.filterThreshold();
+    return threshold !== null && this.options().length >= threshold;
+  });
 
   private onChangeFn: (value: ErpSelectOption | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
