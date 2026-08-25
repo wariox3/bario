@@ -15,7 +15,11 @@ export function contratoToFormValue(c: Contrato): Partial<ContratoFormRawValue> 
   return {
     contacto:
       c.contacto != null
-        ? { id: c.contacto, nombre: c.contacto_nombre ?? '', numero_identificacion: '' }
+        ? {
+            id: c.contacto,
+            nombre: c.contacto_nombre ?? '',
+            numero_identificacion: c.contacto_numero_identificacion ?? '',
+          }
         : null,
     contrato_tipo:
       c.contrato_tipo != null

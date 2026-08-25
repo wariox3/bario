@@ -1825,6 +1825,7 @@ export const en: AppDict = {
         fields: {
           contacto: 'Employee',
           contactoPlaceholder: 'Search employee…',
+          identificacion: 'ID number',
           contratoTipo: 'Contract type',
           cargo: 'Role',
           grupo: 'Group',

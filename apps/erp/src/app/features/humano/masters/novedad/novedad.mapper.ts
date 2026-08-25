@@ -14,7 +14,11 @@ export function novedadToFormValue(n: Novedad): Partial<NovedadFormRawValue> {
   return {
     contrato:
       n.contrato != null
-        ? { id: n.contrato, nombre: n.contrato_nombre ?? '', numero_identificacion: '' }
+        ? {
+            id: n.contrato,
+            nombre: n.contrato_nombre ?? '',
+            numero_identificacion: n.contrato_numero_identificacion ?? '',
+          }
         : null,
     novedad_tipo:
       n.novedad_tipo != null ? { id: n.novedad_tipo, nombre: n.novedad_tipo_nombre ?? '' } : null,

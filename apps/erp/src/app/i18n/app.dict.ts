@@ -1384,6 +1384,7 @@ export interface AppDict
         fields: {
           contacto: string;
           contactoPlaceholder: string;
+          identificacion: string;
           contratoTipo: string;
           cargo: string;
           grupo: string;

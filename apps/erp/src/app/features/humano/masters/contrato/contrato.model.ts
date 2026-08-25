@@ -25,6 +25,14 @@ export interface Contrato {
   readonly contrato_tipo_nombre: string | null;
   readonly contacto: number | null;
   readonly contacto_nombre: string | null;
+  /**
+   * Cédula del empleado, para el addon del autocomplete en edición y la ficha
+   * del detalle. Opcional a propósito: es un campo del **contacto**, no del
+   * contrato —el contrato solo guarda la FK—, así que el backend lo expone como
+   * companion y hasta que lo agregue llega `undefined`. Quien lo lea debe caer a
+   * vacío, nunca asumirlo presente.
+   */
+  readonly contacto_numero_identificacion?: string | null;
   readonly ciudad_contrato: number | null;
   readonly ciudad_contrato_nombre: string | null;
   readonly ciudad_labora: number | null;

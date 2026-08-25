@@ -19,6 +19,15 @@ export interface Adicional {
   // Foreign keys (id pelado) + companion `*_nombre`
   readonly contrato: number | null;
   readonly contrato_nombre: string | null;
+  /**
+   * Cédula del empleado del contrato, para el addon del autocomplete en edición.
+   *
+   * TODO(backend): nombre **asumido**. El companion del nombre es
+   * `contrato_nombre` (que ya es el nombre del empleado, no el del contrato), así
+   * que se sigue el mismo patrón `<fk>_<campo>`. Opcional: hasta que el backend lo
+   * exponga llega `undefined` y el addon degrada a vacío, como hoy.
+   */
+  readonly contrato_numero_identificacion?: string | null;
   readonly concepto: number | null;
   readonly concepto_nombre: string | null;
   readonly programacion: number | null;

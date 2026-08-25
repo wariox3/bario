@@ -115,6 +115,16 @@
           {{ c.contacto_nombre || '—' }}
         </dd>
       </div>
+      <!-- La cédula al lado del nombre: es como se identifica al empleado en nómina. -->
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.identificacion }}</dt>
+        <dd
+          class="contrato-detail__value font-mono tabular-nums"
+          [class.contrato-detail__value--empty]="!c.contacto_numero_identificacion"
+        >
+          {{ c.contacto_numero_identificacion || '—' }}
+        </dd>
+      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="contrato-detail__label">{{ f.contratoTipo }}</dt>
         <dd
