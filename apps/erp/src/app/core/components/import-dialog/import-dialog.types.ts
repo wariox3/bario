@@ -6,17 +6,11 @@
  * - **`{ mode: 'enabled', endpoint, filename? }`** → visible y funcional.
  *   El dialog hace la descarga GET contra `endpoint` reusando
  *   `FileDownloadService` de `@reddoc/core` (cookies + `X-Tenant` automáticos).
- * - **`{ mode: 'external', url }`** → la plantilla no la sirve el backend sino
- *   un archivo público (el bucket donde el ERP anterior dejó las suyas). Se
- *   ofrece como enlace real a pestaña nueva, igual que los maestros: no pasa por
- *   `FileDownloadService` porque no lleva cookies ni `X-Tenant`, y el `<a>` deja
- *   ver a dónde va.
  * - **`{ mode: 'disabled', reason }`** → visible pero deshabilitado, con
  *   tooltip mostrando `reason` (ej. "Plantilla no configurada para este tenant").
  */
 export type ExampleConfig =
   | { readonly mode: 'enabled'; readonly endpoint: string; readonly filename?: string }
-  | { readonly mode: 'external'; readonly url: string }
   | { readonly mode: 'disabled'; readonly reason: string };
 
 /**

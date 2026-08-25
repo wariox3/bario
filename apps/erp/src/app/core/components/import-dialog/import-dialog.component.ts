@@ -172,12 +172,6 @@ export class ImportDialogComponent {
     return cfg !== null && cfg.mode === 'enabled' && !this.exampleDownloading();
   });
 
-  /** URL pública de la plantilla, cuando no la sirve el backend. */
-  protected readonly exampleExternalUrl = computed(() => {
-    const cfg = this.exampleConfig();
-    return cfg !== null && cfg.mode === 'external' ? cfg.url : null;
-  });
-
   protected readonly exampleDisabledReason = computed(() => {
     const cfg = this.exampleConfig();
     return cfg !== null && cfg.mode === 'disabled' ? cfg.reason : null;

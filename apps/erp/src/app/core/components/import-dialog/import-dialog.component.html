@@ -277,14 +277,7 @@
   <ng-template pTemplate="footer">
     <div class="flex items-center justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] pt-4">
       <!-- Acción auxiliar: descargar ejemplo (3 estados: oculto / habilitado / bloqueado) -->
-      @if (exampleExternalUrl(); as url) {
-        <!-- Archivo público: es un enlace de verdad, no un botón que simula uno.
-             Así el navegador ofrece "abrir en pestaña nueva" y se ve el destino. -->
-        <a class="cp-import-dialog__example" [href]="url" target="_blank" rel="noopener" download>
-          <i class="pi pi-download text-[0.8rem]"></i>
-          <span>{{ t().common.import.example.download }}</span>
-        </a>
-      } @else if (exampleVisible()) {
+      @if (exampleVisible()) {
         <button
           type="button"
           class="cp-import-dialog__example"

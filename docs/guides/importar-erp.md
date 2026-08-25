@@ -123,17 +123,16 @@ endpoint de su dominio.
 
 ## La plantilla de ejemplo (`exampleConfig`)
 
-Tres estados, decididos por el consumidor:
+**La plantilla siempre la sirve el backend**, en el `…/importar-ejemplo/` del recurso que
+se importa. No hay plantillas en el bucket: eso es cosa de los maestros (más abajo), que
+son otra cosa. Tres estados, decididos por el consumidor:
 
 ```ts
-// Servida por el backend: va con cookies y X-Tenant, así que puede traer datos del tenant
+// Lo normal: va con cookies y X-Tenant, así que puede traer datos del tenant
 protected readonly exampleConfig = {
   mode: 'enabled' as const,
   endpoint: '/general/contacto/importar-ejemplo/',
 };
-
-// Archivo público en el bucket, cuando el backend todavía no la expone
-{ mode: 'external', url: IMPORT_PLANTILLA.precioDetalle }
 
 // Visible pero bloqueado, con el motivo en un tooltip
 { mode: 'disabled', reason: 'Plantilla no configurada para este tenant' }
@@ -141,11 +140,9 @@ protected readonly exampleConfig = {
 // Oculto: no pasar el input (default null)
 ```
 
-`enabled` descarga por `FileDownloadService`. `external` se renderiza como un enlace real a
-pestaña nueva —igual que los maestros— porque un archivo público no lleva cookies ni
-`X-Tenant` y conviene que se vea a dónde va; sus URLs viven en `IMPORT_PLANTILLA`
-(`import-plantillas.constant.ts`). Preferí `enabled` siempre que exista el endpoint: la
-plantilla del backend puede venir con los datos del tenant, la del bucket no.
+`enabled` descarga por `FileDownloadService`. El endpoint es el del propio recurso; solo
+se apunta al de otro cuando es ese el que declara el esquema del archivo (empleados manda
+a `/general/contacto/importar-ejemplo/`, porque el empleado se importa como contacto).
 
 ---
 

@@ -13,7 +13,6 @@ import {
 } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
 import { importState } from '@erp/core/components/import-dialog/import-state';
-import { IMPORT_PLANTILLA } from '@erp/core/components/import-dialog/import-plantillas.constant';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
 import { PrecioDetalleService } from '../../precio-detalle.service';
@@ -105,15 +104,13 @@ export class PrecioItemsComponent {
   protected readonly vrPrecioMax = VR_PRECIO_MAX;
 
   /**
-   * La plantilla la publica el bucket, no el backend: es el XLSX que el ERP
-   * anterior ofrece para esta misma importación. Pasa a `{ mode: 'enabled' }`
-   * el día que exista un `precio-detalle/importar-ejemplo/` — el que hoy
-   * declara el esquema es `precio/importar-ejemplo/`, que es la plantilla de
-   * las **listas** de precio, no la de sus líneas.
+   * La plantilla la sirve el backend, como la de cualquier otro listado: el
+   * recurso propio de las líneas, no el de las listas de precio. Así baja con
+   * cookies y `X-Tenant`, y puede venir con los datos del tenant.
    */
   protected readonly exampleConfig: ExampleConfig = {
-    mode: 'external',
-    url: IMPORT_PLANTILLA.precioDetalle,
+    mode: 'enabled',
+    endpoint: '/general/precio-detalle/importar-ejemplo/',
   };
 
   /**
