@@ -20,6 +20,9 @@ export { ContratoAutocompleteComponent } from './lib/components/contrato-autocom
 export type { ContratoOption } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export { DetailHeaderComponent } from './lib/components/detail-header/detail-header.component';
 export { PageActionsComponent } from './lib/components/page-actions/page-actions.component';
+export { FormPendingComponent } from './lib/components/form-pending/form-pending.component';
+export type { FormPendingLabels } from './lib/components/form-pending/form-pending.component';
+export { SectionPendingComponent } from './lib/components/form-pending/section-pending.component';
 export { UppercaseDirective } from './lib/directives/uppercase.directive';
 export { SoloDigitosDirective } from './lib/directives/solo-digitos.directive';
 export { TelefonoPipe } from './lib/pipes/telefono.pipe';

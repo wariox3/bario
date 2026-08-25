@@ -18,8 +18,9 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
+    <lib-form-pending [form]="form" />
   </lib-page-actions>
   <!-- ── Sección 1: Datos del contrato ─────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
@@ -45,6 +46,7 @@
           }}
         </p>
       </div>
+      <lib-section-pending [form]="form" />
     </div>
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
@@ -227,6 +229,7 @@
           {{ t().entities.contrato.form.sectionsHint.remuneracion }}
         </p>
       </div>
+      <lib-section-pending [form]="form" />
     </div>
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
@@ -323,6 +326,7 @@
           {{ t().entities.contrato.form.sectionsHint.seguridadSocial }}
         </p>
       </div>
+      <lib-section-pending [form]="form" />
     </div>
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
@@ -523,6 +527,7 @@
             {{ t().entities.contrato.form.sectionsHint.terminacion }}
           </p>
         </div>
+        <lib-section-pending [form]="form" />
       </div>
 
       <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
