@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import {
   CiudadAutocompleteComponent,
   FieldErrorComponent,
+  FocusInvalidDirective,
   PageActionsComponent,
   SoloDigitosDirective,
 } from '@reddoc/ui';
@@ -46,6 +47,7 @@ import { empleadoToFormValue, formValueToPayload } from '../../empleado.mapper';
   selector: 'app-empleado-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

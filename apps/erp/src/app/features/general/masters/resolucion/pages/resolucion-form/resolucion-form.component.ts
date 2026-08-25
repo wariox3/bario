@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, ToastService, startOfToday } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { UppercaseDirective } from '@reddoc/ui';
@@ -33,6 +33,7 @@ import {
   selector: 'app-resolucion-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

@@ -11,6 +11,19 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroupDirective } from '@angular/forms';
 
 /**
+ * Campos que todavía no dejan guardar, en orden de pantalla.
+ *
+ * `.ng-invalid` la pone Angular en el host de cada `formControlName`, sea
+ * `<input>` o componente propio. `.ng-pending` cubre al que está esperando su
+ * validador async —identificación única, por ejemplo—: no está mal, pero es
+ * igual de bloqueante y sin él el clic no haría nada visible.
+ *
+ * `[formcontrolname]` deja fuera a los `formGroupName`, que heredan las clases
+ * pero no son un campo al que saltar.
+ */
+const SELECTOR_PENDIENTE = '[formcontrolname].ng-invalid, [formcontrolname].ng-pending';
+
+/**
  * Al intentar guardar con el formulario inválido, marca todo como tocado —así
  * cada `<lib-field-error>` aparece— y lleva a la persona al primer campo con
  * error, en orden de pantalla.
@@ -24,11 +37,6 @@ import { FormGroupDirective } from '@angular/forms';
  * no explica qué falta ni deja avanzar, y con 20 campos obligatorios en cuatro
  * cards encontrar el que falta a ojo es el problema. La página solo conserva su
  * guard `if (form.invalid) return` en el handler.
- *
- * Los campos se localizan por la clase `.ng-invalid` que Angular pone en el
- * host de cada `formControlName`, sea `<input>` o componente propio: no hay
- * nada que declarar. `[formcontrolname]` deja fuera a los `formGroupName`, que
- * heredan la clase pero no son un campo al que saltar.
  */
 @Directive({
   selector: 'form[libFocusInvalid]',
@@ -49,7 +57,10 @@ export class FocusInvalidDirective implements OnInit {
   ngOnInit(): void {
     this.formDirective.ngSubmit.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       const form = this.formDirective.form;
-      if (!form.invalid) return;
+      // `valid` y no `!invalid`: un form PENDING —esperando un validador async—
+      // tampoco pasó, y hay que decirlo. Uno entero deshabilitado no es un
+      // intento fallido, es una pantalla de solo lectura.
+      if (form.valid || form.disabled) return;
       form.markAllAsTouched();
       afterNextRender(() => this.irAlPrimero(), { injector: this.injector });
     });
@@ -63,7 +74,7 @@ export class FocusInvalidDirective implements OnInit {
    * `preventScroll` para no pelear con el scroll suave que ya está en curso.
    */
   private irAlPrimero(): void {
-    const el = this.host.querySelector<HTMLElement>('[formcontrolname].ng-invalid');
+    const el = this.host.querySelector<HTMLElement>(SELECTOR_PENDIENTE);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     const focusable = el.matches('input, select, textarea')

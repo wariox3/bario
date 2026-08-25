@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -46,6 +46,7 @@ import { novedadToFormValue, formValueToPayload } from '../../novedad.mapper';
   selector: 'app-novedad-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

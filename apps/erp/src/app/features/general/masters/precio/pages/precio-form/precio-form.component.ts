@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -32,6 +32,7 @@ import { precioToFormValue, formValueToPayload } from '../../precio.mapper';
   selector: 'app-precio-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

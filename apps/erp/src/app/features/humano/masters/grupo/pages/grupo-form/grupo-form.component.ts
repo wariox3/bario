@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
@@ -28,6 +28,7 @@ import { grupoToFormValue, formValueToPayload } from '../../grupo.mapper';
   selector: 'app-grupo-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

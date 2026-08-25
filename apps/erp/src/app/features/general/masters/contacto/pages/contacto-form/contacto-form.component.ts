@@ -18,6 +18,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import {
   CiudadAutocompleteComponent,
   FieldErrorComponent,
+  FocusInvalidDirective,
   PageActionsComponent,
   SoloDigitosDirective,
 } from '@reddoc/ui';
@@ -54,6 +55,7 @@ import {
   selector: 'app-contacto-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

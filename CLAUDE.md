@@ -209,6 +209,8 @@ Regla: lo que solo importa a un master vive dentro del master.
 3. Entrada en el `menu` del `<modulo>.module-descriptor.ts` (path relativo: `<plural>`).
 4. Claves i18n `entities.<entity>.*` en `app.es.ts` / `app.en.ts`.
 
+**Formularios (masters y documentos):** el botón de guardar **no** se deshabilita por `form.invalid` — un botón muerto no explica qué falta ni deja avanzar. Va `[disabled]="isSaving()"` y `libFocusInvalid` (`FocusInvalidDirective`, de `@reddoc/ui`) sobre el `<form>`: al intentar guardar en blanco marca todo como tocado —así aparece cada `<lib-field-error>`— y lleva a la persona al primer campo que falta. El guard `if (form.invalid …) return;` del `onSubmit` no cambia.
+
 **Para agregar un documento nuevo** (camino A):
 
 1. Crear `<modulo>.config.ts` que exporte `ModuleConfig` con sus `documents`.
