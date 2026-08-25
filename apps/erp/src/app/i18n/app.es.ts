@@ -1892,7 +1892,7 @@ export const es: AppDict = {
           entidadPension: 'Entidad de pensión',
           entidadCesantias: 'Entidad de cesantías',
           entidadCaja: 'Caja de compensación',
-          riesgo: 'Riesgo',
+          riesgo: 'Clase de riesgo laboral',
           tipoCotizante: 'Tipo de cotizante',
           subtipoCotizante: 'Subtipo de cotizante',
           ciudadContrato: 'Ciudad del contrato',

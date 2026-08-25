@@ -1844,7 +1844,7 @@ export const en: AppDict = {
           entidadPension: 'Pension entity',
           entidadCesantias: 'Severance entity',
           entidadCaja: 'Compensation fund',
-          riesgo: 'Risk',
+          riesgo: 'Occupational risk class',
           tipoCotizante: 'Contributor type',
           subtipoCotizante: 'Contributor subtype',
           ciudadContrato: 'Contract city',
