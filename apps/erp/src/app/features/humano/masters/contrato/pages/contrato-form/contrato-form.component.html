@@ -188,6 +188,25 @@
             </span>
           </label>
         </div>
+
+        <!--
+          Nota libre del contrato. Vive acá, al pie de los datos generales, que
+          es donde la tiene el ERP anterior; estaba escrita pero dentro de la
+          sección "Terminación y pagos", que se renderiza tras una bandera
+          apagada — el campo existía en el código y era inalcanzable en pantalla.
+        -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="contrato-form__label">
+            {{ t().entities.contrato.form.fields.comentario }}
+          </label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            class="w-full"
+          ></textarea>
+        </div>
       </div>
     </div>
   </section>
@@ -573,19 +592,6 @@
               appendTo="body"
               [fluid]="true"
             />
-          </div>
-
-          <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label for="comentario" class="contrato-form__label">
-              {{ t().entities.contrato.form.fields.comentario }}
-            </label>
-            <textarea
-              id="comentario"
-              pTextarea
-              formControlName="comentario"
-              rows="3"
-              class="w-full"
-            ></textarea>
           </div>
         </div>
       </div>

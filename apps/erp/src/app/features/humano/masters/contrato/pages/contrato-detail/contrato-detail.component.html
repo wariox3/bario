@@ -168,6 +168,20 @@
           {{ c.habilitado_turno ? d.boolean.si : d.boolean.no }}
         </dd>
       </div>
+      <!--
+        La nota ocupa la fila entera: es texto libre y en una tercera parte del
+        ancho se lee en columna. `whitespace-pre-line` respeta los saltos con los
+        que se escribió; sin eso, una nota de varias líneas llega aplastada.
+      -->
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="contrato-detail__label">{{ f.comentario }}</dt>
+        <dd
+          class="contrato-detail__value whitespace-pre-line"
+          [class.contrato-detail__value--empty]="!c.comentario"
+        >
+          {{ c.comentario || '—' }}
+        </dd>
+      </div>
     </dl>
   </section>
 
