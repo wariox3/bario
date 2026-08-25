@@ -1115,6 +1115,7 @@ export const en: AppDict = {
         id: 'ID',
         nombre: 'Name',
         periodo: 'Period',
+        dias: 'Days',
       },
       periodos: { 1: 'Biweekly', 2: 'Monthly' },
       form: {

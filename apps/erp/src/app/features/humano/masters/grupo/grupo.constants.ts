@@ -40,6 +40,13 @@ export const GRUPOS_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.grupo.columns.periodo',
     type: 'text',
   },
+  {
+    field: 'periodo_dias',
+    headerKey: 'entities.grupo.columns.dias',
+    type: 'number',
+    width: '90px',
+    align: 'right',
+  },
 ];
 
 export const GRUPOS_FILTER_FIELDS: readonly FilterField[] = [

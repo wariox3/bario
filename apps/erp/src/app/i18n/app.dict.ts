@@ -859,7 +859,7 @@ export interface AppDict
     grupo: {
       name: string;
       searchPlaceholder: string;
-      columns: { id: string; nombre: string; periodo: string };
+      columns: { id: string; nombre: string; periodo: string; dias: string };
       periodos: { 1: string; 2: string };
       form: {
         createTitle: string;

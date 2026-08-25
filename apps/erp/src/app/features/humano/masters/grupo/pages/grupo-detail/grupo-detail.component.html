@@ -71,8 +71,18 @@
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="grupo-detail__label">{{ t().entities.grupo.columns.periodo }}</dt>
-        <dd class="grupo-detail__value" [class.grupo-detail__value--empty]="!g.periodo_nombre">
-          {{ g.periodo_nombre || '—' }}
+        <dd class="grupo-detail__value" [class.grupo-detail__value--empty]="!periodoLabel()">
+          {{ periodoLabel() || '—' }}
+        </dd>
+      </div>
+      <!-- Cuánto dura el período: es lo que el nombre del período significa. -->
+      <div class="flex flex-col gap-0.5">
+        <dt class="grupo-detail__label">{{ t().entities.grupo.columns.dias }}</dt>
+        <dd
+          class="grupo-detail__value font-mono tabular-nums"
+          [class.grupo-detail__value--empty]="!g.periodo_dias"
+        >
+          {{ g.periodo_dias || '—' }}
         </dd>
       </div>
     </dl>
