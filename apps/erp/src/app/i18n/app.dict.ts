@@ -1045,8 +1045,25 @@ export interface AppDict
       detail: {
         sections: { general: string };
         groups: { identificacion: string; jerarquia: string; condiciones: string };
+        fields: { codigoClase: string; codigoGrupo: string; codigoCuenta: string };
+        acciones: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
+        traslado: {
+          menuItem: string;
+          title: string;
+          subtitle: string;
+          submit: string;
+          destino: string;
+          warning: string;
+          fields: { cuentaOrigen: string; cuentaOrigenPlaceholder: string };
+          validation: { required: string; mismaCuenta: string };
+          confirm: { header: string; message: string; accept: string };
+          toasts: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
       };
     };
     activo: {

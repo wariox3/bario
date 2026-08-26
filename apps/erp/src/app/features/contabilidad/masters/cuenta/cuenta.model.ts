@@ -31,3 +31,17 @@ export interface CuentaPayload {
   readonly cuenta_grupo: number | null;
   readonly cuenta_cuenta: number | null;
 }
+
+/**
+ * Traslado de movimientos entre cuentas: todos los movimientos de la cuenta
+ * origen pasan a la cuenta destino. Es irreversible.
+ */
+export interface CuentaTrasladoPayload {
+  readonly cuenta_origen_id: number;
+  readonly cuenta_destino_id: number;
+}
+
+/** Respuesta del traslado. El backend describe en `mensaje` lo que movió. */
+export interface CuentaTrasladoResponse {
+  readonly mensaje?: string;
+}

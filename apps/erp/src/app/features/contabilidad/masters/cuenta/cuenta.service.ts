@@ -7,7 +7,12 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { Cuenta, CuentaPayload } from './cuenta.model';
+import type {
+  Cuenta,
+  CuentaPayload,
+  CuentaTrasladoPayload,
+  CuentaTrasladoResponse,
+} from './cuenta.model';
 
 @Injectable({ providedIn: 'root' })
 export class CuentaService extends BaseHttpService {
@@ -31,6 +36,14 @@ export class CuentaService extends BaseHttpService {
 
   update(id: number, payload: CuentaPayload): Observable<Cuenta> {
     return this.put<Cuenta>(`${this.resourcePath}${id}/`, payload);
+  }
+
+  /**
+   * Traslada a `cuenta_destino_id` todos los movimientos de `cuenta_origen_id`.
+   * Operación irreversible: quien la invoque debe confirmarla antes.
+   */
+  trasladar(payload: CuentaTrasladoPayload): Observable<CuentaTrasladoResponse> {
+    return this.post<CuentaTrasladoResponse>(`${this.resourcePath}trasladar/`, payload);
   }
 
   /** Importación masiva desde un archivo Excel. */

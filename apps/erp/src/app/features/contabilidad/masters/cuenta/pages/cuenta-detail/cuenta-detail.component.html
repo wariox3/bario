@@ -19,6 +19,25 @@
       size="small"
       (onClick)="onEdit()"
     />
+    <!-- El traslado es irreversible: va en el dropdown y no a un click del
+         encabezado, mismo criterio que "Anular" en las fichas de documento. -->
+    <p-button
+      type="button"
+      [label]="t().entities.cuenta.detail.acciones"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleAcciones($event)"
+    />
+    <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
+    <app-trasladar-movimientos-modal
+      [(visible)]="trasladoVisible"
+      [cuentaDestinoId]="c.id"
+      [cuentaDestinoCodigo]="c.codigo"
+      (done)="onTrasladoDone()"
+    />
   }
 </header>
 
@@ -62,7 +81,7 @@
     </div>
 
     <div
-      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1.1fr_1fr_1fr] lg:divide-x lg:divide-y-0"
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1.1fr_1.7fr_1fr] lg:divide-x lg:divide-y-0"
     >
       <!-- Grupo: identificación -->
       <div class="px-5 py-4">
@@ -87,37 +106,42 @@
         </dl>
       </div>
 
-      <!-- Grupo: jerarquía — de qué cuelga la cuenta dentro del PUC. -->
+      <!-- Grupo: jerarquía — de qué cuelga la cuenta dentro del PUC.
+           Cada nivel va con su código además del nombre: el código es lo que se
+           coteja contra un plan de cuentas impreso. Sale del id, que en el PUC
+           codifica el código (clase 1 → grupo 13 → cuenta 1305). -->
       <div class="px-5 py-4">
         <p class="cuenta-detail__group">{{ t().entities.cuenta.detail.groups.jerarquia }}</p>
-        <dl class="mt-3 flex flex-col gap-3">
-          <div class="flex flex-col gap-0.5">
-            <dt class="cuenta-detail__label">{{ t().entities.cuenta.form.fields.cuentaClase }}</dt>
-            <dd
-              class="cuenta-detail__value"
-              [class.cuenta-detail__value--empty]="!c.cuenta_clase_nombre"
-            >
-              {{ c.cuenta_clase_nombre || '—' }}
-            </dd>
-          </div>
-          <div class="flex flex-col gap-0.5">
-            <dt class="cuenta-detail__label">{{ t().entities.cuenta.form.fields.cuentaGrupo }}</dt>
-            <dd
-              class="cuenta-detail__value"
-              [class.cuenta-detail__value--empty]="!c.cuenta_grupo_nombre"
-            >
-              {{ c.cuenta_grupo_nombre || '—' }}
-            </dd>
-          </div>
-          <div class="flex flex-col gap-0.5">
-            <dt class="cuenta-detail__label">{{ t().entities.cuenta.form.fields.cuentaCuenta }}</dt>
-            <dd
-              class="cuenta-detail__value"
-              [class.cuenta-detail__value--empty]="!c.cuenta_cuenta_nombre"
-            >
-              {{ c.cuenta_cuenta_nombre || '—' }}
-            </dd>
-          </div>
+        <!-- `7rem` para la etiqueta: «Código de clase» mide ~5.3rem a 0.7rem/500 y
+             con menos quiebra en dos líneas. `gap-4` en vez del `gap-3` del resto
+             de grupos porque acá cada fila pesa dos datos, no uno. -->
+        <dl class="mt-3 flex flex-col gap-4">
+          @for (nivel of jerarquia(); track nivel.codigoKey) {
+            <div class="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] gap-x-4">
+              <div class="flex flex-col gap-0.5">
+                <dt class="cuenta-detail__label">
+                  {{ t().entities.cuenta.detail.fields[nivel.codigoKey] }}
+                </dt>
+                <dd
+                  class="cuenta-detail__value cuenta-detail__value--mono"
+                  [class.cuenta-detail__value--empty]="nivel.codigo === null"
+                >
+                  {{ nivel.codigo ?? '—' }}
+                </dd>
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <dt class="cuenta-detail__label">
+                  {{ t().entities.cuenta.form.fields[nivel.nombreKey] }}
+                </dt>
+                <dd
+                  class="cuenta-detail__value"
+                  [class.cuenta-detail__value--empty]="!nivel.nombre"
+                >
+                  {{ nivel.nombre || '—' }}
+                </dd>
+              </div>
+            </div>
+          }
         </dl>
       </div>
 

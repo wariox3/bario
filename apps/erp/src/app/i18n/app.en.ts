@@ -1380,12 +1380,43 @@ export const en: AppDict = {
           jerarquia: 'Hierarchy',
           condiciones: 'Conditions',
         },
+        fields: {
+          codigoClase: 'Class code',
+          codigoGrupo: 'Group code',
+          codigoCuenta: 'Account code',
+        },
+        acciones: 'Actions',
         notFound: {
           title: 'Account not found',
           desc: 'The account you are looking for does not exist or was deleted.',
         },
         toasts: {
           loadError: { title: 'Load error', desc: 'Could not load the account' },
+        },
+        traslado: {
+          menuItem: 'Move entries to this account',
+          title: 'Move entries',
+          subtitle: 'Pick the account whose entries move to this one',
+          submit: 'Move',
+          destino: 'All entries of the selected account move to account',
+          warning: 'This action cannot be undone.',
+          fields: {
+            cuentaOrigen: 'Source account',
+            cuentaOrigenPlaceholder: 'Search by code or name…',
+          },
+          validation: {
+            required: 'Pick the source account',
+            mismaCuenta: 'The source account cannot be the one receiving the entries',
+          },
+          confirm: {
+            header: 'Move entries',
+            message: 'Confirm the transfer? This action cannot be undone.',
+            accept: 'Yes, move',
+          },
+          toasts: {
+            success: { title: 'Entries moved', desc: 'The transfer completed successfully' },
+            error: { title: 'Transfer error', desc: 'Could not move the entries' },
+          },
         },
       },
     },

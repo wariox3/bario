@@ -1419,12 +1419,49 @@ export const es: AppDict = {
           jerarquia: 'Jerarquía',
           condiciones: 'Condiciones',
         },
+        fields: {
+          codigoClase: 'Código de clase',
+          codigoGrupo: 'Código de grupo',
+          codigoCuenta: 'Código de cuenta',
+        },
+        acciones: 'Acciones',
         notFound: {
           title: 'Cuenta no encontrada',
           desc: 'La cuenta que buscás no existe o fue eliminada.',
         },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la cuenta' },
+        },
+        traslado: {
+          menuItem: 'Trasladar movimientos a esta cuenta',
+          title: 'Trasladar movimientos',
+          subtitle: 'Elegí la cuenta cuyos movimientos pasan a esta',
+          submit: 'Trasladar',
+          destino: 'Todos los movimientos de la cuenta elegida se trasladan a la cuenta',
+          warning: 'Esta acción no se puede revertir.',
+          fields: {
+            cuentaOrigen: 'Cuenta origen',
+            cuentaOrigenPlaceholder: 'Buscá por código o nombre…',
+          },
+          validation: {
+            required: 'Elegí la cuenta origen',
+            mismaCuenta: 'La cuenta origen no puede ser la misma que recibe los movimientos',
+          },
+          confirm: {
+            header: 'Trasladar movimientos',
+            message: '¿Confirmás el traslado? Esta acción no se puede revertir.',
+            accept: 'Sí, trasladar',
+          },
+          toasts: {
+            success: {
+              title: 'Movimientos trasladados',
+              desc: 'El traslado se hizo correctamente',
+            },
+            error: {
+              title: 'Error al trasladar',
+              desc: 'No se pudieron trasladar los movimientos',
+            },
+          },
         },
       },
     },
