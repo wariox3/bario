@@ -27,6 +27,15 @@ export interface Adicional {
    * que se sigue el mismo patrón `<fk>_<campo>`. Opcional: hasta que el backend lo
    * exponga llega `undefined` y el addon degrada a vacío, como hoy.
    */
+  /**
+   * Código interno del empleado (el id de su contacto).
+   *
+   * TODO(backend): **no existe todavía** en la respuesta de `lista/`. El ERP
+   * anterior lo servía como `contrato__contacto_id`; acá se sigue la convención
+   * `<fk>_<campo>` del resto del modelo. Opcional: hasta que el backend lo
+   * exponga llega `undefined` y la columna queda vacía.
+   */
+  readonly contrato_contacto_id?: number | null;
   readonly contrato_numero_identificacion?: string | null;
   readonly concepto: number | null;
   readonly concepto_nombre: string | null;

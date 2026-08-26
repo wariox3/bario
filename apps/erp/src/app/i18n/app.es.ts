@@ -1771,7 +1771,12 @@ export const es: AppDict = {
       name: 'Adicionales',
       searchPlaceholder: 'Buscar por contrato…',
       columns: {
-        contrato: 'Contrato',
+        id: 'ID',
+        codigo: 'Código',
+        identificacion: 'Identificación',
+        nombre: 'Nombre',
+        contratoId: 'Cont',
+        conceptoId: 'Cod',
         concepto: 'Concepto',
         valor: 'Valor',
         horas: 'Horas',

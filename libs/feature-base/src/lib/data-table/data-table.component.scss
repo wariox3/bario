@@ -146,6 +146,14 @@
       color: #16a34a;
     }
 
+    // `booleanTone: 'negative'`: el «sí» de un estado adverso (inactivo, vencido).
+    // Ámbar y no rojo — es una condición del registro, no un error que atender.
+    &--adverse {
+      background: #fffbeb;
+      color: #b45309;
+    }
+
+    // El «no» va neutro con cualquier tono: no está inactivo no es un logro.
     &--false {
       background: rgba(20 48 73 / 0.06);
       color: var(--brand-muted);

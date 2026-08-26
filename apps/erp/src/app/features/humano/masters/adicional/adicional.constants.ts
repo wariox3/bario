@@ -11,15 +11,46 @@ export const ADICIONAL_LIST_PATH = ['humano', 'adicionales'] as const;
 export const CONCEPTO_ENDPOINT = '/humano/concepto/seleccionar/';
 
 export const ADICIONALES_COLUMNS: readonly ColumnDef[] = [
+  // Los identificadores van primero: dos adicionales del mismo empleado y
+  // concepto se ven idénticos en la lista y son lo único que los separa.
+  {
+    field: 'id',
+    headerKey: 'entities.adicional.columns.id',
+    type: 'number',
+    width: '70px',
+    align: 'right',
+  },
+  {
+    field: 'contrato_contacto_id',
+    headerKey: 'entities.adicional.columns.codigo',
+    type: 'number',
+    width: '80px',
+    align: 'right',
+  },
+  {
+    field: 'contrato_numero_identificacion',
+    headerKey: 'entities.adicional.columns.identificacion',
+    type: 'text',
+    width: '130px',
+  },
   {
     field: 'contrato_nombre',
-    headerKey: 'entities.adicional.columns.contrato',
+    headerKey: 'entities.adicional.columns.nombre',
     type: 'text',
   },
   {
-    field: 'concepto_nombre',
-    headerKey: 'entities.adicional.columns.concepto',
-    type: 'text',
+    field: 'contrato',
+    headerKey: 'entities.adicional.columns.contratoId',
+    type: 'number',
+    width: '75px',
+    align: 'right',
+  },
+  {
+    field: 'concepto',
+    headerKey: 'entities.adicional.columns.conceptoId',
+    type: 'number',
+    width: '75px',
+    align: 'right',
   },
   {
     field: 'valor',
@@ -43,6 +74,9 @@ export const ADICIONALES_COLUMNS: readonly ColumnDef[] = [
     field: 'inactivo',
     headerKey: 'entities.adicional.columns.inactivo',
     type: 'boolean',
+    // Un adicional inactivo no se liquida: el «sí» de esta columna es una
+    // condición adversa, no un estado deseable.
+    booleanTone: 'negative',
     width: '60px',
     align: 'center',
   },
@@ -51,7 +85,7 @@ export const ADICIONALES_COLUMNS: readonly ColumnDef[] = [
 export const ADICIONALES_FILTER_FIELDS: readonly FilterField[] = [
   {
     name: 'contrato_nombre',
-    displayNameKey: 'entities.adicional.columns.contrato',
+    displayNameKey: 'entities.adicional.columns.nombre',
     type: 'string',
   },
   {

@@ -43,6 +43,9 @@ export type ColumnAlignment = 'left' | 'center' | 'right';
  * columnas y la tabla itera sobre ellas para renderizar header + celda según
  * el `type`.
  */
+/** Qué significa un `true` en una columna booleana: un estado deseable o uno adverso. */
+export type BooleanTone = 'positive' | 'negative';
+
 export interface ColumnDef {
   /** Nombre del campo en el row (acceso por `row[field]`). */
   readonly field: string;
@@ -68,6 +71,17 @@ export interface ColumnDef {
    * Permite personalizar por columna: `'common.boolAccepted'` → "Aceptado/Rechazado".
    */
   readonly booleanKeyPrefix?: string;
+  /**
+   * Para `type === 'boolean'`: qué significa que el valor sea verdadero.
+   *
+   * El badge se pintaba siempre verde en `true`, así que una columna como
+   * `inactivo` mostraba «Sí» en verde —el color decía lo contrario del dato—.
+   * Con `'negative'` el verdadero se pinta en ámbar; el falso queda neutro en
+   * ambos casos, porque «no está inactivo» no es un logro que destacar.
+   *
+   * Default `'positive'`: las columnas que no lo declaran no cambian.
+   */
+  readonly booleanTone?: BooleanTone;
   /**
    * Para `type === 'combined'`: las partes a mostrar en la misma celda, cada una
    * formateada según su `type` y unidas por `separator`. El `field` de la columna se

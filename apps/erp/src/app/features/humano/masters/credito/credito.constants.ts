@@ -54,6 +54,7 @@ export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
     field: 'inactivo',
     headerKey: 'entities.credito.columns.inactivo',
     type: 'boolean',
+    booleanTone: 'negative',
     width: '60px',
     align: 'center',
   },

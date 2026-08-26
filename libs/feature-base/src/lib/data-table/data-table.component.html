@@ -68,9 +68,15 @@
             @case ('boolean') {
               @let boolVal = readValue(row, col.field);
               @let prefix = col.booleanKeyPrefix ?? 'common.boolean';
+              <!-- El tono lo decide la columna: un `true` en «inactivo» no es un
+                   estado deseable y pintarlo verde hacía que el color dijera lo
+                   contrario del dato. -->
               <span
                 class="lib-data-table__bool-badge"
-                [class.lib-data-table__bool-badge--true]="boolVal"
+                [class.lib-data-table__bool-badge--true]="boolVal && col.booleanTone !== 'negative'"
+                [class.lib-data-table__bool-badge--adverse]="
+                  boolVal && col.booleanTone === 'negative'
+                "
                 [class.lib-data-table__bool-badge--false]="!boolVal"
               >
                 {{ translate(prefix + '.' + boolVal) }}
