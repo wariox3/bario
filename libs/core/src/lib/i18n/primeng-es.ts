@@ -1,4 +1,5 @@
 import type { Translation } from 'primeng/api';
+import { FORMATO_FECHA } from '../utils/date.utils';
 
 /**
  * Traducción al español de los strings internos de PrimeNG (calendario, botones de
@@ -20,7 +21,10 @@ export const REDDOC_PRIMENG_ES: Partial<Translation> = {
   firstDayOfWeek: 1,
   today: 'Hoy',
   clear: 'Limpiar',
-  dateFormat: 'dd/mm/yy',
+  // El formato sale de la constante del sistema: todos los `<p-datepicker>` lo
+  // heredan de acá, así que ninguno declara `dateFormat` salvo que muestre otra
+  // cosa (`mm/yy` para elegir un mes).
+  dateFormat: FORMATO_FECHA.primeng,
   weekHeader: 'Sm',
   dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
   dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],

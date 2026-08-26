@@ -14,6 +14,7 @@ import { catchError, forkJoin, map, of, switchMap, type Observable } from 'rxjs'
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import {
+  formatFechaCorta,
   anioMesDeIso,
   type DocumentoDetalleReadBase,
   DocumentoDetalleService,
@@ -161,14 +162,7 @@ export class AfectacionModalComponent {
 
   /** Fecha ISO (`"2026-06-17"`) a formato corto local (`17 jun 2026`), sin desfase TZ. */
   protected formatFecha(value: string | null | undefined): string {
-    if (!value) return '—';
-    const [y, m, d] = value.split('-').map(Number);
-    if (!y || !m || !d) return value;
-    return new Date(y, m - 1, d).toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return formatFechaCorta(value, '—');
   }
 
   /** Código del turno de ese día, vacío si no tiene programación. */

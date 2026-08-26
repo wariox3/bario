@@ -249,6 +249,12 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - **SCSS** — component styles are scoped; global Tailwind brand tokens live in `libs/styles/src/tailwind/brand.css`. Avoid inline styles.
 - **Typed errors** — never `throw new Error('msg')` generic. Define a specific class extending `Error`.
 - **No `any`** — use `unknown` + narrowing where the type is genuinely unknown.
+- **Fechas** — el formato sale de `FORMATO_FECHA` (`@reddoc/core`), única fuente para las tres
+  notaciones (PrimeNG, `| date` de Angular, y con hora). Para pintar: `formatFechaCorta`
+  (`05/08/2026` — campos, tablas, fichas) o `formatFechaLarga` (`05 de agosto de 2026` — solo la
+  cabecera de un documento). Un `<p-datepicker>` **no declara `dateFormat`**: lo hereda del
+  translation global (`REDDOC_PRIMENG_ES`); solo se declara para mostrar otra cosa, como `mm/yy`
+  al elegir un mes. Nada de `toLocaleDateString` suelto ni de `iso.slice(0, 10)`.
 - **Readonly by default** — prefer `readonly` properties and `readonly` arrays in configs and contracts.
 
 ## Tener en cuenta

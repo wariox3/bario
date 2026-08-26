@@ -1,4 +1,4 @@
-import { CommonModule, formatDate, formatNumber } from '@angular/common';
+import { CommonModule, formatNumber } from '@angular/common';
 import {
   Component,
   LOCALE_ID,
@@ -17,6 +17,7 @@ import type { MenuItem, SortMeta } from 'primeng/api';
 import {
   I18nService,
   formatCop,
+  formatFechaCorta,
   toFiniteNumber,
   type ColumnDef,
   type ColumnPart,
@@ -182,14 +183,14 @@ export class DataTableComponent {
     return n === null ? '' : formatNumber(n, this.locale, '1.0-2');
   }
 
-  /** Fecha localizada (acepta ISO string, epoch o `Date`). */
+  /**
+   * Fecha en el formato del sistema —`05/08/2026`— aceptando ISO, epoch o `Date`.
+   *
+   * No usa el `mediumDate` del locale: en es-CO da `5/08/2026`, sin el cero del
+   * día, y una columna de fechas se escanea por su alineación.
+   */
   protected dateCell(value: unknown): string {
-    if (value === null || value === undefined || value === '') return '';
-    try {
-      return formatDate(value as string | number | Date, 'mediumDate', this.locale);
-    } catch {
-      return String(value);
-    }
+    return formatFechaCorta(value as string | number | Date | null | undefined);
   }
 
   /**

@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import {
+  formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
@@ -277,10 +278,9 @@ export class ServicioDocumentoDetailComponent implements OnInit {
   /** Formatea un monto a pesos colombianos sin decimales (`$ 1.000.000`). */
   protected readonly formatMoney = formatCop;
 
-  /** Fecha larga de la cabecera (`20 de junio de 2026`). */
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(date, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/venta/<...routePath>[/extra]`. */

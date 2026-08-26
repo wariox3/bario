@@ -3,6 +3,7 @@ import { Component, DestroyRef, effect, inject, input, output, signal } from '@a
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ContenedorService, getInitials, I18nService, ToastService } from '@reddoc/core';
 import {
+  FORMATO_FECHA,
   Contenedor,
   ContenedorInvitacionEstado,
   ContenedorInvitacionPendiente,
@@ -16,6 +17,9 @@ import type { ContenedoresTranslationsHost } from '../../i18n';
   templateUrl: './contenedor-pending-invites.component.html',
 })
 export class ContenedorPendingInvitesComponent {
+  /** Formato de fecha del sistema, para el `| date` de la plantilla. */
+  protected readonly formatoFecha = FORMATO_FECHA.angular;
+
   private readonly contenedorService = inject(ContenedorService);
   private readonly toastService = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);

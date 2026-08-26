@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { I18nService, TenantService, ToastService, FORMATO_FECHA } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { PrecioItemsComponent } from '../../components/precio-items/precio-items.component';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
@@ -31,6 +31,9 @@ import type { Precio } from '../../precio.model';
   styleUrl: './precio-detail.component.scss',
 })
 export class PrecioDetailComponent implements OnInit {
+  /** Formato de fecha del sistema, para el `| date` de la plantilla. */
+  protected readonly formatoFecha = FORMATO_FECHA.angular;
+
   private readonly precioService = inject(PrecioService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);

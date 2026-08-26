@@ -1,4 +1,4 @@
-import { daysBetween, fromIsoDate, startOfToday } from '@reddoc/core';
+import { daysBetween, fromIsoDate, startOfToday, formatFechaCorta } from '@reddoc/core';
 
 function daysUntilExpiry(fecha: string): number {
   return daysBetween(startOfToday(), fromIsoDate(fecha));
@@ -21,6 +21,5 @@ export function getSuscripcionExpiryLabel(fecha: string | undefined): string {
   if (days < 0) return 'Vencida';
   if (days === 0) return 'Vence hoy';
   if (days <= 7) return `Vence en ${days}d`;
-  const date = fromIsoDate(fecha);
-  return `Vence ${date.toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+  return `Vence ${formatFechaCorta(fecha)}`;
 }

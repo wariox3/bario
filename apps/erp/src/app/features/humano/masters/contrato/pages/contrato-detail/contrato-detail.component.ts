@@ -4,7 +4,13 @@ import { Router } from '@angular/router';
 import { EMPTY, filter, from, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
-import { I18nService, TenantService, ToastService, formatCop, fromIsoDate } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  formatCop,
+  formatFechaLarga,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import type { AppDict } from '@erp/i18n';
@@ -169,9 +175,7 @@ export class ContratoDetailComponent implements OnInit {
 
   /** Fecha larga de la ficha (`20 de junio de 2026`); `—` si no hay valor. */
   protected formatFecha(value: string | null): string {
-    const date = fromIsoDate(value);
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(value, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/humano/contratos[/extra]`. */

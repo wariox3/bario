@@ -2,7 +2,13 @@ import { Component, DestroyRef, type OnInit, computed, inject, input, signal } f
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  formatCop,
+  formatFechaCorta,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { CreditoService } from '../../credito.service';
@@ -53,7 +59,7 @@ export class CreditoDetailComponent implements OnInit {
 
   /** Fecha ISO a `yyyy-MM-dd`, la convención del ERP. */
   protected fecha(iso: string | null | undefined): string {
-    return iso ? iso.slice(0, 10) : '';
+    return formatFechaCorta(iso);
   }
 
   private cop(valor: string | number | null | undefined): string {

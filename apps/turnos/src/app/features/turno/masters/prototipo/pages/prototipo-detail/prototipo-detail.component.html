@@ -84,7 +84,7 @@
           <dt class="prototipo-detail__label">
             {{ t().entities.prototipo.detail.fields.documentoFecha }}
           </dt>
-          <dd class="prototipo-detail__value">{{ p.documento_fecha | date: 'mediumDate' }}</dd>
+          <dd class="prototipo-detail__value">{{ p.documento_fecha | date: formatoFecha }}</dd>
         </div>
       }
       @if (p.puesto_nombre) {
@@ -129,7 +129,7 @@
         <dt class="prototipo-detail__label">
           {{ t().entities.prototipo.detail.fields.fechaInicio }}
         </dt>
-        <dd class="prototipo-detail__value">{{ p.fecha_inicio | date: 'mediumDate' }}</dd>
+        <dd class="prototipo-detail__value">{{ p.fecha_inicio | date: formatoFecha }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.posicion }}</dt>

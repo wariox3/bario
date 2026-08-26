@@ -59,7 +59,7 @@
                 {{ estadoLabel(invite.estado) }}
               </span>
               <span class="text-[0.65rem] leading-none text-brand-muted">
-                {{ invite.rol_nombre }} · {{ invite.fecha | date: 'dd/MM/yyyy' }}
+                {{ invite.rol_nombre }} · {{ invite.fecha | date: formatoFecha }}
               </span>
             </div>
           </li>

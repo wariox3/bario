@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import {
+  formatFechaCorta,
   getPlanDescription,
   getPlanFeatures,
   resolvePlanCategory,
@@ -107,11 +108,7 @@ export class PlanConfirmStepComponent {
     } else {
       next.setMonth(now.getMonth() + 1);
     }
-    return next.toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return formatFechaCorta(next);
   });
 
   onCambiarPlan(): void {
