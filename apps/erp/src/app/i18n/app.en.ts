@@ -1455,7 +1455,7 @@ export const en: AppDict = {
           activoGrupo: 'Asset group',
           centroCosto: 'Cost center',
           metodoDepreciacion: 'Depreciation method',
-          duracion: 'Duration',
+          duracion: 'Duration in months',
           valorCompra: 'Purchase value',
           depreciacionInicial: 'Initial depreciation',
           fechaCompra: 'Purchase date',

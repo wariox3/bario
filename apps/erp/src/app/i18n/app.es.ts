@@ -1500,7 +1500,7 @@ export const es: AppDict = {
           activoGrupo: 'Grupo de activo',
           centroCosto: 'Centro de costo',
           metodoDepreciacion: 'Método de depreciación',
-          duracion: 'Duración',
+          duracion: 'Duración en meses',
           valorCompra: 'Valor de compra',
           depreciacionInicial: 'Depreciación inicial',
           fechaCompra: 'Fecha de compra',
