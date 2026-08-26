@@ -212,12 +212,21 @@
             </dd>
           </div>
           <div class="flex flex-col gap-0.5">
-            <dt class="contrato-detail__label">{{ f.sucursal }}</dt>
+            <dt class="contrato-detail__label">{{ f.ciudadContrato }}</dt>
             <dd
               class="contrato-detail__value"
-              [class.contrato-detail__value--empty]="!c.sucursal_nombre"
+              [class.contrato-detail__value--empty]="!c.ciudad_contrato_nombre"
             >
-              {{ c.sucursal_nombre || '—' }}
+              {{ c.ciudad_contrato_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.ciudadLabora }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--empty]="!c.ciudad_labora_nombre"
+            >
+              {{ c.ciudad_labora_nombre || '—' }}
             </dd>
           </div>
           <div class="flex flex-col gap-0.5">
@@ -321,7 +330,28 @@
         {{ d.sections.seguridadSocial }}
       </h2>
     </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Dos columnas, el orden del ERP anterior: la izquierda lleva el tipo y la
+         derecha su entidad (salud con su EPS, pensión con su fondo), así cada
+         fila se lee como un par. Con más columnas el par se parte. -->
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.tipoCotizante }}</dt>
+        <dd
+          class="contrato-detail__value"
+          [class.contrato-detail__value--empty]="!c.tipo_cotizante_nombre"
+        >
+          {{ c.tipo_cotizante_nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.subtipoCotizante }}</dt>
+        <dd
+          class="contrato-detail__value"
+          [class.contrato-detail__value--empty]="!c.subtipo_cotizante_nombre"
+        >
+          {{ c.subtipo_cotizante_nombre || '—' }}
+        </dd>
+      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="contrato-detail__label">{{ f.salud }}</dt>
         <dd class="contrato-detail__value" [class.contrato-detail__value--empty]="!c.salud_nombre">
@@ -356,15 +386,6 @@
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.entidadCesantias }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.entidad_cesantias_nombre"
-        >
-          {{ c.entidad_cesantias_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
         <dt class="contrato-detail__label">{{ f.entidadCaja }}</dt>
         <dd
           class="contrato-detail__value"
@@ -374,45 +395,27 @@
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.entidadCesantias }}</dt>
+        <dd
+          class="contrato-detail__value"
+          [class.contrato-detail__value--empty]="!c.entidad_cesantias_nombre"
+        >
+          {{ c.entidad_cesantias_nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
         <dt class="contrato-detail__label">{{ f.riesgo }}</dt>
         <dd class="contrato-detail__value" [class.contrato-detail__value--empty]="!c.riesgo_nombre">
           {{ c.riesgo_nombre || '—' }}
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.tipoCotizante }}</dt>
+        <dt class="contrato-detail__label">{{ f.sucursal }}</dt>
         <dd
           class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.tipo_cotizante_nombre"
+          [class.contrato-detail__value--empty]="!c.sucursal_nombre"
         >
-          {{ c.tipo_cotizante_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.subtipoCotizante }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.subtipo_cotizante_nombre"
-        >
-          {{ c.subtipo_cotizante_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.ciudadContrato }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.ciudad_contrato_nombre"
-        >
-          {{ c.ciudad_contrato_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.ciudadLabora }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.ciudad_labora_nombre"
-        >
-          {{ c.ciudad_labora_nombre || '—' }}
+          {{ c.sucursal_nombre || '—' }}
         </dd>
       </div>
     </dl>
