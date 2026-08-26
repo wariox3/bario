@@ -3,3 +3,28 @@
   flex-direction: column;
   gap: 1.25rem;
 }
+
+// Etiqueta de cada dato de la ficha (término de la definition list).
+.precio-detail__label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--brand-muted);
+}
+
+// Valor de cada dato.
+.precio-detail__value {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--brand-text);
+  word-break: break-word;
+}
+
+// Dato ausente: presente en la ficha pero sin competir al escanear la columna.
+.precio-detail__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
+}

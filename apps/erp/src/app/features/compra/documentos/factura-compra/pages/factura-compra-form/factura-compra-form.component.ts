@@ -17,7 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -96,6 +96,7 @@ interface FlushableLineTable {
     DatePickerModule,
     TabsModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,

@@ -42,13 +42,49 @@
   </div>
 } @else if (grupo(); as g) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <lib-detail-header
-    icon="pi pi-users"
-    [eyebrow]="t().entities.grupo.detail.eyebrow"
-    [title]="g.nombre"
-  >
-    <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
-      {{ t().entities.grupo.columns.periodo }}: {{ g.periodo_nombre }}
-    </p>
-  </lib-detail-header>
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos" del sistema, como contacto e ítem. Sin
+       `<lib-detail-header>`: repetía el nombre que ya es un campo de acá. La
+       identidad la dan la miga y el `<h1>` accesible. -->
+  <h1 class="sr-only">{{ g.nombre }}</h1>
+
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-users text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.grupo.detail.sections.general }}
+      </h2>
+    </div>
+
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="grupo-detail__label">{{ t().entities.grupo.columns.nombre }}</dt>
+        <dd class="grupo-detail__value" [class.grupo-detail__value--empty]="!g.nombre">
+          {{ g.nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="grupo-detail__label">{{ t().entities.grupo.columns.periodo }}</dt>
+        <dd class="grupo-detail__value" [class.grupo-detail__value--empty]="!periodoLabel()">
+          {{ periodoLabel() || '—' }}
+        </dd>
+      </div>
+      <!-- Cuánto dura el período: es lo que el nombre del período significa. -->
+      <div class="flex flex-col gap-0.5">
+        <dt class="grupo-detail__label">{{ t().entities.grupo.columns.dias }}</dt>
+        <dd
+          class="grupo-detail__value font-mono tabular-nums"
+          [class.grupo-detail__value--empty]="!g.periodo_dias"
+        >
+          {{ g.periodo_dias || '—' }}
+        </dd>
+      </div>
+    </dl>
+  </section>
 }

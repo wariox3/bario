@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpApiSelectComponent } from '@reddoc/ui';
@@ -40,12 +40,14 @@ import { longitudPar, noIniciaCon, soloDigitos } from '../../utils/cuenta-codigo
   selector: 'app-cuenta-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
   ],
   templateUrl: './cuenta-form.component.html',

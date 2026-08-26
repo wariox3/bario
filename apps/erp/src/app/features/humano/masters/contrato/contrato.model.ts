@@ -25,6 +25,14 @@ export interface Contrato {
   readonly contrato_tipo_nombre: string | null;
   readonly contacto: number | null;
   readonly contacto_nombre: string | null;
+  /**
+   * Cédula del empleado, para el addon del autocomplete en edición y la ficha
+   * del detalle. Opcional a propósito: es un campo del **contacto**, no del
+   * contrato —el contrato solo guarda la FK—, así que el backend lo expone como
+   * companion y hasta que lo agregue llega `undefined`. Quien lo lea debe caer a
+   * vacío, nunca asumirlo presente.
+   */
+  readonly contacto_numero_identificacion?: string | null;
   readonly ciudad_contrato: number | null;
   readonly ciudad_contrato_nombre: string | null;
   readonly ciudad_labora: number | null;
@@ -57,8 +65,14 @@ export interface Contrato {
   readonly tiempo_nombre: string | null;
   readonly tipo_costo: number | null;
   readonly tipo_costo_nombre: string | null;
-  readonly centro_costo: number | null;
-  readonly centro_costo_nombre: string | null;
+  /**
+   * Centro de costo. El backend lo nombra `grupo_contabilidad` (vocabulario del
+   * ERP anterior, donde "grupo" era el de contabilidad); en la UI es «centro de
+   * costo», como en el resto del ERP. Ojo: `grupo`, acá al lado, es otra cosa —
+   * el grupo de nómina.
+   */
+  readonly grupo_contabilidad: number | null;
+  readonly grupo_contabilidad_nombre: string | null;
   readonly motivo_terminacion: number | null;
   readonly motivo_terminacion_nombre: string | null;
 }
@@ -90,7 +104,7 @@ export interface ContratoPayload {
   readonly entidad_pension: number | null;
   readonly entidad_salud: number | null;
   readonly grupo: number | null;
-  readonly centro_costo: number | null;
+  readonly grupo_contabilidad: number | null;
   readonly motivo_terminacion: number | null;
   readonly pension: number | null;
   readonly riesgo: number | null;

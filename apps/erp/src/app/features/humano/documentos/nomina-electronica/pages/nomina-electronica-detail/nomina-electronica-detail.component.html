@@ -15,6 +15,7 @@
   />
   @if (cabecera()) {
     <app-document-detail-actions
+      [documentoId]="id()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
       [showAnular]="true"
@@ -26,7 +27,6 @@
       (anular)="onAnular()"
       (emitir)="onEmitir()"
       (imprimir)="onImprimir()"
-      (archivos)="onArchivos()"
     />
     <div class="ml-auto">
       <app-document-estados [estados]="estados()" />

@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -68,6 +68,7 @@ import { ServicioDocumentoDetallesComponent } from '../../components/servicio-do
     InputNumberModule,
     SelectModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ServicioDocumentoDetallesComponent,

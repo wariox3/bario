@@ -37,6 +37,7 @@ export const en: AppDict = {
       exportExcel: 'Export excel',
       exportPdf: 'Export PDF',
       import: 'Import',
+      options: 'Options',
       export: 'Export',
     },
     search: {
@@ -128,6 +129,51 @@ export const en: AppDict = {
         esFalso: 'is no',
       },
     },
+    archivos: {
+      title: 'Files',
+      subtitle: 'Documents attached to this record',
+      empty: 'No files attached yet.',
+      columns: { fecha: 'Date', nombre: 'Name', tamano: 'Size', acciones: 'Actions' },
+      dropzone: {
+        primary: 'Drag a file here or click to select one',
+        hint: 'Up to {max} MB',
+        invalidType: 'The file format is not valid.',
+        tooLarge: 'The file exceeds the maximum allowed size.',
+      },
+      uploading: 'Uploading file…',
+      download: 'Download',
+      delete: 'Delete',
+      confirmDelete: {
+        header: 'Confirm deletion',
+        message: 'Delete “{nombre}”? This action cannot be undone.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Loading error',
+          desc: 'The files could not be retrieved. Try again.',
+        },
+        uploadSuccess: {
+          title: 'File uploaded',
+          desc: 'The file was attached successfully.',
+        },
+        uploadError: {
+          title: 'Could not upload',
+          desc: 'Check the file and try again.',
+        },
+        deleteSuccess: {
+          title: 'File deleted',
+          desc: 'The file was deleted successfully.',
+        },
+        deleteError: {
+          title: 'Could not delete',
+          desc: 'Try again in a few seconds.',
+        },
+        downloadError: {
+          title: 'Could not download',
+          desc: 'Try again in a few seconds.',
+        },
+      },
+    },
     import: {
       dropzone: {
         primary: 'Drag your Excel file here',
@@ -141,7 +187,27 @@ export const en: AppDict = {
       tabs: { errors: 'Errors', masters: 'Masters' },
       emptyStates: {
         errors: 'Errors will appear here after importing the file.',
-        masters: 'The masters summary will appear here after importing.',
+        masters: 'This list has no reference files to download.',
+      },
+      masters: {
+        hint: 'Download these files to look up the valid codes your file must use.',
+        nameHeader: 'File',
+        download: 'Download',
+        names: {
+          ciudad: 'Cities',
+          comprobanteCodigo: 'Voucher codes',
+          comprobante: 'Vouchers',
+          impuesto: 'Taxes',
+          banco: 'Banks',
+          cuentaBancoClase: 'Bank account classes',
+          activoGrupo: 'Asset groups',
+          metodoDepreciacion: 'Depreciation methods',
+          tipoCotizante: 'Contributor types',
+          subtipoCotizante: 'Contributor subtypes',
+          entidad: 'Entities',
+          tipoContrato: 'Contract types',
+          costoTipo: 'Cost types',
+        },
       },
       errors: {
         rowHeader: 'Row',
@@ -462,7 +528,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Warehouse',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Warehouse not found',
           desc: 'The warehouse does not exist or was deleted.',
@@ -503,7 +569,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Advisor',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Advisor not found',
           desc: 'The advisor you are looking for does not exist or was deleted.',
@@ -555,7 +621,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Bank account',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Bank account not found',
           desc: 'The bank account you are looking for does not exist or was deleted.',
@@ -575,6 +641,42 @@ export const en: AppDict = {
         compra: 'Purchases',
         fechaVence: 'Expiry date',
       },
+      items: {
+        title: 'Items in this list',
+        addLine: 'Add item',
+        empty: {
+          title: 'This list has no items',
+          desc: 'Add an item to set its price within this list.',
+        },
+        columns: {
+          id: 'ID',
+          item: 'Item',
+          referencia: 'Reference',
+          precio: 'Price',
+          acciones: 'Actions',
+        },
+        itemPlaceholder: 'Search for an item…',
+        import: {
+          title: 'Import details',
+          subtitle: 'Upload an Excel with the items and their prices for this list',
+          notice: 'Importing reloads the table: rows without an item yet will be lost.',
+        },
+        confirmDelete: {
+          header: 'Remove item',
+          message: 'Remove “{item}” from this price list?',
+        },
+        toasts: {
+          loadError: { title: 'Loading error', desc: 'Could not load the items in this list.' },
+          createSuccess: { title: 'Item added', desc: 'The item was added to the list.' },
+          createError: { title: 'Could not add', desc: 'Check the item and try again.' },
+          updateError: {
+            title: 'Could not save the price',
+            desc: 'The value went back to the last saved one.',
+          },
+          deleteSuccess: { title: 'Item removed', desc: 'The item left the list.' },
+          deleteError: { title: 'Could not remove', desc: 'Try again in a few seconds.' },
+        },
+      },
       form: {
         createTitle: 'New price list',
         editTitle: 'Edit price list',
@@ -582,8 +684,6 @@ export const en: AppDict = {
         editSubtitle: 'Update the price list information',
         fields: {
           nombre: 'Name',
-          venta: 'Applies to sales',
-          compra: 'Applies to purchases',
           fechaVence: 'Expiry date',
         },
         validation: { required: 'This field is required' },
@@ -602,7 +702,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Price list',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Price list not found',
           desc: 'The price list you are looking for does not exist or was deleted.',
@@ -623,6 +723,8 @@ export const en: AppDict = {
         consecutivoHasta: 'Consecutive to',
         fechaDesde: 'Date from',
         fechaHasta: 'Date to',
+        venta: 'Sales',
+        compra: 'Purchases',
       },
       form: {
         createTitle: 'New resolution',
@@ -660,7 +762,8 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Resolution',
+        sections: { general: 'General information' },
+        labels: { aplicaA: 'Applies to' },
         vigencia: 'Validity',
         notFound: {
           title: 'Resolution not found',
@@ -810,6 +913,10 @@ export const en: AppDict = {
     item: {
       name: 'Items',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import items',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         id: 'ID',
         codigo: 'Code',
@@ -836,6 +943,10 @@ export const en: AppDict = {
           cuentas: 'Accounts to post the item',
         },
         clasificacion: 'Options',
+        enUso: {
+          titulo: 'This item has been used in documents',
+          hint: 'Its type and inventory handling can no longer change; everything else can.',
+        },
         fields: {
           codigo: 'Code',
           nombre: 'Name',
@@ -878,10 +989,15 @@ export const en: AppDict = {
       detail: {
         eyebrow: 'Item',
         sections: {
+          general: 'General information',
+          preciosImpuestos: 'Prices and taxes',
           precios: 'Prices',
           impuestos: 'Taxes',
           cuentas: 'Accounting accounts',
         },
+        groups: { identificacion: 'Identification', clasificacion: 'Classification' },
+        opciones: { imagenes: 'Images' },
+        opcionesHint: { imagenes: 'Item photos, beyond the main one' },
         labels: {
           impuestosVenta: 'Sales taxes',
           impuestosCompra: 'Purchase taxes',
@@ -982,7 +1098,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Branch office',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Branch not found',
           desc: 'The branch you are looking for does not exist or was deleted.',
@@ -999,6 +1115,7 @@ export const en: AppDict = {
         id: 'ID',
         nombre: 'Name',
         periodo: 'Period',
+        dias: 'Days',
       },
       periodos: { 1: 'Biweekly', 2: 'Monthly' },
       form: {
@@ -1017,7 +1134,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Group',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Group not found',
           desc: 'The group you are looking for does not exist or was deleted.',
@@ -1055,7 +1172,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Position',
+        sections: { general: 'General information' },
         activo: 'Active',
         notFound: {
           title: 'Position not found',
@@ -1103,7 +1220,8 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cost center',
+        sections: { general: 'General information' },
+        activo: 'Active',
         notFound: {
           title: 'Cost center not found',
           desc: 'The cost center you are looking for does not exist or was deleted.',
@@ -1146,7 +1264,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Payment method',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Payment form not found',
           desc: 'The payment form you are looking for does not exist or was deleted.',
@@ -1189,7 +1307,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Branch',
+        sections: { general: 'General information' },
         notFound: {
           title: 'Branch not found',
           desc: 'The branch you are looking for does not exist or was deleted.',
@@ -1256,13 +1374,49 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Account',
+        sections: { general: 'General information' },
+        groups: {
+          identificacion: 'Identification',
+          jerarquia: 'Hierarchy',
+          condiciones: 'Conditions',
+        },
+        fields: {
+          codigoClase: 'Class code',
+          codigoGrupo: 'Group code',
+          codigoCuenta: 'Account code',
+        },
+        acciones: 'Actions',
         notFound: {
           title: 'Account not found',
           desc: 'The account you are looking for does not exist or was deleted.',
         },
         toasts: {
           loadError: { title: 'Load error', desc: 'Could not load the account' },
+        },
+        traslado: {
+          menuItem: 'Move entries to this account',
+          title: 'Move entries',
+          subtitle: 'Pick the account whose entries move to this one',
+          submit: 'Move',
+          destino: 'All entries of the selected account move to account',
+          warning: 'This action cannot be undone.',
+          fields: {
+            cuentaOrigen: 'Source account',
+            cuentaOrigenPlaceholder: 'Search by code or name…',
+          },
+          validation: {
+            required: 'Pick the source account',
+            mismaCuenta: 'The source account cannot be the one receiving the entries',
+          },
+          confirm: {
+            header: 'Move entries',
+            message: 'Confirm the transfer? This action cannot be undone.',
+            accept: 'Yes, move',
+          },
+          toasts: {
+            success: { title: 'Entries moved', desc: 'The transfer completed successfully' },
+            error: { title: 'Transfer error', desc: 'Could not move the entries' },
+          },
         },
       },
     },
@@ -1321,7 +1475,13 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Fixed asset',
+        sections: { general: 'General information', contabilizacion: 'Accounting' },
+        groups: {
+          identificacion: 'Identification',
+          depreciacion: 'Depreciation',
+          vida: 'Purchase and useful life',
+        },
+        dadoDeBaja: 'Written off',
         notFound: {
           title: 'Asset not found',
           desc: 'The asset you are looking for does not exist or was deleted.',
@@ -1408,6 +1568,10 @@ export const en: AppDict = {
     empleado: {
       name: 'Employees',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import employees',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         id: 'ID',
         identificacion: 'ID number',
@@ -1459,12 +1623,18 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Employee',
-        sections: {
-          general: 'General information',
+        groups: {
+          identificacion: 'Identification',
           contacto: 'Contact',
           ubicacion: 'Location',
+        },
+        sections: {
+          general: 'General information',
           banca: 'Bank details',
+        },
+        labels: {
+          documento: 'Document',
+          nombreCompleto: 'Full name',
         },
         notFound: {
           title: 'Employee not found',
@@ -1525,7 +1695,8 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Credit',
+        sections: { general: 'General information' },
+        groups: { asignacion: 'Assignment', saldo: 'Balance', cuotas: 'Instalments' },
         notFound: {
           title: 'Credit not found',
           desc: 'The credit you are looking for does not exist or was deleted.',
@@ -1584,7 +1755,10 @@ export const en: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Additional',
+        sections: { general: 'General information' },
+        groups: { asignacion: 'Assignment', valores: 'Values', condiciones: 'Conditions' },
+        labels: { programacion: 'Payroll run' },
+        activo: 'Active',
         notFound: {
           title: 'Additional not found',
           desc: 'The additional you are looking for does not exist or was deleted.',
@@ -1647,6 +1821,10 @@ export const en: AppDict = {
     contrato: {
       name: 'Contracts',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import contracts',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         empleado: 'Employee',
         contratoTipo: 'Contract type',
@@ -1679,6 +1857,7 @@ export const en: AppDict = {
         fields: {
           contacto: 'Employee',
           contactoPlaceholder: 'Search employee…',
+          identificacion: 'ID number',
           contratoTipo: 'Contract type',
           cargo: 'Role',
           grupo: 'Group',
@@ -1698,7 +1877,7 @@ export const en: AppDict = {
           entidadPension: 'Pension entity',
           entidadCesantias: 'Severance entity',
           entidadCaja: 'Compensation fund',
-          riesgo: 'Risk',
+          riesgo: 'Occupational risk class',
           tipoCotizante: 'Contributor type',
           subtipoCotizante: 'Contributor subtype',
           ciudadContrato: 'Contract city',
@@ -1711,7 +1890,14 @@ export const en: AppDict = {
           fechaUltimoPagoVacacion: 'Last vacation payment date',
           comentario: 'Comment',
         },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          salarioPositivo: 'The salary must be greater than zero',
+          cotizanteAprendizRequerido:
+            'A SENA apprentice contract requires an apprentice contributor type (code 12 or 19)',
+          cotizanteAprendizNoAplica:
+            'This contract type does not allow the SENA apprentice contributor types',
+        },
         toasts: {
           createSuccess: {
             title: 'Contract created',
@@ -5530,6 +5716,96 @@ export const en: AppDict = {
       },
     },
   },
+  facturacionElectronica: {
+    certificado: {
+      estado: {
+        venceLabel: 'Expires',
+        vigenteTitle: 'Digital certificate uploaded',
+        vigenteDesc: 'Your certificate is valid. Nothing to do here.',
+        porVencerTitle: 'Your certificate is about to expire',
+        porVencerDesc:
+          'Upload the new one before it lapses: without a valid certificate you cannot issue.',
+        vencidoTitle: 'Your certificate expired',
+        vencidoDesc: 'You cannot issue electronic invoices until you upload a new one.',
+        faltan: { one: '1 day left', other: '{dias} days left' },
+        venceHoy: 'Expires today',
+        vencidoHace: { one: 'Expired 1 day ago', other: 'Expired {dias} days ago' },
+      },
+      upload: {
+        title: 'Digital certificate',
+        hint: 'The file your certification authority issued, along with the password protecting it.',
+        dropzone: {
+          primary: 'Drag your certificate or click to choose it',
+          secondary: 'It is sent encrypted and never stored in the browser.',
+          hint: '.p12 or .pfx files · up to 5 MB',
+        },
+      },
+      fields: {
+        clave: 'Certificate password',
+        claveHint: 'The one protecting the file. We do not store it.',
+      },
+      validation: { required: 'This field is required' },
+      errors: {
+        tipo: 'The file must be {tipos}.',
+        tamano: 'The file cannot exceed {max} MB.',
+      },
+      actions: {
+        cargar: 'Upload certificate',
+        reemplazar: 'Replace certificate',
+        quitar: 'Remove file',
+      },
+      toasts: {
+        success: {
+          title: 'Certificate uploaded',
+          desc: 'It is registered along with its expiry date.',
+        },
+        error: { title: 'We could not upload the certificate' },
+      },
+    },
+    asistente: {
+      eyebrow: 'Setup',
+      title: 'Electronic invoicing',
+      subtitle: 'Complete your company details to start issuing.',
+      pasos: {
+        empresa: { label: 'Company details', hint: 'Identity, contact and location' },
+        certificado: { label: 'Digital certificate', hint: '.p12 file and its password' },
+        resolucion: { label: 'Resolution', hint: 'Authorized invoice numbering' },
+        finalizar: { label: 'Finish', hint: 'Review and activation' },
+      },
+      crearEmisor: {
+        confirm: {
+          header: 'Register your company',
+          subtitle: 'With the electronic invoicing provider',
+          intro: 'Your details are saved. We will register your company with this identity:',
+          warning: 'Once registered, these details cannot be changed from the ERP.',
+          accept: 'Register',
+        },
+        toasts: {
+          success: {
+            title: 'Company registered',
+            desc: 'You can now continue with electronic invoicing.',
+          },
+        },
+      },
+      emisorCreado: {
+        title: 'Your company is already registered for electronic invoicing',
+        desc: 'These details were already sent to the provider, so they cannot be changed here. Contact us if something is wrong.',
+        emisorLabel: 'Issuer',
+        copiar: 'Copy issuer id',
+      },
+      pendiente: { title: 'This step is not available yet' },
+      actions: { guardarYContinuar: 'Save and continue', continuar: 'Continue' },
+    },
+  },
+  inicio: {
+    venta: {
+      facturaElectronica: {
+        title: 'Electronic invoicing',
+        desc: 'Complete your company information and start invoicing electronically.',
+        actions: { completar: 'Complete' },
+      },
+    },
+  },
   seguridad: {
     title: 'Security',
     menu: { usuarios: 'Users' },
@@ -5702,19 +5978,21 @@ export const en: AppDict = {
         },
       },
       fields: {
-        nombreCorto: 'Trade name',
+        razonSocial: 'Legal name',
         tipoPersona: 'Person type',
         identificacion: 'ID type',
         numeroIdentificacion: 'ID number',
         digitoVerificacion: 'Check digit',
         direccion: 'Address',
         ciudad: 'City',
+        ciudadPlaceholder: 'Search city…',
         telefono: 'Phone',
         correo: 'Email',
       },
       validation: {
         required: 'This field is required',
         emailInvalid: 'Enter a valid email',
+        onlyDigits: 'Digits only',
       },
     },
     toasts: {

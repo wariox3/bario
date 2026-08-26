@@ -41,7 +41,6 @@ export const NOMINA_ELECTRONICA_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: false,
     canSelectRows: false,
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,

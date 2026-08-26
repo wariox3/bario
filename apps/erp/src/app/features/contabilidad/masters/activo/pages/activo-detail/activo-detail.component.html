@@ -42,99 +42,217 @@
   </div>
 } @else if (activo(); as a) {
   <!-- ── Encabezado (ficha de identidad estándar) ─────────────────────────────── -->
-  <lib-detail-header
-    icon="pi pi-box"
-    [eyebrow]="t().entities.activo.detail.eyebrow"
-    [title]="a.nombre"
-  >
-    <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
-      {{ a.codigo }}
-    </p>
-  </lib-detail-header>
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos". Marca, serie, modelo y fecha de baja
+       no se mostraban: son justo los datos con los que se identifica un activo
+       físico y se sabe si sigue en servicio. -->
+  <h1 class="sr-only">{{ a.nombre }}</h1>
 
-  <!-- ── Datos del activo ──────────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="px-5 py-5 max-[576px]:px-4">
-      <dl class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.columns.activoGrupo }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ a.activo_grupo_nombre || '—' }}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.columns.centroCosto }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ a.centro_costo_nombre || '—' }}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.form.fields.metodoDepreciacion }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{ a.metodo_depreciacion_nombre || '—' }}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.columns.valorCompra }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ formatCop(a.valor_compra) }}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.form.fields.depreciacionInicial }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ formatCop(a.depreciacion_inicial) }}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.form.fields.duracion }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ a.duracion ?? '—' }}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.columns.fechaCompra }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{ a.fecha_compra ? (a.fecha_compra | date: 'yyyy-MM-dd') : '—' }}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.form.fields.fechaActivacion }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{ a.fecha_activacion ? (a.fecha_activacion | date: 'yyyy-MM-dd') : '—' }}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.form.fields.cuentaGasto }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{
-              a.cuenta_gasto_codigo
-                ? a.cuenta_gasto_codigo + ' - ' + (a.cuenta_gasto_nombre || '')
-                : a.cuenta_gasto_nombre || '—'
-            }}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.activo.form.fields.cuentaDepreciacion }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{
-              a.cuenta_depreciacion_codigo
-                ? a.cuenta_depreciacion_codigo + ' - ' + (a.cuenta_depreciacion_nombre || '')
-                : a.cuenta_depreciacion_nombre || '—'
-            }}
-          </dd>
-        </div>
-      </dl>
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-box text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.activo.detail.sections.general }}
+      </h2>
+
+      <!-- Dado de baja: el estado que decide si el activo sigue depreciándose. -->
+      @if (a.fecha_baja) {
+        <span
+          class="ml-auto inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-rose-700"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+          {{ t().entities.activo.detail.dadoDeBaja }}
+        </span>
+      }
     </div>
+
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1.15fr_1fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- Grupo: qué es y cómo se reconoce físicamente -->
+      <div class="px-5 py-4">
+        <p class="activo-detail__group">{{ t().entities.activo.detail.groups.identificacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.nombre }}</dt>
+            <dd class="activo-detail__value" [class.activo-detail__value--empty]="!a.nombre">
+              {{ a.nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.codigo }}</dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!a.codigo"
+            >
+              {{ a.codigo || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.marca }}</dt>
+            <dd class="activo-detail__value" [class.activo-detail__value--empty]="!a.marca">
+              {{ a.marca || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.serie }}</dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!a.serie"
+            >
+              {{ a.serie || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.modelo }}</dt>
+            <dd class="activo-detail__value" [class.activo-detail__value--empty]="!a.modelo">
+              {{ a.modelo || '—' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Grupo: cómo se deprecia -->
+      <div class="px-5 py-4">
+        <p class="activo-detail__group">{{ t().entities.activo.detail.groups.depreciacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.columns.activoGrupo }}</dt>
+            <dd
+              class="activo-detail__value"
+              [class.activo-detail__value--empty]="!a.activo_grupo_nombre"
+            >
+              {{ a.activo_grupo_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">
+              {{ t().entities.activo.form.fields.metodoDepreciacion }}
+            </dt>
+            <dd
+              class="activo-detail__value"
+              [class.activo-detail__value--empty]="!a.metodo_depreciacion_nombre"
+            >
+              {{ a.metodo_depreciacion_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.duracion }}</dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!a.duracion"
+            >
+              {{ a.duracion || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">
+              {{ t().entities.activo.form.fields.depreciacionInicial }}
+            </dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!depreciacionInicialFmt()"
+            >
+              {{ depreciacionInicialFmt() || '—' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Grupo: cuánto costó y desde cuándo cuenta -->
+      <div class="px-5 py-4">
+        <p class="activo-detail__group">{{ t().entities.activo.detail.groups.vida }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.columns.valorCompra }}</dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!valorCompraFmt()"
+            >
+              {{ valorCompraFmt() || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.fechaCompra }}</dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!fecha(a.fecha_compra)"
+            >
+              {{ fecha(a.fecha_compra) || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">
+              {{ t().entities.activo.form.fields.fechaActivacion }}
+            </dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!fecha(a.fecha_activacion)"
+            >
+              {{ fecha(a.fecha_activacion) || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="activo-detail__label">{{ t().entities.activo.form.fields.fechaBaja }}</dt>
+            <dd
+              class="activo-detail__value activo-detail__value--mono"
+              [class.activo-detail__value--empty]="!fecha(a.fecha_baja)"
+            >
+              {{ fecha(a.fecha_baja) || '—' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contabilización ─────────────────────────────────────────────────────── -->
+  <!-- Card propia: es contra qué cuentas golpea la depreciación, no un dato de
+       identidad del activo, y se consulta por sí solo. -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-amber-50 text-amber-700"
+      >
+        <i class="pi pi-book text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.activo.detail.sections.contabilizacion }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="activo-detail__label">{{ t().entities.activo.form.fields.cuentaGasto }}</dt>
+        <dd class="activo-detail__value" [class.activo-detail__value--empty]="!cuentaGasto()">
+          {{ cuentaGasto() || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="activo-detail__label">
+          {{ t().entities.activo.form.fields.cuentaDepreciacion }}
+        </dt>
+        <dd
+          class="activo-detail__value"
+          [class.activo-detail__value--empty]="!cuentaDepreciacion()"
+        >
+          {{ cuentaDepreciacion() || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="activo-detail__label">{{ t().entities.activo.columns.centroCosto }}</dt>
+        <dd
+          class="activo-detail__value"
+          [class.activo-detail__value--empty]="!a.centro_costo_nombre"
+        >
+          {{ a.centro_costo_nombre || '—' }}
+        </dd>
+      </div>
+    </dl>
   </section>
 }

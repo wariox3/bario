@@ -38,7 +38,7 @@ export type { ParamValue, RequestOptions } from './lib/services/base-http.servic
 export { FileDownloadService } from './lib/http/file-download.service';
 export type { FileDownloadOptions } from './lib/http/file-download.service';
 export { parseFilename, triggerBrowserDownload } from './lib/http/file-download.utils';
-export { CiudadService } from './lib/services/ciudad.service';
+export { CiudadService, CIUDAD_FUENTE, type CiudadFuente } from './lib/services/ciudad.service';
 export type { Ciudad } from './lib/models/ciudad.model';
 export { IdentificacionService } from './lib/services/identificacion.service';
 export type { Identificacion } from './lib/models/identificacion.model';
@@ -83,6 +83,8 @@ export {
   INICIALES_DIA_SEMANA_ES,
 } from './lib/utils/date.utils';
 export type { DiaDelMes, AnioMes } from './lib/utils/date.utils';
+export { formatTelefono } from './lib/utils/telefono.utils';
+export { formatCiudad } from './lib/utils/ciudad.utils';
 export { formatCop, toFiniteNumber } from './lib/utils/currency.utils';
 export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/calculo';
 export type { TasaImpuesto, ImpuestoLinea, LineaCalculo, ResumenDocumento } from './lib/calculo';
@@ -107,7 +109,6 @@ export type {
   DocumentCapabilities,
   EditableRowContext,
   EntityRoutes,
-  ImportDescriptor,
   DocumentEntityConfig,
   EntityConfig,
   ModuleConfig,

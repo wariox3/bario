@@ -1,14 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
+  computed,
   effect,
   forwardRef,
   inject,
   input,
   signal,
+  untracked,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
@@ -28,6 +28,10 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
       [disabled]="disabled() || loading()"
       [invalid]="invalid()"
       [loading]="loading()"
+      [filter]="showFilter()"
+      [filterBy]="filterBy()"
+      [filterPlaceholder]="filterPlaceholder()"
+      [resetFilterOnHide]="true"
       optionLabel="nombre"
       dataKey="id"
       appendTo="body"
@@ -50,7 +54,6 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
 })
 export class ErpApiSelectComponent implements ControlValueAccessor {
   private readonly dataService = inject(ErpSelectDataService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly endpoint = input.required<string>();
   readonly params = input<Record<string, string>>({});
@@ -66,45 +69,78 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
    * endpoint vía el genérico `T`.
    */
   readonly displayWith = input<((option: ErpSelectOption) => string) | null>(null);
+  /**
+   * A partir de cuántas opciones el desplegable muestra su buscador. Un catálogo
+   * corto (dos o tres opciones) se lee de un vistazo y el input solo estorba;
+   * uno largo se vuelve inmanejable sin él. `null` lo desactiva siempre.
+   */
+  readonly filterThreshold = input<number | null>(10);
+  /**
+   * Campos por los que filtra el buscador, separados por coma. El default alcanza
+   * salvo que `displayWith` componga la etiqueta con otros campos del endpoint: ahí
+   * hay que nombrarlos (p. ej. `'nombre,codigo'`) o el usuario teclearía lo que ve
+   * sin obtener resultados.
+   */
+  readonly filterBy = input<string>('nombre');
+  readonly filterPlaceholder = input<string>('Buscar…');
 
   readonly value = signal<ErpSelectOption | null>(null);
   readonly disabled = signal(false);
   readonly options = signal<ErpSelectOption[]>([]);
   readonly loading = signal(false);
 
+  /** El buscador filtra en cliente sobre el catálogo ya cargado; no consulta de nuevo. */
+  readonly showFilter = computed(() => {
+    const threshold = this.filterThreshold();
+    return threshold !== null && this.options().length >= threshold;
+  });
+
   private onChangeFn: (value: ErpSelectOption | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
 
   constructor() {
-    effect(() => {
-      // Sin fetch mientras el control está deshabilitado (p. ej. un select en
-      // cascada cuyo padre aún no se eligió): evita consultas prematuras y se
-      // re-dispara solo cuando se habilita. Si hay un valor seleccionado (caso
-      // de un select bloqueado en edición), se siembra como única opción para
-      // que el p-select pueda pintar su label —sin la opción en la lista, el
-      // valor saldría en blanco—. Sin valor (cascada) queda vacío, igual que antes.
-      if (this.disabled()) {
-        const current = this.value();
-        this.options.set(current ? [current] : []);
+    effect((onCleanup) => {
+      const disabled = this.disabled();
+      // Habilitado, el valor cambia con cada selección del usuario: se lee sin
+      // trackear para no volver a pedir el catálogo entero en cada clic.
+      // Deshabilitado solo lo cambia `writeValue` — la precarga por id de un
+      // form que llega **después** del disable—, y ahí sí hay que reaccionar:
+      // sin el re-disparo, ese valor tardío se quedaría sin catálogo que le
+      // ponga etiqueta.
+      const current = disabled ? this.value() : untracked(() => this.value());
+
+      // Cascada (deshabilitado porque su padre aún no se eligió): no hay valor
+      // que pintar ni motivo para consultar. Se re-dispara al habilitarse.
+      if (disabled && !current) {
+        this.options.set([]);
         return;
       }
+
+      // Deshabilitado **con** valor (select bloqueado en edición): se siembra
+      // para que el p-select tenga qué pintar ya mismo, pero se pide el
+      // catálogo igual. Un valor cargado por id —`{ id, nombre: '' }`, como lo
+      // arma quien solo recibe la FK del backend— no trae etiqueta: sin el
+      // catálogo el campo se ve **vacío**, que es peor que verse deshabilitado.
+      if (disabled && current) this.options.set([current]);
+
       const params = this.params();
       const endpoint = this.endpoint();
       this.loading.set(true);
-      this.dataService
-        .fetchOptions(endpoint, params)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (options) => {
-            this.options.set(options);
-            this.loading.set(false);
-            this.applySuggestion(options);
-          },
-          error: () => {
-            this.options.set([]);
-            this.loading.set(false);
-          },
-        });
+      const fetch = this.dataService.fetchOptions(endpoint, params).subscribe({
+        next: (options) => {
+          this.options.set(options);
+          this.loading.set(false);
+          this.applySuggestion(options);
+        },
+        error: () => {
+          this.options.set([]);
+          this.loading.set(false);
+        },
+      });
+      // Si el efecto se re-dispara con una consulta en vuelo, la vieja se
+      // cancela: su respuesta podía llegar última y pisar las opciones del
+      // endpoint/params vigentes. El cleanup corre también al destruir.
+      onCleanup(() => fetch.unsubscribe());
     });
   }
 

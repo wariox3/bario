@@ -38,7 +38,6 @@ export const FACTURA_POS_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: true,
     canSelectRows: true,
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,

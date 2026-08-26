@@ -7,7 +7,6 @@ import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MenuModule } from 'primeng/menu';
 import { TabsModule } from 'primeng/tabs';
-import type { HttpErrorResponse } from '@angular/common/http';
 import {
   FileDownloadService,
   I18nService,
@@ -16,11 +15,8 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
-import type {
-  ExampleConfig,
-  ImportError,
-} from '@erp/core/components/import-dialog/import-dialog.types';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { ProgramacionResumenComponent } from '../../components/programacion-resumen/programacion-resumen.component';
@@ -127,11 +123,11 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   );
 
   // ── Importación de horas ──────────────────────────────────────────────────
-  protected readonly importVisible = signal(false);
-  protected readonly importLoading = signal(false);
-  protected readonly importErrors = signal<readonly ImportError[]>([]);
-  protected readonly importErrorSummary = signal('');
-  protected readonly importErrorTotal = signal(0);
+  /** Las horas importadas cambian los renglones, así que al terminar se refrescan. */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importarHoras(this.programacionId(), file),
+    onImported: () => this.reloadToken.update((n) => n + 1),
+  });
 
   /**
    * El ERP anterior generaba la plantilla de horas desde el propio listado de
@@ -187,7 +183,7 @@ export class ProgramacionWorkspaceComponent implements OnInit {
         label: labels.importarHoras,
         icon: 'pi pi-upload',
         disabled: bloqueado,
-        command: () => this.abrirImportarHoras(),
+        command: () => this.importar.open(),
       });
     }
 
@@ -360,58 +356,6 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   }
 
   // ── Importar horas ────────────────────────────────────────────────────────
-
-  private abrirImportarHoras(): void {
-    this.clearImportErrors();
-    this.importVisible.set(true);
-  }
-
-  protected onImportVisibleChange(value: boolean): void {
-    this.importVisible.set(value);
-  }
-
-  protected onImportRequested(file: File): void {
-    if (this.importLoading()) return;
-    this.importLoading.set(true);
-    this.clearImportErrors();
-    this.service
-      .importarHoras(this.programacionId(), file)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.importLoading.set(false)),
-      )
-      .subscribe({
-        next: (result) => {
-          if (this.applyImportErrors(parseImportErrors(result))) return;
-          const toasts = this.t().common.import.toasts;
-          this.toast.success(toasts.success.title, toasts.success.desc);
-          this.importVisible.set(false);
-          this.clearImportErrors();
-          // Las horas importadas cambian los renglones: se refrescan.
-          this.reloadToken.update((n) => n + 1);
-        },
-        error: (err: HttpErrorResponse) => {
-          if (!this.applyImportErrors(parseImportErrors(err.error))) {
-            const toasts = this.t().common.import.toasts;
-            this.toast.error(toasts.error.title, toasts.error.desc);
-          }
-        },
-      });
-  }
-
-  private applyImportErrors(parsed: ReturnType<typeof parseImportErrors>): boolean {
-    if (parsed.errors.length === 0 && !parsed.summary) return false;
-    this.importErrors.set(parsed.errors);
-    this.importErrorSummary.set(parsed.summary);
-    this.importErrorTotal.set(parsed.total);
-    return true;
-  }
-
-  private clearImportErrors(): void {
-    this.importErrors.set([]);
-    this.importErrorSummary.set('');
-    this.importErrorTotal.set(0);
-  }
 
   /**
    * Pide confirmación y ejecuta. Las cuatro acciones comparten esqueleto —

@@ -93,6 +93,7 @@ export interface AppDict
       exportPdf: string;
       import: string;
       export: string;
+      options: string;
     };
     search: {
       placeholder: string;
@@ -153,6 +154,39 @@ export interface AppDict
         esFalso: string;
       };
     };
+    /**
+     * Diálogo de **archivos adjuntos** (`ArchivosDialogComponent`), que abre el
+     * menú "Opciones → Archivos" de las fichas de detalle.
+     */
+    archivos: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      columns: { fecha: string; nombre: string; tamano: string; acciones: string };
+      dropzone: {
+        primary: string;
+        /** Soporta el placeholder `{max}` (tamaño máximo en MB). */
+        hint: string;
+        invalidType: string;
+        tooLarge: string;
+      };
+      uploading: string;
+      download: string;
+      delete: string;
+      confirmDelete: {
+        header: string;
+        /** Soporta el placeholder `{nombre}`. */
+        message: string;
+      };
+      toasts: {
+        loadError: { title: string; desc: string };
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        downloadError: { title: string; desc: string };
+      };
+    };
     import: {
       dropzone: {
         primary: string;
@@ -169,6 +203,32 @@ export interface AppDict
       removeFile: string;
       tabs: { errors: string; masters: string };
       emptyStates: { errors: string; masters: string };
+      /**
+       * Tab "Maestros": los archivos de referencia descargables que acompañan a
+       * una importación. Las claves de `names` son los `ImportMasterId` de
+       * `import-dialog.types.ts`; el diálogo indexa este objeto con el id, así
+       * que agregar un maestro sin su nombre acá rompe el build.
+       */
+      masters: {
+        hint: string;
+        nameHeader: string;
+        download: string;
+        names: {
+          ciudad: string;
+          comprobanteCodigo: string;
+          comprobante: string;
+          impuesto: string;
+          banco: string;
+          cuentaBancoClase: string;
+          activoGrupo: string;
+          metodoDepreciacion: string;
+          tipoCotizante: string;
+          subtipoCotizante: string;
+          entidad: string;
+          tipoContrato: string;
+          costoTipo: string;
+        };
+      };
       errors: {
         rowHeader: string;
         messageHeader: string;
@@ -385,7 +445,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -410,7 +470,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -445,7 +505,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -454,12 +514,45 @@ export interface AppDict
       name: string;
       searchPlaceholder: string;
       columns: { id: string; nombre: string; venta: string; compra: string; fechaVence: string };
+      /** Tabla de ítems de la lista (`PrecioItemsComponent`). */
+      items: {
+        title: string;
+        addLine: string;
+        empty: { title: string; desc: string };
+        columns: {
+          id: string;
+          item: string;
+          referencia: string;
+          precio: string;
+          acciones: string;
+        };
+        itemPlaceholder: string;
+        import: {
+          title: string;
+          subtitle: string;
+          /** Solo se muestra si hay filas sin guardar. */
+          notice: string;
+        };
+        confirmDelete: {
+          header: string;
+          /** Soporta el placeholder `{item}`. */
+          message: string;
+        };
+        toasts: {
+          loadError: { title: string; desc: string };
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          updateError: { title: string; desc: string };
+          deleteSuccess: { title: string; desc: string };
+          deleteError: { title: string; desc: string };
+        };
+      };
       form: {
         createTitle: string;
         editTitle: string;
         createSubtitle: string;
         editSubtitle: string;
-        fields: { nombre: string; venta: string; compra: string; fechaVence: string };
+        fields: { nombre: string; fechaVence: string };
         validation: { required: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -470,7 +563,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -486,6 +579,8 @@ export interface AppDict
         consecutivoHasta: string;
         fechaDesde: string;
         fechaHasta: string;
+        venta: string;
+        compra: string;
       };
       form: {
         createTitle: string;
@@ -517,7 +612,9 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        /** Campo compuesto: a qué documentos aplica la resolución. */
+        labels: { aplicaA: string };
         vigencia: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
@@ -613,6 +710,7 @@ export interface AppDict
     item: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         codigo: string;
@@ -631,6 +729,8 @@ export interface AppDict
         sections: { principal: string; preciosImpuestos: string; cuentas: string };
         sectionsHint: { principal: string; preciosImpuestos: string; cuentas: string };
         clasificacion: string;
+        /** Aviso del ítem ya movido en documentos (bloquea tipo e inventario). */
+        enUso: { titulo: string; hint: string };
         fields: {
           codigo: string;
           nombre: string;
@@ -667,7 +767,19 @@ export interface AppDict
       };
       detail: {
         eyebrow: string;
-        sections: { precios: string; impuestos: string; cuentas: string };
+        sections: {
+          general: string;
+          preciosImpuestos: string;
+          precios: string;
+          impuestos: string;
+          cuentas: string;
+        };
+        /** Micro-encabezados de los grupos de la card de información general. */
+        groups: { identificacion: string; clasificacion: string };
+        /** Entradas del menú "Opciones" del detalle. */
+        /** Entrada del menú "Opciones" y su subtítulo en el diálogo. */
+        opciones: { imagenes: string };
+        opcionesHint: { imagenes: string };
         labels: { impuestosVenta: string; impuestosCompra: string; sinImpuestos: string };
         notFound: { title: string; desc: string };
         toasts: {
@@ -739,7 +851,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -747,7 +859,7 @@ export interface AppDict
     grupo: {
       name: string;
       searchPlaceholder: string;
-      columns: { id: string; nombre: string; periodo: string };
+      columns: { id: string; nombre: string; periodo: string; dias: string };
       periodos: { 1: string; 2: string };
       form: {
         createTitle: string;
@@ -765,7 +877,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -790,7 +902,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
@@ -822,7 +934,8 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -847,7 +960,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -877,7 +990,7 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -930,9 +1043,27 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        groups: { identificacion: string; jerarquia: string; condiciones: string };
+        fields: { codigoClase: string; codigoGrupo: string; codigoCuenta: string };
+        acciones: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
+        traslado: {
+          menuItem: string;
+          title: string;
+          subtitle: string;
+          submit: string;
+          destino: string;
+          warning: string;
+          fields: { cuentaOrigen: string; cuentaOrigenPlaceholder: string };
+          validation: { required: string; mismaCuenta: string };
+          confirm: { header: string; message: string; accept: string };
+          toasts: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
       };
     };
     activo: {
@@ -984,7 +1115,9 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string; contabilizacion: string };
+        groups: { identificacion: string; depreciacion: string; vida: string };
+        dadoDeBaja: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1031,6 +1164,7 @@ export interface AppDict
     empleado: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         identificacion: string;
@@ -1079,8 +1213,11 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
-        sections: { general: string; contacto: string; ubicacion: string; banca: string };
+        /** Micro-encabezados de los grupos de la card de información general. */
+        groups: { identificacion: string; contacto: string; ubicacion: string };
+        sections: { general: string; banca: string };
+        /** Campos compuestos, que no salen de un solo campo del backend. */
+        labels: { documento: string; nombreCompleto: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1131,7 +1268,8 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        groups: { asignacion: string; saldo: string; cuotas: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1176,7 +1314,10 @@ export interface AppDict
         };
       };
       detail: {
-        eyebrow: string;
+        sections: { general: string };
+        groups: { asignacion: string; valores: string; condiciones: string };
+        labels: { programacion: string };
+        activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -1227,6 +1368,7 @@ export interface AppDict
     contrato: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         empleado: string;
         contratoTipo: string;
@@ -1259,6 +1401,7 @@ export interface AppDict
         fields: {
           contacto: string;
           contactoPlaceholder: string;
+          identificacion: string;
           contratoTipo: string;
           cargo: string;
           grupo: string;
@@ -1291,7 +1434,12 @@ export interface AppDict
           fechaUltimoPagoVacacion: string;
           comentario: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          salarioPositivo: string;
+          cotizanteAprendizRequerido: string;
+          cotizanteAprendizNoAplica: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -4316,6 +4464,73 @@ export interface AppDict
       };
     };
   };
+  facturacionElectronica: {
+    certificado: {
+      estado: {
+        venceLabel: string;
+        vigenteTitle: string;
+        vigenteDesc: string;
+        porVencerTitle: string;
+        porVencerDesc: string;
+        vencidoTitle: string;
+        vencidoDesc: string;
+        /** Cuánto falta / hace cuánto venció; `one` es 1 día, `other` lleva `{dias}`. */
+        faltan: { one: string; other: string };
+        venceHoy: string;
+        vencidoHace: { one: string; other: string };
+      };
+      upload: {
+        title: string;
+        hint: string;
+        dropzone: { primary: string; secondary: string; hint: string };
+      };
+      fields: { clave: string; claveHint: string };
+      validation: { required: string };
+      errors: { tipo: string; tamano: string };
+      actions: { cargar: string; reemplazar: string; quitar: string };
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string };
+      };
+    };
+    asistente: {
+      eyebrow: string;
+      title: string;
+      subtitle: string;
+      pasos: {
+        empresa: { label: string; hint: string };
+        certificado: { label: string; hint: string };
+        resolucion: { label: string; hint: string };
+        finalizar: { label: string; hint: string };
+      };
+      /** Alta de la empresa como emisor ante el proveedor. */
+      crearEmisor: {
+        confirm: {
+          header: string;
+          subtitle: string;
+          intro: string;
+          warning: string;
+          accept: string;
+        };
+        toasts: { success: { title: string; desc: string } };
+      };
+      /** Aviso de solo lectura cuando la empresa ya es emisor. */
+      emisorCreado: { title: string; desc: string; emisorLabel: string; copiar: string };
+      /** Panel de un paso todavía sin contenido. */
+      pendiente: { title: string };
+      actions: { guardarYContinuar: string; continuar: string };
+    };
+  };
+  /** Copy de los inicios (landing) de cada módulo. */
+  inicio: {
+    venta: {
+      facturaElectronica: {
+        title: string;
+        desc: string;
+        actions: { completar: string };
+      };
+    };
+  };
   seguridad: {
     title: string;
     menu: { usuarios: string };
@@ -4413,17 +4628,18 @@ export interface AppDict
         contacto: { title: string; hint: string };
       };
       fields: {
-        nombreCorto: string;
+        razonSocial: string;
         tipoPersona: string;
         identificacion: string;
         numeroIdentificacion: string;
         digitoVerificacion: string;
         direccion: string;
         ciudad: string;
+        ciudadPlaceholder: string;
         telefono: string;
         correo: string;
       };
-      validation: { required: string; emailInvalid: string };
+      validation: { required: string; emailInvalid: string; onlyDigits: string };
     };
     toasts: {
       saveSuccess: { title: string; desc: string };

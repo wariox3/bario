@@ -26,6 +26,8 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '@erp/features/general/masters/contacto/contacto.service';
@@ -33,6 +35,7 @@ import type { Empleado } from '../../empleado.model';
 import {
   EMPLEADOS_COLUMNS,
   EMPLEADOS_FILTER_FIELDS,
+  EMPLEADOS_IMPORT_MASTERS,
   EMPLEADOS_FILTERS_STORAGE_KEY,
   EMPLEADOS_PRIMARY_ACTION,
   EMPLEADOS_QUICK_SEARCH_FIELD,
@@ -58,6 +61,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './empleados-list.component.html',
@@ -106,6 +110,23 @@ export class EmpleadosListComponent {
   protected readonly columns = EMPLEADOS_COLUMNS;
   protected readonly filterFields = EMPLEADOS_FILTER_FIELDS;
   // Empleados usa `ContactoService`: lo gobierna el modelo de Contactos.
+  /** Plantilla de ejemplo que sirve el backend para armar el archivo. */
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/general/contacto/importar-ejemplo/',
+  };
+
+  /**
+   * Estado del diálogo de importación. Sube por `ContactoService`: el empleado es
+   * un contacto con `empleado = true`, así que comparte recurso y endpoint de
+   * importación — es el archivo el que trae la marca.
+   */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: EMPLEADOS_IMPORT_MASTERS,
+  });
+
   protected readonly acciones = masterActions(MODELO.general.contacto, {
     row: EMPLEADOS_ROW_ACTIONS,
     primary: EMPLEADOS_PRIMARY_ACTION,
@@ -173,6 +194,9 @@ export class EmpleadosListComponent {
     switch (actionId) {
       case 'new':
         this.navigateTo('nuevo');
+        break;
+      case 'import':
+        this.importar.open();
         break;
       case 'export-excel':
         this.exportExcel();

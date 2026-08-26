@@ -13,7 +13,6 @@ import type {
   ConciliacionDetalle,
   ConciliacionPayload,
   ConciliacionSoporte,
-  ConciliacionSoporteImportResult,
 } from './conciliacion.model';
 
 /** Endpoint del master. */
@@ -142,14 +141,10 @@ export class ConciliacionService extends BaseHttpService {
    * ⚠️ El `conciliacion_id` viaja como campo del multipart junto al archivo, tal
    * como lo mandaba el legacy.
    */
-  importarSoporte(conciliacionId: number, file: File): Observable<ConciliacionSoporteImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    form.append('conciliacion_id', String(conciliacionId));
-    return this.post<ConciliacionSoporteImportResult>(
-      `${CONCILIACION_SOPORTE_ENDPOINT}cargar-soporte/`,
-      form,
-    );
+  importarSoporte(conciliacionId: number, file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${CONCILIACION_SOPORTE_ENDPOINT}cargar-soporte/`, file, {
+      conciliacion_id: conciliacionId,
+    });
   }
 
   /** Borra todas las líneas del extracto. */

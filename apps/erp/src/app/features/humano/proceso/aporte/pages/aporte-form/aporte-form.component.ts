@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { ErpApiSelectComponent, FieldErrorComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -35,7 +35,7 @@ const ANIO_MIN = 2000;
 const ANIO_MAX = 2100;
 
 /** Campo de la configuración de empresa con la ARL por defecto. */
-const CAMPO_ENTIDAD_RIESGO = 'hum_entidad_riesgo_id';
+const CAMPO_ENTIDAD_RIESGO = 'hum_entidad_riesgo';
 
 /**
  * Alta y edición de la **cabecera** de un aporte a seguridad social: el periodo
@@ -48,7 +48,7 @@ const CAMPO_ENTIDAD_RIESGO = 'hum_entidad_riesgo_id';
  * Tres defaults al crear, para no arrancar con siete campos vacíos:
  *
  * - **Año y mes** en el periodo en curso.
- * - **ARL** desde `hum_entidad_riesgo_id` de la configuración de la empresa.
+ * - **ARL** desde `hum_entidad_riesgo` de la configuración de la empresa.
  * - **SENA e ICBF** en la primera opción del catálogo (`suggestedIndex`), que es
  *   lo que hace el ERP anterior a mano.
  *
@@ -66,6 +66,7 @@ const CAMPO_ENTIDAD_RIESGO = 'hum_entidad_riesgo_id';
     InputNumberModule,
     SelectModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
   ],
   templateUrl: './aporte-form.component.html',
@@ -192,10 +193,9 @@ export class AporteFormComponent implements OnInit {
    * configuración no la tiene, el campo queda vacío y el usuario elige — no es un
    * error que valga un toast.
    *
-   * ⚠️ El ERP anterior pide el campo como `hum_entidad_riesgo`; acá se usa
-   * `hum_entidad_riesgo_id`, que es como lo declara la configuración de empresa
-   * (`configuracion.model.ts`). Si el backend responde con el otro nombre, el
-   * campo queda vacío sin avisar.
+   * El campo es `hum_entidad_riesgo`, sin sufijo `_id`: así lo nombra el schema
+   * del contenedor (`GenConfiguracion`). Con el sufijo la respuesta no trae la
+   * clave y el campo queda vacío sin avisar.
    */
   private sugerirEntidadRiesgo(): void {
     this.configuracion

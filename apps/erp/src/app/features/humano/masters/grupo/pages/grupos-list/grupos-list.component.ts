@@ -32,6 +32,7 @@ import { GrupoService } from '../../grupo.service';
 import type { Grupo } from '../../grupo.model';
 import {
   GRUPOS_COLUMNS,
+  GRUPOS_DEFAULT_SORT,
   GRUPOS_FILTER_FIELDS,
   GRUPOS_FILTERS_STORAGE_KEY,
   GRUPOS_QUICK_SEARCH_FIELD,
@@ -72,7 +73,7 @@ export class GruposListComponent {
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(25);
-  protected readonly sort = signal<readonly SortSpec[]>([]);
+  protected readonly sort = signal<readonly SortSpec[]>(GRUPOS_DEFAULT_SORT);
   protected readonly selectedRows = signal<readonly Grupo[]>([]);
   protected readonly searchValue = signal('');
   protected readonly activeFilters = signal<readonly FilterCondition[]>(

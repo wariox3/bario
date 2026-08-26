@@ -1,6 +1,5 @@
 import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import type { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -13,11 +12,8 @@ import {
   type ToolbarAction,
 } from '@reddoc/feature-base';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
-import type {
-  ExampleConfig,
-  ImportError,
-} from '@erp/core/components/import-dialog/import-dialog.types';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
 import { ConciliacionService, CONCILIACION_EXCEL_SERIALIZADOR } from '../../conciliacion.service';
 import type { ConciliacionSoporte } from '../../conciliacion.model';
@@ -78,11 +74,11 @@ export class ConciliacionSoportesTabComponent {
   protected readonly isBusy = signal(false);
 
   // ── Importación ───────────────────────────────────────────────────────────
-  protected readonly importVisible = signal(false);
-  protected readonly importLoading = signal(false);
-  protected readonly importErrors = signal<readonly ImportError[]>([]);
-  protected readonly importErrorSummary = signal('');
-  protected readonly importErrorTotal = signal(0);
+  /** Estado del diálogo del extracto: sube contra la conciliación abierta. */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importarSoporte(this.conciliacionId(), file),
+    onImported: () => this.loadPage(0),
+  });
 
   /**
    * El ERP anterior servía la plantilla del extracto desde un XLSX alojado
@@ -163,7 +159,7 @@ export class ConciliacionSoportesTabComponent {
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
       case 'cargar':
-        this.onImportOpen();
+        this.importar.open();
         break;
       case 'limpiar':
         this.onLimpiar();
@@ -177,43 +173,6 @@ export class ConciliacionSoportesTabComponent {
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
     this.activeFilters.set(filters);
     this.loadPage(0);
-  }
-
-  private onImportOpen(): void {
-    this.clearImportErrors();
-    this.importVisible.set(true);
-  }
-
-  protected onImportVisibleChange(value: boolean): void {
-    this.importVisible.set(value);
-  }
-
-  protected onImportRequested(file: File): void {
-    if (this.importLoading()) return;
-    this.importLoading.set(true);
-    this.clearImportErrors();
-    this.service
-      .importarSoporte(this.conciliacionId(), file)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.importLoading.set(false)),
-      )
-      .subscribe({
-        next: (result) => {
-          if (this.applyImportErrors(parseImportErrors(result))) return;
-          const toasts = this.t().common.import.toasts;
-          this.toast.success(toasts.success.title, toasts.success.desc);
-          this.importVisible.set(false);
-          this.clearImportErrors();
-          this.loadPage(0);
-        },
-        error: (err: HttpErrorResponse) => {
-          if (!this.applyImportErrors(parseImportErrors(err.error))) {
-            const toasts = this.t().common.import.toasts;
-            this.toast.error(toasts.error.title, toasts.error.desc);
-          }
-        },
-      });
   }
 
   /** Borra todo el extracto cargado, previa confirmación destructiva. */
@@ -269,20 +228,6 @@ export class ConciliacionSoportesTabComponent {
         },
         error: () => this.toast.error(toasts.error.title, toasts.error.desc),
       });
-  }
-
-  private applyImportErrors(parsed: ReturnType<typeof parseImportErrors>): boolean {
-    if (parsed.errors.length === 0 && !parsed.summary) return false;
-    this.importErrors.set(parsed.errors);
-    this.importErrorSummary.set(parsed.summary);
-    this.importErrorTotal.set(parsed.total);
-    return true;
-  }
-
-  private clearImportErrors(): void {
-    this.importErrors.set([]);
-    this.importErrorSummary.set('');
-    this.importErrorTotal.set(0);
   }
 
   loadPage(page: number): void {

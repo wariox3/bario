@@ -16,7 +16,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -68,6 +68,7 @@ import type { PedidoClienteRead } from '../../pedido-cliente.model';
     ConfirmDialogModule,
     DatePickerModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ComercialDocumentoDetallesComponent,
   ],

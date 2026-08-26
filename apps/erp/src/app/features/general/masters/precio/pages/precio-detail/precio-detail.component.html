@@ -19,6 +19,17 @@
       size="small"
       (onClick)="onEdit()"
     />
+    <p-button
+      type="button"
+      [label]="t().common.actions.options"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleOpciones($event)"
+    />
+    <p-menu #opcionesMenu [popup]="true" [model]="opcionesItems()" appendTo="body" />
   }
 </header>
 
@@ -41,42 +52,43 @@
     </p>
   </div>
 } @else if (precio(); as p) {
-  <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <lib-detail-header
-    icon="pi pi-tag"
-    [eyebrow]="t().entities.precio.detail.eyebrow"
-    [title]="p.nombre"
-  />
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos" del sistema, igual que contacto, ítem,
+       sede y almacén. Sin `<lib-detail-header>`: repetía el nombre, que ya es un
+       campo de acá. La identidad la dan la miga y el `<h1>` accesible. -->
+  <h1 class="sr-only">{{ p.nombre }}</h1>
 
-  <!-- ── Datos de la lista de precios ─────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="px-5 py-5 max-[576px]:px-4">
-      <dl class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.precio.columns.venta }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{ p.venta ? t().common.boolean.true : t().common.boolean.false }}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.precio.columns.compra }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{ p.compra ? t().common.boolean.true : t().common.boolean.false }}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.precio.columns.fechaVence }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{ p.fecha_vence ? (p.fecha_vence | date: 'yyyy-MM-dd') : '—' }}
-          </dd>
-        </div>
-      </dl>
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-tag text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.precio.detail.sections.general }}
+      </h2>
     </div>
+
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="precio-detail__label">{{ t().entities.precio.columns.nombre }}</dt>
+        <dd class="precio-detail__value" [class.precio-detail__value--empty]="!p.nombre">
+          {{ p.nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="precio-detail__label">{{ t().entities.precio.columns.fechaVence }}</dt>
+        <dd class="precio-detail__value" [class.precio-detail__value--empty]="!p.fecha_vence">
+          {{ p.fecha_vence ? (p.fecha_vence | date: 'yyyy-MM-dd') : '—' }}
+        </dd>
+      </div>
+    </dl>
   </section>
+
+  <!-- ── Ítems de la lista ────────────────────────────────────────────────────── -->
+  <!-- El precio que cada ítem toma dentro de esta lista. Vive en el detalle
+       —y no en el formulario— porque cada línea se guarda sola: no depende de
+       que la cabecera se envíe. -->
+  <app-precio-items #items [precioId]="p.id" />
 }

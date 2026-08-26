@@ -32,7 +32,7 @@ import {
   type PermisoSeguridad,
   type UsuarioPermiso,
 } from '@reddoc/core';
-import { MODELO } from '@erp/core/permissions';
+import { PERMISO_APPS } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ACCIONES_PERMISO, type AccionColumna } from '../../usuarios.constants';
 import { SeguridadUsuariosService } from '../../usuarios.service';
@@ -44,11 +44,12 @@ import {
 } from '../../usuarios.utils';
 
 /**
- * Apps del backend para las pills. Salen del espejo `MODELO` (mismo criterio
- * que sus ids: datos sembrados que no se descubren en runtime); si aparece una
- * app nueva al navegar el catálogo, `registrarApps` la suma sola.
+ * Apps del backend para las pills: la lista declarada en `PERMISO_APPS` (datos
+ * sembrados que no se descubren en runtime, mismo criterio que los ids de
+ * modelo). Si aparece una app nueva al navegar el catálogo, `registrarApps` la
+ * suma sola.
  */
-const APPS_CATALOGO: readonly string[] = Object.keys(MODELO);
+const APPS_CATALOGO: readonly string[] = PERMISO_APPS;
 
 const LIMITE_DEFAULT = 25;
 

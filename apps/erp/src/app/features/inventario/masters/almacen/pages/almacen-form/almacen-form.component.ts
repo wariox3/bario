@@ -1,15 +1,15 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
+import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
+import { masterNav } from '@erp/core/erp-modules';
 import { AlmacenService } from '../../almacen.service';
-import { ALMACEN_LIST_PATH } from '../../almacen.constants';
+import { ALMACEN_SEGMENT } from '../../almacen.constants';
 
 /** Tope de caracteres del nombre, tomado del ERP anterior. */
 const NOMBRE_MAX_LENGTH = 80;
@@ -28,11 +28,13 @@ const NOMBRE_MAX_LENGTH = 80;
   selector: 'app-almacen-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     FieldErrorComponent,
+    PageActionsComponent,
   ],
   templateUrl: './almacen-form.component.html',
   styleUrl: './almacen-form.component.scss',
@@ -42,12 +44,12 @@ export class AlmacenFormComponent implements OnInit {
   private readonly service = inject(AlmacenService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
-  private readonly tenant = inject(TenantService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  private readonly nav = masterNav(ALMACEN_SEGMENT);
 
   /** Id del almacén a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -56,20 +58,11 @@ export class AlmacenFormComponent implements OnInit {
   protected readonly isSaving = signal(false);
   protected readonly nombreMaxLength = NOMBRE_MAX_LENGTH;
 
-  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
-    const slug = this.tenant.currentSlug();
-    return [
-      {
-        label: this.t().modules.inventario.name,
-        routerLink: slug ? ['/t', slug, 'inventario'] : undefined,
-      },
-      {
-        label: this.t().entities.almacen.name,
-        routerLink: slug ? ['/t', slug, ...ALMACEN_LIST_PATH] : undefined,
-      },
-      { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
-    ];
-  });
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
+    this.nav.crumbs(this.t().entities.almacen.name, {
+      label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
+    }),
+  );
 
   protected readonly form = this.fb.group({
     nombre: ['', [Validators.required, Validators.maxLength(NOMBRE_MAX_LENGTH)]],
@@ -94,7 +87,7 @@ export class AlmacenFormComponent implements OnInit {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        this.nav.ir();
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -105,7 +98,7 @@ export class AlmacenFormComponent implements OnInit {
   }
 
   protected onCancel(): void {
-    this.navigateToList();
+    this.nav.ir();
   }
 
   private loadAlmacen(id: number): void {
@@ -119,11 +112,5 @@ export class AlmacenFormComponent implements OnInit {
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });
-  }
-
-  private navigateToList(): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return;
-    void this.router.navigate(['/t', slug, ...ALMACEN_LIST_PATH]);
   }
 }

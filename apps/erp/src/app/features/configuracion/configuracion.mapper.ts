@@ -1,5 +1,5 @@
 import { toFiniteNumber } from '@reddoc/core';
-import type { ErpSelectOption } from '@reddoc/core';
+import type { Ciudad, ErpSelectOption } from '@reddoc/core';
 import type { ConfiguracionPayload, ConfiguracionRead } from './configuracion.model';
 
 /** Opción mínima para precargar un select por id (el label lo resuelve el `dataKey`). */
@@ -49,16 +49,16 @@ export function humanoFormToPayload(form: HumanoConfigFormValue): ConfiguracionP
   };
 }
 
-// ── Área Empresa (datos de la empresa) — PARQUEADA (sin pestaña por ahora) ──────
+// ── Área Empresa (datos de la empresa) ────────────────────────────────────────
 
 export interface EmpresaConfigFormValue {
-  readonly nombre_corto: string;
+  readonly razon_social: string;
   readonly tipo_persona: ErpSelectOption | null;
   readonly identificacion: ErpSelectOption | null;
   readonly numero_identificacion: string;
   readonly digito_verificacion: string;
   readonly direccion: string;
-  readonly ciudad: ErpSelectOption | null;
+  readonly ciudad: Ciudad | null;
   readonly telefono: string;
   readonly correo: string;
 }
@@ -67,13 +67,18 @@ export function configuracionToEmpresaForm(
   config: Partial<ConfiguracionRead>,
 ): EmpresaConfigFormValue {
   return {
-    nombre_corto: config.gen_empresa_nombre_corto ?? '',
-    tipo_persona: optionFromId(config.gen_empresa_tipo_persona_id),
-    identificacion: optionFromId(config.gen_empresa_identificacion_id),
+    razon_social: config.gen_empresa_razon_social ?? '',
+    tipo_persona: optionFromId(config.gen_empresa_tipo_persona),
+    identificacion: optionFromId(config.gen_empresa_identificacion),
     numero_identificacion: config.gen_empresa_numero_identificacion ?? '',
     digito_verificacion: config.gen_empresa_digito_verificacion ?? '',
     direccion: config.gen_empresa_direccion ?? '',
-    ciudad: optionFromId(config.gen_empresa_ciudad_id),
+    // Solo llega el id: `GenConfiguracion` todavía no manda el nombre de la
+    // ciudad ni el del departamento, así que el autocomplete abre en blanco
+    // aunque haya ciudad guardada. El id viaja igual en el objeto, de modo que
+    // guardar sin tocar el campo no la borra. Ver el TODO del template.
+    ciudad:
+      config.gen_empresa_ciudad != null ? { id: config.gen_empresa_ciudad, nombre: '' } : null,
     telefono: config.gen_empresa_telefono ?? '',
     correo: config.gen_empresa_correo ?? '',
   };
@@ -81,13 +86,13 @@ export function configuracionToEmpresaForm(
 
 export function empresaFormToPayload(form: EmpresaConfigFormValue): ConfiguracionPayload {
   return {
-    gen_empresa_nombre_corto: form.nombre_corto.trim() || null,
-    gen_empresa_tipo_persona_id: form.tipo_persona?.id ?? null,
-    gen_empresa_identificacion_id: form.identificacion?.id ?? null,
+    gen_empresa_razon_social: form.razon_social.trim() || null,
+    gen_empresa_tipo_persona: form.tipo_persona?.id ?? null,
+    gen_empresa_identificacion: form.identificacion?.id ?? null,
     gen_empresa_numero_identificacion: form.numero_identificacion.trim() || null,
     gen_empresa_digito_verificacion: form.digito_verificacion.trim() || null,
     gen_empresa_direccion: form.direccion.trim() || null,
-    gen_empresa_ciudad_id: form.ciudad?.id ?? null,
+    gen_empresa_ciudad: form.ciudad?.id ?? null,
     gen_empresa_telefono: form.telefono.trim() || null,
     gen_empresa_correo: form.correo.trim() || null,
   };

@@ -29,7 +29,6 @@ export type {
   DocumentCapabilities,
   EditableRowContext,
   InventoryEffect,
-  ImportDescriptor,
 } from '@reddoc/core';
 export type { ModuleConfig } from '@reddoc/core';
 

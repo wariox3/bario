@@ -32,16 +32,16 @@
 />
 
 <app-import-dialog
-  [visible]="importVisible()"
-  (visibleChange)="onImportVisibleChange($event)"
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
   [title]="tab.import.title"
   [subtitle]="tab.import.subtitle"
-  [importing]="importLoading()"
-  [errors]="importErrors()"
-  [errorSummary]="importErrorSummary()"
-  [errorTotal]="importErrorTotal()"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
   [exampleConfig]="exampleConfig()"
-  (importRequested)="onImportRequested($event)"
+  (importRequested)="importar.submit($event)"
 />
 
 <p-confirmDialog />

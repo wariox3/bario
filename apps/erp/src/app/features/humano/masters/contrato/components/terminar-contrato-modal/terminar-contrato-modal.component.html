@@ -1,6 +1,12 @@
 @let m = t().entities.contrato.terminar;
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
   <!-- Header: badge + título + a quién se le termina -->
   <div class="flex items-center gap-3.5">
     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-amber-100">
@@ -85,7 +91,7 @@
       [label]="m.submit"
       severity="danger"
       [loading]="isSaving()"
-      [disabled]="form.invalid || isSaving()"
+      [disabled]="isSaving()"
     />
   </div>
 </form>

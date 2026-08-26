@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -32,6 +32,7 @@ import { precioToFormValue, formValueToPayload } from '../../precio.mapper';
   selector: 'app-precio-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -39,6 +40,7 @@ import { precioToFormValue, formValueToPayload } from '../../precio.mapper';
     DatePickerModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
   ],
   templateUrl: './precio-form.component.html',
   styleUrl: './precio-form.component.scss',
@@ -78,10 +80,12 @@ export class PrecioFormComponent implements OnInit {
     ];
   });
 
+  /**
+   * `venta` y `compra` no son campos del formulario: los fija el mapper. Ver
+   * `formValueToPayload`.
+   */
   protected readonly form = this.fb.group({
     nombre: ['', Validators.required],
-    venta: [false],
-    compra: [false],
     fecha_vence: [startOfToday() as Date | null, Validators.required],
   });
 

@@ -3,3 +3,57 @@
   flex-direction: column;
   gap: 1.25rem;
 }
+
+// Micro-encabezado de grupo dentro de la card: se distingue de la etiqueta de
+// campo por caja y peso, no por color.
+.cuenta-detail__group {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
+// Etiqueta de cada dato de la ficha (término de la definition list).
+.cuenta-detail__label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--brand-muted);
+}
+
+// Valor de cada dato.
+.cuenta-detail__value {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--brand-text);
+  word-break: break-word;
+}
+
+// El código del PUC se compara dígito a dígito: monoespaciada con tabular-nums.
+.cuenta-detail__value--mono {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.83rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+// Bandera apagada: un «No» es un valor, no un dato que falta. Atenuarlo deja que
+// la columna se escanee por los «Sí», que son los que cambian el comportamiento.
+.cuenta-detail__value--off {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.65;
+}
+
+// Dato ausente: presente en la ficha pero sin competir al escanear la columna.
+.cuenta-detail__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
+}

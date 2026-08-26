@@ -56,3 +56,4 @@
   (onClick)="toggleOpciones($event)"
 />
 <p-menu #opcionesMenu [popup]="true" [model]="opcionesItems()" appendTo="body" />
+<app-archivos-dialog [(visible)]="archivosVisible" [owner]="archivosOwner()" />

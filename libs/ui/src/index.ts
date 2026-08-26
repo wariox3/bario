@@ -19,7 +19,11 @@ export { ErpAsesorSelectComponent } from './lib/components/asesor-select/erp-ase
 export { ContratoAutocompleteComponent } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export type { ContratoOption } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export { DetailHeaderComponent } from './lib/components/detail-header/detail-header.component';
+export { PageActionsComponent } from './lib/components/page-actions/page-actions.component';
+export { FocusInvalidDirective } from './lib/directives/focus-invalid.directive';
 export { UppercaseDirective } from './lib/directives/uppercase.directive';
+export { SoloDigitosDirective } from './lib/directives/solo-digitos.directive';
+export { TelefonoPipe } from './lib/pipes/telefono.pipe';
 export type { AuthDict, AuthTranslationsHost } from './lib/auth/i18n';
 export { authEs, authEn } from './lib/auth/i18n';
 export { AccesosContenedorComponent } from './lib/components/accesos-contenedor/accesos-contenedor.component';

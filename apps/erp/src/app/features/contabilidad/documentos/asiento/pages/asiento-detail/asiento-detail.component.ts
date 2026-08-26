@@ -220,10 +220,6 @@ export class AsientoDetailComponent implements OnInit {
       });
   }
 
-  protected onArchivos(): void {
-    this.toast.info(this.t().common.comingSoon);
-  }
-
   private loadDocumento(id: number): void {
     // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
     forkJoin({

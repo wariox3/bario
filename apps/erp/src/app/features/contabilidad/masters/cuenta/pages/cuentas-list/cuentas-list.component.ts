@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -28,11 +27,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import type {
-  ImportError,
-  MasterTouched,
-} from '@erp/core/components/import-dialog/import-dialog.types';
-import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
+import { importState } from '@erp/core/components/import-dialog/import-state';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CuentaService } from '../../cuenta.service';
@@ -95,12 +90,11 @@ export class CuentasListComponent {
     endpoint: '/contabilidad/cuenta/importar-ejemplo/',
   };
 
-  protected readonly importVisible = signal(false);
-  protected readonly importLoading = signal(false);
-  protected readonly importErrors = signal<readonly ImportError[]>([]);
-  protected readonly importErrorSummary = signal('');
-  protected readonly importErrorTotal = signal(0);
-  protected readonly importMasters = signal<readonly MasterTouched[]>([]);
+  /** Estado del diálogo de importación (visibilidad, progreso, errores, maestros). */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+  });
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
@@ -186,72 +180,12 @@ export class CuentasListComponent {
         this.navigateTo('nuevo');
         break;
       case 'import':
-        // Abre siempre limpio: descarta el resultado del intento anterior.
-        this.clearImportErrors();
-        this.importVisible.set(true);
+        this.importar.open();
         break;
       case 'export-excel':
         this.exportExcel();
         break;
     }
-  }
-
-  protected onImportVisibleChange(value: boolean): void {
-    this.importVisible.set(value);
-  }
-
-  protected onImportRequested(file: File): void {
-    if (this.importLoading()) return;
-    this.importLoading.set(true);
-    // Limpia el resultado del intento anterior (al reintentar tras corregir).
-    this.clearImportErrors();
-    this.service
-      .importar(file)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.importLoading.set(false)),
-      )
-      .subscribe({
-        next: (result) => {
-          // El backend puede reportar los errores de validación en un 200
-          // ("No se procesó ningún registro"); si los trae, los mostramos en vez
-          // de tratarlo como éxito.
-          if (this.applyImportErrors(parseImportErrors(result))) return;
-          const toasts = this.t().common.import.toasts;
-          this.toast.success(toasts.success.title, toasts.success.desc);
-          this.importVisible.set(false);
-          this.clearImportErrors();
-          this.loadList();
-        },
-        error: (err: HttpErrorResponse) => {
-          // Errores de validación (4xx) con el mismo shape. Si no hay estructura
-          // (red/desconocido) → toast genérico.
-          if (!this.applyImportErrors(parseImportErrors(err.error))) {
-            const toasts = this.t().common.import.toasts;
-            this.toast.error(toasts.error.title, toasts.error.desc);
-          }
-        },
-      });
-  }
-
-  /**
-   * Vuelca los errores parseados en los signals del diálogo. Devuelve `true` si
-   * había errores/resumen (para que el llamador no siga el camino de éxito).
-   */
-  private applyImportErrors(parsed: ReturnType<typeof parseImportErrors>): boolean {
-    if (parsed.errors.length === 0 && !parsed.summary) return false;
-    this.importErrors.set(parsed.errors);
-    this.importErrorSummary.set(parsed.summary);
-    this.importErrorTotal.set(parsed.total);
-    return true;
-  }
-
-  /** Resetea el resultado de la importación (tabla de errores, resumen y masters). */
-  private clearImportErrors(): void {
-    this.importErrors.set([]);
-    this.importErrorSummary.set('');
-    this.importErrorTotal.set(0);
-    this.importMasters.set([]);
   }
 
   protected onRefresh(): void {

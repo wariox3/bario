@@ -62,6 +62,26 @@ informe.
 Ojo: los **filtros** sí usan el lookup de Django (`contacto__numero_identificacion`) a propósito —
 el filtro viaja al ORM, la columna viene del serializador. Eso no cambia.
 
+### 1.2.b Identificación del empleado en los masters de contrato
+
+Pedido a backend (2026-08-25): que el serializador de **contrato** exponga
+`contacto_numero_identificacion` como companion de la FK `contacto`, igual que ya expone
+`contacto_nombre`. Es un campo del **contacto**, no del contrato: no viaja en el payload de
+guardado —el contrato solo guarda la FK— y por eso el front solo lo lee.
+
+Sin él, el addon de cédula de `<app-empleado-autocomplete>` sale vacío al **editar** un contrato
+(al crearlo se ve bien, porque ahí la identificación la trae el propio autocomplete desde
+`general/contacto/seleccionar/`), y la ficha del detalle no la puede mostrar.
+
+El front ya lo lee de forma opcional (`contacto_numero_identificacion?`) con degradado a vacío, así
+que se enciende solo cuando el backend lo agregue. Al confirmarlo, sumar la **columna y el filtro**
+al listado (`contrato.constants.ts`), que quedaron afuera para no publicar una columna vacía.
+
+Mismo pedido, aún **sin nombre confirmado**, para `novedad` y `adicional`: ambos referencian
+`contrato` y su companion de nombre es `contrato_nombre` (que ya es el nombre del empleado), así que
+el front asume `contrato_numero_identificacion` siguiendo ese patrón. Marcado con `TODO(backend)` en
+sus `*.model.ts`.
+
 ### 1.3 Campos de la familia humano en el documento de nómina
 
 En `documentos/nomina/nomina.model.ts`, tomados del legacy sin verificar:
@@ -110,6 +130,25 @@ informe.
 > No confundir con el `documento_tipo_id`: nómina es **14**, nómina electrónica **15**. El
 > `modelo=701` que aparece en las URLs del legacy es otra cosa más — una clave interna de su mapa de
 > imports.
+
+### 1.7 Ids del catálogo de tipo de cotizante
+
+La regla de coherencia entre tipo de contrato y tipo de cotizante
+(`contrato.constants.ts`) hardcodea ids leídos de `reddocapi.uk`:
+
+| Constante                        | Id  | Código PILA | Nombre                               |
+| -------------------------------- | --- | ----------- | ------------------------------------ |
+| `CONTRATO_TIPO_APRENDIZ_SENA_ID` | 4   | —           | Aprendíz del Sena (tipo de contrato) |
+| `TIPO_COTIZANTE_DEPENDIENTE`     | 1   | `01`        | Dependiente                          |
+| `TIPO_COTIZANTE_APRENDIZ_IDS`    | 5   | `12`        | Aprendiz SENA en etapa lectiva       |
+| `TIPO_COTIZANTE_APRENDIZ_IDS`    | 9   | `19`        | Aprendices SENA en etapa productiva  |
+
+Asume que ambos catálogos son **globales**, con ids estables entre tenants —el mismo supuesto que
+ya traía `CONTRATO_TIPO_INDEFINIDO_ID = 1`. Si el backend los siembra por tenant, la regla se cae en
+silencio y hay que pasarla a matchear por `codigo` (el endpoint de tipo de cotizante ya lo devuelve;
+el de tipo de contrato **no**).
+
+---
 
 ---
 

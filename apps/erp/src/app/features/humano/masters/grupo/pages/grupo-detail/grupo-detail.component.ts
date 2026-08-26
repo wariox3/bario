@@ -4,16 +4,19 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { GrupoService } from '../../grupo.service';
-import { GRUPO_LIST_PATH } from '../../grupo.constants';
+import {
+  GRUPO_LIST_PATH,
+  GRUPO_PERIODO_MENSUAL,
+  GRUPO_PERIODO_QUINCENAL,
+} from '../../grupo.constants';
 import type { Grupo } from '../../grupo.model';
 
 @Component({
   selector: 'app-grupo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './grupo-detail.component.html',
   styleUrl: './grupo-detail.component.scss',
 })
@@ -32,6 +35,24 @@ export class GrupoDetailComponent implements OnInit {
   protected readonly grupo = signal<Grupo | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  /**
+   * Etiqueta del período, resuelta desde el **id** y no desde `periodo_nombre`.
+   *
+   * El backend lo manda en mayúsculas (`'QUINCENAL'`) y sin traducir; el
+   * selector del formulario ya pinta estos mismos dos valores desde el
+   * diccionario, así que leerlos de la misma fuente evita que el mismo grupo se
+   * lea distinto en el form y en la ficha. Un período que el front no conozca
+   * cae al nombre del backend antes que quedar en blanco.
+   */
+  protected readonly periodoLabel = computed<string>(() => {
+    const grupo = this.grupo();
+    if (!grupo) return '';
+    const periodos = this.t().entities.grupo.periodos;
+    if (grupo.periodo === GRUPO_PERIODO_QUINCENAL) return periodos[GRUPO_PERIODO_QUINCENAL];
+    if (grupo.periodo === GRUPO_PERIODO_MENSUAL) return periodos[GRUPO_PERIODO_MENSUAL];
+    return grupo.periodo_nombre ?? '';
+  });
 
   /** Migas: módulo Humano → listado de grupos → nombre abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {

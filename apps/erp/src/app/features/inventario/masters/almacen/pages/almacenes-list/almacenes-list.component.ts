@@ -1,6 +1,5 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
@@ -8,7 +7,6 @@ import {
   FileDownloadService,
   FilterStorageService,
   I18nService,
-  TenantService,
   ToastService,
   buildFiltros,
   buildOrdenamientos,
@@ -27,6 +25,7 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
+import { masterNav } from '@erp/core/erp-modules';
 import { AlmacenService } from '../../almacen.service';
 import type { Almacen } from '../../almacen.model';
 import {
@@ -38,7 +37,7 @@ import {
   ALMACENES_QUICK_SEARCH_FIELD,
   ALMACENES_ROW_ACTIONS,
   ALMACENES_TRAILING_ACTIONS,
-  ALMACEN_LIST_PATH,
+  ALMACEN_SEGMENT,
 } from '../../almacen.constants';
 
 /** Listado de **almacenes**. Master del módulo Inventario (camino B). */
@@ -60,14 +59,15 @@ export class AlmacenesListComponent {
   private readonly service = inject(AlmacenService);
   private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
-  private readonly tenant = inject(TenantService);
-  private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  /** Almacenes se abre desde inventario, venta y compra: la URL sigue al activo. */
+  private readonly nav = masterNav(ALMACEN_SEGMENT);
 
   protected readonly items = signal<readonly Almacen[]>([]);
   protected readonly totalCount = signal(0);
@@ -85,16 +85,9 @@ export class AlmacenesListComponent {
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
-  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
-    const slug = this.tenant.currentSlug();
-    return [
-      {
-        label: this.t().modules.inventario.name,
-        routerLink: slug ? ['/t', slug, 'inventario'] : undefined,
-      },
-      { label: this.t().entities.almacen.name },
-    ];
-  });
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
+    this.nav.crumbs(this.t().entities.almacen.name),
+  );
 
   protected readonly columns = ALMACENES_COLUMNS;
   protected readonly filterFields = ALMACENES_FILTER_FIELDS;
@@ -144,10 +137,10 @@ export class AlmacenesListComponent {
     const almacen = event.row as Almacen;
     switch (event.actionId) {
       case 'view':
-        this.navigateTo('detalle', almacen.id);
+        this.nav.ir('detalle', almacen.id);
         break;
       case 'edit':
-        this.navigateTo('editar', almacen.id);
+        this.nav.ir('editar', almacen.id);
         break;
       case 'delete':
         this.confirmRemove([almacen.id]);
@@ -156,13 +149,13 @@ export class AlmacenesListComponent {
   }
 
   protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as Almacen).id);
+    this.nav.ir('detalle', (row as Almacen).id);
   }
 
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
       case 'new':
-        this.navigateTo('nuevo');
+        this.nav.ir('nuevo');
         break;
       case 'export-excel':
         this.exportExcel();
@@ -271,11 +264,5 @@ export class AlmacenesListComponent {
           );
         },
       });
-  }
-
-  private navigateTo(...subPath: (string | number)[]): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) throw new Error('Cannot navigate without an active tenant slug.');
-    void this.router.navigate(['/t', slug, ...ALMACEN_LIST_PATH, ...subPath]);
   }
 }

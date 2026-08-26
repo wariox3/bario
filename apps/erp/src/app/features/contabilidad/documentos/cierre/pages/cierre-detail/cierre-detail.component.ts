@@ -208,10 +208,6 @@ export class CierreDetailComponent implements OnInit {
       });
   }
 
-  protected onArchivos(): void {
-    this.toast.info(this.t().common.comingSoon);
-  }
-
   protected onPageChange(event: PaginatorState): void {
     const id = this.id();
     if (!id) return;

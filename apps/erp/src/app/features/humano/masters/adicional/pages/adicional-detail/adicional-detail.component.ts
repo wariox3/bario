@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
 import { ADICIONAL_LIST_PATH } from '../../adicional.constants';
@@ -13,7 +12,7 @@ import type { Adicional } from '../../adicional.model';
 @Component({
   selector: 'app-adicional-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonModule, BreadcrumbComponent],
   templateUrl: './adicional-detail.component.html',
   styleUrl: './adicional-detail.component.scss',
 })
@@ -33,6 +32,12 @@ export class AdicionalDetailComponent implements OnInit {
   protected readonly adicional = signal<Adicional | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  /** Valor del adicional en pesos. `formatCop` ya resuelve el nulo y el string. */
+  protected readonly valorFormateado = computed(() => {
+    const a = this.adicional();
+    return a?.valor != null ? formatCop(a.valor) : '';
+  });
 
   /** Migas: módulo Humano → listado de adicionales → contrato abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {

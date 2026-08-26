@@ -42,14 +42,42 @@
   </div>
 } @else if (formaPago(); as m) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <lib-detail-header
-    icon="pi pi-credit-card"
-    [eyebrow]="t().entities.formaPago.detail.eyebrow"
-    [title]="m.nombre"
-  >
-    <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
-      {{ t().entities.formaPago.columns.cuenta }}:
-      {{ m.cuenta ? [m.cuenta_codigo, m.cuenta_nombre].join(' - ') : '—' }}
-    </p>
-  </lib-detail-header>
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos" del sistema, como contacto e ítem. Sin
+       `<lib-detail-header>`: repetía el nombre que ya es un campo de acá. La
+       identidad la dan la miga y el `<h1>` accesible. -->
+  <h1 class="sr-only">{{ m.nombre }}</h1>
+
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-credit-card text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.formaPago.detail.sections.general }}
+      </h2>
+    </div>
+
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="forma-pago-detail__label">{{ t().entities.formaPago.columns.nombre }}</dt>
+        <dd class="forma-pago-detail__value" [class.forma-pago-detail__value--empty]="!m.nombre">
+          {{ m.nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="forma-pago-detail__label">{{ t().entities.formaPago.columns.cuenta }}</dt>
+        <dd
+          class="forma-pago-detail__value"
+          [class.forma-pago-detail__value--empty]="!cuentaContable()"
+        >
+          {{ cuentaContable() || '—' }}
+        </dd>
+      </div>
+    </dl>
+  </section>
 }

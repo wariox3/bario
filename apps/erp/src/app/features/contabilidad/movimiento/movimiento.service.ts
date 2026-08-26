@@ -22,19 +22,6 @@ export const MOVIMIENTO_ENDPOINT = '/contabilidad/movimiento/';
 export const MOVIMIENTO_SERIALIZADOR = 'informe_movimiento';
 
 /**
- * Resultado de la importación masiva. Shape provisional: crece cuando el backend
- * defina su contrato (mismo criterio que el resto de importaciones del ERP).
- */
-export interface MovimientoImportResult {
-  readonly imported_count: number;
-  readonly errors?: ReadonlyArray<{
-    readonly row: number;
-    readonly field?: string;
-    readonly message: string;
-  }>;
-}
-
-/**
  * Servicio HTTP de la consulta de **movimientos contables**.
  *
  * Solo lectura más importación: el movimiento lo genera la contabilización de un
@@ -72,9 +59,7 @@ export class MovimientoService extends BaseHttpService {
    * legacy importaba contra `contabilidad/movimiento` y servía la plantilla
    * desde un XLSX alojado fuera del backend.
    */
-  importar(file: File): Observable<MovimientoImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    return this.post<MovimientoImportResult>(`${this.resourcePath}importar/`, form);
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
   }
 }

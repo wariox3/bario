@@ -2,9 +2,15 @@
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
-  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
-  <header class="flex items-center gap-2">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
+  <lib-page-actions>
     <p-button
       type="button"
       [label]="t().common.actions.back"
@@ -20,9 +26,9 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
-  </header>
+  </lib-page-actions>
 
   <!-- ── Sección 1: Identidad y contacto ───────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
@@ -141,7 +147,20 @@
           <label for="celular" class="empleado-form__label">
             {{ f.fields.celular }}<span class="ml-px text-red-500">*</span>
           </label>
-          <input id="celular" pInputText type="tel" formControlName="celular" fluid />
+          <!-- Solo dígitos y tope de 15 (el máximo internacional): el número se
+               guarda pelado para poder compararse, y un celular de otro país
+               sigue entrando. El formato con guiones se aplica al leerlo. -->
+          <input
+            id="celular"
+            pInputText
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel"
+            libSoloDigitos
+            maxlength="15"
+            formControlName="celular"
+            fluid
+          />
           <lib-field-error
             [control]="form.controls.celular"
             [messages]="{ required: f.validation.required }"
@@ -153,10 +172,10 @@
           <label for="ciudad" class="empleado-form__label">
             {{ f.fields.ciudad }}<span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-ciudad-autocomplete
             inputId="ciudad"
             formControlName="ciudad"
-            [endpoint]="endpoints.ciudad"
+            [fuente]="ciudadFuente"
             [placeholder]="f.fields.ciudadPlaceholder"
             [invalid]="form.controls.ciudad.invalid && form.controls.ciudad.touched"
           />
@@ -186,8 +205,10 @@
           <input id="barrio" pInputText type="text" formControlName="barrio" fluid />
         </div>
 
-        <!-- Correo -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <!-- Correo. A la par de Barrio, no a lo ancho: con el ancho completo
+             quedaba una fila desbalanceada —barrio solo a la izquierda y un campo
+             estirado debajo— y el formulario perdía su ritmo de dos columnas. -->
+        <div class="flex flex-col gap-1.5">
           <label for="correo" class="empleado-form__label">
             {{ f.fields.correo }}<span class="ml-px text-red-500">*</span>
           </label>

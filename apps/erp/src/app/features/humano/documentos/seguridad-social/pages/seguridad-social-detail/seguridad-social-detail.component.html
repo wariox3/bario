@@ -15,12 +15,12 @@
   />
   @if (cabecera()) {
     <app-document-detail-actions
+      [documentoId]="id()"
       [canAprobar]="canAprobar()"
       [canDesaprobar]="canDesaprobar()"
       (aprobar)="onAprobar()"
       (desaprobar)="onDesaprobar()"
       (imprimir)="onImprimir()"
-      (archivos)="onArchivos()"
     />
     <div class="ml-auto">
       <app-document-estados [estados]="estados()" />

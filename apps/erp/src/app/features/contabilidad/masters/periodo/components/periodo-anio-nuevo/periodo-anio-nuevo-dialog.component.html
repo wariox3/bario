@@ -34,6 +34,7 @@
     <form
       [formGroup]="form"
       (ngSubmit)="onSubmit()"
+      libFocusInvalid
       autocomplete="off"
       class="flex flex-col gap-5 pt-1"
     >
@@ -76,7 +77,7 @@
           icon="pi pi-check"
           size="small"
           [loading]="isSaving()"
-          [disabled]="form.invalid || isSaving()"
+          [disabled]="isSaving()"
         />
       </div>
     </form>

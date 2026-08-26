@@ -1,5 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const CONTACTOS_FILTERS_STORAGE_KEY = 'contactos:filters:v1';
 
@@ -115,3 +117,14 @@ export const CONTACTOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
     ],
   },
 ];
+
+/**
+ * Maestros que ofrece el diálogo de importación de contactos: **todos**.
+ *
+ * El contacto es la entidad más transversal del ERP —el mismo registro es cliente,
+ * proveedor y empleado— y su archivo puede traer desde la ciudad y los datos
+ * bancarios hasta el tipo de cotizante, el tipo de contrato o el tipo de costo. Una
+ * lista corta acá dejaría al usuario sin el archivo que justo necesita, así que se
+ * ofrece el catálogo completo.
+ */
+export const CONTACTOS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;

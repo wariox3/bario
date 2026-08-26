@@ -42,49 +42,74 @@
   </div>
 } @else if (cuentaBanco(); as c) {
   <!-- ── Encabezado ───────────────────────────────────────────────────────────── -->
-  <lib-detail-header
-    icon="pi pi-wallet"
-    [eyebrow]="t().entities.cuentaBanco.detail.eyebrow"
-    [title]="c.nombre"
-  >
-    @if (c.cuenta_banco_tipo_nombre) {
-      <p detailHeaderSubtitle class="m-0 text-[0.8rem] font-medium text-brand-muted">
-        {{ c.cuenta_banco_tipo_nombre }}
-      </p>
-    }
-  </lib-detail-header>
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos". Sin `<lib-detail-header>`: repetía el
+       nombre y el tipo, que ya son campos de acá. -->
+  <h1 class="sr-only">{{ c.nombre }}</h1>
 
-  <!-- ── Datos ────────────────────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="px-5 py-5 max-[576px]:px-4">
-      <dl class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.cuentaBanco.columns.tipo }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ c.cuenta_banco_tipo_nombre || '—' }}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.cuentaBanco.columns.numeroCuenta }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ c.numero_cuenta || '—' }}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.cuentaBanco.columns.clase }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">
-            {{ c.cuenta_banco_clase_nombre || '—' }}
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="text-[0.72rem] font-semibold uppercase tracking-wide text-brand-muted">
-            {{ t().entities.cuentaBanco.form.fields.cuenta }}
-          </dt>
-          <dd class="m-0 text-[0.9rem] text-brand-text">{{ cuentaLabel() || '—' }}</dd>
-        </div>
-      </dl>
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
+      >
+        <i class="pi pi-wallet text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.cuentaBanco.detail.sections.general }}
+      </h2>
     </div>
+
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="cuenta-banco-detail__label">{{ t().entities.cuentaBanco.columns.nombre }}</dt>
+        <dd
+          class="cuenta-banco-detail__value"
+          [class.cuenta-banco-detail__value--empty]="!c.nombre"
+        >
+          {{ c.nombre || '—' }}
+        </dd>
+      </div>
+      <!-- El número de cuenta se dicta y se compara: monoespaciada. -->
+      <div class="flex flex-col gap-0.5">
+        <dt class="cuenta-banco-detail__label">
+          {{ t().entities.cuentaBanco.columns.numeroCuenta }}
+        </dt>
+        <dd
+          class="cuenta-banco-detail__value cuenta-banco-detail__value--mono"
+          [class.cuenta-banco-detail__value--empty]="!c.numero_cuenta"
+        >
+          {{ c.numero_cuenta || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="cuenta-banco-detail__label">{{ t().entities.cuentaBanco.columns.tipo }}</dt>
+        <dd
+          class="cuenta-banco-detail__value"
+          [class.cuenta-banco-detail__value--empty]="!c.cuenta_banco_tipo_nombre"
+        >
+          {{ c.cuenta_banco_tipo_nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="cuenta-banco-detail__label">{{ t().entities.cuentaBanco.columns.clase }}</dt>
+        <dd
+          class="cuenta-banco-detail__value"
+          [class.cuenta-banco-detail__value--empty]="!c.cuenta_banco_clase_nombre"
+        >
+          {{ c.cuenta_banco_clase_nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="cuenta-banco-detail__label">
+          {{ t().entities.cuentaBanco.form.fields.cuenta }}
+        </dt>
+        <dd
+          class="cuenta-banco-detail__value"
+          [class.cuenta-banco-detail__value--empty]="!cuentaLabel()"
+        >
+          {{ cuentaLabel() || '—' }}
+        </dd>
+      </div>
+    </dl>
   </section>
 }

@@ -1,0 +1,71 @@
+// Tabla de líneas — mismo idioma que las tablas de detalle de documento
+// (`comercial-detalle-table`): header sticky opaco, celdas compactas, separador
+// entre filas y hover apenas perceptible.
+.precio-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.precio-items-table__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--brand-muted, #64748b);
+  // Opaco: si fuera translúcido, las filas se verían por debajo al scrollear.
+  background: #f8f9fa;
+  // `box-shadow` en vez de `border-bottom`: con `border-collapse` el borde se
+  // despega del header sticky al scrollear.
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
+}
+
+.precio-items-table__td {
+  padding: 0.45rem 0.6rem;
+  vertical-align: middle;
+}
+
+.precio-items-table__row + .precio-items-table__row .precio-items-table__td {
+  border-top: 1px solid rgba(20, 48, 73, 0.07);
+}
+
+.precio-items-table__row:hover .precio-items-table__td {
+  background: rgba(20, 48, 73, 0.015);
+}
+
+// Acción de fila: icono ghost, que se tiñe solo al pasar por encima.
+.precio-items-table__action {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-brand-muted);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &--danger:hover:not(:disabled) {
+    background: #fef2f2; // red-50
+    color: #b91c1c; // red-700
+  }
+
+  &:focus-visible {
+    outline: 2px solid #38bdf8; // sky-400
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

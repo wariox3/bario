@@ -43,7 +43,6 @@ export const CONTRATO_SERVICIO_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: true,
     canSelectRows: true,
-    canImport: false,
     canExportExcel: false,
     canExportZip: false,
     canGenerate: true,

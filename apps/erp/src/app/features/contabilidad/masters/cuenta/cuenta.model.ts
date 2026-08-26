@@ -33,14 +33,15 @@ export interface CuentaPayload {
 }
 
 /**
- * Respuesta del endpoint de importación masiva.
- * Shape provisional: crece cuando el backend defina su contrato final.
+ * Traslado de movimientos entre cuentas: todos los movimientos de la cuenta
+ * origen pasan a la cuenta destino. Es irreversible.
  */
-export interface CuentaImportResult {
-  readonly imported_count: number;
-  readonly errors?: ReadonlyArray<{
-    readonly row: number;
-    readonly field?: string;
-    readonly message: string;
-  }>;
+export interface CuentaTrasladoPayload {
+  readonly cuenta_origen_id: number;
+  readonly cuenta_destino_id: number;
+}
+
+/** Respuesta del traslado. El backend describe en `mensaje` lo que movió. */
+export interface CuentaTrasladoResponse {
+  readonly mensaje?: string;
 }

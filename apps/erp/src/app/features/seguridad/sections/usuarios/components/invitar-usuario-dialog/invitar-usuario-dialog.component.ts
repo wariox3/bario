@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import {
   AutoCompleteModule,
   type AutoCompleteCompleteEvent,
@@ -102,7 +104,25 @@ export class InvitarUsuarioDialogComponent {
   /** Accesos marcados. Arranca vacío: se otorga lo que se marque, nada más. */
   protected readonly selectedAccesoIds = signal<readonly ContenedorAccesoId[]>([]);
 
+  /** Términos tecleados; la última consulta gana. */
+  private readonly search$ = new Subject<string>();
+
   constructor() {
+    // `switchMap` cancela la búsqueda en vuelo al llegar un término nuevo: sin él,
+    // la respuesta de un prefijo corto puede llegar tarde y pisar la del completo.
+    this.search$
+      .pipe(
+        tap(() => this.isSearching.set(true)),
+        switchMap((query) =>
+          this.service.searchUsuarios(query).pipe(catchError(() => of<UserSearchResult[]>([]))),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((results) => {
+        this.suggestions.set([...results]);
+        this.isSearching.set(false);
+      });
+
     // Cada apertura arranca limpia: no arrastra el intento anterior. Los
     // grupos se piden en cada apertura por si cambiaron desde la última vez.
     effect(() => {
@@ -143,20 +163,7 @@ export class InvitarUsuarioDialogComponent {
       this.suggestions.set([]);
       return;
     }
-    this.isSearching.set(true);
-    this.service
-      .searchUsuarios(event.query)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (results) => {
-          this.suggestions.set([...results]);
-          this.isSearching.set(false);
-        },
-        error: () => {
-          this.suggestions.set([]);
-          this.isSearching.set(false);
-        },
-      });
+    this.search$.next(event.query);
   }
 
   protected onSelect(event: AutoCompleteSelectEvent): void {

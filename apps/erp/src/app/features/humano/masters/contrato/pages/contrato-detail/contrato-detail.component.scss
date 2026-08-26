@@ -21,3 +21,18 @@
   color: var(--brand-text);
   word-break: break-word;
 }
+
+// Bandera apagada: un «No» es un valor, no un dato que falta. Atenuarlo deja que
+// la columna se escanee por los «Sí».
+.contrato-detail__value--off {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.65;
+}
+
+// Dato ausente: presente en la ficha pero sin competir al escanear la columna.
+.contrato-detail__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
+}

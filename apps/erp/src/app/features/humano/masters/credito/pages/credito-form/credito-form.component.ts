@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -35,6 +35,7 @@ import { creditoToFormValue, formValueToPayload } from '../../credito.mapper';
   selector: 'app-credito-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -42,6 +43,7 @@ import { creditoToFormValue, formValueToPayload } from '../../credito.mapper';
     DatePickerModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ContratoAutocompleteComponent,
     ErpApiAutocompleteComponent,
   ],

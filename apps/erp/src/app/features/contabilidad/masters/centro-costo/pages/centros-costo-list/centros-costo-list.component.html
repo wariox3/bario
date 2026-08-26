@@ -46,15 +46,14 @@
 <p-confirmDialog />
 
 <app-import-dialog
-  [visible]="importVisible()"
-  (visibleChange)="onImportVisibleChange($event)"
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
   [title]="t().entities.centroCosto.import.title"
   [subtitle]="t().entities.centroCosto.import.subtitle"
-  [importing]="importLoading()"
-  [errors]="importErrors()"
-  [errorSummary]="importErrorSummary()"
-  [errorTotal]="importErrorTotal()"
-  [mastersTouched]="importMasters()"
-  (importRequested)="onImportRequested($event)"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  (importRequested)="importar.submit($event)"
   [exampleConfig]="exampleConfig"
 />

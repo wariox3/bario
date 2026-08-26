@@ -4,8 +4,13 @@ import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 export const ALMACENES_FILTERS_STORAGE_KEY = 'almacenes:filters:v1';
 export const ALMACENES_QUICK_SEARCH_FIELD = 'nombre';
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const ALMACEN_LIST_PATH = ['inventario', 'almacenes'] as const;
+/**
+ * Segmento de ruta del master, tal como lo declara `rutaAlmacenes()`.
+ *
+ * Sin módulo a propósito: almacenes se abre desde inventario, venta y compra, y
+ * el módulo lo pone `masterNav` con el que esté activo.
+ */
+export const ALMACEN_SEGMENT = 'almacenes';
 
 /** URL de la exportación a Excel del listado. */
 export const ALMACENES_EXPORT_URL = '/inventario/almacen/excel/';

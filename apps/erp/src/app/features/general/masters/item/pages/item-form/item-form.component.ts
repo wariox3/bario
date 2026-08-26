@@ -1,5 +1,6 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, forkJoin, of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -8,7 +9,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import {
   ErpSelectDataService,
   type ErpSelectOption,
@@ -35,6 +36,7 @@ import { formValueToPayload, itemToFormValue } from '../../item.mapper';
   selector: 'app-item-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -44,6 +46,7 @@ import { formValueToPayload, itemToFormValue } from '../../item.mapper';
     RadioButtonModule,
     MultiSelectModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpCuentaSelectComponent,
   ],
   templateUrl: './item-form.component.html',
@@ -112,6 +115,13 @@ export class ItemFormComponent implements OnInit {
   /** Servicio no maneja existencias: ocultamos/forzamos `inventario`. */
   protected readonly esServicio = signal(false);
 
+  /**
+   * El ítem ya se movió en documentos. Bloquea su **naturaleza** —tipo y manejo
+   * de inventario—, no sus datos: precio, nombre, cuentas e impuestos se siguen
+   * editando. Siempre `false` en alta.
+   */
+  protected readonly enUso = signal(false);
+
   constructor() {
     this.setupFormReactions();
     this.loadImpuestos();
@@ -165,7 +175,10 @@ export class ItemFormComponent implements OnInit {
 
   /**
    * Si el item es servicio, `inventario` se fuerza a `false` y se deshabilita
-   * (un servicio no maneja existencias). Al volver a producto, se rehabilita.
+   * (un servicio no maneja existencias). Al volver a producto, se rehabilita —
+   * salvo que el ítem esté en uso, que es un bloqueo de mayor jerarquía: sin ese
+   * `if`, cargar un ítem en uso rehabilitaría el checkbox que `enUso` acaba de
+   * apagar, porque `patchValue` dispara esta misma reacción.
    */
   private applyTipo(tipo: 'producto' | 'servicio'): void {
     const esServicio = tipo === 'servicio';
@@ -174,9 +187,19 @@ export class ItemFormComponent implements OnInit {
     if (esServicio) {
       inventario.setValue(false, { emitEvent: false });
       inventario.disable({ emitEvent: false });
-    } else {
+    } else if (!this.enUso()) {
       inventario.enable({ emitEvent: false });
     }
+  }
+
+  /**
+   * Apaga lo que un ítem ya movido no puede cambiar. Un control deshabilitado no
+   * viaja en el payload, así que el bloqueo es real y no solo visual.
+   */
+  private aplicarBloqueoPorUso(): void {
+    this.enUso.set(true);
+    this.form.controls.tipo.disable({ emitEvent: false });
+    this.form.controls.inventario.disable({ emitEvent: false });
   }
 
   private loadImpuestos(): void {
@@ -196,12 +219,23 @@ export class ItemFormComponent implements OnInit {
       });
   }
 
+  /**
+   * Trae el ítem y su estado de uso **juntos**, para que el formulario nazca ya
+   * bloqueado en vez de habilitar los campos y apagarlos un instante después.
+   *
+   * La consulta de uso degrada a `false` ante cualquier error: si `validar-uso/`
+   * falla, el formulario abre igual en vez de dejar la pantalla sin cargar.
+   * Deja de proteger, pero no rompe.
+   */
   private loadItem(id: number): void {
-    this.itemService
-      .getById(id)
+    forkJoin({
+      item: this.itemService.getById(id),
+      enUso: this.itemService.validarUso(id).pipe(catchError(() => of(false))),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (item) => {
+        next: ({ item, enUso }) => {
+          if (enUso) this.aplicarBloqueoPorUso();
           this.form.patchValue(itemToFormValue(item));
         },
         error: () => {

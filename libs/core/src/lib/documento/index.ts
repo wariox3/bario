@@ -13,7 +13,6 @@ export type {
   DocumentCapabilities,
   EditableRowContext,
   EntityRoutes,
-  ImportDescriptor,
   DocumentEntityConfig,
   EntityConfig,
 } from './entity-config.types';

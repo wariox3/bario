@@ -7,12 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type {
-  ConsultaDianResponse,
-  Contacto,
-  ContactoImportResult,
-  ContactoPayload,
-} from './contacto.model';
+import type { ConsultaDianResponse, Contacto, ContactoPayload } from './contacto.model';
 
 /**
  * Servicio HTTP de contactos.
@@ -71,17 +66,9 @@ export class ContactoService extends BaseHttpService {
     return this.get<ConsultaDianResponse>(`${this.resourcePath}consulta-dian/`, params);
   }
 
-  /**
-   * Importación masiva desde un archivo Excel.
-   *
-   * HttpClient detecta el `FormData` y arma el `multipart/form-data` con el
-   * boundary correcto — no hay que setear `Content-Type` manualmente. El campo
-   * `archivo` es el contrato que espera el backend.
-   */
-  importar(file: File): Observable<ContactoImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    return this.post<ContactoImportResult>(`${this.resourcePath}importar/`, form);
+  /** Importación masiva desde un archivo Excel. */
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
   }
 
   /**

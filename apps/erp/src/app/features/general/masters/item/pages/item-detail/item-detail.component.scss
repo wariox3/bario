@@ -4,6 +4,19 @@
   gap: 1.25rem;
 }
 
+// Micro-encabezado de grupo dentro de una card (mismo `group-label` del panel
+// del app-switcher y de la ficha del contacto). Se distingue de la etiqueta de
+// campo por caja y peso, no por color.
+.item-detail__group {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
 // Etiqueta de cada dato de la ficha (término de la definition list).
 .item-detail__label {
   font-size: 0.7rem;
@@ -20,4 +33,32 @@
   line-height: 1.35;
   color: var(--brand-text);
   word-break: break-word;
+}
+
+// Bandera apagada. Comparte el tratamiento de `--empty` pero no es lo mismo: un
+// "NO" es un valor, no un dato que falta. Atenuarlo deja que la columna se
+// escanee por los "SÍ", que son los que cambian cómo se comporta el ítem.
+.item-detail__value--off {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.65;
+}
+
+// Dato ausente: presente en la ficha pero sin competir al escanear la columna.
+// Mismo tratamiento que en la ficha del contacto.
+.item-detail__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
+}
+
+// El dato identificador va siempre en monoespaciada (regla del sistema), con
+// `tabular-nums` para que los dígitos queden en columna: así un código de barras
+// se coteja carácter por carácter contra la etiqueta física.
+.item-detail__value--mono {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.83rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }

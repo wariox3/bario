@@ -49,7 +49,6 @@ export const ASIENTO_CONFIG: DocumentEntityConfig = {
     canSelectRows: true,
     // El legacy importa líneas desde Excel (`importar-detalle-cuenta/`), pero esa
     // maquinaria todavía no existe en este ERP. Ver PENDIENTES.md.
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,

@@ -1,6 +1,5 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
@@ -8,7 +7,6 @@ import {
   FileDownloadService,
   FilterStorageService,
   I18nService,
-  TenantService,
   ToastService,
   buildFiltros,
   buildOrdenamientos,
@@ -28,6 +26,7 @@ import {
 } from '@reddoc/feature-base';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
+import { masterNav } from '@erp/core/erp-modules';
 import { SedeService } from '../../sede.service';
 import type { Sede } from '../../sede.model';
 import {
@@ -37,6 +36,7 @@ import {
   SEDES_PRIMARY_ACTION,
   SEDES_QUICK_SEARCH_FIELD,
   SEDES_ROW_ACTIONS,
+  SEDE_SEGMENT,
   SEDES_TRAILING_ACTIONS,
 } from '../../sede.constants';
 
@@ -65,14 +65,15 @@ export class SedesListComponent {
   private readonly service = inject(SedeService);
   private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
-  private readonly tenant = inject(TenantService);
-  private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  /** Sedes se abre desde general y desde venta: la URL sigue al módulo activo. */
+  private readonly nav = masterNav(SEDE_SEGMENT);
 
   protected readonly items = signal<readonly Sede[]>([]);
   protected readonly totalCount = signal(0);
@@ -91,16 +92,9 @@ export class SedesListComponent {
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
-  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
-    const slug = this.tenant.currentSlug();
-    return [
-      {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
-      },
-      { label: this.t().entities.sede.name },
-    ];
-  });
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
+    this.nav.crumbs(this.t().entities.sede.name),
+  );
 
   protected readonly columns = SEDES_COLUMNS;
   protected readonly filterFields = SEDES_FILTER_FIELDS;
@@ -152,10 +146,10 @@ export class SedesListComponent {
     const sede = event.row as Sede;
     switch (event.actionId) {
       case 'view':
-        this.navigateTo('detalle', sede.id);
+        this.nav.ir('detalle', sede.id);
         break;
       case 'edit':
-        this.navigateTo('editar', sede.id);
+        this.nav.ir('editar', sede.id);
         break;
       case 'delete':
         this.confirmRemove([sede.id]);
@@ -164,13 +158,13 @@ export class SedesListComponent {
   }
 
   protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as Sede).id);
+    this.nav.ir('detalle', (row as Sede).id);
   }
 
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
       case 'new':
-        this.navigateTo('nuevo');
+        this.nav.ir('nuevo');
         break;
       case 'export-excel':
         this.exportExcel();
@@ -279,11 +273,5 @@ export class SedesListComponent {
           );
         },
       });
-  }
-
-  private navigateTo(...subPath: (string | number)[]): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) throw new Error('Cannot navigate without an active tenant slug.');
-    void this.router.navigate(['/t', slug, 'general', 'sedes', ...subPath]);
   }
 }

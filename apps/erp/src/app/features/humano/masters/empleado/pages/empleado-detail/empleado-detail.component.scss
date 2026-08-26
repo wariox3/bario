@@ -4,6 +4,18 @@
   gap: 1.25rem;
 }
 
+// Micro-encabezado de un grupo dentro de la card. Se distingue de la etiqueta de
+// campo por caja y peso, no por color: mismo idioma que la ficha del contacto.
+.empleado-detail__group {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
 // Etiqueta de cada dato de la ficha (término de la definition list).
 .empleado-detail__label {
   font-size: 0.7rem;
@@ -32,4 +44,12 @@
     color: var(--reddoc-status-info, #009ef7);
     text-decoration: underline;
   }
+}
+
+// Campo sin dato: la raya se atenúa para que no compita con los valores reales
+// al escanear la columna, pero el campo sigue ocupando su lugar en la ficha.
+.empleado-detail__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
 }

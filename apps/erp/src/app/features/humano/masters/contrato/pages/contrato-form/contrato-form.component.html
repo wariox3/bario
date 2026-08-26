@@ -1,8 +1,14 @@
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
-  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
-  <header class="flex items-center gap-2">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
+  <lib-page-actions>
     <p-button
       type="button"
       [label]="t().common.actions.back"
@@ -18,9 +24,9 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
-  </header>
+  </lib-page-actions>
   <!-- ── Sección 1: Datos del contrato ─────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
@@ -188,6 +194,25 @@
             </span>
           </label>
         </div>
+
+        <!--
+          Nota libre del contrato. Vive acá, al pie de los datos generales, que
+          es donde la tiene el ERP anterior; estaba escrita pero dentro de la
+          sección "Terminación y pagos", que se renderiza tras una bandera
+          apagada — el campo existía en el código y era inalcanzable en pantalla.
+        -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="contrato-form__label">
+            {{ t().entities.contrato.form.fields.comentario }}
+          </label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            class="w-full"
+          ></textarea>
+        </div>
       </div>
     </div>
   </section>
@@ -229,7 +254,10 @@
           />
           <lib-field-error
             [control]="form.controls.salario"
-            [messages]="{ required: t().entities.contrato.form.validation.required }"
+            [messages]="{
+              required: t().entities.contrato.form.validation.required,
+              salarioPositivo: t().entities.contrato.form.validation.salarioPositivo,
+            }"
           />
         </div>
 
@@ -405,6 +433,7 @@
             formControlName="riesgo"
             endpoint="/humano/riesgo/seleccionar/"
             [params]="{ limit: '100' }"
+            [displayWith]="riesgoLabel"
             [invalid]="form.controls.riesgo.invalid && form.controls.riesgo.touched"
           />
         </div>
@@ -419,8 +448,17 @@
             formControlName="tipo_cotizante"
             endpoint="/humano/tipo-cotizante/seleccionar/"
             [params]="{ limit: '100' }"
-            [suggestedIndex]="0"
             [invalid]="form.controls.tipo_cotizante.invalid && form.controls.tipo_cotizante.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.tipo_cotizante"
+            [messages]="{
+              required: t().entities.contrato.form.validation.required,
+              cotizanteAprendizRequerido:
+                t().entities.contrato.form.validation.cotizanteAprendizRequerido,
+              cotizanteAprendizNoAplica:
+                t().entities.contrato.form.validation.cotizanteAprendizNoAplica,
+            }"
           />
         </div>
 
@@ -446,10 +484,10 @@
             {{ t().entities.contrato.form.fields.ciudadContrato }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-ciudad-autocomplete
             inputId="ciudad_contrato"
             formControlName="ciudad_contrato"
-            [endpoint]="endpoints.ciudad"
+            [fuente]="ciudadFuente"
             [placeholder]="t().entities.contrato.form.fields.ciudadPlaceholder"
             [invalid]="
               form.controls.ciudad_contrato.invalid && form.controls.ciudad_contrato.touched
@@ -462,10 +500,10 @@
             {{ t().entities.contrato.form.fields.ciudadLabora }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-ciudad-autocomplete
             inputId="ciudad_labora"
             formControlName="ciudad_labora"
-            [endpoint]="endpoints.ciudad"
+            [fuente]="ciudadFuente"
             [placeholder]="t().entities.contrato.form.fields.ciudadPlaceholder"
             [invalid]="form.controls.ciudad_labora.invalid && form.controls.ciudad_labora.touched"
           />
@@ -561,19 +599,6 @@
               appendTo="body"
               [fluid]="true"
             />
-          </div>
-
-          <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label for="comentario" class="contrato-form__label">
-              {{ t().entities.contrato.form.fields.comentario }}
-            </label>
-            <textarea
-              id="comentario"
-              pTextarea
-              formControlName="comentario"
-              rows="3"
-              class="w-full"
-            ></textarea>
           </div>
         </div>
       </div>

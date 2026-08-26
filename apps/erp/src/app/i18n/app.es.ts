@@ -38,6 +38,7 @@ export const es: AppDict = {
       exportExcel: 'Exportar excel',
       exportPdf: 'Exportar PDF',
       import: 'Importar',
+      options: 'Opciones',
     },
     search: {
       placeholder: 'Buscar...',
@@ -128,6 +129,51 @@ export const es: AppDict = {
         esFalso: 'es no',
       },
     },
+    archivos: {
+      title: 'Archivos',
+      subtitle: 'Documentos adjuntos a este registro',
+      empty: 'Todavía no hay archivos adjuntos.',
+      columns: { fecha: 'Fecha', nombre: 'Nombre', tamano: 'Tamaño', acciones: 'Acciones' },
+      dropzone: {
+        primary: 'Arrastrá un archivo o hacé clic para elegirlo',
+        hint: 'Hasta {max} MB',
+        invalidType: 'El archivo no tiene un formato válido.',
+        tooLarge: 'El archivo supera el tamaño máximo permitido.',
+      },
+      uploading: 'Subiendo archivo…',
+      download: 'Descargar',
+      delete: 'Eliminar',
+      confirmDelete: {
+        header: 'Confirmar eliminación',
+        message: '¿Querés eliminar «{nombre}»? Esta acción no se puede revertir.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron obtener los archivos. Intentá de nuevo.',
+        },
+        uploadSuccess: {
+          title: 'Archivo cargado',
+          desc: 'El archivo se adjuntó correctamente.',
+        },
+        uploadError: {
+          title: 'No se pudo cargar',
+          desc: 'Revisá el archivo y volvé a intentarlo.',
+        },
+        deleteSuccess: {
+          title: 'Archivo eliminado',
+          desc: 'El archivo se eliminó correctamente.',
+        },
+        deleteError: {
+          title: 'No se pudo eliminar',
+          desc: 'Intentá de nuevo en unos segundos.',
+        },
+        downloadError: {
+          title: 'No se pudo descargar',
+          desc: 'Intentá de nuevo en unos segundos.',
+        },
+      },
+    },
     import: {
       dropzone: {
         primary: 'Arrastrá tu archivo Excel aquí',
@@ -141,7 +187,27 @@ export const es: AppDict = {
       tabs: { errors: 'Errores', masters: 'Maestros' },
       emptyStates: {
         errors: 'Los errores aparecerán aquí después de importar el archivo.',
-        masters: 'El resumen de los maestros aparecerá aquí después de importar.',
+        masters: 'Este listado no tiene archivos de referencia para descargar.',
+      },
+      masters: {
+        hint: 'Descargá estos archivos para consultar los códigos válidos que debe usar tu archivo.',
+        nameHeader: 'Archivo',
+        download: 'Descargar',
+        names: {
+          ciudad: 'Ciudades',
+          comprobanteCodigo: 'Códigos comprobantes',
+          comprobante: 'Comprobantes',
+          impuesto: 'Impuestos',
+          banco: 'Bancos',
+          cuentaBancoClase: 'Clases de cuenta bancaria',
+          activoGrupo: 'Grupos de activo',
+          metodoDepreciacion: 'Métodos de depreciación',
+          tipoCotizante: 'Tipos de cotizante',
+          subtipoCotizante: 'Subtipos de cotizante',
+          entidad: 'Entidades',
+          tipoContrato: 'Tipos de contrato',
+          costoTipo: 'Tipos de costo',
+        },
       },
       errors: {
         rowHeader: 'Fila',
@@ -462,7 +528,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Almacén',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Almacén no encontrado',
           desc: 'El almacén no existe o fue eliminado.',
@@ -503,7 +569,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Asesor',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Asesor no encontrado',
           desc: 'El asesor que buscás no existe o fue eliminado.',
@@ -555,7 +621,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cuenta de banco',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Cuenta de banco no encontrada',
           desc: 'La cuenta de banco que buscás no existe o fue eliminada.',
@@ -575,6 +641,49 @@ export const es: AppDict = {
         compra: 'Compra',
         fechaVence: 'Fecha de vencimiento',
       },
+      items: {
+        title: 'Ítems de la lista',
+        addLine: 'Agregar ítem',
+        empty: {
+          title: 'La lista no tiene ítems',
+          desc: 'Agregá un ítem para fijarle un precio dentro de esta lista.',
+        },
+        columns: {
+          id: 'ID',
+          item: 'Ítem',
+          referencia: 'Referencia',
+          precio: 'Precio',
+          acciones: 'Acciones',
+        },
+        itemPlaceholder: 'Buscá un ítem…',
+        import: {
+          title: 'Importar detalles',
+          subtitle: 'Subí un Excel con los ítems y sus precios para esta lista',
+          notice:
+            'Al importar se recarga la tabla: las filas que todavía no tienen ítem se pierden.',
+        },
+        confirmDelete: {
+          header: 'Quitar ítem',
+          message: '¿Querés quitar «{item}» de esta lista de precios?',
+        },
+        toasts: {
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudieron obtener los ítems de la lista.',
+          },
+          createSuccess: { title: 'Ítem agregado', desc: 'El ítem se agregó a la lista.' },
+          createError: {
+            title: 'No se pudo agregar',
+            desc: 'Revisá el ítem y volvé a intentarlo.',
+          },
+          updateError: {
+            title: 'No se pudo guardar el precio',
+            desc: 'El valor volvió al último guardado.',
+          },
+          deleteSuccess: { title: 'Ítem quitado', desc: 'El ítem salió de la lista.' },
+          deleteError: { title: 'No se pudo quitar', desc: 'Intentá de nuevo en unos segundos.' },
+        },
+      },
       form: {
         createTitle: 'Nueva lista de precios',
         editTitle: 'Editar lista de precios',
@@ -582,8 +691,6 @@ export const es: AppDict = {
         editSubtitle: 'Modificá la información de la lista de precios',
         fields: {
           nombre: 'Nombre',
-          venta: 'Aplica para venta',
-          compra: 'Aplica para compra',
           fechaVence: 'Fecha de vencimiento',
         },
         validation: { required: 'Este campo es requerido' },
@@ -602,7 +709,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Lista de precios',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Lista de precios no encontrada',
           desc: 'La lista de precios que buscás no existe o fue eliminada.',
@@ -623,6 +730,8 @@ export const es: AppDict = {
         consecutivoHasta: 'Consecutivo hasta',
         fechaDesde: 'Fecha desde',
         fechaHasta: 'Fecha hasta',
+        venta: 'Venta',
+        compra: 'Compra',
       },
       form: {
         createTitle: 'Nueva resolución',
@@ -660,7 +769,8 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Resolución',
+        sections: { general: 'Información general' },
+        labels: { aplicaA: 'Aplica a' },
         vigencia: 'Vigencia',
         notFound: {
           title: 'Resolución no encontrada',
@@ -810,6 +920,10 @@ export const es: AppDict = {
     item: {
       name: 'Ítems',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar ítems',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
         id: 'ID',
         codigo: 'Código',
@@ -836,6 +950,10 @@ export const es: AppDict = {
           cuentas: 'Cuentas para contabilizar el item',
         },
         clasificacion: 'Opciones',
+        enUso: {
+          titulo: 'Este ítem ya se usó en documentos',
+          hint: 'Su tipo y el manejo de inventario no se pueden cambiar; el resto sí.',
+        },
         fields: {
           codigo: 'Código',
           nombre: 'Nombre',
@@ -887,10 +1005,15 @@ export const es: AppDict = {
       detail: {
         eyebrow: 'Ítem',
         sections: {
+          general: 'Información general',
+          preciosImpuestos: 'Precios e impuestos',
           precios: 'Precios',
           impuestos: 'Impuestos',
           cuentas: 'Cuentas contables',
         },
+        groups: { identificacion: 'Identificación', clasificacion: 'Clasificación' },
+        opciones: { imagenes: 'Imágenes' },
+        opcionesHint: { imagenes: 'Fotos del ítem, además de la principal' },
         labels: {
           impuestosVenta: 'Impuestos de venta',
           impuestosCompra: 'Impuestos de compra',
@@ -994,7 +1117,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Sucursal',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Sucursal no encontrada',
           desc: 'La sucursal que buscás no existe o fue eliminada.',
@@ -1011,6 +1134,7 @@ export const es: AppDict = {
         id: 'ID',
         nombre: 'Nombre',
         periodo: 'Período',
+        dias: 'Días',
       },
       periodos: { 1: 'Quincenal', 2: 'Mensual' },
       form: {
@@ -1036,7 +1160,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Grupo',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Grupo no encontrado',
           desc: 'El grupo que buscás no existe o fue eliminado.',
@@ -1074,7 +1198,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cargo',
+        sections: { general: 'Información general' },
         activo: 'Activo',
         notFound: {
           title: 'Cargo no encontrado',
@@ -1125,7 +1249,8 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Centro de costo',
+        sections: { general: 'Información general' },
+        activo: 'Activo',
         notFound: {
           title: 'Centro de costo no encontrado',
           desc: 'El centro de costo que buscás no existe o fue eliminado.',
@@ -1172,7 +1297,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Forma de pago',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Forma de pago no encontrada',
           desc: 'La forma de pago que buscás no existe o fue eliminada.',
@@ -1218,7 +1343,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Sede',
+        sections: { general: 'Información general' },
         notFound: {
           title: 'Sede no encontrada',
           desc: 'La sede que buscás no existe o fue eliminada.',
@@ -1288,13 +1413,55 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Cuenta',
+        sections: { general: 'Información general' },
+        groups: {
+          identificacion: 'Identificación',
+          jerarquia: 'Jerarquía',
+          condiciones: 'Condiciones',
+        },
+        fields: {
+          codigoClase: 'Código de clase',
+          codigoGrupo: 'Código de grupo',
+          codigoCuenta: 'Código de cuenta',
+        },
+        acciones: 'Acciones',
         notFound: {
           title: 'Cuenta no encontrada',
           desc: 'La cuenta que buscás no existe o fue eliminada.',
         },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la cuenta' },
+        },
+        traslado: {
+          menuItem: 'Trasladar movimientos a esta cuenta',
+          title: 'Trasladar movimientos',
+          subtitle: 'Elegí la cuenta cuyos movimientos pasan a esta',
+          submit: 'Trasladar',
+          destino: 'Todos los movimientos de la cuenta elegida se trasladan a la cuenta',
+          warning: 'Esta acción no se puede revertir.',
+          fields: {
+            cuentaOrigen: 'Cuenta origen',
+            cuentaOrigenPlaceholder: 'Buscá por código o nombre…',
+          },
+          validation: {
+            required: 'Elegí la cuenta origen',
+            mismaCuenta: 'La cuenta origen no puede ser la misma que recibe los movimientos',
+          },
+          confirm: {
+            header: 'Trasladar movimientos',
+            message: '¿Confirmás el traslado? Esta acción no se puede revertir.',
+            accept: 'Sí, trasladar',
+          },
+          toasts: {
+            success: {
+              title: 'Movimientos trasladados',
+              desc: 'El traslado se hizo correctamente',
+            },
+            error: {
+              title: 'Error al trasladar',
+              desc: 'No se pudieron trasladar los movimientos',
+            },
+          },
         },
       },
     },
@@ -1353,7 +1520,13 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Activo fijo',
+        sections: { general: 'Información general', contabilizacion: 'Contabilización' },
+        groups: {
+          identificacion: 'Identificación',
+          depreciacion: 'Depreciación',
+          vida: 'Compra y vida útil',
+        },
+        dadoDeBaja: 'Dado de baja',
         notFound: {
           title: 'Activo no encontrado',
           desc: 'El activo que buscás no existe o fue eliminado.',
@@ -1452,6 +1625,10 @@ export const es: AppDict = {
     empleado: {
       name: 'Empleados',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar empleados',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
         id: 'ID',
         identificacion: 'Identificación',
@@ -1503,12 +1680,18 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Empleado',
-        sections: {
-          general: 'Información general',
+        groups: {
+          identificacion: 'Identificación',
           contacto: 'Contacto',
           ubicacion: 'Ubicación',
+        },
+        sections: {
+          general: 'Información general',
           banca: 'Datos bancarios',
+        },
+        labels: {
+          documento: 'Documento',
+          nombreCompleto: 'Nombre completo',
         },
         notFound: {
           title: 'Empleado no encontrado',
@@ -1569,7 +1752,8 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Crédito',
+        sections: { general: 'Información general' },
+        groups: { asignacion: 'Asignación', saldo: 'Saldo', cuotas: 'Cuotas' },
         notFound: {
           title: 'Crédito no encontrado',
           desc: 'El crédito que buscás no existe o fue eliminado.',
@@ -1625,7 +1809,10 @@ export const es: AppDict = {
         },
       },
       detail: {
-        eyebrow: 'Adicional',
+        sections: { general: 'Información general' },
+        groups: { asignacion: 'Asignación', valores: 'Valores', condiciones: 'Condiciones' },
+        labels: { programacion: 'Programación' },
+        activo: 'Activo',
         notFound: {
           title: 'Adicional no encontrado',
           desc: 'El adicional que buscás no existe o fue eliminado.',
@@ -1688,6 +1875,10 @@ export const es: AppDict = {
     contrato: {
       name: 'Contratos',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar contratos',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
         empleado: 'Empleado',
         contratoTipo: 'Tipo contrato',
@@ -1720,6 +1911,7 @@ export const es: AppDict = {
         fields: {
           contacto: 'Empleado',
           contactoPlaceholder: 'Buscar empleado…',
+          identificacion: 'Identificación',
           contratoTipo: 'Tipo de contrato',
           cargo: 'Cargo',
           grupo: 'Grupo',
@@ -1739,7 +1931,7 @@ export const es: AppDict = {
           entidadPension: 'Entidad de pensión',
           entidadCesantias: 'Entidad de cesantías',
           entidadCaja: 'Caja de compensación',
-          riesgo: 'Riesgo',
+          riesgo: 'Clase de riesgo laboral',
           tipoCotizante: 'Tipo de cotizante',
           subtipoCotizante: 'Subtipo de cotizante',
           ciudadContrato: 'Ciudad del contrato',
@@ -1752,7 +1944,14 @@ export const es: AppDict = {
           fechaUltimoPagoVacacion: 'Fecha último pago vacación',
           comentario: 'Comentario',
         },
-        validation: { required: 'Este campo es requerido' },
+        validation: {
+          required: 'Este campo es requerido',
+          salarioPositivo: 'El salario debe ser mayor que cero',
+          cotizanteAprendizRequerido:
+            'El contrato de aprendiz del SENA exige un tipo de cotizante de aprendiz (código 12 o 19)',
+          cotizanteAprendizNoAplica:
+            'Este tipo de contrato no admite los tipos de cotizante de aprendiz del SENA',
+        },
         toasts: {
           createSuccess: { title: 'Contrato creado', desc: 'El contrato se creó correctamente' },
           editSuccess: {
@@ -5582,6 +5781,96 @@ export const es: AppDict = {
       },
     },
   },
+  facturacionElectronica: {
+    certificado: {
+      estado: {
+        venceLabel: 'Vence',
+        vigenteTitle: 'Certificado digital cargado',
+        vigenteDesc: 'Tu certificado está vigente. No hace falta que hagas nada.',
+        porVencerTitle: 'Tu certificado está por vencer',
+        porVencerDesc:
+          'Cargá el nuevo antes de que caduque: sin certificado vigente no vas a poder emitir.',
+        vencidoTitle: 'Tu certificado venció',
+        vencidoDesc: 'No vas a poder emitir facturas electrónicas hasta que cargues uno nuevo.',
+        faltan: { one: 'Falta 1 día', other: 'Faltan {dias} días' },
+        venceHoy: 'Vence hoy',
+        vencidoHace: { one: 'Venció hace 1 día', other: 'Venció hace {dias} días' },
+      },
+      upload: {
+        title: 'Certificado digital',
+        hint: 'El archivo que te entregó la entidad certificadora, junto con la clave que lo protege.',
+        dropzone: {
+          primary: 'Arrastrá tu certificado o hacé clic para elegirlo',
+          secondary: 'Se envía cifrado y no queda guardado en el navegador.',
+          hint: 'Archivos .p12 o .pfx · hasta 5 MB',
+        },
+      },
+      fields: {
+        clave: 'Clave del certificado',
+        claveHint: 'La misma con la que se protege el archivo. No la guardamos.',
+      },
+      validation: { required: 'Este campo es obligatorio' },
+      errors: {
+        tipo: 'El archivo debe ser {tipos}.',
+        tamano: 'El archivo no puede pesar más de {max} MB.',
+      },
+      actions: {
+        cargar: 'Cargar certificado',
+        reemplazar: 'Reemplazar certificado',
+        quitar: 'Quitar el archivo',
+      },
+      toasts: {
+        success: {
+          title: 'Certificado cargado',
+          desc: 'Ya quedó registrado con su fecha de vencimiento.',
+        },
+        error: { title: 'No pudimos cargar el certificado' },
+      },
+    },
+    asistente: {
+      eyebrow: 'Asistente',
+      title: 'Facturación electrónica',
+      subtitle: 'Completa los datos de tu empresa para empezar a emitir.',
+      pasos: {
+        empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
+        certificado: { label: 'Certificado digital', hint: 'Archivo .p12 y su clave' },
+        resolucion: { label: 'Resolución', hint: 'Numeración autorizada para facturar' },
+        finalizar: { label: 'Terminar', hint: 'Revisión y activación' },
+      },
+      crearEmisor: {
+        confirm: {
+          header: 'Registrar tu empresa',
+          subtitle: 'Ante el proveedor de facturación electrónica',
+          intro: 'Guardamos tus datos. Vamos a dar de alta tu empresa con esta identidad:',
+          warning: 'Una vez registrada, estos datos no se pueden cambiar desde el ERP.',
+          accept: 'Registrar',
+        },
+        toasts: {
+          success: {
+            title: 'Empresa registrada',
+            desc: 'Ya podés continuar con la facturación electrónica.',
+          },
+        },
+      },
+      emisorCreado: {
+        title: 'Tu empresa ya está registrada para facturar electrónicamente',
+        desc: 'Estos datos ya se enviaron al proveedor, así que no se pueden cambiar desde acá. Si algo quedó mal, escribinos.',
+        emisorLabel: 'Emisor',
+        copiar: 'Copiar el id del emisor',
+      },
+      pendiente: { title: 'Este paso todavía no está disponible' },
+      actions: { guardarYContinuar: 'Guardar y continuar', continuar: 'Continuar' },
+    },
+  },
+  inicio: {
+    venta: {
+      facturaElectronica: {
+        title: 'Facturación electrónica',
+        desc: 'Completa la información de tu empresa y empieza a facturar electrónicamente.',
+        actions: { completar: 'Completar' },
+      },
+    },
+  },
   seguridad: {
     title: 'Seguridad',
     menu: { usuarios: 'Usuarios' },
@@ -5754,19 +6043,21 @@ export const es: AppDict = {
         },
       },
       fields: {
-        nombreCorto: 'Nombre comercial',
+        razonSocial: 'Razón social',
         tipoPersona: 'Tipo de persona',
         identificacion: 'Tipo de identificación',
         numeroIdentificacion: 'Número de identificación',
         digitoVerificacion: 'Dígito de verificación',
         direccion: 'Dirección',
         ciudad: 'Ciudad',
+        ciudadPlaceholder: 'Buscar ciudad…',
         telefono: 'Teléfono',
         correo: 'Correo electrónico',
       },
       validation: {
         required: 'Este campo es obligatorio',
         emailInvalid: 'Ingresa un correo válido',
+        onlyDigits: 'Solo números',
       },
     },
     toasts: {

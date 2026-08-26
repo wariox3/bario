@@ -1,5 +1,7 @@
 import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const EMPLEADOS_FILTERS_STORAGE_KEY = 'empleados:filters:v1';
 
@@ -74,7 +76,18 @@ export const EMPLEADOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
     labelKey: 'common.actions.actions',
     iconClass: '',
     children: [
+      { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
     ],
   },
 ];
+
+/**
+ * Maestros del diálogo de importación de empleados: **todos**.
+ *
+ * El empleado es un contacto, y su archivo puede pedir tanto la ciudad y los
+ * datos bancarios como los catálogos de nómina —tipo y subtipo de cotizante,
+ * entidad, tipo de contrato—. Acotar la lista dejaría al usuario sin el archivo
+ * que justo necesita, igual que en la ficha de contactos.
+ */
+export const EMPLEADOS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;

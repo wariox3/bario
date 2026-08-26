@@ -1,0 +1,87 @@
+@let m = t().facturacionElectronica.asistente.crearEmisor.confirm;
+
+<!--
+  Confirmación del alta de emisor.
+
+  Sigue el estándar de modales del ERP (mismo chrome que `descontabilizar-modal`):
+  cabecera con chip de ícono + título y subtítulo, cuerpo, y footer con la
+  secundaria en texto y la primaria a la derecha.
+
+  Chip sky y no rojo: no se está destruyendo nada, se está **comprometiendo**
+  algo. Lo irreversible lo dice la banda ámbar, que es como el ERP marca
+  "ojo con esto" sin gritar.
+-->
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!processing()"
+  [dismissableMask]="!processing()"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-verified text-[1.05rem]" aria-hidden="true"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] leading-tight font-bold tracking-tight text-brand-text">
+          {{ m.header }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-4 pt-1">
+    <p class="m-0 text-[0.85rem] leading-relaxed text-brand-text">{{ m.intro }}</p>
+
+    <!-- Lo que se va a registrar: última oportunidad de verlo. -->
+    <dl
+      class="m-0 flex flex-col gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-bg px-4 py-3.5"
+    >
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <dt class="text-[0.7rem] font-medium text-brand-muted">
+          {{ t().configuracion.empresa.fields.razonSocial }}
+        </dt>
+        <dd class="m-0 text-[0.85rem] font-semibold break-words text-brand-text">
+          {{ datos()?.razon_social || '—' }}
+        </dd>
+      </div>
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <dt class="text-[0.7rem] font-medium text-brand-muted">
+          {{ t().configuracion.empresa.fields.numeroIdentificacion }}
+        </dt>
+        <!-- El dato identificador siempre en monoespaciada (regla del sistema). -->
+        <dd class="m-0 font-mono text-[0.85rem] font-semibold tabular-nums text-brand-text">
+          {{ identificacion() }}
+        </dd>
+      </div>
+    </dl>
+
+    <p class="m-0 rounded-lg bg-amber-50 px-3 py-2 text-[0.78rem] leading-relaxed text-amber-800">
+      <i class="pi pi-exclamation-triangle mr-1.5" aria-hidden="true"></i>{{ m.warning }}
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      severity="secondary"
+      [text]="true"
+      [label]="t().common.actions.cancel"
+      [disabled]="processing()"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      icon="pi pi-verified"
+      [label]="m.accept"
+      [loading]="processing()"
+      (onClick)="confirmar.emit()"
+    />
+  </ng-template>
+</p-dialog>

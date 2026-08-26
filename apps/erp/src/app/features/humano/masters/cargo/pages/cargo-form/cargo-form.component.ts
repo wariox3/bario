@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
@@ -25,6 +25,7 @@ import { cargoToFormValue, formValueToPayload } from '../../cargo.mapper';
   selector: 'app-cargo-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -32,6 +33,7 @@ import { cargoToFormValue, formValueToPayload } from '../../cargo.mapper';
     InputNumberModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
   ],
   templateUrl: './cargo-form.component.html',
   styleUrl: './cargo-form.component.scss',

@@ -1,0 +1,198 @@
+<!--
+  Asistente de facturación electrónica.
+
+  Dos columnas: el **riel** a la izquierda es la columna vertebral del trámite
+  (quién guía, dónde estoy, qué falta) y la hoja de trabajo a la derecha. Esa
+  forma es la que dice "asistente" aunque haya un solo paso — un riel horizontal
+  de un disco se lee como un título, no como un camino.
+
+  El riel queda pegado al scrollear: en un formulario largo, perder de vista en
+  qué paso estás es perder el hilo del trámite. Paleta del sistema, sin colores
+  nuevos: los discos en navy —la identidad— y el hilo que los une en el mismo
+  rgba de los divisores. Borders-only, como todo el ERP.
+-->
+<div class="grid gap-7 lg:grid-cols-[17rem_1fr] lg:gap-12">
+  <!-- ── Riel: identidad del trámite + camino ──────────────────────────────── -->
+  <aside class="min-w-0 lg:sticky lg:top-0 lg:self-start lg:pt-1">
+    <p class="m-0 text-[0.65rem] font-bold tracking-[0.09em] text-brand-muted uppercase opacity-70">
+      {{ t().facturacionElectronica.asistente.eyebrow }}
+    </p>
+    <h1
+      class="mt-1.5 mb-0 text-[1.35rem] leading-tight font-bold tracking-[-0.02em] text-brand-navy"
+    >
+      {{ t().facturacionElectronica.asistente.title }}
+    </h1>
+    <p class="m-0 mt-2 text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ t().facturacionElectronica.asistente.subtitle }}
+    </p>
+
+    <ol class="m-0 mt-7 flex list-none flex-col p-0">
+      @for (step of steps; track step.id; let last = $last; let indice = $index) {
+        <li class="relative min-w-0" [class.pb-6]="!last">
+          <!-- Hilo que une este paso con el siguiente (nunca cuelga del último). -->
+          @if (!last) {
+            <span
+              class="absolute top-9 bottom-1 left-[15px] w-px bg-[rgba(20,48,73,0.14)]"
+              aria-hidden="true"
+            ></span>
+          }
+
+          <button
+            type="button"
+            class="group flex w-full min-w-0 cursor-pointer gap-3.5 border-0 bg-transparent p-0 text-left"
+            [attr.aria-current]="isActivo(step.id) ? 'step' : null"
+            (click)="irA(step.id)"
+          >
+            <span
+              class="relative z-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[0.75rem] font-bold tabular-nums transition-all duration-200"
+              [class]="
+                isCompletado(step.id)
+                  ? 'bg-brand-navy text-white'
+                  : isActivo(step.id)
+                    ? 'bg-brand-navy text-white ring-4 ring-[rgba(19,38,60,0.08)]'
+                    : 'border border-[rgba(20,48,73,0.18)] bg-brand-surface text-brand-muted group-hover:border-[rgba(20,48,73,0.35)]'
+              "
+            >
+              @if (isCompletado(step.id)) {
+                <i class="pi pi-check text-[0.72rem]" aria-hidden="true"></i>
+              } @else {
+                {{ indice + 1 }}
+              }
+            </span>
+
+            <div class="min-w-0 pt-[0.3rem]">
+              <p
+                class="m-0 text-[0.85rem] leading-tight"
+                [class]="
+                  isActivo(step.id) || isCompletado(step.id)
+                    ? 'font-semibold text-brand-text'
+                    : 'font-medium text-brand-muted group-hover:text-brand-text'
+                "
+              >
+                {{ translate(step.labelKey) }}
+              </p>
+              <p class="m-0 mt-1 text-[0.72rem] leading-snug text-brand-muted">
+                {{ translate(step.hintKey) }}
+              </p>
+            </div>
+          </button>
+        </li>
+      }
+    </ol>
+  </aside>
+
+  <!-- ── Hoja de trabajo: el paso activo trae sus propias cards ─────────────── -->
+  <div class="animate-fade-up min-w-0">
+    @switch (activeStep().id) {
+      @case ('empresa') {
+        @if (tieneEmisor()) {
+          <!--
+            Aviso de por qué el formulario está en solo lectura. El motivo vive
+            acá y no en `<app-empresa-config>`: ese componente sabe bloquearse,
+            no sabe de facturación electrónica.
+          -->
+          <div
+            class="mb-5 flex flex-wrap items-start gap-x-3 gap-y-4 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-5 py-4"
+          >
+            <span
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+            >
+              <i class="pi pi-lock text-[0.9rem]" aria-hidden="true"></i>
+            </span>
+            <div class="min-w-0">
+              <p class="m-0 text-[0.85rem] font-semibold text-brand-text">
+                {{ t().facturacionElectronica.asistente.emisorCreado.title }}
+              </p>
+              <p class="m-0 mt-1 text-[0.78rem] leading-relaxed text-brand-muted">
+                {{ t().facturacionElectronica.asistente.emisorCreado.desc }}
+              </p>
+            </div>
+
+            <!--
+              El id del emisor como **código de referencia**, no como un dato
+              más: no lo escribió nadie y no se edita — es el comprobante del
+              alta y el número que hay que citarle a soporte. De ahí la
+              monoespaciada (regla del sistema para identificadores) y el botón
+              de copiar, que es su único uso real.
+            -->
+            <div class="ml-auto flex shrink-0 flex-col items-end gap-1">
+              <span
+                class="text-[0.62rem] font-semibold tracking-[0.08em] text-brand-muted uppercase opacity-70"
+              >
+                {{ t().facturacionElectronica.asistente.emisorCreado.emisorLabel }}
+              </span>
+              <button
+                type="button"
+                class="flex cursor-pointer items-center gap-2 rounded-lg border border-[rgba(20,48,73,0.12)] bg-brand-bg px-2.5 py-1 font-mono text-[0.82rem] font-semibold tabular-nums text-brand-text transition-colors hover:border-[rgba(20,48,73,0.3)]"
+                [attr.aria-label]="t().facturacionElectronica.asistente.emisorCreado.copiar"
+                [title]="t().facturacionElectronica.asistente.emisorCreado.copiar"
+                (click)="copiarEmisor()"
+              >
+                {{ emisor() }}
+                @if (emisorCopiado()) {
+                  <i class="pi pi-check text-[0.72rem] text-brand-muted" aria-hidden="true"></i>
+                } @else {
+                  <i class="pi pi-copy text-[0.72rem] text-brand-muted" aria-hidden="true"></i>
+                }
+              </button>
+            </div>
+          </div>
+        }
+
+        <app-empresa-config
+          [submitLabel]="submitLabel()"
+          [readonly]="tieneEmisor()"
+          (saved)="onStepSaved('empresa', $event)"
+        />
+
+        @if (tieneEmisor()) {
+          <!--
+            Con el formulario bloqueado no hay nada que guardar, pero el paso
+            tiene que poder cerrarse: sin este botón la única salida es el riel,
+            y un asistente que no te deja avanzar hacia adelante deja de serlo.
+            Vive acá y no en `<app-empresa-config>` porque "continuar" es del
+            asistente; ese componente no sabe que hay pasos.
+          -->
+          <div class="mt-5 flex items-center justify-end pb-1">
+            <p-button
+              type="button"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              [label]="t().facturacionElectronica.asistente.actions.continuar"
+              (onClick)="avanzarDesde('empresa')"
+            />
+          </div>
+        }
+      }
+      @case ('certificado') {
+        <app-certificado-step (avanzar)="avanzarDesde('certificado')" />
+      }
+      @default {
+        <!--
+          Andamio: el paso está declarado y se puede recorrer, pero su pantalla
+          todavía no existe. Borde punteado a propósito — dice "acá va algo" sin
+          disfrazarse de card terminada.
+        -->
+        <div
+          class="flex flex-col items-center justify-center gap-2.5 rounded-xl border border-dashed border-[rgba(20,48,73,0.18)] bg-brand-surface px-6 py-24 text-center"
+        >
+          <i class="pi pi-clock text-xl text-brand-muted opacity-50" aria-hidden="true"></i>
+          <p class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+            {{ translate(activeStep().labelKey) }}
+          </p>
+          <p class="m-0 text-[0.8rem] text-brand-muted">
+            {{ t().facturacionElectronica.asistente.pendiente.title }}
+          </p>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Confirmación del alta de emisor (paso 1). -->
+<app-crear-emisor-dialog
+  [(visible)]="confirmVisible"
+  [datos]="datosGuardados()"
+  [processing]="registrando()"
+  (confirmar)="crearEmisor()"
+/>

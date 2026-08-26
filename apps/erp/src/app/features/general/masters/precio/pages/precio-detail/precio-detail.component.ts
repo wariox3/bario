@@ -1,11 +1,22 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { Menu, MenuModule } from 'primeng/menu';
+import type { MenuItem } from 'primeng/api';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DetailHeaderComponent } from '@reddoc/ui';
+import { PrecioItemsComponent } from '../../components/precio-items/precio-items.component';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { PrecioService } from '../../precio.service';
@@ -15,7 +26,7 @@ import type { Precio } from '../../precio.model';
 @Component({
   selector: 'app-precio-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe, DetailHeaderComponent],
+  imports: [ButtonModule, MenuModule, BreadcrumbComponent, DatePipe, PrecioItemsComponent],
   templateUrl: './precio-detail.component.html',
   styleUrl: './precio-detail.component.scss',
 })
@@ -35,6 +46,22 @@ export class PrecioDetailComponent implements OnInit {
   protected readonly precio = signal<Precio | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  private readonly items = viewChild<PrecioItemsComponent>('items');
+  private readonly opcionesMenu = viewChild.required<Menu>('opcionesMenu');
+
+  /**
+   * Entradas del menú "Opciones". `computed` para que la referencia sea estable
+   * entre change detections: con un modelo nuevo en cada CD, `p-menu` pierde el
+   * primer click. Solo cambia al cambiar de idioma.
+   */
+  protected readonly opcionesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.precio.items.import.title,
+      icon: 'pi pi-upload',
+      command: () => this.items()?.abrirImportar(),
+    },
+  ]);
 
   /** Migas: módulo General → listado de precios → nombre abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -64,6 +91,10 @@ export class PrecioDetailComponent implements OnInit {
       return;
     }
     this.loadPrecio(id);
+  }
+
+  protected toggleOpciones(event: Event): void {
+    this.opcionesMenu().toggle(event);
   }
 
   protected onBack(): void {

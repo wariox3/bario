@@ -148,7 +148,6 @@ export const PROGRAMACION_DOCUMENT_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: true,
     canSelectRows: true,
-    canImport: false,
     canExportExcel: false,
     canExportZip: false,
     canGenerate: false,

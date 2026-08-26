@@ -113,6 +113,29 @@ export const MODELO = {
   },
 } as const;
 
+/**
+ * Apps del backend que tienen permisos, en el orden en que se pintan las pills
+ * del picker de `/seguridad/permiso/`.
+ *
+ * **No sale de `Object.keys(MODELO)`**, aunque se le parezca: son dos
+ * vocabularios distintos. `MODELO` espeja *ids de modelo*; la pill solo necesita
+ * el *nombre de app* con el que se arma el `?app=`. Atarlos hacía que un espejo
+ * de ids incompleto escondiera apps enteras del filtro, sin forma de llegar a
+ * ellas (el autodescubrimiento del panel solo alcanza a ver la página visible
+ * del catálogo). Separados, el espejo de ids crece a su ritmo sin tapar nada.
+ *
+ * Solo las apps que el backend tiene sembradas y que se usan: el resto de los
+ * módulos del ERP (venta, compra, tesorería, cartera) no aporta permisos hoy y
+ * su pill saldría vacía.
+ */
+export const PERMISO_APPS: readonly string[] = [
+  'general',
+  'contabilidad',
+  'turno',
+  'humano',
+  'inventario',
+] as const;
+
 type Values<T> = T[keyof T];
 
 /**

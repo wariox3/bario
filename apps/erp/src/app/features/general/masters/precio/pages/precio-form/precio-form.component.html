@@ -1,8 +1,14 @@
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
-  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
-  <header class="flex items-center gap-2">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
+  <lib-page-actions>
     <p-button
       type="button"
       [label]="t().common.actions.back"
@@ -18,9 +24,9 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
-  </header>
+  </lib-page-actions>
 
   <!-- ── Sección: Información principal ────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
@@ -79,23 +85,6 @@
             [control]="form.controls.fecha_vence"
             [messages]="{ required: t().entities.precio.form.validation.required }"
           />
-        </div>
-
-        <!-- Flags venta / compra -->
-        <div class="flex flex-wrap items-center gap-x-6 gap-y-3 sm:col-span-2">
-          <label for="venta" class="flex cursor-pointer items-center gap-2">
-            <p-checkbox inputId="venta" formControlName="venta" [binary]="true" />
-            <span class="text-[0.85rem] text-brand-text">
-              {{ t().entities.precio.form.fields.venta }}
-            </span>
-          </label>
-
-          <label for="compra" class="flex cursor-pointer items-center gap-2">
-            <p-checkbox inputId="compra" formControlName="compra" [binary]="true" />
-            <span class="text-[0.85rem] text-brand-text">
-              {{ t().entities.precio.form.fields.compra }}
-            </span>
-          </label>
         </div>
       </div>
     </div>

@@ -4,8 +4,15 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent } from '@reddoc/ui';
 import {
+  CiudadAutocompleteComponent,
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  SoloDigitosDirective,
+} from '@reddoc/ui';
+import {
+  CIUDAD_FUENTE,
   FormErrorService,
   I18nService,
   SELECT_ENDPOINTS,
@@ -40,13 +47,17 @@ import { empleadoToFormValue, formValueToPayload } from '../../empleado.mapper';
   selector: 'app-empleado-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
     ErpApiAutocompleteComponent,
+    SoloDigitosDirective,
+    CiudadAutocompleteComponent,
   ],
   templateUrl: './empleado-form.component.html',
   styleUrl: './empleado-form.component.scss',
@@ -62,6 +73,9 @@ export class EmpleadoFormComponent implements OnInit {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  /** Ciudades dentro del tenant: el ERP siempre trabaja dentro de uno. */
+  protected readonly ciudadFuente = CIUDAD_FUENTE.erp;
 
   /** Endpoints `seleccionar` de catálogos compartidos, para los `<app-api-*>` del template. */
   protected readonly endpoints = SELECT_ENDPOINTS;

@@ -118,6 +118,7 @@ Cualquier app del monorepo puede usarlos para construir listas paginadas.
 - `TurnstileComponent` (`lib-turnstile`) — Cloudflare Turnstile widget. Reads `turnstileSiteKey` from `ENVIRONMENT`. Dev key `1x00000000000000000000AA` always passes.
 - Auth pages (`LoginComponent`, `RegisterComponent`, `ForgotPasswordComponent`, `ResetPasswordComponent`, `ResendVerificationComponent`, `VerifyEmailComponent`) — fully implemented; each app routes to them via eager `component:` (Nx prohibits mixing lazy + static imports of the same lib).
 - `AppSwitcherComponent` (`lib-app-switcher`) — waffle en el header (`app-header__actions`) que salta entre apps hermanas. Requiere que la app provea `CURRENT_APP` y declare las `<app>Url` de sus hermanas en `ENVIRONMENT`. Trae su propio dict (`AppSwitcherTranslationsHost` + `appSwitcherEs/En`), igual que las auth pages. Lo usan erp y turnos.
+- `PageActionsComponent` (`lib-page-actions`) — la fila de botones de una página (volver / guardar). Se pega bajo el header al hacer scroll y solo entonces se viste de fondo + filete. Se usa envolviendo los botones, sin inputs. El sangrado lateral sale de `--page-gutter`, que **cada layout declara sobre su scrollport** con el valor de su padding (ya lo hacen los `workspace-layout` de erp y turnos); un layout que no la declare cae al default de `1.75rem`. El scrollport **no debe llevar `padding-top`** (los navegadores no acuerdan desde dónde ancla un sticky con padding superior): el gutter de arriba va como espaciador `::before` en el flujo. Ver el patrón completo en `.interface-design/system.md`.
 - Assets: `src/assets/logos/reddoc.svg` and `reddoc-on-dark.svg` — copied into each app's build via `project.json` assets glob.
 
 ### libs/feature-base — building blocks de listados
@@ -208,6 +209,8 @@ Regla: lo que solo importa a un master vive dentro del master.
 3. Entrada en el `menu` del `<modulo>.module-descriptor.ts` (path relativo: `<plural>`).
 4. Claves i18n `entities.<entity>.*` en `app.es.ts` / `app.en.ts`.
 
+**Formularios (masters y documentos):** el botón de guardar **no** se deshabilita por `form.invalid` — un botón muerto no explica qué falta ni deja avanzar. Va `[disabled]="isSaving()"` y `libFocusInvalid` (`FocusInvalidDirective`, de `@reddoc/ui`) sobre el `<form>`: al intentar guardar en blanco marca todo como tocado —así aparece cada `<lib-field-error>`— y lleva a la persona al primer campo que falta. El guard `if (form.invalid …) return;` del `onSubmit` no cambia.
+
 **Para agregar un documento nuevo** (camino A):
 
 1. Crear `<modulo>.config.ts` que exporte `ModuleConfig` con sus `documents`.
@@ -259,4 +262,5 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - `docs/guides/agregar-modulo-erp.md` — guía paso a paso (recetario) para agregar un módulo nuevo al ERP sin perderse: esqueleto navegable en 5 pasos + cómo sumar masters/documentos y el menú del sidebar.
 - `docs/guides/agregar-documento-erp.md` — guía paso a paso para agregar un documento transaccional (camino A): `DocumentEntityConfig`, registro en el `ModuleConfig`/registry, rutas con resolvers y capabilities. Incluye el caso "primer documento del módulo".
 - `docs/guides/permisos-erp.md` — cómo se decide qué ve y qué puede abrir un usuario dentro del tenant, explicado como recorrido en 6 pasos (de dónde salen los permisos → topbar → sidebar → ruta → botones → 403 del backend). Cubre los tres ejes (plan del tenant / permisos del usuario / rol de contenedor), el catálogo de modelos del backend (`MODELO`, espejo de `gen_modelo`), `withPermission` y el `ForbiddenPageStore`. Leerlo antes de tocar permisos o de sumar un master a un módulo ya migrado.
+- `docs/guides/importar-erp.md` — cómo funciona la **importación por Excel** de un listado: el `ImportDialogComponent` (tonto) + el `importar(file)` multipart del servicio + `parseImportErrors`. Distingue las tres cosas que el diálogo ofrece y que se confunden: el archivo del usuario, la **plantilla** (`…/importar-ejemplo/`, del backend) y los **maestros** (XLSX públicos de consulta, declarados por listado con `IMPORT_MASTER.*`). Leerlo antes de sumar importación a un master.
 - `docs/guides/agregar-accion-extra-erp.md` — guía paso a paso para agregar una **acción extra** a un documento (botón en el dropdown "Acciones" que abre su propio modal y endpoint): patrón `EntityActionStrategy` + registro en `ENTITY_ACTION_PROVIDERS` + `extraActionIds`. Ejemplo vivo: "Generar" en pedido-servicio.

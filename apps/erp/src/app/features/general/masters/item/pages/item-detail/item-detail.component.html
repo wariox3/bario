@@ -19,6 +19,17 @@
       size="small"
       (onClick)="onEdit()"
     />
+    <p-button
+      type="button"
+      [label]="t().common.actions.options"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleOpciones($event)"
+    />
+    <p-menu #opcionesMenu [popup]="true" [model]="opcionesItems()" appendTo="body" />
   }
 </header>
 
@@ -43,29 +54,29 @@
     </p>
   </div>
 } @else if (item(); as it) {
-  <!-- ── Encabezado de identidad (ficha) ─────────────────────────────────────── -->
-  <lib-detail-header [eyebrow]="t().entities.item.detail.eyebrow" [title]="it.nombre">
-    <!-- Imagen del item -->
-    <app-erp-image-upload
-      detailHeaderMedia
-      [imageUrl]="imageUrl()"
-      [alt]="it.nombre"
-      [disabled]="isSavingImage()"
-      width="148px"
-      height="148px"
-      (imageSelected)="onImageSelected($event)"
-      (imageRemoved)="onImageRemoved()"
-    />
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos": una sola card con la imagen y dos
+       grupos de campos lado a lado. Sin `<lib-detail-header>` — repetiría el
+       nombre y el código, que ya son campos de acá; la identidad la dan la miga
+       y el `<h1>` accesible de abajo. -->
+  <h1 class="sr-only">{{ it.nombre }}</h1>
 
-    <div detailHeaderSubtitle class="flex flex-col gap-2">
-      @if (it.codigo || it.referencia) {
-        <span class="text-[0.85rem] font-medium text-brand-muted">
-          {{ it.codigo }}{{ it.codigo && it.referencia ? ' · ' : '' }}{{ it.referencia }}
-        </span>
-      }
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-box text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.item.detail.sections.general }}
+      </h2>
 
-      <!-- Pills: tipo + badges de estado -->
-      <div class="flex flex-wrap items-center gap-1.5">
+      <!-- Qué es y en qué estado está: lo que se busca sin leer. El resto de las
+           banderas son campos del grupo "Clasificación", no pills. -->
+      <div class="ml-auto flex flex-wrap items-center gap-1.5">
         @if (tipo(); as tp) {
           <span
             class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
@@ -74,55 +85,94 @@
             {{ t().entities.item.form.tipoOptions[tp] }}
           </span>
         }
-        @for (badge of badges(); track badge.labelKey) {
-          @switch (badge.tone) {
-            @case ('emerald') {
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-emerald-700"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                {{ t().entities.item.form.fields[badge.labelKey] }}
-              </span>
-            }
-            @case ('amber') {
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                {{ t().entities.item.form.fields[badge.labelKey] }}
-              </span>
-            }
-            @case ('sky') {
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
-                {{ t().entities.item.form.fields[badge.labelKey] }}
-              </span>
-            }
-            @case ('slate') {
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-slate-600"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
-                {{ t().entities.item.form.fields[badge.labelKey] }}
-              </span>
-            }
-            @case ('rose') {
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-rose-700"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
-                {{ t().entities.item.form.fields[badge.labelKey] }}
-              </span>
-            }
-          }
+        @if (inactivo()) {
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-rose-700"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+            {{ t().entities.item.form.fields.inactivo }}
+          </span>
         }
       </div>
     </div>
-  </lib-detail-header>
 
-  <!-- ── Precios ─────────────────────────────────────────────────────────────── -->
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[auto_1.3fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- La imagen es el "qué es esto" de un ítem: va primera y sin rótulo. -->
+      <div class="flex items-start justify-center px-5 py-4">
+        <app-erp-image-upload
+          [imageUrl]="imageUrl()"
+          [alt]="it.nombre"
+          [disabled]="isSavingImage()"
+          width="148px"
+          height="148px"
+          (imageSelected)="onImageSelected($event)"
+          (imageRemoved)="onImageRemoved()"
+        />
+      </div>
+
+      <!-- Grupo: identificación -->
+      <div class="px-5 py-4">
+        <p class="item-detail__group">{{ t().entities.item.detail.groups.identificacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="item-detail__label">{{ t().entities.item.form.fields.nombre }}</dt>
+            <dd class="item-detail__value">{{ it.nombre }}</dd>
+          </div>
+          <!-- Los dos identificadores son números largos y parecidos: el rótulo
+               dice cuál es cuál y la monoespaciada con `tabular-nums` deja los
+               dígitos en columna, que es lo que permite cotejar un código de
+               barras carácter por carácter. -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="item-detail__label">{{ t().entities.item.form.fields.codigo }}</dt>
+            <dd
+              class="item-detail__value item-detail__value--mono"
+              [class.item-detail__value--empty]="!it.codigo"
+            >
+              {{ it.codigo || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="item-detail__label">{{ t().entities.item.form.fields.referencia }}</dt>
+            <dd
+              class="item-detail__value item-detail__value--mono"
+              [class.item-detail__value--empty]="!it.referencia"
+            >
+              {{ it.referencia || '—' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Grupo: clasificación. Las banderas van como campos Sí/No: como pills
+           solo se veían las activas, y "no maneja inventario" se leía igual que
+           "nadie lo definió". -->
+      <div class="px-5 py-4">
+        <p class="item-detail__group">{{ t().entities.item.detail.groups.clasificacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          @for (flag of clasificacion(); track flag.labelKey) {
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="item-detail__label">
+                {{ t().entities.item.form.fields[flag.labelKey] }}
+              </dt>
+              <dd class="item-detail__value shrink-0" [class.item-detail__value--off]="!flag.value">
+                {{ flag.value ? t().common.boolean.true : t().common.boolean.false }}
+              </dd>
+            </div>
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Precios e impuestos ─────────────────────────────────────────────────── -->
+  <!-- Una sola card, espejo de la sección homónima del formulario: lo que se
+       captura junto se lee junto. Adentro, dos grupos lado a lado (patrón "ficha
+       de detalle en grupos"), así el alto es el del grupo más alto y no la suma
+       de dos cards con su propio chrome. Los impuestos ya no se ocultan cuando
+       no hay: sin la card, el lector no puede distinguir "no tiene" de "no lo
+       miré" — dicen "Sin impuestos", que es información. -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
       <span
@@ -131,102 +181,118 @@
         <i class="pi pi-dollar text-[1rem]"></i>
       </span>
       <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ t().entities.item.detail.sections.precios }}
+        {{ t().entities.item.detail.sections.preciosImpuestos }}
       </h2>
     </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="flex flex-col gap-0.5">
-        <dt class="item-detail__label">{{ t().entities.item.form.fields.precio }}</dt>
-        <dd class="item-detail__value">{{ it.precio | currency: 'COP' : '$' : '1.0-0' }}</dd>
+
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1fr_1.35fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- Grupo: precios -->
+      <div class="px-5 py-4">
+        <p class="item-detail__group">{{ t().entities.item.detail.sections.precios }}</p>
+        <dl class="mt-3 grid grid-cols-2 gap-x-6 gap-y-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="item-detail__label">{{ t().entities.item.form.fields.precio }}</dt>
+            <dd class="item-detail__value tabular-nums">
+              {{ it.precio | currency: 'COP' : '$' : '1.0-0' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="item-detail__label">{{ t().entities.item.form.fields.costo }}</dt>
+            <dd class="item-detail__value tabular-nums">
+              {{ it.costo | currency: 'COP' : '$' : '1.0-0' }}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="item-detail__label">{{ t().entities.item.form.fields.costo }}</dt>
-        <dd class="item-detail__value">{{ it.costo | currency: 'COP' : '$' : '1.0-0' }}</dd>
+
+      <!-- Grupo: impuestos -->
+      <div class="px-5 py-4">
+        <p class="item-detail__group">{{ t().entities.item.detail.sections.impuestos }}</p>
+        <dl class="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <dt class="item-detail__label">{{ t().entities.item.detail.labels.impuestosVenta }}</dt>
+            <dd class="m-0">
+              @if (impuestosVenta().length) {
+                <div class="flex flex-wrap gap-1.5">
+                  @for (imp of impuestosVenta(); track imp.impuesto) {
+                    <span
+                      class="inline-flex items-center rounded-md bg-brand-surface-2 px-2 py-1 text-[0.75rem] font-medium text-brand-text"
+                    >
+                      {{ imp.impuesto_nombre }}
+                    </span>
+                  }
+                </div>
+              } @else {
+                <span class="text-[0.8rem] text-brand-muted">
+                  {{ t().entities.item.detail.labels.sinImpuestos }}
+                </span>
+              }
+            </dd>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <dt class="item-detail__label">
+              {{ t().entities.item.detail.labels.impuestosCompra }}
+            </dt>
+            <dd class="m-0">
+              @if (impuestosCompra().length) {
+                <div class="flex flex-wrap gap-1.5">
+                  @for (imp of impuestosCompra(); track imp.impuesto) {
+                    <span
+                      class="inline-flex items-center rounded-md bg-brand-surface-2 px-2 py-1 text-[0.75rem] font-medium text-brand-text"
+                    >
+                      {{ imp.impuesto_nombre }}
+                    </span>
+                  }
+                </div>
+              } @else {
+                <span class="text-[0.8rem] text-brand-muted">
+                  {{ t().entities.item.detail.labels.sinImpuestos }}
+                </span>
+              }
+            </dd>
+          </div>
+        </dl>
       </div>
-    </dl>
+    </div>
   </section>
 
-  <!-- ── Impuestos ───────────────────────────────────────────────────────────── -->
-  @if (impuestosVenta().length || impuestosCompra().length) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-amber-50 text-amber-700"
-        >
-          <i class="pi pi-percentage text-[1rem]"></i>
-        </span>
-        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.item.detail.sections.impuestos }}
-        </h2>
-      </div>
-      <dl class="grid grid-cols-1 gap-x-6 gap-y-4 px-5 py-4 sm:grid-cols-2">
-        <div class="flex flex-col gap-1.5">
-          <dt class="item-detail__label">{{ t().entities.item.detail.labels.impuestosVenta }}</dt>
-          <dd class="m-0">
-            @if (impuestosVenta().length) {
-              <div class="flex flex-wrap gap-1.5">
-                @for (imp of impuestosVenta(); track imp.impuesto) {
-                  <span
-                    class="inline-flex items-center rounded-md bg-brand-surface-2 px-2 py-1 text-[0.75rem] font-medium text-brand-text"
-                  >
-                    {{ imp.impuesto_nombre }}
-                  </span>
-                }
-              </div>
-            } @else {
-              <span class="text-[0.8rem] text-brand-muted">
-                {{ t().entities.item.detail.labels.sinImpuestos }}
-              </span>
-            }
-          </dd>
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <dt class="item-detail__label">{{ t().entities.item.detail.labels.impuestosCompra }}</dt>
-          <dd class="m-0">
-            @if (impuestosCompra().length) {
-              <div class="flex flex-wrap gap-1.5">
-                @for (imp of impuestosCompra(); track imp.impuesto) {
-                  <span
-                    class="inline-flex items-center rounded-md bg-brand-surface-2 px-2 py-1 text-[0.75rem] font-medium text-brand-text"
-                  >
-                    {{ imp.impuesto_nombre }}
-                  </span>
-                }
-              </div>
-            } @else {
-              <span class="text-[0.8rem] text-brand-muted">
-                {{ t().entities.item.detail.labels.sinImpuestos }}
-              </span>
-            }
-          </dd>
-        </div>
-      </dl>
-    </section>
-  }
-
   <!-- ── Cuentas contables ───────────────────────────────────────────────────── -->
-  @if (cuentas().length) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-        >
-          <i class="pi pi-book text-[1rem]"></i>
-        </span>
-        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.item.detail.sections.cuentas }}
-        </h2>
-      </div>
-      <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
-        @for (cuenta of cuentas(); track cuenta.labelKey) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="item-detail__label">
-              {{ t().entities.item.form.fields[cuenta.labelKey] }}
-            </dt>
-            <dd class="item-detail__value">{{ cuenta.value }}</dd>
-          </div>
-        }
-      </dl>
-    </section>
-  }
+  <!-- Las cuatro van siempre, asignadas o no: la ficha conserva la misma forma
+       ítem a ítem y la que falta se lee como ausencia, no como omisión. -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-book text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.item.detail.sections.cuentas }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      @for (cuenta of cuentas(); track cuenta.labelKey) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="item-detail__label">
+            {{ t().entities.item.form.fields[cuenta.labelKey] }}
+          </dt>
+          <dd class="item-detail__value" [class.item-detail__value--empty]="!cuenta.value">
+            {{ cuenta.value || '—' }}
+          </dd>
+        </div>
+      }
+    </dl>
+  </section>
 }
+
+<app-archivos-dialog
+  [visible]="imagenesVisible()"
+  (visibleChange)="onArchivosVisibleChange($event)"
+  [owner]="archivosOwner()"
+  [title]="t().entities.item.detail.opciones.imagenes"
+  [subtitle]="t().entities.item.detail.opcionesHint.imagenes"
+  [accept]="archivosAccept"
+  [archivoTipo]="archivosTipo"
+/>

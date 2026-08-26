@@ -10,7 +10,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { DialogService } from 'primeng/dynamicdialog';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -78,6 +78,7 @@ function extractDocumentoId(saved: unknown): number | null {
     PaginatorModule,
     TextareaModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ContableDocumentoLineasTableComponent,

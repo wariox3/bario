@@ -7,7 +7,12 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { Cuenta, CuentaImportResult, CuentaPayload } from './cuenta.model';
+import type {
+  Cuenta,
+  CuentaPayload,
+  CuentaTrasladoPayload,
+  CuentaTrasladoResponse,
+} from './cuenta.model';
 
 @Injectable({ providedIn: 'root' })
 export class CuentaService extends BaseHttpService {
@@ -34,16 +39,16 @@ export class CuentaService extends BaseHttpService {
   }
 
   /**
-   * Importación masiva desde un archivo Excel.
-   *
-   * HttpClient detecta el `FormData` y arma el `multipart/form-data` con el
-   * boundary correcto — no hay que setear `Content-Type` manualmente. El campo
-   * `archivo` es el contrato que espera el backend.
+   * Traslada a `cuenta_destino_id` todos los movimientos de `cuenta_origen_id`.
+   * Operación irreversible: quien la invoque debe confirmarla antes.
    */
-  importar(file: File): Observable<CuentaImportResult> {
-    const form = new FormData();
-    form.append('archivo', file, file.name);
-    return this.post<CuentaImportResult>(`${this.resourcePath}importar/`, form);
+  trasladar(payload: CuentaTrasladoPayload): Observable<CuentaTrasladoResponse> {
+    return this.post<CuentaTrasladoResponse>(`${this.resourcePath}trasladar/`, payload);
+  }
+
+  /** Importación masiva desde un archivo Excel. */
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
   }
 
   remove(ids: readonly number[]): Observable<void> {

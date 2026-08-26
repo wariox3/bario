@@ -45,7 +45,6 @@ export const FACTURA_COMPRA_RECURRENTE_CONFIG: DocumentEntityConfig = {
     canView: true,
     canDelete: true,
     canSelectRows: true,
-    canImport: false,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,

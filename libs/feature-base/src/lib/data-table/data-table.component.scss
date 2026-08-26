@@ -190,8 +190,18 @@
 
   // El bloque "sin registros" llena el alto del contenedor scrollable.
   // Solo cuando la tabla está vacía: con datos la tabla mantiene alto auto.
-  .p-datatable-table-container:has(.lib-data-table__empty) .p-datatable-table {
-    height: 100%;
+  .p-datatable-table-container:has(.lib-data-table__empty) {
+    .p-datatable-table {
+      height: 100%;
+    }
+
+    // Al estirar la tabla el sobrante se reparte entre TODAS sus filas, también
+    // la del header (que por eso crecia solo en vacio). En tablas `height` es
+    // minimo, no maximo: el thead queda a su alto de contenido y todo el
+    // sobrante cae en la fila del empty state.
+    .p-datatable-thead > tr > th {
+      height: 1px;
+    }
   }
 
   // Contenedor scrollable (el que recibe el alto y hace el scroll vertical).

@@ -15,7 +15,11 @@ export function contratoToFormValue(c: Contrato): Partial<ContratoFormRawValue> 
   return {
     contacto:
       c.contacto != null
-        ? { id: c.contacto, nombre: c.contacto_nombre ?? '', numero_identificacion: '' }
+        ? {
+            id: c.contacto,
+            nombre: c.contacto_nombre ?? '',
+            numero_identificacion: c.contacto_numero_identificacion ?? '',
+          }
         : null,
     contrato_tipo:
       c.contrato_tipo != null
@@ -41,8 +45,12 @@ export function contratoToFormValue(c: Contrato): Partial<ContratoFormRawValue> 
     salario_integral: c.salario_integral,
     tipo_costo:
       c.tipo_costo != null ? { id: c.tipo_costo, nombre: c.tipo_costo_nombre ?? '' } : null,
+    // El control se llama `centro_costo` (vocabulario de la UI); el campo del
+    // backend es `grupo_contabilidad`. Ver `contrato.model.ts`.
     centro_costo:
-      c.centro_costo != null ? { id: c.centro_costo, nombre: c.centro_costo_nombre ?? '' } : null,
+      c.grupo_contabilidad != null
+        ? { id: c.grupo_contabilidad, nombre: c.grupo_contabilidad_nombre ?? '' }
+        : null,
     salud: c.salud != null ? { id: c.salud, nombre: c.salud_nombre ?? '' } : null,
     entidad_salud:
       c.entidad_salud != null
@@ -108,7 +116,7 @@ export function formValueToPayload(v: ContratoFormRawValue): ContratoPayload {
     entidad_pension: v.entidad_pension?.id ?? null,
     entidad_salud: v.entidad_salud?.id ?? null,
     grupo: v.grupo?.id ?? null,
-    centro_costo: v.centro_costo?.id ?? null,
+    grupo_contabilidad: v.centro_costo?.id ?? null,
     motivo_terminacion: v.motivo_terminacion?.id ?? null,
     pension: v.pension?.id ?? null,
     riesgo: v.riesgo?.id ?? null,
