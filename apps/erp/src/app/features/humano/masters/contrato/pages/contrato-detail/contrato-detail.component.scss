@@ -5,6 +5,19 @@
 }
 
 // Etiqueta de cada dato de la ficha (término de la definition list).
+// Micro-encabezado de un sub-bloque dentro de una card: se distingue de la
+// etiqueta de campo por caja y peso, no por color. Mismo `group-label` que usan
+// la ficha de contacto y el panel del app-switcher.
+.contrato-detail__group {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
 .contrato-detail__label {
   font-size: 0.7rem;
   font-weight: 500;

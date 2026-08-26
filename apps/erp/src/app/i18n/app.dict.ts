@@ -1375,6 +1375,7 @@ export interface AppDict
         certificadoLaboral: string;
         toasts: { error: { title: string; desc: string } };
       };
+      utilidades: { action: string };
       columns: {
         empleado: string;
         contratoTipo: string;
@@ -1480,7 +1481,13 @@ export interface AppDict
       };
       detail: {
         eyebrow: string;
-        sections: { datos: string; remuneracion: string; seguridadSocial: string };
+        sections: { general: string; contabilidad: string; seguridadSocial: string };
+        groups: {
+          identificacion: string;
+          vigencia: string;
+          remuneracion: string;
+          terminacion: string;
+        };
         estado: { activo: string; terminado: string };
         boolean: { si: string; no: string };
         notFound: { title: string; desc: string };

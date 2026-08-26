@@ -21,6 +21,7 @@ import {
   TenantService,
   ToastService,
   formatCop,
+  formatFechaCorta,
   formatFechaLarga,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -33,6 +34,12 @@ import {
   CONTRATO_LIST_PATH,
 } from '../../contrato.constants';
 import type { Contrato } from '../../contrato.model';
+
+/** Una de las cuatro fechas de último pago: su etiqueta i18n y el valor ya formateado. */
+interface ParametroInicial {
+  readonly labelKey: 'general' | 'prima' | 'cesantia' | 'vacacion';
+  readonly value: string;
+}
 
 /**
  * Ficha (detalle) de un contrato — solo lectura.
@@ -71,6 +78,35 @@ export class ContratoDetailComponent implements OnInit {
   protected readonly notFound = signal(false);
 
   private readonly formatoMenu = viewChild<Menu>('formatoMenu');
+  private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
+
+  /**
+   * Entradas del dropdown "Utilidades" — lo que se corrige sobre un contrato
+   * vigente. `computed` por la misma razón que "Formato": recrear el array en
+   * cada detección de cambios le hace perder el primer click a `p-menu`.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.contrato.parametrosIniciales.action,
+      icon: 'pi pi-calendar-clock',
+      command: () => this.onParametrosIniciales(),
+    },
+  ]);
+
+  /**
+   * Las cuatro fechas de último pago, ya formateadas, para pintarlas en la ficha.
+   * Antes solo se veían abriendo el modal que las edita.
+   */
+  protected readonly parametrosIniciales = computed<readonly ParametroInicial[]>(() => {
+    const c = this.contrato();
+    if (!c) return [];
+    return [
+      { labelKey: 'general', value: formatFechaCorta(c.fecha_ultimo_pago) },
+      { labelKey: 'prima', value: formatFechaCorta(c.fecha_ultimo_pago_prima) },
+      { labelKey: 'cesantia', value: formatFechaCorta(c.fecha_ultimo_pago_cesantia) },
+      { labelKey: 'vacacion', value: formatFechaCorta(c.fecha_ultimo_pago_vacacion) },
+    ];
+  });
 
   /** Descarga en vuelo: evita disparar dos veces el mismo PDF. */
   protected readonly isDescargando = signal(false);
@@ -131,6 +167,10 @@ export class ContratoDetailComponent implements OnInit {
 
   protected toggleFormato(event: Event): void {
     this.formatoMenu()?.toggle(event);
+  }
+
+  protected toggleUtilidades(event: Event): void {
+    this.utilidadesMenu()?.toggle(event);
   }
 
   /**

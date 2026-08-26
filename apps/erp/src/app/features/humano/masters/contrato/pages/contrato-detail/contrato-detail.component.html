@@ -23,8 +23,41 @@
       (onClick)="onEdit()"
     />
 
-    <!-- Formatos imprimibles. Fuera del `@if` de abajo a propósito: el
-         certificado laboral se pide sobre todo para un contrato ya terminado. -->
+    <!-- Terminar queda como botón: cierra el contrato y fabrica la liquidación,
+         no es una utilidad más. Solo mientras el contrato siga vigente.
+
+         Va en `danger` y no en el gris de sus vecinos: es la única acción
+         irreversible de la barra, y en gris pesaba lo mismo que "Formato".
+         Outline y no sólido porque solo abre el modal — el rojo lleno queda
+         para el botón que confirma ahí dentro, que es donde la acción ocurre. -->
+    @if (!c.estado_terminado) {
+      <p-button
+        type="button"
+        [label]="t().entities.contrato.terminar.action"
+        icon="pi pi-ban"
+        severity="danger"
+        [outlined]="true"
+        size="small"
+        (onClick)="onTerminar()"
+      />
+
+      <!-- Utilidades: lo que se corrige sobre un contrato vigente. Hoy solo los
+           parámetros iniciales, igual que en el ERP anterior. -->
+      <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
+      <p-button
+        type="button"
+        [label]="t().entities.contrato.utilidades.action"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="toggleUtilidades($event)"
+      />
+    }
+
+    <!-- Formatos imprimibles. Fuera del `@if` a propósito: el certificado
+         laboral se pide sobre todo para un contrato ya terminado. -->
     <p-button
       type="button"
       [label]="t().entities.contrato.formato.action"
@@ -37,28 +70,6 @@
       (onClick)="toggleFormato($event)"
     />
     <p-menu #formatoMenu [popup]="true" [model]="formatoItems()" appendTo="body" />
-
-    <!-- Las dos acciones de cierre: solo mientras el contrato siga vigente -->
-    @if (!c.estado_terminado) {
-      <p-button
-        type="button"
-        [label]="t().entities.contrato.parametrosIniciales.action"
-        icon="pi pi-calendar-clock"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        (onClick)="onParametrosIniciales()"
-      />
-      <p-button
-        type="button"
-        [label]="t().entities.contrato.terminar.action"
-        icon="pi pi-ban"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        (onClick)="onTerminar()"
-      />
-    }
   }
 </header>
 
@@ -88,7 +99,7 @@
        miga y el `<h1>` accesible. -->
   <h1 class="sr-only">{{ c.contacto_nombre }}</h1>
 
-  <!-- ── Datos del contrato ──────────────────────────────────────────────────── -->
+  <!-- ── Información general ──────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div
       class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
@@ -99,7 +110,7 @@
         <i class="pi pi-file text-[1rem]"></i>
       </span>
       <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ d.sections.datos }}
+        {{ d.sections.general }}
       </h2>
 
       <!-- Activo o terminado: decide si el contrato sigue liquidándose, así que
@@ -119,86 +130,175 @@
         {{ c.estado_terminado ? d.estado.terminado : d.estado.activo }}
       </span>
     </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- De quién es el contrato: el dato que antes solo estaba en el título. -->
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.contacto }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.contacto_nombre"
-        >
-          {{ c.contacto_nombre || '—' }}
-        </dd>
+    <!-- Cuerpo en columnas, el patrón «ficha de detalle en grupos»: lado a lado
+         el alto de la card es el del grupo más alto y no la suma. Los once
+         campos generales van partidos en identificación y vigencia para que las
+         cuatro columnas queden parejas; en una sola, la card medía el doble. -->
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1fr_1fr_0.85fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- Grupo: identificación — de quién es el contrato y bajo qué figura. -->
+      <div class="px-5 py-4">
+        <p class="contrato-detail__group">
+          {{ t().entities.contrato.detail.groups.identificacion }}
+        </p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.contacto }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--empty]="!c.contacto_nombre"
+            >
+              {{ c.contacto_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.identificacion }}</dt>
+            <dd
+              class="contrato-detail__value font-mono tabular-nums"
+              [class.contrato-detail__value--empty]="!c.contacto_numero_identificacion"
+            >
+              {{ c.contacto_numero_identificacion || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.contratoTipo }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--empty]="!c.contrato_tipo_nombre"
+            >
+              {{ c.contrato_tipo_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.cargo }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--empty]="!c.cargo_nombre"
+            >
+              {{ c.cargo_nombre || '—' }}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <!-- La cédula al lado del nombre: es como se identifica al empleado en nómina. -->
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.identificacion }}</dt>
-        <dd
-          class="contrato-detail__value font-mono tabular-nums"
-          [class.contrato-detail__value--empty]="!c.contacto_numero_identificacion"
-        >
-          {{ c.contacto_numero_identificacion || '—' }}
-        </dd>
+      <!-- Grupo: vigencia y asignación — desde cuándo, hasta cuándo y dónde. -->
+      <div class="px-5 py-4">
+        <p class="contrato-detail__group">{{ t().entities.contrato.detail.groups.vigencia }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.fechaDesde }}</dt>
+            <dd class="contrato-detail__value">{{ formatFecha(c.fecha_desde) }}</dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.fechaHasta }}</dt>
+            <dd class="contrato-detail__value">{{ formatFecha(c.fecha_hasta) }}</dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.tiempo }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--empty]="!c.tiempo_nombre"
+            >
+              {{ c.tiempo_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.grupo }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--empty]="!c.grupo_nombre"
+            >
+              {{ c.grupo_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.sucursal }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--empty]="!c.sucursal_nombre"
+            >
+              {{ c.sucursal_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.habilitadoTurno }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--off]="!c.habilitado_turno"
+            >
+              {{ c.habilitado_turno ? d.boolean.si : d.boolean.no }}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.contratoTipo }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.contrato_tipo_nombre"
-        >
-          {{ c.contrato_tipo_nombre || '—' }}
-        </dd>
+      <!-- Grupo: remuneración — qué se le paga al empleado. -->
+      <div class="px-5 py-4">
+        <p class="contrato-detail__group">{{ t().entities.contrato.detail.groups.remuneracion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.salario }}</dt>
+            <dd class="contrato-detail__value tabular-nums">{{ formatMoney(c.salario) }}</dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.aplicaAuxilioTransporte }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--off]="!c.auxilio_transporte"
+            >
+              {{ c.auxilio_transporte ? d.boolean.si : d.boolean.no }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="contrato-detail__label">{{ f.salarioIntegral }}</dt>
+            <dd
+              class="contrato-detail__value"
+              [class.contrato-detail__value--off]="!c.salario_integral"
+            >
+              {{ c.salario_integral ? d.boolean.si : d.boolean.no }}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.cargo }}</dt>
-        <dd class="contrato-detail__value" [class.contrato-detail__value--empty]="!c.cargo_nombre">
-          {{ c.cargo_nombre || '—' }}
-        </dd>
+      <!-- Grupo: terminación y pagos — desde cuándo se liquida cada prestación.
+           Mismo nombre que la sección del formulario que los captura. -->
+      <div class="px-5 py-4">
+        <p class="contrato-detail__group">{{ t().entities.contrato.detail.groups.terminacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <!-- El motivo solo existe si el contrato cerró: en uno vigente, un
+               guion ocuparía una fila sin decir nada. -->
+          @if (c.estado_terminado) {
+            <div class="flex flex-col gap-0.5">
+              <dt class="contrato-detail__label">{{ f.motivoTerminacion }}</dt>
+              <dd
+                class="contrato-detail__value"
+                [class.contrato-detail__value--empty]="!c.motivo_terminacion_nombre"
+              >
+                {{ c.motivo_terminacion_nombre || '—' }}
+              </dd>
+            </div>
+          }
+          @for (fecha of parametrosIniciales(); track fecha.labelKey) {
+            <div class="flex flex-col gap-0.5">
+              <dt class="contrato-detail__label">
+                {{ t().entities.contrato.parametrosIniciales.fields[fecha.labelKey] }}
+              </dt>
+              <dd
+                class="contrato-detail__value contrato-detail__value--mono"
+                [class.contrato-detail__value--empty]="!fecha.value"
+              >
+                {{ fecha.value || '—' }}
+              </dd>
+            </div>
+          }
+        </dl>
       </div>
+    </div>
+
+    <!-- La nota ocupa la fila entera bajo los grupos: es texto libre y en una
+         cuarta parte del ancho se leería en columna. `whitespace-pre-line`
+         respeta los saltos con los que se escribió. -->
+    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
       <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.grupo }}</dt>
-        <dd class="contrato-detail__value" [class.contrato-detail__value--empty]="!c.grupo_nombre">
-          {{ c.grupo_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.sucursal }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.sucursal_nombre"
-        >
-          {{ c.sucursal_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.tiempo }}</dt>
-        <dd class="contrato-detail__value" [class.contrato-detail__value--empty]="!c.tiempo_nombre">
-          {{ c.tiempo_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.fechaDesde }}</dt>
-        <dd class="contrato-detail__value">{{ formatFecha(c.fecha_desde) }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.fechaHasta }}</dt>
-        <dd class="contrato-detail__value">{{ formatFecha(c.fecha_hasta) }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.habilitadoTurno }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--off]="!c.habilitado_turno"
-        >
-          {{ c.habilitado_turno ? d.boolean.si : d.boolean.no }}
-        </dd>
-      </div>
-      <!--
-        La nota ocupa la fila entera: es texto libre y en una tercera parte del
-        ancho se lee en columna. `whitespace-pre-line` respeta los saltos con los
-        que se escribió; sin eso, una nota de varias líneas llega aplastada.
-      -->
-      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="contrato-detail__label">{{ f.comentario }}</dt>
         <dd
           class="contrato-detail__value whitespace-pre-line"
@@ -207,65 +307,8 @@
           {{ c.comentario || '—' }}
         </dd>
       </div>
-    </dl>
-  </section>
-
-  <!-- ── Remuneración ────────────────────────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-      <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
-      >
-        <i class="pi pi-dollar text-[1rem]"></i>
-      </span>
-      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ d.sections.remuneracion }}
-      </h2>
     </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.salario }}</dt>
-        <dd class="contrato-detail__value tabular-nums">{{ formatMoney(c.salario) }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.tipoCosto }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.tipo_costo_nombre"
-        >
-          {{ c.tipo_costo_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.centroCosto }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--empty]="!c.grupo_contabilidad_nombre"
-        >
-          {{ c.grupo_contabilidad_nombre || '—' }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.aplicaAuxilioTransporte }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--off]="!c.auxilio_transporte"
-        >
-          {{ c.auxilio_transporte ? d.boolean.si : d.boolean.no }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="contrato-detail__label">{{ f.salarioIntegral }}</dt>
-        <dd
-          class="contrato-detail__value"
-          [class.contrato-detail__value--off]="!c.salario_integral"
-        >
-          {{ c.salario_integral ? d.boolean.si : d.boolean.no }}
-        </dd>
-      </div>
-    </dl>
   </section>
-
   <!-- ── Seguridad social ────────────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
@@ -370,6 +413,42 @@
           [class.contrato-detail__value--empty]="!c.ciudad_labora_nombre"
         >
           {{ c.ciudad_labora_nombre || '—' }}
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ── Contabilidad ────────────────────────────────────────────────────────── -->
+  <!-- Card propia: «Remuneración» mezclaba cuánto se le paga al empleado con
+       contra qué se imputa ese costo. Misma separación que la ficha de activo. -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-amber-50 text-amber-700"
+      >
+        <i class="pi pi-book text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.sections.contabilidad }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.tipoCosto }}</dt>
+        <dd
+          class="contrato-detail__value"
+          [class.contrato-detail__value--empty]="!c.tipo_costo_nombre"
+        >
+          {{ c.tipo_costo_nombre || '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="contrato-detail__label">{{ f.centroCosto }}</dt>
+        <dd
+          class="contrato-detail__value"
+          [class.contrato-detail__value--empty]="!c.grupo_contabilidad_nombre"
+        >
+          {{ c.grupo_contabilidad_nombre || '—' }}
         </dd>
       </div>
     </dl>

@@ -1883,6 +1883,7 @@ export const es: AppDict = {
         title: 'Importar contratos',
         subtitle: 'Subí un Excel con los registros a cargar',
       },
+      utilidades: { action: 'Utilidades' },
       formato: {
         action: 'Formato',
         certificadoLaboral: 'Certificado laboral',
@@ -1978,7 +1979,7 @@ export const es: AppDict = {
         },
       },
       terminar: {
-        action: 'Terminar contrato',
+        action: 'Terminar',
         title: 'Terminar contrato',
         subtitle: 'Cierre de la relación laboral',
         aviso:
@@ -1996,10 +1997,10 @@ export const es: AppDict = {
         },
       },
       parametrosIniciales: {
-        action: 'Fechas de último pago',
-        title: 'Fechas de último pago',
+        action: 'Parámetros iniciales',
+        title: 'Parámetros iniciales',
         subtitle: 'Punto de partida de la liquidación',
-        hint: 'Desde estas fechas se liquida cada prestación. Dejá una vacía si no hubo pago previo.',
+        hint: 'Desde estas fechas se liquida cada prestación. Deja el campo vacío si no hubo un pago previo.',
         fields: {
           general: 'Último pago',
           prima: 'Último pago de prima',
@@ -2014,9 +2015,15 @@ export const es: AppDict = {
       detail: {
         eyebrow: 'Contrato',
         sections: {
-          datos: 'Datos del contrato',
-          remuneracion: 'Remuneración',
+          general: 'Información general',
+          contabilidad: 'Contabilidad',
           seguridadSocial: 'Seguridad social',
+        },
+        groups: {
+          identificacion: 'Identificación',
+          vigencia: 'Vigencia y asignación',
+          remuneracion: 'Remuneración',
+          terminacion: 'Terminación y pagos',
         },
         estado: {
           activo: 'Activo',

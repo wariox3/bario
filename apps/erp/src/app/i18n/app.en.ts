@@ -1829,6 +1829,7 @@ export const en: AppDict = {
         title: 'Import contracts',
         subtitle: 'Upload an Excel file with the records to load',
       },
+      utilidades: { action: 'Utilities' },
       formato: {
         action: 'Format',
         certificadoLaboral: 'Employment certificate',
@@ -1924,7 +1925,7 @@ export const en: AppDict = {
         },
       },
       terminar: {
-        action: 'End contract',
+        action: 'End',
         title: 'End contract',
         subtitle: 'Closing the employment relationship',
         aviso:
@@ -1942,10 +1943,10 @@ export const en: AppDict = {
         },
       },
       parametrosIniciales: {
-        action: 'Last-payment dates',
-        title: 'Last-payment dates',
+        action: 'Initial parameters',
+        title: 'Initial parameters',
         subtitle: 'Starting point of the settlement',
-        hint: 'Each benefit is calculated from these dates. Leave one empty if there was no prior payment.',
+        hint: 'Each benefit is calculated from these dates. Leave the field empty if there was no prior payment.',
         fields: {
           general: 'Last payment',
           prima: 'Last bonus payment',
@@ -1960,9 +1961,15 @@ export const en: AppDict = {
       detail: {
         eyebrow: 'Contract',
         sections: {
-          datos: 'Contract data',
-          remuneracion: 'Compensation',
+          general: 'General information',
+          contabilidad: 'Accounting',
           seguridadSocial: 'Social security',
+        },
+        groups: {
+          identificacion: 'Identification',
+          vigencia: 'Term and assignment',
+          remuneracion: 'Compensation',
+          terminacion: 'Termination and payments',
         },
         estado: {
           activo: 'Active',
