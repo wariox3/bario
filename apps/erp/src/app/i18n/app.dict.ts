@@ -1069,6 +1069,7 @@ export interface AppDict
     activo: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         codigo: string;

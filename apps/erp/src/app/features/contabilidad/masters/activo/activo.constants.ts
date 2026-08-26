@@ -1,5 +1,7 @@
 import { type ColumnDef, type FilterField, SELECT_ENDPOINTS } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
+import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
 
 export const ACTIVOS_FILTERS_STORAGE_KEY = 'activos:filters:v1';
 export const ACTIVOS_QUICK_SEARCH_FIELD = 'nombre';
@@ -79,7 +81,15 @@ export const ACTIVOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
     labelKey: 'common.actions.actions',
     iconClass: '',
     children: [
+      { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
     ],
   },
 ];
+
+/**
+ * Maestros del archivo de activos: las dos FK del activo que son catálogo
+ * **global**. El centro de costo no entra — es del tenant, así que no hay XLSX
+ * público que consultar.
+ */
+export const ACTIVOS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;

@@ -33,6 +33,11 @@ export class ActivoService extends BaseHttpService {
     return this.put<Activo>(`${this.resourcePath}${id}/`, payload);
   }
 
+  /** Importación masiva desde un archivo Excel. */
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
+  }
+
   remove(ids: readonly number[]): Observable<void> {
     if (ids.length === 0) {
       return new Observable<void>((subscriber) => {

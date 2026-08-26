@@ -1423,6 +1423,10 @@ export const en: AppDict = {
     activo: {
       name: 'Assets',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import assets',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         id: 'ID',
         codigo: 'Code',

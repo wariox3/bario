@@ -1468,6 +1468,10 @@ export const es: AppDict = {
     activo: {
       name: 'Activos',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar activos',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
         id: 'ID',
         codigo: 'Código',
