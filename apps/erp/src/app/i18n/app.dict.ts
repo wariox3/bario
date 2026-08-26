@@ -1305,7 +1305,7 @@ export interface AppDict
           aplicaDiaLaborado: string;
           inactivo: string;
         };
-        validation: { required: string };
+        validation: { required: string; valorNoNegativo: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };

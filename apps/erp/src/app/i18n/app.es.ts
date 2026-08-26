@@ -1800,7 +1800,10 @@ export const es: AppDict = {
           aplicaDiaLaborado: 'Aplica día laborado',
           inactivo: 'Inactivo',
         },
-        validation: { required: 'Este campo es requerido' },
+        validation: {
+          required: 'Este campo es requerido',
+          valorNoNegativo: 'El valor no puede ser negativo',
+        },
         toasts: {
           createSuccess: { title: 'Adicional creado', desc: 'El adicional se creó correctamente' },
           editSuccess: {

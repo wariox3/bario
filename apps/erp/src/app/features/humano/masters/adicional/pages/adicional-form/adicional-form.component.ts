@@ -81,7 +81,9 @@ export class AdicionalFormComponent implements OnInit {
   protected readonly form = this.fb.group({
     contrato: this.fb.control<ContratoOption | null>(null, Validators.required),
     concepto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    valor: this.fb.control<number | null>(null, Validators.required),
+    // Un adicional descuenta o suma, pero su valor se captura en positivo: el
+    // signo lo pone el concepto, no quien digita.
+    valor: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
     detalle: [''],
     aplica_dia_laborado: [false],
     inactivo: [false],

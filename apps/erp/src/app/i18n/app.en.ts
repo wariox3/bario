@@ -1743,7 +1743,10 @@ export const en: AppDict = {
           aplicaDiaLaborado: 'Applies to worked day',
           inactivo: 'Inactive',
         },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          valorNoNegativo: 'The amount cannot be negative',
+        },
         toasts: {
           createSuccess: {
             title: 'Additional created',

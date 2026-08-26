@@ -123,19 +123,25 @@
             {{ t().entities.adicional.form.fields.valor }}
             <span class="ml-px text-red-500">*</span>
           </label>
+          <!-- `min` impide teclear el signo; el validador del control cubre el
+               valor que llega ya negativo desde el backend al editar. -->
           <p-inputnumber
             inputId="valor"
             formControlName="valor"
             mode="decimal"
             [minFractionDigits]="0"
             [maxFractionDigits]="2"
+            [min]="0"
             prefix="$ "
             [fluid]="true"
             [invalid]="form.controls.valor.invalid && form.controls.valor.touched"
           />
           <lib-field-error
             [control]="form.controls.valor"
-            [messages]="{ required: t().entities.adicional.form.validation.required }"
+            [messages]="{
+              required: t().entities.adicional.form.validation.required,
+              min: t().entities.adicional.form.validation.valorNoNegativo,
+            }"
           />
         </div>
 
