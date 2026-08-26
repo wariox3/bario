@@ -1829,6 +1829,16 @@ export const en: AppDict = {
         title: 'Import contracts',
         subtitle: 'Upload an Excel file with the records to load',
       },
+      formato: {
+        action: 'Format',
+        certificadoLaboral: 'Employment certificate',
+        toasts: {
+          error: {
+            title: 'Generation error',
+            desc: 'Could not generate the employment certificate',
+          },
+        },
+      },
       columns: {
         empleado: 'Employee',
         contratoTipo: 'Contract type',

@@ -1883,6 +1883,16 @@ export const es: AppDict = {
         title: 'Importar contratos',
         subtitle: 'Subí un Excel con los registros a cargar',
       },
+      formato: {
+        action: 'Formato',
+        certificadoLaboral: 'Certificado laboral',
+        toasts: {
+          error: {
+            title: 'Error al generar',
+            desc: 'No se pudo generar el certificado laboral',
+          },
+        },
+      },
       columns: {
         empleado: 'Empleado',
         contratoTipo: 'Tipo contrato',

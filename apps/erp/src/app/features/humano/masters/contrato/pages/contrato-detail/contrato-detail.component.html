@@ -23,6 +23,21 @@
       (onClick)="onEdit()"
     />
 
+    <!-- Formatos imprimibles. Fuera del `@if` de abajo a propósito: el
+         certificado laboral se pide sobre todo para un contrato ya terminado. -->
+    <p-button
+      type="button"
+      [label]="t().entities.contrato.formato.action"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [loading]="isDescargando()"
+      (onClick)="toggleFormato($event)"
+    />
+    <p-menu #formatoMenu [popup]="true" [model]="formatoItems()" appendTo="body" />
+
     <!-- Las dos acciones de cierre: solo mientras el contrato siga vigente -->
     @if (!c.estado_terminado) {
       <p-button

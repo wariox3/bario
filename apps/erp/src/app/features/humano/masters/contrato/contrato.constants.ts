@@ -121,3 +121,18 @@ export const CONTRATOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
  * archivo, así que no se ofrece.
  */
 export const CONTRATOS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;
+
+/**
+ * Certificado laboral del contrato: PDF que el backend arma con los datos del
+ * empleado y su vinculación.
+ *
+ * **POST** con `{ id }` en el body y respuesta binaria, igual que en el ERP
+ * anterior (`humano/contrato/imprimir-certificado-laboral/`). Para que el
+ * navegador respete el nombre que manda el backend, la respuesta debe traer
+ * `Content-Disposition` y el CORS `Access-Control-Expose-Headers`; sin eso se
+ * usa `CERTIFICADO_LABORAL_FILENAME`.
+ */
+export const CERTIFICADO_LABORAL_ENDPOINT = '/humano/contrato/imprimir-certificado-laboral/';
+
+/** Nombre de archivo si el backend no expone `Content-Disposition`. */
+export const CERTIFICADO_LABORAL_FILENAME = 'certificado-laboral.pdf';

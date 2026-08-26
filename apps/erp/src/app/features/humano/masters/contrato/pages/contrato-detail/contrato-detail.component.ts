@@ -1,10 +1,22 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { EMPTY, filter, from, switchMap } from 'rxjs';
+import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { Menu, MenuModule } from 'primeng/menu';
+import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import {
+  FileDownloadService,
   I18nService,
   TenantService,
   ToastService,
@@ -15,7 +27,11 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
-import { CONTRATO_LIST_PATH } from '../../contrato.constants';
+import {
+  CERTIFICADO_LABORAL_ENDPOINT,
+  CERTIFICADO_LABORAL_FILENAME,
+  CONTRATO_LIST_PATH,
+} from '../../contrato.constants';
 import type { Contrato } from '../../contrato.model';
 
 /**
@@ -30,7 +46,7 @@ import type { Contrato } from '../../contrato.model';
 @Component({
   selector: 'app-contrato-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, MenuModule, BreadcrumbComponent],
   providers: [DialogService],
   templateUrl: './contrato-detail.component.html',
   styleUrl: './contrato-detail.component.scss',
@@ -38,6 +54,7 @@ import type { Contrato } from '../../contrato.model';
 export class ContratoDetailComponent implements OnInit {
   private readonly service = inject(ContratoService);
   private readonly dialog = inject(DialogService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -52,6 +69,24 @@ export class ContratoDetailComponent implements OnInit {
   protected readonly contrato = signal<Contrato | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  private readonly formatoMenu = viewChild<Menu>('formatoMenu');
+
+  /** Descarga en vuelo: evita disparar dos veces el mismo PDF. */
+  protected readonly isDescargando = signal(false);
+
+  /**
+   * Entradas del dropdown "Formato" — los documentos imprimibles del contrato.
+   * `computed` (ref estable salvo cambio de idioma) para que `p-menu` no pierda
+   * el primer click al recrear el array en cada detección de cambios.
+   */
+  protected readonly formatoItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.contrato.formato.certificadoLaboral,
+      icon: 'pi pi-file-pdf',
+      command: () => this.onCertificadoLaboral(),
+    },
+  ]);
 
   /** Migas: módulo Humano → listado de contratos → empleado del contrato abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -90,6 +125,41 @@ export class ContratoDetailComponent implements OnInit {
     const c = this.contrato();
     if (!c) return;
     this.navigate('editar', c.id);
+  }
+
+  // ── Formatos ──────────────────────────────────────────────────────────────
+
+  protected toggleFormato(event: Event): void {
+    this.formatoMenu()?.toggle(event);
+  }
+
+  /**
+   * Descarga el certificado laboral del empleado.
+   *
+   * Va **sin** condicionar al estado del contrato: certificar dónde y cuándo
+   * trabajó alguien es justamente lo que se pide de un contrato ya terminado.
+   */
+  protected onCertificadoLaboral(): void {
+    const c = this.contrato();
+    if (!c || this.isDescargando()) return;
+
+    this.isDescargando.set(true);
+    this.fileDownload
+      .download(CERTIFICADO_LABORAL_ENDPOINT, {
+        method: 'POST',
+        body: { id: c.id },
+        fallbackFilename: CERTIFICADO_LABORAL_FILENAME,
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isDescargando.set(false)),
+      )
+      .subscribe({
+        error: () => {
+          const ts = this.t().entities.contrato.formato.toasts.error;
+          this.toast.error(ts.title, ts.desc);
+        },
+      });
   }
 
   // ── Terminación ───────────────────────────────────────────────────────────
