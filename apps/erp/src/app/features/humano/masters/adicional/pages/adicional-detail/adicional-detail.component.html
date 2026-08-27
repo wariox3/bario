@@ -136,15 +136,6 @@
             </dd>
           </div>
           <div class="flex flex-col gap-0.5">
-            <dt class="adicional-detail__label">{{ t().entities.adicional.columns.horas }}</dt>
-            <dd
-              class="adicional-detail__value adicional-detail__value--mono"
-              [class.adicional-detail__value--empty]="!horasFormateadas()"
-            >
-              {{ horasFormateadas() || '—' }}
-            </dd>
-          </div>
-          <div class="flex flex-col gap-0.5">
             <dt class="adicional-detail__label">{{ t().entities.adicional.columns.detalle }}</dt>
             <dd class="adicional-detail__value" [class.adicional-detail__value--empty]="!a.detalle">
               {{ a.detalle || '—' }}
@@ -153,8 +144,8 @@
         </dl>
       </div>
 
-      <!-- Grupo: condiciones. Campos Sí/No y no pills: como pills solo se veían
-           las activas, «no es permanente» se leía igual que «sin definir». -->
+      <!-- Grupo: condiciones. Campo Sí/No y no pill: como pill solo se veía la
+           activa, «no aplica» se leía igual que «sin definir». -->
       <div class="px-5 py-4">
         <p class="adicional-detail__group">
           {{ t().entities.adicional.detail.groups.condiciones }}
@@ -169,15 +160,6 @@
               [class.adicional-detail__value--off]="!a.aplica_dia_laborado"
             >
               {{ a.aplica_dia_laborado ? t().common.boolean.true : t().common.boolean.false }}
-            </dd>
-          </div>
-          <div class="flex items-baseline justify-between gap-3">
-            <dt class="adicional-detail__label">{{ t().entities.adicional.columns.permanente }}</dt>
-            <dd
-              class="adicional-detail__value shrink-0"
-              [class.adicional-detail__value--off]="!a.permanente"
-            >
-              {{ a.permanente ? t().common.boolean.true : t().common.boolean.false }}
             </dd>
           </div>
         </dl>

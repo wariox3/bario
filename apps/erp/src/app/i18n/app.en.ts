@@ -1722,10 +1722,8 @@ export const en: AppDict = {
         conceptoId: 'Conc',
         concepto: 'Concept',
         valor: 'Amount',
-        horas: 'Hours',
         detalle: 'Detail',
         aplicaDiaLaborado: 'Applies to worked day',
-        permanente: 'Permanent',
         inactivo: 'Inactive',
       },
       form: {

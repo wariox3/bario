@@ -1287,10 +1287,8 @@ export interface AppDict
         conceptoId: string;
         concepto: string;
         valor: string;
-        horas: string;
         detalle: string;
         aplicaDiaLaborado: string;
-        permanente: string;
         inactivo: string;
       };
       form: {

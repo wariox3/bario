@@ -1779,10 +1779,8 @@ export const es: AppDict = {
         conceptoId: 'Cod',
         concepto: 'Concepto',
         valor: 'Valor',
-        horas: 'Horas',
         detalle: 'Detalle',
         aplicaDiaLaborado: 'Aplica día laborado',
-        permanente: 'Permanente',
         inactivo: 'Inactivo',
       },
       form: {
