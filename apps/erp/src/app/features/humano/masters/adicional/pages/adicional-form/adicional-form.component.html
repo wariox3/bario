@@ -84,6 +84,7 @@
             inputId="concepto"
             formControlName="concepto"
             [endpoint]="conceptoEndpoint"
+            [params]="conceptoParams"
             searchParam="nombre__icontains"
             [placeholder]="t().entities.adicional.form.fields.conceptoPlaceholder"
             [invalid]="form.controls.concepto.invalid && form.controls.concepto.touched"

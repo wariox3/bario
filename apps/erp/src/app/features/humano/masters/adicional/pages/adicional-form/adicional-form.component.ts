@@ -14,7 +14,7 @@ import type { ErpSelectOption } from '@reddoc/core';
 import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
-import { CONCEPTO_ENDPOINT, ADICIONAL_LIST_PATH } from '../../adicional.constants';
+import { CONCEPTO_ENDPOINT, ADICIONAL_LIST_PATH, CONCEPTO_PARAMS } from '../../adicional.constants';
 import { adicionalToFormValue, formValueToPayload } from '../../adicional.mapper';
 
 /**
@@ -56,6 +56,7 @@ export class AdicionalFormComponent implements OnInit {
   protected readonly t = this.i18n.t;
 
   protected readonly conceptoEndpoint = CONCEPTO_ENDPOINT;
+  protected readonly conceptoParams = CONCEPTO_PARAMS;
 
   /** Id del adicional a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();

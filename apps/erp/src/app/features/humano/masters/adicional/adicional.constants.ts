@@ -10,6 +10,12 @@ export const ADICIONAL_LIST_PATH = ['humano', 'adicionales'] as const;
 /** Endpoint del selector de concepto (búsqueda por `nombre__icontains`). */
 export const CONCEPTO_ENDPOINT = '/humano/concepto/seleccionar/';
 
+/**
+ * El catálogo de conceptos sirve a varias pantallas de nómina; acá solo valen los
+ * que se pueden registrar como adicional.
+ */
+export const CONCEPTO_PARAMS: Record<string, string> = { adicional: 'True' };
+
 export const ADICIONALES_COLUMNS: readonly ColumnDef[] = [
   // Los identificadores van primero: dos adicionales del mismo empleado y
   // concepto se ven idénticos en la lista y son lo único que los separa.
