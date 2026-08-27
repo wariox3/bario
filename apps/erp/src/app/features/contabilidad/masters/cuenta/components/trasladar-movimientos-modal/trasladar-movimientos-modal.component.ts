@@ -98,18 +98,28 @@ export class TrasladarMovimientosModalComponent {
     this.processing.set(true);
     this.service
       .trasladar({
-        cuenta_origen_id: cuentaOrigenId,
-        cuenta_destino_id: this.cuentaDestinoId(),
+        cuenta_origen: cuentaOrigenId,
+        cuenta_destino: this.cuentaDestinoId(),
       })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.processing.set(false)),
       )
       .subscribe({
-        // El backend describe en `mensaje` cuántos movimientos movió: vale más
-        // que un texto fijo, así que se muestra cuando viene.
         next: (respuesta) => {
-          this.toast.success(m.toasts.success.title, respuesta.mensaje || m.toasts.success.desc);
+          // El backend cuenta qué movió, y puede no haber movido nada: decir
+          // «traslado correcto» sobre cero registros haría creer que sí pasó.
+          const total = respuesta.movimientos + respuesta.documentos_detalles;
+          if (total === 0) {
+            this.toast.info(m.toasts.vacio.title, m.toasts.vacio.desc);
+          } else {
+            this.toast.success(
+              m.toasts.success.title,
+              m.toasts.success.desc
+                .replace('{movimientos}', String(respuesta.movimientos))
+                .replace('{detalles}', String(respuesta.documentos_detalles)),
+            );
+          }
           this.form.reset();
           this.visible.set(false);
           this.done.emit();

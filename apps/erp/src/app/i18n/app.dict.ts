@@ -1061,6 +1061,7 @@ export interface AppDict
           confirm: { header: string; message: string; accept: string };
           toasts: {
             success: { title: string; desc: string };
+            vacio: { title: string; desc: string };
             error: { title: string; desc: string };
           };
         };

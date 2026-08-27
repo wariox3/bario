@@ -1414,7 +1414,14 @@ export const en: AppDict = {
             accept: 'Yes, move',
           },
           toasts: {
-            success: { title: 'Entries moved', desc: 'The transfer completed successfully' },
+            success: {
+              title: 'Entries moved',
+              desc: 'Moved {movimientos} entries and {detalles} document lines',
+            },
+            vacio: {
+              title: 'Nothing to move',
+              desc: 'The source account has no entries or document lines',
+            },
             error: { title: 'Transfer error', desc: 'Could not move the entries' },
           },
         },

@@ -39,7 +39,7 @@ export class CuentaService extends BaseHttpService {
   }
 
   /**
-   * Traslada a `cuenta_destino_id` todos los movimientos de `cuenta_origen_id`.
+   * Traslada a `cuenta_destino` todos los movimientos de `cuenta_origen`.
    * Operación irreversible: quien la invoque debe confirmarla antes.
    */
   trasladar(payload: CuentaTrasladoPayload): Observable<CuentaTrasladoResponse> {

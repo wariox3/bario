@@ -1455,7 +1455,11 @@ export const es: AppDict = {
           toasts: {
             success: {
               title: 'Movimientos trasladados',
-              desc: 'El traslado se hizo correctamente',
+              desc: 'Se trasladaron {movimientos} movimientos y {detalles} líneas de documento',
+            },
+            vacio: {
+              title: 'No había nada que trasladar',
+              desc: 'La cuenta origen no tiene movimientos ni líneas de documento',
             },
             error: {
               title: 'Error al trasladar',
