@@ -1658,7 +1658,10 @@ export const en: AppDict = {
       name: 'Credits',
       searchPlaceholder: 'Search by contract…',
       columns: {
-        contrato: 'Contract',
+        id: 'ID',
+        identificacion: 'ID number',
+        nombre: 'Name',
+        validarCuotas: 'Validate installments',
         concepto: 'Concept',
         inicio: 'Start',
         total: 'Total',

@@ -12,19 +12,28 @@ export const CONCEPTO_ENDPOINT = '/humano/concepto/seleccionar/';
 
 export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
   {
-    field: 'contrato_nombre',
-    headerKey: 'entities.credito.columns.contrato',
-    type: 'text',
+    field: 'id',
+    headerKey: 'entities.credito.columns.id',
+    type: 'number',
+    width: '70px',
+    align: 'right',
   },
   {
-    field: 'concepto_nombre',
-    headerKey: 'entities.credito.columns.concepto',
+    field: 'contrato_contacto_numero_identificacion',
+    headerKey: 'entities.credito.columns.identificacion',
+    type: 'text',
+    width: '130px',
+  },
+  {
+    field: 'contrato_nombre',
+    headerKey: 'entities.credito.columns.nombre',
     type: 'text',
   },
   {
     field: 'fecha_inicio',
     headerKey: 'entities.credito.columns.inicio',
     type: 'date',
+    width: '110px',
   },
   {
     field: 'total',
@@ -39,9 +48,23 @@ export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
+    field: 'cuota_actual',
+    headerKey: 'entities.credito.columns.cuotaActual',
+    type: 'number',
+    width: '90px',
+    align: 'right',
+  },
+  {
     field: 'cantidad_cuotas',
     headerKey: 'entities.credito.columns.cantidadCuotas',
     type: 'number',
+    width: '90px',
+    align: 'right',
+  },
+  {
+    field: 'abono',
+    headerKey: 'entities.credito.columns.abono',
+    type: 'currency',
     align: 'right',
   },
   {
@@ -51,17 +74,32 @@ export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
+    field: 'validar_cuotas',
+    headerKey: 'entities.credito.columns.validarCuotas',
+    type: 'boolean',
+    width: '90px',
+    align: 'center',
+  },
+  {
+    field: 'pagado',
+    headerKey: 'entities.credito.columns.pagado',
+    type: 'boolean',
+    width: '70px',
+    align: 'center',
+  },
+  {
     field: 'inactivo',
     headerKey: 'entities.credito.columns.inactivo',
     type: 'boolean',
+    // Un crédito inactivo no se descuenta: el «sí» es una condición adversa.
     booleanTone: 'negative',
-    width: '60px',
+    width: '70px',
     align: 'center',
   },
 ];
 
 export const CREDITOS_FILTER_FIELDS: readonly FilterField[] = [
-  { name: 'contrato_nombre', displayNameKey: 'entities.credito.columns.contrato', type: 'string' },
+  { name: 'contrato_nombre', displayNameKey: 'entities.credito.columns.nombre', type: 'string' },
   { name: 'concepto_nombre', displayNameKey: 'entities.credito.columns.concepto', type: 'string' },
   { name: 'fecha_inicio', displayNameKey: 'entities.credito.columns.inicio', type: 'date' },
   { name: 'total', displayNameKey: 'entities.credito.columns.total', type: 'number' },

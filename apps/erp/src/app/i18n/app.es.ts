@@ -1712,7 +1712,10 @@ export const es: AppDict = {
       name: 'Créditos',
       searchPlaceholder: 'Buscar por contrato…',
       columns: {
-        contrato: 'Contrato',
+        id: 'ID',
+        identificacion: 'Identificación',
+        nombre: 'Nombre',
+        validarCuotas: 'Validar cuotas',
         concepto: 'Concepto',
         inicio: 'Inicio',
         total: 'Total',
