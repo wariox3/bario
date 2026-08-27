@@ -51,11 +51,13 @@ export class PeriodoService extends BaseHttpService {
     return this.post<Periodo>(`${this.resourcePath}cerrar/`, { id });
   }
 
-  /** Inconsistencias contables de un periodo (año + mes). */
-  inconsistencias(anio: number, mes: number): Observable<readonly PeriodoInconsistencia[]> {
-    return this.post<{ inconsistencia: readonly PeriodoInconsistencia[] }>(
-      `${this.resourcePath}inconsistencia/`,
-      { anio, mes },
-    ).pipe(map((r) => r.inconsistencia ?? []));
+  /**
+   * Inconsistencias que impedirían bloquear el periodo. **No lo bloquea ni toca
+   * su estado**: lista vacía significa que se puede bloquear.
+   */
+  inconsistencias(id: number): Observable<readonly PeriodoInconsistencia[]> {
+    return this.get<{ inconsistencias: readonly PeriodoInconsistencia[] }>(
+      `${this.resourcePath}${id}/inconsistencias/`,
+    ).pipe(map((r) => r.inconsistencias ?? []));
   }
 }

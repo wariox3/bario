@@ -21,13 +21,19 @@ export interface Periodo {
   readonly estado_inconsistencia: boolean;
 }
 
-/** Fila del visor de inconsistencias de un periodo (POST `.../inconsistencia/`). */
+/**
+ * Fila del visor de inconsistencias de un periodo
+ * (GET `/contabilidad/periodo/{id}/inconsistencias/`).
+ *
+ * Todo puede venir nulo menos el texto: cada fila describe un problema distinto y
+ * no todos apuntan a un comprobante o a un documento.
+ */
 export interface PeriodoInconsistencia {
-  readonly comprobante_id: number;
-  readonly numero: number;
+  readonly comprobante_id: number | null;
+  readonly numero: number | null;
   readonly cuenta_id: number | null;
-  readonly documento_id?: number;
-  readonly documento_tipo_nombre?: string;
+  readonly documento_id: number | null;
+  readonly documento_tipo_nombre: string | null;
   readonly inconsistencia: string;
 }
 
