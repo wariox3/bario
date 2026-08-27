@@ -1807,7 +1807,7 @@ export const es: AppDict = {
         },
         validation: {
           required: 'Este campo es requerido',
-          valorNoNegativo: 'El valor no puede ser negativo',
+          valorPositivo: 'El valor debe ser mayor que cero',
         },
         toasts: {
           createSuccess: { title: 'Adicional creado', desc: 'El adicional se creó correctamente' },

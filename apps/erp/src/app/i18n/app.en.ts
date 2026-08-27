@@ -1750,7 +1750,7 @@ export const en: AppDict = {
         },
         validation: {
           required: 'This field is required',
-          valorNoNegativo: 'The amount cannot be negative',
+          valorPositivo: 'The amount must be greater than zero',
         },
         toasts: {
           createSuccess: {

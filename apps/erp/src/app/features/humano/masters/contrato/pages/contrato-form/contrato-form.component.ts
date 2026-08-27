@@ -48,7 +48,7 @@ import {
   esTipoCotizanteAprendiz,
 } from '../../contrato.constants';
 import { cotizanteCoherenteValidator } from '../../utils/cotizante-coherente.validator';
-import { salarioPositivo } from '../../utils/salario-positivo.validator';
+import { montoPositivo } from '../../../../shared/monto-positivo.validator';
 import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
 
 /**
@@ -194,7 +194,7 @@ export class ContratoFormComponent implements OnInit {
     // Habilita que este contrato entre en la programación de turnos.
     habilitado_turno: this.fb.control<boolean>(false),
     // Remuneración
-    salario: this.fb.control<number | null>(null, [Validators.required, salarioPositivo]),
+    salario: this.fb.control<number | null>(null, [Validators.required, montoPositivo]),
     auxilio_transporte: this.fb.control<boolean>(true),
     salario_integral: this.fb.control<boolean>(false),
     tipo_costo: this.fb.control<ErpSelectOption | null>(null),

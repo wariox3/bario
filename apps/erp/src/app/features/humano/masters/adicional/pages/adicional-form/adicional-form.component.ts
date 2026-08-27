@@ -16,6 +16,7 @@ import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
 import { CONCEPTO_ENDPOINT, ADICIONAL_LIST_PATH, CONCEPTO_PARAMS } from '../../adicional.constants';
 import { adicionalToFormValue, formValueToPayload } from '../../adicional.mapper';
+import { montoPositivo } from '../../../../shared/monto-positivo.validator';
 
 /**
  * Formulario de alta/edición de adicional de empleado.
@@ -83,8 +84,8 @@ export class AdicionalFormComponent implements OnInit {
     contrato: this.fb.control<ContratoOption | null>(null, Validators.required),
     concepto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     // Un adicional descuenta o suma, pero su valor se captura en positivo: el
-    // signo lo pone el concepto, no quien digita.
-    valor: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
+    // signo lo pone el concepto, no quien digita. Y cero no es un adicional.
+    valor: this.fb.control<number | null>(null, [Validators.required, montoPositivo]),
     detalle: [''],
     aplica_dia_laborado: [false],
     inactivo: [false],

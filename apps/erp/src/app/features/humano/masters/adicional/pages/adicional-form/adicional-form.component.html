@@ -124,8 +124,9 @@
             {{ t().entities.adicional.form.fields.valor }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <!-- `min` impide teclear el signo; el validador del control cubre el
-               valor que llega ya negativo desde el backend al editar. -->
+          <!-- `min` impide teclear el signo y `mode="decimal"` impide escribir
+               algo que no sea número; `montoPositivo` rechaza el cero y cubre lo
+               que llegue mal desde el backend al editar. -->
           <p-inputnumber
             inputId="valor"
             formControlName="valor"
@@ -141,7 +142,7 @@
             [control]="form.controls.valor"
             [messages]="{
               required: t().entities.adicional.form.validation.required,
-              min: t().entities.adicional.form.validation.valorNoNegativo,
+              montoPositivo: t().entities.adicional.form.validation.valorPositivo,
             }"
           />
         </div>
