@@ -215,4 +215,23 @@
       </div>
     </div>
   </section>
+
+  <!-- ── Pagos ───────────────────────────────────────────────────────────────── -->
+  <!-- Card propia y no un tab: la ficha tiene una sola colección, y un tab
+       solitario es chrome que no separa nada. -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
+      >
+        <i class="pi pi-wallet text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.credito.pagos.title }}
+      </h2>
+    </div>
+    <div class="px-5 py-4">
+      <app-credito-pagos [creditoId]="c.id" />
+    </div>
+  </section>
 }

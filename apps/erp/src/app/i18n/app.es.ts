@@ -1711,6 +1711,13 @@ export const es: AppDict = {
     credito: {
       name: 'Créditos',
       searchPlaceholder: 'Buscar por contrato…',
+      pagos: {
+        title: 'Pagos',
+        empty: 'Este crédito todavía no tiene pagos aplicados',
+        loadError: 'No se pudieron cargar los pagos',
+        total: 'Total descontado',
+        columns: { id: 'ID', fecha: 'Fecha', documento: 'Documento', pago: 'Valor' },
+      },
       columns: {
         id: 'ID',
         identificacion: 'Identificación',

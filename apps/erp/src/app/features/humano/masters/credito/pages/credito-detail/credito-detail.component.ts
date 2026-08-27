@@ -14,11 +14,12 @@ import type { AppDict } from '@erp/i18n';
 import { CreditoService } from '../../credito.service';
 import { CREDITO_LIST_PATH } from '../../credito.constants';
 import type { Credito } from '../../credito.model';
+import { CreditoPagosComponent } from '../../components/credito-pagos/credito-pagos.component';
 
 @Component({
   selector: 'app-credito-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, BreadcrumbComponent, CreditoPagosComponent],
   templateUrl: './credito-detail.component.html',
   styleUrl: './credito-detail.component.scss',
 })

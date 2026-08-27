@@ -1657,6 +1657,13 @@ export const en: AppDict = {
     credito: {
       name: 'Credits',
       searchPlaceholder: 'Search by contract…',
+      pagos: {
+        title: 'Payments',
+        empty: 'This loan has no payments applied yet',
+        loadError: 'Could not load the payments',
+        total: 'Total deducted',
+        columns: { id: 'ID', fecha: 'Date', documento: 'Document', pago: 'Amount' },
+      },
       columns: {
         id: 'ID',
         identificacion: 'ID number',

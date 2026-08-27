@@ -1227,6 +1227,13 @@ export interface AppDict
     credito: {
       name: string;
       searchPlaceholder: string;
+      pagos: {
+        title: string;
+        empty: string;
+        loadError: string;
+        total: string;
+        columns: { id: string; fecha: string; documento: string; pago: string };
+      };
       columns: {
         id: string;
         identificacion: string;

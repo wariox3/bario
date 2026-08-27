@@ -53,3 +53,23 @@ export interface CreditoPayload {
   contrato: number | null;
   concepto: number | null;
 }
+
+/**
+ * Pago aplicado a un crédito (GET `/humano/credito/{id}/pagos/`).
+ *
+ * Cada pago es un descuento hecho al empleado en una nómina. `fecha` y
+ * `documento` son opcionales en el contrato: identifican de qué nómina salió el
+ * descuento y puede que el backend no los exponga desde el primer día.
+ *
+ * ⚠️ El endpoint está pedido, todavía no existe. Hasta que responda, la card de
+ * pagos de la ficha muestra su estado de error.
+ */
+export interface CreditoPago {
+  readonly id: number;
+  /** Valor descontado. Como el resto de los montos, puede llegar como string Decimal. */
+  readonly pago: string | number | null;
+  /** Fecha del descuento, si el backend la expone. */
+  readonly fecha?: string | null;
+  /** Documento (nómina) del que salió el descuento, si el backend lo expone. */
+  readonly documento?: number | null;
+}

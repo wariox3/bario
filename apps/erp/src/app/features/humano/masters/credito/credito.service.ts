@@ -7,7 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { Credito, CreditoPayload } from './credito.model';
+import type { Credito, CreditoPayload, CreditoPago } from './credito.model';
 
 @Injectable({ providedIn: 'root' })
 export class CreditoService extends BaseHttpService {
@@ -42,5 +42,16 @@ export class CreditoService extends BaseHttpService {
     }
     const deletions = ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`));
     return forkJoin(deletions).pipe(map(() => undefined));
+  }
+  /**
+   * Pagos aplicados al crédito: cada descuento hecho al empleado en una nómina.
+   *
+   * ⚠️ Endpoint pedido al backend, **todavía no existe**. Mientras responda 404,
+   * la card de pagos de la ficha muestra su estado de error.
+   */
+  pagos(id: number): Observable<readonly CreditoPago[]> {
+    return this.get<{ pagos: readonly CreditoPago[] }>(`${this.resourcePath}${id}/pagos/`).pipe(
+      map((r) => r.pagos ?? []),
+    );
   }
 }
