@@ -2,7 +2,7 @@ import { Component, DestroyRef, type OnInit, computed, inject, input, signal } f
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
+import { I18nService, TenantService, ToastService, formatCop, toFiniteNumber } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
@@ -37,6 +37,17 @@ export class AdicionalDetailComponent implements OnInit {
   protected readonly valorFormateado = computed(() => {
     const a = this.adicional();
     return a?.valor != null ? formatCop(a.valor) : '';
+  });
+
+  /**
+   * Horas del adicional, ya como número.
+   *
+   * El backend las manda como string Decimal (`"0.000"`), que es *truthy*: sin
+   * normalizar, un adicional sin horas pintaba «0.000» en vez del guion.
+   */
+  protected readonly horasFormateadas = computed(() => {
+    const horas = toFiniteNumber(this.adicional()?.horas);
+    return horas ? String(horas) : '';
   });
 
   /** Migas: módulo Humano → listado de adicionales → contrato abierto. */

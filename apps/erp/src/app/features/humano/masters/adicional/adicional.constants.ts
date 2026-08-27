@@ -28,7 +28,7 @@ export const ADICIONALES_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'contrato_numero_identificacion',
+    field: 'contrato_contacto_numero_identificacion',
     headerKey: 'entities.adicional.columns.identificacion',
     type: 'text',
     width: '130px',

@@ -139,9 +139,9 @@
             <dt class="adicional-detail__label">{{ t().entities.adicional.columns.horas }}</dt>
             <dd
               class="adicional-detail__value adicional-detail__value--mono"
-              [class.adicional-detail__value--empty]="!a.horas"
+              [class.adicional-detail__value--empty]="!horasFormateadas()"
             >
-              {{ a.horas || '—' }}
+              {{ horasFormateadas() || '—' }}
             </dd>
           </div>
           <div class="flex flex-col gap-0.5">
