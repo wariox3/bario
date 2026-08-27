@@ -1320,7 +1320,6 @@ export interface AppDict
       detail: {
         sections: { general: string };
         groups: { asignacion: string; valores: string; condiciones: string };
-        labels: { programacion: string };
         activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };

@@ -1821,7 +1821,6 @@ export const es: AppDict = {
       detail: {
         sections: { general: 'Información general' },
         groups: { asignacion: 'Asignación', valores: 'Valores', condiciones: 'Condiciones' },
-        labels: { programacion: 'Programación' },
         activo: 'Activo',
         notFound: {
           title: 'Adicional no encontrado',

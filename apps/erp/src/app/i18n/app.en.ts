@@ -1767,7 +1767,6 @@ export const en: AppDict = {
       detail: {
         sections: { general: 'General information' },
         groups: { asignacion: 'Assignment', valores: 'Values', condiciones: 'Conditions' },
-        labels: { programacion: 'Payroll run' },
         activo: 'Active',
         notFound: {
           title: 'Additional not found',

@@ -88,6 +88,13 @@
       <div class="px-5 py-4">
         <p class="adicional-detail__group">{{ t().entities.adicional.detail.groups.asignacion }}</p>
         <dl class="mt-3 flex flex-col gap-3">
+          <!-- El id del registro abre el grupo; la cédula va pegada al nombre
+               porque son el mismo dato leído de dos formas. Ambos en
+               monoespaciada: son identificadores, se comparan y se copian. -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="adicional-detail__label">{{ t().entities.adicional.columns.id }}</dt>
+            <dd class="adicional-detail__value adicional-detail__value--mono">{{ a.id }}</dd>
+          </div>
           <div class="flex flex-col gap-0.5">
             <dt class="adicional-detail__label">
               {{ t().entities.adicional.form.fields.contrato }}
@@ -100,23 +107,23 @@
             </dd>
           </div>
           <div class="flex flex-col gap-0.5">
+            <dt class="adicional-detail__label">
+              {{ t().entities.adicional.columns.identificacion }}
+            </dt>
+            <dd
+              class="adicional-detail__value adicional-detail__value--mono"
+              [class.adicional-detail__value--empty]="!a.contrato_contacto_numero_identificacion"
+            >
+              {{ a.contrato_contacto_numero_identificacion || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
             <dt class="adicional-detail__label">{{ t().entities.adicional.columns.concepto }}</dt>
             <dd
               class="adicional-detail__value"
               [class.adicional-detail__value--empty]="!a.concepto_nombre"
             >
               {{ a.concepto_nombre || '—' }}
-            </dd>
-          </div>
-          <div class="flex flex-col gap-0.5">
-            <dt class="adicional-detail__label">
-              {{ t().entities.adicional.detail.labels.programacion }}
-            </dt>
-            <dd
-              class="adicional-detail__value"
-              [class.adicional-detail__value--empty]="!a.programacion_nombre"
-            >
-              {{ a.programacion_nombre || '—' }}
             </dd>
           </div>
         </dl>
