@@ -1699,11 +1699,20 @@ export const en: AppDict = {
           total: 'Total',
           cuota: 'Installment',
           cantidadCuotas: 'Number of installments',
+          cuotaHint: 'Derived from the total and the number of installments; you can adjust it.',
           inactivo: 'Inactive',
           aplicaPrima: 'Applies to bonus',
           aplicaCesantia: 'Applies to severance',
         },
-        validation: { required: 'This field is required' },
+        plan: {
+          exacto: '{cuotas} installments of {monto}',
+          conFinal: '{cuotas} installments of {monto} and a final one of {final}',
+        },
+        validation: {
+          required: 'This field is required',
+          mayorQueCero: 'Must be greater than zero',
+          cuotaSuperaTotal: 'The installment cannot exceed the loan total',
+        },
         toasts: {
           createSuccess: { title: 'Credit created', desc: 'The credit was created successfully' },
           editSuccess: {
@@ -1765,6 +1774,8 @@ export const en: AppDict = {
         },
         validation: {
           required: 'This field is required',
+          mayorQueCero: 'Must be greater than zero',
+          cuotaSuperaTotal: 'The installment cannot exceed the loan total',
           valorPositivo: 'The amount must be greater than zero',
         },
         toasts: {

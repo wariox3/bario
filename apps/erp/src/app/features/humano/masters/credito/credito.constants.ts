@@ -10,6 +10,16 @@ export const CREDITO_LIST_PATH = ['humano', 'creditos'] as const;
 /** Endpoint del selector de concepto (búsqueda por `nombre__icontains`). */
 export const CONCEPTO_ENDPOINT = '/humano/concepto/seleccionar/';
 
+/**
+ * El catálogo de conceptos sirve a toda la nómina; acá solo valen los del tipo
+ * **crédito**. El id `8` viene del ERP anterior, que filtra igual en este mismo
+ * formulario; el catálogo de tipos vive en `/humano/concepto-tipo/seleccionar/`.
+ *
+ * El parámetro va **sin sufijo `_id`**: así se llama el campo en
+ * `HumConceptoSeleccionar` y es la convención de FK del backend.
+ */
+export const CONCEPTO_PARAMS: Record<string, string> = { concepto_tipo: '8' };
+
 export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
   {
     field: 'id',

@@ -1266,11 +1266,17 @@ export interface AppDict
           total: string;
           cuota: string;
           cantidadCuotas: string;
+          cuotaHint: string;
           inactivo: string;
           aplicaPrima: string;
           aplicaCesantia: string;
         };
-        validation: { required: string };
+        plan: { exacto: string; conFinal: string };
+        validation: {
+          required: string;
+          mayorQueCero: string;
+          cuotaSuperaTotal: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -1319,7 +1325,12 @@ export interface AppDict
           aplicaDiaLaborado: string;
           inactivo: string;
         };
-        validation: { required: string; valorPositivo: string };
+        validation: {
+          required: string;
+          mayorQueCero: string;
+          cuotaSuperaTotal: string;
+          valorPositivo: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };

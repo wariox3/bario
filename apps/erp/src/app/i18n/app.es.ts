@@ -1753,11 +1753,20 @@ export const es: AppDict = {
           total: 'Total',
           cuota: 'Valor cuota',
           cantidadCuotas: 'Cantidad de cuotas',
+          cuotaHint: 'Se calcula con el total y las cuotas; podés ajustarla.',
           inactivo: 'Inactivo',
           aplicaPrima: 'Aplica prima',
           aplicaCesantia: 'Aplica cesantía',
         },
-        validation: { required: 'Este campo es requerido' },
+        plan: {
+          exacto: '{cuotas} cuotas de {monto}',
+          conFinal: '{cuotas} cuotas de {monto} y una final de {final}',
+        },
+        validation: {
+          required: 'Este campo es requerido',
+          mayorQueCero: 'Debe ser mayor que cero',
+          cuotaSuperaTotal: 'La cuota no puede superar el total del crédito',
+        },
         toasts: {
           createSuccess: { title: 'Crédito creado', desc: 'El crédito se creó correctamente' },
           editSuccess: {
@@ -1819,6 +1828,8 @@ export const es: AppDict = {
         },
         validation: {
           required: 'Este campo es requerido',
+          mayorQueCero: 'Debe ser mayor que cero',
+          cuotaSuperaTotal: 'La cuota no puede superar el total del crédito',
           valorPositivo: 'El valor debe ser mayor que cero',
         },
         toasts: {
