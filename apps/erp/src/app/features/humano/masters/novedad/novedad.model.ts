@@ -53,7 +53,15 @@ export interface Novedad {
    * que se sigue el mismo patrón `<fk>_<campo>`. Opcional: hasta que el backend lo
    * exponga llega `undefined` y el addon degrada a vacío, como hoy.
    */
-  readonly contrato_numero_identificacion?: string | null;
+  /**
+   * Datos del empleado del contrato: su código interno y su cédula.
+   *
+   * TODO(backend): el esquema `HumNovedad` **no los declara** todavía; sí lo hace
+   * `HumAdicional`, con estos mismos nombres. Opcionales hasta entonces: llegan
+   * `undefined`, las columnas quedan vacías y el addon del selector también.
+   */
+  readonly contrato_contacto_id?: number | null;
+  readonly contrato_contacto_numero_identificacion?: string | null;
   readonly novedad_tipo: number | null;
   readonly novedad_tipo_nombre: string | null;
   readonly novedad_referencia: number | null;

@@ -1809,8 +1809,12 @@ export const en: AppDict = {
       name: 'Events',
       searchPlaceholder: 'Search by contract…',
       columns: {
+        id: 'ID',
         novedadTipo: 'Type',
-        contrato: 'Contract',
+        codigo: 'Code',
+        identificacion: 'ID number',
+        nombre: 'Name',
+        contratoId: 'Contract',
         fechaDesde: 'Start date',
         fechaHasta: 'End date',
         dias: 'Days',

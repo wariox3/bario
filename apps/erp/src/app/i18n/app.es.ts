@@ -1860,8 +1860,12 @@ export const es: AppDict = {
       name: 'Novedades',
       searchPlaceholder: 'Buscar por contrato…',
       columns: {
+        id: 'ID',
         novedadTipo: 'Tipo',
-        contrato: 'Contrato',
+        codigo: 'Código',
+        identificacion: 'Identificación',
+        nombre: 'Nombre',
+        contratoId: 'Contrato',
         fechaDesde: 'Fecha desde',
         fechaHasta: 'Fecha hasta',
         dias: 'Días',

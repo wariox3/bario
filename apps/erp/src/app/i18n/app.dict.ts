@@ -1351,8 +1351,12 @@ export interface AppDict
       name: string;
       searchPlaceholder: string;
       columns: {
+        id: string;
         novedadTipo: string;
-        contrato: string;
+        codigo: string;
+        identificacion: string;
+        nombre: string;
+        contratoId: string;
         fechaDesde: string;
         fechaHasta: string;
         dias: string;
