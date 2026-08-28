@@ -16,7 +16,7 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiAutocompleteComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
 import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
@@ -55,7 +55,7 @@ import {
     FieldErrorComponent,
     PageActionsComponent,
     ContratoAutocompleteComponent,
-    ErpApiAutocompleteComponent,
+    ErpApiSelectComponent,
   ],
   templateUrl: './credito-form.component.html',
   styleUrl: './credito-form.component.scss',

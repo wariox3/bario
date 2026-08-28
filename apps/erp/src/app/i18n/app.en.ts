@@ -1694,7 +1694,7 @@ export const en: AppDict = {
           contrato: 'Contract',
           contratoPlaceholder: 'Search contract…',
           concepto: 'Concept',
-          conceptoPlaceholder: 'Search concept…',
+          conceptoPlaceholder: 'Select a concept…',
           inicio: 'Start',
           total: 'Total',
           cuota: 'Installment',

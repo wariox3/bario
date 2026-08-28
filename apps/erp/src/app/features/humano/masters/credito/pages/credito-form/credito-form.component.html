@@ -80,12 +80,12 @@
             {{ t().entities.credito.form.fields.concepto }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-api-select
             inputId="concepto"
             formControlName="concepto"
             [endpoint]="conceptoEndpoint"
             [params]="conceptoParams"
-            searchParam="nombre__icontains"
+            [suggestedIndex]="0"
             [placeholder]="t().entities.credito.form.fields.conceptoPlaceholder"
             [invalid]="form.controls.concepto.invalid && form.controls.concepto.touched"
           />
