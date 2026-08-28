@@ -26,14 +26,8 @@ export interface Credito {
   // Foreign keys (id pelado) + companion `*_nombre`
   readonly contrato: number | null;
   readonly contrato_nombre: string | null;
-  /**
-   * Cédula del empleado del contrato.
-   *
-   * TODO(backend): el esquema `HumCredito` **no la declara** todavía (sí lo hace
-   * `HumAdicional`, con este mismo nombre). Opcional hasta entonces: llega
-   * `undefined` y la columna queda vacía.
-   */
-  readonly contrato_contacto_numero_identificacion?: string | null;
+  /** Cédula del empleado del contrato: alimenta el addon del selector y la ficha. */
+  readonly contrato_contacto_numero_identificacion: string | null;
   readonly concepto: number | null;
   readonly concepto_nombre: string | null;
 }

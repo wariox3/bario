@@ -18,7 +18,7 @@ export const CONCEPTO_ENDPOINT = '/humano/concepto/seleccionar/';
  * El parámetro va **sin sufijo `_id`**: así se llama el campo en
  * `HumConceptoSeleccionar` y es la convención de FK del backend.
  */
-export const CONCEPTO_PARAMS: Record<string, string> = { concepto_tipo: '8' };
+export const CONCEPTO_PARAMS: Record<string, string> = { concepto_tipo_id: '8' };
 
 export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
   {
