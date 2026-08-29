@@ -24,10 +24,18 @@ export const NOVEDAD_TIPO_REFERENCIA_ID = 1;
 
 /**
  * Nombres de los parámetros de filtro del selector de novedad de referencia.
- * ⚠️ A confirmar contra el backend (el legacy usaba `contrato_id` / `novedad_tipo_id`).
+ *
+ * TODO(backend): `GET /humano/novedad/seleccionar/` hoy solo acepta `page` y
+ * `search` (OpenAPI del 2026-08-28), así que **ignora** estos dos y devuelve
+ * todas las novedades del tenant. El ERP anterior sí filtraba (`contrato_id` /
+ * `novedad_tipo_id` en el backend viejo). Se mandan igual, con los nombres sin
+ * sufijo del backend nuevo, para que el filtro entre solo cuando lo agreguen.
  */
 export const NOVEDAD_REFERENCIA_CONTRATO_PARAM = 'contrato';
 export const NOVEDAD_REFERENCIA_TIPO_PARAM = 'novedad_tipo';
+
+/** Largo máximo del detalle: `HumNovedadRequest.detalle.maxLength`. */
+export const NOVEDAD_DETALLE_MAX_LENGTH = 150;
 
 export const NOVEDADES_COLUMNS: readonly ColumnDef[] = [
   // El orden es el del ERP anterior: qué novedad, de qué tipo, de quién y

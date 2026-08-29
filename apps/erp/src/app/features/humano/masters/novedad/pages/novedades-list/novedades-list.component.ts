@@ -145,6 +145,8 @@ export class NovedadesListComponent {
     const novedad = event.row as Novedad;
     switch (event.actionId) {
       case 'view':
+        this.navigateTo('detalle', novedad.id);
+        break;
       case 'edit':
         this.navigateTo('editar', novedad.id);
         break;
@@ -155,7 +157,7 @@ export class NovedadesListComponent {
   }
 
   protected onRowClick(row: unknown): void {
-    this.navigateTo('editar', (row as Novedad).id);
+    this.navigateTo('detalle', (row as Novedad).id);
   }
 
   protected onToolbarAction(actionId: string): void {

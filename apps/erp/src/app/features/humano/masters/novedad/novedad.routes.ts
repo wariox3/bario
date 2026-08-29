@@ -18,4 +18,11 @@ export const NOVEDAD_ROUTES: Route[] = [
     loadComponent: () =>
       import('./pages/novedad-form/novedad-form.component').then((m) => m.NovedadFormComponent),
   },
+  {
+    path: 'detalle/:id',
+    loadComponent: () =>
+      import('./pages/novedad-detail/novedad-detail.component').then(
+        (m) => m.NovedadDetailComponent,
+      ),
+  },
 ];

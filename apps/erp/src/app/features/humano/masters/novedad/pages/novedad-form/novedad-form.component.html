@@ -142,6 +142,16 @@
           }
         </div>
 
+        <!-- Duración: son los días que viajan al backend (extremos incluidos),
+             así que se dicen acá para que la cuenta esté a la vista al elegir
+             las fechas. -->
+        @if (diasHint(); as hint) {
+          <p class="m-0 flex items-center gap-1.5 text-[0.78rem] text-brand-muted sm:col-span-2">
+            <i class="pi pi-calendar text-[0.8rem]"></i>
+            <span>{{ hint }}</span>
+          </p>
+        }
+
         <!-- Novedad de referencia (condicional) -->
         @if (mostrarReferencia()) {
           <div class="flex flex-col gap-1.5">
@@ -153,6 +163,8 @@
               formControlName="novedad_referencia"
               [endpoint]="novedadReferenciaEndpoint"
               [params]="referenciaParams()"
+              [displayWith]="referenciaDisplay"
+              filterBy="id,fecha_desde,fecha_hasta"
               [placeholder]="t().entities.novedad.form.fields.selectPlaceholder"
             />
           </div>
@@ -169,8 +181,12 @@
             formControlName="detalle"
             rows="3"
             class="w-full"
+            [maxlength]="detalleMaxLength"
           ></textarea>
-          <lib-field-error [control]="form.controls.detalle" />
+          <lib-field-error
+            [control]="form.controls.detalle"
+            [messages]="{ maxlength: t().entities.novedad.form.validation.maxLength }"
+          />
         </div>
       </div>
     </div>
@@ -249,33 +265,6 @@
                 {{ t().entities.novedad.form.validation.rangoFechas }}
               </small>
             }
-          </div>
-
-          <!-- Días disfrutados reales -->
-          <div class="flex flex-col gap-1.5">
-            <label for="dias_disfrutados_reales" class="novedad-form__label">
-              {{ t().entities.novedad.form.fields.diasDisfrutadosReales }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-inputnumber
-              inputId="dias_disfrutados_reales"
-              formControlName="dias_disfrutados_reales"
-              [useGrouping]="false"
-              [min]="1"
-              [maxFractionDigits]="0"
-              [fluid]="true"
-              [invalid]="
-                form.controls.dias_disfrutados_reales.invalid &&
-                form.controls.dias_disfrutados_reales.touched
-              "
-            />
-            <lib-field-error
-              [control]="form.controls.dias_disfrutados_reales"
-              [messages]="{
-                required: t().entities.novedad.form.validation.required,
-                min: t().entities.novedad.form.validation.min,
-              }"
-            />
           </div>
 
           <!-- Días disfrutados -->

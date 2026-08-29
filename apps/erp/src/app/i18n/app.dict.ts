@@ -1382,9 +1382,9 @@ export interface AppDict
           fechaHastaPeriodo: string;
           diasDinero: string;
           diasDisfrutados: string;
-          diasDisfrutadosReales: string;
         };
-        validation: { required: string; min: string; rangoFechas: string };
+        hints: { dias: string; diasUno: string };
+        validation: { required: string; min: string; maxLength: string; rangoFechas: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -1392,6 +1392,34 @@ export interface AppDict
           editError: { title: string; desc: string };
           loadError: { title: string; desc: string };
         };
+      };
+      detail: {
+        sections: { general: string; vacaciones: string; empresaEntidad: string };
+        groups: {
+          empleado: string;
+          fechas: string;
+          liquidacion: string;
+          dias: string;
+          disfrute: string;
+          dinero: string;
+          empresa: string;
+          entidad: string;
+        };
+        fields: {
+          contratoId: string;
+          prorroga: string;
+          baseCotizacionPropuesto: string;
+          baseCotizacion: string;
+          diasDisfrutadosReales: string;
+          pagoDiaDisfrute: string;
+          pagoDisfrute: string;
+          pagoDiaDinero: string;
+          pagoDinero: string;
+          horas: string;
+          pago: string;
+        };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
       };
     };
     contrato: {

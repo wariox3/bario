@@ -20,7 +20,6 @@ export interface NovedadFormRawValue {
   fecha_hasta_periodo: Date | null;
   dias_dinero: number | null;
   dias_disfrutados: number | null;
-  dias_disfrutados_reales: number | null;
   // Referencia
   novedad_referencia: ErpSelectOption | null;
 }

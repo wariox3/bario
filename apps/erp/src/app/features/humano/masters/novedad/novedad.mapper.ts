@@ -1,6 +1,13 @@
 import { fromIsoDate, toIsoDate } from '@reddoc/core';
 import type { Novedad, NovedadPayload } from './novedad.model';
 import type { NovedadFormRawValue } from './pages/novedad-form/novedad-form.types';
+import { diasDeNovedad } from './novedad.rules';
+
+/** Decimal del backend (`"15.000"`) → número para el control; nulo o inválido → 0. */
+function aDias(valor: string | number | null | undefined): number {
+  const n = Number(valor);
+  return Number.isFinite(n) ? n : 0;
+}
 
 /**
  * Adapta el read-model (`Novedad`) a los valores del reactive form.
@@ -27,9 +34,8 @@ export function novedadToFormValue(n: Novedad): Partial<NovedadFormRawValue> {
     detalle: n.detalle ?? '',
     fecha_desde_periodo: fromIsoDate(n.fecha_desde_periodo),
     fecha_hasta_periodo: fromIsoDate(n.fecha_hasta_periodo),
-    dias_dinero: n.dias_dinero ?? 0,
-    dias_disfrutados: n.dias_disfrutados ?? 0,
-    dias_disfrutados_reales: n.dias_disfrutados_reales ?? 0,
+    dias_dinero: aDias(n.dias_dinero),
+    dias_disfrutados: aDias(n.dias_disfrutados),
     novedad_referencia:
       n.novedad_referencia != null
         ? { id: n.novedad_referencia, nombre: n.novedad_referencia_nombre ?? '' }
@@ -54,9 +60,12 @@ export function formValueToPayload(v: NovedadFormRawValue): NovedadPayload {
     detalle: v.detalle || null,
     fecha_desde_periodo: toIsoDate(v.fecha_desde_periodo),
     fecha_hasta_periodo: toIsoDate(v.fecha_hasta_periodo),
+    // El backend nuevo espera los días desde el front (`dias` está en
+    // `HumNovedadRequest`); el anterior los calculaba solo. Sin esto la novedad
+    // se guarda en cero días y el total, que sí calcula el backend, con ella.
+    dias: diasDeNovedad(v.fecha_desde, v.fecha_hasta),
     dias_dinero: v.dias_dinero ?? 0,
     dias_disfrutados: v.dias_disfrutados ?? 0,
-    dias_disfrutados_reales: v.dias_disfrutados_reales ?? 0,
     novedad_referencia: v.novedad_referencia?.id ?? null,
   };
 }
