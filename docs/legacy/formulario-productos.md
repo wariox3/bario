@@ -324,10 +324,13 @@ Ordenados por impacto:
    (default `1`) firma el monto en `calcularImpuestosLinea`; una retención (−1) produce total
    negativo y el resumen la descuenta sola. Cableado en el catálogo (`operacion`), el ítem
    (`impuesto_operacion`), pendientes y el modal de servicio; con tests en el kernel.
-   **Quedan dos verificaciones de backend**: (a) el serializador de `pendiente/` no manda la
-   operación → una retención importada no resta; (b) `GenDocumentoImpuesto.total` (línea guardada)
-   no trae `operacion` — confirmar si el total persistido viene con signo, si no, las líneas
-   _cargadas_ en edición/detalle siguen mostrando la retención positiva.
+   **Caveat (b) confirmado con payload real el 2026-08-31**: la línea guardada llega sin
+   `operacion` y con `total` sin signo (aunque el backend calcula bien por dentro — sus agregados
+   `impuesto_retencion`/`total` lo prueban). Puente implementado: la tabla de **edición** corrige
+   el signo contra el catálogo (`signImpuestosLeidos`) y el mapper ya lee `impuesto_operacion` si
+   llega — al serializarlo el backend, los ~20 **detalles** quedan corregidos solos. Pedidos al
+   backend: `impuesto_operacion` en `GenDocumentoImpuesto` y en el serializador de `pendiente/`
+   (mismo campo que ya expone el serializador de impuestos del ítem).
 3. ~~**Lista de precios del contacto**~~ — §6.3. **Corregido el 2026-08-31**: en venta, al elegir
    un ítem la tabla lo cotiza contra la lista del cliente (`precio_id` de `contacto/seleccionar/`
    → `GET precio-detalle/?precio_id&item_id`, el reemplazo del `consultar_precio/` legacy que el

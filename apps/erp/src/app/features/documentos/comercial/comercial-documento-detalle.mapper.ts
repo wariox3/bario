@@ -171,11 +171,17 @@ export function comercialDetalleToFormValue(
     precio,
     descuento: toFiniteNumber(read.descuento) ?? 0,
     impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
-    impuestos_totales: (read.impuestos ?? []).map((imp) => ({
-      id: imp.impuesto,
-      nombre: imp.impuesto_nombre ?? '',
-      total: Math.round(parseFloat(imp.total ?? '0')),
-    })),
+    impuestos_totales: (read.impuestos ?? []).map((imp) => {
+      // El backend guarda el monto sin signo. Si el serializer ya manda la
+      // operación, el signo sale de ahí; si no (hoy), queda como llegó y la
+      // tabla de edición lo corrige contra el catálogo (`signImpuestosLeidos`).
+      const parsed = Math.round(parseFloat(imp.total ?? '0'));
+      const total =
+        imp.impuesto_operacion == null
+          ? parsed
+          : Math.abs(parsed) * (imp.impuesto_operacion < 0 ? -1 : 1);
+      return { id: imp.impuesto, nombre: imp.impuesto_nombre ?? '', total };
+    }),
     // Se rellenan al re-seleccionar el ítem; vacías preservan los montos cargados.
     impuestos_disponibles: [],
     detalle: read.detalle ?? null,
