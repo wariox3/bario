@@ -13,6 +13,7 @@ import {
   EMPTY,
   type Observable,
   type Subscription,
+  catchError,
   defer,
   filter,
   finalize,
@@ -56,6 +57,7 @@ import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import { ErpSelectDataService } from '@reddoc/core';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
+import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
 import type { Item } from '@erp/features/general/masters/item/item.model';
 import type { AppDict } from '@erp/i18n';
 import {
@@ -120,6 +122,7 @@ export class ComercialDocumentoDetallesComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly itemService = inject(ItemService);
+  private readonly precioDetalleService = inject(PrecioDetalleService);
   private readonly selectData = inject(ErpSelectDataService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(ToastService);
@@ -157,6 +160,14 @@ export class ComercialDocumentoDetallesComponent {
    * líneas pendientes del modal de importación a ese contacto.
    */
   readonly contactoId = input<number | null>(null);
+
+  /**
+   * Lista de precios del contacto de la cabecera (`precio_id` del contacto;
+   * ver `precioListaDeContacto`). Solo aplica en `modo="venta"`: al elegir un
+   * ítem se cotiza contra la lista y ese precio pisa el del ítem. `null` = sin
+   * lista, la línea queda con el precio propio del ítem.
+   */
+  readonly precioListaId = input<number | null>(null);
 
   /**
    * Avisa al padre que se importaron líneas en **edición** (ya persistidas vía
@@ -531,11 +542,13 @@ export class ComercialDocumentoDetallesComponent {
       return;
     }
     this.ensureCatalog(group);
-    this.itemService
-      .getById(opt.id)
+    forkJoin({
+      item: this.itemService.getById(opt.id),
+      precioLista: this.consultarPrecioLista(opt.id),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((item) => {
-        this.applyPrecioCompra(group, opt, item);
+      .subscribe(({ item, precioLista }) => {
+        this.applyPrecioPactado(group, opt, item, precioLista);
         group.controls.impuestos_ids.setValue(
           tasasDelItem(item, this.modo()).map((tasa) => tasa.id),
         );
@@ -543,23 +556,45 @@ export class ComercialDocumentoDetallesComponent {
   }
 
   /**
-   * En compra la línea vale el **costo** del ítem, no su precio de venta: el
-   * autocomplete siembra `opt.precio` (venta, lo único que trae `seleccionar/`),
-   * y aquí se corrige con el `costo` que aporta la lectura completa del ítem —
-   * la misma que ya se hace para los impuestos, así que no cuesta red extra.
-   * Un costo en 0 se siembra igual (lo normal: el costo real lo dicta la factura
-   * del proveedor y lo digita la persona), como hacía el ERP anterior.
+   * Precio del ítem en la lista del contacto, si aplica: solo en venta (las
+   * listas de precios son condición de venta; en compra manda el costo) y solo
+   * si la cabecera aportó lista. Un fallo de la consulta no bloquea los
+   * impuestos: cae a `null` y la línea queda con el precio del ítem.
+   */
+  private consultarPrecioLista(itemId: number): Observable<number | null> {
+    const precioId = this.precioListaId();
+    if (this.modo() !== 'venta' || precioId == null) return of(null);
+    return this.precioDetalleService
+      .consultarPrecioItem(precioId, itemId)
+      .pipe(catchError(() => of(null)));
+  }
+
+  /**
+   * Corrige el precio sembrado por el autocomplete (`opt.precio`, el precio de
+   * venta del ítem — lo único que trae `seleccionar/`) con el precio **pactado**
+   * que corresponda:
+   *  - **venta con lista de precios del contacto** → el `vr_precio` cotizado en
+   *    la lista (`consultarPrecioLista`);
+   *  - **compra** → el `costo` de la lectura completa del ítem (la misma
+   *    consulta de los impuestos). Un costo 0 se siembra igual — lo normal: el
+   *    costo real lo dicta la factura del proveedor y lo digita la persona,
+   *    como en el ERP anterior.
    *
    * Respeta un precio ya tecleado: solo pisa el valor sembrado por el
    * autocomplete, por si la persona editó el precio en la ventana entre elegir
-   * el ítem y la respuesta de esta consulta.
+   * el ítem y las respuestas de estas consultas.
    */
-  private applyPrecioCompra(group: ComercialDetalleGroup, opt: ItemOption, item: Item): void {
-    if (this.modo() !== 'compra') return;
-    const costo = toFiniteNumber(item.costo);
-    if (costo == null) return;
+  private applyPrecioPactado(
+    group: ComercialDetalleGroup,
+    opt: ItemOption,
+    item: Item,
+    precioLista: number | null,
+  ): void {
+    const costo = this.modo() === 'compra' ? toFiniteNumber(item.costo) : null;
+    const pactado = precioLista ?? costo;
+    if (pactado == null) return;
     if (group.controls.precio.value !== opt.precio) return;
-    group.controls.precio.setValue(costo);
+    group.controls.precio.setValue(pactado);
   }
 
   /**

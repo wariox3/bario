@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { type Observable, concatMap, map, of } from 'rxjs';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import { BaseHttpService, toFiniteNumber, type PaginatedResponse } from '@reddoc/core';
 import type { PrecioDetalle, PrecioDetalleApi, PrecioDetallePayload } from './precio-detalle.model';
 import { toPrecioDetalle } from './precio-detalle.mapper';
 
@@ -46,6 +46,26 @@ export class PrecioDetalleService extends BaseHttpService {
    */
   listar(precioId: number): Observable<readonly PrecioDetalle[]> {
     return this.desdePagina(precioId, 1).pipe(map((filas) => filas.map(toPrecioDetalle)));
+  }
+
+  /**
+   * El precio que un ítem toma dentro de una lista, o `null` si la lista no lo
+   * cotiza (sin línea, o con importe vacío/0 — mismo trato que el ERP anterior):
+   * el consumidor cae entonces al precio propio del ítem.
+   *
+   * `GET precio-detalle/?precio_id&item_id`: el backend filtra por ambos, así
+   * que la primera página alcanza (una lista cotiza cada ítem a lo sumo una vez).
+   */
+  consultarPrecioItem(precioId: number, itemId: number): Observable<number | null> {
+    return this.get<PaginatedResponse<PrecioDetalleApi>>(PRECIO_DETALLE_ENDPOINT, {
+      precio_id: precioId,
+      item_id: itemId,
+    }).pipe(
+      map((res) => {
+        const vrPrecio = toFiniteNumber(res.results?.[0]?.vr_precio);
+        return vrPrecio != null && vrPrecio > 0 ? vrPrecio : null;
+      }),
+    );
   }
 
   crear(payload: PrecioDetallePayload): Observable<PrecioDetalle> {

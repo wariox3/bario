@@ -328,8 +328,13 @@ Ordenados por impacto:
    operación → una retención importada no resta; (b) `GenDocumentoImpuesto.total` (línea guardada)
    no trae `operacion` — confirmar si el total persistido viene con signo, si no, las líneas
    _cargadas_ en edición/detalle siguen mostrando la retención positiva.
-3. **Lista de precios del contacto** — §6.3. No existe `consultar_precio/` con el `precio_id` del
-   cliente (dato que ya llega en `contacto/seleccionar/`). Impacto alto para tenants con listas.
+3. ~~**Lista de precios del contacto**~~ — §6.3. **Corregido el 2026-08-31**: en venta, al elegir
+   un ítem la tabla lo cotiza contra la lista del cliente (`precio_id` de `contacto/seleccionar/`
+   → `GET precio-detalle/?precio_id&item_id`, el reemplazo del `consultar_precio/` legacy que el
+   backend nuevo no expone) y ese `vr_precio` pisa el del ítem; sin línea o en 0, cae al precio
+   propio. Cableado en factura de venta y POS (paridad con el legacy: la recurrente tampoco lo
+   tenía). Caveat: `GenDocumento` no serializa el precio del contacto → en edición solo aplica al
+   (re)elegir el contacto.
 4. **Filtro de documento origen al importar** — §6.6. El modal solo filtra por
    `documento__contacto_id`; el legacy fijaba además el **tipo** origen (p. ej. remisiones = 29) y
    aprobado/pendiente. Verificar qué garantiza `pendiente/` server-side; si no discrimina tipo, una

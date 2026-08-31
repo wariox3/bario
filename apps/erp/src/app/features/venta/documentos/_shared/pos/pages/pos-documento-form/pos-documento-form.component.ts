@@ -45,6 +45,7 @@ import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../pos-documento.constan
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
@@ -243,6 +244,11 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña y la carga). */
   protected get pagos(): FormArray<PagoGroup> {
     return this.form.controls.pagos;
+  }
+
+  /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
+  protected precioListaId(): number | null {
+    return precioListaDeContacto(this.form.controls.contacto.value);
   }
 
   ngOnInit(): void {

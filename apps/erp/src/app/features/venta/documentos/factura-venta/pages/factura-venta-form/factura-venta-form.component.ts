@@ -35,6 +35,7 @@ import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta.constants';
+import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
@@ -172,6 +173,11 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       origen: 'cliente',
       destroyRef: this.destroyRef,
     });
+  }
+
+  /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
+  protected precioListaId(): number | null {
+    return precioListaDeContacto(this.form.controls.contacto.value);
   }
 
   ngOnInit(): void {
