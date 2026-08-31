@@ -24,10 +24,7 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
-      [canAprobar]="!cabecera()?.estados?.estado_aprobado"
-      [canDesaprobar]="!!cabecera()?.estados?.estado_aprobado"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
+      [showAprobacion]="false"
       (imprimir)="onImprimir()"
     />
   }
@@ -130,7 +127,5 @@
     </div>
   </section>
 }
-
-<p-confirmDialog />
 
 <app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />

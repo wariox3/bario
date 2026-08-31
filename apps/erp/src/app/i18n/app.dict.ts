@@ -1958,12 +1958,10 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };
       filters: {
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };
@@ -2260,12 +2258,10 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };
       filters: {
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };

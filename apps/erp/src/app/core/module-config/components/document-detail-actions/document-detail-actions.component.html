@@ -1,13 +1,15 @@
 @let a = t().documentActions.detail;
 
-<p-button
-  type="button"
-  [label]="a.aprobar"
-  icon="pi pi-check-circle"
-  size="small"
-  [disabled]="!canAprobar()"
-  (onClick)="aprobar.emit()"
-/>
+@if (showAprobacion()) {
+  <p-button
+    type="button"
+    [label]="a.aprobar"
+    icon="pi pi-check-circle"
+    size="small"
+    [disabled]="!canAprobar()"
+    (onClick)="aprobar.emit()"
+  />
+}
 
 <p-button
   type="button"
@@ -33,17 +35,19 @@
   />
 }
 
-<p-button
-  type="button"
-  [label]="a.acciones"
-  icon="pi pi-chevron-down"
-  iconPos="right"
-  severity="secondary"
-  [outlined]="true"
-  size="small"
-  (onClick)="toggleAcciones($event)"
-/>
-<p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
+@if (accionesItems().length > 0) {
+  <p-button
+    type="button"
+    [label]="a.acciones"
+    icon="pi pi-chevron-down"
+    iconPos="right"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="toggleAcciones($event)"
+  />
+  <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
+}
 
 <p-button
   type="button"
