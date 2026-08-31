@@ -137,16 +137,62 @@
             </td>
 
             <td class="comercial-detalle-table__td">
-              <p-inputnumber
-                formControlName="precio"
-                mode="decimal"
-                [min]="0"
-                [minFractionDigits]="0"
-                [maxFractionDigits]="2"
-                prefix="$ "
-                [fluid]="true"
-                inputStyleClass="text-right"
-              />
+              <div class="flex items-center gap-1">
+                <p-inputnumber
+                  class="min-w-0 flex-1"
+                  formControlName="precio"
+                  mode="decimal"
+                  [min]="0"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  prefix="$ "
+                  [fluid]="true"
+                  inputStyleClass="text-right"
+                />
+                <!-- Precio con impuestos incluidos → precio base (extraer IVA) -->
+                <button
+                  type="button"
+                  class="shrink-0 rounded-md p-1 text-brand-muted transition-colors hover:bg-sky-50 hover:text-sky-700"
+                  [pTooltip]="t().entities.comercialDetalle.extraerIva.title"
+                  [attr.aria-label]="t().entities.comercialDetalle.extraerIva.title"
+                  (click)="openExtraerIva(extraerIvaOp, $event, row)"
+                >
+                  <i class="pi pi-percentage text-[0.7rem]"></i>
+                </button>
+              </div>
+              <p-popover #extraerIvaOp>
+                <div class="flex w-64 flex-col gap-2">
+                  <span class="text-[0.72rem] font-semibold text-brand-text">
+                    {{ t().entities.comercialDetalle.extraerIva.title }}
+                  </span>
+                  <p-inputnumber
+                    [ngModel]="extraerIvaValor()"
+                    (ngModelChange)="extraerIvaValor.set($event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    mode="decimal"
+                    [min]="0"
+                    [maxFractionDigits]="2"
+                    prefix="$ "
+                    [fluid]="true"
+                    inputStyleClass="text-right"
+                  />
+                  <div class="flex items-center justify-between text-[0.75rem]">
+                    <span class="text-brand-muted">
+                      {{ t().entities.comercialDetalle.extraerIva.baseLabel }}
+                    </span>
+                    <span class="font-semibold tabular-nums text-brand-text">
+                      {{ formatMoney(extraerIvaBase()) }}
+                    </span>
+                  </div>
+                  <p-button
+                    type="button"
+                    size="small"
+                    icon="pi pi-check"
+                    [label]="t().entities.comercialDetalle.extraerIva.apply"
+                    (onClick)="applyExtraerIva(extraerIvaOp)"
+                  />
+                </div>
+              </p-popover>
             </td>
 
             <td class="comercial-detalle-table__td">

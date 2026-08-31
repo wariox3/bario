@@ -3570,6 +3570,11 @@ export const es: AppDict = {
       detallePlaceholder: 'Nota…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
       createItem: 'Crear ítem',
+      extraerIva: {
+        title: 'Precio con impuestos incluidos',
+        baseLabel: 'Precio base',
+        apply: 'Aplicar precio base',
+      },
       scanner: {
         placeholder: 'Escanear código de barras',
         notFound: {

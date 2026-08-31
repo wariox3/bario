@@ -2700,6 +2700,7 @@ export interface AppDict
       detallePlaceholder: string;
       confirmDeleteLine: string;
       createItem: string;
+      extraerIva: { title: string; baseLabel: string; apply: string };
       scanner: {
         placeholder: string;
         notFound: { title: string; desc: string };

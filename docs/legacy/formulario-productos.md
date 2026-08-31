@@ -351,9 +351,17 @@ Ordenados por impacto:
    master como **modal** (el mismo `ItemFormComponent`, ahora dual página/modal vía
    `DynamicDialogRef` opcional); el ítem creado queda seleccionado en la fila y corre la tubería
    normal (precio pactado + impuestos).
-7. **Almacén por línea** — §6.5. No existe en la tabla comercial nueva.
-8. **Grupo contable por línea en compra** — §6.5. No existe.
-9. **Extraer IVA / precio con IVA incluido** — §6.8. No existe.
+7. **Almacén por línea** — §6.5. **Bloqueado por backend** (verificado 2026-08-31): el
+   serializer de `documento-detalle` no acepta `almacen`, y la cabecera (`GenDocumento`) tampoco
+   lo tiene. Sin campo en la API no hay nada que el front pueda persistir.
+8. **Grupo contable por línea en compra** — §6.5. **Bloqueado por backend**: mismo caso, no hay
+   `grupo` en el serializer de la línea ni `grupo_contabilidad` en la cabecera.
+9. ~~**Extraer IVA / precio con IVA incluido**~~ — §6.8. **Corregido el 2026-08-31**: botoncito
+   `%` junto al precio de cada línea → popover "precio con impuestos incluidos" con vista previa
+   del precio base en vivo. Inversión **exacta** del kernel (÷ `1 + Σ fracciones` de las tasas que
+   suman — aditivas sobre la misma base, no en cadena como el legacy, que con varias tasas era
+   inconsistente con su propio cálculo) y las retenciones no participan (no hacen parte de un
+   precio al público).
 10. **AIU** — §6.7. No existe el modal (el kernel ya está listo); rediseñar sin porcentajes
     hardcodeados 9/3/5.
 11. **Congelar el formulario de edición si el documento está aprobado** — §6.9. La lista oculta

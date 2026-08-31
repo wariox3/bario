@@ -26,14 +26,14 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { FormArray, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { PopoverModule } from 'primeng/popover';
+import { Popover, PopoverModule } from 'primeng/popover';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -75,6 +75,8 @@ import {
   comercialDetalleToFormValue,
   comercialDetalleToPayload,
   pendienteLineaToFormValue,
+  precioUnitarioConImpuestos,
+  precioUnitarioSinImpuestos,
   lineBruto,
   lineNeto,
   tasaFromImpuestoOption,
@@ -109,6 +111,7 @@ const IMPUESTO_SELECCIONAR_ENDPOINT = '/general/impuesto/seleccionar/';
   selector: 'app-comercial-documento-detalles',
   standalone: true,
   imports: [
+    FormsModule,
     ReactiveFormsModule,
     ButtonModule,
     SplitButtonModule,
@@ -715,6 +718,42 @@ export class ComercialDocumentoDetallesComponent {
     if (catalog.length === 0) return;
     if (group.controls.impuestos_disponibles.value.length > 0) return;
     group.controls.impuestos_disponibles.setValue(catalog);
+  }
+
+  // ── Precio con impuestos incluidos (extraer IVA) ────────────────────────────
+
+  /** Fila cuyo popover de "precio con impuestos" está abierto. */
+  private extraerIvaGroup: ComercialDetalleGroup | null = null;
+  /** Valor tecleado en el popover (precio unitario final, impuestos incluidos). */
+  protected readonly extraerIvaValor = signal<number | null>(null);
+
+  /**
+   * Abre el popover sembrado con el precio final que produce el precio actual
+   * (así se ve de entrada cuánto vale la línea con impuestos). `ensureCatalog`
+   * primero: una línea cargada en edición aún no tiene el pool de tasas y sin él
+   * la inversión sería identidad muda.
+   */
+  protected openExtraerIva(op: Popover, event: Event, group: ComercialDetalleGroup): void {
+    this.ensureCatalog(group);
+    this.extraerIvaGroup = group;
+    this.extraerIvaValor.set(precioUnitarioConImpuestos(group.getRawValue()));
+    op.toggle(event);
+  }
+
+  /** Precio base que produciría el valor tecleado (vista previa en vivo). */
+  protected extraerIvaBase(): number {
+    const group = this.extraerIvaGroup;
+    const valor = this.extraerIvaValor();
+    if (!group || valor == null) return 0;
+    return precioUnitarioSinImpuestos(valor, group.getRawValue());
+  }
+
+  /** Aplica el precio base a la línea; el recompute encadena montos y resumen. */
+  protected applyExtraerIva(op: Popover): void {
+    const group = this.extraerIvaGroup;
+    if (!group) return;
+    group.controls.precio.setValue(this.extraerIvaBase());
+    op.hide();
   }
 
   /** Ejecuta la baja: local en alta/línea no persistida; contra la API en edición. */

@@ -3510,6 +3510,11 @@ export const en: AppDict = {
       detallePlaceholder: 'Note…',
       confirmDeleteLine: 'Remove this line from the document?',
       createItem: 'Create item',
+      extraerIva: {
+        title: 'Tax-inclusive price',
+        baseLabel: 'Base price',
+        apply: 'Apply base price',
+      },
       scanner: {
         placeholder: 'Scan barcode',
         notFound: {
