@@ -84,6 +84,9 @@ export type { EntityActionStrategy, EntityActionContext } from './actions/entity
 export { ENTITY_ACTION_STRATEGY } from './actions/entity-action.token';
 export { ENTITY_ACTION_PROVIDERS } from './actions/entity-action.providers';
 
+// Navegación tras guardar (id del documento en la respuesta del gateway)
+export { extractDocumentoId } from './navigation/extract-documento-id';
+
 // Storage helper
 export { buildEntityStorageKey } from './storage/build-entity-storage-key';
 

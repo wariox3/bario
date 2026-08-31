@@ -21,7 +21,11 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+import {
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { DepreciacionLineasTableComponent } from '../../components/depreciacion-lineas-table/depreciacion-lineas-table.component';
@@ -30,22 +34,6 @@ import type { DepreciacionLineaRead, DepreciacionLineaView } from '../../depreci
 import { depreciacionToFormValue, formValueToPayload } from '../../depreciacion.mapper';
 import type { DepreciacionRead } from '../../depreciacion.model';
 import { DepreciacionService } from '../../depreciacion.service';
-
-/**
- * Saca el id del documento de la respuesta de creación.
- *
- * ⚠️ El gateway devuelve el body crudo del `POST` y **no está verificado** si el
- * backend responde el documento plano o envuelto en `{ documento: … }` (así lo
- * hacía el ERP anterior). Se contemplan las dos formas; si no aparece por
- * ninguna, el llamador cae a la lista en vez de navegar a una URL inválida.
- */
-function extractDocumentoId(saved: unknown): number | null {
-  if (typeof saved !== 'object' || saved === null) return null;
-  const plano = (saved as { id?: unknown }).id;
-  if (typeof plano === 'number') return plano;
-  const envuelto = (saved as { documento?: { id?: unknown } }).documento?.id;
-  return typeof envuelto === 'number' ? envuelto : null;
-}
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Depreciación.
@@ -184,7 +172,7 @@ export class DepreciacionFormComponent implements OnInit {
         this.isSaving.set(false);
         if (id) {
           this.toast.success(toasts.editSuccess.title, toasts.editSuccess.desc);
-          this.navigateToList();
+          this.navigateToDetail(id);
           return;
         }
         // Recién creado: el documento no sirve de nada vacío y cargar los activos
@@ -331,6 +319,11 @@ export class DepreciacionFormComponent implements OnInit {
   /** Vuelve a la lista del documento, derivando tenant y módulo activos. */
   private navigateToList(): void {
     this.navigate(this.document().routes.list);
+  }
+
+  /** Abre la ficha del documento guardado (`routes.detail` + id). */
+  private navigateToDetail(id: string | number): void {
+    this.navigate(this.document().routes.detail, String(id));
   }
 
   /** Entra a editar el documento recién creado, donde se cargan los activos. */

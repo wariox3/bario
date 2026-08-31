@@ -29,7 +29,11 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+import {
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
@@ -232,11 +236,16 @@ export class PagoFormComponent implements OnInit, CanComponentDeactivate {
       : this.gateway.create(this.document(), payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha del documento, para revisar lo que quedó
+        // almacenado. En alta el id sale de la respuesta del backend; si no
+        // viniera, se cae a la lista antes que navegar a una URL inválida.
+        const savedId = id ?? extractDocumentoId(saved);
+        if (savedId != null) this.navigateToDetail(savedId);
+        else this.navigateToList();
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -365,10 +374,28 @@ export class PagoFormComponent implements OnInit, CanComponentDeactivate {
   }
 
   /** Vuelve a la lista del documento, derivando tenant y módulo activos. */
+  /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {
+    this.navigate(this.document().routes.list);
+  }
+
+  /** Abre la ficha del documento guardado (`routes.detail` + id). */
+  private navigateToDetail(id: string | number): void {
+    this.navigate(this.document().routes.detail, String(id));
+  }
+
+  /** Construye la ruta absoluta del documento dentro del tenant y el módulo. */
+  private navigate(routePath: string, extra?: string): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...segments]);
+    const segments = routePath.split('/').filter(Boolean);
+    const commands: (string | number)[] = [
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...segments,
+    ];
+    if (extra) commands.push(extra);
+    void this.router.navigate(commands);
   }
 }
