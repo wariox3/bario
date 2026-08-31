@@ -36,6 +36,7 @@ import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-compra.constants';
+import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
@@ -191,6 +192,16 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
       selectData: this.selectData,
       destroyRef: this.destroyRef,
       endpoint: this.plazoPagoEndpoint,
+    });
+
+    // Al elegir proveedor, adopta su plazo de pago pactado. Cambiar el plazo
+    // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
+    // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
+    setupPlazoPagoDesdeContacto({
+      contacto: this.form.controls.contacto,
+      plazoPago: this.form.controls.plazo_pago,
+      origen: 'proveedor',
+      destroyRef: this.destroyRef,
     });
   }
 

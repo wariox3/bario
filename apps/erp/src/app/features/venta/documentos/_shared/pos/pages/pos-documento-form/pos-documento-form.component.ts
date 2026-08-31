@@ -45,6 +45,7 @@ import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../pos-documento.constan
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
@@ -222,32 +223,21 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
       endpoint: this.plazoPagoEndpoint,
     });
 
-    // Al elegir cliente, adopta su plazo de pago por defecto. Cambiar el plazo
+    // Al elegir cliente, adopta su plazo de pago pactado. Cambiar el plazo
     // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
     // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
-    this.form.controls.contacto.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((contacto) => this.aplicarPlazoDesdeCliente(contacto));
+    setupPlazoPagoDesdeContacto({
+      contacto: this.form.controls.contacto,
+      plazoPago: this.form.controls.plazo_pago,
+      origen: 'cliente',
+      destroyRef: this.destroyRef,
+    });
 
     // Espejo reactivo de las líneas para el total del documento (el total recibido
     // en pagos lo calcula la sección de pagos a partir de su `FormArray`).
     this.form.controls.detalles.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.lines.set(this.form.controls.detalles.getRawValue()));
-  }
-
-  /**
-   * Setea `plazo_pago` con el plazo por defecto del cliente (`plazo_pago_id` del
-   * endpoint `contacto/seleccionar/`). Solo el `id` importa: el `<lib-api-select>`
-   * resuelve la etiqueta contra sus opciones cargadas y el autocálculo del
-   * vencimiento deriva los días. No hace nada si el cliente no trae plazo o si ya
-   * es el seleccionado (evita recomputar en vano).
-   */
-  private aplicarPlazoDesdeCliente(contacto: ErpSelectOption | null): void {
-    const plazoId = contacto?.['plazo_pago_id'];
-    if (typeof plazoId !== 'number') return;
-    if (this.form.controls.plazo_pago.value?.id === plazoId) return;
-    this.form.controls.plazo_pago.setValue({ id: plazoId, nombre: '' });
   }
 
   /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña y la carga). */

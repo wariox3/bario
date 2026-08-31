@@ -34,6 +34,7 @@ import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-c
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
+import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -168,6 +169,18 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
+
+  constructor() {
+    // El plazo lo pacta el proveedor: elegirlo autocompleta el campo. Esta
+    // plantilla no tiene vencimiento propio (lo calculará cada factura que se
+    // genere de ella), así que aquí la regla termina en el plazo.
+    setupPlazoPagoDesdeContacto({
+      contacto: this.form.controls.contacto,
+      plazoPago: this.form.controls.plazo_pago,
+      origen: 'proveedor',
+      destroyRef: this.destroyRef,
+    });
+  }
 
   ngOnInit(): void {
     const id = this.id();
