@@ -39,6 +39,7 @@ import {
   ToastService,
   calcularResumen,
   formatCop,
+  toFiniteNumber,
   type ImpuestoLinea,
   type ParamValue,
   type ResumenDocumento,
@@ -55,6 +56,7 @@ import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import { ErpSelectDataService } from '@reddoc/core';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
+import type { Item } from '@erp/features/general/masters/item/item.model';
 import type { AppDict } from '@erp/i18n';
 import {
   createComercialDetalleGroup,
@@ -533,10 +535,31 @@ export class ComercialDocumentoDetallesComponent {
       .getById(opt.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((item) => {
+        this.applyPrecioCompra(group, opt, item);
         group.controls.impuestos_ids.setValue(
           tasasDelItem(item, this.modo()).map((tasa) => tasa.id),
         );
       });
+  }
+
+  /**
+   * En compra la línea vale el **costo** del ítem, no su precio de venta: el
+   * autocomplete siembra `opt.precio` (venta, lo único que trae `seleccionar/`),
+   * y aquí se corrige con el `costo` que aporta la lectura completa del ítem —
+   * la misma que ya se hace para los impuestos, así que no cuesta red extra.
+   * Un costo en 0 se siembra igual (lo normal: el costo real lo dicta la factura
+   * del proveedor y lo digita la persona), como hacía el ERP anterior.
+   *
+   * Respeta un precio ya tecleado: solo pisa el valor sembrado por el
+   * autocomplete, por si la persona editó el precio en la ventana entre elegir
+   * el ítem y la respuesta de esta consulta.
+   */
+  private applyPrecioCompra(group: ComercialDetalleGroup, opt: ItemOption, item: Item): void {
+    if (this.modo() !== 'compra') return;
+    const costo = toFiniteNumber(item.costo);
+    if (costo == null) return;
+    if (group.controls.precio.value !== opt.precio) return;
+    group.controls.precio.setValue(costo);
   }
 
   /**
