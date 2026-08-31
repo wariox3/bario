@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   EMPTY,
   type Observable,
+  type Subscription,
   defer,
   filter,
   finalize,
@@ -39,6 +40,7 @@ import {
   calcularResumen,
   formatCop,
   type ImpuestoLinea,
+  type ParamValue,
   type ResumenDocumento,
   type TasaImpuesto,
 } from '@reddoc/core';
@@ -202,8 +204,25 @@ export class ComercialDocumentoDetallesComponent {
    */
   private readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
 
+  /**
+   * Filtros del catálogo de impuestos según el `modo`: `?venta=True` o
+   * `?compra=True`. Los comparten el pool de tasas con el que la tabla calcula y
+   * el desplegable con el que la persona elige, para que ofrezcan lo mismo.
+   */
+  protected readonly impuestoParams = computed<Record<string, ParamValue>>(() => ({
+    [this.modo()]: 'True',
+  }));
+
   constructor() {
-    this.loadImpuestosCatalog();
+    // El catálogo depende de `modo`, que es un signal input: leerlo desde el
+    // constructor devuelve siempre el default (`'venta'`) porque el binding aún
+    // no se aplicó — un documento de compra terminaba calculando contra los
+    // impuestos de venta y la línea quedaba sin impuesto. Dentro de un effect se
+    // lee ya bindeado, y de paso recarga si el modo llegara a cambiar.
+    effect((onCleanup) => {
+      const sub = this.loadImpuestosCatalog(this.impuestoParams());
+      onCleanup(() => sub.unsubscribe());
+    });
 
     effect((onCleanup) => {
       const array = this.detalles();
@@ -217,12 +236,14 @@ export class ComercialDocumentoDetallesComponent {
     });
   }
 
-  /** Carga el catálogo de impuestos del `modo` una vez y lo aplica a las filas nuevas. */
-  private loadImpuestosCatalog(): void {
-    this.selectData
-      .fetchOptions<ImpuestoSeleccionarOption>(IMPUESTO_SELECCIONAR_ENDPOINT, {
-        [this.modo()]: 'True',
-      })
+  /**
+   * Carga el catálogo de impuestos acotado a `params` y lo aplica a las filas
+   * nuevas. Devuelve la suscripción para que el effect que lo dispara cancele la
+   * consulta en vuelo si vuelve a correr.
+   */
+  private loadImpuestosCatalog(params: Record<string, ParamValue>): Subscription {
+    return this.selectData
+      .fetchOptions<ImpuestoSeleccionarOption>(IMPUESTO_SELECCIONAR_ENDPOINT, params)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (options) => {

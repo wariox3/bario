@@ -170,7 +170,10 @@
                   <span class="text-[0.72rem] font-semibold text-brand-text">
                     {{ t().entities.comercialDetalle.impuestosTitle }}
                   </span>
-                  <app-impuesto-select [formControl]="row.controls.impuestos_ids" />
+                  <app-impuesto-select
+                    [formControl]="row.controls.impuestos_ids"
+                    [params]="impuestoParams()"
+                  />
                 </div>
               </p-popover>
             </td>
