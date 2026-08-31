@@ -364,9 +364,12 @@ Ordenados por impacto:
    precio al público).
 10. **AIU** — §6.7. No existe el modal (el kernel ya está listo); rediseñar sin porcentajes
     hardcodeados 9/3/5.
-11. **Congelar el formulario de edición si el documento está aprobado** — §6.9. La lista oculta
-    editar, pero la URL directa de edición no valida `estado_aprobado` (el backend rechazará el
-    guardado; UX mejorable, impacto menor).
+11. ~~**Congelar el formulario de edición si el documento está aprobado**~~ — §6.9. **Falso
+    gap** (fe de erratas de esta auditoría, verificado el 2026-08-31): la URL directa SÍ está
+    cubierta — `editableDocumentResolver` corre en la ruta `editar/:id`, evalúa la misma política
+    `canEditRow: (row) => !row.estado_aprobado` que la lista y el detalle, y ante un aprobado
+    avisa con toast y redirige al detalle sin montar el form. Los 25 configs de documentos la
+    declaran (solo los de humano no, por su ciclo de vida propio).
 
 ### 8.3 Diferencias de diseño deliberadas (no son gaps)
 
