@@ -6,6 +6,7 @@ import {
   forwardRef,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -88,7 +89,23 @@ export function toItemOption(row: ItemApiRow): ItemOption {
       [showClear]="true"
       appendTo="body"
       autocomplete="off"
-    />
+    >
+      @if (allowCreate()) {
+        <!-- Pie del panel: alta inline. El preventDefault del mousedown evita que
+             el blur del input dispare la reconciliación antes de que llegue el click. -->
+        <ng-template #footer>
+          <button
+            type="button"
+            class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-3 py-2 text-[0.8rem] font-medium text-sky-700 transition-colors hover:bg-sky-50"
+            (mousedown)="$event.preventDefault()"
+            (click)="onCreateClick()"
+          >
+            <i class="pi pi-plus text-[0.7rem]"></i>
+            {{ createLabel() }}
+          </button>
+        </ng-template>
+      }
+    </p-autocomplete>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -108,6 +125,15 @@ export class ErpItemAutocompleteComponent implements ControlValueAccessor {
   readonly inputId = input<string>('');
   readonly placeholder = input<string>('Buscar ítem…');
   readonly invalid = input<boolean>(false);
+
+  /**
+   * Muestra "crear ítem" al pie del panel de sugerencias. El autocomplete solo
+   * **emite** `createRequested`: el alta (modal, permisos, selección del creado)
+   * es del consumidor — así este componente de `core` no conoce el master.
+   */
+  readonly allowCreate = input<boolean>(false);
+  readonly createLabel = input<string>('Crear ítem');
+  readonly createRequested = output<void>();
 
   readonly value = signal<ItemOption | null>(null);
   readonly disabled = signal(false);
@@ -211,6 +237,12 @@ export class ErpItemAutocompleteComponent implements ControlValueAccessor {
 
   onSearch(event: AutoCompleteCompleteEvent): void {
     this.query$.next(event.query?.trim() ?? '');
+  }
+
+  /** Cierra el panel y delega el alta en el consumidor. */
+  protected onCreateClick(): void {
+    this.ac?.hide();
+    this.createRequested.emit();
   }
 
   /**

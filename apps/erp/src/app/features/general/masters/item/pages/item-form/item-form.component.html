@@ -1,4 +1,6 @@
-<lib-breadcrumb [items]="breadcrumbItems()" />
+@if (!isModal) {
+  <lib-breadcrumb [items]="breadcrumbItems()" />
+}
 
 <form
   [formGroup]="form"
@@ -7,26 +9,44 @@
   autocomplete="off"
   class="flex flex-col gap-5"
 >
-  <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
-  <lib-page-actions>
-    <p-button
-      type="button"
-      [label]="t().common.actions.back"
-      icon="pi pi-arrow-left"
-      severity="secondary"
-      [outlined]="true"
-      size="small"
-      (onClick)="onCancel()"
-    />
-    <p-button
-      type="submit"
-      [label]="t().common.actions.save"
-      size="small"
-      icon="pi pi-check"
-      [loading]="isSaving()"
-      [disabled]="isSaving()"
-    />
-  </lib-page-actions>
+  <!-- ── Barra de acciones (página) / encabezado (modal) ───────────────────── -->
+  @if (isModal) {
+    <!-- El frame `erp-action-dialog` no trae header propio: se pinta aquí. -->
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="m-0 text-[1rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.item.form.createTitle }}
+      </h2>
+      <p-button
+        type="button"
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        size="small"
+        [ariaLabel]="t().common.actions.cancel"
+        (onClick)="onCancel()"
+      />
+    </div>
+  } @else {
+    <lib-page-actions>
+      <p-button
+        type="button"
+        [label]="t().common.actions.back"
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onCancel()"
+      />
+      <p-button
+        type="submit"
+        [label]="t().common.actions.save"
+        size="small"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        [disabled]="isSaving()"
+      />
+    </lib-page-actions>
+  }
   <!-- ── Sección 1: Información principal ──────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
@@ -334,4 +354,25 @@
       </div>
     </div>
   </section>
+  @if (isModal) {
+    <!-- Pie del modal: mismas acciones que la barra de página. -->
+    <div class="flex items-center justify-end gap-2">
+      <p-button
+        type="button"
+        [label]="t().common.actions.cancel"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onCancel()"
+      />
+      <p-button
+        type="submit"
+        [label]="t().common.actions.save"
+        size="small"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        [disabled]="isSaving()"
+      />
+    </div>
+  }
 </form>

@@ -311,6 +311,39 @@ export class ComercialDocumentoDetallesComponent {
     this.detalles().push(createComercialDetalleGroup());
   }
 
+  /**
+   * Alta de ítem inline desde una línea: abre el formulario del master como
+   * modal (lazy) y, con el ítem creado, lo selecciona en **esa** fila — de ahí
+   * corre la tubería normal de una selección (precio pactado + impuestos). Se
+   * apaga `dismissableMask`: un clic afuera no debe descartar un form a medias.
+   */
+  protected onCreateItem(group: ComercialDetalleGroup): void {
+    from(import('@erp/features/general/masters/item/pages/item-form/item-form.component'))
+      .pipe(
+        switchMap(({ ItemFormComponent }) => {
+          const ref = this.dialog.open(ItemFormComponent, {
+            ...ENTITY_ACTION_DIALOG_DEFAULTS,
+            dismissableMask: false,
+            width: 'min(70rem, 95vw)',
+            contentStyle: { 'max-height': '86vh', overflow: 'auto' },
+          });
+          return ref ? ref.onClose : EMPTY;
+        }),
+        filter((created: unknown): created is Item => created != null),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((created) => {
+        group.controls.item.setValue(
+          toItemOption({
+            id: created.id,
+            codigo: created.codigo ?? undefined,
+            nombre: created.nombre,
+            precio: created.precio,
+          }),
+        );
+      });
+  }
+
   /** Enter en el input del lector: encola el código escaneado. */
   protected onScan(event: Event): void {
     const input = event.target as HTMLInputElement;

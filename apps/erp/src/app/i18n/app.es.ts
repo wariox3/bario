@@ -3569,6 +3569,7 @@ export const es: AppDict = {
       itemPlaceholder: 'Buscar ítem…',
       detallePlaceholder: 'Nota…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
+      createItem: 'Crear ítem',
       scanner: {
         placeholder: 'Escanear código de barras',
         notFound: {

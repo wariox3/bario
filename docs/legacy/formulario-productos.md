@@ -345,7 +345,12 @@ Ordenados por impacto:
    línea y dispara la tubería normal (precio pactado + impuestos). Exige coincidencia **exacta**
    de código (o resultado único) — a diferencia del legacy, que tomaba el primer parcial.
    Habilitado en factura de venta (paridad); sumar POS u otro es un atributo.
-6. **Crear ítem inline desde la línea** — §6.2. No existe; hoy toca salir al master de ítems.
+6. ~~**Crear ítem inline desde la línea**~~ — §6.2. **Corregido el 2026-08-31**: el
+   autocomplete de ítems ofrece "crear ítem" al pie del panel (emite `createRequested`; el alta
+   es del consumidor, `core` no conoce el master) y la tabla comercial abre el formulario del
+   master como **modal** (el mismo `ItemFormComponent`, ahora dual página/modal vía
+   `DynamicDialogRef` opcional); el ítem creado queda seleccionado en la fila y corre la tubería
+   normal (precio pactado + impuestos).
 7. **Almacén por línea** — §6.5. No existe en la tabla comercial nueva.
 8. **Grupo contable por línea en compra** — §6.5. No existe.
 9. **Extraer IVA / precio con IVA incluido** — §6.8. No existe.

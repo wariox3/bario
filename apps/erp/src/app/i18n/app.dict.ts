@@ -2699,6 +2699,7 @@ export interface AppDict
       itemPlaceholder: string;
       detallePlaceholder: string;
       confirmDeleteLine: string;
+      createItem: string;
       scanner: {
         placeholder: string;
         notFound: { title: string; desc: string };

@@ -3509,6 +3509,7 @@ export const en: AppDict = {
       itemPlaceholder: 'Search item…',
       detallePlaceholder: 'Note…',
       confirmDeleteLine: 'Remove this line from the document?',
+      createItem: 'Create item',
       scanner: {
         placeholder: 'Scan barcode',
         notFound: {

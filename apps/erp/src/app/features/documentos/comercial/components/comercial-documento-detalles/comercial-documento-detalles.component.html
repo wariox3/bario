@@ -119,6 +119,9 @@
                 formControlName="item"
                 [placeholder]="t().entities.comercialDetalle.itemPlaceholder"
                 [invalid]="row.controls.item.invalid && row.controls.item.touched"
+                [allowCreate]="true"
+                [createLabel]="t().entities.comercialDetalle.createItem"
+                (createRequested)="onCreateItem(row)"
               />
             </td>
 
