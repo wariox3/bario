@@ -3509,6 +3509,17 @@ export const en: AppDict = {
       itemPlaceholder: 'Search item…',
       detallePlaceholder: 'Note…',
       confirmDeleteLine: 'Remove this line from the document?',
+      scanner: {
+        placeholder: 'Scan barcode',
+        notFound: {
+          title: 'Code not found',
+          desc: 'No item matches the scanned code',
+        },
+        ambiguous: {
+          title: 'Ambiguous code',
+          desc: 'Several items match and none exactly; search for the item manually',
+        },
+      },
       columns: {
         linea: '#',
         ref: 'Ref',

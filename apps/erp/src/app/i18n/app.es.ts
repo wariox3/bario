@@ -3569,6 +3569,17 @@ export const es: AppDict = {
       itemPlaceholder: 'Buscar ítem…',
       detallePlaceholder: 'Nota…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
+      scanner: {
+        placeholder: 'Escanear código de barras',
+        notFound: {
+          title: 'Código no encontrado',
+          desc: 'Ningún ítem coincide con el código escaneado',
+        },
+        ambiguous: {
+          title: 'Código ambiguo',
+          desc: 'Varios ítems coinciden y ninguno es exacto; busca el ítem a mano',
+        },
+      },
       columns: {
         linea: '#',
         ref: 'Ref',

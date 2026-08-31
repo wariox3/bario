@@ -339,8 +339,12 @@ Ordenados por impacto:
    `documento__contacto_id`; el legacy fijaba además el **tipo** origen (p. ej. remisiones = 29) y
    aprobado/pendiente. Verificar qué garantiza `pendiente/` server-side; si no discrimina tipo, una
    factura podría listar pendientes de documentos que no debería facturar.
-5. **Lector de código de barras** — §6.1. No existe (flujo pistola: Enter → busca → agrega →
-   re-enfoca). Relevante para POS y bodega.
+5. ~~**Lector de código de barras**~~ — §6.1. **Corregido el 2026-08-31**: input opcional en la
+   barra de la tabla comercial (`scannerEnabled`); Enter resuelve el código contra
+   `item/seleccionar/?search=` (cola `concatMap`: varios escaneos seguidos no se pisan), agrega la
+   línea y dispara la tubería normal (precio pactado + impuestos). Exige coincidencia **exacta**
+   de código (o resultado único) — a diferencia del legacy, que tomaba el primer parcial.
+   Habilitado en factura de venta (paridad); sumar POS u otro es un atributo.
 6. **Crear ítem inline desde la línea** — §6.2. No existe; hoy toca salir al master de ítems.
 7. **Almacén por línea** — §6.5. No existe en la tabla comercial nueva.
 8. **Grupo contable por línea en compra** — §6.5. No existe.

@@ -12,8 +12,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   EMPTY,
   type Observable,
+  Subject,
   type Subscription,
   catchError,
+  concatMap,
   defer,
   filter,
   finalize,
@@ -53,7 +55,12 @@ import {
 } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import {
+  ITEM_SELECCIONAR_ENDPOINT,
+  toItemOption,
+  type ItemApiRow,
+  type ItemOption,
+} from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import { ErpSelectDataService } from '@reddoc/core';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
@@ -170,6 +177,13 @@ export class ComercialDocumentoDetallesComponent {
   readonly precioListaId = input<number | null>(null);
 
   /**
+   * Habilita el lector de código de barras en la barra de la tabla (flujo
+   * pistola: Enter agrega la línea y el input queda listo para el siguiente
+   * escaneo). Lo activa cada documento donde se factura escaneando.
+   */
+  readonly scannerEnabled = input<boolean>(false);
+
+  /**
    * Avisa al padre que se importaron líneas en **edición** (ya persistidas vía
    * `masivo/`) para que recargue el documento y refresque el `FormArray` con los
    * ids y montos autoritativos del backend.
@@ -218,6 +232,13 @@ export class ComercialDocumentoDetallesComponent {
   private readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
 
   /**
+   * Cola de escaneos del lector. `concatMap` los resuelve **en orden**: una
+   * pistola puede disparar varios códigos seguidos y cada uno debe agregar su
+   * línea sin pisar la consulta del anterior.
+   */
+  private readonly scan$ = new Subject<{ codigo: string; input: HTMLInputElement }>();
+
+  /**
    * Filtros del catálogo de impuestos según el `modo`: `?venta=True` o
    * `?compra=True`. Los comparten el pool de tasas con el que la tabla calcula y
    * el desplegable con el que la persona elige, para que ofrezcan lo mismo.
@@ -236,6 +257,20 @@ export class ComercialDocumentoDetallesComponent {
       const sub = this.loadImpuestosCatalog(this.impuestoParams());
       onCleanup(() => sub.unsubscribe());
     });
+
+    this.scan$
+      .pipe(
+        concatMap(({ codigo, input }) =>
+          this.selectData
+            .fetchOptions<ItemApiRow>(ITEM_SELECCIONAR_ENDPOINT, { search: codigo })
+            .pipe(
+              map((rows) => ({ rows, codigo, input })),
+              catchError(() => of({ rows: [] as readonly ItemApiRow[], codigo, input })),
+            ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(({ rows, codigo, input }) => this.applyScan(rows, codigo, input));
 
     effect((onCleanup) => {
       const array = this.detalles();
@@ -274,6 +309,45 @@ export class ComercialDocumentoDetallesComponent {
 
   protected addLinea(): void {
     this.detalles().push(createComercialDetalleGroup());
+  }
+
+  /** Enter en el input del lector: encola el código escaneado. */
+  protected onScan(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const codigo = input.value.trim();
+    if (codigo) this.scan$.next({ codigo, input });
+  }
+
+  /**
+   * Resuelve un escaneo contra los ítems que `?search=` devolvió (busca por
+   * nombre, código y referencia): manda la coincidencia **exacta** de código y,
+   * si no la hay, un único resultado se acepta. Varios resultados sin exacto se
+   * rechazan — a diferencia del legacy, que tomaba el primero: con `search`
+   * barriendo también nombre y referencia, "el primero" puede ser cualquier
+   * cosa, y una línea equivocada muda es peor que pedir la búsqueda manual.
+   *
+   * Con ítem resuelto agrega la línea y le setea la opción: de ahí en adelante
+   * corre la tubería normal de una selección (precio del ítem → lista/costo →
+   * impuestos). El input se limpia para el siguiente escaneo; si falla, el
+   * código queda **seleccionado**: legible para la persona y listo para que el
+   * próximo disparo de la pistola lo reemplace.
+   */
+  private applyScan(rows: readonly ItemApiRow[], codigo: string, input: HTMLInputElement): void {
+    const exacto = rows.find((row) => row.codigo === codigo);
+    const row = exacto ?? (rows.length === 1 ? rows[0] : undefined);
+    if (!row) {
+      const toasts = this.t().entities.comercialDetalle.scanner;
+      const toast = rows.length > 1 ? toasts.ambiguous : toasts.notFound;
+      this.toast.warn(toast.title, toast.desc);
+      input.select();
+      return;
+    }
+    this.addLinea();
+    // El push emite `valueChanges` sincrónico: el efecto de arriba ya cableó la
+    // fila nueva, así que setear el ítem dispara la tubería completa.
+    const group = this.detalles().at(this.detalles().length - 1);
+    group.controls.item.setValue(toItemOption(row));
+    input.value = '';
   }
 
   /**

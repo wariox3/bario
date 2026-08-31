@@ -27,9 +27,9 @@ export interface ItemOption extends ErpSelectOption {
 
 /**
  * Fila cruda del endpoint `general/item/seleccionar/`. `precio` llega como
- * string con cola de ceros (`"120600.000000"`); se normaliza en `toOption`.
+ * string con cola de ceros (`"120600.000000"`); se normaliza en `toItemOption`.
  */
-interface ItemApiRow {
+export interface ItemApiRow {
   readonly id: number;
   readonly codigo?: string;
   readonly nombre?: string;
@@ -37,13 +37,17 @@ interface ItemApiRow {
 }
 
 /** Endpoint de selección de ítems. */
-const ENDPOINT = '/general/item/seleccionar/';
+export const ITEM_SELECCIONAR_ENDPOINT = '/general/item/seleccionar/';
 
 /** Debounce del autocomplete (ms). Lo usa la plantilla y el timer de reapertura. */
 const DELAY_MS = 300;
 
-/** Construye la opción `{ id, nombre: 'código - nombre', precio }`. */
-function toOption(row: ItemApiRow): ItemOption {
+/**
+ * Construye la opción `{ id, nombre: 'código - nombre', precio }`. Exportado
+ * para quien agrega ítems por fuera del autocomplete (p. ej. el lector de
+ * código de barras) y necesita el mismo shape/etiqueta en la línea.
+ */
+export function toItemOption(row: ItemApiRow): ItemOption {
   const label = [row.codigo, row.nombre].filter(Boolean).join(' - ');
   return { id: row.id, nombre: label || row.nombre || '', precio: toFiniteNumber(row.precio) ?? 0 };
 }
@@ -228,9 +232,11 @@ export class ErpItemAutocompleteComponent implements ControlValueAccessor {
   }
 
   private fetchItems(query: string) {
-    return this.dataService.fetchOptions<ItemApiRow>(ENDPOINT, { search: query }).pipe(
-      takeUntilDestroyed(this.destroyRef),
-      map((rows) => rows.map(toOption)),
-    );
+    return this.dataService
+      .fetchOptions<ItemApiRow>(ITEM_SELECCIONAR_ENDPOINT, { search: query })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((rows) => rows.map(toItemOption)),
+      );
   }
 }

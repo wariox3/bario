@@ -3,6 +3,25 @@
 <div class="flex flex-col gap-4">
   <!-- Toolbar -->
   <div class="flex items-center justify-end gap-2">
+    @if (scannerEnabled()) {
+      <!-- Lector de código de barras (flujo pistola): Enter agrega la línea y el
+           input queda enfocado para el siguiente escaneo. -->
+      <span class="relative mr-auto">
+        <i
+          class="pi pi-barcode absolute top-1/2 left-2.5 -translate-y-1/2 text-[0.8rem] text-brand-muted"
+        ></i>
+        <input
+          pInputText
+          type="text"
+          class="w-56 !pl-8"
+          pSize="small"
+          [placeholder]="t().entities.comercialDetalle.scanner.placeholder"
+          [attr.aria-label]="t().entities.comercialDetalle.scanner.placeholder"
+          (keydown.enter)="$event.preventDefault(); onScan($event)"
+          autocomplete="off"
+        />
+      </span>
+    }
     @if (documentId() !== null && pendingCount() > 0) {
       <span
         class="mr-auto inline-flex items-center gap-1.5 text-[0.74rem] font-medium text-amber-600"
