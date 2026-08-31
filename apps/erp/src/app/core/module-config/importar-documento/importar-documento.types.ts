@@ -18,6 +18,13 @@ export interface LineaPendienteImpuesto {
   readonly impuesto_porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.00"`. */
   readonly impuesto_porcentaje_base?: string | null;
+  /**
+   * Operación sobre el total: `1` suma, `-1` resta (retención). El serializador
+   * de `pendiente/` aún no la documenta (schema verificado el 2026-08-31): si no
+   * llega, el mapper asume `1` y una retención importada no resta — gap a
+   * confirmar con el backend.
+   */
+  readonly impuesto_operacion?: number | null;
 }
 
 /**

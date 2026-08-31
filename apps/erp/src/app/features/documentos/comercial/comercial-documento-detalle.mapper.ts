@@ -84,6 +84,7 @@ export function tasaFromImpuestoOption(opt: ImpuestoSeleccionarOption): TasaImpu
     nombre: opt.nombre,
     porcentaje: parseFloat(opt.porcentaje ?? '0'),
     porcentajeBase: parseFloat(opt.porcentaje_base ?? '100'),
+    operacion: opt.operacion ?? 1,
   };
 }
 
@@ -110,6 +111,7 @@ export function tasasDelItem(
       nombre: imp.impuesto_nombre ?? '',
       porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
       porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+      operacion: imp.impuesto_operacion ?? 1,
     }));
 }
 
@@ -158,6 +160,9 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     nombre: imp.impuesto_nombre ?? '',
     porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
     porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+    // El serializador de pendientes aún no manda la operación: default suma
+    // (una retención importada quedaría positiva — gap del backend, reportado).
+    operacion: imp.impuesto_operacion ?? 1,
   }));
   const base = (cantidad ?? 0) * precio;
   return {

@@ -347,6 +347,7 @@ export class ServicioDocumentoDetalleModalComponent {
           nombre: imp.impuesto_nombre ?? '',
           porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
           porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+          operacion: imp.impuesto_operacion ?? 1,
         }));
       group.controls.impuestos_totales.setValue(calcularImpuestosLinea(subtotal, tasas));
     }

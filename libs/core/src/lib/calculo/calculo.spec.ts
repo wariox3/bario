@@ -4,6 +4,13 @@ import type { LineaCalculo, TasaImpuesto } from './calculo.types';
 const IVA_19: TasaImpuesto = { id: 1, nombre: 'IVA 19%', porcentaje: 19, porcentajeBase: 100 };
 const IVA_AIU: TasaImpuesto = { id: 2, nombre: 'IVA AIU', porcentaje: 19, porcentajeBase: 10 };
 const RETE: TasaImpuesto = { id: 3, nombre: 'ReteFuente', porcentaje: 2.5, porcentajeBase: 100 };
+const RETE_OPERADA: TasaImpuesto = {
+  id: 3,
+  nombre: 'ReteFuente',
+  porcentaje: 2.5,
+  porcentajeBase: 100,
+  operacion: -1,
+};
 
 describe('redondearMoneda', () => {
   it('redondea a entero (COP sin decimales)', () => {
@@ -43,6 +50,25 @@ describe('calcularImpuestosLinea', () => {
 
   it('sin tasas devuelve lista vacía', () => {
     expect(calcularImpuestosLinea(1_000_000, [])).toEqual([]);
+  });
+
+  it('una retención (operacion −1) produce monto negativo: 1.000.000 × 2.5% × −1 = −25.000', () => {
+    expect(calcularImpuestosLinea(1_000_000, [RETE_OPERADA])).toEqual([
+      { id: 3, nombre: 'ReteFuente', total: -25_000 },
+    ]);
+  });
+
+  it('sin operacion declarada asume 1 (suma), compatible con tasas existentes', () => {
+    expect(calcularImpuestosLinea(1_000_000, [RETE])).toEqual([
+      { id: 3, nombre: 'ReteFuente', total: 25_000 },
+    ]);
+  });
+
+  it('IVA y retención conviven en la línea con sus signos', () => {
+    expect(calcularImpuestosLinea(1_000_000, [IVA_19, RETE_OPERADA])).toEqual([
+      { id: 1, nombre: 'IVA 19%', total: 190_000 },
+      { id: 3, nombre: 'ReteFuente', total: -25_000 },
+    ]);
   });
 
   it('porcentaje 0 produce monto 0', () => {
@@ -97,6 +123,25 @@ describe('calcularResumen', () => {
       { id: 3, nombre: 'ReteFuente', total: 25_000 },
     ]);
     expect(r.total).toBe(1_215_000);
+  });
+
+  it('las retenciones (montos negativos) restan del total y se ven negativas en el desglose', () => {
+    // 1.000.000 + IVA 190.000 − ReteFuente 25.000 = 1.165.000
+    const lineas: LineaCalculo[] = [
+      {
+        base: 1_000_000,
+        impuestos: [
+          { id: 1, nombre: 'IVA 19%', total: 190_000 },
+          { id: 3, nombre: 'ReteFuente', total: -25_000 },
+        ],
+      },
+    ];
+    const r = calcularResumen(lineas);
+    expect(r.impuestos).toEqual([
+      { id: 1, nombre: 'IVA 19%', total: 190_000 },
+      { id: 3, nombre: 'ReteFuente', total: -25_000 },
+    ]);
+    expect(r.total).toBe(1_165_000);
   });
 
   it('resta el descuento del total', () => {

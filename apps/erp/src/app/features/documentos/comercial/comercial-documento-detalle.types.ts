@@ -14,6 +14,8 @@ export interface ImpuestoSeleccionarOption {
   readonly porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.00"`. */
   readonly porcentaje_base?: string | null;
+  /** Operación sobre el total: `1` suma, `-1` resta (retención). */
+  readonly operacion?: number | null;
 }
 
 /**
