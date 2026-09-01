@@ -3565,9 +3565,6 @@ export const es: AppDict = {
       },
     },
     vencimiento: {
-      desdeEmision: 'desde la emisión',
-      contado: 'Contado',
-      contadoHint: 'vence el mismo día',
       desvio: {
         mas: {
           one: '1 día más que el plazo ({dias} d)',

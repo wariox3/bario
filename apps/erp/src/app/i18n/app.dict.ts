@@ -2696,9 +2696,6 @@ export interface AppDict
       };
     };
     vencimiento: {
-      desdeEmision: string;
-      contado: string;
-      contadoHint: string;
       desvio: {
         mas: { one: string; other: string };
         menos: { one: string; other: string };

@@ -1,29 +1,16 @@
 @if (!vacio()) {
   @let d = t().entities.vencimiento;
 
-  @if (desviado()) {
-    <!-- Desviada: ámbar, de cuánto es la diferencia y cómo volver. -->
-    <p class="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-[0.72rem] text-amber-700">
-      <i class="pi pi-exclamation-circle text-[0.7rem]" aria-hidden="true"></i>
-      <span>{{ mensajeDesvio() }}</span>
-      <button
-        type="button"
-        class="rounded-[5px] px-1 py-0.5 font-medium underline decoration-amber-700/40 underline-offset-2 transition-colors hover:bg-amber-50 hover:decoration-amber-700"
-        [title]="d.usarTitle"
-        (click)="restablecer.emit()"
-      >
-        {{ etiquetaRestablecer() }}
-      </button>
-    </p>
-  } @else {
-    <!-- En reposo: la ficha lleva el dato, el texto su origen. -->
-    <p class="flex flex-wrap items-baseline gap-x-1.5 text-[0.72rem] text-brand-muted">
-      <span
-        class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-1.5 py-0.5 font-mono text-[0.7rem] font-semibold tabular-nums text-brand-text"
-      >
-        {{ dias() === 0 ? d.contado : dias() + ' d' }}
-      </span>
-      {{ dias() === 0 ? d.contadoHint : d.desdeEmision }}
-    </p>
-  }
+  <p class="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-[0.72rem] text-amber-700">
+    <i class="pi pi-exclamation-circle text-[0.7rem]" aria-hidden="true"></i>
+    <span>{{ mensajeDesvio() }}</span>
+    <button
+      type="button"
+      class="rounded-[5px] px-1 py-0.5 font-medium underline decoration-amber-700/40 underline-offset-2 transition-colors hover:bg-amber-50 hover:decoration-amber-700"
+      [title]="d.usarTitle"
+      (click)="restablecer.emit()"
+    >
+      {{ etiquetaRestablecer() }}
+    </button>
+  </p>
 }

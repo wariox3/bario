@@ -3,18 +3,14 @@ import { formatFechaCorta, I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 
 /**
- * Nota bajo el campo de vencimiento: cuenta **de dónde salió la fecha**.
+ * Aviso bajo el campo de vencimiento cuando la fecha **se apartó del plazo**.
  *
  * Un vencimiento no es un dato que la persona invente: lo dicta el plazo pactado
  * con el contacto. Pero la factura que está digitando llega con su propia fecha
  * impresa y puede no coincidir —el papel manda—, así que el campo queda editable
- * y esta nota es la que hace visible la relación:
- *
- * - **En reposo** (coincide con el plazo) dice cuántos días aporta el plazo. Es
- *   la prueba en pantalla de que el plazo del contacto entró y calculó; sin ella
- *   el autocálculo es invisible y se lee como que no funcionó.
- * - **Desviada** (editada a mano, o un documento viejo cuyo plazo cambió) se
- *   pone ámbar, dice de cuánto es la diferencia y ofrece volver al calculado.
+ * y este aviso es el que hace visible la diferencia: cuando la fecha no es la que
+ * dicta el plazo (editada a mano, o un documento viejo cuyo plazo ya cambió) dice
+ * de cuánto es y ofrece volver al calculado. Mientras coinciden, calla.
  *
  * Ámbar y no rojo, y sin invalidar el formulario: apartarse del plazo es una
  * excepción legítima del negocio, no un error. Lo imposible —vencer antes de
@@ -51,14 +47,14 @@ export class VencimientoHintComponent {
 
   protected readonly restablecer = output<void>();
 
-  /** Se apartó del plazo: hay con qué comparar y no coincide. */
-  protected readonly desviado = computed(() => {
+  /**
+   * Nada que avisar: la fecha coincide con la que dicta el plazo, no hay con qué
+   * compararla, o el campo ya está mostrando un error propio.
+   */
+  readonly vacio = computed(() => {
     const desvio = this.desvio();
-    return desvio != null && desvio !== 0;
+    return this.silenciar() || desvio == null || desvio === 0;
   });
-
-  /** Nada que contar: sin días del plazo no hay origen que explicar. */
-  readonly vacio = computed(() => this.silenciar() || this.dias() == null);
 
   /** `+5` → "5 días más que el plazo (30 d)"; `-5` → "…menos…". */
   protected readonly mensajeDesvio = computed(() => {

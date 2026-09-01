@@ -429,20 +429,20 @@ Dos formas de la misma falla, ambas ya corregidas en la raíz:
 la respuesta es sí, su host tiene que saber desaparecer. Vale igual para `space-y-*`, que aplica
 márgenes con `> * + *` y también cuenta al elemento vacío.
 
-## Patrón: nota de origen bajo un campo derivado (vencimiento)
+## Patrón: aviso de desvío en un campo derivado (vencimiento)
 
 `features/documentos/comercial/components/vencimiento-hint/` — cuando el valor de un campo lo
 **deriva** el sistema de otros dos (aquí `fecha_vence = fecha + días del plazo de pago`) pero la
-persona puede sobrescribirlo, el campo tiene que contar de dónde salió su valor. Sin eso el
-autocálculo es invisible y se reporta como que no funciona (fue el caso: «no carga el plazo de
-pago», con el plazo cargando bien).
+persona puede sobrescribirlo, el campo avisa cuando el valor dejó de ser el derivado.
 
-- **Una línea bajo el campo**, en el hueco del `lib-field-error`, de alto constante entre estados
-  (que la caja no cambie es la misma regla de `<lib-page-actions>`).
-- **En reposo:** ficha mono con el dato (`30 d`) + texto muted con su origen (`desde la emisión`).
-  Es el idioma «ficha navy = tiene valor» de la tira calendario, aplicado a un campo.
-- **Desviado:** `text-amber-700` + `pi pi-exclamation-circle`, de cuánto es la diferencia, y un
-  botón que **nombra la fecha** a la que vuelve (`Usar 15/09/2026`) — no un genérico «restablecer».
+- **Solo habla cuando hay algo que decir.** Mientras la fecha coincide con la que dicta el plazo,
+  el componente no renderiza nada (y su host desaparece, ver la regla de la ranura). Se probó
+  también una nota permanente que explicaba el origen del valor en reposo; se descartó por ruido:
+  una línea fija bajo un campo que casi siempre está en su estado normal cuesta atención todos los
+  días para explicar algo que casi nunca sorprende.
+- **Desviado:** una línea `text-amber-700` + `pi pi-exclamation-circle` con de cuánto es la
+  diferencia (y contra qué plazo), y un botón que **nombra la fecha** a la que vuelve
+  (`Usar 15/09/2026`) — no un genérico «restablecer».
 - **Ámbar, no rojo, y sin invalidar el form:** apartarse de la condición pactada es una excepción
   legítima del negocio (la factura del proveedor llega con su fecha impresa y manda). El rojo se
   reserva para lo imposible — aquí, vencer antes de emitir, que sí es un validator duro.
@@ -451,6 +451,9 @@ pago», con el plazo cargando bien).
 - **El estado lo expone la lógica, no el componente:** `setupVencimientoAutocompute` devuelve
   `{ diasPlazo, sugerido, desvio, restablecer }` y el hint es tonto. Así los 6 formularios
   comerciales lo heredan sin repetir nada.
+- **Contrapartida a tener presente:** sin señal en reposo, que el autocálculo funcione sigue siendo
+  invisible — que fue justo lo que se reportó como «no carga el plazo de pago». Si el reporte
+  vuelve, el lugar donde mostrarlo es el campo del plazo, no el del vencimiento.
 
 ## i18n
 

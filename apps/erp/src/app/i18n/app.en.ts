@@ -3505,9 +3505,6 @@ export const en: AppDict = {
       },
     },
     vencimiento: {
-      desdeEmision: 'from the issue date',
-      contado: 'Cash',
-      contadoHint: 'due on the issue date',
       desvio: {
         mas: {
           one: '1 day later than the term ({dias} d)',
