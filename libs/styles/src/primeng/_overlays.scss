@@ -1,0 +1,28 @@
+// Los overlays no ocupan lugar en el flujo.
+//
+// Un `<p-dialog>` / `<p-confirmdialog>` cerrado no pinta nada, pero su elemento
+// **sigue existiendo en el DOM**: Angular vacía el contenido, no borra el host.
+// Y casi toda página del ERP es un `display:flex` con `gap` (`:host` de la
+// página, o el `flex flex-col gap-*` de un campo), donde el `gap` se cobra por
+// posición y no por contenido — un item de 0×0 separa igual a sus dos vecinos.
+// Resultado: dos overlays declarados entre el encabezado y la primera card
+// empujan la card `2 × gap` hacia abajo, sin nada visible que lo explique.
+//
+// `display: contents` hace que el elemento no genere caja propia: cerrado no
+// cuesta nada, y abierto tampoco cambia nada, porque la máscara del diálogo es
+// `position: fixed` y no participa del flujo de ningún modo.
+//
+// Va fuera de `@layer` por la misma razón que `_button.scss`: PrimeNG emite en
+// `@layer primeng` y las reglas sin capa ganan sin pelear especificidad.
+//
+// Un componente propio que envuelva un overlay (`app-*-modal`) necesita lo
+// mismo en su `:host` — esta regla alcanza al `<p-dialog>` de adentro, no al
+// wrapper. Ver `.interface-design/system.md`.
+p-confirmdialog,
+p-dialog,
+p-drawer,
+p-toast,
+p-popover,
+p-confirmpopup {
+  display: contents;
+}

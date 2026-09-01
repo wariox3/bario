@@ -40,6 +40,7 @@ import { CuentaService } from '../../cuenta.service';
   ],
   providers: [ConfirmationService],
   templateUrl: './trasladar-movimientos-modal.component.html',
+  styles: ':host { display: contents; }',
 })
 export class TrasladarMovimientosModalComponent {
   private readonly fb = inject(FormBuilder);
