@@ -16,6 +16,20 @@ describe('formatTelefono', () => {
     expect(formatTelefono('573105551234')).toBe('573105551234');
   });
 
+  // Los celulares guardados con `lib-phone-input` vienen en E.164: el
+  // indicativo se separa con el catálogo —no a ojo— y se agrupa lo nacional.
+  it('separa el indicativo y agrupa la parte nacional de un E.164', () => {
+    expect(formatTelefono('+573105551234')).toBe('+57 310-555-1234');
+  });
+
+  it('separa indicativos de más de dos dígitos', () => {
+    expect(formatTelefono('+593991234567')).toBe('+593 991234567');
+  });
+
+  it('deja intacto un E.164 de un país fuera del catálogo', () => {
+    expect(formatTelefono('+447911123456')).toBe('+447911123456');
+  });
+
   it('resuelve el vacío como cadena vacía', () => {
     expect(formatTelefono(null)).toBe('');
     expect(formatTelefono(undefined)).toBe('');

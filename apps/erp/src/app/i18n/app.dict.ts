@@ -683,6 +683,8 @@ export interface AppDict
         validation: {
           required: string;
           emailInvalid: string;
+          celularInvalido: string;
+          celularLongitud: string;
           numeroIdentificacionExistente: string;
         };
         submitCreate: string;

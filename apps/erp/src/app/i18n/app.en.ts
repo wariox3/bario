@@ -850,6 +850,8 @@ export const en: AppDict = {
         validation: {
           required: 'This field is required.',
           emailInvalid: 'Enter a valid email.',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
           numeroIdentificacionExistente: 'This identification number is already registered.',
         },
         submitCreate: 'Create contact',

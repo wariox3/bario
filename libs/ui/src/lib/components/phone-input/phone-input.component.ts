@@ -18,9 +18,15 @@ import {
 } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { I18nService } from '@reddoc/core';
-import { PAISES_CELULAR, PaisCelular } from './paises-celular';
-import { CELULAR_E164, banderaEmoji, componerCelular, partirCelular } from './celular.utils';
+import {
+  CELULAR_E164,
+  I18nService,
+  PAISES_CELULAR,
+  PaisCelular,
+  banderaEmoji,
+  componerCelular,
+  partirCelular,
+} from '@reddoc/core';
 import type { PhoneInputTranslationsHost } from './i18n';
 
 /** Opción del selector: el país del catálogo + lo derivado para pintar y filtrar. */

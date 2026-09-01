@@ -229,6 +229,8 @@ export const en: AppDict = {
         },
         validation: {
           required: 'This field is required',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
         },
         toasts: {
           createSuccess: {

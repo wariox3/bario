@@ -33,14 +33,6 @@ export type {
 } from './lib/components/accesos-contenedor/i18n';
 export { accesosContenedorEs, accesosContenedorEn } from './lib/components/accesos-contenedor/i18n';
 export { PhoneInputComponent } from './lib/components/phone-input/phone-input.component';
-export type { PaisCelular } from './lib/components/phone-input/paises-celular';
-export { PAISES_CELULAR } from './lib/components/phone-input/paises-celular';
-export {
-  CELULAR_E164,
-  componerCelular,
-  normalizarCelular,
-  partirCelular,
-} from './lib/components/phone-input/celular.utils';
 export type { PhoneInputDict, PhoneInputTranslationsHost } from './lib/components/phone-input/i18n';
 export { phoneInputEs, phoneInputEn } from './lib/components/phone-input/i18n';
 export { AppSwitcherComponent } from './lib/app-switcher/app-switcher.component';

@@ -87,6 +87,15 @@ export {
 } from './lib/utils/date.utils';
 export type { DiaDelMes, AnioMes } from './lib/utils/date.utils';
 export { formatTelefono } from './lib/utils/telefono.utils';
+export type { PaisCelular, CelularPartido } from './lib/celular';
+export {
+  PAISES_CELULAR,
+  CELULAR_E164,
+  banderaEmoji,
+  componerCelular,
+  normalizarCelular,
+  partirCelular,
+} from './lib/celular';
 export { formatCiudad } from './lib/utils/ciudad.utils';
 export { formatCop, toFiniteNumber } from './lib/utils/currency.utils';
 export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/calculo';

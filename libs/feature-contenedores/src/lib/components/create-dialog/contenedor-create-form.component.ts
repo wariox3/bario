@@ -12,12 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import {
-  FieldErrorComponent,
-  FocusInvalidDirective,
-  PhoneInputComponent,
-  normalizarCelular,
-} from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PhoneInputComponent } from '@reddoc/ui';
 import {
   AUTH_SERVICE,
   Contenedor,
@@ -25,6 +20,7 @@ import {
   FormErrorService,
   I18nService,
   ToastService,
+  normalizarCelular,
 } from '@reddoc/core';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
