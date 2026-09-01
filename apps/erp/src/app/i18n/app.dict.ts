@@ -462,7 +462,12 @@ export interface AppDict
         createSubtitle: string;
         editSubtitle: string;
         fields: { nombreCorto: string; celular: string; correo: string };
-        validation: { required: string; email: string };
+        validation: {
+          required: string;
+          email: string;
+          celularInvalido: string;
+          celularLongitud: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -1208,6 +1213,8 @@ export interface AppDict
         validation: {
           required: string;
           emailInvalid: string;
+          celularInvalido: string;
+          celularLongitud: string;
           numeroIdentificacionExistente: string;
         };
         toasts: {

@@ -6,10 +6,15 @@ import { NgControl } from '@angular/forms';
  * `FormControl` asociado (ReactiveForms) para que el modelo quede limpio, no
  * solo la vista.
  *
- * Pensada para los campos que guardan un número como texto —celular, teléfono,
- * número de identificación, cuenta bancaria—, donde el valor se compara y se
- * busca: si uno se guarda como `310 555 1234` y otro como `3105551234`, dejan de
- * ser el mismo número para el backend.
+ * Pensada para los campos que guardan un número como texto —número de
+ * identificación, cuenta bancaria—, donde el valor se compara y se busca: si
+ * uno se guarda como `310 555 1234` y otro como `3105551234`, dejan de ser el
+ * mismo número para el backend.
+ *
+ * **Para un celular no**: esos van con `<lib-phone-input>`, que además del
+ * saneo trae el selector de indicativo y compone el E.164 que el backend
+ * espera. Esta directiva sola deja el número sin indicativo, que es justo lo
+ * que había que arreglar. Hoy no la usa nadie; queda como building block.
  *
  * **No** impone un largo ni un formato: el tope va con `maxlength` en el
  * template, y así un número extranjero, más corto o más largo que el local,

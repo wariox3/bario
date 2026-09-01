@@ -147,23 +147,21 @@
           <label for="celular" class="empleado-form__label">
             {{ f.fields.celular }}<span class="ml-px text-red-500">*</span>
           </label>
-          <!-- Solo dígitos y tope de 15 (el máximo internacional): el número se
-               guarda pelado para poder compararse, y un celular de otro país
-               sigue entrando. El formato con guiones se aplica al leerlo. -->
-          <input
-            id="celular"
-            pInputText
-            type="tel"
-            inputmode="numeric"
-            autocomplete="tel"
-            libSoloDigitos
-            maxlength="15"
+          <!-- El celular se guarda en E.164 (`+573153334455`): el indicativo va
+               en el mismo campo y lo compone `lib-phone-input`. El formato con
+               guiones se aplica al leerlo, en la ficha. -->
+          <lib-phone-input
+            inputId="celular"
             formControlName="celular"
-            fluid
+            [invalid]="form.controls.celular.invalid && form.controls.celular.touched"
           />
           <lib-field-error
             [control]="form.controls.celular"
-            [messages]="{ required: f.validation.required }"
+            [messages]="{
+              required: f.validation.required,
+              celularE164: f.validation.celularInvalido,
+              celularLongitud: f.validation.celularLongitud,
+            }"
           />
         </div>
 

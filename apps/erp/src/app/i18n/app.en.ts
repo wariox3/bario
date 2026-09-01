@@ -557,7 +557,12 @@ export const en: AppDict = {
         createSubtitle: 'Fill in the advisor information',
         editSubtitle: 'Update the advisor information',
         fields: { nombreCorto: 'Short name', celular: 'Mobile', correo: 'Email' },
-        validation: { required: 'This field is required', email: 'The email is not valid' },
+        validation: {
+          required: 'This field is required',
+          email: 'The email is not valid',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
+        },
         toasts: {
           createSuccess: { title: 'Advisor created', desc: 'The advisor was created successfully' },
           editSuccess: {
@@ -1623,6 +1628,8 @@ export const en: AppDict = {
         validation: {
           required: 'This field is required',
           emailInvalid: 'The email is not valid',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
           numeroIdentificacionExistente: 'A contact with this ID already exists',
         },
         toasts: {

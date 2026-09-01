@@ -557,7 +557,12 @@ export const es: AppDict = {
         createSubtitle: 'Completá la información del asesor',
         editSubtitle: 'Modificá la información del asesor',
         fields: { nombreCorto: 'Nombre corto', celular: 'Celular', correo: 'Correo' },
-        validation: { required: 'Este campo es requerido', email: 'El correo no es válido' },
+        validation: {
+          required: 'Este campo es requerido',
+          email: 'El correo no es válido',
+          celularInvalido: 'El número no es un celular válido.',
+          celularLongitud: 'El número no tiene el largo de un celular del país elegido.',
+        },
         toasts: {
           createSuccess: { title: 'Asesor creado', desc: 'El asesor se creó correctamente' },
           editSuccess: {
@@ -1677,6 +1682,8 @@ export const es: AppDict = {
         validation: {
           required: 'Este campo es requerido',
           emailInvalid: 'El correo no es válido',
+          celularInvalido: 'El número no es un celular válido.',
+          celularLongitud: 'El número no tiene el largo de un celular del país elegido.',
           numeroIdentificacionExistente: 'Ya existe un contacto con esta identificación',
         },
         toasts: {
