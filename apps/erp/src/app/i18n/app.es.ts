@@ -286,6 +286,12 @@ export const es: AppDict = {
     },
     generarRecurrente: {
       seleccionadosLabel: 'Generar seleccionados',
+      modalHeader: 'Generar facturas',
+      modalSubtitle: 'Genera las facturas del período elegido desde las plantillas seleccionadas',
+      periodoLabel: 'Período',
+      submit: 'Generar',
+      cancel: 'Cancelar',
+      sinDestino: 'Este documento no tiene definida la factura que debe generar.',
       noSelection: {
         title: 'Sin selección',
         desc: 'Selecciona al menos una factura recurrente para generar.',

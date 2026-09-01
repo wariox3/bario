@@ -286,6 +286,12 @@ export const en: AppDict = {
     },
     generarRecurrente: {
       seleccionadosLabel: 'Generate selected',
+      modalHeader: 'Generate invoices',
+      modalSubtitle: 'Generates the invoices of the chosen period from the selected templates',
+      periodoLabel: 'Period',
+      submit: 'Generate',
+      cancel: 'Cancel',
+      sinDestino: 'This document has no target invoice defined.',
       noSelection: {
         title: 'No selection',
         desc: 'Select at least one recurring invoice to generate.',

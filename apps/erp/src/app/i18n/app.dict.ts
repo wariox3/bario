@@ -293,6 +293,12 @@ export interface AppDict
     };
     generarRecurrente: {
       seleccionadosLabel: string;
+      modalHeader: string;
+      modalSubtitle: string;
+      periodoLabel: string;
+      submit: string;
+      cancel: string;
+      sinDestino: string;
       noSelection: { title: string; desc: string };
       success: { title: string; desc: string };
       empty: { title: string; desc: string };
