@@ -34,6 +34,7 @@
     <form
       [formGroup]="form"
       (ngSubmit)="submit()"
+      libFocusInvalid
       class="flex flex-col gap-[1.1rem]"
       autocomplete="off"
     >
@@ -132,21 +133,18 @@
           >
             Teléfono
           </label>
-          <input
-            id="dlg-billing-telefono"
-            pInputText
-            type="tel"
-            inputmode="numeric"
+          <lib-phone-input
+            inputId="dlg-billing-telefono"
             formControlName="telefono"
             placeholder="3001234567"
-            class="w-full font-mono tabular-nums"
-            [class.cd-input-error]="
-              form.controls.telefono.invalid && form.controls.telefono.touched
-            "
+            [invalid]="form.controls.telefono.invalid && form.controls.telefono.touched"
           />
           <lib-field-error
             [control]="form.controls.telefono"
-            [messages]="{ pattern: 'Solo dígitos (7–15 caracteres).' }"
+            [messages]="{
+              celularE164: 'El número no es un celular válido.',
+              celularLongitud: 'El número no tiene el largo de un celular del país elegido.',
+            }"
           />
         </div>
       </div>
@@ -211,7 +209,7 @@
         icon="pi pi-arrow-right"
         iconPos="right"
         [loading]="isSubmitting()"
-        [disabled]="form.invalid || isSubmitting()"
+        [disabled]="isSubmitting()"
         (onClick)="submit()"
       />
     </div>

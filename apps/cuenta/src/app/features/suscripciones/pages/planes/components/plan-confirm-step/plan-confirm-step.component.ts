@@ -7,6 +7,7 @@ import {
   resolvePlanTier,
 } from '@reddoc/core';
 import type { PlanFeature } from '@reddoc/core';
+import { TelefonoPipe } from '@reddoc/ui';
 import { BillingProfile } from '../../../../models/billing-profile.model';
 import { SuscripcionTipo } from '../../../../models/suscripcion-tipo.model';
 import {
@@ -18,6 +19,7 @@ import {
 @Component({
   selector: 'app-plan-confirm-step',
   standalone: true,
+  imports: [TelefonoPipe],
   templateUrl: './plan-confirm-step.component.html',
   host: { class: 'block' },
   changeDetection: ChangeDetectionStrategy.OnPush,

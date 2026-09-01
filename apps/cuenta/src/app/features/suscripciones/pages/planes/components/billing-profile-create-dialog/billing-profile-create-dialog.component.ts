@@ -23,11 +23,14 @@ import {
   IdentificacionService,
   ToastService,
   FormErrorService,
+  normalizarCelular,
 } from '@reddoc/core';
 import {
   CiudadAutocompleteComponent,
   IdentificacionSelectComponent,
   FieldErrorComponent,
+  FocusInvalidDirective,
+  PhoneInputComponent,
 } from '@reddoc/ui';
 import { Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
@@ -57,6 +60,8 @@ interface BillingProfileForm {
     CiudadAutocompleteComponent,
     IdentificacionSelectComponent,
     FieldErrorComponent,
+    FocusInvalidDirective,
+    PhoneInputComponent,
   ],
   templateUrl: './billing-profile-create-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -107,9 +112,9 @@ export class BillingProfileCreateDialogComponent {
     email: this.fb.nonNullable.control('', {
       validators: [Validators.required, Validators.email],
     }),
-    telefono: this.fb.nonNullable.control('', {
-      validators: [Validators.required, Validators.pattern(/^[0-9]{7,15}$/)],
-    }),
+    // Wompi exige el celular en E.164 y antes se adivinaba el `+57` al armar su
+    // payload. Ahora el indicativo se elige acá y viaja en el propio valor.
+    telefono: this.fb.nonNullable.control('', { validators: [Validators.required] }),
     direccion: this.fb.nonNullable.control('', {
       validators: [Validators.required, Validators.minLength(5), Validators.maxLength(255)],
     }),
@@ -210,7 +215,7 @@ export class BillingProfileCreateDialogComponent {
       numero: p.numero,
       nombre: p.nombre,
       email: p.email,
-      telefono: p.telefono,
+      telefono: normalizarCelular(p.telefono),
       direccion: p.direccion,
       ciudad,
     });

@@ -24,6 +24,22 @@ function paisPorIso(iso: string): PaisCelular {
 }
 
 /**
+ * Quita el indicativo del país cuando venía pegado a un número sin `+`.
+ *
+ * Solo actúa si el largo total NO es ya un largo nacional válido —así un
+ * nacional legítimo nunca se recorta— y lo que queda tras el indicativo sí lo
+ * es. Si el país no declara `longitudes` no hay con qué decidir y se devuelve
+ * intacto: preferimos un número sin partir a uno mutilado.
+ */
+function sinIndicativoPegado(digitos: string, pais: PaisCelular): string {
+  const largos = pais.longitudes;
+  if (!largos || largos.includes(digitos.length)) return digitos;
+  if (!digitos.startsWith(pais.indicativo)) return digitos;
+  const resto = digitos.slice(pais.indicativo.length);
+  return largos.includes(resto.length) ? resto : digitos;
+}
+
+/**
  * Parte un celular almacenado en `pais + nacional` para poblar el selector.
  *
  * - Con `+`: matchea el indicativo **más largo** del catálogo (`+593` gana
@@ -32,8 +48,11 @@ function paisPorIso(iso: string): PaisCelular {
  *   fuera del catálogo), cae al país por defecto con todos los dígitos como
  *   nacional: el dato no se pierde, solo queda mal atribuido hasta que la
  *   persona lo corrija.
- * - Sin `+` (dato legado, anterior a E.164): asume el país por defecto y se
- *   queda con los dígitos tal cual.
+ * - Sin `+` (dato legado, anterior a E.164): asume el país por defecto. Si los
+ *   dígitos ya traían el indicativo pegado —`573001234567`, como quedaban los
+ *   guardados sin normalizar— se separa igual: se detecta porque el largo total
+ *   no es un largo nacional válido, pero sí lo es lo que queda tras el
+ *   indicativo. Sin esa vuelta el número se duplicaría a `+57573001234567`.
  */
 export function partirCelular(valor: string | null | undefined, defaultIso = 'CO'): CelularPartido {
   const porDefecto = paisPorIso(defaultIso);
@@ -41,7 +60,13 @@ export function partirCelular(valor: string | null | undefined, defaultIso = 'CO
   if (!crudo) return { pais: porDefecto, nacional: '', enCatalogo: true };
 
   const digitos = crudo.replace(/\D/g, '');
-  if (!crudo.startsWith('+')) return { pais: porDefecto, nacional: digitos, enCatalogo: true };
+  if (!crudo.startsWith('+')) {
+    return {
+      pais: porDefecto,
+      nacional: sinIndicativoPegado(digitos, porDefecto),
+      enCatalogo: true,
+    };
+  }
 
   const pais = [...PAISES_CELULAR]
     .sort((a, b) => b.indicativo.length - a.indicativo.length)
