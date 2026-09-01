@@ -3564,6 +3564,24 @@ export const es: AppDict = {
         },
       },
     },
+    vencimiento: {
+      desdeEmision: 'desde la emisión',
+      contado: 'Contado',
+      contadoHint: 'vence el mismo día',
+      desvio: {
+        mas: {
+          one: '1 día más que el plazo ({dias} d)',
+          other: '{n} días más que el plazo ({dias} d)',
+        },
+        menos: {
+          one: '1 día menos que el plazo ({dias} d)',
+          other: '{n} días menos que el plazo ({dias} d)',
+        },
+      },
+      usar: 'Usar {fecha}',
+      usarTitle: 'Volver al vencimiento que dicta el plazo de pago',
+      anteriorAFecha: 'El vencimiento no puede ser anterior a la fecha.',
+    },
     comercialDetalle: {
       title: 'Detalles',
       hint: 'Productos y servicios del documento',

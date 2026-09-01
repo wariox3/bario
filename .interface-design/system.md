@@ -394,6 +394,29 @@ gap-3">` con pares `<dt>`/`<dd>` (`__label` `0.7rem/500` muted, `__value` `0.85r
 - **Cards de rol aparte:** lo condicional a un flag (`cliente`, `proveedor`) se queda en su propia
   card bajo la ficha — son datos comerciales, no básicos, y su ausencia es significativa.
 
+## Patrón: nota de origen bajo un campo derivado (vencimiento)
+
+`features/documentos/comercial/components/vencimiento-hint/` — cuando el valor de un campo lo
+**deriva** el sistema de otros dos (aquí `fecha_vence = fecha + días del plazo de pago`) pero la
+persona puede sobrescribirlo, el campo tiene que contar de dónde salió su valor. Sin eso el
+autocálculo es invisible y se reporta como que no funciona (fue el caso: «no carga el plazo de
+pago», con el plazo cargando bien).
+
+- **Una línea bajo el campo**, en el hueco del `lib-field-error`, de alto constante entre estados
+  (que la caja no cambie es la misma regla de `<lib-page-actions>`).
+- **En reposo:** ficha mono con el dato (`30 d`) + texto muted con su origen (`desde la emisión`).
+  Es el idioma «ficha navy = tiene valor» de la tira calendario, aplicado a un campo.
+- **Desviado:** `text-amber-700` + `pi pi-exclamation-circle`, de cuánto es la diferencia, y un
+  botón que **nombra la fecha** a la que vuelve (`Usar 15/09/2026`) — no un genérico «restablecer».
+- **Ámbar, no rojo, y sin invalidar el form:** apartarse de la condición pactada es una excepción
+  legítima del negocio (la factura del proveedor llega con su fecha impresa y manda). El rojo se
+  reserva para lo imposible — aquí, vencer antes de emitir, que sí es un validator duro.
+- **Se calla ante un error del campo** (`[silenciar]`): el mensaje rojo manda y dos líneas
+  competirían.
+- **El estado lo expone la lógica, no el componente:** `setupVencimientoAutocompute` devuelve
+  `{ diasPlazo, sugerido, desvio, restablecer }` y el hint es tonto. Así los 6 formularios
+  comerciales lo heredan sin repetir nada.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

@@ -3504,6 +3504,24 @@ export const en: AppDict = {
         },
       },
     },
+    vencimiento: {
+      desdeEmision: 'from the issue date',
+      contado: 'Cash',
+      contadoHint: 'due on the issue date',
+      desvio: {
+        mas: {
+          one: '1 day later than the term ({dias} d)',
+          other: '{n} days later than the term ({dias} d)',
+        },
+        menos: {
+          one: '1 day earlier than the term ({dias} d)',
+          other: '{n} days earlier than the term ({dias} d)',
+        },
+      },
+      usar: 'Use {fecha}',
+      usarTitle: 'Go back to the due date set by the payment term',
+      anteriorAFecha: 'The due date cannot be earlier than the date.',
+    },
     comercialDetalle: {
       title: 'Lines',
       hint: 'Products and services of the document',

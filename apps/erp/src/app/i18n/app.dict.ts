@@ -2695,6 +2695,18 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    vencimiento: {
+      desdeEmision: string;
+      contado: string;
+      contadoHint: string;
+      desvio: {
+        mas: { one: string; other: string };
+        menos: { one: string; other: string };
+      };
+      usar: string;
+      usarTitle: string;
+      anteriorAFecha: string;
+    };
     comercialDetalle: {
       title: string;
       hint: string;

@@ -41,7 +41,11 @@ import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.gu
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-compra.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
-import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
+import {
+  setupVencimientoAutocompute,
+  type VencimientoAutocompute,
+} from '@erp/features/documentos/comercial/vencimiento-autocompute';
+import { VencimientoHintComponent } from '@erp/features/documentos/comercial/components/vencimiento-hint/vencimiento-hint.component';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -105,6 +109,7 @@ interface FlushableLineTable {
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
+    VencimientoHintComponent,
     ContableDocumentoDetallesComponent,
   ],
   providers: [ConfirmationService],
@@ -187,9 +192,15 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     cuentas: new FormArray<CuentaDetalleGroup>([]),
   });
 
+  /**
+   * Estado del vencimiento (días del plazo, fecha que dicta y desvío), para que
+   * `<app-vencimiento-hint>` explique bajo el campo de dónde salió la fecha.
+   */
+  protected readonly vencimiento: VencimientoAutocompute;
+
   constructor() {
     // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
-    setupVencimientoAutocompute({
+    this.vencimiento = setupVencimientoAutocompute({
       fecha: this.form.controls.fecha,
       plazoPago: this.form.controls.plazo_pago,
       fechaVence: this.form.controls.fecha_vence,

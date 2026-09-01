@@ -103,7 +103,17 @@
             />
             <lib-field-error
               [control]="form.controls.fecha_vence"
-              [messages]="{ required: t().entities.notaAjuste.form.validation.required }"
+              [messages]="{
+                required: t().entities.notaAjuste.form.validation.required,
+                vencimientoAnterior: t().entities.vencimiento.anteriorAFecha,
+              }"
+            />
+            <app-vencimiento-hint
+              [dias]="vencimiento.diasPlazo()"
+              [sugerido]="vencimiento.sugerido()"
+              [desvio]="vencimiento.desvio()"
+              [silenciar]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
+              (restablecer)="vencimiento.restablecer()"
             />
           </div>
         </div>
