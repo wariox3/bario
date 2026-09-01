@@ -12,7 +12,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PhoneInputComponent,
+  normalizarCelular,
+} from '@reddoc/ui';
 import {
   AUTH_SERVICE,
   Contenedor,
@@ -23,13 +28,6 @@ import {
 } from '@reddoc/core';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
-/**
- * Formato E.164: `+`, indicativo que nunca arranca en `0`, y entre 8 y 15
- * dígitos en total —el máximo que define la norma—. No valida el largo por
- * país: eso cambia de un país a otro y no vale la tabla que habría que mantener.
- */
-const CELULAR_E164 = /^\+[1-9]\d{7,14}$/;
-
 @Component({
   selector: 'lib-contenedor-create-form',
   standalone: true,
@@ -39,6 +37,7 @@ const CELULAR_E164 = /^\+[1-9]\d{7,14}$/;
     InputTextModule,
     FieldErrorComponent,
     FocusInvalidDirective,
+    PhoneInputComponent,
   ],
   templateUrl: './contenedor-create-form.component.html',
   styleUrl: './contenedor-create-form.component.scss',
@@ -69,8 +68,9 @@ export class ContenedorCreateFormComponent {
     nombre: ['', [Validators.required, Validators.minLength(2)]],
     schema_name: ['', [Validators.required, Validators.pattern(/^[a-z0-9][a-z0-9_]*$/)]],
     // El backend guarda el celular en E.164 (`+573163557845`): el indicativo va
-    // en el mismo campo, así que se exige acá y no se arma al enviar.
-    celular: ['', [Validators.required, Validators.pattern(CELULAR_E164)]],
+    // en el mismo campo. El formato lo valida `lib-phone-input` (claves
+    // `celularE164` / `celularLongitud`); acá solo queda la obligatoriedad.
+    celular: ['', [Validators.required]],
     correo: ['', [Validators.required, Validators.email]],
   });
 
@@ -78,7 +78,9 @@ export class ContenedorCreateFormComponent {
     const user = this.authService.currentUser();
     this.form.patchValue({
       correo: user?.email ?? '',
-      celular: user?.celular ?? '',
+      // El celular del perfil puede venir sin `+` o con separadores (su
+      // validación es más laxa): normalizado, el campo no nace inválido.
+      celular: normalizarCelular(user?.celular),
     });
 
     this.form.controls.nombre.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
@@ -96,7 +98,7 @@ export class ContenedorCreateFormComponent {
       this.form.patchValue({
         nombre: c.nombre,
         schema_name: c.schema_name,
-        celular: c.celular ?? '',
+        celular: normalizarCelular(c.celular),
         correo: c.correo ?? '',
       });
       this.form.controls.schema_name.disable();

@@ -41,15 +41,11 @@
     >
       {{ t().contenedores.create.fields.mobile }}
     </label>
-    <input
-      id="celular"
-      pInputText
-      type="tel"
-      inputmode="tel"
+    <lib-phone-input
+      inputId="celular"
       formControlName="celular"
       [placeholder]="t().contenedores.create.fields.mobilePlaceholder"
-      class="w-full"
-      [class.cd-input-error]="
+      [invalid]="
         form.controls.celular.invalid &&
         (form.controls.celular.touched || form.controls.celular.dirty)
       "
@@ -58,7 +54,8 @@
       [control]="form.controls.celular"
       [messages]="{
         required: t().contenedores.create.validation.mobileRequired,
-        pattern: t().contenedores.create.validation.mobilePattern,
+        celularE164: t().contenedores.create.validation.mobilePattern,
+        celularLongitud: t().contenedores.create.validation.mobileLength,
       }"
     />
   </div>

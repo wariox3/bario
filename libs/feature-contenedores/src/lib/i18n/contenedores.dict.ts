@@ -57,6 +57,7 @@ export interface ContenedoresDict {
       nameMin2: string;
       mobileRequired: string;
       mobilePattern: string;
+      mobileLength: string;
       emailRequired: string;
       emailInvalid: string;
     };

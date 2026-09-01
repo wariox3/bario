@@ -3,6 +3,7 @@ import type {
   AccesosContenedorTranslationsHost,
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
+  PhoneInputTranslationsHost,
 } from '@reddoc/ui';
 
 /**
@@ -62,6 +63,7 @@ export interface AppDict
   extends
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
+    PhoneInputTranslationsHost,
     ContenedoresTranslationsHost,
     AccesosContenedorTranslationsHost {
   common: {
