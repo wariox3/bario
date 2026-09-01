@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import {
+  formatCiudad,
   formatFechaCorta,
   getPlanDescription,
   getPlanFeatures,
@@ -33,6 +34,12 @@ export class PlanConfirmStepComponent {
 
   readonly cambiarPlan = output<void>();
   readonly cambiarFacturacion = output<void>();
+
+  /** `Amagá — Antioquia`; sin departamento queda solo el nombre. */
+  readonly ciudadLabel = computed(() => {
+    const bp = this.billingProfile();
+    return bp ? formatCiudad(bp.ciudad, bp.departamento) : '';
+  });
 
   readonly tierName = computed(() => {
     const nombre = this.plan().nombre;

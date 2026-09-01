@@ -49,8 +49,8 @@
       <i class="pi pi-map-marker text-[0.62rem] text-brand-muted/70 mt-[3px] shrink-0"></i>
       <span class="line-clamp-2 leading-snug">
         {{ profile().direccion }}
-        @if (profile().ciudad) {
-          · <span class="text-brand-text/80">{{ profile().ciudad }}</span>
+        @if (ciudadLabel(); as ciudad) {
+          · <span class="text-brand-text/80">{{ ciudad }}</span>
         }
       </span>
     </div>

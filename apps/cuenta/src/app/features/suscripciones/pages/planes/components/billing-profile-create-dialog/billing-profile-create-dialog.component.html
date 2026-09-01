@@ -128,19 +128,19 @@
         </div>
         <div class="flex flex-col">
           <label
-            for="dlg-billing-telefono"
+            for="dlg-billing-celular"
             class="mb-1.5 text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy"
           >
-            Teléfono
+            Celular
           </label>
           <lib-phone-input
-            inputId="dlg-billing-telefono"
-            formControlName="telefono"
+            inputId="dlg-billing-celular"
+            formControlName="celular"
             placeholder="3001234567"
-            [invalid]="form.controls.telefono.invalid && form.controls.telefono.touched"
+            [invalid]="form.controls.celular.invalid && form.controls.celular.touched"
           />
           <lib-field-error
-            [control]="form.controls.telefono"
+            [control]="form.controls.celular"
             [messages]="{
               celularE164: 'El número no es un celular válido.',
               celularLongitud: 'El número no tiene el largo de un celular del país elegido.',

@@ -70,7 +70,7 @@ export function armarCustomerData(bp: BillingProfile): WompiCustomerData {
   return {
     email: bp.email,
     full_name: bp.nombre,
-    phone_number: normalizarCelular(bp.telefono) || undefined,
+    phone_number: normalizarCelular(bp.celular) || undefined,
     legal_id: bp.numero || undefined,
     legal_id_type: mapLegalIdType(bp.tipo),
   };
