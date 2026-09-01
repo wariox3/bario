@@ -156,7 +156,7 @@ export interface Contenedor extends ContenedorAccesoFlags {
   nombre: string;
   activo: boolean;
   dominio: string;
-  telefono?: string;
+  celular?: string;
   correo?: string;
   suscripcion_id?: number;
   suscripcion_fecha_fin?: string;
@@ -179,10 +179,8 @@ export type ContenedoresResponse = PaginatedResponse<Contenedor>;
 export interface CreateContenedorRequest {
   nombre: string;
   schema_name: string;
-  telefono: string;
+  celular: string;
   correo: string;
-  suscripcion_tipo_id: number;
-  frecuencia: string;
 }
 
 export interface UserSearchResult {

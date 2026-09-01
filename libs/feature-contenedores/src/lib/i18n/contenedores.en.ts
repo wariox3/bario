@@ -50,16 +50,17 @@ export const contenedoresEn: ContenedoresDict = {
     fields: {
       name: 'Company name',
       namePlaceholder: 'Acme Corp',
-      phone: 'Phone',
-      phonePlaceholder: '3153334455',
+      mobile: 'Mobile',
+      mobilePlaceholder: '+573153334455',
       email: 'Email',
       emailPlaceholder: 'contact@company.com',
     },
     validation: {
       nameRequired: 'Name is required.',
       nameMin2: 'Minimum 2 characters.',
-      phoneRequired: 'Phone is required.',
-      phoneMax20: 'Maximum 20 characters.',
+      mobileRequired: 'Mobile is required.',
+      mobilePattern:
+        'Enter the number with its country code, starting with +. Example: +573153334455.',
       emailRequired: 'Email is required.',
       emailInvalid: 'Enter a valid email.',
     },

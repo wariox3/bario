@@ -47,16 +47,16 @@ export interface ContenedoresDict {
     fields: {
       name: string;
       namePlaceholder: string;
-      phone: string;
-      phonePlaceholder: string;
+      mobile: string;
+      mobilePlaceholder: string;
       email: string;
       emailPlaceholder: string;
     };
     validation: {
       nameRequired: string;
       nameMin2: string;
-      phoneRequired: string;
-      phoneMax20: string;
+      mobileRequired: string;
+      mobilePattern: string;
       emailRequired: string;
       emailInvalid: string;
     };
