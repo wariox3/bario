@@ -22,7 +22,11 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+import {
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import type { AppDict } from '@erp/i18n';
@@ -36,21 +40,6 @@ import { cierreToFormValue, formValueToPayload } from '../../cierre.mapper';
 import type { CierreRead } from '../../cierre.model';
 import { CierreService } from '../../cierre.service';
 import { fecha31Diciembre } from '../../cierre.validators';
-
-/**
- * Saca el id del documento de la respuesta de creación.
- *
- * ⚠️ Mismo supuesto que en la depreciación: el gateway devuelve el body crudo del
- * `POST` y no está verificado si el backend responde el documento plano o
- * envuelto en `{ documento: … }` (así lo hacía el ERP anterior).
- */
-function extractDocumentoId(saved: unknown): number | null {
-  if (typeof saved !== 'object' || saved === null) return null;
-  const plano = (saved as { id?: unknown }).id;
-  if (typeof plano === 'number') return plano;
-  const envuelto = (saved as { documento?: { id?: unknown } }).documento?.id;
-  return typeof envuelto === 'number' ? envuelto : null;
-}
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Cierre contable.
@@ -188,7 +177,7 @@ export class CierreFormComponent implements OnInit {
         this.isSaving.set(false);
         if (id) {
           this.toast.success(toasts.editSuccess.title, toasts.editSuccess.desc);
-          this.navigateToList();
+          this.navigateToDetail(id);
           return;
         }
         // Recién creado: el cierre no sirve vacío y cargarlo necesita su id, así
@@ -346,6 +335,11 @@ export class CierreFormComponent implements OnInit {
 
   private navigateToList(): void {
     this.navigate(this.document().routes.list);
+  }
+
+  /** Abre la ficha del documento guardado (`routes.detail` + id). */
+  private navigateToDetail(id: string | number): void {
+    this.navigate(this.document().routes.detail, String(id));
   }
 
   private navigateToEdit(id: number): void {

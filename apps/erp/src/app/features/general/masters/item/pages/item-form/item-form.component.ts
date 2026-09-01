@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -31,6 +32,12 @@ import { formValueToPayload, itemToFormValue } from '../../item.mapper';
  *
  * Master del módulo General (camino B). La misma página cubre crear y editar:
  * sin `:id` → alta; con `:id` → edición (el id llega por `withComponentInputBinding`).
+ *
+ * También sirve como **modal** (alta inline desde la línea de un documento): si
+ * hay un `DynamicDialogRef` inyectable es que lo abrió un `DialogService`, y en
+ * ese modo esconde el chrome de página (breadcrumb, barra pegajosa), pinta su
+ * propio encabezado/pie y al guardar **cierra devolviendo el ítem creado** en
+ * vez de navegar a la lista.
  */
 @Component({
   selector: 'app-item-form',
@@ -63,6 +70,11 @@ export class ItemFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  /** Presente solo cuando el form vive en un modal (alta inline); `null` como página. */
+  private readonly dialogRef = inject(DynamicDialogRef, { optional: true });
+
+  /** `true` cuando el form se abrió como modal desde un documento. */
+  protected readonly isModal = this.dialogRef !== null;
 
   protected readonly t = this.i18n.t;
 
@@ -144,10 +156,16 @@ export class ItemFormComponent implements OnInit {
       : this.itemService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
+        // Como modal, el ítem creado vuelve a quien lo pidió (la línea del
+        // documento lo selecciona); como página, se navega a la lista.
+        if (this.dialogRef) {
+          this.dialogRef.close(saved);
+          return;
+        }
         this.navigateToList();
       },
       error: (err: unknown) => {
@@ -159,6 +177,10 @@ export class ItemFormComponent implements OnInit {
   }
 
   protected onCancel(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close(null);
+      return;
+    }
     this.navigateToList();
   }
 

@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
+import { FormErrorService, I18nService, ToastService, formatFechaLarga } from '@reddoc/core';
 import { ParametroService } from '@erp/core/services/parametro.service';
 import type { AppDict } from '@erp/i18n';
 import { FacturaElectronicaService } from '../../factura-electronica.service';
@@ -114,11 +114,7 @@ export class CertificadoStepComponent {
   );
 
   /** Fecha larga (`14 de marzo de 2027`), como el resto del ERP. */
-  protected readonly venceTexto = computed(() => {
-    const fecha = this.venceDate();
-    if (!fecha) return '';
-    return fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
-  });
+  protected readonly venceTexto = computed(() => formatFechaLarga(this.venceDate()));
 
   /** "faltan 205 días" / "venció hace 3 días", ya resuelto acá y no en el template. */
   protected readonly diasTexto = computed(() => {

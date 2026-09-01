@@ -49,6 +49,7 @@ const DOCUMENTO_TIPO_ENDPOINT = '/general/documento-tipo/seleccionar/';
     ErpApiSelectComponent,
   ],
   templateUrl: './descontabilizar-modal.component.html',
+  styles: ':host { display: contents; }',
 })
 export class DescontabilizarModalComponent {
   private readonly fb = inject(FormBuilder);

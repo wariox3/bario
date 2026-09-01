@@ -211,6 +211,8 @@ Regla: lo que solo importa a un master vive dentro del master.
 
 **Formularios (masters y documentos):** el botón de guardar **no** se deshabilita por `form.invalid` — un botón muerto no explica qué falta ni deja avanzar. Va `[disabled]="isSaving()"` y `libFocusInvalid` (`FocusInvalidDirective`, de `@reddoc/ui`) sobre el `<form>`: al intentar guardar en blanco marca todo como tocado —así aparece cada `<lib-field-error>`— y lleva a la persona al primer campo que falta. El guard `if (form.invalid …) return;` del `onSubmit` no cambia.
 
+**Al guardar un documento se cae en su ficha, no en el listado:** crear y editar terminan en `routes.detail` para que la persona revise lo que quedó almacenado. En alta el id sale de la respuesta del `POST` (`extractDocumentoId`, en `@erp/core/module-config`); si no viniera, se cae al listado antes que navegar a una URL inválida. Excepción viva: depreciación y cierre, que al crear entran a `editar/:id` porque el documento nace vacío y sus líneas se cargan desde el form. Cancelar sigue volviendo al listado.
+
 **Para agregar un documento nuevo** (camino A):
 
 1. Crear `<modulo>.config.ts` que exporte `ModuleConfig` con sus `documents`.
@@ -249,6 +251,12 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - **SCSS** — component styles are scoped; global Tailwind brand tokens live in `libs/styles/src/tailwind/brand.css`. Avoid inline styles.
 - **Typed errors** — never `throw new Error('msg')` generic. Define a specific class extending `Error`.
 - **No `any`** — use `unknown` + narrowing where the type is genuinely unknown.
+- **Fechas** — el formato sale de `FORMATO_FECHA` (`@reddoc/core`), única fuente para las tres
+  notaciones (PrimeNG, `| date` de Angular, y con hora). Para pintar: `formatFechaCorta`
+  (`05/08/2026` — campos, tablas, fichas) o `formatFechaLarga` (`05 de agosto de 2026` — solo la
+  cabecera de un documento). Un `<p-datepicker>` **no declara `dateFormat`**: lo hereda del
+  translation global (`REDDOC_PRIMENG_ES`); solo se declara para mostrar otra cosa, como `mm/yy`
+  al elegir un mes. Nada de `toLocaleDateString` suelto ni de `iso.slice(0, 10)`.
 - **Readonly by default** — prefer `readonly` properties and `readonly` arrays in configs and contracts.
 
 ## Tener en cuenta

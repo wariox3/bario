@@ -105,7 +105,7 @@
               @for (archivo of items(); track archivo.id) {
                 <tr>
                   <td class="cp-archivos-dialog__col-fecha whitespace-nowrap tabular-nums">
-                    {{ archivo.fecha | date: 'yyyy-MM-dd HH:mm' }}
+                    {{ archivo.fecha | date: formatoFecha }}
                   </td>
                   <td class="cp-archivos-dialog__name" [title]="archivo.nombre">
                     {{ archivo.nombre }}

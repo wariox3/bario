@@ -1,3 +1,4 @@
+import { normalizarCelular } from '@reddoc/core';
 import type { Contacto, ContactoPayload } from './contacto.model';
 import type { ContactoFormRawValue } from './pages/contacto-form/contacto-form.types';
 import { TIPO_PERSONA } from './contacto.constants';
@@ -28,7 +29,9 @@ export function contactoToFormValue(c: Contacto): Partial<ContactoFormRawValue> 
     apellido1: c.apellido1 ?? '',
     apellido2: c.apellido2 ?? '',
     telefono: c.telefono ?? '',
-    celular: c.celular ?? '',
+    // Los celulares guardados antes de `lib-phone-input` son dígitos pelados:
+    // normalizados a E.164 el campo no nace inválido al abrir la edición.
+    celular: normalizarCelular(c.celular),
     // El departamento viaja con la ciudad para que el campo muestre lo mismo al
     // reabrir que al elegir (`Albania — La Guajira`); sin él, un municipio
     // homónimo se vuelve indistinguible al editar.

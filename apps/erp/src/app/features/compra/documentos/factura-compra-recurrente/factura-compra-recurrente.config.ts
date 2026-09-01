@@ -14,10 +14,11 @@ import {
  * desde la que se generan facturas reales; `inventoryEffect:'inflow'` es solo
  * metadata. El gateway inyecta `documento_tipo_id` desde este config.
  *
- * La acción "Generar seleccionados" (dropdown "Acciones") genera facturas reales
- * a partir de las plantillas marcadas vía `POST general/documento/generar-recurrente/`.
- * La variante "Generar todos" (sobre el filtro completo) queda pendiente para una
- * v2 —requiere confirmar el contrato del backend—.
+ * La acción "Generar seleccionados" (dropdown "Acciones") pide el período y genera
+ * facturas de compra reales a partir de las plantillas marcadas vía
+ * `POST general/documento/generar/` (origen 32 → destino 5). La variante
+ * "Generar todos" (sobre el filtro completo) queda pendiente para una v2 —el
+ * endpoint la admite omitiendo `documento_ids`, falta definir la UX—.
  *
  * `routes` son relativas al módulo; el `BaseDocumentListComponent` les prepende
  * `/t/<slug>/compra/` al navegar.

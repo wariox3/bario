@@ -104,7 +104,8 @@ export class AdicionalModalComponent {
               ? { id: adicional.concepto, nombre: adicional.concepto_nombre ?? '' }
               : null,
           valor: toNumero(adicional.valor),
-          horas: adicional.horas ?? 0,
+          // `horas` llega como string Decimal (`"0.000"`), igual que `valor`.
+          horas: toNumero(adicional.horas),
           detalle: adicional.detalle,
           aplica_dia_laborado: adicional.aplica_dia_laborado,
         },

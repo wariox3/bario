@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import {
+  formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
@@ -248,12 +249,7 @@ export class NominaDetailComponent implements OnInit {
 
   /** Fecha larga (`20 de junio de 2026`) a partir del `yyyy-MM-dd` del backend. */
   protected formatFecha(value: string | null | undefined): string {
-    if (!value) return '—';
-    // El backend manda fecha sin hora; se parsea a mediodía UTC para que el
-    // desfase de zona horaria no la corra un día hacia atrás.
-    const date = new Date(`${value}T12:00:00`);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(value, '—');
   }
 
   /** Monto de cabecera; nulos y ceros se pintan como guion. */

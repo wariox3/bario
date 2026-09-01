@@ -157,6 +157,6 @@
   [style]="{ width: '46rem', maxWidth: '95vw' }"
 >
   @if (dialogVisible() && periodoInconsistencia(); as p) {
-    <app-periodo-inconsistencias [anio]="p.anio" [mes]="p.mes" />
+    <app-periodo-inconsistencias [periodoId]="p.id" />
   }
 </p-dialog>

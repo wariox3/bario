@@ -20,7 +20,7 @@ import {
   FieldErrorComponent,
   FocusInvalidDirective,
   PageActionsComponent,
-  SoloDigitosDirective,
+  PhoneInputComponent,
 } from '@reddoc/ui';
 import {
   CIUDAD_FUENTE,
@@ -66,7 +66,7 @@ import {
     ErpApiSelectComponent,
     ErpAsesorSelectComponent,
     ErpApiAutocompleteComponent,
-    SoloDigitosDirective,
+    PhoneInputComponent,
     CiudadAutocompleteComponent,
   ],
   templateUrl: './contacto-form.component.html',

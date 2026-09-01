@@ -1,0 +1,517 @@
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+  @if (novedad(); as n) {
+    <p-button
+      type="button"
+      [label]="t().common.actions.edit"
+      icon="pi pi-pencil"
+      size="small"
+      (onClick)="onEdit()"
+    />
+  }
+</header>
+
+@if (isLoading()) {
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">
+      {{ t().entities.novedad.detail.notFound.title }}
+    </p>
+    <p class="m-0 mt-1 max-w-70 text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ t().entities.novedad.detail.notFound.desc }}
+    </p>
+  </div>
+} @else if (novedad(); as n) {
+  <h1 class="sr-only">{{ n.contrato_nombre || '#' + n.id }}</h1>
+
+  <!-- ── Información general ─────────────────────────────────────────────────── -->
+  <!-- Patrón "ficha de detalle en grupos": a quién, cuándo y cuánto. El total
+       encabeza su grupo porque es lo que se viene a consultar. -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-calendar-clock text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.novedad.detail.sections.general }}
+      </h2>
+
+      <!-- El tipo decide cómo se liquida y qué ficha se lee: va en la barra,
+           no entre los campos. La prórroga solo aparece cuando lo es. -->
+      <div class="ml-auto flex flex-wrap items-center gap-1.5">
+        @if (n.novedad_tipo_nombre) {
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-sky-700"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+            {{ n.novedad_tipo_nombre }}
+          </span>
+        }
+        @if (n.prorroga) {
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-[0.15rem] text-[0.7rem] font-semibold text-amber-700"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+            {{ t().entities.novedad.detail.fields.prorroga }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[1.1fr_1fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- Grupo: a quién -->
+      <div class="px-5 py-4">
+        <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.empleado }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">{{ t().entities.novedad.columns.nombre }}</dt>
+            <dd
+              class="novedad-detail__value"
+              [class.novedad-detail__value--empty]="!n.contrato_nombre"
+            >
+              {{ n.contrato_nombre || '—' }}
+            </dd>
+          </div>
+          <!-- Hoy cae al guion —`HumNovedad` todavía no la expone— y se llena sola. -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">
+              {{ t().entities.novedad.columns.identificacion }}
+            </dt>
+            <dd
+              class="novedad-detail__value novedad-detail__value--mono"
+              [class.novedad-detail__value--empty]="!n.contrato_contacto_numero_identificacion"
+            >
+              {{ n.contrato_contacto_numero_identificacion || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">
+              {{ t().entities.novedad.detail.fields.contratoId }}
+            </dt>
+            <dd
+              class="novedad-detail__value novedad-detail__value--mono"
+              [class.novedad-detail__value--empty]="n.contrato === null"
+            >
+              {{ n.contrato ?? '—' }}
+            </dd>
+          </div>
+          @if (n.novedad_referencia !== null) {
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.form.fields.novedadReferencia }}
+              </dt>
+              <dd class="novedad-detail__value novedad-detail__value--mono">
+                #{{ n.novedad_referencia }}
+              </dd>
+            </div>
+          }
+        </dl>
+      </div>
+
+      <!-- Grupo: cuándo -->
+      <div class="px-5 py-4">
+        <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.fechas }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaDesde }}</dt>
+            <dd
+              class="novedad-detail__value novedad-detail__value--mono"
+              [class.novedad-detail__value--empty]="!fecha(n.fecha_desde)"
+            >
+              {{ fecha(n.fecha_desde) || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaHasta }}</dt>
+            <dd
+              class="novedad-detail__value novedad-detail__value--mono"
+              [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta)"
+            >
+              {{ fecha(n.fecha_hasta) || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">{{ t().entities.novedad.columns.dias }}</dt>
+            <dd
+              class="novedad-detail__value novedad-detail__value--mono"
+              [class.novedad-detail__value--empty]="!cantidad(n.dias)"
+            >
+              {{ cantidad(n.dias) || '—' }}
+            </dd>
+          </div>
+          @if (esVacaciones()) {
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.form.fields.fechaDesdePeriodo }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!fecha(n.fecha_desde_periodo)"
+              >
+                {{ fecha(n.fecha_desde_periodo) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.form.fields.fechaHastaPeriodo }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta_periodo)"
+              >
+                {{ fecha(n.fecha_hasta_periodo) || '—' }}
+              </dd>
+            </div>
+          }
+        </dl>
+      </div>
+
+      <!-- Grupo: cuánto. Total primero; debajo, de dónde sale según el tipo. -->
+      <div class="px-5 py-4">
+        <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.liquidacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">{{ t().entities.novedad.columns.total }}</dt>
+            <dd
+              class="novedad-detail__value novedad-detail__value--mono"
+              [class.novedad-detail__value--empty]="!cop(n.total)"
+            >
+              {{ cop(n.total) || '—' }}
+            </dd>
+          </div>
+          @if (esVacaciones()) {
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pagoDisfrute }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_disfrute)"
+              >
+                {{ cop(n.pago_disfrute) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pagoDinero }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_dinero)"
+              >
+                {{ cop(n.pago_dinero) || '—' }}
+              </dd>
+            </div>
+          } @else {
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.baseCotizacionPropuesto }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.base_cotizacion_propuesto)"
+              >
+                {{ cop(n.base_cotizacion_propuesto) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.baseCotizacion }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.base_cotizacion)"
+              >
+                {{ cop(n.base_cotizacion) || '—' }}
+              </dd>
+            </div>
+          }
+        </dl>
+      </div>
+    </div>
+
+    <!-- El detalle es texto libre: va a lo ancho, debajo de los grupos, y solo
+         cuando hay algo que leer. -->
+    @if (n.detalle) {
+      <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+        <dl class="flex flex-col gap-0.5">
+          <dt class="novedad-detail__label">{{ t().entities.novedad.form.fields.detalle }}</dt>
+          <dd class="novedad-detail__value whitespace-pre-line">{{ n.detalle }}</dd>
+        </dl>
+      </div>
+    }
+  </section>
+
+  @if (esVacaciones()) {
+    <!-- ── Vacaciones ──────────────────────────────────────────────────────────── -->
+    <!-- Días y pagos de disfrute y dinero, como los muestra el ERP anterior. Los
+         disfrutados reales los calcula el backend a partir del rango. -->
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+        >
+          <i class="pi pi-sun text-[1rem]"></i>
+        </span>
+        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+          {{ t().entities.novedad.detail.sections.vacaciones }}
+        </h2>
+      </div>
+
+      <div
+        class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-3 lg:divide-x lg:divide-y-0"
+      >
+        <div class="px-5 py-4">
+          <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.dias }}</p>
+          <dl class="mt-3 flex flex-col gap-3">
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.form.fields.diasDisfrutados }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cantidad(n.dias_disfrutados)"
+              >
+                {{ cantidad(n.dias_disfrutados) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.form.fields.diasDinero }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cantidad(n.dias_dinero)"
+              >
+                {{ cantidad(n.dias_dinero) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.diasDisfrutadosReales }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cantidad(n.dias_disfrutados_reales)"
+              >
+                {{ cantidad(n.dias_disfrutados_reales) || '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="px-5 py-4">
+          <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.disfrute }}</p>
+          <dl class="mt-3 flex flex-col gap-3">
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pagoDiaDisfrute }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_dia_disfrute)"
+              >
+                {{ cop(n.pago_dia_disfrute) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pagoDisfrute }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_disfrute)"
+              >
+                {{ cop(n.pago_disfrute) || '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="px-5 py-4">
+          <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.dinero }}</p>
+          <dl class="mt-3 flex flex-col gap-3">
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pagoDiaDinero }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_dia_dinero)"
+              >
+                {{ cop(n.pago_dia_dinero) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pagoDinero }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_dinero)"
+              >
+                {{ cop(n.pago_dinero) || '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+  } @else {
+    <!-- ── Empresa y entidad ───────────────────────────────────────────────────── -->
+    <!-- Qué parte de la novedad asume la empresa y cuál reconoce la entidad
+         (EPS/ARL): fechas, días, horas y pago de cada lado, en columnas gemelas
+         para leerlos frente a frente. -->
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+        >
+          <i class="pi pi-building text-[1rem]"></i>
+        </span>
+        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+          {{ t().entities.novedad.detail.sections.empresaEntidad }}
+        </h2>
+      </div>
+
+      <div
+        class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-2 lg:divide-x lg:divide-y-0"
+      >
+        <div class="px-5 py-4">
+          <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.empresa }}</p>
+          <dl class="mt-3 grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaDesde }}</dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!fecha(n.fecha_desde_empresa)"
+              >
+                {{ fecha(n.fecha_desde_empresa) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaHasta }}</dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta_empresa)"
+              >
+                {{ fecha(n.fecha_hasta_empresa) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">{{ t().entities.novedad.columns.dias }}</dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cantidad(n.dias_empresa)"
+              >
+                {{ cantidad(n.dias_empresa) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.horas }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cantidad(n.hora_empresa)"
+              >
+                {{ cantidad(n.hora_empresa) || '—' }}
+              </dd>
+            </div>
+            <div class="col-span-2 flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pago }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_empresa)"
+              >
+                {{ cop(n.pago_empresa) || '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="px-5 py-4">
+          <p class="novedad-detail__group">{{ t().entities.novedad.detail.groups.entidad }}</p>
+          <dl class="mt-3 grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaDesde }}</dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!fecha(n.fecha_desde_entidad)"
+              >
+                {{ fecha(n.fecha_desde_entidad) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">{{ t().entities.novedad.columns.fechaHasta }}</dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!fecha(n.fecha_hasta_entidad)"
+              >
+                {{ fecha(n.fecha_hasta_entidad) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">{{ t().entities.novedad.columns.dias }}</dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cantidad(n.dias_entidad)"
+              >
+                {{ cantidad(n.dias_entidad) || '—' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.horas }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cantidad(n.hora_entidad)"
+              >
+                {{ cantidad(n.hora_entidad) || '—' }}
+              </dd>
+            </div>
+            <div class="col-span-2 flex flex-col gap-0.5">
+              <dt class="novedad-detail__label">
+                {{ t().entities.novedad.detail.fields.pago }}
+              </dt>
+              <dd
+                class="novedad-detail__value novedad-detail__value--mono"
+                [class.novedad-detail__value--empty]="!cop(n.pago_entidad)"
+              >
+                {{ cop(n.pago_entidad) || '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+  }
+}

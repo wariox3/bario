@@ -1,5 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { I18nService, formatCop, fromIsoDate, toFiniteNumber } from '@reddoc/core';
+import { I18nService, formatCop, toFiniteNumber, formatFechaCorta } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { estadoDe, type EstadoProceso } from '../../../shared/proceso.estado';
 import { LIQUIDACION_PRESTACIONES } from '../../liquidacion.constants';
@@ -55,8 +55,6 @@ export class LiquidacionResumenComponent {
 
   /** Fecha corta (`2026-07-30`); `—` si no hay valor. */
   protected formatFecha(value: string | null): string {
-    const date = fromIsoDate(value);
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return formatFechaCorta(value, '—');
   }
 }

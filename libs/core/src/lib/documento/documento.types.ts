@@ -131,4 +131,12 @@ export interface DocumentoDetalleImpuestoRead {
   readonly porcentaje_base?: string | null;
   /** Monto ya calculado por el backend, e.g. `"796537.456000"`. */
   readonly total?: string | null;
+  /**
+   * Operación sobre el total: `1` suma, `-1` resta (retención). **El backend
+   * aún no lo serializa** (pedido el 2026-08-31: el serializer de impuestos del
+   * ítem sí lo trae, este no) y `total` llega sin signo; mientras tanto los
+   * mappers que lo necesitan resuelven el signo contra el catálogo de
+   * impuestos. Cuando llegue, el signo saldrá de aquí solo.
+   */
+  readonly impuesto_operacion?: number | null;
 }

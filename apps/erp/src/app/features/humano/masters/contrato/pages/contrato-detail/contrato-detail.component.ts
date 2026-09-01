@@ -1,16 +1,45 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { EMPTY, filter, from, switchMap } from 'rxjs';
+import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { Menu, MenuModule } from 'primeng/menu';
+import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
-import { I18nService, TenantService, ToastService, formatCop, fromIsoDate } from '@reddoc/core';
+import {
+  FileDownloadService,
+  I18nService,
+  TenantService,
+  ToastService,
+  formatCop,
+  formatFechaCorta,
+  formatFechaLarga,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
-import { CONTRATO_LIST_PATH } from '../../contrato.constants';
+import {
+  CERTIFICADO_LABORAL_ENDPOINT,
+  CERTIFICADO_LABORAL_FILENAME,
+  CONTRATO_LIST_PATH,
+} from '../../contrato.constants';
 import type { Contrato } from '../../contrato.model';
+
+/** Una de las cuatro fechas de último pago: su etiqueta i18n y el valor ya formateado. */
+interface ParametroInicial {
+  readonly labelKey: 'general' | 'prima' | 'cesantia' | 'vacacion';
+  readonly value: string;
+}
 
 /**
  * Ficha (detalle) de un contrato — solo lectura.
@@ -24,7 +53,7 @@ import type { Contrato } from '../../contrato.model';
 @Component({
   selector: 'app-contrato-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonModule, MenuModule, BreadcrumbComponent],
   providers: [DialogService],
   templateUrl: './contrato-detail.component.html',
   styleUrl: './contrato-detail.component.scss',
@@ -32,6 +61,7 @@ import type { Contrato } from '../../contrato.model';
 export class ContratoDetailComponent implements OnInit {
   private readonly service = inject(ContratoService);
   private readonly dialog = inject(DialogService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
@@ -46,6 +76,53 @@ export class ContratoDetailComponent implements OnInit {
   protected readonly contrato = signal<Contrato | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  private readonly formatoMenu = viewChild<Menu>('formatoMenu');
+  private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
+
+  /**
+   * Entradas del dropdown "Utilidades" — lo que se corrige sobre un contrato
+   * vigente. `computed` por la misma razón que "Formato": recrear el array en
+   * cada detección de cambios le hace perder el primer click a `p-menu`.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.contrato.parametrosIniciales.action,
+      icon: 'pi pi-calendar-clock',
+      command: () => this.onParametrosIniciales(),
+    },
+  ]);
+
+  /**
+   * Las cuatro fechas de último pago, ya formateadas, para pintarlas en la ficha.
+   * Antes solo se veían abriendo el modal que las edita.
+   */
+  protected readonly parametrosIniciales = computed<readonly ParametroInicial[]>(() => {
+    const c = this.contrato();
+    if (!c) return [];
+    return [
+      { labelKey: 'general', value: formatFechaCorta(c.fecha_ultimo_pago) },
+      { labelKey: 'prima', value: formatFechaCorta(c.fecha_ultimo_pago_prima) },
+      { labelKey: 'cesantia', value: formatFechaCorta(c.fecha_ultimo_pago_cesantia) },
+      { labelKey: 'vacacion', value: formatFechaCorta(c.fecha_ultimo_pago_vacacion) },
+    ];
+  });
+
+  /** Descarga en vuelo: evita disparar dos veces el mismo PDF. */
+  protected readonly isDescargando = signal(false);
+
+  /**
+   * Entradas del dropdown "Formato" — los documentos imprimibles del contrato.
+   * `computed` (ref estable salvo cambio de idioma) para que `p-menu` no pierda
+   * el primer click al recrear el array en cada detección de cambios.
+   */
+  protected readonly formatoItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.contrato.formato.certificadoLaboral,
+      icon: 'pi pi-file-pdf',
+      command: () => this.onCertificadoLaboral(),
+    },
+  ]);
 
   /** Migas: módulo Humano → listado de contratos → empleado del contrato abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -84,6 +161,45 @@ export class ContratoDetailComponent implements OnInit {
     const c = this.contrato();
     if (!c) return;
     this.navigate('editar', c.id);
+  }
+
+  // ── Formatos ──────────────────────────────────────────────────────────────
+
+  protected toggleFormato(event: Event): void {
+    this.formatoMenu()?.toggle(event);
+  }
+
+  protected toggleUtilidades(event: Event): void {
+    this.utilidadesMenu()?.toggle(event);
+  }
+
+  /**
+   * Descarga el certificado laboral del empleado.
+   *
+   * Va **sin** condicionar al estado del contrato: certificar dónde y cuándo
+   * trabajó alguien es justamente lo que se pide de un contrato ya terminado.
+   */
+  protected onCertificadoLaboral(): void {
+    const c = this.contrato();
+    if (!c || this.isDescargando()) return;
+
+    this.isDescargando.set(true);
+    this.fileDownload
+      .download(CERTIFICADO_LABORAL_ENDPOINT, {
+        method: 'POST',
+        body: { id: c.id },
+        fallbackFilename: CERTIFICADO_LABORAL_FILENAME,
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isDescargando.set(false)),
+      )
+      .subscribe({
+        error: () => {
+          const ts = this.t().entities.contrato.formato.toasts.error;
+          this.toast.error(ts.title, ts.desc);
+        },
+      });
   }
 
   // ── Terminación ───────────────────────────────────────────────────────────
@@ -169,9 +285,7 @@ export class ContratoDetailComponent implements OnInit {
 
   /** Fecha larga de la ficha (`20 de junio de 2026`); `—` si no hay valor. */
   protected formatFecha(value: string | null): string {
-    const date = fromIsoDate(value);
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(value, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/humano/contratos[/extra]`. */

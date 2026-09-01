@@ -84,6 +84,7 @@
             inputId="concepto"
             formControlName="concepto"
             [endpoint]="conceptoEndpoint"
+            [params]="conceptoParams"
             searchParam="nombre__icontains"
             [placeholder]="t().entities.adicional.form.fields.conceptoPlaceholder"
             [invalid]="form.controls.concepto.invalid && form.controls.concepto.touched"
@@ -123,19 +124,26 @@
             {{ t().entities.adicional.form.fields.valor }}
             <span class="ml-px text-red-500">*</span>
           </label>
+          <!-- `min` impide teclear el signo y `mode="decimal"` impide escribir
+               algo que no sea número; `montoPositivo` rechaza el cero y cubre lo
+               que llegue mal desde el backend al editar. -->
           <p-inputnumber
             inputId="valor"
             formControlName="valor"
             mode="decimal"
             [minFractionDigits]="0"
             [maxFractionDigits]="2"
+            [min]="0"
             prefix="$ "
             [fluid]="true"
             [invalid]="form.controls.valor.invalid && form.controls.valor.touched"
           />
           <lib-field-error
             [control]="form.controls.valor"
-            [messages]="{ required: t().entities.adicional.form.validation.required }"
+            [messages]="{
+              required: t().entities.adicional.form.validation.required,
+              montoPositivo: t().entities.adicional.form.validation.valorPositivo,
+            }"
           />
         </div>
 

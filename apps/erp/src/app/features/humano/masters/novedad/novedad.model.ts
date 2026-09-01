@@ -20,14 +20,15 @@ export interface Novedad {
   readonly fecha_hasta_empresa: string | null;
   readonly fecha_desde_entidad: string | null;
   readonly fecha_hasta_entidad: string | null;
-  // Días (editables en vacaciones + calculados)
-  readonly dias_disfrutados: number | null;
-  readonly dias_disfrutados_reales: number | null;
-  readonly dias_dinero: number | null;
-  readonly dias: number | null;
-  readonly dias_empresa: number | null;
-  readonly dias_entidad: number | null;
-  readonly dias_acumulados: number | null;
+  // Días: Decimal del backend → llegan como string (`"15.000"`); el mapper los
+  // coerciona antes de sentarlos en un control numérico.
+  readonly dias_disfrutados: string | number | null;
+  readonly dias_disfrutados_reales: string | number | null;
+  readonly dias_dinero: string | number | null;
+  readonly dias: string | number | null;
+  readonly dias_empresa: string | number | null;
+  readonly dias_entidad: string | number | null;
+  readonly dias_acumulados: string | number | null;
   // Montos calculados por el backend
   readonly pago_disfrute: string | number | null;
   readonly pago_dinero: string | number | null;
@@ -53,11 +54,24 @@ export interface Novedad {
    * que se sigue el mismo patrón `<fk>_<campo>`. Opcional: hasta que el backend lo
    * exponga llega `undefined` y el addon degrada a vacío, como hoy.
    */
-  readonly contrato_numero_identificacion?: string | null;
+  /**
+   * Datos del empleado del contrato: su código interno y su cédula.
+   *
+   * TODO(backend): el esquema `HumNovedad` **no los declara** todavía; sí lo hace
+   * `HumAdicional`, con estos mismos nombres. Opcionales hasta entonces: llegan
+   * `undefined`, las columnas quedan vacías y el addon del selector también.
+   */
+  readonly contrato_contacto_id?: number | null;
+  readonly contrato_contacto_numero_identificacion?: string | null;
   readonly novedad_tipo: number | null;
   readonly novedad_tipo_nombre: string | null;
   readonly novedad_referencia: number | null;
-  readonly novedad_referencia_nombre: string | null;
+  /**
+   * TODO(backend): `HumNovedad` **no** lo expone (tampoco hay `nombre` en la
+   * novedad: `HumNovedadSeleccionar` trae id, contrato y fechas). El formulario
+   * etiqueta la referencia con su id y sus fechas, así que no depende de esto.
+   */
+  readonly novedad_referencia_nombre?: string | null;
 }
 
 /**
@@ -75,9 +89,13 @@ export interface NovedadPayload {
   // Vacaciones
   fecha_desde_periodo: string | null;
   fecha_hasta_periodo: string | null;
+  /** Días de la novedad, extremos incluidos. Los calcula el front, no el backend. */
+  dias: number | null;
   dias_dinero: number;
   dias_disfrutados: number;
-  dias_disfrutados_reales: number;
+  // `dias_disfrutados_reales` no viaja: el OpenAPI lo marca `readOnly` (DRF lo
+  // descartaría) aunque hoy el backend tampoco lo calcula —vuelve `0.000`—.
+  // Pendiente de definir con el backend: o lo calcula o lo vuelve escribible.
   // Referencia
   novedad_referencia: number | null;
 }

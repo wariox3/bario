@@ -6,6 +6,7 @@ import {
   forwardRef,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -27,9 +28,9 @@ export interface ItemOption extends ErpSelectOption {
 
 /**
  * Fila cruda del endpoint `general/item/seleccionar/`. `precio` llega como
- * string con cola de ceros (`"120600.000000"`); se normaliza en `toOption`.
+ * string con cola de ceros (`"120600.000000"`); se normaliza en `toItemOption`.
  */
-interface ItemApiRow {
+export interface ItemApiRow {
   readonly id: number;
   readonly codigo?: string;
   readonly nombre?: string;
@@ -37,13 +38,17 @@ interface ItemApiRow {
 }
 
 /** Endpoint de selección de ítems. */
-const ENDPOINT = '/general/item/seleccionar/';
+export const ITEM_SELECCIONAR_ENDPOINT = '/general/item/seleccionar/';
 
 /** Debounce del autocomplete (ms). Lo usa la plantilla y el timer de reapertura. */
 const DELAY_MS = 300;
 
-/** Construye la opción `{ id, nombre: 'código - nombre', precio }`. */
-function toOption(row: ItemApiRow): ItemOption {
+/**
+ * Construye la opción `{ id, nombre: 'código - nombre', precio }`. Exportado
+ * para quien agrega ítems por fuera del autocomplete (p. ej. el lector de
+ * código de barras) y necesita el mismo shape/etiqueta en la línea.
+ */
+export function toItemOption(row: ItemApiRow): ItemOption {
   const label = [row.codigo, row.nombre].filter(Boolean).join(' - ');
   return { id: row.id, nombre: label || row.nombre || '', precio: toFiniteNumber(row.precio) ?? 0 };
 }
@@ -84,7 +89,23 @@ function toOption(row: ItemApiRow): ItemOption {
       [showClear]="true"
       appendTo="body"
       autocomplete="off"
-    />
+    >
+      @if (allowCreate()) {
+        <!-- Pie del panel: alta inline. El preventDefault del mousedown evita que
+             el blur del input dispare la reconciliación antes de que llegue el click. -->
+        <ng-template #footer>
+          <button
+            type="button"
+            class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-3 py-2 text-[0.8rem] font-medium text-sky-700 transition-colors hover:bg-sky-50"
+            (mousedown)="$event.preventDefault()"
+            (click)="onCreateClick()"
+          >
+            <i class="pi pi-plus text-[0.7rem]"></i>
+            {{ createLabel() }}
+          </button>
+        </ng-template>
+      }
+    </p-autocomplete>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -104,6 +125,15 @@ export class ErpItemAutocompleteComponent implements ControlValueAccessor {
   readonly inputId = input<string>('');
   readonly placeholder = input<string>('Buscar ítem…');
   readonly invalid = input<boolean>(false);
+
+  /**
+   * Muestra "crear ítem" al pie del panel de sugerencias. El autocomplete solo
+   * **emite** `createRequested`: el alta (modal, permisos, selección del creado)
+   * es del consumidor — así este componente de `core` no conoce el master.
+   */
+  readonly allowCreate = input<boolean>(false);
+  readonly createLabel = input<string>('Crear ítem');
+  readonly createRequested = output<void>();
 
   readonly value = signal<ItemOption | null>(null);
   readonly disabled = signal(false);
@@ -209,6 +239,12 @@ export class ErpItemAutocompleteComponent implements ControlValueAccessor {
     this.query$.next(event.query?.trim() ?? '');
   }
 
+  /** Cierra el panel y delega el alta en el consumidor. */
+  protected onCreateClick(): void {
+    this.ac?.hide();
+    this.createRequested.emit();
+  }
+
   /**
    * `forceSelection` descarta el texto que no coincide **exacto** con una opción: al
    * salir del campo, PrimeNG vacía el input y su modelo interno, pero como el
@@ -228,9 +264,11 @@ export class ErpItemAutocompleteComponent implements ControlValueAccessor {
   }
 
   private fetchItems(query: string) {
-    return this.dataService.fetchOptions<ItemApiRow>(ENDPOINT, { search: query }).pipe(
-      takeUntilDestroyed(this.destroyRef),
-      map((rows) => rows.map(toOption)),
-    );
+    return this.dataService
+      .fetchOptions<ItemApiRow>(ITEM_SELECCIONAR_ENDPOINT, { search: query })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((rows) => rows.map(toItemOption)),
+      );
   }
 }

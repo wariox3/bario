@@ -2,7 +2,13 @@ import { Component, DestroyRef, type OnInit, computed, inject, input, signal } f
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  formatCop,
+  formatFechaCorta,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
@@ -64,9 +70,9 @@ export class ActivoDetailComponent implements OnInit {
     return unirCuenta(a?.cuenta_depreciacion_codigo, a?.cuenta_depreciacion_nombre);
   });
 
-  /** Fecha ISO a `yyyy-MM-dd`, la convención del ERP. Vacío si no hay. */
+  /** Fecha del sistema (`05/08/2026`). Vacío si no hay, para que caiga al guion. */
   protected fecha(iso: string | null | undefined): string {
-    return iso ? iso.slice(0, 10) : '';
+    return formatFechaCorta(iso);
   }
 
   /** Migas: módulo Contabilidad → listado de activos → nombre abierto. */

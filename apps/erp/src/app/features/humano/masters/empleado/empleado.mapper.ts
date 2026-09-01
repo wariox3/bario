@@ -1,3 +1,4 @@
+import { normalizarCelular } from '@reddoc/core';
 import { TIPO_PERSONA } from '@erp/features/general/masters/contacto/contacto.constants';
 import { construirNombreCorto } from '@erp/features/general/masters/contacto/utils/nombre-corto.util';
 import { calcularDigitoVerificacion } from '@erp/features/general/masters/contacto/utils/digito-verificacion.util';
@@ -26,7 +27,9 @@ export function empleadoToFormValue(c: Empleado): Partial<EmpleadoFormRawValue> 
     apellido1: c.apellido1 ?? '',
     apellido2: c.apellido2 ?? '',
     telefono: c.telefono ?? '',
-    celular: c.celular ?? '',
+    // Los celulares guardados antes de `lib-phone-input` son dígitos pelados:
+    // normalizados a E.164 el campo no nace inválido al abrir la edición.
+    celular: normalizarCelular(c.celular),
     // Ver el mapper de contacto: el departamento acompaña a la ciudad para que
     // el campo la muestre completa al reabrir el registro.
     ciudad: {

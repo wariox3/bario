@@ -1,6 +1,7 @@
 <form
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
+  libFocusInvalid
   class="flex flex-col gap-[1.1rem]"
   autocomplete="off"
 >
@@ -32,31 +33,29 @@
     />
   </div>
 
-  <!-- Teléfono -->
+  <!-- Celular -->
   <div class="flex flex-col">
     <label
-      for="telefono"
+      for="celular"
       class="mb-1.5 flex items-center gap-2 text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy"
     >
-      {{ t().contenedores.create.fields.phone }}
+      {{ t().contenedores.create.fields.mobile }}
     </label>
-    <input
-      id="telefono"
-      pInputText
-      type="tel"
-      formControlName="telefono"
-      [placeholder]="t().contenedores.create.fields.phonePlaceholder"
-      class="w-full"
-      [class.cd-input-error]="
-        form.controls.telefono.invalid &&
-        (form.controls.telefono.touched || form.controls.telefono.dirty)
+    <lib-phone-input
+      inputId="celular"
+      formControlName="celular"
+      [placeholder]="t().contenedores.create.fields.mobilePlaceholder"
+      [invalid]="
+        form.controls.celular.invalid &&
+        (form.controls.celular.touched || form.controls.celular.dirty)
       "
     />
     <lib-field-error
-      [control]="form.controls.telefono"
+      [control]="form.controls.celular"
       [messages]="{
-        required: t().contenedores.create.validation.phoneRequired,
-        maxlength: t().contenedores.create.validation.phoneMax20,
+        required: t().contenedores.create.validation.mobileRequired,
+        celularE164: t().contenedores.create.validation.mobilePattern,
+        celularLongitud: t().contenedores.create.validation.mobileLength,
       }"
     />
   </div>
@@ -101,7 +100,7 @@
       type="submit"
       [label]="isEditMode() ? t().contenedores.edit.submit : t().contenedores.create.submit"
       [loading]="isSaving()"
-      [disabled]="form.invalid || isSaving()"
+      [disabled]="isSaving()"
     />
   </div>
 </form>

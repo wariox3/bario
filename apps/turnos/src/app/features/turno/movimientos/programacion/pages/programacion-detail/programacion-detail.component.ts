@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import {
+  formatFechaLarga,
   FestivoService,
   I18nService,
   TenantService,
@@ -343,12 +344,7 @@ export class ProgramacionDetailComponent implements OnInit {
 
   /** Fecha larga de la cabecera (`20 de junio de 2026`). */
   protected formatFecha(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString(localeDe(this.i18n.lang()), {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
+    return formatFechaLarga(date, '—', localeDe(this.i18n.lang()));
   }
 
   /**

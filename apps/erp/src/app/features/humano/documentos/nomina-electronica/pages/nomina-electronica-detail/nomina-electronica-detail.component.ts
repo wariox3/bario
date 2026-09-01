@@ -7,12 +7,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { TabsModule } from 'primeng/tabs';
 import {
+  formatFechaCorta,
   I18nService,
   TenantService,
   ToastService,
   extractErrorMessage,
   formatCop,
-  fromIsoDate,
   type DocumentoEstados,
 } from '@reddoc/core';
 import { BreadcrumbComponent, DataTableComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -160,8 +160,7 @@ export class NominaElectronicaDetailComponent implements OnInit {
   }
 
   protected formatFecha(iso: string | null | undefined): string {
-    const d = fromIsoDate(iso ?? null);
-    return d ? d.toLocaleDateString() : '—';
+    return formatFechaCorta(iso, '—');
   }
 
   protected onBack(): void {

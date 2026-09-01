@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
-import { ToastService, extractErrorMessage, getInitials } from '@reddoc/core';
+import { ToastService, extractErrorMessage, getInitials, FORMATO_FECHA } from '@reddoc/core';
 import { InvitacionPendiente } from './models/invitacion.model';
 import { InvitacionesService } from './services/invitaciones.service';
 
@@ -13,6 +13,9 @@ import { InvitacionesService } from './services/invitaciones.service';
   templateUrl: './invitaciones.component.html',
 })
 export class InvitacionesComponent implements OnInit {
+  /** Formato de fecha del sistema, para el `| date` de la plantilla. */
+  protected readonly formatoFecha = FORMATO_FECHA.angular;
+
   private readonly invitacionesService = inject(InvitacionesService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);

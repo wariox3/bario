@@ -80,11 +80,12 @@
             {{ t().entities.credito.form.fields.concepto }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <lib-api-autocomplete
+          <lib-api-select
             inputId="concepto"
             formControlName="concepto"
             [endpoint]="conceptoEndpoint"
-            searchParam="nombre__icontains"
+            [params]="conceptoParams"
+            [suggestedIndex]="0"
             [placeholder]="t().entities.credito.form.fields.conceptoPlaceholder"
             [invalid]="form.controls.concepto.invalid && form.controls.concepto.touched"
           />
@@ -103,7 +104,6 @@
           <p-datepicker
             inputId="fecha_inicio"
             formControlName="fecha_inicio"
-            dateFormat="yy-mm-dd"
             [showIcon]="true"
             appendTo="body"
             [fluid]="true"
@@ -156,29 +156,10 @@
           />
           <lib-field-error
             [control]="form.controls.total"
-            [messages]="{ required: t().entities.credito.form.validation.required }"
-          />
-        </div>
-
-        <!-- Valor cuota -->
-        <div class="flex flex-col gap-1.5">
-          <label for="cuota" class="credito-form__label">
-            {{ t().entities.credito.form.fields.cuota }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <p-inputnumber
-            inputId="cuota"
-            formControlName="cuota"
-            mode="decimal"
-            [minFractionDigits]="0"
-            [maxFractionDigits]="2"
-            prefix="$ "
-            [fluid]="true"
-            [invalid]="form.controls.cuota.invalid && form.controls.cuota.touched"
-          />
-          <lib-field-error
-            [control]="form.controls.cuota"
-            [messages]="{ required: t().entities.credito.form.validation.required }"
+            [messages]="{
+              required: t().entities.credito.form.validation.required,
+              montoPositivo: t().entities.credito.form.validation.mayorQueCero,
+            }"
           />
         </div>
 
@@ -201,9 +182,58 @@
           />
           <lib-field-error
             [control]="form.controls.cantidad_cuotas"
-            [messages]="{ required: t().entities.credito.form.validation.required }"
+            [messages]="{
+              required: t().entities.credito.form.validation.required,
+              montoPositivo: t().entities.credito.form.validation.mayorQueCero,
+            }"
           />
         </div>
+
+        <!-- Valor cuota -->
+        <div class="flex flex-col gap-1.5">
+          <label for="cuota" class="credito-form__label">
+            {{ t().entities.credito.form.fields.cuota }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-inputnumber
+            inputId="cuota"
+            formControlName="cuota"
+            mode="decimal"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            prefix="$ "
+            [fluid]="true"
+            [invalid]="form.controls.cuota.invalid && form.controls.cuota.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.cuota"
+            [messages]="{
+              required: t().entities.credito.form.validation.required,
+              montoPositivo: t().entities.credito.form.validation.mayorQueCero,
+            }"
+          />
+          <p class="m-0 text-[0.72rem] text-brand-muted">
+            {{ t().entities.credito.form.fields.cuotaHint }}
+          </p>
+          <!-- Error de grupo: `lib-field-error` lee el control, no el form. -->
+          @if (form.controls.cuota.touched && form.hasError('cuotaSuperaTotal')) {
+            <p class="m-0 text-[0.8rem] text-red-500">
+              {{ t().entities.credito.form.validation.cuotaSuperaTotal }}
+            </p>
+          }
+        </div>
+
+        <!-- Resumen del plan bajo los tres montos: confirma lo que se va a crear
+             sin que haya que rehacer la cuenta. Neutro y no ámbar — la cantidad
+             se deriva sola, así que no hay nada que advertir. -->
+        @if (planTexto()) {
+          <div
+            class="flex items-center gap-2 rounded-lg border border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2.5 sm:col-span-2"
+          >
+            <i class="pi pi-calculator text-[0.85rem] text-brand-muted"></i>
+            <span class="text-[0.82rem] text-brand-text">{{ planTexto() }}</span>
+          </div>
+        }
 
         <!-- Banderas -->
         <div class="flex flex-wrap items-center gap-x-8 gap-y-3 sm:col-span-2">

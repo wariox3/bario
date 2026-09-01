@@ -30,12 +30,21 @@ import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
 import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+import {
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta-recurrente.constants';
-import { setupVencimientoAutocompute } from '@erp/features/documentos/comercial/vencimiento-autocompute';
+import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
+import {
+  setupVencimientoAutocompute,
+  type VencimientoAutocompute,
+} from '@erp/features/documentos/comercial/vencimiento-autocompute';
+import { VencimientoHintComponent } from '@erp/features/documentos/comercial/components/vencimiento-hint/vencimiento-hint.component';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -81,6 +90,7 @@ import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
+    VencimientoHintComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './factura-venta-recurrente-form.component.html',
@@ -155,15 +165,31 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
 
+  /**
+   * Estado del vencimiento (días del plazo, fecha que dicta y desvío), para que
+   * `<app-vencimiento-hint>` explique bajo el campo de dónde salió la fecha.
+   */
+  protected readonly vencimiento: VencimientoAutocompute;
+
   constructor() {
     // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
-    setupVencimientoAutocompute({
+    this.vencimiento = setupVencimientoAutocompute({
       fecha: this.form.controls.fecha,
       plazoPago: this.form.controls.plazo_pago,
       fechaVence: this.form.controls.fecha_vence,
       selectData: this.selectData,
       destroyRef: this.destroyRef,
       endpoint: this.plazoPagoEndpoint,
+    });
+
+    // Al elegir cliente, adopta su plazo de pago pactado. Cambiar el plazo
+    // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
+    // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
+    setupPlazoPagoDesdeContacto({
+      contacto: this.form.controls.contacto,
+      plazoPago: this.form.controls.plazo_pago,
+      origen: 'cliente',
+      destroyRef: this.destroyRef,
     });
   }
 
@@ -232,11 +258,16 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
       : this.gateway.create(this.document(), payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha del documento, para revisar lo que quedó
+        // almacenado. En alta el id sale de la respuesta del backend; si no
+        // viniera, se cae a la lista antes que navegar a una URL inválida.
+        const savedId = id ?? extractDocumentoId(saved);
+        if (savedId != null) this.navigateToDetail(savedId);
+        else this.navigateToList();
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -344,9 +375,26 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {
+    this.navigate(this.document().routes.list);
+  }
+
+  /** Abre la ficha del documento guardado (`routes.detail` + id). */
+  private navigateToDetail(id: string | number): void {
+    this.navigate(this.document().routes.detail, String(id));
+  }
+
+  /** Construye la ruta absoluta del documento dentro del tenant y el módulo. */
+  private navigate(routePath: string, extra?: string): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...segments]);
+    const segments = routePath.split('/').filter(Boolean);
+    const commands: (string | number)[] = [
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...segments,
+    ];
+    if (extra) commands.push(extra);
+    void this.router.navigate(commands);
   }
 }

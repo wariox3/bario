@@ -44,3 +44,17 @@
 />
 
 <p-confirmDialog />
+
+<app-import-dialog
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
+  [title]="t().entities.activo.import.title"
+  [subtitle]="t().entities.activo.import.subtitle"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
+  (importRequested)="importar.submit($event)"
+  [exampleConfig]="exampleConfig"
+/>

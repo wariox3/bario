@@ -27,7 +27,9 @@ export function redondearMoneda(n: number): number {
 
 /**
  * Resuelve los montos de impuesto de una línea: por cada tasa,
- * `base × (porcentaje / 100) × (porcentajeBase / 100)`, redondeado.
+ * `base × (porcentaje / 100) × (porcentajeBase / 100) × operacion`, redondeado.
+ * `operacion` (default `1`) pone el signo: una retención (`−1`) produce un monto
+ * negativo que los agregados restan del total sin tratamiento especial.
  */
 export function calcularImpuestosLinea(
   base: number,
@@ -36,7 +38,9 @@ export function calcularImpuestosLinea(
   return tasas.map((t) => ({
     id: t.id,
     nombre: t.nombre,
-    total: redondearMoneda(base * (t.porcentaje / 100) * (t.porcentajeBase / 100)),
+    total: redondearMoneda(
+      base * (t.porcentaje / 100) * (t.porcentajeBase / 100) * (t.operacion ?? 1),
+    ),
   }));
 }
 
@@ -46,7 +50,8 @@ export function calcularImpuestosLinea(
  *  - `descuento` = Σ descuentos.
  *  - `impuestos` = montos agrupados y sumados por id de impuesto (un mismo IVA
  *    repartido en varias líneas aparece una sola vez con el total sumado).
- *  - `total` = subtotal − descuento + Σ impuestos.
+ *  - `total` = subtotal − descuento + Σ impuestos (los montos vienen con signo:
+ *    las retenciones son negativas y restan solas).
  */
 export function calcularResumen(lineas: readonly LineaCalculo[]): ResumenDocumento {
   let subtotal = 0;

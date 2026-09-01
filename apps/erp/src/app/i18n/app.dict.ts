@@ -3,6 +3,7 @@ import type {
   AccesosContenedorTranslationsHost,
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
+  PhoneInputTranslationsHost,
 } from '@reddoc/ui';
 
 /**
@@ -62,6 +63,7 @@ export interface AppDict
   extends
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
+    PhoneInputTranslationsHost,
     ContenedoresTranslationsHost,
     AccesosContenedorTranslationsHost {
   common: {
@@ -291,6 +293,12 @@ export interface AppDict
     };
     generarRecurrente: {
       seleccionadosLabel: string;
+      modalHeader: string;
+      modalSubtitle: string;
+      periodoLabel: string;
+      submit: string;
+      cancel: string;
+      sinDestino: string;
       noSelection: { title: string; desc: string };
       success: { title: string; desc: string };
       empty: { title: string; desc: string };
@@ -460,7 +468,12 @@ export interface AppDict
         createSubtitle: string;
         editSubtitle: string;
         fields: { nombreCorto: string; celular: string; correo: string };
-        validation: { required: string; email: string };
+        validation: {
+          required: string;
+          email: string;
+          celularInvalido: string;
+          celularLongitud: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -681,6 +694,8 @@ export interface AppDict
         validation: {
           required: string;
           emailInvalid: string;
+          celularInvalido: string;
+          celularLongitud: string;
           numeroIdentificacionExistente: string;
         };
         submitCreate: string;
@@ -1061,6 +1076,7 @@ export interface AppDict
           confirm: { header: string; message: string; accept: string };
           toasts: {
             success: { title: string; desc: string };
+            vacio: { title: string; desc: string };
             error: { title: string; desc: string };
           };
         };
@@ -1069,6 +1085,7 @@ export interface AppDict
     activo: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         codigo: string;
@@ -1202,6 +1219,8 @@ export interface AppDict
         validation: {
           required: string;
           emailInvalid: string;
+          celularInvalido: string;
+          celularLongitud: string;
           numeroIdentificacionExistente: string;
         };
         toasts: {
@@ -1225,8 +1244,18 @@ export interface AppDict
     credito: {
       name: string;
       searchPlaceholder: string;
+      pagos: {
+        title: string;
+        empty: string;
+        loadError: string;
+        total: string;
+        columns: { id: string; fecha: string; documento: string; pago: string };
+      };
       columns: {
-        contrato: string;
+        id: string;
+        identificacion: string;
+        nombre: string;
+        validarCuotas: string;
         concepto: string;
         inicio: string;
         total: string;
@@ -1254,11 +1283,17 @@ export interface AppDict
           total: string;
           cuota: string;
           cantidadCuotas: string;
+          cuotaHint: string;
           inactivo: string;
           aplicaPrima: string;
           aplicaCesantia: string;
         };
-        validation: { required: string };
+        plan: { exacto: string; conFinal: string };
+        validation: {
+          required: string;
+          mayorQueCero: string;
+          cuotaSuperaTotal: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -1278,13 +1313,16 @@ export interface AppDict
       name: string;
       searchPlaceholder: string;
       columns: {
-        contrato: string;
+        id: string;
+        codigo: string;
+        identificacion: string;
+        nombre: string;
+        contratoId: string;
+        conceptoId: string;
         concepto: string;
         valor: string;
-        horas: string;
         detalle: string;
         aplicaDiaLaborado: string;
-        permanente: string;
         inactivo: string;
       };
       form: {
@@ -1304,7 +1342,12 @@ export interface AppDict
           aplicaDiaLaborado: string;
           inactivo: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          mayorQueCero: string;
+          cuotaSuperaTotal: string;
+          valorPositivo: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -1316,7 +1359,6 @@ export interface AppDict
       detail: {
         sections: { general: string };
         groups: { asignacion: string; valores: string; condiciones: string };
-        labels: { programacion: string };
         activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
@@ -1326,8 +1368,12 @@ export interface AppDict
       name: string;
       searchPlaceholder: string;
       columns: {
+        id: string;
         novedadTipo: string;
-        contrato: string;
+        codigo: string;
+        identificacion: string;
+        nombre: string;
+        contratoId: string;
         fechaDesde: string;
         fechaHasta: string;
         dias: string;
@@ -1353,9 +1399,9 @@ export interface AppDict
           fechaHastaPeriodo: string;
           diasDinero: string;
           diasDisfrutados: string;
-          diasDisfrutadosReales: string;
         };
-        validation: { required: string; min: string; rangoFechas: string };
+        hints: { dias: string; diasUno: string };
+        validation: { required: string; min: string; maxLength: string; rangoFechas: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -1364,11 +1410,45 @@ export interface AppDict
           loadError: { title: string; desc: string };
         };
       };
+      detail: {
+        sections: { general: string; vacaciones: string; empresaEntidad: string };
+        groups: {
+          empleado: string;
+          fechas: string;
+          liquidacion: string;
+          dias: string;
+          disfrute: string;
+          dinero: string;
+          empresa: string;
+          entidad: string;
+        };
+        fields: {
+          contratoId: string;
+          prorroga: string;
+          baseCotizacionPropuesto: string;
+          baseCotizacion: string;
+          diasDisfrutadosReales: string;
+          pagoDiaDisfrute: string;
+          pagoDisfrute: string;
+          pagoDiaDinero: string;
+          pagoDinero: string;
+          horas: string;
+          pago: string;
+        };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
     };
     contrato: {
       name: string;
       searchPlaceholder: string;
       import: { title: string; subtitle: string };
+      formato: {
+        action: string;
+        certificadoLaboral: string;
+        toasts: { error: { title: string; desc: string } };
+      };
+      utilidades: { action: string };
       columns: {
         empleado: string;
         contratoTipo: string;
@@ -1474,7 +1554,13 @@ export interface AppDict
       };
       detail: {
         eyebrow: string;
-        sections: { datos: string; remuneracion: string; seguridadSocial: string };
+        sections: { general: string; contabilidad: string; seguridadSocial: string };
+        groups: {
+          identificacion: string;
+          vigencia: string;
+          remuneracion: string;
+          terminacion: string;
+        };
         estado: { activo: string; terminado: string };
         boolean: { si: string; no: string };
         notFound: { title: string; desc: string };
@@ -1889,12 +1975,10 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };
       filters: {
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };
@@ -2191,12 +2275,10 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };
       filters: {
-        aprobado: string;
         anulado: string;
         contabilizado: string;
       };
@@ -2613,6 +2695,15 @@ export interface AppDict
         notFound: { title: string; desc: string };
       };
     };
+    vencimiento: {
+      desvio: {
+        mas: { one: string; other: string };
+        menos: { one: string; other: string };
+      };
+      usar: string;
+      usarTitle: string;
+      anteriorAFecha: string;
+    };
     comercialDetalle: {
       title: string;
       hint: string;
@@ -2630,6 +2721,13 @@ export interface AppDict
       itemPlaceholder: string;
       detallePlaceholder: string;
       confirmDeleteLine: string;
+      createItem: string;
+      extraerIva: { title: string; baseLabel: string; apply: string };
+      scanner: {
+        placeholder: string;
+        notFound: { title: string; desc: string };
+        ambiguous: { title: string; desc: string };
+      };
       columns: {
         linea: string;
         ref: string;

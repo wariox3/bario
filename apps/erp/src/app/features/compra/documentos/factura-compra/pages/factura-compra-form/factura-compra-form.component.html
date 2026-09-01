@@ -76,7 +76,6 @@
             <p-datepicker
               inputId="fecha"
               formControlName="fecha"
-              dateFormat="yy-mm-dd"
               [showIcon]="true"
               appendTo="body"
               [fluid]="true"
@@ -97,7 +96,6 @@
             <p-datepicker
               inputId="fecha_vence"
               formControlName="fecha_vence"
-              dateFormat="yy-mm-dd"
               [showIcon]="true"
               appendTo="body"
               [fluid]="true"
@@ -105,7 +103,17 @@
             />
             <lib-field-error
               [control]="form.controls.fecha_vence"
-              [messages]="{ required: t().entities.facturaCompra.form.validation.required }"
+              [messages]="{
+                required: t().entities.facturaCompra.form.validation.required,
+                vencimientoAnterior: t().entities.vencimiento.anteriorAFecha,
+              }"
+            />
+            <app-vencimiento-hint
+              [dias]="vencimiento.diasPlazo()"
+              [sugerido]="vencimiento.sugerido()"
+              [desvio]="vencimiento.desvio()"
+              [silenciar]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
+              (restablecer)="vencimiento.restablecer()"
             />
           </div>
         </div>

@@ -31,8 +31,8 @@
       <tbody>
         @for (row of inconsistencias(); track $index) {
           <tr class="border-b border-[rgba(20,48,73,0.06)] last:border-0">
-            <td class="px-3 py-2 text-brand-text">{{ row.comprobante_id }}</td>
-            <td class="px-3 py-2 text-brand-text">{{ row.numero }}</td>
+            <td class="px-3 py-2 text-brand-text">{{ row.comprobante_id ?? '—' }}</td>
+            <td class="px-3 py-2 text-brand-text">{{ row.numero ?? '—' }}</td>
             <td class="px-3 py-2 text-brand-muted">{{ row.documento_tipo_nombre || '—' }}</td>
             <td class="px-3 py-2 text-brand-text">{{ row.inconsistencia }}</td>
           </tr>

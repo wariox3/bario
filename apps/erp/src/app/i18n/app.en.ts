@@ -1,10 +1,11 @@
 import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEn, appSwitcherEn, authEn } from '@reddoc/ui';
+import { accesosContenedorEn, appSwitcherEn, authEn, phoneInputEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
   appSwitcher: appSwitcherEn,
+  phoneInput: phoneInputEn,
   contenedores: contenedoresEn,
   accesosContenedor: accesosContenedorEn,
   common: {
@@ -285,6 +286,12 @@ export const en: AppDict = {
     },
     generarRecurrente: {
       seleccionadosLabel: 'Generate selected',
+      modalHeader: 'Generate invoices',
+      modalSubtitle: 'Generates the invoices of the chosen period from the selected templates',
+      periodoLabel: 'Period',
+      submit: 'Generate',
+      cancel: 'Cancel',
+      sinDestino: 'This document has no target invoice defined.',
       noSelection: {
         title: 'No selection',
         desc: 'Select at least one recurring invoice to generate.',
@@ -556,7 +563,12 @@ export const en: AppDict = {
         createSubtitle: 'Fill in the advisor information',
         editSubtitle: 'Update the advisor information',
         fields: { nombreCorto: 'Short name', celular: 'Mobile', correo: 'Email' },
-        validation: { required: 'This field is required', email: 'The email is not valid' },
+        validation: {
+          required: 'This field is required',
+          email: 'The email is not valid',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
+        },
         toasts: {
           createSuccess: { title: 'Advisor created', desc: 'The advisor was created successfully' },
           editSuccess: {
@@ -849,6 +861,8 @@ export const en: AppDict = {
         validation: {
           required: 'This field is required.',
           emailInvalid: 'Enter a valid email.',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
           numeroIdentificacionExistente: 'This identification number is already registered.',
         },
         submitCreate: 'Create contact',
@@ -1414,7 +1428,14 @@ export const en: AppDict = {
             accept: 'Yes, move',
           },
           toasts: {
-            success: { title: 'Entries moved', desc: 'The transfer completed successfully' },
+            success: {
+              title: 'Entries moved',
+              desc: 'Moved {movimientos} entries and {detalles} document lines',
+            },
+            vacio: {
+              title: 'Nothing to move',
+              desc: 'The source account has no entries or document lines',
+            },
             error: { title: 'Transfer error', desc: 'Could not move the entries' },
           },
         },
@@ -1423,6 +1444,10 @@ export const en: AppDict = {
     activo: {
       name: 'Assets',
       searchPlaceholder: 'Search by name…',
+      import: {
+        title: 'Import assets',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
       columns: {
         id: 'ID',
         codigo: 'Code',
@@ -1451,7 +1476,7 @@ export const en: AppDict = {
           activoGrupo: 'Asset group',
           centroCosto: 'Cost center',
           metodoDepreciacion: 'Depreciation method',
-          duracion: 'Duration',
+          duracion: 'Duration in months',
           valorCompra: 'Purchase value',
           depreciacionInicial: 'Initial depreciation',
           fechaCompra: 'Purchase date',
@@ -1609,6 +1634,8 @@ export const en: AppDict = {
         validation: {
           required: 'This field is required',
           emailInvalid: 'The email is not valid',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
           numeroIdentificacionExistente: 'A contact with this ID already exists',
         },
         toasts: {
@@ -1646,8 +1673,18 @@ export const en: AppDict = {
     credito: {
       name: 'Credits',
       searchPlaceholder: 'Search by contract…',
+      pagos: {
+        title: 'Payments',
+        empty: 'This loan has no payments applied yet',
+        loadError: 'Could not load the payments',
+        total: 'Total deducted',
+        columns: { id: 'ID', fecha: 'Date', documento: 'Document', pago: 'Amount' },
+      },
       columns: {
-        contrato: 'Contract',
+        id: 'ID',
+        identificacion: 'ID number',
+        nombre: 'Name',
+        validarCuotas: 'Validate installments',
         concepto: 'Concept',
         inicio: 'Start',
         total: 'Total',
@@ -1673,16 +1710,25 @@ export const en: AppDict = {
           contrato: 'Contract',
           contratoPlaceholder: 'Search contract…',
           concepto: 'Concept',
-          conceptoPlaceholder: 'Search concept…',
+          conceptoPlaceholder: 'Select a concept…',
           inicio: 'Start',
           total: 'Total',
           cuota: 'Installment',
           cantidadCuotas: 'Number of installments',
+          cuotaHint: 'Derived from the total and the number of installments; you can adjust it.',
           inactivo: 'Inactive',
           aplicaPrima: 'Applies to bonus',
           aplicaCesantia: 'Applies to severance',
         },
-        validation: { required: 'This field is required' },
+        plan: {
+          exacto: '{cuotas} installments of {monto}',
+          conFinal: '{cuotas} installments of {monto} and a final one of {final}',
+        },
+        validation: {
+          required: 'This field is required',
+          mayorQueCero: 'Must be greater than zero',
+          cuotaSuperaTotal: 'The installment cannot exceed the loan total',
+        },
         toasts: {
           createSuccess: { title: 'Credit created', desc: 'The credit was created successfully' },
           editSuccess: {
@@ -1710,13 +1756,16 @@ export const en: AppDict = {
       name: 'Additionals',
       searchPlaceholder: 'Search by contract…',
       columns: {
-        contrato: 'Contract',
+        id: 'ID',
+        codigo: 'Code',
+        identificacion: 'ID number',
+        nombre: 'Name',
+        contratoId: 'Cont',
+        conceptoId: 'Conc',
         concepto: 'Concept',
         valor: 'Amount',
-        horas: 'Hours',
         detalle: 'Detail',
         aplicaDiaLaborado: 'Applies to worked day',
-        permanente: 'Permanent',
         inactivo: 'Inactive',
       },
       form: {
@@ -1739,7 +1788,12 @@ export const en: AppDict = {
           aplicaDiaLaborado: 'Applies to worked day',
           inactivo: 'Inactive',
         },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          mayorQueCero: 'Must be greater than zero',
+          cuotaSuperaTotal: 'The installment cannot exceed the loan total',
+          valorPositivo: 'The amount must be greater than zero',
+        },
         toasts: {
           createSuccess: {
             title: 'Additional created',
@@ -1757,7 +1811,6 @@ export const en: AppDict = {
       detail: {
         sections: { general: 'General information' },
         groups: { asignacion: 'Assignment', valores: 'Values', condiciones: 'Conditions' },
-        labels: { programacion: 'Payroll run' },
         activo: 'Active',
         notFound: {
           title: 'Additional not found',
@@ -1772,8 +1825,12 @@ export const en: AppDict = {
       name: 'Events',
       searchPlaceholder: 'Search by contract…',
       columns: {
+        id: 'ID',
         novedadTipo: 'Type',
-        contrato: 'Contract',
+        codigo: 'Code',
+        identificacion: 'ID number',
+        nombre: 'Name',
+        contratoId: 'Contract',
         fechaDesde: 'Start date',
         fechaHasta: 'End date',
         dias: 'Days',
@@ -1799,11 +1856,15 @@ export const en: AppDict = {
           fechaHastaPeriodo: 'Period end date',
           diasDinero: 'Paid days',
           diasDisfrutados: 'Enjoyed days',
-          diasDisfrutadosReales: 'Actual enjoyed days',
+        },
+        hints: {
+          dias: 'The event lasts {dias} days, start and end included.',
+          diasUno: 'The event lasts 1 day.',
         },
         validation: {
           required: 'This field is required',
           min: 'Value below the minimum',
+          maxLength: 'Detail cannot exceed 150 characters',
           rangoFechas: 'The start date cannot be later than the end date',
         },
         toasts: {
@@ -1817,6 +1878,43 @@ export const en: AppDict = {
           loadError: { title: 'Load error', desc: 'The event could not be loaded' },
         },
       },
+      detail: {
+        sections: {
+          general: 'General information',
+          vacaciones: 'Vacation',
+          empresaEntidad: 'Company and entity',
+        },
+        groups: {
+          empleado: 'Employee',
+          fechas: 'Dates',
+          liquidacion: 'Settlement',
+          dias: 'Days',
+          disfrute: 'Leave',
+          dinero: 'Pay',
+          empresa: 'Company',
+          entidad: 'Entity',
+        },
+        fields: {
+          contratoId: 'Contract ID',
+          prorroga: 'Extension',
+          baseCotizacionPropuesto: 'Proposed contribution base',
+          baseCotizacion: 'Contribution base',
+          diasDisfrutadosReales: 'Actual enjoyed days',
+          pagoDiaDisfrute: 'Pay per day',
+          pagoDisfrute: 'Leave pay',
+          pagoDiaDinero: 'Pay per day',
+          pagoDinero: 'Cash pay',
+          horas: 'Hours',
+          pago: 'Pay',
+        },
+        notFound: {
+          title: 'Event not found',
+          desc: 'The event you are looking for does not exist or was deleted.',
+        },
+        toasts: {
+          loadError: { title: 'Load error', desc: 'The event could not be loaded' },
+        },
+      },
     },
     contrato: {
       name: 'Contracts',
@@ -1824,6 +1922,17 @@ export const en: AppDict = {
       import: {
         title: 'Import contracts',
         subtitle: 'Upload an Excel file with the records to load',
+      },
+      utilidades: { action: 'Utilities' },
+      formato: {
+        action: 'Format',
+        certificadoLaboral: 'Employment certificate',
+        toasts: {
+          error: {
+            title: 'Generation error',
+            desc: 'Could not generate the employment certificate',
+          },
+        },
       },
       columns: {
         empleado: 'Employee',
@@ -1910,7 +2019,7 @@ export const en: AppDict = {
         },
       },
       terminar: {
-        action: 'End contract',
+        action: 'End',
         title: 'End contract',
         subtitle: 'Closing the employment relationship',
         aviso:
@@ -1928,10 +2037,10 @@ export const en: AppDict = {
         },
       },
       parametrosIniciales: {
-        action: 'Last-payment dates',
-        title: 'Last-payment dates',
+        action: 'Initial parameters',
+        title: 'Initial parameters',
         subtitle: 'Starting point of the settlement',
-        hint: 'Each benefit is calculated from these dates. Leave one empty if there was no prior payment.',
+        hint: 'Each benefit is calculated from these dates. Leave the field empty if there was no prior payment.',
         fields: {
           general: 'Last payment',
           prima: 'Last bonus payment',
@@ -1946,9 +2055,15 @@ export const en: AppDict = {
       detail: {
         eyebrow: 'Contract',
         sections: {
-          datos: 'Contract data',
-          remuneracion: 'Compensation',
+          general: 'General information',
+          contabilidad: 'Accounting',
           seguridadSocial: 'Social security',
+        },
+        groups: {
+          identificacion: 'Identification',
+          vigencia: 'Term and assignment',
+          remuneracion: 'Compensation',
+          terminacion: 'Termination and payments',
         },
         estado: {
           activo: 'Active',
@@ -2446,12 +2561,10 @@ export const en: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
-        aprobado: 'Apr',
         anulado: 'Voi',
         contabilizado: 'Pos',
       },
       filters: {
-        aprobado: 'Approved',
         anulado: 'Voided',
         contabilizado: 'Posted',
       },
@@ -2853,12 +2966,10 @@ export const en: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
-        aprobado: 'Apr',
         anulado: 'Void',
         contabilizado: 'Post',
       },
       filters: {
-        aprobado: 'Approved',
         anulado: 'Voided',
         contabilizado: 'Posted',
       },
@@ -3393,6 +3504,21 @@ export const en: AppDict = {
         },
       },
     },
+    vencimiento: {
+      desvio: {
+        mas: {
+          one: '1 day later than the term ({dias} d)',
+          other: '{n} days later than the term ({dias} d)',
+        },
+        menos: {
+          one: '1 day earlier than the term ({dias} d)',
+          other: '{n} days earlier than the term ({dias} d)',
+        },
+      },
+      usar: 'Use {fecha}',
+      usarTitle: 'Go back to the due date set by the payment term',
+      anteriorAFecha: 'The due date cannot be earlier than the date.',
+    },
     comercialDetalle: {
       title: 'Lines',
       hint: 'Products and services of the document',
@@ -3410,6 +3536,23 @@ export const en: AppDict = {
       itemPlaceholder: 'Search item…',
       detallePlaceholder: 'Note…',
       confirmDeleteLine: 'Remove this line from the document?',
+      createItem: 'Create item',
+      extraerIva: {
+        title: 'Tax-inclusive price',
+        baseLabel: 'Base price',
+        apply: 'Apply base price',
+      },
+      scanner: {
+        placeholder: 'Scan barcode',
+        notFound: {
+          title: 'Code not found',
+          desc: 'No item matches the scanned code',
+        },
+        ambiguous: {
+          title: 'Ambiguous code',
+          desc: 'Several items match and none exactly; search for the item manually',
+        },
+      },
       columns: {
         linea: '#',
         ref: 'Ref',

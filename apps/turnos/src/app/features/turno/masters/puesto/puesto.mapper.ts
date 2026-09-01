@@ -1,3 +1,4 @@
+import { normalizarCelular } from '@reddoc/core';
 import type { Puesto, PuestoPayload } from './puesto.model';
 import type { PuestoFormRawValue } from './pages/puesto-form/puesto-form.types';
 
@@ -5,7 +6,9 @@ export function puestoToFormValue(p: Puesto): Partial<PuestoFormRawValue> {
   return {
     nombre: p.nombre,
     direccion: p.direccion ?? '',
-    celular: p.celular ?? '',
+    // Los celulares guardados antes de `lib-phone-input` son dígitos pelados:
+    // normalizados a E.164 el campo no nace inválido al abrir la edición.
+    celular: normalizarCelular(p.celular),
     latitud: p.latitud ?? '',
     longitud: p.longitud ?? '',
     comentario: p.comentario ?? '',

@@ -3,12 +3,14 @@ import type {
   AccesosContenedorTranslationsHost,
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
+  PhoneInputTranslationsHost,
 } from '@reddoc/ui';
 
 export interface AppDict
   extends
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
+    PhoneInputTranslationsHost,
     ContenedoresTranslationsHost,
     AccesosContenedorTranslationsHost {
   common: {
@@ -201,7 +203,11 @@ export interface AppDict
           programador: string;
           programadorPlaceholder: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          celularInvalido: string;
+          celularLongitud: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };

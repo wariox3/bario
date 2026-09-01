@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PhoneInputComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -41,6 +41,7 @@ import { puestoToFormValue, formValueToPayload } from '../../puesto.mapper';
     FieldErrorComponent,
     ErpApiAutocompleteComponent,
     ErpContactoSelectComponent,
+    PhoneInputComponent,
   ],
   templateUrl: './puesto-form.component.html',
   styleUrl: './puesto-form.component.scss',

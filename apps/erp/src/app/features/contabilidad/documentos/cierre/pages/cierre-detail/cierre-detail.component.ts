@@ -5,7 +5,13 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
-import { I18nService, TenantService, ToastService, extractErrorMessage } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  extractErrorMessage,
+  formatFechaLarga,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
@@ -261,10 +267,9 @@ export class CierreDetailComponent implements OnInit {
       });
   }
 
-  /** Fecha larga de la cabecera (`31 de diciembre de 2026`). */
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(date, '—');
   }
 
   /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */

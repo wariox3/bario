@@ -12,6 +12,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   EMPTY,
   type Observable,
+  Subject,
+  type Subscription,
+  catchError,
+  concatMap,
   defer,
   filter,
   finalize,
@@ -22,14 +26,14 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { FormArray, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { PopoverModule } from 'primeng/popover';
+import { Popover, PopoverModule } from 'primeng/popover';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -38,7 +42,9 @@ import {
   ToastService,
   calcularResumen,
   formatCop,
+  toFiniteNumber,
   type ImpuestoLinea,
+  type ParamValue,
   type ResumenDocumento,
   type TasaImpuesto,
 } from '@reddoc/core';
@@ -49,10 +55,17 @@ import {
 } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import {
+  ITEM_SELECCIONAR_ENDPOINT,
+  toItemOption,
+  type ItemApiRow,
+  type ItemOption,
+} from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import { ErpSelectDataService } from '@reddoc/core';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
+import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
+import type { Item } from '@erp/features/general/masters/item/item.model';
 import type { AppDict } from '@erp/i18n';
 import {
   createComercialDetalleGroup,
@@ -62,6 +75,8 @@ import {
   comercialDetalleToFormValue,
   comercialDetalleToPayload,
   pendienteLineaToFormValue,
+  precioUnitarioConImpuestos,
+  precioUnitarioSinImpuestos,
   lineBruto,
   lineNeto,
   tasaFromImpuestoOption,
@@ -96,6 +111,7 @@ const IMPUESTO_SELECCIONAR_ENDPOINT = '/general/impuesto/seleccionar/';
   selector: 'app-comercial-documento-detalles',
   standalone: true,
   imports: [
+    FormsModule,
     ReactiveFormsModule,
     ButtonModule,
     SplitButtonModule,
@@ -116,6 +132,7 @@ export class ComercialDocumentoDetallesComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly itemService = inject(ItemService);
+  private readonly precioDetalleService = inject(PrecioDetalleService);
   private readonly selectData = inject(ErpSelectDataService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(ToastService);
@@ -153,6 +170,21 @@ export class ComercialDocumentoDetallesComponent {
    * líneas pendientes del modal de importación a ese contacto.
    */
   readonly contactoId = input<number | null>(null);
+
+  /**
+   * Lista de precios del contacto de la cabecera (`precio_id` del contacto;
+   * ver `precioListaDeContacto`). Solo aplica en `modo="venta"`: al elegir un
+   * ítem se cotiza contra la lista y ese precio pisa el del ítem. `null` = sin
+   * lista, la línea queda con el precio propio del ítem.
+   */
+  readonly precioListaId = input<number | null>(null);
+
+  /**
+   * Habilita el lector de código de barras en la barra de la tabla (flujo
+   * pistola: Enter agrega la línea y el input queda listo para el siguiente
+   * escaneo). Lo activa cada documento donde se factura escaneando.
+   */
+  readonly scannerEnabled = input<boolean>(false);
 
   /**
    * Avisa al padre que se importaron líneas en **edición** (ya persistidas vía
@@ -202,8 +234,46 @@ export class ComercialDocumentoDetallesComponent {
    */
   private readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
 
+  /**
+   * Cola de escaneos del lector. `concatMap` los resuelve **en orden**: una
+   * pistola puede disparar varios códigos seguidos y cada uno debe agregar su
+   * línea sin pisar la consulta del anterior.
+   */
+  private readonly scan$ = new Subject<{ codigo: string; input: HTMLInputElement }>();
+
+  /**
+   * Filtros del catálogo de impuestos según el `modo`: `?venta=True` o
+   * `?compra=True`. Los comparten el pool de tasas con el que la tabla calcula y
+   * el desplegable con el que la persona elige, para que ofrezcan lo mismo.
+   */
+  protected readonly impuestoParams = computed<Record<string, ParamValue>>(() => ({
+    [this.modo()]: 'True',
+  }));
+
   constructor() {
-    this.loadImpuestosCatalog();
+    // El catálogo depende de `modo`, que es un signal input: leerlo desde el
+    // constructor devuelve siempre el default (`'venta'`) porque el binding aún
+    // no se aplicó — un documento de compra terminaba calculando contra los
+    // impuestos de venta y la línea quedaba sin impuesto. Dentro de un effect se
+    // lee ya bindeado, y de paso recarga si el modo llegara a cambiar.
+    effect((onCleanup) => {
+      const sub = this.loadImpuestosCatalog(this.impuestoParams());
+      onCleanup(() => sub.unsubscribe());
+    });
+
+    this.scan$
+      .pipe(
+        concatMap(({ codigo, input }) =>
+          this.selectData
+            .fetchOptions<ItemApiRow>(ITEM_SELECCIONAR_ENDPOINT, { search: codigo })
+            .pipe(
+              map((rows) => ({ rows, codigo, input })),
+              catchError(() => of({ rows: [] as readonly ItemApiRow[], codigo, input })),
+            ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(({ rows, codigo, input }) => this.applyScan(rows, codigo, input));
 
     effect((onCleanup) => {
       const array = this.detalles();
@@ -217,19 +287,23 @@ export class ComercialDocumentoDetallesComponent {
     });
   }
 
-  /** Carga el catálogo de impuestos del `modo` una vez y lo aplica a las filas nuevas. */
-  private loadImpuestosCatalog(): void {
-    this.selectData
-      .fetchOptions<ImpuestoSeleccionarOption>(IMPUESTO_SELECCIONAR_ENDPOINT, {
-        [this.modo()]: 'True',
-      })
+  /**
+   * Carga el catálogo de impuestos acotado a `params` y lo aplica a las filas
+   * nuevas. Devuelve la suscripción para que el effect que lo dispara cancele la
+   * consulta en vuelo si vuelve a correr.
+   */
+  private loadImpuestosCatalog(params: Record<string, ParamValue>): Subscription {
+    return this.selectData
+      .fetchOptions<ImpuestoSeleccionarOption>(IMPUESTO_SELECCIONAR_ENDPOINT, params)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (options) => {
           this.impuestosCatalog.set(options.map(tasaFromImpuestoOption));
-          // Filas nuevas (sin id) que esperaban el catálogo para poder calcular.
           for (const group of this.detalles().controls) {
+            // Filas nuevas (sin id) que esperaban el catálogo para poder calcular.
             if (group.controls.id.value == null) this.ensureCatalog(group);
+            // Filas cargadas: corregir el signo de las retenciones leídas.
+            this.signImpuestosLeidos(group);
           }
         },
         error: () => {
@@ -240,6 +314,78 @@ export class ComercialDocumentoDetallesComponent {
 
   protected addLinea(): void {
     this.detalles().push(createComercialDetalleGroup());
+  }
+
+  /**
+   * Alta de ítem inline desde una línea: abre el formulario del master como
+   * modal (lazy) y, con el ítem creado, lo selecciona en **esa** fila — de ahí
+   * corre la tubería normal de una selección (precio pactado + impuestos). Se
+   * apaga `dismissableMask`: un clic afuera no debe descartar un form a medias.
+   */
+  protected onCreateItem(group: ComercialDetalleGroup): void {
+    from(import('@erp/features/general/masters/item/pages/item-form/item-form.component'))
+      .pipe(
+        switchMap(({ ItemFormComponent }) => {
+          const ref = this.dialog.open(ItemFormComponent, {
+            ...ENTITY_ACTION_DIALOG_DEFAULTS,
+            dismissableMask: false,
+            width: 'min(70rem, 95vw)',
+            contentStyle: { 'max-height': '86vh', overflow: 'auto' },
+          });
+          return ref ? ref.onClose : EMPTY;
+        }),
+        filter((created: unknown): created is Item => created != null),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((created) => {
+        group.controls.item.setValue(
+          toItemOption({
+            id: created.id,
+            codigo: created.codigo ?? undefined,
+            nombre: created.nombre,
+            precio: created.precio,
+          }),
+        );
+      });
+  }
+
+  /** Enter en el input del lector: encola el código escaneado. */
+  protected onScan(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const codigo = input.value.trim();
+    if (codigo) this.scan$.next({ codigo, input });
+  }
+
+  /**
+   * Resuelve un escaneo contra los ítems que `?search=` devolvió (busca por
+   * nombre, código y referencia): manda la coincidencia **exacta** de código y,
+   * si no la hay, un único resultado se acepta. Varios resultados sin exacto se
+   * rechazan — a diferencia del legacy, que tomaba el primero: con `search`
+   * barriendo también nombre y referencia, "el primero" puede ser cualquier
+   * cosa, y una línea equivocada muda es peor que pedir la búsqueda manual.
+   *
+   * Con ítem resuelto agrega la línea y le setea la opción: de ahí en adelante
+   * corre la tubería normal de una selección (precio del ítem → lista/costo →
+   * impuestos). El input se limpia para el siguiente escaneo; si falla, el
+   * código queda **seleccionado**: legible para la persona y listo para que el
+   * próximo disparo de la pistola lo reemplace.
+   */
+  private applyScan(rows: readonly ItemApiRow[], codigo: string, input: HTMLInputElement): void {
+    const exacto = rows.find((row) => row.codigo === codigo);
+    const row = exacto ?? (rows.length === 1 ? rows[0] : undefined);
+    if (!row) {
+      const toasts = this.t().entities.comercialDetalle.scanner;
+      const toast = rows.length > 1 ? toasts.ambiguous : toasts.notFound;
+      this.toast.warn(toast.title, toast.desc);
+      input.select();
+      return;
+    }
+    this.addLinea();
+    // El push emite `valueChanges` sincrónico: el efecto de arriba ya cableó la
+    // fila nueva, así que setear el ítem dispara la tubería completa.
+    const group = this.detalles().at(this.detalles().length - 1);
+    group.controls.item.setValue(toItemOption(row));
+    input.value = '';
   }
 
   /**
@@ -495,6 +641,36 @@ export class ComercialDocumentoDetallesComponent {
       group.controls.impuestos_ids.valueChanges
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => this.ensureCatalog(group));
+      // Cubre las filas pobladas después de que llegó el catálogo (en edición
+      // el padre las empuja al FormArray cuando responde su propia consulta).
+      this.signImpuestosLeidos(group);
+    }
+  }
+
+  /**
+   * Corrige el **signo** de los montos de impuesto que vinieron del backend: el
+   * serializer de la línea guarda `total` sin signo y (todavía) no manda la
+   * operación, así que una retención cargada en edición sumaría en vez de
+   * restar. El signo autoritativo se resuelve contra el catálogo del `modo`
+   * (que sí trae `operacion`); un impuesto que no esté en él queda como llegó.
+   * Solo toca el signo —la magnitud sigue siendo la del backend— y es
+   * idempotente, así que puede correr al llegar el catálogo y al cablear cada
+   * fila sin pisarse. Cuando el backend serialice `impuesto_operacion`, el
+   * mapper firmará desde el campo y esto pasará a ser un no-op.
+   */
+  private signImpuestosLeidos(group: ComercialDetalleGroup): void {
+    const catalog = this.impuestosCatalog();
+    if (catalog.length === 0) return;
+    const operaciones = new Map(catalog.map((tasa) => [tasa.id, tasa.operacion ?? 1]));
+    const actuales = group.controls.impuestos_totales.value;
+    const firmados = actuales.map((imp) => {
+      const operacion = operaciones.get(imp.id);
+      if (operacion == null) return imp;
+      const total = Math.abs(imp.total) * (operacion < 0 ? -1 : 1);
+      return total === imp.total ? imp : { ...imp, total };
+    });
+    if (firmados.some((imp, i) => imp !== actuales[i])) {
+      group.controls.impuestos_totales.setValue(firmados);
     }
   }
 
@@ -508,14 +684,59 @@ export class ComercialDocumentoDetallesComponent {
       return;
     }
     this.ensureCatalog(group);
-    this.itemService
-      .getById(opt.id)
+    forkJoin({
+      item: this.itemService.getById(opt.id),
+      precioLista: this.consultarPrecioLista(opt.id),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((item) => {
+      .subscribe(({ item, precioLista }) => {
+        this.applyPrecioPactado(group, opt, item, precioLista);
         group.controls.impuestos_ids.setValue(
           tasasDelItem(item, this.modo()).map((tasa) => tasa.id),
         );
       });
+  }
+
+  /**
+   * Precio del ítem en la lista del contacto, si aplica: solo en venta (las
+   * listas de precios son condición de venta; en compra manda el costo) y solo
+   * si la cabecera aportó lista. Un fallo de la consulta no bloquea los
+   * impuestos: cae a `null` y la línea queda con el precio del ítem.
+   */
+  private consultarPrecioLista(itemId: number): Observable<number | null> {
+    const precioId = this.precioListaId();
+    if (this.modo() !== 'venta' || precioId == null) return of(null);
+    return this.precioDetalleService
+      .consultarPrecioItem(precioId, itemId)
+      .pipe(catchError(() => of(null)));
+  }
+
+  /**
+   * Corrige el precio sembrado por el autocomplete (`opt.precio`, el precio de
+   * venta del ítem — lo único que trae `seleccionar/`) con el precio **pactado**
+   * que corresponda:
+   *  - **venta con lista de precios del contacto** → el `vr_precio` cotizado en
+   *    la lista (`consultarPrecioLista`);
+   *  - **compra** → el `costo` de la lectura completa del ítem (la misma
+   *    consulta de los impuestos). Un costo 0 se siembra igual — lo normal: el
+   *    costo real lo dicta la factura del proveedor y lo digita la persona,
+   *    como en el ERP anterior.
+   *
+   * Respeta un precio ya tecleado: solo pisa el valor sembrado por el
+   * autocomplete, por si la persona editó el precio en la ventana entre elegir
+   * el ítem y las respuestas de estas consultas.
+   */
+  private applyPrecioPactado(
+    group: ComercialDetalleGroup,
+    opt: ItemOption,
+    item: Item,
+    precioLista: number | null,
+  ): void {
+    const costo = this.modo() === 'compra' ? toFiniteNumber(item.costo) : null;
+    const pactado = precioLista ?? costo;
+    if (pactado == null) return;
+    if (group.controls.precio.value !== opt.precio) return;
+    group.controls.precio.setValue(pactado);
   }
 
   /**
@@ -529,6 +750,42 @@ export class ComercialDocumentoDetallesComponent {
     if (catalog.length === 0) return;
     if (group.controls.impuestos_disponibles.value.length > 0) return;
     group.controls.impuestos_disponibles.setValue(catalog);
+  }
+
+  // ── Precio con impuestos incluidos (extraer IVA) ────────────────────────────
+
+  /** Fila cuyo popover de "precio con impuestos" está abierto. */
+  private extraerIvaGroup: ComercialDetalleGroup | null = null;
+  /** Valor tecleado en el popover (precio unitario final, impuestos incluidos). */
+  protected readonly extraerIvaValor = signal<number | null>(null);
+
+  /**
+   * Abre el popover sembrado con el precio final que produce el precio actual
+   * (así se ve de entrada cuánto vale la línea con impuestos). `ensureCatalog`
+   * primero: una línea cargada en edición aún no tiene el pool de tasas y sin él
+   * la inversión sería identidad muda.
+   */
+  protected openExtraerIva(op: Popover, event: Event, group: ComercialDetalleGroup): void {
+    this.ensureCatalog(group);
+    this.extraerIvaGroup = group;
+    this.extraerIvaValor.set(precioUnitarioConImpuestos(group.getRawValue()));
+    op.toggle(event);
+  }
+
+  /** Precio base que produciría el valor tecleado (vista previa en vivo). */
+  protected extraerIvaBase(): number {
+    const group = this.extraerIvaGroup;
+    const valor = this.extraerIvaValor();
+    if (!group || valor == null) return 0;
+    return precioUnitarioSinImpuestos(valor, group.getRawValue());
+  }
+
+  /** Aplica el precio base a la línea; el recompute encadena montos y resumen. */
+  protected applyExtraerIva(op: Popover): void {
+    const group = this.extraerIvaGroup;
+    if (!group) return;
+    group.controls.precio.setValue(this.extraerIvaBase());
+    op.hide();
   }
 
   /** Ejecuta la baja: local en alta/línea no persistida; contra la API en edición. */

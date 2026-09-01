@@ -11,10 +11,16 @@ export interface BillingProfile {
   readonly numero: string;
   readonly nombre: string;
   readonly email: string;
-  readonly telefono: string;
+  readonly celular: string;
   readonly direccion: string;
   readonly ciudad: string;
   readonly ciudad_id?: number;
+  /**
+   * Departamento de la ciudad. Va aparte del nombre —y no pegado en `ciudad`—
+   * porque cumple dos papeles: la etiqueta que se lee (`Amagá — Antioquia`) y el
+   * `Ciudad` que se rearma al reabrir la edición, donde el nombre debe ir limpio.
+   */
+  readonly departamento?: string | null;
 }
 
 export interface BillingProfileDraft {
@@ -22,7 +28,7 @@ export interface BillingProfileDraft {
   numero: string;
   nombre: string;
   email: string;
-  telefono: string;
+  celular: string;
   direccion: string;
   ciudad: Ciudad | null;
 }
@@ -32,7 +38,7 @@ export const EMPTY_BILLING_DRAFT: BillingProfileDraft = {
   numero: '',
   nombre: '',
   email: '',
-  telefono: '',
+  celular: '',
   direccion: '',
   ciudad: null,
 };
@@ -42,7 +48,7 @@ export interface BillingProfilePayload {
   readonly numero_identificacion: string;
   readonly nombre_corto: string;
   readonly correo: string;
-  readonly telefono: string;
+  readonly celular: string;
   readonly direccion: string;
   readonly ciudad: number;
 }
@@ -54,7 +60,7 @@ export function isBillingDraftValid(draft: BillingProfileDraft): boolean {
   if (draft.numero.replace(/\D/g, '').length < 5) return false;
   if (draft.nombre.trim().length < 3) return false;
   if (!EMAIL_RE.test(draft.email.trim())) return false;
-  if (draft.telefono.replace(/\D/g, '').length < 7) return false;
+  if (draft.celular.replace(/\D/g, '').length < 7) return false;
   if (draft.direccion.trim().length < 5) return false;
   if (!draft.ciudad || draft.ciudad.nombre.trim().length < 2) return false;
   return true;

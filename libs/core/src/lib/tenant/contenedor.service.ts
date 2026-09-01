@@ -23,7 +23,7 @@ import {
 
 export interface UpdateContenedorRequest {
   nombre: string;
-  telefono?: string;
+  celular?: string;
   correo?: string;
 }
 

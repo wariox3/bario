@@ -35,13 +35,23 @@ export interface CuentaPayload {
 /**
  * Traslado de movimientos entre cuentas: todos los movimientos de la cuenta
  * origen pasan a la cuenta destino. Es irreversible.
+ *
+ * Las FK van **sin sufijo `_id`**, la convención del backend nuevo. El ERP
+ * anterior las mandaba como `cuenta_origen_id` / `cuenta_destino_id` y con esos
+ * nombres el endpoint responde «Este campo es requerido» para los dos.
  */
 export interface CuentaTrasladoPayload {
-  readonly cuenta_origen_id: number;
-  readonly cuenta_destino_id: number;
+  readonly cuenta_origen: number;
+  readonly cuenta_destino: number;
 }
 
-/** Respuesta del traslado. El backend describe en `mensaje` lo que movió. */
+/**
+ * Respuesta del traslado: cuánto movió, contado por tipo de registro. Los dos en
+ * cero significan que la cuenta origen no tenía nada — no es un error.
+ */
 export interface CuentaTrasladoResponse {
-  readonly mensaje?: string;
+  /** Movimientos contables reasignados. */
+  readonly movimientos: number;
+  /** Líneas de documento reasignadas. */
+  readonly documentos_detalles: number;
 }

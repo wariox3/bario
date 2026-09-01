@@ -12,7 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PhoneInputComponent } from '@reddoc/ui';
 import {
   AUTH_SERVICE,
   Contenedor,
@@ -20,13 +20,21 @@ import {
   FormErrorService,
   I18nService,
   ToastService,
+  normalizarCelular,
 } from '@reddoc/core';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
 @Component({
   selector: 'lib-contenedor-create-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonModule, InputTextModule, FieldErrorComponent],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    InputTextModule,
+    FieldErrorComponent,
+    FocusInvalidDirective,
+    PhoneInputComponent,
+  ],
   templateUrl: './contenedor-create-form.component.html',
   styleUrl: './contenedor-create-form.component.scss',
 })
@@ -55,17 +63,20 @@ export class ContenedorCreateFormComponent {
   readonly form = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(2)]],
     schema_name: ['', [Validators.required, Validators.pattern(/^[a-z0-9][a-z0-9_]*$/)]],
-    telefono: ['', [Validators.required, Validators.maxLength(20)]],
+    // El backend guarda el celular en E.164 (`+573163557845`): el indicativo va
+    // en el mismo campo. El formato lo valida `lib-phone-input` (claves
+    // `celularE164` / `celularLongitud`); acá solo queda la obligatoriedad.
+    celular: ['', [Validators.required]],
     correo: ['', [Validators.required, Validators.email]],
-    suscripcion_tipo_id: [13],
-    frecuencia: ['P'],
   });
 
   constructor() {
     const user = this.authService.currentUser();
     this.form.patchValue({
       correo: user?.email ?? '',
-      telefono: user?.celular ?? '',
+      // El celular del perfil puede venir sin `+` o con separadores (su
+      // validación es más laxa): normalizado, el campo no nace inválido.
+      celular: normalizarCelular(user?.celular),
     });
 
     this.form.controls.nombre.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
@@ -83,7 +94,7 @@ export class ContenedorCreateFormComponent {
       this.form.patchValue({
         nombre: c.nombre,
         schema_name: c.schema_name,
-        telefono: c.telefono ?? '',
+        celular: normalizarCelular(c.celular),
         correo: c.correo ?? '',
       });
       this.form.controls.schema_name.disable();
@@ -96,11 +107,11 @@ export class ContenedorCreateFormComponent {
 
     const c = this.contenedor();
     if (this.isEditMode() && c) {
-      const { nombre, telefono, correo } = this.form.getRawValue();
+      const { nombre, celular, correo } = this.form.getRawValue();
       this.contenedorService
         .updateContenedor(c.cliente_id, {
           nombre: nombre ?? '',
-          telefono: telefono ?? undefined,
+          celular: celular ?? undefined,
           correo: correo ?? undefined,
         })
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -118,10 +129,14 @@ export class ContenedorCreateFormComponent {
         });
     } else {
       this.creationOverlay.emit(this.form.controls.nombre.value ?? '');
+      const { nombre, schema_name, celular, correo } = this.form.getRawValue();
       this.contenedorService
-        .createContenedor(
-          this.form.getRawValue() as Parameters<ContenedorService['createContenedor']>[0],
-        )
+        .createContenedor({
+          nombre: nombre ?? '',
+          schema_name: schema_name ?? '',
+          celular: celular ?? '',
+          correo: correo ?? '',
+        })
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {

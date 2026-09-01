@@ -1,0 +1,35 @@
+// Grupo fusionado: selector + input se leen como un solo campo. Los bordes
+// interiores se superponen (margin -1px) en vez de borrarse, para que el ring
+// de foco de PrimeNG siga dibujando el contorno completo del control activo.
+.phone-input {
+  &__select {
+    flex: 0 0 auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &__tel {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  // El control enfocado sube sobre la costura para que su borde no quede
+  // tapado por el vecino.
+  &__select:focus-within,
+  &__tel:focus {
+    position: relative;
+    z-index: 1;
+  }
+
+  // Mismo look que `.cd-input-error`: PrimeNG aplica su propio borde al
+  // input — necesitamos !important para ganarle.
+  &--invalid &__select,
+  &--invalid &__tel {
+    border-color: #dc2626 !important;
+  }
+
+  &--invalid &__tel:focus {
+    box-shadow: 0 0 0 2px rgba(220 38 38 / 0.15) !important;
+  }
+}

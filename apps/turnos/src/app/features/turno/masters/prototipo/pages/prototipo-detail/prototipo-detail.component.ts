@@ -3,7 +3,7 @@ import { Component, DestroyRef, type OnInit, computed, inject, input, signal } f
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { I18nService, TenantService, ToastService, FORMATO_FECHA } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { DetailHeaderComponent } from '@reddoc/ui';
 import type { AppDict } from '@turnos/i18n';
@@ -27,6 +27,9 @@ import { PROTOTIPO_LIST_PATH } from '../../prototipo.constants';
   styleUrl: './prototipo-detail.component.scss',
 })
 export class PrototipoDetailComponent implements OnInit {
+  /** Formato de fecha del sistema, para el `| date` de la plantilla. */
+  protected readonly formatoFecha = FORMATO_FECHA.angular;
+
   private readonly service = inject(PrototipoService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);

@@ -5,7 +5,13 @@ import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { I18nService, TenantService, ToastService, extractErrorMessage } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  extractErrorMessage,
+  formatFechaLarga,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { inventarioDocumentoBreadcrumb } from '@erp/features/inventario/shared/inventario-breadcrumb';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
@@ -248,10 +254,9 @@ export class MovimientoDocumentoDetailComponent implements OnInit {
       });
   }
 
-  /** Fecha larga de la cabecera (`20 de junio de 2026`). */
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(date, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/inventario/<...routePath>[/extra]`. */

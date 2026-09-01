@@ -1,0 +1,48 @@
+<div class="phone-input flex items-stretch" [class.phone-input--invalid]="invalid()">
+  <p-select
+    class="phone-input__select"
+    [options]="opciones()"
+    [ngModel]="opcionSeleccionada()"
+    (ngModelChange)="onPaisChange($event)"
+    (onHide)="onTouchedFn()"
+    [disabled]="disabled()"
+    [filter]="true"
+    filterBy="nombre,indicativo,indicativoMas"
+    [filterPlaceholder]="dict().searchPlaceholder"
+    [resetFilterOnHide]="true"
+    dataKey="iso"
+    appendTo="body"
+    [ariaLabel]="dict().countryLabel"
+  >
+    <ng-template #selectedItem let-opcion>
+      @if (opcion) {
+        <span class="flex items-center gap-1.5">
+          <span aria-hidden="true">{{ opcion.bandera }}</span>
+          <span class="font-mono text-[0.85rem] tabular-nums">{{ opcion.indicativoMas }}</span>
+        </span>
+      }
+    </ng-template>
+    <ng-template #item let-opcion>
+      <span class="flex w-full items-center gap-2">
+        <span aria-hidden="true">{{ opcion.bandera }}</span>
+        <span class="truncate">{{ opcion.nombre }}</span>
+        <span class="ml-auto font-mono text-[0.8rem] tabular-nums text-brand-muted">
+          {{ opcion.indicativoMas }}
+        </span>
+      </span>
+    </ng-template>
+  </p-select>
+  <input
+    class="phone-input__tel min-w-0 flex-1"
+    pInputText
+    type="tel"
+    inputmode="tel"
+    autocomplete="tel-national"
+    [id]="inputId()"
+    [value]="nacional()"
+    [placeholder]="placeholder()"
+    [disabled]="disabled()"
+    (input)="onNacionalInput($event)"
+    (blur)="onTouchedFn()"
+  />
+</div>

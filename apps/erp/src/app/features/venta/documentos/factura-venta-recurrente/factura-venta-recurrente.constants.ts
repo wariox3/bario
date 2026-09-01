@@ -65,13 +65,6 @@ export const FACTURA_VENTA_RECURRENTE_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'estado_aprobado',
-    headerKey: 'entities.facturaVentaRecurrente.columns.aprobado',
-    type: 'boolean',
-    width: '70px',
-    align: 'center',
-  },
-  {
     field: 'estado_anulado',
     headerKey: 'entities.facturaVentaRecurrente.columns.anulado',
     type: 'boolean',
@@ -107,11 +100,6 @@ export const FACTURA_VENTA_RECURRENTE_FILTERS: readonly FilterField[] = [
     name: 'contacto__nombre_corto',
     displayNameKey: 'entities.facturaVentaRecurrente.columns.contacto',
     type: 'string',
-  },
-  {
-    name: 'estado_aprobado',
-    displayNameKey: 'entities.facturaVentaRecurrente.filters.aprobado',
-    type: 'boolean',
   },
   {
     name: 'estado_anulado',

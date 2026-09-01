@@ -55,7 +55,7 @@ function toOption(row: ContratoApiRow): ContratoOption {
 }
 
 /**
- * Selector de contrato con identificación al lado (input group).
+ * Selector de contrato con sus identificadores al lado (input group).
  *
  * Autocomplete sobre `humano/contrato/seleccionar/?estado_terminado=False` que:
  * - Recarga la lista completa (sin término de búsqueda) en cada enfoque y cada vez
@@ -64,8 +64,8 @@ function toOption(row: ContratoApiRow): ContratoOption {
  *   el nombre del empleado del contrato).
  * - Muestra cada contrato a **dos líneas** (nombre + `C.C. <identificación>`) para
  *   desambiguar homónimos.
- * - Pinta la cédula del empleado del contrato elegido en un **addon pegado** a la
- *   derecha, siempre visible (guion `—` cuando no hay selección).
+ * - Pinta el id del contrato y la cédula del empleado en **addons pegados** a la
+ *   derecha, siempre visibles (guion `—` cuando no hay selección).
  *
  * Implementa `ControlValueAccessor`: el valor del control es un `ContratoOption`
  * (`{ id, nombre, numero_identificacion }`). El payload solo necesita el `id`; la
@@ -116,6 +116,19 @@ function toOption(row: ContratoApiRow): ContratoOption {
         </ng-template>
       </p-autocomplete>
 
+      <!-- Dos identificadores, misma caja: el del contrato y el del empleado. Van
+           en ese orden —el del ERP anterior— porque el contrato es el registro
+           que se elige y la cédula, un dato de quien lo firma. -->
+      <p-inputgroup-addon>
+        <span
+          class="flex items-center gap-1.5 text-brand-muted"
+          [attr.aria-label]="contratoIdAriaLabel() + (contratoId() ? ': ' + contratoId() : '')"
+        >
+          <i class="pi pi-hashtag text-[0.85rem]"></i>
+          <span class="font-mono text-[0.8rem] tabular-nums">{{ contratoId() ?? '—' }}</span>
+        </span>
+      </p-inputgroup-addon>
+
       <p-inputgroup-addon>
         <span
           class="flex items-center gap-1.5 text-brand-muted"
@@ -161,6 +174,8 @@ export class ContratoAutocompleteComponent implements ControlValueAccessor {
   readonly delay = input<number>(300);
   /** Etiqueta accesible del addon de identificación. */
   readonly idAriaLabel = input<string>('Identificación');
+  /** Etiqueta accesible del addon del id de contrato. */
+  readonly contratoIdAriaLabel = input<string>('ID del contrato');
 
   /** Endpoint de selección. Default: contratos; overridable para otros masters. */
   readonly endpoint = input<string>('/humano/contrato/seleccionar/');
@@ -173,6 +188,12 @@ export class ContratoAutocompleteComponent implements ControlValueAccessor {
 
   /** Cédula del empleado del contrato elegido; alimenta el addon. */
   readonly identificacion = computed(() => this.value()?.numero_identificacion || null);
+
+  /**
+   * Id del contrato elegido; alimenta su addon. Sale del propio valor del
+   * control, así que no depende de que el backend lo agregue a ningún lado.
+   */
+  readonly contratoId = computed(() => this.value()?.id ?? null);
 
   private onChangeFn: (value: ContratoOption | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;

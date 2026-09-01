@@ -8,7 +8,7 @@ import {
   FieldErrorComponent,
   FocusInvalidDirective,
   PageActionsComponent,
-  SoloDigitosDirective,
+  PhoneInputComponent,
 } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -36,7 +36,7 @@ import { asesorToFormValue, formValueToPayload } from '../../asesor.mapper';
     InputTextModule,
     FieldErrorComponent,
     PageActionsComponent,
-    SoloDigitosDirective,
+    PhoneInputComponent,
   ],
   templateUrl: './asesor-form.component.html',
   styleUrl: './asesor-form.component.scss',

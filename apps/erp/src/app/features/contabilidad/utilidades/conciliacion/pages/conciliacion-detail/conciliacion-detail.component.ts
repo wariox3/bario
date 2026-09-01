@@ -3,7 +3,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
-import { I18nService, TenantService, ToastService, fromIsoDate } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  fromIsoDate,
+  formatFechaLarga,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { ConciliacionDetallesTabComponent } from '../../components/conciliacion-detalles-tab/conciliacion-detalles-tab.component';
@@ -100,10 +106,9 @@ export class ConciliacionDetailComponent implements OnInit {
     this.navigateTo('editar', Number(id));
   }
 
-  /** Fecha larga (`20 de junio de 2026`). */
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(date, '—');
   }
 
   private load(id: number): void {

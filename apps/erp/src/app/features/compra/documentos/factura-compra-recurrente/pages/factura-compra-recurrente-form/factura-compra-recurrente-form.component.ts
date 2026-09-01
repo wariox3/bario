@@ -30,10 +30,15 @@ import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-br
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+import {
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
+import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -169,6 +174,18 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
 
+  constructor() {
+    // El plazo lo pacta el proveedor: elegirlo autocompleta el campo. Esta
+    // plantilla no tiene vencimiento propio (lo calculará cada factura que se
+    // genere de ella), así que aquí la regla termina en el plazo.
+    setupPlazoPagoDesdeContacto({
+      contacto: this.form.controls.contacto,
+      plazoPago: this.form.controls.plazo_pago,
+      origen: 'proveedor',
+      destroyRef: this.destroyRef,
+    });
+  }
+
   ngOnInit(): void {
     const id = this.id();
     if (!id) return;
@@ -232,11 +249,16 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
       : this.gateway.create(this.document(), payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha del documento, para revisar lo que quedó
+        // almacenado. En alta el id sale de la respuesta del backend; si no
+        // viniera, se cae a la lista antes que navegar a una URL inválida.
+        const savedId = id ?? extractDocumentoId(saved);
+        if (savedId != null) this.navigateToDetail(savedId);
+        else this.navigateToList();
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -338,9 +360,21 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {
+    this.navigate(this.document().routes.list);
+  }
+
+  /** Abre la ficha del documento guardado (`routes.detail` + id). */
+  private navigateToDetail(id: string | number): void {
+    this.navigate(this.document().routes.detail, String(id));
+  }
+
+  /** Construye la ruta absoluta del documento dentro del tenant y el módulo. */
+  private navigate(routePath: string, extra?: string): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, 'compra', ...segments]);
+    const segments = routePath.split('/').filter(Boolean);
+    const commands: (string | number)[] = ['/t', slug, 'compra', ...segments];
+    if (extra) commands.push(extra);
+    void this.router.navigate(commands);
   }
 }

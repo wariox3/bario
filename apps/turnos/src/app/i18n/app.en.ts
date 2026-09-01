@@ -1,10 +1,11 @@
 import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEn, appSwitcherEn, authEn } from '@reddoc/ui';
+import { accesosContenedorEn, appSwitcherEn, authEn, phoneInputEn } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
   auth: authEn,
   appSwitcher: appSwitcherEn,
+  phoneInput: phoneInputEn,
   contenedores: contenedoresEn,
   accesosContenedor: accesosContenedorEn,
   common: {
@@ -228,6 +229,8 @@ export const en: AppDict = {
         },
         validation: {
           required: 'This field is required',
+          celularInvalido: 'Enter a valid mobile number.',
+          celularLongitud: "The number doesn't match a mobile length for the selected country.",
         },
         toasts: {
           createSuccess: {

@@ -26,6 +26,8 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
@@ -34,6 +36,7 @@ import {
   ACTIVOS_COLUMNS,
   ACTIVOS_FILTER_FIELDS,
   ACTIVOS_FILTERS_STORAGE_KEY,
+  ACTIVOS_IMPORT_MASTERS,
   ACTIVOS_QUICK_SEARCH_FIELD,
   ACTIVOS_PRIMARY_ACTION,
   ACTIVOS_ROW_ACTIONS,
@@ -49,6 +52,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './activos-list.component.html',
@@ -81,6 +85,18 @@ export class ActivosListComponent {
   protected readonly filtersVisible = signal(false);
 
   protected readonly isExportingExcel = signal(false);
+
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/contabilidad/activo/importar-ejemplo/',
+  };
+
+  /** Estado del diálogo de importación (visibilidad, progreso, errores, maestros). */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: ACTIVOS_IMPORT_MASTERS,
+  });
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
@@ -164,6 +180,9 @@ export class ActivosListComponent {
     switch (actionId) {
       case 'new':
         this.navigateTo('nuevo');
+        break;
+      case 'import':
+        this.importar.open();
         break;
       case 'export-excel':
         this.exportExcel();

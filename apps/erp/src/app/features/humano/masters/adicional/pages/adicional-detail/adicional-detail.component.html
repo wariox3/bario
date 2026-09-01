@@ -88,13 +88,33 @@
       <div class="px-5 py-4">
         <p class="adicional-detail__group">{{ t().entities.adicional.detail.groups.asignacion }}</p>
         <dl class="mt-3 flex flex-col gap-3">
+          <!-- El id del registro abre el grupo; la cédula va pegada al nombre
+               porque son el mismo dato leído de dos formas. Ambos en
+               monoespaciada: son identificadores, se comparan y se copian. -->
           <div class="flex flex-col gap-0.5">
-            <dt class="adicional-detail__label">{{ t().entities.adicional.columns.contrato }}</dt>
+            <dt class="adicional-detail__label">{{ t().entities.adicional.columns.id }}</dt>
+            <dd class="adicional-detail__value adicional-detail__value--mono">{{ a.id }}</dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="adicional-detail__label">
+              {{ t().entities.adicional.form.fields.contrato }}
+            </dt>
             <dd
               class="adicional-detail__value"
               [class.adicional-detail__value--empty]="!a.contrato_nombre"
             >
               {{ a.contrato_nombre || '—' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="adicional-detail__label">
+              {{ t().entities.adicional.columns.identificacion }}
+            </dt>
+            <dd
+              class="adicional-detail__value adicional-detail__value--mono"
+              [class.adicional-detail__value--empty]="!a.contrato_contacto_numero_identificacion"
+            >
+              {{ a.contrato_contacto_numero_identificacion || '—' }}
             </dd>
           </div>
           <div class="flex flex-col gap-0.5">
@@ -104,17 +124,6 @@
               [class.adicional-detail__value--empty]="!a.concepto_nombre"
             >
               {{ a.concepto_nombre || '—' }}
-            </dd>
-          </div>
-          <div class="flex flex-col gap-0.5">
-            <dt class="adicional-detail__label">
-              {{ t().entities.adicional.detail.labels.programacion }}
-            </dt>
-            <dd
-              class="adicional-detail__value"
-              [class.adicional-detail__value--empty]="!a.programacion_nombre"
-            >
-              {{ a.programacion_nombre || '—' }}
             </dd>
           </div>
         </dl>
@@ -134,15 +143,6 @@
             </dd>
           </div>
           <div class="flex flex-col gap-0.5">
-            <dt class="adicional-detail__label">{{ t().entities.adicional.columns.horas }}</dt>
-            <dd
-              class="adicional-detail__value adicional-detail__value--mono"
-              [class.adicional-detail__value--empty]="!a.horas"
-            >
-              {{ a.horas || '—' }}
-            </dd>
-          </div>
-          <div class="flex flex-col gap-0.5">
             <dt class="adicional-detail__label">{{ t().entities.adicional.columns.detalle }}</dt>
             <dd class="adicional-detail__value" [class.adicional-detail__value--empty]="!a.detalle">
               {{ a.detalle || '—' }}
@@ -151,8 +151,8 @@
         </dl>
       </div>
 
-      <!-- Grupo: condiciones. Campos Sí/No y no pills: como pills solo se veían
-           las activas, «no es permanente» se leía igual que «sin definir». -->
+      <!-- Grupo: condiciones. Campo Sí/No y no pill: como pill solo se veía la
+           activa, «no aplica» se leía igual que «sin definir». -->
       <div class="px-5 py-4">
         <p class="adicional-detail__group">
           {{ t().entities.adicional.detail.groups.condiciones }}
@@ -167,15 +167,6 @@
               [class.adicional-detail__value--off]="!a.aplica_dia_laborado"
             >
               {{ a.aplica_dia_laborado ? t().common.boolean.true : t().common.boolean.false }}
-            </dd>
-          </div>
-          <div class="flex items-baseline justify-between gap-3">
-            <dt class="adicional-detail__label">{{ t().entities.adicional.columns.permanente }}</dt>
-            <dd
-              class="adicional-detail__value shrink-0"
-              [class.adicional-detail__value--off]="!a.permanente"
-            >
-              {{ a.permanente ? t().common.boolean.true : t().common.boolean.false }}
             </dd>
           </div>
         </dl>

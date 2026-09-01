@@ -394,6 +394,67 @@ gap-3">` con pares `<dt>`/`<dd>` (`__label` `0.7rem/500` muted, `__value` `0.85r
 - **Cards de rol aparte:** lo condicional a un flag (`cliente`, `proveedor`) se queda en su propia
   card bajo la ficha — son datos comerciales, no básicos, y su ausencia es significativa.
 
+## Regla: un elemento que no pinta nada sigue ocupando su ranura
+
+El bug de layout más repetido del ERP, y no se ve en el HTML: **`gap` se cobra por posición,
+no por contenido**. En un `display:flex` (o grid) con `gap`, cada hijo ocupa su ranura y separa a
+sus dos vecinos aunque mida `0×0`. Angular vacía el _contenido_ de un componente cuyo `@if` no
+entra, pero **no borra el host**: el elemento a medida sigue en el DOM y sigue siendo flex item.
+
+Dos formas de la misma falla, ambas ya corregidas en la raíz:
+
+- **Componente condicionalmente vacío** — `<lib-field-error>` sin error, entre el input y lo que
+  venga después: cobra `gap` a ambos lados (el doble de aire), y cuando es el último hijo infla el
+  alto del campo. Está en los ~250 usos del componente.
+- **Overlay declarado en el flujo** — `<p-confirmDialog />`, `<p-dialog>`, un `app-*-modal`:
+  cerrados no pintan nada, pero entre el encabezado y la primera card de una página empujan
+  `n × gap` hacia abajo. En una página de detalle (`:host` flex con `gap: 1.25rem`), dos overlays
+  = `2.5rem` de aire sin explicación.
+
+**La cura, según el caso:**
+
+- **A veces tiene contenido, a veces no** → el host se saca del flujo cuando está vacío, con un
+  host binding: `host: { '[style.display]': "mensaje() ? null : 'none'" }`. Con contenido vuelve a
+  su display por defecto, así lo que ya se veía queda idéntico. Vive en `lib-field-error` y en
+  `app-vencimiento-hint`.
+- **Nunca ocupa lugar (overlays)** → `display: contents`, que hace que el elemento no genere caja
+  propia. Los de PrimeNG los cubre `libs/styles/src/primeng/_overlays.scss` (importado por el
+  `styles.scss` de las 6 SPAs); esa regla alcanza al `<p-dialog>`, **no** al wrapper, así que un
+  componente propio que envuelva un overlay declara además `:host { display: contents }`. Es seguro
+  porque la máscara del diálogo es `position: fixed` y no participa del flujo en ningún caso.
+- **Lo que se puede evitar de entrada** → si el `@if` vive en el template _padre_, no queda
+  elemento y no hay ranura que pagar. Es la opción preferible cuando el componente se puede omitir.
+
+**Al escribir un componente nuevo, la pregunta es:** ¿puede este componente no renderizar nada? Si
+la respuesta es sí, su host tiene que saber desaparecer. Vale igual para `space-y-*`, que aplica
+márgenes con `> * + *` y también cuenta al elemento vacío.
+
+## Patrón: aviso de desvío en un campo derivado (vencimiento)
+
+`features/documentos/comercial/components/vencimiento-hint/` — cuando el valor de un campo lo
+**deriva** el sistema de otros dos (aquí `fecha_vence = fecha + días del plazo de pago`) pero la
+persona puede sobrescribirlo, el campo avisa cuando el valor dejó de ser el derivado.
+
+- **Solo habla cuando hay algo que decir.** Mientras la fecha coincide con la que dicta el plazo,
+  el componente no renderiza nada (y su host desaparece, ver la regla de la ranura). Se probó
+  también una nota permanente que explicaba el origen del valor en reposo; se descartó por ruido:
+  una línea fija bajo un campo que casi siempre está en su estado normal cuesta atención todos los
+  días para explicar algo que casi nunca sorprende.
+- **Desviado:** una línea `text-amber-700` + `pi pi-exclamation-circle` con de cuánto es la
+  diferencia (y contra qué plazo), y un botón que **nombra la fecha** a la que vuelve
+  (`Usar 15/09/2026`) — no un genérico «restablecer».
+- **Ámbar, no rojo, y sin invalidar el form:** apartarse de la condición pactada es una excepción
+  legítima del negocio (la factura del proveedor llega con su fecha impresa y manda). El rojo se
+  reserva para lo imposible — aquí, vencer antes de emitir, que sí es un validator duro.
+- **Se calla ante un error del campo** (`[silenciar]`): el mensaje rojo manda y dos líneas
+  competirían.
+- **El estado lo expone la lógica, no el componente:** `setupVencimientoAutocompute` devuelve
+  `{ diasPlazo, sugerido, desvio, restablecer }` y el hint es tonto. Así los 6 formularios
+  comerciales lo heredan sin repetir nada.
+- **Contrapartida a tener presente:** sin señal en reposo, que el autocálculo funcione sigue siendo
+  invisible — que fue justo lo que se reportó como «no carga el plazo de pago». Si el reporte
+  vuelve, el lugar donde mostrarlo es el campo del plazo, no el del vencimiento.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

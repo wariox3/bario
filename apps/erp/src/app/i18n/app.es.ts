@@ -1,10 +1,11 @@
 import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEs, appSwitcherEs, authEs } from '@reddoc/ui';
+import { accesosContenedorEs, appSwitcherEs, authEs, phoneInputEs } from '@reddoc/ui';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
   auth: authEs,
   appSwitcher: appSwitcherEs,
+  phoneInput: phoneInputEs,
   contenedores: contenedoresEs,
   accesosContenedor: accesosContenedorEs,
   common: {
@@ -285,6 +286,12 @@ export const es: AppDict = {
     },
     generarRecurrente: {
       seleccionadosLabel: 'Generar seleccionados',
+      modalHeader: 'Generar facturas',
+      modalSubtitle: 'Genera las facturas del período elegido desde las plantillas seleccionadas',
+      periodoLabel: 'Período',
+      submit: 'Generar',
+      cancel: 'Cancelar',
+      sinDestino: 'Este documento no tiene definida la factura que debe generar.',
       noSelection: {
         title: 'Sin selección',
         desc: 'Selecciona al menos una factura recurrente para generar.',
@@ -556,7 +563,12 @@ export const es: AppDict = {
         createSubtitle: 'Completá la información del asesor',
         editSubtitle: 'Modificá la información del asesor',
         fields: { nombreCorto: 'Nombre corto', celular: 'Celular', correo: 'Correo' },
-        validation: { required: 'Este campo es requerido', email: 'El correo no es válido' },
+        validation: {
+          required: 'Este campo es requerido',
+          email: 'El correo no es válido',
+          celularInvalido: 'El número no es un celular válido.',
+          celularLongitud: 'El número no tiene el largo de un celular del país elegido.',
+        },
         toasts: {
           createSuccess: { title: 'Asesor creado', desc: 'El asesor se creó correctamente' },
           editSuccess: {
@@ -856,6 +868,8 @@ export const es: AppDict = {
         validation: {
           required: 'Este campo es obligatorio.',
           emailInvalid: 'Ingresá un correo válido.',
+          celularInvalido: 'El número no es un celular válido.',
+          celularLongitud: 'El número no tiene el largo de un celular del país elegido.',
           numeroIdentificacionExistente: 'Este número de identificación ya está registrado.',
         },
         submitCreate: 'Crear contacto',
@@ -1455,7 +1469,11 @@ export const es: AppDict = {
           toasts: {
             success: {
               title: 'Movimientos trasladados',
-              desc: 'El traslado se hizo correctamente',
+              desc: 'Se trasladaron {movimientos} movimientos y {detalles} líneas de documento',
+            },
+            vacio: {
+              title: 'No había nada que trasladar',
+              desc: 'La cuenta origen no tiene movimientos ni líneas de documento',
             },
             error: {
               title: 'Error al trasladar',
@@ -1468,6 +1486,10 @@ export const es: AppDict = {
     activo: {
       name: 'Activos',
       searchPlaceholder: 'Buscar por nombre…',
+      import: {
+        title: 'Importar activos',
+        subtitle: 'Subí un Excel con los registros a cargar',
+      },
       columns: {
         id: 'ID',
         codigo: 'Código',
@@ -1496,7 +1518,7 @@ export const es: AppDict = {
           activoGrupo: 'Grupo de activo',
           centroCosto: 'Centro de costo',
           metodoDepreciacion: 'Método de depreciación',
-          duracion: 'Duración',
+          duracion: 'Duración en meses',
           valorCompra: 'Valor de compra',
           depreciacionInicial: 'Depreciación inicial',
           fechaCompra: 'Fecha de compra',
@@ -1666,6 +1688,8 @@ export const es: AppDict = {
         validation: {
           required: 'Este campo es requerido',
           emailInvalid: 'El correo no es válido',
+          celularInvalido: 'El número no es un celular válido.',
+          celularLongitud: 'El número no tiene el largo de un celular del país elegido.',
           numeroIdentificacionExistente: 'Ya existe un contacto con esta identificación',
         },
         toasts: {
@@ -1703,8 +1727,18 @@ export const es: AppDict = {
     credito: {
       name: 'Créditos',
       searchPlaceholder: 'Buscar por contrato…',
+      pagos: {
+        title: 'Pagos',
+        empty: 'Este crédito todavía no tiene pagos aplicados',
+        loadError: 'No se pudieron cargar los pagos',
+        total: 'Total descontado',
+        columns: { id: 'ID', fecha: 'Fecha', documento: 'Documento', pago: 'Valor' },
+      },
       columns: {
-        contrato: 'Contrato',
+        id: 'ID',
+        identificacion: 'Identificación',
+        nombre: 'Nombre',
+        validarCuotas: 'Validar cuotas',
         concepto: 'Concepto',
         inicio: 'Inicio',
         total: 'Total',
@@ -1730,16 +1764,25 @@ export const es: AppDict = {
           contrato: 'Contrato',
           contratoPlaceholder: 'Buscar contrato…',
           concepto: 'Concepto',
-          conceptoPlaceholder: 'Buscar concepto…',
+          conceptoPlaceholder: 'Selecciona un concepto…',
           inicio: 'Inicio',
           total: 'Total',
           cuota: 'Valor cuota',
           cantidadCuotas: 'Cantidad de cuotas',
+          cuotaHint: 'Se calcula con el total y las cuotas; podés ajustarla.',
           inactivo: 'Inactivo',
           aplicaPrima: 'Aplica prima',
           aplicaCesantia: 'Aplica cesantía',
         },
-        validation: { required: 'Este campo es requerido' },
+        plan: {
+          exacto: '{cuotas} cuotas de {monto}',
+          conFinal: '{cuotas} cuotas de {monto} y una final de {final}',
+        },
+        validation: {
+          required: 'Este campo es requerido',
+          mayorQueCero: 'Debe ser mayor que cero',
+          cuotaSuperaTotal: 'La cuota no puede superar el total del crédito',
+        },
         toasts: {
           createSuccess: { title: 'Crédito creado', desc: 'El crédito se creó correctamente' },
           editSuccess: {
@@ -1767,13 +1810,16 @@ export const es: AppDict = {
       name: 'Adicionales',
       searchPlaceholder: 'Buscar por contrato…',
       columns: {
-        contrato: 'Contrato',
+        id: 'ID',
+        codigo: 'Código',
+        identificacion: 'Identificación',
+        nombre: 'Nombre',
+        contratoId: 'Cont',
+        conceptoId: 'Cod',
         concepto: 'Concepto',
         valor: 'Valor',
-        horas: 'Horas',
         detalle: 'Detalle',
         aplicaDiaLaborado: 'Aplica día laborado',
-        permanente: 'Permanente',
         inactivo: 'Inactivo',
       },
       form: {
@@ -1796,7 +1842,12 @@ export const es: AppDict = {
           aplicaDiaLaborado: 'Aplica día laborado',
           inactivo: 'Inactivo',
         },
-        validation: { required: 'Este campo es requerido' },
+        validation: {
+          required: 'Este campo es requerido',
+          mayorQueCero: 'Debe ser mayor que cero',
+          cuotaSuperaTotal: 'La cuota no puede superar el total del crédito',
+          valorPositivo: 'El valor debe ser mayor que cero',
+        },
         toasts: {
           createSuccess: { title: 'Adicional creado', desc: 'El adicional se creó correctamente' },
           editSuccess: {
@@ -1811,7 +1862,6 @@ export const es: AppDict = {
       detail: {
         sections: { general: 'Información general' },
         groups: { asignacion: 'Asignación', valores: 'Valores', condiciones: 'Condiciones' },
-        labels: { programacion: 'Programación' },
         activo: 'Activo',
         notFound: {
           title: 'Adicional no encontrado',
@@ -1826,8 +1876,12 @@ export const es: AppDict = {
       name: 'Novedades',
       searchPlaceholder: 'Buscar por contrato…',
       columns: {
+        id: 'ID',
         novedadTipo: 'Tipo',
-        contrato: 'Contrato',
+        codigo: 'Código',
+        identificacion: 'Identificación',
+        nombre: 'Nombre',
+        contratoId: 'Contrato',
         fechaDesde: 'Fecha desde',
         fechaHasta: 'Fecha hasta',
         dias: 'Días',
@@ -1853,11 +1907,15 @@ export const es: AppDict = {
           fechaHastaPeriodo: 'Fecha hasta periodo',
           diasDinero: 'Días dinero',
           diasDisfrutados: 'Días disfrutados',
-          diasDisfrutadosReales: 'Días disfrutados reales',
+        },
+        hints: {
+          dias: 'La novedad dura {dias} días, contando desde y hasta.',
+          diasUno: 'La novedad dura 1 día.',
         },
         validation: {
           required: 'Este campo es requerido',
           min: 'Valor por debajo del mínimo',
+          maxLength: 'El detalle no puede superar los 150 caracteres',
           rangoFechas: 'La fecha desde no puede ser mayor que la fecha hasta',
         },
         toasts: {
@@ -1871,6 +1929,43 @@ export const es: AppDict = {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la novedad' },
         },
       },
+      detail: {
+        sections: {
+          general: 'Información general',
+          vacaciones: 'Vacaciones',
+          empresaEntidad: 'Empresa y entidad',
+        },
+        groups: {
+          empleado: 'Empleado',
+          fechas: 'Fechas',
+          liquidacion: 'Liquidación',
+          dias: 'Días',
+          disfrute: 'Disfrute',
+          dinero: 'Dinero',
+          empresa: 'Empresa',
+          entidad: 'Entidad',
+        },
+        fields: {
+          contratoId: 'ID contrato',
+          prorroga: 'Prórroga',
+          baseCotizacionPropuesto: 'Base cotización propuesta',
+          baseCotizacion: 'Base cotización',
+          diasDisfrutadosReales: 'Días disfrutados reales',
+          pagoDiaDisfrute: 'Pago por día',
+          pagoDisfrute: 'Pago disfrute',
+          pagoDiaDinero: 'Pago por día',
+          pagoDinero: 'Pago dinero',
+          horas: 'Horas',
+          pago: 'Pago',
+        },
+        notFound: {
+          title: 'Novedad no encontrada',
+          desc: 'La novedad que buscás no existe o fue eliminada.',
+        },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la novedad' },
+        },
+      },
     },
     contrato: {
       name: 'Contratos',
@@ -1878,6 +1973,17 @@ export const es: AppDict = {
       import: {
         title: 'Importar contratos',
         subtitle: 'Subí un Excel con los registros a cargar',
+      },
+      utilidades: { action: 'Utilidades' },
+      formato: {
+        action: 'Formato',
+        certificadoLaboral: 'Certificado laboral',
+        toasts: {
+          error: {
+            title: 'Error al generar',
+            desc: 'No se pudo generar el certificado laboral',
+          },
+        },
       },
       columns: {
         empleado: 'Empleado',
@@ -1964,7 +2070,7 @@ export const es: AppDict = {
         },
       },
       terminar: {
-        action: 'Terminar contrato',
+        action: 'Terminar',
         title: 'Terminar contrato',
         subtitle: 'Cierre de la relación laboral',
         aviso:
@@ -1982,10 +2088,10 @@ export const es: AppDict = {
         },
       },
       parametrosIniciales: {
-        action: 'Fechas de último pago',
-        title: 'Fechas de último pago',
+        action: 'Parámetros iniciales',
+        title: 'Parámetros iniciales',
         subtitle: 'Punto de partida de la liquidación',
-        hint: 'Desde estas fechas se liquida cada prestación. Dejá una vacía si no hubo pago previo.',
+        hint: 'Desde estas fechas se liquida cada prestación. Deja el campo vacío si no hubo un pago previo.',
         fields: {
           general: 'Último pago',
           prima: 'Último pago de prima',
@@ -2000,9 +2106,15 @@ export const es: AppDict = {
       detail: {
         eyebrow: 'Contrato',
         sections: {
-          datos: 'Datos del contrato',
-          remuneracion: 'Remuneración',
+          general: 'Información general',
+          contabilidad: 'Contabilidad',
           seguridadSocial: 'Seguridad social',
+        },
+        groups: {
+          identificacion: 'Identificación',
+          vigencia: 'Vigencia y asignación',
+          remuneracion: 'Remuneración',
+          terminacion: 'Terminación y pagos',
         },
         estado: {
           activo: 'Activo',
@@ -2503,12 +2615,10 @@ export const es: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
-        aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
       },
       filters: {
-        aprobado: 'Aprobado',
         anulado: 'Anulado',
         contabilizado: 'Contabilizado',
       },
@@ -2910,12 +3020,10 @@ export const es: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
-        aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
       },
       filters: {
-        aprobado: 'Aprobado',
         anulado: 'Anulado',
         contabilizado: 'Contabilizado',
       },
@@ -3456,6 +3564,21 @@ export const es: AppDict = {
         },
       },
     },
+    vencimiento: {
+      desvio: {
+        mas: {
+          one: '1 día más que el plazo ({dias} d)',
+          other: '{n} días más que el plazo ({dias} d)',
+        },
+        menos: {
+          one: '1 día menos que el plazo ({dias} d)',
+          other: '{n} días menos que el plazo ({dias} d)',
+        },
+      },
+      usar: 'Usar {fecha}',
+      usarTitle: 'Volver al vencimiento que dicta el plazo de pago',
+      anteriorAFecha: 'El vencimiento no puede ser anterior a la fecha.',
+    },
     comercialDetalle: {
       title: 'Detalles',
       hint: 'Productos y servicios del documento',
@@ -3473,6 +3596,23 @@ export const es: AppDict = {
       itemPlaceholder: 'Buscar ítem…',
       detallePlaceholder: 'Nota…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
+      createItem: 'Crear ítem',
+      extraerIva: {
+        title: 'Precio con impuestos incluidos',
+        baseLabel: 'Precio base',
+        apply: 'Aplicar precio base',
+      },
+      scanner: {
+        placeholder: 'Escanear código de barras',
+        notFound: {
+          title: 'Código no encontrado',
+          desc: 'Ningún ítem coincide con el código escaneado',
+        },
+        ambiguous: {
+          title: 'Código ambiguo',
+          desc: 'Varios ítems coinciden y ninguno es exacto; busca el ítem a mano',
+        },
+      },
       columns: {
         linea: '#',
         ref: 'Ref',

@@ -3,13 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
 import {
+  formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
-  extractErrorMessage,
   calcularResumen,
   type DocumentoEstados,
   type ResumenDocumento,
@@ -44,7 +42,8 @@ interface CabeceraView {
   readonly metodoPago: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
-   * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
+   * ficha y la política de edición; la plantilla no se aprueba desde la ficha (el
+   * backend no atiende esa acción para este tipo).
    */
   readonly estados: DocumentoEstados;
 }
@@ -65,7 +64,6 @@ interface CabeceraView {
   standalone: true,
   imports: [
     ButtonModule,
-    ConfirmDialogModule,
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
@@ -73,7 +71,6 @@ interface CabeceraView {
     DocumentEstadosComponent,
     AfectacionModalComponent,
   ],
-  providers: [ConfirmationService],
   templateUrl: './factura-venta-recurrente-detail.component.html',
   styleUrl: './factura-venta-recurrente-detail.component.scss',
 })
@@ -85,7 +82,6 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly confirmation = inject(ConfirmationService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
@@ -164,76 +160,6 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
-  /** Aprueba el documento previa confirmación; al éxito recarga la ficha. */
-  protected onAprobar(): void {
-    const id = this.id();
-    if (!id) return;
-    const a = this.t().documentActions.detail;
-    this.confirmation.confirm({
-      message: a.confirmAprobar.message,
-      header: a.confirmAprobar.header,
-      icon: 'pi pi-check-circle',
-      acceptLabel: a.aprobar,
-      rejectLabel: this.t().common.actions.cancel,
-      // Aprobar (afirmativa) queda como primario relleno; Cancelar baja a
-      // secundario contorneado para dar jerarquía clara — sin esto PrimeNG
-      // pinta ambos botones idénticos. Mismo lenguaje que los botones
-      // secundarios de la botonera (Imprimir/Opciones).
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.aprobarDocumento(Number(id)),
-    });
-  }
-
-  private aprobarDocumento(id: number): void {
-    this.gateway
-      .aprobar(this.document(), id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          const ts = this.t().documentActions.detail.toasts.aprobarSuccess;
-          this.toast.success(ts.title, ts.desc);
-          this.loadDocumento(id);
-        },
-        error: (err: unknown) => {
-          const ts = this.t().documentActions.detail.toasts.aprobarError;
-          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
-        },
-      });
-  }
-
-  /** Desaprueba el documento previa confirmación; al éxito recarga la ficha. */
-  protected onDesaprobar(): void {
-    const id = this.id();
-    if (!id) return;
-    const a = this.t().documentActions.detail;
-    this.confirmation.confirm({
-      message: a.confirmDesaprobar.message,
-      header: a.confirmDesaprobar.header,
-      icon: 'pi pi-times-circle',
-      acceptLabel: a.desaprobar,
-      rejectLabel: this.t().common.actions.cancel,
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.desaprobarDocumento(Number(id)),
-    });
-  }
-
-  private desaprobarDocumento(id: number): void {
-    this.gateway
-      .desaprobar(this.document(), id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          const ts = this.t().documentActions.detail.toasts.desaprobarSuccess;
-          this.toast.success(ts.title, ts.desc);
-          this.loadDocumento(id);
-        },
-        error: (err: unknown) => {
-          const ts = this.t().documentActions.detail.toasts.desaprobarError;
-          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
-        },
-      });
-  }
-
   /** Descarga el PDF del documento. */
   protected onImprimir(): void {
     const id = this.id();
@@ -292,10 +218,9 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
       });
   }
 
-  /** Fecha larga de la cabecera (`20 de junio de 2026`). */
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(date, '—');
   }
 
   /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */

@@ -52,6 +52,7 @@ const IDENTIFICACION_CEDULA = 13;
     FieldErrorComponent,
   ],
   templateUrl: './gestion-estado-modal.component.html',
+  styles: ':host { display: contents; }',
 })
 export class GestionEstadoModalComponent {
   private readonly fb = inject(FormBuilder);

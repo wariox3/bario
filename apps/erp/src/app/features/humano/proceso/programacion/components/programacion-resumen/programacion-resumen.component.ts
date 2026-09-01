@@ -1,6 +1,12 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, formatCop, fromIsoDate, toFiniteNumber } from '@reddoc/core';
+import {
+  I18nService,
+  formatCop,
+  fromIsoDate,
+  toFiniteNumber,
+  formatFechaLarga,
+} from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { PROGRAMACION_BANDERAS } from '../../programacion.banderas';
 import { estadoDe, type EstadoProceso } from '../../../shared/proceso.estado';
@@ -56,9 +62,8 @@ export class ProgramacionResumenComponent {
     this.banderasVisibles.update((visible) => !visible);
   }
 
-  /** Fecha larga (`20 de junio de 2026`). */
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    if (!date) return '—';
-    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+    return formatFechaLarga(date, '—');
   }
 }

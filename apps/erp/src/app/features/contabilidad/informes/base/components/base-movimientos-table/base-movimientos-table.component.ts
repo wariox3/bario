@@ -1,4 +1,3 @@
-import { formatDate } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,7 +6,7 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { I18nService, formatCop } from '@reddoc/core';
+import { I18nService, formatCop, formatFechaCorta } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { BaseMovimientoRow } from '../../base.model';
 
@@ -59,12 +58,7 @@ export class BaseMovimientosTableComponent {
   }
 
   /** Misma presentación de fecha que `<lib-data-table>`, para que se lean igual. */
-  protected formatFecha(value: string | null): string {
-    if (!value) return '';
-    try {
-      return formatDate(value, 'mediumDate', this.locale);
-    } catch {
-      return value;
-    }
+  protected formatFecha(value: string | null | undefined): string {
+    return formatFechaCorta(value);
   }
 }

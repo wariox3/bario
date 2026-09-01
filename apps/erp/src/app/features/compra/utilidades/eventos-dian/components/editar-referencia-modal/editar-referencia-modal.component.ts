@@ -22,6 +22,7 @@ import type { EventosDianViewRow } from '../../eventos-dian.model';
   standalone: true,
   imports: [ReactiveFormsModule, DialogModule, ButtonModule, InputTextModule, UppercaseDirective],
   templateUrl: './editar-referencia-modal.component.html',
+  styles: ':host { display: contents; }',
 })
 export class EditarReferenciaModalComponent {
   private readonly fb = inject(FormBuilder);

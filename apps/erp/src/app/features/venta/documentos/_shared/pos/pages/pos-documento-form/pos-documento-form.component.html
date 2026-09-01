@@ -77,7 +77,6 @@
             <p-datepicker
               inputId="fecha"
               formControlName="fecha"
-              dateFormat="yy-mm-dd"
               [showIcon]="true"
               appendTo="body"
               [fluid]="true"
@@ -98,7 +97,6 @@
             <p-datepicker
               inputId="fecha_vence"
               formControlName="fecha_vence"
-              dateFormat="yy-mm-dd"
               [showIcon]="true"
               appendTo="body"
               [fluid]="true"
@@ -106,7 +104,17 @@
             />
             <lib-field-error
               [control]="form.controls.fecha_vence"
-              [messages]="{ required: f.validation.required }"
+              [messages]="{
+                required: f.validation.required,
+                vencimientoAnterior: t().entities.vencimiento.anteriorAFecha,
+              }"
+            />
+            <app-vencimiento-hint
+              [dias]="vencimiento.diasPlazo()"
+              [sugerido]="vencimiento.sugerido()"
+              [desvio]="vencimiento.desvio()"
+              [silenciar]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
+              (restablecer)="vencimiento.restablecer()"
             />
           </div>
         </div>
@@ -226,6 +234,7 @@
               [documentId]="documentId()"
               [importEnabled]="true"
               [contactoId]="form.controls.contacto.value?.id ?? null"
+              [precioListaId]="precioListaId()"
               (imported)="onImported()"
             />
           </p-tabpanel>

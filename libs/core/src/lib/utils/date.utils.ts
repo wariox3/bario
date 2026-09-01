@@ -19,6 +19,98 @@ export function toIsoDate(date: Date | null | undefined): string | null {
   return `${year}-${month}-${day}`;
 }
 
+/**
+ * **Formato de fecha del sistema**, en las dos notaciones que consume el front.
+ *
+ * PrimeNG (sintaxis heredada de jQuery UI: `yy` = año de 4 dígitos) y Angular
+ * (`DatePipe` / `formatDate`) escriben distinto el **mismo** formato, así que
+ * cambiarlo en un solo lado deja la mitad de la app en el formato viejo. Las dos
+ * viven acá para que un cambio futuro sea de una línea.
+ *
+ * `primeng` alimenta el `dateFormat` del translation global (`REDDOC_PRIMENG_ES`),
+ * del que **todos** los `<p-datepicker>` heredan: un datepicker no debe declarar
+ * su propio `dateFormat` salvo que muestre otra cosa (p. ej. `mm/yy` para elegir
+ * un mes).
+ */
+export const FORMATO_FECHA = {
+  /** Notación PrimeNG — `05/08/2026`. */
+  primeng: 'dd/mm/yy',
+  /** Notación Angular (`| date: …`) — `05/08/2026`. */
+  angular: 'dd/MM/y',
+  /** Notación Angular con hora — `05/08/2026 14:30`. */
+  angularConHora: 'dd/MM/y HH:mm',
+} as const;
+
+/** Fecha ISO sin hora, tal cual la manda el backend en los campos de solo fecha. */
+const ISO_FECHA_SOLA = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Normaliza a `Date` local lo que llegue de un backend o de un form: ISO
+ * `yyyy-MM-dd`, ISO con hora, epoch o un `Date` ya armado. `null` si no hay valor
+ * o si no es una fecha válida.
+ *
+ * El ISO sin hora pasa por `fromIsoDate` a propósito: `new Date('2026-08-05')` lo
+ * interpreta como UTC y al oeste de Greenwich —Colombia— retrocede un día.
+ */
+function aDate(value: string | number | Date | null | undefined): Date | null {
+  if (value === null || value === undefined || value === '') return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (typeof value === 'string' && ISO_FECHA_SOLA.test(value)) return fromIsoDate(value);
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+/**
+ * Fecha para **leer**: `05/08/2026`. Es el formato de los campos de una ficha, de
+ * las columnas de fecha de una tabla y de todo lo que no sea la cabecera de un
+ * documento (para eso está `formatFechaLarga`).
+ *
+ * Se arma con las partes locales en vez de `formatDate` de Angular porque el
+ * formato es puramente numérico: así no depende de que la app haya registrado la
+ * locale, y el cero a la izquierda queda garantizado —que es lo que alinea la
+ * columna al escanearla.
+ */
+export function formatFechaCorta(
+  value: string | number | Date | null | undefined,
+  fallback = '',
+): string {
+  const date = aDate(value);
+  if (!date) return fallback;
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}/${date.getFullYear()}`;
+}
+
+/** `Intl.DateTimeFormat` es caro de construir: uno por locale, reusado. */
+const FECHA_LARGA = new Map<string, Intl.DateTimeFormat>();
+
+function fechaLargaDe(locale: string): Intl.DateTimeFormat {
+  let fmt = FECHA_LARGA.get(locale);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'long', year: 'numeric' });
+    FECHA_LARGA.set(locale, fmt);
+  }
+  return fmt;
+}
+
+/**
+ * Fecha en palabras: `05 de agosto de 2026`. Reservada para la **cabecera de un
+ * documento** (factura, asiento, cierre…), que es una pieza formal y se lee como
+ * tal. En un campo o en una columna va la corta.
+ *
+ * `locale` existe para las pantallas que ya se traducen (turnos lo pasa desde su
+ * `I18nService`); el resto del ERP se queda con el default. La corta no lo
+ * necesita: `05/08/2026` se escribe igual en todos lados.
+ */
+export function formatFechaLarga(
+  value: string | number | Date | null | undefined,
+  fallback = '',
+  locale = 'es-CO',
+): string {
+  const date = aDate(value);
+  return date ? fechaLargaDe(locale).format(date) : fallback;
+}
+
 /** Parsea `yyyy-MM-dd` a un `Date` local (sin corrimiento de zona horaria). */
 export function fromIsoDate(value: string): Date;
 export function fromIsoDate(value: string | null | undefined): Date | null;

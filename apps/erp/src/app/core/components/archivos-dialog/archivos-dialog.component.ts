@@ -19,7 +19,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService } from '@reddoc/core';
+import { I18nService, ToastService, FORMATO_FECHA } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { formatBytes } from '@erp/core/utils/format-bytes';
 import { ARCHIVO_TIPO, ArchivoService } from './archivo.service';
@@ -92,6 +92,9 @@ export class ArchivosDialogComponent {
   readonly archivoTipo = input<number>(ARCHIVO_TIPO.ADJUNTO);
 
   // ── Colaboradores ─────────────────────────────────────────────────────────
+
+  /** Formato de fecha del sistema, para el `| date` de la plantilla. */
+  protected readonly formatoFecha = FORMATO_FECHA.angularConHora;
 
   private readonly service = inject(ArchivoService);
   private readonly confirmation = inject(ConfirmationService);

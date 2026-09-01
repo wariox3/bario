@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { formatCiudad } from '@reddoc/core';
 import { BillingProfile } from '../../../../models/billing-profile.model';
 
 @Component({
@@ -18,6 +19,11 @@ export class BillingProfileCardComponent {
 
   readonly tipoHint = computed(() =>
     /nit/i.test(this.profile().tipo) ? 'Persona jurídica' : 'Persona natural',
+  );
+
+  /** `Amagá — Antioquia`; sin departamento queda solo el nombre. */
+  readonly ciudadLabel = computed(() =>
+    formatCiudad(this.profile().ciudad, this.profile().departamento),
   );
 
   onSelect(): void {

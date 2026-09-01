@@ -17,7 +17,7 @@ export function adicionalToFormValue(a: Adicional): Partial<AdicionalFormRawValu
         ? {
             id: a.contrato,
             nombre: a.contrato_nombre ?? '',
-            numero_identificacion: a.contrato_numero_identificacion ?? '',
+            numero_identificacion: a.contrato_contacto_numero_identificacion ?? '',
           }
         : null,
     concepto: a.concepto != null ? { id: a.concepto, nombre: a.concepto_nombre ?? '' } : null,

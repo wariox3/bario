@@ -29,7 +29,9 @@ import type { AppDict } from '@erp/i18n';
  * Dos acciones son **opt-in** vía `showAnular` / `showEmitir`, apagadas por
  * default: no todo documento se anula ni se emite a la DIAN, y esta botonera la
  * comparte todo el ERP. Prenderlas por default le pondría botones a fichas cuyo
- * backend no los atiende.
+ * backend no los atiende. El eje de aprobación es el caso simétrico:
+ * `showAprobacion` viene encendido y se apaga donde no aplica (las plantillas
+ * recurrentes). Si el dropdown "Acciones" se queda sin entradas, no se pinta.
  */
 @Component({
   selector: 'app-document-detail-actions',
@@ -65,6 +67,14 @@ export class DocumentDetailActionsComponent {
   readonly showAnular = input<boolean>(false);
   readonly showEmitir = input<boolean>(false);
 
+  /**
+   * Presencia del eje de aprobación (botón "Aprobar" + "Desaprobar" del
+   * dropdown). Encendido por default —casi todo documento se aprueba—, se apaga
+   * en los que el backend no aprueba, como las plantillas recurrentes: un botón
+   * que solo sabe fallar no informa, estorba.
+   */
+  readonly showAprobacion = input<boolean>(true);
+
   readonly aprobar = output<void>();
   readonly desaprobar = output<void>();
   readonly imprimir = output<void>();
@@ -92,14 +102,15 @@ export class DocumentDetailActionsComponent {
    */
   protected readonly accionesItems = computed<MenuItem[]>(() => {
     const a = this.t().documentActions.detail;
-    const items: MenuItem[] = [
-      {
+    const items: MenuItem[] = [];
+    if (this.showAprobacion()) {
+      items.push({
         label: a.desaprobar,
         icon: 'pi pi-times-circle',
         disabled: !this.canDesaprobar(),
         command: () => this.desaprobar.emit(),
-      },
-    ];
+      });
+    }
     if (this.showAnular()) {
       items.push({
         label: a.anular,

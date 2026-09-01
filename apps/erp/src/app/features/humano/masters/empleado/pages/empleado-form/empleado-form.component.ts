@@ -9,7 +9,7 @@ import {
   FieldErrorComponent,
   FocusInvalidDirective,
   PageActionsComponent,
-  SoloDigitosDirective,
+  PhoneInputComponent,
 } from '@reddoc/ui';
 import {
   CIUDAD_FUENTE,
@@ -56,7 +56,7 @@ import { empleadoToFormValue, formValueToPayload } from '../../empleado.mapper';
     PageActionsComponent,
     ErpApiSelectComponent,
     ErpApiAutocompleteComponent,
-    SoloDigitosDirective,
+    PhoneInputComponent,
     CiudadAutocompleteComponent,
   ],
   templateUrl: './empleado-form.component.html',

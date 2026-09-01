@@ -22,9 +22,19 @@ export interface TasaImpuesto {
   readonly porcentaje: number;
   /** Porcentaje de la base sobre la que aplica: `100` normal, `10` para esquemas tipo AIU. */
   readonly porcentajeBase: number;
+  /**
+   * Operación del impuesto sobre el total: `1` suma (IVA, consumo…), `-1` resta
+   * (retenciones). Ausente ⇒ `1`. Multiplica el monto, así que el `total` de una
+   * retención queda **negativo** en `ImpuestoLinea` y el resumen la descuenta solo.
+   */
+  readonly operacion?: number;
 }
 
-/** Monto de un impuesto ya resuelto y redondeado para una línea o el documento. */
+/**
+ * Monto de un impuesto ya resuelto y redondeado para una línea o el documento.
+ * `total` viene **con signo**: negativo cuando el impuesto es una retención
+ * (`operacion −1`), así los agregados lo restan sin lógica extra.
+ */
 export interface ImpuestoLinea {
   readonly id: number;
   readonly nombre: string;

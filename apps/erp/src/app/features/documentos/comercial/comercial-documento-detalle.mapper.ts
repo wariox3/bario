@@ -68,6 +68,50 @@ export function recomputeImpuestosLinea(
   return calcularImpuestosLinea(lineBase(line), tasas);
 }
 
+/** Redondeo a 2 decimales para precios unitarios (el precio admite centavos). */
+function redondearPrecio(valor: number): number {
+  return Math.round((valor + Number.EPSILON) * 100) / 100;
+}
+
+/**
+ * Fracción total de los impuestos de la línea que **suman** (`operacion > 0`),
+ * p. ej. IVA 19% sobre base 100 → `0.19`. Las retenciones no participan: no
+ * hacen parte de un precio final al público — se descuentan al pagar.
+ */
+function fraccionImpuestosPositivos(
+  line: Pick<ComercialDetalleFormRawValue, 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  const ids = new Set(line.impuestos_ids);
+  return line.impuestos_disponibles
+    .filter((t) => ids.has(t.id) && (t.operacion ?? 1) > 0)
+    .reduce((s, t) => s + (t.porcentaje / 100) * (t.porcentajeBase / 100), 0);
+}
+
+/**
+ * Precio unitario **final** (con los impuestos que suman) que produce el precio
+ * actual de la línea: `precio × (1 + Σ fracciones)`. Siembra el campo del
+ * popover "precio con impuestos incluidos".
+ */
+export function precioUnitarioConImpuestos(
+  line: Pick<ComercialDetalleFormRawValue, 'precio' | 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  return redondearPrecio((line.precio ?? 0) * (1 + fraccionImpuestosPositivos(line)));
+}
+
+/**
+ * Deshace los impuestos de la línea de un precio unitario final: la inversa
+ * exacta del kernel. Los impuestos son **aditivos sobre la misma base** (así los
+ * calcula `calcularImpuestosLinea`), por eso se divide por `1 + Σ fracciones` —
+ * no en cadena tasa por tasa como hacía el legacy, que con varias tasas era
+ * inconsistente con su propio cálculo hacia adelante.
+ */
+export function precioUnitarioSinImpuestos(
+  precioFinal: number,
+  line: Pick<ComercialDetalleFormRawValue, 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  return redondearPrecio(precioFinal / (1 + fraccionImpuestosPositivos(line)));
+}
+
 /** Adapta una línea comercial al contrato mínimo del kernel de resumen. */
 export function toLineaCalculo(line: ComercialDetalleFormRawValue): LineaCalculo {
   return {
@@ -84,6 +128,7 @@ export function tasaFromImpuestoOption(opt: ImpuestoSeleccionarOption): TasaImpu
     nombre: opt.nombre,
     porcentaje: parseFloat(opt.porcentaje ?? '0'),
     porcentajeBase: parseFloat(opt.porcentaje_base ?? '100'),
+    operacion: opt.operacion ?? 1,
   };
 }
 
@@ -110,6 +155,7 @@ export function tasasDelItem(
       nombre: imp.impuesto_nombre ?? '',
       porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
       porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+      operacion: imp.impuesto_operacion ?? 1,
     }));
 }
 
@@ -125,11 +171,17 @@ export function comercialDetalleToFormValue(
     precio,
     descuento: toFiniteNumber(read.descuento) ?? 0,
     impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
-    impuestos_totales: (read.impuestos ?? []).map((imp) => ({
-      id: imp.impuesto,
-      nombre: imp.impuesto_nombre ?? '',
-      total: Math.round(parseFloat(imp.total ?? '0')),
-    })),
+    impuestos_totales: (read.impuestos ?? []).map((imp) => {
+      // El backend guarda el monto sin signo. Si el serializer ya manda la
+      // operación, el signo sale de ahí; si no (hoy), queda como llegó y la
+      // tabla de edición lo corrige contra el catálogo (`signImpuestosLeidos`).
+      const parsed = Math.round(parseFloat(imp.total ?? '0'));
+      const total =
+        imp.impuesto_operacion == null
+          ? parsed
+          : Math.abs(parsed) * (imp.impuesto_operacion < 0 ? -1 : 1);
+      return { id: imp.impuesto, nombre: imp.impuesto_nombre ?? '', total };
+    }),
     // Se rellenan al re-seleccionar el ítem; vacías preservan los montos cargados.
     impuestos_disponibles: [],
     detalle: read.detalle ?? null,
@@ -158,6 +210,9 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     nombre: imp.impuesto_nombre ?? '',
     porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
     porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+    // El serializador de pendientes aún no manda la operación: default suma
+    // (una retención importada quedaría positiva — gap del backend, reportado).
+    operacion: imp.impuesto_operacion ?? 1,
   }));
   const base = (cantidad ?? 0) * precio;
   return {

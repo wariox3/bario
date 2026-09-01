@@ -1,7 +1,7 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, ToastService } from '@reddoc/core';
+import { I18nService, ToastService, formatFechaCorta } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { ActiveModuleStore, masterNav } from '@erp/core/erp-modules';
@@ -9,9 +9,9 @@ import { ResolucionService } from '../../resolucion.service';
 import { RESOLUCION_SEGMENT } from '../../resolucion.constants';
 import type { Resolucion, ResolucionTipo } from '../../resolucion.model';
 
-/** Fecha ISO a `yyyy-MM-dd`, la convención de fechas del ERP. */
+/** Fecha en el formato del sistema (`05/08/2026`). */
 function formatearFecha(iso: string): string {
-  return iso.slice(0, 10);
+  return formatFechaCorta(iso);
 }
 
 @Component({

@@ -159,8 +159,18 @@
           <label for="celular" class="puesto-form__label">
             {{ t().entities.puesto.form.fields.celular }}
           </label>
-          <input id="celular" pInputText type="tel" formControlName="celular" fluid />
-          <lib-field-error [control]="form.controls.celular" />
+          <lib-phone-input
+            inputId="celular"
+            formControlName="celular"
+            [invalid]="form.controls.celular.invalid && form.controls.celular.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.celular"
+            [messages]="{
+              celularE164: t().entities.puesto.form.validation.celularInvalido,
+              celularLongitud: t().entities.puesto.form.validation.celularLongitud,
+            }"
+          />
         </div>
 
         <!-- Latitud + Longitud (mitad derecha, juntas) -->

@@ -7,8 +7,8 @@ import { PeriodoService } from '../../periodo.service';
 import type { PeriodoInconsistencia } from '../../periodo.model';
 
 /**
- * Contenido del diálogo "Ver inconsistencias" de un periodo. Recibe `anio`/`mes`,
- * consulta el endpoint y pinta la tabla de comprobantes con problemas. Se monta y
+ * Contenido del diálogo "Ver inconsistencias" de un periodo. Recibe el id del
+ * periodo, consulta el endpoint y pinta la tabla de problemas. Se monta y
  * destruye con la apertura/cierre del diálogo (la vista lo envuelve en `@if`), así
  * que la carga vive en `ngOnInit`.
  */
@@ -24,8 +24,7 @@ export class PeriodoInconsistenciasComponent implements OnInit {
 
   protected readonly t = this.i18n.t;
 
-  readonly anio = input.required<number>();
-  readonly mes = input.required<number>();
+  readonly periodoId = input.required<number>();
 
   protected readonly inconsistencias = signal<readonly PeriodoInconsistencia[]>([]);
   protected readonly isLoading = signal(true);
@@ -33,7 +32,7 @@ export class PeriodoInconsistenciasComponent implements OnInit {
 
   ngOnInit(): void {
     this.service
-      .inconsistencias(this.anio(), this.mes())
+      .inconsistencias(this.periodoId())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

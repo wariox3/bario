@@ -58,6 +58,8 @@ export interface ItemImpuesto {
   readonly impuesto_nombre?: string | null;
   readonly impuesto_venta?: boolean;
   readonly impuesto_compra?: boolean;
+  /** Operación sobre el total: `1` suma (IVA…), `-1` resta (retenciones). */
+  readonly impuesto_operacion?: number;
   /** Porcentaje del impuesto, e.g. `"19.00"`. */
   readonly impuesto_porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.00"` o `"10.00"` para AIU. */
