@@ -5,17 +5,17 @@ import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/come
  * Valores crudos del formulario de Factura de venta recurrente
  * (`form.getRawValue()`).
  *
- * Los selects guardan la opción completa (`{ id, nombre }`); `fecha` y
- * `fecha_vence` son `Date` del datepicker; `orden_compra`, `remision` y
- * `comentario` son texto; `detalles` son las líneas comerciales. El mapper los
- * normaliza al payload de la API.
+ * Los selects guardan la opción completa (`{ id, nombre }`); `fecha` es un
+ * `Date` que el form sostiene sin pintar (la plantilla no se fecha a mano); `orden_compra`, `remision` y `comentario` son texto;
+ * `detalles` son las líneas comerciales. El mapper los normaliza al payload de
+ * la API.
  */
 export interface FacturaVentaRecurrenteFormRawValue {
   readonly contacto: ErpSelectOption | null;
   readonly fecha: Date | null;
-  readonly fecha_vence: Date | null;
   readonly plazo_pago: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
+  readonly almacen: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
   readonly orden_compra: string | null;
   readonly remision: string | null;

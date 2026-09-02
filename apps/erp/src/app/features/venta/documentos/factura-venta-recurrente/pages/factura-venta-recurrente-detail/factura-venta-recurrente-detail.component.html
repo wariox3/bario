@@ -89,10 +89,6 @@
         <dd class="factura-venta-recurrente-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.fechaVence }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ formatFecha(c.fechaVence) }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.plazoPago }}</dt>
         <dd class="factura-venta-recurrente-detail__value">{{ c.plazoPago || '—' }}</dd>
       </div>
@@ -104,6 +100,12 @@
         <div class="flex flex-col gap-0.5">
           <dt class="factura-venta-recurrente-detail__label">{{ det.labels.sede }}</dt>
           <dd class="factura-venta-recurrente-detail__value">{{ c.sede }}</dd>
+        </div>
+      }
+      @if (c.almacen) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.almacen }}</dt>
+          <dd class="factura-venta-recurrente-detail__value">{{ c.almacen }}</dd>
         </div>
       }
       @if (c.asesor) {

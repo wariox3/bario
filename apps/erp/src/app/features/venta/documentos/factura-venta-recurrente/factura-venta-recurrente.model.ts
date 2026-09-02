@@ -8,8 +8,10 @@
  * documento (`Documento*Base` en `@reddoc/core`) agregando solo los campos
  * propios de la familia comercial de venta.
  *
- * Nota: `fecha_vence` es el nombre real del campo en el backend (ver
- * `DocumentoListRowBase`). Los demás nombres se confirman contra la API real.
+ * Nota: `fecha_vence` existe en el backend (ver `DocumentoListRowBase`) pero la
+ * recurrente no lo usa —una plantilla no vence—: no se pide en el formulario y
+ * el payload lo manda siempre nulo. Los demás nombres se confirman contra la
+ * API real.
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
@@ -20,11 +22,12 @@ export interface FacturaVentaRecurrenteRead extends DocumentoReadBase {
   readonly numero: string | null;
   /** Identificación del cliente, resuelta por el backend desde el contacto. */
   readonly tercero_numero_identificacion?: string | null;
-  readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly plazo_pago_nombre?: string | null;
   readonly sede: number | null;
   readonly sede_nombre?: string | null;
+  readonly almacen: number | null;
+  readonly almacen_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
   readonly orden_compra: string | null;
@@ -41,9 +44,11 @@ export interface FacturaVentaRecurrenteRead extends DocumentoReadBase {
 
 /** Body (POST/PATCH) de una factura de venta recurrente. */
 export interface FacturaVentaRecurrentePayload extends DocumentoPayloadBase {
-  readonly fecha_vence: string | null;
+  /** Siempre `null`: la plantilla no tiene vencimiento. */
+  readonly fecha_vence: null;
   readonly plazo_pago: number | null;
   readonly sede: number | null;
+  readonly almacen: number | null;
   readonly metodo_pago: number | null;
   readonly orden_compra: string | null;
   readonly remision: string | null;

@@ -1990,12 +1990,12 @@ export interface AppDict
         fields: {
           cliente: string;
           clientePlaceholder: string;
-          fecha: string;
-          fechaVence: string;
           plazoPago: string;
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
@@ -2020,9 +2020,9 @@ export interface AppDict
           cliente: string;
           identificacion: string;
           fecha: string;
-          fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           asesor: string;
           comentario: string;

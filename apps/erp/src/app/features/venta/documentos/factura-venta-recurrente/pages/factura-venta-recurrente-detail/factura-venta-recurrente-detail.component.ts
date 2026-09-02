@@ -43,9 +43,9 @@ interface CabeceraView {
   /** Identificación del cliente (`tercero_numero_identificacion` del read). */
   readonly identificacion: string | null;
   readonly fecha: Date | null;
-  readonly fechaVence: Date | null;
   readonly plazoPago: string | null;
   readonly sede: string | null;
+  readonly almacen: string | null;
   readonly metodoPago: string | null;
   /** Nombre corto del asesor, resuelto contra su catálogo (el read solo trae la FK). */
   readonly asesor: string | null;
@@ -206,9 +206,9 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
             cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
             identificacion: read.tercero_numero_identificacion ?? null,
             fecha: fv.fecha ?? null,
-            fechaVence: fv.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
+            almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             asesor: read.asesor != null ? (asesores.get(read.asesor) ?? null) : null,
             comentario: read.comentario ?? null,

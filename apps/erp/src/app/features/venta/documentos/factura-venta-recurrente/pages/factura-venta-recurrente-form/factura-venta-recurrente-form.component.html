@@ -65,61 +65,6 @@
           />
         </div>
 
-        <!-- Fechas (emisión + vencimiento) -->
-        <div class="grid grid-cols-2 gap-x-4 gap-y-4">
-          <!-- Fecha -->
-          <div class="flex flex-col gap-1.5">
-            <label for="fecha" class="factura-venta-recurrente-form__label">
-              {{ t().entities.facturaVentaRecurrente.form.fields.fecha }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-datepicker
-              inputId="fecha"
-              formControlName="fecha"
-              [showIcon]="true"
-              appendTo="body"
-              [fluid]="true"
-              [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
-            />
-            <lib-field-error
-              [control]="form.controls.fecha"
-              [messages]="{
-                required: t().entities.facturaVentaRecurrente.form.validation.required,
-              }"
-            />
-          </div>
-
-          <!-- Fecha de vencimiento -->
-          <div class="flex flex-col gap-1.5">
-            <label for="fecha_vence" class="factura-venta-recurrente-form__label">
-              {{ t().entities.facturaVentaRecurrente.form.fields.fechaVence }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-datepicker
-              inputId="fecha_vence"
-              formControlName="fecha_vence"
-              [showIcon]="true"
-              appendTo="body"
-              [fluid]="true"
-              [invalid]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
-            />
-            <lib-field-error
-              [control]="form.controls.fecha_vence"
-              [messages]="{
-                required: t().entities.facturaVentaRecurrente.form.validation.required,
-                vencimientoAnterior: t().entities.vencimiento.anteriorAFecha,
-              }"
-            />
-            <app-vencimiento-hint
-              [dias]="vencimiento.diasPlazo()"
-              [sugerido]="vencimiento.sugerido()"
-              [desvio]="vencimiento.desvio()"
-              [silenciar]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
-              (restablecer)="vencimiento.restablecer()"
-            />
-          </div>
-        </div>
-
         <!-- Plazo de pago -->
         <div class="flex flex-col gap-1.5">
           <label for="plazo_pago" class="factura-venta-recurrente-form__label">
@@ -168,6 +113,19 @@
             formControlName="sede"
             [endpoint]="sedeEndpoint"
             [placeholder]="t().entities.facturaVentaRecurrente.form.fields.sedePlaceholder"
+          />
+        </div>
+
+        <!-- Almacén -->
+        <div class="flex flex-col gap-1.5">
+          <label for="almacen" class="factura-venta-recurrente-form__label">
+            {{ t().entities.facturaVentaRecurrente.form.fields.almacen }}
+          </label>
+          <lib-api-select
+            inputId="almacen"
+            formControlName="almacen"
+            [endpoint]="almacenEndpoint"
+            [placeholder]="t().entities.facturaVentaRecurrente.form.fields.almacenPlaceholder"
           />
         </div>
       </div>
