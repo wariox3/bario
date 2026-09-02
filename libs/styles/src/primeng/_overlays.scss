@@ -18,10 +18,15 @@
 // Un componente propio que envuelva un overlay (`app-*-modal`) necesita lo
 // mismo en su `:host` — esta regla alcanza al `<p-dialog>` de adentro, no al
 // wrapper. Ver `.interface-design/system.md`.
+//
+// `p-toast` queda **fuera** de la lista: es el único de la familia cuyo host
+// *es* la caja del overlay (PrimeNG 20 le pone `class="p-toast"` y el
+// `position: fixed; top/right: 20px` por host binding, no en un div interno).
+// Con `display: contents` se pierde esa caja y los mensajes caen al flujo,
+// estirados de lado a lado. Y no lo necesita: al ser `fixed` nunca ocupó lugar.
 p-confirmdialog,
 p-dialog,
 p-drawer,
-p-toast,
 p-popover,
 p-confirmpopup {
   display: contents;
