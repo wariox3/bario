@@ -344,7 +344,7 @@ export class ServicioDocumentoDetalleModalComponent {
         .filter((imp) => imp.impuesto_venta && raw.impuestos_ids.includes(imp.impuesto))
         .map((imp) => ({
           id: imp.impuesto,
-          nombre: imp.impuesto_nombre ?? '',
+          nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
           porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
           porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
           operacion: imp.impuesto_operacion ?? 1,

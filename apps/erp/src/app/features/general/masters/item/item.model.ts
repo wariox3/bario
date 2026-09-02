@@ -55,7 +55,10 @@ export interface Item {
 export interface ItemImpuesto {
   readonly id?: number;
   readonly impuesto: number;
+  /** Nombre corto (`"IVA"`). Para mostrar se prefiere `impuesto_nombre_extendido`. */
   readonly impuesto_nombre?: string | null;
+  /** Nombre para mostrar (`"IVA 19% ventas"`). */
+  readonly impuesto_nombre_extendido?: string | null;
   readonly impuesto_venta?: boolean;
   readonly impuesto_compra?: boolean;
   /** Operación sobre el total: `1` suma (IVA…), `-1` resta (retenciones). */

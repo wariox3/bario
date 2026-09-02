@@ -124,7 +124,15 @@ export interface DocumentoDetallePayloadBase {
 export interface DocumentoDetalleImpuestoRead {
   /** Id del impuesto (FK), p.ej. 1 = IVA 19%. Es lo que espera el multiselector. */
   readonly impuesto: number;
+  /** Nombre corto (`"IVA"`). Para mostrar se prefiere `impuesto_nombre_extendido`. */
   readonly impuesto_nombre?: string | null;
+  /**
+   * Nombre para mostrar (`"IVA 19% ventas"`). **El backend aún no lo serializa
+   * en la línea del documento** (sí en los impuestos del ítem y en el catálogo
+   * `impuesto/seleccionar/`): mientras no llegue, los mappers caen a
+   * `impuesto_nombre` y la tabla de edición reetiqueta contra el catálogo.
+   */
+  readonly impuesto_nombre_extendido?: string | null;
   /** Porcentaje del impuesto, e.g. `"19.000000"`. */
   readonly porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.000000"` o `"10.000000"` para AIU. */

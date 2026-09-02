@@ -13,7 +13,10 @@
 export interface LineaPendienteImpuesto {
   /** Id del impuesto (FK). */
   readonly impuesto: number;
+  /** Nombre corto (`"IVA"`). Para mostrar se prefiere `impuesto_nombre_extendido`. */
   readonly impuesto_nombre?: string | null;
+  /** Nombre para mostrar (`"IVA 19% ventas"`), si el serializador lo manda. */
+  readonly impuesto_nombre_extendido?: string | null;
   /** Porcentaje del impuesto, e.g. `"19.00"`. */
   readonly impuesto_porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.00"`. */
