@@ -6,8 +6,9 @@ import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/come
  * (`form.getRawValue()`).
  *
  * Los selects guardan la opción completa (`{ id, nombre }`); `fecha` y
- * `fecha_vence` son `Date` del datepicker; `detalles` son las líneas comerciales.
- * El mapper los normaliza al payload de la API.
+ * `fecha_vence` son `Date` del datepicker; `orden_compra`, `remision` y
+ * `comentario` son texto; `detalles` son las líneas comerciales. El mapper los
+ * normaliza al payload de la API.
  */
 export interface FacturaVentaRecurrenteFormRawValue {
   readonly contacto: ErpSelectOption | null;
@@ -16,5 +17,14 @@ export interface FacturaVentaRecurrenteFormRawValue {
   readonly plazo_pago: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
+  readonly orden_compra: string | null;
+  readonly remision: string | null;
+  readonly comentario: string | null;
+  /**
+   * Opción del catálogo de asesores. Su etiqueta viene en `nombre_corto` (no en
+   * `nombre`): en edición se siembra como `{ id, nombre: '' }` y el select le
+   * pone nombre al casar contra su catálogo.
+   */
+  readonly asesor: ErpSelectOption | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];
 }

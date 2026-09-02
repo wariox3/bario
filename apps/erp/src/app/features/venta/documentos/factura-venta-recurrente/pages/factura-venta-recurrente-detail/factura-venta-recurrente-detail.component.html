@@ -76,6 +76,14 @@
           <dd class="factura-venta-recurrente-detail__value">{{ c.cliente }}</dd>
         </div>
       }
+      @if (c.identificacion) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.identificacion }}</dt>
+          <dd class="factura-venta-recurrente-detail__value tabular-nums">
+            {{ c.identificacion }}
+          </dd>
+        </div>
+      }
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="factura-venta-recurrente-detail__value">{{ formatFecha(c.fecha) }}</dd>
@@ -96,6 +104,21 @@
         <div class="flex flex-col gap-0.5">
           <dt class="factura-venta-recurrente-detail__label">{{ det.labels.sede }}</dt>
           <dd class="factura-venta-recurrente-detail__value">{{ c.sede }}</dd>
+        </div>
+      }
+      @if (c.asesor) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.asesor }}</dt>
+          <dd class="factura-venta-recurrente-detail__value">{{ c.asesor }}</dd>
+        </div>
+      }
+      <!-- El comentario ocupa el ancho: es prosa, no un dato de una línea. -->
+      @if (c.comentario) {
+        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.comentario }}</dt>
+          <dd class="factura-venta-recurrente-detail__value whitespace-pre-line">
+            {{ c.comentario }}
+          </dd>
         </div>
       }
     </dl>

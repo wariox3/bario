@@ -1986,6 +1986,7 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
+        masInformacion: { title: string; hint: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -1997,6 +1998,11 @@ export interface AppDict
           sedePlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          remision: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          comentario: string;
         };
         validation: { required: string };
         toasts: {
@@ -2012,11 +2018,14 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
           sede: string;
           metodoPago: string;
+          asesor: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };

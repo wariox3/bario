@@ -27,6 +27,12 @@ export function facturaVentaRecurrenteToFormValue(
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
         : null,
+    orden_compra: read.orden_compra ?? null,
+    remision: read.remision ?? null,
+    comentario: read.comentario ?? null,
+    // El read no trae `asesor_nombre_corto`: se siembra la FK sin etiqueta y el
+    // select la resuelve contra su catálogo (casa por `dataKey`).
+    asesor: read.asesor != null ? { id: read.asesor, nombre: '' } : null,
   };
 }
 
@@ -50,6 +56,12 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
+    // Texto en blanco = sin dato: el backend los declara nullable con
+    // `minLength: 1`, así que un string vacío sería un 400.
+    orden_compra: raw.orden_compra?.trim() || null,
+    remision: raw.remision?.trim() || null,
+    comentario: raw.comentario?.trim() || null,
+    asesor: raw.asesor?.id ?? null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

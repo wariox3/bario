@@ -2626,6 +2626,7 @@ export const es: AppDict = {
         createTitle: 'Nueva factura recurrente',
         editTitle: 'Editar factura recurrente',
         sectionHint: 'Plantilla desde la que se generan las facturas de venta',
+        masInformacion: { title: 'Más información', hint: 'opcional' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2637,6 +2638,11 @@ export const es: AppDict = {
           sedePlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          remision: 'Remisión',
+          asesor: 'Asesor',
+          asesorPlaceholder: 'Selecciona…',
+          comentario: 'Comentario',
         },
         validation: { required: 'Este campo es requerido' },
         toasts: {
@@ -2670,11 +2676,14 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
           metodoPago: 'Método de pago',
+          asesor: 'Asesor',
+          comentario: 'Comentario',
         },
         notFound: {
           title: 'Factura no encontrada',

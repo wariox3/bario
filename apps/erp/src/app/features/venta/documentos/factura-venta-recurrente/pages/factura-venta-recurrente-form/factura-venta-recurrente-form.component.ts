@@ -16,6 +16,8 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -38,7 +40,11 @@ import {
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import type { AppDict } from '@erp/i18n';
-import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta-recurrente.constants';
+import {
+  METODO_PAGO_ENDPOINT,
+  SEDE_ENDPOINT,
+  asesorLabel,
+} from '../../factura-venta-recurrente.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
   setupVencimientoAutocompute,
@@ -85,6 +91,8 @@ import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    InputTextModule,
+    TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,
     ErpContactoSelectComponent,
@@ -118,6 +126,15 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly asesorEndpoint = SELECT_ENDPOINTS.asesor;
+  protected readonly asesorLabel = asesorLabel;
+
+  /**
+   * Sección "Más información" plegada/desplegada. Sus cuatro campos son opcionales
+   * y casi nunca se tocan: abiertos empujarían hacia abajo la tabla de líneas, que
+   * es a lo que la persona vino. Se abre sola si el documento trae algo cargado.
+   */
+  protected readonly masInfoOpen = signal(false);
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -162,6 +179,11 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    // Los límites salen del schema del backend (`GenDocumentoRequest`).
+    orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    remision: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
+    asesor: this.fb.control<ErpSelectOption | null>(null),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
 
@@ -357,7 +379,13 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
    * y respetar el vencimiento que viene del backend.
    */
   private applyCabecera(read: FacturaVentaRecurrenteRead): void {
-    this.form.patchValue(facturaVentaRecurrenteToFormValue(read), { emitEvent: false });
+    const values = facturaVentaRecurrenteToFormValue(read);
+    this.form.patchValue(values, { emitEvent: false });
+    // Un dato guardado que vive tras un clic es un dato invisible: si el
+    // documento trae algo en la sección, se abre de entrada.
+    if (values.orden_compra || values.remision || values.comentario || values.asesor) {
+      this.masInfoOpen.set(true);
+    }
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */

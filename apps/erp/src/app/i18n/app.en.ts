@@ -2572,6 +2572,7 @@ export const en: AppDict = {
         createTitle: 'New recurring invoice',
         editTitle: 'Edit recurring invoice',
         sectionHint: 'Template used to generate sales invoices',
+        masInformacion: { title: 'More information', hint: 'optional' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2583,6 +2584,11 @@ export const en: AppDict = {
           sedePlaceholder: 'Select…',
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          remision: 'Delivery note',
+          asesor: 'Sales rep',
+          asesorPlaceholder: 'Select…',
+          comentario: 'Comment',
         },
         validation: { required: 'This field is required' },
         toasts: {
@@ -2616,11 +2622,14 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           cliente: 'Customer',
+          identificacion: 'ID number',
           fecha: 'Date',
           fechaVence: 'Due date',
           plazoPago: 'Payment terms',
           sede: 'Branch',
           metodoPago: 'Payment method',
+          asesor: 'Sales rep',
+          comentario: 'Comment',
         },
         notFound: {
           title: 'Invoice not found',
