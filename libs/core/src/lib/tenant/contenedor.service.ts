@@ -187,9 +187,18 @@ export class ContenedorService extends BaseHttpService {
     return this.delete(`/seguridad/usuario-cliente/${membershipId}/`);
   }
 
-  searchUsers(query: string): Observable<UserSearchResult[]> {
-    return this.get<UserSearchResult[]>(
-      `/seguridad/usuario/seleccionar/?search=${encodeURIComponent(query)}`,
-    );
+  /**
+   * Usuarios que matchean el término, para el autocomplete de la invitación.
+   *
+   * El endpoint responde el envelope paginado de DRF; acá se devuelve solo la
+   * página de resultados: el autocomplete muestra las primeras coincidencias y
+   * el resto se acota tecleando, no paginando. Se tolera además el array plano
+   * por si algún despliegue todavía responde el shape viejo.
+   */
+  searchUsers(query: string): Observable<readonly UserSearchResult[]> {
+    return this.get<UserSearchResult[] | PaginatedResponse<UserSearchResult>>(
+      '/seguridad/usuario/seleccionar/',
+      { search: query },
+    ).pipe(map((r) => (Array.isArray(r) ? r : (r.results ?? []))));
   }
 }
