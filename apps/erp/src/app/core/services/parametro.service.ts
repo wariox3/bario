@@ -20,6 +20,14 @@ export interface ParametroRead {
   readonly gen_factura_electronica_emisor: number | null;
   /** Vencimiento del certificado digital (`AAAA-MM-DD`); `null` si no hay. */
   readonly gen_certificado_vence: string | null;
+  /**
+   * ¿El contenedor todavía no resolvió sus datos iniciales?
+   *
+   * `true` = recién creado, nunca cargó ni descartó la plantilla: hay que
+   * ofrecerle el asistente. Lo apaga el propio backend cuando el contenedor
+   * pasa por `plantilla/cargar/` o `plantilla/descartar/`.
+   */
+  readonly gen_asistente_datos_iniciales: boolean;
 }
 
 /** Nombre de campo pedible (todo menos el `id`). */
@@ -74,6 +82,19 @@ export class ParametroService extends BaseHttpService {
   facturaElectronicaEmisor(): Observable<number | null> {
     return this.sonda(['gen_factura_electronica_emisor']).pipe(
       map((parametro) => parametro.gen_factura_electronica_emisor ?? null),
+    );
+  }
+
+  /**
+   * ¿Hay que ofrecerle a este contenedor el asistente de datos iniciales?
+   *
+   * Al revés que las otras sondas: acá el `true` es lo que hace aparecer algo
+   * en pantalla (el contenedor está en blanco). Un contenedor que ya cargó o
+   * descartó la plantilla responde `false` y no vuelve a ver la invitación.
+   */
+  asistenteDatosIniciales(): Observable<boolean> {
+    return this.sonda(['gen_asistente_datos_iniciales']).pipe(
+      map((parametro) => parametro.gen_asistente_datos_iniciales === true),
     );
   }
 

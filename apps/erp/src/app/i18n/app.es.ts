@@ -6014,6 +6014,29 @@ export const es: AppDict = {
     },
   },
   inicio: {
+    general: {
+      datosIniciales: {
+        title: 'Configuración rápida',
+        desc: 'Establece los valores predeterminados y haz que el sistema funcione al instante.',
+        actions: { cargar: 'Cargar datos', omitir: 'Omitir' },
+        resultado: {
+          title: 'Todo listo',
+          desc: 'Tu empresa ya tiene lo necesario para empezar a operar.',
+          totalLabel: 'Total de registros',
+          modelos: {
+            'contabilidad.ConCuenta': 'Cuentas contables',
+            'general.GenCuentaBanco': 'Cuentas de banco',
+            'general.GenDocumentoTipo': 'Tipos de documento',
+            'general.GenFormaPago': 'Formas de pago',
+            'general.GenImpuesto': 'Impuestos',
+            'humano.HumConceptoCuenta': 'Cuentas de conceptos',
+            'humano.HumConfiguracionAporte': 'Configuraciones de aporte',
+            'humano.HumConfiguracionProvision': 'Configuraciones de provisión',
+          },
+          actions: { cerrar: 'Empezar' },
+        },
+      },
+    },
     venta: {
       facturaElectronica: {
         title: 'Facturación electrónica',

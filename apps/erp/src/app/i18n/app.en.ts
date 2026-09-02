@@ -5952,6 +5952,29 @@ export const en: AppDict = {
     },
   },
   inicio: {
+    general: {
+      datosIniciales: {
+        title: 'Quick setup',
+        desc: 'Set the default values and get the system running right away.',
+        actions: { cargar: 'Load data', omitir: 'Skip' },
+        resultado: {
+          title: 'All set',
+          desc: 'Your company now has everything it needs to start operating.',
+          totalLabel: 'Total records',
+          modelos: {
+            'contabilidad.ConCuenta': 'Accounting accounts',
+            'general.GenCuentaBanco': 'Bank accounts',
+            'general.GenDocumentoTipo': 'Document types',
+            'general.GenFormaPago': 'Payment methods',
+            'general.GenImpuesto': 'Taxes',
+            'humano.HumConceptoCuenta': 'Concept accounts',
+            'humano.HumConfiguracionAporte': 'Contribution settings',
+            'humano.HumConfiguracionProvision': 'Provision settings',
+          },
+          actions: { cerrar: 'Get started' },
+        },
+      },
+    },
     venta: {
       facturaElectronica: {
         title: 'Electronic invoicing',

@@ -4632,6 +4632,23 @@ export interface AppDict
   };
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
+    general: {
+      /** Asistente de datos iniciales: solo en contenedores recién creados. */
+      datosIniciales: {
+        title: string;
+        desc: string;
+        actions: { cargar: string; omitir: string };
+        /** Acuse de la siembra: qué entró al contenedor. */
+        resultado: {
+          title: string;
+          desc: string;
+          /** Etiqueta de la línea de suma, al pie del recibo. */
+          totalLabel: string;
+          modelos: Readonly<Record<string, string>>;
+          actions: { cerrar: string };
+        };
+      };
+    };
     venta: {
       facturaElectronica: {
         title: string;
