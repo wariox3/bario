@@ -17,6 +17,7 @@
  */
 export interface TasaImpuesto {
   readonly id: number;
+  /** Nombre para mostrar del impuesto: el **extendido** (`"IVA 19% ventas"`). */
   readonly nombre: string;
   /** Porcentaje del impuesto: `19` ⇒ 19%. */
   readonly porcentaje: number;
@@ -37,6 +38,7 @@ export interface TasaImpuesto {
  */
 export interface ImpuestoLinea {
   readonly id: number;
+  /** Nombre para mostrar del impuesto: el **extendido** (`"IVA 19% ventas"`). */
   readonly nombre: string;
   readonly total: number;
 }

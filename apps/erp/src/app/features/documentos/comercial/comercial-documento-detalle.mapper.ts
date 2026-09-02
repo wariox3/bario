@@ -125,7 +125,7 @@ export function toLineaCalculo(line: ComercialDetalleFormRawValue): LineaCalculo
 export function tasaFromImpuestoOption(opt: ImpuestoSeleccionarOption): TasaImpuesto {
   return {
     id: opt.id,
-    nombre: opt.nombre,
+    nombre: opt.nombre_extendido ?? opt.nombre,
     porcentaje: parseFloat(opt.porcentaje ?? '0'),
     porcentajeBase: parseFloat(opt.porcentaje_base ?? '100'),
     operacion: opt.operacion ?? 1,
@@ -152,7 +152,7 @@ export function tasasDelItem(
     )
     .map((imp) => ({
       id: imp.impuesto,
-      nombre: imp.impuesto_nombre ?? '',
+      nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
       porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
       porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
       operacion: imp.impuesto_operacion ?? 1,
@@ -174,13 +174,17 @@ export function comercialDetalleToFormValue(
     impuestos_totales: (read.impuestos ?? []).map((imp) => {
       // El backend guarda el monto sin signo. Si el serializer ya manda la
       // operación, el signo sale de ahí; si no (hoy), queda como llegó y la
-      // tabla de edición lo corrige contra el catálogo (`signImpuestosLeidos`).
+      // tabla de edición lo corrige contra el catálogo (`normalizarImpuestosLeidos`).
       const parsed = Math.round(parseFloat(imp.total ?? '0'));
       const total =
         imp.impuesto_operacion == null
           ? parsed
           : Math.abs(parsed) * (imp.impuesto_operacion < 0 ? -1 : 1);
-      return { id: imp.impuesto, nombre: imp.impuesto_nombre ?? '', total };
+      return {
+        id: imp.impuesto,
+        nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
+        total,
+      };
     }),
     // Se rellenan al re-seleccionar el ítem; vacías preservan los montos cargados.
     impuestos_disponibles: [],
@@ -207,7 +211,7 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
   const cantidad = toFiniteNumber(row.cantidad);
   const tasas: TasaImpuesto[] = row.impuestos.map((imp) => ({
     id: imp.impuesto,
-    nombre: imp.impuesto_nombre ?? '',
+    nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
     porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
     porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
     // El serializador de pendientes aún no manda la operación: default suma

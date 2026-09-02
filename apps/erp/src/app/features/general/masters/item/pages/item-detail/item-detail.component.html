@@ -220,7 +220,7 @@
                     <span
                       class="inline-flex items-center rounded-md bg-brand-surface-2 px-2 py-1 text-[0.75rem] font-medium text-brand-text"
                     >
-                      {{ imp.impuesto_nombre }}
+                      {{ imp.impuesto_nombre_extendido ?? imp.impuesto_nombre }}
                     </span>
                   }
                 </div>
@@ -242,7 +242,7 @@
                     <span
                       class="inline-flex items-center rounded-md bg-brand-surface-2 px-2 py-1 text-[0.75rem] font-medium text-brand-text"
                     >
-                      {{ imp.impuesto_nombre }}
+                      {{ imp.impuesto_nombre_extendido ?? imp.impuesto_nombre }}
                     </span>
                   }
                 </div>

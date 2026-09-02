@@ -303,7 +303,7 @@ export class ComercialDocumentoDetallesComponent {
             // Filas nuevas (sin id) que esperaban el catálogo para poder calcular.
             if (group.controls.id.value == null) this.ensureCatalog(group);
             // Filas cargadas: corregir el signo de las retenciones leídas.
-            this.signImpuestosLeidos(group);
+            this.normalizarImpuestosLeidos(group);
           }
         },
         error: () => {
@@ -643,34 +643,40 @@ export class ComercialDocumentoDetallesComponent {
         .subscribe(() => this.ensureCatalog(group));
       // Cubre las filas pobladas después de que llegó el catálogo (en edición
       // el padre las empuja al FormArray cuando responde su propia consulta).
-      this.signImpuestosLeidos(group);
+      this.normalizarImpuestosLeidos(group);
     }
   }
 
   /**
-   * Corrige el **signo** de los montos de impuesto que vinieron del backend: el
-   * serializer de la línea guarda `total` sin signo y (todavía) no manda la
-   * operación, así que una retención cargada en edición sumaría en vez de
-   * restar. El signo autoritativo se resuelve contra el catálogo del `modo`
-   * (que sí trae `operacion`); un impuesto que no esté en él queda como llegó.
-   * Solo toca el signo —la magnitud sigue siendo la del backend— y es
-   * idempotente, así que puede correr al llegar el catálogo y al cablear cada
-   * fila sin pisarse. Cuando el backend serialice `impuesto_operacion`, el
-   * mapper firmará desde el campo y esto pasará a ser un no-op.
+   * Normaliza contra el catálogo del `modo` los impuestos que vinieron del
+   * backend, en dos frentes:
+   *
+   *  - **Signo**: el serializer de la línea guarda `total` sin signo y (todavía)
+   *    no manda la operación, así que una retención cargada en edición sumaría
+   *    en vez de restar. El signo autoritativo sale del catálogo (que sí trae
+   *    `operacion`). Solo toca el signo: la magnitud sigue siendo la del backend.
+   *  - **Nombre**: la línea trae el nombre corto (`"IVA"`) y no el extendido
+   *    (`"IVA 19% ventas"`), que es el que muestran los badges y el resumen.
+   *
+   * Un impuesto que no esté en el catálogo queda como llegó. Es idempotente, así
+   * que puede correr al llegar el catálogo y al cablear cada fila sin pisarse.
+   * Cuando el backend serialice `impuesto_operacion` e `impuesto_nombre_extendido`
+   * en la línea, el mapper resolverá ambos y esto pasará a ser un no-op.
    */
-  private signImpuestosLeidos(group: ComercialDetalleGroup): void {
+  private normalizarImpuestosLeidos(group: ComercialDetalleGroup): void {
     const catalog = this.impuestosCatalog();
     if (catalog.length === 0) return;
-    const operaciones = new Map(catalog.map((tasa) => [tasa.id, tasa.operacion ?? 1]));
+    const tasas = new Map(catalog.map((tasa) => [tasa.id, tasa]));
     const actuales = group.controls.impuestos_totales.value;
-    const firmados = actuales.map((imp) => {
-      const operacion = operaciones.get(imp.id);
-      if (operacion == null) return imp;
-      const total = Math.abs(imp.total) * (operacion < 0 ? -1 : 1);
-      return total === imp.total ? imp : { ...imp, total };
+    const normalizados = actuales.map((imp) => {
+      const tasa = tasas.get(imp.id);
+      if (!tasa) return imp;
+      const total = Math.abs(imp.total) * ((tasa.operacion ?? 1) < 0 ? -1 : 1);
+      const nombre = tasa.nombre || imp.nombre;
+      return total === imp.total && nombre === imp.nombre ? imp : { ...imp, total, nombre };
     });
-    if (firmados.some((imp, i) => imp !== actuales[i])) {
-      group.controls.impuestos_totales.setValue(firmados);
+    if (normalizados.some((imp, i) => imp !== actuales[i])) {
+      group.controls.impuestos_totales.setValue(normalizados);
     }
   }
 

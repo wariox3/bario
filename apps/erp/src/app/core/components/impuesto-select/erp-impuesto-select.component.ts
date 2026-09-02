@@ -16,6 +16,12 @@ import { ErpSelectDataService, ErpSelectOption, type ParamValue } from '@reddoc/
 /** Endpoint de selección de impuestos. */
 const ENDPOINT = '/general/impuesto/seleccionar/';
 
+/** Fila del catálogo: además de `{ id, nombre }` trae el nombre para mostrar. */
+interface ImpuestoOption extends ErpSelectOption {
+  /** Nombre extendido (`"IVA 19% ventas"`) — la etiqueta que ve la persona. */
+  readonly nombre_extendido?: string | null;
+}
+
 /**
  * Selector múltiple de impuestos.
  *
@@ -88,11 +94,16 @@ export class ErpImpuestoSelectComponent implements ControlValueAccessor {
       const params = this.params();
       this.loading.set(true);
       this.dataService
-        .fetchOptions(ENDPOINT, params)
+        .fetchOptions<ImpuestoOption>(ENDPOINT, params)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (options) => {
-            this.options.set(options);
+            // El multiselect etiqueta por `nombre`, pero lo que se muestra es el
+            // nombre extendido —igual que los badges de la línea—; se normaliza
+            // acá para no arrastrar dos etiquetas distintas del mismo impuesto.
+            this.options.set(
+              options.map((opt) => ({ ...opt, nombre: opt.nombre_extendido ?? opt.nombre })),
+            );
             this.loading.set(false);
           },
           error: () => {

@@ -28,6 +28,16 @@ import { ITEM_LIST_PATH } from '../../item.constants';
 import { formValueToPayload, itemToFormValue } from '../../item.mapper';
 
 /**
+ * Opción del catálogo de impuestos etiquetada con el **nombre extendido**
+ * (`"IVA 19% ventas"`), que es como se muestra el impuesto en todo el ERP. El
+ * multiselect etiqueta por `nombre`, así que se normaliza al llegar.
+ */
+function conNombreExtendido(option: ErpSelectOption): ErpSelectOption {
+  const extendido = option['nombre_extendido'];
+  return typeof extendido === 'string' && extendido ? { ...option, nombre: extendido } : option;
+}
+
+/**
  * Formulario de alta/edición de item.
  *
  * Master del módulo General (camino B). La misma página cubre crear y editar:
@@ -229,14 +239,14 @@ export class ItemFormComponent implements OnInit {
       .fetchOptions('/general/impuesto/seleccionar/', { venta: 'True' })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (options) => this.impuestosVentaOptions.set(options),
+        next: (options) => this.impuestosVentaOptions.set(options.map(conNombreExtendido)),
         error: () => this.impuestosVentaOptions.set([]),
       });
     this.selectData
       .fetchOptions('/general/impuesto/seleccionar/', { compra: 'True' })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (options) => this.impuestosCompraOptions.set(options),
+        next: (options) => this.impuestosCompraOptions.set(options.map(conNombreExtendido)),
         error: () => this.impuestosCompraOptions.set([]),
       });
   }
