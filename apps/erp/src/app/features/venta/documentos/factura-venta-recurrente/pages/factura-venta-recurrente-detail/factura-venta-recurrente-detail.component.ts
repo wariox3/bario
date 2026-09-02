@@ -168,21 +168,6 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
-  /** Descarga el PDF del documento. */
-  protected onImprimir(): void {
-    const id = this.id();
-    if (!id) return;
-    this.gateway
-      .imprimir(this.document(), Number(id))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => {
-          const ts = this.t().documentActions.detail.toasts.imprimirError;
-          this.toast.error(ts.title, ts.desc);
-        },
-      });
-  }
-
   private loadDocumento(id: number): void {
     // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
     // Los nombres de los FK (plazo de pago, método de pago, sede) llegan en los

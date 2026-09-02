@@ -30,8 +30,9 @@ import type { AppDict } from '@erp/i18n';
  * default: no todo documento se anula ni se emite a la DIAN, y esta botonera la
  * comparte todo el ERP. Prenderlas por default le pondría botones a fichas cuyo
  * backend no los atiende. El eje de aprobación es el caso simétrico:
- * `showAprobacion` viene encendido y se apaga donde no aplica (las plantillas
- * recurrentes). Si el dropdown "Acciones" se queda sin entradas, no se pinta.
+ * `showAprobacion` y `showImprimir` son el caso simétrico: vienen encendidos y
+ * se apagan donde no aplican (las plantillas recurrentes). Si el dropdown
+ * "Acciones" se queda sin entradas, no se pinta.
  */
 @Component({
   selector: 'app-document-detail-actions',
@@ -74,6 +75,13 @@ export class DocumentDetailActionsComponent {
    * que solo sabe fallar no informa, estorba.
    */
   readonly showAprobacion = input<boolean>(true);
+
+  /**
+   * Presencia del botón "Imprimir". Encendido por default, se apaga donde el
+   * documento no se imprime: las plantillas recurrentes no son un comprobante
+   * —de ellas nacen las facturas, que sí se imprimen—, así que su PDF no existe.
+   */
+  readonly showImprimir = input<boolean>(true);
 
   readonly aprobar = output<void>();
   readonly desaprobar = output<void>();
