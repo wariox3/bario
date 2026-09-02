@@ -13,19 +13,18 @@
     "lib": ["ES2022", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
     "strict": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "paths": {
-      "@erp/*": ["apps/erp/src/app/*"],
-      "@reddoc/core": ["libs/core/src/index.ts"],
-      "@reddoc/feature-base": ["libs/feature-base/src/index.ts"],
-      "@reddoc/feature-contenedores": ["libs/feature-contenedores/src/index.ts"],
-      "@reddoc/feature-contenedores/i18n": ["libs/feature-contenedores/src/i18n.ts"],
-      "@reddoc/styles": ["libs/styles/src/index.ts"],
-      "@reddoc/ui": ["libs/ui/src/index.ts"],
-      "@turnos/*": ["apps/turnos/src/app/*"]
+      "@erp/*": ["./apps/erp/src/app/*"],
+      "@reddoc/core": ["./libs/core/src/index.ts"],
+      "@reddoc/feature-base": ["./libs/feature-base/src/index.ts"],
+      "@reddoc/feature-contenedores": ["./libs/feature-contenedores/src/index.ts"],
+      "@reddoc/feature-contenedores/i18n": ["./libs/feature-contenedores/src/i18n.ts"],
+      "@reddoc/styles": ["./libs/styles/src/index.ts"],
+      "@reddoc/ui": ["./libs/ui/src/index.ts"],
+      "@turnos/*": ["./apps/turnos/src/app/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
