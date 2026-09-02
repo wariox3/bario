@@ -37,6 +37,7 @@ import {
 } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
+import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
@@ -251,6 +252,9 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (saved) => {
         this.isSaving.set(false);
+        // Guardar limpia el estado "sucio": navegar a la ficha pasa por el guard
+        // de salida y, sin esto, el camino feliz preguntaría por cambios ya guardados.
+        this.form.markAsPristine();
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
         // Guardar termina en la ficha del documento, para revisar lo que quedó
@@ -277,27 +281,12 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
    * no perderlas. Solo aplica en edición.
    */
   canDeactivate(): boolean | Observable<boolean> {
-    const detalles = this.detallesTable();
-    if (!detalles || detalles.pendingCount() === 0) return true;
-
-    const labels = this.t().entities.comercialDetalle;
-    return new Observable<boolean>((subscriber) => {
-      this.confirmation.confirm({
-        header: labels.leaveHeader,
-        message: labels.leaveMessage,
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: labels.leaveConfirm,
-        rejectLabel: this.t().common.actions.cancel,
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: () => {
-          subscriber.next(true);
-          subscriber.complete();
-        },
-        reject: () => {
-          subscriber.next(false);
-          subscriber.complete();
-        },
-      });
+    return canLeaveDocumentForm({
+      form: this.form,
+      pendingLines: this.detallesTable()?.pendingCount() ?? 0,
+      confirmation: this.confirmation,
+      labels: this.t().entities.comercialDetalle,
+      cancelLabel: this.t().common.actions.cancel,
     });
   }
 
