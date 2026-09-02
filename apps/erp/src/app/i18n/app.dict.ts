@@ -2016,10 +2016,8 @@ export interface AppDict
       detail: {
         sections: { general: string; detalles: string };
         labels: {
-          numero: string;
           cliente: string;
           identificacion: string;
-          fecha: string;
           plazoPago: string;
           sede: string;
           almacen: string;
@@ -2323,9 +2321,7 @@ export interface AppDict
       detail: {
         sections: { general: string; detalles: string };
         labels: {
-          numero: string;
           proveedor: string;
-          fecha: string;
           plazoPago: string;
           formaPago: string;
           centroCosto: string;

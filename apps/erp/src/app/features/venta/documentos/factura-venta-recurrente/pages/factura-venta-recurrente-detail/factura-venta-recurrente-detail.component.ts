@@ -5,7 +5,6 @@ import { type Observable, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
 import {
-  formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
@@ -38,11 +37,9 @@ import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.
 
 /** Cabecera legible de la factura recurrente para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
-  readonly numero: string | null;
   readonly cliente: string | null;
   /** Identificación del cliente (`tercero_numero_identificacion` del read). */
   readonly identificacion: string | null;
-  readonly fecha: Date | null;
   readonly plazoPago: string | null;
   readonly sede: string | null;
   readonly almacen: string | null;
@@ -202,10 +199,8 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
           const read = cabecera as FacturaVentaRecurrenteRead;
           const fv = facturaVentaRecurrenteToFormValue(read);
           this.cabecera.set({
-            numero: read.numero ?? null,
             cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
             identificacion: read.tercero_numero_identificacion ?? null,
-            fecha: fv.fecha ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
             almacen: read.almacen_nombre ?? null,
@@ -248,11 +243,6 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
       map((options) => new Map(options.map((o: ErpSelectOption) => [o.id, asesorLabel(o)]))),
       catchError(() => of(new Map<number, string>())),
     );
-  }
-
-  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
-  protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
   }
 
   /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */

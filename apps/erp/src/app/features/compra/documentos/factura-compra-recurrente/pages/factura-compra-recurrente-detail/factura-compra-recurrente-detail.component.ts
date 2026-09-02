@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import {
-  formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
@@ -31,9 +30,7 @@ import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrent
 
 /** Cabecera legible de la factura recurrente para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
-  readonly numero: string | null;
   readonly proveedor: string | null;
-  readonly fecha: Date | null;
   readonly plazoPago: string | null;
   readonly formaPago: string | null;
   readonly centroCosto: string | null;
@@ -177,9 +174,7 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
           const read = cabecera as FacturaCompraRecurrenteRead;
           const fr = facturaCompraRecurrenteToFormValue(read);
           this.cabecera.set({
-            numero: read.numero ?? null,
             proveedor: fr.contacto?.nombre ?? read.contacto_nombre ?? null,
-            fecha: fr.fecha ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
@@ -197,11 +192,6 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });
-  }
-
-  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
-  protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/compra/<...routePath>[/extra]`. */

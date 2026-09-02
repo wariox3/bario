@@ -66,10 +66,6 @@
       <app-document-estados class="ml-auto" [estados]="c.estados" />
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="flex flex-col gap-0.5">
-        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.numero }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.numero || '—' }}</dd>
-      </div>
       @if (c.cliente) {
         <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
           <dt class="factura-venta-recurrente-detail__label">{{ det.labels.cliente }}</dt>
@@ -84,10 +80,6 @@
           </dd>
         </div>
       }
-      <div class="flex flex-col gap-0.5">
-        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.fecha }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ formatFecha(c.fecha) }}</dd>
-      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.plazoPago }}</dt>
         <dd class="factura-venta-recurrente-detail__value">{{ c.plazoPago || '—' }}</dd>

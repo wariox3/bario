@@ -2620,10 +2620,8 @@ export const en: AppDict = {
           detalles: 'Details',
         },
         labels: {
-          numero: 'Number',
           cliente: 'Customer',
           identificacion: 'ID number',
-          fecha: 'Date',
           plazoPago: 'Payment terms',
           sede: 'Branch',
           almacen: 'Warehouse',
@@ -3032,9 +3030,7 @@ export const en: AppDict = {
           detalles: 'Details',
         },
         labels: {
-          numero: 'Number',
           proveedor: 'Supplier',
-          fecha: 'Date',
           plazoPago: 'Payment terms',
           formaPago: 'Payment form',
           centroCosto: 'Cost center',
