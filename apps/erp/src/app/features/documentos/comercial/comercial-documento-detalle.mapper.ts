@@ -155,7 +155,7 @@ export function comercialDetalleToFormValue(
     item: read.item != null ? { id: read.item, nombre: read.item_nombre ?? '', precio } : null,
     cantidad: toFiniteNumber(read.cantidad),
     precio,
-    descuento: toFiniteNumber(read.descuento) ?? 0,
+    descuento: toFiniteNumber(read.porcentaje_descuento) ?? 0,
     impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
     impuestos_totales: (read.impuestos ?? []).map((imp) => {
       // El backend guarda el monto sin signo. Si el serializer ya manda la
@@ -227,7 +227,7 @@ export function comercialDetalleToPayload(
     item: raw.item?.id ?? null,
     cantidad: raw.cantidad ?? null,
     precio: (raw.precio ?? 0).toFixed(2),
-    descuento: (raw.descuento ?? 0).toFixed(2),
+    porcentaje_descuento: (raw.descuento ?? 0).toFixed(2),
     detalle: raw.detalle?.trim() || null,
     impuestos_ids: raw.impuestos_ids,
     documento_detalle_afectado: raw.documento_detalle_afectado,

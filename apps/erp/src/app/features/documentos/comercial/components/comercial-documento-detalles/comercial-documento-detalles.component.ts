@@ -297,12 +297,7 @@ export class ComercialDocumentoDetallesComponent {
       .subscribe({
         next: (options) => {
           this.impuestosCatalog.set(options.map(tasaFromImpuestoOption));
-          for (const group of this.detalles().controls) {
-            // Filas nuevas (sin id) que esperaban el catálogo para poder calcular.
-            if (group.controls.id.value == null) this.ensureCatalog(group);
-            // Filas cargadas: corregir el signo de las retenciones leídas.
-            this.normalizarImpuestosLeidos(group);
-          }
+          for (const group of this.detalles().controls) this.seedRow(group);
         },
         error: () => {
           // Sin catálogo, las líneas conservan los montos del ítem/backend.
@@ -646,7 +641,7 @@ export class ComercialDocumentoDetallesComponent {
         .subscribe(() => this.ensureCatalog(group));
       // Cubre las filas pobladas después de que llegó el catálogo (en edición
       // el padre las empuja al FormArray cuando responde su propia consulta).
-      this.normalizarImpuestosLeidos(group);
+      this.seedRow(group);
     }
   }
 
@@ -754,11 +749,30 @@ export class ComercialDocumentoDetallesComponent {
    * aún está vacío (no pisa montos del backend en edición hasta que el usuario
    * toca los impuestos). El recompute del grupo se dispara al setear el pool.
    */
-  private ensureCatalog(group: ComercialDetalleGroup): void {
+  private ensureCatalog(group: ComercialDetalleGroup, emitEvent = true): void {
     const catalog = this.impuestosCatalog();
     if (catalog.length === 0) return;
     if (group.controls.impuestos_disponibles.value.length > 0) return;
-    group.controls.impuestos_disponibles.setValue(catalog);
+    group.controls.impuestos_disponibles.setValue(catalog, { emitEvent });
+  }
+
+  /**
+   * Deja una fila lista para calcular: le siembra el pool de tasas y normaliza
+   * los impuestos que vinieron del backend.
+   *
+   * Sin el pool, el recompute de la línea (`createComercialDetalleGroup`) se
+   * corta de entrada, y una línea **cargada en edición** nace con el pool vacío:
+   * tocarle el descuento (o la cantidad, o el precio) movía la base pero dejaba
+   * el impuesto y el neto en el valor viejo hasta re-elegir el ítem.
+   *
+   * En las filas cargadas se siembra **sin emitir**: al abrir el documento se
+   * conservan los montos que calculó el backend; el recálculo entra recién
+   * cuando la persona edita algo. Es idempotente y no cuesta red — el catálogo
+   * ya está en memoria.
+   */
+  private seedRow(group: ComercialDetalleGroup): void {
+    this.ensureCatalog(group, group.controls.id.value == null);
+    this.normalizarImpuestosLeidos(group);
   }
 
   // ── Precio con impuestos incluidos (extraer IVA) ────────────────────────────
