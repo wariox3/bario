@@ -100,7 +100,7 @@ export class ContenedorInviteFormComponent {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((results) => {
-        this.userSuggestions.set(results);
+        this.userSuggestions.set([...results]);
         this.isSearching.set(false);
       });
 
