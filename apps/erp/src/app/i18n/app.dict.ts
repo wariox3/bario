@@ -2718,6 +2718,8 @@ export interface AppDict
       leaveConfirm: string;
       impuestosTitle: string;
       impuestosAdd: string;
+      impuestosRemove: string;
+      impuestosBuscar: string;
       itemPlaceholder: string;
       detallePlaceholder: string;
       confirmDeleteLine: string;

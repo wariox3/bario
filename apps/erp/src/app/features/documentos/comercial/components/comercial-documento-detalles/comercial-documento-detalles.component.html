@@ -212,38 +212,16 @@
             </td>
 
             <td class="comercial-detalle-table__td">
-              <button
-                type="button"
-                class="group flex w-full flex-wrap items-center gap-1 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-sky-50"
-                (click)="impuestoOp.toggle($event)"
-              >
-                @for (imp of impuestosOf(i); track imp.id) {
-                  <span
-                    class="inline-flex items-center rounded-md border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.05)] px-1.5 py-0.5 text-[0.68rem] font-medium leading-none text-brand-text"
-                  >
-                    {{ imp.nombre }}
-                  </span>
-                } @empty {
-                  <span class="inline-flex items-center gap-1 text-[0.72rem] text-brand-muted">
-                    <i class="pi pi-plus text-[0.6rem]"></i>
-                    {{ t().entities.comercialDetalle.impuestosAdd }}
-                  </span>
-                }
-                <i
-                  class="pi pi-pencil text-[0.62rem] text-transparent transition-colors group-hover:text-brand-muted"
-                ></i>
-              </button>
-              <p-popover #impuestoOp>
-                <div class="flex w-72 flex-col gap-2">
-                  <span class="text-[0.72rem] font-semibold text-brand-text">
-                    {{ t().entities.comercialDetalle.impuestosTitle }}
-                  </span>
-                  <app-impuesto-select
-                    [formControl]="row.controls.impuestos_ids"
-                    [params]="impuestoParams()"
-                  />
-                </div>
-              </p-popover>
+              <app-impuesto-select
+                variant="celda"
+                [formControl]="row.controls.impuestos_ids"
+                [catalogo]="impuestosCatalog()"
+                [baseLinea]="baseOf(i)"
+                [placeholder]="t().entities.comercialDetalle.impuestosAdd"
+                [tituloPanel]="t().entities.comercialDetalle.impuestosTitle"
+                [quitarLabel]="t().entities.comercialDetalle.impuestosRemove"
+                [filtroPlaceholder]="t().entities.comercialDetalle.impuestosBuscar"
+              />
             </td>
 
             <td

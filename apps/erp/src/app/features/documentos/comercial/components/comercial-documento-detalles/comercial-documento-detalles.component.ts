@@ -43,7 +43,6 @@ import {
   calcularResumen,
   formatCop,
   toFiniteNumber,
-  type ImpuestoLinea,
   type ParamValue,
   type ResumenDocumento,
   type TasaImpuesto,
@@ -62,6 +61,11 @@ import {
   type ItemOption,
 } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
+import {
+  IMPUESTO_SELECCIONAR_ENDPOINT,
+  tasaFromImpuestoOption,
+  type ImpuestoSeleccionarOption,
+} from '@erp/core/components/impuesto-select/impuesto-seleccionar.types';
 import { ErpSelectDataService } from '@reddoc/core';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
 import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
@@ -77,21 +81,15 @@ import {
   pendienteLineaToFormValue,
   precioUnitarioConImpuestos,
   precioUnitarioSinImpuestos,
+  lineBase,
   lineBruto,
   lineNeto,
-  tasaFromImpuestoOption,
   tasasDelItem,
   toLineaCalculo,
 } from '../../comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '../../comercial-documento-detalle.model';
-import type {
-  ComercialDetalleFormRawValue,
-  ImpuestoSeleccionarOption,
-} from '../../comercial-documento-detalle.types';
+import type { ComercialDetalleFormRawValue } from '../../comercial-documento-detalle.types';
 import { ComercialDocumentoResumenComponent } from '../comercial-documento-resumen/comercial-documento-resumen.component';
-
-/** Endpoint del catálogo de impuestos (mismo que usa `app-impuesto-select`). */
-const IMPUESTO_SELECCIONAR_ENDPOINT = '/general/impuesto/seleccionar/';
 
 /**
  * Tabla de **líneas (detalles)** de un documento comercial. Reutilizable por
@@ -232,7 +230,7 @@ export class ComercialDocumentoDetallesComponent {
    * **cualquier** impuesto elegido en la línea, no solo los configurados en el
    * ítem. Vacío hasta que el fetch resuelve.
    */
-  private readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
+  protected readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
 
   /**
    * Cola de escaneos del lector. `concatMap` los resuelve **en orden**: una
@@ -615,9 +613,14 @@ export class ComercialDocumentoDetallesComponent {
     return line ? lineBruto(line) : 0;
   }
 
-  /** Impuestos de la línea (id, nombre, monto) para renderizar los badges de la columna. */
-  protected impuestosOf(index: number): readonly ImpuestoLinea[] {
-    return this.lines()[index]?.impuestos_totales ?? [];
+  /**
+   * Base gravable de la línea (`bruto − descuento`). La consume el selector de
+   * impuestos para mostrar, opción por opción, cuánto le suma o resta a **esta**
+   * línea elegir ese impuesto.
+   */
+  protected baseOf(index: number): number {
+    const line = this.lines()[index];
+    return line ? lineBase(line) : 0;
   }
 
   protected netoOf(index: number): number {

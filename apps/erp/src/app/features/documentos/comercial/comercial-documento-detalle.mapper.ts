@@ -12,10 +12,7 @@ import type {
   ComercialDetalleRead,
   ComercialDetallePayload,
 } from './comercial-documento-detalle.model';
-import type {
-  ComercialDetalleFormRawValue,
-  ImpuestoSeleccionarOption,
-} from './comercial-documento-detalle.types';
+import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
 
 /** Subtotal bruto de la línea: `cantidad × precio`. */
 export function lineBruto(line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio'>): number {
@@ -118,17 +115,6 @@ export function toLineaCalculo(line: ComercialDetalleFormRawValue): LineaCalculo
     base: lineBruto(line),
     descuento: lineDescuento(line),
     impuestos: line.impuestos_totales,
-  };
-}
-
-/** Opción del catálogo `impuesto/seleccionar/` → `TasaImpuesto` (base 100 por defecto). */
-export function tasaFromImpuestoOption(opt: ImpuestoSeleccionarOption): TasaImpuesto {
-  return {
-    id: opt.id,
-    nombre: opt.nombre_extendido ?? opt.nombre,
-    porcentaje: parseFloat(opt.porcentaje ?? '0'),
-    porcentajeBase: parseFloat(opt.porcentaje_base ?? '100'),
-    operacion: opt.operacion ?? 1,
   };
 }
 

@@ -3593,6 +3593,8 @@ export const es: AppDict = {
       leaveConfirm: 'Salir sin guardar',
       impuestosTitle: 'Impuestos de la línea',
       impuestosAdd: 'Agregar',
+      impuestosRemove: 'Quitar',
+      impuestosBuscar: 'Buscar impuesto…',
       itemPlaceholder: 'Buscar ítem…',
       detallePlaceholder: 'Nota…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
