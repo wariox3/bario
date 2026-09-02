@@ -1,593 +1,260 @@
 name: Deploy
 
+# Despliega por rsync solo las apps afectadas por el push.
+#
+#   main → configuration=production → secrets PROD_*  → environment "production"
+#   dev  → configuration=staging    → secrets DEV_*   → environment "staging"
+#
+# Secrets esperados (por entorno, <ENV> = PROD | DEV):
+#   <ENV>_HOST, <ENV>_SSH_USER, <ENV>_SSH_KEY, <APP>_<ENV>_DEPLOY_PATH
+# Variable opcional (Settings → Variables): <ENV>_SSH_KNOWN_HOSTS
+#   Salida de `ssh-keyscan -H <host>`. Si falta, se hace keyscan en cada run
+#   (trust-on-first-use) y se avisa con un warning.
+
 on:
   push:
     branches: [main, dev]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.interface-design/**'
+      - '.agents/**'
+      - '.claude/**'
+      - '.vscode/**'
   workflow_dispatch:
     inputs:
       apps:
-        description: 'Que desplegar: "all", o lista separada por comas (erp,landing). Vacio = calcular affected.'
+        description: 'Apps a desplegar separadas por coma (erp,turnos) o "all". Vacío = solo las afectadas.'
         required: false
-        default: all
+        default: ''
 
 permissions:
   contents: read
-  # nx-set-shas consulta la API de runs para ubicar la ultima corrida exitosa.
-  actions: read
+  actions: read # nx-set-shas consulta los runs anteriores del workflow
+
+# Un despliegue por rama a la vez. Sin cancelar: cortar un rsync a medias
+# dejaría el sitio inconsistente; el run siguiente espera en cola.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  NODE_VERSION: 22
 
 jobs:
-  check-affected:
+  plan:
+    name: Plan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
-      landing: ${{ steps.check.outputs.landing }}
-      erp: ${{ steps.check.outputs.erp }}
-      cuenta: ${{ steps.check.outputs.cuenta }}
-      transporte: ${{ steps.check.outputs.transporte }}
-      pos: ${{ steps.check.outputs.pos }}
-      turnos: ${{ steps.check.outputs.turnos }}
-      cliente: ${{ steps.check.outputs.cliente }}
+      apps: ${{ steps.affected.outputs.apps }}
+      target: ${{ steps.target.outputs.target }}
+      secret_prefix: ${{ steps.target.outputs.secret_prefix }}
 
     steps:
+      - name: Resolve target environment
+        id: target
+        run: |
+          case "$GITHUB_REF_NAME" in
+            main) target=production; prefix=PROD ;;
+            dev)  target=staging;    prefix=DEV ;;
+            *)
+              echo "::error::Solo se despliega desde main o dev (rama actual: $GITHUB_REF_NAME)."
+              exit 1 ;;
+          esac
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "secret_prefix=$prefix" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      # main-branch-name = la rama que se está desplegando. Sin esto, en dev la
+      # base sería el último deploy exitoso de MAIN y se redesplegaría todo lo
+      # que dev acumula desde la última merge.
       - name: Derive SHAs for Nx affected
-        uses: nrwl/nx-set-shas@v4
+        uses: nrwl/nx-set-shas@v5
+        with:
+          main-branch-name: ${{ github.ref_name }}
 
-      - name: Check affected apps
-        id: check
+      - name: Resolve apps to deploy
+        id: affected
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          DISPATCH_APPS: ${{ github.event.inputs.apps }}
-          # Por env, no interpolado en el script: el mensaje lo escribe quien commitea.
-          HEAD_COMMIT_MSG: ${{ github.event.head_commit.message }}
+          REQUESTED: ${{ inputs.apps }}
         run: |
-          set -euo pipefail
+          all_apps=$(npx nx show projects --type=app | sort)
 
-          ALL_APPS="landing erp cuenta transporte pos turnos cliente"
+          # ¿package.json / package-lock.json cambiaron solo por el bump de
+          # versión del release? Entonces se excluyen del diff: para Nx un
+          # lockfile tocado marca TODAS las apps como affected. Si cambió
+          # cualquier otra cosa (deps), se dejan pasar y se despliega todo.
+          release_only() {
+            local f
+            for f in package.json package-lock.json; do
+              git diff --quiet "$NX_BASE" "$NX_HEAD" -- "$f" && continue
+              git cat-file -e "$NX_BASE:$f" 2>/dev/null || return 1
+              local strip='del(.version, .packages[""].version)'
+              cmp -s <(git show "$NX_BASE:$f" | jq -S "$strip") \
+                     <(git show "$NX_HEAD:$f" | jq -S "$strip") || return 1
+            done
+            return 0
+          }
 
-          # Escotilla para desplegar sin esperar a que Nx marque algo: el disparo
-          # manual, o un [deploy-all] en el mensaje del commit (sirve en el titulo
-          # del PR, que GitHub copia al cuerpo del merge commit).
-          FORCE=""
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            FORCE="${DISPATCH_APPS:-all}"
-          elif printf '%s' "${HEAD_COMMIT_MSG:-}" | grep -qF '[deploy-all]'; then
-            FORCE="all"
-          fi
-
-          if [ -n "$FORCE" ]; then
-            echo "Despliegue forzado ($EVENT_NAME): $FORCE"
-            if [ "$FORCE" = "all" ]; then
-              AFFECTED=$(printf '%s\n' $ALL_APPS)
+          if [ -n "$REQUESTED" ]; then
+            if [ "$REQUESTED" = "all" ]; then
+              selected=$all_apps
             else
-              AFFECTED=$(printf '%s' "$FORCE" | tr ',' '\n' | tr -d ' ')
+              selected=$(tr -d '[:space:]' <<<"$REQUESTED" | tr ',' '\n' | sed '/^$/d')
+              for app in $selected; do
+                grep -qx "$app" <<<"$all_apps" || {
+                  echo "::error::'$app' no es una app del workspace. Apps: $(paste -sd' ' <<<"$all_apps")"
+                  exit 1
+                }
+              done
             fi
+            reason="pedido manual (workflow_dispatch)"
           else
-            echo "NX_BASE=$NX_BASE"
-            echo "NX_HEAD=$NX_HEAD"
-
-            # La metadata del release (commit-and-tag-version) solo cambia version:
-            # package.json/package-lock.json/CHANGELOG.md. En Nx cada uno marca TODAS
-            # las apps como affected, asi que la excluimos para no desplegar de mas.
-            #
-            # El diff va a su propia variable, sin pipe: encadenarlo a `paste` hacia
-            # que un `git diff` roto (SHA ausente) devolviera exit 0 y lista vacia,
-            # indistinguible de "no cambio nada" -> el deploy se saltaba en silencio.
-            DIFF=$(git diff --name-only "$NX_BASE" "$NX_HEAD" -- . \
-              ':(exclude)package.json' \
-              ':(exclude)package-lock.json' \
-              ':(exclude)CHANGELOG.md')
-            CHANGED=$(printf '%s' "$DIFF" | paste -sd, -)
-            echo "Archivos cambiados: ${CHANGED:-<ninguno>}"
-
-            if [ -z "$CHANGED" ]; then
-              AFFECTED=""
-            else
-              # Sin `2>/dev/null || echo ""`: si Nx falla, el paso muere y se ve.
-              AFFECTED=$(npx nx show projects --affected --files="$CHANGED" --type=app)
+            excludes=(':(exclude)CHANGELOG.md')
+            if release_only; then
+              excludes+=(':(exclude)package.json' ':(exclude)package-lock.json')
             fi
+            changed=$(git diff --name-only "$NX_BASE" "$NX_HEAD" -- . "${excludes[@]}")
+            if [ -z "$changed" ]; then
+              selected=""
+            else
+              selected=$(npx nx show projects --affected --type=app \
+                --files="$(paste -sd, - <<<"$changed")")
+            fi
+            reason="afectadas entre ${NX_BASE::7} y ${NX_HEAD::7}"
           fi
 
-          echo "Apps afectadas: ${AFFECTED:-<ninguna>}"
+          apps=$(jq -nc --arg s "$selected" '
+            $s | split("\n") | map(select(length > 0)) | sort
+              | map({ name: ., key: (ascii_upcase | gsub("-"; "_")) })')
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
 
-          for app in $ALL_APPS; do
-            if printf '%s\n' "$AFFECTED" | grep -qx "$app"; then
-              echo "$app=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Deploy · ${{ steps.target.outputs.target }}"
+            echo
+            echo "Criterio: $reason"
+            echo
+            if [ "$apps" = "[]" ]; then
+              echo "Ninguna app afectada. No se despliega nada."
             else
-              echo "$app=false" >> "$GITHUB_OUTPUT"
+              jq -r '.[] | "- \(.name)"' <<<"$apps"
             fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    name: Deploy ${{ matrix.name }}
+    needs: plan
+    if: needs.plan.outputs.apps != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ needs.plan.outputs.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.apps) }}
+    env:
+      APP: ${{ matrix.name }}
+      BUILD_CONFIGURATION: ${{ needs.plan.outputs.target }}
+      DEPLOY_HOST: ${{ secrets[format('{0}_HOST', needs.plan.outputs.secret_prefix)] }}
+      DEPLOY_USER: ${{ secrets[format('{0}_SSH_USER', needs.plan.outputs.secret_prefix)] }}
+      DEPLOY_PATH: ${{ secrets[format('{0}_{1}_DEPLOY_PATH', matrix.key, needs.plan.outputs.secret_prefix)] }}
+
+    steps:
+      # Antes de gastar minutos en el build: si falta un secret o la ruta es
+      # peligrosa para `rsync --delete`, se corta acá.
+      - name: Validate deploy target
+        env:
+          PATH_SECRET: ${{ format('{0}_{1}_DEPLOY_PATH', matrix.key, needs.plan.outputs.secret_prefix) }}
+        run: |
+          fail() { echo "::error::$1"; exit 1; }
+          [ -n "$DEPLOY_HOST" ] || fail "Falta el secret ${{ needs.plan.outputs.secret_prefix }}_HOST."
+          [ -n "$DEPLOY_USER" ] || fail "Falta el secret ${{ needs.plan.outputs.secret_prefix }}_SSH_USER."
+          [ -n "$DEPLOY_PATH" ] || fail "Falta el secret $PATH_SECRET."
+
+          path="${DEPLOY_PATH%/}"
+          [[ "$path" == /* ]] || fail "$PATH_SECRET debe ser una ruta absoluta."
+          [[ "$path" != *..* ]] || fail "$PATH_SECRET no puede contener '..'."
+          for forbidden in "" /var/www /var/www/html /home /srv /opt /usr/share/nginx/html; do
+            [ "$path" != "$forbidden" ] || fail "$PATH_SECRET apunta a una carpeta demasiado amplia para rsync --delete."
           done
 
-  deploy-landing:
-    needs: check-affected
-    if: needs.check-affected.outputs.landing == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Build (staging)
-        if: github.ref == 'refs/heads/dev'
-        run: npx nx build landing --configuration=staging
+      - name: Build
+        run: npx nx build "$APP" --configuration="$BUILD_CONFIGURATION"
 
-      - name: Build (prod)
-        if: github.ref == 'refs/heads/main'
-        run: npx nx build landing --configuration=production
-
-      - name: Set deploy variables (dev)
-        if: github.ref == 'refs/heads/dev'
+      # Un build "exitoso" con la carpeta vacía o movida haría que rsync --delete
+      # vacíe el servidor. index.html tiene que estar donde se va a sincronizar.
+      - name: Verify build output
         run: |
-          echo "DEPLOY_HOST=${{ secrets.DEV_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.LANDING_DEV_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Set deploy variables (prod)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.LANDING_PROD_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/deploy_key
-          else
-            echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
-          fi
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Validate deploy path
-        run: |
-          if [[ "$DEPLOY_PATH" == "/var/www/html" || "$DEPLOY_PATH" == "/var/www" || -z "$DEPLOY_PATH" ]]; then
-            echo "ERROR: DEPLOY_PATH '$DEPLOY_PATH' is too broad."
+          out="dist/apps/$APP/browser"
+          [ -f "$out/index.html" ] || {
+            echo "::error::No existe $out/index.html. Se aborta para no vaciar el servidor."
             exit 1
-          fi
+          }
+          du -sh "$out"
 
+      - name: Setup SSH
+        env:
+          SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', needs.plan.outputs.secret_prefix)] }}
+          SSH_KNOWN_HOSTS: ${{ vars[format('{0}_SSH_KNOWN_HOSTS', needs.plan.outputs.secret_prefix)] }}
+        run: |
+          [ -n "$SSH_KEY" ] || { echo "::error::Falta el secret ${{ needs.plan.outputs.secret_prefix }}_SSH_KEY."; exit 1; }
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          (umask 077; printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key)
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            echo "::warning::No hay ${{ needs.plan.outputs.secret_prefix }}_SSH_KNOWN_HOSTS; se confía en la clave del host que devuelva ssh-keyscan (TOFU)."
+            ssh-keyscan -H "$DEPLOY_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          fi
+          [ -s ~/.ssh/known_hosts ] || { echo "::error::No se obtuvo la clave del host $DEPLOY_HOST."; exit 1; }
+
+      # --delay-updates: los archivos nuevos entran todos juntos al final.
+      # --delete-after: lo viejo se borra después de copiar. Entre ambos, la
+      # ventana en la que index.html apunta a chunks que aún no existen es mínima.
       - name: Deploy via rsync
         run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            dist/apps/landing/browser/ \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
+          rsync -az --delete-after --delay-updates --stats --human-readable \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=20" \
+            "dist/apps/$APP/browser/" \
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
 
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-  deploy-erp:
-    needs: check-affected
-    if: needs.check-affected.outputs.erp == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build (staging)
-        if: github.ref == 'refs/heads/dev'
-        run: npx nx build erp --configuration=staging
-
-      - name: Build (prod)
-        if: github.ref == 'refs/heads/main'
-        run: npx nx build erp --configuration=production
-
-      - name: Set deploy variables (dev)
-        if: github.ref == 'refs/heads/dev'
+      - name: Summary
         run: |
-          echo "DEPLOY_HOST=${{ secrets.DEV_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.ERP_DEV_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Set deploy variables (prod)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.ERP_PROD_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/deploy_key
-          else
-            echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
-          fi
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Validate deploy path
-        run: |
-          if [[ "$DEPLOY_PATH" == "/var/www/html" || "$DEPLOY_PATH" == "/var/www" || -z "$DEPLOY_PATH" ]]; then
-            echo "ERROR: DEPLOY_PATH '$DEPLOY_PATH' is too broad."
-            exit 1
-          fi
-
-      - name: Deploy via rsync
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            dist/apps/erp/browser/ \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
-
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-  deploy-cuenta:
-    needs: check-affected
-    if: needs.check-affected.outputs.cuenta == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build (staging)
-        if: github.ref == 'refs/heads/dev'
-        run: npx nx build cuenta --configuration=staging
-
-      - name: Build (prod)
-        if: github.ref == 'refs/heads/main'
-        run: npx nx build cuenta --configuration=production
-
-      - name: Set deploy variables (dev)
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.DEV_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.CUENTA_DEV_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Set deploy variables (prod)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.CUENTA_PROD_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/deploy_key
-          else
-            echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
-          fi
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Validate deploy path
-        run: |
-          if [[ "$DEPLOY_PATH" == "/var/www/html" || "$DEPLOY_PATH" == "/var/www" || -z "$DEPLOY_PATH" ]]; then
-            echo "ERROR: DEPLOY_PATH '$DEPLOY_PATH' is too broad."
-            exit 1
-          fi
-
-      - name: Deploy via rsync
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            dist/apps/cuenta/browser/ \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
-
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-  deploy-transporte:
-    needs: check-affected
-    if: needs.check-affected.outputs.transporte == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build (staging)
-        if: github.ref == 'refs/heads/dev'
-        run: npx nx build transporte --configuration=staging
-
-      - name: Build (prod)
-        if: github.ref == 'refs/heads/main'
-        run: npx nx build transporte --configuration=production
-
-      - name: Set deploy variables (dev)
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.DEV_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.TRANSPORTE_DEV_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Set deploy variables (prod)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.TRANSPORTE_PROD_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/deploy_key
-          else
-            echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
-          fi
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Validate deploy path
-        run: |
-          if [[ "$DEPLOY_PATH" == "/var/www/html" || "$DEPLOY_PATH" == "/var/www" || -z "$DEPLOY_PATH" ]]; then
-            echo "ERROR: DEPLOY_PATH '$DEPLOY_PATH' is too broad."
-            exit 1
-          fi
-
-      - name: Deploy via rsync
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            dist/apps/transporte/browser/ \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
-
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-  deploy-pos:
-    needs: check-affected
-    if: needs.check-affected.outputs.pos == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build (staging)
-        if: github.ref == 'refs/heads/dev'
-        run: npx nx build pos --configuration=staging
-
-      - name: Build (prod)
-        if: github.ref == 'refs/heads/main'
-        run: npx nx build pos --configuration=production
-
-      - name: Set deploy variables (dev)
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.DEV_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.POS_DEV_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Set deploy variables (prod)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.POS_PROD_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/deploy_key
-          else
-            echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
-          fi
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Validate deploy path
-        run: |
-          if [[ "$DEPLOY_PATH" == "/var/www/html" || "$DEPLOY_PATH" == "/var/www" || -z "$DEPLOY_PATH" ]]; then
-            echo "ERROR: DEPLOY_PATH '$DEPLOY_PATH' is too broad."
-            exit 1
-          fi
-
-      - name: Deploy via rsync
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            dist/apps/pos/browser/ \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
-
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-  deploy-turnos:
-    needs: check-affected
-    if: needs.check-affected.outputs.turnos == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build (staging)
-        if: github.ref == 'refs/heads/dev'
-        run: npx nx build turnos --configuration=staging
-
-      - name: Build (prod)
-        if: github.ref == 'refs/heads/main'
-        run: npx nx build turnos --configuration=production
-
-      - name: Set deploy variables (dev)
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.DEV_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.TURNOS_DEV_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Set deploy variables (prod)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.TURNOS_PROD_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/deploy_key
-          else
-            echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
-          fi
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Validate deploy path
-        run: |
-          if [[ "$DEPLOY_PATH" == "/var/www/html" || "$DEPLOY_PATH" == "/var/www" || -z "$DEPLOY_PATH" ]]; then
-            echo "ERROR: DEPLOY_PATH '$DEPLOY_PATH' is too broad."
-            exit 1
-          fi
-
-      - name: Deploy via rsync
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            dist/apps/turnos/browser/ \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
-
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-  deploy-cliente:
-    needs: check-affected
-    if: needs.check-affected.outputs.cliente == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build (staging)
-        if: github.ref == 'refs/heads/dev'
-        run: npx nx build cliente --configuration=staging
-
-      - name: Build (prod)
-        if: github.ref == 'refs/heads/main'
-        run: npx nx build cliente --configuration=production
-
-      - name: Set deploy variables (dev)
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.DEV_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.CLIENTE_DEV_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Set deploy variables (prod)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.PROD_HOST }}" >> $GITHUB_ENV
-          echo "DEPLOY_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=${{ secrets.CLIENTE_PROD_DEPLOY_PATH }}" >> $GITHUB_ENV
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/deploy_key
-          else
-            echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/deploy_key
-          fi
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Validate deploy path
-        run: |
-          if [[ "$DEPLOY_PATH" == "/var/www/html" || "$DEPLOY_PATH" == "/var/www" || -z "$DEPLOY_PATH" ]]; then
-            echo "ERROR: DEPLOY_PATH '$DEPLOY_PATH' is too broad."
-            exit 1
-          fi
-
-      - name: Deploy via rsync
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            dist/apps/cliente/browser/ \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
+          {
+            echo "### ${APP} → ${BUILD_CONFIGURATION}"
+            echo
+            echo "Commit \`${GITHUB_SHA::7}\` desplegado."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Cleanup SSH key
         if: always()
