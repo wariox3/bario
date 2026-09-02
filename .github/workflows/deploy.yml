@@ -3,9 +3,17 @@ name: Deploy
 on:
   push:
     branches: [main, dev]
+  workflow_dispatch:
+    inputs:
+      apps:
+        description: 'Que desplegar: "all", o lista separada por comas (erp,landing). Vacio = calcular affected.'
+        required: false
+        default: all
 
 permissions:
   contents: read
+  # nx-set-shas consulta la API de runs para ubicar la ultima corrida exitosa.
+  actions: read
 
 jobs:
   check-affected:
@@ -39,26 +47,68 @@ jobs:
 
       - name: Check affected apps
         id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_APPS: ${{ github.event.inputs.apps }}
+          # Por env, no interpolado en el script: el mensaje lo escribe quien commitea.
+          HEAD_COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          # La metadata del release (commit-and-tag-version) solo cambia version:
-          # package.json/package-lock.json/CHANGELOG.md. En Nx cada uno marca TODAS
-          # las apps como affected, así que la excluimos para no desplegar de mas.
-          CHANGED=$(git diff --name-only "$NX_BASE" "$NX_HEAD" -- . \
-            ':(exclude)package.json' \
-            ':(exclude)package-lock.json' \
-            ':(exclude)CHANGELOG.md' | paste -sd, -)
-          if [ -z "$CHANGED" ]; then
-            AFFECTED=""
-          else
-            AFFECTED=$(npx nx show projects --affected --files="$CHANGED" --type=app 2>/dev/null || echo "")
+          set -euo pipefail
+
+          ALL_APPS="landing erp cuenta transporte pos turnos cliente"
+
+          # Escotilla para desplegar sin esperar a que Nx marque algo: el disparo
+          # manual, o un [deploy-all] en el mensaje del commit (sirve en el titulo
+          # del PR, que GitHub copia al cuerpo del merge commit).
+          FORCE=""
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            FORCE="${DISPATCH_APPS:-all}"
+          elif printf '%s' "${HEAD_COMMIT_MSG:-}" | grep -qF '[deploy-all]'; then
+            FORCE="all"
           fi
-          echo "landing=$(echo "$AFFECTED" | grep -q "^landing$" && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "erp=$(echo "$AFFECTED" | grep -q "^erp$" && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "cuenta=$(echo "$AFFECTED" | grep -q "^cuenta$" && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "transporte=$(echo "$AFFECTED" | grep -q "^transporte$" && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "pos=$(echo "$AFFECTED" | grep -q "^pos$" && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "turnos=$(echo "$AFFECTED" | grep -q "^turnos$" && echo true || echo false)" >> $GITHUB_OUTPUT
-          echo "cliente=$(echo "$AFFECTED" | grep -q "^cliente$" && echo true || echo false)" >> $GITHUB_OUTPUT
+
+          if [ -n "$FORCE" ]; then
+            echo "Despliegue forzado ($EVENT_NAME): $FORCE"
+            if [ "$FORCE" = "all" ]; then
+              AFFECTED=$(printf '%s\n' $ALL_APPS)
+            else
+              AFFECTED=$(printf '%s' "$FORCE" | tr ',' '\n' | tr -d ' ')
+            fi
+          else
+            echo "NX_BASE=$NX_BASE"
+            echo "NX_HEAD=$NX_HEAD"
+
+            # La metadata del release (commit-and-tag-version) solo cambia version:
+            # package.json/package-lock.json/CHANGELOG.md. En Nx cada uno marca TODAS
+            # las apps como affected, asi que la excluimos para no desplegar de mas.
+            #
+            # El diff va a su propia variable, sin pipe: encadenarlo a `paste` hacia
+            # que un `git diff` roto (SHA ausente) devolviera exit 0 y lista vacia,
+            # indistinguible de "no cambio nada" -> el deploy se saltaba en silencio.
+            DIFF=$(git diff --name-only "$NX_BASE" "$NX_HEAD" -- . \
+              ':(exclude)package.json' \
+              ':(exclude)package-lock.json' \
+              ':(exclude)CHANGELOG.md')
+            CHANGED=$(printf '%s' "$DIFF" | paste -sd, -)
+            echo "Archivos cambiados: ${CHANGED:-<ninguno>}"
+
+            if [ -z "$CHANGED" ]; then
+              AFFECTED=""
+            else
+              # Sin `2>/dev/null || echo ""`: si Nx falla, el paso muere y se ve.
+              AFFECTED=$(npx nx show projects --affected --files="$CHANGED" --type=app)
+            fi
+          fi
+
+          echo "Apps afectadas: ${AFFECTED:-<ninguna>}"
+
+          for app in $ALL_APPS; do
+            if printf '%s\n' "$AFFECTED" | grep -qx "$app"; then
+              echo "$app=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "$app=false" >> "$GITHUB_OUTPUT"
+            fi
+          done
 
   deploy-landing:
     needs: check-affected
