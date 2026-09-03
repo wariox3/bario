@@ -254,7 +254,7 @@ export class FacturaCompraDetailComponent implements OnInit {
           const fc = facturaCompraToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            proveedor: fc.contacto?.nombre ?? read.contacto_nombre ?? null,
+            proveedor: read.contacto_nombre ?? null,
             fecha: fc.fecha ?? null,
             fechaVence: fc.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,

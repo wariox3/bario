@@ -1,4 +1,4 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import {
   calcularResumenContable,
   cuentaDetalleToPayload,
@@ -12,8 +12,7 @@ import type { EgresoFormRawValue } from './egreso-form.types';
  */
 export function egresoToFormValue(read: EgresoRead): Partial<Omit<EgresoFormRawValue, 'detalles'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     cuenta_banco:
       read.cuenta_banco != null

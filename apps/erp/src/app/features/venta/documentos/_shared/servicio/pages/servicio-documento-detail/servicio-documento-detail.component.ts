@@ -255,7 +255,7 @@ export class ServicioDocumentoDetailComponent implements OnInit {
           const fv = servicioDocumentoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            contacto: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            contacto: read.contacto_nombre ?? null,
             fecha: fv.fecha ?? null,
             sector: fv.sector?.nombre ?? read.sector_nombre ?? null,
             estrato: fv.estrato ?? null,

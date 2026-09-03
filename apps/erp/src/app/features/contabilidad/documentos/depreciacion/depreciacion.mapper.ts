@@ -1,12 +1,11 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import type { DepreciacionRead, DepreciacionPayload } from './depreciacion.model';
 import type { DepreciacionFormRawValue } from './depreciacion-form.types';
 
 /** Read-model (GET) → valores de cabecera del formulario (edición). */
 export function depreciacionToFormValue(read: DepreciacionRead): Partial<DepreciacionFormRawValue> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     centro_costo:
       read.centro_costo != null

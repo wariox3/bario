@@ -239,7 +239,7 @@ export class PagoDetailComponent implements OnInit {
           const pv = pagoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            cliente: pv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            cliente: read.contacto_nombre ?? null,
             fecha: pv.fecha ?? null,
             cuentaBanco: pv.cuenta_banco?.nombre ?? read.cuenta_banco_nombre ?? null,
             comentario: read.comentario ?? null,

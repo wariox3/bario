@@ -236,7 +236,7 @@ export class MovimientoDocumentoDetailComponent implements OnInit {
           const form = movimientoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            contacto: form.contacto?.nombre ?? read.contacto_nombre ?? null,
+            contacto: read.contacto_nombre ?? null,
             almacen: form.almacen?.nombre ?? read.almacen_nombre ?? null,
             fecha: form.fecha ?? null,
             comentario: read.comentario ?? null,

@@ -25,7 +25,6 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { facturaCompraRecurrenteToFormValue } from '../../factura-compra-recurrente.mapper';
 import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrente.model';
 
 /** Cabecera legible de la factura recurrente para la ficha (solo lo que trae `getById`). */
@@ -157,9 +156,8 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
       .subscribe({
         next: ({ cabecera, lineas }) => {
           const read = cabecera as FacturaCompraRecurrenteRead;
-          const fr = facturaCompraRecurrenteToFormValue(read);
           this.cabecera.set({
-            proveedor: fr.contacto?.nombre ?? read.contacto_nombre ?? null,
+            proveedor: read.contacto_nombre ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,

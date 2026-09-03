@@ -275,7 +275,7 @@ export class PosDocumentoDetailComponent implements OnInit {
           const fv = posDocumentoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            cliente: read.contacto_nombre ?? null,
             fecha: fv.fecha ?? null,
             fechaVence: fv.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,

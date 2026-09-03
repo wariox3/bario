@@ -269,7 +269,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
           const fv = notaVentaToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            cliente: read.contacto_nombre ?? null,
             fecha: fv.fecha ?? null,
             documentoReferencia: read.documento_referencia_numero ?? null,
             sede: read.sede_nombre ?? null,

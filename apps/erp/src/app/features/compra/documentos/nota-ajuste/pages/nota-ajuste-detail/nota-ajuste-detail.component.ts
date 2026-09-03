@@ -247,7 +247,7 @@ export class NotaAjusteDetailComponent implements OnInit {
           const na = notaAjusteToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            proveedor: na.contacto?.nombre ?? read.contacto_nombre ?? null,
+            proveedor: read.contacto_nombre ?? null,
             fecha: na.fecha ?? null,
             fechaVence: na.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,

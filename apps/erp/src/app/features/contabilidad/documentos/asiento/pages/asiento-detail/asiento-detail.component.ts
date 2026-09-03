@@ -239,7 +239,7 @@ export class AsientoDetailComponent implements OnInit {
           const fv = asientoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            contacto: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            contacto: read.contacto_nombre ?? null,
             fecha: fv.fecha ?? null,
             soporte: read.soporte ?? null,
             comprobante: fv.comprobante?.nombre ?? read.comprobante_nombre ?? null,

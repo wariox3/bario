@@ -1,4 +1,4 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type {
   FacturaVentaRecurrenteRead,
@@ -14,8 +14,7 @@ export function facturaVentaRecurrenteToFormValue(
   read: FacturaVentaRecurrenteRead,
 ): Partial<Omit<FacturaVentaRecurrenteFormRawValue, 'detalles'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     plazo_pago:
       read.plazo_pago != null

@@ -221,7 +221,7 @@ export class DepreciacionDetailComponent implements OnInit {
           const fv = depreciacionToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            contacto: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            contacto: read.contacto_nombre ?? null,
             fecha: fv.fecha ?? null,
             centroCosto: fv.centro_costo?.nombre ?? read.centro_costo_nombre ?? null,
             comentario: read.comentario ?? null,

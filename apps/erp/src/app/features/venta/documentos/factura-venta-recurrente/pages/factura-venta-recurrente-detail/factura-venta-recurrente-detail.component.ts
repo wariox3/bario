@@ -31,7 +31,6 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { facturaVentaRecurrenteToFormValue } from '../../factura-venta-recurrente.mapper';
 import { asesorLabel } from '../../factura-venta-recurrente.constants';
 import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.model';
 
@@ -182,9 +181,8 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
       .subscribe({
         next: ({ cabecera, lineas, asesores }) => {
           const read = cabecera as FacturaVentaRecurrenteRead;
-          const fv = facturaVentaRecurrenteToFormValue(read);
           this.cabecera.set({
-            cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            cliente: read.contacto_nombre ?? null,
             identificacion: read.tercero_numero_identificacion ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,

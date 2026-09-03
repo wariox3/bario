@@ -1,4 +1,4 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import { pagosToPayload } from '@erp/features/documentos/pagos/pago.mapper';
 import type { PosDocumentoPayload, PosDocumentoRead } from './pos-documento.model';
@@ -13,8 +13,7 @@ export function posDocumentoToFormValue(
   read: PosDocumentoRead,
 ): Partial<Omit<PosDocumentoFormRawValue, 'detalles' | 'pagos'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     fecha_vence: fromIsoDate(read.fecha_vence),
     plazo_pago:

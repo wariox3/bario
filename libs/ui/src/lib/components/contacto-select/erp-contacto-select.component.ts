@@ -13,7 +13,12 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
 import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { Subject, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { ErpSelectDataService, type ErpSelectOption, type ParamValue } from '@reddoc/core';
+import {
+  buildContactoLabel,
+  ErpSelectDataService,
+  type ErpSelectOption,
+  type ParamValue,
+} from '@reddoc/core';
 
 /**
  * Fila cruda del endpoint `general/contacto/seleccionar/`.
@@ -40,7 +45,9 @@ const ENDPOINT = '/general/contacto/seleccionar/';
  */
 function toOption(row: ContactoApiRow): ErpSelectOption {
   const name = row.nombre_corto ?? row.nombre ?? '';
-  const label = [row.numero_identificacion, name].filter(Boolean).join(' - ');
+  // `buildContactoLabel` es la misma que usan los mappers de documento para
+  // sembrar el campo en edición: una sola fuente de la etiqueta del contacto.
+  const label = buildContactoLabel(row.numero_identificacion, name);
   return { ...row, id: row.id, nombre: label || name };
 }
 

@@ -249,7 +249,7 @@ export class DocumentoSoporteDetailComponent implements OnInit {
           const ds = documentoSoporteToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            proveedor: ds.contacto?.nombre ?? read.contacto_nombre ?? null,
+            proveedor: read.contacto_nombre ?? null,
             fecha: ds.fecha ?? null,
             fechaVence: ds.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,

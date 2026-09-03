@@ -1,4 +1,4 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { RemisionRead, RemisionPayload } from './remision.model';
 import type { RemisionFormRawValue } from './remision-form.types';
@@ -11,8 +11,7 @@ export function remisionToFormValue(
   read: RemisionRead,
 ): Partial<Omit<RemisionFormRawValue, 'detalles'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
     asesor: read.asesor != null ? { id: read.asesor, nombre: read.asesor_nombre ?? '' } : null,

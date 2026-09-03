@@ -245,7 +245,7 @@ export class NotaDebitoCompraDetailComponent implements OnInit {
           const nd = notaDebitoCompraToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            proveedor: nd.contacto?.nombre ?? read.contacto_nombre ?? null,
+            proveedor: read.contacto_nombre ?? null,
             fecha: nd.fecha ?? null,
             documentoReferencia: read.documento_referencia_numero ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
