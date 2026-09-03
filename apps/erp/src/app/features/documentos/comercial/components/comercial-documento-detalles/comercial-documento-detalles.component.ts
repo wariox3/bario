@@ -185,6 +185,23 @@ export class ComercialDocumentoDetallesComponent {
   readonly scannerEnabled = input<boolean>(false);
 
   /**
+   * Muestra la columna **Detalle** (la nota libre por línea). Default `true`.
+   *
+   * Hay documentos donde esa nota no aplica y la columna solo roba ancho a las
+   * que sí importan —la remisión, por ejemplo—; ahí el documento la apaga. El
+   * control `detalle` del `FormGroup` sigue existiendo y viajando en el payload
+   * con su valor actual: esto es visibilidad de la tabla, no un cambio del
+   * contrato de la línea.
+   */
+  readonly detalleEnabled = input<boolean>(true);
+
+  /**
+   * Columnas de la tabla, para el `colspan` del estado vacío. Fijas menos la de
+   * detalle, que es opcional.
+   */
+  protected readonly columnCount = computed(() => (this.detalleEnabled() ? 10 : 9));
+
+  /**
    * Avisa al padre que se importaron líneas en **edición** (ya persistidas vía
    * `masivo/`) para que recargue el documento y refresque el `FormArray` con los
    * ids y montos autoritativos del backend.

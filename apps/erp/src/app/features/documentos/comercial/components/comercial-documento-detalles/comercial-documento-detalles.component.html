@@ -89,9 +89,11 @@
           <th class="comercial-detalle-table__th w-32 text-right">
             {{ t().entities.comercialDetalle.columns.neto }}
           </th>
-          <th class="comercial-detalle-table__th min-w-[12rem] text-left">
-            {{ t().entities.comercialDetalle.columns.detalle }}
-          </th>
+          @if (detalleEnabled()) {
+            <th class="comercial-detalle-table__th min-w-[12rem] text-left">
+              {{ t().entities.comercialDetalle.columns.detalle }}
+            </th>
+          }
           <th class="comercial-detalle-table__th w-20 text-center">
             {{ t().entities.comercialDetalle.columns.acciones }}
           </th>
@@ -230,14 +232,16 @@
               {{ formatMoney(netoOf(i)) }}
             </td>
 
-            <td class="comercial-detalle-table__td">
-              <input
-                pInputText
-                formControlName="detalle"
-                class="w-full"
-                [placeholder]="t().entities.comercialDetalle.detallePlaceholder"
-              />
-            </td>
+            @if (detalleEnabled()) {
+              <td class="comercial-detalle-table__td">
+                <input
+                  pInputText
+                  formControlName="detalle"
+                  class="w-full"
+                  [placeholder]="t().entities.comercialDetalle.detallePlaceholder"
+                />
+              </td>
+            }
 
             <td class="comercial-detalle-table__td">
               <div class="flex items-center justify-center gap-0.5">
@@ -271,7 +275,10 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="10" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <td
+              [attr.colspan]="columnCount()"
+              class="px-5 py-8 text-center text-sm text-brand-muted"
+            >
               <i class="pi pi-inbox mr-2"></i>{{ t().entities.comercialDetalle.empty }}
             </td>
           </tr>
