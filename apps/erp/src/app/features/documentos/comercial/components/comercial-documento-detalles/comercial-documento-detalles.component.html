@@ -248,12 +248,12 @@
                     [disabled]="isSavingRow(row)"
                     [pTooltip]="t().entities.comercialDetalle.saveLine"
                     [attr.aria-label]="t().entities.comercialDetalle.saveLine"
-                    class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
+                    class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
                   >
                     @if (isSavingRow(row)) {
-                      <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+                      <i class="pi pi-spin pi-spinner text-[0.72rem]"></i>
                     } @else {
-                      <i class="pi pi-check text-[0.78rem]"></i>
+                      <i class="pi pi-check text-[0.72rem]"></i>
                     }
                   </button>
                 }
@@ -262,9 +262,9 @@
                   (click)="removeLinea(row)"
                   [pTooltip]="t().entities.comercialDetalle.removeLine"
                   [attr.aria-label]="t().entities.comercialDetalle.removeLine"
-                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                  class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
                 >
-                  <i class="pi pi-trash text-[0.78rem]"></i>
+                  <i class="pi pi-trash text-[0.72rem]"></i>
                 </button>
               </div>
             </td>
