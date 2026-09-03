@@ -14,12 +14,11 @@ import {
  * de venta) desde la que se generan facturas reales; `inventoryEffect:'outflow'`
  * es solo metadata. El gateway inyecta `documento_tipo_id` desde este config.
  *
- * La acción "Generar seleccionados" (dropdown "Acciones") pide el período y genera
- * facturas de venta reales a partir de las plantillas marcadas vía
- * `POST general/documento/generar/` (origen 16 → destino 1; misma strategy
- * `generar-recurrente-seleccionados` que ya usa compra). La variante "Generar
- * todos" (sobre el filtro completo) queda pendiente para una v2 —el endpoint la
- * admite omitiendo `documento_ids`, falta definir la UX—.
+ * Genera facturas de venta reales vía `POST general/documento/generar/`
+ * (origen 16 → destino 1) en dos variantes, ambas piden el período:
+ * "Generar todos" (botón suelto — todas las plantillas del tipo) y "Generar
+ * seleccionados" (dropdown "Acciones" — solo las marcadas). Las dos strategies
+ * las comparte con compra.
  *
  * `routes` son relativas al módulo; el `BaseDocumentListComponent` les prepende
  * `/t/<slug>/venta/` al navegar.
@@ -54,10 +53,12 @@ export const FACTURA_VENTA_RECURRENTE_CONFIG: DocumentEntityConfig = {
   // Un documento aprobado ya no se edita. Regla única consumida por la lista,
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
-  // Acciones extra del dropdown "Acciones" (cada id ↔ un EntityActionStrategy
-  // registrado en ENTITY_ACTION_PROVIDERS):
+  // Acciones extra del toolbar (cada id ↔ un EntityActionStrategy registrado en
+  // ENTITY_ACTION_PROVIDERS; su `placement` decide botón suelto vs dropdown):
+  //  - 'generar-recurrente-todos': botón suelto — genera desde todas las
+  //    plantillas del tipo (rutina de fin de mes).
   //  - 'generar-recurrente-seleccionados': genera facturas reales desde las
   //    plantillas marcadas.
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
-  extraActionIds: ['generar-recurrente-seleccionados', 'export-excel'],
+  extraActionIds: ['generar-recurrente-todos', 'generar-recurrente-seleccionados', 'export-excel'],
 };

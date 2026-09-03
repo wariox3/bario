@@ -153,15 +153,30 @@ export class BaseDocumentListComponent {
   });
 
   /**
-   * Acciones extra del toolbar, agrupadas en un único dropdown "Acciones" (el
-   * toolbar lo renderiza como menú cuando el `ToolbarAction` trae `children`).
-   * Al elegir un hijo, el toolbar emite su `id` → lo resuelve `onToolbarAction`.
-   * Vacío ⇒ sin dropdown.
+   * Acciones extra del toolbar, repartidas según el `placement` de cada strategy:
+   * las de `'button'` quedan como botones sueltos y el resto se agrupa en un
+   * único dropdown "Acciones" (el toolbar lo renderiza como menú cuando el
+   * `ToolbarAction` trae `children`). Orden final:
+   *
+   *   [botón suelto…] [Acciones ▾] │ [refresh] [Nuevo]
+   *
+   * Al elegir un hijo del dropdown, el toolbar emite el `id` **del hijo** → lo
+   * resuelve `onToolbarAction` igual que un botón suelto. Cada grupo se omite si
+   * queda vacío: un documento sin acciones no dibuja nada, y uno cuyas acciones
+   * son todas `'button'` no dibuja el dropdown.
    */
   protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
-    const children = this.availableStrategies().map((s) => s.toolbarAction);
-    if (children.length === 0) return [];
+    const strategies = this.availableStrategies();
+    const standalone = strategies
+      .filter((s) => s.placement === 'button')
+      .map((s) => s.toolbarAction);
+    const children = strategies
+      .filter((s) => (s.placement ?? 'menu') === 'menu')
+      .map((s) => s.toolbarAction);
+
+    if (children.length === 0) return standalone;
     return [
+      ...standalone,
       {
         id: 'actions',
         labelKey: 'common.actions.actions',

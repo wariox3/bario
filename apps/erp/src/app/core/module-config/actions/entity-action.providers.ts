@@ -3,6 +3,7 @@ import { ENTITY_ACTION_STRATEGY } from './entity-action.token';
 import { ExportarExcelActionStrategy } from './exportar-excel/exportar-excel-action.strategy';
 import { GenerarDocumentoActionStrategy } from './generar/generar-documento-action.strategy';
 import { GenerarRecurrenteSeleccionadosActionStrategy } from './generar-recurrente/generar-recurrente-seleccionados-action.strategy';
+import { GenerarRecurrenteTodosActionStrategy } from './generar-recurrente/generar-recurrente-todos-action.strategy';
 import { GenerarNominaElectronicaActionStrategy } from './generar-nomina-electronica/generar-nomina-electronica-action.strategy';
 
 /**
@@ -14,6 +15,7 @@ import { GenerarNominaElectronicaActionStrategy } from './generar-nomina-electro
  */
 export const ENTITY_ACTION_PROVIDERS: readonly Provider[] = [
   { provide: ENTITY_ACTION_STRATEGY, useClass: GenerarDocumentoActionStrategy, multi: true },
+  { provide: ENTITY_ACTION_STRATEGY, useClass: GenerarRecurrenteTodosActionStrategy, multi: true },
   {
     provide: ENTITY_ACTION_STRATEGY,
     useClass: GenerarRecurrenteSeleccionadosActionStrategy,

@@ -288,6 +288,11 @@ export const es: AppDict = {
       seleccionadosLabel: 'Generar seleccionados',
       modalHeader: 'Generar facturas',
       modalSubtitle: 'Genera las facturas del período elegido desde las plantillas seleccionadas',
+      todosLabel: 'Generar todos',
+      todosModalHeader: 'Generar todas las facturas',
+      todosModalSubtitle: 'Genera las facturas del período desde todas las plantillas recurrentes',
+      todosWarning:
+        'Se generará una factura por cada plantilla recurrente del listado, sin tener en cuenta los filtros aplicados. Esta acción no se puede revertir.',
       periodoLabel: 'Período',
       submit: 'Generar',
       cancel: 'Cancelar',
@@ -303,6 +308,7 @@ export const es: AppDict = {
       empty: {
         title: 'Sin novedades',
         desc: 'No había facturas por generar en la selección.',
+        descTodos: 'No había facturas por generar en el período elegido.',
       },
       error: {
         title: 'Error al generar',

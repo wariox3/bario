@@ -288,6 +288,11 @@ export const en: AppDict = {
       seleccionadosLabel: 'Generate selected',
       modalHeader: 'Generate invoices',
       modalSubtitle: 'Generates the invoices of the chosen period from the selected templates',
+      todosLabel: 'Generate all',
+      todosModalHeader: 'Generate all invoices',
+      todosModalSubtitle: 'Generates the invoices of the period from every recurring template',
+      todosWarning:
+        'One invoice will be generated for every recurring template in the list, regardless of the filters applied. This action cannot be undone.',
       periodoLabel: 'Period',
       submit: 'Generate',
       cancel: 'Cancel',
@@ -303,6 +308,7 @@ export const en: AppDict = {
       empty: {
         title: 'Nothing to do',
         desc: 'There were no invoices to generate in the selection.',
+        descTodos: 'There were no invoices to generate for the chosen period.',
       },
       error: {
         title: 'Generation failed',

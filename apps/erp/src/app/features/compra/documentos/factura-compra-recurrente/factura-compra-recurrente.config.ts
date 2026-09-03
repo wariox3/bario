@@ -14,11 +14,11 @@ import {
  * desde la que se generan facturas reales; `inventoryEffect:'inflow'` es solo
  * metadata. El gateway inyecta `documento_tipo_id` desde este config.
  *
- * La acción "Generar seleccionados" (dropdown "Acciones") pide el período y genera
- * facturas de compra reales a partir de las plantillas marcadas vía
- * `POST general/documento/generar/` (origen 32 → destino 5). La variante
- * "Generar todos" (sobre el filtro completo) queda pendiente para una v2 —el
- * endpoint la admite omitiendo `documento_ids`, falta definir la UX—.
+ * Genera facturas de compra reales vía `POST general/documento/generar/`
+ * (origen 32 → destino 5) en dos variantes, ambas piden el período:
+ * "Generar todos" (botón suelto — todas las plantillas del tipo) y "Generar
+ * seleccionados" (dropdown "Acciones" — solo las marcadas). Las dos strategies
+ * las comparte con venta.
  *
  * `routes` son relativas al módulo; el `BaseDocumentListComponent` les prepende
  * `/t/<slug>/compra/` al navegar.
@@ -53,5 +53,6 @@ export const FACTURA_COMPRA_RECURRENTE_CONFIG: DocumentEntityConfig = {
   // Un documento aprobado ya no se edita. Regla única consumida por la lista,
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
-  extraActionIds: ['generar-recurrente-seleccionados', 'export-excel'],
+  // Ver el docblock de FACTURA_VENTA_RECURRENTE_CONFIG para qué aporta cada id.
+  extraActionIds: ['generar-recurrente-todos', 'generar-recurrente-seleccionados', 'export-excel'],
 };

@@ -51,6 +51,18 @@ export interface EntityActionStrategy {
   readonly toolbarAction: ToolbarAction;
 
   /**
+   * Dónde vive el botón en el toolbar. Default `'menu'`.
+   *
+   *  - `'menu'`: un ítem más del dropdown "Acciones" (lo normal — mantiene el
+   *    toolbar corto cuando un documento acumula acciones).
+   *  - `'button'`: botón suelto a la izquierda del dropdown. Reservado para la
+   *    acción **de rutina** del documento, la que se usa cada vez que se entra
+   *    al listado y no merece un click de más (ej. "Generar todos" en una
+   *    plantilla recurrente).
+   */
+  readonly placement?: 'menu' | 'button';
+
+  /**
    * Filtro fino opcional, además de `extraActionIds`. Default: disponible.
    * Permite ocultar la acción según condiciones de runtime del documento.
    */

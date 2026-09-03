@@ -295,13 +295,18 @@ export interface AppDict
       seleccionadosLabel: string;
       modalHeader: string;
       modalSubtitle: string;
+      todosLabel: string;
+      todosModalHeader: string;
+      todosModalSubtitle: string;
+      todosWarning: string;
       periodoLabel: string;
       submit: string;
       cancel: string;
       sinDestino: string;
       noSelection: { title: string; desc: string };
       success: { title: string; desc: string };
-      empty: { title: string; desc: string };
+      /** `desc` habla de la selección; `descTodos`, del período completo. */
+      empty: { title: string; desc: string; descTodos: string };
       error: { title: string; desc: string };
     };
     detail: {

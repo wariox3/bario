@@ -17,6 +17,7 @@ export interface GenerarDocumentoModalTexts {
   readonly periodoLabel: string;
   readonly submit: string;
   readonly cancel: string;
+  readonly warning?: string;
 }
 
 /**
