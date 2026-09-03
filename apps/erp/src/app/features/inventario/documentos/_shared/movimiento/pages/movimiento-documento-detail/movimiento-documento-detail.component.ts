@@ -37,6 +37,8 @@ import type { MovimientoRead } from '../../movimiento-documento.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly contacto: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly almacen: string | null;
   readonly fecha: Date | null;
   readonly comentario: string | null;
@@ -237,6 +239,7 @@ export class MovimientoDocumentoDetailComponent implements OnInit {
           this.cabecera.set({
             numero: read.numero ?? null,
             contacto: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             almacen: form.almacen?.nombre ?? read.almacen_nombre ?? null,
             fecha: form.fecha ?? null,
             comentario: read.comentario ?? null,

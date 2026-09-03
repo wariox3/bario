@@ -70,6 +70,14 @@
           <dd class="factura-compra-recurrente-detail__value">{{ c.proveedor }}</dd>
         </div>
       }
+      @if (c.identificacion) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-compra-recurrente-detail__label">{{ det.labels.identificacion }}</dt>
+          <dd class="factura-compra-recurrente-detail__value tabular-nums">
+            {{ c.identificacion }}
+          </dd>
+        </div>
+      }
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.plazoPago }}</dt>
         <dd class="factura-compra-recurrente-detail__value">{{ c.plazoPago || '—' }}</dd>

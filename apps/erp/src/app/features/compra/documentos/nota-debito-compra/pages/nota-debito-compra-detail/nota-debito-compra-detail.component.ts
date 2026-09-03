@@ -36,6 +36,8 @@ import type { NotaDebitoCompraRead } from '../../nota-debito-compra.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly proveedor: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly documentoReferencia: string | null;
   readonly centroCosto: string | null;
@@ -246,6 +248,7 @@ export class NotaDebitoCompraDetailComponent implements OnInit {
           this.cabecera.set({
             numero: read.numero ?? null,
             proveedor: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: nd.fecha ?? null,
             documentoReferencia: read.documento_referencia_numero ?? null,
             centroCosto: read.centro_costo_nombre ?? null,

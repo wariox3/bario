@@ -77,6 +77,12 @@
           <dd class="egreso-detail__value">{{ c.proveedor }}</dd>
         </div>
       }
+      @if (c.identificacion) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="egreso-detail__label">{{ det.labels.identificacion }}</dt>
+          <dd class="egreso-detail__value tabular-nums">{{ c.identificacion }}</dd>
+        </div>
+      }
       <div class="flex flex-col gap-0.5">
         <dt class="egreso-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="egreso-detail__value">{{ formatFecha(c.fecha) }}</dd>

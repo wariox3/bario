@@ -36,6 +36,8 @@ import type { AsientoRead } from '../../asiento.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly contacto: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly soporte: string | null;
   readonly comprobante: string | null;
@@ -240,6 +242,7 @@ export class AsientoDetailComponent implements OnInit {
           this.cabecera.set({
             numero: read.numero ?? null,
             contacto: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: fv.fecha ?? null,
             soporte: read.soporte ?? null,
             comprobante: fv.comprobante?.nombre ?? read.comprobante_nombre ?? null,

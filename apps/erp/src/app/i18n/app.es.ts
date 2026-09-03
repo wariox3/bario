@@ -2200,6 +2200,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
         },
         notFound: {
@@ -2278,6 +2279,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           sede: 'Sede',
           asesor: 'Asesor',
@@ -2358,6 +2360,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2504,6 +2507,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           documentoReferencia: 'Documento de referencia',
           sede: 'Sede',
@@ -2595,6 +2599,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2764,6 +2769,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2850,6 +2856,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2933,6 +2940,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           documentoReferencia: 'Documento referencia',
           centroCosto: 'Centro de costo',
@@ -3011,6 +3019,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           documentoReferencia: 'Documento referencia',
           centroCosto: 'Centro de costo',
@@ -3091,6 +3100,7 @@ export const es: AppDict = {
         },
         labels: {
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           plazoPago: 'Plazo de pago',
           formaPago: 'Forma de pago',
           centroCosto: 'Centro de costo',
@@ -3173,6 +3183,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -3238,6 +3249,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           cuentaBanco: 'Cuenta banco',
           comentario: 'Comentario',
@@ -3336,6 +3348,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           centroCosto: 'Centro de costo',
           comentario: 'Comentario',
@@ -3414,6 +3427,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           centroCosto: 'Centro de costo',
           comentario: 'Comentario',
@@ -3499,6 +3513,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           soporte: 'Soporte',
           comprobante: 'Comprobante',
@@ -3565,6 +3580,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           cuentaBanco: 'Cuenta banco',
           comentario: 'Comentario',
@@ -3782,6 +3798,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           almacen: 'Almacén',
           fecha: 'Fecha',
           comentario: 'Comentario',
@@ -5922,6 +5939,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           sector: 'Sector',
           estrato: 'Estrato',

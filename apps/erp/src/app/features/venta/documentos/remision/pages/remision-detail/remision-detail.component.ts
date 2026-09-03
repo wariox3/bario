@@ -38,6 +38,8 @@ import type { RemisionRead } from '../../remision.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly cliente: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly sede: string | null;
   readonly asesor: string | null;
@@ -258,6 +260,7 @@ export class RemisionDetailComponent implements OnInit {
           this.cabecera.set({
             numero: read.numero ?? null,
             cliente: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: fromIsoDate(read.fecha),
             sede: read.sede_nombre ?? null,
             asesor: read.asesor_nombre ?? null,

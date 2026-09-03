@@ -83,6 +83,12 @@
           <dd class="pos-documento-detail__value">{{ c.cliente }}</dd>
         </div>
       }
+      @if (c.identificacion) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="pos-documento-detail__label">{{ det.labels.identificacion }}</dt>
+          <dd class="pos-documento-detail__value tabular-nums">{{ c.identificacion }}</dd>
+        </div>
+      }
       <div class="flex flex-col gap-0.5">
         <dt class="pos-documento-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="pos-documento-detail__value">{{ formatFecha(c.fecha) }}</dd>

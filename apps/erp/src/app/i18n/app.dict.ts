@@ -1615,6 +1615,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
         };
         notFound: { title: string; desc: string };
@@ -1669,6 +1670,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           sede: string;
           asesor: string;
@@ -1728,6 +1730,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -1892,6 +1895,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           documentoReferencia: string;
           sede: string;
@@ -1957,6 +1961,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -2084,6 +2089,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -2149,6 +2155,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -2211,6 +2218,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           documentoReferencia: string;
           centroCosto: string;
@@ -2268,6 +2276,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           documentoReferencia: string;
           centroCosto: string;
@@ -2327,6 +2336,7 @@ export interface AppDict
         sections: { general: string; detalles: string };
         labels: {
           proveedor: string;
+          identificacion: string;
           plazoPago: string;
           formaPago: string;
           centroCosto: string;
@@ -2388,6 +2398,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -2444,6 +2455,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           cuentaBanco: string;
           comentario: string;
@@ -2514,6 +2526,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           centroCosto: string;
           comentario: string;
@@ -2571,6 +2584,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           centroCosto: string;
           comentario: string;
@@ -2644,6 +2658,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           soporte: string;
           comprobante: string;
@@ -2698,6 +2713,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           cuentaBanco: string;
           comentario: string;
@@ -2866,6 +2882,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           almacen: string;
           fecha: string;
           comentario: string;
@@ -4565,6 +4582,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           sector: string;
           estrato: string;

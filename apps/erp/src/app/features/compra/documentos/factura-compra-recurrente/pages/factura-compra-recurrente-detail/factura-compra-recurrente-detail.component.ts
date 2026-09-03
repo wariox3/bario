@@ -30,6 +30,8 @@ import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrent
 /** Cabecera legible de la factura recurrente para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
   readonly proveedor: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly plazoPago: string | null;
   readonly formaPago: string | null;
   readonly centroCosto: string | null;
@@ -158,6 +160,7 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
           const read = cabecera as FacturaCompraRecurrenteRead;
           this.cabecera.set({
             proveedor: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,

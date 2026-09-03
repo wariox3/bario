@@ -76,6 +76,10 @@
         <dd class="movimiento-detail__value">{{ c.contacto || '—' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
+        <dt class="movimiento-detail__label">{{ det.labels.identificacion }}</dt>
+        <dd class="movimiento-detail__value tabular-nums">{{ c.identificacion || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
         <dt class="movimiento-detail__label">{{ det.labels.almacen }}</dt>
         <dd class="movimiento-detail__value">{{ c.almacen || '—' }}</dd>
       </div>

@@ -77,6 +77,12 @@
           <dd class="asiento-detail__value">{{ c.contacto }}</dd>
         </div>
       }
+      @if (c.identificacion) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="asiento-detail__label">{{ det.labels.identificacion }}</dt>
+          <dd class="asiento-detail__value tabular-nums">{{ c.identificacion }}</dd>
+        </div>
+      }
       <div class="flex flex-col gap-0.5">
         <dt class="asiento-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="asiento-detail__value">{{ formatFecha(c.fecha) }}</dd>
