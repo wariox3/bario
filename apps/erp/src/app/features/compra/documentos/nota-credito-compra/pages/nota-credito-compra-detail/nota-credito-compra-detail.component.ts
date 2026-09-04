@@ -36,6 +36,8 @@ import type { NotaCreditoCompraRead } from '../../nota-credito-compra.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly proveedor: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly documentoReferencia: string | null;
   readonly centroCosto: string | null;
@@ -245,7 +247,8 @@ export class NotaCreditoCompraDetailComponent implements OnInit {
           const nc = notaCreditoCompraToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            proveedor: nc.contacto?.nombre ?? read.contacto_nombre ?? null,
+            proveedor: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: nc.fecha ?? null,
             documentoReferencia: read.documento_referencia_numero ?? null,
             centroCosto: read.centro_costo_nombre ?? null,

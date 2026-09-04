@@ -1,4 +1,11 @@
-import { fromHora, fromIsoDate, toFiniteNumber, toHora, toIsoDate } from '@reddoc/core';
+import {
+  documentoContactoToOption,
+  fromHora,
+  fromIsoDate,
+  toFiniteNumber,
+  toHora,
+  toIsoDate,
+} from '@reddoc/core';
 import type {
   ServicioDocumentoRead,
   ServicioDocumentoPayload,
@@ -16,8 +23,7 @@ export function servicioDocumentoToFormValue(
   read: ServicioDocumentoRead,
 ): Partial<Omit<ServicioDocumentoFormRawValue, 'detalles'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     sector: read.sector != null ? { id: read.sector, nombre: read.sector_nombre ?? '' } : null,
     estrato: read.estrato,

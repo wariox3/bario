@@ -71,10 +71,15 @@
           <th class="comercial-detalle-table__th min-w-[16rem] text-left">
             {{ t().entities.comercialDetalle.columns.item }}
           </th>
+          @if (almacenEnabled()) {
+            <th class="comercial-detalle-table__th w-36 text-left">
+              {{ t().entities.comercialDetalle.columns.almacen }}
+            </th>
+          }
           <th class="comercial-detalle-table__th w-24 text-right">
             {{ t().entities.comercialDetalle.columns.cantidad }}
           </th>
-          <th class="comercial-detalle-table__th w-32 text-right">
+          <th class="comercial-detalle-table__th w-40 text-right">
             {{ t().entities.comercialDetalle.columns.precio }}
           </th>
           <th class="comercial-detalle-table__th w-24 text-right">
@@ -83,15 +88,17 @@
           <th class="comercial-detalle-table__th w-32 text-right">
             {{ t().entities.comercialDetalle.columns.subtotal }}
           </th>
-          <th class="comercial-detalle-table__th min-w-[9rem] text-left">
+          <th class="comercial-detalle-table__th w-32 text-left">
             {{ t().entities.comercialDetalle.columns.impuesto }}
           </th>
           <th class="comercial-detalle-table__th w-32 text-right">
             {{ t().entities.comercialDetalle.columns.neto }}
           </th>
-          <th class="comercial-detalle-table__th min-w-[12rem] text-left">
-            {{ t().entities.comercialDetalle.columns.detalle }}
-          </th>
+          @if (detalleEnabled()) {
+            <th class="comercial-detalle-table__th min-w-[12rem] text-left">
+              {{ t().entities.comercialDetalle.columns.detalle }}
+            </th>
+          }
           <th class="comercial-detalle-table__th w-20 text-center">
             {{ t().entities.comercialDetalle.columns.acciones }}
           </th>
@@ -124,6 +131,16 @@
                 (createRequested)="onCreateItem(row)"
               />
             </td>
+
+            @if (almacenEnabled()) {
+              <td class="comercial-detalle-table__td">
+                <lib-api-select
+                  formControlName="almacen"
+                  [endpoint]="almacenEndpoint"
+                  [placeholder]="t().entities.comercialDetalle.almacenPlaceholder"
+                />
+              </td>
+            }
 
             <td class="comercial-detalle-table__td">
               <p-inputnumber
@@ -212,38 +229,16 @@
             </td>
 
             <td class="comercial-detalle-table__td">
-              <button
-                type="button"
-                class="group flex w-full flex-wrap items-center gap-1 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-sky-50"
-                (click)="impuestoOp.toggle($event)"
-              >
-                @for (imp of impuestosOf(i); track imp.id) {
-                  <span
-                    class="inline-flex items-center rounded-md border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.05)] px-1.5 py-0.5 text-[0.68rem] font-medium leading-none text-brand-text"
-                  >
-                    {{ imp.nombre }}
-                  </span>
-                } @empty {
-                  <span class="inline-flex items-center gap-1 text-[0.72rem] text-brand-muted">
-                    <i class="pi pi-plus text-[0.6rem]"></i>
-                    {{ t().entities.comercialDetalle.impuestosAdd }}
-                  </span>
-                }
-                <i
-                  class="pi pi-pencil text-[0.62rem] text-transparent transition-colors group-hover:text-brand-muted"
-                ></i>
-              </button>
-              <p-popover #impuestoOp>
-                <div class="flex w-72 flex-col gap-2">
-                  <span class="text-[0.72rem] font-semibold text-brand-text">
-                    {{ t().entities.comercialDetalle.impuestosTitle }}
-                  </span>
-                  <app-impuesto-select
-                    [formControl]="row.controls.impuestos_ids"
-                    [params]="impuestoParams()"
-                  />
-                </div>
-              </p-popover>
+              <app-impuesto-select
+                variant="celda"
+                [formControl]="row.controls.impuestos_ids"
+                [catalogo]="impuestosCatalog()"
+                [baseLinea]="baseOf(i)"
+                [placeholder]="t().entities.comercialDetalle.impuestosAdd"
+                [tituloPanel]="t().entities.comercialDetalle.impuestosTitle"
+                [quitarLabel]="t().entities.comercialDetalle.impuestosRemove"
+                [filtroPlaceholder]="t().entities.comercialDetalle.impuestosBuscar"
+              />
             </td>
 
             <td
@@ -252,14 +247,16 @@
               {{ formatMoney(netoOf(i)) }}
             </td>
 
-            <td class="comercial-detalle-table__td">
-              <input
-                pInputText
-                formControlName="detalle"
-                class="w-full"
-                [placeholder]="t().entities.comercialDetalle.detallePlaceholder"
-              />
-            </td>
+            @if (detalleEnabled()) {
+              <td class="comercial-detalle-table__td">
+                <input
+                  pInputText
+                  formControlName="detalle"
+                  class="w-full"
+                  [placeholder]="t().entities.comercialDetalle.detallePlaceholder"
+                />
+              </td>
+            }
 
             <td class="comercial-detalle-table__td">
               <div class="flex items-center justify-center gap-0.5">
@@ -270,12 +267,12 @@
                     [disabled]="isSavingRow(row)"
                     [pTooltip]="t().entities.comercialDetalle.saveLine"
                     [attr.aria-label]="t().entities.comercialDetalle.saveLine"
-                    class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
+                    class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
                   >
                     @if (isSavingRow(row)) {
-                      <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+                      <i class="pi pi-spin pi-spinner text-[0.72rem]"></i>
                     } @else {
-                      <i class="pi pi-check text-[0.78rem]"></i>
+                      <i class="pi pi-check text-[0.72rem]"></i>
                     }
                   </button>
                 }
@@ -284,16 +281,19 @@
                   (click)="removeLinea(row)"
                   [pTooltip]="t().entities.comercialDetalle.removeLine"
                   [attr.aria-label]="t().entities.comercialDetalle.removeLine"
-                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                  class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
                 >
-                  <i class="pi pi-trash text-[0.78rem]"></i>
+                  <i class="pi pi-trash text-[0.72rem]"></i>
                 </button>
               </div>
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="10" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <td
+              [attr.colspan]="columnCount()"
+              class="px-5 py-8 text-center text-sm text-brand-muted"
+            >
               <i class="pi pi-inbox mr-2"></i>{{ t().entities.comercialDetalle.empty }}
             </td>
           </tr>

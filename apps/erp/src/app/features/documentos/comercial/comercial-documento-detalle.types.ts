@@ -1,25 +1,5 @@
-import type { ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
+import type { ErpSelectOption, ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-
-/**
- * Fila del endpoint `general/impuesto/seleccionar/`. Además de `{ id, nombre }`
- * (lo que muestra el dropdown) trae la **tasa** del impuesto, fuente autoritativa
- * para calcular el monto de cualquier impuesto elegido en la línea —no solo los
- * configurados en el ítem.
- */
-export interface ImpuestoSeleccionarOption {
-  readonly id: number;
-  /** Nombre corto (`"IVA"`). Para mostrar se usa `nombre_extendido`. */
-  readonly nombre: string;
-  /** Nombre para mostrar (`"IVA 19% ventas"`). Es lo que ven badges y resumen. */
-  readonly nombre_extendido?: string | null;
-  /** Porcentaje del impuesto, e.g. `"19.00"`. */
-  readonly porcentaje?: string | null;
-  /** Porcentaje de la base sobre la que aplica, e.g. `"100.00"`. */
-  readonly porcentaje_base?: string | null;
-  /** Operación sobre el total: `1` suma, `-1` resta (retención). */
-  readonly operacion?: number | null;
-}
 
 /**
  * Valores crudos de una línea de detalle **comercial** (`form.getRawValue()` de
@@ -49,6 +29,11 @@ export interface ComercialDetalleFormRawValue {
   readonly impuestos_disponibles: readonly TasaImpuesto[];
   /** Nota libre de la línea. */
   readonly detalle: string | null;
+  /**
+   * Almacén de la línea. Solo lo piden los documentos que declaran la columna
+   * (`almacenEnabled`); en el resto queda en `null` y no se renderiza.
+   */
+  readonly almacen: ErpSelectOption | null;
   /**
    * Id de la línea origen que esta línea **afecta** (descuenta su pendiente),
    * cuando proviene de "importar desde documento". `null` en líneas normales.

@@ -25,7 +25,7 @@
     <app-document-detail-actions
       [documentoId]="id()"
       [showAprobacion]="false"
-      (imprimir)="onImprimir()"
+      [showImprimir]="false"
     />
   }
 </header>
@@ -66,24 +66,20 @@
       <app-document-estados class="ml-auto" [estados]="c.estados" />
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="flex flex-col gap-0.5">
-        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.numero }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.numero || '—' }}</dd>
-      </div>
       @if (c.cliente) {
         <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
           <dt class="factura-venta-recurrente-detail__label">{{ det.labels.cliente }}</dt>
           <dd class="factura-venta-recurrente-detail__value">{{ c.cliente }}</dd>
         </div>
       }
-      <div class="flex flex-col gap-0.5">
-        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.fecha }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ formatFecha(c.fecha) }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.fechaVence }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ formatFecha(c.fechaVence) }}</dd>
-      </div>
+      @if (c.identificacion) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.identificacion }}</dt>
+          <dd class="factura-venta-recurrente-detail__value tabular-nums">
+            {{ c.identificacion }}
+          </dd>
+        </div>
+      }
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.plazoPago }}</dt>
         <dd class="factura-venta-recurrente-detail__value">{{ c.plazoPago || '—' }}</dd>
@@ -96,6 +92,27 @@
         <div class="flex flex-col gap-0.5">
           <dt class="factura-venta-recurrente-detail__label">{{ det.labels.sede }}</dt>
           <dd class="factura-venta-recurrente-detail__value">{{ c.sede }}</dd>
+        </div>
+      }
+      @if (c.almacen) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.almacen }}</dt>
+          <dd class="factura-venta-recurrente-detail__value">{{ c.almacen }}</dd>
+        </div>
+      }
+      @if (c.asesor) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.asesor }}</dt>
+          <dd class="factura-venta-recurrente-detail__value">{{ c.asesor }}</dd>
+        </div>
+      }
+      <!-- El comentario ocupa el ancho: es prosa, no un dato de una línea. -->
+      @if (c.comentario) {
+        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+          <dt class="factura-venta-recurrente-detail__label">{{ det.labels.comentario }}</dt>
+          <dd class="factura-venta-recurrente-detail__value whitespace-pre-line">
+            {{ c.comentario }}
+          </dd>
         </div>
       }
     </dl>

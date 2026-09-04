@@ -1,0 +1,36 @@
+<!--
+  Asistente de datos iniciales. Misma tira que la invitación de Venta
+  (`app-inicio-invitacion`); lo único propio es que acá hay dos salidas, no una:
+  omitir viaja como texto secundario para que la que ofrecemos siga siendo una.
+-->
+@if (mostrarAsistente()) {
+  <app-inicio-invitacion
+    icon="pi-bolt"
+    [title]="t().inicio.general.datosIniciales.title"
+    [desc]="t().inicio.general.datosIniciales.desc"
+  >
+    <p-button
+      type="button"
+      size="small"
+      [text]="true"
+      severity="secondary"
+      [label]="t().inicio.general.datosIniciales.actions.omitir"
+      [loading]="enVuelo() === 'descartar'"
+      [disabled]="enVuelo() === 'cargar'"
+      (onClick)="onOmitir()"
+    />
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      [label]="t().inicio.general.datosIniciales.actions.cargar"
+      [loading]="enVuelo() === 'cargar'"
+      [disabled]="enVuelo() === 'descartar'"
+      (onClick)="onCargar()"
+    />
+  </app-inicio-invitacion>
+}
+
+<!-- El acuse de la siembra: se abre solo cuando hay resultado. -->
+<app-plantilla-cargada-dialog [resultado]="resultado()" (cerrar)="onCerrarResultado()" />

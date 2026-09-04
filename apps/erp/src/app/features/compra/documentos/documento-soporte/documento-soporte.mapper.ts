@@ -1,4 +1,4 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { DocumentoSoporteRead, DocumentoSoportePayload } from './documento-soporte.model';
 import type { DocumentoSoporteFormRawValue } from './documento-soporte-form.types';
@@ -11,8 +11,7 @@ export function documentoSoporteToFormValue(
   read: DocumentoSoporteRead,
 ): Partial<Omit<DocumentoSoporteFormRawValue, 'detalles'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     fecha_vence: fromIsoDate(read.fecha_vence),
     plazo_pago:

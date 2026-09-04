@@ -36,6 +36,8 @@ import type { NotaAjusteRead } from '../../nota-ajuste.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly proveedor: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly fechaVence: Date | null;
   readonly plazoPago: string | null;
@@ -247,7 +249,8 @@ export class NotaAjusteDetailComponent implements OnInit {
           const na = notaAjusteToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            proveedor: na.contacto?.nombre ?? read.contacto_nombre ?? null,
+            proveedor: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: na.fecha ?? null,
             fechaVence: na.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,

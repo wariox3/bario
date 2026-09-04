@@ -455,6 +455,101 @@ persona puede sobrescribirlo, el campo avisa cuando el valor dejó de ser el der
   invisible — que fue justo lo que se reportó como «no carga el plazo de pago». Si el reporte
   vuelve, el lugar donde mostrarlo es el campo del plazo, no el del vencimiento.
 
+## Patrón: invitación en el inicio de un módulo (tira con atmósfera)
+
+`core/components/inicio-invitacion/` (`<app-inicio-invitacion>`) — "hay algo disponible para tu
+empresa" en el landing de un módulo. Lo comparten el inicio de Venta (activar facturación
+electrónica) y el de General (asistente de datos iniciales, y su acuse). **Una sola familia
+visual**: si cada módulo inventara la suya, el ERP tendría varias formas de decir lo mismo.
+
+- **Tira horizontal, no card de empty-state centrada.** Quien entra a un módulo viene a trabajar,
+  no a hacer onboarding: chip + copy a la izquierda, acciones a la derecha, todo en una barrida,
+  y el resto del inicio queda libre para lo que venga después (indicadores, accesos rápidos).
+- **Shell:** `relative overflow-hidden rounded-xl border-[rgba(20,48,73,0.1)] bg-brand-surface`
+  `animate-fade-up`; fila `flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-4` (con `relative`
+  para montar sobre las capas). Chip `h-9 w-9 rounded-[10px] bg-sky-50 text-sky-700` + ícono
+  `text-[1rem]`. Copy `min-w-[15rem] flex-1`: `h2` `0.9rem/bold tracking-tight text-brand-text`,
+  `p` `0.8rem/leading-relaxed text-brand-muted mt-0.5`.
+- **Nada de banda de alerta** (ni ámbar, ni borde grueso, ni fondo tintado): no hay nada roto, hay
+  algo disponible. Sigue siendo una ficha del ERP.
+- **Atmósfera en vez de ilustración** — tres capas decorativas, todas `aria-hidden`
+  `pointer-events-none absolute`, que reemplazan a los SVG del legacy **sin sumar assets**:
+  1. **Grilla de puntos** — `w-[58%]` a la derecha,
+     `bg-[radial-gradient(circle,rgba(20,48,73,0.16)_1px,transparent_1.6px)] bg-[size:14px_14px]`
+     - `[mask-image:linear-gradient(to_left,rgba(0,0,0,0.85),transparent)]`. Celdas de una tabla
+       esperando datos: la imagen del ERP. El máscara es lo que evita que compita con el copy.
+  2. **Halo sky** — `-top-16 -right-10 h-56 w-72 rounded-full`
+     `bg-[radial-gradient(closest-side,rgba(119,170,215,0.22),transparent)]`. El acento de marca
+     como luz, no como bloque de color.
+  3. **Marca de agua** — el mismo `pi-*` del dominio a `text-[7.5rem]`, `rgba(20,48,73,0.05)`,
+     `-rotate-[10deg]`, sangrando por `-right-3 -bottom-7`. Cada inicio trae su glifo.
+     Los tres diales son opacidad; si alguna vez pesan, bajar la grilla (`0.16` → `0.10`) primero.
+- **Un solo acento.** El acuse de éxito **no** vira a verde: el ERP declara jerarquía por
+  estructura, no por color, y sumar una segunda familia cromática para una tira que se ve una vez
+  diluye. El significado lo cargan el glifo (`pi-check-circle`) y el copy en pasado.
+- **API:** `icon` / `title` / `desc` como inputs y las acciones proyectadas (`<ng-content>`,
+  envueltas en `flex shrink-0 items-center gap-2`). El componente no sabe nada del dominio de
+  quien lo usa: uno mete un botón y el otro dos.
+- **Dos acciones, una oferta:** cuando hay salida secundaria (omitir/descartar), va
+  `[text]="true" severity="secondary"` a la izquierda del primario. Lo que ofrecemos sigue siendo
+  uno solo. Cada botón lleva su `[loading]` y deshabilita al otro: se ve **cuál** está en vuelo,
+  en vez de apagarse la tira entera.
+- **Cuándo aparece:** solo con el parámetro **confirmado** por el backend (`signal<boolean | null>`,
+  `null` = en vuelo o falló). Nunca arrancar en el valor que muestra la tira: parpadearía en toda
+  entrada al módulo, incluso en contenedores que resolvieron eso hace meses. Si la sonda falla, no
+  se ofrece nada.
+
+## Patrón: acuse de una acción masiva (modal recibo)
+
+Cuando un clic crea cientos de registros de una, la acción **no se resuelve en silencio** — pero
+tampoco en la página: va a un **modal**. Ejemplo vivo:
+`features/general/inicio/components/plantilla-cargada-dialog/`, tras `plantilla/cargar/`.
+
+- **Por qué modal y no una tira en línea.** Se probó primero en línea y quedaba como nota al pie de
+  una pantalla por lo demás vacía: la persona acababa de hacer el cambio más grande de la vida del
+  contenedor y el acuse no pesaba más que un aviso. El modal obliga a mirarlo una vez y después
+  desaparece para siempre. **Regla:** acuse en línea para lo que se repite (guardar, filtrar);
+  modal para lo irrepetible y voluminoso.
+- **Puede permitirse más presencia de lo habitual** justamente porque pasa una sola vez: no hay
+  fatiga posible. No extender esta licencia a pantallas de trabajo.
+- **La forma es un recibo contable, no un dashboard.** Nombre a la izquierda, **guía punteada** que
+  estira (`min-w-4 flex-1 translate-y-[-0.15rem] border-b border-dotted
+border-[rgba(20,48,73,0.25)]`), cantidad a la derecha en `font-mono text-[0.85rem] font-semibold
+tabular-nums`. La **suma al pie**, tras `border-t-2 border-[rgba(20,48,73,0.12)]`, en
+  `--brand-navy` y un punto más grande. Es el idioma en el que ya lee quien usa un ERP —el ojo baja
+  buscando el total— y no vocabulario prestado de un panel de métricas.
+- **La marca entra como luz, nunca como campo de color.** La cabecera lleva las mismas tres capas
+  de la tira de invitación y a la misma opacidad de susurro, sobre blanco: grilla
+  `rgba(20,48,73,0.14)` @ `14px` con máscara **vertical**
+  (`linear-gradient(to bottom, rgba(0,0,0,0.85), transparent 88%)`), halo sky
+  `rgba(119,170,215,0.28)` centrado arriba, y el **mismo chip sky** de la tira escalado
+  (`h-12 w-12 rounded-[14px] bg-sky-50 text-sky-700 ring-1 ring-[rgba(20,48,73,0.06)]`) — es la
+  firma de "algo disponible para tu empresa" en los inicios, y el acuse cierra ese arco.
+  **Se probó con la banda en navy sólido y se descartó:** pesaba de más y un bloque de color es
+  justo lo que el sistema evita ("jerarquía por estructura, no por color"). Para un acuse no hace
+  falta gritar; alcanza con que la superficie tenga textura.
+- **La atmósfera se disuelve, no se corta.** La máscara vertical hace que el recibo emerja del
+  degradado sin que ningún borde separe cabecera de cuerpo. Un `border-b` ahí habría partido el
+  modal en dos piezas cosidas en vez de una sola superficie.
+- **Una sola animación, y que signifique algo:** las líneas entran escalonadas
+  (`animation-delay: 80 + i*45 ms`, `0.34s cubic-bezier(0.16,1,0.3,1)`) — el recibo se escribe solo.
+  Menos de medio segundo en total. Con `@media (prefers-reduced-motion: reduce)` en `none`.
+- **Frame:** `.erp-plantilla-dialog` en `styles.scss` (el dialog se teletransporta al body, así que
+  el frame no puede ser scoped) — radius `16px`, la sombra en capas del `.erp-action-dialog`,
+  `.p-dialog-header { display: none }` y `.p-dialog-content { padding: 0 }` para que la banda navy
+  sangre hasta el borde. El markup propio **sí** lo alcanzan los estilos del componente: la
+  encapsulación emulada viaja en el atributo del elemento. Ojo con los **backticks en comentarios
+  CSS** dentro de `styles: [\`…\`]`— cortan el template literal y el compilador tira un`Failed to resolve styles at position 0 to a string` que no señala la línea.
+- `[closable]="false"` + `[dismissableMask]="false"`: hay una sola salida y es el botón. No es una
+  consulta que se abandona, es un acuse que se lee.
+- **Orden descendente por cantidad:** lo que más entró es lo que cuenta la historia.
+- **Nombres por mapa abierto:** el backend devuelve etiquetas Django (`contabilidad.ConCuenta`), así
+  que el dict las traduce en un `Readonly<Record<string, string>>` y la pantalla **cae a la clave
+  cruda** si falta. Un modelo nuevo en la plantilla no rompe el build ni desaparece del recuento:
+  feo es mejor que mentir sobre el total.
+- **El parámetro recalculado sale de la propia respuesta** (`gen_asistente_datos_iniciales`), no de
+  releer el endpoint de parámetros.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

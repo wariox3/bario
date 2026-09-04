@@ -39,6 +39,28 @@ body {
   --p-font-family: 'DM Sans', system-ui, sans-serif;
 }
 
+// ─── Frame del acuse de datos iniciales ──────────────────────────────────────
+// El dialog se teletransporta al body, así que su frame vive acá (la
+// encapsulación emulada sí alcanza al markup propio, pero no a `.p-dialog`).
+// Sin padding ni header: la banda navy del componente sangra hasta el borde, y
+// para eso el contenido tiene que ir a ras del frame.
+.erp-plantilla-dialog.p-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(20 48 73 / 0.04),
+    0 20px 60px rgba(20 48 73 / 0.14);
+
+  .p-dialog-header {
+    display: none;
+  }
+
+  .p-dialog-content {
+    padding: 0;
+    border-radius: 16px;
+  }
+}
+
 // ─── Auth shared: logo + back link ───────────────────────────────────────────
 .form-panel__logo-img {
   height: 25px;

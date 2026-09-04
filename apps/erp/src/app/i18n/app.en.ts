@@ -288,6 +288,11 @@ export const en: AppDict = {
       seleccionadosLabel: 'Generate selected',
       modalHeader: 'Generate invoices',
       modalSubtitle: 'Generates the invoices of the chosen period from the selected templates',
+      todosLabel: 'Generate all',
+      todosModalHeader: 'Generate all invoices',
+      todosModalSubtitle: 'Generates the invoices of the period from every recurring template',
+      todosWarning:
+        'One invoice will be generated for every recurring template in the list, regardless of the filters applied. This action cannot be undone.',
       periodoLabel: 'Period',
       submit: 'Generate',
       cancel: 'Cancel',
@@ -303,6 +308,7 @@ export const en: AppDict = {
       empty: {
         title: 'Nothing to do',
         desc: 'There were no invoices to generate in the selection.',
+        descTodos: 'There were no invoices to generate for the chosen period.',
       },
       error: {
         title: 'Generation failed',
@@ -1345,7 +1351,7 @@ export const en: AppDict = {
         movimiento: 'Movement',
         exigeBase: 'Requires base',
         exigeContacto: 'Requires contact',
-        exigeGrupo: 'Requires group',
+        exigeCentroCosto: 'Requires cost center',
       },
       form: {
         createTitle: 'New account',
@@ -1370,7 +1376,7 @@ export const en: AppDict = {
           permiteMovimiento: 'Allows movement',
           exigeBase: 'Requires base',
           exigeContacto: 'Requires contact',
-          exigeGrupo: 'Requires group',
+          exigeCentroCosto: 'Requires cost center',
         },
         validation: {
           required: 'This field is required',
@@ -2143,6 +2149,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           cliente: 'Customer',
+          identificacion: 'ID number',
           fecha: 'Date',
         },
         notFound: {
@@ -2221,6 +2228,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           cliente: 'Customer',
+          identificacion: 'ID number',
           fecha: 'Date',
           sede: 'Branch',
           asesor: 'Sales rep',
@@ -2301,6 +2309,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           cliente: 'Customer',
+          identificacion: 'ID number',
           fecha: 'Date',
           fechaVence: 'Due date',
           plazoPago: 'Payment terms',
@@ -2444,6 +2453,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           cliente: 'Customer',
+          identificacion: 'ID number',
           fecha: 'Date',
           documentoReferencia: 'Reference document',
           sede: 'Branch',
@@ -2535,6 +2545,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           cliente: 'Customer',
+          identificacion: 'ID number',
           fecha: 'Date',
           fechaVence: 'Due date',
           plazoPago: 'Payment terms',
@@ -2572,17 +2583,23 @@ export const en: AppDict = {
         createTitle: 'New recurring invoice',
         editTitle: 'Edit recurring invoice',
         sectionHint: 'Template used to generate sales invoices',
+        masInformacion: { title: 'More information', hint: 'optional' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
-          fecha: 'Date',
-          fechaVence: 'Due date',
           plazoPago: 'Payment terms',
           plazoPagoPlaceholder: 'Select…',
           sede: 'Branch',
           sedePlaceholder: 'Select…',
+          almacen: 'Warehouse',
+          almacenPlaceholder: 'Select…',
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          remision: 'Delivery note',
+          asesor: 'Sales rep',
+          asesorPlaceholder: 'Select…',
+          comentario: 'Comment',
         },
         validation: { required: 'This field is required' },
         toasts: {
@@ -2614,13 +2631,14 @@ export const en: AppDict = {
           detalles: 'Details',
         },
         labels: {
-          numero: 'Number',
           cliente: 'Customer',
-          fecha: 'Date',
-          fechaVence: 'Due date',
+          identificacion: 'ID number',
           plazoPago: 'Payment terms',
           sede: 'Branch',
+          almacen: 'Warehouse',
           metodoPago: 'Payment method',
+          asesor: 'Sales rep',
+          comentario: 'Comment',
         },
         notFound: {
           title: 'Invoice not found',
@@ -2697,6 +2715,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           proveedor: 'Supplier',
+          identificacion: 'ID number',
           fecha: 'Date',
           fechaVence: 'Due date',
           plazoPago: 'Payment terms',
@@ -2783,6 +2802,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           proveedor: 'Supplier',
+          identificacion: 'ID number',
           fecha: 'Date',
           fechaVence: 'Due date',
           plazoPago: 'Payment terms',
@@ -2866,6 +2886,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           proveedor: 'Supplier',
+          identificacion: 'ID number',
           fecha: 'Date',
           documentoReferencia: 'Reference document',
           centroCosto: 'Cost center',
@@ -2944,6 +2965,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           proveedor: 'Supplier',
+          identificacion: 'ID number',
           fecha: 'Date',
           documentoReferencia: 'Reference document',
           centroCosto: 'Cost center',
@@ -3023,9 +3045,8 @@ export const en: AppDict = {
           detalles: 'Details',
         },
         labels: {
-          numero: 'Number',
           proveedor: 'Supplier',
-          fecha: 'Date',
+          identificacion: 'ID number',
           plazoPago: 'Payment terms',
           formaPago: 'Payment form',
           centroCosto: 'Cost center',
@@ -3108,6 +3129,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           proveedor: 'Supplier',
+          identificacion: 'ID number',
           fecha: 'Date',
           fechaVence: 'Due date',
           plazoPago: 'Payment terms',
@@ -3173,6 +3195,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           cliente: 'Client',
+          identificacion: 'ID number',
           fecha: 'Date',
           cuentaBanco: 'Bank account',
           comentario: 'Comment',
@@ -3262,6 +3285,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           contacto: 'Contact',
+          identificacion: 'ID number',
           fecha: 'Date',
           centroCosto: 'Cost center',
           comentario: 'Comment',
@@ -3337,6 +3361,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           contacto: 'Contact',
+          identificacion: 'ID number',
           fecha: 'Date',
           centroCosto: 'Cost center',
           comentario: 'Comment',
@@ -3425,6 +3450,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           contacto: 'Contact',
+          identificacion: 'ID number',
           fecha: 'Date',
           soporte: 'Reference',
           comprobante: 'Voucher',
@@ -3494,6 +3520,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           proveedor: 'Supplier',
+          identificacion: 'ID number',
           fecha: 'Date',
           cuentaBanco: 'Bank account',
           comentario: 'Comment',
@@ -3529,12 +3556,15 @@ export const en: AppDict = {
       saveAll: 'Save lines',
       pendingSuffix: 'unsaved',
       leaveHeader: 'Unsaved changes',
-      leaveMessage: 'There are unsaved lines that will be lost. Leave anyway?',
+      leaveMessage: 'There are unsaved changes that will be lost. Leave anyway?',
       leaveConfirm: 'Leave without saving',
       impuestosTitle: 'Line taxes',
       impuestosAdd: 'Add',
+      impuestosRemove: 'Remove',
+      impuestosBuscar: 'Search tax…',
       itemPlaceholder: 'Search item…',
       detallePlaceholder: 'Note…',
+      almacenPlaceholder: 'Warehouse…',
       confirmDeleteLine: 'Remove this line from the document?',
       createItem: 'Create item',
       extraerIva: {
@@ -3557,6 +3587,7 @@ export const en: AppDict = {
         linea: '#',
         ref: 'Ref',
         item: 'Item',
+        almacen: 'Warehouse',
         cantidad: 'Qty.',
         precio: 'Price',
         descuento: 'Disc. %',
@@ -3709,6 +3740,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           contacto: 'Contact',
+          identificacion: 'ID number',
           almacen: 'Warehouse',
           fecha: 'Date',
           comentario: 'Comment',
@@ -3729,7 +3761,7 @@ export const en: AppDict = {
       saveAll: 'Save lines',
       pendingSuffix: 'unsaved',
       leaveHeader: 'Unsaved changes',
-      leaveMessage: 'There are unsaved lines that will be lost. Leave anyway?',
+      leaveMessage: 'There are unsaved changes that will be lost. Leave anyway?',
       leaveConfirm: 'Leave without saving',
       itemPlaceholder: 'Search item…',
       almacenPlaceholder: 'Select…',
@@ -5847,6 +5879,7 @@ export const en: AppDict = {
         labels: {
           numero: 'Number',
           contacto: 'Contact',
+          identificacion: 'ID number',
           fecha: 'Date',
           sector: 'Sector',
           estrato: 'Stratum',
@@ -5941,6 +5974,29 @@ export const en: AppDict = {
     },
   },
   inicio: {
+    general: {
+      datosIniciales: {
+        title: 'Quick setup',
+        desc: 'Set the default values and get the system running right away.',
+        actions: { cargar: 'Load data', omitir: 'Skip' },
+        resultado: {
+          title: 'All set',
+          desc: 'Your company now has everything it needs to start operating.',
+          totalLabel: 'Total records',
+          modelos: {
+            'contabilidad.ConCuenta': 'Accounting accounts',
+            'general.GenCuentaBanco': 'Bank accounts',
+            'general.GenDocumentoTipo': 'Document types',
+            'general.GenFormaPago': 'Payment methods',
+            'general.GenImpuesto': 'Taxes',
+            'humano.HumConceptoCuenta': 'Concept accounts',
+            'humano.HumConfiguracionAporte': 'Contribution settings',
+            'humano.HumConfiguracionProvision': 'Provision settings',
+          },
+          actions: { cerrar: 'Get started' },
+        },
+      },
+    },
     venta: {
       facturaElectronica: {
         title: 'Electronic invoicing',

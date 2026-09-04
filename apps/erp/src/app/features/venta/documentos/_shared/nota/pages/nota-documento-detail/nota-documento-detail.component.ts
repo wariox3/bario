@@ -46,6 +46,8 @@ interface PagoView {
 interface CabeceraView {
   readonly numero: string | null;
   readonly cliente: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly documentoReferencia: string | null;
   readonly sede: string | null;
@@ -269,7 +271,8 @@ export class NotaDocumentoDetailComponent implements OnInit {
           const fv = notaVentaToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            cliente: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: fv.fecha ?? null,
             documentoReferencia: read.documento_referencia_numero ?? null,
             sede: read.sede_nombre ?? null,

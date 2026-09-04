@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
+import { InicioInvitacionComponent } from '@erp/core/components/inicio-invitacion/inicio-invitacion.component';
 import { I18nService, TenantService } from '@reddoc/core';
 import { ParametroService } from '@erp/core/services/parametro.service';
 import type { AppDict } from '@erp/i18n';
@@ -17,7 +18,7 @@ import type { AppDict } from '@erp/i18n';
 @Component({
   selector: 'app-venta-inicio',
   standalone: true,
-  imports: [ButtonModule],
+  imports: [ButtonModule, InicioInvitacionComponent],
   templateUrl: './venta-inicio.component.html',
   // Mismo ancho acotado que Configuración: no es una tabla, se lee mejor en una
   // columna. Las listas del ERP sí van a todo el ancho.

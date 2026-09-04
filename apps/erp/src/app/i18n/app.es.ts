@@ -288,6 +288,11 @@ export const es: AppDict = {
       seleccionadosLabel: 'Generar seleccionados',
       modalHeader: 'Generar facturas',
       modalSubtitle: 'Genera las facturas del período elegido desde las plantillas seleccionadas',
+      todosLabel: 'Generar todos',
+      todosModalHeader: 'Generar todas las facturas',
+      todosModalSubtitle: 'Genera las facturas del período desde todas las plantillas recurrentes',
+      todosWarning:
+        'Se generará una factura por cada plantilla recurrente del listado, sin tener en cuenta los filtros aplicados. Esta acción no se puede revertir.',
       periodoLabel: 'Período',
       submit: 'Generar',
       cancel: 'Cancelar',
@@ -303,6 +308,7 @@ export const es: AppDict = {
       empty: {
         title: 'Sin novedades',
         desc: 'No había facturas por generar en la selección.',
+        descTodos: 'No había facturas por generar en el período elegido.',
       },
       error: {
         title: 'Error al generar',
@@ -1381,7 +1387,7 @@ export const es: AppDict = {
         movimiento: 'Movimiento',
         exigeBase: 'Exige base',
         exigeContacto: 'Exige contacto',
-        exigeGrupo: 'Exige grupo',
+        exigeCentroCosto: 'Exige centro de costo',
       },
       form: {
         createTitle: 'Nueva cuenta',
@@ -1406,7 +1412,7 @@ export const es: AppDict = {
           permiteMovimiento: 'Permite movimiento',
           exigeBase: 'Exige base',
           exigeContacto: 'Exige contacto',
-          exigeGrupo: 'Exige grupo',
+          exigeCentroCosto: 'Exige centro de costo',
         },
         validation: {
           required: 'Este campo es requerido',
@@ -2194,6 +2200,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
         },
         notFound: {
@@ -2272,6 +2279,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           sede: 'Sede',
           asesor: 'Asesor',
@@ -2352,6 +2360,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2498,6 +2507,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           documentoReferencia: 'Documento de referencia',
           sede: 'Sede',
@@ -2589,6 +2599,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2626,17 +2637,23 @@ export const es: AppDict = {
         createTitle: 'Nueva factura recurrente',
         editTitle: 'Editar factura recurrente',
         sectionHint: 'Plantilla desde la que se generan las facturas de venta',
+        masInformacion: { title: 'Más información', hint: 'opcional' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
-          fecha: 'Fecha',
-          fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
           plazoPagoPlaceholder: 'Selecciona…',
           sede: 'Sede',
           sedePlaceholder: 'Selecciona…',
+          almacen: 'Almacén',
+          almacenPlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          remision: 'Remisión',
+          asesor: 'Asesor',
+          asesorPlaceholder: 'Selecciona…',
+          comentario: 'Comentario',
         },
         validation: { required: 'Este campo es requerido' },
         toasts: {
@@ -2668,13 +2685,14 @@ export const es: AppDict = {
           detalles: 'Detalles',
         },
         labels: {
-          numero: 'Número',
           cliente: 'Cliente',
-          fecha: 'Fecha',
-          fechaVence: 'Fecha de vencimiento',
+          identificacion: 'Identificación',
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
+          almacen: 'Almacén',
           metodoPago: 'Método de pago',
+          asesor: 'Asesor',
+          comentario: 'Comentario',
         },
         notFound: {
           title: 'Factura no encontrada',
@@ -2751,6 +2769,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2837,6 +2856,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -2920,6 +2940,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           documentoReferencia: 'Documento referencia',
           centroCosto: 'Centro de costo',
@@ -2998,6 +3019,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           documentoReferencia: 'Documento referencia',
           centroCosto: 'Centro de costo',
@@ -3077,9 +3099,8 @@ export const es: AppDict = {
           detalles: 'Detalles',
         },
         labels: {
-          numero: 'Número',
           proveedor: 'Proveedor',
-          fecha: 'Fecha',
+          identificacion: 'Identificación',
           plazoPago: 'Plazo de pago',
           formaPago: 'Forma de pago',
           centroCosto: 'Centro de costo',
@@ -3162,6 +3183,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
           plazoPago: 'Plazo de pago',
@@ -3227,6 +3249,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           cliente: 'Cliente',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           cuentaBanco: 'Cuenta banco',
           comentario: 'Comentario',
@@ -3325,6 +3348,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           centroCosto: 'Centro de costo',
           comentario: 'Comentario',
@@ -3403,6 +3427,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           centroCosto: 'Centro de costo',
           comentario: 'Comentario',
@@ -3488,6 +3513,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           soporte: 'Soporte',
           comprobante: 'Comprobante',
@@ -3554,6 +3580,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           proveedor: 'Proveedor',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           cuentaBanco: 'Cuenta banco',
           comentario: 'Comentario',
@@ -3589,12 +3616,15 @@ export const es: AppDict = {
       saveAll: 'Guardar líneas',
       pendingSuffix: 'sin guardar',
       leaveHeader: 'Cambios sin guardar',
-      leaveMessage: 'Hay líneas sin guardar que se perderán. ¿Salir de todos modos?',
+      leaveMessage: 'Hay cambios sin guardar que se perderán. ¿Salir de todos modos?',
       leaveConfirm: 'Salir sin guardar',
       impuestosTitle: 'Impuestos de la línea',
       impuestosAdd: 'Agregar',
+      impuestosRemove: 'Quitar',
+      impuestosBuscar: 'Buscar impuesto…',
       itemPlaceholder: 'Buscar ítem…',
       detallePlaceholder: 'Nota…',
+      almacenPlaceholder: 'Almacén…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
       createItem: 'Crear ítem',
       extraerIva: {
@@ -3617,6 +3647,7 @@ export const es: AppDict = {
         linea: '#',
         ref: 'Ref',
         item: 'Ítem',
+        almacen: 'Almacén',
         cantidad: 'Cant.',
         precio: 'Precio',
         descuento: 'Desc. %',
@@ -3769,6 +3800,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           almacen: 'Almacén',
           fecha: 'Fecha',
           comentario: 'Comentario',
@@ -3789,7 +3821,7 @@ export const es: AppDict = {
       saveAll: 'Guardar líneas',
       pendingSuffix: 'sin guardar',
       leaveHeader: 'Cambios sin guardar',
-      leaveMessage: 'Hay líneas sin guardar que se perderán. ¿Salir de todos modos?',
+      leaveMessage: 'Hay cambios sin guardar que se perderán. ¿Salir de todos modos?',
       leaveConfirm: 'Salir sin guardar',
       itemPlaceholder: 'Buscar ítem…',
       almacenPlaceholder: 'Selecciona…',
@@ -5909,6 +5941,7 @@ export const es: AppDict = {
         labels: {
           numero: 'Número',
           contacto: 'Contacto',
+          identificacion: 'Identificación',
           fecha: 'Fecha',
           sector: 'Sector',
           estrato: 'Estrato',
@@ -6003,6 +6036,29 @@ export const es: AppDict = {
     },
   },
   inicio: {
+    general: {
+      datosIniciales: {
+        title: 'Configuración rápida',
+        desc: 'Establece los valores predeterminados y haz que el sistema funcione al instante.',
+        actions: { cargar: 'Cargar datos', omitir: 'Omitir' },
+        resultado: {
+          title: 'Todo listo',
+          desc: 'Tu empresa ya tiene lo necesario para empezar a operar.',
+          totalLabel: 'Total de registros',
+          modelos: {
+            'contabilidad.ConCuenta': 'Cuentas contables',
+            'general.GenCuentaBanco': 'Cuentas de banco',
+            'general.GenDocumentoTipo': 'Tipos de documento',
+            'general.GenFormaPago': 'Formas de pago',
+            'general.GenImpuesto': 'Impuestos',
+            'humano.HumConceptoCuenta': 'Cuentas de conceptos',
+            'humano.HumConfiguracionAporte': 'Configuraciones de aporte',
+            'humano.HumConfiguracionProvision': 'Configuraciones de provisión',
+          },
+          actions: { cerrar: 'Empezar' },
+        },
+      },
+    },
     venta: {
       facturaElectronica: {
         title: 'Facturación electrónica',

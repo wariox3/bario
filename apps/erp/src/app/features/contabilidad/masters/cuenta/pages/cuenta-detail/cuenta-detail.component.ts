@@ -23,7 +23,7 @@ import { TrasladarMovimientosModalComponent } from '../../components/trasladar-m
 
 /** Bandera de la cuenta como campo: etiqueta i18n + su valor. */
 interface CuentaCondicion {
-  readonly labelKey: 'permiteMovimiento' | 'exigeBase' | 'exigeContacto' | 'exigeGrupo';
+  readonly labelKey: 'permiteMovimiento' | 'exigeBase' | 'exigeContacto' | 'exigeCentroCosto';
   readonly value: boolean;
 }
 
@@ -70,7 +70,7 @@ export class CuentaDetailComponent implements OnInit {
       { labelKey: 'permiteMovimiento', value: c.permite_movimiento },
       { labelKey: 'exigeBase', value: c.exige_base },
       { labelKey: 'exigeContacto', value: c.exige_contacto },
-      { labelKey: 'exigeGrupo', value: c.exige_grupo },
+      { labelKey: 'exigeCentroCosto', value: c.exige_centro_costo },
     ];
   });
   protected readonly isLoading = signal(true);

@@ -114,6 +114,7 @@ export {
   ENTITY_DATA_GATEWAY,
   HttpEntityDataGateway,
   DocumentoDetalleService,
+  documentoContactoToOption,
 } from './lib/documento';
 export type {
   EntityKind,
@@ -127,6 +128,7 @@ export type {
   DocumentTypeId,
   DocumentTypeKey,
   EntityDataGateway,
+  DocumentoContactoRead,
 } from './lib/documento';
 export {
   toProgramacionFecha,
@@ -189,7 +191,7 @@ export type {
   CreateContenedorRequest,
   UserSearchResult,
 } from './lib/tenant';
-export { ErpSelectDataService, SELECT_ENDPOINTS } from './lib/data';
+export { ErpSelectDataService, SELECT_ENDPOINTS, buildContactoLabel } from './lib/data';
 export type { ErpSelectOption } from './lib/data';
 export * from './lib/data-list';
 export * from './lib/plans';

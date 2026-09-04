@@ -1,7 +1,32 @@
 .comercial-detalle-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
+
+  // ── Densidad de los controles de la línea ────────────────────────────────
+  // Los inputs viven dentro de componentes hijos (`p-inputnumber`,
+  // `app-item-autocomplete`, `app-impuesto-select`), así que el CSS scoped de
+  // este componente no los alcanza. Lo que sí los alcanza son las **variables**
+  // del tema de PrimeNG: heredan por DOM sin importar la encapsulación, y todo
+  // control de formulario deriva su caja de `--p-form-field-*`. Declararlas acá
+  // achica cualquier control dentro de la tabla —presente o futuro— sin tocar
+  // el tema global ni la API de los wrappers.
+  //
+  // Los paneles (autocomplete, multiselect) van con `appendTo="body"`: quedan
+  // fuera de este scope y conservan su tamaño normal, que es lo que se quiere
+  // para leer opciones.
+  --p-form-field-padding-y: 0.25rem;
+  --p-form-field-padding-x: 0.45rem;
+}
+
+// Lo único que no sale de una variable: el CSS base de PrimeNG fija
+// `font-size: 1rem` a mano, tanto en `.p-inputtext` (input, inputnumber,
+// autocomplete) como en `.p-select-label` (el select de almacén). El padding sí
+// lo heredan de los tokens de arriba; el tamaño de letra hay que bajarlo acá.
+// `::ng-deep` acotado a la tabla evita un override global — mismo recurso que
+// usa `app-impuesto-select` para su variante celda, que ya se estiliza sola.
+.comercial-detalle-table ::ng-deep :is(.p-inputtext, .p-select-label) {
+  font-size: 0.78rem;
 }
 
 // Cabecera: etiquetas discretas en mayúscula, sticky al hacer scroll (igual que
@@ -10,8 +35,8 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  padding: 0.5rem 0.6rem;
-  font-size: 0.66rem;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -25,7 +50,7 @@
 }
 
 .comercial-detalle-table__td {
-  padding: 0.45rem 0.6rem;
+  padding: 0.3rem 0.5rem;
   vertical-align: middle;
 }
 

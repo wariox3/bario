@@ -38,6 +38,8 @@ import type { PedidoClienteRead } from '../../pedido-cliente.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly cliente: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -253,6 +255,7 @@ export class PedidoClienteDetailComponent implements OnInit {
           this.cabecera.set({
             numero: read.numero ?? null,
             cliente: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: fromIsoDate(read.fecha),
             estados: {
               estado_aprobado: read.estado_aprobado,

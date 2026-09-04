@@ -1,4 +1,4 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { inventarioDetalleToPayload } from '@erp/features/documentos/inventario/inventario-documento-detalle.mapper';
 import type { MovimientoRead, MovimientoPayload } from './movimiento-documento.model';
 import type { MovimientoFormRawValue } from './movimiento-documento-form.types';
@@ -11,8 +11,7 @@ export function movimientoToFormValue(
   read: MovimientoRead,
 ): Partial<Omit<MovimientoFormRawValue, 'detalles'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     fecha: fromIsoDate(read.fecha),
     comentario: read.comentario ?? null,

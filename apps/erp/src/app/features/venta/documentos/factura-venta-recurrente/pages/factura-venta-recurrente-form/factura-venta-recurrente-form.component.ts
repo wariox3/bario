@@ -15,7 +15,8 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DatePickerModule } from 'primeng/datepicker';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -29,7 +30,7 @@ import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/co
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
+import { SELECT_ENDPOINTS } from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -37,14 +38,14 @@ import {
 } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
+import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
-import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta-recurrente.constants';
-import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
-  setupVencimientoAutocompute,
-  type VencimientoAutocompute,
-} from '@erp/features/documentos/comercial/vencimiento-autocompute';
-import { VencimientoHintComponent } from '@erp/features/documentos/comercial/components/vencimiento-hint/vencimiento-hint.component';
+  METODO_PAGO_ENDPOINT,
+  SEDE_ENDPOINT,
+  asesorLabel,
+} from '../../factura-venta-recurrente.constants';
+import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -84,13 +85,13 @@ import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
-    DatePickerModule,
+    InputTextModule,
+    TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
-    VencimientoHintComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './factura-venta-recurrente-form.component.html',
@@ -100,7 +101,6 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
   private readonly fb = inject(FormBuilder);
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
-  private readonly selectData = inject(ErpSelectDataService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
@@ -118,6 +118,16 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+  protected readonly asesorEndpoint = SELECT_ENDPOINTS.asesor;
+  protected readonly asesorLabel = asesorLabel;
+
+  /**
+   * Sección "Más información" plegada/desplegada. Sus cuatro campos son opcionales
+   * y casi nunca se tocan: abiertos empujarían hacia abajo la tabla de líneas, que
+   * es a lo que la persona vino. Arranca cerrada siempre, también en edición.
+   */
+  protected readonly masInfoOpen = signal(false);
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -157,34 +167,25 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
 
   protected readonly form = this.fb.group({
     contacto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
-    fecha_vence: this.fb.control<Date | null>(null, Validators.required),
+    // La plantilla no se fecha a mano: el campo no se pinta y la fecha viaja
+    // igual (hoy en alta, la del backend en edición) porque el endpoint genérico
+    // de documento la exige en el payload.
+    fecha: this.fb.control<Date | null>(startOfToday()),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
+    almacen: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    // Los límites salen del schema del backend (`GenDocumentoRequest`).
+    orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    remision: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
+    asesor: this.fb.control<ErpSelectOption | null>(null),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
 
-  /**
-   * Estado del vencimiento (días del plazo, fecha que dicta y desvío), para que
-   * `<app-vencimiento-hint>` explique bajo el campo de dónde salió la fecha.
-   */
-  protected readonly vencimiento: VencimientoAutocompute;
-
   constructor() {
-    // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
-    this.vencimiento = setupVencimientoAutocompute({
-      fecha: this.form.controls.fecha,
-      plazoPago: this.form.controls.plazo_pago,
-      fechaVence: this.form.controls.fecha_vence,
-      selectData: this.selectData,
-      destroyRef: this.destroyRef,
-      endpoint: this.plazoPagoEndpoint,
-    });
-
-    // Al elegir cliente, adopta su plazo de pago pactado. Cambiar el plazo
-    // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
-    // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
+    // Al elegir cliente, adopta su plazo de pago pactado. En edición no aplica:
+    // `applyCabecera` puebla con `emitEvent: false`.
     setupPlazoPagoDesdeContacto({
       contacto: this.form.controls.contacto,
       plazoPago: this.form.controls.plazo_pago,
@@ -260,6 +261,9 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (saved) => {
         this.isSaving.set(false);
+        // Guardar limpia el estado "sucio": navegar a la ficha pasa por el guard
+        // de salida y, sin esto, el camino feliz preguntaría por cambios ya guardados.
+        this.form.markAsPristine();
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
         // Guardar termina en la ficha del documento, para revisar lo que quedó
@@ -287,27 +291,12 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
    * hay pendientes y no molesta). Solo aplica en edición.
    */
   canDeactivate(): boolean | Observable<boolean> {
-    const detalles = this.detallesTable();
-    if (!detalles || detalles.pendingCount() === 0) return true;
-
-    const labels = this.t().entities.comercialDetalle;
-    return new Observable<boolean>((subscriber) => {
-      this.confirmation.confirm({
-        header: labels.leaveHeader,
-        message: labels.leaveMessage,
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: labels.leaveConfirm,
-        rejectLabel: this.t().common.actions.cancel,
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: () => {
-          subscriber.next(true);
-          subscriber.complete();
-        },
-        reject: () => {
-          subscriber.next(false);
-          subscriber.complete();
-        },
-      });
+    return canLeaveDocumentForm({
+      form: this.form,
+      pendingLines: this.detallesTable()?.pendingCount() ?? 0,
+      confirmation: this.confirmation,
+      labels: this.t().entities.comercialDetalle,
+      cancelLabel: this.t().common.actions.cancel,
     });
   }
 
@@ -353,11 +342,16 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
   }
 
   /**
-   * Pobla la cabecera en el form. `emitEvent: false`: no disparar el autocálculo
-   * y respetar el vencimiento que viene del backend.
+   * Pobla la cabecera en el form. `emitEvent: false`: no disparar los efectos
+   * derivados (el plazo de pago del cliente) al sembrar valores del backend.
    */
   private applyCabecera(read: FacturaVentaRecurrenteRead): void {
     this.form.patchValue(facturaVentaRecurrenteToFormValue(read), { emitEvent: false });
+    // El campo no se pinta: si el documento vino sin fecha, se repone hoy para
+    // que el PATCH no mande `null` a un campo que el backend espera con valor.
+    if (!this.form.controls.fecha.value) {
+      this.form.controls.fecha.setValue(startOfToday(), { emitEvent: false });
+    }
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */

@@ -11,16 +11,18 @@
   />
 }
 
-<p-button
-  type="button"
-  [label]="a.imprimir"
-  icon="pi pi-print"
-  severity="secondary"
-  [outlined]="true"
-  size="small"
-  [disabled]="!canImprimir()"
-  (onClick)="imprimir.emit()"
-/>
+@if (showImprimir()) {
+  <p-button
+    type="button"
+    [label]="a.imprimir"
+    icon="pi pi-print"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    [disabled]="!canImprimir()"
+    (onClick)="imprimir.emit()"
+  />
+}
 
 @if (showEmitir()) {
   <p-button

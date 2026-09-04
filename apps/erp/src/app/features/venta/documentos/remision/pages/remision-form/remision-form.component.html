@@ -156,6 +156,7 @@
         [detalles]="form.controls.detalles"
         [documentId]="documentId()"
         [importEnabled]="true"
+        [detalleEnabled]="false"
         [contactoId]="form.controls.contacto.value?.id ?? null"
         (imported)="onImported()"
       />

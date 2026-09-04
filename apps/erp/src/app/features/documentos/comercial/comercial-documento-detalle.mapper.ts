@@ -12,10 +12,7 @@ import type {
   ComercialDetalleRead,
   ComercialDetallePayload,
 } from './comercial-documento-detalle.model';
-import type {
-  ComercialDetalleFormRawValue,
-  ImpuestoSeleccionarOption,
-} from './comercial-documento-detalle.types';
+import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
 
 /** Subtotal bruto de la línea: `cantidad × precio`. */
 export function lineBruto(line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio'>): number {
@@ -121,17 +118,6 @@ export function toLineaCalculo(line: ComercialDetalleFormRawValue): LineaCalculo
   };
 }
 
-/** Opción del catálogo `impuesto/seleccionar/` → `TasaImpuesto` (base 100 por defecto). */
-export function tasaFromImpuestoOption(opt: ImpuestoSeleccionarOption): TasaImpuesto {
-  return {
-    id: opt.id,
-    nombre: opt.nombre_extendido ?? opt.nombre,
-    porcentaje: parseFloat(opt.porcentaje ?? '0'),
-    porcentajeBase: parseFloat(opt.porcentaje_base ?? '100'),
-    operacion: opt.operacion ?? 1,
-  };
-}
-
 /**
  * Tasas de **venta o compra** del ítem (opcionalmente acotadas a `ids`) como
  * `TasaImpuesto[]`. El `modo` selecciona el flag del ítem a filtrar
@@ -169,7 +155,7 @@ export function comercialDetalleToFormValue(
     item: read.item != null ? { id: read.item, nombre: read.item_nombre ?? '', precio } : null,
     cantidad: toFiniteNumber(read.cantidad),
     precio,
-    descuento: toFiniteNumber(read.descuento) ?? 0,
+    descuento: toFiniteNumber(read.porcentaje_descuento) ?? 0,
     impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
     impuestos_totales: (read.impuestos ?? []).map((imp) => {
       // El backend guarda el monto sin signo. Si el serializer ya manda la
@@ -189,6 +175,7 @@ export function comercialDetalleToFormValue(
     // Se rellenan al re-seleccionar el ítem; vacías preservan los montos cargados.
     impuestos_disponibles: [],
     detalle: read.detalle ?? null,
+    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     documento_detalle_afectado: read.documento_detalle_afectado ?? null,
   };
 }
@@ -229,6 +216,8 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     impuestos_totales: calcularImpuestosLinea(base, tasas),
     impuestos_disponibles: tasas,
     detalle: null,
+    // La fila pendiente no trae almacén: la línea importada nace sin él.
+    almacen: null,
     documento_detalle_afectado: row.id,
   };
 }
@@ -241,8 +230,9 @@ export function comercialDetalleToPayload(
     item: raw.item?.id ?? null,
     cantidad: raw.cantidad ?? null,
     precio: (raw.precio ?? 0).toFixed(2),
-    descuento: (raw.descuento ?? 0).toFixed(2),
+    porcentaje_descuento: (raw.descuento ?? 0).toFixed(2),
     detalle: raw.detalle?.trim() || null,
+    almacen: raw.almacen?.id ?? null,
     impuestos_ids: raw.impuestos_ids,
     documento_detalle_afectado: raw.documento_detalle_afectado,
   };

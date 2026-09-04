@@ -36,6 +36,8 @@ import type { PagoRead } from '../../pago.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly cliente: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly cuentaBanco: string | null;
   readonly comentario: string | null;
@@ -239,7 +241,8 @@ export class PagoDetailComponent implements OnInit {
           const pv = pagoToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            cliente: pv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            cliente: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: pv.fecha ?? null,
             cuentaBanco: pv.cuenta_banco?.nombre ?? read.cuenta_banco_nombre ?? null,
             comentario: read.comentario ?? null,

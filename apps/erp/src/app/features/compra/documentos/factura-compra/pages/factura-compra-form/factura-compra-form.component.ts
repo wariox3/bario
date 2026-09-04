@@ -38,6 +38,7 @@ import {
 } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
+import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-compra.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
@@ -295,6 +296,9 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (saved) => {
         this.isSaving.set(false);
+        // Guardar limpia el estado "sucio": navegar a la ficha pasa por el guard
+        // de salida y, sin esto, el camino feliz preguntaría por cambios ya guardados.
+        this.form.markAsPristine();
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
         // Guardar termina en la ficha del documento, para revisar lo que quedó
@@ -322,27 +326,14 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
    * hay pendientes y no molesta). Solo aplica en edición.
    */
   canDeactivate(): boolean | Observable<boolean> {
-    const pending = this.lineTables().reduce((total, table) => total + table.pendingCount(), 0);
-    if (pending === 0) return true;
-
-    const labels = this.t().entities.comercialDetalle;
-    return new Observable<boolean>((subscriber) => {
-      this.confirmation.confirm({
-        header: labels.leaveHeader,
-        message: labels.leaveMessage,
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: labels.leaveConfirm,
-        rejectLabel: this.t().common.actions.cancel,
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: () => {
-          subscriber.next(true);
-          subscriber.complete();
-        },
-        reject: () => {
-          subscriber.next(false);
-          subscriber.complete();
-        },
-      });
+    return canLeaveDocumentForm({
+      form: this.form,
+      pendingLines: this.lineTables().reduce((total, table) => total + table.pendingCount(), 0),
+      // Dos tablas en vivo: ítems y cuentas contables.
+      lineControls: ['detalles', 'cuentas'],
+      confirmation: this.confirmation,
+      labels: this.t().entities.comercialDetalle,
+      cancelLabel: this.t().common.actions.cancel,
     });
   }
 

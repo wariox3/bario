@@ -1,5 +1,5 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import type { ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
+import type { ErpSelectOption, ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
 import { recomputeImpuestosLinea } from './comercial-documento-detalle.mapper';
@@ -15,6 +15,8 @@ export type ComercialDetalleGroup = FormGroup<{
   impuestos_totales: FormControl<readonly ImpuestoLinea[]>;
   impuestos_disponibles: FormControl<readonly TasaImpuesto[]>;
   detalle: FormControl<string | null>;
+  /** Almacén de la línea; solo se renderiza donde la tabla declara la columna. */
+  almacen: FormControl<ErpSelectOption | null>;
   /** Línea origen afectada (importar desde documento); `null` en líneas normales. */
   documento_detalle_afectado: FormControl<number | null>;
 }>;
@@ -57,6 +59,7 @@ export function createComercialDetalleGroup(
       { nonNullable: true },
     ),
     detalle: new FormControl<string | null>(value?.detalle ?? null),
+    almacen: new FormControl<ErpSelectOption | null>(value?.almacen ?? null),
     documento_detalle_afectado: new FormControl<number | null>(
       value?.documento_detalle_afectado ?? null,
     ),

@@ -19,7 +19,7 @@ export function cuentaToFormValue(c: Cuenta): Partial<CuentaFormRawValue> {
         : null,
     exige_base: c.exige_base,
     exige_contacto: c.exige_contacto,
-    exige_grupo: c.exige_grupo,
+    exige_centro_costo: c.exige_centro_costo,
     permite_movimiento: c.permite_movimiento,
   };
 }
@@ -35,7 +35,7 @@ export function formValueToPayload(v: CuentaFormRawValue): CuentaPayload {
     nombre: v.nombre ?? '',
     exige_base: v.exige_base ?? false,
     exige_contacto: v.exige_contacto ?? false,
-    exige_grupo: v.exige_grupo ?? false,
+    exige_centro_costo: v.exige_centro_costo ?? false,
     permite_movimiento: v.permite_movimiento ?? false,
     cuenta_clase: v.cuenta_clase?.id ?? null,
     cuenta_grupo: v.cuenta_grupo?.id ?? null,

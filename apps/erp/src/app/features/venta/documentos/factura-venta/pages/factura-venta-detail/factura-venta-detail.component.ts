@@ -38,6 +38,8 @@ import type { FacturaVentaRead } from '../../factura-venta.model';
 interface CabeceraView {
   readonly numero: string | null;
   readonly cliente: string | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly fechaVence: Date | null;
   readonly plazoPago: string | null;
@@ -264,7 +266,8 @@ export class FacturaVentaDetailComponent implements OnInit {
           const fv = facturaVentaToFormValue(read);
           this.cabecera.set({
             numero: read.numero ?? null,
-            cliente: fv.contacto?.nombre ?? read.contacto_nombre ?? null,
+            cliente: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             fecha: fv.fecha ?? null,
             fechaVence: fv.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,

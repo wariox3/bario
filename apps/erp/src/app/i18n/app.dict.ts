@@ -295,13 +295,18 @@ export interface AppDict
       seleccionadosLabel: string;
       modalHeader: string;
       modalSubtitle: string;
+      todosLabel: string;
+      todosModalHeader: string;
+      todosModalSubtitle: string;
+      todosWarning: string;
       periodoLabel: string;
       submit: string;
       cancel: string;
       sinDestino: string;
       noSelection: { title: string; desc: string };
       success: { title: string; desc: string };
-      empty: { title: string; desc: string };
+      /** `desc` habla de la selección; `descTodos`, del período completo. */
+      empty: { title: string; desc: string; descTodos: string };
       error: { title: string; desc: string };
     };
     detail: {
@@ -1021,7 +1026,7 @@ export interface AppDict
         movimiento: string;
         exigeBase: string;
         exigeContacto: string;
-        exigeGrupo: string;
+        exigeCentroCosto: string;
       };
       form: {
         createTitle: string;
@@ -1040,7 +1045,7 @@ export interface AppDict
           permiteMovimiento: string;
           exigeBase: string;
           exigeContacto: string;
-          exigeGrupo: string;
+          exigeCentroCosto: string;
         };
         validation: {
           required: string;
@@ -1610,6 +1615,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
         };
         notFound: { title: string; desc: string };
@@ -1664,6 +1670,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           sede: string;
           asesor: string;
@@ -1723,6 +1730,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -1887,6 +1895,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           documentoReferencia: string;
           sede: string;
@@ -1952,6 +1961,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -1986,17 +1996,23 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
+        masInformacion: { title: string; hint: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
-          fecha: string;
-          fechaVence: string;
           plazoPago: string;
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          remision: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          comentario: string;
         };
         validation: { required: string };
         toasts: {
@@ -2010,13 +2026,14 @@ export interface AppDict
       detail: {
         sections: { general: string; detalles: string };
         labels: {
-          numero: string;
           cliente: string;
-          fecha: string;
-          fechaVence: string;
+          identificacion: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
+          asesor: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -2072,6 +2089,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -2137,6 +2155,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -2199,6 +2218,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           documentoReferencia: string;
           centroCosto: string;
@@ -2256,6 +2276,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           documentoReferencia: string;
           centroCosto: string;
@@ -2314,9 +2335,8 @@ export interface AppDict
       detail: {
         sections: { general: string; detalles: string };
         labels: {
-          numero: string;
           proveedor: string;
-          fecha: string;
+          identificacion: string;
           plazoPago: string;
           formaPago: string;
           centroCosto: string;
@@ -2378,6 +2398,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           fechaVence: string;
           plazoPago: string;
@@ -2434,6 +2455,7 @@ export interface AppDict
         labels: {
           numero: string;
           cliente: string;
+          identificacion: string;
           fecha: string;
           cuentaBanco: string;
           comentario: string;
@@ -2504,6 +2526,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           centroCosto: string;
           comentario: string;
@@ -2561,6 +2584,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           centroCosto: string;
           comentario: string;
@@ -2634,6 +2658,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           soporte: string;
           comprobante: string;
@@ -2688,6 +2713,7 @@ export interface AppDict
         labels: {
           numero: string;
           proveedor: string;
+          identificacion: string;
           fecha: string;
           cuentaBanco: string;
           comentario: string;
@@ -2718,8 +2744,11 @@ export interface AppDict
       leaveConfirm: string;
       impuestosTitle: string;
       impuestosAdd: string;
+      impuestosRemove: string;
+      impuestosBuscar: string;
       itemPlaceholder: string;
       detallePlaceholder: string;
+      almacenPlaceholder: string;
       confirmDeleteLine: string;
       createItem: string;
       extraerIva: { title: string; baseLabel: string; apply: string };
@@ -2732,6 +2761,7 @@ export interface AppDict
         linea: string;
         ref: string;
         item: string;
+        almacen: string;
         cantidad: string;
         precio: string;
         descuento: string;
@@ -2854,6 +2884,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           almacen: string;
           fecha: string;
           comentario: string;
@@ -4553,6 +4584,7 @@ export interface AppDict
         labels: {
           numero: string;
           contacto: string;
+          identificacion: string;
           fecha: string;
           sector: string;
           estrato: string;
@@ -4621,6 +4653,23 @@ export interface AppDict
   };
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
+    general: {
+      /** Asistente de datos iniciales: solo en contenedores recién creados. */
+      datosIniciales: {
+        title: string;
+        desc: string;
+        actions: { cargar: string; omitir: string };
+        /** Acuse de la siembra: qué entró al contenedor. */
+        resultado: {
+          title: string;
+          desc: string;
+          /** Etiqueta de la línea de suma, al pie del recibo. */
+          totalLabel: string;
+          modelos: Readonly<Record<string, string>>;
+          actions: { cerrar: string };
+        };
+      };
+    };
     venta: {
       facturaElectronica: {
         title: string;

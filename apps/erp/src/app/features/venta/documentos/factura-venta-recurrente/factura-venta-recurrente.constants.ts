@@ -1,9 +1,21 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import type { ColumnDef, ErpSelectOption, FilterField } from '@reddoc/core';
 
 /** Endpoint `seleccionar` de sedes. */
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /** Endpoint `seleccionar` de métodos de pago. */
 export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
+
+/**
+ * Etiqueta de un asesor en el desplegable.
+ *
+ * `general/asesor/seleccionar/` es el raro del lote: devuelve `{ id, nombre_corto }`
+ * y no el `nombre` que `lib-api-select` muestra y filtra por defecto. De ahí que
+ * el campo vaya con `[displayWith]="asesorLabel"` **y** `filterBy="nombre_corto"`
+ * —sin lo segundo la persona teclearía lo que ve y no encontraría nada—.
+ */
+export function asesorLabel(option: ErpSelectOption): string {
+  return String(option['nombre_corto'] ?? option.nombre ?? '');
+}
 
 /**
  * Columnas visibles del listado de Factura de venta recurrente.

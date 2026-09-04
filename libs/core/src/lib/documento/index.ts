@@ -22,4 +22,6 @@ export type { DocumentTypeId, DocumentTypeKey } from './document-types.constants
 export { ENTITY_DATA_GATEWAY } from './entity-data-gateway';
 export type { EntityDataGateway } from './entity-data-gateway';
 export { HttpEntityDataGateway } from './http-entity-data-gateway.service';
+export { documentoContactoToOption } from './documento-contacto';
+export type { DocumentoContactoRead } from './documento-contacto';
 export { DocumentoDetalleService } from './documento-detalle.service';

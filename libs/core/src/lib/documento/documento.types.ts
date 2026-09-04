@@ -83,6 +83,11 @@ export interface DocumentoReadBase extends DocumentoEstados {
   readonly contacto: number | null;
   /** Nombre del contacto para etiquetar el autocomplete al cargar en edición. */
   readonly contacto_nombre?: string | null;
+  /**
+   * Identificación del contacto. Completa la etiqueta del autocomplete en
+   * edición (`identificación - nombre`, ver `documentoContactoToOption`).
+   */
+  readonly tercero_numero_identificacion?: string | null;
   /** Fecha en formato `yyyy-MM-dd`. */
   readonly fecha: string | null;
 }

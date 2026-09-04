@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import {
-  formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
@@ -26,14 +25,13 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { facturaCompraRecurrenteToFormValue } from '../../factura-compra-recurrente.mapper';
 import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrente.model';
 
 /** Cabecera legible de la factura recurrente para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
-  readonly numero: string | null;
   readonly proveedor: string | null;
-  readonly fecha: Date | null;
+  /** Identificación del contacto (`tercero_numero_identificacion` del read). */
+  readonly identificacion: string | null;
   readonly plazoPago: string | null;
   readonly formaPago: string | null;
   readonly centroCosto: string | null;
@@ -151,21 +149,6 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
-  /** Descarga el PDF del documento. */
-  protected onImprimir(): void {
-    const id = this.id();
-    if (!id) return;
-    this.gateway
-      .imprimir(this.document(), Number(id))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => {
-          const ts = this.t().documentActions.detail.toasts.imprimirError;
-          this.toast.error(ts.title, ts.desc);
-        },
-      });
-  }
-
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
@@ -175,11 +158,9 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
       .subscribe({
         next: ({ cabecera, lineas }) => {
           const read = cabecera as FacturaCompraRecurrenteRead;
-          const fr = facturaCompraRecurrenteToFormValue(read);
           this.cabecera.set({
-            numero: read.numero ?? null,
-            proveedor: fr.contacto?.nombre ?? read.contacto_nombre ?? null,
-            fecha: fr.fecha ?? null,
+            proveedor: read.contacto_nombre ?? null,
+            identificacion: read.tercero_numero_identificacion ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
@@ -197,11 +178,6 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });
-  }
-
-  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
-  protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/compra/<...routePath>[/extra]`. */

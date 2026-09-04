@@ -43,7 +43,6 @@ import {
   calcularResumen,
   formatCop,
   toFiniteNumber,
-  type ImpuestoLinea,
   type ParamValue,
   type ResumenDocumento,
   type TasaImpuesto,
@@ -62,7 +61,13 @@ import {
   type ItemOption,
 } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
-import { ErpSelectDataService } from '@reddoc/core';
+import {
+  IMPUESTO_SELECCIONAR_ENDPOINT,
+  tasaFromImpuestoOption,
+  type ImpuestoSeleccionarOption,
+} from '@erp/core/components/impuesto-select/impuesto-seleccionar.types';
+import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
+import { ErpApiSelectComponent } from '@reddoc/ui';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
 import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
 import type { Item } from '@erp/features/general/masters/item/item.model';
@@ -77,21 +82,15 @@ import {
   pendienteLineaToFormValue,
   precioUnitarioConImpuestos,
   precioUnitarioSinImpuestos,
+  lineBase,
   lineBruto,
   lineNeto,
-  tasaFromImpuestoOption,
   tasasDelItem,
   toLineaCalculo,
 } from '../../comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '../../comercial-documento-detalle.model';
-import type {
-  ComercialDetalleFormRawValue,
-  ImpuestoSeleccionarOption,
-} from '../../comercial-documento-detalle.types';
+import type { ComercialDetalleFormRawValue } from '../../comercial-documento-detalle.types';
 import { ComercialDocumentoResumenComponent } from '../comercial-documento-resumen/comercial-documento-resumen.component';
-
-/** Endpoint del catálogo de impuestos (mismo que usa `app-impuesto-select`). */
-const IMPUESTO_SELECCIONAR_ENDPOINT = '/general/impuesto/seleccionar/';
 
 /**
  * Tabla de **líneas (detalles)** de un documento comercial. Reutilizable por
@@ -122,6 +121,7 @@ const IMPUESTO_SELECCIONAR_ENDPOINT = '/general/impuesto/seleccionar/';
     ConfirmDialogModule,
     ErpItemAutocompleteComponent,
     ErpImpuestoSelectComponent,
+    ErpApiSelectComponent,
     ComercialDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
@@ -187,6 +187,38 @@ export class ComercialDocumentoDetallesComponent {
   readonly scannerEnabled = input<boolean>(false);
 
   /**
+   * Muestra la columna **Almacén** (el almacén por línea), a la derecha de ítem.
+   * Default `false`: solo la declara el documento que la necesita.
+   *
+   * Ojo: `GenDocumentoDetalle` todavía no tiene `almacen` en el OpenAPI, así que
+   * el backend lo descarta al guardar (ver la nota en `ComercialDetalleRead`).
+   * La columna se ve y se edita; persistirá cuando el serializer sume el campo.
+   */
+  readonly almacenEnabled = input<boolean>(false);
+
+  /** Catálogo del select de almacén de la línea. */
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+
+  /**
+   * Muestra la columna **Detalle** (la nota libre por línea). Default `true`.
+   *
+   * Hay documentos donde esa nota no aplica y la columna solo roba ancho a las
+   * que sí importan —la remisión, por ejemplo—; ahí el documento la apaga. El
+   * control `detalle` del `FormGroup` sigue existiendo y viajando en el payload
+   * con su valor actual: esto es visibilidad de la tabla, no un cambio del
+   * contrato de la línea.
+   */
+  readonly detalleEnabled = input<boolean>(true);
+
+  /**
+   * Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las
+   * opcionales que el documento haya encendido.
+   */
+  protected readonly columnCount = computed(
+    () => 9 + (this.detalleEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
+  );
+
+  /**
    * Avisa al padre que se importaron líneas en **edición** (ya persistidas vía
    * `masivo/`) para que recargue el documento y refresque el `FormArray` con los
    * ids y montos autoritativos del backend.
@@ -232,7 +264,7 @@ export class ComercialDocumentoDetallesComponent {
    * **cualquier** impuesto elegido en la línea, no solo los configurados en el
    * ítem. Vacío hasta que el fetch resuelve.
    */
-  private readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
+  protected readonly impuestosCatalog = signal<readonly TasaImpuesto[]>([]);
 
   /**
    * Cola de escaneos del lector. `concatMap` los resuelve **en orden**: una
@@ -299,12 +331,7 @@ export class ComercialDocumentoDetallesComponent {
       .subscribe({
         next: (options) => {
           this.impuestosCatalog.set(options.map(tasaFromImpuestoOption));
-          for (const group of this.detalles().controls) {
-            // Filas nuevas (sin id) que esperaban el catálogo para poder calcular.
-            if (group.controls.id.value == null) this.ensureCatalog(group);
-            // Filas cargadas: corregir el signo de las retenciones leídas.
-            this.normalizarImpuestosLeidos(group);
-          }
+          for (const group of this.detalles().controls) this.seedRow(group);
         },
         error: () => {
           // Sin catálogo, las líneas conservan los montos del ítem/backend.
@@ -615,9 +642,14 @@ export class ComercialDocumentoDetallesComponent {
     return line ? lineBruto(line) : 0;
   }
 
-  /** Impuestos de la línea (id, nombre, monto) para renderizar los badges de la columna. */
-  protected impuestosOf(index: number): readonly ImpuestoLinea[] {
-    return this.lines()[index]?.impuestos_totales ?? [];
+  /**
+   * Base gravable de la línea (`bruto − descuento`). La consume el selector de
+   * impuestos para mostrar, opción por opción, cuánto le suma o resta a **esta**
+   * línea elegir ese impuesto.
+   */
+  protected baseOf(index: number): number {
+    const line = this.lines()[index];
+    return line ? lineBase(line) : 0;
   }
 
   protected netoOf(index: number): number {
@@ -643,7 +675,7 @@ export class ComercialDocumentoDetallesComponent {
         .subscribe(() => this.ensureCatalog(group));
       // Cubre las filas pobladas después de que llegó el catálogo (en edición
       // el padre las empuja al FormArray cuando responde su propia consulta).
-      this.normalizarImpuestosLeidos(group);
+      this.seedRow(group);
     }
   }
 
@@ -751,11 +783,30 @@ export class ComercialDocumentoDetallesComponent {
    * aún está vacío (no pisa montos del backend en edición hasta que el usuario
    * toca los impuestos). El recompute del grupo se dispara al setear el pool.
    */
-  private ensureCatalog(group: ComercialDetalleGroup): void {
+  private ensureCatalog(group: ComercialDetalleGroup, emitEvent = true): void {
     const catalog = this.impuestosCatalog();
     if (catalog.length === 0) return;
     if (group.controls.impuestos_disponibles.value.length > 0) return;
-    group.controls.impuestos_disponibles.setValue(catalog);
+    group.controls.impuestos_disponibles.setValue(catalog, { emitEvent });
+  }
+
+  /**
+   * Deja una fila lista para calcular: le siembra el pool de tasas y normaliza
+   * los impuestos que vinieron del backend.
+   *
+   * Sin el pool, el recompute de la línea (`createComercialDetalleGroup`) se
+   * corta de entrada, y una línea **cargada en edición** nace con el pool vacío:
+   * tocarle el descuento (o la cantidad, o el precio) movía la base pero dejaba
+   * el impuesto y el neto en el valor viejo hasta re-elegir el ítem.
+   *
+   * En las filas cargadas se siembra **sin emitir**: al abrir el documento se
+   * conservan los montos que calculó el backend; el recálculo entra recién
+   * cuando la persona edita algo. Es idempotente y no cuesta red — el catálogo
+   * ya está en memoria.
+   */
+  private seedRow(group: ComercialDetalleGroup): void {
+    this.ensureCatalog(group, group.controls.id.value == null);
+    this.normalizarImpuestosLeidos(group);
   }
 
   // ── Precio con impuestos incluidos (extraer IVA) ────────────────────────────
