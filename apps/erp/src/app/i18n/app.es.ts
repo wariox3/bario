@@ -3624,6 +3624,7 @@ export const es: AppDict = {
       impuestosBuscar: 'Buscar impuesto…',
       itemPlaceholder: 'Buscar ítem…',
       detallePlaceholder: 'Nota…',
+      almacenPlaceholder: 'Almacén…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
       createItem: 'Crear ítem',
       extraerIva: {
@@ -3646,6 +3647,7 @@ export const es: AppDict = {
         linea: '#',
         ref: 'Ref',
         item: 'Ítem',
+        almacen: 'Almacén',
         cantidad: 'Cant.',
         precio: 'Precio',
         descuento: 'Desc. %',

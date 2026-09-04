@@ -66,7 +66,8 @@ import {
   tasaFromImpuestoOption,
   type ImpuestoSeleccionarOption,
 } from '@erp/core/components/impuesto-select/impuesto-seleccionar.types';
-import { ErpSelectDataService } from '@reddoc/core';
+import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
+import { ErpApiSelectComponent } from '@reddoc/ui';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
 import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
 import type { Item } from '@erp/features/general/masters/item/item.model';
@@ -120,6 +121,7 @@ import { ComercialDocumentoResumenComponent } from '../comercial-documento-resum
     ConfirmDialogModule,
     ErpItemAutocompleteComponent,
     ErpImpuestoSelectComponent,
+    ErpApiSelectComponent,
     ComercialDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
@@ -185,6 +187,19 @@ export class ComercialDocumentoDetallesComponent {
   readonly scannerEnabled = input<boolean>(false);
 
   /**
+   * Muestra la columna **Almacén** (el almacén por línea), a la derecha de ítem.
+   * Default `false`: solo la declara el documento que la necesita.
+   *
+   * Ojo: `GenDocumentoDetalle` todavía no tiene `almacen` en el OpenAPI, así que
+   * el backend lo descarta al guardar (ver la nota en `ComercialDetalleRead`).
+   * La columna se ve y se edita; persistirá cuando el serializer sume el campo.
+   */
+  readonly almacenEnabled = input<boolean>(false);
+
+  /** Catálogo del select de almacén de la línea. */
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+
+  /**
    * Muestra la columna **Detalle** (la nota libre por línea). Default `true`.
    *
    * Hay documentos donde esa nota no aplica y la columna solo roba ancho a las
@@ -196,10 +211,12 @@ export class ComercialDocumentoDetallesComponent {
   readonly detalleEnabled = input<boolean>(true);
 
   /**
-   * Columnas de la tabla, para el `colspan` del estado vacío. Fijas menos la de
-   * detalle, que es opcional.
+   * Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las
+   * opcionales que el documento haya encendido.
    */
-  protected readonly columnCount = computed(() => (this.detalleEnabled() ? 10 : 9));
+  protected readonly columnCount = computed(
+    () => 9 + (this.detalleEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
+  );
 
   /**
    * Avisa al padre que se importaron líneas en **edición** (ya persistidas vía

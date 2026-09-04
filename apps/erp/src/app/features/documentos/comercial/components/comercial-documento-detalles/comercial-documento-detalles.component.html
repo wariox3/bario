@@ -71,6 +71,11 @@
           <th class="comercial-detalle-table__th min-w-[16rem] text-left">
             {{ t().entities.comercialDetalle.columns.item }}
           </th>
+          @if (almacenEnabled()) {
+            <th class="comercial-detalle-table__th w-36 text-left">
+              {{ t().entities.comercialDetalle.columns.almacen }}
+            </th>
+          }
           <th class="comercial-detalle-table__th w-24 text-right">
             {{ t().entities.comercialDetalle.columns.cantidad }}
           </th>
@@ -126,6 +131,16 @@
                 (createRequested)="onCreateItem(row)"
               />
             </td>
+
+            @if (almacenEnabled()) {
+              <td class="comercial-detalle-table__td">
+                <lib-api-select
+                  formControlName="almacen"
+                  [endpoint]="almacenEndpoint"
+                  [placeholder]="t().entities.comercialDetalle.almacenPlaceholder"
+                />
+              </td>
+            }
 
             <td class="comercial-detalle-table__td">
               <p-inputnumber

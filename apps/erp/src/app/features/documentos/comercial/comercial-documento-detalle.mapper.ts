@@ -175,6 +175,7 @@ export function comercialDetalleToFormValue(
     // Se rellenan al re-seleccionar el ítem; vacías preservan los montos cargados.
     impuestos_disponibles: [],
     detalle: read.detalle ?? null,
+    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     documento_detalle_afectado: read.documento_detalle_afectado ?? null,
   };
 }
@@ -215,6 +216,8 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     impuestos_totales: calcularImpuestosLinea(base, tasas),
     impuestos_disponibles: tasas,
     detalle: null,
+    // La fila pendiente no trae almacén: la línea importada nace sin él.
+    almacen: null,
     documento_detalle_afectado: row.id,
   };
 }
@@ -229,6 +232,7 @@ export function comercialDetalleToPayload(
     precio: (raw.precio ?? 0).toFixed(2),
     porcentaje_descuento: (raw.descuento ?? 0).toFixed(2),
     detalle: raw.detalle?.trim() || null,
+    almacen: raw.almacen?.id ?? null,
     impuestos_ids: raw.impuestos_ids,
     documento_detalle_afectado: raw.documento_detalle_afectado,
   };

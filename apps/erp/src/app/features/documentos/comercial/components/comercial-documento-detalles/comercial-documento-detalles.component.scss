@@ -19,10 +19,13 @@
   --p-form-field-padding-x: 0.45rem;
 }
 
-// El único valor que no sale de una variable: el CSS base de PrimeNG fija
-// `font-size: 1rem` en `.p-inputtext`. `::ng-deep` acotado a la tabla lo baja
-// sin un override global (mismo recurso que usa `app-impuesto-select`).
-.comercial-detalle-table ::ng-deep .p-inputtext {
+// Lo único que no sale de una variable: el CSS base de PrimeNG fija
+// `font-size: 1rem` a mano, tanto en `.p-inputtext` (input, inputnumber,
+// autocomplete) como en `.p-select-label` (el select de almacén). El padding sí
+// lo heredan de los tokens de arriba; el tamaño de letra hay que bajarlo acá.
+// `::ng-deep` acotado a la tabla evita un override global — mismo recurso que
+// usa `app-impuesto-select` para su variante celda, que ya se estiliza sola.
+.comercial-detalle-table ::ng-deep :is(.p-inputtext, .p-select-label) {
   font-size: 0.78rem;
 }
 

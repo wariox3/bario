@@ -2748,6 +2748,7 @@ export interface AppDict
       impuestosBuscar: string;
       itemPlaceholder: string;
       detallePlaceholder: string;
+      almacenPlaceholder: string;
       confirmDeleteLine: string;
       createItem: string;
       extraerIva: { title: string; baseLabel: string; apply: string };
@@ -2760,6 +2761,7 @@ export interface AppDict
         linea: string;
         ref: string;
         item: string;
+        almacen: string;
         cantidad: string;
         precio: string;
         descuento: string;

@@ -3564,6 +3564,7 @@ export const en: AppDict = {
       impuestosBuscar: 'Search tax…',
       itemPlaceholder: 'Search item…',
       detallePlaceholder: 'Note…',
+      almacenPlaceholder: 'Warehouse…',
       confirmDeleteLine: 'Remove this line from the document?',
       createItem: 'Create item',
       extraerIva: {
@@ -3586,6 +3587,7 @@ export const en: AppDict = {
         linea: '#',
         ref: 'Ref',
         item: 'Item',
+        almacen: 'Warehouse',
         cantidad: 'Qty.',
         precio: 'Price',
         descuento: 'Disc. %',

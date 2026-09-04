@@ -24,6 +24,17 @@ export interface ComercialDetalleRead extends DocumentoDetalleReadBase {
    */
   readonly descuento?: string | number | null;
   readonly detalle?: string | null;
+  /**
+   * Almacén de la línea. **Asunción de contrato**: `GenDocumentoDetalle` no la
+   * declara en el OpenAPI (verificado el 2026-09-03), así que hoy el backend la
+   * descarta en silencio al guardar y no vuelve en el read. El campo queda
+   * cableado para cuando el serializer lo sume; mientras tanto la columna se ve
+   * y se edita, pero no persiste. Mismo estado que el almacén de las líneas de
+   * inventario.
+   */
+  readonly almacen?: number | null;
+  /** Nombre del almacén, para etiquetar el select al cargar en edición. */
+  readonly almacen_nombre?: string | null;
   /** Línea origen afectada, si la línea provino de "importar desde documento". */
   readonly documento_detalle_afectado?: number | null;
 }
@@ -33,6 +44,8 @@ export interface ComercialDetallePayload extends DocumentoDetallePayloadBase {
   /** Porcentaje de descuento como string con 2 decimales (`"10.00"`). */
   readonly porcentaje_descuento: string;
   readonly detalle: string | null;
+  /** Almacén de la línea; ver la nota de `almacen` en el read. */
+  readonly almacen: number | null;
   /** Línea origen afectada (importar desde documento); `null` en líneas normales. */
   readonly documento_detalle_afectado: number | null;
 }

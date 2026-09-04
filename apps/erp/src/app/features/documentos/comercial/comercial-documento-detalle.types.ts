@@ -1,4 +1,4 @@
-import type { ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
+import type { ErpSelectOption, ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
 import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 
 /**
@@ -29,6 +29,11 @@ export interface ComercialDetalleFormRawValue {
   readonly impuestos_disponibles: readonly TasaImpuesto[];
   /** Nota libre de la línea. */
   readonly detalle: string | null;
+  /**
+   * Almacén de la línea. Solo lo piden los documentos que declaran la columna
+   * (`almacenEnabled`); en el resto queda en `null` y no se renderiza.
+   */
+  readonly almacen: ErpSelectOption | null;
   /**
    * Id de la línea origen que esta línea **afecta** (descuenta su pendiente),
    * cuando proviene de "importar desde documento". `null` en líneas normales.
