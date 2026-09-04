@@ -3462,6 +3462,16 @@ export const en: AppDict = {
           desc: 'The journal entry you are looking for does not exist or was deleted.',
         },
       },
+      utilidades: {
+        action: 'Tools',
+        importarDetalle: 'Import lines',
+      },
+      import: {
+        title: 'Import lines',
+        subtitle: 'Upload an Excel file with the lines to add to this journal entry',
+        notice:
+          'The lines in the file are added to the ones the entry already has; nothing is replaced. If any row fails, none are saved.',
+      },
     },
     egreso: {
       name: 'Disbursement',

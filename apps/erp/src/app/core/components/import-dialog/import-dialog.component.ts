@@ -103,9 +103,10 @@ export class ImportDialogComponent {
 
   /**
    * Advertencia sobre lo que la importación va a hacer, mostrada antes de subir.
-   * Vacío ⇒ no se pinta. La usan las importaciones que **reemplazan** lo que hay
-   * en pantalla; el consumidor decide cuándo mostrarla, para que no se vuelva un
-   * cartel permanente que nadie lee.
+   * Vacío ⇒ no se pinta. La usan las importaciones cuyo efecto no es obvio —las
+   * que **reemplazan** lo que hay en pantalla, o las que **suman** a lo que ya
+   * está guardado—; el consumidor decide cuándo mostrarla, para que no se vuelva
+   * un cartel permanente que nadie lee.
    */
   readonly notice = input<string>('');
 
@@ -287,7 +288,10 @@ export class ImportDialogComponent {
 
     this.exampleDownloading.set(true);
     this.fileDownload
-      .download(cfg.endpoint, { fallbackFilename: cfg.filename ?? 'ejemplo.xlsx' })
+      .download(cfg.endpoint, {
+        fallbackFilename: cfg.filename ?? 'ejemplo.xlsx',
+        params: cfg.params,
+      })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.exampleDownloading.set(false),

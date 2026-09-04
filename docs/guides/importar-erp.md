@@ -144,6 +144,11 @@ protected readonly exampleConfig = {
 se apunta al de otro cuando es ese el que declara el esquema del archivo (empleados manda
 a `/general/contacto/importar-ejemplo/`, porque el empleado se importa como contacto).
 
+El `params` opcional es para las plantillas que **dependen de un contexto**, no de un
+recurso: la de líneas de documento arma sus columnas según el tipo del padre, así que va
+con `{ documento: id() }` y el `exampleConfig` pasa a ser un `computed`. La plantilla de
+un master no lleva ninguno.
+
 ---
 
 ## Los maestros (tab "Maestros")
@@ -209,10 +214,42 @@ Muestra hasta 100 filas y avisa del truncado con el total real. Su spec vive en
 
 ---
 
+## Importar **líneas** de un documento
+
+Es el mismo diálogo, con un endpoint que además recibe el **documento padre**:
+
+| Qué       | Endpoint                                                                        |
+| --------- | ------------------------------------------------------------------------------- |
+| Carga     | `POST /general/documento-detalle/importar/` — multipart `archivo` + `documento` |
+| Plantilla | `GET /general/documento-detalle/importar-ejemplo/?documento=<id>`               |
+
+Los dos viven en `DocumentoDetalleService` (`@reddoc/core`), que ya es el CRUD compartido
+de líneas: `importar(documentoId, file)` y `importarEjemploEndpoint`.
+
+Tres cosas que lo distinguen de importar un master:
+
+- **La plantilla depende del documento**, no del recurso: el backend devuelve las columnas
+  del tipo del padre —no se llena igual una factura que un asiento—. Por eso `ExampleConfig`
+  acepta `params`, y la ficha pasa `{ documento: id() }`.
+- **Suma, no reemplaza.** Las filas del archivo se agregan a las líneas que el documento ya
+  tiene; el endpoint no ofrece reemplazo. Verificado contra `reddocapi.uk`, no solo leído
+  del schema. Se evaluó pedirle a backend un `reemplazar` y se decidió que no hace falta:
+  en la práctica se importa sobre un documento recién creado y vacío. Conviene decirlo
+  igual en el `notice` del diálogo, que es lo que hace el asiento.
+- **Es todo-o-nada** y exige un documento **modificable**: si una fila falla no se guarda
+  ninguna, y sobre un documento ya aprobado el backend responde 400. Ofrecerlo solo cuando
+  la ficha lo dé por editable.
+
+Ejemplo vivo: el dropdown **Utilidades** de la ficha del asiento contable
+(`contabilidad/documentos/asiento/pages/asiento-detail`). Vive en la ficha y no en el
+formulario porque la importación necesita un documento ya creado, y la ficha es el único
+lugar donde siempre lo hay. Al terminar recarga la ficha **entera**: el backend recalcula
+los totales del documento, así que la cabecera también quedó vieja.
+
+---
+
 ## Lo que este diálogo **no** hace
 
-- **Importar líneas dentro de un documento** (agregar detalles a una factura desde
-  Excel). Es otro flujo; hoy ningún documento lo hace.
 - **Importar en un documento del camino A** (factura, nota crédito…). El framework
   configuracional no expone importación: `BaseDocumentListComponent` no tiene handler y
   el `DocumentEntityConfig` no declara nada al respecto. Hasta agosto de 2026 sí había
