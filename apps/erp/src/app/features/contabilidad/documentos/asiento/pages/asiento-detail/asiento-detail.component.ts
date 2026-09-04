@@ -1,10 +1,20 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, type MenuItem } from 'primeng/api';
+import { Menu, MenuModule } from 'primeng/menu';
 import {
   I18nService,
   TenantService,
@@ -17,6 +27,9 @@ import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/co
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
 import { ContableDocumentoLineasTableComponent } from '@erp/features/documentos/contable/components/contable-documento-lineas-table/contable-documento-lineas-table.component';
 import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
@@ -55,6 +68,11 @@ interface CabeceraView {
  * columnas que imputa —número, contacto, centro de costo, base y glosa—. Carga
  * (`ENTITY_DATA_GATEWAY`) y líneas (`DocumentoDetalleService`) en paralelo, igual
  * que el form. El resumen marca la diferencia si el asiento no cuadra.
+ *
+ * Suma un dropdown **Utilidades** con la importación de líneas por Excel. Vive
+ * acá y no en el formulario porque la importación necesita un documento ya
+ * creado —el backend recibe el id del padre— y la ficha es el único lugar donde
+ * siempre lo hay.
  */
 @Component({
   selector: 'app-asiento-detail',
@@ -66,6 +84,8 @@ interface CabeceraView {
     ContableDocumentoLineasTableComponent,
     ContableDocumentoResumenComponent,
     DocumentDetailActionsComponent,
+    MenuModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './asiento-detail.component.html',
@@ -114,6 +134,48 @@ export class AsientoDetailComponent implements OnInit {
     calcularResumenContable(this.lines()),
   );
 
+  private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
+
+  /**
+   * Entradas del dropdown "Utilidades". `computed` por la misma razón que en la
+   * ficha del contrato: recrear el array en cada detección de cambios le hace
+   * perder el primer click a `p-menu`.
+   *
+   * Importar se deshabilita sobre un asiento no editable —aprobado, típicamente—
+   * porque el backend responde 400 en ese caso: mejor decirlo en el menú que
+   * dejar que el usuario elija un archivo para nada.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.asiento.utilidades.importarDetalle,
+      icon: 'pi pi-upload',
+      disabled: !this.isEditable(),
+      command: () => this.importar.open(),
+    },
+  ]);
+
+  /**
+   * Plantilla de importación de líneas. El endpoint es el genérico de
+   * `documento-detalle`, pero el `documento` no es decorativo: el backend arma
+   * las columnas según el tipo del padre, así que sin él no hay plantilla.
+   */
+  protected readonly exampleConfig = computed<ExampleConfig>(() => ({
+    mode: 'enabled',
+    endpoint: this.detalleService.importarEjemploEndpoint,
+    params: { documento: this.id() },
+    filename: 'detalle-asiento.xlsx',
+  }));
+
+  /**
+   * Estado del diálogo de importación de líneas. Al terminar recarga la ficha
+   * entera y no solo las líneas: el backend recalcula los totales del documento
+   * al cerrar la importación, así que la cabecera también quedó vieja.
+   */
+  protected readonly importar = importState({
+    upload: (file) => this.detalleService.importar(Number(this.id()), file),
+    onImported: () => this.loadDocumento(Number(this.id())),
+  });
+
   /** Migas: módulo activo → listado del documento → identificador del documento abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     documentoBreadcrumb(
@@ -145,6 +207,10 @@ export class AsientoDetailComponent implements OnInit {
     const id = this.id();
     if (!id) return;
     this.navigate(this.document().routes.edit, id);
+  }
+
+  protected toggleUtilidades(event: Event): void {
+    this.utilidadesMenu()?.toggle(event);
   }
 
   /** Aprueba el documento previa confirmación; al éxito recarga la ficha. */

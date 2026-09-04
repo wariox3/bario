@@ -114,6 +114,41 @@ export class DocumentoDetalleService extends BaseHttpService {
     });
   }
 
+  /**
+   * Importa líneas desde un Excel a un documento existente
+   * (`POST /general/documento-detalle/importar/`, multipart `archivo` +
+   * `documento`).
+   *
+   * Es el único `importar/` del backend que recibe un padre: el resto carga
+   * masters completos. Cada fila pasa por la misma creación que el POST
+   * individual (impuestos y totales incluidos) y el backend recalcula los
+   * totales del documento al cerrar. Es **todo-o-nada**: si una fila falla, no
+   * se guarda ninguna.
+   *
+   * Las líneas del archivo se **agregan** a las que el documento ya tiene; el
+   * endpoint no ofrece reemplazo.
+   *
+   * El backend responde 400 si el documento no es modificable o si su tipo no
+   * admite importación de detalles, así que conviene ofrecerlo solo sobre
+   * documentos editables.
+   */
+  importar(documentoId: number, file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${DOCUMENTO_DETALLE_ENDPOINT}importar/`, file, {
+      documento: documentoId,
+    });
+  }
+
+  /**
+   * Endpoint de la **plantilla** de importación de líneas. Se expone en vez de
+   * descargarla acá porque quien la baja es el diálogo de importación, con su
+   * propio `FileDownloadService`.
+   *
+   * Va acompañada de `?documento=<id>`: el backend devuelve las columnas del
+   * tipo del padre —no se llena igual una factura que un asiento—, así que sin
+   * el documento no sabe qué plantilla armar.
+   */
+  readonly importarEjemploEndpoint = `${DOCUMENTO_DETALLE_ENDPOINT}importar-ejemplo/`;
+
   /** Actualiza una línea existente por su `id`. */
   actualizar<TRead = unknown>(id: number, payload: object): Observable<TRead> {
     return this.patch<TRead>(`${DOCUMENTO_DETALLE_ENDPOINT}${id}/`, payload);

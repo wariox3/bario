@@ -2667,6 +2667,15 @@ export interface AppDict
         };
         notFound: { title: string; desc: string };
       };
+      utilidades: {
+        action: string;
+        importarDetalle: string;
+      };
+      import: {
+        title: string;
+        subtitle: string;
+        notice: string;
+      };
     };
     egreso: {
       name: string;

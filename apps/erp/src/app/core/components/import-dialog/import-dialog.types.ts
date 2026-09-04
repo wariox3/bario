@@ -1,16 +1,27 @@
+import type { ParamValue } from '@reddoc/core';
+
 /**
  * Configuración del botón "Descargar ejemplo" del `ImportDialogComponent`.
  *
  * El consumidor decide los 3 estados visibles del botón:
  * - **null** → el botón NO se renderiza (oculto).
- * - **`{ mode: 'enabled', endpoint, filename? }`** → visible y funcional.
+ * - **`{ mode: 'enabled', endpoint, params?, filename? }`** → visible y funcional.
  *   El dialog hace la descarga GET contra `endpoint` reusando
  *   `FileDownloadService` de `@reddoc/core` (cookies + `X-Tenant` automáticos).
  * - **`{ mode: 'disabled', reason }`** → visible pero deshabilitado, con
  *   tooltip mostrando `reason` (ej. "Plantilla no configurada para este tenant").
+ *
+ * `params` existe para las plantillas que **dependen de un contexto**: la de
+ * líneas de documento devuelve las columnas del tipo del padre, así que necesita
+ * `{ documento: id }`. La plantilla de un master no lleva ninguno.
  */
 export type ExampleConfig =
-  | { readonly mode: 'enabled'; readonly endpoint: string; readonly filename?: string }
+  | {
+      readonly mode: 'enabled';
+      readonly endpoint: string;
+      readonly params?: Record<string, ParamValue>;
+      readonly filename?: string;
+    }
   | { readonly mode: 'disabled'; readonly reason: string };
 
 /**

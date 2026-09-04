@@ -3525,6 +3525,16 @@ export const es: AppDict = {
           desc: 'El asiento que buscas no existe o fue eliminado.',
         },
       },
+      utilidades: {
+        action: 'Utilidades',
+        importarDetalle: 'Importar detalle',
+      },
+      import: {
+        title: 'Importar detalle',
+        subtitle: 'Sube un Excel con las líneas a cargar en este asiento',
+        notice:
+          'Las líneas del archivo se agregan a las que el asiento ya tiene; no reemplazan nada. Si alguna fila falla no se guarda ninguna.',
+      },
     },
     egreso: {
       name: 'Egreso',
