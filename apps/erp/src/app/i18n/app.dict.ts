@@ -3693,6 +3693,8 @@ export interface AppDict
     informeCuentas: {
       generar: string;
       descuadre: string;
+      /** Aviso: los parámetros cambiaron y lo que se ve quedó viejo. */
+      paramsStale: string;
       params: {
         fechaDesde: string;
         fechaHasta: string;
@@ -3722,6 +3724,8 @@ export interface AppDict
         debito: string;
         credito: string;
         saldoActual: string;
+        /** Solo el balance de prueba: su contrato nuevo lo llama `saldo_final`. */
+        saldoFinal: string;
         total: string;
       };
       empty: {
@@ -3729,7 +3733,19 @@ export interface AppDict
         noData: string;
       };
     };
-    balancePrueba: { name: string };
+    balancePrueba: {
+      name: string;
+      params: { soloConSaldo: string };
+      /**
+       * Empty state propio (título + pista), que es la forma canónica del ERP.
+       * Los otros 8 informes siguen con las dos líneas sueltas de
+       * `informeCuentas.empty`, que su tabla pinta en una sola celda.
+       */
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
     balancePruebaContacto: { name: string };
     auxiliarCuenta: { name: string };
     auxiliarGeneral: { name: string };

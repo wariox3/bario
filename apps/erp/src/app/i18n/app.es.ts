@@ -4866,6 +4866,7 @@ export const es: AppDict = {
     informeCuentas: {
       generar: 'Generar',
       descuadre: 'El informe no cuadra',
+      paramsStale: 'Cambiaste los parámetros — generá de nuevo',
       params: {
         fechaDesde: 'Fecha desde',
         fechaHasta: 'Fecha hasta',
@@ -4895,6 +4896,7 @@ export const es: AppDict = {
         debito: 'Débito',
         credito: 'Crédito',
         saldoActual: 'Saldo actual',
+        saldoFinal: 'Saldo final',
         total: 'Total',
       },
       empty: {
@@ -4902,7 +4904,20 @@ export const es: AppDict = {
         noData: 'No hay movimientos para los parámetros seleccionados.',
       },
     },
-    balancePrueba: { name: 'Balance de prueba' },
+    balancePrueba: {
+      name: 'Balance de prueba',
+      params: { soloConSaldo: 'Solo cuentas con saldo' },
+      empty: {
+        notGenerated: {
+          title: 'Todavía no generaste el informe',
+          sub: 'Elegí el periodo y las cuentas, y generá para ver los saldos.',
+        },
+        noData: {
+          title: 'Sin movimientos en el periodo',
+          sub: 'Ninguna cuenta del rango movió entre esas fechas. Probá ampliar el periodo o desmarcar «solo cuentas con saldo».',
+        },
+      },
+    },
     balancePruebaContacto: { name: 'Balance de prueba por contacto' },
     auxiliarCuenta: { name: 'Auxiliar cuenta' },
     auxiliarGeneral: { name: 'Auxiliar general' },

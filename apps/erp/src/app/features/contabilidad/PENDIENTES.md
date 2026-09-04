@@ -19,6 +19,77 @@ Estado (2026-07-29): portados el **asiento contable** (documento tipo 13, §6), 
 (documento tipo 23, §7), el **cierre contable** (documento tipo 25, §8), la consulta de
 **movimientos** (§9) y la **conciliación bancaria** (§10).
 
+Estado (2026-09-04): el **balance de prueba** migró al contrato nuevo
+(`/contabilidad/movimiento-informe/`) y salió de la familia vieja. Ver §0. Los otros 8 informes
+siguen sobre `InformeCuentasService` y todo lo que dicen §1–§5 sobre ellos sigue vigente.
+
+---
+
+## 0. Balance de prueba — contrato nuevo (ya no es un supuesto)
+
+Confirmado contra el **schema del tenant**: `GET https://reddocapi.uk/api/schema/` con el header
+`X-Tenant: <slug>` sirve el OpenAPI del contenedor (sin el header cae al schema público, donde
+`/contabilidad/*` no existe). Ahí está declarado todo lo de abajo; no hace falta suponer nada.
+
+`/contabilidad/movimiento-informe/` es el **punto único de informes agregados** sobre el movimiento
+contable. Tres acciones con el **mismo body**:
+
+| Acción     | Qué devuelve                                   |
+| ---------- | ---------------------------------------------- |
+| `lista/`   | El informe **paginado** (`{ count, results }`) |
+| `excel/`   | El XLSX del informe completo                   |
+| `totales/` | Los totales de cuadre, sin paginar             |
+
+Body (`InformeContabilidadRequestRequest`):
+
+```json
+{
+  "informe": "balance_prueba",
+  "fecha_desde": "2026-09-01",
+  "fecha_hasta": "2026-09-30",
+  "solo_con_saldo": true,
+  "incluir_cierre": false,
+  "filtros": [
+    { "propiedad": "cuenta__codigo", "operador": ">=", "valor": "1105" },
+    { "propiedad": "cuenta__codigo", "operador": "<=", "valor": "1199", "operador_logico": "AND" }
+  ]
+}
+```
+
+Lo que dice el backend y define la página:
+
+- `informe`, `fecha_desde` y `fecha_hasta` son **obligatorios**. `informe` es un enum: hoy solo
+  `balance_prueba`, así que los otros 8 informes todavía no tienen a dónde migrar.
+- Los `filtros` son los **dinámicos genéricos** del ERP y se aplican **antes de agrupar**, así que
+  acotan por igual el saldo anterior y el movimiento del rango.
+- **No acepta `ordenamientos`**: el informe sale siempre por código de cuenta. Sobre un queryset
+  agrupado, ordenar por un campo fuera del `GROUP BY` cambiaría el agrupado en silencio y devolvería
+  una fila por movimiento sin que nadie lo note.
+- `solo_con_saldo` (default **`true`**) omite las cuentas que no movieron en el rango y llegan con
+  saldo anterior en cero. Reemplaza a `cuenta_con_movimiento`.
+- `incluir_cierre` **se manda igual**, aunque el schema no lo declare y el backend hoy lo ignore:
+  está confirmado que lo va a soportar (backend, 2026-09-04). Mandarlo desde ya evita tener que
+  volver a la pantalla cuando lo implementen.
+- **No hay PDF** en esta familia. El botón se apagó con `[showPdf]="false"`.
+
+Columnas de la fila (`ConMovimientoInformeBalance`), todas los montos como **string decimal**:
+`cuenta_id`, `cuenta_codigo`, `cuenta_nombre`, `saldo_anterior_debito`, `saldo_anterior_credito`,
+`saldo_anterior`, `debito`, `credito`, `saldo_final_debito`, `saldo_final_credito`, `saldo_final`.
+La tabla pinta la **vista compacta** (los netos); el desglose débito/crédito de saldo anterior y
+final queda para el Excel.
+
+| #   | Decisión                                                                     | Por qué                                                                                                                                                                             |
+| --- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | El informe **sale** de `InformeCuentasService` / `InformeCuentasPageBase`    | La base de la familia asume `{ parametros }` y el informe entero en una respuesta. Acá pagina y los totales vienen aparte: quedarse en la base obligaba a agujerearla por dentro    |
+| 2   | Tabla propia (`<app-balance-prueba-table>`), no `<app-saldos-cuenta-table>`  | El contrato renombró todas las columnas (`cuenta_codigo`, `saldo_final`…) y manda strings. Compartir la tabla sería un mapper de ida y vuelta para nada                             |
+| 3   | Panel de parámetros propio                                                   | El contrato renombró la segunda bandera (`cuenta_con_movimiento` → `solo_con_saldo`, ahora encendida por defecto). El panel compartido la ata por `formControlName` al nombre viejo |
+| 4   | Los totales del pie salen de `totales/`, no de sumar las filas               | Con el informe paginado, sumar lo recibido daría el total de la página. Justo el chequeo de cuadre es lo que no puede mentir                                                        |
+| 5   | `operador_logico` se sumó a `FilterCondition`/`BackendFilter` en `libs/core` | Es del contrato general de `lista/` (AND por defecto, evaluación secuencial), no de este informe. Se emite solo cuando la condición lo declara                                      |
+| 6   | El rango de cuentas lee `option.codigo` del selector                         | El filtro viaja por `cuenta__codigo`. `<app-cuenta-select>` ya expone el código suelto, así que acá no se recorta de la etiqueta como en los informes de §1.3                       |
+
+**Queda pendiente**: que backend sume el PDF (o confirmar que no va), y el resto del enum `informe`
+para migrar los otros 8.
+
 ---
 
 ## 1. Por confirmar con backend
@@ -113,7 +184,7 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 | Informe                        | Endpoint                               | Parámetros                              | Tabla                         | PDF |
 | ------------------------------ | -------------------------------------- | --------------------------------------- | ----------------------------- | --- |
-| Balance de prueba              | `informe-balance-prueba/`              | completos                               | saldos                        | sí  |
+| Balance de prueba              | `movimiento-informe/` (§0)             | periodo + banderas + filtros            | propia (paginada + totales)   | no  |
 | Balance de prueba por contacto | `informe-balance-prueba-tercero/`      | completos + `contacto`                  | saldos + tercero, sin totales | sí  |
 | Auxiliar de cuenta             | `informe-auxiliar-cuenta/`             | completos                               | saldos                        | sí  |
 | Auxiliar por contacto          | `informe-auxiliar-tercero/`            | completos + contacto/número/comprobante | saldos + tercero, sin totales | no  |

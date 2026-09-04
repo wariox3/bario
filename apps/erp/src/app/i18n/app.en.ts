@@ -4803,6 +4803,7 @@ export const en: AppDict = {
     informeCuentas: {
       generar: 'Generate',
       descuadre: 'Report does not balance',
+      paramsStale: 'You changed the parameters — generate again',
       params: {
         fechaDesde: 'Date from',
         fechaHasta: 'Date to',
@@ -4832,6 +4833,7 @@ export const en: AppDict = {
         debito: 'Debit',
         credito: 'Credit',
         saldoActual: 'Closing balance',
+        saldoFinal: 'Ending balance',
         total: 'Total',
       },
       empty: {
@@ -4839,7 +4841,20 @@ export const en: AppDict = {
         noData: 'No entries for the selected parameters.',
       },
     },
-    balancePrueba: { name: 'Trial balance' },
+    balancePrueba: {
+      name: 'Trial balance',
+      params: { soloConSaldo: 'Only accounts with balance' },
+      empty: {
+        notGenerated: {
+          title: 'Report not generated yet',
+          sub: 'Pick the period and the accounts, then generate to see the balances.',
+        },
+        noData: {
+          title: 'No movements in the period',
+          sub: 'No account in the range moved between those dates. Try widening the period or unchecking “only accounts with balance”.',
+        },
+      },
+    },
     balancePruebaContacto: { name: 'Trial balance by contact' },
     auxiliarCuenta: { name: 'Account ledger' },
     auxiliarGeneral: { name: 'General ledger' },

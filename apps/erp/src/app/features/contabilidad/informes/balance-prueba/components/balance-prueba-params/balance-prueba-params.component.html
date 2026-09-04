@@ -1,0 +1,71 @@
+@let d = t().entities.informeCuentas;
+@let bp = t().entities.balancePrueba;
+
+<form [formGroup]="form()" class="bp-params__grid">
+  <!-- Periodo. Obligatorio para el backend: acota el informe entero. -->
+  <div class="flex flex-col gap-1.5">
+    <label for="bp-fecha-desde" class="bp-params__label">{{ d.params.fechaDesde }}</label>
+    <p-datepicker
+      inputId="bp-fecha-desde"
+      formControlName="fecha_desde"
+      [showIcon]="true"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label for="bp-fecha-hasta" class="bp-params__label">{{ d.params.fechaHasta }}</label>
+    <p-datepicker
+      inputId="bp-fecha-hasta"
+      formControlName="fecha_hasta"
+      [showIcon]="true"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </div>
+
+  <!-- Rango de cuentas: viaja como filtros sobre cuenta__codigo. Vacío = todo el plan. -->
+  <div class="flex flex-col gap-1.5">
+    <label for="bp-cuenta-desde" class="bp-params__label">{{ d.params.cuentaDesde }}</label>
+    <app-cuenta-select
+      inputId="bp-cuenta-desde"
+      formControlName="cuenta_desde"
+      [placeholder]="d.params.cuentaPlaceholder"
+    />
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <label for="bp-cuenta-hasta" class="bp-params__label">{{ d.params.cuentaHasta }}</label>
+    <app-cuenta-select
+      inputId="bp-cuenta-hasta"
+      formControlName="cuenta_hasta"
+      [placeholder]="d.params.cuentaPlaceholder"
+    />
+  </div>
+
+  <!--
+    Banderas. `incluir_cierre` viaja aunque el backend todavía no lo mire: está
+    confirmado que lo va a soportar, y así el día que lo haga no hay que tocar
+    la pantalla.
+  -->
+  <div class="bp-params__flags">
+    <div class="flex items-center gap-2">
+      <p-checkbox inputId="bp-incluir-cierre" formControlName="incluir_cierre" [binary]="true" />
+      <label for="bp-incluir-cierre" class="text-sm">{{ d.params.incluirCierre }}</label>
+    </div>
+    <div class="flex items-center gap-2">
+      <p-checkbox inputId="bp-solo-con-saldo" formControlName="solo_con_saldo" [binary]="true" />
+      <label for="bp-solo-con-saldo" class="text-sm">{{ bp.params.soloConSaldo }}</label>
+    </div>
+  </div>
+</form>
+
+<!-- Errores del rango (validador a nivel de formulario) -->
+@if (form().touched || form().dirty) {
+  @if (form().hasError('rangoInvertido')) {
+    <p class="bp-params__error">{{ d.validation.rangoInvertido }}</p>
+  } @else if (form().hasError('anioDistinto')) {
+    <p class="bp-params__error">{{ d.validation.anioDistinto }}</p>
+  }
+}

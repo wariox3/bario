@@ -550,6 +550,70 @@ tabular-nums`. La **suma al pie**, tras `border-t-2 border-[rgba(20,48,73,0.12)]
 - **El parámetro recalculado sale de la propia respuesta** (`gen_asistente_datos_iniciales`), no de
   releer el endpoint de parámetros.
 
+## Patrón: informe paginado con totales de cuadre (tabla propia)
+
+`features/contabilidad/informes/balance-prueba/components/balance-prueba-table/` — cuando un
+informe **pagina** pero necesita una **fila de totales** que cubra el resultado entero.
+`<lib-data-table>` no la cubre, así que la tabla es propia; lo que **no** puede ser propio es el
+lenguaje visual, o el informe se lee como una isla dentro del ERP.
+
+Lo que hay que copiar de `<lib-data-table>`, y por qué:
+
+- **Encadenar el flex hasta el scrollport.** `:host { display:flex; flex-direction:column; flex:1;
+min-height:0; overflow:hidden }` y el wrapper con `flex:1; min-height:0; overflow:auto`.
+  **`flex: 1` en el host no es opcional:** `.list-shell__table` es un flex column con `flex:1` que
+  ocupa el alto de la card, y un hijo sin `flex` mide su contenido — la tabla queda pegada arriba y
+  el borde del recuadro dibuja un rectángulo vacío debajo. Con datos se disimula; **con el informe
+  vacío es lo único que se ve**. Fue un bug real (2026-09-04), heredado de `saldos-cuenta-table`,
+  donde no se notaba porque no había paginador debajo.
+- **Empty state que llena la caja**, no una línea en un `<td>`: `pi pi-inbox` (`1.4rem`, muted,
+  `opacity .5`) + título (`0.95rem/700 --brand-navy`) + pista (`0.8rem` muted, `max-width:280px`),
+  centrado con `padding: 4rem 1rem`. Para que llene el alto: `height:100%` en la tabla **solo
+  cuando está vacía** y `height:1px` en el `<th>` — en una tabla `height` es un mínimo, así que el
+  sobrante cae entero en la fila del empty state y el header no se infla.
+- **Dos vacíos distintos, dos copys distintos.** "Todavía no generaste" y "sin resultados" se leen
+  al revés: el primero pide una acción, el segundo dice que la acción ya se hizo y no había nada.
+  Un `generated: boolean` los separa. Y el copy va como `{ title, sub }` — la forma canónica de
+  todos los empty states del dict.
+- **Header sticky** `#f8f9fa` + `box-shadow: inset 0 -1px 0 rgba(19 38 60 / 0.1)` (no
+  `border-bottom`: con `border-collapse` el borde se despega al scrollear). Celdas `.6rem/.75rem`
+  (`th`) y `.55rem/.75rem` (`td`), `tabular-nums`, hover `rgba(19 38 60 / 0.02)`.
+- **Pie:** `border-top: 1px solid rgba(19 38 60 / 0.08)`, paginador **centrado** y contador
+  (`1–25 de 63 registros`) en `position:absolute; right` — mismo reparto que `lib-data-table`. El
+  contador va **fuera** del `<p-paginator>` (no por sus templates internos) para no acoplarse a la
+  estructura interna de PrimeNG; al paginador se le quita su caja (`padding:0; border:0;
+background:transparent`) porque el marco lo pone el pie.
+- **Totales sticky al fondo** (`position:sticky; bottom:0`) y **solo con filas**: un cuadre en `$ 0`
+  sobre un informe vacío no dice nada y compite con el empty state. Se resalta en rojo cuando
+  débito ≠ crédito — comparar dos cifras a ojo es justo lo que el informe evita.
+- **Los totales no se calculan sobre las filas.** Con el informe paginado, sumar lo recibido da el
+  total de la página. Vienen de su propia acción del backend (`totales/`).
+- **Cargando ≠ vaciar.** Al cambiar de página se atenúa lo que ya está (`opacity:.55;
+pointer-events:none`), no se parpadea la tabla entera. **No se atenúa el empty state**: no hay
+  nada que refrescar y el spinner del botón ya lo dice.
+- **Guard del paginador:** PrimeNG reemite `onPageChange` al reprogramarle `first`/`rows`; sin
+  `if (page === page() && pageSize === pageSize()) return;` cada respuesta dispara otra consulta.
+- **Sass:** las declaraciones sueltas van **antes** de cualquier regla anidada (`&--x`,
+  `&::-webkit-scrollbar`) o el build tira `mixed-decls`.
+
+## Patrón: aviso de resultado desactualizado (informe ya generado)
+
+Para una pantalla de **consultar → resultado** donde los parámetros pueden cambiar después de
+generar (informes contables). El problema: cambiás la fecha y la tabla sigue mostrando los números
+del rango anterior como si fueran vigentes — y la descarga de Excel **sí** sale con los parámetros
+nuevos, así que pantalla y archivo dejan de coincidir sin que nadie avise.
+
+- **No se limpia la tabla.** Quitarle a alguien los números que está leyendo por haber tocado un
+  campo es peor que el problema. Se avisa y listo.
+- **Aviso a la izquierda de la botonera**, empujado con `mr-auto` dentro del `justify-end`:
+  `pi pi-exclamation-circle` + texto en `text-[0.78rem] text-amber-700`.
+- **Ámbar, no rojo** — mismo criterio que el aviso de vencimiento: apartarse no es un error, es un
+  estado legítimo con una salida obvia (volver a generar). El rojo se reserva para lo imposible.
+- **El texto nombra la salida**, no el síntoma: «Cambiaste los parámetros — generá de nuevo».
+- **Mecánica:** un `signal` que enciende `form.valueChanges` (solo si ya se generó) y que la
+  consulta apaga. El aviso viaja como `input` opcional (`hint`) de la botonera compartida, con
+  `@if` — vacío no pinta nada y no cuesta ranura de `gap`.
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

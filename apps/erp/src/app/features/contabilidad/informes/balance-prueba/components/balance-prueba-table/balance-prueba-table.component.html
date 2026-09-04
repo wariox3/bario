@@ -1,0 +1,100 @@
+@let d = t().entities.informeCuentas;
+@let vacio = t().entities.balancePrueba.empty;
+@let lista = t().common.list;
+
+<div class="bp-table__wrapper" [class.bp-table__wrapper--loading]="loading() && !isEmpty()">
+  <!-- `--empty` estira la tabla para que el bloque "sin datos" llene el recuadro. -->
+  <table class="bp-table" [class.bp-table--empty]="isEmpty()">
+    <thead>
+      <tr>
+        <th class="bp-table__th w-28 text-left" scope="col">{{ d.columns.cuenta }}</th>
+        <th class="bp-table__th min-w-[16rem] text-left" scope="col">{{ d.columns.nombre }}</th>
+        <th class="bp-table__th w-40 text-right" scope="col">{{ d.columns.saldoAnterior }}</th>
+        <th class="bp-table__th w-40 text-right" scope="col">{{ d.columns.debito }}</th>
+        <th class="bp-table__th w-40 text-right" scope="col">{{ d.columns.credito }}</th>
+        <th class="bp-table__th w-40 text-right" scope="col">{{ d.columns.saldoFinal }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of rows(); track row.cuenta_id) {
+        <tr class="bp-table__row">
+          <td class="bp-table__td tabular-nums">{{ row.cuenta_codigo }}</td>
+          <td class="bp-table__td whitespace-normal">{{ row.cuenta_nombre }}</td>
+          <td class="bp-table__td text-right tabular-nums">
+            {{ formatMonto(row.saldo_anterior) }}
+          </td>
+          <td class="bp-table__td text-right tabular-nums">{{ formatMonto(row.debito) }}</td>
+          <td class="bp-table__td text-right tabular-nums">{{ formatMonto(row.credito) }}</td>
+          <td class="bp-table__td text-right tabular-nums">{{ formatMonto(row.saldo_final) }}</td>
+        </tr>
+      } @empty {
+        <!-- Mismo bloque que `<lib-data-table>`: ícono atenuado, título y pista. -->
+        @let copy = generated() ? vacio.noData : vacio.notGenerated;
+        <tr>
+          <td [attr.colspan]="columnCount" class="bp-table__empty-cell">
+            <div class="bp-table__empty">
+              <i class="pi pi-inbox bp-table__empty-icon"></i>
+              <p class="bp-table__empty-title">{{ copy.title }}</p>
+              <p class="bp-table__empty-sub">{{ copy.sub }}</p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+
+    <!--
+      Totales del informe completo (acción `totales/`), no de la página: con el
+      informe paginado, sumar lo que se ve no diría nada del cuadre. Si débito y
+      crédito no coinciden se resalta.
+    -->
+    @if (totalesVisibles(); as tot) {
+      <tfoot>
+        <tr>
+          <td class="bp-table__tf" colspan="2">
+            {{ d.columns.total }}
+            @if (descuadrado()) {
+              <span class="bp-table__warn" [title]="d.descuadre">
+                <i class="pi pi-exclamation-triangle"></i> {{ d.descuadre }}
+              </span>
+            }
+          </td>
+          <td class="bp-table__tf"></td>
+          <td
+            class="bp-table__tf text-right tabular-nums"
+            [class.bp-table__tf--warn]="descuadrado()"
+          >
+            {{ formatMonto(tot.debito) }}
+          </td>
+          <td
+            class="bp-table__tf text-right tabular-nums"
+            [class.bp-table__tf--warn]="descuadrado()"
+          >
+            {{ formatMonto(tot.credito) }}
+          </td>
+          <td class="bp-table__tf"></td>
+        </tr>
+      </tfoot>
+    }
+  </table>
+</div>
+
+<!--
+  Pie: paginador centrado y el contador pegado a la derecha, igual que
+  `<lib-data-table>`. El contador va fuera del `<p-paginator>` para no depender
+  de sus templates internos.
+-->
+@if (totalCount() > 0) {
+  <div class="bp-table__footer">
+    <p-paginator
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="page() * pageSize()"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      (onPageChange)="pageChange.emit($event)"
+    />
+    <span class="bp-table__count">
+      {{ rangeStart() }}–{{ rangeEnd() }} {{ lista.of }} {{ totalCount() }} {{ lista.records }}
+    </span>
+  </div>
+}
