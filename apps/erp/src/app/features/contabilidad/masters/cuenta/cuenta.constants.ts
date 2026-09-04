@@ -43,10 +43,10 @@ export const CUENTAS_COLUMNS: readonly ColumnDef[] = [
     align: 'center',
   },
   {
-    field: 'exige_grupo',
-    headerKey: 'entities.cuenta.columns.exigeGrupo',
+    field: 'exige_centro_costo',
+    headerKey: 'entities.cuenta.columns.exigeCentroCosto',
     type: 'boolean',
-    width: '110px',
+    width: '160px',
     align: 'center',
   },
   {

@@ -1026,7 +1026,7 @@ export interface AppDict
         movimiento: string;
         exigeBase: string;
         exigeContacto: string;
-        exigeGrupo: string;
+        exigeCentroCosto: string;
       };
       form: {
         createTitle: string;
@@ -1045,7 +1045,7 @@ export interface AppDict
           permiteMovimiento: string;
           exigeBase: string;
           exigeContacto: string;
-          exigeGrupo: string;
+          exigeCentroCosto: string;
         };
         validation: {
           required: string;

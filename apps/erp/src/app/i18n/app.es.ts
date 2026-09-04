@@ -1387,7 +1387,7 @@ export const es: AppDict = {
         movimiento: 'Movimiento',
         exigeBase: 'Exige base',
         exigeContacto: 'Exige contacto',
-        exigeGrupo: 'Exige grupo',
+        exigeCentroCosto: 'Exige centro de costo',
       },
       form: {
         createTitle: 'Nueva cuenta',
@@ -1412,7 +1412,7 @@ export const es: AppDict = {
           permiteMovimiento: 'Permite movimiento',
           exigeBase: 'Exige base',
           exigeContacto: 'Exige contacto',
-          exigeGrupo: 'Exige grupo',
+          exigeCentroCosto: 'Exige centro de costo',
         },
         validation: {
           required: 'Este campo es requerido',

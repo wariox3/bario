@@ -9,7 +9,7 @@ export interface Cuenta {
   readonly nombre: string;
   readonly exige_base: boolean;
   readonly exige_contacto: boolean;
-  readonly exige_grupo: boolean;
+  readonly exige_centro_costo: boolean;
   readonly permite_movimiento: boolean;
   readonly cuenta_clase: number | null;
   readonly cuenta_clase_nombre: string | null;
@@ -25,7 +25,7 @@ export interface CuentaPayload {
   readonly nombre: string;
   readonly exige_base: boolean;
   readonly exige_contacto: boolean;
-  readonly exige_grupo: boolean;
+  readonly exige_centro_costo: boolean;
   readonly permite_movimiento: boolean;
   readonly cuenta_clase: number | null;
   readonly cuenta_grupo: number | null;

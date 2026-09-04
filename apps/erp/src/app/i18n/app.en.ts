@@ -1351,7 +1351,7 @@ export const en: AppDict = {
         movimiento: 'Movement',
         exigeBase: 'Requires base',
         exigeContacto: 'Requires contact',
-        exigeGrupo: 'Requires group',
+        exigeCentroCosto: 'Requires cost center',
       },
       form: {
         createTitle: 'New account',
@@ -1376,7 +1376,7 @@ export const en: AppDict = {
           permiteMovimiento: 'Allows movement',
           exigeBase: 'Requires base',
           exigeContacto: 'Requires contact',
-          exigeGrupo: 'Requires group',
+          exigeCentroCosto: 'Requires cost center',
         },
         validation: {
           required: 'This field is required',

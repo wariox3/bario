@@ -12,6 +12,6 @@ export interface CuentaFormRawValue {
   readonly cuenta_cuenta: ErpSelectOption | null;
   readonly exige_base: boolean | null;
   readonly exige_contacto: boolean | null;
-  readonly exige_grupo: boolean | null;
+  readonly exige_centro_costo: boolean | null;
   readonly permite_movimiento: boolean | null;
 }

@@ -154,7 +154,7 @@ export class CuentaFormComponent implements OnInit {
     ),
     exige_base: this.fb.control<boolean>(false),
     exige_contacto: this.fb.control<boolean>(false),
-    exige_grupo: this.fb.control<boolean>(false),
+    exige_centro_costo: this.fb.control<boolean>(false),
     permite_movimiento: this.fb.control<boolean>(false),
   });
 
