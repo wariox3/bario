@@ -27,6 +27,7 @@ export type {
 export type { FilterField, FilterFieldType } from './types/filter-field.types';
 export type {
   FilterCondition,
+  FilterLogic,
   FilterOperator,
   ListQuery,
   ListResponse,

@@ -1,5 +1,11 @@
 import type { ParamValue } from '../../services/base-http.service';
-import type { FilterCondition, FilterOperator, ListQuery, SortSpec } from './list-query.types';
+import type {
+  FilterCondition,
+  FilterLogic,
+  FilterOperator,
+  ListQuery,
+  SortSpec,
+} from './list-query.types';
 
 /**
  * Serialización del `ListQuery` genérico al **body** que esperan los endpoints
@@ -73,6 +79,12 @@ export interface BackendFilter {
   readonly propiedad: string;
   readonly operador: string;
   readonly valor: string | number | boolean;
+  /**
+   * Cómo se encadena con el filtro anterior. El backend evalúa la lista en
+   * secuencia y asume `AND`, así que solo se emite cuando la condición lo
+   * declara — un `operador_logico` en el primer filtro no significa nada.
+   */
+  readonly operador_logico?: FilterLogic;
 }
 
 /**
@@ -90,6 +102,8 @@ function toBackendFilter(condition: FilterCondition): BackendFilter {
     propiedad: condition.field,
     operador: BACKEND_OPERATOR[condition.operator],
     valor: normalizeFilterValue(condition.value),
+    // Solo cuando la condición lo declara: la clave ausente ya significa `AND`.
+    ...(condition.logic ? { operador_logico: condition.logic } : {}),
   };
 }
 
