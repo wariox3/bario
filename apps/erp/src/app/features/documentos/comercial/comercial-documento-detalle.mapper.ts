@@ -158,8 +158,8 @@ export function comercialDetalleToFormValue(
     descuento: toFiniteNumber(read.porcentaje_descuento) ?? 0,
     impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
     impuestos_totales: (read.impuestos ?? []).map((imp) => {
-      // El backend guarda el monto sin signo. Si el serializer ya manda la
-      // operación, el signo sale de ahí; si no (hoy), queda como llegó y la
+      // El backend guarda el monto sin signo y manda la operación aparte, así
+      // que el signo sale de ahí. Si faltara, el monto queda como llegó y la
       // tabla de edición lo corrige contra el catálogo (`normalizarImpuestosLeidos`).
       const parsed = Math.round(parseFloat(imp.total ?? '0'));
       const total =
@@ -201,8 +201,7 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
     porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
     porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
-    // El serializador de pendientes aún no manda la operación: default suma
-    // (una retención importada quedaría positiva — gap del backend, reportado).
+    // La fila pendiente manda la operación; el default solo cubre su ausencia.
     operacion: imp.impuesto_operacion ?? 1,
   }));
   const base = (cantidad ?? 0) * precio;
