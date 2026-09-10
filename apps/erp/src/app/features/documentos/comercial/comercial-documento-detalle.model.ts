@@ -25,12 +25,10 @@ export interface ComercialDetalleRead extends DocumentoDetalleReadBase {
   readonly descuento?: string | number | null;
   readonly detalle?: string | null;
   /**
-   * Almacén de la línea. **Asunción de contrato**: `GenDocumentoDetalle` no la
-   * declara en el OpenAPI (verificado el 2026-09-03), así que hoy el backend la
-   * descarta en silencio al guardar y no vuelve en el read. El campo queda
-   * cableado para cuando el serializer lo sume; mientras tanto la columna se ve
-   * y se edita, pero no persiste. Mismo estado que el almacén de las líneas de
-   * inventario.
+   * Almacén de la línea. El backend lo persiste y lo devuelve junto a
+   * `almacen_nombre` (verificado contra la respuesta real el 2026-09-10; antes
+   * lo descartaba en silencio). Solo lo muestran los documentos que encienden la
+   * columna en sus tablas, editable y de solo lectura.
    */
   readonly almacen?: number | null;
   /** Nombre del almacén, para etiquetar el select al cargar en edición. */

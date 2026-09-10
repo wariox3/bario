@@ -188,11 +188,9 @@ export class ComercialDocumentoDetallesComponent {
 
   /**
    * Muestra la columna **Almacén** (el almacén por línea), a la derecha de ítem.
-   * Default `false`: solo la declara el documento que la necesita.
-   *
-   * Ojo: `GenDocumentoDetalle` todavía no tiene `almacen` en el OpenAPI, así que
-   * el backend lo descarta al guardar (ver la nota en `ComercialDetalleRead`).
-   * La columna se ve y se edita; persistirá cuando el serializer sume el campo.
+   * Default `false`: solo la declara el documento que la necesita. El documento
+   * que la encienda aquí debería encenderla también en la tabla de solo lectura
+   * de su ficha, para que se vea lo mismo que se editó.
    */
   readonly almacenEnabled = input<boolean>(false);
 

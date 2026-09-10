@@ -7,6 +7,9 @@
         <th class="comercial-detalle-table__th w-10 text-center">{{ c.columns.linea }}</th>
         <th class="comercial-detalle-table__th w-12 text-center">{{ c.columns.ref }}</th>
         <th class="comercial-detalle-table__th min-w-[16rem] text-left">{{ c.columns.item }}</th>
+        @if (almacenEnabled()) {
+          <th class="comercial-detalle-table__th w-36 text-left">{{ c.columns.almacen }}</th>
+        }
         <th class="comercial-detalle-table__th w-24 text-right">{{ c.columns.cantidad }}</th>
         <th class="comercial-detalle-table__th w-32 text-right">{{ c.columns.precio }}</th>
         <th class="comercial-detalle-table__th w-24 text-right">{{ c.columns.descuento }}</th>
@@ -48,6 +51,11 @@
           <td class="comercial-detalle-table__td font-medium text-brand-text">
             {{ line.item?.nombre || '—' }}
           </td>
+          @if (almacenEnabled()) {
+            <td class="comercial-detalle-table__td text-brand-text">
+              {{ line.almacen?.nombre || '—' }}
+            </td>
+          }
           <td class="comercial-detalle-table__td text-right tabular-nums">{{ line.cantidad }}</td>
           <td class="comercial-detalle-table__td text-right tabular-nums">
             {{ formatMoney(line.precio ?? 0) }}
@@ -82,7 +90,7 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="10" class="px-5 py-8 text-center text-sm text-brand-muted">
+          <td [attr.colspan]="columnCount()" class="px-5 py-8 text-center text-sm text-brand-muted">
             <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
           </td>
         </tr>

@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { I18nService, formatCop, type ImpuestoLinea } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { lineBruto, lineNeto } from '../../comercial-documento-detalle.mapper';
@@ -32,12 +32,23 @@ export class ComercialDocumentoLineasTableComponent {
   readonly linkable = input<boolean>(false);
 
   /**
+   * Muestra la columna **Almacén** (el almacén por línea), a la derecha de ítem.
+   * Default `false`: solo la declara el documento que la necesita, igual que en
+   * la tabla editable — y ambas deberían coincidir para que la ficha muestre lo
+   * mismo que se editó.
+   */
+  readonly almacenEnabled = input<boolean>(false);
+
+  /**
    * Id del **detalle base** a consultar en el modal de afectación: la propia línea
    * (clic en #) o su `documento_detalle_afectado` (clic en REF).
    */
   readonly verAfectacion = output<number>();
 
   protected readonly formatMoney = formatCop;
+
+  /** Columnas de la tabla, para el `colspan` del estado vacío: 10 fijas más la opcional. */
+  protected readonly columnCount = computed(() => 10 + (this.almacenEnabled() ? 1 : 0));
 
   /** Subtotal bruto de una línea por índice. */
   protected subtotalOf(index: number): number {
