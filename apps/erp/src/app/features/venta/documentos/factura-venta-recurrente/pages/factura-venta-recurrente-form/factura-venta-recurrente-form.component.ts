@@ -53,6 +53,7 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import {
   facturaVentaRecurrenteToFormValue,
   formValueToPayload,
@@ -192,6 +193,11 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
       origen: 'cliente',
       destroyRef: this.destroyRef,
     });
+  }
+
+  /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
+  protected precioListaId(): number | null {
+    return precioListaDeContacto(this.form.controls.contacto.value);
   }
 
   ngOnInit(): void {

@@ -49,6 +49,7 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { SEDE_ENDPOINT } from '../../remision.constants';
 import { remisionToFormValue, formValueToPayload } from '../../remision.mapper';
 import type { RemisionRead } from '../../remision.model';
@@ -155,6 +156,11 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
+
+  /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
+  protected precioListaId(): number | null {
+    return precioListaDeContacto(this.form.controls.contacto.value);
+  }
 
   ngOnInit(): void {
     const id = this.id();

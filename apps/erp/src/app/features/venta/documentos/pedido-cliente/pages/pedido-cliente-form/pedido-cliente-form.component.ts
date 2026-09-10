@@ -44,6 +44,7 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { pedidoClienteToFormValue, formValueToPayload } from '../../pedido-cliente.mapper';
 import type { PedidoClienteRead } from '../../pedido-cliente.model';
 
@@ -140,6 +141,11 @@ export class PedidoClienteFormComponent implements OnInit, CanComponentDeactivat
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
+
+  /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
+  protected precioListaId(): number | null {
+    return precioListaDeContacto(this.form.controls.contacto.value);
+  }
 
   ngOnInit(): void {
     const id = this.id();

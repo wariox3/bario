@@ -92,6 +92,16 @@ export interface DocumentoReadBase extends DocumentoEstados {
    * edición (`identificación - nombre`, ver `documentoContactoToOption`).
    */
   readonly contacto_numero_identificacion?: string | null;
+  /**
+   * Lista de precios pactada con el contacto. Es el mismo dato que
+   * `contacto/seleccionar/` expone como `precio_id`; el documento lo serializa
+   * con el prefijo del FK. Al editar, la tabla de líneas lo necesita para
+   * cotizar un ítem nuevo contra la lista del cliente sin re-elegir el contacto
+   * (ver `documentoContactoToOption` y `precioListaDeContacto`).
+   */
+  readonly contacto_precio_id?: number | null;
+  /** Nombre de esa lista de precios (`"mundialista"`). Informativo. */
+  readonly contacto_precio_nombre?: string | null;
   /** Fecha en formato `yyyy-MM-dd`. */
   readonly fecha: string | null;
 }

@@ -246,6 +246,7 @@
         [detalles]="form.controls.detalles"
         [documentId]="documentId()"
         [contactoId]="form.controls.contacto.value?.id ?? null"
+        [precioListaId]="precioListaId()"
         (imported)="onImported()"
       />
     </div>
