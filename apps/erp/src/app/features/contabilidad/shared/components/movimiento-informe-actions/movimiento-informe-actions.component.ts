@@ -76,10 +76,10 @@ export class MovimientoInformeActionsComponent {
   readonly canExport = input<boolean>(false);
 
   /**
-   * Ofrecer la descarga en PDF. Lo alimenta `soportaPdf` de la página base, que
-   * hoy está apagado en los nueve informes: la familia todavía no sirve `pdf/`.
-   * Se declara por informe y no de una vez porque el ERP anterior solo imprimía
-   * algunos, y dejaba el botón puesto sin efecto en el resto.
+   * Ofrecer la descarga en PDF. Lo alimenta `soportaPdf` de la página base, hoy
+   * encendido solo en el certificado de retención: la acción `pdf/` responde
+   * 400 a los otros ocho informes. Se declara por informe y no de una vez
+   * porque el ERP anterior dejaba el botón puesto sin efecto en el resto.
    */
   readonly showPdf = input<boolean>(true);
 

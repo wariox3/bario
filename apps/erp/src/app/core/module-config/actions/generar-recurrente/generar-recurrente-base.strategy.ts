@@ -24,7 +24,7 @@ const DESTINO_POR_RECURRENTE: Readonly<Record<number, number>> = {
 
 /**
  * Base de las acciones que generan facturas reales desde **plantillas
- * recurrentes** vía `POST general/documento/generar/`.
+ * recurrentes** vía `POST general/documento/generar-recurrente/`.
  *
  * Concentra todo lo que las variantes comparten —resolver el destino, abrir el
  * modal de período (lazy), armar el POST, los toasts y el reload— y deja a cada
@@ -34,8 +34,8 @@ const DESTINO_POR_RECURRENTE: Readonly<Record<number, number>> = {
  *  - `modalTexts()`: los textos de su modal (una llama a "las seleccionadas",
  *    la otra advierte que toma todas).
  *  - `resolveScope(ctx)`: el alcance. Devuelve los `documento_ids` a mandar, o
- *    `'todos'` para omitir el campo (el backend toma todas las del tipo), o
- *    `null` para abortar sin HTTP habiendo ya avisado por toast.
+ *    `'todos'` para mandarlos vacíos (el backend toma todas las del tipo de
+ *    origen), o `null` para abortar sin HTTP habiendo ya avisado por toast.
  *
  * No lleva `@Injectable()`: es abstracta y nunca se provee; las subclases sí.
  */
@@ -59,8 +59,9 @@ export abstract class GenerarRecurrenteBaseStrategy implements EntityActionStrat
 
   /**
    * Alcance de la generación:
-   *  - `readonly number[]` → se manda como `documento_ids`.
-   *  - `'todos'` → se omite `documento_ids`; el backend toma todas las del tipo.
+   *  - `readonly number[]` → se manda como `documento_ids`, que acota la
+   *    selección del tipo de origen a esas plantillas.
+   *  - `'todos'` → `documento_ids` vacío; el backend toma todas las del tipo.
    *  - `null` → no se genera (la subclase ya avisó por qué).
    */
   protected abstract resolveScope(ctx: EntityActionContext): readonly number[] | 'todos' | null;
@@ -102,18 +103,18 @@ export abstract class GenerarRecurrenteBaseStrategy implements EntityActionStrat
         this.generating = true;
         return this.api
           .generar({
-            documento_tipo_id: origen,
-            documento_tipo_id_destino: destino,
-            // Omitir el campo es lo que significa "todas las del tipo": mandarlo
-            // vacío sería una selección vacía, otra cosa.
-            ...(scope === 'todos' ? {} : { documento_ids: scope }),
+            documento_tipo_origen: origen,
+            documento_tipo_destino: destino,
+            // El tipo de origen ya delimita "todas las del tipo"; los ids solo
+            // acotan esa selección, así que vacío es justamente el alcance total.
+            documento_ids: scope === 'todos' ? [] : scope,
             mes: periodo.getMonth() + 1,
             anio: periodo.getFullYear(),
           })
           .pipe(
             tap((res) => {
               this.generating = false;
-              if (res.count === 0) {
+              if (res.generados === 0) {
                 this.toast.info(dict.empty.title, this.emptyDesc());
                 return;
               }

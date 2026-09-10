@@ -159,30 +159,28 @@ nombre, su archivo y qué bloques de columnas enciende (`showContacto`, `showMov
 
 ### Queda pendiente
 
-- [ ] **Pedirle al backend la acción `POST /contabilidad/movimiento-informe/pdf/`** (2026-09-09).
-      Simétrica a `excel/`: mismo `InformeContabilidadRequestRequest` de body, respuesta
-      `application/pdf` con `Content-Disposition`. Verificado contra
-      `GET https://reddocapi.uk/api/contenedor/schema/`: la acción no existe y la única respuesta
-      PDF de todo el schema del tenant es `/general/documento/imprimir/`, que es para documentos.
+- [x] **La acción `POST /contabilidad/movimiento-informe/pdf/`** — publicada por el backend y
+      encendida en el front (2026-09-10). Quedó como acción aparte, con el mismo
+      `InformeContabilidadRequestRequest` de body que `lista/` y `excel/`, y respuesta
+      `application/pdf`.
 
-      Quien lo necesita es el **certificado de retención**, el único de los nueve que en el ERP
-      anterior imprimía de verdad: pegaba a `contabilidad/movimiento/informe-certificado-retencion/`
-      (API vieja, `reddocapi.xyz`) con `pdf: true` y los mismos parámetros de la consulta. Ese
-      endpoint no existe en la API nueva.
+      Las cuatro dudas que la bloqueaban las cerró el propio schema:
 
-      Lo que hay que aclarar con ellos, porque cambia la pantalla:
+      1. Es una **acción aparte**, no una bandera de formato en el body.
+      2. Es el **certificado fiscal**, no la tabla impresa: el backend arma **una hoja por tercero**.
+      3. Por eso el tercero **sigue siendo opcional**: acotado sale ese certificado, en blanco salen
+         todos los del periodo en un mismo archivo. El botón no depende del formulario.
+      4. Aplica **solo a `certificado_retencion`**; los otros ocho informes responden 400.
 
-      1. Si prefieren una bandera de formato en el body en vez de una acción aparte.
-      2. Si el PDF es la tabla del informe impresa o el **certificado fiscal formal** por tercero
-         (emisor, periodo, firma). El nombre sugiere lo segundo.
-      3. Si es lo segundo, qué pasa **sin `contacto_id`**: un PDF por tercero, uno solo con todos, o
-         el tercero pasa a ser obligatorio. En ese caso el botón deja de ser un flag y pasa a
-         depender del formulario.
-      4. Si la acción aplica a los nueve informes o solo a este.
+      En el front fue encender `soportaPdf` en la página del certificado: la descarga ya estaba
+      armada (`pdfUrl` en el servicio, `exportPdf()` e `isExportingPdf` en la page base, los nueve
+      templates enlazados). El botón se ofrece sobre un informe ya generado, a diferencia del ERP
+      anterior, que lo dejaba activo desde el vamos.
 
-      El front ya está listo: `pdfUrl` en `MovimientoInformeService`, `exportPdf()` y
-      `isExportingPdf` en la page base, y los nueve templates enlazados. Encenderlo es poner
-      `soportaPdf` en `true` en el informe que el backend confirme.
+      La consulta no cambió: el ERP anterior mandaba a
+      `contabilidad/movimiento/informe-certificado-retencion/` los mismos parámetros que se mandan
+      hoy —periodo, rango de cuentas por código y tercero—, y qué movimientos y qué cuentas de
+      retención entran lo decide el backend, no la pantalla.
 
 - [ ] **Confirmar la forma de la fila de `auxiliar_general` contra el API real.** El schema solo
       declara `ConMovimientoInformeBalance` (drf-spectacular emitió únicamente el serializer por
@@ -223,7 +221,6 @@ nombre, su archivo y qué bloques de columnas enciende (`showContacto`, `showMov
 - [ ] **Paginar un árbol.** Con 25 filas por página, la página 2 puede empezar a mitad de una cuenta,
       sin las filas de subtotal que le dan contexto. Falta decidir si se resuelve en el front
       (repetir la cabecera del auxiliar en curso) o si backend puede paginar por auxiliar.
-- [ ] Que backend sume el PDF, o confirmar que no va.
 - [ ] **Que `auxiliar_cuenta` sume `comprobante` y `numero`.** Hoy sus filas de detalle solo traen
       `movimiento_id`, así que un asiento se identifica por su id de base de datos y nada más. La
       pantalla enciende la columna del id para que al menos se pueda buscar en la consulta de
@@ -332,7 +329,7 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 | Auxiliar por contacto          | `movimiento-informe/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
 | Auxiliar general               | `movimiento-informe/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
 | Base                           | `movimiento-informe/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | no  |
-| Certificado de retención       | `movimiento-informe/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | no  |
+| Certificado de retención       | `movimiento-informe/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | sí  |
 | Estado de resultados           | `movimiento-informe/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
 | Estado de situación financiera | `movimiento-informe/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
 

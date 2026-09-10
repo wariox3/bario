@@ -14,7 +14,7 @@ import {
  * de venta) desde la que se generan facturas reales; `inventoryEffect:'outflow'`
  * es solo metadata. El gateway inyecta `documento_tipo_id` desde este config.
  *
- * Genera facturas de venta reales vía `POST general/documento/generar/`
+ * Genera facturas de venta reales vía `POST general/documento/generar-recurrente/`
  * (origen 16 → destino 1) en dos variantes, ambas en el dropdown "Acciones" y
  * ambas piden el período: "Generar todos" (todas las plantillas del tipo) y
  * "Generar seleccionados" (solo las marcadas). Las dos strategies las comparte

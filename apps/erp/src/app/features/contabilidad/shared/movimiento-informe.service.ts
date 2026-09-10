@@ -9,8 +9,8 @@ import type {
 /**
  * Punto único de informes agregados sobre el movimiento contable. Sirve tres
  * acciones con el **mismo body**: `lista/` (paginada), `excel/` y `totales/`.
- * La cuarta, `pdf/`, está pedida al backend y todavía no existe: ver
- * `pdfUrl`.
+ * La cuarta, `pdf/`, comparte el body pero **solo la sirve el certificado de
+ * retención**: ver `pdfUrl`.
  */
 export const MOVIMIENTO_INFORME_ENDPOINT = '/contabilidad/movimiento-informe/';
 
@@ -39,14 +39,10 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
   /**
    * URL de la impresión en PDF, simétrica a `excel/`: mismo verbo y mismo body.
    *
-   * TODO(backend): la acción **todavía no existe**. El OpenAPI del contenedor
-   * (`GET /contenedor/schema/`) declara solo `lista/`, `excel/` y `totales/`, y
-   * el body (`InformeContabilidadRequestRequest`) no admite bandera de formato.
-   * Está pedida al backend con esta forma; hasta que responda, el botón vive
-   * apagado (ningún informe pone `soportaPdf` en `true`) y esta URL no se pega.
-   * El ERP anterior lo resolvía en el endpoint viejo
-   * `contabilidad/movimiento/informe-certificado-retencion/` con `pdf: true`
-   * en el body.
+   * La acción existe pero **no es de la familia entera**: solo acepta
+   * `certificado_retencion` —del que devuelve una hoja por tercero— y responde
+   * 400 a los otros ocho informes. Por eso el botón se enciende informe por
+   * informe con `soportaPdf` y no de una vez en la botonera.
    */
   readonly pdfUrl = `${MOVIMIENTO_INFORME_ENDPOINT}pdf/`;
 
