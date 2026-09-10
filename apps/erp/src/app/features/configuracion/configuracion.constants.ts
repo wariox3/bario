@@ -26,12 +26,13 @@ export const HUMANO_CAMPOS = [
 // ── Área Empresa (datos de la empresa) ────────────────────────────────────────
 
 /**
- * Campos de los datos de empresa. Los pide el paso «Datos de la empresa» del
- * asistente de facturación electrónica; la pestaña de Configuración todavía no
- * está habilitada.
+ * Campos de los datos de empresa. Los piden sus dos hogares: la página «Mi
+ * empresa» (`/t/:slug/empresa`) y el paso «Datos de la empresa» del asistente de
+ * facturación electrónica.
  */
 export const EMPRESA_CAMPOS = [
   'gen_empresa_razon_social',
+  'gen_empresa_nombre_corto',
   'gen_empresa_tipo_persona',
   'gen_empresa_identificacion',
   'gen_empresa_numero_identificacion',

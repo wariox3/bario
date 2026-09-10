@@ -34,10 +34,12 @@
       [exportingExcel]="isExportingExcel()"
       [busy]="isBusy()"
       [canExport]="canExport()"
-      [showPdf]="false"
+      [showPdf]="soportaPdf"
+      [exportingPdf]="isExportingPdf()"
       [hint]="hint()"
       (generar)="generar()"
       (excel)="exportExcel()"
+      (pdf)="exportPdf()"
     />
   </app-movimiento-informe-params>
 

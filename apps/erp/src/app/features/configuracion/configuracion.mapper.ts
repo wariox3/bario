@@ -60,6 +60,7 @@ export function humanoFormToPayload(form: HumanoConfigFormValue): ConfiguracionP
 
 export interface EmpresaConfigFormValue {
   readonly razon_social: string;
+  readonly nombre_corto: string;
   readonly tipo_persona: ErpSelectOption | null;
   readonly identificacion: ErpSelectOption | null;
   readonly numero_identificacion: string;
@@ -70,22 +71,27 @@ export interface EmpresaConfigFormValue {
   readonly correo: string;
 }
 
+/**
+ * `ciudad` llega por separado porque la configuración solo guarda su id, y
+ * resolverlo cuesta una petición al catálogo (`CiudadService.byId`). Sin ella el
+ * campo conserva el id igual —guardar sin tocarlo no la borra— pero el
+ * autocomplete abre en blanco: arma su etiqueta desde el propio valor.
+ */
 export function configuracionToEmpresaForm(
   config: Partial<ConfiguracionRead>,
+  ciudad?: Ciudad | null,
 ): EmpresaConfigFormValue {
   return {
     razon_social: config.gen_empresa_razon_social ?? '',
+    nombre_corto: config.gen_empresa_nombre_corto ?? '',
     tipo_persona: optionFromId(config.gen_empresa_tipo_persona),
     identificacion: optionFromId(config.gen_empresa_identificacion),
     numero_identificacion: config.gen_empresa_numero_identificacion ?? '',
     digito_verificacion: config.gen_empresa_digito_verificacion ?? '',
     direccion: config.gen_empresa_direccion ?? '',
-    // Solo llega el id: `GenConfiguracion` todavía no manda el nombre de la
-    // ciudad ni el del departamento, así que el autocomplete abre en blanco
-    // aunque haya ciudad guardada. El id viaja igual en el objeto, de modo que
-    // guardar sin tocar el campo no la borra. Ver el TODO del template.
     ciudad:
-      config.gen_empresa_ciudad != null ? { id: config.gen_empresa_ciudad, nombre: '' } : null,
+      ciudad ??
+      (config.gen_empresa_ciudad != null ? { id: config.gen_empresa_ciudad, nombre: '' } : null),
     telefono: config.gen_empresa_telefono ?? '',
     correo: config.gen_empresa_correo ?? '',
   };
@@ -94,6 +100,10 @@ export function configuracionToEmpresaForm(
 export function empresaFormToPayload(form: EmpresaConfigFormValue): ConfiguracionPayload {
   return {
     gen_empresa_razon_social: form.razon_social.trim() || null,
+    // Sin `|| null` como sus vecinos: la columna no es nulable en el schema del
+    // contenedor, así que un nulo vuelve como 400. En blanco no llega —el campo
+    // es obligatorio— pero el payload no depende de esa suerte.
+    gen_empresa_nombre_corto: form.nombre_corto.trim(),
     gen_empresa_tipo_persona: form.tipo_persona?.id ?? null,
     gen_empresa_identificacion: form.identificacion?.id ?? null,
     gen_empresa_numero_identificacion: form.numero_identificacion.trim() || null,

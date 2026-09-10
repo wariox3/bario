@@ -9,6 +9,8 @@ import type {
 /**
  * Punto único de informes agregados sobre el movimiento contable. Sirve tres
  * acciones con el **mismo body**: `lista/` (paginada), `excel/` y `totales/`.
+ * La cuarta, `pdf/`, está pedida al backend y todavía no existe: ver
+ * `pdfUrl`.
  */
 export const MOVIMIENTO_INFORME_ENDPOINT = '/contabilidad/movimiento-informe/';
 
@@ -33,6 +35,20 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
 
   /** URL de la descarga de Excel (la usa `FileDownloadService`). */
   readonly exportUrl = `${MOVIMIENTO_INFORME_ENDPOINT}excel/`;
+
+  /**
+   * URL de la impresión en PDF, simétrica a `excel/`: mismo verbo y mismo body.
+   *
+   * TODO(backend): la acción **todavía no existe**. El OpenAPI del contenedor
+   * (`GET /contenedor/schema/`) declara solo `lista/`, `excel/` y `totales/`, y
+   * el body (`InformeContabilidadRequestRequest`) no admite bandera de formato.
+   * Está pedida al backend con esta forma; hasta que responda, el botón vive
+   * apagado (ningún informe pone `soportaPdf` en `true`) y esta URL no se pega.
+   * El ERP anterior lo resolvía en el endpoint viejo
+   * `contabilidad/movimiento/informe-certificado-retencion/` con `pdf: true`
+   * en el body.
+   */
+  readonly pdfUrl = `${MOVIMIENTO_INFORME_ENDPOINT}pdf/`;
 
   /**
    * Body común a las tres acciones. Público porque la descarga la dispara la

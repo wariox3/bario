@@ -26,7 +26,7 @@
     />
   </div>
 } @else {
-  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+  <form [formGroup]="form" (ngSubmit)="guardar()" libFocusInvalid class="flex flex-col gap-5">
     <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
       <!-- ── Grupo: identidad ──────────────────────────────────────────────── -->
       <div
@@ -45,7 +45,7 @@
         </p>
 
         <div class="mt-4 grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-          <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <div class="flex flex-col gap-1.5">
             <label
               for="razon_social"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
@@ -68,6 +68,90 @@
 
           <div class="flex flex-col gap-1.5">
             <label
+              for="nombre_corto"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ t().configuracion.empresa.fields.nombreCorto }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <input
+              pInputText
+              id="nombre_corto"
+              formControlName="nombre_corto"
+              fluid
+              [invalid]="form.controls.nombre_corto.invalid && form.controls.nombre_corto.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.nombre_corto"
+              [messages]="{ required: t().configuracion.empresa.validation.required }"
+            />
+          </div>
+
+          <!--
+              Identificación en un solo campo: tipo · número · DV son un mismo
+              identificador, y el DV es **un** dígito que no justifica su propia
+              celda de la grilla. Mismo idioma que el form de contacto, que ya
+              pega el DV al número; acá se le suma el tipo, que sin el número al
+              lado no dice nada. El DV va deshabilitado porque lo calcula el
+              número, y cada control lleva su `aria-label` porque el rótulo
+              visible nombra al conjunto, no a ninguna de las tres partes.
+            -->
+          <div role="group" aria-labelledby="grupo-doc" class="flex flex-col gap-1.5">
+            <span
+              id="grupo-doc"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ t().configuracion.empresa.fields.identificacionGroup }}
+              <span class="ml-px text-red-500">*</span>
+            </span>
+            <div class="flex gap-2">
+              <div class="w-60 shrink-0">
+                <lib-api-select
+                  inputId="identificacion"
+                  formControlName="identificacion"
+                  [endpoint]="endpoints.identificacion"
+                  [ariaLabel]="t().configuracion.empresa.fields.identificacion"
+                  [invalid]="
+                    form.controls.identificacion.invalid && form.controls.identificacion.touched
+                  "
+                />
+              </div>
+              <input
+                pInputText
+                id="numero_identificacion"
+                formControlName="numero_identificacion"
+                class="min-w-0 flex-1"
+                fluid
+                [attr.aria-label]="t().configuracion.empresa.fields.numeroIdentificacion"
+                [invalid]="
+                  form.controls.numero_identificacion.invalid &&
+                  form.controls.numero_identificacion.touched
+                "
+              />
+              <input
+                pInputText
+                id="digito_verificacion"
+                formControlName="digito_verificacion"
+                class="w-16 text-center"
+                [attr.aria-label]="t().configuracion.empresa.fields.digitoVerificacion"
+                [title]="t().configuracion.empresa.fields.digitoVerificacion"
+              />
+            </div>
+            <lib-field-error
+              [control]="form.controls.identificacion"
+              [messages]="{ required: t().configuracion.empresa.validation.required }"
+            />
+            <lib-field-error
+              [control]="form.controls.numero_identificacion"
+              [messages]="{
+                required: t().configuracion.empresa.validation.required,
+                pattern: t().configuracion.empresa.validation.onlyDigits,
+              }"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
               for="tipo_persona"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >
@@ -83,70 +167,6 @@
             <lib-field-error
               [control]="form.controls.tipo_persona"
               [messages]="{ required: t().configuracion.empresa.validation.required }"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label
-              for="identificacion"
-              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
-            >
-              {{ t().configuracion.empresa.fields.identificacion }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <lib-api-select
-              inputId="identificacion"
-              formControlName="identificacion"
-              [endpoint]="endpoints.identificacion"
-              [invalid]="
-                form.controls.identificacion.invalid && form.controls.identificacion.touched
-              "
-            />
-            <lib-field-error
-              [control]="form.controls.identificacion"
-              [messages]="{ required: t().configuracion.empresa.validation.required }"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label
-              for="numero_identificacion"
-              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
-            >
-              {{ t().configuracion.empresa.fields.numeroIdentificacion }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <input
-              pInputText
-              id="numero_identificacion"
-              formControlName="numero_identificacion"
-              fluid
-              [invalid]="
-                form.controls.numero_identificacion.invalid &&
-                form.controls.numero_identificacion.touched
-              "
-            />
-            <lib-field-error
-              [control]="form.controls.numero_identificacion"
-              [messages]="{
-                required: t().configuracion.empresa.validation.required,
-                pattern: t().configuracion.empresa.validation.onlyDigits,
-              }"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label
-              for="digito_verificacion"
-              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
-            >
-              {{ t().configuracion.empresa.fields.digitoVerificacion }}
-            </label>
-            <input
-              pInputText
-              id="digito_verificacion"
-              formControlName="digito_verificacion"
-              fluid
             />
           </div>
         </div>
@@ -169,7 +189,7 @@
         </p>
 
         <div class="mt-4 grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-          <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <div class="flex flex-col gap-1.5">
             <label
               for="direccion"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
@@ -222,26 +242,6 @@
 
           <div class="flex flex-col gap-1.5">
             <label
-              for="telefono"
-              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
-            >
-              {{ t().configuracion.empresa.fields.telefono }}
-            </label>
-            <input
-              pInputText
-              id="telefono"
-              formControlName="telefono"
-              fluid
-              [invalid]="form.controls.telefono.invalid && form.controls.telefono.touched"
-            />
-            <lib-field-error
-              [control]="form.controls.telefono"
-              [messages]="{ pattern: t().configuracion.empresa.validation.onlyDigits }"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label
               for="correo"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >
@@ -264,12 +264,33 @@
               }"
             />
           </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="telefono"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ t().configuracion.empresa.fields.telefono }}
+            </label>
+            <input
+              pInputText
+              id="telefono"
+              formControlName="telefono"
+              fluid
+              [invalid]="form.controls.telefono.invalid && form.controls.telefono.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.telefono"
+              [messages]="{ pattern: t().configuracion.empresa.validation.onlyDigits }"
+            />
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Acciones -->
-    @if (!readonly()) {
+    <!-- Acciones propias. El host que pone las suyas (un modal con su pie) las
+         apaga con `hideActions` y guarda llamando a `guardar()`. -->
+    @if (!readonly() && !hideActions()) {
       <div class="flex items-center justify-end gap-3 pb-1">
         @if (form.dirty) {
           <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
@@ -282,7 +303,7 @@
           [label]="submitLabel() ?? t().configuracion.actions.save"
           icon="pi pi-check"
           [loading]="isSaving()"
-          [disabled]="form.invalid || isSaving()"
+          [disabled]="isSaving()"
         />
       </div>
     }

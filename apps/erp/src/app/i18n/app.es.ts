@@ -261,6 +261,7 @@ export const es: AppDict = {
       label: 'Menú de usuario',
       myContainers: 'Mis contenedores',
       manageAccount: 'Gestionar cuenta',
+      myCompany: 'Mi empresa',
       security: 'Seguridad',
       settings: 'Configuración',
       logout: 'Cerrar sesión',
@@ -3929,8 +3930,10 @@ export const es: AppDict = {
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {
         linea: '#',
+        id: 'Id',
         numero: 'Número',
         documento: 'Documento',
+        documentoTipo: 'Documento tipo',
         cuenta: 'Cuenta',
         contacto: 'Contacto',
         naturaleza: 'Naturaleza',
@@ -6455,7 +6458,9 @@ export const es: AppDict = {
       },
       fields: {
         razonSocial: 'Razón social',
+        nombreCorto: 'Nombre corto',
         tipoPersona: 'Tipo de persona',
+        identificacionGroup: 'Identificación',
         identificacion: 'Tipo de identificación',
         numeroIdentificacion: 'Número de identificación',
         digitoVerificacion: 'Dígito de verificación',
@@ -6483,6 +6488,41 @@ export const es: AppDict = {
       loadError: {
         title: 'Error al cargar',
         desc: 'No pudimos traer la configuración de la empresa.',
+      },
+    },
+  },
+  empresa: {
+    title: 'Mi empresa',
+    subtitle: 'Identidad de la empresa: lo que sale impreso en cada documento.',
+    groups: {
+      logotipo: 'Logotipo',
+      identificacion: 'Identificación',
+      contacto: 'Contacto y ubicación',
+    },
+    dialog: {
+      title: 'Editar datos de la empresa',
+      subtitle: 'El logotipo se cambia desde la ficha.',
+    },
+    logo: {
+      formats: 'PNG, JPG o WEBP, hasta 5 MB.',
+      alt: 'Logotipo de la empresa',
+      toasts: {
+        uploadSuccess: {
+          title: 'Logotipo actualizado',
+          desc: 'El logotipo se guardó correctamente.',
+        },
+        uploadError: {
+          title: 'Error al subir',
+          desc: 'No pudimos guardar el logotipo. Intentá de nuevo.',
+        },
+        removeSuccess: {
+          title: 'Logotipo eliminado',
+          desc: 'Los documentos vuelven a salir sin logotipo.',
+        },
+        removeError: {
+          title: 'Error al eliminar',
+          desc: 'No pudimos quitar el logotipo. Intentá de nuevo.',
+        },
       },
     },
   },

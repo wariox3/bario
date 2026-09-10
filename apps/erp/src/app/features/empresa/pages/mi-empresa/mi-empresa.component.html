@@ -1,0 +1,187 @@
+<!--
+  Mi empresa — ficha de detalle en grupos (patrón del sistema).
+
+  Una sola card con tres columnas lado a lado: el logotipo abre a la izquierda,
+  porque es el "quién es esta empresa" antes que cualquier campo, y a la derecha
+  los datos repartidos en identificación y contacto. Lado a lado el alto de la
+  card es el del grupo más alto, no la suma; apilado en móvil el mismo filete
+  pasa a horizontal.
+
+  Ningún campo se oculta: el que no tiene valor se pinta con «—» atenuado, para
+  que la ficha conserve siempre la misma forma y se pueda leer por posición.
+-->
+<header class="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+  <div class="min-w-0 flex-1">
+    <h1 class="m-0 text-[1.35rem] leading-tight font-bold tracking-[-0.02em] text-brand-navy">
+      {{ t().empresa.title }}
+    </h1>
+    <p class="m-0 mt-1.5 text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ t().empresa.subtitle }}
+    </p>
+  </div>
+
+  @if (!loading() && !loadFailed()) {
+    <p-button
+      type="button"
+      [label]="t().common.actions.edit"
+      icon="pi pi-pencil"
+      size="small"
+      (onClick)="onEdit()"
+    />
+  }
+</header>
+
+<app-empresa-edit-dialog [(visible)]="editVisible" (saved)="cargar()" />
+
+@if (loading()) {
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (loadFailed()) {
+  <div
+    class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
+  >
+    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+    <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.toasts.loadError.desc }}</p>
+    <p-button
+      type="button"
+      [label]="t().common.actions.refresh"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="cargar()"
+    />
+  </div>
+} @else if (ficha(); as f) {
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[auto_1.1fr_1fr] lg:divide-x lg:divide-y-0"
+    >
+      <!-- ── Logotipo ────────────────────────────────────────────────────────
+           Único editable de la ficha: se guarda al elegir la imagen, sin pasar
+           por el modal ni por el botón de guardar. -->
+      <div class="px-5 py-4">
+        <p class="mi-empresa__group">{{ t().empresa.groups.logotipo }}</p>
+        <div class="mt-3">
+          <app-empresa-logo />
+        </div>
+      </div>
+
+      <!-- ── Identificación ─────────────────────────────────────────────────── -->
+      <div class="px-5 py-4">
+        <p class="mi-empresa__group">{{ t().empresa.groups.identificacion }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.razonSocial }}
+            </dt>
+            <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.razonSocial">
+              {{ f.razonSocial || '—' }}
+            </dd>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.nombreCorto }}
+            </dt>
+            <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.nombreCorto">
+              {{ f.nombreCorto || '—' }}
+            </dd>
+          </div>
+
+          <!-- Tipo + número + DV en un solo campo: `NIT 900123456-7`. El número
+               va en monoespaciada porque es un identificador que se compara y
+               se copia. -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.identificacionGroup }}
+            </dt>
+            <dd
+              class="mi-empresa__value"
+              [class.mi-empresa__value--empty]="!f.identificacion && !f.documento"
+            >
+              @if (f.identificacion || f.documento) {
+                @if (f.identificacion) {
+                  {{ f.identificacion }}
+                }
+                @if (f.documento) {
+                  <span class="font-mono tabular-nums">{{ f.documento }}</span>
+                }
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.tipoPersona }}
+            </dt>
+            <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.tipoPersona">
+              {{ f.tipoPersona || '—' }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- ── Contacto y ubicación ───────────────────────────────────────────── -->
+      <div class="px-5 py-4">
+        <p class="mi-empresa__group">{{ t().empresa.groups.contacto }}</p>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.direccion }}
+            </dt>
+            <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.direccion">
+              {{ f.direccion || '—' }}
+            </dd>
+          </div>
+
+          <!--
+            Sale con la raya mientras `/general/ciudad/seleccionar/` no acepte el
+            filtro `id`: la configuración guarda el id pelado y ese catálogo hoy
+            solo busca por nombre. `CiudadService.byId` ya hace la consulta y se
+            enciende sola el día que el backend declare el filtro; hasta entonces
+            descarta la respuesta antes que pintar una ciudad equivocada.
+          -->
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.ciudad }}
+            </dt>
+            <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.ciudad">
+              {{ f.ciudad || '—' }}
+            </dd>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.correo }}
+            </dt>
+            <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.correo">
+              @if (f.correo) {
+                <a class="mi-empresa__link" [href]="'mailto:' + f.correo">{{ f.correo }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.telefono }}
+            </dt>
+            <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.telefono">
+              @if (f.telefono) {
+                <a class="mi-empresa__link" [href]="'tel:' + f.telefono">{{ f.telefono }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+}

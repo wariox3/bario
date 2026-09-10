@@ -1,0 +1,52 @@
+// Ficha de «Mi empresa». Mismos tres tokens de la ficha de contacto: el idioma
+// de una ficha de detalle es del sistema, no de la pantalla.
+
+// Micro-encabezado de un grupo dentro de la card (logotipo / identificación /
+// contacto). Se distingue de la etiqueta de campo por caja y peso, no por color.
+.mi-empresa__group {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
+// Etiqueta de cada dato (término de la definition list).
+.mi-empresa__label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--brand-muted);
+}
+
+// Valor de cada dato.
+.mi-empresa__value {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--brand-text);
+  word-break: break-word;
+}
+
+// Campo sin dato: la raya se atenúa para que no compita con los valores reales
+// al escanear la columna, pero el campo sigue ocupando su lugar en la ficha.
+.mi-empresa__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
+}
+
+// Enlaces de contacto (correo / teléfono).
+.mi-empresa__link {
+  color: var(--brand-text);
+  text-decoration: none;
+  transition: color 0.16s ease;
+
+  &:hover {
+    color: var(--reddoc-status-info, #009ef7);
+    text-decoration: underline;
+  }
+}

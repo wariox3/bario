@@ -4,7 +4,14 @@
   <table class="contable-detalle-table">
     <thead>
       <tr>
-        <th class="contable-detalle-table__th w-10 text-center">{{ c.columns.linea }}</th>
+        <th class="contable-detalle-table__th w-10 text-center">
+          {{ showId() ? c.columns.id : c.columns.linea }}
+        </th>
+        @if (showDocumentoAfectado()) {
+          <th class="contable-detalle-table__th w-20 text-left">{{ c.columns.documento }}</th>
+          <th class="contable-detalle-table__th w-40 text-left">{{ c.columns.documentoTipo }}</th>
+          <th class="contable-detalle-table__th w-24 text-left">{{ c.columns.numero }}</th>
+        }
         @if (showNumero()) {
           <th class="contable-detalle-table__th w-24 text-left">{{ c.columns.numero }}</th>
         }
@@ -33,8 +40,19 @@
       @for (line of lines(); track line.id ?? $index; let i = $index) {
         <tr class="contable-detalle-table__row">
           <td class="contable-detalle-table__td text-center text-brand-muted tabular-nums">
-            {{ i + 1 }}
+            {{ showId() ? (line.id ?? '—') : i + 1 }}
           </td>
+          @if (showDocumentoAfectado()) {
+            <td class="contable-detalle-table__td text-brand-text tabular-nums">
+              {{ line.documento_afectado ?? '—' }}
+            </td>
+            <td class="contable-detalle-table__td text-brand-text">
+              {{ line.documento_afectado_tipo || '—' }}
+            </td>
+            <td class="contable-detalle-table__td text-brand-text tabular-nums">
+              {{ line.documento_afectado_numero || '—' }}
+            </td>
+          }
           @if (showNumero()) {
             <td class="contable-detalle-table__td text-brand-text tabular-nums">
               {{ line.numero ?? '—' }}

@@ -1,4 +1,4 @@
-import { DestroyRef, computed, inject, signal } from '@angular/core';
+import { DestroyRef, computed, inject, signal, type WritableSignal } from '@angular/core';
 import { FormBuilder, type AbstractControl, type ValidatorFn } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, forkJoin } from 'rxjs';
@@ -31,7 +31,8 @@ const PAGE_SIZE_DEFAULT = 25;
  *
  * Lo que aporta:
  *  - El formulario de parámetros (`form`) con su validador de rango.
- *  - `generar()`, `onPageChange()`, `exportExcel()` y los flags de progreso.
+ *  - `generar()`, `onPageChange()`, `exportExcel()`, `exportPdf()` y los flags
+ *    de progreso.
  *  - `generated`, que distingue "todavía no generaste" de "no hay resultados".
  *  - `paramsStale`, que avisa cuando lo que se ve dejó de corresponder al
  *    formulario.
@@ -40,7 +41,9 @@ const PAGE_SIZE_DEFAULT = 25;
  * Lo que cada informe declara: `service`, `nombre`, `archivo` y —si necesita
  * otra regla de fechas o filtros propios— `rangeValidator()` y `extraFilters()`.
  *
- * Sin PDF: esta familia de endpoints solo sirve `lista/`, `excel/` y `totales/`.
+ * El PDF entra por el mismo camino que el Excel pero llega apagado: el endpoint
+ * de la familia todavía no sirve `pdf/`. El informe que lo tenga confirmado
+ * enciende `soportaPdf`.
  */
 export abstract class MovimientoInformePageBase<TRow> {
   // ── Colaboradores ─────────────────────────────────────────────────────────
@@ -64,6 +67,17 @@ export abstract class MovimientoInformePageBase<TRow> {
 
   /** Nombre base de la descarga, sin extensión (p. ej. `'balance-prueba'`). */
   protected abstract readonly archivo: string;
+
+  /**
+   * ¿El endpoint sirve el PDF de **este** informe? Apagado para todos hasta que
+   * el backend publique la acción `pdf/`; el informe que la tenga confirmada lo
+   * sobrescribe en `true` y con eso aparece el botón.
+   *
+   * Es un interruptor por informe y no uno global porque el ERP anterior solo
+   * imprimía algunos, y dejar el botón puesto sin efecto —lo que hacía— es peor
+   * que no ofrecerlo.
+   */
+  protected readonly soportaPdf: boolean = false;
 
   /**
    * Regla de validación del rango de fechas. `undefined` deja el default de la
@@ -112,6 +126,7 @@ export abstract class MovimientoInformePageBase<TRow> {
   protected readonly pageSize = signal(PAGE_SIZE_DEFAULT);
   protected readonly isLoading = signal(false);
   protected readonly isExportingExcel = signal(false);
+  protected readonly isExportingPdf = signal(false);
   /** `false` hasta la primera generación — distingue "sin generar" de "sin datos". */
   protected readonly generated = signal(false);
   /**
@@ -135,7 +150,9 @@ export abstract class MovimientoInformePageBase<TRow> {
     ];
   });
 
-  protected readonly isBusy = computed(() => this.isLoading() || this.isExportingExcel());
+  protected readonly isBusy = computed(
+    () => this.isLoading() || this.isExportingExcel() || this.isExportingPdf(),
+  );
 
   /** Texto del aviso de la botonera; vacío = no hay nada que avisar. */
   protected readonly hint = computed(() =>
@@ -206,17 +223,34 @@ export abstract class MovimientoInformePageBase<TRow> {
 
   /** Excel del informe **completo**: mismo endpoint y mismo body que la consulta. */
   protected exportExcel(): void {
+    this.descargar(this.service.exportUrl, `${this.archivo}.xlsx`, this.isExportingExcel);
+  }
+
+  /**
+   * PDF del informe **completo**. Misma llamada que el Excel salvo la acción y
+   * la extensión: el backend recibe el mismo body y devuelve otro binario.
+   */
+  protected exportPdf(): void {
+    this.descargar(this.service.pdfUrl, `${this.archivo}.pdf`, this.isExportingPdf);
+  }
+
+  /**
+   * Descarga binaria del informe completo. Las dos salidas comparten verbo,
+   * body y manejo de error; lo único propio de cada una es a qué acción pega,
+   * cómo se llama el archivo y qué botón muestra su spinner.
+   */
+  private descargar(url: string, archivo: string, progreso: WritableSignal<boolean>): void {
     if (!this.canExport()) return;
-    this.isExportingExcel.set(true);
+    progreso.set(true);
     this.fileDownload
-      .download(this.service.exportUrl, {
+      .download(url, {
         method: 'POST',
         body: this.service.buildBody(this.buildParams()),
-        fallbackFilename: `${this.archivo}.xlsx`,
+        fallbackFilename: archivo,
       })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isExportingExcel.set(false)),
+        finalize(() => progreso.set(false)),
       )
       .subscribe({
         error: () =>

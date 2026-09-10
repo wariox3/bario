@@ -89,7 +89,9 @@ Lo que dice el backend y define las páginas:
   el orden lo fija el informe, y reordenar por encima despegaría el detalle de su cuenta.
 - `solo_con_saldo` (default del backend: **`false`**) omite las cuentas que quedan en ceros en las
   cuatro columnas, con su detalle. El front lo arranca en `true` y lo manda siempre explícito.
-- **No hay PDF** en esta familia. El botón se apaga con `[showPdf]="false"`.
+- **Todavía no hay PDF** en esta familia: el schema declara solo `lista/`, `excel/` y `totales/`,
+  y el body no admite bandera de formato. La descarga está armada en el front y llega apagada;
+  se enciende por informe con `soportaPdf`. Está pedido al backend — ver el pendiente de abajo.
 
 ### Las filas vienen **jerarquizadas**
 
@@ -156,6 +158,31 @@ nombre, su archivo y qué bloques de columnas enciende (`showContacto`, `showMov
 | 8   | Auxiliar general también exige **mismo año**                                 | El contrato nuevo le calcula `saldo_anterior` contra la apertura del ejercicio, cosa que el informe del ERP anterior no hacía                                                          |
 
 ### Queda pendiente
+
+- [ ] **Pedirle al backend la acción `POST /contabilidad/movimiento-informe/pdf/`** (2026-09-09).
+      Simétrica a `excel/`: mismo `InformeContabilidadRequestRequest` de body, respuesta
+      `application/pdf` con `Content-Disposition`. Verificado contra
+      `GET https://reddocapi.uk/api/contenedor/schema/`: la acción no existe y la única respuesta
+      PDF de todo el schema del tenant es `/general/documento/imprimir/`, que es para documentos.
+
+      Quien lo necesita es el **certificado de retención**, el único de los nueve que en el ERP
+      anterior imprimía de verdad: pegaba a `contabilidad/movimiento/informe-certificado-retencion/`
+      (API vieja, `reddocapi.xyz`) con `pdf: true` y los mismos parámetros de la consulta. Ese
+      endpoint no existe en la API nueva.
+
+      Lo que hay que aclarar con ellos, porque cambia la pantalla:
+
+      1. Si prefieren una bandera de formato en el body en vez de una acción aparte.
+      2. Si el PDF es la tabla del informe impresa o el **certificado fiscal formal** por tercero
+         (emisor, periodo, firma). El nombre sugiere lo segundo.
+      3. Si es lo segundo, qué pasa **sin `contacto_id`**: un PDF por tercero, uno solo con todos, o
+         el tercero pasa a ser obligatorio. En ese caso el botón deja de ser un flag y pasa a
+         depender del formulario.
+      4. Si la acción aplica a los nueve informes o solo a este.
+
+      El front ya está listo: `pdfUrl` en `MovimientoInformeService`, `exportPdf()` y
+      `isExportingPdf` en la page base, y los nueve templates enlazados. Encenderlo es poner
+      `soportaPdf` en `true` en el informe que el backend confirme.
 
 - [ ] **Confirmar la forma de la fila de `auxiliar_general` contra el API real.** El schema solo
       declara `ConMovimientoInformeBalance` (drf-spectacular emitió únicamente el serializer por

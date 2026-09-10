@@ -274,6 +274,7 @@ export interface AppDict
       label: string;
       myContainers: string;
       manageAccount: string;
+      myCompany: string;
       security: string;
       settings: string;
       logout: string;
@@ -2982,8 +2983,10 @@ export interface AppDict
       naturaleza: { debito: string; credito: string };
       columns: {
         linea: string;
+        id: string;
         numero: string;
         documento: string;
+        documentoTipo: string;
         cuenta: string;
         contacto: string;
         naturaleza: string;
@@ -4913,7 +4916,10 @@ export interface AppDict
       };
       fields: {
         razonSocial: string;
+        nombreCorto: string;
         tipoPersona: string;
+        /** Rótulo del campo compuesto tipo · número · DV. */
+        identificacionGroup: string;
         identificacion: string;
         numeroIdentificacion: string;
         digitoVerificacion: string;
@@ -4929,6 +4935,27 @@ export interface AppDict
       saveSuccess: { title: string; desc: string };
       saveError: { title: string; desc: string };
       loadError: { title: string; desc: string };
+    };
+  };
+  /**
+   * Página «Mi empresa». Los campos del formulario **no** viven acá: son los de
+   * `configuracion.empresa`, porque el componente que los pinta lo comparte con
+   * el asistente de facturación electrónica. Acá solo va lo propio de la página.
+   */
+  empresa: {
+    title: string;
+    subtitle: string;
+    groups: { logotipo: string; identificacion: string; contacto: string };
+    dialog: { title: string; subtitle: string };
+    logo: {
+      formats: string;
+      alt: string;
+      toasts: {
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        removeSuccess: { title: string; desc: string };
+        removeError: { title: string; desc: string };
+      };
     };
   };
 }

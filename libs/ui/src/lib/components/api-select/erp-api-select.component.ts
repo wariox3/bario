@@ -20,6 +20,7 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
   template: `
     <p-select
       [inputId]="inputId()"
+      [ariaLabel]="ariaLabel()"
       [options]="options()"
       [ngModel]="value()"
       (ngModelChange)="onValueChange($event)"
@@ -59,6 +60,12 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   readonly endpoint = input.required<string>();
   readonly params = input<Record<string, string>>({});
   readonly inputId = input<string>('');
+  /**
+   * Nombre accesible del select, para cuando no hay un `<label for>` que lo
+   * nombre: lo típico es un control dentro de un campo compuesto, donde el
+   * rótulo visible nombra al conjunto (tipo · número · DV) y no a cada parte.
+   */
+  readonly ariaLabel = input<string | undefined>(undefined);
   readonly placeholder = input<string>('Selecciona…');
   readonly invalid = input<boolean>(false);
   /**

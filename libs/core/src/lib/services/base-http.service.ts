@@ -83,8 +83,10 @@ export abstract class BaseHttpService {
   /**
    * POST multipart de **un archivo**, para los endpoints de importación.
    *
-   * El backend recibe el archivo en el campo `archivo` en todos los recursos, así
-   * que la convención se declara una vez acá y no en cada servicio. `fields` suma
+   * El backend recibe el archivo en el campo `archivo` en todos los recursos de
+   * importación, así que la convención se declara una vez acá y no en cada
+   * servicio. `fieldName` la corre para los pocos endpoints que nombran su campo
+   * de otra forma (el logotipo de la empresa lo llama `logotipo`). `fields` suma
    * los campos de contexto que pida el endpoint (`conciliacion_id`, etc.); los
    * `null`/`undefined` se omiten, igual que en `buildHttpParams`.
    *
@@ -95,9 +97,10 @@ export abstract class BaseHttpService {
     path: string,
     file: File,
     fields?: Record<string, ParamValue>,
+    fieldName = 'archivo',
   ): Observable<T> {
     const form = new FormData();
-    form.append('archivo', file, file.name);
+    form.append(fieldName, file, file.name);
     for (const [key, value] of Object.entries(fields ?? {})) {
       if (value != null) form.append(key, String(value));
     }

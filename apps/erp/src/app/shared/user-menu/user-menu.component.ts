@@ -47,9 +47,10 @@ export class UserMenuComponent {
   readonly email = computed(() => this.authService.currentUser()?.email ?? '');
 
   /**
-   * Administrar accesos es cosa de propietario y administrador. La regla vive en
-   * `PermissionsService` porque también la aplica el guard de la ruta: el menú y
-   * la puerta tienen que decidir con el mismo criterio.
+   * Administrar accesos —y la identidad de la empresa— es cosa de propietario y
+   * administrador. La regla vive en `PermissionsService` porque también la
+   * aplican los guards de esas rutas: el menú y la puerta tienen que decidir con
+   * el mismo criterio.
    */
   readonly canManageSecurity = this.permissions.isContenedorPropietario;
 
@@ -68,6 +69,14 @@ export class UserMenuComponent {
         : [
             ...(this.canManageSecurity()
               ? [
+                  {
+                    label: labels.myCompany,
+                    icon: 'pi pi-building',
+                    command: () => {
+                      const slug = this.tenant.currentSlug();
+                      if (slug) this.router.navigate(['/t', slug, 'empresa']);
+                    },
+                  },
                   {
                     label: labels.security,
                     icon: 'pi pi-shield',

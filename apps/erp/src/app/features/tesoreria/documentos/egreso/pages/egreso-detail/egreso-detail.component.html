@@ -116,8 +116,15 @@
     </div>
 
     <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <!--
+        Las líneas del egreso nacen de cruzar cartera, así que la ficha las
+        identifica como lo hacía el ERP anterior: el id de la línea y el
+        documento cruzado abierto en id, tipo y número.
+      -->
       <app-contable-documento-lineas-table
         [lines]="lines()"
+        [showId]="true"
+        [showDocumentoAfectado]="true"
         [showContacto]="true"
         [showCentroCosto]="true"
       />

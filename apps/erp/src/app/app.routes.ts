@@ -58,6 +58,14 @@ export const appRoutes: Route[] = [
           import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
       },
       {
+        path: 'empresa',
+        canActivate: [contenedorPropietarioGuard],
+        // Ruta global (no-módulo): limpia el módulo activo para ocultar el sidebar.
+        resolve: { _module: erpModuleResolver(null) },
+        loadChildren: () =>
+          import('./features/empresa/empresa.routes').then((m) => m.EMPRESA_ROUTES),
+      },
+      {
         path: 'configuracion',
         // Ruta global (no-módulo): limpia el módulo activo para ocultar el sidebar.
         resolve: { _module: erpModuleResolver(null) },

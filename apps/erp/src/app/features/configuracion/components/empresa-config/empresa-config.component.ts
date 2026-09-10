@@ -3,9 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
+import { map, of, switchMap } from 'rxjs';
 import {
   CIUDAD_FUENTE,
+  CiudadService,
   FormErrorService,
   I18nService,
   SELECT_ENDPOINTS,
@@ -30,6 +32,7 @@ import type { EmpresaConfigFormValue } from '../../configuracion.mapper';
  */
 const EMPRESA_FIELD_MAP = {
   gen_empresa_razon_social: 'razon_social',
+  gen_empresa_nombre_corto: 'nombre_corto',
   gen_empresa_tipo_persona: 'tipo_persona',
   gen_empresa_identificacion: 'identificacion',
   gen_empresa_numero_identificacion: 'numero_identificacion',
@@ -47,13 +50,14 @@ const SOLO_DIGITOS = /^[0-9]+$/;
  * Área "Empresa" — datos de identidad de la empresa (`gen_empresa_*`).
  *
  * Auto-contenido como las demás áreas: lee y guarda solo sus campos
- * (`EMPRESA_CAMPOS`). Hoy lo renderiza el paso «Datos de la empresa» del
- * asistente de facturación electrónica; la pestaña de Configuración sigue sin
- * habilitarse (basta con sumar un `p-tabpanel` en el shell cuando se decida).
+ * (`EMPRESA_CAMPOS`). Tiene dos hogares: el modal de edición de «Mi empresa»
+ * (`/t/:slug/empresa`), que pone su propio pie, y el paso «Datos de la empresa»
+ * del asistente de facturación electrónica, que lo muestra suelto.
  *
- * Los dos inputs/outputs existen por ese doble hogar: dentro del asistente el
- * botón dice "Guardar y continuar" y quien lo hospeda necesita saber cuándo
- * guardó para avanzar de paso. Suelto, guarda y se queda donde está.
+ * Los inputs y el output existen por ese doble hogar: en el asistente el botón
+ * dice "Guardar y continuar" y quien lo hospeda necesita saber cuándo guardó
+ * para avanzar de paso; en el modal, las acciones propias se apagan y el pie
+ * dispara `guardar()`.
  */
 @Component({
   selector: 'app-empresa-config',
@@ -63,6 +67,7 @@ const SOLO_DIGITOS = /^[0-9]+$/;
     ButtonModule,
     InputTextModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     ErpApiSelectComponent,
     CiudadAutocompleteComponent,
   ],
@@ -71,6 +76,7 @@ const SOLO_DIGITOS = /^[0-9]+$/;
 export class EmpresaConfigComponent {
   private readonly fb = inject(FormBuilder);
   private readonly configuracionService = inject(ConfiguracionService);
+  private readonly ciudadService = inject(CiudadService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly destroyRef = inject(DestroyRef);
@@ -92,6 +98,14 @@ export class EmpresaConfigComponent {
   readonly readonly = input(false);
 
   /**
+   * Esconde la fila de acciones propia, para el host que ya puso las suyas.
+   *
+   * Lo usa el modal de «Mi empresa», cuyo pie trae cancelar y guardar: ese host
+   * dispara el guardado con `guardar()` y sigue el progreso con `isSaving`.
+   */
+  readonly hideActions = input(false);
+
+  /**
    * Se emite tras un guardado exitoso, con lo que quedó guardado.
    *
    * Lleva el valor y no un `void` porque el host suele necesitar mostrarlo: el
@@ -108,7 +122,9 @@ export class EmpresaConfigComponent {
 
   protected readonly loading = signal(true);
   protected readonly loadFailed = signal(false);
-  protected readonly isSaving = signal(false);
+
+  /** Público: el host que reemplazó la fila de acciones necesita el progreso. */
+  readonly isSaving = signal(false);
 
   /**
    * Reglas portadas del ERP anterior, con los topes del schema del contenedor.
@@ -126,6 +142,7 @@ export class EmpresaConfigComponent {
       Validators.minLength(3),
       Validators.maxLength(450),
     ]),
+    nombre_corto: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(200)]),
     tipo_persona: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     identificacion: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     numero_identificacion: this.fb.nonNullable.control('', [
@@ -174,12 +191,23 @@ export class EmpresaConfigComponent {
   protected cargar(): void {
     this.loading.set(true);
     this.loadFailed.set(false);
+    // La ciudad se resuelve en un segundo viaje: la configuración solo guarda su
+    // id. Si no se puede resolver, el formulario abre con el campo en blanco y el
+    // id intacto — es lo que pasaba siempre antes de este encadenado.
     this.configuracionService
       .obtener(EMPRESA_CAMPOS)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        switchMap((config) =>
+          (config.gen_empresa_ciudad != null
+            ? this.ciudadService.byId(config.gen_empresa_ciudad, this.ciudadFuente)
+            : of(null)
+          ).pipe(map((ciudad) => ({ config, ciudad }))),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
-        next: (config) => {
-          this.form.reset(configuracionToEmpresaForm(config));
+        next: ({ config, ciudad }) => {
+          this.form.reset(configuracionToEmpresaForm(config, ciudad));
           this.form.markAsPristine();
           this.loading.set(false);
         },
@@ -192,7 +220,11 @@ export class EmpresaConfigComponent {
       });
   }
 
-  protected onSave(): void {
+  /**
+   * Valida y persiste. Público porque el botón que lo dispara puede vivir
+   * afuera (el pie de un modal), no solo en la fila de acciones propia.
+   */
+  guardar(): void {
     if (this.form.invalid || this.isSaving()) {
       this.form.markAllAsTouched();
       return;

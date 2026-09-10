@@ -49,6 +49,19 @@ export class CertificadoRetencionComponent extends MovimientoInformePageBase<Inf
   protected readonly service = inject(CertificadoRetencionService);
   protected readonly archivo = 'certificado-retencion';
 
+  /**
+   * TODO(backend): poner en `true` cuando exista `POST
+   * /contabilidad/movimiento-informe/pdf/`. Con eso aparece el botón y toda la
+   * descarga ya está armada en la base (`exportPdf()`).
+   *
+   * Es el único informe de los nueve que en el ERP anterior imprimía de verdad:
+   * pegaba a `contabilidad/movimiento/informe-certificado-retencion/` con
+   * `pdf: true` y los mismos parámetros de la consulta. El endpoint nuevo
+   * todavía no tiene la acción —el OpenAPI del contenedor declara solo `lista/`,
+   * `excel/` y `totales/`— así que hasta entonces el botón no se ofrece.
+   */
+  protected override readonly soportaPdf = false;
+
   /** Tercero por el que acotar (opcional). Viaja como filtro `contacto_id`. */
   protected readonly contacto = new FormControl<ErpSelectOption | null>(null);
 

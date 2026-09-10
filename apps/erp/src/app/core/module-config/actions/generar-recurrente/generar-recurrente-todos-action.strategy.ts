@@ -8,8 +8,9 @@ import { GenerarRecurrenteBaseStrategy } from './generar-recurrente-base.strateg
  * las plantillas recurrentes del tipo, sin necesidad de seleccionar filas.
  *
  * Es la rutina de fin de mes del listado recurrente —el equivalente al "Generar
- * todos" del ERP legacy—, por eso va como **botón suelto** (`placement:
- * 'button'`) a la izquierda del dropdown "Acciones" en vez de escondida dentro.
+ * todos" del ERP legacy—, y vive dentro del dropdown "Acciones" (`placement`
+ * default `'menu'`, heredado de la base) junto a "Generar seleccionados": las
+ * dos variantes de lo mismo se leen juntas y el toolbar queda corto.
  *
  * Dos cosas que el modal explicita antes de confirmar, porque el backend las
  * impone y no son obvias:
@@ -30,8 +31,6 @@ export class GenerarRecurrenteTodosActionStrategy extends GenerarRecurrenteBaseS
     labelKey: 'documentActions.generarRecurrente.todosLabel',
     iconClass: 'pi pi-bolt',
   };
-
-  override readonly placement = 'button' as const;
 
   protected override modalTexts(): GenerarDocumentoModalTexts {
     const dict = this.dict;

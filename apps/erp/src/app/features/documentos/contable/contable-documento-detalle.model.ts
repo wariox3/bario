@@ -34,7 +34,17 @@ export interface CuentaDetalleRead extends DocumentoDetalleReadBase {
   readonly numero?: number | string | null;
   /** Glosa libre de la línea. */
   readonly detalle?: string | null;
-  /** Documento cruzado por la línea (cabecera afectada); `null` en asientos manuales. */
+  /**
+   * Documento cruzado por la línea (cabecera afectada); `null` en asientos
+   * manuales.
+   *
+   * TODO(backend): los tres **no vienen** en el serializer. `GenDocumentoDetalle`
+   * (verificado en `GET /contenedor/schema/`) solo expone
+   * `documento_detalle_afectado`, que es la línea cruzada, no la cabecera.
+   * Están pedidos con estos nombres, los del ERP anterior, que los leía así en
+   * la ficha del egreso y del pago. Mientras no lleguen, las tres columnas de la
+   * ficha del egreso pintan `—`: el mapper ya las deja en `null`.
+   */
   readonly documento_afectado?: number | null;
   readonly documento_afectado_numero?: string | number | null;
   readonly documento_afectado_documento_tipo_nombre?: string | null;

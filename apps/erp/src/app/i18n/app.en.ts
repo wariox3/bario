@@ -261,6 +261,7 @@ export const en: AppDict = {
       label: 'User menu',
       myContainers: 'My containers',
       manageAccount: 'Manage account',
+      myCompany: 'My company',
       security: 'Security',
       settings: 'Settings',
       logout: 'Sign out',
@@ -3869,8 +3870,10 @@ export const en: AppDict = {
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
         linea: '#',
+        id: 'ID',
         numero: 'Number',
         documento: 'Document',
+        documentoTipo: 'Document type',
         cuenta: 'Account',
         contacto: 'Contact',
         naturaleza: 'Nature',
@@ -6393,7 +6396,9 @@ export const en: AppDict = {
       },
       fields: {
         razonSocial: 'Legal name',
+        nombreCorto: 'Short name',
         tipoPersona: 'Person type',
+        identificacionGroup: 'Tax ID',
         identificacion: 'ID type',
         numeroIdentificacion: 'ID number',
         digitoVerificacion: 'Check digit',
@@ -6421,6 +6426,22 @@ export const en: AppDict = {
       loadError: {
         title: 'Load failed',
         desc: 'We could not fetch the company settings.',
+      },
+    },
+  },
+  empresa: {
+    title: 'My company',
+    subtitle: 'Company identity: what gets printed on every document.',
+    groups: { logotipo: 'Logo', identificacion: 'Tax ID', contacto: 'Contact and location' },
+    dialog: { title: 'Edit company details', subtitle: 'The logo is changed from the card.' },
+    logo: {
+      formats: 'PNG, JPG or WEBP, up to 5 MB.',
+      alt: 'Company logo',
+      toasts: {
+        uploadSuccess: { title: 'Logo updated', desc: 'The logo was saved successfully.' },
+        uploadError: { title: 'Upload failed', desc: 'We could not save the logo. Try again.' },
+        removeSuccess: { title: 'Logo removed', desc: 'Documents go out without a logo again.' },
+        removeError: { title: 'Remove failed', desc: 'We could not remove the logo. Try again.' },
       },
     },
   },
