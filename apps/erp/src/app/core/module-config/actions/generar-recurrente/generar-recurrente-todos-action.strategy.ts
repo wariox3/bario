@@ -15,12 +15,12 @@ import { GenerarRecurrenteBaseStrategy } from './generar-recurrente-base.strateg
  * Dos cosas que el modal explicita antes de confirmar, porque el backend las
  * impone y no son obvias:
  *  - El período (mes/año) es requerido: no se asume el mes actual.
- *  - `POST general/documento/generar/` **no acepta filtros**. "Todos" son todas
- *    las plantillas del tipo, no las que se estén viendo filtradas — de ahí el
- *    `warning` del modal.
+ *  - `POST general/documento/generar-recurrente/` **no acepta filtros**. "Todos"
+ *    son todas las plantillas del tipo, no las que se estén viendo filtradas —
+ *    de ahí el `warning` del modal.
  *
- * El alcance se expresa **omitiendo** `documento_ids` (ver la base): mandarlo
- * vacío sería una selección vacía, otra cosa.
+ * El alcance se expresa mandando `documento_ids` vacío (ver la base): quien
+ * delimita la generación es el tipo de origen, y los ids solo la acotarían.
  */
 @Injectable()
 export class GenerarRecurrenteTodosActionStrategy extends GenerarRecurrenteBaseStrategy {
