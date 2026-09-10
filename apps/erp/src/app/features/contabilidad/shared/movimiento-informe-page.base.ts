@@ -41,9 +41,9 @@ const PAGE_SIZE_DEFAULT = 25;
  * Lo que cada informe declara: `service`, `nombre`, `archivo` y —si necesita
  * otra regla de fechas o filtros propios— `rangeValidator()` y `extraFilters()`.
  *
- * El PDF entra por el mismo camino que el Excel pero llega apagado: el endpoint
- * de la familia todavía no sirve `pdf/`. El informe que lo tenga confirmado
- * enciende `soportaPdf`.
+ * El PDF entra por el mismo camino que el Excel, pero llega apagado por
+ * defecto: la acción `pdf/` solo la sirve el certificado de retención. El
+ * informe que la tenga enciende `soportaPdf`.
  */
 export abstract class MovimientoInformePageBase<TRow> {
   // ── Colaboradores ─────────────────────────────────────────────────────────
@@ -69,13 +69,13 @@ export abstract class MovimientoInformePageBase<TRow> {
   protected abstract readonly archivo: string;
 
   /**
-   * ¿El endpoint sirve el PDF de **este** informe? Apagado para todos hasta que
-   * el backend publique la acción `pdf/`; el informe que la tenga confirmada lo
-   * sobrescribe en `true` y con eso aparece el botón.
+   * ¿El endpoint sirve el PDF de **este** informe? Apagado por defecto: `pdf/`
+   * solo acepta `certificado_retencion` y responde 400 al resto, así que el
+   * informe que la tenga lo sobrescribe en `true` y con eso aparece el botón.
    *
-   * Es un interruptor por informe y no uno global porque el ERP anterior solo
-   * imprimía algunos, y dejar el botón puesto sin efecto —lo que hacía— es peor
-   * que no ofrecerlo.
+   * Es un interruptor por informe y no uno global justamente por eso: dejar el
+   * botón puesto en los ocho que no imprimen —lo que hacía el ERP anterior—
+   * ofrece una descarga que termina en error.
    */
   protected readonly soportaPdf: boolean = false;
 
