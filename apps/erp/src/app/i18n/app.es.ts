@@ -3861,6 +3861,16 @@ export const es: AppDict = {
           desc: 'El documento no existe o no tienes acceso a él',
         },
       },
+      utilidades: {
+        action: 'Utilidades',
+        importarDetalle: 'Importar detalle',
+      },
+      import: {
+        title: 'Importar detalle',
+        subtitle: 'Sube un Excel con las líneas a cargar en este documento',
+        notice:
+          'Las líneas del archivo se agregan a las que el documento ya tiene; no reemplazan nada. Si alguna fila falla no se guarda ninguna.',
+      },
     },
     inventarioDetalle: {
       title: 'Detalles',

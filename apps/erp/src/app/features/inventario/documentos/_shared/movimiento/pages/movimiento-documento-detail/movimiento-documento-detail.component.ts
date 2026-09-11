@@ -1,10 +1,20 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, type MenuItem } from 'primeng/api';
+import { Menu, MenuModule } from 'primeng/menu';
 import {
   I18nService,
   TenantService,
@@ -18,6 +28,9 @@ import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-c
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { InventarioDocumentoLineasTableComponent } from '@erp/features/documentos/inventario/components/inventario-documento-lineas-table/inventario-documento-lineas-table.component';
 import { InventarioDocumentoResumenComponent } from '@erp/features/documentos/inventario/components/inventario-documento-resumen/inventario-documento-resumen.component';
 import {
@@ -55,6 +68,11 @@ interface CabeceraView {
  * Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas (`DocumentoDetalleService`)
  * en paralelo —igual que el form— y las muestra sin formularios. Desde aquí se
  * vuelve a la lista, se salta a editar o se aprueba/desaprueba el documento.
+ *
+ * Suma un dropdown **Utilidades** con la importación de líneas por Excel, igual
+ * que la ficha del asiento. Vive acá y no en el formulario —donde lo tenía el
+ * legacy— porque la importación necesita un documento ya creado: el backend
+ * recibe el id del padre, y la ficha es el único lugar donde siempre lo hay.
  */
 @Component({
   selector: 'app-movimiento-documento-detail',
@@ -66,6 +84,8 @@ interface CabeceraView {
     InventarioDocumentoLineasTableComponent,
     InventarioDocumentoResumenComponent,
     DocumentDetailActionsComponent,
+    MenuModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './movimiento-documento-detail.component.html',
@@ -113,6 +133,48 @@ export class MovimientoDocumentoDetailComponent implements OnInit {
   /** ¿Se muestra el sentido del movimiento por línea? Solo en el traslado. */
   protected readonly showOperacion = computed(() => usaOperacionInventario(this.document().id));
 
+  private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
+
+  /**
+   * Entradas del dropdown "Utilidades". `computed` porque recrear el array en
+   * cada detección de cambios le hace perder el primer click a `p-menu`.
+   *
+   * Importar se deshabilita sobre un documento no editable —aprobado,
+   * típicamente— porque el backend responde 400 en ese caso: mejor decirlo en el
+   * menú que dejar que el usuario elija un archivo para nada.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.movimientoInventario.utilidades.importarDetalle,
+      icon: 'pi pi-upload',
+      disabled: !this.isEditable(),
+      command: () => this.importar.open(),
+    },
+  ]);
+
+  /**
+   * Plantilla de importación de líneas. El endpoint es el genérico de
+   * `documento-detalle`, pero el `documento` no es decorativo: el backend arma
+   * las columnas según el tipo del padre, así que la misma llamada devuelve la
+   * plantilla de la entrada, la salida o el traslado sin que el front elija.
+   */
+  protected readonly exampleConfig = computed<ExampleConfig>(() => ({
+    mode: 'enabled',
+    endpoint: this.detalleService.importarEjemploEndpoint,
+    params: { documento: this.id() },
+    filename: `detalle-${this.document().id}.xlsx`,
+  }));
+
+  /**
+   * Estado del diálogo de importación de líneas. Al terminar recarga la ficha
+   * entera y no solo las líneas: el backend recalcula los totales del documento
+   * al cerrar la importación, así que la cabecera también quedó vieja.
+   */
+  protected readonly importar = importState({
+    upload: (file) => this.detalleService.importar(Number(this.id()), file),
+    onImported: () => this.loadDocumento(Number(this.id())),
+  });
+
   /** Migas: módulo Inventario → listado del documento → identificador del abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     inventarioDocumentoBreadcrumb(
@@ -143,6 +205,10 @@ export class MovimientoDocumentoDetailComponent implements OnInit {
     const id = this.id();
     if (!id) return;
     this.navigate(this.document().routes.edit, id);
+  }
+
+  protected toggleUtilidades(event: Event): void {
+    this.utilidadesMenu()?.toggle(event);
   }
 
   /** Aprueba el documento previa confirmación; al éxito recarga la ficha. */
