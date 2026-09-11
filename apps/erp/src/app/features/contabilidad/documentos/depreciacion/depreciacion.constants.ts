@@ -3,8 +3,12 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
 /**
  * Endpoint que genera las líneas del documento a partir de los activos fijos.
  *
- * ⚠️ **Supuesto**: tomado del ERP legacy (`DepreciacionService.cargarActivos`),
- * que hace `POST` con `{ id }` del documento. Sin verificar contra el backend.
+ * Confirmado contra el schema del contenedor: `POST` con `{ id }` del documento.
+ * Carga una línea por activo con saldo por depreciar **en el mes de la fecha del
+ * documento**, con mes comercial de 30 días y prorrateo por los días que el
+ * activo estuvo vivo. Exige el documento modificable y **sin detalles**, porque
+ * el cargue no descuenta el saldo del activo. Responde el documento con su
+ * `total` ya actualizado.
  */
 export const CARGAR_ACTIVOS_ENDPOINT = '/general/documento/cargar-activo/';
 

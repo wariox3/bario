@@ -8,7 +8,6 @@
         <th class="depreciacion-linea-table__th w-20 text-right">{{ c.columns.activo }}</th>
         <th class="depreciacion-linea-table__th w-32 text-left">{{ c.columns.codigo }}</th>
         <th class="depreciacion-linea-table__th min-w-[18rem] text-left">{{ c.columns.nombre }}</th>
-        <th class="depreciacion-linea-table__th w-24 text-right">{{ c.columns.dias }}</th>
         <th class="depreciacion-linea-table__th w-40 text-right">{{ c.columns.valor }}</th>
         @if (canDelete()) {
           <th class="depreciacion-linea-table__th w-20 text-center">{{ c.columns.acciones }}</th>
@@ -29,9 +28,6 @@
           </td>
           <td class="depreciacion-linea-table__td font-medium text-brand-text">
             {{ line.nombre || '—' }}
-          </td>
-          <td class="depreciacion-linea-table__td text-right text-brand-text tabular-nums">
-            {{ line.dias }}
           </td>
           <td
             class="depreciacion-linea-table__td text-right font-semibold tabular-nums text-brand-text"
@@ -65,8 +61,8 @@
     @if (lines().length > 0) {
       <tfoot>
         <tr>
-          <!-- Cubre las 5 primeras columnas (nº, activo, código, nombre y días). -->
-          <td colspan="5" class="depreciacion-linea-table__total text-right text-brand-muted">
+          <!-- Cubre las 4 primeras columnas (nº, activo, código y nombre). -->
+          <td colspan="4" class="depreciacion-linea-table__total text-right text-brand-muted">
             {{ c.total }}
           </td>
           <td class="depreciacion-linea-table__total text-right tabular-nums text-brand-text">

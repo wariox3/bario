@@ -188,11 +188,9 @@ export class ComercialDocumentoDetallesComponent {
 
   /**
    * Muestra la columna **Almacén** (el almacén por línea), a la derecha de ítem.
-   * Default `false`: solo la declara el documento que la necesita.
-   *
-   * Ojo: `GenDocumentoDetalle` todavía no tiene `almacen` en el OpenAPI, así que
-   * el backend lo descarta al guardar (ver la nota en `ComercialDetalleRead`).
-   * La columna se ve y se edita; persistirá cuando el serializer sume el campo.
+   * Default `false`: solo la declara el documento que la necesita. El documento
+   * que la encienda aquí debería encenderla también en la tabla de solo lectura
+   * de su ficha, para que se vea lo mismo que se editó.
    */
   readonly almacenEnabled = input<boolean>(false);
 
@@ -683,17 +681,18 @@ export class ComercialDocumentoDetallesComponent {
    * Normaliza contra el catálogo del `modo` los impuestos que vinieron del
    * backend, en dos frentes:
    *
-   *  - **Signo**: el serializer de la línea guarda `total` sin signo y (todavía)
-   *    no manda la operación, así que una retención cargada en edición sumaría
-   *    en vez de restar. El signo autoritativo sale del catálogo (que sí trae
-   *    `operacion`). Solo toca el signo: la magnitud sigue siendo la del backend.
    *  - **Nombre**: la línea trae el nombre corto (`"IVA"`) y no el extendido
-   *    (`"IVA 19% ventas"`), que es el que muestran los badges y el resumen.
+   *    (`"IVA 19% ventas"`), que es el que muestran los badges y el resumen. Es
+   *    lo único que este paso aporta hoy; mientras el serializer de la línea no
+   *    mande `impuesto_nombre_extendido`, la ficha de detalle —que no consulta
+   *    el catálogo— sigue mostrando el corto.
+   *  - **Signo**: redundante desde que la línea serializa `impuesto_operacion`
+   *    (el mapper ya lo aplica), pero se conserva porque el catálogo es la
+   *    fuente autoritativa y cuesta nada. Solo toca el signo: la magnitud sigue
+   *    siendo la del backend.
    *
    * Un impuesto que no esté en el catálogo queda como llegó. Es idempotente, así
    * que puede correr al llegar el catálogo y al cablear cada fila sin pisarse.
-   * Cuando el backend serialice `impuesto_operacion` e `impuesto_nombre_extendido`
-   * en la línea, el mapper resolverá ambos y esto pasará a ser un no-op.
    */
   private normalizarImpuestosLeidos(group: ComercialDetalleGroup): void {
     const catalog = this.impuestosCatalog();

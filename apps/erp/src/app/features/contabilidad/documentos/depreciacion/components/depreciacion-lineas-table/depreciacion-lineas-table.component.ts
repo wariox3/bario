@@ -5,20 +5,20 @@ import type { AppDict } from '@erp/i18n';
 import type { DepreciacionLineaView } from '../../depreciacion-linea.model';
 import { sumarLineasDepreciacion } from '../../depreciacion-linea.mapper';
 
-/** Columnas fijas: nº, activo, código, nombre, días y valor. */
-const BASE_COLUMN_COUNT = 6;
+/** Columnas fijas: nº, activo, código, nombre y valor. */
+const BASE_COLUMN_COUNT = 5;
 
 /**
  * Tabla **tonta** de las líneas de una depreciación: un activo fijo por fila con
- * sus días depreciados y el valor que calculó el backend.
+ * el valor que calculó el backend para el periodo.
  *
  * Es de solo lectura por naturaleza —las líneas las genera `cargar-activo/`, no
  * el usuario—, así que no compone controles de formulario. La única acción es
  * eliminar una fila, y va opt-in (`canDelete`): la ficha de detalle monta la
  * misma tabla sin ella.
  *
- * Cierra con una fila de total, que es el dato que el formulario manda en la
- * cabecera.
+ * Cierra con una fila de total, que solo se muestra: el total de la cabecera lo
+ * calcula el backend.
  */
 @Component({
   selector: 'app-depreciacion-lineas-table',

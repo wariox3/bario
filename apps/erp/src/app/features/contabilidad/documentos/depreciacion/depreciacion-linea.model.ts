@@ -7,11 +7,11 @@ import type { DocumentoDetalleReadBase } from '@reddoc/core';
  * Comparte la tabla `documento-detalle` con las líneas de ítem y de cuenta (el
  * backend las discrimina por `tipo_registro`), pero en el front no comparte
  * nada con ellas: no se teclea ni se edita —la genera `cargar-activo/`— y lo
- * que muestra es el activo y sus días depreciados, no una imputación contable.
- * Por eso vive acá y no en `features/documentos/contable/`.
+ * que muestra es el activo, no una imputación contable. Por eso vive acá y no
+ * en `features/documentos/contable/`.
  *
- * ⚠️ Contrato **supuesto** a partir del ERP legacy (nombres de campos y tipos).
- * Todo el riesgo queda aislado en este archivo y en el mapper.
+ * Contrato **confirmado** contra el schema del contenedor (`GenDocumentoDetalle`):
+ * el backend serializa `activo`, `activo_codigo` y `activo_nombre`.
  */
 
 /** Línea de depreciación leída desde la API. */
@@ -20,8 +20,12 @@ export interface DepreciacionLineaRead extends DocumentoDetalleReadBase {
   readonly activo?: number | null;
   readonly activo_codigo?: string | null;
   readonly activo_nombre?: string | null;
-  /** Días depreciados en el periodo que cubre el documento. */
-  readonly dias?: number | string | null;
+  /**
+   * Valor de la línea, calculado por el backend (`readOnly`). Es lo que se
+   * muestra y lo que suma el total, no `precio`: el cargue prorratea por días,
+   * así que `precio` podría ser una cuota diaria y no el valor del periodo.
+   */
+  readonly total?: string | number | null;
 }
 
 /**
@@ -34,6 +38,5 @@ export interface DepreciacionLineaView {
   readonly activo: number | null;
   readonly codigo: string;
   readonly nombre: string;
-  readonly dias: number;
   readonly valor: number;
 }

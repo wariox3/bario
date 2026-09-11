@@ -51,6 +51,7 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
+import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
@@ -246,6 +247,11 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña y la carga). */
   protected get pagos(): FormArray<PagoGroup> {
     return this.form.controls.pagos;
+  }
+
+  /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
+  protected precioListaId(): number | null {
+    return precioListaDeContacto(this.form.controls.contacto.value);
   }
 
   ngOnInit(): void {

@@ -2022,16 +2022,6 @@ export const es: AppDict = {
         subtitle: 'Subí un Excel con los registros a cargar',
       },
       utilidades: { action: 'Utilidades' },
-      formato: {
-        action: 'Formato',
-        certificadoLaboral: 'Certificado laboral',
-        toasts: {
-          error: {
-            title: 'Error al generar',
-            desc: 'No se pudo generar el certificado laboral',
-          },
-        },
-      },
       columns: {
         empleado: 'Empleado',
         contratoTipo: 'Tipo contrato',
@@ -3423,11 +3413,13 @@ export const es: AppDict = {
         editTitle: 'Editar depreciación',
         sectionHint: 'Registra el periodo y carga los activos que se van a depreciar',
         sections: { activos: 'Activos depreciados' },
-        activosHint: 'Las calcula el sistema a partir de los activos fijos',
+        activosHint:
+          'Las calcula el sistema con los activos que tengan saldo por depreciar en el mes de la fecha',
         cargarActivos: 'Cargar activos',
         confirmReload: {
           header: 'Volver a cargar',
-          message: 'El documento ya tiene activos cargados. ¿Cargarlos de nuevo?',
+          message:
+            'El documento ya tiene activos cargados. Se eliminarán y se cargarán de nuevo. ¿Continuar?',
         },
         fields: {
           contacto: 'Contacto',
@@ -3457,7 +3449,15 @@ export const es: AppDict = {
             title: 'Activos cargados',
             desc: 'Se generaron las líneas del documento',
           },
+          cargarVacio: {
+            title: 'Sin activos por depreciar',
+            desc: 'Ningún activo tenía saldo por depreciar en el mes de la fecha del documento',
+          },
           cargarError: { title: 'Error al cargar activos', desc: 'No se pudieron cargar' },
+          limpiarError: {
+            title: 'Error al limpiar',
+            desc: 'No se pudieron eliminar los activos anteriores',
+          },
         },
       },
       detail: {
@@ -3489,7 +3489,6 @@ export const es: AppDict = {
         activo: 'Activo',
         codigo: 'Código',
         nombre: 'Nombre',
-        dias: 'Días',
         valor: 'Valor',
         acciones: 'Acciones',
       },
