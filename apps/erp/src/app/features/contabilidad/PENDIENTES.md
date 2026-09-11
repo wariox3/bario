@@ -490,17 +490,27 @@ Tres consecuencias que ya están en el código:
 3. **El `total` del documento es de solo lectura** y ni siquiera existe en el cuerpo de escritura, así
    que el front dejó de mandarlo. La suma de las líneas se quedó solo para mostrar.
 
-#### Lo único que falta: los días
+#### Cómo se ve una línea real
 
-Pedimos cuatro campos en la línea y llegaron tres: `activo`, `activo_codigo` y `activo_nombre`.
-**`dias` no está** en `GenDocumentoDetalle`, así que la columna de días salió de la tabla.
+Los cuatro campos que pedimos ya llegan. Así se ve una línea real (documento 5, activo MOTOCARRO,
+documento con fecha del 11 de mayo):
 
-El valor de la línea se lee de `total`, no de `precio`: como el cargue prorratea por días, `precio`
-podría ser una cuota diaria. `total` siempre es el valor depreciado del periodo.
+| Campo      | Valor          | Qué es                                      |
+| ---------- | -------------- | ------------------------------------------- |
+| `precio`   | `29167.000000` | La depreciación del periodo, ya prorrateada |
+| `dias`     | `21`           | Días depreciados en el mes                  |
+| `cantidad` | `0.000000`     | Sin usar                                    |
+| `total`    | `0.000000`     | cantidad × precio, o sea 0                  |
 
-Queda por mirar, con líneas reales en pantalla, **qué guarda el backend en `cantidad`**. Si son los
-días, la columna vuelve leyendo de ahí y no hace falta pedir nada. Si es siempre 1, hay que pedir el
-campo.
+De ahí salen las dos reglas del mapper, que no son obvias leyendo el código suelto:
+
+- **El valor se lee de `precio`, no de `total`.** El backend calcula el `total` de la línea como
+  cantidad × precio y deja `cantidad` en 0, así que la línea "vale" 0. El `total` del **documento**
+  sí queda bien (`29167.000000`), porque no lo arma sumando totales de línea.
+- **Los días vienen en `dias`**, campo propio, no en `cantidad`.
+
+Queda pedido al backend, como asunto menor, poner `cantidad` en 1 para que el total de la línea deje
+de ser 0. No rompe nada hoy, pero cualquiera que lea la línea por el camino genérico ve un cero.
 
 ### 7.2 Decisiones tomadas
 

@@ -2624,6 +2624,7 @@ export interface AppDict
         activo: string;
         codigo: string;
         nombre: string;
+        dias: string;
         valor: string;
         acciones: string;
       };

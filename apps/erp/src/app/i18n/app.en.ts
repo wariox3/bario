@@ -3423,6 +3423,7 @@ export const en: AppDict = {
         activo: 'Asset',
         codigo: 'Code',
         nombre: 'Name',
+        dias: 'Days',
         valor: 'Amount',
         acciones: 'Actions',
       },
