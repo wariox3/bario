@@ -4,9 +4,9 @@ import type { DepreciacionLineaRead, DepreciacionLineaView } from './depreciacio
 /**
  * Read-model (GET) → línea normalizada para la tabla.
  *
- * El valor sale de `total`, no de `precio`: el cargue prorratea la cuota por los
- * días que el activo estuvo vivo en el mes, así que `precio` puede ser una cuota
- * diaria. `total` siempre es el valor depreciado del periodo.
+ * El valor sale de `precio`, donde el backend deja la depreciación del periodo
+ * ya prorrateada. **No** de `total`: el backend lo calcula como cantidad × precio
+ * y deja `cantidad` en 0, así que vuelve en 0. Ver PENDIENTES §7.1.
  */
 export function depreciacionLineaToView(read: DepreciacionLineaRead): DepreciacionLineaView {
   return {
@@ -14,7 +14,8 @@ export function depreciacionLineaToView(read: DepreciacionLineaRead): Depreciaci
     activo: read.activo ?? null,
     codigo: read.activo_codigo ?? '',
     nombre: read.activo_nombre ?? '',
-    valor: toFiniteNumber(read.total) ?? 0,
+    dias: toFiniteNumber(read.dias) ?? 0,
+    valor: toFiniteNumber(read.precio) ?? 0,
   };
 }
 

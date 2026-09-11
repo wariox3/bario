@@ -10,8 +10,13 @@ import type { DocumentoDetalleReadBase } from '@reddoc/core';
  * que muestra es el activo, no una imputación contable. Por eso vive acá y no
  * en `features/documentos/contable/`.
  *
- * Contrato **confirmado** contra el schema del contenedor (`GenDocumentoDetalle`):
- * el backend serializa `activo`, `activo_codigo` y `activo_nombre`.
+ * Contrato **confirmado** contra una línea real: el backend serializa `activo`,
+ * `activo_codigo`, `activo_nombre` y `dias`, y deja la depreciación del periodo
+ * en `precio` (de `DocumentoDetalleReadBase`).
+ *
+ * ⚠️ El `total` de la línea vuelve en 0: el backend lo calcula como
+ * cantidad × precio y deja `cantidad` en 0. No sirve para mostrar; el valor sale
+ * de `precio`. Ver PENDIENTES §7.1.
  */
 
 /** Línea de depreciación leída desde la API. */
@@ -20,12 +25,8 @@ export interface DepreciacionLineaRead extends DocumentoDetalleReadBase {
   readonly activo?: number | null;
   readonly activo_codigo?: string | null;
   readonly activo_nombre?: string | null;
-  /**
-   * Valor de la línea, calculado por el backend (`readOnly`). Es lo que se
-   * muestra y lo que suma el total, no `precio`: el cargue prorratea por días,
-   * así que `precio` podría ser una cuota diaria y no el valor del periodo.
-   */
-  readonly total?: string | number | null;
+  /** Días depreciados en el mes que cubre el documento. */
+  readonly dias?: number | null;
 }
 
 /**
@@ -38,5 +39,6 @@ export interface DepreciacionLineaView {
   readonly activo: number | null;
   readonly codigo: string;
   readonly nombre: string;
+  readonly dias: number;
   readonly valor: number;
 }
