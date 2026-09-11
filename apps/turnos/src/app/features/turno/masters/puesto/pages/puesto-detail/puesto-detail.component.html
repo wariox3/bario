@@ -82,99 +82,79 @@
       </h2>
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      @if (p.ciudad_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.ciudad }}</dt>
-          <dd class="puesto-detail__value">{{ p.ciudad_nombre }}</dd>
-        </div>
-      }
-      @if (p.direccion) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.direccion }}</dt>
-          <dd class="puesto-detail__value">{{ p.direccion }}</dd>
-        </div>
-      }
-      @if (p.celular) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.celular }}</dt>
-          <dd class="puesto-detail__value">
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.ciudad }}</dt>
+        <dd class="puesto-detail__value">{{ p.ciudad_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.direccion }}</dt>
+        <dd class="puesto-detail__value">{{ p.direccion || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.celular }}</dt>
+        <dd class="puesto-detail__value">
+          @if (p.celular) {
             <a [href]="'tel:' + p.celular" class="puesto-detail__link">
               {{ p.celular | libTelefono }}
             </a>
-          </dd>
-        </div>
-      }
-      @if (p.latitud) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.latitud }}</dt>
-          <dd class="puesto-detail__value font-mono">{{ p.latitud }}</dd>
-        </div>
-      }
-      @if (p.longitud) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.longitud }}</dt>
-          <dd class="puesto-detail__value font-mono">{{ p.longitud }}</dd>
-        </div>
-      }
+          } @else {
+            —
+          }
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.latitud }}</dt>
+        <dd class="puesto-detail__value font-mono">{{ p.latitud || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.longitud }}</dt>
+        <dd class="puesto-detail__value font-mono">{{ p.longitud || '—' }}</dd>
+      </div>
     </dl>
   </section>
 
   <!-- ── Relaciones ──────────────────────────────────────────────────────────── -->
-  @if (p.contacto || p.programador || p.centro_costo) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
-        >
-          <i class="pi pi-users text-[1rem]"></i>
-        </span>
-        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.puesto.detail.sections.relaciones }}
-        </h2>
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
+      >
+        <i class="pi pi-users text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.puesto.detail.sections.relaciones }}
+      </h2>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.contacto }}</dt>
+        <dd class="puesto-detail__value">{{ p.contacto_nombre_corto ?? p.contacto ?? '—' }}</dd>
       </div>
-      <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
-        @if (p.contacto) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.contacto }}</dt>
-            <dd class="puesto-detail__value">
-              {{ p.contacto_nombre_corto ?? p.contacto }}
-            </dd>
-          </div>
-        }
-        @if (p.centro_costo) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.centroCosto }}</dt>
-            <dd class="puesto-detail__value">
-              {{ p.centro_costo_nombre ?? p.centro_costo }}
-            </dd>
-          </div>
-        }
-        @if (p.programador) {
-          <div class="flex flex-col gap-0.5">
-            <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.programador }}</dt>
-            <dd class="puesto-detail__value">
-              {{ p.programador_nombre ?? p.programador }}
-            </dd>
-          </div>
-        }
-      </dl>
-    </section>
-  }
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.centroCosto }}</dt>
+        <dd class="puesto-detail__value">{{ p.centro_costo_nombre ?? p.centro_costo ?? '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="puesto-detail__label">{{ t().entities.puesto.form.fields.programador }}</dt>
+        <dd class="puesto-detail__value">{{ p.programador_nombre ?? p.programador ?? '—' }}</dd>
+      </div>
+    </dl>
+  </section>
 
   <!-- ── Comentario ─────────────────────────────────────────────────────────── -->
-  @if (p.comentario) {
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-        <span
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
-        >
-          <i class="pi pi-comment text-[1rem]"></i>
-        </span>
-        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.puesto.detail.sections.comentario }}
-        </h2>
-      </div>
-      <p class="m-0 px-5 py-4 text-[0.85rem] leading-relaxed text-brand-text">{{ p.comentario }}</p>
-    </section>
-  }
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-slate-100 text-brand-muted"
+      >
+        <i class="pi pi-comment text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.puesto.detail.sections.comentario }}
+      </h2>
+    </div>
+    <p class="m-0 px-5 py-4 text-[0.85rem] leading-relaxed text-brand-text">
+      {{ p.comentario || '—' }}
+    </p>
+  </section>
 }

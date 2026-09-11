@@ -49,6 +49,10 @@ interface LineaCargada {
         en el atributo del propio elemento: los estilos de abajo sí lo alcanzan.
         El frame (.p-dialog) es lo único que no, y vive en styles.scss.
       */
+      :host {
+        display: contents;
+      }
+
       @keyframes lineaIn {
         from {
           opacity: 0;

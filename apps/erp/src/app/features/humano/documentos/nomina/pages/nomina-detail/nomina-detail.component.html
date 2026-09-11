@@ -88,17 +88,15 @@
         <dt class="nomina-detail__label">{{ det.labels.programacionDetalle }}</dt>
         <dd class="nomina-detail__value">{{ c.programacion_detalle_id ?? '—' }}</dd>
       </div>
-      @if (c.comentario) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2">
-          <dt class="nomina-detail__label">{{ det.labels.comentario }}</dt>
-          <dd class="nomina-detail__value">{{ c.comentario }}</dd>
-        </div>
-      }
-      @if (dianUrl(); as url) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-          <dt class="nomina-detail__label">{{ det.labels.cue }}</dt>
-          <dd class="nomina-detail__value break-all">
-            {{ c.cue }}
+      <div class="flex flex-col gap-0.5 sm:col-span-2">
+        <dt class="nomina-detail__label">{{ det.labels.comentario }}</dt>
+        <dd class="nomina-detail__value">{{ c.comentario || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="nomina-detail__label">{{ det.labels.cue }}</dt>
+        <dd class="nomina-detail__value break-all">
+          {{ c.cue || '—' }}
+          @if (dianUrl(); as url) {
             <a
               class="ml-2 font-semibold text-sky-700 hover:underline"
               [href]="url"
@@ -106,9 +104,9 @@
               rel="noopener noreferrer"
               >{{ det.labels.verDian }}</a
             >
-          </dd>
-        </div>
-      }
+          }
+        </dd>
+      </div>
     </dl>
   </section>
 

@@ -49,21 +49,43 @@ export interface CreditoPayload {
 }
 
 /**
- * Pago aplicado a un crédito (GET `/humano/credito/{id}/pagos/`).
+ * Pago aplicado a un crédito, ya listo para pintar.
  *
- * Cada pago es un descuento hecho al empleado en una nómina. `fecha` y
- * `documento` son opcionales en el contrato: identifican de qué nómina salió el
- * descuento y puede que el backend no los exponga desde el primer día.
- *
- * ⚠️ El endpoint está pedido, todavía no existe. Hasta que responda, la card de
- * pagos de la ficha muestra su estado de error.
+ * Cada pago es un descuento hecho al empleado en una nómina. No existe entidad
+ * propia en el backend: son **líneas de documento** (`/general/documento-detalle/`)
+ * que apuntan al crédito por su FK `credito`. `CreditoService.pagos` arma esto
+ * cruzando las líneas con la cabecera de su documento.
  */
 export interface CreditoPago {
   readonly id: number;
   /** Valor descontado. Como el resto de los montos, puede llegar como string Decimal. */
   readonly pago: string | number | null;
-  /** Fecha del descuento, si el backend la expone. */
+  /** Fecha del documento del que salió el descuento; `null` si no se pudo resolver. */
   readonly fecha?: string | null;
-  /** Documento (nómina) del que salió el descuento, si el backend lo expone. */
+  /** Consecutivo de la nómina del descuento; `null` si no se pudo resolver. */
   readonly documento?: number | null;
+}
+
+/**
+ * Línea de documento leída con el filtro por crédito.
+ *
+ * Es el `GenDocumentoDetalle` genérico, del que acá solo interesan cuatro
+ * campos. `pago` es el nombre que usaba el ERP anterior para el valor
+ * descontado y **hoy no viene en el serializador**; se declara opcional para
+ * que la card lo tome sin tocar nada el día que el backend lo sume, y mientras
+ * tanto se cae a `total`.
+ */
+export interface CreditoPagoLineaRead {
+  readonly id: number;
+  /** Id del documento (nómina) al que pertenece la línea. */
+  readonly documento: number | null;
+  readonly pago?: string | number | null;
+  readonly total?: string | number | null;
+}
+
+/** Lo único que se le pide a la cabecera del documento para identificar el pago. */
+export interface CreditoPagoDocumentoRead {
+  readonly id: number;
+  readonly numero: number | null;
+  readonly fecha: string | null;
 }

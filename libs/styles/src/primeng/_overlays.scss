@@ -24,10 +24,18 @@
 // `position: fixed; top/right: 20px` por host binding, no en un div interno).
 // Con `display: contents` se pierde esa caja y los mensajes caen al flujo,
 // estirados de lado a lado. Y no lo necesita: al ser `fixed` nunca ocupó lugar.
+//
+// `p-menu` entra por la misma puerta, con un matiz: en modo popup su contenido
+// se monta en `<body>` (`appendTo`), así que el host no queda vacío por estar
+// cerrado — queda vacío **siempre**. Es el caso que se ve en la botonera de una
+// ficha: cada menú declarado junto a su botón cobra un `gap` extra, y el
+// "Utilidades" que va después de la botonera aparece separado del resto por un
+// espacio que ningún margen explica.
 p-confirmdialog,
 p-dialog,
 p-drawer,
 p-popover,
-p-confirmpopup {
+p-confirmpopup,
+p-menu {
   display: contents;
 }

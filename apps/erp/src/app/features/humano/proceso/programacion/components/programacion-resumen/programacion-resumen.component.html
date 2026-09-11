@@ -59,12 +59,10 @@
       <dt class="programacion-resumen__label">{{ res.labels.total }}</dt>
       <dd class="programacion-resumen__value font-bold tabular-nums">{{ formatMoney(total()) }}</dd>
     </div>
-    @if (p.comentario) {
-      <div class="flex flex-col gap-0.5 sm:col-span-3 lg:col-span-6">
-        <dt class="programacion-resumen__label">{{ res.labels.comentario }}</dt>
-        <dd class="programacion-resumen__value">{{ p.comentario }}</dd>
-      </div>
-    }
+    <div class="flex flex-col gap-0.5 sm:col-span-3 lg:col-span-6">
+      <dt class="programacion-resumen__label">{{ res.labels.comentario }}</dt>
+      <dd class="programacion-resumen__value">{{ p.comentario || '—' }}</dd>
+    </div>
   </dl>
 
   <!-- Banderas activas, plegadas -->

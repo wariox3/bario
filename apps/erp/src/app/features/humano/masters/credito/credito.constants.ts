@@ -20,6 +20,20 @@ export const CONCEPTO_ENDPOINT = '/humano/concepto/seleccionar/';
  */
 export const CONCEPTO_PARAMS: Record<string, string> = { concepto_tipo_id: '8' };
 
+/**
+ * Propiedad por la que se filtran las líneas de documento para traer los pagos
+ * de un crédito (`POST /general/documento-detalle/lista/`).
+ *
+ * Va **con sufijo `_id`**, que es la convención de FK al filtrar; el campo se
+ * llama `credito` al escribir. El ERP anterior filtraba igual, como query param
+ * del `GET`.
+ *
+ * ⚠️ Pendiente de que backend confirme que `credito_id` está en los
+ * `campos_filtrables` del endpoint: una propiedad no declarada no da error,
+ * devuelve la lista **sin filtrar**.
+ */
+export const CREDITO_PAGO_FILTER_FIELD = 'credito_id';
+
 export const CREDITOS_COLUMNS: readonly ColumnDef[] = [
   {
     field: 'id',

@@ -263,12 +263,10 @@
         <dt>{{ z.confirmar.resumen.cue }}</dt>
         <dd class="break-all">{{ doc.cue || '—' }}</dd>
       </div>
-      @if (doc.comentario) {
-        <div class="sm:col-span-2">
-          <dt>{{ z.confirmar.resumen.comentario }}</dt>
-          <dd>{{ doc.comentario }}</dd>
-        </div>
-      }
+      <div class="sm:col-span-2">
+        <dt>{{ z.confirmar.resumen.comentario }}</dt>
+        <dd>{{ doc.comentario || '—' }}</dd>
+      </div>
     </dl>
 
     <!-- Detalles del documento -->

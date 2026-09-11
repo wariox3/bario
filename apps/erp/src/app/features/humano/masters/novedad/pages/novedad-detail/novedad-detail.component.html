@@ -120,16 +120,17 @@
               {{ n.contrato ?? '—' }}
             </dd>
           </div>
-          @if (n.novedad_referencia !== null) {
-            <div class="flex flex-col gap-0.5">
-              <dt class="novedad-detail__label">
-                {{ t().entities.novedad.form.fields.novedadReferencia }}
-              </dt>
-              <dd class="novedad-detail__value novedad-detail__value--mono">
-                #{{ n.novedad_referencia }}
-              </dd>
-            </div>
-          }
+          <div class="flex flex-col gap-0.5">
+            <dt class="novedad-detail__label">
+              {{ t().entities.novedad.form.fields.novedadReferencia }}
+            </dt>
+            <dd
+              class="novedad-detail__value novedad-detail__value--mono"
+              [class.novedad-detail__value--empty]="n.novedad_referencia === null"
+            >
+              {{ n.novedad_referencia !== null ? '#' + n.novedad_referencia : '—' }}
+            </dd>
+          </div>
         </dl>
       </div>
 
@@ -257,14 +258,12 @@
 
     <!-- El detalle es texto libre: va a lo ancho, debajo de los grupos, y solo
          cuando hay algo que leer. -->
-    @if (n.detalle) {
-      <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
-        <dl class="flex flex-col gap-0.5">
-          <dt class="novedad-detail__label">{{ t().entities.novedad.form.fields.detalle }}</dt>
-          <dd class="novedad-detail__value whitespace-pre-line">{{ n.detalle }}</dd>
-        </dl>
-      </div>
-    }
+    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <dl class="flex flex-col gap-0.5">
+        <dt class="novedad-detail__label">{{ t().entities.novedad.form.fields.detalle }}</dt>
+        <dd class="novedad-detail__value whitespace-pre-line">{{ n.detalle || '—' }}</dd>
+      </dl>
+    </div>
   </section>
 
   @if (esVacaciones()) {

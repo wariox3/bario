@@ -73,18 +73,14 @@
         <dt class="pago-detail__label">{{ det.labels.numero }}</dt>
         <dd class="pago-detail__value">{{ c.numero || '—' }}</dd>
       </div>
-      @if (c.cliente) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-          <dt class="pago-detail__label">{{ det.labels.cliente }}</dt>
-          <dd class="pago-detail__value">{{ c.cliente }}</dd>
-        </div>
-      }
-      @if (c.identificacion) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="pago-detail__label">{{ det.labels.identificacion }}</dt>
-          <dd class="pago-detail__value tabular-nums">{{ c.identificacion }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
+        <dt class="pago-detail__label">{{ det.labels.cliente }}</dt>
+        <dd class="pago-detail__value">{{ c.cliente || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="pago-detail__label">{{ det.labels.identificacion }}</dt>
+        <dd class="pago-detail__value tabular-nums">{{ c.identificacion || '—' }}</dd>
+      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="pago-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="pago-detail__value">{{ formatFecha(c.fecha) }}</dd>
@@ -93,12 +89,10 @@
         <dt class="pago-detail__label">{{ det.labels.cuentaBanco }}</dt>
         <dd class="pago-detail__value">{{ c.cuentaBanco || '—' }}</dd>
       </div>
-      @if (c.comentario) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-          <dt class="pago-detail__label">{{ det.labels.comentario }}</dt>
-          <dd class="pago-detail__value">{{ c.comentario }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="pago-detail__label">{{ det.labels.comentario }}</dt>
+        <dd class="pago-detail__value">{{ c.comentario || '—' }}</dd>
+      </div>
     </dl>
   </section>
 

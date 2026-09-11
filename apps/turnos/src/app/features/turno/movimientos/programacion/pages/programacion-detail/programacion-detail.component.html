@@ -55,12 +55,10 @@
         <dt class="programacion-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="programacion-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
-      @if (c.contacto) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="programacion-detail__label">{{ det.labels.contacto }}</dt>
-          <dd class="programacion-detail__value">{{ c.contacto }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="programacion-detail__label">{{ det.labels.contacto }}</dt>
+        <dd class="programacion-detail__value">{{ c.contacto || '—' }}</dd>
+      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="programacion-detail__label">{{ det.labels.identificacion }}</dt>
         <dd class="programacion-detail__value">{{ c.identificacion || '—' }}</dd>

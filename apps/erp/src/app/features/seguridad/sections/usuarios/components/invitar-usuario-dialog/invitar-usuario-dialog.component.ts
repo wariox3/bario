@@ -65,6 +65,7 @@ const SEARCH_MIN_LENGTH = 3;
     AccesosContenedorComponent,
   ],
   templateUrl: './invitar-usuario-dialog.component.html',
+  styles: ':host { display: contents; }',
 })
 export class InvitarUsuarioDialogComponent {
   private readonly service = inject(SeguridadUsuariosService);

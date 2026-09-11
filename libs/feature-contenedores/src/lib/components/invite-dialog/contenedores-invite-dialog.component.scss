@@ -1,3 +1,10 @@
+// El host no es más que el envoltorio del diálogo: el diálogo se pinta `fixed`,
+// así que fuera del flujo no pierde nada y deja de cobrar el `gap` del
+// contenedor que lo declara. Misma razón que `_overlays.scss` en libs/styles.
+:host {
+  display: contents;
+}
+
 // El chrome del diálogo (paddings + línea del encabezado) vive en
 // `@reddoc/styles` (`primeng/_invite-dialog.scss`), compartido con el diálogo
 // de invitación del ERP. Acá quedan solo los tabs, que son de esta pantalla.

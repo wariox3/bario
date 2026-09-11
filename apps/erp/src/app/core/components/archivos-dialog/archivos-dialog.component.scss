@@ -1,3 +1,10 @@
+// El host no es más que el envoltorio del diálogo: el diálogo se pinta `fixed`,
+// así que fuera del flujo no pierde nada y deja de cobrar el `gap` del
+// contenedor que lo declara. Misma razón que `_overlays.scss` en libs/styles.
+:host {
+  display: contents;
+}
+
 // ── Dialog shell — mismo chrome que el resto de los diálogos del ERP:
 //    radius 16px, sombra suave + larga, paddings propios. Gemelo del
 //    `cp-import-dialog`, que es su vecino conceptual (ambos manejan archivos).

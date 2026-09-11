@@ -83,18 +83,14 @@
         <dt class="asiento-detail__label">{{ det.labels.numero }}</dt>
         <dd class="asiento-detail__value">{{ c.numero || '—' }}</dd>
       </div>
-      @if (c.contacto) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-          <dt class="asiento-detail__label">{{ det.labels.contacto }}</dt>
-          <dd class="asiento-detail__value">{{ c.contacto }}</dd>
-        </div>
-      }
-      @if (c.identificacion) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="asiento-detail__label">{{ det.labels.identificacion }}</dt>
-          <dd class="asiento-detail__value tabular-nums">{{ c.identificacion }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
+        <dt class="asiento-detail__label">{{ det.labels.contacto }}</dt>
+        <dd class="asiento-detail__value">{{ c.contacto || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="asiento-detail__label">{{ det.labels.identificacion }}</dt>
+        <dd class="asiento-detail__value tabular-nums">{{ c.identificacion || '—' }}</dd>
+      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="asiento-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="asiento-detail__value">{{ formatFecha(c.fecha) }}</dd>
@@ -111,12 +107,10 @@
         <dt class="asiento-detail__label">{{ det.labels.centroCosto }}</dt>
         <dd class="asiento-detail__value">{{ c.centroCosto || '—' }}</dd>
       </div>
-      @if (c.comentario) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-          <dt class="asiento-detail__label">{{ det.labels.comentario }}</dt>
-          <dd class="asiento-detail__value">{{ c.comentario }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="asiento-detail__label">{{ det.labels.comentario }}</dt>
+        <dd class="asiento-detail__value">{{ c.comentario || '—' }}</dd>
+      </div>
     </dl>
   </section>
 

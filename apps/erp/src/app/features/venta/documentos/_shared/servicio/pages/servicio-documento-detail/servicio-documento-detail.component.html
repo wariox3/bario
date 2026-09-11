@@ -71,42 +71,32 @@
         <dt class="servicio-documento-detail__label">{{ det.labels.numero }}</dt>
         <dd class="servicio-documento-detail__value">{{ c.numero || '—' }}</dd>
       </div>
-      @if (c.contacto) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-          <dt class="servicio-documento-detail__label">{{ det.labels.contacto }}</dt>
-          <dd class="servicio-documento-detail__value">{{ c.contacto }}</dd>
-        </div>
-      }
-      @if (c.identificacion) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="servicio-documento-detail__label">{{ det.labels.identificacion }}</dt>
-          <dd class="servicio-documento-detail__value tabular-nums">{{ c.identificacion }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
+        <dt class="servicio-documento-detail__label">{{ det.labels.contacto }}</dt>
+        <dd class="servicio-documento-detail__value">{{ c.contacto || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="servicio-documento-detail__label">{{ det.labels.identificacion }}</dt>
+        <dd class="servicio-documento-detail__value tabular-nums">{{ c.identificacion || '—' }}</dd>
+      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="servicio-documento-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="servicio-documento-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
-      @if (c.sector) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="servicio-documento-detail__label">{{ det.labels.sector }}</dt>
-          <dd class="servicio-documento-detail__value">{{ c.sector }}</dd>
-        </div>
-      }
-      @if (c.estrato !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="servicio-documento-detail__label">{{ det.labels.estrato }}</dt>
-          <dd class="servicio-documento-detail__value">{{ c.estrato }}</dd>
-        </div>
-      }
-      @if (c.salario !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="servicio-documento-detail__label">{{ det.labels.salario }}</dt>
-          <dd class="servicio-documento-detail__value tabular-nums">
-            {{ formatMoney(c.salario) }}
-          </dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="servicio-documento-detail__label">{{ det.labels.sector }}</dt>
+        <dd class="servicio-documento-detail__value">{{ c.sector || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="servicio-documento-detail__label">{{ det.labels.estrato }}</dt>
+        <dd class="servicio-documento-detail__value">{{ c.estrato ?? '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="servicio-documento-detail__label">{{ det.labels.salario }}</dt>
+        <dd class="servicio-documento-detail__value tabular-nums">
+          {{ c.salario !== null ? formatMoney(c.salario) : '—' }}
+        </dd>
+      </div>
     </dl>
   </section>
 

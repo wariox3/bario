@@ -3801,6 +3801,16 @@ export const en: AppDict = {
           desc: 'The document does not exist or you do not have access to it',
         },
       },
+      utilidades: {
+        action: 'Tools',
+        importarDetalle: 'Import lines',
+      },
+      import: {
+        title: 'Import lines',
+        subtitle: 'Upload an Excel file with the lines to add to this document',
+        notice:
+          'The lines in the file are added to the ones the document already has; nothing is replaced. If any row fails, none are saved.',
+      },
     },
     inventarioDetalle: {
       title: 'Lines',
