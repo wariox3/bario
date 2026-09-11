@@ -30,6 +30,10 @@ Estado (2026-07-31): portado el **aporte a seguridad social** como documento (§
 la familia —`701`, `702` y `703`— y con ella el §3.1. El módulo Humano queda completo salvo lo que
 sigue anotado como supuesto.
 
+Estado (2026-09-11): conectada la **card de pagos del crédito** (§9). Backend confirmó que no existe
+entidad de pagos: son líneas de documento filtradas por el crédito. Quedan tres supuestos vivos, y
+dos de ellos fallan sin dar error.
+
 ---
 
 ## 1. Por confirmar con backend
@@ -708,3 +712,48 @@ Tres preguntas abiertas:
   programación reusado por conveniencia.
 - El `selector` del componente, que se llama `app-nomina-electronica-detalle` por copy/paste — el
   mismo desliz que ya estaba anotado en §6.5.
+
+---
+
+## 9. Pagos de un crédito (card de la ficha)
+
+`masters/credito/components/credito-pagos/` muestra los descuentos que ya se le hicieron al empleado.
+Se pidió a backend un `GET /humano/credito/{id}/pagos/` y la respuesta (2026-09-11) fue que **no
+existe una entidad de pagos**: hay que consultar las líneas de documento filtrando por el crédito.
+
+Así quedó conectado, en `credito.service.ts`:
+
+1. `POST /general/documento-detalle/lista/` con `filtros: [{ propiedad: 'credito_id', operador: '=',
+valor: <id> }]`.
+2. `POST /general/documento/lista/` con `id in <ids>` para el número y la fecha de cada nómina, que
+   no viajan en la línea. Si esta segunda falla, los pagos se pintan igual sin esas dos columnas.
+
+Es lo mismo que hacía el ERP anterior (`general/documento_detalle/?credito_id=…`), salvo que allá
+pedía además `serializador=credito_pago`, un mecanismo que la API nueva **no tiene**: la palabra
+`serializador` no aparece ni una vez en el OpenAPI.
+
+### 9.1 Por confirmar con backend
+
+| #   | Qué                                                                     | Qué pasa si está mal                                                                   |
+| --- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1   | Que `credito_id` esté en los `campos_filtrables` de `documento-detalle` | **No da error**: devuelve todas las líneas del tenant y la card las muestra como pagos |
+| 2   | De qué campo sale el valor descontado                                   | La card suma otra cosa. El serializador expone `total`, pero no `pago` ni `deduccion`  |
+| 3   | Que `id` sea filtrable con el operador `in` en `documento/lista/`       | **No da error**: las columnas de fecha y documento salen vacías                        |
+
+Sobre el #2: el ERP anterior leía el valor de un campo **`pago`** de la línea, que el serializador
+actual no expone —tampoco `concepto`, `devengado` ni `deduccion`, los demás campos de la familia
+humano que sí están en §1.3—. `CreditoPagoLineaRead` declara `pago` como opcional y se cae a `total`:
+el día que backend lo sume, la card lo toma sin tocar nada.
+
+Sobre el #3: si backend sumara `documento_numero` y `documento_fecha` al serializador de la línea
+—ya existen en el de `documento-detalle-informe`, que a su vez no expone `credito`— sobraría la
+segunda petición entera.
+
+### 9.2 Cómo verificarlo sin backend
+
+Abrir la ficha de un crédito con pagos y mirar la red:
+
+- Si la card lista pagos de **otros** créditos, falló el #1.
+- Si los valores no cuadran con el `abono` que muestra la ficha, falló el #2. Ese `abono` sale del
+  propio crédito y es el contraste más rápido.
+- Si las columnas de fecha y documento no aparecen, falló el #3 o la nómina no tiene número.

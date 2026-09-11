@@ -18,12 +18,11 @@ interface PagoFila {
  * Pagos aplicados a un crédito: cada descuento hecho al empleado en una nómina.
  *
  * Se monta dentro de la ficha y se carga solo, igual que el visor de
- * inconsistencias de un periodo. Las columnas de fecha y documento son
- * **opcionales en el contrato**, así que solo se pintan si alguna fila las trae:
- * una columna entera de guiones no dice nada.
- *
- * ⚠️ El endpoint `/humano/credito/{id}/pagos/` está pedido pero todavía no
- * existe; hasta entonces esto muestra su estado de error.
+ * inconsistencias de un periodo. Los pagos salen de las líneas de documento que
+ * apuntan al crédito (ver `CreditoService.pagos`). La fecha y el documento
+ * llegan de la cabecera de cada nómina y pueden no resolverse, así que sus
+ * columnas solo se pintan si alguna fila las trae: una columna entera de
+ * guiones no dice nada.
  */
 @Component({
   selector: 'app-credito-pagos',

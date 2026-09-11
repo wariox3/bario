@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseHttpService } from '../services/base-http.service';
+import type { BackendFilter } from '../data-list/data/build-list-body';
 import type { PaginatedResponse } from '../models/pagination.model';
 
 /** Endpoint CRUD de líneas de documento (compartido por todos los documentos). */
@@ -73,21 +74,34 @@ export class DocumentoDetalleService extends BaseHttpService {
   }
 
   /**
-   * Lista las líneas que **afectan** a una línea dada vía
-   * `POST …documento-detalle/lista/` con body
-   * `{ filtros: [{ propiedad: 'documento_detalle_afectado_id', operador: '=', valor }] }`
-   * (misma convención de filtros que el listado de documentos). Pueden ser varias,
-   * por eso es lista. La paginación viaja como query param (`?limit=`); respuesta
-   * paginada estándar (`count`/`results`), devolvemos `results`.
+   * Lista líneas por **filtros arbitrarios** vía `POST …documento-detalle/lista/`
+   * (misma convención de filtros que el listado de documentos: `buildFiltros`
+   * arma el array desde condiciones del front). La paginación viaja como query
+   * param (`?limit=`); respuesta paginada estándar, devolvemos `results`.
+   *
+   * ⚠️ El backend solo aplica los filtros cuya `propiedad` esté en la whitelist
+   * `campos_filtrables` del endpoint. Una propiedad no declarada **no da error**:
+   * devuelve la lista sin filtrar. Confirmar cada campo antes de usarlo.
    */
-  listarPorAfectado<TRead = unknown>(afectadoId: number): Observable<TRead[]> {
+  listarPorFiltros<TRead = unknown>(
+    filtros: readonly BackendFilter[],
+    limit: number = DETALLE_PAGE_SIZE,
+  ): Observable<TRead[]> {
     return this.post<PaginatedResponse<TRead>>(
       `${DOCUMENTO_DETALLE_ENDPOINT}lista/`,
-      {
-        filtros: [{ propiedad: 'documento_detalle_afectado_id', operador: '=', valor: afectadoId }],
-      },
-      { limit: DETALLE_PAGE_SIZE },
+      { filtros },
+      { limit },
     ).pipe(map((res) => [...res.results]));
+  }
+
+  /**
+   * Lista las líneas que **afectan** a una línea dada (filtro
+   * `documento_detalle_afectado_id`). Pueden ser varias, por eso es lista.
+   */
+  listarPorAfectado<TRead = unknown>(afectadoId: number): Observable<TRead[]> {
+    return this.listarPorFiltros<TRead>([
+      { propiedad: 'documento_detalle_afectado_id', operador: '=', valor: afectadoId },
+    ]);
   }
 
   /** Crea una línea asociada al documento `documentoId`. Devuelve la línea creada. */
