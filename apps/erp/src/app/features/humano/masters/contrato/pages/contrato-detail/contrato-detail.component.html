@@ -27,7 +27,7 @@
          no es una utilidad más. Solo mientras el contrato siga vigente.
 
          Va en `danger` y no en el gris de sus vecinos: es la única acción
-         irreversible de la barra, y en gris pesaba lo mismo que "Formato".
+         irreversible de la barra, y en gris pesaba lo mismo que "Utilidades".
          Outline y no sólido porque solo abre el modal — el rojo lleno queda
          para el botón que confirma ahí dentro, que es donde la acción ocurre. -->
     @if (!c.estado_terminado) {
@@ -55,21 +55,6 @@
         (onClick)="toggleUtilidades($event)"
       />
     }
-
-    <!-- Formatos imprimibles. Fuera del `@if` a propósito: el certificado
-         laboral se pide sobre todo para un contrato ya terminado. -->
-    <p-button
-      type="button"
-      [label]="t().entities.contrato.formato.action"
-      icon="pi pi-chevron-down"
-      iconPos="right"
-      severity="secondary"
-      [outlined]="true"
-      size="small"
-      [loading]="isDescargando()"
-      (onClick)="toggleFormato($event)"
-    />
-    <p-menu #formatoMenu [popup]="true" [model]="formatoItems()" appendTo="body" />
   }
 </header>
 

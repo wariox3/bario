@@ -1971,16 +1971,6 @@ export const en: AppDict = {
         subtitle: 'Upload an Excel file with the records to load',
       },
       utilidades: { action: 'Utilities' },
-      formato: {
-        action: 'Format',
-        certificadoLaboral: 'Employment certificate',
-        toasts: {
-          error: {
-            title: 'Generation error',
-            desc: 'Could not generate the employment certificate',
-          },
-        },
-      },
       columns: {
         empleado: 'Employee',
         contratoTipo: 'Contract type',

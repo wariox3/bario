@@ -1473,11 +1473,6 @@ export interface AppDict
       name: string;
       searchPlaceholder: string;
       import: { title: string; subtitle: string };
-      formato: {
-        action: string;
-        certificadoLaboral: string;
-        toasts: { error: { title: string; desc: string } };
-      };
       utilidades: { action: string };
       columns: {
         empleado: string;
