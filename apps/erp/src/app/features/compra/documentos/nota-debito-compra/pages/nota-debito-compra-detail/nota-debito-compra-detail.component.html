@@ -75,40 +75,30 @@
         <dt class="nota-debito-compra-detail__label">{{ det.labels.numero }}</dt>
         <dd class="nota-debito-compra-detail__value">{{ c.numero || '—' }}</dd>
       </div>
-      @if (c.proveedor) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
-          <dt class="nota-debito-compra-detail__label">{{ det.labels.proveedor }}</dt>
-          <dd class="nota-debito-compra-detail__value">{{ c.proveedor }}</dd>
-        </div>
-      }
-      @if (c.identificacion) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="nota-debito-compra-detail__label">{{ det.labels.identificacion }}</dt>
-          <dd class="nota-debito-compra-detail__value tabular-nums">{{ c.identificacion }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
+        <dt class="nota-debito-compra-detail__label">{{ det.labels.proveedor }}</dt>
+        <dd class="nota-debito-compra-detail__value">{{ c.proveedor || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="nota-debito-compra-detail__label">{{ det.labels.identificacion }}</dt>
+        <dd class="nota-debito-compra-detail__value tabular-nums">{{ c.identificacion || '—' }}</dd>
+      </div>
       <div class="flex flex-col gap-0.5">
         <dt class="nota-debito-compra-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="nota-debito-compra-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
-      @if (c.documentoReferencia) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="nota-debito-compra-detail__label">{{ det.labels.documentoReferencia }}</dt>
-          <dd class="nota-debito-compra-detail__value">{{ c.documentoReferencia }}</dd>
-        </div>
-      }
-      @if (c.centroCosto) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="nota-debito-compra-detail__label">{{ det.labels.centroCosto }}</dt>
-          <dd class="nota-debito-compra-detail__value">{{ c.centroCosto }}</dd>
-        </div>
-      }
-      @if (c.comentario) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-          <dt class="nota-debito-compra-detail__label">{{ det.labels.comentario }}</dt>
-          <dd class="nota-debito-compra-detail__value">{{ c.comentario }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="nota-debito-compra-detail__label">{{ det.labels.documentoReferencia }}</dt>
+        <dd class="nota-debito-compra-detail__value">{{ c.documentoReferencia || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="nota-debito-compra-detail__label">{{ det.labels.centroCosto }}</dt>
+        <dd class="nota-debito-compra-detail__value">{{ c.centroCosto || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="nota-debito-compra-detail__label">{{ det.labels.comentario }}</dt>
+        <dd class="nota-debito-compra-detail__value">{{ c.comentario || '—' }}</dd>
+      </div>
     </dl>
   </section>
 

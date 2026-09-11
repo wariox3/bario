@@ -89,12 +89,10 @@
         <dt class="movimiento-detail__label">{{ det.labels.fecha }}</dt>
         <dd class="movimiento-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
-      @if (c.comentario) {
-        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-          <dt class="movimiento-detail__label">{{ det.labels.comentario }}</dt>
-          <dd class="movimiento-detail__value">{{ c.comentario }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="movimiento-detail__label">{{ det.labels.comentario }}</dt>
+        <dd class="movimiento-detail__value">{{ c.comentario || '—' }}</dd>
+      </div>
     </dl>
   </section>
 

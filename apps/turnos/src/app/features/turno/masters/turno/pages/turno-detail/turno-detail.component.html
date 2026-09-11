@@ -100,54 +100,44 @@
         <dt class="turno-detail__label">{{ t().entities.turno.form.fields.codigo }}</dt>
         <dd class="turno-detail__value font-mono">{{ turno.codigo }}</dd>
       </div>
-      @if (turno.novedad_tipo_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="turno-detail__label">{{ t().entities.turno.form.fields.novedadTipo }}</dt>
-          <dd class="turno-detail__value">{{ turno.novedad_tipo_nombre }}</dd>
-        </div>
-      }
-      @if (turno.hora_inicio !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horaInicio }}</dt>
-          <dd class="turno-detail__value font-mono">{{ turno.hora_inicio }}</dd>
-        </div>
-      }
-      @if (turno.hora_fin !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horaFin }}</dt>
-          <dd class="turno-detail__value font-mono">{{ turno.hora_fin }}</dd>
-        </div>
-      }
-      @if (turno.horas !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horas }}</dt>
-          <dd class="turno-detail__value">{{ turno.horas }}</dd>
-        </div>
-      }
-      @if (turno.horas_diurnas !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horasDiurnas }}</dt>
-          <dd class="turno-detail__value">{{ turno.horas_diurnas }}</dd>
-        </div>
-      }
-      @if (turno.horas_nocturnas !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horasNocturnas }}</dt>
-          <dd class="turno-detail__value">{{ turno.horas_nocturnas }}</dd>
-        </div>
-      }
-      @if (turno.color !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="turno-detail__label">{{ t().entities.turno.form.fields.color }}</dt>
-          <dd class="turno-detail__value flex items-center gap-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="turno-detail__label">{{ t().entities.turno.form.fields.novedadTipo }}</dt>
+        <dd class="turno-detail__value">{{ turno.novedad_tipo_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horaInicio }}</dt>
+        <dd class="turno-detail__value font-mono">{{ turno.hora_inicio ?? '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horaFin }}</dt>
+        <dd class="turno-detail__value font-mono">{{ turno.hora_fin ?? '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horas }}</dt>
+        <dd class="turno-detail__value">{{ turno.horas ?? '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horasDiurnas }}</dt>
+        <dd class="turno-detail__value">{{ turno.horas_diurnas ?? '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="turno-detail__label">{{ t().entities.turno.form.fields.horasNocturnas }}</dt>
+        <dd class="turno-detail__value">{{ turno.horas_nocturnas ?? '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="turno-detail__label">{{ t().entities.turno.form.fields.color }}</dt>
+        <dd class="turno-detail__value flex items-center gap-2">
+          @if (turno.color !== null) {
             <span
               class="h-4 w-4 shrink-0 rounded border border-[rgba(20,48,73,0.15)]"
               [style.background-color]="turno.color"
             ></span>
             <span class="font-mono">{{ turno.color }}</span>
-          </dd>
-        </div>
-      }
+          } @else {
+            —
+          }
+        </dd>
+      </div>
     </dl>
   </section>
 }

@@ -65,40 +65,34 @@
       </h2>
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      @if (p.documento_numero) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="prototipo-detail__label">
-            {{ t().entities.prototipo.detail.fields.documento }}
-          </dt>
-          <dd class="prototipo-detail__value">#{{ p.documento_numero }}</dd>
-        </div>
-      }
-      @if (p.documento_documento_tipo_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.tipo }}</dt>
-          <dd class="prototipo-detail__value">{{ p.documento_documento_tipo_nombre }}</dd>
-        </div>
-      }
-      @if (p.documento_fecha) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="prototipo-detail__label">
-            {{ t().entities.prototipo.detail.fields.documentoFecha }}
-          </dt>
-          <dd class="prototipo-detail__value">{{ p.documento_fecha | date: formatoFecha }}</dd>
-        </div>
-      }
-      @if (p.puesto_nombre) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.puesto }}</dt>
-          <dd class="prototipo-detail__value">{{ p.puesto_nombre }}</dd>
-        </div>
-      }
-      @if (p.fecha) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.fecha }}</dt>
-          <dd class="prototipo-detail__value">{{ p.fecha | date: 'MMMM y' }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">
+          {{ t().entities.prototipo.detail.fields.documento }}
+        </dt>
+        <dd class="prototipo-detail__value">
+          {{ p.documento_numero ? '#' + p.documento_numero : '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.tipo }}</dt>
+        <dd class="prototipo-detail__value">{{ p.documento_documento_tipo_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">
+          {{ t().entities.prototipo.detail.fields.documentoFecha }}
+        </dt>
+        <dd class="prototipo-detail__value">
+          {{ p.documento_fecha ? (p.documento_fecha | date: formatoFecha) : '—' }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.puesto }}</dt>
+        <dd class="prototipo-detail__value">{{ p.puesto_nombre || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="prototipo-detail__label">{{ t().entities.prototipo.detail.fields.fecha }}</dt>
+        <dd class="prototipo-detail__value">{{ p.fecha ? (p.fecha | date: 'MMMM y') : '—' }}</dd>
+      </div>
     </dl>
   </section>
 

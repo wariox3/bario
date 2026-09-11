@@ -92,12 +92,10 @@
       </h2>
     </div>
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      @if (s.dias !== null) {
-        <div class="flex flex-col gap-0.5">
-          <dt class="secuencia-detail__label">{{ t().entities.secuencia.form.fields.dias }}</dt>
-          <dd class="secuencia-detail__value">{{ s.dias }}</dd>
-        </div>
-      }
+      <div class="flex flex-col gap-0.5">
+        <dt class="secuencia-detail__label">{{ t().entities.secuencia.form.fields.dias }}</dt>
+        <dd class="secuencia-detail__value">{{ s.dias ?? '—' }}</dd>
+      </div>
     </dl>
   </section>
 

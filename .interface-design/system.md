@@ -371,6 +371,17 @@ gap-3">` con pares `<dt>`/`<dd>` (`__label` `0.7rem/500` muted, `__value` `0.85r
   `<dd class="__value" [class.__value--empty]="!x">{{ x || '—' }}</dd>`; con enlace
   (`mailto:`/`tel:`), el mismo modificador con `@if/@else`. `--empty` = `font-weight:400`,
   `color: var(--brand-muted)`, `opacity:.55` — presente pero sin competir al escanear la columna.
+  - **La forma en que se rompe** es siempre la misma: un `@if` cuya guarda **es el propio valor**
+    envolviendo la fila entera, con el `<dt>` adentro. Se lee inofensivo y borra la etiqueta junto
+    con el dato. Regla para detectarlo: si la guarda del `@if` coincide con lo que interpola su
+    `<dd>`, sobra — va la fila siempre y el guion adentro. Se corrigió así en 30 plantillas.
+  - **Vale igual para una sección entera.** Una card que se esconde porque sus tres campos vinieron
+    vacíos deja la ficha con un hueco que nadie puede interpretar. La sección se queda con sus
+    guiones.
+  - **Lo que sí es condicional** es lo que **no aplica** a ese registro, no lo que está vacío: un
+    grupo que solo existe para un rol (`cliente`, `proveedor`), para un estado (motivo de
+    terminación de un contrato terminado) o para un tipo (los campos de vacaciones de una novedad).
+    Ahí la ausencia significa algo y pintar guiones inventaría campos que la entidad no tiene.
 - **Colapsar lo que se lee junto** (es lo que de verdad achica la ficha, y no pierde ningún valor):
   - Identificador compuesto → **un** campo (`Documento` = tipo + número + DV), con el número en
     `font-mono tabular-nums`. Regla del sistema: el dato identificador siempre en monoespaciada.
