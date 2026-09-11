@@ -32,7 +32,7 @@ import {
   ErpApiSelectComponent,
   ErpAsesorSelectComponent,
 } from '@reddoc/ui';
-import type { ErpSelectOption } from '@reddoc/core';
+import { SELECT_ENDPOINTS, type ErpSelectOption } from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -64,10 +64,11 @@ import type { RemisionRead } from '../../remision.model';
  * `ENTITY_DATA_GATEWAY`.
  *
  * La remisión es una entrega física (mueve inventario): su cabecera —fiel al
- * legacy— lleva cliente, fecha, sede, asesor y comentario. Sin plazo/vencimiento/
- * método de pago. La **tabla de detalles** —compartida entre documentos
- * comerciales— se compone vía `<app-comercial-documento-detalles>` recibiendo el
- * `FormArray` de líneas.
+ * legacy— lleva cliente, fecha, sede, almacén, asesor y comentario. Sin
+ * plazo/vencimiento/método de pago. La **tabla de detalles** —compartida entre
+ * documentos comerciales— se compone vía `<app-comercial-documento-detalles>`
+ * recibiendo el `FormArray` de líneas; cada línea lleva su propio almacén, que
+ * nace precargado con el de la cabecera.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -111,6 +112,7 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -152,6 +154,7 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
     contacto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
+    almacen: this.fb.control<ErpSelectOption | null>(null),
     asesor: this.fb.control<ErpSelectOption | null>(null),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),

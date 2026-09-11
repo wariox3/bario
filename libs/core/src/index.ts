@@ -193,7 +193,12 @@ export type {
   CreateContenedorRequest,
   UserSearchResult,
 } from './lib/tenant';
-export { ErpSelectDataService, SELECT_ENDPOINTS, buildContactoLabel } from './lib/data';
+export {
+  ErpSelectDataService,
+  SELECT_ENDPOINTS,
+  buildContactoLabel,
+  asesorLabel,
+} from './lib/data';
 export type { ErpSelectOption } from './lib/data';
 export * from './lib/data-list';
 export * from './lib/plans';

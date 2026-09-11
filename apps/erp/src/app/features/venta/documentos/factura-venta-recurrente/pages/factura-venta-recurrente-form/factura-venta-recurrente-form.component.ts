@@ -30,7 +30,7 @@ import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/co
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { SELECT_ENDPOINTS } from '@reddoc/core';
+import { asesorLabel, SELECT_ENDPOINTS } from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -40,11 +40,7 @@ import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
-import {
-  METODO_PAGO_ENDPOINT,
-  SEDE_ENDPOINT,
-  asesorLabel,
-} from '../../factura-venta-recurrente.constants';
+import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta-recurrente.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {

@@ -42,6 +42,12 @@ interface CabeceraView {
   readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly sede: string | null;
+  readonly almacen: string | null;
+  /**
+   * Nombre del asesor. Sale de `asesor_nombre` del read, que el backend todavía
+   * no serializa: hasta que lo haga se ve "—". No se resuelve contra el catálogo
+   * de asesores —una petición extra para una etiqueta no es el deber ser—.
+   */
   readonly asesor: string | null;
   readonly comentario: string | null;
   /**
@@ -55,7 +61,7 @@ interface CabeceraView {
  * Ficha (detalle) de una **Remisión** (familia comercial) — solo lectura.
  *
  * Camino A del enfoque híbrido: la cabecera de la remisión es específica (cliente,
- * fecha, sede, asesor, comentario), pero la tabla de líneas y el resumen los
+ * fecha, sede, almacén, asesor, comentario), pero la tabla de líneas y el resumen los
  * aporta la familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y
  * líneas (`DocumentoDetalleService`) en paralelo —igual que el form— y las muestra
  * sin formularios. Desde aquí se vuelve a la lista o se salta a editar.
@@ -258,8 +264,8 @@ export class RemisionDetailComponent implements OnInit {
 
   private loadDocumento(id: number): void {
     // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
-    // Los nombres de los FK (sede, asesor) llegan en los `*_nombre` del read; no
-    // hace falta resolverlos con peticiones extra.
+    // Los nombres de los FK (sede, almacén, asesor) llegan en los `*_nombre` del
+    // read; no se resuelven con peticiones extra.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
@@ -274,6 +280,7 @@ export class RemisionDetailComponent implements OnInit {
             identificacion: read.contacto_numero_identificacion ?? null,
             fecha: fromIsoDate(read.fecha),
             sede: read.sede_nombre ?? null,
+            almacen: read.almacen_nombre ?? null,
             asesor: read.asesor_nombre ?? null,
             comentario: read.comentario ?? null,
             estados: {

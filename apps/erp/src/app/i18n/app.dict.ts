@@ -1671,6 +1671,8 @@ export interface AppDict
           fecha: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           asesor: string;
           asesorPlaceholder: string;
           comentario: string;
@@ -1693,6 +1695,7 @@ export interface AppDict
           identificacion: string;
           fecha: string;
           sede: string;
+          almacen: string;
           asesor: string;
           comentario: string;
         };

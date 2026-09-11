@@ -24,6 +24,11 @@ export type ComercialDetalleGroup = FormGroup<{
 /**
  * Crea un `FormGroup` de línea comercial (vacío o precargado en edición).
  *
+ * `almacenPorDefecto` precarga en la línea nueva el almacén de la cabecera, como
+ * hacía el legacy: lo normal es que todas las líneas salgan del mismo almacén y
+ * la persona corrija solo las excepciones. Solo lo pasa el documento que muestra
+ * la columna; el resto crea la línea sin almacén.
+ *
  * Suscripciones auto-contenidas (solo referencian controles del propio grupo,
  * así viven/mueren con él):
  *  - al elegir ítem → autollena el precio (editable).
@@ -33,6 +38,7 @@ export type ComercialDetalleGroup = FormGroup<{
  */
 export function createComercialDetalleGroup(
   value?: Partial<ComercialDetalleFormRawValue>,
+  almacenPorDefecto?: ErpSelectOption | null,
 ): ComercialDetalleGroup {
   const group: ComercialDetalleGroup = new FormGroup({
     id: new FormControl<number | null>(value?.id ?? null),
@@ -59,7 +65,7 @@ export function createComercialDetalleGroup(
       { nonNullable: true },
     ),
     detalle: new FormControl<string | null>(value?.detalle ?? null),
-    almacen: new FormControl<ErpSelectOption | null>(value?.almacen ?? null),
+    almacen: new FormControl<ErpSelectOption | null>(value?.almacen ?? almacenPorDefecto ?? null),
     documento_detalle_afectado: new FormControl<number | null>(
       value?.documento_detalle_afectado ?? null,
     ),
