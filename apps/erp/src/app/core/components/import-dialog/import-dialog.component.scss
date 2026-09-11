@@ -1,3 +1,10 @@
+// El host no es más que el envoltorio del diálogo: el diálogo se pinta `fixed`,
+// así que fuera del flujo no pierde nada y deja de cobrar el `gap` del
+// contenedor que lo declara. Misma razón que `_overlays.scss` en libs/styles.
+:host {
+  display: contents;
+}
+
 // ── Dialog shell — hereda el lenguaje visual de los dialogs del proyecto:
 //    radius 16px, sombra suave + larga, padding propio del header/content/footer.
 //    El mismo patrón vive en contenedores/components/{delete,create,invite}-dialog.

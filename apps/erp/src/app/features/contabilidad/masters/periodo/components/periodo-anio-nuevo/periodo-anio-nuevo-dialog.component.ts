@@ -30,6 +30,7 @@ const ANIO_MAX = 2100;
     FocusInvalidDirective,
   ],
   templateUrl: './periodo-anio-nuevo-dialog.component.html',
+  styles: ':host { display: contents; }',
 })
 export class PeriodoAnioNuevoDialogComponent {
   private readonly fb = inject(FormBuilder);

@@ -1,3 +1,10 @@
+// El host no es más que el envoltorio del diálogo: el diálogo se pinta `fixed`,
+// así que fuera del flujo no pierde nada y deja de cobrar el `gap` del
+// contenedor que lo declara. Misma razón que `_overlays.scss` en libs/styles.
+:host {
+  display: contents;
+}
+
 :host ::ng-deep .cp-delete-dialog {
   border-radius: 16px !important;
   overflow: hidden;
