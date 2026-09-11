@@ -469,45 +469,47 @@ Lo que lo separa del resto: **sus líneas no las teclea nadie**. El backend las 
 activos fijos y el front solo las muestra y las elimina. Por eso no reusa la familia contable
 (editable, de cuenta/naturaleza/valor) sino una tabla propia de solo lectura.
 
-### 7.1 Por confirmar con backend
+### 7.1 El contrato, ya confirmado (2026-09-11)
 
-#### El endpoint que genera las líneas
+El backend creó `POST /general/documento/cargar-activo/` y está en el schema del contenedor. Recibe
+`{ id }` del documento y responde el documento con su `total` actualizado.
 
-`POST /general/documento/cargar-activo/` con body `{ id }` (id del documento). Tomado de
-`DepreciacionService.cargarActivos` del legacy, sin verificar.
+Qué hace, en sus palabras: carga una línea por cada activo que todavía tenga saldo por depreciar
+**en el mes de la fecha del documento**. El mes es comercial, de 30 días; el activo que estuvo el mes
+completo deprecia su cuota entera y el que se activó o se dio de baja dentro del mes deprecia la
+parte proporcional a los días. Ningún activo deprecia más que su saldo.
 
-**Pregunta concreta**: al llamarlo con un documento que **ya tiene líneas**, ¿las reemplaza o las
-acumula? El front no lo sabe, así que pide confirmación al usuario antes de volver a llamar. Si el
-backend reemplaza siempre, esa confirmación sobra.
+Tres consecuencias que ya están en el código:
 
-La respuesta del endpoint **se ignora**: al terminar se recargan las líneas desde
-`documento-detalle`, que es la fuente autoritativa. Si el endpoint ya devuelve las líneas, se ahorra
-una petición.
+1. **Recargar exige borrar primero.** El cargue pide el documento modificable y **sin detalles**,
+   porque no descuenta el saldo del activo: cargar dos veces depreciaría el mismo periodo dos veces.
+   El formulario confirma, borra las líneas una por una —la API no tiene borrado masivo— y recarga.
+2. **El cargue puede terminar bien y no generar nada**, si el mes no tiene activos con saldo. Ese
+   caso lleva su propio aviso; sin él un documento que sigue vacío se lee como un fallo, y eso fue
+   exactamente lo que reportaron desde soporte.
+3. **El `total` del documento es de solo lectura** y ni siquiera existe en el cuerpo de escritura, así
+   que el front dejó de mandarlo. La suma de las líneas se quedó solo para mostrar.
 
-#### Campos de la línea
+#### Lo único que falta: los días
 
-`activo`, `activo_codigo`, `activo_nombre` y `dias`, sobre `DocumentoDetalleReadBase` (de donde sale
-`precio`). Salen del `FormGroup` del legacy, **no de una respuesta real**.
+Pedimos cuatro campos en la línea y llegaron tres: `activo`, `activo_codigo` y `activo_nombre`.
+**`dias` no está** en `GenDocumentoDetalle`, así que la columna de días salió de la tabla.
 
-Ojo: el legacy pinta `detalle.value.activo` como si fuera el **id** del activo (columna "Activo ID"),
-mientras que el código y el nombre van en columnas aparte. Se portó igual, pero conviene confirmar
-que `activo` es la FK y no otra cosa.
+El valor de la línea se lee de `total`, no de `precio`: como el cargue prorratea por días, `precio`
+podría ser una cuota diaria. `total` siempre es el valor depreciado del periodo.
 
-#### El total
-
-Se calcula en el front sumando el `precio` de las líneas y viaja así en la cabecera. El legacy
-**nunca lo calculaba** (su `calcularTotales()` está comentado entero): mostraba el que devolvía el
-backend. Confirmar que el backend acepta el total que le mandamos y que coincide con el suyo; si lo
-recalcula al aprobar, mandarlo es inofensivo.
+Queda por mirar, con líneas reales en pantalla, **qué guarda el backend en `cantidad`**. Si son los
+días, la columna vuelve leyendo de ahí y no hace falta pedir nada. Si es siempre 1, hay que pedir el
+campo.
 
 ### 7.2 Decisiones tomadas
 
 | #   | Decisión                                                                          | Por qué                                                                                                                                                                                          |
 | --- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **Tabla propia** (`<app-depreciacion-lineas-table>`), no la familia contable      | La línea no comparte ni una columna con un asiento: activo, código, nombre y días contra cuenta, naturaleza y valor. Y no se edita: meterla en la tabla contable obligaba a volverla opt-out     |
+| 1   | **Tabla propia** (`<app-depreciacion-lineas-table>`), no la familia contable      | La línea no comparte ni una columna con un asiento: activo, código y nombre contra cuenta, naturaleza y valor. Y no se edita: meterla en la tabla contable obligaba a volverla opt-out           |
 | 2   | Al crear, se navega a **editar** el documento nuevo (no a la lista ni al detalle) | Una depreciación recién creada está vacía y cargar los activos necesita su id. Volver a la lista obligaba al usuario a buscar el documento que acaba de crear                                    |
 | 3   | La sección de activos **no existe en alta**                                       | Sin id no se puede generar ni listar nada; mostrar una tabla vacía con un botón muerto es peor que no mostrarla                                                                                  |
-| 4   | El total se **suma en el front** (ver §7.1)                                       | El usuario ve el total apenas carga los activos, sin guardar ni recargar. Las líneas vienen del backend, así que la suma no inventa nada                                                         |
+| 4   | El total se **suma en el front solo para mostrar**                                | El usuario ve el total apenas carga los activos, sin guardar ni recargar. En la cabecera es de solo lectura, así que el front no lo manda                                                        |
 | 5   | **No** se portan `soporte` ni `comprobante`                                       | El formulario del legacy los declaraba —y hasta pedía el catálogo de comprobantes en `ngOnInit`— pero su plantilla no los renderiza nunca. Son restos de haber copiado el formulario del asiento |
 | 6   | El `comentario` va en la misma sección, no en una segunda pestaña                 | Ningún formulario de este ERP usa pestañas; esconder un solo campo detrás de una no aporta                                                                                                       |
 | 7   | Eliminar una línea pega a `documento-detalle` al instante                         | Es lo que ya hace la familia contable. El `detalles_eliminados` diferido del legacy no aplica                                                                                                    |

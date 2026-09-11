@@ -10,6 +10,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
 import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
+  extractErrorMessage,
   FormErrorService,
   I18nService,
   SELECT_ENDPOINTS,
@@ -44,10 +45,10 @@ import { DepreciacionService } from '../../depreciacion.service';
  *
  * Lo que lo distingue de los demás documentos: **sus líneas no se teclean**. El
  * botón "Cargar activos" le pide al backend que las genere desde los activos
- * fijos, y el form solo las muestra (y deja eliminarlas). Como esa operación
- * necesita el id del documento, en alta la sección de líneas no existe todavía:
- * al guardar se navega a la edición del documento recién creado, que es donde
- * se cargan.
+ * fijos del mes de la fecha del documento, y el form solo las muestra (y deja
+ * eliminarlas). Como esa operación necesita el id del documento, en alta la
+ * sección de líneas no existe todavía: al guardar se navega a la edición del
+ * documento recién creado, que es donde se cargan.
  */
 @Component({
   selector: 'app-depreciacion-form',
@@ -116,7 +117,7 @@ export class DepreciacionFormComponent implements OnInit {
   /** Líneas generadas por el backend. Solo lectura: el form no las construye. */
   protected readonly lines = signal<readonly DepreciacionLineaView[]>([]);
 
-  /** Total depreciado; es el que viaja en la cabecera al guardar. */
+  /** Total depreciado. Solo para mostrar: el de la cabecera lo calcula el backend. */
   protected readonly total = computed(() => sumarLineasDepreciacion(this.lines()));
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
@@ -156,11 +157,7 @@ export class DepreciacionFormComponent implements OnInit {
 
     const id = this.id();
     const toasts = this.t().entities.depreciacion.form.toasts;
-    const payload = formValueToPayload(
-      this.form.getRawValue(),
-      this.document().documentTypeId,
-      this.total(),
-    );
+    const payload = formValueToPayload(this.form.getRawValue(), this.document().documentTypeId);
 
     this.isSaving.set(true);
     const operation = id
@@ -196,14 +193,19 @@ export class DepreciacionFormComponent implements OnInit {
   }
 
   /**
-   * Pide al backend generar las líneas desde los activos fijos. Si ya hay
-   * líneas confirma antes: no sabemos si el backend acumula o reemplaza, así
-   * que la decisión queda del lado del usuario (ver PENDIENTES).
+   * Pide al backend generar las líneas desde los activos fijos.
+   *
+   * El cargue **exige el documento sin detalles**: no descuenta el saldo del
+   * activo, así que cargar dos veces depreciaría el mismo periodo dos veces. Si
+   * ya hay líneas, se confirma y se borran antes de volver a cargar.
    */
   protected onCargarActivos(): void {
     if (this.isLoadingActivos()) return;
+    const id = this.documentId();
+    if (id == null) return;
+
     if (this.lines().length === 0) {
-      this.cargarActivos();
+      this.cargarActivos(id);
       return;
     }
 
@@ -215,30 +217,89 @@ export class DepreciacionFormComponent implements OnInit {
       acceptLabel: labels.cargarActivos,
       rejectLabel: this.t().common.actions.cancel,
       rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.cargarActivos(),
+      accept: () => this.recargarActivos(id),
     });
   }
 
-  private cargarActivos(): void {
-    const id = this.documentId();
-    if (id == null) return;
+  /**
+   * Deja el documento en blanco y vuelve a cargar. La API no tiene borrado
+   * masivo de líneas, así que van una por una en paralelo; si alguna falla se
+   * aborta y se recarga la tabla para mostrar lo que sí se borró.
+   */
+  private recargarActivos(id: number): void {
+    const ids = this.lines()
+      .map((line) => line.id)
+      .filter((lineId): lineId is number => lineId != null);
+    if (ids.length === 0) {
+      this.cargarActivos(id);
+      return;
+    }
 
+    this.isLoadingActivos.set(true);
+    forkJoin(ids.map((lineId) => this.detalleService.eliminar(lineId)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.lines.set([]);
+          this.cargarActivos(id);
+        },
+        error: () => {
+          this.isLoadingActivos.set(false);
+          const toasts = this.t().entities.depreciacion.form.toasts;
+          this.toast.error(toasts.limpiarError.title, toasts.limpiarError.desc);
+          this.loadLineas(id);
+        },
+      });
+  }
+
+  private cargarActivos(id: number): void {
     this.isLoadingActivos.set(true);
     const toasts = this.t().entities.depreciacion.form.toasts;
     this.depreciacionService
       .cargarActivos(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        // El backend es la fuente autoritativa: se recargan las líneas en vez
+        // de confiar en lo que devuelva la respuesta.
+        next: () => this.loadLineasTrasCargue(id),
+        error: (err: unknown) => {
           this.isLoadingActivos.set(false);
+          // El backend explica por qué no cargó (documento con detalles, no
+          // modificable); vale más que un texto fijo.
+          this.toast.error(
+            toasts.cargarError.title,
+            extractErrorMessage(err, toasts.cargarError.desc),
+          );
+        },
+      });
+  }
+
+  /**
+   * Recarga las líneas tras un cargue y avisa según lo que haya quedado.
+   *
+   * El cargue puede terminar bien y no generar nada: solo toma los activos con
+   * saldo por depreciar en el mes de la fecha del documento, y puede que ese mes
+   * no tenga ninguno. Un documento que sigue vacío sin explicación se lee como
+   * un fallo, así que ese caso lleva su propio aviso.
+   */
+  private loadLineasTrasCargue(id: number): void {
+    this.detalleService
+      .listarPorDocumento<DepreciacionLineaRead>(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lineas) => {
+          this.isLoadingActivos.set(false);
+          this.lines.set(lineas.map(depreciacionLineaToView));
+          const toasts = this.t().entities.depreciacion.form.toasts;
+          if (lineas.length === 0) {
+            this.toast.info(toasts.cargarVacio.title, toasts.cargarVacio.desc);
+            return;
+          }
           this.toast.success(toasts.cargarSuccess.title, toasts.cargarSuccess.desc);
-          // El backend es la fuente autoritativa: se recargan las líneas en vez
-          // de confiar en lo que devuelva la respuesta.
-          this.loadLineas(id);
         },
         error: () => {
           this.isLoadingActivos.set(false);
-          this.toast.error(toasts.cargarError.title, toasts.cargarError.desc);
+          this.notifyLoadError();
         },
       });
   }

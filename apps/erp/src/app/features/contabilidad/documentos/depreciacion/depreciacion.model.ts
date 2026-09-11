@@ -29,10 +29,12 @@ export interface DepreciacionRead extends DocumentoReadBase {
  *
  * **Sin `detalles`**: las líneas no se crean desde el front, las genera el
  * backend con `cargar-activo/`. Es la diferencia de fondo con el asiento.
+ *
+ * **Sin `total`** tampoco: en el backend es de solo lectura y ni siquiera existe
+ * en el cuerpo de escritura, así que mandarlo era enviar un campo que DRF
+ * descarta. Lo calcula él al cargar los activos.
  */
 export interface DepreciacionPayload extends DocumentoPayloadBase {
   readonly centro_costo: number | null;
   readonly comentario: string | null;
-  /** Suma de las líneas cargadas, como string con 2 decimales. */
-  readonly total: string;
 }

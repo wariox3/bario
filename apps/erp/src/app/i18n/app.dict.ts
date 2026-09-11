@@ -2601,7 +2601,9 @@ export interface AppDict
           editError: { title: string; desc: string };
           loadError: { title: string; desc: string };
           cargarSuccess: { title: string; desc: string };
+          cargarVacio: { title: string; desc: string };
           cargarError: { title: string; desc: string };
+          limpiarError: { title: string; desc: string };
         };
       };
       detail: {
@@ -2627,7 +2629,6 @@ export interface AppDict
         activo: string;
         codigo: string;
         nombre: string;
-        dias: string;
         valor: string;
         acciones: string;
       };

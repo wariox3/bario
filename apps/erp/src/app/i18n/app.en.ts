@@ -3360,11 +3360,13 @@ export const en: AppDict = {
         editTitle: 'Edit depreciation',
         sectionHint: 'Register the period and load the assets to depreciate',
         sections: { activos: 'Depreciated assets' },
-        activosHint: 'Calculated by the system from the fixed assets',
+        activosHint:
+          'Calculated by the system from the assets with a remaining balance in the month of the date',
         cargarActivos: 'Load assets',
         confirmReload: {
           header: 'Load again',
-          message: 'This document already has assets loaded. Load them again?',
+          message:
+            'This document already has assets loaded. They will be removed and loaded again. Continue?',
         },
         fields: {
           contacto: 'Contact',
@@ -3391,7 +3393,15 @@ export const en: AppDict = {
             title: 'Assets loaded',
             desc: 'The document lines were generated',
           },
+          cargarVacio: {
+            title: 'No assets to depreciate',
+            desc: 'No asset had a remaining balance in the month of the document date',
+          },
           cargarError: { title: 'Load assets failed', desc: 'The assets could not be loaded' },
+          limpiarError: {
+            title: 'Clear failed',
+            desc: 'The previous assets could not be removed',
+          },
         },
       },
       detail: {
@@ -3423,7 +3433,6 @@ export const en: AppDict = {
         activo: 'Asset',
         codigo: 'Code',
         nombre: 'Name',
-        dias: 'Days',
         valor: 'Amount',
         acciones: 'Actions',
       },
