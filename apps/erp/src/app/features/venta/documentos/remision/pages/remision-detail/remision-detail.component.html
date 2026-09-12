@@ -24,11 +24,14 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
-      [canAprobar]="!cabecera()?.estados?.estado_aprobado"
-      [canDesaprobar]="!!cabecera()?.estados?.estado_aprobado"
+      [canAprobar]="capacidades().puedeAprobar"
+      [canDesaprobar]="capacidades().puedeDesaprobar"
+      [showAnular]="true"
+      [canAnular]="capacidades().puedeAnular"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (aprobar)="onAprobar()"
       (desaprobar)="onDesaprobar()"
+      (anular)="onAnular()"
       (imprimir)="onImprimir()"
       (contabilizacionChanged)="onContabilizacionChanged()"
     />

@@ -18,8 +18,13 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
-import type { DocumentEntityConfig } from '@erp/core/module-config';
+import {
+  CAPACIDADES_DOCUMENTO_VACIAS,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  capacidadesDocumento,
+} from '@erp/core/module-config';
+import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos/comercial/components/comercial-documento-lineas-table/comercial-documento-lineas-table.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
@@ -126,6 +131,17 @@ export class RemisionDetailComponent implements OnInit {
     return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
   });
 
+  /**
+   * Qué acciones ofrece la botonera con las banderas actuales. La regla vive en
+   * `documento.estado.ts` (módulo puro y testeado), no en los `[disabled]` del
+   * template: son tres acciones sobre cuatro banderas y el ERP anterior ya se
+   * contradijo escribiendo la misma condición de dos maneras.
+   */
+  protected readonly capacidades = computed<CapacidadesDocumento>(() => {
+    const cab = this.cabecera();
+    return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
+  });
+
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
   protected readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),
@@ -198,6 +214,44 @@ export class RemisionDetailComponent implements OnInit {
         },
         error: (err: unknown) => {
           const ts = this.t().documentActions.detail.toasts.aprobarError;
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
+        },
+      });
+  }
+
+  /**
+   * Anula el documento previa confirmación. Es **irreversible** —deja el
+   * documento congelado, no lo devuelve a borrador como desaprobar—, así que la
+   * confirmación lo dice antes de llamar al backend.
+   */
+  protected onAnular(): void {
+    const id = this.id();
+    if (!id) return;
+    const a = this.t().documentActions.detail;
+    this.confirmation.confirm({
+      message: a.confirmAnular.message,
+      header: a.confirmAnular.header,
+      icon: 'pi pi-ban',
+      acceptLabel: a.anular,
+      acceptButtonProps: { severity: 'danger' },
+      rejectLabel: this.t().common.actions.cancel,
+      rejectButtonProps: { severity: 'secondary', outlined: true },
+      accept: () => this.anularDocumento(Number(id)),
+    });
+  }
+
+  private anularDocumento(id: number): void {
+    this.gateway
+      .anular(this.document(), id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          const ts = this.t().documentActions.detail.toasts.anularSuccess;
+          this.toast.success(ts.title, ts.desc);
+          this.loadDocumento(id);
+        },
+        error: (err: unknown) => {
+          const ts = this.t().documentActions.detail.toasts.anularError;
           this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
       });
