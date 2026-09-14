@@ -14,6 +14,7 @@ import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import type { MenuItem } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
+import { TabsModule } from 'primeng/tabs';
 import {
   formatFechaLarga,
   I18nService,
@@ -44,7 +45,12 @@ import { AfectacionModalComponent } from '@erp/core/module-config/components/afe
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
+  totalCantidad,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { DocumentoPagosTableComponent } from '@erp/features/documentos/pagos/components/documento-pagos-table/documento-pagos-table.component';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
+import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
+import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { facturaVentaToFormValue } from '../../factura-venta.mapper';
@@ -76,7 +82,8 @@ interface CabeceraView {
  * tabla de líneas y el resumen los aporta la familia comercial. Carga cabecera
  * (`ENTITY_DATA_GATEWAY.getById`) y líneas (`DocumentoDetalleService`) en paralelo
  * —igual que el form— y las muestra sin formularios. Desde aquí se vuelve a la
- * lista o se salta a editar.
+ * lista o se salta a editar. Líneas y pagos van en tabs dentro de la card de la
+ * cabecera, con un único resumen debajo: el mismo esqueleto que el formulario.
  *
  * Suma un dropdown **Utilidades** con la importación de líneas por Excel, igual
  * que la ficha del asiento. Vive acá y no en el formulario porque la
@@ -91,10 +98,12 @@ interface CabeceraView {
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
+    DocumentoPagosTableComponent,
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
     MenuModule,
+    TabsModule,
     ImportDialogComponent,
   ],
   templateUrl: './factura-venta-detail.component.html',
@@ -121,6 +130,8 @@ export class FacturaVentaDetailComponent implements OnInit {
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+  /** Pagos recibidos, mapeados a la forma del front (asunción de contrato: el backend aún no los expone). */
+  protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -155,6 +166,14 @@ export class FacturaVentaDetailComponent implements OnInit {
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
   protected readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),
+  );
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Recibido, saldo y exceso de los pagos frente al total: misma función que el formulario. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagos(), this.resumen().total),
   );
 
   private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
@@ -285,6 +304,7 @@ export class FacturaVentaDetailComponent implements OnInit {
             },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
+          this.pagos.set((read.pagos ?? []).map(pagoReadToFormValue));
           this.isLoading.set(false);
         },
         error: () => {

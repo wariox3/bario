@@ -1,0 +1,38 @@
+@let p = t().entities.documentoPago;
+
+<div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <table class="documento-pagos-table">
+    <thead>
+      <tr>
+        <th class="documento-pagos-table__th w-10 text-center">{{ p.columns.linea }}</th>
+        <th class="documento-pagos-table__th min-w-[16rem] text-left">
+          {{ p.columns.cuentaBanco }}
+        </th>
+        <th class="documento-pagos-table__th w-40 text-right">{{ p.columns.monto }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (pago of pagos(); track $index) {
+        <tr class="documento-pagos-table__row">
+          <td class="documento-pagos-table__td text-center text-brand-muted tabular-nums">
+            {{ $index + 1 }}
+          </td>
+          <td class="documento-pagos-table__td font-medium text-brand-text">
+            {{ pago.cuenta_banco?.nombre || '—' }}
+          </td>
+          <td
+            class="documento-pagos-table__td text-right font-semibold tabular-nums text-brand-text"
+          >
+            {{ formatMoney(pago.pago) }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="3" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <i class="pi pi-inbox mr-2"></i>{{ p.empty }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
