@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
 import { I18nService } from '@reddoc/core';
@@ -14,6 +15,10 @@ import type { AppDict } from '@erp/i18n';
  * Imprimir, un dropdown "Acciones" (Desaprobar y, opcionalmente, Anular) y un
  * dropdown "Opciones" (Archivos y Contabilidad). Compartida por todas las
  * fichas de detalle (servicio, factura de venta y futuras).
+ *
+ * "Aprobar" va suelto y el resto (Imprimir, Emitir, Acciones, Opciones) en un
+ * `p-buttongroup`: aprobar es la decisión y lleva el único peso primario; lo
+ * demás es consulta o salida del documento y se lee como una sola pieza.
  *
  * Es **presentacional** salvo por dos acciones: renderiza los botones y emite
  * eventos, y cada ficha decide qué hacer. Los botones se deshabilitan según el
@@ -44,7 +49,13 @@ import type { AppDict } from '@erp/i18n';
 @Component({
   selector: 'app-document-detail-actions',
   standalone: true,
-  imports: [ButtonModule, MenuModule, ArchivosDialogComponent, ContabilidadDialogComponent],
+  imports: [
+    ButtonModule,
+    ButtonGroupModule,
+    MenuModule,
+    ArchivosDialogComponent,
+    ContabilidadDialogComponent,
+  ],
   templateUrl: './document-detail-actions.component.html',
   styleUrl: './document-detail-actions.component.scss',
 })

@@ -28,3 +28,38 @@
     transform: scale(0.97);
   }
 }
+
+// `p-buttongroup`: el grupo une sus botones desde `@layer primeng`, así que el
+// radio de arriba —sin capa— le gana y cada botón conserva sus 4 esquinas: se
+// leen como botones pegados, no como un control. Mismo problema que resuelve
+// `.p-splitbutton` en `apps/erp/src/styles.scss`.
+// Se cuentan `p-button` (el host), no `.p-button`: cada `<button>` es hijo único
+// de su host y `:first-of-type` sobre él siempre sería verdadero.
+.p-buttongroup {
+  p-button:not(:first-of-type) .p-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  p-button:not(:last-of-type) .p-button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+  }
+
+  // El resplandor y el encogido del botón suelto desbordan sobre el vecino y
+  // abren la costura; en el grupo el hover lo da el fondo del preset.
+  .p-button:not(:disabled):hover {
+    box-shadow: none;
+  }
+
+  .p-button:not(:disabled):active {
+    transform: none;
+  }
+
+  // El foco de un segmento no queda tapado por el borde del siguiente.
+  .p-button:focus-visible {
+    position: relative;
+    z-index: 1;
+  }
+}
