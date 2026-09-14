@@ -24,21 +24,16 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
+      [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
       [showAnular]="true"
       [canAnular]="capacidades().puedeAnular"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
-      (anular)="onAnular()"
-      (imprimir)="onImprimir()"
-      (contabilizacionChanged)="onContabilizacionChanged()"
+      (documentoChanged)="onDocumentoChanged()"
     />
   }
 </header>
-
-<p-confirmDialog />
 
 <app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
 

@@ -16,6 +16,7 @@
   @if (cabecera()) {
     <app-document-detail-actions
       [documentoId]="id()"
+      [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
       [showAnular]="true"
@@ -23,12 +24,8 @@
       [showEmitir]="true"
       [canEmitir]="capacidades().puedeEmitir"
       [contabilizado]="!!estados().estado_contabilizado"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
-      (anular)="onAnular()"
       (emitir)="onEmitir()"
-      (imprimir)="onImprimir()"
-      (contabilizacionChanged)="onContabilizacionChanged()"
+      (documentoChanged)="onDocumentoChanged()"
     />
     <div class="ml-auto">
       <app-document-estados [estados]="estados()" />

@@ -16,21 +16,17 @@
   @if (cabecera(); as c) {
     <app-document-detail-actions
       [documentoId]="id()"
+      [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
       [contabilizado]="!!estados().estado_contabilizado"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
-      (imprimir)="onImprimir()"
-      (contabilizacionChanged)="onContabilizacionChanged()"
+      (documentoChanged)="onDocumentoChanged()"
     />
     <div class="ml-auto">
       <app-document-estados [estados]="estados()" />
     </div>
   }
 </header>
-
-<p-confirmDialog />
 
 @if (isLoading()) {
   <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->

@@ -739,10 +739,11 @@ las 25 fichas de detalle). Vive en `core/components/contabilidad-dialog/` y lo a
 Qué hace: lista el libro contable del documento (paginado), suma débitos y créditos cuando todas
 las líneas están a la vista y avisa si no cuadran, exporta el libro a Excel y ofrece
 **contabilizar** o **descontabilizar** según `estado_contabilizado` de la cabecera. Tras la acción
-recarga el libro y avisa a la ficha (`contabilizacionChanged`) para que recargue su cabecera.
+recarga el libro y avisa a la botonera (`contabilizacionChanged`), que se lo pasa a la ficha como
+`documentoChanged` para que recargue su cabecera.
 
 Estado (2026-09-07): mecanismo listo y **cableado en las 19 fichas que se contabilizan** —cada una
-pasa `[contabilizado]` desde su cabecera y escucha `(contabilizacionChanged)` para recargarla—. Lo
+pasa `[contabilizado]` desde su cabecera y escucha `(documentoChanged)` para recargarla—. Lo
 apagan con `[showContabilidad]="false"` las fichas de **inventario** (el legacy hacía lo mismo con
 `permiteContabilizar=false`) y las dos **plantillas recurrentes**, que no se contabilizan: de ellas
 nacen las facturas, que sí.

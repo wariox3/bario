@@ -44,7 +44,7 @@ Diferencias con los informes de contabilidad, que condicionan el diseño:
 
 ### Columnas
 
-Solo `existencia` está **verificado contra el schema** (`InvExistenciaInforme`):
+`existencia` está **verificado contra el schema** (`InvExistenciaInforme`):
 
 ```
 id · codigo · nombre · referencia · existencia · remision · disponible · negativo · inactivo
@@ -69,12 +69,17 @@ código de ítem y detalle sumados.
 **La asimetría que hay que tener presente**: las **columnas** leen el JSON y van **planas**; los
 **filtros** viajan como rutas ORM y van con **doble guion bajo**. No unificar unos con otras.
 
-- [ ] **Los campos de `existencia_almacen`.** Es el único que queda sin verificar, y sus columnas
-      siguen con doble guion bajo (`item__nombre`, `almacen__nombre`). La evidencia en contra ya es
-      fuerte: los **dos** serializers confirmados de esta familia usan nombres planos, y
-      `historial_movimiento` devuelve exactamente `item_id` / `item_codigo` / `item_nombre` /
-      `almacen_id` / `almacen_nombre` para las mismas entidades. Lo más probable es que esas
-      columnas salgan vacías hoy. No se cambiaron por inferencia: basta pedir su respuesta.
+`existencia_almacen` quedó **verificado contra la respuesta real** (2026-09-14):
+
+```
+id · item_id · item_codigo · item_nombre · item_referencia · almacen_id · almacen_nombre ·
+existencia · remision · disponible · costo_promedio
+```
+
+Sus columnas leían `item__nombre` / `almacen__nombre` y salían vacías. Ya está corregido, con código,
+referencia y costo promedio sumados. Los filtros (`item__nombre`, `almacen__nombre`) no se tocaron:
+son rutas ORM y la respuesta no dice nada de ellos.
+
 - [ ] **Qué hacer con `operacion_inventario` y `operacion_remision`.** Son dos ejes independientes
       (`1` suma, `-1` resta, `0` no toca ese saldo) y hoy se modelan pero no se pintan: en crudo son
       números sin significado para quien lee. Si vale mostrarlos, hace falta el catálogo de valores

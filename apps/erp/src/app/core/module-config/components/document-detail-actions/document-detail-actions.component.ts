@@ -1,63 +1,118 @@
-import { Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Menu, MenuModule } from 'primeng/menu';
-import type { MenuItem } from 'primeng/api';
-import { I18nService } from '@reddoc/core';
+import { ConfirmationService, type MenuItem } from 'primeng/api';
+import {
+  ENTITY_DATA_GATEWAY,
+  I18nService,
+  ToastService,
+  extractErrorMessage,
+  type DocumentEntityConfig,
+} from '@reddoc/core';
 import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
 import { ContabilidadDialogComponent } from '@erp/core/components/contabilidad-dialog/contabilidad-dialog.component';
 import { MODELO } from '@erp/core/permissions';
 import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import type { AppDict } from '@erp/i18n';
 
+/** Acciones que cambian el estado del documento y que la botonera resuelve sola. */
+type AccionEstado = 'aprobar' | 'desaprobar' | 'anular';
+
+/**
+ * Confirmación de cada acción de estado. Anular va en rojo: es irreversible —deja
+ * el documento congelado, no lo devuelve a borrador como desaprobar—.
+ */
+const CONFIRMACION: Readonly<
+  Record<
+    AccionEstado,
+    {
+      readonly clave: 'confirmAprobar' | 'confirmDesaprobar' | 'confirmAnular';
+      readonly icon: string;
+      readonly peligrosa: boolean;
+    }
+  >
+> = {
+  aprobar: { clave: 'confirmAprobar', icon: 'pi pi-check-circle', peligrosa: false },
+  desaprobar: { clave: 'confirmDesaprobar', icon: 'pi pi-times-circle', peligrosa: false },
+  anular: { clave: 'confirmAnular', icon: 'pi pi-ban', peligrosa: true },
+};
+
 /**
  * Botonera de acciones de un documento en su **vista de detalle**: Aprobar,
  * Imprimir, un dropdown "Acciones" (Desaprobar y, opcionalmente, Anular) y un
  * dropdown "Opciones" (Archivos y Contabilidad). Compartida por todas las
- * fichas de detalle (servicio, factura de venta y futuras).
+ * fichas de detalle.
  *
- * Es **presentacional** salvo por dos acciones: renderiza los botones y emite
- * eventos, y cada ficha decide qué hacer. Los botones se deshabilitan según el
- * estado del documento vía los inputs `can*` (todos habilitados por default; las
- * fichas los cablearán a su estado).
+ * Todas van en un `p-buttongroup`, que las lee como una sola pieza.
  *
- * Las excepciones son **Archivos** y **Contabilidad**, que traen su propio
- * diálogo. Son las acciones cuyo comportamiento es idéntico en las 22 fichas
- * —los mismos recursos `general/archivo/` y `contabilidad/movimiento/` +
- * `general/documento/(des)contabilizar/`, discriminados solo por el id del
- * documento—, así que emitirlas hacia afuera obligaba a repetir el mismo estado
- * y el mismo handler en cada una. Las demás (aprobar, imprimir, anular) sí
- * cambian de endpoint según el documento y siguen siendo del host.
+ * **Resuelve sus acciones sola.** Aprobar, desaprobar, anular e imprimir eran
+ * eventos que cada ficha atendía con el mismo bloque —confirmar, llamar al
+ * gateway, avisar y recargar—: 22 copias calcadas. No cambian de endpoint según
+ * el documento: van por `ENTITY_DATA_GATEWAY`, que lo deriva del
+ * `DocumentEntityConfig`, así que la ficha solo pasa `[document]` y escucha
+ * `documentoChanged` para recargar. Archivos y Contabilidad ya funcionaban así.
  *
- * Contabilidad necesita dos cosas del host que Archivos no: el **estado**
- * `contabilizado` (decide si el diálogo ofrece contabilizar o descontabilizar) y
- * un canal de vuelta, `contabilizacionChanged`, para que la ficha recargue su
- * cabecera cuando ese estado cambia en el backend.
+ * La ficha sigue decidiendo **qué** se ofrece (los `show*`) y **cuándo** está
+ * habilitado (los `can*`, atados a su estado). La confirmación la pinta este
+ * componente con su propio `ConfirmationService`, sin depender de que la ficha
+ * tenga un `<p-confirmDialog>`.
+ *
+ * **Emitir** es la excepción que sigue saliendo como evento: solo lo tiene la
+ * nómina electrónica, que lo resuelve en su ficha.
  *
  * Dos acciones son **opt-in** vía `showAnular` / `showEmitir`, apagadas por
  * default: no todo documento se anula ni se emite a la DIAN, y esta botonera la
  * comparte todo el ERP. Prenderlas por default le pondría botones a fichas cuyo
- * backend no los atiende. El eje de aprobación es el caso simétrico:
- * `showAprobacion` y `showImprimir` son el caso simétrico: vienen encendidos y
- * se apagan donde no aplican (las plantillas recurrentes). Si el dropdown
- * "Acciones" se queda sin entradas, no se pinta.
+ * backend no los atiende. `showAprobacion` y `showImprimir` son el caso
+ * simétrico: vienen encendidos y se apagan donde no aplican (las plantillas
+ * recurrentes). Si el dropdown "Acciones" se queda sin entradas, no se pinta.
  */
 @Component({
   selector: 'app-document-detail-actions',
   standalone: true,
-  imports: [ButtonModule, MenuModule, ArchivosDialogComponent, ContabilidadDialogComponent],
+  imports: [
+    ButtonModule,
+    ButtonGroupModule,
+    ConfirmDialogModule,
+    MenuModule,
+    ArchivosDialogComponent,
+    ContabilidadDialogComponent,
+  ],
+  providers: [ConfirmationService],
   templateUrl: './document-detail-actions.component.html',
   styleUrl: './document-detail-actions.component.scss',
 })
 export class DocumentDetailActionsComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly gateway = inject(ENTITY_DATA_GATEWAY);
+  private readonly confirmation = inject(ConfirmationService);
+  private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly t = this.i18n.t;
 
+  /** Documento activo: de su config sale el endpoint de cada acción. */
+  readonly document = input.required<DocumentEntityConfig>();
+
   /**
-   * Id del documento abierto, dueño de los archivos adjuntos.
+   * Id del documento abierto: el que se aprueba, se imprime y es dueño de los
+   * archivos adjuntos.
    *
    * Las fichas lo pasan directo desde el parámetro de ruta, que llega como
    * `string | undefined`; el `transform` lo normaliza acá para que ninguna tenga
-   * que convertirlo. Sin un id válido, la opción "Archivos" queda deshabilitada.
+   * que convertirlo. Sin un id válido, ninguna acción se ejecuta.
    */
   readonly documentoId = input<number | null, number | string | null | undefined>(null, {
     transform: toDocumentoId,
@@ -105,19 +160,27 @@ export class DocumentDetailActionsComponent {
    */
   readonly showImprimir = input<boolean>(true);
 
-  readonly aprobar = output<void>();
-  readonly desaprobar = output<void>();
-  readonly imprimir = output<void>();
-  readonly anular = output<void>();
+  /** Emitir a la DIAN: lo resuelve la ficha (solo la nómina electrónica lo ofrece). */
   readonly emitir = output<void>();
-  /** El diálogo "Contabilidad" (des)contabilizó el documento: la ficha debe recargar. */
-  readonly contabilizacionChanged = output<void>();
+
+  /**
+   * El documento cambió de estado en el backend —se aprobó, desaprobó, anuló o
+   * (des)contabilizó—: la ficha debe recargar su cabecera.
+   */
+  readonly documentoChanged = output<void>();
 
   private readonly accionesMenu = viewChild.required<Menu>('accionesMenu');
   private readonly opcionesMenu = viewChild.required<Menu>('opcionesMenu');
 
   protected readonly archivosVisible = signal(false);
   protected readonly contabilidadVisible = signal(false);
+
+  /**
+   * Acción en vuelo. Mientras hay una, sus botones muestran carga y no aceptan
+   * un segundo click: sin esto un doble click aprueba dos veces y el backend
+   * responde la segunda con error.
+   */
+  protected readonly enCurso = signal<AccionEstado | 'imprimir' | null>(null);
 
   /** Dueño de los archivos: el documento abierto. `null` mientras no hay id válido. */
   protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
@@ -135,21 +198,22 @@ export class DocumentDetailActionsComponent {
    */
   protected readonly accionesItems = computed<MenuItem[]>(() => {
     const a = this.t().documentActions.detail;
+    const ocupado = this.enCurso() !== null;
     const items: MenuItem[] = [];
     if (this.showAprobacion()) {
       items.push({
         label: a.desaprobar,
         icon: 'pi pi-times-circle',
-        disabled: !this.canDesaprobar(),
-        command: () => this.desaprobar.emit(),
+        disabled: !this.canDesaprobar() || ocupado,
+        command: () => this.onAccionEstado('desaprobar'),
       });
     }
     if (this.showAnular()) {
       items.push({
         label: a.anular,
         icon: 'pi pi-ban',
-        disabled: !this.canAnular(),
-        command: () => this.anular.emit(),
+        disabled: !this.canAnular() || ocupado,
+        command: () => this.onAccionEstado('anular'),
       });
     }
     return items;
@@ -192,6 +256,76 @@ export class DocumentDetailActionsComponent {
 
   protected toggleOpciones(event: Event): void {
     this.opcionesMenu().toggle(event);
+  }
+
+  /** Pide confirmación y, al aceptar, ejecuta la acción de estado. */
+  protected onAccionEstado(accion: AccionEstado): void {
+    const id = this.documentoId();
+    if (id === null || this.enCurso() !== null) return;
+    const a = this.t().documentActions.detail;
+    const { clave, icon, peligrosa } = CONFIRMACION[accion];
+    this.confirmation.confirm({
+      message: a[clave].message,
+      header: a[clave].header,
+      icon,
+      acceptLabel: a[accion],
+      acceptButtonProps: peligrosa ? { severity: 'danger' } : undefined,
+      rejectLabel: this.t().common.actions.cancel,
+      // Cancelar baja a secundario contorneado para dar jerarquía clara: sin
+      // esto PrimeNG pinta los dos botones idénticos.
+      rejectButtonProps: { severity: 'secondary', outlined: true },
+      accept: () => this.ejecutar(accion, id),
+    });
+  }
+
+  /** Descarga el PDF del documento. */
+  protected onImprimir(): void {
+    const id = this.documentoId();
+    if (id === null || this.enCurso() !== null) return;
+    this.enCurso.set('imprimir');
+    this.gateway
+      .imprimir(this.document(), id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.enCurso.set(null),
+        error: (err: unknown) => {
+          this.enCurso.set(null);
+          const ts = this.t().documentActions.detail.toasts.imprimirError;
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
+        },
+      });
+  }
+
+  /** Llama al backend, avisa y le pide a la ficha que recargue. */
+  private ejecutar(accion: AccionEstado, id: number): void {
+    this.enCurso.set(accion);
+    this.llamada(accion, id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.enCurso.set(null);
+          const ts = this.t().documentActions.detail.toasts[`${accion}Success` as const];
+          this.toast.success(ts.title, ts.desc);
+          this.documentoChanged.emit();
+        },
+        error: (err: unknown) => {
+          this.enCurso.set(null);
+          const ts = this.t().documentActions.detail.toasts[`${accion}Error` as const];
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
+        },
+      });
+  }
+
+  private llamada(accion: AccionEstado, id: number): Observable<unknown> {
+    const document = this.document();
+    switch (accion) {
+      case 'aprobar':
+        return this.gateway.aprobar(document, id);
+      case 'desaprobar':
+        return this.gateway.desaprobar(document, id);
+      case 'anular':
+        return this.gateway.anular(document, id);
+    }
   }
 }
 

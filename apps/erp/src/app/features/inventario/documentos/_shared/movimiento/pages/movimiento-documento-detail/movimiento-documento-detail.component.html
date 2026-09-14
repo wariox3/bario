@@ -25,12 +25,11 @@
     <!-- Los documentos de inventario no generan movimiento contable: sin "Contabilidad". -->
     <app-document-detail-actions
       [documentoId]="id()"
+      [document]="document()"
       [canAprobar]="!cabecera()?.estadoAprobado"
       [canDesaprobar]="!!cabecera()?.estadoAprobado"
       [showContabilidad]="false"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
-      (imprimir)="onImprimir()"
+      (documentoChanged)="onDocumentoChanged()"
     />
 
     <p-button
@@ -46,8 +45,6 @@
     <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
   }
 </header>
-
-<p-confirmDialog />
 
 @if (isLoading()) {
   <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->

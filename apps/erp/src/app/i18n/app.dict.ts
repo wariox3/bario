@@ -1762,6 +1762,15 @@ export interface AppDict
         };
         notFound: { title: string; desc: string };
       };
+      utilidades: {
+        action: string;
+        importarDetalle: string;
+      };
+      import: {
+        title: string;
+        subtitle: string;
+        notice: string;
+      };
     };
     facturaPos: {
       name: string;
@@ -2120,6 +2129,15 @@ export interface AppDict
           metodoPago: string;
         };
         notFound: { title: string; desc: string };
+      };
+      utilidades: {
+        action: string;
+        importarDetalle: string;
+      };
+      import: {
+        title: string;
+        subtitle: string;
+        notice: string;
       };
     };
     documentoSoporte: {
@@ -4180,11 +4198,14 @@ export interface AppDict
       name: string;
       columns: {
         id: string;
+        codigo: string;
         item: string;
+        referencia: string;
         almacen: string;
         existencia: string;
         remision: string;
         disponible: string;
+        costoPromedio: string;
       };
     };
     inventarioValorizado: {

@@ -1,66 +1,78 @@
 @let a = t().documentActions.detail;
 
-@if (showAprobacion()) {
-  <p-button
-    type="button"
-    [label]="a.aprobar"
-    icon="pi pi-check-circle"
-    size="small"
-    [disabled]="!canAprobar()"
-    (onClick)="aprobar.emit()"
-  />
-}
+<!--
+  Las acciones del documento fundidas en un solo segmento, que se lee como una pieza.
+  Los <p-menu> van FUERA del grupo: su CSS une los botones con
+  `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
+-->
+<p-buttongroup>
+  @if (showAprobacion()) {
+    <p-button
+      type="button"
+      [label]="a.aprobar"
+      icon="pi pi-check-circle"
+      size="small"
+      [loading]="enCurso() === 'aprobar'"
+      [disabled]="!canAprobar() || enCurso() !== null"
+      (onClick)="onAccionEstado('aprobar')"
+    />
+  }
 
-@if (showImprimir()) {
-  <p-button
-    type="button"
-    [label]="a.imprimir"
-    icon="pi pi-print"
-    severity="secondary"
-    [outlined]="true"
-    size="small"
-    [disabled]="!canImprimir()"
-    (onClick)="imprimir.emit()"
-  />
-}
+  @if (showImprimir()) {
+    <p-button
+      type="button"
+      [label]="a.imprimir"
+      icon="pi pi-print"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [loading]="enCurso() === 'imprimir'"
+      [disabled]="!canImprimir() || enCurso() !== null"
+      (onClick)="onImprimir()"
+    />
+  }
 
-@if (showEmitir()) {
-  <p-button
-    type="button"
-    [label]="a.emitir"
-    icon="pi pi-send"
-    severity="secondary"
-    [outlined]="true"
-    size="small"
-    [disabled]="!canEmitir()"
-    (onClick)="emitir.emit()"
-  />
-}
+  @if (showEmitir()) {
+    <p-button
+      type="button"
+      [label]="a.emitir"
+      icon="pi pi-send"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [disabled]="!canEmitir()"
+      (onClick)="emitir.emit()"
+    />
+  }
 
-@if (accionesItems().length > 0) {
+  @if (accionesItems().length > 0) {
+    <p-button
+      type="button"
+      [label]="a.acciones"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleAcciones($event)"
+    />
+  }
+
   <p-button
     type="button"
-    [label]="a.acciones"
+    [label]="a.opciones"
     icon="pi pi-chevron-down"
     iconPos="right"
     severity="secondary"
     [outlined]="true"
     size="small"
-    (onClick)="toggleAcciones($event)"
+    (onClick)="toggleOpciones($event)"
   />
+</p-buttongroup>
+
+@if (accionesItems().length > 0) {
   <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
 }
-
-<p-button
-  type="button"
-  [label]="a.opciones"
-  icon="pi pi-chevron-down"
-  iconPos="right"
-  severity="secondary"
-  [outlined]="true"
-  size="small"
-  (onClick)="toggleOpciones($event)"
-/>
 <p-menu #opcionesMenu [popup]="true" [model]="opcionesItems()" appendTo="body" />
 <app-archivos-dialog [(visible)]="archivosVisible" [owner]="archivosOwner()" />
 @if (showContabilidad()) {
@@ -69,6 +81,7 @@
     [documentoId]="documentoId()"
     [contabilizado]="contabilizado()"
     [canContabilizar]="canContabilizar()"
-    (contabilizacionChanged)="contabilizacionChanged.emit()"
+    (contabilizacionChanged)="documentoChanged.emit()"
   />
 }
+<p-confirmdialog />

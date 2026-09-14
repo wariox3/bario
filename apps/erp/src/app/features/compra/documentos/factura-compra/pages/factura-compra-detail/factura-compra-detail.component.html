@@ -24,18 +24,26 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
+      [document]="document()"
       [canAprobar]="!cabecera()?.estadoAprobado"
       [canDesaprobar]="!!cabecera()?.estadoAprobado"
       [contabilizado]="!!cabecera()?.estadoContabilizado"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
-      (imprimir)="onImprimir()"
-      (contabilizacionChanged)="onContabilizacionChanged()"
+      (documentoChanged)="onDocumentoChanged()"
     />
+
+    <p-button
+      type="button"
+      [label]="t().entities.facturaCompra.utilidades.action"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleUtilidades($event)"
+    />
+    <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
   }
 </header>
-
-<p-confirmDialog />
 
 <app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
 
@@ -132,3 +140,18 @@
     </div>
   </section>
 }
+
+<app-import-dialog
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
+  [title]="t().entities.facturaCompra.import.title"
+  [subtitle]="t().entities.facturaCompra.import.subtitle"
+  [notice]="t().entities.facturaCompra.import.notice"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
+  [exampleConfig]="exampleConfig()"
+  (importRequested)="importar.submit($event)"
+/>
