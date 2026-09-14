@@ -1,7 +1,5 @@
 @let p = t().entities.documentoPago;
 
-<p-confirmdialog />
-
 <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
   <table class="documento-pagos-table">
     <thead>
@@ -46,17 +44,6 @@
               >
                 {{ p.anulado }}
               </span>
-            } @else if (anulable() && pago.id !== null) {
-              <p-button
-                type="button"
-                size="small"
-                severity="danger"
-                [text]="true"
-                [label]="p.anular"
-                [loading]="anulandoId() === pago.id"
-                [disabled]="anulandoId() !== null"
-                (onClick)="onAnular(pago)"
-              />
             }
           </td>
         </tr>

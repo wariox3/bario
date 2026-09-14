@@ -150,11 +150,7 @@
           </p-tabpanel>
 
           <p-tabpanel value="pagos">
-            <app-documento-pagos-table
-              [pagos]="pagos()"
-              [anulable]="puedeAnularPagos()"
-              (anulado)="onDocumentoChanged()"
-            />
+            <app-documento-pagos-table [pagos]="pagos()" />
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>

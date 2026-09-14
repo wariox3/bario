@@ -31,7 +31,6 @@ import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
   capacidadesDocumento,
-  puedeAnularPagosDocumento,
 } from '@erp/core/module-config';
 import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
@@ -178,15 +177,6 @@ export class FacturaVentaDetailComponent implements OnInit {
   protected readonly pagosResumen = computed(() =>
     calcularPagos(this.pagos(), this.resumen().total),
   );
-
-  /**
-   * ¿Se pueden anular pagos? Regla del backend: el documento tiene que estar
-   * aprobado, sin contabilizar ni anular (sin aprobar, un pago se elimina desde el form).
-   */
-  protected readonly puedeAnularPagos = computed(() => {
-    const cab = this.cabecera();
-    return cab ? puedeAnularPagosDocumento(cab.estados) : false;
-  });
 
   private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
 

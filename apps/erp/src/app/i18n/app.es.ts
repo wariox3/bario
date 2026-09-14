@@ -2574,14 +2574,7 @@ export const es: AppDict = {
       saveAll: 'Guardar pagos',
       pendingSuffix: 'sin guardar',
       anulado: 'Anulado',
-      anular: 'Anular',
       confirmDelete: '¿Eliminar este pago?',
-      confirmAnular: {
-        header: 'Anular pago',
-        message:
-          'El pago dejará de contar y lo pagado volverá a quedar pendiente. La fila se conserva con su valor. ¿Anularlo?',
-        accept: 'Anular pago',
-      },
       columns: {
         id: 'ID',
         cuentaBanco: 'Cuenta de banco',
@@ -2614,11 +2607,6 @@ export const es: AppDict = {
           title: 'Pagos sin registrar',
           desc: 'El documento se guardó, pero algunos pagos no se registraron. Edítalo para agregarlos',
         },
-        anularSuccess: {
-          title: 'Pago anulado',
-          desc: 'El pago dejó de contar y lo pagado volvió a quedar pendiente',
-        },
-        anularError: { title: 'Error al anular', desc: 'No se pudo anular el pago' },
       },
     },
     posDocumento: {

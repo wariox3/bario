@@ -2520,14 +2520,7 @@ export const en: AppDict = {
       saveAll: 'Save payments',
       pendingSuffix: 'unsaved',
       anulado: 'Voided',
-      anular: 'Void',
       confirmDelete: 'Remove this payment?',
-      confirmAnular: {
-        header: 'Void payment',
-        message:
-          'The payment will stop counting and the amount will be outstanding again. The row keeps its value. Void it?',
-        accept: 'Void payment',
-      },
       columns: {
         id: 'ID',
         cuentaBanco: 'Bank account',
@@ -2560,11 +2553,6 @@ export const en: AppDict = {
           title: 'Payments not registered',
           desc: 'The document was saved, but some payments were not registered. Edit it to add them',
         },
-        anularSuccess: {
-          title: 'Payment voided',
-          desc: 'The payment stopped counting and the amount is outstanding again',
-        },
-        anularError: { title: 'Void failed', desc: 'The payment could not be voided' },
       },
     },
     posDocumento: {

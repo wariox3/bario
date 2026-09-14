@@ -92,11 +92,7 @@ export { ENTITY_ACTION_PROVIDERS } from './actions/entity-action.providers';
 export { extractDocumentoId } from './navigation/extract-documento-id';
 
 // Estado del documento (eje de aprobación). Módulo puro, sin Angular.
-export {
-  capacidadesDocumento,
-  CAPACIDADES_DOCUMENTO_VACIAS,
-  puedeAnularPagosDocumento,
-} from './estado/documento.estado';
+export { capacidadesDocumento, CAPACIDADES_DOCUMENTO_VACIAS } from './estado/documento.estado';
 export type { CapacidadesDocumento } from './estado/documento.estado';
 
 // Storage helper

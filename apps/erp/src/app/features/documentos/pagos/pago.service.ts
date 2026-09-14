@@ -18,8 +18,7 @@ const PAGO_PAGE_SIZE = 1000;
  * - Crear, editar y eliminar solo con el documento **modificable** (sin aprobar), y
  *   solo si su tipo cobra. La cuenta bancaria necesita cuenta contable.
  * - Que la suma no supere el total **no** se valida al registrar: se valida al aprobar.
- * - Anular es para un documento aprobado y sin contabilizar; en uno sin aprobar el
- *   pago se elimina. El pago de una nota crédito no se anula: se desaprueba la nota.
+ * - El backend también expone `anular/`, pero el ERP no ofrece anular pagos.
  */
 @Injectable({ providedIn: 'root' })
 export class DocumentoPagoService extends BaseHttpService {
@@ -44,10 +43,5 @@ export class DocumentoPagoService extends BaseHttpService {
   /** Elimina un pago de un documento modificable. */
   eliminar(id: number): Observable<void> {
     return this.delete(`${DOCUMENTO_PAGO_ENDPOINT}${id}/`);
-  }
-
-  /** Anula un pago de un documento aprobado y sin contabilizar. Responde el pago anulado. */
-  anular(id: number): Observable<PagoRead> {
-    return this.post<PagoRead>(`${DOCUMENTO_PAGO_ENDPOINT}anular/`, { id });
   }
 }

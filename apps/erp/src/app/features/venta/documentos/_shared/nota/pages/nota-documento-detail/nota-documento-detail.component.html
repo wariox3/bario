@@ -141,7 +141,6 @@
 
           @if (conPagos()) {
             <p-tabpanel value="pagos">
-              <!-- Sin [anulable]: el pago de una nota crédito no se anula, se desaprueba la nota. -->
               <app-documento-pagos-table [pagos]="pagos()" />
             </p-tabpanel>
           }

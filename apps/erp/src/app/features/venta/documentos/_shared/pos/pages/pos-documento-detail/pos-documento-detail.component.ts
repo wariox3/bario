@@ -20,7 +20,6 @@ import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
   capacidadesDocumento,
-  puedeAnularPagosDocumento,
 } from '@erp/core/module-config';
 import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
@@ -163,15 +162,6 @@ export class PosDocumentoDetailComponent implements OnInit {
     calcularPagos(this.pagos(), this.resumen().total),
   );
 
-  /**
-   * ¿Se pueden anular pagos? Regla del backend: el documento tiene que estar
-   * aprobado, sin contabilizar ni anular (sin aprobar, un pago se elimina desde el form).
-   */
-  protected readonly puedeAnularPagos = computed(() => {
-    const cab = this.cabecera();
-    return cab ? puedeAnularPagosDocumento(cab.estados) : false;
-  });
-
   /** Migas: módulo Venta → listado del documento → identificador del documento abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     documentoBreadcrumb(
@@ -213,7 +203,7 @@ export class PosDocumentoDetailComponent implements OnInit {
 
   /**
    * La botonera cambió el estado del documento en el backend —lo aprobó,
-   * desaprobó, anuló o (des)contabilizó— o se anuló un pago: se recarga la ficha para que la
+   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
    * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
    */
   protected onDocumentoChanged(): void {

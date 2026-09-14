@@ -1951,9 +1951,7 @@ export interface AppDict
       saveAll: string;
       pendingSuffix: string;
       anulado: string;
-      anular: string;
       confirmDelete: string;
-      confirmAnular: { header: string; message: string; accept: string };
       columns: {
         id: string;
         cuentaBanco: string;
@@ -1974,8 +1972,6 @@ export interface AppDict
         incompletos: { title: string; desc: string };
         deleteError: { title: string; desc: string };
         noRegistrados: { title: string; desc: string };
-        anularSuccess: { title: string; desc: string };
-        anularError: { title: string; desc: string };
       };
     };
     posDocumento: {
