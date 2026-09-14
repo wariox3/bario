@@ -181,7 +181,11 @@
 
           @if (conPagos()) {
             <p-tabpanel value="pagos">
-              <app-documento-pagos [pagos]="form.controls.pagos" [documentTotal]="totalGeneral()" />
+              <app-documento-pagos
+                [pagos]="form.controls.pagos"
+                [documentTotal]="totalGeneral()"
+                [documentId]="documentId()"
+              />
             </p-tabpanel>
           }
 

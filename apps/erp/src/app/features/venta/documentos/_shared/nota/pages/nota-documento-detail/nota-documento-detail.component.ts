@@ -1,7 +1,7 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
 import {
@@ -37,6 +37,7 @@ import { DocumentoPagosTableComponent } from '@erp/features/documentos/pagos/com
 import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { notaVentaToFormValue } from '../../nota-documento.mapper';
@@ -67,8 +68,9 @@ interface CabeceraView {
  * `activeDocumentResolver`.
  *
  * Camino A del enfoque híbrido: la tabla de líneas y el resumen los aporta la
- * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas
- * (`DocumentoDetalleService`) en paralelo —igual que el form— y las muestra sin
+ * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`), líneas
+ * (`DocumentoDetalleService`) y pagos (`DocumentoPagoService`, solo si la config
+ * declara `hasPagos`) en paralelo —igual que el form— y los muestra sin
  * formularios. Líneas y pagos van en tabs dentro de la card de la cabecera, con
  * un único resumen debajo: el mismo esqueleto que el formulario. La pestaña de
  * pagos solo aparece si la config declara `hasPagos` (la nota crédito sí, la
@@ -95,6 +97,7 @@ interface CabeceraView {
 export class NotaDocumentoDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
+  private readonly pagoService = inject(DocumentoPagoService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
@@ -113,7 +116,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
-  /** Pagos recibidos, mapeados a la forma del front (asunción de contrato: el backend aún no los expone). */
+  /** Pagos del documento (`documento-pago`), anulados incluidos, en la forma del front. */
   protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   /** ¿Se cobra en el acto? Lo declara la config (`hasPagos`); sin él no hay pestaña de pagos. */
   protected readonly conPagos = computed(() => this.document().hasPagos === true);
@@ -211,14 +214,15 @@ export class NotaDocumentoDetailComponent implements OnInit {
   }
 
   private loadDocumento(id: number): void {
-    // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
+    // Mismo patrón que el form: cabecera, líneas y pagos son independientes → en paralelo.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.conPagos() ? this.pagoService.listarPorDocumento(id) : of([]),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, lineas, pagos }) => {
           const read = cabecera as NotaVentaRead;
           const fv = notaVentaToFormValue(read);
           this.cabecera.set({
@@ -241,7 +245,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
             },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
-          this.pagos.set(this.conPagos() ? (read.pagos ?? []).map(pagoReadToFormValue) : []);
+          this.pagos.set(pagos.map((pago) => pagoReadToFormValue(pago)));
           this.isLoading.set(false);
         },
         error: () => {

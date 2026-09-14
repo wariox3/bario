@@ -43,3 +43,17 @@
 .documento-pagos-table__row:hover .documento-pagos-table__td {
   background: rgba(20, 48, 73, 0.015);
 }
+
+// Pago sin guardar: tinte ámbar tenue + marca al margen, igual que las líneas.
+.documento-pagos-table__row--pending .documento-pagos-table__td {
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.documento-pagos-table__row--pending .documento-pagos-table__td:first-child {
+  box-shadow: inset 3px 0 0 0 rgba(217, 119, 6, 0.85);
+}
+
+// Pago anulado: presente pero sin competir; ya no cuenta en lo recibido.
+.documento-pagos-table__row--anulado .documento-pagos-table__td {
+  background: rgba(20, 48, 73, 0.02);
+}

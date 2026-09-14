@@ -1,9 +1,26 @@
 @let p = t().entities.documentoPago;
 
+<p-confirmdialog />
+
 <div class="flex flex-col gap-4">
   <!-- Toolbar: mismo idioma que la tabla de detalles (acción a la derecha) -->
-  <div class="flex items-center justify-end gap-2">
+  <div class="flex flex-wrap items-center justify-end gap-2">
     <p class="m-0 mr-auto text-[0.75rem] text-brand-muted">{{ hint() ?? p.hint }}</p>
+    @if (pendingCount() > 0) {
+      <span class="inline-flex items-center gap-1.5 text-[0.74rem] font-medium text-amber-600">
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        {{ pendingCount() }} {{ p.pendingSuffix }}
+      </span>
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-save"
+        [label]="p.saveAll + ' (' + pendingCount() + ')'"
+        [loading]="savingAll()"
+        [disabled]="savingAll()"
+        (onClick)="onSaveAllClick()"
+      />
+    }
     <p-button
       type="button"
       size="small"
@@ -18,55 +35,106 @@
     <table class="documento-pagos-table">
       <thead>
         <tr>
-          <th class="documento-pagos-table__th w-10 text-center">{{ p.columns.linea }}</th>
+          <th class="documento-pagos-table__th w-16 text-center">{{ p.columns.id }}</th>
           <th class="documento-pagos-table__th min-w-[16rem] text-left">
             {{ p.columns.cuentaBanco }}
           </th>
           <th class="documento-pagos-table__th w-48 text-right">{{ p.columns.monto }}</th>
-          <th class="documento-pagos-table__th w-20 text-center">{{ p.columns.acciones }}</th>
+          <th class="documento-pagos-table__th w-24 text-center">{{ p.columns.acciones }}</th>
         </tr>
       </thead>
       <tbody>
-        @for (pago of pagos().controls; track pago; let i = $index) {
-          <tr [formGroup]="pago" class="documento-pagos-table__row">
+        @for (pago of pagos().controls; track pago) {
+          @let anulado = isAnulado(pago);
+          <tr
+            [formGroup]="pago"
+            class="documento-pagos-table__row"
+            [class.documento-pagos-table__row--pending]="isPending(pago)"
+            [class.documento-pagos-table__row--anulado]="anulado"
+          >
             <td class="documento-pagos-table__td text-center text-brand-muted tabular-nums">
-              {{ i + 1 }}
+              @if (isPending(pago)) {
+                <span
+                  class="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 align-middle"
+                  [pTooltip]="p.pendingSuffix"
+                ></span>
+              }
+              <!-- Id real del pago; una fila aún sin guardar no tiene id. -->
+              {{ pago.controls.id.value ?? '—' }}
             </td>
 
             <td class="documento-pagos-table__td">
-              <lib-api-select
-                formControlName="cuenta_banco"
-                [endpoint]="cuentaBancoEndpoint"
-                [placeholder]="p.cuentaBancoPlaceholder"
-                [invalid]="pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched"
-              />
+              @if (anulado) {
+                <span class="text-brand-muted">{{
+                  pago.controls.cuenta_banco.value?.nombre || '—'
+                }}</span>
+              } @else {
+                <lib-api-select
+                  formControlName="cuenta_banco"
+                  [endpoint]="cuentaBancoEndpoint"
+                  [placeholder]="p.cuentaBancoPlaceholder"
+                  [invalid]="
+                    pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched
+                  "
+                />
+              }
             </td>
 
             <td class="documento-pagos-table__td">
-              <p-inputnumber
-                formControlName="pago"
-                [invalid]="pago.controls.pago.invalid && pago.controls.pago.touched"
-                mode="decimal"
-                [min]="0"
-                [minFractionDigits]="0"
-                [maxFractionDigits]="2"
-                prefix="$ "
-                [fluid]="true"
-                inputStyleClass="text-right"
-              />
+              @if (anulado) {
+                <span class="block text-right tabular-nums text-brand-muted line-through">
+                  {{ formatMoney(pago.controls.pago.value) }}
+                </span>
+              } @else {
+                <p-inputnumber
+                  formControlName="pago"
+                  [invalid]="pago.controls.pago.invalid && pago.controls.pago.touched"
+                  mode="decimal"
+                  [min]="0"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  prefix="$ "
+                  [fluid]="true"
+                  inputStyleClass="text-right"
+                />
+              }
             </td>
 
             <td class="documento-pagos-table__td">
-              <div class="flex items-center justify-center">
-                <button
-                  type="button"
-                  (click)="removePago(i)"
-                  [pTooltip]="p.removePago"
-                  [attr.aria-label]="p.removePago"
-                  class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
-                >
-                  <i class="pi pi-trash text-[0.72rem]"></i>
-                </button>
+              <div class="flex items-center justify-center gap-0.5">
+                @if (anulado) {
+                  <span
+                    class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 text-[0.68rem] font-medium text-brand-muted"
+                  >
+                    {{ p.anulado }}
+                  </span>
+                } @else {
+                  @if (canSaveRow(pago)) {
+                    <button
+                      type="button"
+                      (click)="savePago(pago)"
+                      [disabled]="isSavingRow(pago)"
+                      [pTooltip]="p.savePago"
+                      [attr.aria-label]="p.savePago"
+                      class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
+                    >
+                      @if (isSavingRow(pago)) {
+                        <i class="pi pi-spin pi-spinner text-[0.72rem]"></i>
+                      } @else {
+                        <i class="pi pi-check text-[0.72rem]"></i>
+                      }
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    (click)="removePago(pago)"
+                    [pTooltip]="p.removePago"
+                    [attr.aria-label]="p.removePago"
+                    class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                  >
+                    <i class="pi pi-trash text-[0.72rem]"></i>
+                  </button>
+                }
               </div>
             </td>
           </tr>

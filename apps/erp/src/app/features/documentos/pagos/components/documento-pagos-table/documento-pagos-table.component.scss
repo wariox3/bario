@@ -37,3 +37,8 @@
 .documento-pagos-table__row:hover .documento-pagos-table__td {
   background: rgba(20, 48, 73, 0.015);
 }
+
+// Pago anulado: presente pero sin competir; ya no cuenta en lo recibido.
+.documento-pagos-table__row--anulado .documento-pagos-table__td {
+  background: rgba(20, 48, 73, 0.02);
+}

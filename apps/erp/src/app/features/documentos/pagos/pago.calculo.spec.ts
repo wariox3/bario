@@ -1,9 +1,11 @@
 import { calcularPagos } from './pago.calculo';
 import type { PagoFormRawValue } from './pago.form';
 
-const pago = (monto: number): PagoFormRawValue => ({
+const pago = (monto: number, estado_anulado = false): PagoFormRawValue => ({
+  id: null,
   cuenta_banco: { id: 1, nombre: 'Bancolombia' },
   pago: monto,
+  estado_anulado,
 });
 
 describe('calcularPagos', () => {
@@ -36,6 +38,14 @@ describe('calcularPagos', () => {
       recibido: 1_300_000,
       saldo: 0,
       excede: true,
+    });
+  });
+
+  it('un pago anulado no cuenta: su valor vuelve al saldo', () => {
+    expect(calcularPagos([pago(1_000_000, true), pago(190_000)], 1_190_000)).toEqual({
+      recibido: 190_000,
+      saldo: 1_000_000,
+      excede: false,
     });
   });
 });

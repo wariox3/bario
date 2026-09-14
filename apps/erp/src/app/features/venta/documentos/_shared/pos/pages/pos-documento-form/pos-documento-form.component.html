@@ -208,7 +208,7 @@
             {{ f.tabs.pagos }}
             <!-- Los pagos quedan tras un clic, pero el cajero necesita saber si están
                  en orden desde la pestaña de detalles: el chip lleva el conteo y se
-                 tiñe cuando lo recibido supera el total (lo mismo que bloquea guardar). -->
+                 tiñe cuando lo recibido supera el total (lo que impedirá aprobar). -->
             @if (pagos.length > 0) {
               <span
                 class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
@@ -242,6 +242,7 @@
             <app-documento-pagos
               [pagos]="form.controls.pagos"
               [documentTotal]="totalGeneral()"
+              [documentId]="documentId()"
               [hint]="f.pagosHint"
             />
           </p-tabpanel>

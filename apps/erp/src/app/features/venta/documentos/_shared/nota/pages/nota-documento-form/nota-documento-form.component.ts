@@ -9,7 +9,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, concat, forkJoin, of, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -63,6 +64,7 @@ import {
 import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
+import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
 import type { NotaVentaRead } from '../../nota-documento.model';
 import {
@@ -85,7 +87,8 @@ import {
  * el POS, puede cobrarse en el acto: a la cabecera (cliente, fecha, sede, método
  * de pago, comentario) le suma la **sección de pagos** —compartida— y la **tabla
  * de detalles** comercial. La pestaña de pagos solo aparece si la config declara
- * `hasPagos` (la nota crédito sí, la débito no). Detalles / Pagos / Más información
+ * `hasPagos` (la nota crédito sí, la débito no); los pagos no viajan en el documento:
+ * transaccionan aparte contra `documento-pago`. Detalles / Pagos / Más información
  * van en tabs dentro de la card de la cabecera, con un único resumen debajo.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
@@ -125,18 +128,22 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly confirmation = inject(ConfirmationService);
+  private readonly pagoService = inject(DocumentoPagoService);
 
   protected readonly t = this.i18n.t;
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
+  /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
+  private readonly pagosTable = viewChild(DocumentoPagosComponent);
+
   /** Tab activo del bloque (Detalles / Pagos / Más información). */
   protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
 
   /**
    * ¿Se cobra en el acto? Lo declara la config (`hasPagos`): solo entonces hay
-   * pestaña de pagos, filas de pagos en el resumen, validación y pagos en el payload.
+   * pestaña de pagos, filas de pagos en el resumen y pagos que cargar y registrar.
    */
   protected readonly conPagos = computed(() => this.document().hasPagos === true);
 
@@ -218,7 +225,10 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     calcularPagos(this.pagosLines(), this.totalGeneral()),
   );
 
-  /** `true` cuando lo recibido supera el total: bloquea el guardado y tiñe la pestaña. */
+  /**
+   * `true` cuando lo recibido supera el total. No bloquea guardar —el backend lo frena
+   * al aprobar—: tiñe la pestaña y el resumen avisa que no se podrá aprobar.
+   */
   protected readonly pagosExceden = computed(() => this.pagosResumen().excede);
 
   /**
@@ -284,7 +294,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     const id = this.id();
     if (!id) return;
     // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
-    // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
+    // pedimos líneas y pagos. Sin resolved (fail-open) cae a la carga completa.
     const prefetched = this.documentoEdit();
     if (prefetched) {
       this.applyCabecera(prefetched as NotaVentaRead);
@@ -297,46 +307,58 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected onSubmit(): void {
     if (this.form.invalid || this.form.pending || this.isSaving()) return;
 
-    // Lo recibido en pagos no puede superar el total. Con los pagos tras un tab,
-    // se abre la pestaña que lo contiene antes de avisar.
-    if (this.conPagos() && this.pagosExceden()) {
+    const id = this.id();
+    const detalles = this.detallesTable();
+    // Solo la nota que se cobra en el acto tiene pagos que persistir.
+    const pagos = this.conPagos() ? this.pagosTable() : undefined;
+
+    if (!id) {
+      // Alta: las líneas viajan embebidas; los pagos se registran al crear.
+      this.isSaving.set(true);
+      this.persistCabecera(id);
+      return;
+    }
+
+    // Edición: líneas y pagos transaccionan aparte, así que antes de guardar el
+    // documento se persisten los pendientes. Si alguno está incompleto se abre su
+    // pestaña y se avisa, en vez de guardar a medias.
+    if (detalles?.hasInvalidPending()) {
+      this.activeTab.set('detalles');
+      const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
+      this.toast.warn(toast.title, toast.desc);
+      return;
+    }
+    if (pagos?.hasInvalidPending()) {
       this.activeTab.set('pagos');
-      const toast = this.t().entities.documentoPago.toasts.exceden;
+      const toast = this.t().entities.documentoPago.toasts.incompletos;
       this.toast.warn(toast.title, toast.desc);
       return;
     }
 
-    const id = this.id();
-    const detalles = this.detallesTable();
-    // En edición las líneas transaccionan aparte (no viajan en el payload de la
-    // cabecera). Antes de guardar el documento se flushean las pendientes; si hay
-    // líneas incompletas se avisa y se aborta.
-    if (id && detalles) {
-      if (detalles.hasInvalidPending()) {
-        this.activeTab.set('detalles');
-        const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
-        this.toast.warn(toast.title, toast.desc);
-        return;
-      }
-      if (detalles.pendingCount() > 0) {
-        this.isSaving.set(true);
-        detalles
-          .saveAll()
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => this.persistCabecera(id),
-            error: () => {
-              this.isSaving.set(false);
-              const toast = this.t().entities.comercialDetalle.toasts.lineSaveError;
-              this.toast.error(toast.title, toast.desc);
-            },
-          });
-        return;
-      }
-    }
-
     this.isSaving.set(true);
-    this.persistCabecera(id);
+    // Flush silencioso y en serie (líneas, luego pagos): el éxito lo confirma el toast
+    // del documento; aquí solo se reporta el que falle.
+    concat(
+      (detalles?.saveAll() ?? of(undefined)).pipe(
+        catchError((err: unknown) => {
+          const toast = this.t().entities.comercialDetalle.toasts.lineSaveError;
+          this.toast.error(toast.title, toast.desc);
+          return throwError(() => err);
+        }),
+      ),
+      (pagos?.saveAll() ?? of(undefined)).pipe(
+        catchError((err: unknown) => {
+          const toast = this.t().entities.documentoPago.toasts.saveError;
+          this.toast.error(toast.title, toast.desc);
+          return throwError(() => err);
+        }),
+      ),
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        complete: () => this.persistCabecera(id),
+        error: () => this.isSaving.set(false),
+      });
   }
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
@@ -347,7 +369,6 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
       this.form.getRawValue(),
       this.document().documentTypeId,
       !id,
-      this.conPagos(),
     );
     const operation = id
       ? this.gateway.update(this.document(), Number(id), payload)
@@ -355,7 +376,6 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (saved) => {
-        this.isSaving.set(false);
         // Guardar limpia el estado "sucio": navegar a la ficha pasa por el guard
         // de salida y, sin esto, el camino feliz preguntaría por cambios ya guardados.
         this.form.markAsPristine();
@@ -365,8 +385,32 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
         // almacenado. En alta el id sale de la respuesta del backend; si no
         // viniera, se cae a la lista antes que navegar a una URL inválida.
         const savedId = id ?? extractDocumentoId(saved);
-        if (savedId != null) this.navigateToDetail(savedId);
-        else this.navigateToList();
+        if (savedId == null) {
+          this.isSaving.set(false);
+          this.navigateToList();
+          return;
+        }
+        const pagos = this.conPagos() ? this.pagosTable() : undefined;
+        if (id || !pagos || pagos.rowCount() === 0) {
+          this.isSaving.set(false);
+          this.navigateToDetail(savedId);
+          return;
+        }
+        // Alta con pagos: no viajan embebidos, se registran contra el documento recién
+        // creado. Si alguno falla, el documento ya existe: se avisa y se abre igual su
+        // ficha, desde donde se edita para agregarlos.
+        pagos.saveAll(Number(savedId)).subscribe({
+          complete: () => {
+            this.isSaving.set(false);
+            this.navigateToDetail(savedId);
+          },
+          error: () => {
+            this.isSaving.set(false);
+            const toast = this.t().entities.documentoPago.toasts.noRegistrados;
+            this.toast.warn(toast.title, toast.desc);
+            this.navigateToDetail(savedId);
+          },
+        });
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -381,13 +425,16 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /**
-   * Guard de salida: si hay líneas sin guardar, confirma antes de abandonar para
-   * no perderlas. Solo aplica en edición.
+   * Guard de salida: si hay líneas o pagos sin guardar, confirma antes de abandonar
+   * para no perderlos. Solo aplica en edición.
    */
   canDeactivate(): boolean | Observable<boolean> {
+    const pagosPendientes = this.conPagos() ? (this.pagosTable()?.pendingCount() ?? 0) : 0;
     return canLeaveDocumentForm({
       form: this.form,
-      pendingLines: this.detallesTable()?.pendingCount() ?? 0,
+      pendingLines: (this.detallesTable()?.pendingCount() ?? 0) + pagosPendientes,
+      // En edición los pagos transaccionan aparte, como las líneas: los cuenta `pendingLines`.
+      lineControls: this.id() ? ['detalles', 'pagos'] : ['detalles'],
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,
       cancelLabel: this.t().common.actions.cancel,
@@ -404,46 +451,57 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /**
-   * Carga completa (cabecera + líneas). La cabecera ya no embebe los detalles: las
-   * líneas se traen aparte de `documento-detalle/?documento_id=`. Se usa como
+   * Carga completa (cabecera + líneas + pagos). La cabecera no embebe líneas ni
+   * pagos: se traen aparte de `documento-detalle` y `documento-pago`. Se usa como
    * fallback de la carga inicial y para recargar tras importar.
    */
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.listarPagos(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, lineas, pagos }) => {
           this.applyCabecera(cabecera as NotaVentaRead);
           this.populateLineas(lineas);
+          this.populatePagos(pagos);
         },
         error: () => this.notifyLoadError(),
       });
   }
 
-  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
+  /** Carga líneas y pagos (la cabecera ya la aportó el resolver). */
   private loadLineas(id: number): void {
-    this.detalleService
-      .listarPorDocumento<ComercialDetalleRead>(id)
+    forkJoin({
+      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.listarPagos(id),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (lineas) => this.populateLineas(lineas),
+        next: ({ lineas, pagos }) => {
+          this.populateLineas(lineas);
+          this.populatePagos(pagos);
+        },
         error: () => this.notifyLoadError(),
       });
+  }
+
+  /** Pagos del documento; la nota que no se cobra en el acto no los pide. */
+  private listarPagos(id: number): Observable<readonly PagoRead[]> {
+    return this.conPagos() ? this.pagoService.listarPorDocumento(id) : of([]);
   }
 
   /**
    * Pobla la cabecera en el form. `emitEvent: false`: no disparar el efecto de
    * cambio de cliente (que limpiaría la referencia recién cargada). Como el patch
-   * no emite, sincronizamos el estado del select de referencia a mano. Los pagos
-   * se reconstruyen aparte (van en un `FormArray`).
+   * no emite, sincronizamos el estado del select de referencia a mano. Los pagos no
+   * vienen en la cabecera: se traen de `documento-pago` junto con las líneas.
    */
   private applyCabecera(read: NotaVentaRead): void {
     this.form.patchValue(notaVentaToFormValue(read), { emitEvent: false });
     this.syncReferenciaState();
-    if (this.conPagos()) this.populatePagos(read.pagos ?? []);
   }
 
   /**
@@ -469,7 +527,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     else ref.enable({ emitEvent: false });
   }
 
-  /** Reemplaza el `FormArray` de pagos con los recibidos del backend. */
+  /** Reemplaza el `FormArray` de pagos con los del backend (anulados incluidos, de solo lectura). */
   private populatePagos(pagos: readonly PagoRead[]): void {
     const arr = this.form.controls.pagos;
     arr.clear();

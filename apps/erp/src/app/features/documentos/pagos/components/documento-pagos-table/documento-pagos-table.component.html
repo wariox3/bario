@@ -1,34 +1,68 @@
 @let p = t().entities.documentoPago;
 
+<p-confirmdialog />
+
 <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
   <table class="documento-pagos-table">
     <thead>
       <tr>
-        <th class="documento-pagos-table__th w-10 text-center">{{ p.columns.linea }}</th>
+        <th class="documento-pagos-table__th w-16 text-center">{{ p.columns.id }}</th>
         <th class="documento-pagos-table__th min-w-[16rem] text-left">
           {{ p.columns.cuentaBanco }}
         </th>
         <th class="documento-pagos-table__th w-40 text-right">{{ p.columns.monto }}</th>
+        <th class="documento-pagos-table__th w-28 text-center">{{ p.columns.estado }}</th>
       </tr>
     </thead>
     <tbody>
-      @for (pago of pagos(); track $index) {
-        <tr class="documento-pagos-table__row">
+      @for (pago of pagos(); track pago.id ?? $index) {
+        <tr
+          class="documento-pagos-table__row"
+          [class.documento-pagos-table__row--anulado]="pago.estado_anulado"
+        >
           <td class="documento-pagos-table__td text-center text-brand-muted tabular-nums">
-            {{ $index + 1 }}
+            {{ pago.id ?? '—' }}
           </td>
-          <td class="documento-pagos-table__td font-medium text-brand-text">
+          <td
+            class="documento-pagos-table__td"
+            [class]="pago.estado_anulado ? 'text-brand-muted' : 'font-medium text-brand-text'"
+          >
             {{ pago.cuenta_banco?.nombre || '—' }}
           </td>
           <td
-            class="documento-pagos-table__td text-right font-semibold tabular-nums text-brand-text"
+            class="documento-pagos-table__td text-right tabular-nums"
+            [class]="
+              pago.estado_anulado
+                ? 'text-brand-muted line-through'
+                : 'font-semibold text-brand-text'
+            "
           >
             {{ formatMoney(pago.pago) }}
+          </td>
+          <td class="documento-pagos-table__td text-center">
+            @if (pago.estado_anulado) {
+              <span
+                class="inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 text-[0.68rem] font-medium text-brand-muted"
+              >
+                {{ p.anulado }}
+              </span>
+            } @else if (anulable() && pago.id !== null) {
+              <p-button
+                type="button"
+                size="small"
+                severity="danger"
+                [text]="true"
+                [label]="p.anular"
+                [loading]="anulandoId() === pago.id"
+                [disabled]="anulandoId() !== null"
+                (onClick)="onAnular(pago)"
+              />
+            }
           </td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="3" class="px-5 py-8 text-center text-sm text-brand-muted">
+          <td colspan="4" class="px-5 py-8 text-center text-sm text-brand-muted">
             <i class="pi pi-inbox mr-2"></i>{{ p.empty }}
           </td>
         </tr>

@@ -179,7 +179,7 @@
           <p-tab value="pagos">
             {{ t().entities.facturaVenta.form.tabs.pagos }}
             <!-- Los pagos quedan tras un clic: el chip lleva el conteo y se tiñe cuando
-                 lo recibido supera el total (lo mismo que bloquea guardar). -->
+                 lo recibido supera el total (lo que impedirá aprobar). -->
             @if (pagos.length > 0) {
               <span
                 class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
@@ -210,7 +210,11 @@
           </p-tabpanel>
 
           <p-tabpanel value="pagos">
-            <app-documento-pagos [pagos]="form.controls.pagos" [documentTotal]="totalGeneral()" />
+            <app-documento-pagos
+              [pagos]="form.controls.pagos"
+              [documentTotal]="totalGeneral()"
+              [documentId]="documentId()"
+            />
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>

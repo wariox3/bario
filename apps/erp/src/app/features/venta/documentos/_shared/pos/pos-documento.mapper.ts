@@ -1,13 +1,12 @@
 import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import { pagosToPayload } from '@erp/features/documentos/pagos/pago.mapper';
 import type { PosDocumentoPayload, PosDocumentoRead } from './pos-documento.model';
 import type { PosDocumentoFormRawValue } from './pos-documento-form.types';
 
 /**
  * Read-model (GET) → valores **escalares** de cabecera del formulario (edición).
  * No incluye `detalles` ni `pagos`: ambos viven en `FormArray` y se reconstruyen
- * aparte (los detalles vía `documento-detalle`, los pagos desde `read.pagos`).
+ * aparte (los detalles vía `documento-detalle`, los pagos vía `documento-pago`).
  */
 export function posDocumentoToFormValue(
   read: PosDocumentoRead,
@@ -36,8 +35,8 @@ export function posDocumentoToFormValue(
  *
  * `documento_tipo` proviene del `documentTypeId` del `DocumentEntityConfig`.
  * En **edición** se omiten los detalles (`includeDetalles=false`): transaccionan
- * en vivo contra `documento-detalle`. En **alta** viajan embebidos. Los `pagos`
- * viajan siempre embebidos (asunción de contrato pendiente de confirmar).
+ * en vivo contra `documento-detalle`. En **alta** viajan embebidos. Los pagos nunca
+ * viajan en el documento: se registran aparte en `documento-pago`.
  */
 export function formValueToPayload(
   raw: PosDocumentoFormRawValue,
@@ -58,7 +57,6 @@ export function formValueToPayload(
     asesor: raw.asesor?.id ?? null,
     orden_compra: ordenCompra ? ordenCompra : null,
     comentario: comentario ? comentario : null,
-    ...pagosToPayload(raw.pagos),
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

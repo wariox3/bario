@@ -19,10 +19,11 @@ export interface LeaveConfirmLabels {
  * quedan marcadas como sucias aun después de persistirse (guardar una línea
  * reemplaza su grupo, pero el array padre conserva la marca).
  *
- * Un documento con más de una tabla en vivo declara las suyas (la factura de
- * compra suma `cuentas`). Un `FormArray` que **no** transacciona aparte —los
- * `pagos` del POS y de las notas, que viajan embebidos en el documento— no va
- * acá: ahí ensuciar sí es un cambio pendiente que se perdería al salir.
+ * Un documento con más de una tabla en vivo declara las suyas: la factura de
+ * compra suma `cuentas` y los documentos que cobran suman `pagos` en edición
+ * (transaccionan contra `documento-pago`). En alta esas tablas todavía no
+ * persisten nada, así que no se declaran: ensuciarlas sí es un cambio que se
+ * perdería al salir.
  */
 const CONTROLES_LINEAS_DEFAULT: readonly string[] = ['detalles'];
 

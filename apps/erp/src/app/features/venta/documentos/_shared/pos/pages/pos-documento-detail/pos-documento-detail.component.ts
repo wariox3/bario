@@ -37,6 +37,7 @@ import { DocumentoPagosTableComponent } from '@erp/features/documentos/pagos/com
 import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { posDocumentoToFormValue } from '../../pos-documento.mapper';
@@ -70,9 +71,9 @@ interface CabeceraView {
  * `DocumentEntityConfig` inyectado por `activeDocumentResolver`.
  *
  * Camino A del enfoque híbrido: la tabla de líneas y el resumen los aporta la
- * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas
- * (`DocumentoDetalleService`) en paralelo —igual que el form— y las muestra sin
- * formularios. Líneas y pagos van en tabs dentro de la card de la cabecera, con
+ * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`), líneas
+ * (`DocumentoDetalleService`) y pagos (`DocumentoPagoService`) en paralelo —igual
+ * que el form— y los muestra sin formularios. Líneas y pagos van en tabs dentro de la card de la cabecera, con
  * un único resumen debajo: el mismo esqueleto que el formulario. Desde aquí se
  * vuelve a la lista o se edita.
  */
@@ -96,6 +97,7 @@ interface CabeceraView {
 export class PosDocumentoDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
+  private readonly pagoService = inject(DocumentoPagoService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
@@ -114,7 +116,7 @@ export class PosDocumentoDetailComponent implements OnInit {
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
-  /** Pagos recibidos, mapeados a la forma del front (asunción de contrato: el backend aún no los expone). */
+  /** Pagos del documento (`documento-pago`), anulados incluidos, en la forma del front. */
   protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
@@ -160,6 +162,15 @@ export class PosDocumentoDetailComponent implements OnInit {
     calcularPagos(this.pagos(), this.resumen().total),
   );
 
+  /**
+   * ¿Se pueden anular pagos? Regla del backend: el documento tiene que estar
+   * aprobado, sin contabilizar ni anular (sin aprobar, un pago se elimina desde el form).
+   */
+  protected readonly puedeAnularPagos = computed(() => {
+    const estados = this.cabecera()?.estados;
+    return !!estados?.estado_aprobado && !estados.estado_contabilizado && !estados.estado_anulado;
+  });
+
   /** Migas: módulo Venta → listado del documento → identificador del documento abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     documentoBreadcrumb(
@@ -201,7 +212,7 @@ export class PosDocumentoDetailComponent implements OnInit {
 
   /**
    * La botonera cambió el estado del documento en el backend —lo aprobó,
-   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
+   * desaprobó, anuló o (des)contabilizó— o se anuló un pago: se recarga la ficha para que la
    * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
    */
   protected onDocumentoChanged(): void {
@@ -211,16 +222,17 @@ export class PosDocumentoDetailComponent implements OnInit {
   }
 
   private loadDocumento(id: number): void {
-    // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
+    // Mismo patrón que el form: cabecera, líneas y pagos son independientes → en paralelo.
     // Los nombres de los FK (plazo/método de pago, sede, asesor) llegan en los
     // `*_nombre` del read; no hace falta resolverlos con peticiones extra.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.pagoService.listarPorDocumento(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, lineas, pagos }) => {
           const read = cabecera as PosDocumentoRead;
           const fv = posDocumentoToFormValue(read);
           this.cabecera.set({
@@ -246,7 +258,7 @@ export class PosDocumentoDetailComponent implements OnInit {
             },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
-          this.pagos.set((read.pagos ?? []).map(pagoReadToFormValue));
+          this.pagos.set(pagos.map((pago) => pagoReadToFormValue(pago)));
           this.isLoading.set(false);
         },
         error: () => {

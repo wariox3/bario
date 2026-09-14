@@ -9,18 +9,13 @@
  * la familia: lo único que los distingue es el `documento_tipo`, que aporta el
  * `DocumentEntityConfig` de cada uno.
  *
- * Un POS es una factura de venta que además **se cobra en el acto**: de ahí la
- * lista de `pagos` (uno por cuenta de banco) que no tiene la factura de venta
- * normal. Fuera de eso la cabecera es la misma (contacto, fechas, plazo, método
- * de pago, sede) más asesor, orden de compra y comentario.
- *
- * Nota: la sección de pagos (`pagos`/`pago`) es una **asunción de contrato**
- * calcada del legacy (`{ cuenta_banco, pago }` embebido en el payload del
- * documento); pendiente de confirmar el shape real con el backend nuevo.
+ * Un POS es una factura de venta que además **se cobra en el acto**: la cabecera
+ * es la misma (contacto, fechas, plazo, método de pago, sede) más asesor, orden de
+ * compra y comentario. Los pagos no viajan en el documento: son un recurso propio
+ * (`documento-pago`) que se registra contra el documento ya creado.
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { PagoPayload, PagoRead } from '@erp/features/documentos/pagos/pago.model';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un documento POS. */
 export interface PosDocumentoRead extends DocumentoReadBase {
@@ -37,8 +32,10 @@ export interface PosDocumentoRead extends DocumentoReadBase {
   readonly asesor_nombre?: string | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
-  /** Pagos recibidos en el punto de venta. */
-  readonly pagos?: readonly PagoRead[] | null;
+  /** Suma de los pagos no anulados (`documento-pago`). La mantiene el backend. */
+  readonly pago?: string | null;
+  /** Lo que queda por cobrar. El backend lo fija al aprobar (`total − pago`). */
+  readonly pendiente?: string | null;
 }
 
 /** Body (POST/PATCH) de un documento POS. */
@@ -50,10 +47,6 @@ export interface PosDocumentoPayload extends DocumentoPayloadBase {
   readonly asesor: number | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
-  /** Total recibido en pagos (suma de `pagos[].pago`). */
-  readonly pago: string;
-  /** Pagos del punto de venta. */
-  readonly pagos: readonly PagoPayload[];
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
 }

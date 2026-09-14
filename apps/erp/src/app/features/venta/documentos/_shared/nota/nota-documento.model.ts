@@ -9,16 +9,12 @@
  * `documento_tipo`, que aporta el `DocumentEntityConfig` de cada uno.
  *
  * Una nota de venta ajusta una **factura de venta** (`documento_referencia`). La
- * nota crédito, como el POS, además **se cobra en el acto**: de ahí la lista de
- * `pagos` (uno por cuenta de banco), que la nota débito no envía. El resto de la cabecera es cliente, fecha, sede, método de
- * pago y comentario.
- *
- * Nota: la sección de pagos (shape `pagos`/`pago` embebido) es una **asunción de
- * contrato** calcada del legacy; pendiente de confirmar con el backend nuevo.
+ * cabecera es cliente, fecha, sede, método de pago y comentario. La nota crédito,
+ * como el POS, además **se cobra en el acto**, pero sus pagos no viajan en el
+ * documento: se registran aparte en `documento-pago` (la nota débito no tiene).
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { PagoPayload, PagoRead } from '@erp/features/documentos/pagos/pago.model';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una nota de venta. */
 export interface NotaVentaRead extends DocumentoReadBase {
@@ -33,8 +29,10 @@ export interface NotaVentaRead extends DocumentoReadBase {
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
   readonly comentario: string | null;
-  /** Pagos recibidos al emitir la nota. */
-  readonly pagos?: readonly PagoRead[] | null;
+  /** Suma de los pagos no anulados (`documento-pago`). La mantiene el backend. */
+  readonly pago?: string | null;
+  /** Lo que queda por cobrar. El backend lo fija al aprobar (`total − pago`). */
+  readonly pendiente?: string | null;
 }
 
 /** Body (POST/PATCH) de una nota de venta. */
@@ -43,10 +41,6 @@ export interface NotaVentaPayload extends DocumentoPayloadBase {
   readonly sede: number | null;
   readonly metodo_pago: number | null;
   readonly comentario: string | null;
-  /** Total recibido en pagos (suma de `pagos[].pago`). Solo si la config declara `hasPagos`. */
-  readonly pago?: string;
-  /** Pagos recibidos al emitir la nota. Solo si la config declara `hasPagos`. */
-  readonly pagos?: readonly PagoPayload[];
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
 }
