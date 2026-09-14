@@ -236,3 +236,8 @@ export function comercialDetalleToPayload(
     documento_detalle_afectado: raw.documento_detalle_afectado,
   };
 }
+
+/** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+export function totalCantidad(lines: readonly ComercialDetalleFormRawValue[]): number {
+  return lines.reduce((acc, line) => acc + (line.cantidad ?? 0), 0);
+}

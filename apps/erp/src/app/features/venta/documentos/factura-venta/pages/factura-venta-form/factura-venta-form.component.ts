@@ -16,10 +16,12 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
+import { TabsModule } from 'primeng/tabs';
 import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
+  calcularResumen,
   startOfToday,
   TenantService,
   ToastService,
@@ -52,8 +54,20 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import {
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  totalCantidad,
+} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
+import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
+import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
+import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
+import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { facturaVentaToFormValue, formValueToPayload } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
 
@@ -69,8 +83,8 @@ import type { FacturaVentaRead } from '../../factura-venta.model';
  * A diferencia de la familia *servicio*, la cabecera comercial es específica de
  * cada documento (los campos de una factura ≠ los de una nota débito): por eso
  * este form vive dentro de `factura-venta/` y no en un _shared. La **tabla de
- * detalles** —esa sí compartida entre documentos comerciales— se compone vía
- * `<app-comercial-documento-detalles>` recibiendo el `FormArray` de líneas.
+ * detalles** y la **sección de pagos** —compartidas entre documentos— van en
+ * tabs dentro de la misma card de la cabecera, cada una recibiendo su `FormArray`.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -83,11 +97,14 @@ import type { FacturaVentaRead } from '../../factura-venta.model';
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    TabsModule,
     FieldErrorComponent,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
+    DocumentoPagosComponent,
+    ComercialDocumentoResumenComponent,
     VencimientoHintComponent,
   ],
   providers: [ConfirmationService],
@@ -112,6 +129,9 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
+
+  /** Tab activo del bloque de líneas (Detalles / Pagos). */
+  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
@@ -142,6 +162,29 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   });
   protected readonly isSaving = signal(false);
 
+  /** Espejo reactivo de las líneas para calcular el total del documento. */
+  protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+
+  /** Resumen del documento: lo pinta el aside bajo los tabs, igual en Detalles y Pagos. */
+  protected readonly resumen = computed(() => calcularResumen(this.lines().map(toLineaCalculo)));
+
+  /** Total del documento: contra él se validan y se prellenan los pagos. */
+  protected readonly totalGeneral = computed(() => this.resumen().total);
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Espejo reactivo de los pagos para el resumen y la validación del guardado. */
+  protected readonly pagosLines = signal<readonly PagoFormRawValue[]>([]);
+
+  /** Recibido, saldo y exceso de los pagos frente al total. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagosLines(), this.totalGeneral()),
+  );
+
+  /** `true` cuando lo recibido supera el total: bloquea el guardado y tiñe la pestaña. */
+  protected readonly pagosExceden = computed(() => this.pagosResumen().excede);
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     documentoBreadcrumb(
       this.activeModule,
@@ -161,6 +204,7 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     sede: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     detalles: new FormArray<ComercialDetalleGroup>([]),
+    pagos: new FormArray<PagoGroup>([]),
   });
 
   /**
@@ -189,6 +233,21 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       origen: 'cliente',
       destroyRef: this.destroyRef,
     });
+
+    // Espejo reactivo de las líneas para el total del documento.
+    this.form.controls.detalles.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.lines.set(this.form.controls.detalles.getRawValue()));
+
+    // Espejo reactivo de los pagos para el resumen y la validación del guardado.
+    this.form.controls.pagos.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.pagosLines.set(this.form.controls.pagos.getRawValue()));
+  }
+
+  /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña). */
+  protected get pagos(): FormArray<PagoGroup> {
+    return this.form.controls.pagos;
   }
 
   /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
@@ -213,6 +272,15 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected onSubmit(): void {
     if (this.form.invalid || this.form.pending || this.isSaving()) return;
 
+    // Lo recibido en pagos no puede superar el total. Con los pagos tras un tab,
+    // se abre la pestaña que lo contiene antes de avisar.
+    if (this.pagosExceden()) {
+      this.activeTab.set('pagos');
+      const toast = this.t().entities.documentoPago.toasts.exceden;
+      this.toast.warn(toast.title, toast.desc);
+      return;
+    }
+
     const id = this.id();
     const detalles = this.detallesTable();
     // En edición las líneas transaccionan aparte (no viajan en el payload de la
@@ -220,6 +288,7 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     // flushean las pendientes; si hay líneas incompletas se avisa y se aborta.
     if (id && detalles) {
       if (detalles.hasInvalidPending()) {
+        this.activeTab.set('detalles');
         const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
         this.toast.warn(toast.title, toast.desc);
         return;
@@ -345,10 +414,19 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
 
   /**
    * Pobla la cabecera en el form. `emitEvent: false`: no disparar el autocálculo
-   * y respetar el vencimiento que viene del backend.
+   * y respetar el vencimiento que viene del backend. Los pagos se reconstruyen
+   * aparte (van en un `FormArray`).
    */
   private applyCabecera(read: FacturaVentaRead): void {
     this.form.patchValue(facturaVentaToFormValue(read), { emitEvent: false });
+    this.populatePagos(read.pagos ?? []);
+  }
+
+  /** Reemplaza el `FormArray` de pagos con los recibidos del backend. */
+  private populatePagos(pagos: readonly PagoRead[]): void {
+    const arr = this.form.controls.pagos;
+    arr.clear();
+    for (const pago of pagos) arr.push(createPagoGroup(pagoReadToFormValue(pago)));
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */

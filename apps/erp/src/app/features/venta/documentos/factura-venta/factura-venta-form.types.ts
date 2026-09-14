@@ -1,11 +1,13 @@
 import type { ErpSelectOption } from '@reddoc/core';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
+import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 
 /**
  * Valores crudos del formulario de Factura de venta (`form.getRawValue()`).
  *
  * Los selects guardan la opción completa (`{ id, nombre }`); `fecha` y
- * `fecha_vence` son `Date` del datepicker; `detalles` son las líneas comerciales.
+ * `fecha_vence` son `Date` del datepicker; `detalles` son las líneas comerciales y
+ * `pagos` las filas de cobro (cuenta de banco + monto).
  * El mapper los normaliza al payload de la API.
  */
 export interface FacturaVentaFormRawValue {
@@ -16,4 +18,5 @@ export interface FacturaVentaFormRawValue {
   readonly sede: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];
+  readonly pagos: readonly PagoFormRawValue[];
 }
