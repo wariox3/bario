@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import type { MenuItem } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
 import { I18nService, TenantService, ToastService, formatFechaLarga } from '@reddoc/core';
@@ -78,6 +79,7 @@ interface CabeceraView {
     DocumentDetailActionsComponent,
     MenuModule,
     ImportDialogComponent,
+    TabsModule,
   ],
   templateUrl: './movimiento-documento-detail.component.html',
   styleUrl: './movimiento-documento-detail.component.scss',

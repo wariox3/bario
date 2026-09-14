@@ -4,6 +4,7 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { forkJoin, startWith } from 'rxjs';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
@@ -65,6 +66,7 @@ import { ServicioDocumentoDetallesComponent } from '../../components/servicio-do
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
+    TabsModule,
     DatePickerModule,
     InputNumberModule,
     SelectModule,

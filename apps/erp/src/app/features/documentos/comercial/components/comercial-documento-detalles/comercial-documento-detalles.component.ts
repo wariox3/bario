@@ -25,6 +25,7 @@ import {
   of,
   switchMap,
   tap,
+  throwError,
 } from 'rxjs';
 import { FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -72,6 +73,7 @@ import { ItemService } from '@erp/features/general/masters/item/item.service';
 import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
 import type { Item } from '@erp/features/general/masters/item/item.model';
 import type { AppDict } from '@erp/i18n';
+import { LineasEnCursoError } from '../../comercial-documento-detalle.errors';
 import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
@@ -266,6 +268,12 @@ export class ComercialDocumentoDetallesComponent {
 
   /** Guardado en lote ("Guardar líneas" / flush del padre) en curso. */
   protected readonly savingAll = signal(false);
+
+  /**
+   * Hay un guardado en curso (una línea con su ✓ o un lote). El form padre deshabilita
+   * "Guardar" mientras tanto: guardar a la vez reenviaría líneas que aún no tienen `id`.
+   */
+  readonly ocupado = computed(() => this.savingAll() || this.savingGroup() !== null);
 
   /** Filas ya cableadas al fetch de impuestos del ítem (evita doble suscripción). */
   private readonly wired = new WeakSet<ComercialDetalleGroup>();
@@ -528,7 +536,10 @@ export class ComercialDocumentoDetallesComponent {
 
   /** Filas pendientes (para el conteo del toolbar y el flush del padre). */
   private pendingRows(): readonly ComercialDetalleGroup[] {
-    return this.detalles().controls.filter((row) => this.isPending(row));
+    // La línea en vuelo por su ✓ ya se está guardando: no entra en otro lote.
+    return this.detalles().controls.filter(
+      (row) => row !== this.savingGroup() && this.isPending(row),
+    );
   }
 
   /** Nº de líneas sin guardar; alimenta el botón, el toolbar y el guard de salida. */
@@ -583,8 +594,7 @@ export class ComercialDocumentoDetallesComponent {
 
   /** Guarda una sola línea (botón ✓ por fila). */
   protected saveLinea(group: ComercialDetalleGroup): void {
-    if (this.documentId() == null || group.invalid || this.savingGroup() || this.savingAll())
-      return;
+    if (this.documentId() == null || group.invalid || this.ocupado()) return;
     this.savingGroup.set(group);
     this.persistRow(group)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -637,6 +647,7 @@ export class ComercialDocumentoDetallesComponent {
     // llamada. Así `savingAll` nunca queda colgado si alguien arma el observable
     // sin suscribirse, y las filas se evalúan en el momento de ejecutar.
     return defer(() => {
+      if (this.ocupado()) return throwError(() => new LineasEnCursoError());
       const rows = this.pendingSavable();
       if (this.documentId() == null || rows.length === 0) return of(undefined);
 

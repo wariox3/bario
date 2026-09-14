@@ -2570,21 +2570,55 @@ export const es: AppDict = {
       add: 'Agregar pago',
       empty: 'No hay pagos registrados',
       removePago: 'Eliminar pago',
-      columns: { linea: '#', cuentaBanco: 'Cuenta de banco', monto: 'Monto', acciones: 'Acciones' },
+      savePago: 'Guardar pago',
+      saveAll: 'Guardar pagos',
+      pendingSuffix: 'sin guardar',
+      anulado: 'Anulado',
+      anular: 'Anular',
+      confirmDelete: '¿Eliminar este pago?',
+      confirmAnular: {
+        header: 'Anular pago',
+        message:
+          'El pago dejará de contar y lo pagado volverá a quedar pendiente. La fila se conserva con su valor. ¿Anularlo?',
+        accept: 'Anular pago',
+      },
+      columns: {
+        id: 'ID',
+        cuentaBanco: 'Cuenta de banco',
+        monto: 'Monto',
+        acciones: 'Acciones',
+        estado: 'Estado',
+      },
       cuentaBancoPlaceholder: 'Selecciona…',
-      totalDocumento: 'Total documento',
       totalRecibido: 'Total recibido',
       saldo: 'Saldo pendiente',
-      excedenHint: 'Los pagos superan el total del documento',
+      excedenHint: 'Los pagos superan el total: el documento no se podrá aprobar',
       toasts: {
-        exceden: {
-          title: 'Pagos inválidos',
-          desc: 'El total recibido no puede superar el total del documento',
-        },
         sinDetalles: {
           title: 'Sin valor por cobrar',
           desc: 'Agrega detalles con valor antes de registrar pagos',
         },
+        sinSaldo: {
+          title: 'Sin saldo por cobrar',
+          desc: 'Los pagos ya cubren el total del documento',
+        },
+        saveSuccess: { title: 'Pago guardado', desc: 'El pago se registró correctamente' },
+        saveError: { title: 'Error al guardar', desc: 'No se pudo guardar el pago' },
+        allSaved: { title: 'Pagos guardados', desc: 'Se guardaron los pagos pendientes' },
+        incompletos: {
+          title: 'Pagos incompletos',
+          desc: 'Elige la cuenta de banco y un monto mayor a cero en cada pago',
+        },
+        deleteError: { title: 'Error al eliminar', desc: 'No se pudo eliminar el pago' },
+        noRegistrados: {
+          title: 'Pagos sin registrar',
+          desc: 'El documento se guardó, pero algunos pagos no se registraron. Edítalo para agregarlos',
+        },
+        anularSuccess: {
+          title: 'Pago anulado',
+          desc: 'El pago dejó de contar y lo pagado volvió a quedar pendiente',
+        },
+        anularError: { title: 'Error al anular', desc: 'No se pudo anular el pago' },
       },
     },
     posDocumento: {

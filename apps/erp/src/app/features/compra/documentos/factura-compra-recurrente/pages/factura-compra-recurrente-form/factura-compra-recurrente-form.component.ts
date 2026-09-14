@@ -13,6 +13,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -89,6 +90,7 @@ import { SELECT_ENDPOINTS } from '@reddoc/core';
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
+    TabsModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './factura-compra-recurrente-form.component.html',
@@ -283,6 +285,8 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   canDeactivate(): boolean | Observable<boolean> {
     return canLeaveDocumentForm({
       form: this.form,
+      // En alta nada persiste aparte: tocar una línea y salir también pierde trabajo.
+      enAlta: !this.id(),
       pendingLines: this.detallesTable()?.pendingCount() ?? 0,
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,

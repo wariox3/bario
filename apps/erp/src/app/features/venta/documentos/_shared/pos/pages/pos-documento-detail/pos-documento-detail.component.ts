@@ -3,14 +3,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import {
   formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
   calcularResumen,
-  formatCop,
-  toFiniteNumber,
   type DocumentoEstados,
   type ResumenDocumento,
 } from '@reddoc/core';
@@ -21,6 +20,7 @@ import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
   capacidadesDocumento,
+  puedeAnularPagosDocumento,
 } from '@erp/core/module-config';
 import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
@@ -32,17 +32,17 @@ import { AfectacionModalComponent } from '@erp/core/module-config/components/afe
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
+  totalCantidad,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { DocumentoPagosTableComponent } from '@erp/features/documentos/pagos/components/documento-pagos-table/documento-pagos-table.component';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
+import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
+import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { posDocumentoToFormValue } from '../../pos-documento.mapper';
 import type { PosDocumentoRead } from '../../pos-documento.model';
-
-/** Fila de pago legible para la ficha (cuenta de banco + monto). */
-interface PagoView {
-  readonly cuentaBanco: string | null;
-  readonly monto: number;
-}
 
 /** Cabecera legible de la factura POS para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -58,7 +58,6 @@ interface CabeceraView {
   readonly asesor: string | null;
   readonly ordenCompra: string | null;
   readonly comentario: string | null;
-  readonly pagos: readonly PagoView[];
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
    * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
@@ -73,10 +72,11 @@ interface CabeceraView {
  * `DocumentEntityConfig` inyectado por `activeDocumentResolver`.
  *
  * Camino A del enfoque híbrido: la tabla de líneas y el resumen los aporta la
- * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas
- * (`DocumentoDetalleService`) en paralelo —igual que el form— y las muestra sin
- * formularios. Suma la lista de pagos recibidos en el punto de venta. Desde aquí
- * se vuelve a la lista o se edita.
+ * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`), líneas
+ * (`DocumentoDetalleService`) y pagos (`DocumentoPagoService`) en paralelo —igual
+ * que el form— y los muestra sin formularios. Líneas y pagos van en tabs dentro de la card de la cabecera, con
+ * un único resumen debajo: el mismo esqueleto que el formulario. Desde aquí se
+ * vuelve a la lista o se edita.
  */
 @Component({
   selector: 'app-pos-documento-detail',
@@ -86,9 +86,11 @@ interface CabeceraView {
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
+    DocumentoPagosTableComponent,
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
+    TabsModule,
   ],
   templateUrl: './pos-documento-detail.component.html',
   styleUrl: './pos-documento-detail.component.scss',
@@ -96,6 +98,7 @@ interface CabeceraView {
 export class PosDocumentoDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
+  private readonly pagoService = inject(DocumentoPagoService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
@@ -104,7 +107,6 @@ export class PosDocumentoDetailComponent implements OnInit {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
-  protected readonly formatMoney = formatCop;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -115,6 +117,8 @@ export class PosDocumentoDetailComponent implements OnInit {
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+  /** Pagos del documento (`documento-pago`), anulados incluidos, en la forma del front. */
+  protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -150,6 +154,23 @@ export class PosDocumentoDetailComponent implements OnInit {
   protected readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),
   );
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Recibido, saldo y exceso de los pagos frente al total: misma función que el formulario. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagos(), this.resumen().total),
+  );
+
+  /**
+   * ¿Se pueden anular pagos? Regla del backend: el documento tiene que estar
+   * aprobado, sin contabilizar ni anular (sin aprobar, un pago se elimina desde el form).
+   */
+  protected readonly puedeAnularPagos = computed(() => {
+    const cab = this.cabecera();
+    return cab ? puedeAnularPagosDocumento(cab.estados) : false;
+  });
 
   /** Migas: módulo Venta → listado del documento → identificador del documento abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
@@ -192,7 +213,7 @@ export class PosDocumentoDetailComponent implements OnInit {
 
   /**
    * La botonera cambió el estado del documento en el backend —lo aprobó,
-   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
+   * desaprobó, anuló o (des)contabilizó— o se anuló un pago: se recarga la ficha para que la
    * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
    */
   protected onDocumentoChanged(): void {
@@ -202,16 +223,17 @@ export class PosDocumentoDetailComponent implements OnInit {
   }
 
   private loadDocumento(id: number): void {
-    // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
+    // Mismo patrón que el form: cabecera, líneas y pagos son independientes → en paralelo.
     // Los nombres de los FK (plazo/método de pago, sede, asesor) llegan en los
     // `*_nombre` del read; no hace falta resolverlos con peticiones extra.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.pagoService.listarPorDocumento(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, lineas, pagos }) => {
           const read = cabecera as PosDocumentoRead;
           const fv = posDocumentoToFormValue(read);
           this.cabecera.set({
@@ -226,10 +248,6 @@ export class PosDocumentoDetailComponent implements OnInit {
             asesor: read.asesor_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             comentario: read.comentario ?? null,
-            pagos: (read.pagos ?? []).map((p) => ({
-              cuentaBanco: p.cuenta_banco_nombre ?? null,
-              monto: toFiniteNumber(p.pago) ?? 0,
-            })),
             estados: {
               estado_aprobado: read.estado_aprobado,
               estado_anulado: read.estado_anulado,
@@ -241,6 +259,7 @@ export class PosDocumentoDetailComponent implements OnInit {
             },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
+          this.pagos.set(pagos.map((pago) => pagoReadToFormValue(pago)));
           this.isLoading.set(false);
         },
         error: () => {

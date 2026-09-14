@@ -19,10 +19,10 @@ export interface LeaveConfirmLabels {
  * quedan marcadas como sucias aun después de persistirse (guardar una línea
  * reemplaza su grupo, pero el array padre conserva la marca).
  *
- * Un documento con más de una tabla en vivo declara las suyas (la factura de
- * compra suma `cuentas`). Un `FormArray` que **no** transacciona aparte —los
- * `pagos` del POS y de las notas, que viajan embebidos en el documento— no va
- * acá: ahí ensuciar sí es un cambio pendiente que se perdería al salir.
+ * Un documento con más de una tabla en vivo declara las suyas: la factura de
+ * compra suma `cuentas` y los documentos que cobran suman `pagos` en edición
+ * (transaccionan contra `documento-pago`). En alta no persiste ninguna: el form
+ * pasa `enAlta` y el chequeo cuenta todos los controles.
  */
 const CONTROLES_LINEAS_DEFAULT: readonly string[] = ['detalles'];
 
@@ -68,9 +68,15 @@ export function canLeaveDocumentForm(options: {
    * documento con otra tabla en vivo (la factura de compra) declara las suyas.
    */
   readonly lineControls?: readonly string[];
+  /**
+   * `true` en alta. Ahí ninguna tabla persiste aparte —todo viaja al crear el
+   * documento—, así que `lineControls` no se excluye: tocar una línea y salir también
+   * pierde trabajo. En edición esas tablas las cubre `pendingLines`.
+   */
+  readonly enAlta?: boolean;
 }): boolean | Observable<boolean> {
-  const { form, pendingLines, confirmation, labels, cancelLabel, lineControls } = options;
-  if (pendingLines === 0 && !isHeaderDirty(form, lineControls)) return true;
+  const { form, pendingLines, confirmation, labels, cancelLabel, lineControls, enAlta } = options;
+  if (pendingLines === 0 && !isHeaderDirty(form, enAlta ? [] : lineControls)) return true;
 
   return new Observable<boolean>((subscriber) => {
     confirmation.confirm({

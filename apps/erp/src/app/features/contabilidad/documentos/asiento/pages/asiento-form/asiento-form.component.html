@@ -149,23 +149,31 @@
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ── Sección: Detalles (líneas del asiento) ────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <app-contable-documento-detalles
-        [detalles]="form.controls.detalles"
-        [documentId]="documentId()"
-        [contactoPorDefecto]="contactoCabecera()"
-        [centroCostoPorDefecto]="centroCostoCabecera()"
-        [showContacto]="true"
-        [showNumero]="true"
-        [showCentroCosto]="true"
-        [showBase]="true"
-        [showDetalle]="true"
-        [showDescuadre]="true"
-      />
+    <!-- ── Detalles (líneas del asiento): misma card que la cabecera ─── -->
+    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <p-tabs value="detalles">
+        <p-tablist>
+          <p-tab value="detalles">{{ t().entities.asiento.detail.sections.detalles }}</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="detalles">
+            <app-contable-documento-detalles
+              [detalles]="form.controls.detalles"
+              [documentId]="documentId()"
+              [contactoPorDefecto]="contactoCabecera()"
+              [centroCostoPorDefecto]="centroCostoCabecera()"
+              [showContacto]="true"
+              [showNumero]="true"
+              [showCentroCosto]="true"
+              [showBase]="true"
+              [showDetalle]="true"
+              [showDescuadre]="true"
+            />
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </section>
 </form>

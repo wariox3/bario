@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import {
   formatFechaLarga,
   I18nService,
@@ -62,6 +63,7 @@ interface CabeceraView {
   standalone: true,
   imports: [
     ButtonModule,
+    TabsModule,
     BreadcrumbComponent,
     ServicioDocumentoResumenComponent,
     ServicioDocumentoLineasTableComponent,

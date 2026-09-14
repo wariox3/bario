@@ -1947,15 +1947,35 @@ export interface AppDict
       add: string;
       empty: string;
       removePago: string;
-      columns: { linea: string; cuentaBanco: string; monto: string; acciones: string };
+      savePago: string;
+      saveAll: string;
+      pendingSuffix: string;
+      anulado: string;
+      anular: string;
+      confirmDelete: string;
+      confirmAnular: { header: string; message: string; accept: string };
+      columns: {
+        id: string;
+        cuentaBanco: string;
+        monto: string;
+        acciones: string;
+        estado: string;
+      };
       cuentaBancoPlaceholder: string;
-      totalDocumento: string;
       totalRecibido: string;
       saldo: string;
       excedenHint: string;
       toasts: {
-        exceden: { title: string; desc: string };
         sinDetalles: { title: string; desc: string };
+        sinSaldo: { title: string; desc: string };
+        saveSuccess: { title: string; desc: string };
+        saveError: { title: string; desc: string };
+        allSaved: { title: string; desc: string };
+        incompletos: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        noRegistrados: { title: string; desc: string };
+        anularSuccess: { title: string; desc: string };
+        anularError: { title: string; desc: string };
       };
     };
     posDocumento: {

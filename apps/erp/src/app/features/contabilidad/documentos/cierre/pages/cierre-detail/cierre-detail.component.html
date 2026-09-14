@@ -90,44 +90,43 @@
         <dd class="cierre-detail__value">{{ c.comentario || '—' }}</dd>
       </div>
     </dl>
-  </section>
 
-  <!-- ── Líneas del cierre ───────────────────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-      <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-list text-[1rem]"></i>
-      </span>
-      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ det.sections.lineas }}
-      </h2>
-    </div>
+    <!-- ── Líneas del cierre: mismo documento, misma card (espejo del formulario) ── -->
+    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <p-tabs value="lineas">
+        <p-tablist>
+          <p-tab value="lineas">{{ det.sections.lineas }}</p-tab>
+        </p-tablist>
 
-    <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      @if (isLoadingLineas()) {
-        <div class="flex items-center justify-center py-10 text-brand-muted">
-          <i class="pi pi-spin pi-spinner text-xl"></i>
-        </div>
-      } @else {
-        <app-contable-documento-lineas-table
-          [lines]="lines()"
-          [showContacto]="true"
-          [showCentroCosto]="true"
-          [showBase]="true"
-          [showDetalle]="true"
-        />
-      }
+        <p-tabpanels>
+          <p-tabpanel value="lineas">
+            <div class="flex flex-col gap-4">
+              @if (isLoadingLineas()) {
+                <div class="flex items-center justify-center py-10 text-brand-muted">
+                  <i class="pi pi-spin pi-spinner text-xl"></i>
+                </div>
+              } @else {
+                <app-contable-documento-lineas-table
+                  [lines]="lines()"
+                  [showContacto]="true"
+                  [showCentroCosto]="true"
+                  [showBase]="true"
+                  [showDetalle]="true"
+                />
+              }
 
-      @if (totalLineas() > pageSize) {
-        <p-paginator
-          [rows]="pageSize"
-          [totalRecords]="totalLineas()"
-          [first]="page() * pageSize"
-          (onPageChange)="onPageChange($event)"
-        />
-      }
+              @if (totalLineas() > pageSize) {
+                <p-paginator
+                  [rows]="pageSize"
+                  [totalRecords]="totalLineas()"
+                  [first]="page() * pageSize"
+                  (onPageChange)="onPageChange($event)"
+                />
+              }
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </section>
 }

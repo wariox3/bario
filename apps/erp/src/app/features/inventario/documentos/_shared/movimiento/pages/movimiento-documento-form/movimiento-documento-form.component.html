@@ -116,34 +116,26 @@
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ── Sección: Detalles (líneas de inventario) ─────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-      <span
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-list text-[1.05rem]"></i>
-      </span>
-      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-          {{ t().entities.inventarioDetalle.title }}
-        </h2>
-        <p class="m-0 text-[0.75rem] text-brand-muted">
-          {{ t().entities.inventarioDetalle.hint }}
-        </p>
-      </div>
-    </div>
+    <!-- ── Detalles (líneas de inventario): misma card que la cabecera ─── -->
+    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <p-tabs value="detalles">
+        <p-tablist>
+          <p-tab value="detalles">{{ t().entities.inventarioDetalle.title }}</p-tab>
+        </p-tablist>
 
-    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <app-inventario-documento-detalles
-        [detalles]="form.controls.detalles"
-        [documentId]="documentId()"
-        [almacenPorDefecto]="form.controls.almacen.value"
-        [costoField]="costoField()"
-        [showOperacion]="showOperacion()"
-      />
+        <p-tabpanels>
+          <p-tabpanel value="detalles">
+            <app-inventario-documento-detalles
+              [detalles]="form.controls.detalles"
+              [documentId]="documentId()"
+              [almacenPorDefecto]="form.controls.almacen.value"
+              [costoField]="costoField()"
+              [showOperacion]="showOperacion()"
+            />
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </section>
 </form>

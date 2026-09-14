@@ -31,6 +31,7 @@ import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
   capacidadesDocumento,
+  puedeAnularPagosDocumento,
 } from '@erp/core/module-config';
 import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
@@ -51,6 +52,7 @@ import { DocumentoPagosTableComponent } from '@erp/features/documentos/pagos/com
 import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { facturaVentaToFormValue } from '../../factura-venta.mapper';
@@ -112,6 +114,7 @@ interface CabeceraView {
 export class FacturaVentaDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
+  private readonly pagoService = inject(DocumentoPagoService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
@@ -130,7 +133,7 @@ export class FacturaVentaDetailComponent implements OnInit {
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
-  /** Pagos recibidos, mapeados a la forma del front (asunción de contrato: el backend aún no los expone). */
+  /** Pagos del documento (`documento-pago`), anulados incluidos, en la forma del front. */
   protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
@@ -175,6 +178,15 @@ export class FacturaVentaDetailComponent implements OnInit {
   protected readonly pagosResumen = computed(() =>
     calcularPagos(this.pagos(), this.resumen().total),
   );
+
+  /**
+   * ¿Se pueden anular pagos? Regla del backend: el documento tiene que estar
+   * aprobado, sin contabilizar ni anular (sin aprobar, un pago se elimina desde el form).
+   */
+  protected readonly puedeAnularPagos = computed(() => {
+    const cab = this.cabecera();
+    return cab ? puedeAnularPagosDocumento(cab.estados) : false;
+  });
 
   private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
 
@@ -278,10 +290,11 @@ export class FacturaVentaDetailComponent implements OnInit {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.pagoService.listarPorDocumento(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, lineas, pagos }) => {
           const read = cabecera as FacturaVentaRead;
           const fv = facturaVentaToFormValue(read);
           this.cabecera.set({
@@ -304,7 +317,7 @@ export class FacturaVentaDetailComponent implements OnInit {
             },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
-          this.pagos.set((read.pagos ?? []).map(pagoReadToFormValue));
+          this.pagos.set(pagos.map((pago) => pagoReadToFormValue(pago)));
           this.isLoading.set(false);
         },
         error: () => {

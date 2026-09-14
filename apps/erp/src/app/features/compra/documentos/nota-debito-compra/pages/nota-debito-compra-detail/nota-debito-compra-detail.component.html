@@ -96,30 +96,29 @@
         <dd class="nota-debito-compra-detail__value">{{ c.comentario || '—' }}</dd>
       </div>
     </dl>
-  </section>
 
-  <!-- ── Detalles (líneas comerciales) ───────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-      <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-list text-[1rem]"></i>
-      </span>
-      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ det.sections.detalles }}
-      </h2>
-    </div>
+    <!-- ── Detalles (líneas comerciales): misma card que la cabecera ────────── -->
+    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <p-tabs value="detalles">
+        <p-tablist>
+          <p-tab value="detalles">{{ det.sections.detalles }}</p-tab>
+        </p-tablist>
 
-    <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <app-comercial-documento-lineas-table
-        [lines]="lines()"
-        [linkable]="true"
-        (verAfectacion)="onVerAfectacion($event)"
-      />
+        <p-tabpanels>
+          <p-tabpanel value="detalles">
+            <app-comercial-documento-lineas-table
+              [lines]="lines()"
+              [linkable]="true"
+              (verAfectacion)="onVerAfectacion($event)"
+            />
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
 
       @if (lines().length > 0) {
-        <app-comercial-documento-resumen [resumen]="resumen()" />
+        <div class="mt-4">
+          <app-comercial-documento-resumen [resumen]="resumen()" />
+        </div>
       }
     </div>
   </section>

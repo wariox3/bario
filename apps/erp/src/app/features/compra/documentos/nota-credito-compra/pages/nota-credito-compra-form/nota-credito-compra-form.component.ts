@@ -13,6 +13,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -81,6 +82,7 @@ import { NOTA_CREDITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-credito-comp
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
+    TabsModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './nota-credito-compra-form.component.html',
@@ -284,6 +286,8 @@ export class NotaCreditoCompraFormComponent implements OnInit, CanComponentDeact
   canDeactivate(): boolean | Observable<boolean> {
     return canLeaveDocumentForm({
       form: this.form,
+      // En alta nada persiste aparte: tocar una línea y salir también pierde trabajo.
+      enAlta: !this.id(),
       pendingLines: this.detallesTable()?.pendingCount() ?? 0,
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,

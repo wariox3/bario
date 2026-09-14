@@ -1,12 +1,12 @@
 import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import { pagosToPayload } from '@erp/features/documentos/pagos/pago.mapper';
 import type { FacturaVentaRead, FacturaVentaPayload } from './factura-venta.model';
 import type { FacturaVentaFormRawValue } from './factura-venta-form.types';
 
 /**
  * Read-model (GET) → valores de cabecera del formulario (edición).
- * No incluye `detalles` ni `pagos` (se pueblan aparte en sus `FormArray`).
+ * No incluye `detalles` ni `pagos` (se pueblan aparte en sus `FormArray`; los pagos
+ * vienen de `documento-pago`, no de la cabecera).
  */
 export function facturaVentaToFormValue(
   read: FacturaVentaRead,
@@ -32,7 +32,8 @@ export function facturaVentaToFormValue(
  *
  * `documento_tipo` proviene del `documentTypeId` del `DocumentEntityConfig`.
  * En **edición** se omiten los detalles (`includeDetalles=false`): transaccionan
- * en vivo contra `documento-detalle`. En **alta** viajan embebidos.
+ * en vivo contra `documento-detalle`. En **alta** viajan embebidos. Los pagos nunca
+ * viajan en el documento: se registran aparte en `documento-pago`.
  */
 export function formValueToPayload(
   raw: FacturaVentaFormRawValue,
@@ -47,7 +48,6 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
-    ...pagosToPayload(raw.pagos),
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { I18nService, TenantService, ToastService, formatFechaLarga } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -59,6 +60,7 @@ interface CabeceraView {
     ContableDocumentoLineasTableComponent,
     ContableDocumentoResumenComponent,
     DocumentDetailActionsComponent,
+    TabsModule,
   ],
   templateUrl: './egreso-detail.component.html',
   styleUrl: './egreso-detail.component.scss',

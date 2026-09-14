@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -18,7 +18,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -48,14 +48,28 @@ import {
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
+  totalCantidad,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
-import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
+import {
+  guardarTablasEnSerie,
+  pestanaConPrimerError,
+  registrarPagosDeAlta,
+  type TablaEnVivoDocumento,
+} from '@erp/features/documentos/tablas-en-vivo';
+import {
+  createPagoGroup,
+  type PagoFormRawValue,
+  type PagoGroup,
+} from '@erp/features/documentos/pagos/pago.form';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
+import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
 import type { NotaVentaRead } from '../../nota-documento.model';
 import {
@@ -77,7 +91,10 @@ import {
  * Una nota de venta ajusta una factura de venta (`documento_referencia`) y, como
  * el POS, puede cobrarse en el acto: a la cabecera (cliente, fecha, sede, método
  * de pago, comentario) le suma la **sección de pagos** —compartida— y la **tabla
- * de detalles** comercial. Detalles / Pagos / Más información van en tabs.
+ * de detalles** comercial. La pestaña de pagos solo aparece si la config declara
+ * `hasPagos` (la nota crédito sí, la débito no); los pagos no viajan en el documento:
+ * transaccionan aparte contra `documento-pago`. Detalles / Pagos / Más información
+ * van en tabs dentro de la card de la cabecera, con un único resumen debajo.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -93,11 +110,13 @@ import {
     TabsModule,
     TextareaModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
     DocumentoPagosComponent,
+    ComercialDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './nota-documento-form.component.html',
@@ -115,21 +134,41 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly confirmation = inject(ConfirmationService);
+  private readonly pagoService = inject(DocumentoPagoService);
 
   protected readonly t = this.i18n.t;
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
-  /**
-   * Sección de pagos (dentro de su tab). El padre le lee `excede()` para bloquear
-   * el guardado y colorear el chip de la pestaña; el panel del tab sigue montado
-   * aunque no esté activo (PrimeNG no lo destruye).
-   */
-  private readonly pagosPanel = viewChild(DocumentoPagosComponent);
+  /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
+  private readonly pagosTable = viewChild(DocumentoPagosComponent);
+
+  /** Guardado en curso en la tabla de líneas o la de pagos: el botón Guardar espera a que termine. */
+  protected readonly tablasOcupadas = computed(
+    () => (this.detallesTable()?.ocupado() ?? false) || (this.pagosTable()?.ocupado() ?? false),
+  );
 
   /** Tab activo del bloque (Detalles / Pagos / Más información). */
   protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
+
+  /**
+   * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
+   * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
+   */
+  private readonly pestanasPorControl: Readonly<
+    Record<string, 'detalles' | 'pagos' | 'informacion'>
+  > = {
+    detalles: 'detalles',
+    pagos: 'pagos',
+    comentario: 'informacion',
+  };
+
+  /**
+   * ¿Se cobra en el acto? Lo declara la config (`hasPagos`): solo entonces hay
+   * pestaña de pagos, filas de pagos en el resumen y pagos que cargar y registrar.
+   */
+  protected readonly conPagos = computed(() => this.document().hasPagos === true);
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
@@ -192,13 +231,28 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   /** Espejo reactivo de las líneas para calcular el total del documento. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
 
-  /** Total del documento (mismo kernel que la tabla de detalles y el resumen). */
-  protected readonly totalGeneral = computed(
-    () => calcularResumen(this.lines().map(toLineaCalculo)).total,
+  /** Resumen del documento: lo pinta el aside bajo los tabs, igual en Detalles y Pagos. */
+  protected readonly resumen = computed(() => calcularResumen(this.lines().map(toLineaCalculo)));
+
+  /** Total del documento: contra él se validan y se prellenan los pagos. */
+  protected readonly totalGeneral = computed(() => this.resumen().total);
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Espejo reactivo de los pagos para el resumen y la validación del guardado. */
+  protected readonly pagosLines = signal<readonly PagoFormRawValue[]>([]);
+
+  /** Recibido, saldo y exceso de los pagos frente al total. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagosLines(), this.totalGeneral()),
   );
 
-  /** `true` cuando lo recibido supera el total; lo aporta la sección de pagos. */
-  protected readonly pagosExceden = computed(() => this.pagosPanel()?.excede() ?? false);
+  /**
+   * `true` cuando lo recibido supera el total. No bloquea guardar —el backend lo frena
+   * al aprobar—: tiñe la pestaña y el resumen avisa que no se podrá aprobar.
+   */
+  protected readonly pagosExceden = computed(() => this.pagosResumen().excede);
 
   /**
    * Nombre del documento activo (Nota crédito, Nota débito…). La página la
@@ -242,6 +296,11 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     this.form.controls.detalles.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.lines.set(this.form.controls.detalles.getRawValue()));
+
+    // Espejo reactivo de los pagos para el resumen y la validación del guardado.
+    this.form.controls.pagos.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.pagosLines.set(this.form.controls.pagos.getRawValue()));
   }
 
   /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña y la carga). */
@@ -258,7 +317,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     const id = this.id();
     if (!id) return;
     // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
-    // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
+    // pedimos líneas y pagos. Sin resolved (fail-open) cae a la carga completa.
     const prefetched = this.documentoEdit();
     if (prefetched) {
       this.applyCabecera(prefetched as NotaVentaRead);
@@ -269,48 +328,48 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.form.pending || this.isSaving()) return;
-
-    // Validación propia: lo recibido en pagos no puede superar el total. Con los
-    // pagos tras un tab, se abre la pestaña que lo contiene antes de avisar.
-    if (this.pagosExceden()) {
-      this.activeTab.set('pagos');
-      const toast = this.t().entities.documentoPago.toasts.exceden;
-      this.toast.warn(toast.title, toast.desc);
+    if (this.isSaving() || this.tablasOcupadas()) return;
+    if (this.form.invalid || this.form.pending) {
+      // `libFocusInvalid` marca todo como tocado y lleva al primer campo con error, pero
+      // un panel inactivo está oculto: antes se abre la pestaña que lo contiene.
+      const pestana = pestanaConPrimerError(this.form, this.pestanasPorControl);
+      if (pestana) this.activeTab.set(pestana);
       return;
     }
 
     const id = this.id();
-    const detalles = this.detallesTable();
-    // En edición las líneas transaccionan aparte (no viajan en el payload de la
-    // cabecera). Antes de guardar el documento se flushean las pendientes; si hay
-    // líneas incompletas se avisa y se aborta.
-    if (id && detalles) {
-      if (detalles.hasInvalidPending()) {
-        this.activeTab.set('detalles');
-        const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
-        this.toast.warn(toast.title, toast.desc);
-        return;
-      }
-      if (detalles.pendingCount() > 0) {
-        this.isSaving.set(true);
-        detalles
-          .saveAll()
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => this.persistCabecera(id),
-            error: () => {
-              this.isSaving.set(false);
-              const toast = this.t().entities.comercialDetalle.toasts.lineSaveError;
-              this.toast.error(toast.title, toast.desc);
-            },
-          });
-        return;
-      }
+    if (!id) {
+      // Alta: las líneas viajan embebidas; los pagos se registran al crear.
+      this.isSaving.set(true);
+      this.persistCabecera(id);
+      return;
     }
 
+    // Edición: líneas y pagos transaccionan aparte, así que antes de guardar el
+    // documento se persisten sus pendientes (el form ya es válido: no hay incompletos).
+    const tablas = this.tablasEnVivo();
+
     this.isSaving.set(true);
-    this.persistCabecera(id);
+    // Flush silencioso y en serie (líneas, luego pagos): el éxito lo confirma el toast
+    // del documento; el helper solo reporta la tabla que falle.
+    guardarTablasEnSerie(tablas, this.toast)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        complete: () => this.persistCabecera(id),
+        error: () => this.isSaving.set(false),
+      });
+  }
+
+  /** Tablas que transaccionan en vivo, en el orden en que se guardan. */
+  private tablasEnVivo(): readonly TablaEnVivoDocumento[] {
+    const { comercialDetalle, documentoPago } = this.t().entities;
+    return [
+      { tabla: this.detallesTable(), errorAlGuardar: comercialDetalle.toasts.lineSaveError },
+      {
+        tabla: this.conPagos() ? this.pagosTable() : undefined,
+        errorAlGuardar: documentoPago.toasts.saveError,
+      },
+    ];
   }
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
@@ -328,7 +387,6 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (saved) => {
-        this.isSaving.set(false);
         // Guardar limpia el estado "sucio": navegar a la ficha pasa por el guard
         // de salida y, sin esto, el camino feliz preguntaría por cambios ya guardados.
         this.form.markAsPristine();
@@ -338,8 +396,27 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
         // almacenado. En alta el id sale de la respuesta del backend; si no
         // viniera, se cae a la lista antes que navegar a una URL inválida.
         const savedId = id ?? extractDocumentoId(saved);
-        if (savedId != null) this.navigateToDetail(savedId);
-        else this.navigateToList();
+        if (savedId == null) {
+          this.isSaving.set(false);
+          this.navigateToList();
+          return;
+        }
+        // Alta: los pagos no viajan embebidos, se registran contra el documento recién
+        // creado. Si alguno falla el documento ya existe: el helper avisa con el motivo
+        // del backend y se abre igual su ficha, desde donde se edita para agregarlos.
+        registrarPagosDeAlta(
+          id || !this.conPagos() ? undefined : this.pagosTable(),
+          Number(savedId),
+          this.toast,
+          this.t().entities.documentoPago.toasts.noRegistrados,
+        )
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            complete: () => {
+              this.isSaving.set(false);
+              this.navigateToDetail(savedId);
+            },
+          });
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -354,13 +431,18 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /**
-   * Guard de salida: si hay líneas sin guardar, confirma antes de abandonar para
-   * no perderlas. Solo aplica en edición.
+   * Guard de salida: si hay líneas o pagos sin guardar, confirma antes de abandonar
+   * para no perderlos. Solo aplica en edición.
    */
   canDeactivate(): boolean | Observable<boolean> {
+    const pagosPendientes = this.conPagos() ? (this.pagosTable()?.pendingCount() ?? 0) : 0;
     return canLeaveDocumentForm({
       form: this.form,
-      pendingLines: this.detallesTable()?.pendingCount() ?? 0,
+      pendingLines: (this.detallesTable()?.pendingCount() ?? 0) + pagosPendientes,
+      // En edición los pagos transaccionan aparte, como las líneas: los cuenta `pendingLines`.
+      lineControls: ['detalles', 'pagos'],
+      // En alta nada persiste aparte: tocar una línea o un pago y salir también pierde trabajo.
+      enAlta: !this.id(),
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,
       cancelLabel: this.t().common.actions.cancel,
@@ -377,46 +459,57 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /**
-   * Carga completa (cabecera + líneas). La cabecera ya no embebe los detalles: las
-   * líneas se traen aparte de `documento-detalle/?documento_id=`. Se usa como
+   * Carga completa (cabecera + líneas + pagos). La cabecera no embebe líneas ni
+   * pagos: se traen aparte de `documento-detalle` y `documento-pago`. Se usa como
    * fallback de la carga inicial y para recargar tras importar.
    */
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.listarPagos(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, lineas, pagos }) => {
           this.applyCabecera(cabecera as NotaVentaRead);
           this.populateLineas(lineas);
+          this.populatePagos(pagos);
         },
         error: () => this.notifyLoadError(),
       });
   }
 
-  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
+  /** Carga líneas y pagos (la cabecera ya la aportó el resolver). */
   private loadLineas(id: number): void {
-    this.detalleService
-      .listarPorDocumento<ComercialDetalleRead>(id)
+    forkJoin({
+      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.listarPagos(id),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (lineas) => this.populateLineas(lineas),
+        next: ({ lineas, pagos }) => {
+          this.populateLineas(lineas);
+          this.populatePagos(pagos);
+        },
         error: () => this.notifyLoadError(),
       });
+  }
+
+  /** Pagos del documento; la nota que no se cobra en el acto no los pide. */
+  private listarPagos(id: number): Observable<readonly PagoRead[]> {
+    return this.conPagos() ? this.pagoService.listarPorDocumento(id) : of([]);
   }
 
   /**
    * Pobla la cabecera en el form. `emitEvent: false`: no disparar el efecto de
    * cambio de cliente (que limpiaría la referencia recién cargada). Como el patch
-   * no emite, sincronizamos el estado del select de referencia a mano. Los pagos
-   * se reconstruyen aparte (van en un `FormArray`).
+   * no emite, sincronizamos el estado del select de referencia a mano. Los pagos no
+   * vienen en la cabecera: se traen de `documento-pago` junto con las líneas.
    */
   private applyCabecera(read: NotaVentaRead): void {
     this.form.patchValue(notaVentaToFormValue(read), { emitEvent: false });
     this.syncReferenciaState();
-    this.populatePagos(read.pagos ?? []);
   }
 
   /**
@@ -442,7 +535,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     else ref.enable({ emitEvent: false });
   }
 
-  /** Reemplaza el `FormArray` de pagos con los recibidos del backend. */
+  /** Reemplaza el `FormArray` de pagos con los del backend (anulados incluidos, de solo lectura). */
   private populatePagos(pagos: readonly PagoRead[]): void {
     const arr = this.form.controls.pagos;
     arr.clear();

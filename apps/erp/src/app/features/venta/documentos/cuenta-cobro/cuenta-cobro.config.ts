@@ -26,6 +26,8 @@ export const CUENTA_COBRO_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.cuentaCobro.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.CUENTA_COBRO,
+  // Se cobra en el acto, como en el ERP anterior (usa el form y la ficha del POS).
+  hasPagos: true,
   schemaVersion: 1,
   columns: CUENTA_COBRO_COLUMNS,
   filters: CUENTA_COBRO_FILTERS,

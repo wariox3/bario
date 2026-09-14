@@ -21,6 +21,8 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_CREDITO_VENTA,
   inventoryEffect: 'inflow',
+  // Se cobra en el acto: el form y la ficha compartidos muestran la pestaña de pagos.
+  hasPagos: true,
   schemaVersion: 1,
   columns: NOTA_CREDITO_COLUMNS,
   filters: NOTA_CREDITO_FILTERS,

@@ -13,6 +13,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -71,6 +72,7 @@ import type { PedidoClienteRead } from '../../pedido-cliente.model';
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
+    TabsModule,
     ConfirmDialogModule,
     DatePickerModule,
     FieldErrorComponent,
@@ -246,6 +248,8 @@ export class PedidoClienteFormComponent implements OnInit, CanComponentDeactivat
   canDeactivate(): boolean | Observable<boolean> {
     return canLeaveDocumentForm({
       form: this.form,
+      // En alta nada persiste aparte: tocar una línea y salir también pierde trabajo.
+      enAlta: !this.id(),
       pendingLines: this.detallesTable()?.pendingCount() ?? 0,
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,

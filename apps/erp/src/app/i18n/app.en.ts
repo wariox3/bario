@@ -2516,21 +2516,55 @@ export const en: AppDict = {
       add: 'Add payment',
       empty: 'No payments registered',
       removePago: 'Remove payment',
-      columns: { linea: '#', cuentaBanco: 'Bank account', monto: 'Amount', acciones: 'Actions' },
+      savePago: 'Save payment',
+      saveAll: 'Save payments',
+      pendingSuffix: 'unsaved',
+      anulado: 'Voided',
+      anular: 'Void',
+      confirmDelete: 'Remove this payment?',
+      confirmAnular: {
+        header: 'Void payment',
+        message:
+          'The payment will stop counting and the amount will be outstanding again. The row keeps its value. Void it?',
+        accept: 'Void payment',
+      },
+      columns: {
+        id: 'ID',
+        cuentaBanco: 'Bank account',
+        monto: 'Amount',
+        acciones: 'Actions',
+        estado: 'Status',
+      },
       cuentaBancoPlaceholder: 'Select…',
-      totalDocumento: 'Document total',
       totalRecibido: 'Total received',
       saldo: 'Outstanding balance',
-      excedenHint: 'Payments exceed the document total',
+      excedenHint: 'Payments exceed the total: the document cannot be approved',
       toasts: {
-        exceden: {
-          title: 'Invalid payments',
-          desc: 'The total received cannot exceed the document total',
-        },
         sinDetalles: {
           title: 'Nothing to collect',
           desc: 'Add details with a value before registering payments',
         },
+        sinSaldo: {
+          title: 'Nothing left to collect',
+          desc: 'Payments already cover the document total',
+        },
+        saveSuccess: { title: 'Payment saved', desc: 'The payment was registered' },
+        saveError: { title: 'Save failed', desc: 'The payment could not be saved' },
+        allSaved: { title: 'Payments saved', desc: 'Pending payments were saved' },
+        incompletos: {
+          title: 'Incomplete payments',
+          desc: 'Choose the bank account and an amount above zero for each payment',
+        },
+        deleteError: { title: 'Remove failed', desc: 'The payment could not be removed' },
+        noRegistrados: {
+          title: 'Payments not registered',
+          desc: 'The document was saved, but some payments were not registered. Edit it to add them',
+        },
+        anularSuccess: {
+          title: 'Payment voided',
+          desc: 'The payment stopped counting and the amount is outstanding again',
+        },
+        anularError: { title: 'Void failed', desc: 'The payment could not be voided' },
       },
     },
     posDocumento: {
