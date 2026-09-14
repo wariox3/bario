@@ -9,8 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, concat, forkJoin, of, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -64,6 +63,12 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
+import {
+  guardarTablasEnSerie,
+  primeraTablaIncompleta,
+  registrarPagosDeAlta,
+  type TablaEnVivoDocumento,
+} from '@erp/features/documentos/tablas-en-vivo';
 import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
@@ -135,6 +140,9 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
 
   /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
   private readonly pagosTable = viewChild(DocumentoPagosComponent);
+
+  /** Guardado en curso dentro de la tabla de pagos: el botón Guardar espera a que termine. */
+  protected readonly tablasOcupadas = computed(() => this.pagosTable()?.ocupado() ?? false);
 
   /** Tab activo del bloque de líneas (Detalles / Pagos). */
   protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
@@ -279,12 +287,9 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.form.pending || this.isSaving()) return;
+    if (this.form.invalid || this.form.pending || this.isSaving() || this.tablasOcupadas()) return;
 
     const id = this.id();
-    const detalles = this.detallesTable();
-    const pagos = this.pagosTable();
-
     if (!id) {
       // Alta: las líneas viajan embebidas; los pagos se registran al crear.
       this.isSaving.set(true);
@@ -295,43 +300,42 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     // Edición: líneas y pagos transaccionan aparte, así que antes de guardar el
     // documento se persisten los pendientes. Si alguno está incompleto se abre su
     // pestaña y se avisa, en vez de guardar a medias.
-    if (detalles?.hasInvalidPending()) {
-      this.activeTab.set('detalles');
-      const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
-      this.toast.warn(toast.title, toast.desc);
-      return;
-    }
-    if (pagos?.hasInvalidPending()) {
-      this.activeTab.set('pagos');
-      const toast = this.t().entities.documentoPago.toasts.incompletos;
-      this.toast.warn(toast.title, toast.desc);
+    const tablas = this.tablasEnVivo();
+    const incompleta = primeraTablaIncompleta(tablas);
+    if (incompleta) {
+      this.activeTab.set(incompleta.tab);
+      this.toast.warn(incompleta.incompleta.title, incompleta.incompleta.desc);
       return;
     }
 
     this.isSaving.set(true);
     // Flush silencioso y en serie (líneas, luego pagos): el éxito lo confirma el toast
-    // del documento; aquí solo se reporta el que falle.
-    concat(
-      (detalles?.saveAll() ?? of(undefined)).pipe(
-        catchError((err: unknown) => {
-          const toast = this.t().entities.comercialDetalle.toasts.lineSaveError;
-          this.toast.error(toast.title, toast.desc);
-          return throwError(() => err);
-        }),
-      ),
-      (pagos?.saveAll() ?? of(undefined)).pipe(
-        catchError((err: unknown) => {
-          const toast = this.t().entities.documentoPago.toasts.saveError;
-          this.toast.error(toast.title, toast.desc);
-          return throwError(() => err);
-        }),
-      ),
-    )
+    // del documento; el helper solo reporta la tabla que falle.
+    guardarTablasEnSerie(tablas, this.toast)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: () => this.persistCabecera(id),
         error: () => this.isSaving.set(false),
       });
+  }
+
+  /** Tablas que transaccionan en vivo, en el orden en que se guardan. */
+  private tablasEnVivo(): readonly TablaEnVivoDocumento<'detalles' | 'pagos'>[] {
+    const { comercialDetalle, documentoPago } = this.t().entities;
+    return [
+      {
+        tabla: this.detallesTable(),
+        tab: 'detalles',
+        incompleta: comercialDetalle.toasts.incompleteLines,
+        errorAlGuardar: comercialDetalle.toasts.lineSaveError,
+      },
+      {
+        tabla: this.pagosTable(),
+        tab: 'pagos',
+        incompleta: documentoPago.toasts.incompletos,
+        errorAlGuardar: documentoPago.toasts.saveError,
+      },
+    ];
   }
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
@@ -363,27 +367,22 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
           this.navigateToList();
           return;
         }
-        const pagos = this.pagosTable();
-        if (id || !pagos || pagos.rowCount() === 0) {
-          this.isSaving.set(false);
-          this.navigateToDetail(savedId);
-          return;
-        }
-        // Alta con pagos: no viajan embebidos, se registran contra el documento recién
-        // creado. Si alguno falla, el documento ya existe: se avisa y se abre igual su
-        // ficha, desde donde se edita para agregarlos.
-        pagos.saveAll(Number(savedId)).subscribe({
-          complete: () => {
-            this.isSaving.set(false);
-            this.navigateToDetail(savedId);
-          },
-          error: () => {
-            this.isSaving.set(false);
-            const toast = this.t().entities.documentoPago.toasts.noRegistrados;
-            this.toast.warn(toast.title, toast.desc);
-            this.navigateToDetail(savedId);
-          },
-        });
+        // Alta: los pagos no viajan embebidos, se registran contra el documento recién
+        // creado. Si alguno falla el documento ya existe: el helper avisa con el motivo
+        // del backend y se abre igual su ficha, desde donde se edita para agregarlos.
+        registrarPagosDeAlta(
+          id ? undefined : this.pagosTable(),
+          Number(savedId),
+          this.toast,
+          this.t().entities.documentoPago.toasts.noRegistrados,
+        )
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            complete: () => {
+              this.isSaving.set(false);
+              this.navigateToDetail(savedId);
+            },
+          });
       },
       error: (err: unknown) => {
         this.isSaving.set(false);

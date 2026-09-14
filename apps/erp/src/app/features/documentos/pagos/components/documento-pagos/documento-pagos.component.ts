@@ -1,14 +1,14 @@
 import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
-import { Observable, concat, defer, of } from 'rxjs';
+import { Observable, concat, defer, of, throwError } from 'rxjs';
 import { finalize, ignoreElements, tap } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TooltipModule } from 'primeng/tooltip';
-import { I18nService, ToastService, formatCop } from '@reddoc/core';
+import { I18nService, ToastService, extractErrorMessage, formatCop } from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { createPagoGroup, type PagoFormRawValue, type PagoGroup } from '../../pago.form';
@@ -17,6 +17,7 @@ import { calcularPagos } from '../../pago.calculo';
 import { pagoReadToFormValue, pagoToPayload } from '../../pago.mapper';
 import type { PagoRead } from '../../pago.model';
 import { DocumentoPagoService } from '../../pago.service';
+import { PagosEnCursoError } from '../../pago.errors';
 
 /**
  * Tabla **editable** de pagos de un documento que se cobra en el acto (factura de
@@ -90,6 +91,12 @@ export class DocumentoPagosComponent {
   /** Guardado en lote en curso (botón del toolbar o flush del padre). */
   protected readonly savingAll = signal(false);
 
+  /**
+   * Hay un guardado en curso (una fila con su ✓ o un lote). El padre deshabilita su
+   * "Guardar" mientras tanto: guardar a la vez reenviaría filas que aún no tienen `id`.
+   */
+  readonly ocupado = computed(() => this.savingAll() || this.savingGroup() !== null);
+
   constructor() {
     // Espejo reactivo del FormArray inyectado (se re-suscribe si cambia la instancia).
     effect((onCleanup) => {
@@ -112,6 +119,12 @@ export class DocumentoPagosComponent {
       this.toast.warn(toast.title, toast.desc);
       return;
     }
+    if (this.saldoPendiente() <= 0) {
+      // Los pagos ya cubren el total: una fila nueva nacería en cero e invalidaría el form.
+      const toast = this.t().entities.documentoPago.toasts.sinSaldo;
+      this.toast.warn(toast.title, toast.desc);
+      return;
+    }
     this.pagos().push(createPagoGroup({ pago: this.saldoPendiente() }));
   }
 
@@ -125,7 +138,8 @@ export class DocumentoPagosComponent {
    */
   private rowsToPersist(): readonly PagoGroup[] {
     return this.pagos().controls.filter((row) => {
-      if (this.isAnulado(row)) return false;
+      // Anulado: solo lectura. En vuelo por su ✓: ya se está guardando, no se reenvía.
+      if (this.isAnulado(row) || row === this.savingGroup()) return false;
       return row.controls.id.value == null ? row.controls.cuenta_banco.value != null : row.dirty;
     });
   }
@@ -148,6 +162,11 @@ export class DocumentoPagosComponent {
   /** `true` si algún pago por guardar está incompleto (sin cuenta o en cero). */
   hasInvalidPending(): boolean {
     return this.rowsToPersist().some((row) => row.invalid);
+  }
+
+  /** Pendientes y válidos: los que `saveAll` y el ✓ pueden persistir ya. */
+  private pendingSavable(): readonly PagoGroup[] {
+    return this.rowsToPersist().filter((row) => row.valid);
   }
 
   protected canSaveRow(group: PagoGroup): boolean {
@@ -178,7 +197,7 @@ export class DocumentoPagosComponent {
   /** Guarda un solo pago (✓ por fila, en edición). */
   protected savePago(group: PagoGroup): void {
     const docId = this.documentId();
-    if (docId == null || group.invalid || this.savingGroup() || this.savingAll()) return;
+    if (docId == null || group.invalid || this.ocupado()) return;
     this.savingGroup.set(group);
     this.persistRow(group, docId)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -188,10 +207,10 @@ export class DocumentoPagosComponent {
           const toast = this.t().entities.documentoPago.toasts.saveSuccess;
           this.toast.success(toast.title, toast.desc);
         },
-        error: () => {
+        error: (err: unknown) => {
           this.savingGroup.set(null);
           const toast = this.t().entities.documentoPago.toasts.saveError;
-          this.toast.error(toast.title, toast.desc);
+          this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
         },
       });
   }
@@ -201,9 +220,12 @@ export class DocumentoPagosComponent {
     const toasts = this.t().entities.documentoPago.toasts;
     if (this.hasInvalidPending())
       this.toast.warn(toasts.incompletos.title, toasts.incompletos.desc);
+    // Solo incompletos: ya se avisó, y un "Pagos guardados" sin haber guardado nada mentiría.
+    if (this.pendingSavable().length === 0) return;
     this.saveAll().subscribe({
       complete: () => this.toast.success(toasts.allSaved.title, toasts.allSaved.desc),
-      error: () => this.toast.error(toasts.saveError.title, toasts.saveError.desc),
+      error: (err: unknown) =>
+        this.toast.error(toasts.saveError.title, extractErrorMessage(err, toasts.saveError.desc)),
     });
   }
 
@@ -212,16 +234,21 @@ export class DocumentoPagosComponent {
    * del documento en edición; en alta, el recién creado). Completa al terminar y
    * emite error si alguno falla.
    *
-   * Va **en serie**, no en paralelo: cada escritura hace que el backend recalcule
-   * `documento.pago`, y dos a la vez sobre el mismo documento se pisarían la suma.
+   * - Va **en serie**, no en paralelo: cada escritura hace que el backend recalcule
+   *   `documento.pago`, y dos a la vez sobre el mismo documento se pisarían la suma.
+   * - Cada payload se arma **cuando le toca** (`defer`), no al empezar el lote: si la
+   *   persona corrige un monto mientras se guardan las filas anteriores, viaja el nuevo.
+   * - Con otro guardado en curso emite `PagosEnCursoError` en vez de reenviar filas.
+   *
    * Operación pura: no muestra toasts.
    */
   saveAll(documentoId: number | null = this.documentId()): Observable<void> {
     return defer(() => {
-      const rows = this.rowsToPersist().filter((row) => row.valid);
+      if (this.ocupado()) return throwError(() => new PagosEnCursoError());
+      const rows = this.pendingSavable();
       if (documentoId == null || rows.length === 0) return of(undefined);
       this.savingAll.set(true);
-      return concat(...rows.map((row) => this.persistRow(row, documentoId))).pipe(
+      return concat(...rows.map((row) => defer(() => this.persistRow(row, documentoId)))).pipe(
         ignoreElements(),
         finalize(() => this.savingAll.set(false)),
       );
@@ -251,9 +278,9 @@ export class DocumentoPagosComponent {
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: () => this.removeRow(group),
-            error: () => {
+            error: (err: unknown) => {
               const toast = this.t().entities.documentoPago.toasts.deleteError;
-              this.toast.error(toast.title, toast.desc);
+              this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
             },
           }),
     });

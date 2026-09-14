@@ -2544,6 +2544,10 @@ export const en: AppDict = {
           title: 'Nothing to collect',
           desc: 'Add details with a value before registering payments',
         },
+        sinSaldo: {
+          title: 'Nothing left to collect',
+          desc: 'Payments already cover the document total',
+        },
         saveSuccess: { title: 'Payment saved', desc: 'The payment was registered' },
         saveError: { title: 'Save failed', desc: 'The payment could not be saved' },
         allSaved: { title: 'Payments saved', desc: 'Pending payments were saved' },

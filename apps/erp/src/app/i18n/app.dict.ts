@@ -1967,6 +1967,7 @@ export interface AppDict
       excedenHint: string;
       toasts: {
         sinDetalles: { title: string; desc: string };
+        sinSaldo: { title: string; desc: string };
         saveSuccess: { title: string; desc: string };
         saveError: { title: string; desc: string };
         allSaved: { title: string; desc: string };

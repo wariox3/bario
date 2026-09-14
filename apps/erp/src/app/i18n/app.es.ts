@@ -2598,6 +2598,10 @@ export const es: AppDict = {
           title: 'Sin valor por cobrar',
           desc: 'Agrega detalles con valor antes de registrar pagos',
         },
+        sinSaldo: {
+          title: 'Sin saldo por cobrar',
+          desc: 'Los pagos ya cubren el total del documento',
+        },
         saveSuccess: { title: 'Pago guardado', desc: 'El pago se registró correctamente' },
         saveError: { title: 'Error al guardar', desc: 'No se pudo guardar el pago' },
         allSaved: { title: 'Pagos guardados', desc: 'Se guardaron los pagos pendientes' },

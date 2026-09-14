@@ -24,7 +24,7 @@ export interface PagoRead {
 /** Body (POST/PATCH) de un pago. */
 export interface PagoPayload {
   readonly documento: number;
-  readonly cuenta_banco: number | null;
+  readonly cuenta_banco: number;
   /** Monto como string con 2 decimales (`"50000.00"`). */
   readonly pago: string;
 }

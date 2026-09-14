@@ -20,7 +20,7 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="form.invalid || form.pending || isSaving() || tablasOcupadas()"
     />
   </lib-page-actions>
 

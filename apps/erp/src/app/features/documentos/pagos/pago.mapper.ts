@@ -1,3 +1,4 @@
+import { PagoSinCuentaBancoError } from './pago.errors';
 import type { PagoFormRawValue } from './pago.form';
 import type { PagoPayload, PagoRead } from './pago.model';
 
@@ -11,11 +12,16 @@ export function pagoReadToFormValue(read: PagoRead): PagoFormRawValue {
   };
 }
 
-/** Fila del formulario → body de `POST`/`PATCH /general/documento-pago/`. */
+/**
+ * Fila del formulario → body de `POST`/`PATCH /general/documento-pago/`. La cuenta es
+ * obligatoria en el backend; una fila sin ella es inválida y no debería llegar aquí.
+ */
 export function pagoToPayload(raw: PagoFormRawValue, documentoId: number): PagoPayload {
+  const cuentaBanco = raw.cuenta_banco?.id;
+  if (cuentaBanco == null) throw new PagoSinCuentaBancoError();
   return {
     documento: documentoId,
-    cuenta_banco: raw.cuenta_banco?.id ?? null,
+    cuenta_banco: cuentaBanco,
     pago: (raw.pago ?? 0).toFixed(2),
   };
 }
