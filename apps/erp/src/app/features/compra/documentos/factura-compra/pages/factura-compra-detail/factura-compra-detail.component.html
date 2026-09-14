@@ -32,6 +32,18 @@
       (imprimir)="onImprimir()"
       (contabilizacionChanged)="onContabilizacionChanged()"
     />
+
+    <p-button
+      type="button"
+      [label]="t().entities.facturaCompra.utilidades.action"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleUtilidades($event)"
+    />
+    <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
   }
 </header>
 
@@ -132,3 +144,18 @@
     </div>
   </section>
 }
+
+<app-import-dialog
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
+  [title]="t().entities.facturaCompra.import.title"
+  [subtitle]="t().entities.facturaCompra.import.subtitle"
+  [notice]="t().entities.facturaCompra.import.notice"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
+  [exampleConfig]="exampleConfig()"
+  (importRequested)="importar.submit($event)"
+/>

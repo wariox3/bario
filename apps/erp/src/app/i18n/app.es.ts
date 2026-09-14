@@ -2406,6 +2406,16 @@ export const es: AppDict = {
           desc: 'La factura que buscas no existe o fue eliminada.',
         },
       },
+      utilidades: {
+        action: 'Utilidades',
+        importarDetalle: 'Importar detalle',
+      },
+      import: {
+        title: 'Importar detalle',
+        subtitle: 'Sube un Excel con las líneas a cargar en esta factura',
+        notice:
+          'Las líneas del archivo se agregan a las que la factura ya tiene; no reemplazan nada. Si alguna fila falla no se guarda ninguna.',
+      },
     },
     facturaPos: {
       name: 'Factura POS',
@@ -2814,6 +2824,16 @@ export const es: AppDict = {
           title: 'Factura no encontrada',
           desc: 'La factura que buscas no existe o fue eliminada.',
         },
+      },
+      utilidades: {
+        action: 'Utilidades',
+        importarDetalle: 'Importar detalle',
+      },
+      import: {
+        title: 'Importar detalle',
+        subtitle: 'Sube un Excel con las líneas a cargar en esta factura',
+        notice:
+          'Las líneas del archivo se agregan a las que la factura ya tiene; no reemplazan nada. Si alguna fila falla no se guarda ninguna.',
       },
     },
     documentoSoporte: {

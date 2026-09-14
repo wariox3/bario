@@ -2355,6 +2355,16 @@ export const en: AppDict = {
           desc: 'The invoice you are looking for does not exist or was deleted.',
         },
       },
+      utilidades: {
+        action: 'Tools',
+        importarDetalle: 'Import lines',
+      },
+      import: {
+        title: 'Import lines',
+        subtitle: 'Upload an Excel file with the lines to add to this invoice',
+        notice:
+          'The lines in the file are added to the ones the invoice already has; nothing is replaced. If any row fails, none are saved.',
+      },
     },
     facturaPos: {
       name: 'POS invoice',
@@ -2760,6 +2770,16 @@ export const en: AppDict = {
           title: 'Invoice not found',
           desc: 'The invoice you are looking for does not exist or was deleted.',
         },
+      },
+      utilidades: {
+        action: 'Tools',
+        importarDetalle: 'Import lines',
+      },
+      import: {
+        title: 'Import lines',
+        subtitle: 'Upload an Excel file with the lines to add to this invoice',
+        notice:
+          'The lines in the file are added to the ones the invoice already has; nothing is replaced. If any row fails, none are saved.',
       },
     },
     documentoSoporte: {
