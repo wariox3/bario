@@ -5495,11 +5495,14 @@ export const es: AppDict = {
       name: 'Existencia almacén',
       columns: {
         id: 'ID',
+        codigo: 'Código',
         item: 'Ítem',
+        referencia: 'Referencia',
         almacen: 'Almacén',
         existencia: 'Existencia',
         remision: 'Remisión',
         disponible: 'Disponible',
+        costoPromedio: 'Costo promedio',
       },
     },
     inventarioValorizado: {

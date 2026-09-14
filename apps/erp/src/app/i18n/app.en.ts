@@ -5431,11 +5431,14 @@ export const en: AppDict = {
       name: 'Stock by warehouse',
       columns: {
         id: 'ID',
+        codigo: 'Code',
         item: 'Item',
+        referencia: 'Reference',
         almacen: 'Warehouse',
         existencia: 'On hand',
         remision: 'Committed',
         disponible: 'Available',
+        costoPromedio: 'Average cost',
       },
     },
     inventarioValorizado: {

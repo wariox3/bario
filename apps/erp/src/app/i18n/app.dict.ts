@@ -4198,11 +4198,14 @@ export interface AppDict
       name: string;
       columns: {
         id: string;
+        codigo: string;
         item: string;
+        referencia: string;
         almacen: string;
         existencia: string;
         remision: string;
         disponible: string;
+        costoPromedio: string;
       };
     };
     inventarioValorizado: {

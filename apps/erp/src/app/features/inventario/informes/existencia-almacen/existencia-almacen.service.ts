@@ -15,9 +15,7 @@ import type { ExistenciaAlmacen } from './existencia-almacen.model';
  * Abre el saldo por almacén: una fila por ítem y almacén, sobre
  * `InvExistencia`. El consolidado por ítem es `existencia`.
  *
- * **Columnas sin confirmar**: el schema solo declara el serializer del informe
- * por defecto, así que la fila de este se mantiene como estaba hasta que backend
- * publique sus campos. Ver `PENDIENTES.md`.
+ * La fila quedó verificada contra la respuesta real: ver `ExistenciaAlmacen`.
  */
 @Injectable({ providedIn: 'root' })
 export class ExistenciaAlmacenService extends InventarioInformeService<ExistenciaAlmacen> {

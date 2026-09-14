@@ -4,7 +4,8 @@ import type { ToolbarAction } from '@reddoc/feature-base';
 export const EXISTENCIA_ALMACEN_FILTERS_STORAGE_KEY = 'existencia-almacen:filters:v1';
 
 /**
- * Columnas del informe: identificación del par ítem/almacén y sus saldos.
+ * Columnas del informe: identificación del par ítem/almacén, sus saldos y el
+ * costo promedio de la unidad. Leen el JSON, así que van **planas**.
  *
  * **La tabla no ordena.** `excel/` no acepta `ordenamientos`, así que dejar la
  * cabecera ordenable haría que la pantalla y el archivo descargado salieran en
@@ -19,12 +20,23 @@ export const EXISTENCIA_ALMACEN_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'item__nombre',
+    field: 'item_codigo',
+    headerKey: 'entities.existenciaAlmacen.columns.codigo',
+    type: 'text',
+    width: '140px',
+  },
+  {
+    field: 'item_nombre',
     headerKey: 'entities.existenciaAlmacen.columns.item',
     type: 'text',
   },
   {
-    field: 'almacen__nombre',
+    field: 'item_referencia',
+    headerKey: 'entities.existenciaAlmacen.columns.referencia',
+    type: 'text',
+  },
+  {
+    field: 'almacen_nombre',
     headerKey: 'entities.existenciaAlmacen.columns.almacen',
     type: 'text',
   },
@@ -47,6 +59,13 @@ export const EXISTENCIA_ALMACEN_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.existenciaAlmacen.columns.disponible',
     type: 'number',
     width: '110px',
+    align: 'right',
+  },
+  {
+    field: 'costo_promedio',
+    headerKey: 'entities.existenciaAlmacen.columns.costoPromedio',
+    type: 'currency',
+    width: '130px',
     align: 'right',
   },
 ];
