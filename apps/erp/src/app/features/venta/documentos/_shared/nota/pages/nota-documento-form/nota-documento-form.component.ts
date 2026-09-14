@@ -48,12 +48,19 @@ import {
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
+  totalCantidad,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
-import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
+import {
+  createPagoGroup,
+  type PagoFormRawValue,
+  type PagoGroup,
+} from '@erp/features/documentos/pagos/pago.form';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
@@ -77,7 +84,8 @@ import {
  * Una nota de venta ajusta una factura de venta (`documento_referencia`) y, como
  * el POS, puede cobrarse en el acto: a la cabecera (cliente, fecha, sede, método
  * de pago, comentario) le suma la **sección de pagos** —compartida— y la **tabla
- * de detalles** comercial. Detalles / Pagos / Más información van en tabs.
+ * de detalles** comercial. Detalles / Pagos / Más información van en tabs dentro
+ * de la card de la cabecera, con un único resumen del documento debajo.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -98,6 +106,7 @@ import {
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
     DocumentoPagosComponent,
+    ComercialDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './nota-documento-form.component.html',
@@ -120,13 +129,6 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
-
-  /**
-   * Sección de pagos (dentro de su tab). El padre le lee `excede()` para bloquear
-   * el guardado y colorear el chip de la pestaña; el panel del tab sigue montado
-   * aunque no esté activo (PrimeNG no lo destruye).
-   */
-  private readonly pagosPanel = viewChild(DocumentoPagosComponent);
 
   /** Tab activo del bloque (Detalles / Pagos / Más información). */
   protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
@@ -192,13 +194,25 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   /** Espejo reactivo de las líneas para calcular el total del documento. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
 
-  /** Total del documento (mismo kernel que la tabla de detalles y el resumen). */
-  protected readonly totalGeneral = computed(
-    () => calcularResumen(this.lines().map(toLineaCalculo)).total,
+  /** Resumen del documento: lo pinta el aside bajo los tabs, igual en Detalles y Pagos. */
+  protected readonly resumen = computed(() => calcularResumen(this.lines().map(toLineaCalculo)));
+
+  /** Total del documento: contra él se validan y se prellenan los pagos. */
+  protected readonly totalGeneral = computed(() => this.resumen().total);
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Espejo reactivo de los pagos para el resumen y la validación del guardado. */
+  protected readonly pagosLines = signal<readonly PagoFormRawValue[]>([]);
+
+  /** Recibido, saldo y exceso de los pagos frente al total. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagosLines(), this.totalGeneral()),
   );
 
-  /** `true` cuando lo recibido supera el total; lo aporta la sección de pagos. */
-  protected readonly pagosExceden = computed(() => this.pagosPanel()?.excede() ?? false);
+  /** `true` cuando lo recibido supera el total: bloquea el guardado y tiñe la pestaña. */
+  protected readonly pagosExceden = computed(() => this.pagosResumen().excede);
 
   /**
    * Nombre del documento activo (Nota crédito, Nota débito…). La página la
@@ -242,6 +256,11 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     this.form.controls.detalles.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.lines.set(this.form.controls.detalles.getRawValue()));
+
+    // Espejo reactivo de los pagos para el resumen y la validación del guardado.
+    this.form.controls.pagos.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.pagosLines.set(this.form.controls.pagos.getRawValue()));
   }
 
   /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña y la carga). */
@@ -271,8 +290,8 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected onSubmit(): void {
     if (this.form.invalid || this.form.pending || this.isSaving()) return;
 
-    // Validación propia: lo recibido en pagos no puede superar el total. Con los
-    // pagos tras un tab, se abre la pestaña que lo contiene antes de avisar.
+    // Lo recibido en pagos no puede superar el total. Con los pagos tras un tab,
+    // se abre la pestaña que lo contiene antes de avisar.
     if (this.pagosExceden()) {
       this.activeTab.set('pagos');
       const toast = this.t().entities.documentoPago.toasts.exceden;

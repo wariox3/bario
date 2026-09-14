@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
+import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
 import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
@@ -59,6 +60,7 @@ import { DepreciacionService } from '../../depreciacion.service';
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    TabsModule,
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,

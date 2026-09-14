@@ -13,6 +13,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -79,6 +80,7 @@ import type { RemisionRead } from '../../remision.model';
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
+    TabsModule,
     ConfirmDialogModule,
     DatePickerModule,
     TextareaModule,

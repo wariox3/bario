@@ -139,11 +139,9 @@
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ── Sección: Líneas, pagos e información ──────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+    <!-- ── Líneas, pagos e información: mismo documento, misma card ────────── -->
+    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
       <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
         <p-tablist>
           <p-tab value="detalles">{{ f.tabs.detalles }}</p-tab>
@@ -155,7 +153,7 @@
               <span
                 class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
                 [class]="
-                  pagosExceden()
+                  pagosExceden() || (pagos.invalid && pagos.touched)
                     ? 'bg-red-50 text-red-600'
                     : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
                 "
@@ -174,6 +172,7 @@
               [documentId]="documentId()"
               [contactoId]="form.controls.contacto.value?.id ?? null"
               [precioListaId]="precioListaId()"
+              [resumenEnabled]="false"
               (imported)="onImported()"
             />
           </p-tabpanel>
@@ -205,6 +204,17 @@
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>
+
+      <!-- Resumen del documento: fuera de los tabs, el mismo en todas las pestañas -->
+      @if (lines().length > 0 || pagos.length > 0) {
+        <div class="mt-4">
+          <app-comercial-documento-resumen
+            [resumen]="resumen()"
+            [cantidad]="cantidadTotal()"
+            [pagos]="pagos.length > 0 ? pagosResumen() : null"
+          />
+        </div>
+      }
     </div>
   </section>
 </form>

@@ -722,6 +722,36 @@ nuevos, así que pantalla y archivo dejan de coincidir sin que nadie avise.
   consulta apaga. El aviso viaja como `input` opcional (`hint`) de la botonera compartida, con
   `@if` — vacío no pinta nada y no cuesta ranura de `gap`.
 
+## Patrón: documento en una sola card (cabecera + tabs + resumen único)
+
+Formulario y ficha de todo documento transaccional con líneas. **Una sola card**: arriba la
+cabecera, debajo las vistas del documento en tabs y, bajo los tabs, un único resumen. Ejemplo vivo:
+`venta/documentos/factura-venta` (form y detail). Fuera de este patrón: nómina, seguridad social
+y nómina electrónica, que no tienen tabla de líneas.
+
+- **Por qué una card:** cabecera y líneas son el mismo documento. Dos cards apiladas lo parten en
+  dos piezas cosidas y duplican el chrome (chip de ícono + título) solo para decir «Detalles».
+- **La banda de tabs** va dentro de la `<section>` de la cabecera, tras los campos:
+  `border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4` con `<p-tabs>`.
+  El filete separa sin cortar la card.
+- **Tab único también:** un documento con una sola tabla lleva igual su tab (`Detalles`,
+  `Líneas`, `Activos`). Todos los documentos se leen igual y sumar Pagos o Más información después
+  no cambia el esqueleto. La etiqueta reusa la clave i18n que titulaba la card eliminada.
+- **Acciones de la tabla** (cargar, eliminar todos) y su hint van en una fila al tope del panel:
+  `mb-4 flex flex-wrap items-center justify-end gap-2`, hint primero con `mr-auto`.
+- **Resumen fuera de los tabs:** el mismo en todas las vistas, como en el ERP anterior. Lo calcula
+  la página (dueña de los `FormArray`), no la tabla: `calcularResumen` + `totalCantidad` para las
+  líneas y `calcularPagos` (`pagos/pago.calculo.ts`) para recibido/saldo/exceso. Va en
+  `@if (…) { <div class="mt-4"> <app-comercial-documento-resumen …/> </div> }`. Las tablas
+  editables traen `resumenEnabled` (default `true`): el form que pinta el resumen afuera lo apaga.
+  Con un tab único el resumen interno de la tabla es visualmente idéntico y se deja.
+- **Chip de conteo en el tab** que esconde algo que importa (Pagos): `font-mono tabular-nums` sobre
+  `bg-[rgba(20,48,73,0.06)]`; en `bg-red-50 text-red-600` cuando lo que esconde bloquea guardar
+  (pagos que exceden o filas inválidas ya tocadas). El error se ve desde otra pestaña.
+- **Validar abre la pestaña del error** antes del toast: `activeTab.set('pagos')` / `'detalles'`.
+- **Ficha = form en solo lectura:** mismas pestañas y mismo resumen; cada tabla editable tiene su
+  gemela tonta (`comercial-documento-lineas-table`, `documento-pagos-table`).
+
 ## i18n
 
 Claves bajo `layout.*` en `app.dict.ts` (tipo) + `app.es.ts` + `app.en.ts`. Resolución por

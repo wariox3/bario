@@ -48,7 +48,12 @@ import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../pos-documento.constants';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
-import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
+import {
+  createPagoGroup,
+  type PagoFormRawValue,
+  type PagoGroup,
+} from '@erp/features/documentos/pagos/pago.form';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
@@ -62,8 +67,12 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import { toLineaCalculo } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import {
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  totalCantidad,
+} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { posDocumentoToFormValue, formValueToPayload } from '../../pos-documento.mapper';
@@ -84,9 +93,9 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
  * Un POS es una factura de venta que además **se cobra en el acto**: a la
  * cabecera comercial (contacto, fechas, plazo, método de pago, sede, asesor,
  * orden de compra, comentario) le suma una **sección de pagos** —un `FormArray`
- * de `{ cuenta_banco, monto }`— que no tiene la factura de venta normal. La
- * **tabla de detalles** —compartida entre documentos comerciales— se compone vía
- * `<app-comercial-documento-detalles>`.
+ * de `{ cuenta_banco, monto }`. La **tabla de detalles** y la **sección de
+ * pagos** —compartidas entre documentos— van en tabs dentro de la misma card de
+ * la cabecera, con un único resumen del documento debajo.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -110,6 +119,7 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
     ComercialDocumentoDetallesComponent,
     VencimientoHintComponent,
     DocumentoPagosComponent,
+    ComercialDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './pos-documento-form.component.html',
@@ -133,14 +143,6 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
-
-  /**
-   * Sección de pagos (dentro de su tab). El padre le lee `excede()` para bloquear
-   * el guardado y colorear el chip de la pestaña. El panel del tab está montado
-   * aunque no esté activo (PrimeNG no lo destruye), así que `excede()` es legible
-   * desde cualquier pestaña —mismo patrón que las tablas de la factura de compra.
-   */
-  private readonly pagosPanel = viewChild(DocumentoPagosComponent);
 
   /**
    * Tab activo del bloque de líneas (Detalles / Pagos / Más información). Mismo
@@ -181,13 +183,25 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   /** Espejo reactivo de las líneas para calcular el total del documento. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
 
-  /** Total del documento (mismo kernel que la tabla de detalles y el resumen). */
-  protected readonly totalGeneral = computed(
-    () => calcularResumen(this.lines().map(toLineaCalculo)).total,
+  /** Resumen del documento: lo pinta el aside bajo los tabs, igual en Detalles y Pagos. */
+  protected readonly resumen = computed(() => calcularResumen(this.lines().map(toLineaCalculo)));
+
+  /** Total del documento: contra él se validan y se prellenan los pagos. */
+  protected readonly totalGeneral = computed(() => this.resumen().total);
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Espejo reactivo de los pagos para el resumen y la validación del guardado. */
+  protected readonly pagosLines = signal<readonly PagoFormRawValue[]>([]);
+
+  /** Recibido, saldo y exceso de los pagos frente al total. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagosLines(), this.totalGeneral()),
   );
 
-  /** `true` cuando lo recibido supera el total; lo aporta la sección de pagos. */
-  protected readonly pagosExceden = computed(() => this.pagosPanel()?.excede() ?? false);
+  /** `true` cuando lo recibido supera el total: bloquea el guardado y tiñe la pestaña. */
+  protected readonly pagosExceden = computed(() => this.pagosResumen().excede);
 
   /**
    * Nombre del documento activo (Factura POS, Factura POS electrónica…). La
@@ -250,11 +264,15 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
       destroyRef: this.destroyRef,
     });
 
-    // Espejo reactivo de las líneas para el total del documento (el total recibido
-    // en pagos lo calcula la sección de pagos a partir de su `FormArray`).
+    // Espejo reactivo de las líneas para el total del documento.
     this.form.controls.detalles.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.lines.set(this.form.controls.detalles.getRawValue()));
+
+    // Espejo reactivo de los pagos para el resumen y la validación del guardado.
+    this.form.controls.pagos.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.pagosLines.set(this.form.controls.pagos.getRawValue()));
   }
 
   /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña y la carga). */

@@ -3,14 +3,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import {
   formatFechaLarga,
   I18nService,
   TenantService,
   ToastService,
   calcularResumen,
-  formatCop,
-  toFiniteNumber,
   type DocumentoEstados,
   type ResumenDocumento,
 } from '@reddoc/core';
@@ -32,17 +31,16 @@ import { AfectacionModalComponent } from '@erp/core/module-config/components/afe
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
+  totalCantidad,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { DocumentoPagosTableComponent } from '@erp/features/documentos/pagos/components/documento-pagos-table/documento-pagos-table.component';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
+import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
+import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { posDocumentoToFormValue } from '../../pos-documento.mapper';
 import type { PosDocumentoRead } from '../../pos-documento.model';
-
-/** Fila de pago legible para la ficha (cuenta de banco + monto). */
-interface PagoView {
-  readonly cuentaBanco: string | null;
-  readonly monto: number;
-}
 
 /** Cabecera legible de la factura POS para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -58,7 +56,6 @@ interface CabeceraView {
   readonly asesor: string | null;
   readonly ordenCompra: string | null;
   readonly comentario: string | null;
-  readonly pagos: readonly PagoView[];
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
    * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
@@ -75,8 +72,9 @@ interface CabeceraView {
  * Camino A del enfoque híbrido: la tabla de líneas y el resumen los aporta la
  * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas
  * (`DocumentoDetalleService`) en paralelo —igual que el form— y las muestra sin
- * formularios. Suma la lista de pagos recibidos en el punto de venta. Desde aquí
- * se vuelve a la lista o se edita.
+ * formularios. Líneas y pagos van en tabs dentro de la card de la cabecera, con
+ * un único resumen debajo: el mismo esqueleto que el formulario. Desde aquí se
+ * vuelve a la lista o se edita.
  */
 @Component({
   selector: 'app-pos-documento-detail',
@@ -86,9 +84,11 @@ interface CabeceraView {
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
+    DocumentoPagosTableComponent,
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
+    TabsModule,
   ],
   templateUrl: './pos-documento-detail.component.html',
   styleUrl: './pos-documento-detail.component.scss',
@@ -104,7 +104,6 @@ export class PosDocumentoDetailComponent implements OnInit {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
-  protected readonly formatMoney = formatCop;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -115,6 +114,8 @@ export class PosDocumentoDetailComponent implements OnInit {
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+  /** Pagos recibidos, mapeados a la forma del front (asunción de contrato: el backend aún no los expone). */
+  protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -149,6 +150,14 @@ export class PosDocumentoDetailComponent implements OnInit {
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
   protected readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),
+  );
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Recibido, saldo y exceso de los pagos frente al total: misma función que el formulario. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagos(), this.resumen().total),
   );
 
   /** Migas: módulo Venta → listado del documento → identificador del documento abierto. */
@@ -226,10 +235,6 @@ export class PosDocumentoDetailComponent implements OnInit {
             asesor: read.asesor_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             comentario: read.comentario ?? null,
-            pagos: (read.pagos ?? []).map((p) => ({
-              cuentaBanco: p.cuenta_banco_nombre ?? null,
-              monto: toFiniteNumber(p.pago) ?? 0,
-            })),
             estados: {
               estado_aprobado: read.estado_aprobado,
               estado_anulado: read.estado_anulado,
@@ -241,6 +246,7 @@ export class PosDocumentoDetailComponent implements OnInit {
             },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
+          this.pagos.set((read.pagos ?? []).map(pagoReadToFormValue));
           this.isLoading.set(false);
         },
         error: () => {

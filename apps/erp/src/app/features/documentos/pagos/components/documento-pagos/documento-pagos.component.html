@@ -80,42 +80,4 @@
       </tbody>
     </table>
   </div>
-
-  <!-- Resumen: mismo aside que el de detalles; aquí la cifra que se busca es el saldo -->
-  @if (resumenEnabled() && pagos().length > 0) {
-    <div class="flex justify-end">
-      <div
-        class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
-      >
-        <div class="flex flex-col gap-1.5">
-          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-            <span class="text-brand-muted">{{ p.totalDocumento }}</span>
-            <span class="tabular-nums text-brand-text">{{ formatMoney(documentTotal()) }}</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-            <span class="text-brand-muted">{{ p.totalRecibido }}</span>
-            <span
-              class="tabular-nums"
-              [class]="excede() ? 'font-semibold text-red-600' : 'text-brand-text'"
-            >
-              {{ formatMoney(totalPagos()) }}
-            </span>
-          </div>
-          <div
-            class="mt-1 flex items-baseline justify-between gap-2 border-t border-[rgba(20,48,73,0.1)] pt-2.5"
-          >
-            <span class="text-[0.78rem] font-semibold text-brand-text">{{ p.saldo }}</span>
-            <span
-              class="text-[1.35rem] leading-none font-bold tracking-[-0.02em] text-[#143049] tabular-nums"
-            >
-              {{ formatMoney(saldoPendiente()) }}
-            </span>
-          </div>
-          @if (excede()) {
-            <p class="m-0 mt-1 text-[0.72rem] text-red-600">{{ p.excedenHint }}</p>
-          }
-        </div>
-      </div>
-    </div>
-  }
 </div>

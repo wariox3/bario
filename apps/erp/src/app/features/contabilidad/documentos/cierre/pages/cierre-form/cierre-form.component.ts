@@ -9,6 +9,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogService } from 'primeng/dynamicdialog';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
+import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
 import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
 import {
@@ -65,6 +66,7 @@ import { fecha31Diciembre } from '../../cierre.validators';
     ConfirmDialogModule,
     DatePickerModule,
     PaginatorModule,
+    TabsModule,
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,

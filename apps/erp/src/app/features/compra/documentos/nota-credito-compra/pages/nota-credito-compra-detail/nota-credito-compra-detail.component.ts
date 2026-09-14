@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import {
   formatFechaLarga,
   I18nService,
@@ -63,6 +64,7 @@ interface CabeceraView {
     ComercialDocumentoResumenComponent,
     DocumentDetailActionsComponent,
     AfectacionModalComponent,
+    TabsModule,
   ],
   templateUrl: './nota-credito-compra-detail.component.html',
   styleUrl: './nota-credito-compra-detail.component.scss',

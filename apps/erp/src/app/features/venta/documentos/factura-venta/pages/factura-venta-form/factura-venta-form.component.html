@@ -210,11 +210,7 @@
           </p-tabpanel>
 
           <p-tabpanel value="pagos">
-            <app-documento-pagos
-              [pagos]="form.controls.pagos"
-              [documentTotal]="totalGeneral()"
-              [resumenEnabled]="false"
-            />
+            <app-documento-pagos [pagos]="form.controls.pagos" [documentTotal]="totalGeneral()" />
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>

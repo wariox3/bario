@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { type Observable, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import {
   I18nService,
   TenantService,
@@ -70,6 +71,7 @@ interface CabeceraView {
   standalone: true,
   imports: [
     ButtonModule,
+    TabsModule,
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,

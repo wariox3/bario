@@ -13,6 +13,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -88,6 +89,7 @@ import type { NotaAjusteRead } from '../../nota-ajuste.model';
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
     VencimientoHintComponent,
+    TabsModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './nota-ajuste-form.component.html',

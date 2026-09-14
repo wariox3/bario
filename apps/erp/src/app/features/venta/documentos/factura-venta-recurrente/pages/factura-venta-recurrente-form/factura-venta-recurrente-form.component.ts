@@ -13,6 +13,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -81,6 +82,7 @@ import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
+    TabsModule,
     ConfirmDialogModule,
     InputTextModule,
     TextareaModule,

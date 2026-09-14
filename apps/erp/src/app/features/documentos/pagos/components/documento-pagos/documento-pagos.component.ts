@@ -3,7 +3,7 @@ import { FormArray, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TooltipModule } from 'primeng/tooltip';
-import { I18nService, ToastService, formatCop } from '@reddoc/core';
+import { I18nService, ToastService } from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { createPagoGroup, type PagoFormRawValue, type PagoGroup } from '../../pago.form';
@@ -14,13 +14,12 @@ import { calcularPagos } from '../../pago.calculo';
  * Sección de **pagos** de un documento que se cobra en el acto (factura POS, nota
  * crédito de venta…). Building block transversal: recibe el `FormArray` de pagos
  * del form padre y el total del documento, y lo edita en una **tabla** (cuenta de
- * banco + monto) con el mismo idioma que la tabla de detalles, más el resumen
- * recibido/pendiente.
+ * banco + monto) con el mismo idioma que la tabla de detalles.
  *
  * Es agnóstico al documento: el padre posee el `FormArray` (viaja en su payload)
- * y le pasa el total contra el que validar. La regla de negocio —lo recibido no
- * puede superar el total— se expone vía `excede()` para que el padre bloquee el
- * guardado (mismo patrón que `pendingCount()` en la tabla de detalles).
+ * y le pasa el total, que aquí solo sirve para prellenar cada fila con el saldo.
+ * El resumen (recibido, saldo) y la regla —lo recibido no puede superar el total—
+ * los resuelve el documento con `calcularPagos`, fuera de los tabs.
  */
 @Component({
   selector: 'app-documento-pagos',
@@ -41,13 +40,12 @@ export class DocumentoPagosComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
-  protected readonly formatMoney = formatCop;
   protected readonly cuentaBancoEndpoint = CUENTA_BANCO_ENDPOINT;
 
   /** FormArray de pagos, propiedad del form padre (viaja en su payload). */
   readonly pagos = input.required<FormArray<PagoGroup>>();
 
-  /** Total del documento contra el que se valida y se calcula el saldo. */
+  /** Total del documento; de él sale el saldo con que se prellena cada fila nueva. */
   readonly documentTotal = input.required<number>();
 
   /**
@@ -56,26 +54,14 @@ export class DocumentoPagosComponent {
    */
   readonly hint = input<string | null>(null);
 
-  /**
-   * Pinta el resumen propio (total, recibido, saldo) bajo la tabla. Default `true`;
-   * lo apaga el formulario que muestra un único resumen fuera de los tabs.
-   */
-  readonly resumenEnabled = input<boolean>(true);
-
-  /** Espejo reactivo del valor del array para los totales y el resumen. */
+  /** Espejo reactivo del valor del array para calcular el saldo. */
   private readonly mirror = signal<readonly PagoFormRawValue[]>([]);
 
-  /** Recibido, saldo y exceso: la misma función que usa el formulario padre. */
+  /** Saldo por la misma función con que el documento arma su resumen. */
   private readonly calculo = computed(() => calcularPagos(this.mirror(), this.documentTotal()));
-
-  /** Total recibido en pagos. */
-  readonly totalPagos = computed(() => this.calculo().recibido);
 
   /** Saldo pendiente por cubrir con pagos (nunca negativo). */
   protected readonly saldoPendiente = computed(() => this.calculo().saldo);
-
-  /** `true` cuando lo recibido supera el total del documento (bloquea el guardado). */
-  readonly excede = computed(() => this.calculo().excede);
 
   constructor() {
     // Espejo reactivo del FormArray inyectado (se re-suscribe si cambia la instancia).

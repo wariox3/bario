@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import type { MenuItem } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
 import {
@@ -87,6 +88,7 @@ interface CabeceraView {
     AfectacionModalComponent,
     MenuModule,
     ImportDialogComponent,
+    TabsModule,
   ],
   templateUrl: './factura-compra-detail.component.html',
   styleUrl: './factura-compra-detail.component.scss',

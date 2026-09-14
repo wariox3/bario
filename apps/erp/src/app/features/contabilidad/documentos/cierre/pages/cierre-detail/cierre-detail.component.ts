@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
+import { TabsModule } from 'primeng/tabs';
 import { I18nService, TenantService, ToastService, formatFechaLarga } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -49,6 +50,7 @@ interface CabeceraView {
   imports: [
     ButtonModule,
     PaginatorModule,
+    TabsModule,
     BreadcrumbComponent,
     ContableDocumentoLineasTableComponent,
     DocumentDetailActionsComponent,

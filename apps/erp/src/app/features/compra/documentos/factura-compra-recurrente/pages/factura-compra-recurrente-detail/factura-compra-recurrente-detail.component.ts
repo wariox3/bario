@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import {
   I18nService,
   TenantService,
@@ -62,6 +63,7 @@ interface CabeceraView {
     ComercialDocumentoResumenComponent,
     DocumentDetailActionsComponent,
     AfectacionModalComponent,
+    TabsModule,
   ],
   templateUrl: './factura-compra-recurrente-detail.component.html',
   styleUrl: './factura-compra-recurrente-detail.component.scss',
