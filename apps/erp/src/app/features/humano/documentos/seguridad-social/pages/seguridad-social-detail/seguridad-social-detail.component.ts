@@ -3,15 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
 import {
   formatFechaCorta,
   DocumentoDetalleService,
   I18nService,
   TenantService,
-  ToastService,
-  extractErrorMessage,
   formatCop,
   type DocumentoEstados,
 } from '@reddoc/core';
@@ -52,13 +48,11 @@ import type { SeguridadSocialDetalleRead, SeguridadSocialRead } from '../../segu
   standalone: true,
   imports: [
     ButtonModule,
-    ConfirmDialogModule,
     BreadcrumbComponent,
     DataTableComponent,
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
   ],
-  providers: [ConfirmationService],
   templateUrl: './seguridad-social-detail.component.html',
   styleUrl: './seguridad-social-detail.component.scss',
 })
@@ -67,9 +61,7 @@ export class SeguridadSocialDetailComponent implements OnInit {
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
-  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly confirmation = inject(ConfirmationService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
@@ -152,82 +144,15 @@ export class SeguridadSocialDetailComponent implements OnInit {
     void this.router.navigate(['/t', slug, 'humano', ...segments]);
   }
 
-  protected onAprobar(): void {
-    this.confirmarYEjecutar('confirmAprobar', 'aprobar', (id) =>
-      this.gateway.aprobar(this.document(), id),
-    );
-  }
-
-  protected onDesaprobar(): void {
-    this.confirmarYEjecutar('confirmDesaprobar', 'desaprobar', (id) =>
-      this.gateway.desaprobar(this.document(), id),
-    );
-  }
-
   /**
-   * El diálogo "Contabilidad" cambió el estado del documento en el backend:
-   * se recarga la ficha para que la cabecera (y el propio diálogo, que lee de
-   * ella su estado) reflejen el estado nuevo.
+   * La botonera cambió el estado del documento en el backend —lo aprobó,
+   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
+   * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
    */
-  protected onContabilizacionChanged(): void {
+  protected onDocumentoChanged(): void {
     const id = this.id();
     if (!id) return;
     this.load(Number(id));
-  }
-
-  /**
-   * Descarga el PDF. Va por el gateway, que manda **solo el id**: el ERP
-   * anterior le suma `filtros`, `limite`, `desplazar`, `ordenamientos`,
-   * `limite_conteo`, `modelo` y `tipo`, que el endpoint no usa.
-   */
-  protected onImprimir(): void {
-    const id = this.id();
-    if (!id) return;
-    this.gateway
-      .imprimir(this.document(), Number(id))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: (err: unknown) => {
-          const ts = this.t().documentActions.detail.toasts.imprimirError;
-          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
-        },
-      });
-  }
-
-  /** Aprobar y desaprobar difieren solo en el texto y la llamada. */
-  private confirmarYEjecutar(
-    confirmKey: 'confirmAprobar' | 'confirmDesaprobar',
-    accion: 'aprobar' | 'desaprobar',
-    llamada: (id: number) => ReturnType<typeof this.gateway.aprobar>,
-  ): void {
-    const rawId = this.id();
-    if (!rawId) return;
-    const id = Number(rawId);
-    const a = this.t().documentActions.detail;
-
-    this.confirmation.confirm({
-      message: a[confirmKey].message,
-      header: a[confirmKey].header,
-      icon: accion === 'aprobar' ? 'pi pi-check-circle' : 'pi pi-times-circle',
-      acceptLabel: a[accion],
-      rejectLabel: this.t().common.actions.cancel,
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => {
-        llamada(id)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => {
-              const ts = a.toasts[`${accion}Success` as const];
-              this.toast.success(ts.title, ts.desc);
-              this.load(id);
-            },
-            error: (err: unknown) => {
-              const ts = a.toasts[`${accion}Error` as const];
-              this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
-            },
-          });
-      },
-    });
   }
 
   /** Cabecera y líneas en paralelo. */

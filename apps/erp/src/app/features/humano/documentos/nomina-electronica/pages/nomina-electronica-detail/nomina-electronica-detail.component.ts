@@ -186,94 +186,53 @@ export class NominaElectronicaDetailComponent implements OnInit {
     void this.router.navigate(['/t', slug, 'humano', ...NOMINA_DETALLE_PATH, nomina.id]);
   }
 
-  protected onAprobar(): void {
-    this.confirmarYEjecutar('confirmAprobar', 'aprobar', (id) =>
-      this.gateway.aprobar(this.document(), id),
-    );
-  }
-
-  protected onDesaprobar(): void {
-    this.confirmarYEjecutar('confirmDesaprobar', 'desaprobar', (id) =>
-      this.gateway.desaprobar(this.document(), id),
-    );
-  }
-
-  protected onAnular(): void {
-    this.confirmarYEjecutar('confirmAnular', 'anular', (id) =>
-      this.gateway.anular(this.document(), id),
-    );
-  }
-
-  protected onEmitir(): void {
-    this.confirmarYEjecutar('confirmEmitir', 'emitir', (id) =>
-      this.gateway.emitir(this.document(), id),
-    );
-  }
-
   /**
-   * El diálogo "Contabilidad" cambió el estado del documento en el backend:
-   * se recarga la ficha para que la cabecera (y el propio diálogo, que lee de
-   * ella su estado) reflejen el estado nuevo.
+   * Emite a la DIAN previa confirmación; al éxito recarga la ficha. Es la única
+   * acción de estado que sigue en la ficha: aprobar, desaprobar y anular los
+   * resuelve la botonera, pero emitir solo existe en este documento.
    */
-  protected onContabilizacionChanged(): void {
-    const id = this.id();
-    if (!id) return;
-    this.load(Number(id));
+  protected onEmitir(): void {
+    const rawId = this.id();
+    if (!rawId) return;
+    const id = Number(rawId);
+    const a = this.t().documentActions.detail;
+    this.confirmation.confirm({
+      message: a.confirmEmitir.message,
+      header: a.confirmEmitir.header,
+      icon: 'pi pi-check-circle',
+      acceptLabel: a.emitir,
+      rejectLabel: this.t().common.actions.cancel,
+      rejectButtonProps: { severity: 'secondary', outlined: true },
+      accept: () => this.emitirDocumento(id),
+    });
   }
 
-  /** Descarga el PDF del documento. */
-  protected onImprimir(): void {
-    const id = this.id();
-    if (!id) return;
+  private emitirDocumento(id: number): void {
     this.gateway
-      .imprimir(this.document(), Number(id))
+      .emitir(this.document(), id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
+        next: () => {
+          const ts = this.t().documentActions.detail.toasts.emitirSuccess;
+          this.toast.success(ts.title, ts.desc);
+          this.load(id);
+        },
         error: (err: unknown) => {
-          const ts = this.t().documentActions.detail.toasts.imprimirError;
+          const ts = this.t().documentActions.detail.toasts.emitirError;
           this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
       });
   }
 
   /**
-   * Las cuatro acciones de estado se comportan igual: confirmar, llamar al
-   * gateway, avisar y recargar. Solo cambian el texto y la llamada, así que van
-   * por un único camino en vez de cuatro bloques calcados.
+   * La botonera cambió el estado del documento en el backend —lo aprobó,
+   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
+   * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
    */
-  private confirmarYEjecutar(
-    confirmKey: 'confirmAprobar' | 'confirmDesaprobar' | 'confirmAnular' | 'confirmEmitir',
-    accion: 'aprobar' | 'desaprobar' | 'anular' | 'emitir',
-    llamada: (id: number) => ReturnType<typeof this.gateway.aprobar>,
-  ): void {
-    const rawId = this.id();
-    if (!rawId) return;
-    const id = Number(rawId);
-    const a = this.t().documentActions.detail;
-
-    this.confirmation.confirm({
-      message: a[confirmKey].message,
-      header: a[confirmKey].header,
-      icon: accion === 'anular' ? 'pi pi-ban' : 'pi pi-check-circle',
-      acceptLabel: a[accion],
-      rejectLabel: this.t().common.actions.cancel,
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => {
-        llamada(id)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => {
-              const ts = a.toasts[`${accion}Success` as const];
-              this.toast.success(ts.title, ts.desc);
-              this.load(id);
-            },
-            error: (err: unknown) => {
-              const ts = a.toasts[`${accion}Error` as const];
-              this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
-            },
-          });
-      },
-    });
+  protected onDocumentoChanged(): void {
+    const id = this.id();
+    if (!id) return;
+    this.load(Number(id));
   }
 
   /** Cabecera, nóminas origen y líneas en paralelo. */

@@ -3,15 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import {
-  I18nService,
-  TenantService,
-  ToastService,
-  extractErrorMessage,
-  formatFechaLarga,
-} from '@reddoc/core';
+import { I18nService, TenantService, ToastService, formatFechaLarga } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
@@ -52,12 +44,10 @@ interface CabeceraView {
   standalone: true,
   imports: [
     ButtonModule,
-    ConfirmDialogModule,
     BreadcrumbComponent,
     DepreciacionLineasTableComponent,
     DocumentDetailActionsComponent,
   ],
-  providers: [ConfirmationService],
   templateUrl: './depreciacion-detail.component.html',
   styleUrl: './depreciacion-detail.component.scss',
 })
@@ -69,7 +59,6 @@ export class DepreciacionDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly confirmation = inject(ConfirmationService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
@@ -131,96 +120,15 @@ export class DepreciacionDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
-  /** Aprueba el documento previa confirmación; al éxito recarga la ficha. */
-  protected onAprobar(): void {
-    const id = this.id();
-    if (!id) return;
-    const a = this.t().documentActions.detail;
-    this.confirmation.confirm({
-      message: a.confirmAprobar.message,
-      header: a.confirmAprobar.header,
-      icon: 'pi pi-check-circle',
-      acceptLabel: a.aprobar,
-      rejectLabel: this.t().common.actions.cancel,
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.aprobarDocumento(Number(id)),
-    });
-  }
-
-  private aprobarDocumento(id: number): void {
-    this.gateway
-      .aprobar(this.document(), id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          const ts = this.t().documentActions.detail.toasts.aprobarSuccess;
-          this.toast.success(ts.title, ts.desc);
-          this.loadDocumento(id);
-        },
-        error: (err: unknown) => {
-          const ts = this.t().documentActions.detail.toasts.aprobarError;
-          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
-        },
-      });
-  }
-
-  /** Desaprueba el documento previa confirmación; al éxito recarga la ficha. */
-  protected onDesaprobar(): void {
-    const id = this.id();
-    if (!id) return;
-    const a = this.t().documentActions.detail;
-    this.confirmation.confirm({
-      message: a.confirmDesaprobar.message,
-      header: a.confirmDesaprobar.header,
-      icon: 'pi pi-times-circle',
-      acceptLabel: a.desaprobar,
-      rejectLabel: this.t().common.actions.cancel,
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.desaprobarDocumento(Number(id)),
-    });
-  }
-
-  private desaprobarDocumento(id: number): void {
-    this.gateway
-      .desaprobar(this.document(), id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          const ts = this.t().documentActions.detail.toasts.desaprobarSuccess;
-          this.toast.success(ts.title, ts.desc);
-          this.loadDocumento(id);
-        },
-        error: (err: unknown) => {
-          const ts = this.t().documentActions.detail.toasts.desaprobarError;
-          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
-        },
-      });
-  }
-
   /**
-   * El diálogo "Contabilidad" cambió el estado del documento en el backend:
-   * se recarga la ficha para que la cabecera (y el propio diálogo, que lee de
-   * ella su estado) reflejen el estado nuevo.
+   * La botonera cambió el estado del documento en el backend —lo aprobó,
+   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
+   * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
    */
-  protected onContabilizacionChanged(): void {
+  protected onDocumentoChanged(): void {
     const id = this.id();
     if (!id) return;
     this.loadDocumento(Number(id));
-  }
-
-  /** Descarga el PDF del documento. */
-  protected onImprimir(): void {
-    const id = this.id();
-    if (!id) return;
-    this.gateway
-      .imprimir(this.document(), Number(id))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => {
-          const ts = this.t().documentActions.detail.toasts.imprimirError;
-          this.toast.error(ts.title, ts.desc);
-        },
-      });
   }
 
   private loadDocumento(id: number): void {

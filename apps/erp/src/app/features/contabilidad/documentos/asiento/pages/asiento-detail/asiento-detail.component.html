@@ -24,13 +24,11 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
+      [document]="document()"
       [canAprobar]="!cabecera()?.estadoAprobado"
       [canDesaprobar]="!!cabecera()?.estadoAprobado"
       [contabilizado]="!!cabecera()?.estadoContabilizado"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
-      (imprimir)="onImprimir()"
-      (contabilizacionChanged)="onContabilizacionChanged()"
+      (documentoChanged)="onDocumentoChanged()"
     />
 
     <p-button
@@ -158,5 +156,3 @@
   [exampleConfig]="exampleConfig()"
   (importRequested)="importar.submit($event)"
 />
-
-<p-confirmDialog />

@@ -24,13 +24,11 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
+      [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
-      (aprobar)="onAprobar()"
-      (desaprobar)="onDesaprobar()"
-      (imprimir)="onImprimir()"
-      (contabilizacionChanged)="onContabilizacionChanged()"
+      (documentoChanged)="onDocumentoChanged()"
     />
 
     <p-button
@@ -46,8 +44,6 @@
     <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
   }
 </header>
-
-<p-confirmDialog />
 
 <app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
 

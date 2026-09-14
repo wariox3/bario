@@ -1,8 +1,7 @@
 @let a = t().documentActions.detail;
 
 <!--
-  Herramientas del documento fundidas en un solo segmento: se leen como una pieza
-  y no compiten con "Aprobar", que queda suelto como la única decisión primaria.
+  Las acciones del documento fundidas en un solo segmento, que se lee como una pieza.
   Los <p-menu> van FUERA del grupo: su CSS une los botones con
   `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
 -->
@@ -13,8 +12,9 @@
       [label]="a.aprobar"
       icon="pi pi-check-circle"
       size="small"
-      [disabled]="!canAprobar()"
-      (onClick)="aprobar.emit()"
+      [loading]="enCurso() === 'aprobar'"
+      [disabled]="!canAprobar() || enCurso() !== null"
+      (onClick)="onAccionEstado('aprobar')"
     />
   }
 
@@ -26,8 +26,9 @@
       severity="secondary"
       [outlined]="true"
       size="small"
-      [disabled]="!canImprimir()"
-      (onClick)="imprimir.emit()"
+      [loading]="enCurso() === 'imprimir'"
+      [disabled]="!canImprimir() || enCurso() !== null"
+      (onClick)="onImprimir()"
     />
   }
 
@@ -80,6 +81,7 @@
     [documentoId]="documentoId()"
     [contabilizado]="contabilizado()"
     [canContabilizar]="canContabilizar()"
-    (contabilizacionChanged)="contabilizacionChanged.emit()"
+    (contabilizacionChanged)="documentoChanged.emit()"
   />
 }
+<p-confirmdialog />
