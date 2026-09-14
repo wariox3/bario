@@ -147,3 +147,13 @@ describe('canLeaveDocumentForm — alta', () => {
     expect(result).toBe(true);
   });
 });
+
+describe('isHeaderDirty — pagos', () => {
+  it('en edición ignora los pagos declarados: los cuenta pendingLines', () => {
+    const form = documentoForm();
+    form.addControl('pagos', new FormArray([]));
+    form.controls['pagos'].markAsDirty();
+    expect(isHeaderDirty(form, ['detalles', 'pagos'])).toBe(false);
+    expect(isHeaderDirty(form)).toBe(true);
+  });
+});
