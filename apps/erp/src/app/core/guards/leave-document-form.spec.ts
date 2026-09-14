@@ -116,3 +116,34 @@ describe('canLeaveDocumentForm', () => {
     expect(call(form, 0, service)).toBe(true);
   });
 });
+
+describe('canLeaveDocumentForm — alta', () => {
+  it('en alta pregunta si se tocó una línea: nada persistió aparte', () => {
+    const form = documentoForm();
+    form.controls['detalles'].markAsDirty();
+    const { service } = fakeConfirmation();
+    const result = canLeaveDocumentForm({
+      form,
+      pendingLines: 0,
+      confirmation: service,
+      labels,
+      cancelLabel: 'Cancelar',
+      enAlta: true,
+    });
+    expect(isObservable(result)).toBe(true);
+  });
+
+  it('en edición la misma línea sucia no pregunta: la cubre pendingLines', () => {
+    const form = documentoForm();
+    form.controls['detalles'].markAsDirty();
+    const { service } = fakeConfirmation();
+    const result = canLeaveDocumentForm({
+      form,
+      pendingLines: 0,
+      confirmation: service,
+      labels,
+      cancelLabel: 'Cancelar',
+    });
+    expect(result).toBe(true);
+  });
+});

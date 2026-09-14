@@ -88,3 +88,16 @@ export const CAPACIDADES_DOCUMENTO_VACIAS: CapacidadesDocumento = capacidadesDoc
   estado_aprobado: false,
   estado_anulado: true,
 });
+
+/**
+ * ¿Se pueden anular los pagos del documento? Regla del backend
+ * (`documento-pago/anular/`): documento **aprobado y sin contabilizar**, y nada si
+ * está anulado. Sin aprobar un pago no se anula, se elimina desde el formulario.
+ *
+ * No sabe de tipos: la nota crédito no anula su pago —se desaprueba la nota— y eso lo
+ * resuelve su ficha, que no ofrece la acción.
+ */
+export function puedeAnularPagosDocumento(estados: DocumentoEstados): boolean {
+  if (estados.estado_anulado) return false;
+  return (estados.estado_aprobado ?? false) && !estados.estado_contabilizado;
+}

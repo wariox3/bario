@@ -31,6 +31,7 @@ import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
   capacidadesDocumento,
+  puedeAnularPagosDocumento,
 } from '@erp/core/module-config';
 import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
@@ -183,8 +184,8 @@ export class FacturaVentaDetailComponent implements OnInit {
    * aprobado, sin contabilizar ni anular (sin aprobar, un pago se elimina desde el form).
    */
   protected readonly puedeAnularPagos = computed(() => {
-    const estados = this.cabecera()?.estados;
-    return !!estados?.estado_aprobado && !estados.estado_contabilizado && !estados.estado_anulado;
+    const cab = this.cabecera();
+    return cab ? puedeAnularPagosDocumento(cab.estados) : false;
   });
 
   private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');

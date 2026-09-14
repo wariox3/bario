@@ -328,6 +328,8 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   canDeactivate(): boolean | Observable<boolean> {
     return canLeaveDocumentForm({
       form: this.form,
+      // En alta nada persiste aparte: tocar una línea y salir también pierde trabajo.
+      enAlta: !this.id(),
       pendingLines: this.lineTables().reduce((total, table) => total + table.pendingCount(), 0),
       // Dos tablas en vivo: ítems y cuentas contables.
       lineControls: ['detalles', 'cuentas'],

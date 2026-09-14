@@ -1,3 +1,4 @@
+import type { FormGroup } from '@angular/forms';
 import type { ToastService } from '@reddoc/core';
 import { extractErrorMessage } from '@reddoc/core';
 import { Observable, concat, defer, of, throwError } from 'rxjs';
@@ -11,30 +12,41 @@ interface ToastTexto {
 
 /**
  * Contrato mínimo de una tabla que transacciona en vivo contra el backend (líneas de
- * `documento-detalle`, pagos de `documento-pago`): el form padre le pide si tiene
- * pendientes incompletos y que guarde los que sí puede.
+ * `documento-detalle`, pagos de `documento-pago`): el form padre le pide que guarde
+ * sus pendientes antes de guardar la cabecera.
  */
 export interface TablaEnVivo {
-  hasInvalidPending(): boolean;
   saveAll(): Observable<void>;
 }
 
-/** Una tabla del documento con la pestaña que la contiene y sus textos de aviso. */
-export interface TablaEnVivoDocumento<TTab extends string> {
+/** Una tabla del documento con su texto de error al guardar. */
+export interface TablaEnVivoDocumento {
   /** `undefined` si la tabla no está montada o no aplica al documento (nota débito sin pagos). */
   readonly tabla: TablaEnVivo | undefined;
-  readonly tab: TTab;
-  /** Aviso cuando la tabla tiene pendientes incompletos. */
-  readonly incompleta: ToastTexto;
   /** Error cuando falla su guardado; la descripción se reemplaza por la del backend si viene. */
   readonly errorAlGuardar: ToastTexto;
 }
 
-/** Primera tabla, en orden, con pendientes incompletos; `null` si todas se pueden guardar. */
-export function primeraTablaIncompleta<TTab extends string>(
-  tablas: readonly TablaEnVivoDocumento<TTab>[],
-): TablaEnVivoDocumento<TTab> | null {
-  return tablas.find((t) => t.tabla?.hasInvalidPending()) ?? null;
+/**
+ * Pestaña que hay que abrir para mostrar el primer error del formulario, en orden de
+ * pantalla. `libFocusInvalid` lleva al primer campo inválido del DOM, pero los paneles
+ * inactivos de `p-tabs` están montados y ocultos (`hidden`): el campo existe, pero ni
+ * se ve ni recibe foco hasta que se abre su pestaña.
+ *
+ * La cabecera va arriba de los tabs: si le falta algo devuelve `null` y no se cambia
+ * de pestaña. Si no, devuelve la pestaña del primer control inválido según el orden de
+ * `pestanas` (control del form → pestaña que lo contiene).
+ */
+export function pestanaConPrimerError<TTab extends string>(
+  form: FormGroup,
+  pestanas: Readonly<Record<string, TTab>>,
+): TTab | null {
+  const enCabecera = Object.entries(form.controls).some(
+    ([nombre, control]) => !(nombre in pestanas) && control.invalid,
+  );
+  if (enCabecera) return null;
+  const nombre = Object.keys(pestanas).find((n) => form.controls[n]?.invalid);
+  return nombre ? pestanas[nombre] : null;
 }
 
 /**
@@ -43,8 +55,8 @@ export function primeraTablaIncompleta<TTab extends string>(
  * guardado. Completa al terminar; si una tabla falla, avisa con el mensaje del backend
  * (o el texto de la tabla) y emite el error sin tocar las siguientes.
  */
-export function guardarTablasEnSerie<TTab extends string>(
-  tablas: readonly TablaEnVivoDocumento<TTab>[],
+export function guardarTablasEnSerie(
+  tablas: readonly TablaEnVivoDocumento[],
   toast: ToastService,
 ): Observable<void> {
   return concat(

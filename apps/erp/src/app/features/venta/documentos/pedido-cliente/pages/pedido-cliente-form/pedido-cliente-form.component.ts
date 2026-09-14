@@ -248,6 +248,8 @@ export class PedidoClienteFormComponent implements OnInit, CanComponentDeactivat
   canDeactivate(): boolean | Observable<boolean> {
     return canLeaveDocumentForm({
       form: this.form,
+      // En alta nada persiste aparte: tocar una línea y salir también pierde trabajo.
+      enAlta: !this.id(),
       pendingLines: this.detallesTable()?.pendingCount() ?? 0,
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,

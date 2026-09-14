@@ -17,7 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -65,7 +65,7 @@ import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/come
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import {
   guardarTablasEnSerie,
-  primeraTablaIncompleta,
+  pestanaConPrimerError,
   registrarPagosDeAlta,
   type TablaEnVivoDocumento,
 } from '@erp/features/documentos/tablas-en-vivo';
@@ -106,6 +106,7 @@ import type { FacturaVentaRead } from '../../factura-venta.model';
     DatePickerModule,
     TabsModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
@@ -141,11 +142,22 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
   private readonly pagosTable = viewChild(DocumentoPagosComponent);
 
-  /** Guardado en curso dentro de la tabla de pagos: el botón Guardar espera a que termine. */
-  protected readonly tablasOcupadas = computed(() => this.pagosTable()?.ocupado() ?? false);
+  /** Guardado en curso en la tabla de líneas o la de pagos: el botón Guardar espera a que termine. */
+  protected readonly tablasOcupadas = computed(
+    () => (this.detallesTable()?.ocupado() ?? false) || (this.pagosTable()?.ocupado() ?? false),
+  );
 
   /** Tab activo del bloque de líneas (Detalles / Pagos). */
   protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
+
+  /**
+   * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
+   * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
+   */
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'pagos'>> = {
+    detalles: 'detalles',
+    pagos: 'pagos',
+  };
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
@@ -287,7 +299,14 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.form.pending || this.isSaving() || this.tablasOcupadas()) return;
+    if (this.isSaving() || this.tablasOcupadas()) return;
+    if (this.form.invalid || this.form.pending) {
+      // `libFocusInvalid` marca todo como tocado y lleva al primer campo con error, pero
+      // un panel inactivo está oculto: antes se abre la pestaña que lo contiene.
+      const pestana = pestanaConPrimerError(this.form, this.pestanasPorControl);
+      if (pestana) this.activeTab.set(pestana);
+      return;
+    }
 
     const id = this.id();
     if (!id) {
@@ -298,15 +317,8 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     }
 
     // Edición: líneas y pagos transaccionan aparte, así que antes de guardar el
-    // documento se persisten los pendientes. Si alguno está incompleto se abre su
-    // pestaña y se avisa, en vez de guardar a medias.
+    // documento se persisten sus pendientes (el form ya es válido: no hay incompletos).
     const tablas = this.tablasEnVivo();
-    const incompleta = primeraTablaIncompleta(tablas);
-    if (incompleta) {
-      this.activeTab.set(incompleta.tab);
-      this.toast.warn(incompleta.incompleta.title, incompleta.incompleta.desc);
-      return;
-    }
 
     this.isSaving.set(true);
     // Flush silencioso y en serie (líneas, luego pagos): el éxito lo confirma el toast
@@ -320,19 +332,12 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   }
 
   /** Tablas que transaccionan en vivo, en el orden en que se guardan. */
-  private tablasEnVivo(): readonly TablaEnVivoDocumento<'detalles' | 'pagos'>[] {
+  private tablasEnVivo(): readonly TablaEnVivoDocumento[] {
     const { comercialDetalle, documentoPago } = this.t().entities;
     return [
-      {
-        tabla: this.detallesTable(),
-        tab: 'detalles',
-        incompleta: comercialDetalle.toasts.incompleteLines,
-        errorAlGuardar: comercialDetalle.toasts.lineSaveError,
-      },
+      { tabla: this.detallesTable(), errorAlGuardar: comercialDetalle.toasts.lineSaveError },
       {
         tabla: this.pagosTable(),
-        tab: 'pagos',
-        incompleta: documentoPago.toasts.incompletos,
         errorAlGuardar: documentoPago.toasts.saveError,
       },
     ];
@@ -407,7 +412,9 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       pendingLines:
         (this.detallesTable()?.pendingCount() ?? 0) + (this.pagosTable()?.pendingCount() ?? 0),
       // En edición los pagos transaccionan aparte, como las líneas: los cuenta `pendingLines`.
-      lineControls: this.id() ? ['detalles', 'pagos'] : ['detalles'],
+      lineControls: ['detalles', 'pagos'],
+      // En alta nada persiste aparte: tocar una línea o un pago y salir también pierde trabajo.
+      enAlta: !this.id(),
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,
       cancelLabel: this.t().common.actions.cancel,

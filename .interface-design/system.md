@@ -746,9 +746,12 @@ y nómina electrónica, que no tienen tabla de líneas.
   editables traen `resumenEnabled` (default `true`): el form que pinta el resumen afuera lo apaga.
   Con un tab único el resumen interno de la tabla es visualmente idéntico y se deja.
 - **Chip de conteo en el tab** que esconde algo que importa (Pagos): `font-mono tabular-nums` sobre
-  `bg-[rgba(20,48,73,0.06)]`; en `bg-red-50 text-red-600` cuando lo que esconde bloquea guardar
-  (pagos que exceden o filas inválidas ya tocadas). El error se ve desde otra pestaña.
-- **Validar abre la pestaña del error** antes del toast: `activeTab.set('pagos')` / `'detalles'`.
+  `bg-[rgba(20,48,73,0.06)]`; en `bg-red-50 text-red-600` cuando lo que esconde necesita atención (pagos que superan el total —no se podrá aprobar— o filas inválidas ya tocadas). El error se ve desde otra pestaña.
+- **Guardar nunca queda muerto:** el botón solo espera a `isSaving` y a las tablas
+  ocupadas (`ocupado()` de líneas y pagos). Con errores, `pestanaConPrimerError`
+  (`features/documentos/tablas-en-vivo.ts`) abre la pestaña del primer control inválido
+  —los paneles inactivos de `p-tabs` están montados pero `hidden`— y `libFocusInvalid`
+  lleva al campo.
 - **Ficha = form en solo lectura:** mismas pestañas y mismo resumen; cada tabla editable tiene su
   gemela tonta (`comercial-documento-lineas-table`, `documento-pagos-table`).
 
