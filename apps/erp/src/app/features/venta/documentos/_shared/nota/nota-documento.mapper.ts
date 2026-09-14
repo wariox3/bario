@@ -34,12 +34,14 @@ export function notaVentaToFormValue(
  * `documento_tipo` proviene del `documentTypeId` del `DocumentEntityConfig`.
  * En **edición** se omiten los detalles (`includeDetalles=false`): transaccionan
  * en vivo contra `documento-detalle`. En **alta** viajan embebidos. Los `pagos`
- * viajan siempre embebidos (asunción de contrato pendiente de confirmar).
+ * viajan embebidos solo si el documento se cobra en el acto (`includePagos`, que
+ * sale de `hasPagos` en la config; asunción de contrato pendiente de confirmar).
  */
 export function formValueToPayload(
   raw: NotaVentaFormRawValue,
   documentTypeId: number,
   includeDetalles = true,
+  includePagos = true,
 ): NotaVentaPayload {
   const comentario = raw.comentario?.trim() ?? '';
 
@@ -51,7 +53,7 @@ export function formValueToPayload(
     sede: raw.sede?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
     comentario: comentario ? comentario : null,
-    ...pagosToPayload(raw.pagos),
+    ...(includePagos ? pagosToPayload(raw.pagos) : {}),
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

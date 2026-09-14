@@ -34,6 +34,7 @@ export const FACTURA_POS_ELECTRONICA_CONFIG: DocumentEntityConfig = {
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.FACTURA_POS_ELECTRONICO,
   inventoryEffect: 'outflow',
+  hasPagos: true,
   schemaVersion: 1,
   columns: FACTURA_POS_ELECTRONICA_COLUMNS,
   filters: FACTURA_POS_ELECTRONICA_FILTERS,

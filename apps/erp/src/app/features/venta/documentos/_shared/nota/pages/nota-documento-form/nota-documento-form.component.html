@@ -145,23 +145,25 @@
       <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
         <p-tablist>
           <p-tab value="detalles">{{ f.tabs.detalles }}</p-tab>
-          <p-tab value="pagos">
-            {{ f.tabs.pagos }}
-            <!-- Los pagos quedan tras un clic, pero conviene saber si están en orden
+          @if (conPagos()) {
+            <p-tab value="pagos">
+              {{ f.tabs.pagos }}
+              <!-- Los pagos quedan tras un clic, pero conviene saber si están en orden
                  desde otra pestaña: el chip lleva el conteo y se tiñe si exceden. -->
-            @if (pagos.length > 0) {
-              <span
-                class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
-                [class]="
-                  pagosExceden() || (pagos.invalid && pagos.touched)
-                    ? 'bg-red-50 text-red-600'
-                    : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
-                "
-              >
-                {{ pagos.length }}
-              </span>
-            }
-          </p-tab>
+              @if (pagos.length > 0) {
+                <span
+                  class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+                  [class]="
+                    pagosExceden() || (pagos.invalid && pagos.touched)
+                      ? 'bg-red-50 text-red-600'
+                      : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
+                  "
+                >
+                  {{ pagos.length }}
+                </span>
+              }
+            </p-tab>
+          }
           <p-tab value="informacion">{{ f.tabs.informacion }}</p-tab>
         </p-tablist>
 
@@ -177,9 +179,11 @@
             />
           </p-tabpanel>
 
-          <p-tabpanel value="pagos">
-            <app-documento-pagos [pagos]="form.controls.pagos" [documentTotal]="totalGeneral()" />
-          </p-tabpanel>
+          @if (conPagos()) {
+            <p-tabpanel value="pagos">
+              <app-documento-pagos [pagos]="form.controls.pagos" [documentTotal]="totalGeneral()" />
+            </p-tabpanel>
+          }
 
           <p-tabpanel value="informacion">
             <!-- Comentario -->
@@ -211,7 +215,7 @@
           <app-comercial-documento-resumen
             [resumen]="resumen()"
             [cantidad]="cantidadTotal()"
-            [pagos]="pagos.length > 0 ? pagosResumen() : null"
+            [pagos]="conPagos() && pagos.length > 0 ? pagosResumen() : null"
           />
         </div>
       }

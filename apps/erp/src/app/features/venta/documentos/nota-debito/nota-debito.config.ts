@@ -6,9 +6,10 @@ import { NOTA_DEBITO_COLUMNS, NOTA_DEBITO_FILTERS } from './nota-debito.constant
  *
  * Gemela de la nota crédito de venta (camino A): vive sobre el endpoint genérico
  * `/api/general/documento` discriminado por `documento_tipo_id`. De la familia
- * comercial; ajusta una factura de venta (`documento_referencia`) y puede
- * cobrarse en el acto (sección de pagos). El form y la ficha los aporta la
- * familia `documentos/_shared/nota/`, compartida con la nota crédito.
+ * comercial; ajusta una factura de venta (`documento_referencia`). A diferencia de
+ * la nota crédito **no se cobra en el acto**: sin `hasPagos`, el form y la ficha no
+ * muestran pagos (tampoco los tenía en el legacy). Ambos los aporta la familia
+ * `documentos/_shared/nota/`, compartida con la nota crédito.
  *
  * `inventoryEffect: 'inflow'` es solo metadata (espeja la nota crédito). `routes`
  * son relativas al módulo; el `BaseDocumentListComponent` les prepende

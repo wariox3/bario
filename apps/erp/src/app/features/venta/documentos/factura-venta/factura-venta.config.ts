@@ -23,6 +23,7 @@ export const FACTURA_VENTA_CONFIG: DocumentEntityConfig = {
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.FACTURA_VENTA,
   inventoryEffect: 'outflow',
+  hasPagos: true,
   schemaVersion: 1,
   columns: FACTURA_VENTA_COLUMNS,
   filters: FACTURA_VENTA_FILTERS,

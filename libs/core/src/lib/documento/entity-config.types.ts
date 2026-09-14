@@ -86,6 +86,13 @@ export interface DocumentEntityConfig {
    */
   readonly inventoryEffect?: InventoryEffect;
   /**
+   * El documento **se cobra en el acto**: lleva pagos (cuenta de banco + monto).
+   * Lo leen las páginas que comparten documentos con y sin pagos (la familia de
+   * notas de venta: la nota crédito los tiene, la débito no) para mostrar la
+   * pestaña, el resumen de pagos y enviarlos en el payload. Se omite ⇒ sin pagos.
+   */
+  readonly hasPagos?: boolean;
+  /**
    * Versión del schema. Se usa como sufijo en la clave de localStorage
    * para invalidar filtros guardados cuando el shape cambia.
    */

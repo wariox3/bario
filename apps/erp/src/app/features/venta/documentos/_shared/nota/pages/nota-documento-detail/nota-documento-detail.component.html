@@ -110,22 +110,24 @@
       <p-tabs value="detalles">
         <p-tablist>
           <p-tab value="detalles">{{ det.sections.detalles }}</p-tab>
-          <p-tab value="pagos">
-            {{ det.sections.pagos }}
-            <!-- Mismo chip que el formulario: conteo, en rojo si lo recibido supera el total. -->
-            @if (pagos().length > 0) {
-              <span
-                class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
-                [class]="
-                  pagosResumen().excede
-                    ? 'bg-red-50 text-red-600'
-                    : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
-                "
-              >
-                {{ pagos().length }}
-              </span>
-            }
-          </p-tab>
+          @if (conPagos()) {
+            <p-tab value="pagos">
+              {{ det.sections.pagos }}
+              <!-- Mismo chip que el formulario: conteo, en rojo si lo recibido supera el total. -->
+              @if (pagos().length > 0) {
+                <span
+                  class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+                  [class]="
+                    pagosResumen().excede
+                      ? 'bg-red-50 text-red-600'
+                      : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
+                  "
+                >
+                  {{ pagos().length }}
+                </span>
+              }
+            </p-tab>
+          }
         </p-tablist>
 
         <p-tabpanels>
@@ -137,9 +139,11 @@
             />
           </p-tabpanel>
 
-          <p-tabpanel value="pagos">
-            <app-documento-pagos-table [pagos]="pagos()" />
-          </p-tabpanel>
+          @if (conPagos()) {
+            <p-tabpanel value="pagos">
+              <app-documento-pagos-table [pagos]="pagos()" />
+            </p-tabpanel>
+          }
         </p-tabpanels>
       </p-tabs>
 

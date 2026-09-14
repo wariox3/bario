@@ -8,9 +8,9 @@
  * cabecera es idéntica entre crédito y débito: lo único que los distingue es el
  * `documento_tipo`, que aporta el `DocumentEntityConfig` de cada uno.
  *
- * Una nota de venta ajusta una **factura de venta** (`documento_referencia`) y,
- * como el POS, puede **cobrarse en el acto**: de ahí la lista de `pagos` (uno por
- * cuenta de banco). El resto de la cabecera es cliente, fecha, sede, método de
+ * Una nota de venta ajusta una **factura de venta** (`documento_referencia`). La
+ * nota crédito, como el POS, además **se cobra en el acto**: de ahí la lista de
+ * `pagos` (uno por cuenta de banco), que la nota débito no envía. El resto de la cabecera es cliente, fecha, sede, método de
  * pago y comentario.
  *
  * Nota: la sección de pagos (shape `pagos`/`pago` embebido) es una **asunción de
@@ -43,10 +43,10 @@ export interface NotaVentaPayload extends DocumentoPayloadBase {
   readonly sede: number | null;
   readonly metodo_pago: number | null;
   readonly comentario: string | null;
-  /** Total recibido en pagos (suma de `pagos[].pago`). */
-  readonly pago: string;
-  /** Pagos recibidos al emitir la nota. */
-  readonly pagos: readonly PagoPayload[];
+  /** Total recibido en pagos (suma de `pagos[].pago`). Solo si la config declara `hasPagos`. */
+  readonly pago?: string;
+  /** Pagos recibidos al emitir la nota. Solo si la config declara `hasPagos`. */
+  readonly pagos?: readonly PagoPayload[];
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
 }

@@ -70,7 +70,9 @@ interface CabeceraView {
  * familia comercial. Carga cabecera (`ENTITY_DATA_GATEWAY.getById`) y líneas
  * (`DocumentoDetalleService`) en paralelo —igual que el form— y las muestra sin
  * formularios. Líneas y pagos van en tabs dentro de la card de la cabecera, con
- * un único resumen debajo: el mismo esqueleto que el formulario. Desde aquí se
+ * un único resumen debajo: el mismo esqueleto que el formulario. La pestaña de
+ * pagos solo aparece si la config declara `hasPagos` (la nota crédito sí, la
+ * débito no). Desde aquí se
  * vuelve a la lista o se edita.
  */
 @Component({
@@ -113,6 +115,8 @@ export class NotaDocumentoDetailComponent implements OnInit {
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
   /** Pagos recibidos, mapeados a la forma del front (asunción de contrato: el backend aún no los expone). */
   protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
+  /** ¿Se cobra en el acto? Lo declara la config (`hasPagos`); sin él no hay pestaña de pagos. */
+  protected readonly conPagos = computed(() => this.document().hasPagos === true);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -237,7 +241,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
             },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
-          this.pagos.set((read.pagos ?? []).map(pagoReadToFormValue));
+          this.pagos.set(this.conPagos() ? (read.pagos ?? []).map(pagoReadToFormValue) : []);
           this.isLoading.set(false);
         },
         error: () => {

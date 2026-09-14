@@ -84,8 +84,9 @@ import {
  * Una nota de venta ajusta una factura de venta (`documento_referencia`) y, como
  * el POS, puede cobrarse en el acto: a la cabecera (cliente, fecha, sede, método
  * de pago, comentario) le suma la **sección de pagos** —compartida— y la **tabla
- * de detalles** comercial. Detalles / Pagos / Más información van en tabs dentro
- * de la card de la cabecera, con un único resumen del documento debajo.
+ * de detalles** comercial. La pestaña de pagos solo aparece si la config declara
+ * `hasPagos` (la nota crédito sí, la débito no). Detalles / Pagos / Más información
+ * van en tabs dentro de la card de la cabecera, con un único resumen debajo.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -132,6 +133,12 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
   /** Tab activo del bloque (Detalles / Pagos / Más información). */
   protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
+
+  /**
+   * ¿Se cobra en el acto? Lo declara la config (`hasPagos`): solo entonces hay
+   * pestaña de pagos, filas de pagos en el resumen, validación y pagos en el payload.
+   */
+  protected readonly conPagos = computed(() => this.document().hasPagos === true);
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
@@ -292,7 +299,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
     // Lo recibido en pagos no puede superar el total. Con los pagos tras un tab,
     // se abre la pestaña que lo contiene antes de avisar.
-    if (this.pagosExceden()) {
+    if (this.conPagos() && this.pagosExceden()) {
       this.activeTab.set('pagos');
       const toast = this.t().entities.documentoPago.toasts.exceden;
       this.toast.warn(toast.title, toast.desc);
@@ -340,6 +347,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
       this.form.getRawValue(),
       this.document().documentTypeId,
       !id,
+      this.conPagos(),
     );
     const operation = id
       ? this.gateway.update(this.document(), Number(id), payload)
@@ -435,7 +443,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   private applyCabecera(read: NotaVentaRead): void {
     this.form.patchValue(notaVentaToFormValue(read), { emitEvent: false });
     this.syncReferenciaState();
-    this.populatePagos(read.pagos ?? []);
+    if (this.conPagos()) this.populatePagos(read.pagos ?? []);
   }
 
   /**
