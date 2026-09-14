@@ -217,6 +217,12 @@ export class ComercialDocumentoDetallesComponent {
   readonly detalleEnabled = input<boolean>(true);
 
   /**
+   * Pinta el resumen del documento bajo la tabla. Default `true`; lo apaga el
+   * formulario que muestra un único resumen fuera de los tabs (común a Detalles y Pagos).
+   */
+  readonly resumenEnabled = input<boolean>(true);
+
+  /**
    * Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las
    * opcionales que el documento haya encendido.
    */

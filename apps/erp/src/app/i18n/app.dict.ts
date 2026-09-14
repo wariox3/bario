@@ -1727,6 +1727,7 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
+        tabs: { detalles: string; pagos: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -1945,14 +1946,17 @@ export interface AppDict
       hint: string;
       add: string;
       empty: string;
-      cuentaBanco: string;
+      removePago: string;
+      columns: { linea: string; cuentaBanco: string; monto: string; acciones: string };
       cuentaBancoPlaceholder: string;
-      monto: string;
       totalDocumento: string;
       totalRecibido: string;
       saldo: string;
       excedenHint: string;
-      toasts: { exceden: { title: string; desc: string } };
+      toasts: {
+        exceden: { title: string; desc: string };
+        sinDetalles: { title: string; desc: string };
+      };
     };
     posDocumento: {
       form: {
@@ -2826,6 +2830,8 @@ export interface AppDict
       resumen: {
         subtotal: string;
         descuento: string;
+        cantidad: string;
+        totalImpuestos: string;
         total: string;
       };
       toasts: {

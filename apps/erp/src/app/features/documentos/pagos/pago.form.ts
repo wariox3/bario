@@ -18,7 +18,7 @@ export type PagoGroup = FormGroup<{
   pago: FormControl<number>;
 }>;
 
-/** Crea una fila de pago (cuenta de banco requerida, monto ≥ 0). */
+/** Crea una fila de pago (cuenta de banco requerida, monto > 0: un pago en cero no es un pago). */
 export function createPagoGroup(value?: Partial<PagoFormRawValue>): PagoGroup {
   return new FormGroup({
     cuenta_banco: new FormControl<ErpSelectOption | null>(value?.cuenta_banco ?? null, {
@@ -26,7 +26,7 @@ export function createPagoGroup(value?: Partial<PagoFormRawValue>): PagoGroup {
     }),
     pago: new FormControl<number>(value?.pago ?? 0, {
       nonNullable: true,
-      validators: Validators.min(0),
+      validators: Validators.min(1),
     }),
   });
 }

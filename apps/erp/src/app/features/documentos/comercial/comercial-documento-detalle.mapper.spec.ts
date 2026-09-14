@@ -1,6 +1,7 @@
 import {
   comercialDetalleToFormValue,
   comercialDetalleToPayload,
+  totalCantidad,
 } from './comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from './comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
@@ -48,5 +49,29 @@ describe('comercial detalle · descuento', () => {
   it('cae a 0 cuando la línea llega sin porcentaje', () => {
     const read: ComercialDetalleRead = { id: 1, item: 3, cantidad: '1', precio: '100' };
     expect(comercialDetalleToFormValue(read).descuento).toBe(0);
+  });
+});
+
+/** Fila «Total cantidad» del resumen: suma las cantidades y trata la vacía como cero. */
+describe('comercial detalle · total cantidad', () => {
+  const linea = (cantidad: number | null): ComercialDetalleFormRawValue => ({
+    id: null,
+    item: null,
+    cantidad,
+    precio: 0,
+    descuento: 0,
+    impuestos_ids: [],
+    impuestos_totales: [],
+    impuestos_disponibles: [],
+    detalle: null,
+    documento_detalle_afectado: null,
+  });
+
+  it('sin líneas suma cero', () => {
+    expect(totalCantidad([])).toBe(0);
+  });
+
+  it('suma cantidades decimales e ignora la vacía', () => {
+    expect(totalCantidad([linea(2), linea(1.5), linea(null)])).toBe(3.5);
   });
 });

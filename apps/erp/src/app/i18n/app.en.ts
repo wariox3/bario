@@ -2299,6 +2299,7 @@ export const en: AppDict = {
         createTitle: 'New sales invoice',
         editTitle: 'Edit sales invoice',
         sectionHint: 'Main document details',
+        tabs: { detalles: 'Details', pagos: 'Payments' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2514,9 +2515,9 @@ export const en: AppDict = {
       hint: 'Payments received for the document',
       add: 'Add payment',
       empty: 'No payments registered',
-      cuentaBanco: 'Bank account',
+      removePago: 'Remove payment',
+      columns: { linea: '#', cuentaBanco: 'Bank account', monto: 'Amount', acciones: 'Actions' },
       cuentaBancoPlaceholder: 'Select…',
-      monto: 'Amount',
       totalDocumento: 'Document total',
       totalRecibido: 'Total received',
       saldo: 'Outstanding balance',
@@ -2525,6 +2526,10 @@ export const en: AppDict = {
         exceden: {
           title: 'Invalid payments',
           desc: 'The total received cannot exceed the document total',
+        },
+        sinDetalles: {
+          title: 'Nothing to collect',
+          desc: 'Add details with a value before registering payments',
         },
       },
     },
@@ -3674,6 +3679,8 @@ export const en: AppDict = {
       resumen: {
         subtotal: 'Subtotal',
         descuento: 'Discount',
+        cantidad: 'Total quantity',
+        totalImpuestos: 'Total taxes',
         total: 'Total',
       },
       toasts: {

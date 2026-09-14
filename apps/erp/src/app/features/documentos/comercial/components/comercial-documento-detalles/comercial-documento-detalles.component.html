@@ -302,7 +302,7 @@
     </table>
   </div>
 
-  @if (detalles().controls.length > 0) {
+  @if (resumenEnabled() && detalles().controls.length > 0) {
     <app-comercial-documento-resumen [resumen]="resumen()" />
   }
 </div>

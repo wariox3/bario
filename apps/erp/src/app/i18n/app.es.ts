@@ -2350,6 +2350,7 @@ export const es: AppDict = {
         createTitle: 'Nueva factura de venta',
         editTitle: 'Editar factura de venta',
         sectionHint: 'Datos principales del documento',
+        tabs: { detalles: 'Detalles', pagos: 'Pagos' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2568,9 +2569,9 @@ export const es: AppDict = {
       hint: 'Pagos recibidos del documento',
       add: 'Agregar pago',
       empty: 'No hay pagos registrados',
-      cuentaBanco: 'Cuenta de banco',
+      removePago: 'Eliminar pago',
+      columns: { linea: '#', cuentaBanco: 'Cuenta de banco', monto: 'Monto', acciones: 'Acciones' },
       cuentaBancoPlaceholder: 'Selecciona…',
-      monto: 'Monto',
       totalDocumento: 'Total documento',
       totalRecibido: 'Total recibido',
       saldo: 'Saldo pendiente',
@@ -2579,6 +2580,10 @@ export const es: AppDict = {
         exceden: {
           title: 'Pagos inválidos',
           desc: 'El total recibido no puede superar el total del documento',
+        },
+        sinDetalles: {
+          title: 'Sin valor por cobrar',
+          desc: 'Agrega detalles con valor antes de registrar pagos',
         },
       },
     },
@@ -3734,6 +3739,8 @@ export const es: AppDict = {
       resumen: {
         subtotal: 'Subtotal',
         descuento: 'Descuento',
+        cantidad: 'Total cantidad',
+        totalImpuestos: 'Total impuestos',
         total: 'Total',
       },
       toasts: {

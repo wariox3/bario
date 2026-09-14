@@ -13,6 +13,7 @@
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type { PagoPayload, PagoRead } from '@erp/features/documentos/pagos/pago.model';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de venta. */
 export interface FacturaVentaRead extends DocumentoReadBase {
@@ -25,6 +26,8 @@ export interface FacturaVentaRead extends DocumentoReadBase {
   readonly sede_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
+  /** Pagos recibidos (asunción de contrato: el backend aún no los expone). */
+  readonly pagos?: readonly PagoRead[] | null;
 }
 
 /** Body (POST/PATCH) de una factura de venta. */
@@ -35,4 +38,7 @@ export interface FacturaVentaPayload extends DocumentoPayloadBase {
   readonly metodo_pago: number | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
+  /** Total recibido (suma de `pagos[].pago`). */
+  readonly pago: string;
+  readonly pagos: readonly PagoPayload[];
 }

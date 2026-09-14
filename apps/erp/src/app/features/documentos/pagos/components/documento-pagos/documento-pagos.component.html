@@ -1,87 +1,121 @@
 @let p = t().entities.documentoPago;
 
 <div class="flex flex-col gap-4">
-  <div class="flex items-center gap-3">
-    <p class="m-0 flex-1 text-[0.75rem] text-brand-muted">{{ hint() ?? p.hint }}</p>
+  <!-- Toolbar: mismo idioma que la tabla de detalles (acción a la derecha) -->
+  <div class="flex items-center justify-end gap-2">
+    <p class="m-0 mr-auto text-[0.75rem] text-brand-muted">{{ hint() ?? p.hint }}</p>
     <p-button
       type="button"
-      [label]="p.add"
-      icon="pi pi-plus"
       size="small"
-      severity="secondary"
+      icon="pi pi-plus"
+      [label]="p.add"
       [outlined]="true"
       (onClick)="addPago()"
     />
   </div>
 
-  @if (pagos().length === 0) {
-    <p class="m-0 py-4 text-center text-[0.8rem] text-brand-muted">{{ p.empty }}</p>
-  } @else {
-    <div class="flex flex-col gap-3">
-      @for (pago of pagos().controls; track pago; let i = $index) {
-        <div class="flex items-end gap-3" [formGroup]="pago">
-          <!-- Cuenta de banco -->
-          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-            <label [for]="'pago-cuenta-' + i" class="documento-pagos__label">
-              {{ p.cuentaBanco }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <lib-api-select
-              [inputId]="'pago-cuenta-' + i"
-              formControlName="cuenta_banco"
-              [endpoint]="cuentaBancoEndpoint"
-              [placeholder]="p.cuentaBancoPlaceholder"
-              [invalid]="pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched"
-            />
-          </div>
+  <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <table class="documento-pagos-table">
+      <thead>
+        <tr>
+          <th class="documento-pagos-table__th w-10 text-center">{{ p.columns.linea }}</th>
+          <th class="documento-pagos-table__th min-w-[16rem] text-left">
+            {{ p.columns.cuentaBanco }}
+          </th>
+          <th class="documento-pagos-table__th w-48 text-right">{{ p.columns.monto }}</th>
+          <th class="documento-pagos-table__th w-20 text-center">{{ p.columns.acciones }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (pago of pagos().controls; track pago; let i = $index) {
+          <tr [formGroup]="pago" class="documento-pagos-table__row">
+            <td class="documento-pagos-table__td text-center text-brand-muted tabular-nums">
+              {{ i + 1 }}
+            </td>
 
-          <!-- Monto -->
-          <div class="flex w-40 flex-col gap-1.5">
-            <label [for]="'pago-monto-' + i" class="documento-pagos__label">{{ p.monto }}</label>
-            <p-inputnumber
-              [inputId]="'pago-monto-' + i"
-              formControlName="pago"
-              mode="currency"
-              currency="COP"
-              locale="es-CO"
-              [min]="0"
-              [fluid]="true"
-            />
-          </div>
+            <td class="documento-pagos-table__td">
+              <lib-api-select
+                formControlName="cuenta_banco"
+                [endpoint]="cuentaBancoEndpoint"
+                [placeholder]="p.cuentaBancoPlaceholder"
+                [invalid]="pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched"
+              />
+            </td>
 
-          <p-button
-            type="button"
-            icon="pi pi-trash"
-            severity="danger"
-            [text]="true"
-            [rounded]="true"
-            size="small"
-            [ariaLabel]="t().common.actions.delete"
-            (onClick)="removePago(i)"
-          />
+            <td class="documento-pagos-table__td">
+              <p-inputnumber
+                formControlName="pago"
+                [invalid]="pago.controls.pago.invalid && pago.controls.pago.touched"
+                mode="decimal"
+                [min]="0"
+                [minFractionDigits]="0"
+                [maxFractionDigits]="2"
+                prefix="$ "
+                [fluid]="true"
+                inputStyleClass="text-right"
+              />
+            </td>
+
+            <td class="documento-pagos-table__td">
+              <div class="flex items-center justify-center">
+                <button
+                  type="button"
+                  (click)="removePago(i)"
+                  [pTooltip]="p.removePago"
+                  [attr.aria-label]="p.removePago"
+                  class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                >
+                  <i class="pi pi-trash text-[0.72rem]"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="px-5 py-8 text-center text-sm text-brand-muted">
+              <i class="pi pi-inbox mr-2"></i>{{ p.empty }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Resumen: mismo aside que el de detalles; aquí la cifra que se busca es el saldo -->
+  @if (resumenEnabled() && pagos().length > 0) {
+    <div class="flex justify-end">
+      <div
+        class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
+      >
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+            <span class="text-brand-muted">{{ p.totalDocumento }}</span>
+            <span class="tabular-nums text-brand-text">{{ formatMoney(documentTotal()) }}</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+            <span class="text-brand-muted">{{ p.totalRecibido }}</span>
+            <span
+              class="tabular-nums"
+              [class]="excede() ? 'font-semibold text-red-600' : 'text-brand-text'"
+            >
+              {{ formatMoney(totalPagos()) }}
+            </span>
+          </div>
+          <div
+            class="mt-1 flex items-baseline justify-between gap-2 border-t border-[rgba(20,48,73,0.1)] pt-2.5"
+          >
+            <span class="text-[0.78rem] font-semibold text-brand-text">{{ p.saldo }}</span>
+            <span
+              class="text-[1.35rem] leading-none font-bold tracking-[-0.02em] text-[#143049] tabular-nums"
+            >
+              {{ formatMoney(saldoPendiente()) }}
+            </span>
+          </div>
+          @if (excede()) {
+            <p class="m-0 mt-1 text-[0.72rem] text-red-600">{{ p.excedenHint }}</p>
+          }
         </div>
-      }
+      </div>
     </div>
-
-    <!-- Resumen de pagos -->
-    <dl class="flex flex-col gap-1.5 rounded-lg bg-[rgba(20,48,73,0.03)] px-4 py-3 text-[0.82rem]">
-      <div class="flex items-center justify-between">
-        <dt class="text-brand-muted">{{ p.totalDocumento }}</dt>
-        <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(documentTotal()) }}</dd>
-      </div>
-      <div class="flex items-center justify-between">
-        <dt class="text-brand-muted">{{ p.totalRecibido }}</dt>
-        <dd class="m-0 font-semibold" [class.text-red-600]="excede()">
-          {{ formatMoney(totalPagos()) }}
-        </dd>
-      </div>
-      <div class="flex items-center justify-between border-t border-[rgba(20,48,73,0.08)] pt-1.5">
-        <dt class="text-brand-muted">{{ p.saldo }}</dt>
-        <dd class="m-0 font-semibold text-brand-text">{{ formatMoney(saldoPendiente()) }}</dd>
-      </div>
-      @if (excede()) {
-        <p class="m-0 mt-1 text-[0.78rem] text-red-600">{{ p.excedenHint }}</p>
-      }
-    </dl>
   }
 </div>
