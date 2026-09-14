@@ -24,6 +24,15 @@ export function facturaVentaToFormValue(
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
         : null,
+    orden_compra: read.orden_compra ?? null,
+    remision: read.remision ?? null,
+    comentario: read.comentario ?? null,
+    asesor: read.asesor != null ? { id: read.asesor, nombre: read.asesor_nombre ?? '' } : null,
+    // Sin etiqueta en el read: `lib-api-select` hidrata la opción por id contra su catálogo.
+    resolucion:
+      read.resolucion != null
+        ? { id: read.resolucion, nombre: read.resolucion_nombre ?? '' }
+        : null,
   };
 }
 
@@ -48,6 +57,11 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
+    orden_compra: raw.orden_compra?.trim() || null,
+    remision: raw.remision?.trim() || null,
+    comentario: raw.comentario?.trim() || null,
+    asesor: raw.asesor?.id ?? null,
+    resolucion: raw.resolucion?.id ?? null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

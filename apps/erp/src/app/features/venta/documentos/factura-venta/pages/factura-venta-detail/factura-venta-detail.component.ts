@@ -68,6 +68,12 @@ interface CabeceraView {
   readonly plazoPago: string | null;
   readonly sede: string | null;
   readonly metodoPago: string | null;
+  readonly ordenCompra: string | null;
+  readonly remision: string | null;
+  readonly asesor: string | null;
+  /** Hoy siempre `null`: el read no serializa la etiqueta de la resolución. */
+  readonly resolucion: string | null;
+  readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
    * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
@@ -296,6 +302,11 @@ export class FacturaVentaDetailComponent implements OnInit {
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
+            ordenCompra: read.orden_compra ?? null,
+            remision: read.remision ?? null,
+            asesor: read.asesor_nombre ?? null,
+            resolucion: read.resolucion_nombre ?? null,
+            comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,
               estado_anulado: read.estado_anulado,

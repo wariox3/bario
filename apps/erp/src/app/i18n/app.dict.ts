@@ -1727,7 +1727,7 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        tabs: { detalles: string; pagos: string };
+        tabs: { detalles: string; pagos: string; informacion: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -1739,8 +1739,23 @@ export interface AppDict
           sedePlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          ordenCompraPlaceholder: string;
+          remision: string;
+          remisionPlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          resolucion: string;
+          resolucionPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          ordenCompraMax: string;
+          remisionMax: string;
+          comentarioMax: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           createError: { title: string; desc: string };
@@ -1760,6 +1775,11 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           metodoPago: string;
+          ordenCompra: string;
+          remision: string;
+          asesor: string;
+          resolucion: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };

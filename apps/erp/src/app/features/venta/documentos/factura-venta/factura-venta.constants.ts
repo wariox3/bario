@@ -4,6 +4,8 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /** Endpoint `seleccionar` de métodos de pago. */
 export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
+/** Endpoint `seleccionar` de resoluciones de facturación. */
+export const RESOLUCION_ENDPOINT = '/general/resolucion/seleccionar/';
 
 /**
  * Columnas visibles del listado de Factura de venta.

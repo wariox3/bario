@@ -199,6 +199,7 @@
               </span>
             }
           </p-tab>
+          <p-tab value="informacion">{{ t().entities.facturaVenta.form.tabs.informacion }}</p-tab>
         </p-tablist>
 
         <p-tabpanels>
@@ -222,10 +223,102 @@
               [documentId]="documentId()"
             />
           </p-tabpanel>
+
+          <p-tabpanel value="informacion">
+            @let f = t().entities.facturaVenta.form;
+            <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+              <!-- Orden de compra -->
+              <div class="flex flex-col gap-1.5">
+                <label for="orden_compra" class="factura-venta-form__label">
+                  {{ f.fields.ordenCompra }}
+                </label>
+                <input
+                  pInputText
+                  id="orden_compra"
+                  formControlName="orden_compra"
+                  [fluid]="true"
+                  [placeholder]="f.fields.ordenCompraPlaceholder"
+                  [invalid]="
+                    form.controls.orden_compra.invalid && form.controls.orden_compra.touched
+                  "
+                />
+                <lib-field-error
+                  [control]="form.controls.orden_compra"
+                  [messages]="{ maxlength: f.validation.ordenCompraMax }"
+                />
+              </div>
+
+              <!-- Remisión -->
+              <div class="flex flex-col gap-1.5">
+                <label for="remision" class="factura-venta-form__label">
+                  {{ f.fields.remision }}
+                </label>
+                <input
+                  pInputText
+                  id="remision"
+                  formControlName="remision"
+                  [fluid]="true"
+                  [placeholder]="f.fields.remisionPlaceholder"
+                  [invalid]="form.controls.remision.invalid && form.controls.remision.touched"
+                />
+                <lib-field-error
+                  [control]="form.controls.remision"
+                  [messages]="{ maxlength: f.validation.remisionMax }"
+                />
+              </div>
+
+              <!-- Asesor -->
+              <div class="flex flex-col gap-1.5">
+                <label for="asesor" class="factura-venta-form__label">{{ f.fields.asesor }}</label>
+                <lib-asesor-select
+                  inputId="asesor"
+                  formControlName="asesor"
+                  [placeholder]="f.fields.asesorPlaceholder"
+                />
+              </div>
+
+              <!-- Resolución -->
+              <div class="flex flex-col gap-1.5">
+                <label for="resolucion" class="factura-venta-form__label">
+                  {{ f.fields.resolucion }}
+                </label>
+                <lib-api-select
+                  inputId="resolucion"
+                  formControlName="resolucion"
+                  [endpoint]="resolucionEndpoint"
+                  [params]="resolucionParams"
+                  [displayWith]="resolucionLabel"
+                  filterBy="prefijo,numero"
+                  [showClear]="true"
+                  [placeholder]="f.fields.resolucionPlaceholder"
+                />
+              </div>
+
+              <!-- Comentario -->
+              <div class="flex flex-col gap-1.5 sm:col-span-2">
+                <label for="comentario" class="factura-venta-form__label">
+                  {{ f.fields.comentario }}
+                </label>
+                <textarea
+                  pTextarea
+                  id="comentario"
+                  formControlName="comentario"
+                  rows="4"
+                  [fluid]="true"
+                  [placeholder]="f.fields.comentarioPlaceholder"
+                  [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
+                ></textarea>
+                <lib-field-error
+                  [control]="form.controls.comentario"
+                  [messages]="{ maxlength: f.validation.comentarioMax }"
+                />
+              </div>
+            </div>
+          </p-tabpanel>
         </p-tabpanels>
       </p-tabs>
 
-      <!-- Resumen del documento: fuera de los tabs, el mismo en Detalles y en Pagos -->
+      <!-- Resumen del documento: fuera de los tabs, el mismo en todas las pestañas -->
       @if (lines().length > 0 || pagos.length > 0) {
         <div class="mt-4">
           <app-comercial-documento-resumen
