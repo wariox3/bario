@@ -11,6 +11,7 @@ import {
   calcularResumen,
   ErpSelectDataService,
   SELECT_ENDPOINTS,
+  asesorLabel,
   type DocumentoEstados,
   type ErpSelectOption,
   type ResumenDocumento,
@@ -31,7 +32,6 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { asesorLabel } from '../../factura-venta-recurrente.constants';
 import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.model';
 
 /** Cabecera legible de la factura recurrente para la ficha (solo lo que trae `getById`). */

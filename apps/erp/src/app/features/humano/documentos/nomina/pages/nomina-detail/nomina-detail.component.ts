@@ -15,8 +15,13 @@ import {
   type DocumentoEstados,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
-import type { DocumentEntityConfig } from '@erp/core/module-config';
+import {
+  CAPACIDADES_DOCUMENTO_VACIAS,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  capacidadesDocumento,
+} from '@erp/core/module-config';
+import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { humanoDocumentoBreadcrumb } from '@erp/features/humano/shared/humano-breadcrumb';
@@ -88,19 +93,14 @@ export class NominaDetailComponent implements OnInit {
   });
 
   /**
-   * Un documento anulado queda congelado: ni se aprueba ni se desaprueba.
-   * El legacy solo ofrecía desaprobar; acá se ofrecen las dos porque si no,
-   * desaprobar sería un camino sin retorno.
+   * Qué acciones ofrece la botonera. La regla es la de cualquier documento y
+   * vive en `documento.estado.ts`; acá solo se le pasan las banderas. El legacy
+   * solo ofrecía desaprobar; acá se ofrecen las dos porque si no, desaprobar
+   * sería un camino sin retorno.
    */
-  protected readonly canAprobar = computed(() => {
-    const c = this.cabecera();
-    return !!c && !c.estado_aprobado && !c.estado_anulado;
-  });
-
-  protected readonly canDesaprobar = computed(() => {
-    const c = this.cabecera();
-    return !!c && c.estado_aprobado && !c.estado_anulado;
-  });
+  protected readonly capacidades = computed<CapacidadesDocumento>(() =>
+    this.cabecera() ? capacidadesDocumento(this.estados()) : CAPACIDADES_DOCUMENTO_VACIAS,
+  );
 
   /** Empleado en una sola línea: `<identificación> - <nombre>`. */
   protected readonly empleado = computed(() => {

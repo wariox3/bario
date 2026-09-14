@@ -16,8 +16,12 @@ import {
   type DocumentoEstados,
 } from '@reddoc/core';
 import { BreadcrumbComponent, DataTableComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
-import type { DocumentEntityConfig } from '@erp/core/module-config';
+import {
+  CAPACIDADES_DOCUMENTO_VACIAS,
+  ENTITY_DATA_GATEWAY,
+  capacidadesDocumento,
+} from '@erp/core/module-config';
+import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { humanoDocumentoBreadcrumb } from '@erp/features/humano/shared/humano-breadcrumb';
@@ -94,16 +98,13 @@ export class SeguridadSocialDetailComponent implements OnInit {
     };
   });
 
-  /** Un documento anulado queda congelado: ni se aprueba ni se desaprueba. */
-  protected readonly canAprobar = computed(() => {
-    const c = this.cabecera();
-    return !!c && !c.estado_aprobado && !c.estado_anulado;
-  });
-
-  protected readonly canDesaprobar = computed(() => {
-    const c = this.cabecera();
-    return !!c && !!c.estado_aprobado && !c.estado_anulado;
-  });
+  /**
+   * Qué acciones ofrece la botonera. La regla es la de cualquier documento y
+   * vive en `documento.estado.ts`; acá solo se le pasan las banderas.
+   */
+  protected readonly capacidades = computed<CapacidadesDocumento>(() =>
+    this.cabecera() ? capacidadesDocumento(this.estados()) : CAPACIDADES_DOCUMENTO_VACIAS,
+  );
 
   /** Empleado en una sola línea: `<identificación> - <nombre>`. */
   protected readonly empleado = computed(() => {

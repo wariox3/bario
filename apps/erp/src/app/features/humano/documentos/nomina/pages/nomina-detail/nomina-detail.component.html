@@ -16,8 +16,8 @@
   @if (cabecera(); as c) {
     <app-document-detail-actions
       [documentoId]="id()"
-      [canAprobar]="canAprobar()"
-      [canDesaprobar]="canDesaprobar()"
+      [canAprobar]="capacidades().puedeAprobar"
+      [canDesaprobar]="capacidades().puedeDesaprobar"
       [contabilizado]="!!estados().estado_contabilizado"
       (aprobar)="onAprobar()"
       (desaprobar)="onDesaprobar()"

@@ -121,15 +121,9 @@ export class NominaElectronicaDetailComponent implements OnInit {
    * Qué acciones ofrece la botonera. Una sola fuente: la tabla pura de
    * `nomina-electronica.estado.ts`, no cuatro condiciones sueltas en el template.
    */
-  protected readonly capacidades = computed<CapacidadesNominaElectronica>(() => {
-    const c = this.cabecera();
-    if (!c) return CAPACIDADES_VACIAS;
-    return capacidadesDe({
-      estado_aprobado: c.estado_aprobado ?? false,
-      estado_anulado: c.estado_anulado ?? false,
-      estado_electronico_enviado: c.estado_electronico_enviado ?? false,
-    });
-  });
+  protected readonly capacidades = computed<CapacidadesNominaElectronica>(() =>
+    this.cabecera() ? capacidadesDe(this.estados()) : CAPACIDADES_VACIAS,
+  );
 
   /** Empleado en una sola línea: `<identificación> - <nombre>`. */
   protected readonly empleado = computed(() => {

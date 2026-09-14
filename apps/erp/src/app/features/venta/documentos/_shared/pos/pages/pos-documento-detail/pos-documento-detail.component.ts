@@ -19,8 +19,13 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
-import type { DocumentEntityConfig } from '@erp/core/module-config';
+import {
+  CAPACIDADES_DOCUMENTO_VACIAS,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  capacidadesDocumento,
+} from '@erp/core/module-config';
+import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos/comercial/components/comercial-documento-lineas-table/comercial-documento-lineas-table.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
@@ -135,6 +140,16 @@ export class PosDocumentoDetailComponent implements OnInit {
     const canEditRow = this.document().canEditRow;
     if (!canEditRow) return true;
     return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
+  });
+
+  /**
+   * Qué acciones ofrece la botonera con las banderas actuales. La regla vive en
+   * `documento.estado.ts` (módulo puro y testeado), no en los `[disabled]` del
+   * template, que es donde el ERP anterior terminó contradiciéndose.
+   */
+  protected readonly capacidades = computed<CapacidadesDocumento>(() => {
+    const cab = this.cabecera();
+    return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
   });
 
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */

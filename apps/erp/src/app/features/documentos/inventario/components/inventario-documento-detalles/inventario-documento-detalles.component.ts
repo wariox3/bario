@@ -13,6 +13,7 @@ import {
   SELECT_ENDPOINTS,
   ToastService,
   formatCop,
+  toFiniteNumber,
   type ErpSelectOption,
 } from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
@@ -335,7 +336,14 @@ export class InventarioDocumentoDetallesComponent {
     this.itemService
       .getById(opt.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((item) => group.controls.precio.setValue(item[field] ?? item.costo ?? 0));
+      // El backend serializa los costos como decimal en texto ("1500.000000"): sin
+      // normalizar, el precio queda string y `inventarioDetalleToPayload` revienta
+      // en `.toFixed` antes de enviar nada, dejando el guardado colgado.
+      .subscribe((item) =>
+        group.controls.precio.setValue(
+          toFiniteNumber(item[field]) ?? toFiniteNumber(item.costo) ?? 0,
+        ),
+      );
   }
 
   /** Ejecuta la baja: local en alta/línea no persistida; contra la API en edición. */

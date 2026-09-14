@@ -24,8 +24,8 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
-      [canAprobar]="!cabecera()?.estados?.estado_aprobado"
-      [canDesaprobar]="!!cabecera()?.estados?.estado_aprobado"
+      [canAprobar]="capacidades().puedeAprobar"
+      [canDesaprobar]="capacidades().puedeDesaprobar"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (aprobar)="onAprobar()"
       (desaprobar)="onDesaprobar()"

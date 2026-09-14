@@ -24,11 +24,14 @@
     />
     <app-document-detail-actions
       [documentoId]="id()"
-      [canAprobar]="!cabecera()?.estados?.estado_aprobado"
-      [canDesaprobar]="!!cabecera()?.estados?.estado_aprobado"
+      [canAprobar]="capacidades().puedeAprobar"
+      [canDesaprobar]="capacidades().puedeDesaprobar"
+      [showAnular]="true"
+      [canAnular]="capacidades().puedeAnular"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (aprobar)="onAprobar()"
       (desaprobar)="onDesaprobar()"
+      (anular)="onAnular()"
       (imprimir)="onImprimir()"
       (contabilizacionChanged)="onContabilizacionChanged()"
     />
@@ -96,6 +99,10 @@
         <dd class="remision-detail__value">{{ c.sede || '—' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
+        <dt class="remision-detail__label">{{ det.labels.almacen }}</dt>
+        <dd class="remision-detail__value">{{ c.almacen || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
         <dt class="remision-detail__label">{{ det.labels.asesor }}</dt>
         <dd class="remision-detail__value">{{ c.asesor || '—' }}</dd>
       </div>
@@ -123,6 +130,7 @@
       <app-comercial-documento-lineas-table
         [lines]="lines()"
         [linkable]="true"
+        [almacenEnabled]="true"
         (verAfectacion)="onVerAfectacion($event)"
       />
 

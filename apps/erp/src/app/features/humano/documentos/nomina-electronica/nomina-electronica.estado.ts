@@ -3,32 +3,20 @@
  * estado. Módulo **puro**: sin Angular, sin HTTP, testeado en
  * `nomina-electronica.estado.spec.ts`.
  *
- * Misma disciplina que los tres procesos de humano, y por el mismo motivo: acá
- * hay cuatro acciones que se habilitan por combinaciones de tres banderas, y
- * repartir esa lógica en `[disabled]` del template es como estaba en el ERP
- * anterior — donde una de las cuatro condiciones se escribió distinta en el
- * botón y en el dropdown.
- *
- * A diferencia de los procesos, acá **no hay etapa** que derivar: no existe un
- * `estado_generado`. El documento nace aprobado o sin aprobar y de ahí se mueve.
+ * El eje de aprobación —aprobar, desaprobar, anular— es el de cualquier
+ * documento y vive en `@erp/core/module-config`. Este archivo existe solo por lo
+ * que la nómina electrónica agrega encima: **emitir a la DIAN**. Por eso
+ * compone sobre la base en vez de reescribirla; si mañana cambia la regla de
+ * anular, cambia en un sitio y este documento la hereda.
  */
+import { capacidadesDocumento, type CapacidadesDocumento } from '@erp/core/module-config';
+import type { DocumentoEstados } from '@reddoc/core';
 
-/** Contexto de decisión: las tres banderas que gobiernan las cuatro acciones. */
-export interface ContextoNominaElectronica {
-  readonly estado_aprobado: boolean;
-  readonly estado_anulado: boolean;
-  /** Ya se envió a la DIAN (esperando o con respuesta). */
-  readonly estado_electronico_enviado: boolean;
-}
+/** Contexto de decisión: las banderas de estado del documento. */
+export type ContextoNominaElectronica = DocumentoEstados;
 
-/** Lo que la ficha puede ofrecer con las banderas actuales. Una por acción. */
-export interface CapacidadesNominaElectronica {
-  /** Aprobar el documento: requisito para todo lo demás. */
-  readonly puedeAprobar: boolean;
-  /** Revertir la aprobación. */
-  readonly puedeDesaprobar: boolean;
-  /** Anular: irreversible, congela el documento. */
-  readonly puedeAnular: boolean;
+/** Lo que la ficha puede ofrecer: el eje de aprobación más emitir. */
+export interface CapacidadesNominaElectronica extends CapacidadesDocumento {
   /** Emitir a la DIAN. */
   readonly puedeEmitir: boolean;
 }
@@ -36,47 +24,28 @@ export interface CapacidadesNominaElectronica {
 /**
  * Traduce las banderas a capacidades concretas.
  *
- * Reglas, tomadas de los `[disabled]` del ERP anterior:
+ * Lo propio de este documento es una sola fila:
  *
- * | Acción     | sin aprobar | aprobada | emitida | anulada |
- * | ---------- | ----------- | -------- | ------- | ------- |
- * | Aprobar    | sí          | no       | no      | no      |
- * | Desaprobar | no          | sí       | sí      | no      |
- * | Anular     | no          | sí       | sí      | no      |
- * | Emitir     | no          | sí       | no      | no      |
+ * | Acción | sin aprobar | aprobada | emitida | anulada |
+ * | ------ | ----------- | -------- | ------- | ------- |
+ * | Emitir | no          | sí       | no      | no      |
  *
- * Dos cosas que la tabla deja ver mejor que el template:
- *
- * - **Anulada gana sobre todo.** Un documento anulado queda congelado; las
- *   cuatro acciones se apagan. Es la única bandera que corta por sí sola.
- * - **Emitir es de un solo uso**, pero desaprobar y anular siguen disponibles
- *   después de emitir. Esa asimetría es del legacy y se conserva: emitir dos
- *   veces el mismo documento a la DIAN no es idempotente.
+ * **Emitir es de un solo uso**, pero desaprobar sigue disponible después de
+ * emitir. Esa asimetría es del legacy y se conserva: emitir dos veces el mismo
+ * documento a la DIAN no es idempotente.
  *
  * **Imprimir no es una capacidad**: está siempre disponible, así que declararla
  * solo agregaría una constante en `true`.
  */
 export function capacidadesDe(ctx: ContextoNominaElectronica): CapacidadesNominaElectronica {
-  if (ctx.estado_anulado) {
-    return {
-      puedeAprobar: false,
-      puedeDesaprobar: false,
-      puedeAnular: false,
-      puedeEmitir: false,
-    };
-  }
+  const puedeEmitir =
+    !ctx.estado_anulado && (ctx.estado_aprobado ?? false) && !ctx.estado_electronico_enviado;
 
-  return {
-    puedeAprobar: !ctx.estado_aprobado,
-    puedeDesaprobar: ctx.estado_aprobado,
-    puedeAnular: ctx.estado_aprobado,
-    puedeEmitir: ctx.estado_aprobado && !ctx.estado_electronico_enviado,
-  };
+  return { ...capacidadesDocumento(ctx), puedeEmitir };
 }
 
 /** Capacidades con todo apagado: estado inicial mientras la cabecera carga. */
 export const CAPACIDADES_VACIAS: CapacidadesNominaElectronica = capacidadesDe({
   estado_aprobado: false,
   estado_anulado: true,
-  estado_electronico_enviado: false,
 });

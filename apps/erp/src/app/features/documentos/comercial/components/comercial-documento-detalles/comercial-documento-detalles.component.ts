@@ -66,7 +66,7 @@ import {
   tasaFromImpuestoOption,
   type ImpuestoSeleccionarOption,
 } from '@erp/core/components/impuesto-select/impuesto-seleccionar.types';
-import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
+import { ErpSelectDataService, SELECT_ENDPOINTS, type ErpSelectOption } from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import { ItemService } from '@erp/features/general/masters/item/item.service';
 import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
@@ -196,6 +196,14 @@ export class ComercialDocumentoDetallesComponent {
 
   /** Catálogo del select de almacén de la línea. */
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+
+  /**
+   * Almacén de la cabecera, para precargarlo en cada línea nueva (incluidas las
+   * que entran por el lector de código de barras). Lo pasa el documento que tiene
+   * almacén general; la persona cambia después las líneas que sean la excepción.
+   * No toca las líneas ya creadas ni las que llegan en edición con su almacén.
+   */
+  readonly almacenPorDefecto = input<ErpSelectOption | null>(null);
 
   /**
    * Muestra la columna **Detalle** (la nota libre por línea). Default `true`.
@@ -338,7 +346,7 @@ export class ComercialDocumentoDetallesComponent {
   }
 
   protected addLinea(): void {
-    this.detalles().push(createComercialDetalleGroup());
+    this.detalles().push(createComercialDetalleGroup(undefined, this.almacenPorDefecto()));
   }
 
   /**
