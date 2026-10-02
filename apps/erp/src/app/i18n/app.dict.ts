@@ -3176,8 +3176,6 @@ export interface AppDict
           nombrePlaceholder: string;
           fechaDesde: string;
           fechaHasta: string;
-          fechaHastaPeriodo: string;
-          fechaHastaPeriodoHint: string;
           comentario: string;
           seleccionar: string;
         };

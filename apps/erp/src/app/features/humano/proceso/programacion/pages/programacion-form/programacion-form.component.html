@@ -41,7 +41,7 @@
     </div>
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         <!-- Tipo de pago -->
         <div class="flex flex-col gap-1.5">
           <label for="pago_tipo" class="programacion-form__label">
@@ -61,8 +61,22 @@
           />
         </div>
 
-        <!-- Grupo -->
+        <!-- Nombre -->
         <div class="flex flex-col gap-1.5">
+          <label for="nombre" class="programacion-form__label">{{ f.fields.nombre }}</label>
+          <input
+            id="nombre"
+            pInputText
+            formControlName="nombre"
+            type="text"
+            maxlength="100"
+            class="w-full"
+            [placeholder]="f.fields.nombrePlaceholder"
+          />
+        </div>
+
+        <!-- Grupo -->
+        <div class="flex flex-col gap-1.5 sm:col-start-1">
           <label for="grupo" class="programacion-form__label">
             {{ f.fields.grupo }}
             <span class="ml-px text-red-500">*</span>
@@ -81,22 +95,8 @@
           />
         </div>
 
-        <!-- Nombre -->
-        <div class="flex flex-col gap-1.5">
-          <label for="nombre" class="programacion-form__label">{{ f.fields.nombre }}</label>
-          <input
-            id="nombre"
-            pInputText
-            formControlName="nombre"
-            type="text"
-            maxlength="100"
-            class="w-full"
-            [placeholder]="f.fields.nombrePlaceholder"
-          />
-        </div>
-
-        <!-- Fecha desde -->
-        <div class="flex flex-col gap-1.5">
+        <!-- Fecha desde: arranca fila, debajo del grupo -->
+        <div class="flex flex-col gap-1.5 sm:col-start-1">
           <label for="fecha_desde" class="programacion-form__label">
             {{ f.fields.fechaDesde }}
             <span class="ml-px text-red-500">*</span>
@@ -135,31 +135,8 @@
           />
         </div>
 
-        <!-- Fecha hasta periodo -->
-        <div class="flex flex-col gap-1.5">
-          <label for="fecha_hasta_periodo" class="programacion-form__label">
-            {{ f.fields.fechaHastaPeriodo }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <p-datepicker
-            inputId="fecha_hasta_periodo"
-            formControlName="fecha_hasta_periodo"
-            [showIcon]="true"
-            appendTo="body"
-            [fluid]="true"
-            [invalid]="
-              form.controls.fecha_hasta_periodo.invalid && form.controls.fecha_hasta_periodo.touched
-            "
-          />
-          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.fechaHastaPeriodoHint }}</p>
-          <lib-field-error
-            [control]="form.controls.fecha_hasta_periodo"
-            [messages]="{ required: f.validation.required }"
-          />
-        </div>
-
         <!-- Comentario -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-3">
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
           <label for="comentario" class="programacion-form__label">{{ f.fields.comentario }}</label>
           <textarea
             id="comentario"

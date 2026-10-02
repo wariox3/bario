@@ -134,7 +134,6 @@ export class ProgramacionFormComponent implements OnInit {
       nombre: this.fb.control<string | null>(null, Validators.maxLength(100)),
       fecha_desde: this.fb.control<Date | null>(primerDiaDelMes(), Validators.required),
       fecha_hasta: this.fb.control<Date | null>(ultimoDiaDelMes(), Validators.required),
-      fecha_hasta_periodo: this.fb.control<Date | null>(ultimoDiaDelMes(), Validators.required),
       comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
       pago_tipo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
       grupo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
@@ -293,7 +292,7 @@ function primerDiaDelMes(): Date {
 }
 
 /**
- * Último día del mes en curso. El legacy sembraba las tres fechas con el primer
+ * Último día del mes en curso. El legacy sembraba las fechas con el primer
  * día, lo que dejaba el formulario en error de duración desde el arranque; sembrar
  * el mes completo es el caso más común y arranca válido.
  */

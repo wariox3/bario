@@ -4093,8 +4093,6 @@ export const en: AppDict = {
           nombrePlaceholder: 'How to identify this run',
           fechaDesde: 'Date from',
           fechaHasta: 'Date to',
-          fechaHastaPeriodo: 'Period end date',
-          fechaHastaPeriodoHint: 'Period close, it may go further',
           comentario: 'Comment',
           seleccionar: 'Select…',
         },

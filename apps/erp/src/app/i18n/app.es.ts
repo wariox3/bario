@@ -4153,8 +4153,6 @@ export const es: AppDict = {
           nombrePlaceholder: 'Cómo identificar esta programación',
           fechaDesde: 'Fecha desde',
           fechaHasta: 'Fecha hasta',
-          fechaHastaPeriodo: 'Fecha hasta periodo',
-          fechaHastaPeriodoHint: 'Cierre del periodo, puede ir más allá',
           comentario: 'Comentario',
           seleccionar: 'Seleccionar…',
         },

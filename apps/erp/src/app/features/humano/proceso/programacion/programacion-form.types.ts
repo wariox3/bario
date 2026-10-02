@@ -14,7 +14,6 @@ export interface ProgramacionFormRawValue extends ProgramacionBanderas {
   readonly nombre: string | null;
   readonly fecha_desde: Date | null;
   readonly fecha_hasta: Date | null;
-  readonly fecha_hasta_periodo: Date | null;
   readonly comentario: string | null;
   readonly pago_tipo: ErpSelectOption | null;
   readonly grupo: ErpSelectOption | null;

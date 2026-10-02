@@ -43,7 +43,6 @@ export function programacionToFormValue(read: Programacion): Partial<Programacio
     nombre: read.nombre,
     fecha_desde: fromIsoDate(read.fecha_desde),
     fecha_hasta: fromIsoDate(read.fecha_hasta),
-    fecha_hasta_periodo: fromIsoDate(read.fecha_hasta_periodo),
     comentario: read.comentario,
     pago_tipo:
       read.pago_tipo_id != null
@@ -79,7 +78,8 @@ export function formValueToPayload(
     nombre: raw.nombre,
     fecha_desde: toIsoDate(raw.fecha_desde),
     fecha_hasta: toIsoDate(raw.fecha_hasta),
-    fecha_hasta_periodo: toIsoDate(raw.fecha_hasta_periodo),
+    // El backend lo exige, pero el formulario ya no lo pide: el periodo cierra con el rango.
+    fecha_hasta_periodo: toIsoDate(raw.fecha_hasta),
     comentario: raw.comentario,
     pago_tipo: raw.pago_tipo?.id ?? null,
     grupo: raw.grupo?.id ?? null,
