@@ -32,6 +32,7 @@ import type { Programacion } from '../../programacion.model';
 import {
   PROGRAMACION_EXPORTS,
   ProgramacionService,
+  cuerpoDe,
   type ProgramacionExportKey,
 } from '../../programacion.service';
 
@@ -318,13 +319,13 @@ export class ProgramacionWorkspaceComponent implements OnInit {
     this.descargar(this.service.imprimirNominasUrl, 'nominas.pdf');
   }
 
-  /** PDFs: el id va en el body, como los pide el legacy. */
+  /** PDFs: la programación va en el body, como en las demás acciones. */
   private descargar(url: string, archivo: string): void {
     const toasts = this.t().common.toasts;
     this.fileDownload
       .download(url, {
         method: 'POST',
-        body: { id: this.programacionId() },
+        body: cuerpoDe(this.programacionId()),
         fallbackFilename: archivo,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))

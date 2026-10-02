@@ -292,7 +292,7 @@ export class ProgramacionRenglonesTabComponent {
   private eliminar(ids: readonly number[]): void {
     this.isBusy.set(true);
     this.service
-      .eliminarRenglones(ids)
+      .eliminarRenglones(this.programacionId(), ids)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isBusy.set(false)),
@@ -320,7 +320,7 @@ export class ProgramacionRenglonesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarRenglones(id, page + 1, this.pageSize)
+      .listarRenglones(id, page, this.pageSize)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

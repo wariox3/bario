@@ -7,13 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type {
-  CargarContratosResultado,
-  GenerarResultado,
-  Programacion,
-  ProgramacionDetalle,
-  ProgramacionPayload,
-} from './programacion.model';
+import type { Programacion, ProgramacionDetalle, ProgramacionPayload } from './programacion.model';
 
 /** Endpoint del proceso. */
 export const PROGRAMACION_ENDPOINT = '/humano/programacion/';
@@ -34,6 +28,10 @@ export const PROGRAMACION_DETALLE_ENDPOINT = '/humano/programacion-detalle/';
  * Los métodos están agrupados por etapa para que el ciclo se lea en el archivo.
  * **Quién puede llamar a cada uno lo decide `programacion.estado.ts`**, no este
  * servicio: acá solo vive el transporte.
+ *
+ * Las acciones sobre una programación (`cargar-contrato/`, `generar/`,
+ * `eliminar-detalle/`…) la identifican con `programacion_id` en el cuerpo, no con
+ * `id`, y responden la programación ya actualizada.
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
@@ -76,7 +74,11 @@ export class ProgramacionService extends BaseHttpService {
   // ── Renglones ─────────────────────────────────────────────────────────────
 
   /**
-   * Página de renglones. `page` es 1-based, como espera el backend.
+   * Página de renglones de una programación, ordenados por contrato.
+   *
+   * Va por `POST …/lista/` con el filtro y el orden en el cuerpo: el recurso no
+   * acepta `GET` en la raíz (responde 405). `page` es 0-based, como en todo
+   * `ListQuery`; `buildListParams` lo pasa a 1-based para el backend.
    *
    * El legacy pedía `limit: 1000` para traerlos todos de una; acá se pagina de
    * verdad: una programación de una empresa grande no cabe en una página.
@@ -84,14 +86,19 @@ export class ProgramacionService extends BaseHttpService {
   listarRenglones(
     programacionId: number,
     page: number,
-    limit: number,
+    pageSize: number,
   ): Observable<PaginatedResponse<ProgramacionDetalle>> {
-    return this.get<PaginatedResponse<ProgramacionDetalle>>(PROGRAMACION_DETALLE_ENDPOINT, {
-      programacion_id: programacionId,
+    const query: ListQuery = {
+      filters: [{ field: 'programacion_id', operator: 'eq', value: programacionId }],
+      sort: [{ field: 'contrato_id', direction: 'asc' }],
       page,
-      limit,
-      ordering: 'contrato_id',
-    });
+      pageSize,
+    };
+    return this.post<PaginatedResponse<ProgramacionDetalle>>(
+      `${PROGRAMACION_DETALLE_ENDPOINT}lista/`,
+      buildListBody(query),
+      buildListParams(query),
+    );
   }
 
   /** Trae un renglón por id (lo usa el modal de edición). */
@@ -104,37 +111,50 @@ export class ProgramacionService extends BaseHttpService {
     return this.put<ProgramacionDetalle>(`${PROGRAMACION_DETALLE_ENDPOINT}${id}/`, payload);
   }
 
-  /** Quita renglones de la programación (DELETE por id, en paralelo). */
-  eliminarRenglones(ids: readonly number[]): Observable<void> {
+  /**
+   * Quita renglones de la programación, todos en una petición.
+   *
+   * ⚠️ Sin `ids` el backend borra **todos** los renglones de la programación. Una
+   * lista vacía no se manda: que no haya nada seleccionado nunca debe vaciarla.
+   */
+  eliminarRenglones(programacionId: number, ids: readonly number[]): Observable<void> {
     if (ids.length === 0) return of(undefined);
-    const deletions = ids.map((id) => this.delete<void>(`${PROGRAMACION_DETALLE_ENDPOINT}${id}/`));
-    return forkJoin(deletions).pipe(map(() => undefined));
+    return this.post<Programacion>(`${this.resourcePath}eliminar-detalle/`, {
+      programacion_id: programacionId,
+      ids,
+    }).pipe(map(() => undefined));
   }
 
-  /** Trae los contratos del grupo como renglones de la programación. */
-  cargarContratos(id: number): Observable<CargarContratosResultado> {
-    return this.post<CargarContratosResultado>(`${this.resourcePath}cargar-contrato/`, { id });
+  /**
+   * Trae los contratos del grupo que le aplican según el tipo de pago. Los que ya
+   * tienen renglón no se tocan. Responde la programación con su `contratos` al día.
+   */
+  cargarContratos(id: number): Observable<Programacion> {
+    return this.post<Programacion>(`${this.resourcePath}cargar-contrato/`, cuerpoDe(id));
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   /** Liquida: **crea los documentos de nómina**, uno por renglón. */
-  generar(id: number): Observable<GenerarResultado> {
-    return this.post<GenerarResultado>(`${this.resourcePath}generar/`, { id });
+  generar(id: number): Observable<Programacion> {
+    return this.post<Programacion>(`${this.resourcePath}generar/`, cuerpoDe(id));
   }
 
   /** Revierte la liquidación: **borra los documentos de nómina**. */
-  desgenerar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}desgenerar/`, { id });
+  desgenerar(id: number): Observable<Programacion> {
+    return this.post<Programacion>(`${this.resourcePath}desgenerar/`, cuerpoDe(id));
   }
 
-  /** Aprueba (contabiliza) las nóminas generadas. */
-  aprobar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}aprobar/`, { id });
+  /**
+   * Aprueba las nóminas generadas: abona los créditos y mueve la fecha de último
+   * pago de los contratos.
+   */
+  aprobar(id: number): Observable<Programacion> {
+    return this.post<Programacion>(`${this.resourcePath}aprobar/`, cuerpoDe(id));
   }
 
-  desaprobar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}desaprobar/`, { id });
+  desaprobar(id: number): Observable<Programacion> {
+    return this.post<Programacion>(`${this.resourcePath}desaprobar/`, cuerpoDe(id));
   }
 
   /**
@@ -173,6 +193,11 @@ export class ProgramacionService extends BaseHttpService {
       limit: 1,
     });
   }
+}
+
+/** Cuerpo con el que las acciones del backend identifican una programación. */
+export function cuerpoDe(programacionId: number): { readonly programacion_id: number } {
+  return { programacion_id: programacionId };
 }
 
 /** Endpoint genérico de documentos: por ahí salen las nóminas generadas. */

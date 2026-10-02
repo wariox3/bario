@@ -195,15 +195,3 @@ export interface AdicionalProgramacionPayload {
   readonly programacion: number;
   readonly horas: number;
 }
-
-/** Respuesta de `cargar-contrato/`: cuántos contratos quedaron cargados. */
-export interface CargarContratosResultado {
-  readonly contratos: number;
-}
-
-/** Respuesta de `generar/`: los acumulados de la liquidación. */
-export interface GenerarResultado {
-  readonly total: number;
-  readonly devengado: number;
-  readonly deduccion: number;
-}
