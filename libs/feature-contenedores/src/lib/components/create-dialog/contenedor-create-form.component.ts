@@ -53,8 +53,6 @@ export class ContenedorCreateFormComponent {
   readonly created = output<void>();
   readonly updated = output<void>();
   readonly cancelled = output<void>();
-  // Nombre de la empresa mientras se crea (overlay full-screen), o null al terminar.
-  readonly creationOverlay = output<string | null>();
 
   readonly isSaving = signal(false);
 
@@ -128,7 +126,8 @@ export class ContenedorCreateFormComponent {
           },
         });
     } else {
-      this.creationOverlay.emit(this.form.controls.nombre.value ?? '');
+      // El backend responde 202 apenas registra el contenedor: el resto de la
+      // creación sigue en segundo plano y la lista lo vigila por su `estado`.
       const { nombre, schema_name, celular, correo } = this.form.getRawValue();
       this.contenedorService
         .createContenedor({
@@ -141,14 +140,12 @@ export class ContenedorCreateFormComponent {
         .subscribe({
           next: () => {
             this.isSaving.set(false);
-            this.creationOverlay.emit(null);
             const toasts = this.t().contenedores.create.toasts;
             this.toastService.success(toasts.success.title, toasts.success.desc);
             this.created.emit();
           },
           error: (err) => {
             this.isSaving.set(false);
-            this.creationOverlay.emit(null);
             this.formErrors.handle(this.form, err, this.t().contenedores.create.toasts.error.title);
           },
         });

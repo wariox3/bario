@@ -176,6 +176,8 @@ export type {
   UpdateContenedorResponse,
   Contenedor,
   ContenedorDetalle,
+  ContenedorEstado,
+  ContenedorEstadoResponse,
   ContenedorAccesoFlags,
   ContenedorMember,
   ContenedorMembersResponse,

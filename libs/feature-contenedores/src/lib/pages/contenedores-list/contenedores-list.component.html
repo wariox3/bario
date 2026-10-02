@@ -127,6 +127,10 @@
                     [expiredBadgeLabel]="t().contenedores.list.expired.badge"
                     [ownerLabel]="t().contenedores.list.roles.propietario"
                     [memberLabel]="t().contenedores.list.roles.miembro"
+                    [creatingLabel]="
+                      creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
+                    "
+                    [errorLabel]="t().contenedores.list.estado.error"
                     (enter)="enterContenedor(item)"
                     (renew)="renewContenedor()"
                     (menuOpen)="openRowMenu($event, item)"
@@ -149,6 +153,10 @@
                   [expiredBadgeLabel]="t().contenedores.list.expired.badge"
                   [ownerLabel]="t().contenedores.list.roles.propietario"
                   [memberLabel]="t().contenedores.list.roles.miembro"
+                  [creatingLabel]="
+                    creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
+                  "
+                  [errorLabel]="t().contenedores.list.estado.error"
                   (enter)="enterContenedor(item)"
                   (renew)="renewContenedor()"
                   (menuOpen)="openRowMenu($event, item)"

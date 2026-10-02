@@ -39,6 +39,18 @@ export const contenedoresEs: ContenedoresDict = {
       ownerCta: 'Renovar suscripción',
       memberLocked: 'Solo el propietario puede renovar',
     },
+    estado: {
+      creando: 'Creando…',
+      error: 'No se pudo crear',
+      creandoPaso: 'Creando {paso}…',
+    },
+    toasts: {
+      ready: { title: 'Contenedor listo', desc: '{nombre} ya está listo para ingresar.' },
+      failed: {
+        title: 'No se pudo crear el contenedor',
+        desc: 'Algo falló al preparar {nombre}.',
+      },
+    },
     roles: {
       propietario: 'Propietario',
       miembro: 'Miembro',
@@ -67,7 +79,10 @@ export const contenedoresEs: ContenedoresDict = {
     submit: 'Crear contenedor',
     cancel: 'Cancelar',
     toasts: {
-      success: { title: 'Contenedor creado', desc: 'El contenedor fue creado correctamente.' },
+      success: {
+        title: 'Contenedor creado',
+        desc: 'Lo estamos preparando; te avisamos cuando esté listo.',
+      },
       error: {
         title: 'Error al crear',
         desc: 'No se pudo crear el contenedor. Intenta de nuevo.',

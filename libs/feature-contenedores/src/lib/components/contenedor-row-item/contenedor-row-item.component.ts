@@ -23,6 +23,8 @@ export class ContenedorRowItemComponent {
   readonly expiredBadgeLabel = input<string>('Vencida');
   readonly ownerLabel = input<string>('Propietario');
   readonly memberLabel = input<string>('Miembro');
+  readonly creatingLabel = input<string>('Creando…');
+  readonly errorLabel = input<string>('No se pudo crear');
   /** Muestra el botón de acciones de fila. La app lo apaga si no habilita ninguna. */
   readonly showMenu = input<boolean>(true);
   /** Muestra el CTA de renovación al propietario con la suscripción vencida. */
@@ -49,7 +51,16 @@ export class ContenedorRowItemComponent {
     isSuscripcionExpired(this.contenedor().suscripcion_fecha_fin),
   );
 
+  readonly isCreando = computed(() => this.contenedor().estado === 'creando');
+
+  readonly isError = computed(() => this.contenedor().estado === 'error');
+
+  /** Mientras se crea no hay acciones: el menú vuelve cuando termina (o falla). */
+  readonly menuDisabled = computed(() => !this.isOwner() || this.isCreando());
+
   protected onActivate(): void {
+    // Hasta estar `listo`, el backend responde 409 a cualquier petición del tenant.
+    if (this.contenedor().estado !== 'listo') return;
     if (this.isExpired()) {
       if (this.isOwner() && this.canRenew()) this.renew.emit();
       return;

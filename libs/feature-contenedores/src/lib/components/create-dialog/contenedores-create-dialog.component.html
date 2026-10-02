@@ -36,11 +36,6 @@
       (created)="onCreated()"
       (updated)="onUpdated()"
       (cancelled)="onCancel()"
-      (creationOverlay)="creationOverlayNombre.set($event)"
     />
   }
 </p-dialog>
-
-@if (creationOverlayNombre() !== null) {
-  <lib-contenedor-creation-overlay [nombreEmpresa]="creationOverlayNombre()!" />
-}

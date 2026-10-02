@@ -9,6 +9,7 @@ import {
 import type { PaginatedResponse } from '../models/pagination.model';
 import {
   ContenedorDetalle,
+  ContenedorEstadoResponse,
   ContenedorInvitacionesPendientesResponse,
   ContenedorMembersResponse,
   ContenedoresResponse,
@@ -47,8 +48,16 @@ export class ContenedorService extends BaseHttpService {
     return this.get<ContenedorDetalle>(`/contenedor/cliente/${id}/`);
   }
 
+  /**
+   * Responde 202 con el contenedor en `estado: creando`: la creación sigue en
+   * segundo plano y se sigue con `getEstado` hasta que deje de estar `creando`.
+   */
   createContenedor(payload: CreateContenedorRequest): Observable<ContenedorDetalle> {
     return this.post<ContenedorDetalle>('/contenedor/cliente/', payload);
+  }
+
+  getEstado(id: number): Observable<ContenedorEstadoResponse> {
+    return this.get<ContenedorEstadoResponse>(`/contenedor/cliente/${id}/estado/`);
   }
 
   updateContenedor(

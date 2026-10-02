@@ -21,6 +21,8 @@ export type { UpdateContenedorRequest, UpdateContenedorResponse } from './conten
 export type {
   Contenedor,
   ContenedorDetalle,
+  ContenedorEstado,
+  ContenedorEstadoResponse,
   ContenedorAccesoFlags,
   ContenedorMember,
   ContenedorMembersResponse,
