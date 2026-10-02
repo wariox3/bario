@@ -46,6 +46,12 @@ export type ColumnAlignment = 'left' | 'center' | 'right';
 /** Qué significa un `true` en una columna booleana: un estado deseable o uno adverso. */
 export type BooleanTone = 'positive' | 'negative';
 
+/**
+ * Tono con el que se resalta una celda según su fila (`ColumnDef.toneFor`):
+ * `positive` marca un hecho a notar (verde), `critical` un problema (rojo).
+ */
+export type CellTone = 'positive' | 'critical';
+
 export interface ColumnDef {
   /** Nombre del campo en el row (acceso por `row[field]`). */
   readonly field: string;
@@ -90,4 +96,11 @@ export interface ColumnDef {
   readonly parts?: readonly ColumnPart[];
   /** Para `type === 'combined'`: separador entre partes. Default `'/'`. */
   readonly separator?: string;
+  /**
+   * Resalta la celda según la fila: devuelve el tono, o `null` para dejarla
+   * normal. Para marcas que el dato trae aparte de su valor —una fecha que cae
+   * en un ingreso, un error de la fila—; la página que lo use explica los
+   * colores con una leyenda.
+   */
+  readonly toneFor?: (row: unknown) => CellTone | null;
 }

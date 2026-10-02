@@ -63,7 +63,11 @@
         </td>
       }
       @for (col of columns(); track col.field) {
-        <td [style.text-align]="col.align ?? 'left'">
+        <td
+          [style.text-align]="col.align ?? 'left'"
+          [class.lib-data-table__cell--positive]="col.toneFor?.(row) === 'positive'"
+          [class.lib-data-table__cell--critical]="col.toneFor?.(row) === 'critical'"
+        >
           @switch (col.type) {
             @case ('boolean') {
               @let boolVal = readValue(row, col.field);
