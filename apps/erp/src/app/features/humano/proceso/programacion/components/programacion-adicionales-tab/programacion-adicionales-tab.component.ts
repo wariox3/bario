@@ -174,7 +174,7 @@ export class ProgramacionAdicionalesTabComponent {
     // El acote a la programación viaja como filtro de la consulta: así se reusa el
     // `list` del master sin tocarlo.
     const filters: readonly FilterCondition[] = [
-      { field: 'programacion', operator: 'eq', value: id },
+      { field: 'programacion_id', operator: 'eq', value: id },
     ];
     const query: ListQuery = { filters, sort: [], page, pageSize: this.pageSize() };
 

@@ -65,5 +65,5 @@ export class DocumentoMovimientosService extends BaseHttpService {
 }
 
 function filtroDocumento(documentoId: number): readonly FilterCondition[] {
-  return [{ field: 'documento', operator: 'eq', value: documentoId }];
+  return [{ field: 'documento_id', operator: 'eq', value: documentoId }];
 }
