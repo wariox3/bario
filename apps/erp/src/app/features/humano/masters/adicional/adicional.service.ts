@@ -33,6 +33,18 @@ export class AdicionalService extends BaseHttpService {
     return this.put<Adicional>(`${this.resourcePath}${id}/`, payload);
   }
 
+  /**
+   * Importa adicionales desde un Excel (multipart, campo `archivo`). El backend
+   * procesa todo o nada: si una fila falla, no guarda ninguna.
+   *
+   * `contexto` viaja como campos extra del multipart. La programación manda
+   * `programacion_id` para que lo importado quede colgado de ella, como hacía el
+   * ERP anterior; el schema del `importar/` solo declara `archivo`.
+   */
+  importar(file: File, contexto?: { readonly programacion_id: number }): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file, contexto);
+  }
+
   remove(ids: readonly number[]): Observable<void> {
     if (ids.length === 0) {
       return new Observable<void>((subscriber) => {

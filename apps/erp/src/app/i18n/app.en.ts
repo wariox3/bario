@@ -4193,6 +4193,10 @@ export const en: AppDict = {
         createTitle: 'New additional concept',
         editTitle: 'Edit additional concept',
         subtitle: "It is added to this period's settlement",
+        import: {
+          title: 'Import additionals',
+          subtitle: "Upload the Excel file with this period's additionals",
+        },
         fields: {
           contrato: 'Employee',
           contratoPlaceholder: 'Search by name or tax ID…',

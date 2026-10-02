@@ -4256,6 +4256,10 @@ export const es: AppDict = {
         createTitle: 'Nuevo adicional',
         editTitle: 'Editar adicional',
         subtitle: 'Se suma a la liquidación de este periodo',
+        import: {
+          title: 'Importar adicionales',
+          subtitle: 'Sube el Excel con los adicionales de este periodo',
+        },
         fields: {
           contrato: 'Empleado',
           contratoPlaceholder: 'Buscar por nombre o identificación…',

@@ -3265,6 +3265,7 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         subtitle: string;
+        import: { title: string; subtitle: string };
         fields: {
           contrato: string;
           contratoPlaceholder: string;

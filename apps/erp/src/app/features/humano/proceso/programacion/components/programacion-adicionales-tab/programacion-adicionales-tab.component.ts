@@ -16,6 +16,8 @@ import {
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { AdicionalService } from '@erp/features/humano/masters/adicional/adicional.service';
 import type { Adicional } from '@erp/features/humano/masters/adicional/adicional.model';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { AppDict } from '@erp/i18n';
 import { ADICIONALES_PROGRAMACION_COLUMNS } from '../../programacion.constants';
 import type { CapacidadesProgramacion } from '../../programacion.estado';
@@ -34,7 +36,7 @@ import type { CapacidadesProgramacion } from '../../programacion.estado';
 @Component({
   selector: 'app-programacion-adicionales-tab',
   standalone: true,
-  imports: [ConfirmDialogModule, DataTableComponent, DataToolbarComponent],
+  imports: [ConfirmDialogModule, DataTableComponent, DataToolbarComponent, ImportDialogComponent],
   providers: [ConfirmationService, DialogService],
   templateUrl: './programacion-adicionales-tab.component.html',
 })
@@ -74,6 +76,34 @@ export class ProgramacionAdicionalesTabComponent {
       : [],
   );
 
+  /** "Acciones" de la tabla, como en los masters: por ahora solo importar. */
+  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() =>
+    this.capacidades().puedeGestionarAdicionales && !this.isBusy()
+      ? [
+          {
+            id: 'actions',
+            labelKey: 'common.actions.actions',
+            iconClass: '',
+            children: [
+              { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
+            ],
+          },
+        ]
+      : [],
+  );
+
+  /** Plantilla de ejemplo que sirve el backend para armar el archivo. */
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/humano/adicional/importar-ejemplo/',
+  };
+
+  /** Importación masiva: lo subido queda en esta programación y la tabla vuelve a la página 1. */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file, { programacion_id: this.programacionId() }),
+    onImported: () => this.loadPage(0),
+  });
+
   protected readonly primaryAction = computed<ToolbarAction | null>(() =>
     this.capacidades().puedeGestionarAdicionales && !this.isBusy()
       ? { id: 'new', labelKey: 'common.actions.new', iconClass: 'pi pi-plus' }
@@ -101,6 +131,7 @@ export class ProgramacionAdicionalesTabComponent {
 
   protected onToolbarAction(actionId: string): void {
     if (actionId === 'new') this.abrirModal(null);
+    if (actionId === 'import') this.importar.open();
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {

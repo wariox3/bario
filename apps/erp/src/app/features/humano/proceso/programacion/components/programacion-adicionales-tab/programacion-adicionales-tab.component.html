@@ -1,6 +1,7 @@
 <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
   <lib-data-toolbar
     [primaryAction]="primaryAction()"
+    [trailingActions]="trailingActions()"
     [searchEnabled]="false"
     [filtersEnabled]="false"
     [deleteSelectedEnabled]="hasSelection() && capacidades().puedeGestionarAdicionales"
@@ -24,5 +25,19 @@
     (rowActionInvoked)="onRowAction($event)"
   />
 </div>
+
+<app-import-dialog
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
+  [title]="t().entities.programacion.adicionales.import.title"
+  [subtitle]="t().entities.programacion.adicionales.import.subtitle"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
+  [exampleConfig]="exampleConfig"
+  (importRequested)="importar.submit($event)"
+/>
 
 <p-confirmDialog />
