@@ -34,7 +34,7 @@
     </span>
   </div>
 
-  <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-3 lg:grid-cols-6">
+  <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-3 lg:grid-cols-7">
     <div class="flex flex-col gap-0.5">
       <dt class="programacion-resumen__label">{{ res.labels.fechaDesde }}</dt>
       <dd class="programacion-resumen__value">{{ formatFecha(fechaDesde()) }}</dd>
@@ -42,6 +42,10 @@
     <div class="flex flex-col gap-0.5">
       <dt class="programacion-resumen__label">{{ res.labels.fechaHasta }}</dt>
       <dd class="programacion-resumen__value">{{ formatFecha(fechaHasta()) }}</dd>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <dt class="programacion-resumen__label">{{ res.labels.dias }}</dt>
+      <dd class="programacion-resumen__value tabular-nums">{{ p.dias ?? '—' }}</dd>
     </div>
     <div class="flex flex-col gap-0.5">
       <dt class="programacion-resumen__label">{{ res.labels.contratos }}</dt>
@@ -59,7 +63,7 @@
       <dt class="programacion-resumen__label">{{ res.labels.total }}</dt>
       <dd class="programacion-resumen__value font-bold tabular-nums">{{ formatMoney(total()) }}</dd>
     </div>
-    <div class="flex flex-col gap-0.5 sm:col-span-3 lg:col-span-6">
+    <div class="flex flex-col gap-0.5 sm:col-span-3 lg:col-span-7">
       <dt class="programacion-resumen__label">{{ res.labels.comentario }}</dt>
       <dd class="programacion-resumen__value">{{ p.comentario || '—' }}</dd>
     </div>

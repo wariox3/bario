@@ -1,5 +1,6 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import type { CellTone, ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import type { ProgramacionDetalle } from './programacion.model';
 
 export const PROGRAMACIONES_FILTERS_STORAGE_KEY = 'programaciones:filters:v1';
 
@@ -184,6 +185,31 @@ export const PROGRAMACIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
 
 // ── Renglones del workspace ─────────────────────────────────────────────────
 
+/** Las tres marcas del renglón que resaltan sus fechas. */
+type MarcasRenglon = Partial<Pick<ProgramacionDetalle, 'ingreso' | 'retiro' | 'error_terminacion'>>;
+
+function marcasDe(row: unknown): MarcasRenglon {
+  return row !== null && typeof row === 'object' ? (row as MarcasRenglon) : {};
+}
+
+/**
+ * Tono de la fecha desde: verde si el contrato **ingresó** dentro del periodo,
+ * rojo si su terminación tiene un error. El error gana: es lo que hay que atender.
+ * Mismo criterio que el ERP anterior.
+ */
+export function tonoFechaDesde(row: unknown): CellTone | null {
+  const m = marcasDe(row);
+  if (m.error_terminacion) return 'critical';
+  return m.ingreso ? 'positive' : null;
+}
+
+/** Tono de la fecha hasta: verde si el contrato **se retiró** dentro del periodo. */
+export function tonoFechaHasta(row: unknown): CellTone | null {
+  const m = marcasDe(row);
+  if (m.error_terminacion) return 'critical';
+  return m.retiro ? 'positive' : null;
+}
+
 /**
  * Columnas comunes a las tres variantes: quién es el empleado y qué tramo del
  * contrato se liquidó.
@@ -224,12 +250,14 @@ const RENGLON_COLUMNS_IDENTIFICACION: readonly ColumnDef[] = [
     headerKey: 'entities.programacion.renglones.columns.desde',
     type: 'date',
     width: '115px',
+    toneFor: tonoFechaDesde,
   },
   {
     field: 'fecha_hasta',
     headerKey: 'entities.programacion.renglones.columns.hasta',
     type: 'date',
     width: '115px',
+    toneFor: tonoFechaHasta,
   },
   {
     field: 'salario',

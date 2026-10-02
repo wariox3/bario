@@ -3204,6 +3204,7 @@ export interface AppDict
         labels: {
           fechaDesde: string;
           fechaHasta: string;
+          dias: string;
           contratos: string;
           devengado: string;
           deduccion: string;
@@ -3346,6 +3347,8 @@ export interface AppDict
         confirmEliminar: { header: string; message: string };
         confirmRecargar: { header: string; message: string };
         leyenda: { titulo: string; contenido: string };
+        /** Leyenda de los colores de las fechas (`tonoFechaDesde` / `tonoFechaHasta`). */
+        marcas: { ingresoRetiro: string; errorTerminacion: string };
         toasts: {
           cargarSuccess: { title: string; desc: string };
           cargarError: { title: string; desc: string };

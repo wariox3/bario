@@ -27,7 +27,11 @@ import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/e
 import type { AppDict } from '@erp/i18n';
 import type { CapacidadesProgramacion } from '../../programacion.estado';
 import type { ProgramacionDetalle } from '../../programacion.model';
-import { PROGRAMACION_RENGLONES_PAGE_SIZE } from '../../programacion.constants';
+import {
+  PROGRAMACION_RENGLONES_PAGE_SIZE,
+  tonoFechaDesde,
+  tonoFechaHasta,
+} from '../../programacion.constants';
 import { columnasDeRenglones, muestraHoras } from '../../programacion.renglones';
 import { ProgramacionService } from '../../programacion.service';
 
@@ -93,6 +97,19 @@ export class ProgramacionRenglonesTabComponent {
 
   /** Con horas hay que explicar las abreviaturas de las columnas. */
   protected readonly mostrarLeyenda = computed(() => muestraHoras(this.pagoTipoId()));
+
+  /**
+   * Qué colores de fecha hay en la página: la leyenda solo explica los que se
+   * ven. Sale de las mismas funciones que pintan las celdas.
+   */
+  protected readonly hayIngresoRetiro = computed(() =>
+    this.items().some(
+      (row) => tonoFechaDesde(row) === 'positive' || tonoFechaHasta(row) === 'positive',
+    ),
+  );
+  protected readonly hayErrorTerminacion = computed(() =>
+    this.items().some((row) => tonoFechaDesde(row) === 'critical'),
+  );
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 

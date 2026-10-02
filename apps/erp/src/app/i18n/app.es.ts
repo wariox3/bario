@@ -4192,6 +4192,7 @@ export const es: AppDict = {
         labels: {
           fechaDesde: 'Desde',
           fechaHasta: 'Hasta',
+          dias: 'Días',
           contratos: 'Contratos',
           devengado: 'Devengado',
           deduccion: 'Deducción',
@@ -4372,6 +4373,10 @@ export const es: AppDict = {
           titulo: 'Abreviaturas',
           contenido:
             'DT: días de transporte · D: diurna · N: nocturna · FD: festiva diurna · FN: festiva nocturna · ED: extra diurna · EN: extra nocturna · EFD: extra festiva diurna · EFN: extra festiva nocturna · RN: recargo nocturno · RFD: recargo festivo diurno · RFN: recargo festivo nocturno',
+        },
+        marcas: {
+          ingresoRetiro: 'El contrato ingresó o se retiró dentro del periodo',
+          errorTerminacion: 'La terminación del contrato tiene un error',
         },
         toasts: {
           cargarSuccess: { title: 'Contratos cargados', desc: 'empleados en la programación' },

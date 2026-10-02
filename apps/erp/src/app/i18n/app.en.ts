@@ -4129,6 +4129,7 @@ export const en: AppDict = {
         labels: {
           fechaDesde: 'From',
           fechaHasta: 'To',
+          dias: 'Days',
           contratos: 'Contracts',
           devengado: 'Earnings',
           deduccion: 'Deductions',
@@ -4309,6 +4310,10 @@ export const en: AppDict = {
           titulo: 'Abbreviations',
           contenido:
             'DT: transport days · D: day · N: night · FD: holiday day · FN: holiday night · ED: overtime day · EN: overtime night · EFD: overtime holiday day · EFN: overtime holiday night · RN: night premium · RFD: holiday day premium · RFN: holiday night premium',
+        },
+        marcas: {
+          ingresoRetiro: 'The contract started or ended within the period',
+          errorTerminacion: 'The contract termination has an error',
         },
         toasts: {
           cargarSuccess: { title: 'Contracts loaded', desc: 'employees in the run' },
