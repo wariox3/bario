@@ -64,7 +64,8 @@ const CAMPOS_BANDERA = [
  *
  * Un solo modal para los cuatro tipos de pago, con el bloque del medio
  * condicionado: la nómina del periodo edita horas; prima, cesantía e interés
- * editan las bases (salario y promedio) más el valor propuesto de la prestación.
+ * editan las bases (salario y promedio) más el valor propuesto de la prestación
+ * (`prima_propuesto`, `cesantia_propuesto` o `interes_propuesto`).
  * El ERP anterior tenía dos modales con el mismo formulario duplicado.
  *
  * Cierra con `true` si guardó, para que el llamador recargue.
@@ -100,14 +101,13 @@ export class EditarRenglonModalComponent {
   /** La nómina del periodo edita horas; el resto, bases y prestación propuesta. */
   protected readonly editaHoras = computed(() => this.data.pagoTipoId === PAGO_TIPO_ID.NOMINA);
 
-  /** Cesantía e interés piden además el valor propuesto de la prestación. */
-  protected readonly campoPropuesto = computed<'cesantia_propuesto' | 'interes_propuesto' | null>(
-    () => {
-      if (this.data.pagoTipoId === PAGO_TIPO_ID.CESANTIA) return 'cesantia_propuesto';
-      if (this.data.pagoTipoId === PAGO_TIPO_ID.INTERES_CESANTIA) return 'interes_propuesto';
-      return null;
-    },
-  );
+  /** Prima, cesantía e interés piden además el valor propuesto de su prestación. */
+  protected readonly campoPropuesto = computed<CampoPropuesto | null>(() => {
+    if (this.data.pagoTipoId === PAGO_TIPO_ID.PRIMA) return 'prima_propuesto';
+    if (this.data.pagoTipoId === PAGO_TIPO_ID.CESANTIA) return 'cesantia_propuesto';
+    if (this.data.pagoTipoId === PAGO_TIPO_ID.INTERES_CESANTIA) return 'interes_propuesto';
+    return null;
+  });
 
   protected readonly form = this.fb.group({
     dias_transporte: this.fb.control<number>(0, {
@@ -118,6 +118,7 @@ export class EditarRenglonModalComponent {
     // grupo para que el payload tenga una sola forma.
     salario: this.fb.control<number>(0, { nonNullable: true }),
     salario_promedio: this.fb.control<number>(0, { nonNullable: true }),
+    prima_propuesto: this.fb.control<number>(0, { nonNullable: true }),
     cesantia_propuesto: this.fb.control<number>(0, { nonNullable: true }),
     interes_propuesto: this.fb.control<number>(0, { nonNullable: true }),
 
@@ -175,6 +176,13 @@ export class EditarRenglonModalComponent {
     this.ref.close(false);
   }
 
+  /** Etiqueta del valor propuesto según la prestación. */
+  protected etiquetaPropuesto(campo: CampoPropuesto): string {
+    const m = this.t().entities.programacion.editarRenglon;
+    if (campo === 'prima_propuesto') return m.primaPropuesta;
+    return campo === 'cesantia_propuesto' ? m.cesantiaPropuesta : m.interesPropuesto;
+  }
+
   /** Etiqueta i18n de un campo de hora o bandera (se renderizan en bucle). */
   protected etiqueta(grupo: 'horas' | 'banderas', campo: string): string {
     return this.i18n.translate(`entities.programacion.editarRenglon.${grupo}.${campo}`);
@@ -229,20 +237,29 @@ export class EditarRenglonModalComponent {
       [renglon.contacto_numero_identificacion, renglon.contrato_nombre].filter(Boolean).join(' · '),
     );
 
+    // Todo lo numérico pasa por `numero`: el backend manda los decimales como
+    // string y `<p-inputNumber>` necesita un número. Los propuestos se cargan
+    // siempre; si no, el campo arrancaría en 0 y guardar pisaría el valor real.
     const valores: Record<string, number | boolean> = {
-      dias_transporte: renglon.dias_transporte ?? 0,
+      dias_transporte: numero(renglon.dias_transporte),
       salario: numero(renglon.salario),
       salario_promedio: numero(renglon.salario_promedio),
+      prima_propuesto: numero(renglon.prima_propuesto),
+      cesantia_propuesto: numero(renglon.cesantia_propuesto),
+      interes_propuesto: numero(renglon.interes_propuesto),
     };
-    for (const campo of CAMPOS_HORA) valores[campo] = renglon[campo] ?? 0;
+    for (const campo of CAMPOS_HORA) valores[campo] = numero(renglon[campo]);
     for (const bandera of CAMPOS_BANDERA) valores[bandera] = renglon[bandera];
 
     this.form.patchValue(valores, { emitEvent: false });
   }
 }
 
-/** Los montos llegan como string decimal del backend. */
-function numero(valor: string | number | null): number {
+/** El valor propuesto que edita cada prestación. */
+type CampoPropuesto = 'prima_propuesto' | 'cesantia_propuesto' | 'interes_propuesto';
+
+/** Los decimales llegan como string del backend (`"109.995"`); vacío o inválido es 0. */
+export function numero(valor: string | number | null | undefined): number {
   if (typeof valor === 'number') return valor;
   const n = Number(valor);
   return Number.isFinite(n) ? n : 0;

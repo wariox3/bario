@@ -4217,6 +4217,7 @@ export const es: AppDict = {
         salarioPromedio: 'Salario promedio',
         cesantiaPropuesta: 'Cesantía propuesta',
         interesPropuesto: 'Interés propuesto',
+        primaPropuesta: 'Prima propuesta',
         banderasHint: 'Desmarca lo que no aplique a este empleado en este periodo',
         sections: { horas: 'Horas y recargos', banderas: 'Conceptos del empleado' },
         horas: {

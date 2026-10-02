@@ -3226,6 +3226,7 @@ export interface AppDict
         salarioPromedio: string;
         cesantiaPropuesta: string;
         interesPropuesto: string;
+        primaPropuesta: string;
         banderasHint: string;
         sections: { horas: string; banderas: string };
         horas: {

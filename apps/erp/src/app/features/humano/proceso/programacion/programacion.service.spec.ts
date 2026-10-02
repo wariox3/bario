@@ -83,6 +83,14 @@ describe('ProgramacionService · acciones sobre la programación', () => {
     req.flush({});
   });
 
+  it('ajusta un renglón por PATCH: el modal manda solo lo que edita', () => {
+    service.actualizarRenglon(3, { diurna: 8 }).subscribe();
+    const req = http.expectOne('/api/humano/programacion-detalle/3/');
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({ diurna: 8 });
+    req.flush({});
+  });
+
   it('elimina los renglones elegidos en una sola petición', () => {
     service.eliminarRenglones(7, [11, 12]).subscribe();
     const req = http.expectOne('/api/humano/programacion/eliminar-detalle/');

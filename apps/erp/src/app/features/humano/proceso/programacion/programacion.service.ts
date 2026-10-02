@@ -107,9 +107,13 @@ export class ProgramacionService extends BaseHttpService {
     return this.get<ProgramacionDetalle>(`${PROGRAMACION_DETALLE_ENDPOINT}${id}/`);
   }
 
-  /** Ajusta un renglón (horas, días de transporte, banderas del empleado). */
+  /**
+   * Ajusta un renglón (horas, días de transporte, banderas del empleado, bases y
+   * valor propuesto). `PATCH` porque el modal manda solo lo que edita según el
+   * tipo de pago; un `PUT` exigiría además `contrato` y `programacion`.
+   */
   actualizarRenglon(id: number, payload: object): Observable<ProgramacionDetalle> {
-    return this.put<ProgramacionDetalle>(`${PROGRAMACION_DETALLE_ENDPOINT}${id}/`, payload);
+    return this.patch<ProgramacionDetalle>(`${PROGRAMACION_DETALLE_ENDPOINT}${id}/`, payload);
   }
 
   /**

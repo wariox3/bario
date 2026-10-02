@@ -128,8 +128,9 @@ export interface ProgramacionDetalle {
   // Periodo liquidado del contrato
   readonly fecha_desde: string | null;
   readonly fecha_hasta: string | null;
-  readonly dias: number | null;
-  readonly dias_transporte: number | null;
+  // Los decimales llegan como string (`"15.000"`), igual que los montos.
+  readonly dias: string | number | null;
+  readonly dias_transporte: string | number | null;
 
   // Bases
   readonly salario: string | number | null;
@@ -137,22 +138,27 @@ export interface ProgramacionDetalle {
   readonly base_prestacion: string | number | null;
 
   // Horas y recargos (solo tipo NOMINA)
-  readonly diurna: number | null;
-  readonly nocturna: number | null;
-  readonly festiva_diurna: number | null;
-  readonly festiva_nocturna: number | null;
-  readonly extra_diurna: number | null;
-  readonly extra_nocturna: number | null;
-  readonly extra_festiva_diurna: number | null;
-  readonly extra_festiva_nocturna: number | null;
-  readonly recargo_nocturno: number | null;
-  readonly recargo_festivo_diurno: number | null;
-  readonly recargo_festivo_nocturno: number | null;
+  readonly diurna: string | number | null;
+  readonly nocturna: string | number | null;
+  readonly festiva_diurna: string | number | null;
+  readonly festiva_nocturna: string | number | null;
+  readonly extra_diurna: string | number | null;
+  readonly extra_nocturna: string | number | null;
+  readonly extra_festiva_diurna: string | number | null;
+  readonly extra_festiva_nocturna: string | number | null;
+  readonly recargo_nocturno: string | number | null;
+  readonly recargo_festivo_diurno: string | number | null;
+  readonly recargo_festivo_nocturno: string | number | null;
 
   // Resultado
   readonly devengado: string | number | null;
   readonly deduccion: string | number | null;
   readonly total: string | number | null;
+
+  /** Valor propuesto de la prestación: se ajusta a mano en prima, cesantía e interés. */
+  readonly prima_propuesto: string | number | null;
+  readonly cesantia_propuesto: string | number | null;
+  readonly interes_propuesto: string | number | null;
 
   /**
    * Marcas que el legacy usa para resaltar la fila: `ingreso`/`retiro` pintan la
