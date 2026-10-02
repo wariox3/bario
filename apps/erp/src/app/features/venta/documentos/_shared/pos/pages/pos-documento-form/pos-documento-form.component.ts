@@ -19,7 +19,12 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -117,6 +122,7 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputTextModule,
     TabsModule,
     TextareaModule,

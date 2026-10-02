@@ -7,7 +7,12 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { ErpApiSelectComponent, FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import {
+  ErpApiSelectComponent,
+  FieldErrorComponent,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -62,6 +67,7 @@ const DEFAULTS = banderasPorDefecto();
     ButtonModule,
     CheckboxModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputTextModule,
     TextareaModule,
     FieldErrorComponent,

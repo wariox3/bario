@@ -19,7 +19,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -81,6 +81,7 @@ import type { NotaAjusteRead } from '../../nota-ajuste.model';
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputTextModule,
     TextareaModule,
     FieldErrorComponent,

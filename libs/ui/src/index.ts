@@ -23,6 +23,7 @@ export { PageActionsComponent } from './lib/components/page-actions/page-actions
 export { FocusInvalidDirective } from './lib/directives/focus-invalid.directive';
 export { UppercaseDirective } from './lib/directives/uppercase.directive';
 export { SoloDigitosDirective } from './lib/directives/solo-digitos.directive';
+export { MascaraFechaDirective } from './lib/directives/mascara-fecha.directive';
 export { TelefonoPipe } from './lib/pipes/telefono.pipe';
 export type { AuthDict, AuthTranslationsHost } from './lib/auth/i18n';
 export { authEs, authEn } from './lib/auth/i18n';

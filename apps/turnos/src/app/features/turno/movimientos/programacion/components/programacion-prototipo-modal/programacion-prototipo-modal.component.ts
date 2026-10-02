@@ -36,7 +36,11 @@ import {
   toProgramacionFecha,
 } from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
-import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
+import {
+  ContratoAutocompleteComponent,
+  type ContratoOption,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import type { ProgramacionGrupoRef } from '../programacion-grid/programacion-grid.component';
 import { ProgramacionPeriodoStore } from '../programacion-agregar-contrato-modal/programacion-periodo.store';
@@ -87,6 +91,7 @@ type FilaGroup = FormGroup<{
     ConfirmDialogModule,
     InputTextModule,
     DatePickerModule,
+    MascaraFechaDirective,
     ContratoAutocompleteComponent,
     ErpApiAutocompleteComponent,
   ],

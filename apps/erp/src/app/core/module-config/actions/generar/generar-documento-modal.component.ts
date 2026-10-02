@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
+import { MascaraFechaDirective } from '@reddoc/ui';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { I18nService, startOfToday } from '@reddoc/core';
@@ -32,7 +33,7 @@ export interface GenerarDocumentoModalTexts {
 @Component({
   selector: 'app-generar-documento-modal',
   standalone: true,
-  imports: [FormsModule, DatePickerModule, ButtonModule],
+  imports: [FormsModule, DatePickerModule, MascaraFechaDirective, ButtonModule],
   templateUrl: './generar-documento-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

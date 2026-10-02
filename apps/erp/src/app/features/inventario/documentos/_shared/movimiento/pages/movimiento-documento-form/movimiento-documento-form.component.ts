@@ -23,6 +23,7 @@ import {
   ErpContactoSelectComponent,
   FieldErrorComponent,
   PageActionsComponent,
+  MascaraFechaDirective,
 } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -85,6 +86,7 @@ import type { MovimientoRead } from '../../movimiento-documento.model';
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,

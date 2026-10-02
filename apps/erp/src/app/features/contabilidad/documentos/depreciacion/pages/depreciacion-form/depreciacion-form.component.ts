@@ -9,7 +9,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   extractErrorMessage,
   FormErrorService,
@@ -60,6 +60,7 @@ import { DepreciacionService } from '../../depreciacion.service';
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TabsModule,
     TextareaModule,
     FieldErrorComponent,

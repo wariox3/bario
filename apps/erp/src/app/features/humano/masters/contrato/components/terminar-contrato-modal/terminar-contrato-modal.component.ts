@@ -4,7 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ErpApiSelectComponent, FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
+import {
+  ErpApiSelectComponent,
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -47,6 +52,7 @@ const MOTIVO_TERMINACION_ENDPOINT = '/humano/motivo-terminacion/seleccionar/';
     ReactiveFormsModule,
     ButtonModule,
     DatePickerModule,
+    MascaraFechaDirective,
     FieldErrorComponent,
     ErpApiSelectComponent,
   ],

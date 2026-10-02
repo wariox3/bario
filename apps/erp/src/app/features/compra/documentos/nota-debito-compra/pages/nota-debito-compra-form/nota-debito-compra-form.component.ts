@@ -18,7 +18,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   DOCUMENT_TYPE_ID,
   FormErrorService,
@@ -76,6 +76,7 @@ import { NOTA_DEBITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-debito-compra
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,

@@ -31,6 +31,7 @@ import {
   FieldErrorComponent,
   FocusInvalidDirective,
   PageActionsComponent,
+  MascaraFechaDirective,
 } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import { EmpleadoAutocompleteComponent } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
@@ -95,6 +96,7 @@ const CONTRATO_FIELD_MAP = { grupo_contabilidad: 'centro_costo' };
     BreadcrumbComponent,
     ButtonModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputNumberModule,
     CheckboxModule,
     TextareaModule,

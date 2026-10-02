@@ -11,7 +11,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -65,6 +65,7 @@ import { fecha31Diciembre } from '../../cierre.validators';
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     PaginatorModule,
     TabsModule,
     TextareaModule,

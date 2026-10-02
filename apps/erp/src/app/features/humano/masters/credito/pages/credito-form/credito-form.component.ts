@@ -6,7 +6,12 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   formatCop,
   FormErrorService,
@@ -51,6 +56,7 @@ import {
     ButtonModule,
     InputNumberModule,
     DatePickerModule,
+    MascaraFechaDirective,
     CheckboxModule,
     FieldErrorComponent,
     PageActionsComponent,

@@ -2,6 +2,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
+import { MascaraFechaDirective } from '@reddoc/ui';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -32,7 +33,14 @@ type RegenerarStatus = 'idle' | 'running' | 'success' | 'error';
 @Component({
   selector: 'app-regenerar-horas',
   standalone: true,
-  imports: [FormsModule, DatePickerModule, ButtonModule, ConfirmDialogModule, ListShellComponent],
+  imports: [
+    FormsModule,
+    DatePickerModule,
+    MascaraFechaDirective,
+    ButtonModule,
+    ConfirmDialogModule,
+    ListShellComponent,
+  ],
   templateUrl: './regenerar-horas.component.html',
   styleUrl: './regenerar-horas.component.scss',
   providers: [ConfirmationService],

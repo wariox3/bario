@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
+import { MascaraFechaDirective } from '@reddoc/ui';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { I18nService, startOfToday } from '@reddoc/core';
@@ -20,7 +21,7 @@ import type { AppDict } from '@erp/i18n';
 @Component({
   selector: 'app-generar-nomina-electronica-modal',
   standalone: true,
-  imports: [FormsModule, DatePickerModule, ButtonModule],
+  imports: [FormsModule, DatePickerModule, MascaraFechaDirective, ButtonModule],
   templateUrl: './generar-nomina-electronica-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

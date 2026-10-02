@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core
 import { ReactiveFormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
+import { MascaraFechaDirective } from '@reddoc/ui';
 import { I18nService } from '@reddoc/core';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import type { AppDict } from '@erp/i18n';
@@ -19,7 +20,13 @@ import type { MovimientoInformeForm } from '../../movimiento-informe.types';
 @Component({
   selector: 'app-movimiento-informe-params',
   standalone: true,
-  imports: [ReactiveFormsModule, CheckboxModule, DatePickerModule, ErpCuentaSelectComponent],
+  imports: [
+    ReactiveFormsModule,
+    CheckboxModule,
+    DatePickerModule,
+    MascaraFechaDirective,
+    ErpCuentaSelectComponent,
+  ],
   templateUrl: './movimiento-informe-params.component.html',
   styleUrl: './movimiento-informe-params.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

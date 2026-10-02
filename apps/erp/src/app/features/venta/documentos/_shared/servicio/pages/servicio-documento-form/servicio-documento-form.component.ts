@@ -8,7 +8,7 @@ import { TabsModule } from 'primeng/tabs';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -68,6 +68,7 @@ import { ServicioDocumentoDetallesComponent } from '../../components/servicio-do
     ButtonModule,
     TabsModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputNumberModule,
     SelectModule,
     FieldErrorComponent,

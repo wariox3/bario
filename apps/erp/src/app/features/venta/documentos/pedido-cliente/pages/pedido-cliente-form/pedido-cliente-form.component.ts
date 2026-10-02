@@ -17,7 +17,7 @@ import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -75,6 +75,7 @@ import type { PedidoClienteRead } from '../../pedido-cliente.model';
     TabsModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     FieldErrorComponent,
     PageActionsComponent,
     ErpContactoSelectComponent,

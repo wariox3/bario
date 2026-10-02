@@ -256,7 +256,9 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
   (`05/08/2026` — campos, tablas, fichas) o `formatFechaLarga` (`05 de agosto de 2026` — solo la
   cabecera de un documento). Un `<p-datepicker>` **no declara `dateFormat`**: lo hereda del
   translation global (`REDDOC_PRIMENG_ES`); solo se declara para mostrar otra cosa, como `mm/yy`
-  al elegir un mes. Nada de `toLocaleDateString` suelto ni de `iso.slice(0, 10)`.
+  al elegir un mes. Nada de `toLocaleDateString` suelto ni de `iso.slice(0, 10)`. Todo componente
+  que use `<p-datepicker>` suma `MascaraFechaDirective` (`@reddoc/ui`) a sus `imports`: el selector
+  es el propio elemento, así que sin el import el calendario queda sin máscara y nada avisa.
 - **Readonly by default** — prefer `readonly` properties and `readonly` arrays in configs and contracts.
 
 ## Tener en cuenta
