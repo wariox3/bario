@@ -113,13 +113,17 @@ export interface ProgramacionPayload extends ProgramacionBanderas {
  */
 export interface ProgramacionDetalle {
   readonly id: number;
-  readonly programacion_id: number;
+  readonly programacion: number;
 
-  // Identificación del empleado
-  readonly contrato_id: number;
-  readonly contrato_contacto_id: number | null;
-  readonly contrato_contacto_numero_identificacion: string | null;
-  readonly contrato_contacto_nombre_corto: string | null;
+  // Identificación del empleado. Las FK llegan sin `_id`; el nombre del empleado
+  // viaja como `contrato_nombre`.
+  readonly contrato: number;
+  readonly contrato_nombre: string | null;
+  /**
+   * Identificación del empleado. Ojo: llega como `contacto_…`, sin el
+   * `contrato_` delante que usan adicional, novedad y crédito.
+   */
+  readonly contacto_numero_identificacion: string | null;
 
   // Periodo liquidado del contrato
   readonly fecha_desde: string | null;

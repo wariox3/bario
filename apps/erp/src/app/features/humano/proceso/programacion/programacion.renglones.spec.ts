@@ -4,9 +4,9 @@ import { columnasDeRenglones, muestraHoras } from './programacion.renglones';
 /** Campos que las tres variantes deben traer siempre. */
 const COMUNES = [
   'id',
-  'contrato_contacto_numero_identificacion',
-  'contrato_contacto_nombre_corto',
-  'contrato_id',
+  'contacto_numero_identificacion',
+  'contrato_nombre',
+  'contrato',
   'fecha_desde',
   'fecha_hasta',
   'salario',

@@ -201,19 +201,19 @@ const RENGLON_COLUMNS_IDENTIFICACION: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'contrato_contacto_numero_identificacion',
+    field: 'contacto_numero_identificacion',
     headerKey: 'entities.programacion.renglones.columns.identificacion',
     type: 'text',
     width: '130px',
   },
   {
-    field: 'contrato_contacto_nombre_corto',
+    field: 'contrato_nombre',
     headerKey: 'entities.programacion.renglones.columns.empleado',
     type: 'text',
     width: '220px',
   },
   {
-    field: 'contrato_id',
+    field: 'contrato',
     headerKey: 'entities.programacion.renglones.columns.contrato',
     type: 'number',
     width: '100px',

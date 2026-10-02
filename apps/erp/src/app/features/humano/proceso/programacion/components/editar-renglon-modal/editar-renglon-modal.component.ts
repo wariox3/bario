@@ -226,9 +226,7 @@ export class EditarRenglonModalComponent {
 
   private aplicar(renglon: ProgramacionDetalle): void {
     this.empleado.set(
-      [renglon.contrato_contacto_numero_identificacion, renglon.contrato_contacto_nombre_corto]
-        .filter(Boolean)
-        .join(' · '),
+      [renglon.contacto_numero_identificacion, renglon.contrato_nombre].filter(Boolean).join(' · '),
     );
 
     const valores: Record<string, number | boolean> = {
