@@ -3,6 +3,7 @@ import { Observable, forkJoin, map, of } from 'rxjs';
 import {
   BaseHttpService,
   buildListBody,
+  type AdvancedListBody,
   buildListParams,
   type ListQuery,
   type PaginatedResponse,
@@ -163,7 +164,7 @@ export class ProgramacionService extends BaseHttpService {
    * TODO(backend): confirmar si es idempotente (¿reenvía a quien ya se notificó?).
    */
   notificar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}notificar/`, { id });
+    return this.post<unknown>(`${this.resourcePath}notificar/`, cuerpoDe(id));
   }
 
   // ── Importación e impresión ───────────────────────────────────────────────
@@ -186,12 +187,25 @@ export class ProgramacionService extends BaseHttpService {
   /** URL del PDF con todas las nóminas generadas. */
   readonly imprimirNominasUrl = `${PROGRAMACION_ENDPOINT}imprimir-nominas/`;
 
-  /** Busca el documento de nómina que generó un renglón. */
+  /**
+   * Busca el documento de nómina que generó un renglón.
+   *
+   * Por `POST documento/lista/`: el `GET` de la raíz solo acepta `page` e ignora
+   * cualquier otro parámetro, así que con él la búsqueda devolvía el primer
+   * documento de la empresa —la nómina de otro empleado— sin dar error.
+   */
   nominaDelRenglon(renglonId: number): Observable<PaginatedResponse<{ id: number }>> {
-    return this.get<PaginatedResponse<{ id: number }>>(DOCUMENTO_ENDPOINT, {
-      programacion_detalle_id: renglonId,
-      limit: 1,
-    });
+    const query: ListQuery = {
+      filters: [{ field: 'programacion_detalle_id', operator: 'eq', value: renglonId }],
+      sort: [],
+      page: 0,
+      pageSize: 1,
+    };
+    return this.post<PaginatedResponse<{ id: number }>>(
+      `${DOCUMENTO_ENDPOINT}lista/`,
+      buildListBody(query),
+      buildListParams(query),
+    );
   }
 }
 
@@ -205,11 +219,12 @@ const DOCUMENTO_ENDPOINT = '/general/documento/';
 
 /**
  * Las tres exportaciones a Excel de la programación, con el endpoint, el
- * serializador y el filtro de cada una.
+ * serializador y el filtro de cada una. El cuerpo lo arma `cuerpoExportacion`.
  *
- * ⚠️ Los tres serializadores y los tres filtros salen del ERP anterior, que además
- * los pedía por **GET con query params**; acá se usan con el `POST …excel/` que es
- * la convención del ERP. Mismo supuesto que arrastran los otros informes portados.
+ * ⚠️ Los tres serializadores salen del ERP anterior, que los pedía por **GET con
+ * query params**; acá van en el `POST …excel/`, como en el resto de informes.
+ * `programacion-detalle/excel/` y `documento-detalle/excel/` todavía no están
+ * publicados en el backend: solo el de nóminas (`documento/excel/`) responde.
  *
  * Las dos últimas apuntan al endpoint genérico de documentos porque lo que exportan
  * son las **nóminas generadas**, no los renglones de la programación.
@@ -240,3 +255,25 @@ export const PROGRAMACION_EXPORTS = {
 
 /** Clave de una de las tres exportaciones. */
 export type ProgramacionExportKey = keyof typeof PROGRAMACION_EXPORTS;
+
+/**
+ * Cuerpo del `POST …excel/` de una exportación: el filtro que la acota a esta
+ * programación, en el formato de `filtros` del backend, más su serializador.
+ *
+ * El filtro **tiene** que ir dentro de `filtros`. Suelto en el cuerpo
+ * (`{ programacion_detalle__programacion_id: 7 }`) el backend lo ignora sin
+ * error y exporta las nóminas de toda la empresa.
+ */
+export function cuerpoExportacion(
+  clave: ProgramacionExportKey,
+  programacionId: number,
+): AdvancedListBody & { readonly serializador: string } {
+  const config = PROGRAMACION_EXPORTS[clave];
+  const query: ListQuery = {
+    filters: [{ field: config.filtro, operator: 'eq', value: programacionId }],
+    sort: [],
+    page: 0,
+    pageSize: 0,
+  };
+  return { ...buildListBody(query), serializador: config.serializador };
+}

@@ -34,6 +34,7 @@ import {
   PROGRAMACION_EXPORTS,
   ProgramacionService,
   cuerpoDe,
+  cuerpoExportacion,
   type ProgramacionExportKey,
 } from '../../programacion.service';
 
@@ -344,10 +345,7 @@ export class ProgramacionWorkspaceComponent implements OnInit {
     this.fileDownload
       .download(config.url, {
         method: 'POST',
-        body: {
-          serializador: config.serializador,
-          [config.filtro]: this.programacionId(),
-        },
+        body: cuerpoExportacion(clave, this.programacionId()),
         fallbackFilename: config.archivo,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
