@@ -3306,6 +3306,7 @@ export interface AppDict
         importarHoras: string;
         imprimir: string;
         imprimirNominas: string;
+        utilidades: string;
         exportRenglones: string;
         exportNomina: string;
         exportNominaDetalle: string;

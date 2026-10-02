@@ -4300,6 +4300,7 @@ export const es: AppDict = {
         importarHoras: 'Importar horas',
         imprimir: 'PDF de la programación',
         imprimirNominas: 'PDF de las nóminas',
+        utilidades: 'Utilidades',
         exportRenglones: 'Excel de empleados',
         exportNomina: 'Excel de nóminas',
         exportNominaDetalle: 'Excel de conceptos',

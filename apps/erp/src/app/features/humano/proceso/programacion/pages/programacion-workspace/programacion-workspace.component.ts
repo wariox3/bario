@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MenuModule } from 'primeng/menu';
@@ -61,6 +62,7 @@ type AccionCiclo = 'generar' | 'desgenerar' | 'aprobar' | 'desaprobar';
   standalone: true,
   imports: [
     ButtonModule,
+    ButtonGroupModule,
     ConfirmDialogModule,
     MenuModule,
     TabsModule,
@@ -142,83 +144,81 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   }));
 
   /**
-   * Acciones secundarias del dropdown. Se arman según capacidades: `MenuItem` sí
-   * admite `disabled`, pero una acción que no aplica a la etapa no debería ni
-   * aparecer — el legacy mostraba las cinco siempre, la mayoría deshabilitadas.
+   * "Acciones": lo que deshace la etapa actual o lleva la nómina afuera. Como en
+   * la ficha de los documentos, están siempre y se **deshabilitan** cuando no
+   * aplican: la botonera no cambia de forma entre etapas y la persona aprende
+   * dónde vive cada cosa.
    */
-  protected readonly accionesSecundarias = computed<MenuItem[]>(() => {
+  protected readonly accionesItems = computed<MenuItem[]>(() => {
     const c = this.capacidades();
     const labels = this.t().entities.programacion.acciones;
     const bloqueado = this.estaOcupado();
-    const items: MenuItem[] = [];
-
-    if (c.puedeDesgenerar) {
-      items.push({
+    return [
+      {
         label: labels.desgenerar,
         icon: 'pi pi-undo',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeDesgenerar,
         command: () => this.confirmar('desgenerar'),
-      });
-    }
-    if (c.puedeDesaprobar) {
-      items.push({
+      },
+      {
         label: labels.desaprobar,
         icon: 'pi pi-times-circle',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeDesaprobar,
         command: () => this.confirmar('desaprobar'),
-      });
-    }
-    if (c.puedeNotificar) {
-      items.push({
+      },
+      { separator: true },
+      {
         label: labels.notificar,
         icon: 'pi pi-send',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeNotificar,
         command: () => this.confirmarNotificar(),
-      });
-    }
-    if (c.puedeImportarHoras) {
-      items.push({
-        separator: items.length > 0,
-      });
-      items.push({
+      },
+    ];
+  });
+
+  /**
+   * "Utilidades": importar horas, y las impresiones y exportaciones que no
+   * cambian nada. El PDF de la programación no va acá: es el botón Imprimir.
+   *
+   * El legacy rotulaba "Importar nominas" a lo que en realidad **imprime** las
+   * nóminas (`imprimirNominas()`); acá se llama por lo que hace.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => {
+    const c = this.capacidades();
+    const labels = this.t().entities.programacion.acciones;
+    const bloqueado = this.estaOcupado();
+    return [
+      {
         label: labels.importarHoras,
         icon: 'pi pi-upload',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeImportarHoras,
         command: () => this.importar.open(),
-      });
-    }
-
-    // Impresiones y descargas: siempre al final, separadas de lo que muta.
-    const descargas: MenuItem[] = [
-      { label: labels.imprimir, icon: 'pi pi-file-pdf', command: () => this.imprimir() },
+      },
+      {
+        label: labels.imprimirNominas,
+        icon: 'pi pi-file-pdf',
+        disabled: !c.puedeImprimirNominas,
+        command: () => this.imprimirNominas(),
+      },
+      { separator: true },
       {
         label: labels.exportRenglones,
         icon: 'pi pi-file-excel',
         command: () => this.exportar('renglones'),
       },
+      {
+        label: labels.exportNomina,
+        icon: 'pi pi-file-excel',
+        disabled: !c.puedeImprimirNominas,
+        command: () => this.exportar('nomina'),
+      },
+      {
+        label: labels.exportNominaDetalle,
+        icon: 'pi pi-file-excel',
+        disabled: !c.puedeImprimirNominas,
+        command: () => this.exportar('nominaDetalle'),
+      },
     ];
-    if (c.puedeImprimirNominas) {
-      descargas.push(
-        {
-          label: labels.imprimirNominas,
-          icon: 'pi pi-file-pdf',
-          command: () => this.imprimirNominas(),
-        },
-        {
-          label: labels.exportNomina,
-          icon: 'pi pi-file-excel',
-          command: () => this.exportar('nomina'),
-        },
-        {
-          label: labels.exportNominaDetalle,
-          icon: 'pi pi-file-excel',
-          command: () => this.exportar('nominaDetalle'),
-        },
-      );
-    }
-
-    if (items.length > 0) items.push({ separator: true });
-    return [...items, ...descargas];
   });
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -311,7 +311,7 @@ export class ProgramacionWorkspaceComponent implements OnInit {
 
   // ── Impresión y descargas ─────────────────────────────────────────────────
 
-  private imprimir(): void {
+  protected onImprimir(): void {
     this.descargar(this.service.imprimirUrl, 'programacion.pdf');
   }
 

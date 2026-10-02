@@ -4237,6 +4237,7 @@ export const en: AppDict = {
         importarHoras: 'Import hours',
         imprimir: 'Payroll run PDF',
         imprimirNominas: 'Payslips PDF',
+        utilidades: 'Utilities',
         exportRenglones: 'Employees Excel',
         exportNomina: 'Payslips Excel',
         exportNominaDetalle: 'Concepts Excel',
