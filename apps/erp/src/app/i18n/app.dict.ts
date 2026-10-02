@@ -3182,9 +3182,11 @@ export interface AppDict
         validation: {
           required: string;
           rangoInvalido: string;
+          /** `{requeridos}` y `{duracion}`: días que debe durar el rango y los que dura. */
           duracionPeriodo: string;
-          duracionEsperada: string;
-          duracionActual: string;
+          /** `{fecha}`: la fecha hasta que cierra el periodo. */
+          usarFechaSugerida: string;
+          usarFechaSugeridaTitle: string;
         };
         toasts: {
           createSuccess: { title: string; desc: string };

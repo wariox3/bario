@@ -4099,9 +4099,10 @@ export const en: AppDict = {
         validation: {
           required: 'This field is required',
           rangoInvalido: 'The start date cannot be later than the end date',
-          duracionPeriodo: "The period must last exactly the group's period length",
-          duracionEsperada: 'expected',
-          duracionActual: 'actual',
+          duracionPeriodo:
+            'For this group the period must last {requeridos} days and the range has {duracion}',
+          usarFechaSugerida: 'Use {fecha}',
+          usarFechaSugeridaTitle: 'Move the end date to the close of the period',
         },
         toasts: {
           createSuccess: {

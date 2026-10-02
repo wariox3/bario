@@ -67,15 +67,18 @@ export interface Programacion extends ProgramacionBanderas {
   readonly fecha_hasta_periodo: string | null;
   readonly comentario: string | null;
 
-  readonly pago_tipo_id: number | null;
+  // Las FK llegan **sin** `_id` (`"grupo": 1`), cada una con su `_nombre` al lado.
+  readonly pago_tipo: number | null;
   readonly pago_tipo_nombre?: string | null;
-  readonly grupo_id: number | null;
+  readonly grupo: number | null;
   readonly grupo_nombre?: string | null;
-  readonly periodo_id: number | null;
+  /** Lo deriva el backend del grupo. */
+  readonly periodo: number | null;
   readonly periodo_nombre?: string | null;
 
   /** Acumulados que calcula el backend al generar. */
   readonly dias: number | null;
+  readonly dias_reales: number | null;
   readonly contratos: number | null;
   readonly devengado: string | number | null;
   readonly deduccion: string | number | null;
@@ -94,8 +97,8 @@ export interface ProgramacionPayload extends ProgramacionBanderas {
   readonly fecha_hasta_periodo: string | null;
   readonly comentario: string | null;
   readonly pago_tipo: number | null;
+  /** El backend deriva el `periodo` de este grupo: no se manda. */
   readonly grupo: number | null;
-  readonly periodo: number | null;
 }
 
 /**

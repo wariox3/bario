@@ -4159,9 +4159,10 @@ export const es: AppDict = {
         validation: {
           required: 'Este campo es obligatorio',
           rangoInvalido: 'La fecha desde no puede ser posterior a la fecha hasta',
-          duracionPeriodo: 'El periodo debe durar exactamente los días del grupo',
-          duracionEsperada: 'esperados',
-          duracionActual: 'actual',
+          duracionPeriodo:
+            'Para este grupo el periodo debe durar {requeridos} días y el rango tiene {duracion}',
+          usarFechaSugerida: 'Usar {fecha}',
+          usarFechaSugeridaTitle: 'Llevar la fecha hasta al cierre del periodo',
         },
         toasts: {
           createSuccess: {

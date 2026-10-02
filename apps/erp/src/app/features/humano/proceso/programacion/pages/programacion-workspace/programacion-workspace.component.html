@@ -103,7 +103,7 @@
             <p class="m-0 mb-3 text-[0.72rem] text-brand-muted">{{ det.renglonesHint }}</p>
             <app-programacion-renglones-tab
               [programacionId]="programacionId()"
-              [pagoTipoId]="p.pago_tipo_id"
+              [pagoTipoId]="p.pago_tipo"
               [capacidades]="capacidades()"
               [reloadToken]="reloadToken()"
               (totalChange)="onRenglonesChange($event)"
