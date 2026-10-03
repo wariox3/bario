@@ -34,10 +34,13 @@ describe('AdicionalService · importar', () => {
     req.flush({});
   });
 
-  it('desde una programación, la manda como campo del multipart', () => {
-    service.importar(archivo, { programacion_id: 7 }).subscribe();
+  it('desde una programación, manda programacion_id y permanente en el multipart', () => {
+    service.importar(archivo, { programacion_id: 7, permanente: false }).subscribe();
     const req = http.expectOne('/api/humano/adicional/importar/');
-    expect((req.request.body as FormData).get('programacion_id')).toBe('7');
+    const form = req.request.body as FormData;
+    expect(form.get('archivo')).toBeInstanceOf(File);
+    expect(form.get('programacion_id')).toBe('7');
+    expect(form.get('permanente')).toBe('false');
     req.flush({});
   });
 });

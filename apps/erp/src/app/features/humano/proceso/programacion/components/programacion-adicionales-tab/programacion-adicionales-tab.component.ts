@@ -100,12 +100,15 @@ export class ProgramacionAdicionalesTabComponent {
   };
 
   /**
-   * Importación masiva: lo subido queda en esta programación y la tabla vuelve a
-   * la página 1. Ofrece **todos** los maestros, como contactos: el archivo cruza
+   * Importación masiva: multipart con `archivo`, `programacion_id` y
+   * `permanente: false`. Lo subido queda en esta programación y la tabla vuelve a
+   * la página 1. Un adicional permanente es del contrato, no de una programación:
+   * el backend rechaza la combinación, y se carga desde el master. Ofrece **todos** los maestros, como contactos: el archivo cruza
    * contratos, conceptos y empleados, y acotarlos dejaría afuera el que falte.
    */
   protected readonly importar = importState({
-    upload: (file) => this.service.importar(file, { programacion_id: this.programacionId() }),
+    upload: (file) =>
+      this.service.importar(file, { programacion_id: this.programacionId(), permanente: false }),
     onImported: () => this.loadPage(0),
     masters: IMPORT_MASTERS_ALL,
   });

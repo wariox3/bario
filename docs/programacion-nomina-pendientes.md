@@ -122,10 +122,9 @@ Sin estos, el `lista/` / `excel/` responde _"Propiedad … no permitida"_.
 
 ## 3. Para confirmar
 
-- **`POST humano/adicional/importar/`**: el frontend manda `programacion_id` como campo
-  extra del multipart (como el legacy), pero el schema solo declara `archivo`. ¿Lo lee?
-  Si no, los adicionales importados quedan sin programación y no aparecen en la pestaña,
-  sin dar error. ¿`permanente` queda en `false`? (el legacy lo forzaba).
+- **`POST humano/adicional/importar/`** ✅: multipart con `archivo`, `programacion_id` y
+  `permanente: false`. El backend lee los dos campos extra (rechaza `permanente: true`
+  con programación: un adicional permanente es del contrato, no de una programación).
 - **`documento_tipo__documento_clase__grupo`** (filtros base de facturación electrónica de
   venta y compra): ¿`grupo` es una FK? Si lo es, por el estándar sería `…__grupo_id`.
 - **Nombre de la identificación del empleado**: en `programacion-detalle` llega como
