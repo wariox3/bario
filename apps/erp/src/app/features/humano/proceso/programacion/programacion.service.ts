@@ -9,6 +9,7 @@ import {
   type PaginatedResponse,
   type SortSpec,
 } from '@reddoc/core';
+import type { NominaRead } from '@erp/features/humano/documentos/nomina/nomina.model';
 import type { Programacion, ProgramacionDetalle, ProgramacionPayload } from './programacion.model';
 
 /** Endpoint del proceso. */
@@ -203,20 +204,22 @@ export class ProgramacionService extends BaseHttpService {
   readonly imprimirNominasUrl = `${PROGRAMACION_ENDPOINT}imprimir-nominas/`;
 
   /**
-   * Busca el documento de nómina que generó un renglón.
+   * Busca el documento de nómina que generó un renglón. El `lista/` devuelve el
+   * documento **completo** —el mismo serializador que `GET documento/{id}/`—, así
+   * que sirve directo como cabecera, sin una segunda petición.
    *
    * Por `POST documento/lista/`: el `GET` de la raíz solo acepta `page` e ignora
    * cualquier otro parámetro, así que con él la búsqueda devolvía el primer
    * documento de la empresa —la nómina de otro empleado— sin dar error.
    */
-  nominaDelRenglon(renglonId: number): Observable<PaginatedResponse<{ id: number }>> {
+  nominaDelRenglon(renglonId: number): Observable<PaginatedResponse<NominaRead>> {
     const query: ListQuery = {
       filters: [{ field: 'programacion_detalle_id', operator: 'eq', value: renglonId }],
       sort: [],
       page: 0,
       pageSize: 1,
     };
-    return this.post<PaginatedResponse<{ id: number }>>(
+    return this.post<PaginatedResponse<NominaRead>>(
       `${DOCUMENTO_ENDPOINT}lista/`,
       buildListBody(query),
       buildListParams(query),

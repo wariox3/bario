@@ -3342,6 +3342,8 @@ export interface AppDict
       renglones: {
         cargarContratos: string;
         verNomina: string;
+        /** Modal de solo lectura de la nómina de un renglón. */
+        nominaResumen: { title: string };
         confirmEliminar: { header: string; message: string };
         confirmRecargar: { header: string; message: string };
         leyenda: { titulo: string; contenido: string };

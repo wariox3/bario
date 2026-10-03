@@ -38,17 +38,20 @@ export class NominaConceptosTableComponent {
     return labels.neutro;
   }
 
-  /** Número formateado sin símbolo de moneda (días, horas, porcentaje). */
+  /**
+   * Número formateado sin símbolo de moneda (días, horas, porcentaje). Sin valor,
+   * la celda queda **vacía**: una columna de guiones se lee como ruido.
+   */
   protected formatNumber(value: string | number | null | undefined): string {
-    if (value === null || value === undefined || value === '') return '—';
+    if (value === null || value === undefined || value === '') return '';
     const parsed = typeof value === 'number' ? value : Number(value);
-    return Number.isFinite(parsed) ? parsed.toLocaleString('es-CO') : '—';
+    return Number.isFinite(parsed) ? parsed.toLocaleString('es-CO') : '';
   }
 
-  /** Monto formateado; los ceros se pintan como guion para aligerar la tabla. */
+  /** Monto formateado; los ceros y los vacíos dejan la celda vacía para aligerar la tabla. */
   protected formatAmount(value: string | number | null | undefined): string {
     const parsed = typeof value === 'number' ? value : Number(value ?? 0);
-    if (!Number.isFinite(parsed) || parsed === 0) return '—';
+    if (!Number.isFinite(parsed) || parsed === 0) return '';
     return this.formatMoney(parsed);
   }
 }

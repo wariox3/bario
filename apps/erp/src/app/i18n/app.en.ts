@@ -4299,6 +4299,7 @@ export const en: AppDict = {
       renglones: {
         cargarContratos: 'Load contracts',
         verNomina: 'View payslip',
+        nominaResumen: { title: 'Payslip' },
         confirmEliminar: {
           header: 'Remove employees',
           message: 'Remove the selected rows from the payroll run?',
@@ -4913,7 +4914,7 @@ export const en: AppDict = {
     nominaDetalle: {
       empty: 'This payroll has no settled items',
       columns: {
-        linea: '#',
+        linea: 'ID',
         codigo: 'Code',
         concepto: 'Item',
         detalle: 'Detail',
@@ -4927,7 +4928,7 @@ export const en: AppDict = {
         deduccion: 'Deductions',
         basePrestacion: 'BSI',
         baseCotizacion: 'CBI',
-        baseImpuesto: 'Tax base',
+        baseImpuesto: 'Base',
       },
       tooltips: {
         credito: 'Loan code',

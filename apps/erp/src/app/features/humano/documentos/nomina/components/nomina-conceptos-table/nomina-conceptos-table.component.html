@@ -38,14 +38,14 @@
             {{ line.id }}
           </td>
           <td class="nomina-conceptos-table__td text-right text-brand-muted tabular-nums">
-            {{ line.concepto_id ?? '—' }}
+            {{ line.concepto_id ?? '' }}
           </td>
           <td class="nomina-conceptos-table__td font-medium text-brand-text">
-            {{ line.concepto_nombre || '—' }}
+            {{ line.concepto_nombre || '' }}
           </td>
-          <td class="nomina-conceptos-table__td text-brand-text">{{ line.detalle || '—' }}</td>
+          <td class="nomina-conceptos-table__td text-brand-text">{{ line.detalle || '' }}</td>
           <td class="nomina-conceptos-table__td text-right text-brand-muted tabular-nums">
-            {{ line.credito_id ?? '—' }}
+            {{ line.credito_id ?? '' }}
           </td>
           <td class="nomina-conceptos-table__td text-right tabular-nums">
             {{ formatNumber(line.porcentaje) }}

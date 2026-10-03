@@ -4362,6 +4362,7 @@ export const es: AppDict = {
       renglones: {
         cargarContratos: 'Cargar contratos',
         verNomina: 'Ver nómina',
+        nominaResumen: { title: 'Nómina' },
         confirmEliminar: {
           header: 'Quitar empleados',
           message: '¿Quitar los renglones seleccionados de la programación?',
@@ -4976,7 +4977,7 @@ export const es: AppDict = {
     nominaDetalle: {
       empty: 'Esta nómina no tiene conceptos liquidados',
       columns: {
-        linea: '#',
+        linea: 'ID',
         codigo: 'Cód',
         concepto: 'Concepto',
         detalle: 'Detalle',
@@ -4990,7 +4991,7 @@ export const es: AppDict = {
         deduccion: 'Deducción',
         basePrestacion: 'IBP',
         baseCotizacion: 'IBC',
-        baseImpuesto: 'Base impuesto',
+        baseImpuesto: 'Base',
       },
       tooltips: {
         credito: 'Código del crédito',

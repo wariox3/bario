@@ -9,12 +9,11 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
-import { FileDownloadService, I18nService, TenantService, ToastService } from '@reddoc/core';
+import { FileDownloadService, I18nService, ToastService } from '@reddoc/core';
 import {
   DataTableComponent,
   DataToolbarComponent,
@@ -65,8 +64,6 @@ export class ProgramacionRenglonesTabComponent {
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly dialog = inject(DialogService);
-  private readonly tenant = inject(TenantService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
@@ -232,35 +229,19 @@ export class ProgramacionRenglonesTabComponent {
   }
 
   /**
-   * Abre la nómina que generó el renglón.
-   *
-   * En vez de un modal que vuelva a pintar el documento —lo que hacía el ERP
-   * anterior, con su propia copia de la cabecera y las líneas— se navega a la
-   * **ficha del documento de nómina que ya existe** en este ERP. El renglón solo
-   * conoce su propio id, así que primero se busca el documento por
-   * `programacion_detalle_id`.
+   * Muestra la nómina que generó el renglón en un modal de **solo lectura**,
+   * sin salir de la programación, como el ERP anterior: cabecera y conceptos,
+   * sin acciones. Lazy: el modal solo se usa con la programación generada.
    */
   private verNomina(renglonId: number): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return;
-
-    this.service
-      .nominaDelRenglon(renglonId)
+    from(import('../nomina-resumen-modal/nomina-resumen-modal.component'))
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res) => {
-          const documento = res.results[0];
-          if (!documento) {
-            const toast = this.t().entities.programacion.renglones.toasts.sinNomina;
-            this.toast.warn(toast.title, toast.desc);
-            return;
-          }
-          void this.router.navigate(['/t', slug, 'humano', 'nomina', 'detalle', documento.id]);
-        },
-        error: () => {
-          const toast = this.t().entities.programacion.renglones.toasts.sinNomina;
-          this.toast.error(toast.title, toast.desc);
-        },
+      .subscribe(({ NominaResumenModalComponent }) => {
+        this.dialog.open(NominaResumenModalComponent, {
+          ...ENTITY_ACTION_DIALOG_DEFAULTS,
+          width: '84rem',
+          data: { renglonId },
+        });
       });
   }
 
