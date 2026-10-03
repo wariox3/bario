@@ -4231,8 +4231,8 @@ export const en: AppDict = {
       },
       importarHoras: {
         title: 'Import hours',
-        subtitle: "Upload the Excel file with the period's hours",
-        plantillaNoDisponible: 'The template is requested with the run open (pending)',
+        subtitle:
+          "Download the template with this run's employees, adjust their hours and upload it",
       },
       acciones: {
         generar: 'Generate',
@@ -4244,9 +4244,6 @@ export const en: AppDict = {
         imprimir: 'Payroll run PDF',
         imprimirNominas: 'Payslips PDF',
         utilidades: 'Utilities',
-        exportRenglones: 'Employees Excel',
-        exportNomina: 'Payslips Excel',
-        exportNominaDetalle: 'Concepts Excel',
         confirmaciones: {
           generar: {
             header: 'Generate payroll',
@@ -4315,6 +4312,12 @@ export const en: AppDict = {
           titulo: 'Abbreviations',
           contenido:
             'DT: transport days · D: day · N: night · FD: holiday day · FN: holiday night · ED: overtime day · EN: overtime night · EFD: overtime holiday day · EFN: overtime holiday night · RN: night premium · RFD: holiday day premium · RFN: holiday night premium',
+        },
+        excel: {
+          action: 'Excel',
+          detalle: 'Detail',
+          nomina: 'Payslips',
+          nominaDetalle: 'Payslip detail',
         },
         marcas: {
           ingresoRetiro: 'The contract started or ended within the period',

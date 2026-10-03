@@ -14,7 +14,7 @@ import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { FileDownloadService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import {
   DataTableComponent,
   DataToolbarComponent,
@@ -33,7 +33,12 @@ import {
   tonoFechaHasta,
 } from '../../programacion.constants';
 import { columnasDeRenglones, muestraHoras } from '../../programacion.renglones';
-import { ProgramacionService } from '../../programacion.service';
+import {
+  PROGRAMACION_EXPORTS,
+  ProgramacionService,
+  cuerpoExportacion,
+  type ProgramacionExportKey,
+} from '../../programacion.service';
 
 /**
  * Los **renglones** de la programación: un contrato por fila con su liquidación
@@ -56,6 +61,7 @@ import { ProgramacionService } from '../../programacion.service';
 })
 export class ProgramacionRenglonesTabComponent {
   private readonly service = inject(ProgramacionService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly dialog = inject(DialogService);
@@ -160,6 +166,42 @@ export class ProgramacionRenglonesTabComponent {
       : null,
   );
 
+  /**
+   * "Excel ▾" de la tabla: las tres exportaciones, junto a lo que exportan. El
+   * botón va sin ícono, solo los ítems lo llevan. Nómina y nómina detalle
+   * exportan documentos que existen desde que se genera: antes se ven
+   * deshabilitados, como el resto de la botonera.
+   */
+  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
+    const sinNominas = !this.capacidades().puedeImprimirNominas;
+    return [
+      {
+        id: 'excel',
+        labelKey: 'entities.programacion.renglones.excel.action',
+        iconClass: '',
+        children: [
+          {
+            id: 'excel:renglones',
+            labelKey: 'entities.programacion.renglones.excel.detalle',
+            iconClass: 'pi pi-file-excel',
+          },
+          {
+            id: 'excel:nomina',
+            labelKey: 'entities.programacion.renglones.excel.nomina',
+            iconClass: 'pi pi-file-excel',
+            disabled: sinNominas,
+          },
+          {
+            id: 'excel:nominaDetalle',
+            labelKey: 'entities.programacion.renglones.excel.nominaDetalle',
+            iconClass: 'pi pi-file-excel',
+            disabled: sinNominas,
+          },
+        ],
+      },
+    ];
+  });
+
   constructor() {
     effect(() => {
       this.programacionId();
@@ -180,6 +222,7 @@ export class ProgramacionRenglonesTabComponent {
 
   protected onToolbarAction(actionId: string): void {
     if (actionId === 'cargar-contratos') this.cargarContratos();
+    if (actionId.startsWith('excel:')) this.exportar(actionId.slice(6) as ProgramacionExportKey);
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
@@ -328,6 +371,25 @@ export class ProgramacionRenglonesTabComponent {
             this.t().common.toasts.deleteError.title,
             this.t().common.toasts.deleteError.desc,
           ),
+      });
+  }
+
+  /**
+   * Las tres exportaciones comparten forma: endpoint, serializador y el filtro que
+   * las acota a esta programación (ver `PROGRAMACION_EXPORTS`).
+   */
+  private exportar(clave: ProgramacionExportKey): void {
+    const config = PROGRAMACION_EXPORTS[clave];
+    const toasts = this.t().common.toasts;
+    this.fileDownload
+      .download(config.url, {
+        method: 'POST',
+        body: cuerpoExportacion(clave, this.programacionId()),
+        fallbackFilename: config.archivo,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
       });
   }
 

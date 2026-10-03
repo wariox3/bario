@@ -30,13 +30,7 @@ import {
   type CapacidadesProgramacion,
 } from '../../programacion.estado';
 import type { Programacion } from '../../programacion.model';
-import {
-  PROGRAMACION_EXPORTS,
-  ProgramacionService,
-  cuerpoDe,
-  cuerpoExportacion,
-  type ProgramacionExportKey,
-} from '../../programacion.service';
+import { ProgramacionService, cuerpoDe } from '../../programacion.service';
 
 /** Acciones del ciclo que se confirman antes de ejecutarse. */
 type AccionCiclo = 'generar' | 'desgenerar' | 'aprobar' | 'desaprobar';
@@ -134,14 +128,14 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   });
 
   /**
-   * El ERP anterior generaba la plantilla de horas desde el propio listado de
-   * renglones (`serializador: 'ImportarHoras'` sobre la programación abierta), no
-   * desde un endpoint fijo. Hasta confirmar cómo se pide, el botón se muestra
-   * deshabilitado con el motivo a la vista.
+   * La plantilla de horas sale de esta programación: trae a sus empleados con
+   * las horas actuales, se edita y se sube la misma. Por eso depende del id.
    */
   protected readonly exampleConfig = computed<ExampleConfig>(() => ({
-    mode: 'disabled',
-    reason: this.t().entities.programacion.importarHoras.plantillaNoDisponible,
+    mode: 'enabled',
+    endpoint: this.service.importarHorasEjemploUrl,
+    params: { programacion_id: this.programacionId() },
+    filename: `horas-programacion-${this.programacionId()}.xlsx`,
   }));
 
   /**
@@ -178,8 +172,9 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   });
 
   /**
-   * "Utilidades": importar horas, y las impresiones y exportaciones que no
-   * cambian nada. El PDF de la programación no va acá: es el botón Imprimir.
+   * "Utilidades": importar horas y el PDF de las nóminas. El PDF de la
+   * programación es el botón Imprimir, y los Excel viven en la tabla de
+   * empleados, junto a lo que exportan.
    *
    * El legacy rotulaba "Importar nominas" a lo que en realidad **imprime** las
    * nóminas (`imprimirNominas()`); acá se llama por lo que hace.
@@ -200,24 +195,6 @@ export class ProgramacionWorkspaceComponent implements OnInit {
         icon: 'pi pi-file-pdf',
         disabled: !c.puedeImprimirNominas,
         command: () => this.imprimirNominas(),
-      },
-      { separator: true },
-      {
-        label: labels.exportRenglones,
-        icon: 'pi pi-file-excel',
-        command: () => this.exportar('renglones'),
-      },
-      {
-        label: labels.exportNomina,
-        icon: 'pi pi-file-excel',
-        disabled: !c.puedeImprimirNominas,
-        command: () => this.exportar('nomina'),
-      },
-      {
-        label: labels.exportNominaDetalle,
-        icon: 'pi pi-file-excel',
-        disabled: !c.puedeImprimirNominas,
-        command: () => this.exportar('nominaDetalle'),
       },
     ];
   });
@@ -328,25 +305,6 @@ export class ProgramacionWorkspaceComponent implements OnInit {
         method: 'POST',
         body: cuerpoDe(this.programacionId()),
         fallbackFilename: archivo,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
-      });
-  }
-
-  /**
-   * Las tres exportaciones comparten forma: endpoint, serializador y el filtro que
-   * acota a esta programación (ver `PROGRAMACION_EXPORTS`).
-   */
-  private exportar(clave: ProgramacionExportKey): void {
-    const config = PROGRAMACION_EXPORTS[clave];
-    const toasts = this.t().common.toasts;
-    this.fileDownload
-      .download(config.url, {
-        method: 'POST',
-        body: cuerpoExportacion(clave, this.programacionId()),
-        fallbackFilename: config.archivo,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

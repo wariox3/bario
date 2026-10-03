@@ -17,7 +17,6 @@
   <p-button
     type="button"
     [label]="t().common.actions.back"
-    icon="pi pi-arrow-left"
     severity="secondary"
     [outlined]="true"
     size="small"
@@ -28,7 +27,6 @@
     <p-button
       type="button"
       [label]="t().common.actions.edit"
-      icon="pi pi-pencil"
       size="small"
       [disabled]="!capacidades().puedeEditarCabecera || estaOcupado()"
       (onClick)="onEdit()"
@@ -38,7 +36,6 @@
       <p-button
         type="button"
         [label]="acc.generar"
-        icon="pi pi-cog"
         severity="secondary"
         [outlined]="true"
         size="small"
@@ -49,7 +46,6 @@
       <p-button
         type="button"
         [label]="acc.aprobar"
-        icon="pi pi-check-circle"
         size="small"
         [loading]="accionEnCurso() === 'aprobar'"
         [disabled]="!capacidades().puedeAprobar || estaOcupado()"

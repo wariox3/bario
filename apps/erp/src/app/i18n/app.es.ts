@@ -4294,8 +4294,8 @@ export const es: AppDict = {
       },
       importarHoras: {
         title: 'Importar horas',
-        subtitle: 'Subí el Excel con las horas del periodo',
-        plantillaNoDisponible: 'La plantilla se pide con la programación abierta (pendiente)',
+        subtitle:
+          'Descarga la plantilla con los empleados de esta programación, ajusta sus horas y súbela',
       },
       acciones: {
         generar: 'Generar',
@@ -4307,9 +4307,6 @@ export const es: AppDict = {
         imprimir: 'PDF de la programación',
         imprimirNominas: 'PDF de las nóminas',
         utilidades: 'Utilidades',
-        exportRenglones: 'Excel de empleados',
-        exportNomina: 'Excel de nóminas',
-        exportNominaDetalle: 'Excel de conceptos',
         confirmaciones: {
           generar: {
             header: 'Generar la nómina',
@@ -4378,6 +4375,12 @@ export const es: AppDict = {
           titulo: 'Abreviaturas',
           contenido:
             'DT: días de transporte · D: diurna · N: nocturna · FD: festiva diurna · FN: festiva nocturna · ED: extra diurna · EN: extra nocturna · EFD: extra festiva diurna · EFN: extra festiva nocturna · RN: recargo nocturno · RFD: recargo festivo diurno · RFN: recargo festivo nocturno',
+        },
+        excel: {
+          action: 'Excel',
+          detalle: 'Detalle',
+          nomina: 'Nómina',
+          nominaDetalle: 'Nómina detalle',
         },
         marcas: {
           ingresoRetiro: 'El contrato ingresó o se retiró dentro del periodo',

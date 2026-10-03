@@ -91,6 +91,22 @@ describe('ProgramacionService · acciones sobre la programación', () => {
     req.flush({});
   });
 
+  it('importa las horas bajo programacion-detalle, con archivo y programacion_id', () => {
+    service.importarHoras(7, new File(['x'], 'horas.xlsx')).subscribe();
+    const req = http.expectOne('/api/humano/programacion-detalle/importar-horas/');
+    expect(req.request.method).toBe('POST');
+    const form = req.request.body as FormData;
+    expect(form.get('archivo')).toBeInstanceOf(File);
+    expect(form.get('programacion_id')).toBe('7');
+    req.flush({ creados: 3 });
+  });
+
+  it('la plantilla de horas también vive bajo programacion-detalle', () => {
+    expect(service.importarHorasEjemploUrl).toBe(
+      '/humano/programacion-detalle/importar-horas-ejemplo/',
+    );
+  });
+
   it('elimina los renglones elegidos en una sola petición', () => {
     service.eliminarRenglones(7, [11, 12]).subscribe();
     const req = http.expectOne('/api/humano/programacion/eliminar-detalle/');
@@ -143,16 +159,19 @@ describe('cuerpoExportacion', () => {
   it('acota las nóminas a la programación dentro de filtros, no suelto en el cuerpo', () => {
     expect(cuerpoExportacion('nomina', 7)).toEqual({
       filtros: [{ propiedad: 'programacion_detalle__programacion_id', operador: '=', valor: 7 }],
-      ordenamientos: [],
-      serializador: 'informe_nomina',
+      ordenamientos: ['-fecha'],
+      informe: 'nomina',
     });
   });
 
-  it('cada exportación usa su filtro y su serializador', () => {
+  it('cada exportación usa su filtro y su reporte (serializador o informe)', () => {
     expect(cuerpoExportacion('renglones', 7).filtros[0].propiedad).toBe('programacion_id');
-    expect(cuerpoExportacion('nominaDetalle', 7)).toMatchObject({
-      filtros: [{ propiedad: 'documento__programacion_detalle__programacion_id', valor: 7 }],
-      serializador: 'informe_nomina_detalle',
+    expect(cuerpoExportacion('nominaDetalle', 7)).toEqual({
+      filtros: [
+        { propiedad: 'documento__programacion_detalle__programacion_id', operador: '=', valor: 7 },
+      ],
+      ordenamientos: [],
+      informe: 'nomina_detalle',
     });
   });
 });

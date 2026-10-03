@@ -3298,7 +3298,6 @@ export interface AppDict
       importarHoras: {
         title: string;
         subtitle: string;
-        plantillaNoDisponible: string;
       };
       acciones: {
         generar: string;
@@ -3310,9 +3309,6 @@ export interface AppDict
         imprimir: string;
         imprimirNominas: string;
         utilidades: string;
-        exportRenglones: string;
-        exportNomina: string;
-        exportNominaDetalle: string;
         confirmaciones: {
           generar: { header: string; message: string };
           desgenerar: { header: string; message: string };
@@ -3351,6 +3347,8 @@ export interface AppDict
         leyenda: { titulo: string; contenido: string };
         /** Leyenda de los colores de las fechas (`tonoFechaDesde` / `tonoFechaHasta`). */
         marcas: { ingresoRetiro: string; errorTerminacion: string };
+        /** Dropdown "Excel" de la tabla de empleados. */
+        excel: { action: string; detalle: string; nomina: string; nominaDetalle: string };
         toasts: {
           cargarSuccess: { title: string; desc: string };
           cargarError: { title: string; desc: string };

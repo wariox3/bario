@@ -7,6 +7,7 @@ import {
   buildListParams,
   type ListQuery,
   type PaginatedResponse,
+  type SortSpec,
 } from '@reddoc/core';
 import type { Programacion, ProgramacionDetalle, ProgramacionPayload } from './programacion.model';
 
@@ -174,16 +175,26 @@ export class ProgramacionService extends BaseHttpService {
   // ── Importación e impresión ───────────────────────────────────────────────
 
   /**
-   * Importa las horas del periodo desde un Excel.
+   * Importa las horas del periodo desde un Excel: el mismo archivo de la
+   * plantilla (`importarHorasEjemploUrl`) con las horas editadas.
    *
-   * El legacy nombra la acción `importar_horas/`; acá va con **guion**, como el
-   * resto de los endpoints. El `programacion_id` viaja como campo del multipart.
+   * Vive bajo **`programacion-detalle`**, no bajo `programacion`: actualiza las
+   * horas de los renglones. Multipart con `archivo` + `programacion_id`. Es todo
+   * o nada, una celda vacía se guarda como 0, y la programación no puede estar
+   * generada ni aprobada. Responde `{ creados: N }` (renglones actualizados).
    */
   importarHoras(id: number, file: File): Observable<unknown> {
-    return this.postFile<unknown>(`${this.resourcePath}importar-horas/`, file, {
+    return this.postFile<unknown>(`${PROGRAMACION_DETALLE_ENDPOINT}importar-horas/`, file, {
       programacion_id: id,
     });
   }
+
+  /**
+   * Plantilla de horas: un renglón por empleado de la programación con su id, su
+   * identificación, su nombre y las horas actuales. Va con `programacion_id`
+   * como query param.
+   */
+  readonly importarHorasEjemploUrl = `${PROGRAMACION_DETALLE_ENDPOINT}importar-horas-ejemplo/`;
 
   /** URL del PDF de la programación (la usa `FileDownloadService`). */
   readonly imprimirUrl = `${PROGRAMACION_ENDPOINT}imprimir/`;
@@ -222,47 +233,62 @@ export function cuerpoDe(programacionId: number): { readonly programacion_id: nu
 const DOCUMENTO_ENDPOINT = '/general/documento/';
 
 /**
- * Las tres exportaciones a Excel de la programación, con el endpoint, el
- * serializador y el filtro de cada una. El cuerpo lo arma `cuerpoExportacion`.
+ * Qué reporte arma un `POST …excel/`. Depende del endpoint: los genéricos
+ * eligen la forma con `serializador`; los `*-informe/` (como los contables)
+ * con `informe`.
+ */
+type ReporteExcel = { readonly serializador: string } | { readonly informe: string };
+
+/** Una exportación: endpoint, reporte, filtro que la acota, orden y nombre del archivo. */
+interface ExportacionProgramacion {
+  readonly url: string;
+  readonly reporte: ReporteExcel;
+  readonly filtro: string;
+  /** Orden de las filas; sin él, el que defina el backend. */
+  readonly orden?: readonly SortSpec[];
+  readonly archivo: string;
+}
+
+/**
+ * Las tres exportaciones a Excel de la programación. El cuerpo lo arma
+ * `cuerpoExportacion`.
  *
- * ⚠️ Los tres serializadores salen del ERP anterior, que los pedía por **GET con
- * query params**; acá van en el `POST …excel/`, como en el resto de informes.
- * `programacion-detalle/excel/` y `documento-detalle/excel/` todavía no están
- * publicados en el backend: solo el de nóminas (`documento/excel/`) responde.
- *
- * Las dos últimas apuntan al endpoint genérico de documentos porque lo que exportan
- * son las **nóminas generadas**, no los renglones de la programación.
+ * Las dos últimas exportan las **nóminas generadas**, no los renglones: por eso
+ * apuntan a los informes de documentos (`documento-informe` y
+ * `documento-detalle-informe`), que eligen el reporte con `informe`.
  */
 export const PROGRAMACION_EXPORTS = {
   /** Los renglones de la programación. */
   renglones: {
     url: `${PROGRAMACION_DETALLE_ENDPOINT}excel/`,
-    serializador: 'informe_programacion_detalle',
+    reporte: { serializador: 'informe_programacion_detalle' },
     filtro: 'programacion_id',
     archivo: 'programacion-renglones.xlsx',
   },
   /** Las nóminas generadas (una fila por documento). */
   nomina: {
-    url: `${DOCUMENTO_ENDPOINT}excel/`,
-    serializador: 'informe_nomina',
+    url: '/general/documento-informe/excel/',
+    reporte: { informe: 'nomina' },
     filtro: 'programacion_detalle__programacion_id',
+    orden: [{ field: 'fecha', direction: 'desc' }],
     archivo: 'nominas.xlsx',
   },
-  /** Los conceptos de las nóminas generadas (una fila por línea). */
+  /** Los conceptos de las nóminas generadas (una fila por línea del documento). */
   nominaDetalle: {
-    url: '/general/documento-detalle/excel/',
-    serializador: 'informe_nomina_detalle',
+    url: '/general/documento-detalle-informe/excel/',
+    reporte: { informe: 'nomina_detalle' },
     filtro: 'documento__programacion_detalle__programacion_id',
     archivo: 'nominas-detalle.xlsx',
   },
-} as const;
+} as const satisfies Record<string, ExportacionProgramacion>;
 
 /** Clave de una de las tres exportaciones. */
 export type ProgramacionExportKey = keyof typeof PROGRAMACION_EXPORTS;
 
 /**
  * Cuerpo del `POST …excel/` de una exportación: el filtro que la acota a esta
- * programación, en el formato de `filtros` del backend, más su serializador.
+ * programación, en el formato de `filtros` del backend, más el reporte
+ * (`serializador` o `informe`, según el endpoint).
  *
  * El filtro **tiene** que ir dentro de `filtros`. Suelto en el cuerpo
  * (`{ programacion_detalle__programacion_id: 7 }`) el backend lo ignora sin
@@ -271,13 +297,13 @@ export type ProgramacionExportKey = keyof typeof PROGRAMACION_EXPORTS;
 export function cuerpoExportacion(
   clave: ProgramacionExportKey,
   programacionId: number,
-): AdvancedListBody & { readonly serializador: string } {
-  const config = PROGRAMACION_EXPORTS[clave];
+): AdvancedListBody & ReporteExcel {
+  const config: ExportacionProgramacion = PROGRAMACION_EXPORTS[clave];
   const query: ListQuery = {
     filters: [{ field: config.filtro, operator: 'eq', value: programacionId }],
-    sort: [],
+    sort: config.orden ?? [],
     page: 0,
     pageSize: 0,
   };
-  return { ...buildListBody(query), serializador: config.serializador };
+  return { ...buildListBody(query), ...config.reporte };
 }
