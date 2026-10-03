@@ -4123,10 +4123,14 @@ export const en: AppDict = {
         },
       },
       resumen: {
-        sinNombre: 'Unnamed payroll run',
         conceptos: 'Settled concepts',
         sinConceptos: 'No active concepts',
         labels: {
+          id: 'ID',
+          nombre: 'Name',
+          pagoTipo: 'Payment type',
+          grupo: 'Group',
+          periodo: 'Period',
           fechaDesde: 'From',
           fechaHasta: 'To',
           dias: 'Days',

@@ -4186,12 +4186,16 @@ export const es: AppDict = {
         },
       },
       resumen: {
-        sinNombre: 'Programación sin nombre',
         conceptos: 'Conceptos que se liquidan',
         sinConceptos: 'No hay conceptos activos',
         labels: {
+          id: 'ID',
+          nombre: 'Nombre',
           fechaDesde: 'Desde',
           fechaHasta: 'Hasta',
+          pagoTipo: 'Tipo de pago',
+          grupo: 'Grupo',
+          periodo: 'Periodo',
           dias: 'Días',
           contratos: 'Contratos',
           devengado: 'Devengado',

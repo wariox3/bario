@@ -3198,12 +3198,16 @@ export interface AppDict
         };
       };
       resumen: {
-        sinNombre: string;
         conceptos: string;
         sinConceptos: string;
         labels: {
+          id: string;
+          nombre: string;
           fechaDesde: string;
           fechaHasta: string;
+          pagoTipo: string;
+          grupo: string;
+          periodo: string;
           dias: string;
           contratos: string;
           devengado: string;
