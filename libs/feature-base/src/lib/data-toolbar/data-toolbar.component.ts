@@ -124,6 +124,7 @@ export class DataToolbarComponent {
         ? action.children.map((child) => ({
             label: this.resolveKey(dict, child.labelKey),
             icon: child.iconClass,
+            disabled: child.disabled ?? false,
             command: () => this.actionInvoked.emit(child.id),
           }))
         : null,
