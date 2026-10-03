@@ -361,8 +361,9 @@ export const CONCEPTO_ADICIONAL_ENDPOINT = '/humano/concepto/seleccionar/';
 export const CONCEPTO_ADICIONAL_PARAMS: Record<string, string> = { adicional: 'True' };
 
 /**
- * Columnas de los adicionales dentro del workspace. Es un subconjunto de las del
- * master: acá la programación es implícita, así que su columna no aporta.
+ * Columnas de los adicionales dentro del workspace, en el orden del ERP anterior:
+ * quién (identificación, nombre, contrato), qué concepto y por cuánto. La
+ * programación es implícita, así que no lleva columna. Las FK llegan sin `_id`.
  */
 export const ADICIONALES_PROGRAMACION_COLUMNS: readonly ColumnDef[] = [
   {
@@ -373,15 +374,36 @@ export const ADICIONALES_PROGRAMACION_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
+    field: 'contrato_contacto_numero_identificacion',
+    headerKey: 'entities.programacion.adicionales.columns.identificacion',
+    type: 'text',
+    width: '130px',
+  },
+  {
     field: 'contrato_nombre',
     headerKey: 'entities.programacion.adicionales.columns.empleado',
     type: 'text',
+    width: '220px',
+  },
+  {
+    field: 'contrato',
+    headerKey: 'entities.programacion.adicionales.columns.contrato',
+    type: 'number',
+    width: '80px',
+    align: 'right',
+  },
+  {
+    field: 'concepto',
+    headerKey: 'entities.programacion.adicionales.columns.conceptoId',
+    type: 'number',
+    width: '80px',
+    align: 'right',
   },
   {
     field: 'concepto_nombre',
     headerKey: 'entities.programacion.adicionales.columns.concepto',
     type: 'text',
-    width: '220px',
+    width: '200px',
   },
   {
     field: 'valor',
@@ -391,22 +413,16 @@ export const ADICIONALES_PROGRAMACION_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'horas',
-    headerKey: 'entities.programacion.adicionales.columns.horas',
-    type: 'number',
-    width: '90px',
-    align: 'right',
-  },
-  {
     field: 'detalle',
     headerKey: 'entities.programacion.adicionales.columns.detalle',
     type: 'text',
   },
   {
+    // ADL: aplica día laborado (se prorratea por los días trabajados).
     field: 'aplica_dia_laborado',
     headerKey: 'entities.programacion.adicionales.columns.aplicaDiaLaborado',
     type: 'boolean',
-    width: '110px',
+    width: '80px',
     align: 'center',
   },
 ];

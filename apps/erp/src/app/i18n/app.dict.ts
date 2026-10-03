@@ -3273,21 +3273,23 @@ export interface AppDict
           concepto: string;
           conceptoPlaceholder: string;
           valor: string;
-          horas: string;
-          horasHint: string;
           detalle: string;
           aplicaDiaLaborado: string;
         };
         validation: { required: string; valorMinimo: string };
         columns: {
           id: string;
+          identificacion: string;
           empleado: string;
+          contrato: string;
+          conceptoId: string;
           concepto: string;
           valor: string;
-          horas: string;
           detalle: string;
           aplicaDiaLaborado: string;
         };
+        /** Abreviaturas de la tabla, bajo ella como en la de empleados. */
+        leyenda: { titulo: string; contenido: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           createError: { title: string; desc: string };

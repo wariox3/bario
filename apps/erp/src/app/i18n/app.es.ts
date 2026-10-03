@@ -4267,8 +4267,6 @@ export const es: AppDict = {
           concepto: 'Concepto',
           conceptoPlaceholder: 'Buscar concepto…',
           valor: 'Valor',
-          horas: 'Horas',
-          horasHint: 'Solo si el concepto se liquida por horas',
           detalle: 'Detalle',
           aplicaDiaLaborado: 'Proporcional a los días laborados',
         },
@@ -4278,12 +4276,19 @@ export const es: AppDict = {
         },
         columns: {
           id: 'ID',
-          empleado: 'Empleado',
+          identificacion: 'Identificación',
+          empleado: 'Nombre',
+          contrato: 'Cont',
+          conceptoId: 'Cód',
           concepto: 'Concepto',
           valor: 'Valor',
-          horas: 'Horas',
           detalle: 'Detalle',
-          aplicaDiaLaborado: 'Proporcional',
+          aplicaDiaLaborado: 'ADL',
+        },
+        leyenda: {
+          titulo: 'Abreviaturas',
+          contenido:
+            'Cont: contrato · Cód: código del concepto · ADL: aplica día laborado (el valor se prorratea por los días trabajados)',
         },
         toasts: {
           createSuccess: { title: 'Adicional creado', desc: 'Se agregó a la programación' },

@@ -17,6 +17,7 @@ import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/e
 import { AdicionalService } from '@erp/features/humano/masters/adicional/adicional.service';
 import type { Adicional } from '@erp/features/humano/masters/adicional/adicional.model';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { AppDict } from '@erp/i18n';
 import { ADICIONALES_PROGRAMACION_COLUMNS } from '../../programacion.constants';
@@ -98,10 +99,15 @@ export class ProgramacionAdicionalesTabComponent {
     endpoint: '/humano/adicional/importar-ejemplo/',
   };
 
-  /** Importación masiva: lo subido queda en esta programación y la tabla vuelve a la página 1. */
+  /**
+   * Importación masiva: lo subido queda en esta programación y la tabla vuelve a
+   * la página 1. Ofrece **todos** los maestros, como contactos: el archivo cruza
+   * contratos, conceptos y empleados, y acotarlos dejaría afuera el que falte.
+   */
   protected readonly importar = importState({
     upload: (file) => this.service.importar(file, { programacion_id: this.programacionId() }),
     onImported: () => this.loadPage(0),
+    masters: IMPORT_MASTERS_ALL,
   });
 
   protected readonly primaryAction = computed<ToolbarAction | null>(() =>
@@ -162,7 +168,7 @@ export class ProgramacionAdicionalesTabComponent {
         switchMap(({ AdicionalModalComponent }) => {
           const ref = this.dialog.open(AdicionalModalComponent, {
             ...ENTITY_ACTION_DIALOG_DEFAULTS,
-            width: '44rem',
+            width: '32rem',
             data: { programacionId: this.programacionId(), adicional },
           });
           return ref ? ref.onClose : EMPTY;

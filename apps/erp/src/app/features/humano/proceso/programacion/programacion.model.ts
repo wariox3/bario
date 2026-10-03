@@ -203,5 +203,4 @@ export interface AdicionalProgramacionPayload {
   readonly aplica_dia_laborado: boolean;
   readonly inactivo: boolean;
   readonly programacion: number;
-  readonly horas: number;
 }
