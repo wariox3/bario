@@ -1,6 +1,6 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
@@ -16,6 +16,7 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -34,6 +35,9 @@ import { ProgramacionService, cuerpoDe } from '../../programacion.service';
 
 /** Acciones del ciclo que se confirman antes de ejecutarse. */
 type AccionCiclo = 'generar' | 'desgenerar' | 'aprobar' | 'desaprobar';
+
+/** Pestañas del workspace: empleados (renglones) y adicionales. */
+type WorkspaceTab = 'renglones' | 'adicionales';
 
 /**
  * **Workspace** de una programación de nómina: donde se arma, se liquida y se
@@ -76,6 +80,7 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -94,7 +99,15 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   /** Notificación en vuelo. No es del ciclo (no cambia de etapa) pero también bloquea. */
   protected readonly notificando = signal(false);
 
-  protected readonly activeTab = signal<'renglones' | 'adicionales'>('renglones');
+  /**
+   * Pestaña activa, en la URL (`?tab=adicionales`) para que recargar o compartir
+   * el link no la pierda. Llega como input por `withComponentInputBinding`; un
+   * valor desconocido cae en empleados.
+   */
+  readonly tab = input<string>();
+  protected readonly activeTab = computed<WorkspaceTab>(() =>
+    this.tab() === 'adicionales' ? 'adicionales' : 'renglones',
+  );
 
   /** Renglones cargados; alimenta la capacidad de generar. */
   protected readonly renglones = signal(0);
@@ -125,6 +138,7 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   protected readonly importar = importState({
     upload: (file) => this.service.importarHoras(this.programacionId(), file),
     onImported: () => this.reloadToken.update((n) => n + 1),
+    masters: IMPORT_MASTERS_ALL,
   });
 
   /**
@@ -226,6 +240,19 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   }
 
   // ── Navegación ────────────────────────────────────────────────────────────
+
+  /**
+   * Cambiar de pestaña reescribe `?tab=` sin sumar al historial: "Atrás" vuelve a
+   * la página anterior, no a la pestaña anterior.
+   */
+  protected onTabChange(value: WorkspaceTab): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: value },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   protected onBack(): void {
     this.navigateTo();
