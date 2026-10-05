@@ -38,7 +38,6 @@ export const APORTES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'anio',
@@ -46,7 +45,6 @@ export const APORTES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '90px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'mes',
@@ -54,13 +52,11 @@ export const APORTES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'sucursal_nombre',
     headerKey: 'entities.aporte.columns.sucursal',
     type: 'text',
-    sortable: true,
   },
   {
     field: 'empleados',
