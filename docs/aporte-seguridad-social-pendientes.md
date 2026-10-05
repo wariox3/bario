@@ -21,18 +21,11 @@ Convenciones que asume el frontend:
 
 ## 1. Endpoints que faltan
 
-### `POST humano/aporte/eliminar-contrato/` ❌ PENDIENTE
+### `DELETE humano/aporte-contrato/{id}/` ✅ IMPLEMENTADO
 
 Quitar contratos del aporte antes de generar (la persona excluye a mano a quien no debe
-ir en la planilla). Hoy `aporte-contrato` no publica `DELETE`. Se propone la misma forma
-que `programacion/eliminar-detalle/`:
-
-```json
-{ "aporte_id": 1, "ids": [10, 11, 12] }
-```
-
-Responde el aporte con su `contratos` al día. Solo debe permitirse con el aporte sin
-generar.
+ir en la planilla). El frontend manda un `DELETE` por contrato seleccionado y después
+vuelve a pedir la cabecera para refrescar `contratos` y `empleados`.
 
 ### `POST humano/aporte/imprimir/` ❌ PENDIENTE
 
