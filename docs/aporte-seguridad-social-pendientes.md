@@ -89,6 +89,24 @@ Y estos ordenamientos: `contrato_id` (contratos), `aporte_contrato_id` (detalles
 Los filtros fijos son los críticos: si el backend no los acepta, la pestaña muestra
 registros de **todos** los aportes.
 
+### "Ver detalle" de un contrato (nóminas del periodo)
+
+El modal de la pestaña de contratos cruza el contrato contra sus nóminas del periodo con
+dos `lista/` en paralelo. Filtros que usa:
+
+| Endpoint                   | Filtro                                          | Uso                      |
+| -------------------------- | ----------------------------------------------- | ------------------------ |
+| `documento/lista/`         | `documento_tipo__documento_clase_id` (= 701)    | Solo nóminas             |
+| `documento/lista/`         | `contrato_id`                                   | Las del contrato         |
+| `documento/lista/`         | `fecha` (`>=` desde, `<=` hasta del aporte)     | Dentro del periodo       |
+| `documento-detalle/lista/` | `documento__documento_tipo__documento_clase_id` | Solo conceptos de nómina |
+| `documento-detalle/lista/` | `documento__contrato_id`                        | Las del contrato         |
+| `documento-detalle/lista/` | `documento__fecha` (rango del aporte)           | Dentro del periodo       |
+
+Si `contrato_id` / `documento__contrato_id` no están en los `campos_filtrables`, el modal
+muestra nóminas de **todos** los empleados. El ERP anterior además mandaba un
+`serializador` (`lista_nomina`, `nomina`) que este backend no declara; ya no se manda.
+
 ## 4. Preguntas
 
 1. **`POST humano/aporte/generar-entidad/`**: ¿qué hace? ¿Hay que llamarlo después de
