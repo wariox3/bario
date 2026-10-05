@@ -7,6 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
+import type { Liquidacion } from '@erp/features/humano/proceso/liquidacion/liquidacion.model';
 import type { Contrato, ContratoPayload } from './contrato.model';
 
 @Injectable({ providedIn: 'root' })
@@ -57,9 +58,11 @@ export class ContratoService extends BaseHttpService {
    * **No es un `update` más**: el backend cierra el contrato y con eso **fabrica
    * la liquidación** del empleado. Por eso vive acá y no en el formulario, y por
    * eso la pantalla confirma diciendo qué va a pasar.
+   *
+   * Responde la **liquidación ya calculada**: el modal la muestra y ofrece abrirla.
    */
-  terminar(payload: TerminarContratoPayload): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}terminar/`, payload);
+  terminar(payload: TerminarContratoPayload): Observable<Liquidacion> {
+    return this.post<Liquidacion>(`${this.resourcePath}terminar/`, payload);
   }
 
   /**
@@ -80,11 +83,18 @@ export class ContratoService extends BaseHttpService {
   }
 }
 
-/** Lo que pide `terminar/`: cuándo y por qué se cierra el contrato. */
+/**
+ * Lo que pide `terminar/`: cuándo y por qué se cierra el contrato.
+ *
+ * ⚠️ **Acá las FK sí llevan `_id`**, al revés que en el `PUT` del contrato. Es una
+ * acción con su propio serializer de request (`TerminarContratoRequest` en el
+ * schema), no el del modelo, y los tres campos son obligatorios. Se portó sin
+ * sufijo siguiendo la convención general y el backend respondió 400.
+ */
 export interface TerminarContratoPayload {
-  readonly id: number;
+  readonly contrato_id: number;
   readonly fecha_terminacion: string | null;
-  readonly motivo_terminacion: number | null;
+  readonly motivo_terminacion_id: number | null;
 }
 
 /** Las cuatro fechas de último pago del contrato. */

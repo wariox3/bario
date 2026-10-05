@@ -211,13 +211,13 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'contacto_numero_identificacion',
+    field: 'contrato_contacto_numero_identificacion',
     headerKey: 'entities.aporte.contratos.columns.identificacion',
     type: 'text',
     width: '140px',
   },
   {
-    field: 'contacto_nombre_corto',
+    field: 'contrato_contacto_nombre_corto',
     headerKey: 'entities.aporte.contratos.columns.empleado',
     type: 'text',
   },

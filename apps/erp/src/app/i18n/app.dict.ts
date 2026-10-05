@@ -1557,12 +1557,21 @@ export interface AppDict
         action: string;
         title: string;
         subtitle: string;
-        aviso: string;
         submit: string;
         fields: { fecha: string; motivo: string; seleccionar: string };
-        validation: { required: string };
+        validation: { required: string; antesDelInicio: string };
+        /** Resumen de la liquidación que respondió `terminar/`. */
+        resultado: {
+          title: string;
+          subtitle: string;
+          periodo: string;
+          total: string;
+          adiciones: string;
+          deducciones: string;
+          nota: string;
+          cerrar: string;
+        };
         toasts: {
-          success: { title: string; desc: string };
           error: { title: string };
         };
       };

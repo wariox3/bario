@@ -122,8 +122,8 @@ export interface AporteContrato {
   readonly id: number;
   readonly contrato: number | null;
   /** El empleado del contrato, aplanado desde su contacto. */
-  readonly contacto_numero_identificacion: string | null;
-  readonly contacto_nombre_corto: string | null;
+  readonly contrato_contacto_numero_identificacion: string | null;
+  readonly contrato_contacto_nombre_corto: string | null;
 
   readonly fecha_desde: string | null;
   readonly fecha_hasta: string | null;

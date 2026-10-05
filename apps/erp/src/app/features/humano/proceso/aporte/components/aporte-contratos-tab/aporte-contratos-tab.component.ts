@@ -189,7 +189,7 @@ export class AporteContratosTabComponent {
             width: '80rem',
             data: {
               contratoId: fila.contrato,
-              empleado: fila.contacto_nombre_corto,
+              empleado: fila.contrato_contacto_nombre_corto,
               fechaDesde: this.fechaDesde(),
               fechaHasta: this.fechaHasta(),
             },

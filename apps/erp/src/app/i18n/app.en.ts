@@ -2059,17 +2059,27 @@ export const en: AppDict = {
         action: 'End',
         title: 'End contract',
         subtitle: 'Closing the employment relationship',
-        aviso:
-          "Ending the contract creates the employee's severance settlement with any pending benefits. Check the last-payment dates first.",
         submit: 'End contract',
         fields: {
           fecha: 'End date',
           motivo: 'Reason',
           seleccionar: 'Select…',
         },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          antesDelInicio: 'It cannot be before the contract start',
+        },
+        resultado: {
+          title: 'Contract ended',
+          subtitle: 'The settlement was created',
+          periodo: 'Settled period',
+          total: 'Total to pay',
+          adiciones: 'Additions',
+          deducciones: 'Deductions',
+          nota: 'Review it in Settlements before approving it: you can add additions or deductions there.',
+          cerrar: 'Close',
+        },
         toasts: {
-          success: { title: 'Contract ended', desc: 'The settlement was created' },
           error: { title: 'Could not end the contract' },
         },
       },

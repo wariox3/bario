@@ -69,7 +69,7 @@ y `aporte_contrato_salario`.
 ### `HumAporteContrato` ✅ IMPLEMENTADO
 
 El contrato del aporte ya trae al empleado, y el frontend lo pinta:
-`contacto_numero_identificacion` y `contacto_nombre_corto`.
+`contrato_contacto_numero_identificacion` y `contrato_contacto_nombre_corto`.
 
 ## 3. Filtros a confirmar (`campos_filtrables`)
 

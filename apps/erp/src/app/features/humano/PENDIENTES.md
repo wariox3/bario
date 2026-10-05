@@ -477,6 +477,17 @@ contrato siga vigente:
 | Fechas de último pago | `PATCH /humano/contrato/:id/`     | Desde cuándo se liquida cada prestación      |
 | Terminar contrato     | `POST /humano/contrato/terminar/` | Cierra el contrato y **crea la liquidación** |
 
+**`terminar/` lleva las FK con `_id`** — `{ contrato_id, fecha_terminacion, motivo_terminacion_id }`,
+los tres obligatorios (`TerminarContratoRequest` en el schema). Es la excepción a "se escribe sin
+`_id`": una acción con su propio serializer, no el del modelo. Se portó como
+`{ id, motivo_terminacion }` y respondió 400; el legacy mandaba `motivo_terminacion_id` bien pero
+`id` en vez de `contrato_id`. Corregido 2026-10-05.
+
+El endpoint **responde la liquidación ya calculada** (`HumLiquidacion`). El modal la usa: tras
+terminar pasa a un resumen (total, periodo, prestaciones) en vez de cerrarse
+con un toast. La fecha de terminación no admite días anteriores al inicio del contrato. La ficha se recarga siempre al cerrar el modal: también se cierra con la máscara
+o con Esc, sin resultado.
+
 ⚠️ **Las fechas de último pago son el supuesto más frágil de esta tanda.** El ERP anterior las lee
 con `serializador=parametros_iniciales` y las guarda con un endpoint aparte; acá se reusa el `PATCH`
 del propio contrato para no inventar uno. Si el backend no acepta la actualización parcial, el modal

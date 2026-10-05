@@ -2110,17 +2110,27 @@ export const es: AppDict = {
         action: 'Terminar',
         title: 'Terminar contrato',
         subtitle: 'Cierre de la relación laboral',
-        aviso:
-          'Al terminar el contrato se crea la liquidación del empleado con las prestaciones pendientes. Revisá antes las fechas de último pago.',
         submit: 'Terminar contrato',
         fields: {
           fecha: 'Fecha de terminación',
           motivo: 'Motivo',
           seleccionar: 'Selecciona…',
         },
-        validation: { required: 'Este campo es obligatorio' },
+        validation: {
+          required: 'Este campo es obligatorio',
+          antesDelInicio: 'No puede ser anterior al inicio del contrato',
+        },
+        resultado: {
+          title: 'Contrato terminado',
+          subtitle: 'Se creó la liquidación',
+          periodo: 'Periodo liquidado',
+          total: 'Total a pagar',
+          adiciones: 'Adiciones',
+          deducciones: 'Deducciones',
+          nota: 'Revísala en Liquidaciones antes de aprobarla: ahí puedes sumar adiciones o deducciones.',
+          cerrar: 'Cerrar',
+        },
         toasts: {
-          success: { title: 'Contrato terminado', desc: 'Se creó la liquidación del empleado' },
           error: { title: 'Error al terminar' },
         },
       },

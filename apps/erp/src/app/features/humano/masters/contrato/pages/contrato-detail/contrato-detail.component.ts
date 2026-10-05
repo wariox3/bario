@@ -29,6 +29,7 @@ import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
 import { CONTRATO_LIST_PATH } from '../../contrato.constants';
 import type { Contrato } from '../../contrato.model';
+import type { TerminarContratoModalData } from '../../components/terminar-contrato-modal/terminar-contrato-modal.component';
 
 /** Una de las cuatro fechas de último pago: su etiqueta i18n y el valor ya formateado. */
 interface ParametroInicial {
@@ -149,8 +150,9 @@ export class ContratoDetailComponent implements OnInit {
   /**
    * Abre el modal de terminación (lazy: solo se usa al cerrar un contrato).
    *
-   * Terminar **crea la liquidación** del empleado en el backend, así que al
-   * volver se recarga la ficha para ver el contrato ya cerrado.
+   * Terminar **crea la liquidación** del empleado en el backend. Al volver se
+   * recarga la ficha **siempre**: el modal también se cierra con la máscara o con
+   * Esc, sin resultado, y para entonces el contrato puede estar terminado igual.
    */
   protected onTerminar(): void {
     const c = this.contrato();
@@ -165,12 +167,12 @@ export class ContratoDetailComponent implements OnInit {
             data: {
               contratoId: c.id,
               empleado: c.contacto_nombre_corto,
+              fechaDesde: c.fecha_desde,
               fechaHasta: c.fecha_hasta,
-            },
+            } satisfies TerminarContratoModalData,
           });
           return ref ? ref.onClose : EMPTY;
         }),
-        filter((termino: unknown): termino is true => termino === true),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => this.loadContrato(c.id));
