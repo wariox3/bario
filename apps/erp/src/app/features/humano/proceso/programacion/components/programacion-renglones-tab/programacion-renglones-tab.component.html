@@ -6,10 +6,13 @@
       [primaryAction]="primaryAction()"
       [trailingActions]="trailingActions()"
       [searchEnabled]="false"
-      [filtersEnabled]="false"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
       [deleteSelectedEnabled]="hasSelection() && capacidades().puedeEliminarRenglon"
       [deleteSelectedCount]="selectedRows().length"
       (actionInvoked)="onToolbarAction($event)"
+      (filtersToggle)="filtersVisible.set(true)"
+      (filtersClear)="clearFilters()"
       (deleteSelected)="removeSelected()"
     />
 
@@ -61,5 +64,13 @@
     </p>
   }
 </div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
 
 <p-confirmDialog />

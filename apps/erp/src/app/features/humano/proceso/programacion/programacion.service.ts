@@ -4,6 +4,7 @@ import {
   BaseHttpService,
   buildListBody,
   type AdvancedListBody,
+  type FilterCondition,
   buildListParams,
   type ListQuery,
   type PaginatedResponse,
@@ -85,14 +86,18 @@ export class ProgramacionService extends BaseHttpService {
    *
    * El legacy pedía `limit: 1000` para traerlos todos de una; acá se pagina de
    * verdad: una programación de una empresa grande no cabe en una página.
+   *
+   * `filtros` son los que elige la persona en la tabla; van **después** del de la
+   * programación, que no se puede pisar.
    */
   listarRenglones(
     programacionId: number,
     page: number,
     pageSize: number,
+    filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<ProgramacionDetalle>> {
     const query: ListQuery = {
-      filters: [{ field: 'programacion_id', operator: 'eq', value: programacionId }],
+      filters: [{ field: 'programacion_id', operator: 'eq', value: programacionId }, ...filtros],
       sort: [{ field: 'contrato_id', direction: 'asc' }],
       page,
       pageSize,

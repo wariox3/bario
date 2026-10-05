@@ -7,6 +7,15 @@ export const PROGRAMACIONES_FILTERS_STORAGE_KEY = 'programaciones:filters:v1';
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const PROGRAMACION_LIST_PATH = ['humano', 'proceso', 'programacion'] as const;
 
+/**
+ * Filtros de la tabla de empleados: solo por ID del renglón, como el ERP
+ * anterior. No se guardan en el navegador como los de un listado: la tabla vive
+ * dentro de cada programación, y un filtro guardado aparecería en la siguiente.
+ */
+export const RENGLONES_FILTER_FIELDS: readonly FilterField[] = [
+  { name: 'id', displayNameKey: 'entities.programacion.renglones.columns.id', type: 'number' },
+];
+
 /** Filas por página de la tabla de renglones del workspace. */
 export const PROGRAMACION_RENGLONES_PAGE_SIZE = 25;
 

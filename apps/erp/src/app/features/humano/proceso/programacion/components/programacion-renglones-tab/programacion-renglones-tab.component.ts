@@ -13,8 +13,9 @@ import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
-import { FileDownloadService, I18nService, ToastService } from '@reddoc/core';
+import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
 import {
+  DataFilterModalComponent,
   DataTableComponent,
   DataToolbarComponent,
   type PageChangeEvent,
@@ -28,6 +29,7 @@ import type { CapacidadesProgramacion } from '../../programacion.estado';
 import type { ProgramacionDetalle } from '../../programacion.model';
 import {
   PROGRAMACION_RENGLONES_PAGE_SIZE,
+  RENGLONES_FILTER_FIELDS,
   tonoFechaDesde,
   tonoFechaHasta,
 } from '../../programacion.constants';
@@ -54,7 +56,12 @@ import {
 @Component({
   selector: 'app-programacion-renglones-tab',
   standalone: true,
-  imports: [ConfirmDialogModule, DataTableComponent, DataToolbarComponent],
+  imports: [
+    ConfirmDialogModule,
+    DataFilterModalComponent,
+    DataTableComponent,
+    DataToolbarComponent,
+  ],
   providers: [ConfirmationService, DialogService],
   templateUrl: './programacion-renglones-tab.component.html',
 })
@@ -199,6 +206,12 @@ export class ProgramacionRenglonesTabComponent {
     ];
   });
 
+  // ── Filtros ───────────────────────────────────────────────────────────────
+  // En memoria, no en el navegador: ver `RENGLONES_FILTER_FIELDS`.
+  protected readonly filterFields = RENGLONES_FILTER_FIELDS;
+  protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
+  protected readonly filtersVisible = signal(false);
+
   constructor() {
     effect(() => {
       this.programacionId();
@@ -215,6 +228,16 @@ export class ProgramacionRenglonesTabComponent {
 
   protected onSelectionChange(rows: unknown[]): void {
     this.selectedRows.set(rows as ProgramacionDetalle[]);
+  }
+
+  protected onFiltersApply(filters: readonly FilterCondition[]): void {
+    this.activeFilters.set(filters);
+    this.loadPage(0);
+  }
+
+  protected clearFilters(): void {
+    this.activeFilters.set([]);
+    this.loadPage(0);
   }
 
   protected onToolbarAction(actionId: string): void {
@@ -380,7 +403,7 @@ export class ProgramacionRenglonesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarRenglones(id, page, this.pageSize)
+      .listarRenglones(id, page, this.pageSize, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

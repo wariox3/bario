@@ -40,6 +40,16 @@ describe('ProgramacionService · listarRenglones', () => {
     req.flush({ count: 0, next: null, previous: null, results: [] });
   });
 
+  it('suma los filtros de la tabla después del de la programación', () => {
+    service.listarRenglones(7, 0, 25, [{ field: 'id', operator: 'eq', value: 3 }]).subscribe();
+    const req = http.expectOne((r) => r.url.endsWith('/programacion-detalle/lista/'));
+    expect(req.request.body.filtros).toEqual([
+      { propiedad: 'programacion_id', operador: '=', valor: 7 },
+      { propiedad: 'id', operador: '=', valor: 3 },
+    ]);
+    req.flush({ count: 0, next: null, previous: null, results: [] });
+  });
+
   it('recibe la página 0-based y la manda 1-based', () => {
     service.listarRenglones(7, 2, 25).subscribe();
     const req = http.expectOne((r) => r.url.endsWith('/programacion-detalle/lista/'));
