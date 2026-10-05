@@ -6,15 +6,16 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { I18nService, ToastService, formatCop } from '@reddoc/core';
+import { I18nService, ToastService, formatCop, formatFechaCorta } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { LineaNominaDelContrato, NominaDelContrato } from './nominas-contrato.model';
 import { NominasContratoService } from './nominas-contrato.service';
-import { totalesDe } from './nominas-contrato.totales';
+import { conDocumento, totalesDe } from './nominas-contrato.totales';
 
 /** Datos con los que la pestaña de contratos abre el modal. */
 export interface NominasContratoModalData {
@@ -26,9 +27,8 @@ export interface NominasContratoModalData {
   readonly fechaHasta: string | null;
 }
 
-/** Campos que se totalizan en cada tabla. */
-const CAMPOS_NOMINA = [
-  'salario',
+/** Campos que se totalizan en cada tabla, los mismos que el ERP anterior. */
+const CAMPOS_DOCUMENTO = [
   'base_cotizacion',
   'base_prestacion',
   'devengado',
@@ -36,23 +36,25 @@ const CAMPOS_NOMINA = [
   'total',
 ] as const;
 
-const CAMPOS_LINEA = ['base_cotizacion', 'base_prestacion', 'devengado', 'deduccion'] as const;
+const CAMPOS_DETALLE = ['devengado', 'deduccion', 'base_cotizacion', 'base_prestacion'] as const;
 
 /**
- * Cruce entre un contrato del aporte y las **nóminas ya liquidadas** del periodo.
+ * "Ver detalle" de un contrato del aporte: las **nóminas ya liquidadas** del
+ * periodo y sus conceptos, en dos tablas con sus totales.
  *
  * Responde la única pregunta que no contesta ninguna otra pantalla: *de dónde
  * salió el IBC que se le está cotizando a este empleado*. Por eso es un modal y
  * no un link a la ficha de nómina — lo que hace falta ver son **varias** nóminas
- * filtradas por contrato y periodo, con sus conceptos y sus totales cruzados.
+ * filtradas por contrato y periodo, con sus conceptos.
  *
  * Solo lectura. Las dos consultas van en paralelo y se totalizan completas, sin
- * paginar.
+ * paginar. El contrato no lo trae el documento: es el mismo con el que se
+ * filtra, así que se pinta el que llega en los datos.
  */
 @Component({
   selector: 'app-nominas-contrato-modal',
   standalone: true,
-  imports: [ButtonModule],
+  imports: [ButtonModule, DecimalPipe],
   providers: [NominasContratoService],
   templateUrl: './nominas-contrato-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,18 +74,27 @@ export class NominasContratoModalComponent {
   protected readonly datos = this.config.data as NominasContratoModalData;
 
   protected readonly isLoading = signal(true);
-  protected readonly nominas = signal<readonly NominaDelContrato[]>([]);
-  protected readonly lineas = signal<readonly LineaNominaDelContrato[]>([]);
+  protected readonly documentos = signal<readonly NominaDelContrato[]>([]);
+  private readonly lineas = signal<readonly LineaNominaDelContrato[]>([]);
 
-  protected readonly totalesNomina = computed(() => totalesDe(this.nominas(), CAMPOS_NOMINA));
-  protected readonly totalesLinea = computed(() => totalesDe(this.lineas(), CAMPOS_LINEA));
+  /** Cada concepto con el tipo y el número de su nómina. */
+  protected readonly detalles = computed(() => conDocumento(this.lineas(), this.documentos()));
 
-  protected readonly sinNominas = computed(() => !this.isLoading() && this.nominas().length === 0);
+  protected readonly totalesDocumento = computed(() =>
+    totalesDe(this.documentos(), CAMPOS_DOCUMENTO),
+  );
+  protected readonly totalesDetalle = computed(() => totalesDe(this.lineas(), CAMPOS_DETALLE));
+
+  /** "Nóminas de camilo vargas"; sin empleado, el título genérico. */
+  protected readonly titulo = computed(() => {
+    const m = this.t().entities.aporte.trazabilidad;
+    return this.datos.empleado ? `${m.title} ${this.datos.empleado}` : m.sinEmpleado;
+  });
 
   constructor() {
     const { contratoId, fechaDesde, fechaHasta } = this.datos;
     forkJoin({
-      nominas: this.service.listarNominas(contratoId, fechaDesde, fechaHasta),
+      documentos: this.service.listarNominas(contratoId, fechaDesde, fechaHasta),
       lineas: this.service.listarLineas(contratoId, fechaDesde, fechaHasta),
     })
       .pipe(
@@ -91,8 +102,8 @@ export class NominasContratoModalComponent {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: ({ nominas, lineas }) => {
-          this.nominas.set(nominas.results);
+        next: ({ documentos, lineas }) => {
+          this.documentos.set(documentos.results);
           this.lineas.set(lineas.results);
         },
         error: () =>
@@ -101,6 +112,11 @@ export class NominasContratoModalComponent {
             this.t().common.toasts.loadError.desc,
           ),
       });
+  }
+
+  /** Fecha corta (`05/08/2026`); raya si no hay. */
+  protected formatFecha(value: string | null): string {
+    return formatFechaCorta(value, '—');
   }
 
   protected onClose(): void {

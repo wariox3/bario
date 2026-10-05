@@ -3686,37 +3686,47 @@ export interface AppDict
         };
       };
       trazabilidad: {
-        verNominas: string;
+        verDetalle: string;
         title: string;
+        sinEmpleado: string;
         subtitle: string;
         total: string;
-        empty: { title: string; sub: string };
-        nominas: {
+        documentos: {
           title: string;
+          empty: string;
           columns: {
+            id: string;
+            tipo: string;
             numero: string;
             desde: string;
             hasta: string;
+            contrato: string;
             salario: string;
             ibc: string;
             ibp: string;
             devengado: string;
             deduccion: string;
-            total: string;
+            neto: string;
           };
         };
-        conceptos: {
+        detalles: {
           title: string;
           empty: string;
           columns: {
-            nomina: string;
+            id: string;
+            tipo: string;
+            numero: string;
+            conceptoId: string;
             concepto: string;
-            dias: string;
+            detalle: string;
+            porcentaje: string;
             horas: string;
-            ibc: string;
-            ibp: string;
+            dias: string;
+            valorHora: string;
             devengado: string;
             deduccion: string;
+            ibc: string;
+            ibp: string;
           };
         };
       };

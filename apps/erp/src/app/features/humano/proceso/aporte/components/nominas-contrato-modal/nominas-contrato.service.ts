@@ -23,16 +23,6 @@ const DOCUMENTO_ENDPOINT = '/general/documento/';
 const DOCUMENTO_DETALLE_ENDPOINT = '/general/documento-detalle/';
 
 /**
- * Serializadores del cruce. Los nombres salen del ERP anterior.
- *
- * TODO(backend): confirmarlos en el API nuevo. El legacy los mandaba como query
- * params de un `GET`; acá viajan en el body del `POST …/lista/`, que es la
- * convención de este ERP.
- */
-const SERIALIZADOR_NOMINA = 'lista_nomina';
-const SERIALIZADOR_LINEA = 'nomina';
-
-/**
  * Tope de registros del cruce. Un contrato tiene una o dos nóminas por periodo y
  * unas decenas de conceptos: se traen todos para poder totalizar sin paginar.
  */
@@ -50,6 +40,9 @@ const PAGINA_UNICA = {
  * Vive junto al modal y no en `AporteService` porque no toca ningún endpoint del
  * aporte: pega contra el master de documentos, que es justamente el punto —
  * cruzar lo que el aporte va a cotizar contra lo que ya se liquidó.
+ *
+ * El cuerpo es el de cualquier `lista/` (`filtros` y `ordenamientos`): el ERP
+ * anterior le agregaba un `serializador` que este backend no declara.
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
@@ -69,8 +62,7 @@ export class NominasContratoService extends BaseHttpService {
           { field: 'contrato_id', operator: 'eq', value: contratoId },
           ...rangoDeFechas('fecha', desde, hasta),
         ]),
-        ordenamientos: ['fecha'],
-        serializador: SERIALIZADOR_NOMINA,
+        ordenamientos: ['fecha', 'id'],
       },
       PAGINA_UNICA,
     );
@@ -94,8 +86,7 @@ export class NominasContratoService extends BaseHttpService {
           { field: 'documento__contrato_id', operator: 'eq', value: contratoId },
           ...rangoDeFechas('documento__fecha', desde, hasta),
         ]),
-        ordenamientos: ['documento__fecha'],
-        serializador: SERIALIZADOR_LINEA,
+        ordenamientos: ['documento__fecha', 'id'],
       },
       PAGINA_UNICA,
     );

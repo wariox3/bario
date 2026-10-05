@@ -116,9 +116,9 @@ export class AporteContratosTabComponent {
    */
   protected readonly rowActions: readonly RowAction[] = [
     {
-      id: 'ver-nominas',
-      labelKey: 'entities.aporte.trazabilidad.verNominas',
-      iconClass: 'pi pi-file-check',
+      id: 'ver-detalle',
+      labelKey: 'entities.aporte.trazabilidad.verDetalle',
+      iconClass: 'pi pi-file',
       inline: true,
     },
   ];
@@ -171,7 +171,7 @@ export class AporteContratosTabComponent {
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId === 'ver-nominas') this.verNominas(event.row as AporteContratoFila);
+    if (event.actionId === 'ver-detalle') this.verDetalle(event.row as AporteContratoFila);
   }
 
   /**
@@ -179,14 +179,14 @@ export class AporteContratosTabComponent {
    * cuando alguien pregunta por una cifra). Se le pasa el **contrato del
    * empleado**, no el id del renglón del aporte.
    */
-  private verNominas(fila: AporteContratoFila): void {
+  private verDetalle(fila: AporteContratoFila): void {
     if (fila.contrato == null) return;
     from(import('../nominas-contrato-modal/nominas-contrato-modal.component'))
       .pipe(
         switchMap(({ NominasContratoModalComponent }) => {
           const ref = this.dialog.open(NominasContratoModalComponent, {
             ...ENTITY_ACTION_DIALOG_DEFAULTS,
-            width: '68rem',
+            width: '80rem',
             data: {
               contratoId: fila.contrato,
               empleado: fila.contacto_nombre_corto,
