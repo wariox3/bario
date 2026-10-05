@@ -4504,6 +4504,29 @@ export const es: AppDict = {
           total: 'Total a pagar',
         },
       },
+      form: {
+        editTitle: 'Editar liquidación',
+        sectionHint: 'Desde cuándo se cuenta cada prestación. Los valores los calcula el sistema.',
+        fields: {
+          fechaUltimoPago: 'Último pago',
+          fechaUltimoPagoCesantia: 'Último pago de cesantías',
+          fechaUltimoPagoPrima: 'Último pago de prima',
+          fechaUltimoPagoVacacion: 'Último pago de vacaciones',
+          comentario: 'Comentario',
+        },
+        toasts: {
+          editSuccess: {
+            title: 'Liquidación actualizada',
+            desc: 'Reliquidá para rehacer el cálculo',
+          },
+          editError: { title: 'Error al guardar', desc: 'No se pudo actualizar la liquidación' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la liquidación' },
+          noEditable: {
+            title: 'Liquidación no editable',
+            desc: 'Solo se edita una liquidación en borrador',
+          },
+        },
+      },
       workspace: {
         adicionalesHint: 'Conceptos que suman o restan al total, cargados a mano.',
         notFound: {
@@ -4517,7 +4540,6 @@ export const es: AppDict = {
         desgenerar: 'Desgenerar',
         aprobar: 'Aprobar',
         desaprobar: 'Desaprobar',
-        imprimir: 'Imprimir',
         confirmaciones: {
           generar: {
             header: '¿Generar la liquidación?',
@@ -4538,10 +4560,6 @@ export const es: AppDict = {
           desaprobar: {
             header: '¿Desaprobar la liquidación?',
             message: 'Se revierte el cierre y la liquidación vuelve a quedar generada.',
-          },
-          eliminar: {
-            header: '¿Eliminar la liquidación?',
-            message: 'El contrato terminado queda sin su liquidación.',
           },
         },
         toasts: {

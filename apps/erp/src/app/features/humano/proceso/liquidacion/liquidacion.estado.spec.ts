@@ -13,7 +13,7 @@ describe('capacidadesDe — borrador', () => {
     expect(c.puedeGenerar).toBe(true);
     expect(c.puedeReliquidar).toBe(true);
     expect(c.puedeGestionarAdicionales).toBe(true);
-    expect(c.puedeEliminar).toBe(true);
+    expect(c.puedeEditarCabecera).toBe(true);
   });
 
   it('no ofrece nada del tramo posterior', () => {
@@ -39,7 +39,7 @@ describe('capacidadesDe — generada', () => {
   });
 
   it('no deja eliminar una liquidación ya calculada', () => {
-    expect(capacidadesDe(GENERADA).puedeEliminar).toBe(false);
+    expect(capacidadesDe(GENERADA).puedeEditarCabecera).toBe(false);
   });
 });
 
@@ -51,7 +51,7 @@ describe('capacidadesDe — aprobada', () => {
     expect(c.puedeReliquidar).toBe(false);
     expect(c.puedeAprobar).toBe(false);
     expect(c.puedeGestionarAdicionales).toBe(false);
-    expect(c.puedeEliminar).toBe(false);
+    expect(c.puedeEditarCabecera).toBe(false);
   });
 
   it('no deja desgenerar directamente: hay que desaprobar primero', () => {
@@ -66,6 +66,6 @@ describe('CAPACIDADES_VACIAS', () => {
     expect(CAPACIDADES_VACIAS.puedeDesgenerar).toBe(false);
     expect(CAPACIDADES_VACIAS.puedeAprobar).toBe(false);
     expect(CAPACIDADES_VACIAS.puedeGestionarAdicionales).toBe(false);
-    expect(CAPACIDADES_VACIAS.puedeEliminar).toBe(false);
+    expect(CAPACIDADES_VACIAS.puedeEditarCabecera).toBe(false);
   });
 });

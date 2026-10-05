@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, forkJoin, map, of } from 'rxjs';
 import {
   BaseHttpService,
-  LIST_PAGINATION_PARAMS,
   buildListBody,
   buildListParams,
   type ListQuery,
@@ -12,6 +11,7 @@ import type {
   Liquidacion,
   LiquidacionAdicional,
   LiquidacionAdicionalPayload,
+  LiquidacionPatch,
 } from './liquidacion.model';
 
 /** Endpoint del proceso. */
@@ -24,14 +24,6 @@ export const LIQUIDACION_ENDPOINT = '/humano/liquidacion/';
  * **guion**, que es la convención de endpoints de este ERP.
  */
 export const LIQUIDACION_ADICIONAL_ENDPOINT = '/humano/liquidacion-adicional/';
-
-/**
- * Serializador de la cabecera. Sin él el backend devuelve la liquidación cruda,
- * sin los campos del contrato ni del empleado.
- *
- * TODO(backend): confirmar el nombre y que se acepte como query param del `GET`.
- */
-const SERIALIZADOR_DETALLE = 'detalle';
 
 /**
  * Tope de adicionales por liquidación. Son unos pocos conceptos cargados a mano,
@@ -47,6 +39,10 @@ const ADICIONALES_LIMITE = 200;
  * contrato; desde acá solo se consulta, se ajusta y se liquida. Tampoco hay
  * `update` de cabecera: los únicos números que se tocan a mano son los
  * adicionales.
+ *
+ * Las acciones (`generar/`, `reliquidar/`, `aprobar/`, `imprimir/`…) identifican
+ * la liquidación con `liquidacion_id` en el cuerpo, no con `id` (ver `cuerpoDe`),
+ * y responden la liquidación actualizada.
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
@@ -71,9 +67,16 @@ export class LiquidacionService extends BaseHttpService {
   }
 
   getById(id: number): Observable<Liquidacion> {
-    return this.get<Liquidacion>(`${this.resourcePath}${id}/`, {
-      serializador: SERIALIZADOR_DETALLE,
-    });
+    return this.get<Liquidacion>(`${this.resourcePath}${id}/`);
+  }
+
+  /**
+   * Edita la cabecera por `PATCH`: solo el comentario y las fechas de último
+   * pago (`LiquidacionPatch`). Un `PUT` exigiría además `fecha`, el periodo y el
+   * contrato, que no se tocan desde acá.
+   */
+  actualizar(id: number, payload: LiquidacionPatch): Observable<Liquidacion> {
+    return this.patch<Liquidacion>(`${this.resourcePath}${id}/`, payload);
   }
 
   /** Elimina una o varias liquidaciones (DELETE por id, en paralelo). */
@@ -85,14 +88,25 @@ export class LiquidacionService extends BaseHttpService {
 
   // ── Adicionales ───────────────────────────────────────────────────────────
 
-  /** Todos los adicionales de la liquidación, sin paginar. */
+  /**
+   * Todos los adicionales de la liquidación en una sola página, para poder
+   * totalizar sin paginar.
+   *
+   * Va por `POST …/lista/` con el filtro y el orden en el cuerpo: el recurso no
+   * publica `GET` en la raíz.
+   */
   listarAdicionales(liquidacionId: number): Observable<PaginatedResponse<LiquidacionAdicional>> {
-    return this.get<PaginatedResponse<LiquidacionAdicional>>(LIQUIDACION_ADICIONAL_ENDPOINT, {
-      liquidacion_id: liquidacionId,
-      ordering: 'id',
-      [LIST_PAGINATION_PARAMS.page]: 1,
-      [LIST_PAGINATION_PARAMS.size]: ADICIONALES_LIMITE,
-    });
+    const query: ListQuery = {
+      filters: [{ field: 'liquidacion_id', operator: 'eq', value: liquidacionId }],
+      sort: [{ field: 'id', direction: 'asc' }],
+      page: 0,
+      pageSize: ADICIONALES_LIMITE,
+    };
+    return this.post<PaginatedResponse<LiquidacionAdicional>>(
+      `${LIQUIDACION_ADICIONAL_ENDPOINT}lista/`,
+      buildListBody(query),
+      buildListParams(query),
+    );
   }
 
   obtenerAdicional(id: number): Observable<LiquidacionAdicional> {
@@ -104,17 +118,20 @@ export class LiquidacionService extends BaseHttpService {
   }
 
   /**
-   * Actualiza un adicional.
+   * Actualiza un adicional por `PATCH`.
    *
    * El ERP anterior tiene este endpoint en su servicio y **nunca lo llama**: su
    * modal solo crea, así que corregir un valor obliga a borrar y volver a
    * cargarlo. Acá el modal lo usa.
+   *
+   * ⚠️ El backend todavía no publica `PATCH liquidacion-adicional/{id}/`: se
+   * pidió (ver `docs/liquidacion-pendientes.md`).
    */
   actualizarAdicional(
     id: number,
     payload: LiquidacionAdicionalPayload,
   ): Observable<LiquidacionAdicional> {
-    return this.put<LiquidacionAdicional>(`${LIQUIDACION_ADICIONAL_ENDPOINT}${id}/`, payload);
+    return this.patch<LiquidacionAdicional>(`${LIQUIDACION_ADICIONAL_ENDPOINT}${id}/`, payload);
   }
 
   /**
@@ -133,13 +150,13 @@ export class LiquidacionService extends BaseHttpService {
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   /** Liquida: calcula prestaciones y totales. */
-  generar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}generar/`, { id });
+  generar(id: number): Observable<Liquidacion> {
+    return this.post<Liquidacion>(`${this.resourcePath}generar/`, cuerpoDe(id));
   }
 
   /** Revierte la liquidación. */
-  desgenerar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}desgenerar/`, { id });
+  desgenerar(id: number): Observable<Liquidacion> {
+    return this.post<Liquidacion>(`${this.resourcePath}desgenerar/`, cuerpoDe(id));
   }
 
   /**
@@ -148,15 +165,20 @@ export class LiquidacionService extends BaseHttpService {
    * Exclusiva de este proceso. En el legacy el método se llama `reliquiar`, con
    * la `d` comida.
    */
-  reliquidar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}reliquidar/`, { id });
+  reliquidar(id: number): Observable<Liquidacion> {
+    return this.post<Liquidacion>(`${this.resourcePath}reliquidar/`, cuerpoDe(id));
   }
 
-  aprobar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}aprobar/`, { id });
+  aprobar(id: number): Observable<Liquidacion> {
+    return this.post<Liquidacion>(`${this.resourcePath}aprobar/`, cuerpoDe(id));
   }
 
-  desaprobar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}desaprobar/`, { id });
+  desaprobar(id: number): Observable<Liquidacion> {
+    return this.post<Liquidacion>(`${this.resourcePath}desaprobar/`, cuerpoDe(id));
   }
+}
+
+/** Cuerpo con el que las acciones del backend identifican una liquidación. */
+export function cuerpoDe(liquidacionId: number): { readonly liquidacion_id: number } {
+  return { liquidacion_id: liquidacionId };
 }

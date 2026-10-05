@@ -3,9 +3,10 @@ import type { Route } from '@angular/router';
 /**
  * Rutas de la **liquidación**.
  *
- * Solo listado y workspace: **no hay `nuevo` ni `editar`**. Una liquidación la
- * fabrica el backend al terminar un contrato, y sus números los calcula él; lo
- * único que se toca a mano son los adicionales, desde el workspace.
+ * Listado, workspace y edición: **no hay `nuevo`**. Una liquidación la fabrica
+ * el backend al terminar un contrato, y sus números los calcula él. A mano se
+ * tocan los adicionales (desde el workspace) y, en borrador, el comentario y las
+ * fechas de último pago (`editar/:id`).
  *
  * URL base: `/t/:tenantSlug/humano/proceso/liquidacion`
  */
@@ -15,6 +16,13 @@ export const LIQUIDACION_ROUTES: Route[] = [
     loadComponent: () =>
       import('./pages/liquidaciones-list/liquidaciones-list.component').then(
         (m) => m.LiquidacionesListComponent,
+      ),
+  },
+  {
+    path: 'editar/:id',
+    loadComponent: () =>
+      import('./pages/liquidacion-form/liquidacion-form.component').then(
+        (m) => m.LiquidacionFormComponent,
       ),
   },
   {

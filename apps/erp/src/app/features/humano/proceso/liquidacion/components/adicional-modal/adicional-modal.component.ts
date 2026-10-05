@@ -166,7 +166,7 @@ export class AdicionalModalComponent {
           this.form.patchValue({
             concepto:
               read.concepto != null
-                ? { id: read.concepto, nombre: read.concepto__nombre ?? '' }
+                ? { id: read.concepto, nombre: read.concepto_nombre ?? '' }
                 : null,
             valor: valorDe(read),
             detalle: read.detalle,

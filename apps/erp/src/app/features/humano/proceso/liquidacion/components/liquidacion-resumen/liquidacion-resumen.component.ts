@@ -41,14 +41,15 @@ export class LiquidacionResumenComponent {
     return LIQUIDACION_PRESTACIONES.map(({ labelKey, valor, dias, ultimoPago }) => ({
       label: this.i18n.translate(labelKey),
       valor: toFiniteNumber(liquidacion[valor]) ?? 0,
-      dias: dias ? (liquidacion[dias] as number | null) : null,
+      dias: dias ? toFiniteNumber(liquidacion[dias]) : null,
       ultimoPago: ultimoPago ? this.formatFecha(liquidacion[ultimoPago] as string | null) : null,
     }));
   });
 
-  protected readonly salario = computed(
-    () => toFiniteNumber(this.liquidacion().contrato__salario) ?? 0,
-  );
+  /** Días liquidados: llegan como decimal en string (`"30.00"`). */
+  protected readonly dias = computed(() => toFiniteNumber(this.liquidacion().dias) ?? 0);
+
+  protected readonly salario = computed(() => toFiniteNumber(this.liquidacion().salario) ?? 0);
   protected readonly adicion = computed(() => toFiniteNumber(this.liquidacion().adicion) ?? 0);
   protected readonly deduccion = computed(() => toFiniteNumber(this.liquidacion().deduccion) ?? 0);
   protected readonly total = computed(() => toFiniteNumber(this.liquidacion().total) ?? 0);

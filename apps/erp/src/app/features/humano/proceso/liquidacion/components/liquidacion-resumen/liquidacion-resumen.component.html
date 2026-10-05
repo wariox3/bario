@@ -11,11 +11,11 @@
     </span>
     <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
       <h2 class="m-0 truncate text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ l.contrato__contacto__nombre_corto || res.sinEmpleado }}
+        {{ l.contrato_nombre || res.sinEmpleado }}
       </h2>
       <p class="m-0 text-[0.72rem] text-brand-muted">
-        {{ l.contrato__contacto__numero_identificacion || '—' }} · {{ res.labels.contrato }}
-        {{ l.contrato_id ?? '—' }}
+        {{ l.contacto_numero_identificacion || '—' }} · {{ res.labels.contrato }}
+        {{ l.contrato ?? '—' }}
       </p>
     </div>
 
@@ -54,7 +54,7 @@
     </div>
     <div class="flex flex-col gap-0.5">
       <dt class="liquidacion-resumen__label">{{ res.labels.dias }}</dt>
-      <dd class="liquidacion-resumen__value tabular-nums">{{ l.dias ?? 0 }}</dd>
+      <dd class="liquidacion-resumen__value tabular-nums">{{ dias() }}</dd>
     </div>
     <div class="flex flex-col gap-0.5">
       <dt class="liquidacion-resumen__label">{{ res.labels.salario }}</dt>

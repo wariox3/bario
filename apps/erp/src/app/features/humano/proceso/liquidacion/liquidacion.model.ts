@@ -8,10 +8,9 @@
  * contrato (`POST /humano/contrato/terminar/`), y por eso el listado no tiene
  * "Nuevo" ni edición de cabecera — igual que en el ERP anterior.
  *
- * ⚠️ Contratos **supuestos** a partir del ERP legacy (nombres y tipos), sin
- * verificar contra el backend. Los campos del empleado llegan con el lookup
- * completo (`contrato__contacto__…`) porque así los aplana el serializador
- * `detalle`.
+ * Nombres y tipos verificados contra el schema del backend (`HumLiquidacion`):
+ * las FK llegan sin `_id` con su `_nombre` al lado, y los importes y los días
+ * como decimal en string.
  */
 
 /**
@@ -31,9 +30,9 @@ export interface LiquidacionPrestaciones {
   readonly prima: string | number | null;
   readonly vacacion: string | number | null;
 
-  readonly dias_cesantia: number | null;
-  readonly dias_prima: number | null;
-  readonly dias_vacacion: number | null;
+  readonly dias_cesantia: string | number | null;
+  readonly dias_prima: string | number | null;
+  readonly dias_vacacion: string | number | null;
 
   readonly fecha_ultimo_pago_cesantia: string | null;
   readonly fecha_ultimo_pago_prima: string | null;
@@ -50,12 +49,18 @@ export interface Liquidacion extends LiquidacionPrestaciones {
   readonly fecha_hasta: string | null;
   /** Último pago general del contrato, del que arranca el conteo de días. */
   readonly fecha_ultimo_pago: string | null;
-  readonly dias: number | null;
+  readonly dias: string | number | null;
 
-  readonly contrato_id: number | null;
-  readonly contrato__salario: string | number | null;
-  readonly contrato__contacto__numero_identificacion: string | null;
-  readonly contrato__contacto__nombre_corto: string | null;
+  readonly contrato: number | null;
+  /** Nombre del **empleado** del contrato (no un nombre del contrato). */
+  readonly contrato_nombre: string | null;
+  /**
+   * ⚠️ El backend todavía no lo serializa: se pidió. Se deja leído para que se
+   * pinte solo el día que llegue (mientras tanto, "—").
+   */
+  readonly contacto_numero_identificacion?: string | null;
+  /** Salario con el que se liquidó. */
+  readonly salario: string | number | null;
 
   /** Suma de los adicionales cargados a mano. */
   readonly adicion: string | number | null;
@@ -71,6 +76,19 @@ export interface Liquidacion extends LiquidacionPrestaciones {
 }
 
 /**
+ * Lo que se edita de la cabecera (`PATCH`): el comentario y desde cuándo se
+ * cuenta cada prestación. Lo demás lo calcula el backend; después de editar hay
+ * que reliquidar para que el cálculo use las fechas nuevas.
+ */
+export interface LiquidacionPatch {
+  readonly fecha_ultimo_pago: string | null;
+  readonly fecha_ultimo_pago_cesantia: string | null;
+  readonly fecha_ultimo_pago_prima: string | null;
+  readonly fecha_ultimo_pago_vacacion: string | null;
+  readonly comentario: string | null;
+}
+
+/**
  * Un concepto cargado a mano sobre la liquidación.
  *
  * El registro guarda **los dos** campos, `adicional` y `deduccion`, con uno en
@@ -81,7 +99,7 @@ export interface LiquidacionAdicional {
   readonly id: number;
   readonly liquidacion: number | null;
   readonly concepto: number | null;
-  readonly concepto__nombre: string | null;
+  readonly concepto_nombre: string | null;
   readonly detalle: string | null;
   readonly adicional: string | number | null;
   readonly deduccion: string | number | null;

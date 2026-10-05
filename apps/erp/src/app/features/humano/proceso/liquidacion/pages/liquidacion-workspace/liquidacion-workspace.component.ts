@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MenuModule } from 'primeng/menu';
@@ -24,7 +25,7 @@ import {
   type CapacidadesLiquidacion,
 } from '../../liquidacion.estado';
 import type { Liquidacion } from '../../liquidacion.model';
-import { LiquidacionService } from '../../liquidacion.service';
+import { LiquidacionService, cuerpoDe } from '../../liquidacion.service';
 
 /** Acciones del ciclo que se confirman antes de ejecutarse. */
 type AccionCiclo = 'generar' | 'reliquidar' | 'desgenerar' | 'aprobar' | 'desaprobar';
@@ -33,8 +34,9 @@ type AccionCiclo = 'generar' | 'reliquidar' | 'desgenerar' | 'aprobar' | 'desapr
  * **Workspace** de una liquidación: donde se revisa, se ajusta y se liquida el
  * cierre de un contrato.
  *
- * Toda la botonera sale de `capacidadesDe(...)`: **ninguna condición se combina
- * en la plantilla**. Las cinco acciones del ciclo piden confirmación, porque las
+ * Toda la botonera sale de `capacidadesDe(...)`, con el mismo estándar que la
+ * programación y el aporte: lo que no aplica a la etapa se ve deshabilitado, no
+ * se oculta. Las cinco acciones del ciclo piden confirmación, porque las
  * cinco tocan lo que se le va a pagar a una persona:
  *
  * - **Generar** liquida las prestaciones.
@@ -52,6 +54,7 @@ type AccionCiclo = 'generar' | 'reliquidar' | 'desgenerar' | 'aprobar' | 'desapr
   standalone: true,
   imports: [
     ButtonModule,
+    ButtonGroupModule,
     ConfirmDialogModule,
     MenuModule,
     BreadcrumbComponent,
@@ -82,7 +85,6 @@ export class LiquidacionWorkspaceComponent implements OnInit {
   protected readonly notFound = signal(false);
   /** Acción en vuelo: bloquea toda la botonera. */
   protected readonly accionEnCurso = signal<AccionCiclo | null>(null);
-  protected readonly eliminando = signal(false);
 
   /** Se incrementa tras generar/reliquidar para refrescar los adicionales. */
   protected readonly reloadToken = signal(0);
@@ -101,61 +103,41 @@ export class LiquidacionWorkspaceComponent implements OnInit {
     return l ? capacidadesDe(l) : CAPACIDADES_VACIAS;
   });
 
-  protected readonly estaOcupado = computed(
-    () => this.accionEnCurso() !== null || this.eliminando(),
-  );
+  protected readonly estaOcupado = computed(() => this.accionEnCurso() !== null);
 
   /**
-   * Acciones secundarias del desplegable. Se arman según capacidades: una acción
-   * que no aplica a la etapa no aparece, en vez de mostrarse gris como en el ERP
-   * anterior.
+   * "Acciones": lo que revierte una etapa y, aparte, reliquidar, que rehace el
+   * cálculo del borrador. Van siempre los tres; el que no aplica a la etapa se ve
+   * deshabilitado, como el resto de la botonera.
+   *
+   * No hay "Eliminar": la liquidación nace al terminar el contrato y borrarla lo
+   * deja sin su cierre. El legacy tampoco lo ofrece.
    */
-  protected readonly accionesSecundarias = computed<MenuItem[]>(() => {
+  protected readonly accionesItems = computed<MenuItem[]>(() => {
     const c = this.capacidades();
     const labels = this.t().entities.liquidacion.acciones;
     const bloqueado = this.estaOcupado();
-    const items: MenuItem[] = [];
-
-    if (c.puedeReliquidar) {
-      items.push({
-        label: labels.reliquidar,
-        icon: 'pi pi-refresh',
-        disabled: bloqueado,
-        command: () => this.confirmar('reliquidar'),
-      });
-    }
-    if (c.puedeDesgenerar) {
-      items.push({
-        label: labels.desgenerar,
-        icon: 'pi pi-undo',
-        disabled: bloqueado,
-        command: () => this.confirmar('desgenerar'),
-      });
-    }
-    if (c.puedeDesaprobar) {
-      items.push({
+    return [
+      {
         label: labels.desaprobar,
         icon: 'pi pi-times-circle',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeDesaprobar,
         command: () => this.confirmar('desaprobar'),
-      });
-    }
-
-    // Imprimir está disponible en las tres etapas, así que va siempre.
-    const cierre: MenuItem[] = [
-      { label: labels.imprimir, icon: 'pi pi-file-pdf', command: () => this.imprimir() },
+      },
+      {
+        label: labels.desgenerar,
+        icon: 'pi pi-undo',
+        disabled: bloqueado || !c.puedeDesgenerar,
+        command: () => this.confirmar('desgenerar'),
+      },
+      { separator: true },
+      {
+        label: labels.reliquidar,
+        icon: 'pi pi-refresh',
+        disabled: bloqueado || !c.puedeReliquidar,
+        command: () => this.confirmar('reliquidar'),
+      },
     ];
-    if (c.puedeEliminar) {
-      cierre.push({
-        label: this.t().common.actions.delete,
-        icon: 'pi pi-trash',
-        disabled: bloqueado,
-        command: () => this.confirmarEliminar(),
-      });
-    }
-
-    if (items.length > 0) items.push({ separator: true });
-    return [...items, ...cierre];
   });
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -188,6 +170,10 @@ export class LiquidacionWorkspaceComponent implements OnInit {
 
   protected onBack(): void {
     this.navigateTo();
+  }
+
+  protected onEdit(): void {
+    this.navigateTo('editar', this.liquidacionId());
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
@@ -265,64 +251,20 @@ export class LiquidacionWorkspaceComponent implements OnInit {
       });
   }
 
-  // ── Eliminar ──────────────────────────────────────────────────────────────
-
-  /**
-   * Borrar la liquidación deja al contrato terminado sin su cierre, así que
-   * confirma aparte y en rojo. Solo se ofrece en borrador (`puedeEliminar`).
-   */
-  private confirmarEliminar(): void {
-    if (this.estaOcupado()) return;
-    const labels = this.t().entities.liquidacion.acciones;
-    this.confirmation.confirm({
-      header: labels.confirmaciones.eliminar.header,
-      message: labels.confirmaciones.eliminar.message,
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: this.t().common.actions.delete,
-      rejectLabel: this.t().common.actions.cancel,
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.eliminar(),
-    });
-  }
-
-  private eliminar(): void {
-    const id = this.liquidacionId();
-    if (!id) return;
-    this.eliminando.set(true);
-    this.service
-      .remove([id])
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.eliminando.set(false)),
-      )
-      .subscribe({
-        next: () => {
-          const toasts = this.t().common.toasts.deleteSuccess;
-          this.toast.success(toasts.title, toasts.desc);
-          this.navigateTo();
-        },
-        error: () => {
-          const toasts = this.t().common.toasts.deleteError;
-          this.toast.error(toasts.title, toasts.desc);
-        },
-      });
-  }
-
   // ── Impresión ─────────────────────────────────────────────────────────────
 
   /**
    * PDF de la liquidación.
    *
-   * El id va solo en el body; el ERP anterior le suma `filtros`, `limite`,
-   * `desplazar`, `modelo` y `tipo`, que el endpoint no usa.
+   * Solo `liquidacion_id` en el cuerpo; el ERP anterior le suma `filtros`,
+   * `limite`, `desplazar`, `modelo` y `tipo`, que el endpoint no usa.
    */
-  private imprimir(): void {
+  protected onImprimir(): void {
     const toasts = this.t().common.toasts;
     this.fileDownload
       .download(this.service.imprimirUrl, {
         method: 'POST',
-        body: { id: this.liquidacionId() },
+        body: cuerpoDe(this.liquidacionId()),
         fallbackFilename: 'liquidacion.pdf',
       })
       .pipe(takeUntilDestroyed(this.destroyRef))

@@ -1,14 +1,22 @@
 @let acc = t().entities.liquidacion.acciones;
 @let det = t().entities.liquidacion.workspace;
+@let doc = t().documentActions.detail;
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<!-- ── Botonera: todo sale de capacidades() ──────────────────────────────────── -->
+<!--
+  ── Botonera ─────────────────────────────────────────────────────────────────
+  Mismo estándar que la programación y el aporte: volver y editar sueltos, el
+  ciclo de vida y Acciones fundidos en un segmento. Solo Aprobar va relleno: es
+  el paso que cierra la liquidación. Todo sale de capacidades(): lo que no aplica
+  a la etapa se deshabilita, no se oculta.
+  El <p-menu> va FUERA del grupo: su CSS une los botones con
+  `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
+-->
 <header class="flex flex-wrap items-center gap-2">
   <p-button
     type="button"
     [label]="t().common.actions.back"
-    icon="pi pi-arrow-left"
     severity="secondary"
     [outlined]="true"
     size="small"
@@ -16,44 +24,55 @@
   />
 
   @if (liquidacion()) {
-    @if (capacidades().puedeGenerar) {
+    <p-button
+      type="button"
+      [label]="t().common.actions.edit"
+      size="small"
+      [disabled]="!capacidades().puedeEditarCabecera || estaOcupado()"
+      (onClick)="onEdit()"
+    />
+
+    <p-buttongroup>
       <p-button
         type="button"
         [label]="acc.generar"
-        icon="pi pi-cog"
+        severity="secondary"
+        [outlined]="true"
         size="small"
         [loading]="accionEnCurso() === 'generar'"
-        [disabled]="estaOcupado()"
+        [disabled]="!capacidades().puedeGenerar || estaOcupado()"
         (onClick)="onGenerar()"
       />
-    }
-
-    @if (capacidades().puedeAprobar) {
+      <p-button
+        type="button"
+        [label]="doc.imprimir"
+        icon="pi pi-print"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onImprimir()"
+      />
       <p-button
         type="button"
         [label]="acc.aprobar"
-        icon="pi pi-check-circle"
         size="small"
         [loading]="accionEnCurso() === 'aprobar'"
-        [disabled]="estaOcupado()"
+        [disabled]="!capacidades().puedeAprobar || estaOcupado()"
         (onClick)="onAprobar()"
       />
-    }
-
-    @if (accionesSecundarias().length) {
       <p-button
         type="button"
-        [label]="t().common.actions.actions"
+        [label]="doc.acciones"
         icon="pi pi-chevron-down"
         iconPos="right"
         severity="secondary"
         [outlined]="true"
         size="small"
-        [disabled]="estaOcupado()"
         (onClick)="accionesMenu.toggle($event)"
       />
-      <p-menu #accionesMenu [popup]="true" [model]="accionesSecundarias()" appendTo="body" />
-    }
+    </p-buttongroup>
+
+    <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
   }
 </header>
 

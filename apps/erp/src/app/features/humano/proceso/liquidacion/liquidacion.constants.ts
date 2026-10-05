@@ -33,20 +33,20 @@ export const LIQUIDACIONES_COLUMNS: readonly ColumnDef[] = [
     sortable: true,
   },
   {
-    field: 'contrato_id',
+    field: 'contrato',
     headerKey: 'entities.liquidacion.columns.contrato',
     type: 'number',
     width: '100px',
     align: 'right',
   },
   {
-    field: 'contrato__contacto__numero_identificacion',
+    field: 'contacto_numero_identificacion',
     headerKey: 'entities.liquidacion.columns.identificacion',
     type: 'text',
     width: '140px',
   },
   {
-    field: 'contrato__contacto__nombre_corto',
+    field: 'contrato_nombre',
     headerKey: 'entities.liquidacion.columns.empleado',
     type: 'text',
   },
@@ -65,7 +65,7 @@ export const LIQUIDACIONES_COLUMNS: readonly ColumnDef[] = [
     sortable: true,
   },
   {
-    field: 'contrato__salario',
+    field: 'salario',
     headerKey: 'entities.liquidacion.columns.salario',
     type: 'currency',
     width: '140px',
@@ -257,7 +257,7 @@ export const LIQUIDACION_ADICIONAL_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'concepto__nombre',
+    field: 'concepto_nombre',
     headerKey: 'entities.liquidacion.adicionales.columns.concepto',
     type: 'text',
   },

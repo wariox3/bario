@@ -3452,6 +3452,23 @@ export interface AppDict
           total: string;
         };
       };
+      form: {
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          fechaUltimoPago: string;
+          fechaUltimoPagoCesantia: string;
+          fechaUltimoPagoPrima: string;
+          fechaUltimoPagoVacacion: string;
+          comentario: string;
+        };
+        toasts: {
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          noEditable: { title: string; desc: string };
+        };
+      };
       workspace: {
         adicionalesHint: string;
         notFound: { title: string; desc: string };
@@ -3462,14 +3479,12 @@ export interface AppDict
         desgenerar: string;
         aprobar: string;
         desaprobar: string;
-        imprimir: string;
         confirmaciones: {
           generar: { header: string; message: string };
           reliquidar: { header: string; message: string };
           desgenerar: { header: string; message: string };
           aprobar: { header: string; message: string };
           desaprobar: { header: string; message: string };
-          eliminar: { header: string; message: string };
         };
         toasts: {
           generar: {

@@ -4440,6 +4440,26 @@ export const en: AppDict = {
           total: 'Total payable',
         },
       },
+      form: {
+        editTitle: 'Edit settlement',
+        sectionHint: 'When each benefit starts counting. The amounts are calculated by the system.',
+        fields: {
+          fechaUltimoPago: 'Last payment',
+          fechaUltimoPagoCesantia: 'Last severance payment',
+          fechaUltimoPagoPrima: 'Last bonus payment',
+          fechaUltimoPagoVacacion: 'Last vacation payment',
+          comentario: 'Comment',
+        },
+        toasts: {
+          editSuccess: { title: 'Settlement updated', desc: 'Recalculate to redo the figures' },
+          editError: { title: 'Error saving', desc: 'The settlement could not be updated' },
+          loadError: { title: 'Error loading', desc: 'The settlement could not be loaded' },
+          noEditable: {
+            title: 'Settlement not editable',
+            desc: 'Only a draft settlement can be edited',
+          },
+        },
+      },
       workspace: {
         adicionalesHint: 'Items that add to or subtract from the total, entered by hand.',
         notFound: {
@@ -4453,7 +4473,6 @@ export const en: AppDict = {
         desgenerar: 'Undo generate',
         aprobar: 'Approve',
         desaprobar: 'Undo approval',
-        imprimir: 'Print',
         confirmaciones: {
           generar: {
             header: 'Generate the settlement?',
@@ -4474,10 +4493,6 @@ export const en: AppDict = {
           desaprobar: {
             header: 'Undo the approval?',
             message: 'The closing is reverted and the settlement goes back to generated.',
-          },
-          eliminar: {
-            header: 'Delete the settlement?',
-            message: 'The ended contract will be left without its settlement.',
           },
         },
         toasts: {
