@@ -66,11 +66,10 @@ La línea liquidada ya trae quién es el empleado, y el frontend lo pinta:
 `aporte_contrato__contacto_numero_identificacion`, `aporte_contrato__contacto_nombre_corto`
 y `aporte_contrato_salario`.
 
-### `HumAporteContrato` ❌ PENDIENTE
+### `HumAporteContrato` ✅ IMPLEMENTADO
 
-| Campo                            | Qué es                      |
-| -------------------------------- | --------------------------- |
-| `contacto_numero_identificacion` | Identificación del empleado |
+El contrato del aporte ya trae al empleado, y el frontend lo pinta:
+`contacto_numero_identificacion` y `contacto_nombre_corto`.
 
 ## 3. Filtros a confirmar (`campos_filtrables`)
 
