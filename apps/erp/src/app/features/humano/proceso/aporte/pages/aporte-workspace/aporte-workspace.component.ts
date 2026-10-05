@@ -203,6 +203,12 @@ export class AporteWorkspaceComponent implements OnInit {
     this.confirmar('aprobar');
   }
 
+  /** Se cargaron o quitaron contratos: la cabecera trae otros contadores. */
+  protected onCabeceraDesactualizada(): void {
+    const id = this.aporteId();
+    if (id) this.load(id);
+  }
+
   /** Contratos informados por la pestaña: entran en el cálculo de capacidades. */
   protected onContratosChange(total: number): void {
     this.contratos.set(total);

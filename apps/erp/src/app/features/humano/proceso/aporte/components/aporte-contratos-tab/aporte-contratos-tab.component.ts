@@ -92,6 +92,12 @@ export class AporteContratosTabComponent {
    */
   readonly totalChange = output<number>();
 
+  /**
+   * Se cargaron o se quitaron contratos: la cabecera trae otros contadores
+   * (contratos y empleados), así que el workspace la vuelve a pedir.
+   */
+  readonly cambio = output<void>();
+
   protected readonly items = signal<readonly AporteContratoFila[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
@@ -289,6 +295,7 @@ export class AporteContratosTabComponent {
           );
           this.selectedRows.set([]);
           this.loadPage(0);
+          this.cambio.emit();
         },
         error: () => this.toast.error(toasts.cargarError.title, toasts.cargarError.desc),
       });
@@ -315,6 +322,7 @@ export class AporteContratosTabComponent {
           );
           this.selectedRows.set([]);
           this.loadPage(0);
+          this.cambio.emit();
         },
         error: () =>
           this.toast.error(
