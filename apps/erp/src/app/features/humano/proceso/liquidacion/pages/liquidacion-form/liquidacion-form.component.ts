@@ -140,7 +140,7 @@ export class LiquidacionFormComponent implements OnInit {
             this.navigateTo('detalle', id);
             return;
           }
-          this.empleado.set(read.contrato_nombre);
+          this.empleado.set(read.contrato_contacto_nombre_corto);
           this.form.patchValue(liquidacionToFormValue(read), { emitEvent: false });
         },
         error: () => {

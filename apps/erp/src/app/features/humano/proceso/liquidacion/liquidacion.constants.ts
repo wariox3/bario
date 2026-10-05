@@ -30,7 +30,6 @@ export const LIQUIDACIONES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'contrato',
@@ -40,13 +39,13 @@ export const LIQUIDACIONES_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'contacto_numero_identificacion',
+    field: 'contrato_contacto_numero_identificacion',
     headerKey: 'entities.liquidacion.columns.identificacion',
     type: 'text',
     width: '140px',
   },
   {
-    field: 'contrato_nombre',
+    field: 'contrato_contacto_nombre_corto',
     headerKey: 'entities.liquidacion.columns.empleado',
     type: 'text',
   },
@@ -55,14 +54,12 @@ export const LIQUIDACIONES_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.liquidacion.columns.desde',
     type: 'date',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'fecha_hasta',
     headerKey: 'entities.liquidacion.columns.hasta',
     type: 'date',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'salario',

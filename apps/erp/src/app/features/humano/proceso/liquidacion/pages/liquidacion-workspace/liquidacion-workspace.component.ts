@@ -7,6 +7,7 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MenuModule } from 'primeng/menu';
+import { TabsModule } from 'primeng/tabs';
 import {
   FileDownloadService,
   I18nService,
@@ -57,6 +58,7 @@ type AccionCiclo = 'generar' | 'reliquidar' | 'desgenerar' | 'aprobar' | 'desapr
     ButtonGroupModule,
     ConfirmDialogModule,
     MenuModule,
+    TabsModule,
     BreadcrumbComponent,
     LiquidacionResumenComponent,
     LiquidacionAdicionalesTabComponent,

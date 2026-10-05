@@ -1,6 +1,14 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { I18nService, formatCop, toFiniteNumber, formatFechaCorta } from '@reddoc/core';
+import { RouterLink } from '@angular/router';
+import {
+  I18nService,
+  TenantService,
+  formatCop,
+  toFiniteNumber,
+  formatFechaCorta,
+} from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
+import { CONTRATO_LIST_PATH } from '@erp/features/humano/masters/contrato/contrato.constants';
 import { estadoDe, type EstadoProceso } from '../../../shared/proceso.estado';
 import { LIQUIDACION_PRESTACIONES } from '../../liquidacion.constants';
 import type { Liquidacion } from '../../liquidacion.model';
@@ -20,12 +28,13 @@ import type { Liquidacion } from '../../liquidacion.model';
 @Component({
   selector: 'app-liquidacion-resumen',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './liquidacion-resumen.component.html',
   styleUrl: './liquidacion-resumen.component.scss',
 })
 export class LiquidacionResumenComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly tenant = inject(TenantService);
   protected readonly t = this.i18n.t;
 
   readonly liquidacion = input.required<Liquidacion>();
@@ -46,6 +55,14 @@ export class LiquidacionResumenComponent {
     }));
   });
 
+  /** Ficha del contrato del que salió la liquidación; `null` si no hay a dónde ir. */
+  protected readonly contratoLink = computed<readonly (string | number)[] | null>(() => {
+    const contrato = this.liquidacion().contrato;
+    const slug = this.tenant.currentSlug();
+    if (contrato == null || !slug) return null;
+    return ['/t', slug, ...CONTRATO_LIST_PATH, 'detalle', contrato];
+  });
+
   /** Días liquidados: llegan como decimal en string (`"30.00"`). */
   protected readonly dias = computed(() => toFiniteNumber(this.liquidacion().dias) ?? 0);
 
@@ -54,7 +71,7 @@ export class LiquidacionResumenComponent {
   protected readonly deduccion = computed(() => toFiniteNumber(this.liquidacion().deduccion) ?? 0);
   protected readonly total = computed(() => toFiniteNumber(this.liquidacion().total) ?? 0);
 
-  /** Fecha corta (`2026-07-30`); `—` si no hay valor. */
+  /** Fecha corta (`30/07/2026`); `—` si no hay valor. */
   protected formatFecha(value: string | null): string {
     return formatFechaCorta(value, '—');
   }

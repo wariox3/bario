@@ -52,13 +52,9 @@ export interface Liquidacion extends LiquidacionPrestaciones {
   readonly dias: string | number | null;
 
   readonly contrato: number | null;
-  /** Nombre del **empleado** del contrato (no un nombre del contrato). */
-  readonly contrato_nombre: string | null;
-  /**
-   * ⚠️ El backend todavía no lo serializa: se pidió. Se deja leído para que se
-   * pinte solo el día que llegue (mientras tanto, "—").
-   */
-  readonly contacto_numero_identificacion?: string | null;
+  /** Empleado del contrato, resuelto a través de él (`contrato → contacto`). */
+  readonly contrato_contacto_nombre_corto: string | null;
+  readonly contrato_contacto_numero_identificacion: string | null;
   /** Salario con el que se liquidó. */
   readonly salario: string | number | null;
 

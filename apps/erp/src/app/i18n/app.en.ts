@@ -4433,9 +4433,11 @@ export const en: AppDict = {
         vacacion: 'Vacation',
       },
       resumen: {
-        sinEmpleado: 'No employee',
         prestacionesTitle: 'Calculated benefits',
         labels: {
+          id: 'ID',
+          empleado: 'Employee',
+          identificacion: 'ID number',
           contrato: 'Contract',
           fecha: 'Date',
           desde: 'From',
@@ -4448,6 +4450,7 @@ export const en: AppDict = {
           adicion: 'Additions',
           deduccion: 'Deductions',
           total: 'Total payable',
+          comentario: 'Comment',
         },
       },
       form: {
@@ -4471,6 +4474,7 @@ export const en: AppDict = {
         },
       },
       workspace: {
+        tabs: { adicionales: 'Additional' },
         adicionalesHint: 'Items that add to or subtract from the total, entered by hand.',
         notFound: {
           title: 'Settlement not found',

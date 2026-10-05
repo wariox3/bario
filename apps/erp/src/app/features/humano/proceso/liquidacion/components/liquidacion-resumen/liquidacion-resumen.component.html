@@ -2,6 +2,8 @@
 @let res = t().entities.liquidacion.resumen;
 @let estados = t().entities.liquidacion.estados;
 
+<!-- Mismo esqueleto que el resumen de la programación y del aporte: el título es
+     el proceso, y quién, cuándo y cuánto van en tres columnas de datos. -->
 <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
   <div class="flex flex-wrap items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
     <span
@@ -11,12 +13,8 @@
     </span>
     <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
       <h2 class="m-0 truncate text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ l.contrato_nombre || res.sinEmpleado }}
+        {{ t().entities.liquidacion.name }}
       </h2>
-      <p class="m-0 text-[0.72rem] text-brand-muted">
-        {{ l.contacto_numero_identificacion || '—' }} · {{ res.labels.contrato }}
-        {{ l.contrato ?? '—' }}
-      </p>
     </div>
 
     <!-- Etapa del ciclo: es la información que decide qué se puede hacer -->
@@ -34,33 +32,129 @@
     </span>
   </div>
 
-  <!-- Periodo liquidado y base -->
-  <dl class="grid grid-cols-2 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-3 lg:grid-cols-6">
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.fecha }}</dt>
-      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.desde }}</dt>
-      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha_desde) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.hasta }}</dt>
-      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha_hasta) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.ultimoPago }}</dt>
-      <dd class="liquidacion-resumen__value">{{ formatFecha(l.fecha_ultimo_pago) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.dias }}</dt>
-      <dd class="liquidacion-resumen__value tabular-nums">{{ dias() }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.salario }}</dt>
-      <dd class="liquidacion-resumen__value tabular-nums">{{ formatMoney(salario()) }}</dd>
-    </div>
-  </dl>
+  <!--
+    Tres columnas: a quién y de qué contrato, qué periodo se liquidó (el último
+    pago va junto a los días porque es de donde arranca su conteo), y cuánto. El
+    total cierra la última, como en la programación.
+  -->
+  <div
+    class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+  >
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.id }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ l.id }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.empleado }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [class.liquidacion-resumen__empty]="!l.contrato_contacto_nombre_corto"
+        >
+          {{ l.contrato_contacto_nombre_corto || '—' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.identificacion }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium font-mono tabular-nums text-brand-text"
+          [class.liquidacion-resumen__empty]="!l.contrato_contacto_numero_identificacion"
+        >
+          {{ l.contrato_contacto_numero_identificacion || '—' }}
+        </dd>
+      </div>
+      <!-- El contrato abre su ficha: de ahí sale la liquidación y ahí se corrigen
+           las fechas de último pago. -->
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.contrato }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          @if (contratoLink(); as link) {
+            <a
+              [routerLink]="link"
+              class="text-brand-text underline-offset-2 hover:text-brand-navy hover:underline"
+              >{{ l.contrato }}</a
+            >
+          } @else {
+            <span class="liquidacion-resumen__empty">—</span>
+          }
+        </dd>
+      </div>
+    </dl>
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.fecha }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium tabular-nums text-brand-text"
+          [class.liquidacion-resumen__empty]="!l.fecha"
+        >
+          {{ formatFecha(l.fecha) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.desde }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium tabular-nums text-brand-text"
+          [class.liquidacion-resumen__empty]="!l.fecha_desde"
+        >
+          {{ formatFecha(l.fecha_desde) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.hasta }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium tabular-nums text-brand-text"
+          [class.liquidacion-resumen__empty]="!l.fecha_hasta"
+        >
+          {{ formatFecha(l.fecha_hasta) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.ultimoPago }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium tabular-nums text-brand-text"
+          [class.liquidacion-resumen__empty]="!l.fecha_ultimo_pago"
+        >
+          {{ formatFecha(l.fecha_ultimo_pago) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.dias }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ dias() }}
+        </dd>
+      </div>
+    </dl>
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.salario }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ formatMoney(salario()) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.adicion }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ formatMoney(adicion()) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.deduccion }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ formatMoney(deduccion()) }}
+        </dd>
+      </div>
+      <div
+        class="mt-auto flex items-baseline justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] pt-2"
+      >
+        <dt class="text-[0.8rem] font-semibold text-brand-text">{{ res.labels.total }}</dt>
+        <dd class="m-0 text-right text-[0.95rem] font-bold tabular-nums text-brand-text">
+          {{ formatMoney(total()) }}
+        </dd>
+      </div>
+    </dl>
+  </div>
 
   <!-- Las cuatro prestaciones, con lo que explica cada monto -->
   <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
@@ -104,25 +198,13 @@
     </div>
   </div>
 
-  <!-- Cierre: lo cargado a mano y el neto -->
-  <dl class="grid grid-cols-3 gap-x-6 gap-y-3 border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.adicion }}</dt>
-      <dd class="liquidacion-resumen__value tabular-nums">{{ formatMoney(adicion()) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.deduccion }}</dt>
-      <dd class="liquidacion-resumen__value tabular-nums">{{ formatMoney(deduccion()) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="liquidacion-resumen__label">{{ res.labels.total }}</dt>
-      <dd class="liquidacion-resumen__value font-bold tabular-nums">{{ formatMoney(total()) }}</dd>
-    </div>
-  </dl>
-
-  @if (l.comentario) {
-    <p class="m-0 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-[0.78rem] text-brand-muted">
-      {{ l.comentario }}
+  <div class="flex flex-col gap-0.5 border-t border-[rgba(20,48,73,0.08)] px-5 py-3">
+    <span class="text-[0.75rem] text-brand-muted">{{ res.labels.comentario }}</span>
+    <p
+      class="m-0 whitespace-pre-line text-[0.85rem] text-brand-text"
+      [class.liquidacion-resumen__empty]="!l.comentario"
+    >
+      {{ l.comentario || '—' }}
     </p>
-  }
+  </div>
 </section>

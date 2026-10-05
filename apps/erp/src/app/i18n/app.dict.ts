@@ -3444,9 +3444,11 @@ export interface AppDict
       estados: { borrador: string; generada: string; aprobada: string };
       prestaciones: { cesantia: string; interes: string; prima: string; vacacion: string };
       resumen: {
-        sinEmpleado: string;
         prestacionesTitle: string;
         labels: {
+          id: string;
+          empleado: string;
+          identificacion: string;
           contrato: string;
           fecha: string;
           desde: string;
@@ -3459,6 +3461,7 @@ export interface AppDict
           adicion: string;
           deduccion: string;
           total: string;
+          comentario: string;
         };
       };
       form: {
@@ -3479,6 +3482,7 @@ export interface AppDict
         };
       };
       workspace: {
+        tabs: { adicionales: string };
         adicionalesHint: string;
         notFound: { title: string; desc: string };
       };

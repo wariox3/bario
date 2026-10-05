@@ -4497,9 +4497,11 @@ export const es: AppDict = {
         vacacion: 'Vacaciones',
       },
       resumen: {
-        sinEmpleado: 'Sin empleado',
         prestacionesTitle: 'Prestaciones liquidadas',
         labels: {
+          id: 'ID',
+          empleado: 'Empleado',
+          identificacion: 'Identificación',
           contrato: 'Contrato',
           fecha: 'Fecha',
           desde: 'Desde',
@@ -4512,6 +4514,7 @@ export const es: AppDict = {
           adicion: 'Adiciones',
           deduccion: 'Deducciones',
           total: 'Total a pagar',
+          comentario: 'Comentario',
         },
       },
       form: {
@@ -4538,6 +4541,7 @@ export const es: AppDict = {
         },
       },
       workspace: {
+        tabs: { adicionales: 'Adicionales' },
         adicionalesHint: 'Conceptos que suman o restan al total, cargados a mano.',
         notFound: {
           title: 'Liquidación no encontrada',
