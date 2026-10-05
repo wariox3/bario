@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, map, of } from 'rxjs';
 import {
   BaseHttpService,
+  FileDownloadService,
   buildListBody,
   type AdvancedListBody,
   buildListParams,
@@ -62,6 +63,7 @@ export const APORTE_ENTIDADES_LIMITE = 1000;
 @Injectable({ providedIn: 'root' })
 export class AporteService extends BaseHttpService {
   private readonly resourcePath = APORTE_ENDPOINT;
+  private readonly fileDownload = inject(FileDownloadService);
 
   /** URL de la exportación del listado (la usa `FileDownloadService`). */
   readonly exportUrl = `${APORTE_ENDPOINT}excel/`;
@@ -228,6 +230,16 @@ export class AporteService extends BaseHttpService {
    * TODO(backend): confirmar la URL real de impresión del aporte.
    */
   readonly imprimirUrl = `${APORTE_ENDPOINT}imprimir/`;
+
+  /** Descarga el Excel de una de las pestañas, acotado a este aporte. */
+  exportar(clave: AporteExportKey, aporteId: number): Observable<void> {
+    const config = APORTE_EXPORTS[clave];
+    return this.fileDownload.download(config.url, {
+      method: 'POST',
+      body: cuerpoExportacion(clave, aporteId),
+      fallbackFilename: config.archivo,
+    });
+  }
 }
 
 /** Cuerpo con el que las acciones del backend identifican un aporte. */
@@ -236,21 +248,33 @@ export function cuerpoDe(aporteId: number): { readonly aporte_id: number } {
 }
 
 /**
- * Exportaciones a Excel del aporte: el endpoint, el serializador, el filtro que
- * la acota al aporte abierto y el nombre del archivo. Viven en el "Excel ▾" de la
- * pestaña de contratos, como en la programación.
+ * Exportaciones a Excel del aporte, una por pestaña: el endpoint, el
+ * serializador, el filtro que la acota al aporte abierto y el nombre del
+ * archivo. Cada una vive en el "Excel ▾" de su tabla, junto a lo que exporta.
  *
- * ⚠️ El backend todavía no publica `aporte-detalle/excel/`: se pidió (ver
- * `docs/aporte-seguridad-social-pendientes.md`). El serializador sale del ERP
- * anterior.
+ * Los serializadores y los filtros salen del ERP anterior.
  */
 export const APORTE_EXPORTS = {
+  /** Los contratos incluidos. */
+  contratos: {
+    url: `${APORTE_CONTRATO_ENDPOINT}excel/`,
+    serializador: 'informe_aporte_contrato',
+    filtro: 'aporte_id',
+    archivo: 'aporte-contratos.xlsx',
+  },
   /** Las líneas liquidadas. */
-  detalle: {
+  detalles: {
     url: `${APORTE_DETALLE_ENDPOINT}excel/`,
     serializador: 'informe_aporte_detalle',
     filtro: 'aporte_contrato__aporte_id',
     archivo: 'aporte-detalle.xlsx',
+  },
+  /** La cotización por entidad. */
+  entidades: {
+    url: `${APORTE_ENTIDAD_ENDPOINT}excel/`,
+    serializador: 'informe_aporte_entidad',
+    filtro: 'aporte_id',
+    archivo: 'aporte-entidades.xlsx',
   },
 } as const;
 

@@ -3655,9 +3655,9 @@ export interface AppDict
           };
         };
       };
+      excel: { action: string; detalle: string };
       contratos: {
         cargarContratos: string;
-        excel: { action: string; detalle: string };
         leyenda: { titulo: string; contenido: string };
         confirmEliminar: { header: string; message: string };
         confirmRecargar: { header: string; message: string };
@@ -3721,7 +3721,7 @@ export interface AppDict
         };
       };
       entidades: {
-        columns: { tipo: string; entidad: string; cotizacion: string };
+        columns: { id: string; tipo: string; entidad: string; cotizacion: string };
         subtotal: string;
         totalGeneral: string;
         empty: { title: string; sub: string };

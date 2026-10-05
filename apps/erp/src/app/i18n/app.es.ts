@@ -4760,9 +4760,9 @@ export const es: AppDict = {
           },
         },
       },
+      excel: { action: 'Excel', detalle: 'Detalle' },
       contratos: {
         cargarContratos: 'Cargar contratos',
-        excel: { action: 'Excel', detalle: 'Detalle' },
         leyenda: {
           titulo: 'Antes de generar',
           contenido:
@@ -4839,7 +4839,7 @@ export const es: AppDict = {
         },
       },
       entidades: {
-        columns: { tipo: 'Tipo', entidad: 'Entidad', cotizacion: 'Cotización' },
+        columns: { id: 'ID', tipo: 'Tipo', entidad: 'Entidad', cotizacion: 'Cotización' },
         subtotal: 'Subtotal',
         totalGeneral: 'Total general',
         empty: {

@@ -13,7 +13,7 @@ import { EMPTY, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
-import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
+import { I18nService, ToastService, type FilterCondition } from '@reddoc/core';
 import {
   DataFilterModalComponent,
   DataTableComponent,
@@ -31,13 +31,10 @@ import {
   APORTE_CONTRATOS_PAGE_SIZE,
   APORTE_CONTRATO_COLUMNS,
   APORTE_CONTRATO_FILTER_FIELDS,
+  EXCEL_ACTION_PREFIX,
+  excelAction,
 } from '../../aporte.constants';
-import {
-  APORTE_EXPORTS,
-  AporteService,
-  cuerpoExportacion,
-  type AporteExportKey,
-} from '../../aporte.service';
+import { AporteService, type AporteExportKey } from '../../aporte.service';
 
 /**
  * Los **contratos** incluidos en el aporte: quién entra en la planilla del
@@ -65,7 +62,6 @@ import {
 })
 export class AporteContratosTabComponent {
   private readonly service = inject(AporteService);
-  private readonly fileDownload = inject(FileDownloadService);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly dialog = inject(DialogService);
@@ -146,24 +142,8 @@ export class AporteContratosTabComponent {
       : null,
   );
 
-  /**
-   * "Excel ▾" de la tabla, junto a "Cargar contratos", como en la programación.
-   * El botón va sin ícono, solo los ítems lo llevan.
-   */
-  protected readonly trailingActions: readonly ToolbarAction[] = [
-    {
-      id: 'excel',
-      labelKey: 'entities.aporte.contratos.excel.action',
-      iconClass: '',
-      children: [
-        {
-          id: 'excel:detalle',
-          labelKey: 'entities.aporte.contratos.excel.detalle',
-          iconClass: 'pi pi-file-excel',
-        },
-      ],
-    },
-  ];
+  /** "Excel ▾" de la tabla, junto a "Cargar contratos": exporta los contratos. */
+  protected readonly trailingActions = excelAction('contratos');
 
   constructor() {
     effect(() => {
@@ -185,7 +165,9 @@ export class AporteContratosTabComponent {
 
   protected onToolbarAction(actionId: string): void {
     if (actionId === 'cargar-contratos') this.cargarContratos();
-    if (actionId.startsWith('excel:')) this.exportar(actionId.slice(6) as AporteExportKey);
+    if (actionId.startsWith(EXCEL_ACTION_PREFIX)) {
+      this.exportar(actionId.slice(EXCEL_ACTION_PREFIX.length) as AporteExportKey);
+    }
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
@@ -207,7 +189,7 @@ export class AporteContratosTabComponent {
             width: '68rem',
             data: {
               contratoId: fila.contrato,
-              empleado: fila.contrato_nombre,
+              empleado: fila.contacto_nombre_corto,
               fechaDesde: this.fechaDesde(),
               fechaHasta: this.fechaHasta(),
             },
@@ -334,12 +316,8 @@ export class AporteContratosTabComponent {
 
   private exportar(clave: AporteExportKey): void {
     const toasts = this.t().common.toasts;
-    this.fileDownload
-      .download(APORTE_EXPORTS[clave].url, {
-        method: 'POST',
-        body: cuerpoExportacion(clave, this.aporteId()),
-        fallbackFilename: APORTE_EXPORTS[clave].archivo,
-      })
+    this.service
+      .exportar(clave, this.aporteId())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),

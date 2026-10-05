@@ -33,35 +33,38 @@ PDF del aporte. Cuerpo `{ "aporte_id": 1 }`. El ERP anterior imprimía por
 `general/documento/imprimir/` con `documento_tipo_id: 1` fijo, pero el aporte no es un
 documento, así que esa ruta no aplica. Si el PDF sale por otro lado, avisar cuál.
 
-### `POST humano/aporte-detalle/excel/` ❌ PENDIENTE
+### Exportaciones de las tres pestañas ❌ PENDIENTE
 
-Exporta las líneas liquidadas del aporte. Cuerpo:
+Cada pestaña del workspace tiene su "Excel", como en el ERP anterior:
+
+| Pestaña   | Endpoint                             | `serializador`            | Filtro que acota al aporte   |
+| --------- | ------------------------------------ | ------------------------- | ---------------------------- |
+| Contratos | `POST humano/aporte-contrato/excel/` | `informe_aporte_contrato` | `aporte_id`                  |
+| Detalle   | `POST humano/aporte-detalle/excel/`  | `informe_aporte_detalle`  | `aporte_contrato__aporte_id` |
+| Entidades | `POST humano/aporte-entidad/excel/`  | `informe_aporte_entidad`  | `aporte_id`                  |
+
+Cuerpo, con la convención de los `lista/` (ejemplo de contratos):
 
 ```json
 {
-  "filtros": [{ "propiedad": "aporte_contrato__aporte_id", "operador": "=", "valor": 1 }],
+  "filtros": [{ "propiedad": "aporte_id", "operador": "=", "valor": 1 }],
   "ordenamientos": [],
-  "serializador": "informe_aporte_detalle"
+  "serializador": "informe_aporte_contrato"
 }
 ```
 
-El nombre del serializador sale del ERP anterior; si en este backend se llama distinto,
-avisar.
+Los nombres de serializador salen del ERP anterior (que los pedía por `GET` con
+`excel_informe=True`); si en este backend se llaman distinto, avisar.
 
 ## 2. Campos que faltan en los serializadores
 
 El frontend ya los lee; mientras no lleguen se muestran como "—".
 
-### `HumAporteDetalle` ❌ PENDIENTE
+### `HumAporteDetalle` ✅ IMPLEMENTADO
 
-Hoy la línea liquidada solo trae el id de `aporte_contrato`: **no hay forma de saber de
-qué empleado es cada línea**, que es lo primero que se mira al compararla contra el plano.
-
-| Campo                            | Qué es                                            |
-| -------------------------------- | ------------------------------------------------- |
-| `contrato_nombre`                | Nombre del empleado (como en `HumAporteContrato`) |
-| `contacto_numero_identificacion` | Identificación del empleado                       |
-| `aporte_contrato_salario`        | Salario del contrato en el aporte                 |
+La línea liquidada ya trae quién es el empleado, y el frontend lo pinta:
+`aporte_contrato__contacto_numero_identificacion`, `aporte_contrato__contacto_nombre_corto`
+y `aporte_contrato_salario`.
 
 ### `HumAporteContrato` ❌ PENDIENTE
 
@@ -96,7 +99,6 @@ registros de **todos** los aportes.
 2. **Respuesta de `cargar-contrato/`**: el schema la declara como objeto genérico. El
    frontend lee `contratos` para el toast ("N contratos en la planilla"). ¿Responde el
    aporte completo, como las otras acciones?
-3. **Respuesta de los `lista/`**: el schema declara un objeto suelto
-   (`HumAporteContrato`, etc.), pero el frontend espera la página
-   `{ count, next, previous, results }`. Confirmar que es paginada.
+3. ~~**Respuesta de los `lista/`**~~ ✅ Confirmado: viene paginada
+   (`{ count, next, previous, results }`), aunque el schema declare un objeto suelto.
 4. **`presentacion`** (`S` sucursal / `U` única): ¿qué cambia en la liquidación?

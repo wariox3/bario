@@ -1,6 +1,6 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
@@ -76,6 +76,7 @@ export class AporteWorkspaceComponent implements OnInit {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -92,7 +93,16 @@ export class AporteWorkspaceComponent implements OnInit {
   /** Acción del ciclo en vuelo: bloquea toda la botonera. */
   protected readonly accionEnCurso = signal<AccionCiclo | null>(null);
 
-  protected readonly activeTab = signal<Pestania>('contratos');
+  /**
+   * Pestaña activa, en la URL (`?tab=entidades`) para que recargar o compartir
+   * el link no la pierda. Llega como input por `withComponentInputBinding`; un
+   * valor desconocido cae en contratos.
+   */
+  readonly tab = input<string>();
+  protected readonly activeTab = computed<Pestania>(() => {
+    const tab = this.tab();
+    return tab === 'detalles' || tab === 'entidades' ? tab : 'contratos';
+  });
 
   /** Contratos cargados; alimenta la capacidad de generar. */
   protected readonly contratos = signal(0);
@@ -184,6 +194,19 @@ export class AporteWorkspaceComponent implements OnInit {
   }
 
   // ── Navegación ────────────────────────────────────────────────────────────
+
+  /**
+   * Cambiar de pestaña reescribe `?tab=` sin sumar al historial: "Atrás" vuelve a
+   * la página anterior, no a la pestaña anterior.
+   */
+  protected onTabChange(value: Pestania): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: value },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   protected onBack(): void {
     this.navigateTo();

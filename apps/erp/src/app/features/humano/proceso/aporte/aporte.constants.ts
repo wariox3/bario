@@ -1,6 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 import type { AporteCotizaciones } from './aporte.model';
+import type { AporteExportKey } from './aporte.service';
 
 export const APORTES_FILTERS_STORAGE_KEY = 'aportes:filters:v1';
 
@@ -216,7 +217,7 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
     width: '140px',
   },
   {
-    field: 'contrato_nombre',
+    field: 'contacto_nombre_corto',
     headerKey: 'entities.aporte.contratos.columns.empleado',
     type: 'text',
   },
@@ -296,3 +297,29 @@ export const APORTE_DETALLE_FILTER_FIELDS: readonly FilterField[] = [
     type: 'number',
   },
 ];
+
+// ── Excel de las pestañas ───────────────────────────────────────────────────
+
+/** Prefijo del id de acción del "Excel ▾": `excel:<clave>`. */
+export const EXCEL_ACTION_PREFIX = 'excel:';
+
+/**
+ * "Excel ▾" de una pestaña, con su única exportación adentro, como en el ERP
+ * anterior. El botón va sin ícono, solo el ítem lo lleva.
+ */
+export function excelAction(clave: AporteExportKey): readonly ToolbarAction[] {
+  return [
+    {
+      id: 'excel',
+      labelKey: 'entities.aporte.excel.action',
+      iconClass: '',
+      children: [
+        {
+          id: `${EXCEL_ACTION_PREFIX}${clave}`,
+          labelKey: 'entities.aporte.excel.detalle',
+          iconClass: 'pi pi-file-excel',
+        },
+      ],
+    },
+  ];
+}

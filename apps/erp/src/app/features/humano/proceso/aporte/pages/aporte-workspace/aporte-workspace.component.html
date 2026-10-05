@@ -109,7 +109,7 @@
   <!-- ── Los tres niveles del aporte ─────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
+      <p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
         <p-tablist>
           <p-tab value="contratos">{{ det.tabs.contratos }}</p-tab>
           <p-tab value="detalles">{{ det.tabs.detalles }}</p-tab>

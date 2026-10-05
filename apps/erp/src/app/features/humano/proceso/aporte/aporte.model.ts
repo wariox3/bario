@@ -121,13 +121,9 @@ export interface AportePayload {
 export interface AporteContrato {
   readonly id: number;
   readonly contrato: number | null;
-  /** Nombre del **empleado** del contrato (no un nombre del contrato). */
-  readonly contrato_nombre: string | null;
-  /**
-   * ⚠️ El backend todavía no lo serializa: se pidió. Se deja leído para que la
-   * columna se pinte sola el día que llegue (mientras tanto, "—").
-   */
-  readonly contacto_numero_identificacion?: string | null;
+  /** El empleado del contrato, aplanado desde su contacto. */
+  readonly contacto_numero_identificacion: string | null;
+  readonly contacto_nombre_corto: string | null;
 
   readonly fecha_desde: string | null;
   readonly fecha_hasta: string | null;
@@ -157,13 +153,9 @@ export interface AporteContrato {
 export interface AporteDetalle {
   readonly id: number;
   readonly aporte_contrato: number | null;
-  /**
-   * ⚠️ Quién es el empleado de la línea. El backend todavía no los serializa
-   * (solo manda el id de `aporte_contrato`): se pidieron. Se dejan leídos para
-   * que las columnas se pinten solas el día que lleguen (mientras tanto, "—").
-   */
-  readonly contacto_numero_identificacion?: string | null;
-  readonly contrato_nombre?: string | null;
+  /** Quién es el empleado de la línea, aplanado desde su contrato del aporte. */
+  readonly aporte_contrato__contacto_numero_identificacion: string | null;
+  readonly aporte_contrato__contacto_nombre_corto: string | null;
 
   readonly ingreso: boolean;
   readonly retiro: boolean;
@@ -177,8 +169,7 @@ export interface AporteDetalle {
   readonly salario_integral: boolean;
   readonly dias_incapacidad_laboral: number | null;
 
-  /** ⚠️ Tampoco lo serializa el backend todavía: se pidió junto con el empleado. */
-  readonly aporte_contrato_salario?: string | number | null;
+  readonly aporte_contrato_salario: string | number | null;
   readonly horas: number | null;
 
   readonly dias_pension: number | null;
