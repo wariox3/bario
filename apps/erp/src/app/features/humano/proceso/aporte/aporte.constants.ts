@@ -272,30 +272,10 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
 
 export const APORTE_CONTRATO_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.contratos.columns.id', type: 'number' },
-  {
-    name: 'contrato__contacto__nombre_corto',
-    displayNameKey: 'entities.aporte.contratos.columns.empleado',
-    type: 'string',
-  },
-  {
-    name: 'contrato_id',
-    displayNameKey: 'entities.aporte.contratos.columns.contrato',
-    type: 'number',
-  },
 ];
 
 export const APORTE_DETALLE_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.detalles.columns.id', type: 'number' },
-  {
-    name: 'aporte_contrato__contrato__contacto__nombre_corto',
-    displayNameKey: 'entities.aporte.detalles.columns.empleado',
-    type: 'string',
-  },
-  {
-    name: 'aporte_contrato_id',
-    displayNameKey: 'entities.aporte.detalles.columns.contrato',
-    type: 'number',
-  },
 ];
 
 // ── Excel de las pestañas ───────────────────────────────────────────────────

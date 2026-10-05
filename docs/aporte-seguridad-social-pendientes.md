@@ -75,15 +75,13 @@ El contrato del aporte ya trae al empleado, y el frontend lo pinta:
 
 El schema no publica qué campos acepta cada `lista/`. El frontend usa estos:
 
-| Endpoint                 | Filtro                                              | Uso                           |
-| ------------------------ | --------------------------------------------------- | ----------------------------- |
-| `aporte-contrato/lista/` | `aporte_id`                                         | Fijo: acota al aporte abierto |
-| `aporte-contrato/lista/` | `id`, `contrato_id`                                 | Filtros de la tabla           |
-| `aporte-contrato/lista/` | `contrato__contacto__nombre_corto`                  | Buscar por empleado           |
-| `aporte-detalle/lista/`  | `aporte_contrato__aporte_id`                        | Fijo: acota al aporte abierto |
-| `aporte-detalle/lista/`  | `id`, `aporte_contrato_id`                          | Filtros de la tabla           |
-| `aporte-detalle/lista/`  | `aporte_contrato__contrato__contacto__nombre_corto` | Buscar por empleado           |
-| `aporte-entidad/lista/`  | `aporte_id`                                         | Fijo: acota al aporte abierto |
+| Endpoint                 | Filtro                       | Uso                           |
+| ------------------------ | ---------------------------- | ----------------------------- |
+| `aporte-contrato/lista/` | `aporte_id`                  | Fijo: acota al aporte abierto |
+| `aporte-contrato/lista/` | `id`                         | Filtro de la tabla            |
+| `aporte-detalle/lista/`  | `aporte_contrato__aporte_id` | Fijo: acota al aporte abierto |
+| `aporte-detalle/lista/`  | `id`                         | Filtro de la tabla            |
+| `aporte-entidad/lista/`  | `aporte_id`                  | Fijo: acota al aporte abierto |
 
 Y estos ordenamientos: `contrato_id` (contratos), `aporte_contrato_id` (detalles), `tipo`
 (entidades).
