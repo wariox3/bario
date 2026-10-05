@@ -6,6 +6,8 @@
 
 <!--
   ── Botonera ─────────────────────────────────────────────────────────────────
+  Va en <lib-page-actions>: queda pegada bajo el header al hacer scroll, como en
+  los formularios, para no perder el ciclo de vida al bajar por las tablas.
   Mismo estándar que la programación y el aporte: volver y editar sueltos, el
   ciclo de vida y Acciones fundidos en un segmento. Solo Aprobar va relleno: es
   el paso que cierra la liquidación. Todo sale de capacidades(): lo que no aplica
@@ -13,7 +15,7 @@
   El <p-menu> va FUERA del grupo: su CSS une los botones con
   `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
 -->
-<header class="flex flex-wrap items-center gap-2">
+<lib-page-actions>
   <p-button
     type="button"
     [label]="t().common.actions.back"
@@ -74,7 +76,7 @@
 
     <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
   }
-</header>
+</lib-page-actions>
 
 @if (isLoading()) {
   <div

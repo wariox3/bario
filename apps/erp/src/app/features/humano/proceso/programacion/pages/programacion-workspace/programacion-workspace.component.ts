@@ -20,6 +20,7 @@ import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-ma
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ProgramacionResumenComponent } from '../../components/programacion-resumen/programacion-resumen.component';
 import { ProgramacionAdicionalesTabComponent } from '../../components/programacion-adicionales-tab/programacion-adicionales-tab.component';
@@ -66,6 +67,7 @@ type WorkspaceTab = 'renglones' | 'adicionales';
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
+    PageActionsComponent,
     ImportDialogComponent,
     ProgramacionResumenComponent,
     ProgramacionRenglonesTabComponent,

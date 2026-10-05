@@ -16,6 +16,7 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { LiquidacionAdicionalesTabComponent } from '../../components/liquidacion-adicionales-tab/liquidacion-adicionales-tab.component';
 import { LiquidacionResumenComponent } from '../../components/liquidacion-resumen/liquidacion-resumen.component';
@@ -60,6 +61,7 @@ type AccionCiclo = 'generar' | 'reliquidar' | 'desgenerar' | 'aprobar' | 'desapr
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
+    PageActionsComponent,
     LiquidacionResumenComponent,
     LiquidacionAdicionalesTabComponent,
   ],

@@ -16,6 +16,7 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AporteContratosTabComponent } from '../../components/aporte-contratos-tab/aporte-contratos-tab.component';
 import { AporteDetallesTabComponent } from '../../components/aporte-detalles-tab/aporte-detalles-tab.component';
@@ -62,6 +63,7 @@ type Pestania = 'contratos' | 'detalles' | 'entidades';
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
+    PageActionsComponent,
     AporteResumenComponent,
     AporteContratosTabComponent,
     AporteDetallesTabComponent,
