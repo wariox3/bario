@@ -18,13 +18,13 @@ function opcionDe(id: number | null, nombre: string | null | undefined): ErpSele
 /** Read-model (GET) → valores del formulario (edición). */
 export function aporteToFormValue(read: Aporte): Partial<AporteFormRawValue> {
   return {
-    sucursal: opcionDe(read.sucursal_id, read.sucursal_nombre),
+    sucursal: opcionDe(read.sucursal, read.sucursal_nombre),
     anio: read.anio,
     mes: read.mes,
     presentacion: read.presentacion ?? PRESENTACION.SUCURSAL,
-    entidad_riesgo: opcionDe(read.entidad_riesgo_id, read.entidad_riesgo_nombre),
-    entidad_sena: opcionDe(read.entidad_sena_id, read.entidad_sena_nombre),
-    entidad_icbf: opcionDe(read.entidad_icbf_id, read.entidad_icbf_nombre),
+    entidad_riesgo: opcionDe(read.entidad_riesgo, read.entidad_riesgo_nombre),
+    entidad_sena: opcionDe(read.entidad_sena, read.entidad_sena_nombre),
+    entidad_icbf: opcionDe(read.entidad_icbf, read.entidad_icbf_nombre),
   };
 }
 

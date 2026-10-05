@@ -4628,13 +4628,13 @@ export const es: AppDict = {
       presentaciones: { sucursal: 'Por sucursal', unica: 'Única' },
       cotizaciones: {
         pension: 'Pensión',
-        solidaridad: 'Fondo de solidaridad',
-        subsistencia: 'Fondo de subsistencia',
-        voluntarioAfiliado: 'Voluntario afiliado',
-        voluntarioAportante: 'Voluntario aportante',
+        solidaridad: 'Solidaridad',
+        subsistencia: 'Subsistencia',
+        voluntarioAfiliado: 'Vol. afiliado',
+        voluntarioAportante: 'Vol. aportante',
         salud: 'Salud',
-        riesgos: 'Riesgos laborales',
-        caja: 'Caja de compensación',
+        riesgos: 'Riesgos',
+        caja: 'Caja',
         sena: 'SENA',
         icbf: 'ICBF',
       },
@@ -4672,15 +4672,19 @@ export const es: AppDict = {
         },
       },
       resumen: {
-        cotizacionesTitle: 'Cotización del periodo',
+        valoresTitle: 'Valores',
         labels: {
+          sucursal: 'Sucursal',
+          mes: 'Mes',
+          anio: 'Año',
+          presentacion: 'Forma de presentación',
+          entidadRiesgo: 'Entidad riesgo',
+          entidadSena: 'Entidad SENA',
+          entidadIcbf: 'Entidad ICBF',
           empleados: 'Empleados',
           contratos: 'Contratos',
           lineas: 'Líneas',
-          baseCotizacion: 'Base de cotización',
-          entidadRiesgo: 'ARL',
-          entidadSena: 'SENA',
-          entidadIcbf: 'ICBF',
+          baseCotizacion: 'Base cotización',
           total: 'Total',
         },
       },
@@ -4700,10 +4704,7 @@ export const es: AppDict = {
         aprobar: 'Aprobar',
         desaprobar: 'Desaprobar',
         planoOperador: 'Plano del operador',
-        imprimir: 'Imprimir',
-        exportContratos: 'Exportar contratos',
-        exportDetalles: 'Exportar detalle',
-        exportEntidades: 'Exportar entidades',
+        utilidades: 'Utilidades',
         confirmaciones: {
           generar: {
             header: '¿Generar el aporte?',
@@ -4743,6 +4744,7 @@ export const es: AppDict = {
       },
       contratos: {
         cargarContratos: 'Cargar contratos',
+        excel: { action: 'Excel', detalle: 'Detalle' },
         leyenda: {
           titulo: 'Antes de generar',
           contenido:
@@ -4762,7 +4764,6 @@ export const es: AppDict = {
         },
         columns: {
           id: 'ID',
-          codigo: 'Código',
           identificacion: 'Identificación',
           empleado: 'Empleado',
           contrato: 'Contrato',

@@ -210,20 +210,13 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'contrato__contacto_id',
-    headerKey: 'entities.aporte.contratos.columns.codigo',
-    type: 'number',
-    width: '90px',
-    align: 'right',
-  },
-  {
-    field: 'contrato__contacto__numero_identificacion',
+    field: 'contacto_numero_identificacion',
     headerKey: 'entities.aporte.contratos.columns.identificacion',
     type: 'text',
     width: '140px',
   },
   {
-    field: 'contrato__contacto__nombre_corto',
+    field: 'contrato_nombre',
     headerKey: 'entities.aporte.contratos.columns.empleado',
     type: 'text',
   },
@@ -284,8 +277,8 @@ export const APORTE_CONTRATO_FILTER_FIELDS: readonly FilterField[] = [
     type: 'string',
   },
   {
-    name: 'contrato__contacto_id',
-    displayNameKey: 'entities.aporte.contratos.columns.codigo',
+    name: 'contrato_id',
+    displayNameKey: 'entities.aporte.contratos.columns.contrato',
     type: 'number',
   },
 ];

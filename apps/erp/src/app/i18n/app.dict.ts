@@ -3585,15 +3585,19 @@ export interface AppDict
         };
       };
       resumen: {
-        cotizacionesTitle: string;
+        valoresTitle: string;
         labels: {
+          sucursal: string;
+          mes: string;
+          anio: string;
+          presentacion: string;
+          entidadRiesgo: string;
+          entidadSena: string;
+          entidadIcbf: string;
           empleados: string;
           contratos: string;
           lineas: string;
           baseCotizacion: string;
-          entidadRiesgo: string;
-          entidadSena: string;
-          entidadIcbf: string;
           total: string;
         };
       };
@@ -3610,10 +3614,7 @@ export interface AppDict
         aprobar: string;
         desaprobar: string;
         planoOperador: string;
-        imprimir: string;
-        exportContratos: string;
-        exportDetalles: string;
-        exportEntidades: string;
+        utilidades: string;
         confirmaciones: {
           generar: { header: string; message: string };
           desgenerar: { header: string; message: string };
@@ -3641,6 +3642,7 @@ export interface AppDict
       };
       contratos: {
         cargarContratos: string;
+        excel: { action: string; detalle: string };
         leyenda: { titulo: string; contenido: string };
         confirmEliminar: { header: string; message: string };
         confirmRecargar: { header: string; message: string };
@@ -3650,7 +3652,6 @@ export interface AppDict
         };
         columns: {
           id: string;
-          codigo: string;
           identificacion: string;
           empleado: string;
           contrato: string;

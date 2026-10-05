@@ -5,13 +5,26 @@ import { estadoDe, type EstadoProceso } from '../../../shared/proceso.estado';
 import { APORTE_COTIZACIONES } from '../../aporte.constants';
 import { PRESENTACION, type Aporte } from '../../aporte.model';
 
+/** Un importe de la zona de valores, con su etiqueta ya resuelta. */
+interface ValorResumen {
+  readonly label: string;
+  readonly valor: number;
+}
+
+/** Cuántos importes van por columna en la zona de valores. */
+const VALORES_POR_COLUMNA = 4;
+
 /**
- * Resumen de la cabecera de un aporte: el periodo, el alcance, las entidades, los
- * contadores del proceso y los diez acumulados de cotización.
+ * Encabezado de un aporte, con el mismo patrón que el de la programación: filas
+ * etiqueta/valor en columnas.
  *
- * Los acumulados se recorren desde `APORTE_COTIZACIONES` en vez de escribir once
- * filas de tabla a mano como el ERP anterior: agregar un concepto es tocar la
- * metadata y su clave i18n.
+ * - **Datos**, en tres columnas: de dónde y de cuándo (sucursal, mes, año,
+ *   presentación), a qué entidades de la planilla, y a cuántos alcanza.
+ * - **Valores**, en tres columnas de cuatro: la base y los diez acumulados de
+ *   cotización, cerrando con el total.
+ *
+ * Los acumulados se recorren desde `APORTE_COTIZACIONES` en vez de escribir una
+ * fila a mano por concepto: agregar uno es tocar la metadata y su clave i18n.
  */
 @Component({
   selector: 'app-aporte-resumen',
@@ -31,30 +44,41 @@ export class AporteResumenComponent {
   /** Etapa del ciclo, para el badge. */
   protected readonly estado = computed<EstadoProceso>(() => estadoDe(this.aporte()));
 
-  /** Periodo en texto: `Julio 2026`, con el mes traducido. */
-  protected readonly periodo = computed(() => {
-    const { mes, anio } = this.aporte();
-    const nombre = mes != null ? this.t().common.months[mes - 1] : undefined;
-    return [nombre, anio].filter((parte) => parte != null && parte !== '').join(' ') || '—';
+  /** Mes en texto (`Julio`), traducido. */
+  protected readonly mes = computed(() => {
+    const { mes } = this.aporte();
+    return mes != null ? (this.t().common.months[mes - 1] ?? '') : '';
   });
 
   protected readonly presentacionLabel = computed(() => {
+    const { presentacion } = this.aporte();
+    if (presentacion == null) return '';
     const labels = this.t().entities.aporte.presentaciones;
-    return this.aporte().presentacion === PRESENTACION.UNICA ? labels.unica : labels.sucursal;
+    return presentacion === PRESENTACION.UNICA ? labels.unica : labels.sucursal;
   });
-
-  protected readonly baseCotizacion = computed(
-    () => toFiniteNumber(this.aporte().base_cotizacion) ?? 0,
-  );
 
   protected readonly total = computed(() => toFiniteNumber(this.aporte().cotizacion_total) ?? 0);
 
-  /** Los diez acumulados con su etiqueta ya resuelta y su valor numérico. */
-  protected readonly cotizaciones = computed(() => {
+  /**
+   * La base y los diez acumulados, repartidos en columnas de cuatro. El total no
+   * entra: cierra la última columna con su propio peso.
+   */
+  protected readonly columnasValores = computed<readonly (readonly ValorResumen[])[]>(() => {
     const aporte = this.aporte();
-    return APORTE_COTIZACIONES.map(({ clave, labelKey }) => ({
-      label: this.i18n.translate(labelKey),
-      valor: toFiniteNumber(aporte[clave]) ?? 0,
-    }));
+    const valores: ValorResumen[] = [
+      {
+        label: this.t().entities.aporte.resumen.labels.baseCotizacion,
+        valor: toFiniteNumber(aporte.base_cotizacion) ?? 0,
+      },
+      ...APORTE_COTIZACIONES.map(({ clave, labelKey }) => ({
+        label: this.i18n.translate(labelKey),
+        valor: toFiniteNumber(aporte[clave]) ?? 0,
+      })),
+    ];
+    const columnas: ValorResumen[][] = [];
+    for (let i = 0; i < valores.length; i += VALORES_POR_COLUMNA) {
+      columnas.push(valores.slice(i, i + VALORES_POR_COLUMNA));
+    }
+    return columnas;
   });
 }

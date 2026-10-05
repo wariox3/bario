@@ -101,7 +101,7 @@ export class AporteDetallesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarDetalles(id, page + 1, this.pageSize, this.activeFilters())
+      .listarDetalles(id, page, this.pageSize, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

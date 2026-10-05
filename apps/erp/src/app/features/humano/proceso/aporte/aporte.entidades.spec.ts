@@ -6,7 +6,7 @@ function entidad(
   tipo: string | null,
   cotizacion: string | number | null,
 ): AporteEntidad {
-  return { id, tipo, entidad_id: id, entidad__nombre: `Entidad ${id}`, cotizacion };
+  return { id, tipo, entidad: id, entidad_nombre: `Entidad ${id}`, cotizacion };
 }
 
 describe('agruparEntidades', () => {

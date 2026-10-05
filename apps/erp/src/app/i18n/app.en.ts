@@ -4564,12 +4564,12 @@ export const en: AppDict = {
       presentaciones: { sucursal: 'By branch', unica: 'Single' },
       cotizaciones: {
         pension: 'Pension',
-        solidaridad: 'Solidarity fund',
-        subsistencia: 'Subsistence fund',
-        voluntarioAfiliado: 'Voluntary — member',
-        voluntarioAportante: 'Voluntary — employer',
+        solidaridad: 'Solidarity',
+        subsistencia: 'Subsistence',
+        voluntarioAfiliado: 'Vol. member',
+        voluntarioAportante: 'Vol. employer',
         salud: 'Health',
-        riesgos: 'Occupational risks',
+        riesgos: 'Risks',
         caja: 'Compensation fund',
         sena: 'SENA',
         icbf: 'ICBF',
@@ -4608,15 +4608,19 @@ export const en: AppDict = {
         },
       },
       resumen: {
-        cotizacionesTitle: 'Contributions for the period',
+        valoresTitle: 'Amounts',
         labels: {
+          sucursal: 'Branch',
+          mes: 'Month',
+          anio: 'Year',
+          presentacion: 'Filing type',
+          entidadRiesgo: 'Risk entity',
+          entidadSena: 'SENA entity',
+          entidadIcbf: 'ICBF entity',
           empleados: 'Employees',
           contratos: 'Contracts',
           lineas: 'Lines',
           baseCotizacion: 'Contribution base',
-          entidadRiesgo: 'ARL',
-          entidadSena: 'SENA',
-          entidadIcbf: 'ICBF',
           total: 'Total',
         },
       },
@@ -4636,10 +4640,7 @@ export const en: AppDict = {
         aprobar: 'Approve',
         desaprobar: 'Undo approval',
         planoOperador: 'Operator file',
-        imprimir: 'Print',
-        exportContratos: 'Export contracts',
-        exportDetalles: 'Export detail',
-        exportEntidades: 'Export entities',
+        utilidades: 'Utilities',
         confirmaciones: {
           generar: {
             header: 'Generate the contribution?',
@@ -4679,6 +4680,7 @@ export const en: AppDict = {
       },
       contratos: {
         cargarContratos: 'Load contracts',
+        excel: { action: 'Excel', detalle: 'Detail' },
         leyenda: {
           titulo: 'Before generating',
           contenido:
@@ -4698,7 +4700,6 @@ export const en: AppDict = {
         },
         columns: {
           id: 'ID',
-          codigo: 'Code',
           identificacion: 'ID number',
           empleado: 'Employee',
           contrato: 'Contract',

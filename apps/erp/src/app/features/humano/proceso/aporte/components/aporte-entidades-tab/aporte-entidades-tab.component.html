@@ -31,7 +31,7 @@
           @for (entidad of grupo.entidades; track entidad.id) {
             <tr class="border-b border-[rgba(20,48,73,0.06)]">
               <td class="px-4 py-2 text-brand-muted">{{ entidad.tipo }}</td>
-              <td class="px-4 py-2 text-brand-text">{{ entidad.entidad__nombre || '—' }}</td>
+              <td class="px-4 py-2 text-brand-text">{{ entidad.entidad_nombre || '—' }}</td>
               <td class="px-4 py-2 text-right tabular-nums text-brand-text">
                 {{ formatMoney(entidad.cotizacion) }}
               </td>

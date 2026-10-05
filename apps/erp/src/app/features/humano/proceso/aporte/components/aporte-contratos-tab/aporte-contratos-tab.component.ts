@@ -13,7 +13,7 @@ import { EMPTY, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
-import { I18nService, ToastService, type FilterCondition } from '@reddoc/core';
+import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
 import {
   DataFilterModalComponent,
   DataTableComponent,
@@ -32,7 +32,12 @@ import {
   APORTE_CONTRATO_COLUMNS,
   APORTE_CONTRATO_FILTER_FIELDS,
 } from '../../aporte.constants';
-import { AporteService } from '../../aporte.service';
+import {
+  APORTE_EXPORTS,
+  AporteService,
+  cuerpoExportacion,
+  type AporteExportKey,
+} from '../../aporte.service';
 
 /**
  * Los **contratos** incluidos en el aporte: quién entra en la planilla del
@@ -60,6 +65,7 @@ import { AporteService } from '../../aporte.service';
 })
 export class AporteContratosTabComponent {
   private readonly service = inject(AporteService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly dialog = inject(DialogService);
@@ -134,6 +140,25 @@ export class AporteContratosTabComponent {
       : null,
   );
 
+  /**
+   * "Excel ▾" de la tabla, junto a "Cargar contratos", como en la programación.
+   * El botón va sin ícono, solo los ítems lo llevan.
+   */
+  protected readonly trailingActions: readonly ToolbarAction[] = [
+    {
+      id: 'excel',
+      labelKey: 'entities.aporte.contratos.excel.action',
+      iconClass: '',
+      children: [
+        {
+          id: 'excel:detalle',
+          labelKey: 'entities.aporte.contratos.excel.detalle',
+          iconClass: 'pi pi-file-excel',
+        },
+      ],
+    },
+  ];
+
   constructor() {
     effect(() => {
       this.aporteId();
@@ -154,6 +179,7 @@ export class AporteContratosTabComponent {
 
   protected onToolbarAction(actionId: string): void {
     if (actionId === 'cargar-contratos') this.cargarContratos();
+    if (actionId.startsWith('excel:')) this.exportar(actionId.slice(6) as AporteExportKey);
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
@@ -175,7 +201,7 @@ export class AporteContratosTabComponent {
             width: '68rem',
             data: {
               contratoId: fila.contrato,
-              empleado: fila.contrato__contacto__nombre_corto,
+              empleado: fila.contrato_nombre,
               fechaDesde: this.fechaDesde(),
               fechaHasta: this.fechaHasta(),
             },
@@ -298,13 +324,27 @@ export class AporteContratosTabComponent {
       });
   }
 
+  private exportar(clave: AporteExportKey): void {
+    const toasts = this.t().common.toasts;
+    this.fileDownload
+      .download(APORTE_EXPORTS[clave].url, {
+        method: 'POST',
+        body: cuerpoExportacion(clave, this.aporteId()),
+        fallbackFilename: APORTE_EXPORTS[clave].archivo,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
+      });
+  }
+
   private loadPage(page: number): void {
     const id = this.aporteId();
     if (!id) return;
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarContratos(id, page + 1, this.pageSize, this.activeFilters())
+      .listarContratos(id, page, this.pageSize, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
