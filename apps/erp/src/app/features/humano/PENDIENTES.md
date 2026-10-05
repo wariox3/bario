@@ -477,6 +477,11 @@ contrato siga vigente:
 | Fechas de último pago | `PATCH /humano/contrato/:id/`     | Desde cuándo se liquida cada prestación      |
 | Terminar contrato     | `POST /humano/contrato/terminar/` | Cierra el contrato y **crea la liquidación** |
 
+**Falta el certificado laboral.** El ERP anterior lo descargaba desde la ficha (menú "Formato →
+Certificado laboral", `humano/contrato/imprimir-certificado-laboral/` con `{ id }`). Ese endpoint
+**no está en el schema actual** del backend (revisado 2026-10-05), así que no se portó: hay que
+pedirlo antes de sumar el menú.
+
 **`terminar/` lleva las FK con `_id`** — `{ contrato_id, fecha_terminacion, motivo_terminacion_id }`,
 los tres obligatorios (`TerminarContratoRequest` en el schema). Es la excepción a "se escribe sin
 `_id`": una acción con su propio serializer, no el del modelo. Se portó como

@@ -21,7 +21,6 @@ import {
   ToastService,
   formatCop,
   formatFechaCorta,
-  formatFechaLarga,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
@@ -231,9 +230,12 @@ export class ContratoDetailComponent implements OnInit {
     return formatCop(num);
   }
 
-  /** Fecha larga de la ficha (`20 de junio de 2026`); `—` si no hay valor. */
+  /**
+   * Fecha corta (`20/06/2026`), la de toda ficha: la larga es solo para la
+   * cabecera de un documento. `—` si no hay valor (contrato indefinido).
+   */
   protected formatFecha(value: string | null): string {
-    return formatFechaLarga(value, '—');
+    return formatFechaCorta(value, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/humano/contratos[/extra]`. */

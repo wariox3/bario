@@ -2158,8 +2158,8 @@ export const es: AppDict = {
           seguridadSocial: 'Seguridad social',
         },
         groups: {
-          identificacion: 'Identificación',
-          vigencia: 'Vigencia y asignación',
+          identificacion: 'Identificación y asignación',
+          vigencia: 'Vigencia',
           remuneracion: 'Remuneración',
           terminacion: 'Terminación y pagos',
         },

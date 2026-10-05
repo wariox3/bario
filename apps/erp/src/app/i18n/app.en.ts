@@ -2107,8 +2107,8 @@ export const en: AppDict = {
           seguridadSocial: 'Social security',
         },
         groups: {
-          identificacion: 'Identification',
-          vigencia: 'Term and assignment',
+          identificacion: 'Identification and assignment',
+          vigencia: 'Term',
           remuneracion: 'Compensation',
           terminacion: 'Termination and payments',
         },
