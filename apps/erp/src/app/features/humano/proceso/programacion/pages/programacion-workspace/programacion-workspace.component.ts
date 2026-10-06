@@ -264,6 +264,10 @@ export class ProgramacionWorkspaceComponent implements OnInit {
     this.navigateTo('editar', this.programacionId());
   }
 
+  protected onNew(): void {
+    this.navigateTo('nuevo');
+  }
+
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   protected onGenerar(): void {

@@ -15,11 +15,12 @@ import { CreditoService } from '../../credito.service';
 import { CREDITO_LIST_PATH } from '../../credito.constants';
 import type { Credito } from '../../credito.model';
 import { CreditoPagosComponent } from '../../components/credito-pagos/credito-pagos.component';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-credito-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, CreditoPagosComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent, CreditoPagosComponent],
   templateUrl: './credito-detail.component.html',
   styleUrl: './credito-detail.component.scss',
 })
@@ -104,6 +105,10 @@ export class CreditoDetailComponent implements OnInit {
     const c = this.credito();
     if (!c) return;
     this.navigate(...CREDITO_LIST_PATH, 'editar', c.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...CREDITO_LIST_PATH, 'nuevo');
   }
 
   private loadCredito(id: number): void {

@@ -218,6 +218,10 @@ export class AporteWorkspaceComponent implements OnInit {
     this.navigateTo('editar', this.aporteId());
   }
 
+  protected onNew(): void {
+    this.navigateTo('nuevo');
+  }
+
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   protected onGenerar(): void {

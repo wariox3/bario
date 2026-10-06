@@ -9,6 +9,7 @@ import type { AppDict } from '@turnos/i18n';
 import { TurnoService } from '../../turno.service';
 import { TURNO_LIST_PATH } from '../../turno.constants';
 import type { Turno } from '../../turno.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /**
  * Detalle (ficha) de un turno (jornada) — solo lectura.
@@ -19,7 +20,7 @@ import type { Turno } from '../../turno.model';
 @Component({
   selector: 'app-turno-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
   templateUrl: './turno-detail.component.html',
   styleUrl: './turno-detail.component.scss',
 })
@@ -77,6 +78,10 @@ export class TurnoDetailComponent implements OnInit {
     const turno = this.turno();
     if (!turno) return;
     this.navigate(...TURNO_LIST_PATH, 'editar', turno.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...TURNO_LIST_PATH, 'nuevo');
   }
 
   private loadTurno(id: number): void {

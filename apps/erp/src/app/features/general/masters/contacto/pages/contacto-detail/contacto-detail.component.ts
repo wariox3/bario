@@ -25,6 +25,7 @@ import { ContactoService } from '../../contacto.service';
 import { CONTACTO_LIST_PATH } from '../../contacto.constants';
 import { direccionLineasDe, nombreCompletoDe, numeroDocumentoDe } from '../../contacto.format';
 import type { Contacto } from '../../contacto.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /** Rol comercial activo del contacto, con su clave i18n y color de pill. */
 interface ContactoRol {
@@ -49,7 +50,14 @@ interface ContactoRol {
 @Component({
   selector: 'app-contacto-detail',
   standalone: true,
-  imports: [ButtonModule, MenuModule, BreadcrumbComponent, ArchivosDialogComponent, TelefonoPipe],
+  imports: [
+    ButtonGroupModule,
+    ButtonModule,
+    MenuModule,
+    BreadcrumbComponent,
+    ArchivosDialogComponent,
+    TelefonoPipe,
+  ],
   templateUrl: './contacto-detail.component.html',
   styleUrl: './contacto-detail.component.scss',
 })
@@ -167,6 +175,10 @@ export class ContactoDetailComponent implements OnInit {
     const c = this.contacto();
     if (!c) return;
     this.navigate(...CONTACTO_LIST_PATH, 'editar', c.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...CONTACTO_LIST_PATH, 'nuevo');
   }
 
   private loadContacto(id: number): void {

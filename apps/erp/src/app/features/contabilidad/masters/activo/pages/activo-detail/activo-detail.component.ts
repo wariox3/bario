@@ -14,6 +14,7 @@ import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
 import { ACTIVO_LIST_PATH } from '../../activo.constants';
 import type { Activo } from '../../activo.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /** Une `código - nombre` de una cuenta, descartando lo que falte. */
 function unirCuenta(codigo?: string | null, nombre?: string | null): string {
@@ -23,7 +24,7 @@ function unirCuenta(codigo?: string | null, nombre?: string | null): string {
 @Component({
   selector: 'app-activo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './activo-detail.component.html',
   styleUrl: './activo-detail.component.scss',
 })
@@ -112,6 +113,10 @@ export class ActivoDetailComponent implements OnInit {
     const a = this.activo();
     if (!a) return;
     this.navigate(...ACTIVO_LIST_PATH, 'editar', a.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...ACTIVO_LIST_PATH, 'nuevo');
   }
 
   private loadActivo(id: number): void {

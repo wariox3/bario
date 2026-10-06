@@ -128,6 +128,10 @@ export class CierreDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
+  protected onNew(): void {
+    this.navigate(this.document().routes.new);
+  }
+
   /**
    * La botonera cambió el estado del documento en el backend —lo aprobó,
    * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la

@@ -9,11 +9,12 @@ import type { AppDict } from '@erp/i18n';
 import { CuentaBancoService } from '../../cuenta-banco.service';
 import { CUENTA_BANCO_LIST_PATH } from '../../cuenta-banco.constants';
 import type { CuentaBanco } from '../../cuenta-banco.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-cuenta-banco-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './cuenta-banco-detail.component.html',
   styleUrl: './cuenta-banco-detail.component.scss',
 })
@@ -79,6 +80,10 @@ export class CuentaBancoDetailComponent implements OnInit {
     const c = this.cuentaBanco();
     if (!c) return;
     this.navigate(...CUENTA_BANCO_LIST_PATH, 'editar', c.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...CUENTA_BANCO_LIST_PATH, 'nuevo');
   }
 
   private loadCuentaBanco(id: number): void {

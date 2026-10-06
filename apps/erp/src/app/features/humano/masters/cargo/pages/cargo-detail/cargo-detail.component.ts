@@ -8,11 +8,12 @@ import type { AppDict } from '@erp/i18n';
 import { CargoService } from '../../cargo.service';
 import { CARGO_LIST_PATH } from '../../cargo.constants';
 import type { Cargo } from '../../cargo.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-cargo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './cargo-detail.component.html',
   styleUrl: './cargo-detail.component.scss',
 })
@@ -69,6 +70,10 @@ export class CargoDetailComponent implements OnInit {
     const c = this.cargo();
     if (!c) return;
     this.navigate(...CARGO_LIST_PATH, 'editar', c.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...CARGO_LIST_PATH, 'nuevo');
   }
 
   private loadCargo(id: number): void {

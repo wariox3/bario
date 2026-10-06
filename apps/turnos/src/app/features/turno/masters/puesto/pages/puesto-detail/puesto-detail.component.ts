@@ -9,6 +9,7 @@ import type { AppDict } from '@turnos/i18n';
 import { PuestoService } from '../../puesto.service';
 import { PUESTO_LIST_PATH } from '../../puesto.constants';
 import type { Puesto } from '../../puesto.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /**
  * Detalle (ficha) de un puesto — solo lectura.
@@ -19,7 +20,13 @@ import type { Puesto } from '../../puesto.model';
 @Component({
   selector: 'app-puesto-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent, TelefonoPipe],
+  imports: [
+    ButtonGroupModule,
+    ButtonModule,
+    BreadcrumbComponent,
+    DetailHeaderComponent,
+    TelefonoPipe,
+  ],
   templateUrl: './puesto-detail.component.html',
   styleUrl: './puesto-detail.component.scss',
 })
@@ -77,6 +84,10 @@ export class PuestoDetailComponent implements OnInit {
     const p = this.puesto();
     if (!p) return;
     this.navigate(...PUESTO_LIST_PATH, 'editar', p.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...PUESTO_LIST_PATH, 'nuevo');
   }
 
   private loadPuesto(id: number): void {

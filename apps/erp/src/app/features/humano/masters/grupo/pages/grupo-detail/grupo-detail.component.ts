@@ -12,11 +12,12 @@ import {
   GRUPO_PERIODO_QUINCENAL,
 } from '../../grupo.constants';
 import type { Grupo } from '../../grupo.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-grupo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './grupo-detail.component.html',
   styleUrl: './grupo-detail.component.scss',
 })
@@ -91,6 +92,10 @@ export class GrupoDetailComponent implements OnInit {
     const g = this.grupo();
     if (!g) return;
     this.navigate(...GRUPO_LIST_PATH, 'editar', g.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...GRUPO_LIST_PATH, 'nuevo');
   }
 
   private loadGrupo(id: number): void {

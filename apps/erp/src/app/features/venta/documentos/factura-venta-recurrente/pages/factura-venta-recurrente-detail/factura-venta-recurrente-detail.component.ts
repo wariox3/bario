@@ -171,6 +171,10 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
+  protected onNew(): void {
+    this.navigate(this.document().routes.new);
+  }
+
   private loadDocumento(id: number): void {
     // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
     // Los nombres de los FK (plazo de pago, método de pago, sede) llegan en los

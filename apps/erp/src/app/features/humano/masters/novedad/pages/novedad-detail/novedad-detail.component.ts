@@ -15,6 +15,7 @@ import { NovedadService } from '../../novedad.service';
 import { NOVEDAD_LIST_PATH } from '../../novedad.constants';
 import type { Novedad } from '../../novedad.model';
 import { esVacaciones } from '../../novedad.rules';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /** Días y horas llegan como Decimal (string) con hasta 3 decimales; se pintan sin ceros de relleno. */
 const cantidadFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
@@ -30,7 +31,7 @@ const cantidadFormatter = new Intl.NumberFormat('es-CO', { maximumFractionDigits
 @Component({
   selector: 'app-novedad-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './novedad-detail.component.html',
   styleUrl: './novedad-detail.component.scss',
 })
@@ -109,6 +110,10 @@ export class NovedadDetailComponent implements OnInit {
     const n = this.novedad();
     if (!n) return;
     this.navigate(...NOVEDAD_LIST_PATH, 'editar', n.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...NOVEDAD_LIST_PATH, 'nuevo');
   }
 
   private loadNovedad(id: number): void {

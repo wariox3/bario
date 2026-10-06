@@ -24,6 +24,18 @@
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (documentoChanged)="onDocumentoChanged()"
     >
+      @if (document().capabilities.canCreate) {
+        <p-button
+          actionsStart
+          type="button"
+          [label]="t().common.actions.new"
+          severity="secondary"
+          [outlined]="true"
+          icon="pi pi-plus"
+          size="small"
+          (onClick)="onNew()"
+        />
+      }
       <p-button
         actionsStart
         type="button"

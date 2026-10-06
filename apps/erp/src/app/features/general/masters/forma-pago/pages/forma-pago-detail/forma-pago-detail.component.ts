@@ -9,11 +9,12 @@ import type { AppDict } from '@erp/i18n';
 import { FormaPagoService } from '../../forma-pago.service';
 import { FORMA_PAGO_LIST_PATH } from '../../forma-pago.constants';
 import type { FormaPago } from '../../forma-pago.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-forma-pago-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './forma-pago-detail.component.html',
   styleUrl: './forma-pago-detail.component.scss',
 })
@@ -82,6 +83,10 @@ export class FormaPagoDetailComponent implements OnInit {
     const m = this.formaPago();
     if (!m) return;
     this.navigate(...FORMA_PAGO_LIST_PATH, 'editar', m.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...FORMA_PAGO_LIST_PATH, 'nuevo');
   }
 
   private loadFormaPago(id: number): void {

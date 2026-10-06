@@ -152,6 +152,10 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
+  protected onNew(): void {
+    this.navigate(this.document().routes.new);
+  }
+
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),

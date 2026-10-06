@@ -17,6 +17,7 @@ import { ConciliacionSoportesTabComponent } from '../../components/conciliacion-
 import { CONCILIACION_LIST_PATH } from '../../conciliacion.constants';
 import type { Conciliacion } from '../../conciliacion.model';
 import { ConciliacionService } from '../../conciliacion.service';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /** Cabecera legible de la conciliación para la ficha. */
 interface CabeceraView {
@@ -38,6 +39,7 @@ interface CabeceraView {
   selector: 'app-conciliacion-detail',
   standalone: true,
   imports: [
+    ButtonGroupModule,
     ButtonModule,
     TabsModule,
     BreadcrumbComponent,
@@ -104,6 +106,10 @@ export class ConciliacionDetailComponent implements OnInit {
     const id = this.id();
     if (!id) return;
     this.navigateTo('editar', Number(id));
+  }
+
+  protected onNew(): void {
+    this.navigateTo('nuevo');
   }
 
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */

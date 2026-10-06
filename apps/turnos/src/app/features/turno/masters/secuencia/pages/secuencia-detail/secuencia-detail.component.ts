@@ -13,6 +13,7 @@ import {
   SECUENCIA_WEEKDAYS,
 } from '../../secuencia.constants';
 import type { Secuencia } from '../../secuencia.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /**
  * Detalle (ficha) de una secuencia — solo lectura.
@@ -24,7 +25,7 @@ import type { Secuencia } from '../../secuencia.model';
 @Component({
   selector: 'app-secuencia-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
   templateUrl: './secuencia-detail.component.html',
   styleUrl: './secuencia-detail.component.scss',
 })
@@ -105,6 +106,10 @@ export class SecuenciaDetailComponent implements OnInit {
     const s = this.secuencia();
     if (!s) return;
     this.navigate(...SECUENCIA_LIST_PATH, 'editar', s.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...SECUENCIA_LIST_PATH, 'nuevo');
   }
 
   /**

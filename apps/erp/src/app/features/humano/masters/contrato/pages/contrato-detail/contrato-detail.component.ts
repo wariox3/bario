@@ -141,6 +141,10 @@ export class ContratoDetailComponent implements OnInit {
     this.navigate('editar', c.id);
   }
 
+  protected onNew(): void {
+    this.navigate('nuevo');
+  }
+
   protected toggleUtilidades(event: Event): void {
     this.utilidadesMenu()?.toggle(event);
   }

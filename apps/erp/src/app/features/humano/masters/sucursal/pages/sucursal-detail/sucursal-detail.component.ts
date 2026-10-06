@@ -8,11 +8,12 @@ import type { AppDict } from '@erp/i18n';
 import { SucursalService } from '../../sucursal.service';
 import { SUCURSAL_LIST_PATH } from '../../sucursal.constants';
 import type { Sucursal } from '../../sucursal.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-sucursal-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './sucursal-detail.component.html',
   styleUrl: './sucursal-detail.component.scss',
 })
@@ -69,6 +70,10 @@ export class SucursalDetailComponent implements OnInit {
     const s = this.sucursal();
     if (!s) return;
     this.navigate(...SUCURSAL_LIST_PATH, 'editar', s.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...SUCURSAL_LIST_PATH, 'nuevo');
   }
 
   private loadSucursal(id: number): void {

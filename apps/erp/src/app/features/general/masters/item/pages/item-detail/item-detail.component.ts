@@ -26,6 +26,7 @@ import type { AppDict } from '@erp/i18n';
 import { ItemService } from '../../item.service';
 import { ITEM_LIST_PATH } from '../../item.constants';
 import type { Item, ItemImpuesto } from '../../item.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /**
  * Bandera del ítem como **campo**, no como pill.
@@ -68,6 +69,7 @@ interface CuentaRow {
   selector: 'app-item-detail',
   standalone: true,
   imports: [
+    ButtonGroupModule,
     ButtonModule,
     MenuModule,
     BreadcrumbComponent,
@@ -240,6 +242,10 @@ export class ItemDetailComponent implements OnInit {
     const it = this.item();
     if (!it) return;
     this.navigate(...ITEM_LIST_PATH, 'editar', it.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...ITEM_LIST_PATH, 'nuevo');
   }
 
   protected onImageSelected(base64: string): void {
