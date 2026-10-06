@@ -19,14 +19,12 @@ export const NOMINA_INFORME_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '70px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'numero',
     headerKey: `${I18N}.columns.numero`,
     type: 'text',
     width: '100px',
-    sortable: true,
   },
   {
     // El serializador devuelve el inicio del periodo en `fecha`, no en
@@ -35,7 +33,6 @@ export const NOMINA_INFORME_COLUMNS: readonly ColumnDef[] = [
     headerKey: `${I18N}.columns.desde`,
     type: 'date',
     width: '110px',
-    sortable: true,
   },
   {
     field: 'fecha_hasta',

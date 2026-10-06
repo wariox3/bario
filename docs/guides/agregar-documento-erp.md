@@ -79,20 +79,17 @@ export const NOTA_CREDITO_VENTA_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.notaCreditoVenta.columns.numero',
     type: 'text',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'fecha',
     headerKey: 'entities.notaCreditoVenta.columns.fecha',
     type: 'date',
     width: '110px',
-    sortable: true,
   },
   {
     field: 'contacto_nombre_corto',
     headerKey: 'entities.notaCreditoVenta.columns.contacto',
     type: 'text',
-    sortable: true,
   },
   {
     field: 'total',

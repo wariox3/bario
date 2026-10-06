@@ -20,7 +20,6 @@ export const MOVIMIENTO_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'numero',
@@ -28,21 +27,18 @@ export const MOVIMIENTO_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '100px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'comprobante_nombre',
     headerKey: 'entities.movimientoContable.columns.comprobante',
     type: 'text',
     width: '150px',
-    sortable: true,
   },
   {
     field: 'fecha',
     headerKey: 'entities.movimientoContable.columns.fecha',
     type: 'date',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'contacto_nombre_corto',
@@ -54,14 +50,12 @@ export const MOVIMIENTO_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.movimientoContable.columns.cuenta',
     type: 'text',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'centro_costo_nombre',
     headerKey: 'entities.movimientoContable.columns.centroCosto',
     type: 'text',
     width: '160px',
-    sortable: true,
   },
   {
     field: 'debito',

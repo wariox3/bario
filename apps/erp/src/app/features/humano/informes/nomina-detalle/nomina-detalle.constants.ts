@@ -19,7 +19,6 @@ export const NOMINA_DETALLE_INFORME_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '70px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'documento',

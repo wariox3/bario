@@ -499,13 +499,11 @@ export class ContactosListComponent {
       type: 'number',
       width: '70px',
       align: 'right',
-      sortable: true,
     },
     {
       field: 'nombre_corto',
       headerKey: 'modules.general.contacto.columns.nombre',
       type: 'text',
-      sortable: true,
     },
     // ...
   ];
