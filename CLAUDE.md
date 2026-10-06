@@ -267,6 +267,7 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - Para los textos no crees por ejemplo "Nueva Empresa" esta mal para nosotros, debe ser "Nueva empresa" no uses mayusculas al inicio de las palabras despues de la primera palabra
 - No comitees sin que yo te lo pida explicitamente
 - siempre procura usar clases de tailwind
+- Cuando un valor viene vacío (`null`, `undefined`, `''`) se deja la celda o el campo **vacío**: nada de `—`, `-` ni `N/A` como relleno. En plantillas basta `{{ valor }}` (Angular pinta vacío un `null`), sin `?? '—'` ni `|| '—'`; en helpers, `formatFechaCorta(valor, '')` y `return ''`
 
 ## Documentación de arquitectura
 
