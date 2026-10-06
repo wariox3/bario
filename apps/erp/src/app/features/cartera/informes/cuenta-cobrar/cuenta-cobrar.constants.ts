@@ -73,6 +73,13 @@ export const CUENTA_COBRAR_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
+    field: 'pago',
+    headerKey: 'entities.cuentaCobrar.columns.pago',
+    type: 'currency',
+    width: '130px',
+    align: 'right',
+  },
+  {
     field: 'afectado',
     headerKey: 'entities.cuentaCobrar.columns.afectado',
     type: 'currency',

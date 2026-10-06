@@ -40,6 +40,8 @@ export interface CuentaCobrar {
   readonly impuesto: string | null;
   /** Total del documento (subtotal − descuento + impuesto). */
   readonly total: string | null;
+  /** Monto recibido en pagos aplicados al documento. */
+  readonly pago: string | null;
   /** Monto ya cruzado/pagado del documento. */
   readonly afectado: string | null;
   /** Saldo aún pendiente por cobrar (`total - afectado`). */

@@ -28,6 +28,8 @@ export interface CuentaCobrarCorte {
   readonly subtotal: string | number | null;
   readonly impuesto: string | number | null;
   readonly total: string | number | null;
+  /** Monto recibido en pagos aplicados al documento. */
+  readonly pago: string | number | null;
   /** Abonos acumulados al corte. */
   readonly abono: string | number | null;
   /** Saldo pendiente por cobrar **al corte** (`total - abono`). */

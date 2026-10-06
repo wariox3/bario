@@ -4372,6 +4372,7 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
+        pago: string;
         afectado: string;
         pendiente: string;
       };
@@ -4392,6 +4393,7 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
+        pago: string;
         saldo: string;
       };
     };

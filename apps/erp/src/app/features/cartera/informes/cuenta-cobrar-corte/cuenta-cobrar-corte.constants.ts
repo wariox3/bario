@@ -50,6 +50,13 @@ export const CUENTA_COBRAR_CORTE_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
+    field: 'pago',
+    headerKey: `${I18N}.columns.pago`,
+    type: 'currency',
+    width: '130px',
+    align: 'right',
+  },
+  {
     field: 'saldo',
     headerKey: `${I18N}.columns.saldo`,
     type: 'currency',
