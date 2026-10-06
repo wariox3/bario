@@ -6328,6 +6328,29 @@ export const en: AppDict = {
     },
   },
   inicio: {
+    carteraResumen: {
+      porTipo: {
+        cobrar: {
+          titulo: 'Accounts receivable',
+          cifra: 'pending to collect',
+          sinPendiente: 'No pending receivables',
+          verInforme: 'View accounts receivable',
+        },
+        pagar: {
+          titulo: 'Accounts payable',
+          cifra: 'pending to pay',
+          sinPendiente: 'No pending payables',
+          verInforme: 'View accounts payable',
+        },
+      },
+      saldoAl: 'Balance as of',
+      vigente: 'Current',
+      vencido: 'Overdue',
+      error: {
+        title: 'Could not load the balance',
+        desc: 'Try again in a moment.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Quick setup',

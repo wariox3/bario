@@ -6394,6 +6394,29 @@ export const es: AppDict = {
     },
   },
   inicio: {
+    carteraResumen: {
+      porTipo: {
+        cobrar: {
+          titulo: 'Cuentas por cobrar',
+          cifra: 'pendiente por cobrar',
+          sinPendiente: 'No hay cuentas por cobrar pendientes',
+          verInforme: 'Ver cuentas por cobrar',
+        },
+        pagar: {
+          titulo: 'Cuentas por pagar',
+          cifra: 'pendiente por pagar',
+          sinPendiente: 'No hay cuentas por pagar pendientes',
+          verInforme: 'Ver cuentas por pagar',
+        },
+      },
+      saldoAl: 'Saldo al',
+      vigente: 'Vigente',
+      vencido: 'Vencido',
+      error: {
+        title: 'No se pudo cargar el saldo',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Configuración rápida',

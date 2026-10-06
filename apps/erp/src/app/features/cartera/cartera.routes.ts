@@ -24,12 +24,10 @@ export const CARTERA_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(CARTERA_MODULE),
       {
-        // Inicio del módulo (vacío por ahora — sin estadísticas).
+        // Inicio del módulo: tablero de cuentas por cobrar.
         path: 'inicio',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
+          import('./inicio/cartera-inicio.component').then((m) => m.CarteraInicioComponent),
       },
       {
         path: 'pago',

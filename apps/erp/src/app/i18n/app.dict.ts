@@ -4912,6 +4912,16 @@ export interface AppDict
   };
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
+    carteraResumen: {
+      porTipo: Record<
+        'cobrar' | 'pagar',
+        { titulo: string; cifra: string; sinPendiente: string; verInforme: string }
+      >;
+      saldoAl: string;
+      vigente: string;
+      vencido: string;
+      error: { title: string; desc: string };
+    };
     general: {
       /** Asistente de datos iniciales: solo en contenedores recién creados. */
       datosIniciales: {
