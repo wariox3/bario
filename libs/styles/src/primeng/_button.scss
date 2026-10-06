@@ -93,3 +93,26 @@
     z-index: 1;
   }
 }
+
+// Menús que despliega un botón (Acciones, Opciones, Excel, el ⋮ de una fila, el
+// split button, el menú del perfil): a la escala del botón compacto. Sin esto
+// toman la letra de Aura (1rem), que se lee grande al lado de un botón de .78rem.
+//
+// Global y no por `styleClass`: el popup se monta en `<body>` (`appendTo`), fuera
+// del scss scopeado de quien lo declara, y cada menú repetía la misma regla
+// acotada por su clase. Sin capa, por la misma razón que `.p-button`.
+.p-menu,
+.p-tieredmenu,
+.p-contextmenu {
+  font-family: inherit;
+
+  :is(.p-menu-item-link, .p-tieredmenu-item-link, .p-contextmenu-item-link) {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  :is(.p-menu-item-icon, .p-tieredmenu-item-icon, .p-contextmenu-item-icon) {
+    font-size: 0.8rem;
+  }
+}
