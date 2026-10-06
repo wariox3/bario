@@ -19,6 +19,7 @@
   <p-button
     type="button"
     [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
     severity="secondary"
     [outlined]="true"
     size="small"
@@ -29,6 +30,7 @@
     <p-button
       type="button"
       [label]="t().common.actions.edit"
+      icon="pi pi-pencil"
       size="small"
       [disabled]="!capacidades().puedeEditarCabecera || estaOcupado()"
       (onClick)="onEdit()"
