@@ -28,6 +28,8 @@ import {
   REDDOC_PRIMENG_ES,
   authInterceptor,
   errorInterceptor,
+  observabilidadInterceptor,
+  provideObservabilidad,
   tenantInterceptor,
   provideI18n,
   TENANT_ROUTES,
@@ -47,9 +49,17 @@ export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'es-CO' },
     provideBrowserGlobalErrorListeners(),
+    provideObservabilidad(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([authInterceptor, tenantInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,
+        tenantInterceptor,
+        errorInterceptor,
+        observabilidadInterceptor,
+      ]),
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
