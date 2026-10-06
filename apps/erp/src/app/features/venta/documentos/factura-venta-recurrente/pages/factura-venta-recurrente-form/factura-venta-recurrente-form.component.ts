@@ -56,6 +56,7 @@ import {
   formValueToPayload,
 } from '../../factura-venta-recurrente.mapper';
 import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.model';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de venta
@@ -75,10 +76,12 @@ import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-factura-venta-recurrente-form',
   standalone: true,
   imports: [
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

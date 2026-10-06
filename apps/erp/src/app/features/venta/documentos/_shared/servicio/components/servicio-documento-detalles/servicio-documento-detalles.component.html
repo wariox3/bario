@@ -1,7 +1,9 @@
 @let d = t().entities.servicioDocumento.form.detalles;
 
-<div class="flex flex-col gap-4">
-  <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+<div class="flex flex-col">
+  <div
+    class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[rgba(20,48,73,0.08)] px-5 py-2.5 max-[576px]:px-4"
+  >
     @if (!contactoId()) {
       <span class="inline-flex items-center gap-1.5 text-[0.76rem] text-brand-muted">
         <i class="pi pi-info-circle text-[0.72rem]"></i>
@@ -41,10 +43,6 @@
     (edit)="openEdit($event)"
     (remove)="removeLinea($event)"
   />
-
-  @if (lines().length > 0) {
-    <app-servicio-documento-resumen [resumen]="resumen()" />
-  }
 </div>
 
 <app-servicio-documento-detalle-modal

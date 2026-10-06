@@ -740,29 +740,38 @@ nuevos, así que pantalla y archivo dejan de coincidir sin que nadie avise.
   consulta apaga. El aviso viaja como `input` opcional (`hint`) de la botonera compartida, con
   `@if` — vacío no pinta nada y no cuesta ranura de `gap`.
 
-## Patrón: documento en una sola card (cabecera + tabs + resumen único)
+## Patrón: documento en dos cards (cabecera · líneas con su botonera) + resumen flotante
 
-Formulario y ficha de todo documento transaccional con líneas. **Una sola card**: arriba la
-cabecera, debajo las vistas del documento en tabs y, bajo los tabs, un único resumen. Ejemplo vivo:
+Formulario y ficha de todo documento transaccional con líneas. Ejemplo vivo:
 `venta/documentos/factura-venta` (form y detail). Fuera de este patrón: nómina, seguridad social
 y nómina electrónica, que no tienen tabla de líneas.
 
-- **Por qué una card:** cabecera y líneas son el mismo documento. Dos cards apiladas lo parten en
-  dos piezas cosidas y duplican el chrome (chip de ícono + título) solo para decir «Detalles».
-- **La banda de tabs** va dentro de la `<section>` de la cabecera, tras los campos:
-  `border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4` con `<p-tabs>`.
-  El filete separa sin cortar la card.
+- **Card 1, cabecera:** chip de ícono + título y los campos del documento.
+- **Card 2, líneas** (2026-10-06, antes iban en la misma card): sigue el estándar de los listados
+  (`<lib-list-shell>`). Las tabs y la botonera de la tabla forman la **cabecera** de la card, con
+  su padding y su divisor, y la tabla es el **cuerpo**, sin recuadro propio. Se separó porque con
+  la tabla dentro de la card de campos quedaban tres marcos anidados (card → padding → recuadro).
+  - `<p-tabs class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0
+max-[576px]:[&_.p-tablist-tab-list]:px-4">`: los tabs alinean con el gutter de la card y el
+    panel no suma el padding de Aura.
+  - Las tablas (`comercial-documento-detalles`, `documento-pagos`, sus gemelas de solo lectura y
+    las de contable, inventario, servicio y depreciación) ya traen la botonera como banda
+    (`border-b px-5 py-2.5`) y la tabla sin borde. Una botonera propia de la página (cierre,
+    depreciación) usa la misma banda.
+  - Lo que no es tabla (la pestaña Información, un paginador) pone su propio padding o filete.
+- **Resumen flotante, fuera de las cards**, siempre (también con un tab único): tras la card de
+  líneas, la caja `w-72` alineada a la derecha. La tabla ya no lo pinta: expone `resumen` y
+  `hayLineas`, y la página los lee por referencia de plantilla —`<app-…-detalles #detallesTabla>`
+  y `@if (detallesTabla.hayLineas()) { <app-…-resumen [resumen]="detallesTabla.resumen()" /> }`—.
+  Con dos tablas (factura de compra: ítems y cuentas) se muestra el de la pestaña activa.
 - **Tab único también:** un documento con una sola tabla lleva igual su tab (`Detalles`,
   `Líneas`, `Activos`). Todos los documentos se leen igual y sumar Pagos o Más información después
   no cambia el esqueleto. La etiqueta reusa la clave i18n que titulaba la card eliminada.
-- **Acciones de la tabla** (cargar, eliminar todos) y su hint van en una fila al tope del panel:
-  `mb-4 flex flex-wrap items-center justify-end gap-2`, hint primero con `mr-auto`.
+- **Acciones de la tabla** (cargar, eliminar todos) y su hint van en la banda de cabecera,
+  hint primero con `mr-auto`.
 - **Resumen fuera de los tabs:** el mismo en todas las vistas, como en el ERP anterior. Lo calcula
   la página (dueña de los `FormArray`), no la tabla: `calcularResumen` + `totalCantidad` para las
-  líneas y `calcularPagos` (`pagos/pago.calculo.ts`) para recibido/saldo/exceso. Va en
-  `@if (…) { <div class="mt-4"> <app-comercial-documento-resumen …/> </div> }`. Las tablas
-  editables traen `resumenEnabled` (default `true`): el form que pinta el resumen afuera lo apaga.
-  Con un tab único el resumen interno de la tabla es visualmente idéntico y se deja.
+  líneas y `calcularPagos` (`pagos/pago.calculo.ts`) para recibido/saldo/exceso. Si además tiene pagos, la página lo calcula ella misma.
 - **Chip de conteo en el tab** que esconde algo que importa (Pagos): `font-mono tabular-nums` sobre
   `bg-[rgba(20,48,73,0.06)]`; en `bg-red-50 text-red-600` cuando lo que esconde necesita atención (pagos que superan el total —no se podrá aprobar— o filas inválidas ya tocadas). El error se ve desde otra pestaña.
 - **Guardar nunca queda muerto:** el botón solo espera a `isSaving` y a las tablas

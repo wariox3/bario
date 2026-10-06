@@ -1,8 +1,10 @@
 <p-confirmdialog />
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col">
   <!-- Toolbar -->
-  <div class="flex items-center justify-end gap-2">
+  <div
+    class="flex items-center justify-end gap-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-2.5 max-[576px]:px-4"
+  >
     @if (scannerEnabled()) {
       <!-- Lector de código de barras (flujo pistola): Enter agrega la línea y el
            input queda enfocado para el siguiente escaneo. -->
@@ -61,7 +63,7 @@
     }
   </div>
 
-  <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <div class="max-h-[30rem] overflow-auto">
     <table class="comercial-detalle-table">
       <thead>
         <tr>
@@ -302,8 +304,4 @@
       </tbody>
     </table>
   </div>
-
-  @if (resumenEnabled() && detalles().controls.length > 0) {
-    <app-comercial-documento-resumen [resumen]="resumen()" />
-  }
 </div>

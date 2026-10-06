@@ -8,7 +8,6 @@ import { I18nService, ToastService, calcularResumen, type ResumenDocumento } fro
 import { DocumentoDetalleService } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ServicioDocumentoDetalleModalComponent } from '../servicio-documento-detalle-modal/servicio-documento-detalle-modal.component';
-import { ServicioDocumentoResumenComponent } from '../servicio-documento-resumen/servicio-documento-resumen.component';
 import { ServicioDocumentoLineasTableComponent } from '../servicio-documento-lineas-table/servicio-documento-lineas-table.component';
 import { createDetalleGroup, type DetalleGroup } from '../../servicio-documento-detalle.form';
 import { detalleToFormValue, detalleToPayload } from '../../servicio-documento.mapper';
@@ -33,7 +32,6 @@ import type { ErpSelectOption } from '@reddoc/core';
     ButtonModule,
     ConfirmDialogModule,
     ServicioDocumentoDetalleModalComponent,
-    ServicioDocumentoResumenComponent,
     ServicioDocumentoLineasTableComponent,
   ],
   providers: [ConfirmationService],
@@ -83,8 +81,15 @@ export class ServicioDocumentoDetallesComponent {
   /** Multi-puesto habilitado: cada línea nueva elige su puesto libremente. */
   protected readonly lockedPuesto = computed<ErpSelectOption | null>(() => null);
 
-  /** Resumen financiero del documento: subtotal, desglose por impuesto y total. */
-  protected readonly resumen = computed<ResumenDocumento>(() =>
+  /** Hay al menos una línea: la página pinta el resumen solo entonces. */
+  readonly hayLineas = computed(() => this.lines().length > 0);
+
+  /**
+   * Resumen financiero del documento: subtotal, desglose por impuesto y total.
+   * Público: la página lo pinta fuera de la card de líneas, leyéndolo por
+   * referencia de plantilla (`#detallesTabla`).
+   */
+  readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),
   );
 

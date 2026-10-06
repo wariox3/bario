@@ -52,6 +52,7 @@ import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contab
 import { CUENTA_BANCO_ENDPOINT } from '../../egreso.constants';
 import { egresoToFormValue, formValueToPayload } from '../../egreso.mapper';
 import type { EgresoRead } from '../../egreso.model';
+import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Egreso (desembolso de
@@ -70,10 +71,12 @@ import type { EgresoRead } from '../../egreso.model';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-egreso-form',
   standalone: true,
   imports: [
+    ContableDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

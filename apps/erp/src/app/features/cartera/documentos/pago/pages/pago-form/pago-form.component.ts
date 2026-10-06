@@ -52,6 +52,7 @@ import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contab
 import { CUENTA_BANCO_ENDPOINT } from '../../pago.constants';
 import { pagoToFormValue, formValueToPayload } from '../../pago.mapper';
 import type { PagoRead } from '../../pago.model';
+import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Pago (recaudo de cartera).
@@ -68,10 +69,12 @@ import type { PagoRead } from '../../pago.model';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-pago-form',
   standalone: true,
   imports: [
+    ContableDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

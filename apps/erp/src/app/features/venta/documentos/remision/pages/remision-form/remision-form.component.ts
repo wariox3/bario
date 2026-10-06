@@ -54,6 +54,7 @@ import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio
 import { SEDE_ENDPOINT } from '../../remision.constants';
 import { remisionToFormValue, formValueToPayload } from '../../remision.mapper';
 import type { RemisionRead } from '../../remision.model';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Remisión.
@@ -73,10 +74,12 @@ import type { RemisionRead } from '../../remision.model';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-remision-form',
   standalone: true,
   imports: [
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

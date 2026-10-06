@@ -59,6 +59,7 @@ import {
 } from '../../factura-compra-recurrente.mapper';
 import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrente.model';
 import { SELECT_ENDPOINTS } from '@reddoc/core';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de compra
@@ -75,10 +76,12 @@ import { SELECT_ENDPOINTS } from '@reddoc/core';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-factura-compra-recurrente-form',
   standalone: true,
   imports: [
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

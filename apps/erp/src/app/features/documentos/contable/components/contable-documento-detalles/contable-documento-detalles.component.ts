@@ -54,7 +54,6 @@ import {
 } from '../../contable-documento-detalle.mapper';
 import type { CuentaDetalleRead } from '../../contable-documento-detalle.model';
 import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
-import { ContableDocumentoResumenComponent } from '../contable-documento-resumen/contable-documento-resumen.component';
 
 /** Columnas fijas: nº, cuenta, naturaleza, valor y acciones. */
 const BASE_COLUMN_COUNT = 5;
@@ -96,7 +95,6 @@ const BASE_COLUMN_COUNT = 5;
     ErpCuentaSelectComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
-    ContableDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './contable-documento-detalles.component.html',
@@ -224,10 +222,15 @@ export class ContableDocumentoDetallesComponent {
   /** Espejo reactivo del valor del array para la tabla y el resumen. */
   protected readonly lines = signal<readonly CuentaDetalleFormRawValue[]>([]);
 
-  /** Acumulado de débitos/créditos; el signo del neto lo fija la familia de cartera. */
-  protected readonly resumen = computed(() =>
-    calcularResumenContable(this.lines(), this.carteraTipo()),
-  );
+  /** Hay al menos una línea: la página pinta el resumen solo entonces. */
+  readonly hayLineas = computed(() => this.lines().length > 0);
+
+  /**
+   * Acumulado de débitos/créditos; el signo del neto lo fija la familia de cartera.
+   * Público: la página lo pinta fuera de la card de líneas, leyéndolo por
+   * referencia de plantilla (`#detallesTabla`).
+   */
+  readonly resumen = computed(() => calcularResumenContable(this.lines(), this.carteraTipo()));
 
   /** Grupo persistiéndose ahora mismo (edición); bloquea su botón. */
   protected readonly savingGroup = signal<CuentaDetalleGroup | null>(null);

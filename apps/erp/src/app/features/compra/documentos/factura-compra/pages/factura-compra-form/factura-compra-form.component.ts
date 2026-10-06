@@ -63,6 +63,8 @@ import { cuentaDetalleToFormValue } from '@erp/features/documentos/contable/cont
 import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contable-documento-detalle.model';
 import { facturaCompraToFormValue, formValueToPayload } from '../../factura-compra.mapper';
 import type { FacturaCompraRead } from '../../factura-compra.model';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 
 /**
  * Línea de documento leída al cargar en edición: la tabla `documento-detalle`
@@ -95,10 +97,13 @@ interface FlushableLineTable {
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-factura-compra-form',
   standalone: true,
   imports: [
+    ContableDocumentoResumenComponent,
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
