@@ -24,6 +24,8 @@ import {
   REDDOC_PRIMENG_ES,
   authInterceptor,
   errorInterceptor,
+  observabilidadInterceptor,
+  provideObservabilidad,
   provideI18n,
 } from '@reddoc/core';
 import { authEs, authEn } from '@reddoc/ui';
@@ -33,9 +35,12 @@ import { ROUTE_PATHS } from './core/constants/route-paths.constants';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideObservabilidad(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([authInterceptor, errorInterceptor, observabilidadInterceptor]),
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {

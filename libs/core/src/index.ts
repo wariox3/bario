@@ -98,6 +98,13 @@ export {
 } from './lib/celular';
 export { formatCiudad } from './lib/utils/ciudad.utils';
 export { formatCop, toFiniteNumber } from './lib/utils/currency.utils';
+export {
+  iniciarObservabilidad,
+  provideObservabilidad,
+  observabilidadInterceptor,
+  SENTRY_PRODUCCION,
+} from './lib/observabilidad';
+export type { ObservabilidadOptions, SentryConfig } from './lib/observabilidad';
 export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/calculo';
 export type { TasaImpuesto, ImpuestoLinea, LineaCalculo, ResumenDocumento } from './lib/calculo';
 export type {

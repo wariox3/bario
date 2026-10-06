@@ -1,14 +1,58 @@
 {
   "types": [
-    { "type": "feat", "section": "Features" },
-    { "type": "fix", "section": "Bug Fixes" },
-    { "type": "perf", "section": "Performance" },
-    { "type": "refactor", "section": "Refactoring" },
-    { "type": "docs", "section": "Documentation" },
-    { "type": "chore", "hidden": true },
-    { "type": "style", "hidden": true },
-    { "type": "test", "hidden": true },
-    { "type": "build", "hidden": true },
-    { "type": "ci", "hidden": true }
+    {
+      "type": "feat",
+      "section": "Features"
+    },
+    {
+      "type": "fix",
+      "section": "Bug Fixes"
+    },
+    {
+      "type": "perf",
+      "section": "Performance"
+    },
+    {
+      "type": "refactor",
+      "section": "Refactoring"
+    },
+    {
+      "type": "docs",
+      "section": "Documentation"
+    },
+    {
+      "type": "chore",
+      "hidden": true
+    },
+    {
+      "type": "style",
+      "hidden": true
+    },
+    {
+      "type": "test",
+      "hidden": true
+    },
+    {
+      "type": "build",
+      "hidden": true
+    },
+    {
+      "type": "ci",
+      "hidden": true
+    }
+  ],
+  "bumpFiles": [
+    {
+      "filename": "package.json",
+      "type": "json"
+    },
+    {
+      "filename": "package-lock.json",
+      "type": "json"
+    },
+    {
+      "filename": "libs/core/src/lib/observabilidad/version.ts",
+      "updater": "tools/release/version-ts-updater.js"
+    }
   ]
 }

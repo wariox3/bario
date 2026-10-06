@@ -222,6 +222,32 @@ jobs:
           }
           du -sh "$out"
 
+      # Solo producción reporta a Sentry (ver SENTRY_PRODUCCION en libs/core).
+      # `inject` marca cada .js con un debug id y `upload` sube sus .map: Sentry
+      # traduce el stack minificado a TypeScript sin que los mapas se publiquen.
+      # Sin token se avisa y se sigue: el deploy no depende de Sentry.
+      #   Secret (environment "production"): SENTRY_AUTH_TOKEN
+      #   Variables: SENTRY_ORG, SENTRY_PROJECT
+      - name: Upload source maps to Sentry
+        if: env.BUILD_CONFIGURATION == 'production'
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+        run: |
+          if [ -z "$SENTRY_AUTH_TOKEN" ] || [ -z "$SENTRY_ORG" ] || [ -z "$SENTRY_PROJECT" ]; then
+            echo "::warning::Sin SENTRY_AUTH_TOKEN / SENTRY_ORG / SENTRY_PROJECT: los errores de $APP llegan a Sentry sin source maps."
+            exit 0
+          fi
+          out="dist/apps/$APP/browser"
+          release="reddoc-front@$(node -p "require('./package.json').version")"
+          npx --yes @sentry/cli@3.8.0 sourcemaps inject "$out"
+          npx --yes @sentry/cli@3.8.0 sourcemaps upload --release="$release" "$out"
+
+      # Los .map nunca llegan al servidor: expondrían el código fuente.
+      - name: Remove source maps from build
+        run: find "dist/apps/$APP/browser" -name '*.map' -delete
+
       - name: Setup SSH
         env:
           SSH_KEY: ${{ secrets[format('{0}_SSH_KEY', needs.plan.outputs.secret_prefix)] }}

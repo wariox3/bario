@@ -9,6 +9,7 @@ import {
   RegisterResponse,
   ResendVerificationRequest,
 } from './models/auth.model';
+import type { SentryConfig } from './observabilidad';
 
 /**
  * Apps del monorepo alcanzables desde el app-switcher. Es el id estable de cada
@@ -33,6 +34,8 @@ export interface ReddocEnvironment {
    * `window.location.origin`.
    */
   wompiRedirectOrigin?: string;
+  /** Reporte de errores a Sentry. Ausente = apagado (desarrollo local). */
+  sentry?: SentryConfig;
 }
 
 export interface RoutePaths {

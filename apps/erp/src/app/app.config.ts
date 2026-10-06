@@ -31,6 +31,8 @@ import {
   errorInterceptor,
   tenantInterceptor,
   provideI18n,
+  provideObservabilidad,
+  observabilidadInterceptor,
   TENANT_ROUTES,
 } from '@reddoc/core';
 import type { ReddocAppId } from '@reddoc/core';
@@ -53,9 +55,17 @@ export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'es-CO' },
     provideBrowserGlobalErrorListeners(),
+    provideObservabilidad(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([authInterceptor, tenantInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,
+        tenantInterceptor,
+        errorInterceptor,
+        observabilidadInterceptor,
+      ]),
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
