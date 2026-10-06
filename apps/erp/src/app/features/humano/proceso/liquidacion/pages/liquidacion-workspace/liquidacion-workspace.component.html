@@ -9,7 +9,8 @@
   Va en <lib-page-actions>: queda pegada bajo el header al hacer scroll, como en
   los formularios, para no perder el ciclo de vida al bajar por las tablas.
   Mismo estándar que la programación y el aporte: volver y editar sueltos, el
-  ciclo de vida y Acciones fundidos en un segmento. Solo Aprobar va relleno: es
+  ciclo de vida y Acciones fundidos en un segmento, empujado a la derecha
+  (ml-auto) como en las fichas. Solo Aprobar va relleno: es
   el paso que cierra la liquidación. Todo sale de capacidades(): lo que no aplica
   a la etapa se deshabilita, no se oculta.
   El <p-menu> va FUERA del grupo: su CSS une los botones con
@@ -36,7 +37,7 @@
       (onClick)="onEdit()"
     />
 
-    <p-buttongroup>
+    <p-buttongroup class="ml-auto">
       <p-button
         type="button"
         [label]="acc.generar"

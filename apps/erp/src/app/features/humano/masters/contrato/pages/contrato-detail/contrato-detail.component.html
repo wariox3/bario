@@ -24,8 +24,8 @@
     />
 
     <!-- Terminar y Utilidades fundidos en un segmento: las acciones sobre el
-         contrato, como el grupo de las fichas de documento. Volver y Editar van
-         sueltos. Solo mientras el contrato siga vigente.
+         contrato, como el grupo de las fichas de documento, empujado a la derecha
+         (ml-auto). Volver y Editar van sueltos a la izquierda. Solo mientras el contrato siga vigente.
 
          Terminar queda como botón y no dentro de Utilidades: cierra el contrato
          y fabrica la liquidación, no es una utilidad más. Va en `danger` y no en
@@ -37,7 +37,7 @@
          parámetros iniciales, igual que en el ERP anterior. Su <p-menu> va FUERA
          del grupo: un hermano detrás del último botón le quitaría el borde. -->
     @if (!c.estado_terminado) {
-      <p-buttongroup>
+      <p-buttongroup class="ml-auto">
         <p-button
           type="button"
           [label]="t().entities.contrato.terminar.action"
