@@ -21,6 +21,28 @@
     color: var(--brand-navy);
   }
 
+  // La fecha a la escala de los botones de al lado (32px, como el buscador del
+  // toolbar de los listados), para que la fila se lea pareja.
+  &__field ::ng-deep {
+    .p-datepicker-input {
+      height: 32px;
+      padding-block: 0;
+      font-size: 0.8rem;
+    }
+
+    .p-datepicker-dropdown {
+      width: 32px;
+      height: 32px;
+
+      .p-icon,
+      .pi {
+        width: 0.78rem;
+        height: 0.78rem;
+        font-size: 0.78rem;
+      }
+    }
+  }
+
   &__actions {
     display: flex;
     align-items: center;

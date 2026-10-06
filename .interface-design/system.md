@@ -343,6 +343,9 @@ arriba fuera de vista. Se usa envolviendo los botones, sin nada más:
   y no vale despertar la detección de cambios para alternar una clase en el propio host.
 - El contenido proyectado queda dentro del `<form>` en el DOM real: un botón `type="submit"` sigue
   enviando. Para algo alineado a la derecha, un `<div class="ml-auto">` dentro.
+- **Botones compactos (32px)**, a la escala del toolbar de los listados. Es el tamaño global de
+  `.p-button` (`libs/styles/src/primeng/_button.scss`), así que la barra no hace nada especial. La
+  única excepción es `fluid` (43px), el llamado principal de las páginas de auth.
 
 ## Patrón: ficha de detalle en grupos (card única)
 
