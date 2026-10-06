@@ -1,36 +1,15 @@
 :host {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  // Llena el alto de su contenedor: la card crece y solo la tabla scrollea.
+  gap: 0.75rem;
+  // Llena el alto de su contenedor: el recuadro crece y solo la tabla scrollea.
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
 .list-shell {
-  // Card raíz: título + contador como cabecera, y la tabla embebida en su propio
-  // recuadro. Una sola fuente de verdad para todas las listas del ERP.
-  &__card {
-    background: #fff;
-    border: 1px solid rgba(19 38 60 / 0.08);
-    border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(19 38 60 / 0.04);
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  // Cabecera compacta: solo el título, separada del cuerpo por un borde inferior.
-  // Liviana — la botonera vive en el cuerpo, no aquí.
-  &__head {
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid rgba(19 38 60 / 0.08);
-    min-width: 0;
-  }
-
+  // Encabezado de página, suelto: ya no hay card que lo enmarque.
   &__title {
     margin: 0;
     font-size: 1.125rem;
@@ -39,38 +18,49 @@
     color: var(--brand-navy);
   }
 
-  // Cuerpo: botonera sobre la tabla. El gutter de 1rem genera el efecto "embebido"
-  // del recuadro de la tabla dentro de la card.
-  &__body {
+  // El único recuadro de la vista: botonera arriba, tabla abajo. overflow:hidden
+  // clipa el header sticky y el paginador en las esquinas redondeadas.
+  &__frame {
     flex: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(20 48 73 / 0.12);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(19 38 60 / 0.04);
 
-    // El toolbar proyectado ya no separa zonas (esa función pasó al borde del
-    // header): se neutraliza su borde inferior y su padding horizontal para que
-    // su contenido alinee con el borde del recuadro de la tabla. ::ng-deep alcanza
-    // al toolbar porque es descendiente DOM de __body.
-    ::ng-deep .lib-data-toolbar {
-      border-bottom: none;
-      padding-left: 0;
-      padding-right: 0;
+    // `<lib-data-toolbar toolbar>` ya trae padding y divisor propios. Un
+    // contenedor propio en el slot no: el shell le pone el divisor que lo separa
+    // de las filas y, si es un `div` (filtros + botones de una utilidad), el
+    // mismo padding que el toolbar. El `lib-data-toolbar` que lleve dentro
+    // suelta su marco para no duplicarlo.
+    > ::ng-deep [toolbar] {
+      flex-shrink: 0;
+    }
+
+    > ::ng-deep [toolbar]:not(lib-data-toolbar) {
+      border-bottom: 1px solid rgba(19 38 60 / 0.08);
+
+      .lib-data-toolbar {
+        min-height: 0;
+        padding: 0;
+        border-bottom: none;
+      }
+    }
+
+    > ::ng-deep div[toolbar] {
+      padding: 0.7rem 1rem;
     }
   }
 
-  // Recuadro embebido de la tabla. Borde un punto más definido que la card
-  // (0.12 vs 0.08) para la jerarquía por capas. display:flex releva la cadena de
-  // alturas hasta lib-data-table (host flex:1); overflow:hidden clipa el header
-  // sticky y el paginador en las esquinas redondeadas.
+  // display:flex releva la cadena de alturas hasta lib-data-table (host flex:1).
   &__table {
     flex: 1;
     min-height: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(20, 48, 73, 0.12);
-    border-radius: 12px;
   }
 }

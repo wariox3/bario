@@ -3,9 +3,9 @@ import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import type { BreadcrumbItem } from '../breadcrumb/breadcrumb.types';
 
 /**
- * Shell de página de listado: breadcrumb + card con cabecera (título) y un cuerpo
- * donde la botonera va **encima** de la tabla embebida en su propio recuadro con
- * borde sutil.
+ * Shell de página de listado: breadcrumb + título suelto y **un solo recuadro**
+ * con la botonera como cabecera y la tabla debajo. Sin card envolvente: card →
+ * recuadro → tabla eran tres marcos anidados para una sola pieza.
  *
  * Es "tonto" como el resto de building blocks: recibe `breadcrumb`/`title` y
  * **proyecta** la botonera y la tabla por slots. No conoce HTTP ni dominio; cada
@@ -19,6 +19,11 @@ import type { BreadcrumbItem } from '../breadcrumb/breadcrumb.types';
  *   <lib-data-table   table   ... />
  * </lib-list-shell>
  * ```
+ *
+ * El slot `toolbar` admite el `<lib-data-toolbar>` tal cual (trae su padding y su
+ * divisor) o un contenedor propio —filtros + botones de una utilidad, panel de
+ * parámetros de un informe—, al que el shell le da el divisor y, si es un `div`,
+ * también el padding.
  */
 @Component({
   selector: 'lib-list-shell',

@@ -299,6 +299,20 @@ tabular-nums`). El número dice qué hay, el clic dice qué hacer. Tres estados,
 - **Cuándo NO:** si el barrido es destructivo o costoso (bulk por columna = decenas de escrituras de
   un clic), no va como toggle directo — eso pide confirmación explícita.
 
+## Patrón: listado (`<lib-list-shell>`, un solo recuadro)
+
+`libs/feature-base/src/lib/list-shell/` — breadcrumb, título suelto (`1.125rem/700` navy) y **un
+solo recuadro** (`.list-shell__frame`: fondo blanco, borde `rgba(20 48 73 / 0.12)`, radio 12px)
+con la botonera como cabecera y la tabla debajo. Sin card envolvente: card → recuadro → tabla eran
+tres marcos para una sola pieza (se probó en contactos y pasó a estándar, 2026-10-06).
+
+- El `<lib-data-toolbar toolbar>` trae su padding (`0.7rem 1rem`) y su divisor con las filas.
+- Un contenedor propio en el slot (`div[toolbar]` con filtros + botones de una utilidad, o el panel
+  de parámetros de un informe) recibe del shell el divisor; si es un `div`, también el padding. El
+  `lib-data-toolbar` que lleve dentro suelta su marco para no duplicarlo.
+- Una página que no pueda usar el shell (Enviar factura electrónica, por su tab-strip) copia el
+  mismo chrome: título suelto + un recuadro, y el tab-strip encabezándolo.
+
 ## Patrón: barra de acciones pegajosa (`<lib-page-actions>`)
 
 `libs/ui/src/lib/components/page-actions/` (vía `@reddoc/ui`) — la fila de botones de una página
@@ -602,9 +616,10 @@ campos se sostiene; con 8 se cae por tres motivos a la vez, y ninguno se arregla
 
 La forma:
 
-- **Recuadro hermano del de la tabla** — mismo `border: 1px solid rgba(20 48 73 / 0.12)` y
-  `radius: 12px` que `.list-shell__table`. Dos piezas de la misma familia dentro de la card, no una
-  pieza y un montón de campos sueltos.
+- **Cabecera del recuadro del informe** — va en el slot `[toolbar]` de `<lib-list-shell>`, que le
+  pone el marco (`.list-shell__frame`) y el divisor con la tabla, igual que al toolbar de un
+  listado. Sin borde propio: una sola pieza "consulta + resultados", no un montón de campos sueltos
+  ni una caja dentro de otra.
 - **Una banda por pregunta**, separadas por el filete estándar `rgba(20 48 73 / 0.08)`. Cada banda
   lleva su **micro-encabezado arriba** y los campos debajo — el mismo `group-label` del app-switcher
   y de la ficha de detalle (uppercase `0.65rem/600`, muted, `opacity .7`), que se distingue de la
@@ -651,7 +666,7 @@ Lo que hay que copiar de `<lib-data-table>`, y por qué:
 - **Encadenar el flex hasta el scrollport.** `:host { display:flex; flex-direction:column; flex:1;
 min-height:0; overflow:hidden }` y el wrapper con `flex:1; min-height:0; overflow:auto`.
   **`flex: 1` en el host no es opcional:** `.list-shell__table` es un flex column con `flex:1` que
-  ocupa el alto de la card, y un hijo sin `flex` mide su contenido — la tabla queda pegada arriba y
+  ocupa el alto del recuadro, y un hijo sin `flex` mide su contenido — la tabla queda pegada arriba y
   el borde del recuadro dibuja un rectángulo vacío debajo. Con datos se disimula; **con el informe
   vacío es lo único que se ve**. Fue un bug real (2026-09-04), heredado de `saldos-cuenta-table`,
   donde no se notaba porque no había paginador debajo.

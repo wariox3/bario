@@ -1,33 +1,19 @@
 // Utilidad "Enviar factura electrónica".
-// Reproduce el chrome de <lib-list-shell> (breadcrumb + card + tabla embebida)
-// con los mismos tokens para no fragmentar el sistema visual del ERP; la única
-// pieza propia es el tab-strip interno. Depth borders-only, navy/sky, radios 12px.
+// Reproduce el chrome de <lib-list-shell> (breadcrumb + título suelto + un solo
+// recuadro) con los mismos tokens para no fragmentar el sistema visual del ERP;
+// la única pieza propia es el tab-strip, que encabeza el recuadro.
 :host {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
-// ── Card raíz (idéntica a .list-shell__card) ──────────────────────────────────
-.efe-card {
-  background: #fff;
-  border: 1px solid rgba(19 38 60 / 0.08);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(19 38 60 / 0.04);
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  &__head {
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid rgba(19 38 60 / 0.08);
-    min-width: 0;
-  }
+// ── Encabezado de página (idéntico a .list-shell__title) ─────────────────────
+.efe-head {
+  min-width: 0;
 
   &__title {
     margin: 0;
@@ -42,25 +28,28 @@
     font-size: 0.8rem;
     color: var(--brand-muted);
   }
+}
 
-  &__body {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    padding: 0.5rem 1rem 1rem;
-  }
+// ── El único recuadro (idéntico a .list-shell__frame) ────────────────────────
+.efe-frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(20 48 73 / 0.12);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(19 38 60 / 0.04);
+}
 
-  // Recuadro embebido de la tabla (borde un punto más definido que la card).
-  &__table {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid rgba(20, 48, 73, 0.12);
-    border-radius: 12px;
-  }
+// display:flex releva la cadena de alturas hasta lib-data-table.
+.efe-table {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 // ── Tab-strip: encadena el flex para que solo la tabla scrollee ───────────────
@@ -82,7 +71,7 @@
 
     // El panel activo aloja la cadena de alturas hasta la tabla.
     .p-tabpanels {
-      padding: 0.85rem 0 0;
+      padding: 0;
     }
 
     .p-tabpanel {
@@ -90,31 +79,34 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
       padding: 0;
     }
 
-    // Tira de tabs: solo un borde inferior sutil, sin fondo (casa con la card).
+    // Tira de tabs: encabeza el recuadro, alineada con el padding del toolbar.
     .p-tablist {
       background: transparent;
+      padding: 0 1rem;
     }
   }
 }
 
 // ── Toolbar por tab: filtros a la izquierda, acciones batch a la derecha ──────
+// Cabecera de la tabla, como el toolbar de un listado: su padding y su divisor.
 .efe-toolbar {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(19 38 60 / 0.08);
 
   &__filters {
     flex: 1;
     min-width: 0;
 
     // Neutraliza el marco propio del toolbar embebido (igual que list-shell):
-    // sin borde inferior ni padding horizontal, para que alinee con el recuadro
-    // de la tabla y las acciones queden en la misma línea.
+    // el padding y el divisor los pone .efe-toolbar, que también aloja las
+    // acciones en la misma línea.
     ::ng-deep .lib-data-toolbar {
       border-bottom: none;
       padding: 0;
