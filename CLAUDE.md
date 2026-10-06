@@ -76,6 +76,7 @@ The 6 SPAs share the same skeleton:
 - **PrimeNG theme** — single `ReddocPreset` exported from `@reddoc/core` (navy `#143049` primary, sky `#77aad7` accent), used by every app via `providePrimeNG({ theme: { preset: ReddocPreset, ... } })`.
 - **Environments** — `src/environments/environment.ts` (dev), `.staging.ts`, `.prod.ts`. Swap via `fileReplacements` in `project.json`.
 - **Auth pages** — every app loads `LoginComponent`/`RegisterComponent`/etc. directly from `@reddoc/ui`. Per-app branding is provided via the `APP_BRANDING` token (`{ appName, tagline }`).
+- **Botón estándar** — cada `src/styles.scss` arranca con `@use` de `libs/styles/src/primeng/button` (y `overlays`): botones compactos de 32px, `fluid` a 43px. Una app nueva que lo omita queda con el botón por defecto de PrimeNG.
 - **Tailwind brand tokens** — each app's `src/tailwind.css` imports `libs/styles/src/tailwind/brand.css`, which exposes `--color-brand-*` and the `fade-up` / `drift1` / `drift2` animations as Tailwind v4 `@theme` values.
 - **Logos** — `libs/ui/src/assets/logos/` is wired in each app's `project.json` so `<img src="/logos/reddoc.svg">` resolves.
 
