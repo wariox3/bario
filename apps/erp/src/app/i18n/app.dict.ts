@@ -369,6 +369,12 @@ export interface AppDict
       title: string;
       subtitle: string;
       empty: string;
+      porDocumento: {
+        subtitle: string;
+        empty: string;
+        cols: { concepto: string; valor: string };
+      };
+      ver: string;
       cols: {
         id: string;
         documento: string;

@@ -1,0 +1,79 @@
+@let a = t().documentActions.afectacion;
+@let doc = documento();
+@let microLabel = 'text-[0.62rem] font-bold uppercase tracking-[0.06em] text-brand-muted';
+
+<div class="overflow-hidden rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+  <!-- Título -->
+  <div class="border-b border-[rgba(20,48,73,0.06)] px-4 pt-2.5 pb-1.5">
+    <span [class]="microLabel">{{ titulo() }}</span>
+  </div>
+
+  <!-- Identidad: tipo de documento + ids -->
+  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-2.5 pb-2.5">
+    <span class="text-[0.95rem] font-semibold text-brand-text">
+      {{ doc.documento_tipo_nombre }}
+    </span>
+    <div class="flex items-center gap-4">
+      @if (mostrarDetalleId()) {
+        <span class="inline-flex items-center gap-1.5">
+          <span [class]="microLabel">{{ a.campos.detalleId }}</span>
+          <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+            {{ detalleId() }}
+          </span>
+        </span>
+      }
+      <span class="inline-flex items-center gap-1.5">
+        <span [class]="microLabel">{{ a.campos.documentoId }}</span>
+        <span class="text-[0.82rem] font-semibold tabular-nums text-brand-text">
+          {{ doc.id }}
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Atributos: fecha · contacto -->
+  <div class="flex flex-wrap gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.06)] px-4 py-2.5">
+    <div class="flex flex-col gap-0.5">
+      <span [class]="microLabel">{{ a.campos.fecha }}</span>
+      <span class="whitespace-nowrap text-[0.85rem] text-brand-text">
+        {{ formatFecha(doc.fecha) }}
+      </span>
+    </div>
+    @if (doc.contacto_nombre_corto) {
+      <div class="flex flex-col gap-0.5">
+        <span [class]="microLabel">{{ a.campos.contacto }}</span>
+        <span class="text-[0.85rem] text-brand-text">{{ doc.contacto_nombre_corto }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Resumen financiero: banda con tinte sky; total destacado -->
+  <div
+    class="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-[rgba(20,48,73,0.08)] bg-[rgba(119,170,215,0.06)] px-4 py-2.5 sm:grid-cols-4"
+  >
+    <div class="flex flex-col gap-0.5">
+      <span [class]="microLabel">{{ a.cols.subtotal }}</span>
+      <span class="text-[0.85rem] tabular-nums text-brand-text">
+        {{ formatMoney(doc.subtotal ?? 0) }}
+      </span>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <span [class]="microLabel">{{ a.cols.baseImpuesto }}</span>
+      <span class="text-[0.85rem] tabular-nums text-brand-text">
+        {{ formatMoney(doc.base_impuesto ?? 0) }}
+      </span>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <span [class]="microLabel">{{ a.cols.impuesto }}</span>
+      <span class="text-[0.85rem] tabular-nums text-brand-text">
+        {{ formatMoney(doc.impuesto ?? 0) }}
+      </span>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <span [class]="microLabel">{{ a.cols.total }}</span>
+      <span class="text-[0.9rem] font-bold tabular-nums text-brand-text">
+        {{ formatMoney(doc.total ?? 0) }}
+      </span>
+    </div>
+  </div>
+</div>

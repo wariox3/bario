@@ -44,4 +44,13 @@
   />
 }
 
+<!-- Afectación del documento: el chunk del modal solo se descarga al primer clic
+     en un id, así los listados que no lo usan no lo pagan. -->
+@defer (when afectacionVisible()) {
+  <app-documento-afectacion-modal
+    [(visible)]="afectacionVisible"
+    [documentoId]="afectacionDocumentoId()"
+  />
+}
+
 <p-confirmDialog />

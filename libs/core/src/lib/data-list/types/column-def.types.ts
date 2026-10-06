@@ -103,4 +103,13 @@ export interface ColumnDef {
    * colores con una leyenda.
    */
   readonly toneFor?: (row: unknown) => CellTone | null;
+  /**
+   * Vuelve la celda clicable: se pinta como enlace y al clic la tabla emite
+   * `rowActionInvoked` con este id, por el mismo canal que las acciones de fila.
+   * La tabla no sabe qué hace la acción; lo decide el consumidor en su handler.
+   * Una celda sin valor no se vuelve enlace: no hay nada que abrir.
+   */
+  readonly cellAction?: string;
+  /** Clave i18n del tooltip y `aria-label` de la celda clicable (`cellAction`). */
+  readonly cellActionLabelKey?: string;
 }

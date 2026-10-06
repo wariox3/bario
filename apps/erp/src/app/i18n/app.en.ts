@@ -432,6 +432,12 @@ export const en: AppDict = {
       title: 'Document traceability',
       subtitle: 'The document, its affected document and the details that affect it',
       empty: 'No details affect this one.',
+      porDocumento: {
+        subtitle: 'The document, its reference and what affects it',
+        empty: 'No documents affect this one.',
+        cols: { concepto: 'Concept', valor: 'Amount' },
+      },
+      ver: 'View traceability',
       cols: {
         id: 'ID',
         documento: 'Document',
@@ -466,7 +472,7 @@ export const en: AppDict = {
       close: 'Close',
       loadError: {
         title: 'Could not load',
-        desc: 'An error occurred while loading the line traceability.',
+        desc: 'An error occurred while loading the traceability.',
       },
     },
   },

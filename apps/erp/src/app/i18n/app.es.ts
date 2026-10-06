@@ -432,6 +432,12 @@ export const es: AppDict = {
       title: 'Afectación del documento',
       subtitle: 'El documento, su documento afectado y los detalles que lo afectan',
       empty: 'Ningún detalle afecta a este.',
+      porDocumento: {
+        subtitle: 'El documento, su referencia y lo que lo afecta',
+        empty: 'Ningún documento afecta a este.',
+        cols: { concepto: 'Concepto', valor: 'Valor' },
+      },
+      ver: 'Ver afectación',
       cols: {
         id: 'ID',
         documento: 'Documento',
@@ -466,7 +472,7 @@ export const es: AppDict = {
       close: 'Cerrar',
       loadError: {
         title: 'No se pudo cargar',
-        desc: 'Ocurrió un error al cargar la afectación de la línea.',
+        desc: 'Ocurrió un error al cargar la afectación.',
       },
     },
   },

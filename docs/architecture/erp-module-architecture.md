@@ -322,6 +322,8 @@ export interface DocumentCapabilities {
   readonly canExportExcel: boolean;
   readonly canExportZip: boolean;
   readonly canGenerate: boolean;
+  /** Opcional: el `id` del listado abre la afectación del documento. */
+  readonly canViewAfectacion?: boolean;
 }
 
 /** Rutas relativas al módulo. */
