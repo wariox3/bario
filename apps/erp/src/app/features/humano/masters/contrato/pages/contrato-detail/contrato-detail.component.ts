@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { EMPTY, filter, from, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -48,7 +49,7 @@ interface ParametroInicial {
 @Component({
   selector: 'app-contrato-detail',
   standalone: true,
-  imports: [ButtonModule, MenuModule, BreadcrumbComponent],
+  imports: [ButtonModule, ButtonGroupModule, MenuModule, BreadcrumbComponent],
   providers: [DialogService],
   templateUrl: './contrato-detail.component.html',
   styleUrl: './contrato-detail.component.scss',

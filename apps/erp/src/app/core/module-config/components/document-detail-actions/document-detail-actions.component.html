@@ -2,6 +2,8 @@
 
 <!--
   Las acciones del documento fundidas en un solo segmento, que se lee como una pieza.
+  Lo propio de cada documento (su "Utilidades") entra al final del segmento por el
+  slot `[actionsEnd]`; su <p-menu> lo declara la ficha, fuera de este componente.
   Los <p-menu> van FUERA del grupo: su CSS une los botones con
   `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
 -->
@@ -68,6 +70,8 @@
     size="small"
     (onClick)="toggleOpciones($event)"
   />
+
+  <ng-content select="[actionsEnd]" />
 </p-buttongroup>
 
 @if (accionesItems().length > 0) {
