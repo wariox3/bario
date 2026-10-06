@@ -14,7 +14,6 @@ import { catchError, forkJoin, map, of, switchMap, type Observable } from 'rxjs'
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import {
-  formatFechaCorta,
   anioMesDeIso,
   type DocumentoDetalleReadBase,
   DocumentoDetalleService,
@@ -35,31 +34,11 @@ import {
   type ProgramacionCalendarioRead,
   type ProgramacionFilaRead,
 } from './programacion-detalle.service';
+import { AfectacionDocumentoCardComponent } from '../afectacion-documento-card/afectacion-documento-card.component';
+import type { AfectacionDocumentoRead } from '../afectacion-documento-card/afectacion-documento.types';
 
 /** Calendario sin programaciones: degradado de la carga (documento no-servicio o fallo). */
 const CALENDARIO_VACIO: ProgramacionCalendarioRead = { fechas: [], filas: [] };
-
-/**
- * Cabecera de documento (`documento/<id>/`), recortada a lo que el modal pinta.
- *
- * Alimenta las dos cards: la del documento del detalle base (card 1) y la del
- * `documento_referencia` de ese documento (card 2, si existe). Los montos llegan
- * como string con decimales, de ahí `string | number | null`.
- */
-interface AfectacionDocumentoRead {
-  readonly id?: number | null;
-  readonly numero?: string | null;
-  readonly fecha?: string | null;
-  readonly contacto_nombre_corto?: string | null;
-  readonly documento_tipo_nombre?: string | null;
-  /** FK al documento de referencia (origen). Algunos serializadores lo exponen con `_id`. */
-  readonly documento_referencia?: number | null;
-  readonly documento_referencia_id?: number | null;
-  readonly subtotal?: string | number | null;
-  readonly base_impuesto?: string | number | null;
-  readonly impuesto?: string | number | null;
-  readonly total?: string | number | null;
-}
 
 /**
  * Línea de documento-detalle, recortada a lo que el modal lee.
@@ -90,7 +69,7 @@ interface AfectacionDetalleRead extends DocumentoDetalleReadBase {
 @Component({
   selector: 'app-afectacion-modal',
   standalone: true,
-  imports: [DialogModule, ButtonModule],
+  imports: [DialogModule, ButtonModule, AfectacionDocumentoCardComponent],
   templateUrl: './afectacion-modal.component.html',
   styleUrl: './afectacion-modal.component.scss',
 })
@@ -158,11 +137,6 @@ export class AfectacionModalComponent {
   protected formatCantidad(value: AfectacionDetalleRead['cantidad']): string {
     const n = toFiniteNumber(value);
     return n === null ? '—' : String(n);
-  }
-
-  /** Fecha ISO (`"2026-06-17"`) a formato corto local (`17 jun 2026`), sin desfase TZ. */
-  protected formatFecha(value: string | null | undefined): string {
-    return formatFechaCorta(value, '—');
   }
 
   /** Código del turno de ese día, vacío si no tiene programación. */

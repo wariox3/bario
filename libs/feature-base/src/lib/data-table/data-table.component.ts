@@ -229,6 +229,22 @@ export class DataTableComponent {
   }
 
   /**
+   * Clic en una celda clicable (`ColumnDef.cellAction`): sale por el mismo
+   * `rowActionInvoked` que las acciones de fila, así el consumidor la atiende
+   * en su handler de siempre.
+   */
+  protected invokeCellAction(col: ColumnDef, row: unknown): void {
+    if (!col.cellAction) return;
+    this.rowActionInvoked.emit({ actionId: col.cellAction, row });
+  }
+
+  /** ¿La celda tiene un valor que mostrar? Una vacía no se vuelve enlace. */
+  protected hasValue(row: unknown, field: string): boolean {
+    const value = this.readValue(row, field);
+    return value !== null && value !== undefined && value !== '';
+  }
+
+  /**
    * Construye los `MenuItem` de PrimeNG para una fila concreta a partir
    * de las acciones del menú y su predicado `visibleFor`.
    */

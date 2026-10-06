@@ -8,12 +8,13 @@ import { masterNav } from '@erp/core/erp-modules';
 import { AlmacenService } from '../../almacen.service';
 import { ALMACEN_SEGMENT } from '../../almacen.constants';
 import type { Almacen } from '../../almacen.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /** Ficha de un **almacén**. Un nombre: no hay más que mostrar. */
 @Component({
   selector: 'app-almacen-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './almacen-detail.component.html',
   styleUrl: './almacen-detail.component.scss',
 })
@@ -61,6 +62,10 @@ export class AlmacenDetailComponent implements OnInit {
     const a = this.almacen();
     if (!a) return;
     this.nav.ir('editar', a.id);
+  }
+
+  protected onNew(): void {
+    this.nav.ir('nuevo');
   }
 
   private loadAlmacen(id: number): void {

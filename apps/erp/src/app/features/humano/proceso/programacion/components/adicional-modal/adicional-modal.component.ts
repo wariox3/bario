@@ -12,7 +12,7 @@ import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { FormErrorService, I18nService, ToastService, type ErpSelectOption } from '@reddoc/core';
 import {
@@ -39,9 +39,11 @@ export interface AdicionalModalData {
  * Alta y edición de un **concepto adicional** dentro de la programación.
  *
  * Reusa `AdicionalService` del master: el transporte es el mismo endpoint. Lo que
- * cambia es el payload — acá el adicional nace **atado a la programación**, y se
- * pueden capturar `horas` (el master no las expone porque las gestiona este
- * proceso).
+ * cambia es el payload — acá el adicional nace **atado a la programación**.
+ *
+ * `horas` no se captura, como en el ERP anterior, y **tampoco se manda**: en alta
+ * el backend pone su default, y en edición conserva las que ya tenía. Mandar el 0
+ * de un control oculto las pisaría.
  *
  * Cierra con `true` si guardó.
  */
@@ -53,7 +55,7 @@ export interface AdicionalModalData {
     ButtonModule,
     CheckboxModule,
     InputNumberModule,
-    InputTextModule,
+    TextareaModule,
     FieldErrorComponent,
     ContratoAutocompleteComponent,
     ErpApiAutocompleteComponent,
@@ -85,7 +87,6 @@ export class AdicionalModalComponent {
     contrato: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     concepto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     valor: this.fb.control<number | null>(0, [Validators.required, Validators.min(0)]),
-    horas: this.fb.control<number>(0, { nonNullable: true }),
     detalle: this.fb.control<string | null>(null, Validators.maxLength(200)),
     aplica_dia_laborado: this.fb.control<boolean>(false, { nonNullable: true }),
   });
@@ -104,8 +105,6 @@ export class AdicionalModalComponent {
               ? { id: adicional.concepto, nombre: adicional.concepto_nombre ?? '' }
               : null,
           valor: toNumero(adicional.valor),
-          // `horas` llega como string Decimal (`"0.000"`), igual que `valor`.
-          horas: toNumero(adicional.horas),
           detalle: adicional.detalle,
           aplica_dia_laborado: adicional.aplica_dia_laborado,
         },
@@ -123,7 +122,6 @@ export class AdicionalModalComponent {
       contrato: raw.contrato?.id ?? null,
       concepto: raw.concepto?.id ?? null,
       valor: raw.valor,
-      horas: raw.horas,
       detalle: raw.detalle,
       aplica_dia_laborado: raw.aplica_dia_laborado,
       inactivo: false,

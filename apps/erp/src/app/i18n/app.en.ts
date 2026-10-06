@@ -10,6 +10,7 @@ export const en: AppDict = {
   accesosContenedor: accesosContenedorEn,
   common: {
     comingSoon: 'Coming soon.',
+    masInformacion: { title: 'More information', hint: 'optional' },
     accessDenied: {
       title: 'You do not have access',
       sub: 'This section is only for container administrators. Ask the company owner for access.',
@@ -431,6 +432,12 @@ export const en: AppDict = {
       title: 'Document traceability',
       subtitle: 'The document, its affected document and the details that affect it',
       empty: 'No details affect this one.',
+      porDocumento: {
+        subtitle: 'The document, its reference and what affects it',
+        empty: 'No documents affect this one.',
+        cols: { concepto: 'Concept', valor: 'Amount' },
+      },
+      ver: 'View traceability',
       cols: {
         id: 'ID',
         documento: 'Document',
@@ -465,7 +472,7 @@ export const en: AppDict = {
       close: 'Close',
       loadError: {
         title: 'Could not load',
-        desc: 'An error occurred while loading the line traceability.',
+        desc: 'An error occurred while loading the traceability.',
       },
     },
   },
@@ -2059,17 +2066,27 @@ export const en: AppDict = {
         action: 'End',
         title: 'End contract',
         subtitle: 'Closing the employment relationship',
-        aviso:
-          "Ending the contract creates the employee's severance settlement with any pending benefits. Check the last-payment dates first.",
         submit: 'End contract',
         fields: {
           fecha: 'End date',
           motivo: 'Reason',
           seleccionar: 'Select…',
         },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          antesDelInicio: 'It cannot be before the contract start',
+        },
+        resultado: {
+          title: 'Contract ended',
+          subtitle: 'The settlement was created',
+          periodo: 'Settled period',
+          total: 'Total to pay',
+          adiciones: 'Additions',
+          deducciones: 'Deductions',
+          nota: 'Review it in Settlements before approving it: you can add additions or deductions there.',
+          cerrar: 'Close',
+        },
         toasts: {
-          success: { title: 'Contract ended', desc: 'The settlement was created' },
           error: { title: 'Could not end the contract' },
         },
       },
@@ -2097,8 +2114,8 @@ export const en: AppDict = {
           seguridadSocial: 'Social security',
         },
         groups: {
-          identificacion: 'Identification',
-          vigencia: 'Term and assignment',
+          identificacion: 'Identification and assignment',
+          vigencia: 'Term',
           remuneracion: 'Compensation',
           terminacion: 'Termination and payments',
         },
@@ -2311,8 +2328,23 @@ export const en: AppDict = {
           sedePlaceholder: 'Select…',
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          ordenCompraPlaceholder: 'Order number',
+          remision: 'Delivery note',
+          remisionPlaceholder: 'Delivery note number',
+          asesor: 'Sales advisor',
+          asesorPlaceholder: 'Select…',
+          resolucion: 'Resolution',
+          resolucionPlaceholder: 'Select…',
+          comentario: 'Comment',
+          comentarioPlaceholder: 'Document notes',
         },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          ordenCompraMax: 'Maximum 50 characters',
+          remisionMax: 'Maximum 50 characters',
+          comentarioMax: 'Maximum 500 characters',
+        },
         toasts: {
           createSuccess: {
             title: 'Invoice created',
@@ -2350,6 +2382,11 @@ export const en: AppDict = {
           plazoPago: 'Payment terms',
           sede: 'Branch',
           metodoPago: 'Payment method',
+          ordenCompra: 'Purchase order',
+          remision: 'Delivery note',
+          asesor: 'Sales advisor',
+          resolucion: 'Resolution',
+          comentario: 'Comment',
         },
         notFound: {
           title: 'Invoice not found',
@@ -2466,7 +2503,7 @@ export const en: AppDict = {
       form: {
         createHint: 'Main details of the new note',
         editHint: 'Update the note details',
-        tabs: { detalles: 'Details', pagos: 'Payments', informacion: 'More information' },
+        tabs: { detalles: 'Details', pagos: 'Payments' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2474,6 +2511,7 @@ export const en: AppDict = {
           documentoReferencia: 'Reference document',
           documentoReferenciaPlaceholder: 'Select the invoice…',
           documentoReferenciaDisabled: 'Select a customer first',
+          documentoReferenciaEmpty: 'The customer has no approved invoices with that number.',
           sede: 'Branch',
           sedePlaceholder: 'Select…',
           metodoPago: 'Payment method',
@@ -2520,14 +2558,7 @@ export const en: AppDict = {
       saveAll: 'Save payments',
       pendingSuffix: 'unsaved',
       anulado: 'Voided',
-      anular: 'Void',
       confirmDelete: 'Remove this payment?',
-      confirmAnular: {
-        header: 'Void payment',
-        message:
-          'The payment will stop counting and the amount will be outstanding again. The row keeps its value. Void it?',
-        accept: 'Void payment',
-      },
       columns: {
         id: 'ID',
         cuentaBanco: 'Bank account',
@@ -2560,11 +2591,6 @@ export const en: AppDict = {
           title: 'Payments not registered',
           desc: 'The document was saved, but some payments were not registered. Edit it to add them',
         },
-        anularSuccess: {
-          title: 'Payment voided',
-          desc: 'The payment stopped counting and the amount is outstanding again',
-        },
-        anularError: { title: 'Void failed', desc: 'The payment could not be voided' },
       },
     },
     posDocumento: {
@@ -2572,7 +2598,7 @@ export const en: AppDict = {
         createHint: 'Main details of the new document',
         editHint: 'Update the document details',
         pagosHint: 'Payments received at the point of sale',
-        tabs: { detalles: 'Details', pagos: 'Payments', informacion: 'More information' },
+        tabs: { detalles: 'Details', pagos: 'Payments' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2666,7 +2692,6 @@ export const en: AppDict = {
         createTitle: 'New recurring invoice',
         editTitle: 'Edit recurring invoice',
         sectionHint: 'Template used to generate sales invoices',
-        masInformacion: { title: 'More information', hint: 'optional' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2722,6 +2747,8 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           asesor: 'Sales rep',
           comentario: 'Comment',
+          ordenCompra: 'Purchase order',
+          remision: 'Delivery note',
         },
         notFound: {
           title: 'Invoice not found',
@@ -2764,6 +2791,8 @@ export const en: AppDict = {
           sedePlaceholder: 'Select…',
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
         },
         tabs: { detalles: 'Details', cuentas: 'Accounts' },
         validation: { required: 'This field is required' },
@@ -2804,6 +2833,8 @@ export const en: AppDict = {
           plazoPago: 'Payment terms',
           sede: 'Branch',
           metodoPago: 'Payment method',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
         },
         notFound: {
           title: 'Invoice not found',
@@ -3092,7 +3123,6 @@ export const en: AppDict = {
         createTitle: 'New recurring invoice',
         editTitle: 'Edit recurring invoice',
         sectionHint: 'Template used to generate the invoices',
-        adicionales: { title: 'Additional details', hint: 'optional' },
         fields: {
           proveedor: 'Supplier',
           proveedorPlaceholder: 'Search supplier…',
@@ -3145,6 +3175,7 @@ export const en: AppDict = {
           centroCosto: 'Cost center',
           sede: 'Branch',
           ordenCompra: 'Purchase order',
+          comentario: 'Comment',
         },
         notFound: {
           title: 'Invoice not found',
@@ -4085,17 +4116,16 @@ export const en: AppDict = {
           nombrePlaceholder: 'How to identify this run',
           fechaDesde: 'Date from',
           fechaHasta: 'Date to',
-          fechaHastaPeriodo: 'Period end date',
-          fechaHastaPeriodoHint: 'Period close, it may go further',
           comentario: 'Comment',
           seleccionar: 'Select…',
         },
         validation: {
           required: 'This field is required',
           rangoInvalido: 'The start date cannot be later than the end date',
-          duracionPeriodo: "The period must last exactly the group's period length",
-          duracionEsperada: 'expected',
-          duracionActual: 'actual',
+          duracionPeriodo:
+            'For this group the period must last {requeridos} days and the range has {duracion}',
+          usarFechaSugerida: 'Use {fecha}',
+          usarFechaSugeridaTitle: 'Move the end date to the close of the period',
         },
         toasts: {
           createSuccess: {
@@ -4116,12 +4146,17 @@ export const en: AppDict = {
         },
       },
       resumen: {
-        sinNombre: 'Unnamed payroll run',
         conceptos: 'Settled concepts',
         sinConceptos: 'No active concepts',
         labels: {
+          id: 'ID',
+          nombre: 'Name',
+          pagoTipo: 'Payment type',
+          grupo: 'Group',
+          periodo: 'Period',
           fechaDesde: 'From',
           fechaHasta: 'To',
+          dias: 'Days',
           contratos: 'Contracts',
           devengado: 'Earnings',
           deduccion: 'Deductions',
@@ -4146,6 +4181,7 @@ export const en: AppDict = {
         salarioPromedio: 'Average salary',
         cesantiaPropuesta: 'Proposed severance',
         interesPropuesto: 'Proposed interest',
+        primaPropuesta: 'Proposed bonus',
         banderasHint: 'Uncheck whatever does not apply to this employee this period',
         sections: { horas: 'Hours and premiums', banderas: 'Employee concepts' },
         horas: {
@@ -4185,14 +4221,16 @@ export const en: AppDict = {
         createTitle: 'New additional concept',
         editTitle: 'Edit additional concept',
         subtitle: "It is added to this period's settlement",
+        import: {
+          title: 'Import additionals',
+          subtitle: "Upload the Excel file with this period's additionals",
+        },
         fields: {
           contrato: 'Employee',
           contratoPlaceholder: 'Search by name or tax ID…',
           concepto: 'Concept',
           conceptoPlaceholder: 'Search concept…',
           valor: 'Amount',
-          horas: 'Hours',
-          horasHint: 'Only if the concept is settled by hours',
           detalle: 'Description',
           aplicaDiaLaborado: 'Prorated by days worked',
         },
@@ -4202,12 +4240,18 @@ export const en: AppDict = {
         },
         columns: {
           id: 'ID',
-          empleado: 'Employee',
+          identificacion: 'ID number',
+          empleado: 'Name',
+          contrato: 'Contract',
+          conceptoId: 'Code',
           concepto: 'Concept',
           valor: 'Amount',
-          horas: 'Hours',
-          detalle: 'Description',
-          aplicaDiaLaborado: 'Prorated',
+          detalle: 'Detail',
+          aplicaDiaLaborado: 'PDW',
+        },
+        leyenda: {
+          titulo: 'Abbreviations',
+          contenido: 'PDW: prorated by days worked (the amount is prorated by the days worked)',
         },
         toasts: {
           createSuccess: { title: 'Concept created', desc: 'It was added to the payroll run' },
@@ -4218,8 +4262,8 @@ export const en: AppDict = {
       },
       importarHoras: {
         title: 'Import hours',
-        subtitle: "Upload the Excel file with the period's hours",
-        plantillaNoDisponible: 'The template is requested with the run open (pending)',
+        subtitle:
+          "Download the template with this run's employees, adjust their hours and upload it",
       },
       acciones: {
         generar: 'Generate',
@@ -4230,9 +4274,7 @@ export const en: AppDict = {
         importarHoras: 'Import hours',
         imprimir: 'Payroll run PDF',
         imprimirNominas: 'Payslips PDF',
-        exportRenglones: 'Employees Excel',
-        exportNomina: 'Payslips Excel',
-        exportNominaDetalle: 'Concepts Excel',
+        utilidades: 'Utilities',
         confirmaciones: {
           generar: {
             header: 'Generate payroll',
@@ -4288,6 +4330,7 @@ export const en: AppDict = {
       renglones: {
         cargarContratos: 'Load contracts',
         verNomina: 'View payslip',
+        nominaResumen: { title: 'Payslip' },
         confirmEliminar: {
           header: 'Remove employees',
           message: 'Remove the selected rows from the payroll run?',
@@ -4301,6 +4344,16 @@ export const en: AppDict = {
           titulo: 'Abbreviations',
           contenido:
             'DT: transport days · D: day · N: night · FD: holiday day · FN: holiday night · ED: overtime day · EN: overtime night · EFD: overtime holiday day · EFN: overtime holiday night · RN: night premium · RFD: holiday day premium · RFN: holiday night premium',
+        },
+        excel: {
+          action: 'Excel',
+          detalle: 'Detail',
+          nomina: 'Payslips',
+          nominaDetalle: 'Payslip detail',
+        },
+        marcas: {
+          ingresoRetiro: 'The contract started or ended within the period',
+          errorTerminacion: 'The contract termination has an error',
         },
         toasts: {
           cargarSuccess: { title: 'Contracts loaded', desc: 'employees in the run' },
@@ -4393,9 +4446,11 @@ export const en: AppDict = {
         vacacion: 'Vacation',
       },
       resumen: {
-        sinEmpleado: 'No employee',
         prestacionesTitle: 'Calculated benefits',
         labels: {
+          id: 'ID',
+          empleado: 'Employee',
+          identificacion: 'ID number',
           contrato: 'Contract',
           fecha: 'Date',
           desde: 'From',
@@ -4408,9 +4463,31 @@ export const en: AppDict = {
           adicion: 'Additions',
           deduccion: 'Deductions',
           total: 'Total payable',
+          comentario: 'Comment',
+        },
+      },
+      form: {
+        editTitle: 'Edit settlement',
+        sectionHint: 'When each benefit starts counting. The amounts are calculated by the system.',
+        fields: {
+          fechaUltimoPago: 'Last payment',
+          fechaUltimoPagoCesantia: 'Last severance payment',
+          fechaUltimoPagoPrima: 'Last bonus payment',
+          fechaUltimoPagoVacacion: 'Last vacation payment',
+          comentario: 'Comment',
+        },
+        toasts: {
+          editSuccess: { title: 'Settlement updated', desc: 'Recalculate to redo the figures' },
+          editError: { title: 'Error saving', desc: 'The settlement could not be updated' },
+          loadError: { title: 'Error loading', desc: 'The settlement could not be loaded' },
+          noEditable: {
+            title: 'Settlement not editable',
+            desc: 'Only a draft settlement can be edited',
+          },
         },
       },
       workspace: {
+        tabs: { adicionales: 'Additional' },
         adicionalesHint: 'Items that add to or subtract from the total, entered by hand.',
         notFound: {
           title: 'Settlement not found',
@@ -4423,7 +4500,6 @@ export const en: AppDict = {
         desgenerar: 'Undo generate',
         aprobar: 'Approve',
         desaprobar: 'Undo approval',
-        imprimir: 'Print',
         confirmaciones: {
           generar: {
             header: 'Generate the settlement?',
@@ -4444,10 +4520,6 @@ export const en: AppDict = {
           desaprobar: {
             header: 'Undo the approval?',
             message: 'The closing is reverted and the settlement goes back to generated.',
-          },
-          eliminar: {
-            header: 'Delete the settlement?',
-            message: 'The ended contract will be left without its settlement.',
           },
         },
         toasts: {
@@ -4534,12 +4606,12 @@ export const en: AppDict = {
       presentaciones: { sucursal: 'By branch', unica: 'Single' },
       cotizaciones: {
         pension: 'Pension',
-        solidaridad: 'Solidarity fund',
-        subsistencia: 'Subsistence fund',
-        voluntarioAfiliado: 'Voluntary — member',
-        voluntarioAportante: 'Voluntary — employer',
+        solidaridad: 'Solidarity',
+        subsistencia: 'Subsistence',
+        voluntarioAfiliado: 'Vol. member',
+        voluntarioAportante: 'Vol. employer',
         salud: 'Health',
-        riesgos: 'Occupational risks',
+        riesgos: 'Risks',
         caja: 'Compensation fund',
         sena: 'SENA',
         icbf: 'ICBF',
@@ -4578,15 +4650,19 @@ export const en: AppDict = {
         },
       },
       resumen: {
-        cotizacionesTitle: 'Contributions for the period',
+        valoresTitle: 'Amounts',
         labels: {
+          sucursal: 'Branch',
+          mes: 'Month',
+          anio: 'Year',
+          presentacion: 'Filing type',
+          entidadRiesgo: 'Risk entity',
+          entidadSena: 'SENA entity',
+          entidadIcbf: 'ICBF entity',
           empleados: 'Employees',
           contratos: 'Contracts',
           lineas: 'Lines',
           baseCotizacion: 'Contribution base',
-          entidadRiesgo: 'ARL',
-          entidadSena: 'SENA',
-          entidadIcbf: 'ICBF',
           total: 'Total',
         },
       },
@@ -4606,10 +4682,7 @@ export const en: AppDict = {
         aprobar: 'Approve',
         desaprobar: 'Undo approval',
         planoOperador: 'Operator file',
-        imprimir: 'Print',
-        exportContratos: 'Export contracts',
-        exportDetalles: 'Export detail',
-        exportEntidades: 'Export entities',
+        utilidades: 'Utilities',
         confirmaciones: {
           generar: {
             header: 'Generate the contribution?',
@@ -4647,6 +4720,7 @@ export const en: AppDict = {
           },
         },
       },
+      excel: { action: 'Excel', detalle: 'Detail' },
       contratos: {
         cargarContratos: 'Load contracts',
         leyenda: {
@@ -4668,7 +4742,6 @@ export const en: AppDict = {
         },
         columns: {
           id: 'ID',
-          codigo: 'Code',
           identificacion: 'ID number',
           empleado: 'Employee',
           contrato: 'Contract',
@@ -4688,45 +4761,52 @@ export const en: AppDict = {
         },
       },
       trazabilidad: {
-        verNominas: 'View payroll',
-        title: 'Payroll for the period',
-        subtitle: 'Where this contract\u2019s IBC comes from',
-        total: 'Total',
-        empty: {
-          title: 'No payroll in the period',
-          sub: 'This contract has no payroll calculated within the contribution period.',
-        },
-        nominas: {
-          title: 'Calculated payroll',
+        verDetalle: 'View detail',
+        title: 'Payroll of',
+        sinEmpleado: 'Payroll for the period',
+        subtitle: 'Where this contract\u2019s IBC comes from in the contribution period',
+        total: 'Totals',
+        documentos: {
+          title: 'Documents',
+          empty: 'No documents registered',
           columns: {
+            id: 'ID',
+            tipo: 'Type',
             numero: 'Number',
             desde: 'From',
             hasta: 'To',
+            contrato: 'Contract',
             salario: 'Salary',
             ibc: 'IBC',
             ibp: 'IBP',
             devengado: 'Earnings',
             deduccion: 'Deductions',
-            total: 'Net',
+            neto: 'Net',
           },
         },
-        conceptos: {
-          title: 'Calculated items',
-          empty: 'The payroll for this period has no items.',
+        detalles: {
+          title: 'Document details',
+          empty: 'No details registered for these documents',
           columns: {
-            nomina: 'Payroll',
+            id: 'ID',
+            tipo: 'Type',
+            numero: 'Number',
+            conceptoId: 'Item ID',
             concepto: 'Item',
-            dias: 'Days',
+            detalle: 'Detail',
+            porcentaje: '%',
             horas: 'Hours',
-            ibc: 'IBC',
-            ibp: 'IBP',
+            dias: 'Days',
+            valorHora: 'Hourly rate',
             devengado: 'Earnings',
             deduccion: 'Deductions',
+            ibc: 'IBC',
+            ibp: 'IBP',
           },
         },
       },
       entidades: {
-        columns: { tipo: 'Type', entidad: 'Entity', cotizacion: 'Contribution' },
+        columns: { id: 'ID', tipo: 'Type', entidad: 'Entity', cotizacion: 'Contribution' },
         subtotal: 'Subtotal',
         totalGeneral: 'Grand total',
         empty: {
@@ -4892,7 +4972,7 @@ export const en: AppDict = {
     nominaDetalle: {
       empty: 'This payroll has no settled items',
       columns: {
-        linea: '#',
+        linea: 'ID',
         codigo: 'Code',
         concepto: 'Item',
         detalle: 'Detail',
@@ -4906,7 +4986,7 @@ export const en: AppDict = {
         deduccion: 'Deductions',
         basePrestacion: 'BSI',
         baseCotizacion: 'CBI',
-        baseImpuesto: 'Tax base',
+        baseImpuesto: 'Base',
       },
       tooltips: {
         credito: 'Loan code',
@@ -5545,6 +5625,7 @@ export const en: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
+        pago: 'Payment',
         afectado: 'Applied',
         pendiente: 'Pending',
       },
@@ -5568,6 +5649,7 @@ export const en: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
+        pago: 'Payment',
         saldo: 'Balance',
       },
     },
@@ -5943,6 +6025,40 @@ export const en: AppDict = {
         },
       },
     },
+    validarSaldos: {
+      porTipo: {
+        cobrar: {
+          description:
+            'This process recalculates the payment, affected and pending amounts of each receivable from its origin and fixes those that do not match what is stored.',
+          confirmMessage:
+            'The balances of all receivables will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+          successDesc: 'Receivable balances were checked and fixed.',
+        },
+        pagar: {
+          description:
+            'This process recalculates the payment, affected and pending amounts of each payable from its origin and fixes those that do not match what is stored.',
+          confirmMessage:
+            'The balances of all payables will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+          successDesc: 'Payable balances were checked and fixed.',
+        },
+      },
+      name: 'Validate balances',
+      run: 'Validate',
+      confirm: {
+        header: 'Validate balances?',
+        accept: 'Validate',
+        cancel: 'Cancel',
+      },
+      toasts: {
+        success: {
+          title: 'Validation completed',
+        },
+        error: {
+          title: 'Could not validate',
+          desc: 'An error occurred while validating the balances. Try again.',
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:
@@ -6212,6 +6328,29 @@ export const en: AppDict = {
     },
   },
   inicio: {
+    carteraResumen: {
+      porTipo: {
+        cobrar: {
+          titulo: 'Accounts receivable',
+          cifra: 'pending to collect',
+          sinPendiente: 'No pending receivables',
+          verInforme: 'View accounts receivable',
+        },
+        pagar: {
+          titulo: 'Accounts payable',
+          cifra: 'pending to pay',
+          sinPendiente: 'No pending payables',
+          verInforme: 'View accounts payable',
+        },
+      },
+      saldoAl: 'Balance as of',
+      vigente: 'Current',
+      vencido: 'Overdue',
+      error: {
+        title: 'Could not load the balance',
+        desc: 'Try again in a moment.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Quick setup',

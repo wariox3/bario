@@ -76,7 +76,7 @@ export function detalleToFormValue(
     impuestos_totales: (read.impuestos ?? []).map((imp) => ({
       id: imp.impuesto,
       nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
-      total: Math.round(parseFloat(imp.total ?? '0')),
+      total: toFiniteNumber(imp.total) ?? 0,
     })),
     horas: toFiniteNumber(read.horas),
     horas_diurnas: toFiniteNumber(read.horas_diurnas),

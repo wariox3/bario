@@ -322,6 +322,8 @@ export interface DocumentCapabilities {
   readonly canExportExcel: boolean;
   readonly canExportZip: boolean;
   readonly canGenerate: boolean;
+  /** Opcional: el `id` del listado abre la afectación del documento. */
+  readonly canViewAfectacion?: boolean;
 }
 
 /** Rutas relativas al módulo. */
@@ -499,13 +501,11 @@ export class ContactosListComponent {
       type: 'number',
       width: '70px',
       align: 'right',
-      sortable: true,
     },
     {
       field: 'nombre_corto',
       headerKey: 'modules.general.contacto.columns.nombre',
       type: 'text',
-      sortable: true,
     },
     // ...
   ];

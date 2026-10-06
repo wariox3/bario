@@ -10,6 +10,7 @@ export const es: AppDict = {
   accesosContenedor: accesosContenedorEs,
   common: {
     comingSoon: 'Próximamente disponible.',
+    masInformacion: { title: 'Más información', hint: 'opcional' },
     accessDenied: {
       title: 'No tienes acceso',
       sub: 'Esta sección es solo para administradores del contenedor. Pídele acceso al propietario de la empresa.',
@@ -431,6 +432,12 @@ export const es: AppDict = {
       title: 'Afectación del documento',
       subtitle: 'El documento, su documento afectado y los detalles que lo afectan',
       empty: 'Ningún detalle afecta a este.',
+      porDocumento: {
+        subtitle: 'El documento, su referencia y lo que lo afecta',
+        empty: 'Ningún documento afecta a este.',
+        cols: { concepto: 'Concepto', valor: 'Valor' },
+      },
+      ver: 'Ver afectación',
       cols: {
         id: 'ID',
         documento: 'Documento',
@@ -465,7 +472,7 @@ export const es: AppDict = {
       close: 'Cerrar',
       loadError: {
         title: 'No se pudo cargar',
-        desc: 'Ocurrió un error al cargar la afectación de la línea.',
+        desc: 'Ocurrió un error al cargar la afectación.',
       },
     },
   },
@@ -2110,17 +2117,27 @@ export const es: AppDict = {
         action: 'Terminar',
         title: 'Terminar contrato',
         subtitle: 'Cierre de la relación laboral',
-        aviso:
-          'Al terminar el contrato se crea la liquidación del empleado con las prestaciones pendientes. Revisá antes las fechas de último pago.',
         submit: 'Terminar contrato',
         fields: {
           fecha: 'Fecha de terminación',
           motivo: 'Motivo',
           seleccionar: 'Selecciona…',
         },
-        validation: { required: 'Este campo es obligatorio' },
+        validation: {
+          required: 'Este campo es obligatorio',
+          antesDelInicio: 'No puede ser anterior al inicio del contrato',
+        },
+        resultado: {
+          title: 'Contrato terminado',
+          subtitle: 'Se creó la liquidación',
+          periodo: 'Periodo liquidado',
+          total: 'Total a pagar',
+          adiciones: 'Adiciones',
+          deducciones: 'Deducciones',
+          nota: 'Revísala en Liquidaciones antes de aprobarla: ahí puedes sumar adiciones o deducciones.',
+          cerrar: 'Cerrar',
+        },
         toasts: {
-          success: { title: 'Contrato terminado', desc: 'Se creó la liquidación del empleado' },
           error: { title: 'Error al terminar' },
         },
       },
@@ -2148,8 +2165,8 @@ export const es: AppDict = {
           seguridadSocial: 'Seguridad social',
         },
         groups: {
-          identificacion: 'Identificación',
-          vigencia: 'Vigencia y asignación',
+          identificacion: 'Identificación y asignación',
+          vigencia: 'Vigencia',
           remuneracion: 'Remuneración',
           terminacion: 'Terminación y pagos',
         },
@@ -2362,8 +2379,23 @@ export const es: AppDict = {
           sedePlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          ordenCompraPlaceholder: 'Número de la orden',
+          remision: 'Remisión',
+          remisionPlaceholder: 'Número de la remisión',
+          asesor: 'Asesor',
+          asesorPlaceholder: 'Selecciona…',
+          resolucion: 'Resolución',
+          resolucionPlaceholder: 'Selecciona…',
+          comentario: 'Comentario',
+          comentarioPlaceholder: 'Observaciones del documento',
         },
-        validation: { required: 'Este campo es requerido' },
+        validation: {
+          required: 'Este campo es requerido',
+          ordenCompraMax: 'Máximo 50 caracteres',
+          remisionMax: 'Máximo 50 caracteres',
+          comentarioMax: 'Máximo 500 caracteres',
+        },
         toasts: {
           createSuccess: {
             title: 'Factura creada',
@@ -2401,6 +2433,11 @@ export const es: AppDict = {
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
           metodoPago: 'Método de pago',
+          ordenCompra: 'Orden de compra',
+          remision: 'Remisión',
+          asesor: 'Asesor',
+          resolucion: 'Resolución',
+          comentario: 'Comentario',
         },
         notFound: {
           title: 'Factura no encontrada',
@@ -2517,7 +2554,7 @@ export const es: AppDict = {
       form: {
         createHint: 'Datos principales de la nueva nota',
         editHint: 'Actualiza los datos de la nota',
-        tabs: { detalles: 'Detalles', pagos: 'Pagos', informacion: 'Más información' },
+        tabs: { detalles: 'Detalles', pagos: 'Pagos' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2525,6 +2562,7 @@ export const es: AppDict = {
           documentoReferencia: 'Documento de referencia',
           documentoReferenciaPlaceholder: 'Selecciona la factura…',
           documentoReferenciaDisabled: 'Selecciona primero un cliente',
+          documentoReferenciaEmpty: 'El cliente no tiene facturas aprobadas con ese número.',
           sede: 'Sede',
           sedePlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
@@ -2574,14 +2612,7 @@ export const es: AppDict = {
       saveAll: 'Guardar pagos',
       pendingSuffix: 'sin guardar',
       anulado: 'Anulado',
-      anular: 'Anular',
       confirmDelete: '¿Eliminar este pago?',
-      confirmAnular: {
-        header: 'Anular pago',
-        message:
-          'El pago dejará de contar y lo pagado volverá a quedar pendiente. La fila se conserva con su valor. ¿Anularlo?',
-        accept: 'Anular pago',
-      },
       columns: {
         id: 'ID',
         cuentaBanco: 'Cuenta de banco',
@@ -2614,11 +2645,6 @@ export const es: AppDict = {
           title: 'Pagos sin registrar',
           desc: 'El documento se guardó, pero algunos pagos no se registraron. Edítalo para agregarlos',
         },
-        anularSuccess: {
-          title: 'Pago anulado',
-          desc: 'El pago dejó de contar y lo pagado volvió a quedar pendiente',
-        },
-        anularError: { title: 'Error al anular', desc: 'No se pudo anular el pago' },
       },
     },
     posDocumento: {
@@ -2626,7 +2652,7 @@ export const es: AppDict = {
         createHint: 'Datos principales del nuevo documento',
         editHint: 'Actualiza los datos del documento',
         pagosHint: 'Cobros recibidos en el punto de venta',
-        tabs: { detalles: 'Detalles', pagos: 'Pagos', informacion: 'Más información' },
+        tabs: { detalles: 'Detalles', pagos: 'Pagos' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2720,7 +2746,6 @@ export const es: AppDict = {
         createTitle: 'Nueva factura recurrente',
         editTitle: 'Editar factura recurrente',
         sectionHint: 'Plantilla desde la que se generan las facturas de venta',
-        masInformacion: { title: 'Más información', hint: 'opcional' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2776,6 +2801,8 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           asesor: 'Asesor',
           comentario: 'Comentario',
+          ordenCompra: 'Orden de compra',
+          remision: 'Remisión',
         },
         notFound: {
           title: 'Factura no encontrada',
@@ -2818,6 +2845,8 @@ export const es: AppDict = {
           sedePlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
         },
         tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
         validation: { required: 'Este campo es requerido' },
@@ -2858,6 +2887,8 @@ export const es: AppDict = {
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
           metodoPago: 'Método de pago',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
         },
         notFound: {
           title: 'Factura no encontrada',
@@ -3146,7 +3177,6 @@ export const es: AppDict = {
         createTitle: 'Nueva factura recurrente',
         editTitle: 'Editar factura recurrente',
         sectionHint: 'Plantilla desde la que se generan las facturas',
-        adicionales: { title: 'Datos adicionales', hint: 'opcional' },
         fields: {
           proveedor: 'Proveedor',
           proveedorPlaceholder: 'Buscar proveedor…',
@@ -3199,6 +3229,7 @@ export const es: AppDict = {
           centroCosto: 'Centro de costo',
           sede: 'Sede',
           ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
         },
         notFound: {
           title: 'Factura no encontrada',
@@ -4145,17 +4176,16 @@ export const es: AppDict = {
           nombrePlaceholder: 'Cómo identificar esta programación',
           fechaDesde: 'Fecha desde',
           fechaHasta: 'Fecha hasta',
-          fechaHastaPeriodo: 'Fecha hasta periodo',
-          fechaHastaPeriodoHint: 'Cierre del periodo, puede ir más allá',
           comentario: 'Comentario',
           seleccionar: 'Seleccionar…',
         },
         validation: {
           required: 'Este campo es obligatorio',
           rangoInvalido: 'La fecha desde no puede ser posterior a la fecha hasta',
-          duracionPeriodo: 'El periodo debe durar exactamente los días del grupo',
-          duracionEsperada: 'esperados',
-          duracionActual: 'actual',
+          duracionPeriodo:
+            'Para este grupo el periodo debe durar {requeridos} días y el rango tiene {duracion}',
+          usarFechaSugerida: 'Usar {fecha}',
+          usarFechaSugeridaTitle: 'Llevar la fecha hasta al cierre del periodo',
         },
         toasts: {
           createSuccess: {
@@ -4179,12 +4209,17 @@ export const es: AppDict = {
         },
       },
       resumen: {
-        sinNombre: 'Programación sin nombre',
         conceptos: 'Conceptos que se liquidan',
         sinConceptos: 'No hay conceptos activos',
         labels: {
+          id: 'ID',
+          nombre: 'Nombre',
           fechaDesde: 'Desde',
           fechaHasta: 'Hasta',
+          pagoTipo: 'Tipo de pago',
+          grupo: 'Grupo',
+          periodo: 'Periodo',
+          dias: 'Días',
           contratos: 'Contratos',
           devengado: 'Devengado',
           deduccion: 'Deducción',
@@ -4209,6 +4244,7 @@ export const es: AppDict = {
         salarioPromedio: 'Salario promedio',
         cesantiaPropuesta: 'Cesantía propuesta',
         interesPropuesto: 'Interés propuesto',
+        primaPropuesta: 'Prima propuesta',
         banderasHint: 'Desmarca lo que no aplique a este empleado en este periodo',
         sections: { horas: 'Horas y recargos', banderas: 'Conceptos del empleado' },
         horas: {
@@ -4248,14 +4284,16 @@ export const es: AppDict = {
         createTitle: 'Nuevo adicional',
         editTitle: 'Editar adicional',
         subtitle: 'Se suma a la liquidación de este periodo',
+        import: {
+          title: 'Importar adicionales',
+          subtitle: 'Sube el Excel con los adicionales de este periodo',
+        },
         fields: {
           contrato: 'Empleado',
           contratoPlaceholder: 'Buscar por nombre o identificación…',
           concepto: 'Concepto',
           conceptoPlaceholder: 'Buscar concepto…',
           valor: 'Valor',
-          horas: 'Horas',
-          horasHint: 'Solo si el concepto se liquida por horas',
           detalle: 'Detalle',
           aplicaDiaLaborado: 'Proporcional a los días laborados',
         },
@@ -4265,12 +4303,19 @@ export const es: AppDict = {
         },
         columns: {
           id: 'ID',
-          empleado: 'Empleado',
+          identificacion: 'Identificación',
+          empleado: 'Nombre',
+          contrato: 'Cont',
+          conceptoId: 'Cód',
           concepto: 'Concepto',
           valor: 'Valor',
-          horas: 'Horas',
           detalle: 'Detalle',
-          aplicaDiaLaborado: 'Proporcional',
+          aplicaDiaLaborado: 'ADL',
+        },
+        leyenda: {
+          titulo: 'Abreviaturas',
+          contenido:
+            'Cont: contrato · Cód: código del concepto · ADL: aplica día laborado (el valor se prorratea por los días trabajados)',
         },
         toasts: {
           createSuccess: { title: 'Adicional creado', desc: 'Se agregó a la programación' },
@@ -4281,8 +4326,8 @@ export const es: AppDict = {
       },
       importarHoras: {
         title: 'Importar horas',
-        subtitle: 'Subí el Excel con las horas del periodo',
-        plantillaNoDisponible: 'La plantilla se pide con la programación abierta (pendiente)',
+        subtitle:
+          'Descarga la plantilla con los empleados de esta programación, ajusta sus horas y súbela',
       },
       acciones: {
         generar: 'Generar',
@@ -4293,9 +4338,7 @@ export const es: AppDict = {
         importarHoras: 'Importar horas',
         imprimir: 'PDF de la programación',
         imprimirNominas: 'PDF de las nóminas',
-        exportRenglones: 'Excel de empleados',
-        exportNomina: 'Excel de nóminas',
-        exportNominaDetalle: 'Excel de conceptos',
+        utilidades: 'Utilidades',
         confirmaciones: {
           generar: {
             header: 'Generar la nómina',
@@ -4351,6 +4394,7 @@ export const es: AppDict = {
       renglones: {
         cargarContratos: 'Cargar contratos',
         verNomina: 'Ver nómina',
+        nominaResumen: { title: 'Nómina' },
         confirmEliminar: {
           header: 'Quitar empleados',
           message: '¿Quitar los renglones seleccionados de la programación?',
@@ -4364,6 +4408,16 @@ export const es: AppDict = {
           titulo: 'Abreviaturas',
           contenido:
             'DT: días de transporte · D: diurna · N: nocturna · FD: festiva diurna · FN: festiva nocturna · ED: extra diurna · EN: extra nocturna · EFD: extra festiva diurna · EFN: extra festiva nocturna · RN: recargo nocturno · RFD: recargo festivo diurno · RFN: recargo festivo nocturno',
+        },
+        excel: {
+          action: 'Excel',
+          detalle: 'Detalle',
+          nomina: 'Nómina',
+          nominaDetalle: 'Nómina detalle',
+        },
+        marcas: {
+          ingresoRetiro: 'El contrato ingresó o se retiró dentro del periodo',
+          errorTerminacion: 'La terminación del contrato tiene un error',
         },
         toasts: {
           cargarSuccess: { title: 'Contratos cargados', desc: 'empleados en la programación' },
@@ -4456,9 +4510,11 @@ export const es: AppDict = {
         vacacion: 'Vacaciones',
       },
       resumen: {
-        sinEmpleado: 'Sin empleado',
         prestacionesTitle: 'Prestaciones liquidadas',
         labels: {
+          id: 'ID',
+          empleado: 'Empleado',
+          identificacion: 'Identificación',
           contrato: 'Contrato',
           fecha: 'Fecha',
           desde: 'Desde',
@@ -4471,9 +4527,34 @@ export const es: AppDict = {
           adicion: 'Adiciones',
           deduccion: 'Deducciones',
           total: 'Total a pagar',
+          comentario: 'Comentario',
+        },
+      },
+      form: {
+        editTitle: 'Editar liquidación',
+        sectionHint: 'Desde cuándo se cuenta cada prestación. Los valores los calcula el sistema.',
+        fields: {
+          fechaUltimoPago: 'Último pago',
+          fechaUltimoPagoCesantia: 'Último pago de cesantías',
+          fechaUltimoPagoPrima: 'Último pago de prima',
+          fechaUltimoPagoVacacion: 'Último pago de vacaciones',
+          comentario: 'Comentario',
+        },
+        toasts: {
+          editSuccess: {
+            title: 'Liquidación actualizada',
+            desc: 'Reliquidá para rehacer el cálculo',
+          },
+          editError: { title: 'Error al guardar', desc: 'No se pudo actualizar la liquidación' },
+          loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la liquidación' },
+          noEditable: {
+            title: 'Liquidación no editable',
+            desc: 'Solo se edita una liquidación en borrador',
+          },
         },
       },
       workspace: {
+        tabs: { adicionales: 'Adicionales' },
         adicionalesHint: 'Conceptos que suman o restan al total, cargados a mano.',
         notFound: {
           title: 'Liquidación no encontrada',
@@ -4486,7 +4567,6 @@ export const es: AppDict = {
         desgenerar: 'Desgenerar',
         aprobar: 'Aprobar',
         desaprobar: 'Desaprobar',
-        imprimir: 'Imprimir',
         confirmaciones: {
           generar: {
             header: '¿Generar la liquidación?',
@@ -4507,10 +4587,6 @@ export const es: AppDict = {
           desaprobar: {
             header: '¿Desaprobar la liquidación?',
             message: 'Se revierte el cierre y la liquidación vuelve a quedar generada.',
-          },
-          eliminar: {
-            header: '¿Eliminar la liquidación?',
-            message: 'El contrato terminado queda sin su liquidación.',
           },
         },
         toasts: {
@@ -4597,13 +4673,13 @@ export const es: AppDict = {
       presentaciones: { sucursal: 'Por sucursal', unica: 'Única' },
       cotizaciones: {
         pension: 'Pensión',
-        solidaridad: 'Fondo de solidaridad',
-        subsistencia: 'Fondo de subsistencia',
-        voluntarioAfiliado: 'Voluntario afiliado',
-        voluntarioAportante: 'Voluntario aportante',
+        solidaridad: 'Solidaridad',
+        subsistencia: 'Subsistencia',
+        voluntarioAfiliado: 'Vol. afiliado',
+        voluntarioAportante: 'Vol. aportante',
         salud: 'Salud',
-        riesgos: 'Riesgos laborales',
-        caja: 'Caja de compensación',
+        riesgos: 'Riesgos',
+        caja: 'Caja',
         sena: 'SENA',
         icbf: 'ICBF',
       },
@@ -4641,15 +4717,19 @@ export const es: AppDict = {
         },
       },
       resumen: {
-        cotizacionesTitle: 'Cotización del periodo',
+        valoresTitle: 'Valores',
         labels: {
+          sucursal: 'Sucursal',
+          mes: 'Mes',
+          anio: 'Año',
+          presentacion: 'Forma de presentación',
+          entidadRiesgo: 'Entidad riesgo',
+          entidadSena: 'Entidad SENA',
+          entidadIcbf: 'Entidad ICBF',
           empleados: 'Empleados',
           contratos: 'Contratos',
           lineas: 'Líneas',
-          baseCotizacion: 'Base de cotización',
-          entidadRiesgo: 'ARL',
-          entidadSena: 'SENA',
-          entidadIcbf: 'ICBF',
+          baseCotizacion: 'Base cotización',
           total: 'Total',
         },
       },
@@ -4669,10 +4749,7 @@ export const es: AppDict = {
         aprobar: 'Aprobar',
         desaprobar: 'Desaprobar',
         planoOperador: 'Plano del operador',
-        imprimir: 'Imprimir',
-        exportContratos: 'Exportar contratos',
-        exportDetalles: 'Exportar detalle',
-        exportEntidades: 'Exportar entidades',
+        utilidades: 'Utilidades',
         confirmaciones: {
           generar: {
             header: '¿Generar el aporte?',
@@ -4710,6 +4787,7 @@ export const es: AppDict = {
           },
         },
       },
+      excel: { action: 'Excel', detalle: 'Detalle' },
       contratos: {
         cargarContratos: 'Cargar contratos',
         leyenda: {
@@ -4731,7 +4809,6 @@ export const es: AppDict = {
         },
         columns: {
           id: 'ID',
-          codigo: 'Código',
           identificacion: 'Identificación',
           empleado: 'Empleado',
           contrato: 'Contrato',
@@ -4751,45 +4828,52 @@ export const es: AppDict = {
         },
       },
       trazabilidad: {
-        verNominas: 'Ver nóminas',
-        title: 'Nóminas del periodo',
-        subtitle: 'De dónde sale el IBC de este contrato',
-        total: 'Total',
-        empty: {
-          title: 'Sin nóminas en el periodo',
-          sub: 'Este contrato no tiene nóminas liquidadas dentro del periodo del aporte.',
-        },
-        nominas: {
-          title: 'Nóminas liquidadas',
+        verDetalle: 'Ver detalle',
+        title: 'Nóminas de',
+        sinEmpleado: 'Nóminas del periodo',
+        subtitle: 'De dónde sale el IBC de este contrato en el periodo del aporte',
+        total: 'Totales',
+        documentos: {
+          title: 'Documentos',
+          empty: 'No hay documentos registrados',
           columns: {
+            id: 'ID',
+            tipo: 'Tipo',
             numero: 'Número',
             desde: 'Desde',
             hasta: 'Hasta',
+            contrato: 'Contrato',
             salario: 'Salario',
             ibc: 'IBC',
             ibp: 'IBP',
             devengado: 'Devengado',
             deduccion: 'Deducción',
-            total: 'Neto',
+            neto: 'Neto',
           },
         },
-        conceptos: {
-          title: 'Conceptos liquidados',
-          empty: 'Las nóminas del periodo no tienen conceptos cargados.',
+        detalles: {
+          title: 'Detalles del documento',
+          empty: 'No hay detalles registrados para estos documentos',
           columns: {
-            nomina: 'Nómina',
+            id: 'ID',
+            tipo: 'Tipo',
+            numero: 'Número',
+            conceptoId: 'Concepto ID',
             concepto: 'Concepto',
-            dias: 'Días',
+            detalle: 'Detalle',
+            porcentaje: '%',
             horas: 'Horas',
-            ibc: 'IBC',
-            ibp: 'IBP',
+            dias: 'Días',
+            valorHora: 'Vr. hora',
             devengado: 'Devengado',
             deduccion: 'Deducción',
+            ibc: 'IBC',
+            ibp: 'IBP',
           },
         },
       },
       entidades: {
-        columns: { tipo: 'Tipo', entidad: 'Entidad', cotizacion: 'Cotización' },
+        columns: { id: 'ID', tipo: 'Tipo', entidad: 'Entidad', cotizacion: 'Cotización' },
         subtotal: 'Subtotal',
         totalGeneral: 'Total general',
         empty: {
@@ -4955,7 +5039,7 @@ export const es: AppDict = {
     nominaDetalle: {
       empty: 'Esta nómina no tiene conceptos liquidados',
       columns: {
-        linea: '#',
+        linea: 'ID',
         codigo: 'Cód',
         concepto: 'Concepto',
         detalle: 'Detalle',
@@ -4969,7 +5053,7 @@ export const es: AppDict = {
         deduccion: 'Deducción',
         basePrestacion: 'IBP',
         baseCotizacion: 'IBC',
-        baseImpuesto: 'Base impuesto',
+        baseImpuesto: 'Base',
       },
       tooltips: {
         credito: 'Código del crédito',
@@ -5609,6 +5693,7 @@ export const es: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
+        pago: 'Pago',
         afectado: 'Afectado',
         pendiente: 'Pendiente',
       },
@@ -5632,6 +5717,7 @@ export const es: AppDict = {
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
+        pago: 'Pago',
         saldo: 'Saldo',
       },
     },
@@ -6005,6 +6091,40 @@ export const es: AppDict = {
         },
       },
     },
+    validarSaldos: {
+      porTipo: {
+        cobrar: {
+          description:
+            'Este proceso recalcula el pago, lo afectado y el pendiente de cada cuenta por cobrar desde su origen y corrige los que no cuadren con lo guardado.',
+          confirmMessage:
+            'Se recalcularán los saldos de todas las cuentas por cobrar y se corregirán los que no cuadren. La operación puede tardar unos segundos.',
+          successDesc: 'Los saldos de las cuentas por cobrar se revisaron y corrigieron.',
+        },
+        pagar: {
+          description:
+            'Este proceso recalcula el pago, lo afectado y el pendiente de cada cuenta por pagar desde su origen y corrige los que no cuadren con lo guardado.',
+          confirmMessage:
+            'Se recalcularán los saldos de todas las cuentas por pagar y se corregirán los que no cuadren. La operación puede tardar unos segundos.',
+          successDesc: 'Los saldos de las cuentas por pagar se revisaron y corrigieron.',
+        },
+      },
+      name: 'Validar saldos',
+      run: 'Validar',
+      confirm: {
+        header: '¿Validar saldos?',
+        accept: 'Validar',
+        cancel: 'Cancelar',
+      },
+      toasts: {
+        success: {
+          title: 'Validación completada',
+        },
+        error: {
+          title: 'No se pudo validar',
+          desc: 'Ocurrió un error al validar los saldos. Intenta de nuevo.',
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:
@@ -6274,6 +6394,29 @@ export const es: AppDict = {
     },
   },
   inicio: {
+    carteraResumen: {
+      porTipo: {
+        cobrar: {
+          titulo: 'Cuentas por cobrar',
+          cifra: 'pendiente por cobrar',
+          sinPendiente: 'No hay cuentas por cobrar pendientes',
+          verInforme: 'Ver cuentas por cobrar',
+        },
+        pagar: {
+          titulo: 'Cuentas por pagar',
+          cifra: 'pendiente por pagar',
+          sinPendiente: 'No hay cuentas por pagar pendientes',
+          verInforme: 'Ver cuentas por pagar',
+        },
+      },
+      saldoAl: 'Saldo al',
+      vigente: 'Vigente',
+      vencido: 'Vencido',
+      error: {
+        title: 'No se pudo cargar el saldo',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Configuración rápida',

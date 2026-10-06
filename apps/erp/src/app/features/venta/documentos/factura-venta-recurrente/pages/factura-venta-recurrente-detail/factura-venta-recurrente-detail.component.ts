@@ -46,6 +46,8 @@ interface CabeceraView {
   readonly metodoPago: string | null;
   /** Nombre corto del asesor, resuelto contra su catálogo (el read solo trae la FK). */
   readonly asesor: string | null;
+  readonly ordenCompra: string | null;
+  readonly remision: string | null;
   readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -169,6 +171,10 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
+  protected onNew(): void {
+    this.navigate(this.document().routes.new);
+  }
+
   private loadDocumento(id: number): void {
     // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
     // Los nombres de los FK (plazo de pago, método de pago, sede) llegan en los
@@ -191,6 +197,8 @@ export class FacturaVentaRecurrenteDetailComponent implements OnInit {
             almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             asesor: read.asesor != null ? (asesores.get(read.asesor) ?? null) : null,
+            ordenCompra: read.orden_compra ?? null,
+            remision: read.remision ?? null,
             comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,

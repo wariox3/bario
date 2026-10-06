@@ -17,7 +17,14 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
-import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -29,9 +36,9 @@ import {
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
-import { ErpApiSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, ErpAsesorSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
+import { ErpSelectDataService, SELECT_ENDPOINTS, resolucionLabel } from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -41,7 +48,11 @@ import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
-import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-venta.constants';
+import {
+  METODO_PAGO_ENDPOINT,
+  RESOLUCION_ENDPOINT,
+  SEDE_ENDPOINT,
+} from '../../factura-venta.constants';
 import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
@@ -77,6 +88,7 @@ import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { facturaVentaToFormValue, formValueToPayload } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de venta.
@@ -99,17 +111,22 @@ import type { FacturaVentaRead } from '../../factura-venta.model';
   selector: 'app-factura-venta-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TabsModule,
     FieldErrorComponent,
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
+    ErpAsesorSelectComponent,
+    InputTextModule,
+    TextareaModule,
     ComercialDocumentoDetallesComponent,
     DocumentoPagosComponent,
     ComercialDocumentoResumenComponent,
@@ -162,6 +179,11 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly resolucionEndpoint = RESOLUCION_ENDPOINT;
+  protected readonly resolucionLabel = resolucionLabel;
+
+  /** Solo resoluciones de venta, como el ERP anterior (la de compra es del documento soporte). */
+  protected readonly resolucionParams = { venta: 'True' } as const;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -232,6 +254,12 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    // Más información: opcionales, con el largo que acepta el backend.
+    orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    remision: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    asesor: this.fb.control<ErpSelectOption | null>(null),
+    resolucion: this.fb.control<ErpSelectOption | null>(null),
+    comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
     pagos: new FormArray<PagoGroup>([]),
   });

@@ -8,7 +8,7 @@ import { TabsModule } from 'primeng/tabs';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -43,6 +43,7 @@ import type {
 } from '../../servicio-documento.model';
 import { createDetalleGroup, type DetalleGroup } from '../../servicio-documento-detalle.form';
 import { ServicioDocumentoDetallesComponent } from '../../components/servicio-documento-detalles/servicio-documento-detalles.component';
+import { ServicioDocumentoResumenComponent } from '@erp/features/venta/documentos/_shared/servicio/components/servicio-documento-resumen/servicio-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de un **documento de servicio** (vigilancia):
@@ -59,15 +60,18 @@ import { ServicioDocumentoDetallesComponent } from '../../components/servicio-do
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  * Las líneas de servicio (detalles) se editan en `app-servicio-documento-detalles`.
  */
+
 @Component({
   selector: 'app-servicio-documento-form',
   standalone: true,
   imports: [
+    ServicioDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     TabsModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputNumberModule,
     SelectModule,
     FieldErrorComponent,

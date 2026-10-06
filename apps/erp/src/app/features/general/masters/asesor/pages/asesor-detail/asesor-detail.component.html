@@ -12,13 +12,26 @@
     (onClick)="onBack()"
   />
   @if (asesor(); as a) {
-    <p-button
-      type="button"
-      [label]="t().common.actions.edit"
-      icon="pi pi-pencil"
-      size="small"
-      (onClick)="onEdit()"
-    />
+    <p-buttongroup>
+      <p-button
+        type="button"
+        [label]="t().common.actions.new"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-plus"
+        size="small"
+        (onClick)="onNew()"
+      />
+      <p-button
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        (onClick)="onEdit()"
+      />
+    </p-buttongroup>
   }
 </header>
 

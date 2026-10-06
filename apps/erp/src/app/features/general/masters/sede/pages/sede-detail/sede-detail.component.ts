@@ -8,11 +8,12 @@ import { masterNav } from '@erp/core/erp-modules';
 import { SedeService } from '../../sede.service';
 import { SEDE_SEGMENT } from '../../sede.constants';
 import type { Sede } from '../../sede.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-sede-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './sede-detail.component.html',
   styleUrl: './sede-detail.component.scss',
 })
@@ -57,6 +58,10 @@ export class SedeDetailComponent implements OnInit {
     const s = this.sede();
     if (!s) return;
     this.nav.ir('editar', s.id);
+  }
+
+  protected onNew(): void {
+    this.nav.ir('nuevo');
   }
 
   private loadSede(id: number): void {

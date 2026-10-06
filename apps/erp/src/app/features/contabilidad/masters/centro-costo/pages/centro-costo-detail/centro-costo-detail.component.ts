@@ -8,11 +8,12 @@ import type { AppDict } from '@erp/i18n';
 import { CentroCostoService } from '../../centro-costo.service';
 import { CENTRO_COSTO_LIST_PATH } from '../../centro-costo.constants';
 import type { CentroCosto } from '../../centro-costo.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-centro-costo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './centro-costo-detail.component.html',
   styleUrl: './centro-costo-detail.component.scss',
 })
@@ -69,6 +70,10 @@ export class CentroCostoDetailComponent implements OnInit {
     const c = this.centroCosto();
     if (!c) return;
     this.navigate(...CENTRO_COSTO_LIST_PATH, 'editar', c.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...CENTRO_COSTO_LIST_PATH, 'nuevo');
   }
 
   private loadCentroCosto(id: number): void {

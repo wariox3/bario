@@ -22,21 +22,18 @@ export const NOMINA_ELECTRONICA_INFORME_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '70px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'numero',
     headerKey: `${I18N}.columns.numero`,
     type: 'text',
     width: '100px',
-    sortable: true,
   },
   {
     field: 'fecha',
     headerKey: `${I18N}.columns.fecha`,
     type: 'date',
     width: '110px',
-    sortable: true,
   },
   {
     field: 'contacto_numero_identificacion',
@@ -55,7 +52,6 @@ export const NOMINA_ELECTRONICA_INFORME_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '90px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'salario',

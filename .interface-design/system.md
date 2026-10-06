@@ -299,6 +299,20 @@ tabular-nums`). El número dice qué hay, el clic dice qué hacer. Tres estados,
 - **Cuándo NO:** si el barrido es destructivo o costoso (bulk por columna = decenas de escrituras de
   un clic), no va como toggle directo — eso pide confirmación explícita.
 
+## Patrón: listado (`<lib-list-shell>`, un solo recuadro)
+
+`libs/feature-base/src/lib/list-shell/` — breadcrumb, título suelto (`1.125rem/700` navy) y **un
+solo recuadro** (`.list-shell__frame`: fondo blanco, borde `rgba(20 48 73 / 0.12)`, radio 12px)
+con la botonera como cabecera y la tabla debajo. Sin card envolvente: card → recuadro → tabla eran
+tres marcos para una sola pieza (se probó en contactos y pasó a estándar, 2026-10-06).
+
+- El `<lib-data-toolbar toolbar>` trae su padding (`0.7rem 1rem`) y su divisor con las filas.
+- Un contenedor propio en el slot (`div[toolbar]` con filtros + botones de una utilidad, o el panel
+  de parámetros de un informe) recibe del shell el divisor; si es un `div`, también el padding. El
+  `lib-data-toolbar` que lleve dentro suelta su marco para no duplicarlo.
+- Una página que no pueda usar el shell (Enviar factura electrónica, por su tab-strip) copia el
+  mismo chrome: título suelto + un recuadro, y el tab-strip encabezándolo.
+
 ## Patrón: barra de acciones pegajosa (`<lib-page-actions>`)
 
 `libs/ui/src/lib/components/page-actions/` (vía `@reddoc/ui`) — la fila de botones de una página
@@ -343,6 +357,9 @@ arriba fuera de vista. Se usa envolviendo los botones, sin nada más:
   y no vale despertar la detección de cambios para alternar una clase en el propio host.
 - El contenido proyectado queda dentro del `<form>` en el DOM real: un botón `type="submit"` sigue
   enviando. Para algo alineado a la derecha, un `<div class="ml-auto">` dentro.
+- **Botones compactos (32px)**, a la escala del toolbar de los listados. Es el tamaño global de
+  `.p-button` (`libs/styles/src/primeng/_button.scss`), así que la barra no hace nada especial. La
+  única excepción es `fluid` (43px), el llamado principal de las páginas de auth.
 
 ## Patrón: ficha de detalle en grupos (card única)
 
@@ -599,9 +616,10 @@ campos se sostiene; con 8 se cae por tres motivos a la vez, y ninguno se arregla
 
 La forma:
 
-- **Recuadro hermano del de la tabla** — mismo `border: 1px solid rgba(20 48 73 / 0.12)` y
-  `radius: 12px` que `.list-shell__table`. Dos piezas de la misma familia dentro de la card, no una
-  pieza y un montón de campos sueltos.
+- **Cabecera del recuadro del informe** — va en el slot `[toolbar]` de `<lib-list-shell>`, que le
+  pone el marco (`.list-shell__frame`) y el divisor con la tabla, igual que al toolbar de un
+  listado. Sin borde propio: una sola pieza "consulta + resultados", no un montón de campos sueltos
+  ni una caja dentro de otra.
 - **Una banda por pregunta**, separadas por el filete estándar `rgba(20 48 73 / 0.08)`. Cada banda
   lleva su **micro-encabezado arriba** y los campos debajo — el mismo `group-label` del app-switcher
   y de la ficha de detalle (uppercase `0.65rem/600`, muted, `opacity .7`), que se distingue de la
@@ -648,7 +666,7 @@ Lo que hay que copiar de `<lib-data-table>`, y por qué:
 - **Encadenar el flex hasta el scrollport.** `:host { display:flex; flex-direction:column; flex:1;
 min-height:0; overflow:hidden }` y el wrapper con `flex:1; min-height:0; overflow:auto`.
   **`flex: 1` en el host no es opcional:** `.list-shell__table` es un flex column con `flex:1` que
-  ocupa el alto de la card, y un hijo sin `flex` mide su contenido — la tabla queda pegada arriba y
+  ocupa el alto del recuadro, y un hijo sin `flex` mide su contenido — la tabla queda pegada arriba y
   el borde del recuadro dibuja un rectángulo vacío debajo. Con datos se disimula; **con el informe
   vacío es lo único que se ve**. Fue un bug real (2026-09-04), heredado de `saldos-cuenta-table`,
   donde no se notaba porque no había paginador debajo.
@@ -722,29 +740,46 @@ nuevos, así que pantalla y archivo dejan de coincidir sin que nadie avise.
   consulta apaga. El aviso viaja como `input` opcional (`hint`) de la botonera compartida, con
   `@if` — vacío no pinta nada y no cuesta ranura de `gap`.
 
-## Patrón: documento en una sola card (cabecera + tabs + resumen único)
+## Patrón: documento en dos cards (cabecera · líneas con su botonera) + resumen flotante
 
-Formulario y ficha de todo documento transaccional con líneas. **Una sola card**: arriba la
-cabecera, debajo las vistas del documento en tabs y, bajo los tabs, un único resumen. Ejemplo vivo:
+Formulario y ficha de todo documento transaccional con líneas. Ejemplo vivo:
 `venta/documentos/factura-venta` (form y detail). Fuera de este patrón: nómina, seguridad social
 y nómina electrónica, que no tienen tabla de líneas.
 
-- **Por qué una card:** cabecera y líneas son el mismo documento. Dos cards apiladas lo parten en
-  dos piezas cosidas y duplican el chrome (chip de ícono + título) solo para decir «Detalles».
-- **La banda de tabs** va dentro de la `<section>` de la cabecera, tras los campos:
-  `border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4` con `<p-tabs>`.
-  El filete separa sin cortar la card.
+- **Card 1, cabecera:** chip de ícono + título y los campos del documento.
+- **"Más información"** (2026-10-06): los opcionales que menos se tocan van plegados al pie de la
+  card 1 con `<app-mas-informacion [campos]="[…]">` (`features/documentos/components/`), nunca en
+  una pestaña junto a Detalles/Pagos. Qué va adentro sale del ERP anterior: el comentario siempre;
+  en las facturas de venta, además orden de compra, remisión, asesor (y resolución en la factura);
+  en remisión, el asesor; en documento soporte, la resolución; en factura de compra, la orden de
+  compra. El componente se abre solo al guardar si uno de sus `campos` es inválido, antes de que
+  `libFocusInvalid` lleve al campo. En la **ficha** esos valores van en la grilla de la cabecera,
+  a la vista con el resto (ningún campo se oculta).
+- **Card 2, líneas** (2026-10-06, antes iban en la misma card): sigue el estándar de los listados
+  (`<lib-list-shell>`). Las tabs y la botonera de la tabla forman la **cabecera** de la card, con
+  su padding y su divisor, y la tabla es el **cuerpo**, sin recuadro propio. Se separó porque con
+  la tabla dentro de la card de campos quedaban tres marcos anidados (card → padding → recuadro).
+  - `<p-tabs class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0
+max-[576px]:[&_.p-tablist-tab-list]:px-4">`: los tabs alinean con el gutter de la card y el
+    panel no suma el padding de Aura.
+  - Las tablas (`comercial-documento-detalles`, `documento-pagos`, sus gemelas de solo lectura y
+    las de contable, inventario, servicio y depreciación) ya traen la botonera como banda
+    (`border-b px-5 py-2.5`) y la tabla sin borde. Una botonera propia de la página (cierre,
+    depreciación) usa la misma banda.
+  - Lo que no es tabla (la pestaña Información, un paginador) pone su propio padding o filete.
+- **Resumen flotante, fuera de las cards**, siempre (también con un tab único): tras la card de
+  líneas, la caja `w-72` alineada a la derecha. La tabla ya no lo pinta: expone `resumen` y
+  `hayLineas`, y la página los lee por referencia de plantilla —`<app-…-detalles #detallesTabla>`
+  y `@if (detallesTabla.hayLineas()) { <app-…-resumen [resumen]="detallesTabla.resumen()" /> }`—.
+  Con dos tablas (factura de compra: ítems y cuentas) se muestra el de la pestaña activa.
 - **Tab único también:** un documento con una sola tabla lleva igual su tab (`Detalles`,
   `Líneas`, `Activos`). Todos los documentos se leen igual y sumar Pagos o Más información después
   no cambia el esqueleto. La etiqueta reusa la clave i18n que titulaba la card eliminada.
-- **Acciones de la tabla** (cargar, eliminar todos) y su hint van en una fila al tope del panel:
-  `mb-4 flex flex-wrap items-center justify-end gap-2`, hint primero con `mr-auto`.
+- **Acciones de la tabla** (cargar, eliminar todos) y su hint van en la banda de cabecera,
+  hint primero con `mr-auto`.
 - **Resumen fuera de los tabs:** el mismo en todas las vistas, como en el ERP anterior. Lo calcula
   la página (dueña de los `FormArray`), no la tabla: `calcularResumen` + `totalCantidad` para las
-  líneas y `calcularPagos` (`pagos/pago.calculo.ts`) para recibido/saldo/exceso. Va en
-  `@if (…) { <div class="mt-4"> <app-comercial-documento-resumen …/> </div> }`. Las tablas
-  editables traen `resumenEnabled` (default `true`): el form que pinta el resumen afuera lo apaga.
-  Con un tab único el resumen interno de la tabla es visualmente idéntico y se deja.
+  líneas y `calcularPagos` (`pagos/pago.calculo.ts`) para recibido/saldo/exceso. Si además tiene pagos, la página lo calcula ella misma.
 - **Chip de conteo en el tab** que esconde algo que importa (Pagos): `font-mono tabular-nums` sobre
   `bg-[rgba(20,48,73,0.06)]`; en `bg-red-50 text-red-600` cuando lo que esconde necesita atención (pagos que superan el total —no se podrá aprobar— o filas inválidas ya tocadas). El error se ve desde otra pestaña.
 - **Guardar nunca queda muerto:** el botón solo espera a `isSaving` y a las tablas

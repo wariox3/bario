@@ -9,7 +9,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   extractErrorMessage,
   FormErrorService,
@@ -36,6 +36,7 @@ import type { DepreciacionLineaRead, DepreciacionLineaView } from '../../depreci
 import { depreciacionToFormValue, formValueToPayload } from '../../depreciacion.mapper';
 import type { DepreciacionRead } from '../../depreciacion.model';
 import { DepreciacionService } from '../../depreciacion.service';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Depreciación.
@@ -55,11 +56,13 @@ import { DepreciacionService } from '../../depreciacion.service';
   selector: 'app-depreciacion-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TabsModule,
     TextareaModule,
     FieldErrorComponent,

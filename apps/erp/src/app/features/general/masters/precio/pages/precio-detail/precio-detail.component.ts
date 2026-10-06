@@ -22,11 +22,19 @@ import type { AppDict } from '@erp/i18n';
 import { PrecioService } from '../../precio.service';
 import { PRECIO_LIST_PATH } from '../../precio.constants';
 import type { Precio } from '../../precio.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-precio-detail',
   standalone: true,
-  imports: [ButtonModule, MenuModule, BreadcrumbComponent, DatePipe, PrecioItemsComponent],
+  imports: [
+    ButtonGroupModule,
+    ButtonModule,
+    MenuModule,
+    BreadcrumbComponent,
+    DatePipe,
+    PrecioItemsComponent,
+  ],
   templateUrl: './precio-detail.component.html',
   styleUrl: './precio-detail.component.scss',
 })
@@ -108,6 +116,10 @@ export class PrecioDetailComponent implements OnInit {
     const p = this.precio();
     if (!p) return;
     this.navigate(...PRECIO_LIST_PATH, 'editar', p.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...PRECIO_LIST_PATH, 'nuevo');
   }
 
   private loadPrecio(id: number): void {

@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { EMPTY, filter, from, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -21,7 +22,6 @@ import {
   ToastService,
   formatCop,
   formatFechaCorta,
-  formatFechaLarga,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
@@ -29,6 +29,7 @@ import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
 import { CONTRATO_LIST_PATH } from '../../contrato.constants';
 import type { Contrato } from '../../contrato.model';
+import type { TerminarContratoModalData } from '../../components/terminar-contrato-modal/terminar-contrato-modal.component';
 
 /** Una de las cuatro fechas de último pago: su etiqueta i18n y el valor ya formateado. */
 interface ParametroInicial {
@@ -48,7 +49,7 @@ interface ParametroInicial {
 @Component({
   selector: 'app-contrato-detail',
   standalone: true,
-  imports: [ButtonModule, MenuModule, BreadcrumbComponent],
+  imports: [ButtonModule, ButtonGroupModule, MenuModule, BreadcrumbComponent],
   providers: [DialogService],
   templateUrl: './contrato-detail.component.html',
   styleUrl: './contrato-detail.component.scss',
@@ -140,6 +141,10 @@ export class ContratoDetailComponent implements OnInit {
     this.navigate('editar', c.id);
   }
 
+  protected onNew(): void {
+    this.navigate('nuevo');
+  }
+
   protected toggleUtilidades(event: Event): void {
     this.utilidadesMenu()?.toggle(event);
   }
@@ -149,8 +154,9 @@ export class ContratoDetailComponent implements OnInit {
   /**
    * Abre el modal de terminación (lazy: solo se usa al cerrar un contrato).
    *
-   * Terminar **crea la liquidación** del empleado en el backend, así que al
-   * volver se recarga la ficha para ver el contrato ya cerrado.
+   * Terminar **crea la liquidación** del empleado en el backend. Al volver se
+   * recarga la ficha **siempre**: el modal también se cierra con la máscara o con
+   * Esc, sin resultado, y para entonces el contrato puede estar terminado igual.
    */
   protected onTerminar(): void {
     const c = this.contrato();
@@ -165,12 +171,12 @@ export class ContratoDetailComponent implements OnInit {
             data: {
               contratoId: c.id,
               empleado: c.contacto_nombre_corto,
+              fechaDesde: c.fecha_desde,
               fechaHasta: c.fecha_hasta,
-            },
+            } satisfies TerminarContratoModalData,
           });
           return ref ? ref.onClose : EMPTY;
         }),
-        filter((termino: unknown): termino is true => termino === true),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => this.loadContrato(c.id));
@@ -229,9 +235,12 @@ export class ContratoDetailComponent implements OnInit {
     return formatCop(num);
   }
 
-  /** Fecha larga de la ficha (`20 de junio de 2026`); `—` si no hay valor. */
+  /**
+   * Fecha corta (`20/06/2026`), la de toda ficha: la larga es solo para la
+   * cabecera de un documento. `—` si no hay valor (contrato indefinido).
+   */
   protected formatFecha(value: string | null): string {
-    return formatFechaLarga(value, '—');
+    return formatFechaCorta(value, '—');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/humano/contratos[/extra]`. */

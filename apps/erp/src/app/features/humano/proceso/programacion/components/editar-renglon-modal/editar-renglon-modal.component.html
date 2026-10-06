@@ -76,7 +76,7 @@
           @if (campoPropuesto(); as propuesto) {
             <div class="flex flex-col gap-1.5">
               <label [for]="propuesto" class="text-[0.855rem] font-semibold text-brand-text">
-                {{ propuesto === 'cesantia_propuesto' ? m.cesantiaPropuesta : m.interesPropuesto }}
+                {{ etiquetaPropuesto(propuesto) }}
               </label>
               <p-inputnumber
                 [inputId]="propuesto"

@@ -39,6 +39,18 @@ export const contenedoresEn: ContenedoresDict = {
       ownerCta: 'Renew subscription',
       memberLocked: 'Only the owner can renew',
     },
+    estado: {
+      creando: 'Creating…',
+      error: 'Could not be created',
+      creandoPaso: 'Creating {paso}…',
+    },
+    toasts: {
+      ready: { title: 'Container ready', desc: '{nombre} is ready to enter.' },
+      failed: {
+        title: 'The container could not be created',
+        desc: 'Something went wrong while setting up {nombre}.',
+      },
+    },
     roles: {
       propietario: 'Owner',
       miembro: 'Member',
@@ -67,7 +79,10 @@ export const contenedoresEn: ContenedoresDict = {
     submit: 'Create company',
     cancel: 'Cancel',
     toasts: {
-      success: { title: 'Company created', desc: 'The container was created successfully.' },
+      success: {
+        title: 'Company created',
+        desc: "We're setting it up; we'll let you know when it's ready.",
+      },
       error: { title: 'Creation error', desc: 'Could not create the container. Try again.' },
     },
   },

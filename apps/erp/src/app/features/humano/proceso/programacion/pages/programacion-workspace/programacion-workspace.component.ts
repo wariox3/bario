@@ -1,8 +1,9 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MenuModule } from 'primeng/menu';
@@ -15,9 +16,11 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ProgramacionResumenComponent } from '../../components/programacion-resumen/programacion-resumen.component';
 import { ProgramacionAdicionalesTabComponent } from '../../components/programacion-adicionales-tab/programacion-adicionales-tab.component';
@@ -29,14 +32,13 @@ import {
   type CapacidadesProgramacion,
 } from '../../programacion.estado';
 import type { Programacion } from '../../programacion.model';
-import {
-  PROGRAMACION_EXPORTS,
-  ProgramacionService,
-  type ProgramacionExportKey,
-} from '../../programacion.service';
+import { ProgramacionService, cuerpoDe } from '../../programacion.service';
 
 /** Acciones del ciclo que se confirman antes de ejecutarse. */
 type AccionCiclo = 'generar' | 'desgenerar' | 'aprobar' | 'desaprobar';
+
+/** Pestañas del workspace: empleados (renglones) y adicionales. */
+type WorkspaceTab = 'renglones' | 'adicionales';
 
 /**
  * **Workspace** de una programación de nómina: donde se arma, se liquida y se
@@ -60,10 +62,12 @@ type AccionCiclo = 'generar' | 'desgenerar' | 'aprobar' | 'desaprobar';
   standalone: true,
   imports: [
     ButtonModule,
+    ButtonGroupModule,
     ConfirmDialogModule,
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
+    PageActionsComponent,
     ImportDialogComponent,
     ProgramacionResumenComponent,
     ProgramacionRenglonesTabComponent,
@@ -78,6 +82,7 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -96,7 +101,15 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   /** Notificación en vuelo. No es del ciclo (no cambia de etapa) pero también bloquea. */
   protected readonly notificando = signal(false);
 
-  protected readonly activeTab = signal<'renglones' | 'adicionales'>('renglones');
+  /**
+   * Pestaña activa, en la URL (`?tab=adicionales`) para que recargar o compartir
+   * el link no la pierda. Llega como input por `withComponentInputBinding`; un
+   * valor desconocido cae en empleados.
+   */
+  readonly tab = input<string>();
+  protected readonly activeTab = computed<WorkspaceTab>(() =>
+    this.tab() === 'adicionales' ? 'adicionales' : 'renglones',
+  );
 
   /** Renglones cargados; alimenta la capacidad de generar. */
   protected readonly renglones = signal(0);
@@ -127,97 +140,79 @@ export class ProgramacionWorkspaceComponent implements OnInit {
   protected readonly importar = importState({
     upload: (file) => this.service.importarHoras(this.programacionId(), file),
     onImported: () => this.reloadToken.update((n) => n + 1),
+    masters: IMPORT_MASTERS_ALL,
   });
 
   /**
-   * El ERP anterior generaba la plantilla de horas desde el propio listado de
-   * renglones (`serializador: 'ImportarHoras'` sobre la programación abierta), no
-   * desde un endpoint fijo. Hasta confirmar cómo se pide, el botón se muestra
-   * deshabilitado con el motivo a la vista.
+   * La plantilla de horas sale de esta programación: trae a sus empleados con
+   * las horas actuales, se edita y se sube la misma. Por eso depende del id.
    */
   protected readonly exampleConfig = computed<ExampleConfig>(() => ({
-    mode: 'disabled',
-    reason: this.t().entities.programacion.importarHoras.plantillaNoDisponible,
+    mode: 'enabled',
+    endpoint: this.service.importarHorasEjemploUrl,
+    params: { programacion_id: this.programacionId() },
+    filename: `horas-programacion-${this.programacionId()}.xlsx`,
   }));
 
   /**
-   * Acciones secundarias del dropdown. Se arman según capacidades: `MenuItem` sí
-   * admite `disabled`, pero una acción que no aplica a la etapa no debería ni
-   * aparecer — el legacy mostraba las cinco siempre, la mayoría deshabilitadas.
+   * "Acciones": lo que deshace la etapa actual o lleva la nómina afuera. Como en
+   * la ficha de los documentos, están siempre y se **deshabilitan** cuando no
+   * aplican: la botonera no cambia de forma entre etapas y la persona aprende
+   * dónde vive cada cosa.
    */
-  protected readonly accionesSecundarias = computed<MenuItem[]>(() => {
+  protected readonly accionesItems = computed<MenuItem[]>(() => {
     const c = this.capacidades();
     const labels = this.t().entities.programacion.acciones;
     const bloqueado = this.estaOcupado();
-    const items: MenuItem[] = [];
-
-    if (c.puedeDesgenerar) {
-      items.push({
+    return [
+      {
         label: labels.desgenerar,
         icon: 'pi pi-undo',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeDesgenerar,
         command: () => this.confirmar('desgenerar'),
-      });
-    }
-    if (c.puedeDesaprobar) {
-      items.push({
+      },
+      {
         label: labels.desaprobar,
         icon: 'pi pi-times-circle',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeDesaprobar,
         command: () => this.confirmar('desaprobar'),
-      });
-    }
-    if (c.puedeNotificar) {
-      items.push({
+      },
+      { separator: true },
+      {
         label: labels.notificar,
         icon: 'pi pi-send',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeNotificar,
         command: () => this.confirmarNotificar(),
-      });
-    }
-    if (c.puedeImportarHoras) {
-      items.push({
-        separator: items.length > 0,
-      });
-      items.push({
-        label: labels.importarHoras,
-        icon: 'pi pi-upload',
-        disabled: bloqueado,
-        command: () => this.importar.open(),
-      });
-    }
-
-    // Impresiones y descargas: siempre al final, separadas de lo que muta.
-    const descargas: MenuItem[] = [
-      { label: labels.imprimir, icon: 'pi pi-file-pdf', command: () => this.imprimir() },
-      {
-        label: labels.exportRenglones,
-        icon: 'pi pi-file-excel',
-        command: () => this.exportar('renglones'),
       },
     ];
-    if (c.puedeImprimirNominas) {
-      descargas.push(
-        {
-          label: labels.imprimirNominas,
-          icon: 'pi pi-file-pdf',
-          command: () => this.imprimirNominas(),
-        },
-        {
-          label: labels.exportNomina,
-          icon: 'pi pi-file-excel',
-          command: () => this.exportar('nomina'),
-        },
-        {
-          label: labels.exportNominaDetalle,
-          icon: 'pi pi-file-excel',
-          command: () => this.exportar('nominaDetalle'),
-        },
-      );
-    }
+  });
 
-    if (items.length > 0) items.push({ separator: true });
-    return [...items, ...descargas];
+  /**
+   * "Utilidades": importar horas y el PDF de las nóminas. El PDF de la
+   * programación es el botón Imprimir, y los Excel viven en la tabla de
+   * empleados, junto a lo que exportan.
+   *
+   * El legacy rotulaba "Importar nominas" a lo que en realidad **imprime** las
+   * nóminas (`imprimirNominas()`); acá se llama por lo que hace.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => {
+    const c = this.capacidades();
+    const labels = this.t().entities.programacion.acciones;
+    const bloqueado = this.estaOcupado();
+    return [
+      {
+        label: labels.importarHoras,
+        icon: 'pi pi-upload',
+        disabled: bloqueado || !c.puedeImportarHoras,
+        command: () => this.importar.open(),
+      },
+      {
+        label: labels.imprimirNominas,
+        icon: 'pi pi-file-pdf',
+        disabled: !c.puedeImprimirNominas,
+        command: () => this.imprimirNominas(),
+      },
+    ];
   });
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -248,12 +243,29 @@ export class ProgramacionWorkspaceComponent implements OnInit {
 
   // ── Navegación ────────────────────────────────────────────────────────────
 
+  /**
+   * Cambiar de pestaña reescribe `?tab=` sin sumar al historial: "Atrás" vuelve a
+   * la página anterior, no a la pestaña anterior.
+   */
+  protected onTabChange(value: WorkspaceTab): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: value },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
   protected onBack(): void {
     this.navigateTo();
   }
 
   protected onEdit(): void {
     this.navigateTo('editar', this.programacionId());
+  }
+
+  protected onNew(): void {
+    this.navigateTo('nuevo');
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
@@ -310,7 +322,7 @@ export class ProgramacionWorkspaceComponent implements OnInit {
 
   // ── Impresión y descargas ─────────────────────────────────────────────────
 
-  private imprimir(): void {
+  protected onImprimir(): void {
     this.descargar(this.service.imprimirUrl, 'programacion.pdf');
   }
 
@@ -318,36 +330,14 @@ export class ProgramacionWorkspaceComponent implements OnInit {
     this.descargar(this.service.imprimirNominasUrl, 'nominas.pdf');
   }
 
-  /** PDFs: el id va en el body, como los pide el legacy. */
+  /** PDFs: la programación va en el body, como en las demás acciones. */
   private descargar(url: string, archivo: string): void {
     const toasts = this.t().common.toasts;
     this.fileDownload
       .download(url, {
         method: 'POST',
-        body: { id: this.programacionId() },
+        body: cuerpoDe(this.programacionId()),
         fallbackFilename: archivo,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
-      });
-  }
-
-  /**
-   * Las tres exportaciones comparten forma: endpoint, serializador y el filtro que
-   * acota a esta programación (ver `PROGRAMACION_EXPORTS`).
-   */
-  private exportar(clave: ProgramacionExportKey): void {
-    const config = PROGRAMACION_EXPORTS[clave];
-    const toasts = this.t().common.toasts;
-    this.fileDownload
-      .download(config.url, {
-        method: 'POST',
-        body: {
-          serializador: config.serializador,
-          [config.filtro]: this.programacionId(),
-        },
-        fallbackFilename: config.archivo,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

@@ -25,6 +25,8 @@ export interface FacturaCompraRead extends DocumentoReadBase {
   readonly sede_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
+  readonly orden_compra: string | null;
+  readonly comentario: string | null;
 }
 
 /** Body (POST/PATCH) de una factura de compra. */
@@ -33,6 +35,8 @@ export interface FacturaCompraPayload extends DocumentoPayloadBase {
   readonly plazo_pago: number | null;
   readonly sede: number | null;
   readonly metodo_pago: number | null;
+  readonly orden_compra: string | null;
+  readonly comentario: string | null;
   /**
    * Solo en alta: en edición las líneas transaccionan contra `documento-detalle`.
    * Mezcla líneas de ítem (comerciales) y de cuenta contable; el backend las

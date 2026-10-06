@@ -151,6 +151,23 @@ export interface ContenedorAccesoFlags {
 }
 
 /**
+ * Ciclo de vida del contenedor. El `POST` lo deja en `creando` y responde 202:
+ * el schema, las migraciones y los catálogos los termina una tarea en segundo
+ * plano. Mientras no esté `listo`, toda petición con su `X-Tenant` responde 409.
+ */
+export type ContenedorEstado = 'creando' | 'listo' | 'error';
+
+/** `GET /contenedor/cliente/{id}/estado/`: lo que se consulta mientras se crea. */
+export interface ContenedorEstadoResponse {
+  readonly estado: ContenedorEstado;
+  /**
+   * En qué va la creación (`esquema`, `migraciones`, `permisos`, `catalogos`).
+   * Solo en `creando`, y aun así puede faltar: el backend lo lee de caché.
+   */
+  readonly paso: string | null;
+}
+
+/**
  * Una empresa del usuario, tal como la lista `/contenedor/cliente/lista-usuario/`
  * (serializer `CtnClienteListaUsuario`).
  *
@@ -165,6 +182,8 @@ export interface Contenedor extends ContenedorAccesoFlags {
   schema_name: string;
   cliente_nombre: string;
   activo: boolean;
+  /** Solo se puede ingresar a un contenedor `listo`. */
+  estado: ContenedorEstado;
   dominio: string;
   suscripcion_id?: number;
   suscripcion_fecha_fin?: string;
@@ -200,6 +219,7 @@ export interface ContenedorDetalle {
   readonly celular: string;
   readonly correo: string;
   readonly activo: boolean;
+  readonly estado: ContenedorEstado;
   /** Alta de la empresa, `yyyy-MM-ddTHH:mm:ss`. */
   readonly fecha_creacion: string | null;
 }

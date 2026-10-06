@@ -9,10 +9,15 @@ import {
   type PageChangeEvent,
 } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
-import { APORTE_DETALLES_PAGE_SIZE, APORTE_DETALLE_FILTER_FIELDS } from '../../aporte.constants';
+import {
+  APORTE_DETALLES_PAGE_SIZE,
+  APORTE_DETALLE_FILTER_FIELDS,
+  EXCEL_ACTION_PREFIX,
+  excelAction,
+} from '../../aporte.constants';
 import { APORTE_DETALLE_ABREVIATURAS, APORTE_DETALLE_COLUMNS } from '../../aporte.detalles';
 import type { AporteDetalle } from '../../aporte.model';
-import { AporteService } from '../../aporte.service';
+import { AporteService, type AporteExportKey } from '../../aporte.service';
 
 /**
  * Las **líneas liquidadas** del aporte: el desglose PILA de cada contrato.
@@ -57,6 +62,9 @@ export class AporteDetallesTabComponent {
   protected readonly columns = APORTE_DETALLE_COLUMNS;
   protected readonly filterFields = APORTE_DETALLE_FILTER_FIELDS;
 
+  /** "Excel ▾" de la tabla: exporta las líneas liquidadas. */
+  protected readonly trailingActions = excelAction('detalles');
+
   /** Abreviaturas con sus textos ya resueltos, para la leyenda. */
   protected readonly abreviaturas = computed(() =>
     APORTE_DETALLE_ABREVIATURAS.map(({ siglaKey, nombreKey }) => ({
@@ -93,7 +101,23 @@ export class AporteDetallesTabComponent {
     this.loadPage(0);
   }
 
+  protected onToolbarAction(actionId: string): void {
+    if (actionId.startsWith(EXCEL_ACTION_PREFIX)) {
+      this.exportar(actionId.slice(EXCEL_ACTION_PREFIX.length) as AporteExportKey);
+    }
+  }
+
   // ── Internos ──────────────────────────────────────────────────────────────
+
+  private exportar(clave: AporteExportKey): void {
+    const toasts = this.t().common.toasts;
+    this.service
+      .exportar(clave, this.aporteId())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
+      });
+  }
 
   private loadPage(page: number): void {
     const id = this.aporteId();
@@ -101,7 +125,7 @@ export class AporteDetallesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarDetalles(id, page + 1, this.pageSize, this.activeFilters())
+      .listarDetalles(id, page, this.pageSize, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

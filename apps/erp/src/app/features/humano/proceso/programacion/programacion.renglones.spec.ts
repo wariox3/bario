@@ -1,12 +1,13 @@
 import { PAGO_TIPO_ID } from './programacion.model';
 import { columnasDeRenglones, muestraHoras } from './programacion.renglones';
+import { tonoFechaDesde, tonoFechaHasta } from './programacion.constants';
 
 /** Campos que las tres variantes deben traer siempre. */
 const COMUNES = [
   'id',
-  'contrato_contacto_numero_identificacion',
-  'contrato_contacto_nombre_corto',
-  'contrato_id',
+  'contacto_numero_identificacion',
+  'contrato_nombre',
+  'contrato',
   'fecha_desde',
   'fecha_hasta',
   'salario',
@@ -84,5 +85,39 @@ describe('muestraHoras', () => {
     expect(muestraHoras(PAGO_TIPO_ID.PRIMA)).toBe(false);
     expect(muestraHoras(PAGO_TIPO_ID.CESANTIA)).toBe(false);
     expect(muestraHoras(PAGO_TIPO_ID.INTERES_CESANTIA)).toBe(false);
+  });
+});
+
+describe('tono de las fechas del renglón', () => {
+  const renglon = (marcas: { ingreso?: boolean; retiro?: boolean; error_terminacion?: boolean }) =>
+    ({ ingreso: false, retiro: false, error_terminacion: false, ...marcas }) as const;
+
+  it('la fecha desde se marca en verde si el contrato ingresó en el periodo', () => {
+    expect(tonoFechaDesde(renglon({ ingreso: true }))).toBe('positive');
+    expect(tonoFechaHasta(renglon({ ingreso: true }))).toBeNull();
+  });
+
+  it('la fecha hasta se marca en verde si el contrato se retiró en el periodo', () => {
+    expect(tonoFechaHasta(renglon({ retiro: true }))).toBe('positive');
+    expect(tonoFechaDesde(renglon({ retiro: true }))).toBeNull();
+  });
+
+  it('un error de terminación pinta las dos en rojo y gana sobre ingreso y retiro', () => {
+    const r = renglon({ ingreso: true, retiro: true, error_terminacion: true });
+    expect(tonoFechaDesde(r)).toBe('critical');
+    expect(tonoFechaHasta(r)).toBe('critical');
+  });
+
+  it('sin marcas, o con una fila que no es objeto, no resalta nada', () => {
+    expect(tonoFechaDesde(renglon({}))).toBeNull();
+    expect(tonoFechaHasta(null)).toBeNull();
+  });
+
+  it('las tres variantes de tabla llevan el resaltado en sus fechas', () => {
+    for (const tipo of [PAGO_TIPO_ID.NOMINA, PAGO_TIPO_ID.PRIMA, PAGO_TIPO_ID.CESANTIA]) {
+      const cols = columnasDeRenglones(tipo);
+      expect(cols.find((c) => c.field === 'fecha_desde')?.toneFor).toBe(tonoFechaDesde);
+      expect(cols.find((c) => c.field === 'fecha_hasta')?.toneFor).toBe(tonoFechaHasta);
+    }
   });
 });

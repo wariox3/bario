@@ -18,6 +18,7 @@
 // Types
 export type {
   BooleanTone,
+  CellTone,
   ColumnDef,
   ColumnValueType,
   ColumnAlignment,

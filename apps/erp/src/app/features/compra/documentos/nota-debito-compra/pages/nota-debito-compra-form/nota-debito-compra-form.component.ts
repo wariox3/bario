@@ -18,7 +18,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   DOCUMENT_TYPE_ID,
   FormErrorService,
@@ -52,6 +52,8 @@ import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/co
 import { notaDebitoCompraToFormValue, formValueToPayload } from '../../nota-debito-compra.mapper';
 import type { NotaDebitoCompraRead } from '../../nota-debito-compra.model';
 import { NOTA_DEBITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-debito-compra.constants';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Nota débito de compra.
@@ -67,15 +69,19 @@ import { NOTA_DEBITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-debito-compra
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-nota-debito-compra-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,

@@ -17,7 +17,7 @@ import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -48,6 +48,7 @@ import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/co
 import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { pedidoClienteToFormValue, formValueToPayload } from '../../pedido-cliente.mapper';
 import type { PedidoClienteRead } from '../../pedido-cliente.model';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Pedido de cliente.
@@ -65,16 +66,19 @@ import type { PedidoClienteRead } from '../../pedido-cliente.model';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-pedido-cliente-form',
   standalone: true,
   imports: [
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     TabsModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     FieldErrorComponent,
     PageActionsComponent,
     ErpContactoSelectComponent,

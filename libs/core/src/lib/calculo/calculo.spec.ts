@@ -13,10 +13,20 @@ const RETE_OPERADA: TasaImpuesto = {
 };
 
 describe('redondearMoneda', () => {
-  it('redondea a entero (COP sin decimales)', () => {
-    expect(redondearMoneda(100.4)).toBe(100);
-    expect(redondearMoneda(100.5)).toBe(101);
+  it('redondea a centavos (2 decimales, como el backend)', () => {
+    expect(redondearMoneda(5.985)).toBe(5.99);
+    expect(redondearMoneda(100.004)).toBe(100);
     expect(redondearMoneda(100)).toBe(100);
+  });
+
+  it('no se deja engañar por la representación binaria de la mitad', () => {
+    // 1.005 × 100 = 100.49999999999999 en coma flotante
+    expect(redondearMoneda(1.005)).toBe(1.01);
+  });
+
+  it('redondea negativos (retenciones) igual que su positivo', () => {
+    expect(redondearMoneda(-5.985)).toBe(-5.99);
+    expect(redondearMoneda(-0.004)).toBe(0);
   });
 });
 
@@ -33,10 +43,9 @@ describe('calcularImpuestosLinea', () => {
     ]);
   });
 
-  it('redondea cada monto a entero (front autoritativo, sin colas decimales)', () => {
-    // 333.333 × 2.5% = 8.333,325 → 8.333
-    expect(calcularImpuestosLinea(333_333, [RETE])).toEqual([
-      { id: 3, nombre: 'ReteFuente', total: 8_333 },
+  it('redondea cada monto a centavos: 31,50 × 19% = 5,985 → 5,99', () => {
+    expect(calcularImpuestosLinea(31.5, [IVA_19])).toEqual([
+      { id: 1, nombre: 'IVA 19%', total: 5.99 },
     ]);
   });
 
@@ -157,6 +166,17 @@ describe('calcularResumen', () => {
     expect(r.descuento).toBe(100_000);
     // total = 1.000.000 − 100.000 + 190.000
     expect(r.total).toBe(1_090_000);
+  });
+
+  it('suma montos con centavos sin colas de coma flotante', () => {
+    const lineas: LineaCalculo[] = [
+      { base: 0.1, impuestos: [{ id: 1, nombre: 'IVA 19%', total: 0.1 }] },
+      { base: 0.2, impuestos: [{ id: 1, nombre: 'IVA 19%', total: 0.2 }] },
+    ];
+    const r = calcularResumen(lineas);
+    expect(r.subtotal).toBe(0.3);
+    expect(r.impuestos).toEqual([{ id: 1, nombre: 'IVA 19%', total: 0.3 }]);
+    expect(r.total).toBe(0.6);
   });
 
   it('líneas sin impuestos: total = subtotal', () => {

@@ -1,6 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 import type { AporteCotizaciones } from './aporte.model';
+import type { AporteExportKey } from './aporte.service';
 
 export const APORTES_FILTERS_STORAGE_KEY = 'aportes:filters:v1';
 
@@ -37,7 +38,6 @@ export const APORTES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'anio',
@@ -45,7 +45,6 @@ export const APORTES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '90px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'mes',
@@ -53,13 +52,11 @@ export const APORTES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'sucursal_nombre',
     headerKey: 'entities.aporte.columns.sucursal',
     type: 'text',
-    sortable: true,
   },
   {
     field: 'empleados',
@@ -210,20 +207,13 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'contrato__contacto_id',
-    headerKey: 'entities.aporte.contratos.columns.codigo',
-    type: 'number',
-    width: '90px',
-    align: 'right',
-  },
-  {
-    field: 'contrato__contacto__numero_identificacion',
+    field: 'contrato_contacto_numero_identificacion',
     headerKey: 'entities.aporte.contratos.columns.identificacion',
     type: 'text',
     width: '140px',
   },
   {
-    field: 'contrato__contacto__nombre_corto',
+    field: 'contrato_contacto_nombre_corto',
     headerKey: 'entities.aporte.contratos.columns.empleado',
     type: 'text',
   },
@@ -278,28 +268,34 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
 
 export const APORTE_CONTRATO_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.contratos.columns.id', type: 'number' },
-  {
-    name: 'contrato__contacto__nombre_corto',
-    displayNameKey: 'entities.aporte.contratos.columns.empleado',
-    type: 'string',
-  },
-  {
-    name: 'contrato__contacto_id',
-    displayNameKey: 'entities.aporte.contratos.columns.codigo',
-    type: 'number',
-  },
 ];
 
 export const APORTE_DETALLE_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.detalles.columns.id', type: 'number' },
-  {
-    name: 'aporte_contrato__contrato__contacto__nombre_corto',
-    displayNameKey: 'entities.aporte.detalles.columns.empleado',
-    type: 'string',
-  },
-  {
-    name: 'aporte_contrato_id',
-    displayNameKey: 'entities.aporte.detalles.columns.contrato',
-    type: 'number',
-  },
 ];
+
+// ── Excel de las pestañas ───────────────────────────────────────────────────
+
+/** Prefijo del id de acción del "Excel ▾": `excel:<clave>`. */
+export const EXCEL_ACTION_PREFIX = 'excel:';
+
+/**
+ * "Excel ▾" de una pestaña, con su única exportación adentro, como en el ERP
+ * anterior. El botón va sin ícono, solo el ítem lo lleva.
+ */
+export function excelAction(clave: AporteExportKey): readonly ToolbarAction[] {
+  return [
+    {
+      id: 'excel',
+      labelKey: 'entities.aporte.excel.action',
+      iconClass: '',
+      children: [
+        {
+          id: `${EXCEL_ACTION_PREFIX}${clave}`,
+          labelKey: 'entities.aporte.excel.detalle',
+          iconClass: 'pi pi-file-excel',
+        },
+      ],
+    },
+  ];
+}

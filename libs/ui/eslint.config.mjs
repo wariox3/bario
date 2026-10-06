@@ -27,6 +27,15 @@ export default [
     },
   },
   {
+    // La máscara va sobre el elemento `<p-datepicker>` de PrimeNG, sin atributo
+    // propio. La excepción vive acá y no en un comentario del archivo porque el
+    // eslint de lint-staged corre con la config raíz, que no carga esta regla.
+    files: ['**/mascara-fecha.directive.ts'],
+    rules: {
+      '@angular-eslint/directive-selector': 'off',
+    },
+  },
+  {
     files: ['**/*.html'],
     // Override or add rules here
     rules: {},

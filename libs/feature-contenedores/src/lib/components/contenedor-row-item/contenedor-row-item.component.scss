@@ -58,6 +58,11 @@
     .cl-row__cta {
       display: none;
     }
+
+    // Sin el CTA, el estado de creación es la única señal de la fila: queda visible.
+    .cl-row__cta--pending {
+      display: inline-flex;
+    }
   }
 
   &.cl-row--expired {
@@ -111,6 +116,39 @@
     .cl-row__monogram {
       opacity: 0.75;
     }
+  }
+
+  // Todavía no se puede ingresar: la fila no reacciona al hover como un botón.
+  &.cl-row--creando,
+  &.cl-row--error {
+    &:hover,
+    &:active {
+      background: transparent;
+      border-color: transparent;
+
+      .cl-row__monogram {
+        background: rgba(19 38 60 / 0.06);
+      }
+    }
+
+    .cl-row__monogram {
+      opacity: 0.6;
+    }
+  }
+
+  &.cl-row--creando {
+    cursor: progress;
+
+    // El hueco de «Ingresar» no se enciende: todavía no hay a dónde entrar.
+    &:hover .cl-row__cta--pending {
+      background: rgba(19 38 60 / 0.02);
+      color: var(--brand-muted);
+      border-color: rgba(19 38 60 / 0.08);
+    }
+  }
+
+  &.cl-row--error {
+    cursor: not-allowed;
   }
 }
 
@@ -224,6 +262,25 @@
   .pi {
     font-size: 0.7em;
     transition: transform 0.18s ease;
+  }
+}
+
+.cl-row__cta--pending {
+  background: rgba(19 38 60 / 0.02);
+  color: var(--brand-muted);
+  border-color: rgba(19 38 60 / 0.08);
+
+  .pi {
+    font-size: 0.8em;
+  }
+}
+
+.cl-row__locked-msg--error {
+  color: rgb(190 18 60);
+
+  // Como el pendiente: sin CTA en móvil, el error es lo único que explica la fila.
+  @media (max-width: 640px) {
+    display: inline-flex;
   }
 }
 

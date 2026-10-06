@@ -25,12 +25,10 @@ export const TESORERIA_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(TESORERIA_MODULE),
       {
-        // Inicio del módulo (vacío por ahora — sin estadísticas).
+        // Inicio del módulo: ficha de saldo de las cuentas por pagar.
         path: 'inicio',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
+          import('./inicio/tesoreria-inicio.component').then((m) => m.TesoreriaInicioComponent),
       },
       {
         path: 'egreso',
@@ -48,6 +46,13 @@ export const TESORERIA_ROUTES: Route[] = [
       // Masters compartidos (ver `masters-compartidos.routes.ts`).
       ...rutaContactos(),
       ...rutaCuentasBanco(),
+      {
+        path: 'proceso/validar-saldos',
+        loadChildren: () =>
+          import('@erp/features/documentos/validar-saldos/validar-saldos.routes').then((m) =>
+            m.validarSaldosRoutes('pagar'),
+          ),
+      },
       {
         path: 'informes/cuenta-pagar',
         loadChildren: () =>

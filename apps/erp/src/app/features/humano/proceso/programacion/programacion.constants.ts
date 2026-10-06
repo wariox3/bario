@@ -1,10 +1,20 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import type { CellTone, ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import type { ProgramacionDetalle } from './programacion.model';
 
 export const PROGRAMACIONES_FILTERS_STORAGE_KEY = 'programaciones:filters:v1';
 
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const PROGRAMACION_LIST_PATH = ['humano', 'proceso', 'programacion'] as const;
+
+/**
+ * Filtros de la tabla de empleados: solo por ID del renglón, como el ERP
+ * anterior. No se guardan en el navegador como los de un listado: la tabla vive
+ * dentro de cada programación, y un filtro guardado aparecería en la siguiente.
+ */
+export const RENGLONES_FILTER_FIELDS: readonly FilterField[] = [
+  { name: 'id', displayNameKey: 'entities.programacion.renglones.columns.id', type: 'number' },
+];
 
 /** Filas por página de la tabla de renglones del workspace. */
 export const PROGRAMACION_RENGLONES_PAGE_SIZE = 25;
@@ -35,48 +45,41 @@ export const PROGRAMACIONES_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-    sortable: true,
   },
   {
     field: 'nombre',
     headerKey: 'entities.programacion.columns.nombre',
     type: 'text',
-    sortable: true,
   },
   {
     field: 'pago_tipo_nombre',
     headerKey: 'entities.programacion.columns.pagoTipo',
     type: 'text',
     width: '140px',
-    sortable: true,
   },
   {
     field: 'grupo_nombre',
     headerKey: 'entities.programacion.columns.grupo',
     type: 'text',
     width: '150px',
-    sortable: true,
   },
   {
     field: 'periodo_nombre',
     headerKey: 'entities.programacion.columns.periodo',
     type: 'text',
     width: '140px',
-    sortable: true,
   },
   {
     field: 'fecha_desde',
     headerKey: 'entities.programacion.columns.fechaDesde',
     type: 'date',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'fecha_hasta',
     headerKey: 'entities.programacion.columns.fechaHasta',
     type: 'date',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'dias',
@@ -184,6 +187,31 @@ export const PROGRAMACIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
 
 // ── Renglones del workspace ─────────────────────────────────────────────────
 
+/** Las tres marcas del renglón que resaltan sus fechas. */
+type MarcasRenglon = Partial<Pick<ProgramacionDetalle, 'ingreso' | 'retiro' | 'error_terminacion'>>;
+
+function marcasDe(row: unknown): MarcasRenglon {
+  return row !== null && typeof row === 'object' ? (row as MarcasRenglon) : {};
+}
+
+/**
+ * Tono de la fecha desde: verde si el contrato **ingresó** dentro del periodo,
+ * rojo si su terminación tiene un error. El error gana: es lo que hay que atender.
+ * Mismo criterio que el ERP anterior.
+ */
+export function tonoFechaDesde(row: unknown): CellTone | null {
+  const m = marcasDe(row);
+  if (m.error_terminacion) return 'critical';
+  return m.ingreso ? 'positive' : null;
+}
+
+/** Tono de la fecha hasta: verde si el contrato **se retiró** dentro del periodo. */
+export function tonoFechaHasta(row: unknown): CellTone | null {
+  const m = marcasDe(row);
+  if (m.error_terminacion) return 'critical';
+  return m.retiro ? 'positive' : null;
+}
+
 /**
  * Columnas comunes a las tres variantes: quién es el empleado y qué tramo del
  * contrato se liquidó.
@@ -201,19 +229,19 @@ const RENGLON_COLUMNS_IDENTIFICACION: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'contrato_contacto_numero_identificacion',
+    field: 'contacto_numero_identificacion',
     headerKey: 'entities.programacion.renglones.columns.identificacion',
     type: 'text',
     width: '130px',
   },
   {
-    field: 'contrato_contacto_nombre_corto',
+    field: 'contrato_nombre',
     headerKey: 'entities.programacion.renglones.columns.empleado',
     type: 'text',
     width: '220px',
   },
   {
-    field: 'contrato_id',
+    field: 'contrato',
     headerKey: 'entities.programacion.renglones.columns.contrato',
     type: 'number',
     width: '100px',
@@ -224,12 +252,14 @@ const RENGLON_COLUMNS_IDENTIFICACION: readonly ColumnDef[] = [
     headerKey: 'entities.programacion.renglones.columns.desde',
     type: 'date',
     width: '115px',
+    toneFor: tonoFechaDesde,
   },
   {
     field: 'fecha_hasta',
     headerKey: 'entities.programacion.renglones.columns.hasta',
     type: 'date',
     width: '115px',
+    toneFor: tonoFechaHasta,
   },
   {
     field: 'salario',
@@ -333,8 +363,9 @@ export const CONCEPTO_ADICIONAL_ENDPOINT = '/humano/concepto/seleccionar/';
 export const CONCEPTO_ADICIONAL_PARAMS: Record<string, string> = { adicional: 'True' };
 
 /**
- * Columnas de los adicionales dentro del workspace. Es un subconjunto de las del
- * master: acá la programación es implícita, así que su columna no aporta.
+ * Columnas de los adicionales dentro del workspace, en el orden del ERP anterior:
+ * quién (identificación, nombre, contrato), qué concepto y por cuánto. La
+ * programación es implícita, así que no lleva columna. Las FK llegan sin `_id`.
  */
 export const ADICIONALES_PROGRAMACION_COLUMNS: readonly ColumnDef[] = [
   {
@@ -345,15 +376,36 @@ export const ADICIONALES_PROGRAMACION_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
+    field: 'contrato_contacto_numero_identificacion',
+    headerKey: 'entities.programacion.adicionales.columns.identificacion',
+    type: 'text',
+    width: '130px',
+  },
+  {
     field: 'contrato_nombre',
     headerKey: 'entities.programacion.adicionales.columns.empleado',
     type: 'text',
+    width: '220px',
+  },
+  {
+    field: 'contrato',
+    headerKey: 'entities.programacion.adicionales.columns.contrato',
+    type: 'number',
+    width: '80px',
+    align: 'right',
+  },
+  {
+    field: 'concepto',
+    headerKey: 'entities.programacion.adicionales.columns.conceptoId',
+    type: 'number',
+    width: '80px',
+    align: 'right',
   },
   {
     field: 'concepto_nombre',
     headerKey: 'entities.programacion.adicionales.columns.concepto',
     type: 'text',
-    width: '220px',
+    width: '200px',
   },
   {
     field: 'valor',
@@ -363,22 +415,16 @@ export const ADICIONALES_PROGRAMACION_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'horas',
-    headerKey: 'entities.programacion.adicionales.columns.horas',
-    type: 'number',
-    width: '90px',
-    align: 'right',
-  },
-  {
     field: 'detalle',
     headerKey: 'entities.programacion.adicionales.columns.detalle',
     type: 'text',
   },
   {
+    // ADL: aplica día laborado (se prorratea por los días trabajados).
     field: 'aplica_dia_laborado',
     headerKey: 'entities.programacion.adicionales.columns.aplicaDiaLaborado',
     type: 'boolean',
-    width: '110px',
+    width: '80px',
     align: 'center',
   },
 ];

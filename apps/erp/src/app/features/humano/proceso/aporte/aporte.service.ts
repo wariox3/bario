@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, map, of } from 'rxjs';
 import {
   BaseHttpService,
+  FileDownloadService,
   buildListBody,
+  type AdvancedListBody,
   buildListParams,
   type FilterCondition,
   type ListQuery,
@@ -49,6 +51,10 @@ export const APORTE_ENTIDADES_LIMITE = 1000;
  * niveles de renglones y las acciones del ciclo de vida.
  *
  * Los métodos están agrupados por etapa para que el ciclo se lea en el archivo.
+ * Las acciones (`cargar-contrato/`, `generar/`, `aprobar/`, `plano-operador/`…)
+ * identifican el aporte con `aporte_id` en el cuerpo, no con `id` (ver
+ * `cuerpoDe`).
+ *
  * **Quién puede llamar a cada uno lo decide `aporte.estado.ts`**, no este
  * servicio: acá solo vive el transporte.
  *
@@ -57,6 +63,7 @@ export const APORTE_ENTIDADES_LIMITE = 1000;
 @Injectable({ providedIn: 'root' })
 export class AporteService extends BaseHttpService {
   private readonly resourcePath = APORTE_ENDPOINT;
+  private readonly fileDownload = inject(FileDownloadService);
 
   /** URL de la exportación del listado (la usa `FileDownloadService`). */
   readonly exportUrl = `${APORTE_ENDPOINT}excel/`;
@@ -93,23 +100,26 @@ export class AporteService extends BaseHttpService {
   // ── Contratos incluidos ───────────────────────────────────────────────────
 
   /**
-   * Página de contratos del aporte. `page` es 1-based, como espera el backend.
+   * Página de contratos del aporte, ordenados por contrato.
    *
-   * El legacy pedía `limit: 1000` y aun así mostraba paginador; acá se pagina de
-   * verdad.
+   * Los tres niveles del aporte van por `POST …/lista/` con el filtro y el orden
+   * en el cuerpo: el recurso no publica `GET` en la raíz. `page` es 0-based, como
+   * en todo `ListQuery`; `buildListParams` lo pasa a 1-based para el backend.
+   *
+   * `filtros` son los que elige la persona en la tabla; van **después** del del
+   * aporte, que no se puede pisar.
    */
   listarContratos(
     aporteId: number,
     page: number,
-    limit: number,
+    pageSize: number,
     filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<AporteContrato>> {
-    return this.get<PaginatedResponse<AporteContrato>>(APORTE_CONTRATO_ENDPOINT, {
-      aporte_id: aporteId,
+    return this.listar<AporteContrato>(APORTE_CONTRATO_ENDPOINT, {
+      filters: [{ field: 'aporte_id', operator: 'eq', value: aporteId }, ...filtros],
+      sort: [{ field: 'contrato_id', direction: 'asc' }],
       page,
-      limit,
-      ordering: 'contrato_id',
-      ...filtrosComoParams(filtros),
+      pageSize,
     });
   }
 
@@ -128,64 +138,84 @@ export class AporteService extends BaseHttpService {
 
   /** Trae los contratos vigentes del periodo como renglones del aporte. */
   cargarContratos(id: number): Observable<CargarContratosResultado> {
-    return this.post<CargarContratosResultado>(`${this.resourcePath}cargar-contrato/`, { id });
+    return this.post<CargarContratosResultado>(
+      `${this.resourcePath}cargar-contrato/`,
+      cuerpoDe(id),
+    );
   }
 
   // ── Líneas liquidadas ─────────────────────────────────────────────────────
 
-  /** Página de líneas liquidadas. Solo lectura: las fabrica el backend al generar. */
+  /**
+   * Página de líneas liquidadas. Solo lectura: las fabrica el backend al generar.
+   * Cuelgan del contrato del aporte, así que el filtro cruza por él.
+   */
   listarDetalles(
     aporteId: number,
     page: number,
-    limit: number,
+    pageSize: number,
     filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<AporteDetalle>> {
-    return this.get<PaginatedResponse<AporteDetalle>>(APORTE_DETALLE_ENDPOINT, {
-      aporte_contrato__aporte_id: aporteId,
+    return this.listar<AporteDetalle>(APORTE_DETALLE_ENDPOINT, {
+      filters: [
+        { field: 'aporte_contrato__aporte_id', operator: 'eq', value: aporteId },
+        ...filtros,
+      ],
+      sort: [{ field: 'aporte_contrato_id', direction: 'asc' }],
       page,
-      limit,
-      ...filtrosComoParams(filtros),
+      pageSize,
     });
   }
 
   /**
-   * Todas las entidades del aporte, sin paginar: los subtotales se calculan
-   * sobre el conjunto completo (ver `APORTE_ENTIDADES_LIMITE`).
+   * Todas las entidades del aporte en una sola página: los subtotales se calculan
+   * sobre el conjunto completo (ver `APORTE_ENTIDADES_LIMITE`). El orden por
+   * `tipo` es el que usa el agrupado.
    */
   listarEntidades(aporteId: number): Observable<PaginatedResponse<AporteEntidad>> {
-    return this.get<PaginatedResponse<AporteEntidad>>(APORTE_ENTIDAD_ENDPOINT, {
-      aporte_id: aporteId,
-      ordering: 'tipo',
-      limit: APORTE_ENTIDADES_LIMITE,
+    return this.listar<AporteEntidad>(APORTE_ENTIDAD_ENDPOINT, {
+      filters: [{ field: 'aporte_id', operator: 'eq', value: aporteId }],
+      sort: [{ field: 'tipo', direction: 'asc' }],
+      page: 0,
+      pageSize: APORTE_ENTIDADES_LIMITE,
     });
+  }
+
+  /** `POST …/lista/` de uno de los tres niveles. */
+  private listar<T>(endpoint: string, query: ListQuery): Observable<PaginatedResponse<T>> {
+    return this.post<PaginatedResponse<T>>(
+      `${endpoint}lista/`,
+      buildListBody(query),
+      buildListParams(query),
+    );
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
-  /** Liquida: calcula las líneas y los acumulados por entidad. */
-  generar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}generar/`, { id });
+  /** Liquida: calcula las líneas y los acumulados por entidad. Responde el aporte. */
+  generar(id: number): Observable<Aporte> {
+    return this.post<Aporte>(`${this.resourcePath}generar/`, cuerpoDe(id));
   }
 
   /** Revierte la liquidación. */
-  desgenerar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}desgenerar/`, { id });
+  desgenerar(id: number): Observable<Aporte> {
+    return this.post<Aporte>(`${this.resourcePath}desgenerar/`, cuerpoDe(id));
   }
 
   /** Aprueba (cierra) el aporte liquidado. */
-  aprobar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}aprobar/`, { id });
+  aprobar(id: number): Observable<Aporte> {
+    return this.post<Aporte>(`${this.resourcePath}aprobar/`, cuerpoDe(id));
   }
 
-  desaprobar(id: number): Observable<unknown> {
-    return this.post<unknown>(`${this.resourcePath}desaprobar/`, { id });
+  desaprobar(id: number): Observable<Aporte> {
+    return this.post<Aporte>(`${this.resourcePath}desaprobar/`, cuerpoDe(id));
   }
 
   // ── Entregables ───────────────────────────────────────────────────────────
 
   /**
    * Plano para el operador de PILA: **el entregable del proceso**. Se pide por
-   * `POST` con el id en el body, como el resto de las acciones.
+   * `POST` con `cuerpoDe(id)`, como el resto de las acciones.
    */
   readonly planoOperadorUrl = `${APORTE_ENDPOINT}plano-operador/`;
 
@@ -200,38 +230,29 @@ export class AporteService extends BaseHttpService {
    * TODO(backend): confirmar la URL real de impresión del aporte.
    */
   readonly imprimirUrl = `${APORTE_ENDPOINT}imprimir/`;
-}
 
-/**
- * Traduce los filtros de la UI a **query params**.
- *
- * Los tres niveles del aporte se listan por `GET`, no por el `POST …/lista/` de
- * los masters, así que no sirven `buildFiltros`/`buildListBody`, que arman un
- * body. La convención es la misma que aplica `serializeListQuery` de
- * `@reddoc/core`: `campo=valor` para igualdad y `campo__operador=valor` para el
- * resto, al estilo Django REST.
- *
- * No se reutiliza aquella función porque devuelve `HttpParams` con su propia
- * paginación (`page` / `page_size`) y estos endpoints paginan con `limit`.
- */
-function filtrosComoParams(filtros: readonly FilterCondition[]): Record<string, string> {
-  const params: Record<string, string> = {};
-  for (const filtro of filtros) {
-    const clave = filtro.operator === 'eq' ? filtro.field : `${filtro.field}__${filtro.operator}`;
-    params[clave] = Array.isArray(filtro.value)
-      ? filtro.value.join(',')
-      : String(filtro.value ?? '');
+  /** Descarga el Excel de una de las pestañas, acotado a este aporte. */
+  exportar(clave: AporteExportKey, aporteId: number): Observable<void> {
+    const config = APORTE_EXPORTS[clave];
+    return this.fileDownload.download(config.url, {
+      method: 'POST',
+      body: cuerpoExportacion(clave, aporteId),
+      fallbackFilename: config.archivo,
+    });
   }
-  return params;
+}
+
+/** Cuerpo con el que las acciones del backend identifican un aporte. */
+export function cuerpoDe(aporteId: number): { readonly aporte_id: number } {
+  return { aporte_id: aporteId };
 }
 
 /**
- * Las tres exportaciones a Excel del aporte, con el endpoint, el serializador y
- * el filtro de cada una.
+ * Exportaciones a Excel del aporte, una por pestaña: el endpoint, el
+ * serializador, el filtro que la acota al aporte abierto y el nombre del
+ * archivo. Cada una vive en el "Excel ▾" de su tabla, junto a lo que exporta.
  *
- * ⚠️ Los serializadores y los filtros salen del ERP anterior, que además los pedía
- * por **GET con query params**; acá se usan con el `POST …excel/` que es la
- * convención del ERP. Mismo supuesto que arrastran los otros informes portados.
+ * Los serializadores y los filtros salen del ERP anterior.
  */
 export const APORTE_EXPORTS = {
   /** Los contratos incluidos. */
@@ -246,7 +267,7 @@ export const APORTE_EXPORTS = {
     url: `${APORTE_DETALLE_ENDPOINT}excel/`,
     serializador: 'informe_aporte_detalle',
     filtro: 'aporte_contrato__aporte_id',
-    archivo: 'aporte-detalles.xlsx',
+    archivo: 'aporte-detalle.xlsx',
   },
   /** La cotización por entidad. */
   entidades: {
@@ -257,5 +278,23 @@ export const APORTE_EXPORTS = {
   },
 } as const;
 
-/** Clave de una de las tres exportaciones. */
+/** Clave de una de las exportaciones. */
 export type AporteExportKey = keyof typeof APORTE_EXPORTS;
+
+/**
+ * Cuerpo de un `POST …excel/`: la convención del ERP —`{ filtros, ordenamientos }`
+ * como en un `lista/`— más el serializador que elige la forma del reporte.
+ */
+export function cuerpoExportacion(
+  clave: AporteExportKey,
+  aporteId: number,
+): AdvancedListBody & { readonly serializador: string } {
+  const config = APORTE_EXPORTS[clave];
+  const query: ListQuery = {
+    filters: [{ field: config.filtro, operator: 'eq', value: aporteId }],
+    sort: [],
+    page: 0,
+    pageSize: 0,
+  };
+  return { ...buildListBody(query), serializador: config.serializador };
+}

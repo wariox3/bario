@@ -205,90 +205,93 @@
       </div>
     </div>
 
-    <!-- ── Líneas, pagos e información: mismo documento, misma card ────────── -->
-    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
-        <p-tablist>
-          <p-tab value="detalles">{{ f.tabs.detalles }}</p-tab>
-          <p-tab value="pagos">
-            {{ f.tabs.pagos }}
-            <!-- Los pagos quedan tras un clic, pero el cajero necesita saber si están
-                 en orden desde la pestaña de detalles: el chip lleva el conteo y se
-                 tiñe cuando lo recibido supera el total (lo que impedirá aprobar). -->
-            @if (pagos.length > 0) {
-              <span
-                class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
-                [class]="
-                  pagosExceden() || (pagos.invalid && pagos.touched)
-                    ? 'bg-red-50 text-red-600'
-                    : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
-                "
-              >
-                {{ pagos.length }}
-              </span>
-            }
-          </p-tab>
-          <p-tab value="informacion">{{ f.tabs.informacion }}</p-tab>
-        </p-tablist>
-
-        <p-tabpanels>
-          <p-tabpanel value="detalles">
-            <app-comercial-documento-detalles
-              [detalles]="form.controls.detalles"
-              [documentId]="documentId()"
-              [importEnabled]="true"
-              [contactoId]="form.controls.contacto.value?.id ?? null"
-              [precioListaId]="precioListaId()"
-              [resumenEnabled]="false"
-              (imported)="onImported()"
-            />
-          </p-tabpanel>
-
-          <p-tabpanel value="pagos">
-            <app-documento-pagos
-              [pagos]="form.controls.pagos"
-              [documentTotal]="totalGeneral()"
-              [documentId]="documentId()"
-              [hint]="f.pagosHint"
-            />
-          </p-tabpanel>
-
-          <p-tabpanel value="informacion">
-            <!-- Comentario -->
-            <div class="flex flex-col gap-1.5">
-              <label for="comentario" class="pos-documento-form__label">
-                {{ f.fields.comentario }}
-              </label>
-              <textarea
-                pTextarea
-                id="comentario"
-                formControlName="comentario"
-                rows="4"
-                [fluid]="true"
-                [placeholder]="f.fields.comentarioPlaceholder"
-                [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
-              ></textarea>
-              <lib-field-error
-                [control]="form.controls.comentario"
-                [messages]="{ maxlength: f.validation.comentarioMax }"
-              />
-            </div>
-          </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
-
-      <!-- Resumen del documento: fuera de los tabs, el mismo en todas las pestañas -->
-      @if (lines().length > 0 || pagos.length > 0) {
-        <div class="mt-4">
-          <app-comercial-documento-resumen
-            [resumen]="resumen()"
-            [cantidad]="cantidadTotal()"
-            [pagos]="pagos.length > 0 ? pagosResumen() : null"
+    <!-- Más información: los opcionales que menos se tocan (como en el ERP anterior). -->
+    <app-mas-informacion [campos]="['comentario']">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5">
+          <label for="comentario" class="pos-documento-form__label">
+            {{ f.fields.comentario }}
+          </label>
+          <textarea
+            pTextarea
+            id="comentario"
+            formControlName="comentario"
+            rows="4"
+            [fluid]="true"
+            [placeholder]="f.fields.comentarioPlaceholder"
+            [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
+          ></textarea>
+          <lib-field-error
+            [control]="form.controls.comentario"
+            [messages]="{ maxlength: f.validation.comentarioMax }"
           />
         </div>
-      }
-    </div>
+      </div>
+    </app-mas-informacion>
   </section>
+
+  <!-- Líneas: card propia; las tabs y la botonera de la tabla son su cabecera -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <p-tabs
+      class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
+      [value]="activeTab()"
+      (valueChange)="activeTab.set($any($event))"
+    >
+      <p-tablist>
+        <p-tab value="detalles">{{ f.tabs.detalles }}</p-tab>
+        <p-tab value="pagos">
+          {{ f.tabs.pagos }}
+          <!-- Los pagos quedan tras un clic, pero el cajero necesita saber si están
+                 en orden desde la pestaña de detalles: el chip lleva el conteo y se
+                 tiñe cuando lo recibido supera el total (lo que impedirá aprobar). -->
+          @if (pagos.length > 0) {
+            <span
+              class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+              [class]="
+                pagosExceden() || (pagos.invalid && pagos.touched)
+                  ? 'bg-red-50 text-red-600'
+                  : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
+              "
+            >
+              {{ pagos.length }}
+            </span>
+          }
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="detalles">
+          <app-comercial-documento-detalles
+            [detalles]="form.controls.detalles"
+            [documentId]="documentId()"
+            [importEnabled]="true"
+            [contactoId]="form.controls.contacto.value?.id ?? null"
+            [precioListaId]="precioListaId()"
+            (imported)="onImported()"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="pagos">
+          <app-documento-pagos
+            [pagos]="form.controls.pagos"
+            [documentTotal]="totalGeneral()"
+            [documentId]="documentId()"
+            [hint]="f.pagosHint"
+          />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </section>
+
+  <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
+  @if (lines().length > 0 || pagos.length > 0) {
+    <app-comercial-documento-resumen
+      [resumen]="resumen()"
+      [cantidad]="cantidadTotal()"
+      [pagos]="pagos.length > 0 ? pagosResumen() : null"
+    />
+  }
 </form>
 
 <p-confirmdialog />

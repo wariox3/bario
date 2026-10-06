@@ -176,6 +176,8 @@ export type {
   UpdateContenedorResponse,
   Contenedor,
   ContenedorDetalle,
+  ContenedorEstado,
+  ContenedorEstadoResponse,
   ContenedorAccesoFlags,
   ContenedorMember,
   ContenedorMembersResponse,
@@ -198,6 +200,7 @@ export {
   SELECT_ENDPOINTS,
   buildContactoLabel,
   asesorLabel,
+  resolucionLabel,
 } from './lib/data';
 export type { ErpSelectOption } from './lib/data';
 export * from './lib/data-list';

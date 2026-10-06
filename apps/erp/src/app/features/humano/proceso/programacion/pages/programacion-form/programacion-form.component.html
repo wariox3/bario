@@ -2,7 +2,13 @@
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
   <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
   <lib-page-actions>
     <p-button
@@ -20,7 +26,7 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
   </lib-page-actions>
 
@@ -41,7 +47,7 @@
     </div>
 
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         <!-- Tipo de pago -->
         <div class="flex flex-col gap-1.5">
           <label for="pago_tipo" class="programacion-form__label">
@@ -53,30 +59,11 @@
             formControlName="pago_tipo"
             [endpoint]="pagoTipoEndpoint"
             [placeholder]="f.fields.seleccionar"
+            (optionsLoaded)="onPagoTiposCargados($event)"
             [invalid]="form.controls.pago_tipo.invalid && form.controls.pago_tipo.touched"
           />
           <lib-field-error
             [control]="form.controls.pago_tipo"
-            [messages]="{ required: f.validation.required }"
-          />
-        </div>
-
-        <!-- Grupo -->
-        <div class="flex flex-col gap-1.5">
-          <label for="grupo" class="programacion-form__label">
-            {{ f.fields.grupo }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <lib-api-select
-            inputId="grupo"
-            formControlName="grupo"
-            [endpoint]="grupoEndpoint"
-            [placeholder]="f.fields.seleccionar"
-            [invalid]="form.controls.grupo.invalid && form.controls.grupo.touched"
-          />
-          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.grupoHint }}</p>
-          <lib-field-error
-            [control]="form.controls.grupo"
             [messages]="{ required: f.validation.required }"
           />
         </div>
@@ -95,8 +82,29 @@
           />
         </div>
 
-        <!-- Fecha desde -->
-        <div class="flex flex-col gap-1.5">
+        <!-- Grupo -->
+        <div class="flex flex-col gap-1.5 sm:col-start-1">
+          <label for="grupo" class="programacion-form__label">
+            {{ f.fields.grupo }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="grupo"
+            formControlName="grupo"
+            [endpoint]="grupoEndpoint"
+            [placeholder]="f.fields.seleccionar"
+            (optionsLoaded)="onGruposCargados($event)"
+            [invalid]="form.controls.grupo.invalid && form.controls.grupo.touched"
+          />
+          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.grupoHint }}</p>
+          <lib-field-error
+            [control]="form.controls.grupo"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        <!-- Fecha desde: arranca fila, debajo del grupo -->
+        <div class="flex flex-col gap-1.5 sm:col-start-1">
           <label for="fecha_desde" class="programacion-form__label">
             {{ f.fields.fechaDesde }}
             <span class="ml-px text-red-500">*</span>
@@ -131,35 +139,33 @@
           />
           <lib-field-error
             [control]="form.controls.fecha_hasta"
-            [messages]="{ required: f.validation.required }"
+            [messages]="{
+              required: f.validation.required,
+              rangoFechasInvalido: f.validation.rangoInvalido,
+            }"
           />
-        </div>
-
-        <!-- Fecha hasta periodo -->
-        <div class="flex flex-col gap-1.5">
-          <label for="fecha_hasta_periodo" class="programacion-form__label">
-            {{ f.fields.fechaHastaPeriodo }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <p-datepicker
-            inputId="fecha_hasta_periodo"
-            formControlName="fecha_hasta_periodo"
-            [showIcon]="true"
-            appendTo="body"
-            [fluid]="true"
-            [invalid]="
-              form.controls.fecha_hasta_periodo.invalid && form.controls.fecha_hasta_periodo.touched
-            "
-          />
-          <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.fechaHastaPeriodoHint }}</p>
-          <lib-field-error
-            [control]="form.controls.fecha_hasta_periodo"
-            [messages]="{ required: f.validation.required }"
-          />
+          <!-- Duración: en rojo como cualquier error del campo, con la salida a mano -->
+          @if (mensajeDuracion(); as mensaje) {
+            <p
+              class="m-0 mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-[0.7rem] tracking-[0.01em] text-red-600"
+            >
+              <span>{{ mensaje }}</span>
+              @if (etiquetaUsarSugerida(); as etiqueta) {
+                <button
+                  type="button"
+                  class="rounded-[5px] px-1 py-0.5 font-medium underline decoration-red-600/40 underline-offset-2 transition-colors hover:bg-red-50 hover:decoration-red-600"
+                  [title]="f.validation.usarFechaSugeridaTitle"
+                  (click)="usarFechaHastaSugerida()"
+                >
+                  {{ etiqueta }}
+                </button>
+              }
+            </p>
+          }
         </div>
 
         <!-- Comentario -->
-        <div class="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-3">
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
           <label for="comentario" class="programacion-form__label">{{ f.fields.comentario }}</label>
           <textarea
             id="comentario"
@@ -171,21 +177,6 @@
           ></textarea>
         </div>
       </div>
-
-      <!-- Errores del grupo: no pertenecen a ningún campo -->
-      @if (form.errors; as errores) {
-        @if (form.controls.fecha_hasta.touched) {
-          @if (errores['rangoFechasInvalido']) {
-            <p class="m-0 mt-3 text-[0.78rem] text-red-600">{{ f.validation.rangoInvalido }}</p>
-          }
-          @if (errores['duracionPeriodo']; as detalle) {
-            <p class="m-0 mt-3 text-[0.78rem] text-red-600">
-              {{ f.validation.duracionPeriodo }} — {{ f.validation.duracionEsperada }}:
-              {{ detalle.requeridos }}, {{ f.validation.duracionActual }}: {{ detalle.duracion }}
-            </p>
-          }
-        }
-      }
     </div>
   </section>
 

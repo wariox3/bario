@@ -6,6 +6,7 @@ import {
   forwardRef,
   inject,
   input,
+  output,
   signal,
   untracked,
 } from '@angular/core';
@@ -100,6 +101,14 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   readonly filterBy = input<string>('nombre');
   readonly filterPlaceholder = input<string>('Buscar…');
 
+  /**
+   * Emite el catálogo cada vez que llega del endpoint. Sirve a quien necesita
+   * campos extra de las filas sin una segunda petición: completar un valor
+   * cargado por id en edición —que llega como `{ id, nombre }`— o elegir un
+   * default por id en vez de por posición.
+   */
+  readonly optionsLoaded = output<readonly ErpSelectOption[]>();
+
   readonly value = signal<ErpSelectOption | null>(null);
   readonly disabled = signal(false);
   readonly options = signal<ErpSelectOption[]>([]);
@@ -147,6 +156,7 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
           this.options.set(options);
           this.loading.set(false);
           this.applySuggestion(options);
+          this.optionsLoaded.emit(options);
         },
         error: () => {
           this.options.set([]);

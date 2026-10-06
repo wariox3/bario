@@ -97,6 +97,39 @@
       opacity: 0.75;
     }
   }
+
+  // Todavía no se puede ingresar: la tarjeta no se levanta al hover.
+  &.cl-card--creando,
+  &.cl-card--error {
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: rgba(19 38 60 / 0.08);
+
+      .cl-card__monogram {
+        background: rgba(19 38 60 / 0.06);
+      }
+    }
+
+    .cl-card__monogram {
+      opacity: 0.6;
+    }
+  }
+
+  &.cl-card--creando {
+    cursor: progress;
+
+    // El hueco de «Ingresar» no se enciende: todavía no hay a dónde entrar.
+    &:hover .cl-card__cta--pending {
+      background: rgba(19 38 60 / 0.02);
+      color: var(--brand-muted);
+      border-color: rgba(19 38 60 / 0.08);
+    }
+  }
+
+  &.cl-card--error {
+    cursor: not-allowed;
+  }
 }
 
 .cl-card__top {
@@ -233,6 +266,20 @@
     font-size: 0.7em;
     transition: transform 0.18s ease;
   }
+}
+
+.cl-card__cta--pending {
+  background: rgba(19 38 60 / 0.02);
+  color: var(--brand-muted);
+  border-color: rgba(19 38 60 / 0.08);
+
+  .pi {
+    font-size: 0.8em;
+  }
+}
+
+.cl-card__locked-msg--error {
+  color: rgb(190 18 60);
 }
 
 .cl-card__cta--renew {

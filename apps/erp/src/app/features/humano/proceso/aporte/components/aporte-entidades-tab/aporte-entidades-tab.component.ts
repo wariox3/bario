@@ -2,10 +2,12 @@ import { Component, DestroyRef, computed, effect, inject, input, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { I18nService, ToastService, formatCop } from '@reddoc/core';
+import { DataToolbarComponent } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
+import { EXCEL_ACTION_PREFIX, excelAction } from '../../aporte.constants';
 import { agruparEntidades } from '../../aporte.entidades';
 import type { AporteEntidad } from '../../aporte.model';
-import { AporteService } from '../../aporte.service';
+import { AporteService, type AporteExportKey } from '../../aporte.service';
 
 /**
  * Lo que se le paga a cada **entidad**, agrupado por subsistema con subtotal y
@@ -19,7 +21,7 @@ import { AporteService } from '../../aporte.service';
 @Component({
   selector: 'app-aporte-entidades-tab',
   standalone: true,
-  imports: [],
+  imports: [DataToolbarComponent],
   templateUrl: './aporte-entidades-tab.component.html',
 })
 export class AporteEntidadesTabComponent {
@@ -43,12 +45,31 @@ export class AporteEntidadesTabComponent {
 
   protected readonly formatMoney = formatCop;
 
+  /** "Excel ▾" de la tabla: exporta la cotización por entidad. */
+  protected readonly trailingActions = excelAction('entidades');
+
   constructor() {
     effect(() => {
       this.aporteId();
       this.reloadToken();
       this.load();
     });
+  }
+
+  protected onToolbarAction(actionId: string): void {
+    if (actionId.startsWith(EXCEL_ACTION_PREFIX)) {
+      this.exportar(actionId.slice(EXCEL_ACTION_PREFIX.length) as AporteExportKey);
+    }
+  }
+
+  private exportar(clave: AporteExportKey): void {
+    const toasts = this.t().common.toasts;
+    this.service
+      .exportar(clave, this.aporteId())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
+      });
   }
 
   private load(): void {

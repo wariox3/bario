@@ -68,6 +68,8 @@ export interface AppDict
     AccesosContenedorTranslationsHost {
   common: {
     comingSoon: string;
+    /** Colapsable de los documentos con los campos opcionales que menos se tocan. */
+    masInformacion: { title: string; hint: string };
     accessDenied: {
       title: string;
       sub: string;
@@ -367,6 +369,12 @@ export interface AppDict
       title: string;
       subtitle: string;
       empty: string;
+      porDocumento: {
+        subtitle: string;
+        empty: string;
+        cols: { concepto: string; valor: string };
+      };
+      ver: string;
       cols: {
         id: string;
         documento: string;
@@ -1557,12 +1565,21 @@ export interface AppDict
         action: string;
         title: string;
         subtitle: string;
-        aviso: string;
         submit: string;
         fields: { fecha: string; motivo: string; seleccionar: string };
-        validation: { required: string };
+        validation: { required: string; antesDelInicio: string };
+        /** Resumen de la liquidación que respondió `terminar/`. */
+        resultado: {
+          title: string;
+          subtitle: string;
+          periodo: string;
+          total: string;
+          adiciones: string;
+          deducciones: string;
+          nota: string;
+          cerrar: string;
+        };
         toasts: {
-          success: { title: string; desc: string };
           error: { title: string };
         };
       };
@@ -1739,8 +1756,23 @@ export interface AppDict
           sedePlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          ordenCompraPlaceholder: string;
+          remision: string;
+          remisionPlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          resolucion: string;
+          resolucionPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          ordenCompraMax: string;
+          remisionMax: string;
+          comentarioMax: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           createError: { title: string; desc: string };
@@ -1760,6 +1792,11 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           metodoPago: string;
+          ordenCompra: string;
+          remision: string;
+          asesor: string;
+          resolucion: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -1899,7 +1936,7 @@ export interface AppDict
       form: {
         createHint: string;
         editHint: string;
-        tabs: { detalles: string; pagos: string; informacion: string };
+        tabs: { detalles: string; pagos: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -1907,6 +1944,7 @@ export interface AppDict
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           sede: string;
           sedePlaceholder: string;
           metodoPago: string;
@@ -1951,9 +1989,7 @@ export interface AppDict
       saveAll: string;
       pendingSuffix: string;
       anulado: string;
-      anular: string;
       confirmDelete: string;
-      confirmAnular: { header: string; message: string; accept: string };
       columns: {
         id: string;
         cuentaBanco: string;
@@ -1974,8 +2010,6 @@ export interface AppDict
         incompletos: { title: string; desc: string };
         deleteError: { title: string; desc: string };
         noRegistrados: { title: string; desc: string };
-        anularSuccess: { title: string; desc: string };
-        anularError: { title: string; desc: string };
       };
     };
     posDocumento: {
@@ -1984,7 +2018,7 @@ export interface AppDict
         editHint: string;
         /** Ayuda de la sección de pagos, matiz propio del POS (cobro en el acto). */
         pagosHint: string;
-        tabs: { detalles: string; pagos: string; informacion: string };
+        tabs: { detalles: string; pagos: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -2052,7 +2086,6 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        masInformacion: { title: string; hint: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -2090,6 +2123,8 @@ export interface AppDict
           metodoPago: string;
           asesor: string;
           comentario: string;
+          ordenCompra: string;
+          remision: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -2129,6 +2164,8 @@ export interface AppDict
           sedePlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
         };
         tabs: { detalles: string; cuentas: string };
         validation: { required: string };
@@ -2151,6 +2188,8 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           metodoPago: string;
+          ordenCompra: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -2372,7 +2411,6 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        adicionales: { title: string; hint: string };
         fields: {
           proveedor: string;
           proveedorPlaceholder: string;
@@ -2407,6 +2445,7 @@ export interface AppDict
           centroCosto: string;
           sede: string;
           ordenCompra: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -3160,17 +3199,17 @@ export interface AppDict
           nombrePlaceholder: string;
           fechaDesde: string;
           fechaHasta: string;
-          fechaHastaPeriodo: string;
-          fechaHastaPeriodoHint: string;
           comentario: string;
           seleccionar: string;
         };
         validation: {
           required: string;
           rangoInvalido: string;
+          /** `{requeridos}` y `{duracion}`: días que debe durar el rango y los que dura. */
           duracionPeriodo: string;
-          duracionEsperada: string;
-          duracionActual: string;
+          /** `{fecha}`: la fecha hasta que cierra el periodo. */
+          usarFechaSugerida: string;
+          usarFechaSugeridaTitle: string;
         };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -3182,12 +3221,17 @@ export interface AppDict
         };
       };
       resumen: {
-        sinNombre: string;
         conceptos: string;
         sinConceptos: string;
         labels: {
+          id: string;
+          nombre: string;
           fechaDesde: string;
           fechaHasta: string;
+          pagoTipo: string;
+          grupo: string;
+          periodo: string;
+          dias: string;
           contratos: string;
           devengado: string;
           deduccion: string;
@@ -3209,6 +3253,7 @@ export interface AppDict
         salarioPromedio: string;
         cesantiaPropuesta: string;
         interesPropuesto: string;
+        primaPropuesta: string;
         banderasHint: string;
         sections: { horas: string; banderas: string };
         horas: {
@@ -3248,27 +3293,30 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         subtitle: string;
+        import: { title: string; subtitle: string };
         fields: {
           contrato: string;
           contratoPlaceholder: string;
           concepto: string;
           conceptoPlaceholder: string;
           valor: string;
-          horas: string;
-          horasHint: string;
           detalle: string;
           aplicaDiaLaborado: string;
         };
         validation: { required: string; valorMinimo: string };
         columns: {
           id: string;
+          identificacion: string;
           empleado: string;
+          contrato: string;
+          conceptoId: string;
           concepto: string;
           valor: string;
-          horas: string;
           detalle: string;
           aplicaDiaLaborado: string;
         };
+        /** Abreviaturas de la tabla, bajo ella como en la de empleados. */
+        leyenda: { titulo: string; contenido: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           createError: { title: string; desc: string };
@@ -3279,7 +3327,6 @@ export interface AppDict
       importarHoras: {
         title: string;
         subtitle: string;
-        plantillaNoDisponible: string;
       };
       acciones: {
         generar: string;
@@ -3290,9 +3337,7 @@ export interface AppDict
         importarHoras: string;
         imprimir: string;
         imprimirNominas: string;
-        exportRenglones: string;
-        exportNomina: string;
-        exportNominaDetalle: string;
+        utilidades: string;
         confirmaciones: {
           generar: { header: string; message: string };
           desgenerar: { header: string; message: string };
@@ -3326,9 +3371,15 @@ export interface AppDict
       renglones: {
         cargarContratos: string;
         verNomina: string;
+        /** Modal de solo lectura de la nómina de un renglón. */
+        nominaResumen: { title: string };
         confirmEliminar: { header: string; message: string };
         confirmRecargar: { header: string; message: string };
         leyenda: { titulo: string; contenido: string };
+        /** Leyenda de los colores de las fechas (`tonoFechaDesde` / `tonoFechaHasta`). */
+        marcas: { ingresoRetiro: string; errorTerminacion: string };
+        /** Dropdown "Excel" de la tabla de empleados. */
+        excel: { action: string; detalle: string; nomina: string; nominaDetalle: string };
         toasts: {
           cargarSuccess: { title: string; desc: string };
           cargarError: { title: string; desc: string };
@@ -3407,9 +3458,11 @@ export interface AppDict
       estados: { borrador: string; generada: string; aprobada: string };
       prestaciones: { cesantia: string; interes: string; prima: string; vacacion: string };
       resumen: {
-        sinEmpleado: string;
         prestacionesTitle: string;
         labels: {
+          id: string;
+          empleado: string;
+          identificacion: string;
           contrato: string;
           fecha: string;
           desde: string;
@@ -3422,9 +3475,28 @@ export interface AppDict
           adicion: string;
           deduccion: string;
           total: string;
+          comentario: string;
+        };
+      };
+      form: {
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          fechaUltimoPago: string;
+          fechaUltimoPagoCesantia: string;
+          fechaUltimoPagoPrima: string;
+          fechaUltimoPagoVacacion: string;
+          comentario: string;
+        };
+        toasts: {
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          noEditable: { title: string; desc: string };
         };
       };
       workspace: {
+        tabs: { adicionales: string };
         adicionalesHint: string;
         notFound: { title: string; desc: string };
       };
@@ -3434,14 +3506,12 @@ export interface AppDict
         desgenerar: string;
         aprobar: string;
         desaprobar: string;
-        imprimir: string;
         confirmaciones: {
           generar: { header: string; message: string };
           reliquidar: { header: string; message: string };
           desgenerar: { header: string; message: string };
           aprobar: { header: string; message: string };
           desaprobar: { header: string; message: string };
-          eliminar: { header: string; message: string };
         };
         toasts: {
           generar: {
@@ -3557,15 +3627,19 @@ export interface AppDict
         };
       };
       resumen: {
-        cotizacionesTitle: string;
+        valoresTitle: string;
         labels: {
+          sucursal: string;
+          mes: string;
+          anio: string;
+          presentacion: string;
+          entidadRiesgo: string;
+          entidadSena: string;
+          entidadIcbf: string;
           empleados: string;
           contratos: string;
           lineas: string;
           baseCotizacion: string;
-          entidadRiesgo: string;
-          entidadSena: string;
-          entidadIcbf: string;
           total: string;
         };
       };
@@ -3582,10 +3656,7 @@ export interface AppDict
         aprobar: string;
         desaprobar: string;
         planoOperador: string;
-        imprimir: string;
-        exportContratos: string;
-        exportDetalles: string;
-        exportEntidades: string;
+        utilidades: string;
         confirmaciones: {
           generar: { header: string; message: string };
           desgenerar: { header: string; message: string };
@@ -3611,6 +3682,7 @@ export interface AppDict
           };
         };
       };
+      excel: { action: string; detalle: string };
       contratos: {
         cargarContratos: string;
         leyenda: { titulo: string; contenido: string };
@@ -3622,7 +3694,6 @@ export interface AppDict
         };
         columns: {
           id: string;
-          codigo: string;
           identificacion: string;
           empleado: string;
           contrato: string;
@@ -3642,42 +3713,52 @@ export interface AppDict
         };
       };
       trazabilidad: {
-        verNominas: string;
+        verDetalle: string;
         title: string;
+        sinEmpleado: string;
         subtitle: string;
         total: string;
-        empty: { title: string; sub: string };
-        nominas: {
+        documentos: {
           title: string;
+          empty: string;
           columns: {
+            id: string;
+            tipo: string;
             numero: string;
             desde: string;
             hasta: string;
+            contrato: string;
             salario: string;
             ibc: string;
             ibp: string;
             devengado: string;
             deduccion: string;
-            total: string;
+            neto: string;
           };
         };
-        conceptos: {
+        detalles: {
           title: string;
           empty: string;
           columns: {
-            nomina: string;
+            id: string;
+            tipo: string;
+            numero: string;
+            conceptoId: string;
             concepto: string;
-            dias: string;
+            detalle: string;
+            porcentaje: string;
             horas: string;
-            ibc: string;
-            ibp: string;
+            dias: string;
+            valorHora: string;
             devengado: string;
             deduccion: string;
+            ibc: string;
+            ibp: string;
           };
         };
       };
       entidades: {
-        columns: { tipo: string; entidad: string; cotizacion: string };
+        columns: { id: string; tipo: string; entidad: string; cotizacion: string };
         subtotal: string;
         totalGeneral: string;
         empty: { title: string; sub: string };
@@ -4297,6 +4378,7 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
+        pago: string;
         afectado: string;
         pendiente: string;
       };
@@ -4317,6 +4399,7 @@ export interface AppDict
         subtotal: string;
         impuesto: string;
         total: string;
+        pago: string;
         saldo: string;
       };
     };
@@ -4605,6 +4688,19 @@ export interface AppDict
         };
       };
     };
+    validarSaldos: {
+      porTipo: Record<
+        'cobrar' | 'pagar',
+        { description: string; confirmMessage: string; successDesc: string }
+      >;
+      name: string;
+      run: string;
+      confirm: { header: string; accept: string; cancel: string };
+      toasts: {
+        success: { title: string };
+        error: { title: string; desc: string };
+      };
+    };
     regenerarAfectado: {
       name: string;
       description: string;
@@ -4816,6 +4912,16 @@ export interface AppDict
   };
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
+    carteraResumen: {
+      porTipo: Record<
+        'cobrar' | 'pagar',
+        { titulo: string; cifra: string; sinPendiente: string; verInforme: string }
+      >;
+      saldoAl: string;
+      vigente: string;
+      vencido: string;
+      error: { title: string; desc: string };
+    };
     general: {
       /** Asistente de datos iniciales: solo en contenedores recién creados. */
       datosIniciales: {

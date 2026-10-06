@@ -28,7 +28,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { I18nService, calcularImpuestosLinea, toHora, type TasaImpuesto } from '@reddoc/core';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, MascaraFechaDirective } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
@@ -65,6 +65,7 @@ import type {
     ButtonModule,
     DialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputNumberModule,
     ToggleSwitchModule,
     FieldErrorComponent,

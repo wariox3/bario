@@ -1,0 +1,126 @@
+@let l = t().entities.nomina.detail.labels;
+@let tips = t().entities.nomina.detail.tooltips;
+
+<div class="flex flex-col gap-5">
+  <!-- Header: badge + número + a quién pertenece -->
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-file text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex min-w-0 flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ titulo() }}
+      </h2>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-12 text-brand-muted">
+      <i class="pi pi-spin pi-spinner text-xl"></i>
+    </div>
+  } @else if (cabecera(); as c) {
+    <!--
+      Cabecera en tres columnas que se leen como una suma: quién y cuándo, sobre
+      qué bases se liquidó, y cuánto salió. El total cierra la última.
+    -->
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] rounded-[10px] border border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+    >
+      <dl class="m-0 flex flex-col gap-2 px-4 py-3.5">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted">{{ l.numero }}</dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ c.numero || '' }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted">{{ l.empleado }}</dt>
+          <dd
+            class="m-0 min-w-0 truncate text-right text-[0.85rem] text-brand-text"
+            [title]="empleado()"
+          >
+            {{ empleado() }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted">{{ l.desde }}</dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ formatFecha(c.fecha_desde) }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted">{{ l.hasta }}</dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ formatFecha(c.fecha_hasta) }}
+          </dd>
+        </div>
+      </dl>
+      <dl class="m-0 flex flex-col gap-2 px-4 py-3.5">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted" [title]="tips.basePrestacion">
+            {{ l.basePrestacion }}
+          </dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ formatMonto(c.base_prestacion) }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted" [title]="tips.baseCotizacion">
+            {{ l.baseCotizacion }}
+          </dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ formatMonto(c.base_cotizacion) }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted">{{ l.salario }}</dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ formatMonto(c.salario) }}
+          </dd>
+        </div>
+      </dl>
+      <dl class="m-0 flex flex-col gap-2 px-4 py-3.5">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted">{{ l.devengado }}</dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ formatMonto(c.devengado) }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.75rem] text-brand-muted">{{ l.deduccion }}</dt>
+          <dd class="m-0 text-right text-[0.85rem] tabular-nums text-brand-text">
+            {{ formatMonto(c.deduccion) }}
+          </dd>
+        </div>
+        <div
+          class="mt-auto flex items-baseline justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] pt-2"
+        >
+          <dt class="text-[0.8rem] font-semibold text-brand-text">{{ l.total }}</dt>
+          <dd class="m-0 text-right text-[0.95rem] font-bold tabular-nums text-brand-text">
+            {{ formatMonto(c.total) }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Conceptos: la misma tabla de solo lectura de la ficha de nómina -->
+    <div class="max-h-[50vh] overflow-auto">
+      <app-nomina-conceptos-table [lines]="lineas()" />
+    </div>
+  }
+
+  <!-- Footer: solo cerrar, no hay nada que guardar -->
+  <div class="mt-1 flex items-center justify-end border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.close"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onClose()"
+    />
+  </div>
+</div>

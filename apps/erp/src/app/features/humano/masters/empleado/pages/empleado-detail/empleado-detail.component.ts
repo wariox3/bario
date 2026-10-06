@@ -14,6 +14,7 @@ import {
 } from '@erp/features/general/masters/contacto/contacto.format';
 import type { Empleado } from '../../empleado.model';
 import { EMPLEADO_LIST_PATH } from '../../empleado.constants';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /**
  * Ficha (detalle) de un empleado — solo lectura. Empleado = contacto con
@@ -32,7 +33,7 @@ import { EMPLEADO_LIST_PATH } from '../../empleado.constants';
 @Component({
   selector: 'app-empleado-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, TelefonoPipe],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent, TelefonoPipe],
   templateUrl: './empleado-detail.component.html',
   styleUrl: './empleado-detail.component.scss',
 })
@@ -106,6 +107,10 @@ export class EmpleadoDetailComponent implements OnInit {
     const c = this.empleado();
     if (!c) return;
     this.navigate(...EMPLEADO_LIST_PATH, 'editar', c.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...EMPLEADO_LIST_PATH, 'nuevo');
   }
 
   private loadEmpleado(id: number): void {

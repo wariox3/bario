@@ -8,6 +8,7 @@ import { ActiveModuleStore, masterNav } from '@erp/core/erp-modules';
 import { ResolucionService } from '../../resolucion.service';
 import { RESOLUCION_SEGMENT } from '../../resolucion.constants';
 import type { Resolucion, ResolucionTipo } from '../../resolucion.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /** Fecha en el formato del sistema (`05/08/2026`). */
 function formatearFecha(iso: string): string {
@@ -17,7 +18,7 @@ function formatearFecha(iso: string): string {
 @Component({
   selector: 'app-resolucion-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './resolucion-detail.component.html',
   styleUrl: './resolucion-detail.component.scss',
 })
@@ -95,6 +96,10 @@ export class ResolucionDetailComponent implements OnInit {
     const r = this.resolucion();
     if (!r) return;
     this.nav.ir('editar', r.id);
+  }
+
+  protected onNew(): void {
+    this.nav.ir('nuevo');
   }
 
   private loadResolucion(id: number): void {

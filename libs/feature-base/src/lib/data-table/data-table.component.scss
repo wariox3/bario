@@ -152,6 +152,20 @@
     }
   }
 
+  // `ColumnDef.toneFor`: la celda entera se tiñe con los mismos pares que los
+  // badges, así una fecha marcada se lee de un vistazo sin cambiar su formato.
+  &__cell--positive {
+    background: #f0fdf4;
+    color: #16a34a;
+    font-weight: 600;
+  }
+
+  &__cell--critical {
+    background: #fef2f2;
+    color: #dc2626;
+    font-weight: 600;
+  }
+
   &__paginator-count {
     font-size: 0.8rem;
     color: var(--brand-muted);

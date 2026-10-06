@@ -1,9 +1,5 @@
 import type { DocumentoEstados } from '@reddoc/core';
-import {
-  CAPACIDADES_DOCUMENTO_VACIAS,
-  capacidadesDocumento,
-  puedeAnularPagosDocumento,
-} from './documento.estado';
+import { CAPACIDADES_DOCUMENTO_VACIAS, capacidadesDocumento } from './documento.estado';
 
 const SIN_APROBAR: DocumentoEstados = {
   estado_aprobado: false,
@@ -89,27 +85,5 @@ describe('CAPACIDADES_DOCUMENTO_VACIAS', () => {
       puedeDesaprobar: false,
       puedeAnular: false,
     });
-  });
-});
-
-describe('puedeAnularPagosDocumento', () => {
-  it('sin aprobar no: el pago se elimina desde el formulario', () => {
-    expect(puedeAnularPagosDocumento(SIN_APROBAR)).toBe(false);
-  });
-
-  it('aprobado y sin contabilizar sí', () => {
-    expect(puedeAnularPagosDocumento(APROBADO)).toBe(true);
-  });
-
-  it('contabilizado no: el pago ya está en la contabilidad', () => {
-    expect(puedeAnularPagosDocumento(CONTABILIZADO)).toBe(false);
-  });
-
-  it('anulado no: el documento quedó congelado', () => {
-    expect(puedeAnularPagosDocumento(ANULADO)).toBe(false);
-  });
-
-  it('una bandera ausente cuenta como "no" (conservador)', () => {
-    expect(puedeAnularPagosDocumento({})).toBe(false);
   });
 });

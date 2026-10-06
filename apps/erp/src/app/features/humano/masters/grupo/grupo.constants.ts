@@ -1,7 +1,8 @@
 import type { ColumnDef, FilterField, SortSpec } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
-export const GRUPOS_FILTERS_STORAGE_KEY = 'grupos:filters:v1';
+// v2: el filtro por periodo pasó a `periodo_id`; uno guardado con el nombre viejo se descarta.
+export const GRUPOS_FILTERS_STORAGE_KEY = 'grupos:filters:v2';
 export const GRUPOS_QUICK_SEARCH_FIELD = 'nombre';
 
 /** Segmentos de ruta del listado, relativos al tenant. */
@@ -52,7 +53,7 @@ export const GRUPOS_COLUMNS: readonly ColumnDef[] = [
 export const GRUPOS_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.grupo.columns.id', type: 'number' },
   { name: 'nombre', displayNameKey: 'entities.grupo.columns.nombre', type: 'string' },
-  { name: 'periodo', displayNameKey: 'entities.grupo.columns.periodo', type: 'number' },
+  { name: 'periodo_id', displayNameKey: 'entities.grupo.columns.periodo', type: 'number' },
 ];
 
 export const GRUPOS_ROW_ACTIONS: readonly RowAction[] = [

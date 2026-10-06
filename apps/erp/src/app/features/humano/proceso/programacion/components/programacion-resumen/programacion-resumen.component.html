@@ -11,12 +11,8 @@
     </span>
     <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
       <h2 class="m-0 truncate text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ p.nombre || res.sinNombre }}
+        {{ t().entities.programacion.name }}
       </h2>
-      <p class="m-0 text-[0.72rem] text-brand-muted">
-        {{ p.pago_tipo_nombre || '—' }} · {{ p.grupo_nombre || '—' }} ·
-        {{ p.periodo_nombre || '—' }}
-      </p>
     </div>
 
     <!-- Etapa del ciclo: es la información que decide qué se puede hacer -->
@@ -34,36 +30,112 @@
     </span>
   </div>
 
-  <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-3 lg:grid-cols-6">
-    <div class="flex flex-col gap-0.5">
-      <dt class="programacion-resumen__label">{{ res.labels.fechaDesde }}</dt>
-      <dd class="programacion-resumen__value">{{ formatFecha(fechaDesde()) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="programacion-resumen__label">{{ res.labels.fechaHasta }}</dt>
-      <dd class="programacion-resumen__value">{{ formatFecha(fechaHasta()) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="programacion-resumen__label">{{ res.labels.contratos }}</dt>
-      <dd class="programacion-resumen__value tabular-nums">{{ p.contratos ?? 0 }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="programacion-resumen__label">{{ res.labels.devengado }}</dt>
-      <dd class="programacion-resumen__value tabular-nums">{{ formatMoney(devengado()) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="programacion-resumen__label">{{ res.labels.deduccion }}</dt>
-      <dd class="programacion-resumen__value tabular-nums">{{ formatMoney(deduccion()) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5">
-      <dt class="programacion-resumen__label">{{ res.labels.total }}</dt>
-      <dd class="programacion-resumen__value font-bold tabular-nums">{{ formatMoney(total()) }}</dd>
-    </div>
-    <div class="flex flex-col gap-0.5 sm:col-span-3 lg:col-span-6">
-      <dt class="programacion-resumen__label">{{ res.labels.comentario }}</dt>
-      <dd class="programacion-resumen__value">{{ p.comentario || '—' }}</dd>
-    </div>
-  </dl>
+  <!--
+    Tres columnas que se leen como la nómina: qué programación y de cuándo, a
+    quién alcanza, y cuánto suma. El total cierra la última; el comentario va
+    debajo, a todo el ancho, porque es texto libre y necesita lugar.
+  -->
+  <div
+    class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+  >
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.id }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ p.id }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.nombre }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.nombre || ''"
+        >
+          {{ p.nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.fechaDesde }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium text-brand-text">
+          {{ formatFecha(fechaDesde()) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.fechaHasta }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium text-brand-text">
+          {{ formatFecha(fechaHasta()) }}
+        </dd>
+      </div>
+    </dl>
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.pagoTipo }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.pago_tipo_nombre || ''"
+        >
+          {{ p.pago_tipo_nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.grupo }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.grupo_nombre || ''"
+        >
+          {{ p.grupo_nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.periodo }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.periodo_nombre || ''"
+        >
+          {{ p.periodo_nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.dias }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ p.dias ?? '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.contratos }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ p.contratos ?? 0 }}
+        </dd>
+      </div>
+    </dl>
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.devengado }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ formatMoney(devengado()) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.deduccion }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ formatMoney(deduccion()) }}
+        </dd>
+      </div>
+      <div
+        class="mt-auto flex items-baseline justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] pt-2"
+      >
+        <dt class="text-[0.8rem] font-semibold text-brand-text">{{ res.labels.total }}</dt>
+        <dd class="m-0 text-right text-[0.95rem] font-bold tabular-nums text-brand-text">
+          {{ formatMoney(total()) }}
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="flex flex-col gap-0.5 border-t border-[rgba(20,48,73,0.08)] px-5 py-3">
+    <span class="text-[0.75rem] text-brand-muted">{{ res.labels.comentario }}</span>
+    <p class="m-0 whitespace-pre-line text-[0.85rem] text-brand-text">{{ p.comentario || '' }}</p>
+  </div>
 
   <!-- Banderas activas, plegadas -->
   <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-3">

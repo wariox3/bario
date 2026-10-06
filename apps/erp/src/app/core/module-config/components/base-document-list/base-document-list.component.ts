@@ -19,6 +19,7 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  type ColumnDef,
   type FilterCondition,
   type ListQuery,
   type SortSpec,
@@ -46,9 +47,16 @@ import {
 import { MissingModuleContextError } from '../../errors/config.errors';
 import { ModuleNavigationStore } from '../../module-navigation.store';
 import { buildEntityStorageKey } from '../../storage/build-entity-storage-key';
+import { DocumentoAfectacionModalComponent } from '../documento-afectacion-modal/documento-afectacion-modal.component';
 
 /** Tamaño de página default mientras `DocumentEntityConfig` no exponga `paginationDefaults`. */
 const DEFAULT_PAGE_SIZE = 25;
+
+/**
+ * Acción de la celda `id` cuando el documento declara `canViewAfectacion`. Sale
+ * por `rowActionInvoked`, como las acciones de fila.
+ */
+const AFECTACION_ACTION_ID = 'afectacion';
 
 /** Acción primaria "Nuevo" del toolbar — derivada de `capabilities.canCreate`. */
 const NEW_ACTION: ToolbarAction = {
@@ -87,6 +95,7 @@ const NEW_ACTION: ToolbarAction = {
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
+    DocumentoAfectacionModalComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './base-document-list.component.html',
@@ -124,10 +133,31 @@ export class BaseDocumentListComponent {
   protected readonly selectedRows = signal<readonly unknown[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
+  /** Modal de afectación (solo documentos con `canViewAfectacion`). */
+  protected readonly afectacionVisible = signal(false);
+  protected readonly afectacionDocumentoId = signal<number | null>(null);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
-  protected readonly columns = computed(() => this.document().columns);
   protected readonly capabilities = computed(() => this.document().capabilities);
+
+  /**
+   * Columnas del documento. Con `canViewAfectacion`, la del `id` se vuelve
+   * clicable y abre la afectación: se marca aquí y no en cada `*.constants.ts`,
+   * así encenderla en un documento es solo su capability.
+   */
+  protected readonly columns = computed<readonly ColumnDef[]>(() => {
+    const columns = this.document().columns;
+    if (!this.capabilities().canViewAfectacion) return columns;
+    return columns.map((col) =>
+      col.field === 'id'
+        ? {
+            ...col,
+            cellAction: AFECTACION_ACTION_ID,
+            cellActionLabelKey: 'documentActions.afectacion.ver',
+          }
+        : col,
+    );
+  });
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   /** Campos filtrables declarados por el documento (vacío ⇒ sin filtros). */
@@ -359,7 +389,17 @@ export class BaseDocumentListComponent {
       case 'delete':
         this.confirmRemove([id]);
         break;
+      case AFECTACION_ACTION_ID:
+        this.openAfectacion(id);
+        break;
     }
+  }
+
+  private openAfectacion(id: string | number): void {
+    const documentoId = Number(id);
+    if (!Number.isFinite(documentoId)) return;
+    this.afectacionDocumentoId.set(documentoId);
+    this.afectacionVisible.set(true);
   }
 
   protected navigateToNew(): void {

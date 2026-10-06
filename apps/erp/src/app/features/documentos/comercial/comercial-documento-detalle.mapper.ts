@@ -14,9 +14,14 @@ import type {
 } from './comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
 
-/** Subtotal bruto de la línea: `cantidad × precio`. */
+/**
+ * Subtotal bruto de la línea: `cantidad × precio`, redondeado a centavos. Con
+ * cantidad y precio decimales el producto puede tener más de dos decimales
+ * (`1.5 × 33.33 = 49.995`); sin redondear, el resumen sumaría un valor distinto
+ * al que pinta la fila.
+ */
 export function lineBruto(line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio'>): number {
-  return (line.cantidad ?? 0) * (line.precio ?? 0);
+  return redondearMoneda((line.cantidad ?? 0) * (line.precio ?? 0));
 }
 
 /** Monto del descuento: `bruto × desc%/100`, redondeado. */
@@ -30,14 +35,14 @@ export function lineDescuento(
 export function lineBase(
   line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio' | 'descuento'>,
 ): number {
-  return lineBruto(line) - lineDescuento(line);
+  return redondearMoneda(lineBruto(line) - lineDescuento(line));
 }
 
 /** Suma de los montos de impuesto ya calculados de la línea. */
 export function lineImpuesto(
   line: Pick<ComercialDetalleFormRawValue, 'impuestos_totales'>,
 ): number {
-  return line.impuestos_totales.reduce((s, i) => s + i.total, 0);
+  return redondearMoneda(line.impuestos_totales.reduce((s, i) => s + i.total, 0));
 }
 
 /** Neto de la línea: `base + impuesto`. */
@@ -47,7 +52,7 @@ export function lineNeto(
     'cantidad' | 'precio' | 'descuento' | 'impuestos_totales'
   >,
 ): number {
-  return lineBase(line) + lineImpuesto(line);
+  return redondearMoneda(lineBase(line) + lineImpuesto(line));
 }
 
 /**
@@ -161,7 +166,7 @@ export function comercialDetalleToFormValue(
       // El backend guarda el monto sin signo y manda la operación aparte, así
       // que el signo sale de ahí. Si faltara, el monto queda como llegó y la
       // tabla de edición lo corrige contra el catálogo (`normalizarImpuestosLeidos`).
-      const parsed = Math.round(parseFloat(imp.total ?? '0'));
+      const parsed = toFiniteNumber(imp.total) ?? 0;
       const total =
         imp.impuesto_operacion == null
           ? parsed
@@ -204,7 +209,7 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     // La fila pendiente manda la operación; el default solo cubre su ausencia.
     operacion: imp.impuesto_operacion ?? 1,
   }));
-  const base = (cantidad ?? 0) * precio;
+  const base = redondearMoneda((cantidad ?? 0) * precio);
   return {
     id: null,
     item: { id: row.item_id, nombre: row.item_nombre, precio },

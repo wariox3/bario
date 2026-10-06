@@ -31,8 +31,10 @@ import {
   APORTE_CONTRATOS_PAGE_SIZE,
   APORTE_CONTRATO_COLUMNS,
   APORTE_CONTRATO_FILTER_FIELDS,
+  EXCEL_ACTION_PREFIX,
+  excelAction,
 } from '../../aporte.constants';
-import { AporteService } from '../../aporte.service';
+import { AporteService, type AporteExportKey } from '../../aporte.service';
 
 /**
  * Los **contratos** incluidos en el aporte: quién entra en la planilla del
@@ -86,6 +88,12 @@ export class AporteContratosTabComponent {
    */
   readonly totalChange = output<number>();
 
+  /**
+   * Se cargaron o se quitaron contratos: la cabecera trae otros contadores
+   * (contratos y empleados), así que el workspace la vuelve a pedir.
+   */
+  readonly cambio = output<void>();
+
   protected readonly items = signal<readonly AporteContratoFila[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
@@ -108,9 +116,9 @@ export class AporteContratosTabComponent {
    */
   protected readonly rowActions: readonly RowAction[] = [
     {
-      id: 'ver-nominas',
-      labelKey: 'entities.aporte.trazabilidad.verNominas',
-      iconClass: 'pi pi-file-check',
+      id: 'ver-detalle',
+      labelKey: 'entities.aporte.trazabilidad.verDetalle',
+      iconClass: 'pi pi-file',
       inline: true,
     },
   ];
@@ -134,6 +142,9 @@ export class AporteContratosTabComponent {
       : null,
   );
 
+  /** "Excel ▾" de la tabla, junto a "Cargar contratos": exporta los contratos. */
+  protected readonly trailingActions = excelAction('contratos');
+
   constructor() {
     effect(() => {
       this.aporteId();
@@ -154,10 +165,13 @@ export class AporteContratosTabComponent {
 
   protected onToolbarAction(actionId: string): void {
     if (actionId === 'cargar-contratos') this.cargarContratos();
+    if (actionId.startsWith(EXCEL_ACTION_PREFIX)) {
+      this.exportar(actionId.slice(EXCEL_ACTION_PREFIX.length) as AporteExportKey);
+    }
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId === 'ver-nominas') this.verNominas(event.row as AporteContratoFila);
+    if (event.actionId === 'ver-detalle') this.verDetalle(event.row as AporteContratoFila);
   }
 
   /**
@@ -165,17 +179,17 @@ export class AporteContratosTabComponent {
    * cuando alguien pregunta por una cifra). Se le pasa el **contrato del
    * empleado**, no el id del renglón del aporte.
    */
-  private verNominas(fila: AporteContratoFila): void {
+  private verDetalle(fila: AporteContratoFila): void {
     if (fila.contrato == null) return;
     from(import('../nominas-contrato-modal/nominas-contrato-modal.component'))
       .pipe(
         switchMap(({ NominasContratoModalComponent }) => {
           const ref = this.dialog.open(NominasContratoModalComponent, {
             ...ENTITY_ACTION_DIALOG_DEFAULTS,
-            width: '68rem',
+            width: '80rem',
             data: {
               contratoId: fila.contrato,
-              empleado: fila.contrato__contacto__nombre_corto,
+              empleado: fila.contrato_contacto_nombre_corto,
               fechaDesde: this.fechaDesde(),
               fechaHasta: this.fechaHasta(),
             },
@@ -263,6 +277,7 @@ export class AporteContratosTabComponent {
           );
           this.selectedRows.set([]);
           this.loadPage(0);
+          this.cambio.emit();
         },
         error: () => this.toast.error(toasts.cargarError.title, toasts.cargarError.desc),
       });
@@ -289,6 +304,7 @@ export class AporteContratosTabComponent {
           );
           this.selectedRows.set([]);
           this.loadPage(0);
+          this.cambio.emit();
         },
         error: () =>
           this.toast.error(
@@ -298,13 +314,23 @@ export class AporteContratosTabComponent {
       });
   }
 
+  private exportar(clave: AporteExportKey): void {
+    const toasts = this.t().common.toasts;
+    this.service
+      .exportar(clave, this.aporteId())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
+      });
+  }
+
   private loadPage(page: number): void {
     const id = this.aporteId();
     if (!id) return;
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarContratos(id, page + 1, this.pageSize, this.activeFilters())
+      .listarContratos(id, page, this.pageSize, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

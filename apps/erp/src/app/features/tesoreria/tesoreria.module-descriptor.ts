@@ -61,6 +61,23 @@ export const TESORERIA_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'tesoreria-proceso',
+      labelKey: 'layout.nav.sections.process',
+      iconClass: 'pi pi-sync',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.validarSaldos.name',
+              path: 'proceso/validar-saldos',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'tesoreria-informes',
       labelKey: 'layout.nav.sections.report',
       iconClass: 'pi pi-chart-bar',

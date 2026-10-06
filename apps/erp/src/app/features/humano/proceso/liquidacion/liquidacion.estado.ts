@@ -22,6 +22,8 @@ export type ContextoLiquidacion = ContextoProceso;
 
 /** Lo que la UI puede ofrecer en la etapa actual. Una capacidad por acción. */
 export interface CapacidadesLiquidacion {
+  /** Editar el comentario y las fechas de último pago de la cabecera. */
+  readonly puedeEditarCabecera: boolean;
   /** Liquidar: calcula prestaciones y totales. */
   readonly puedeGenerar: boolean;
   /**
@@ -40,8 +42,6 @@ export interface CapacidadesLiquidacion {
   readonly puedeAprobar: boolean;
   /** Revertir la aprobación. */
   readonly puedeDesaprobar: boolean;
-  /** Eliminar la liquidación completa. */
-  readonly puedeEliminar: boolean;
 }
 
 /**
@@ -51,13 +51,13 @@ export interface CapacidadesLiquidacion {
  *
  * | Acción        | borrador | generada | aprobada |
  * | ------------- | -------- | -------- | -------- |
+ * | Editar        | sí       | no       | no       |
  * | Generar       | sí       | no       | no       |
  * | Reliquidar    | sí       | no       | no       |
  * | Adicionales   | sí       | no       | no       |
  * | Desgenerar    | no       | sí       | no       |
  * | Aprobar       | no       | sí       | no       |
  * | Desaprobar    | no       | no       | sí       |
- * | Eliminar      | sí       | no       | no       |
  *
  * **Imprimir no es una capacidad**: está disponible en las tres etapas, así que
  * declararla solo agregaría una constante en `true`.
@@ -76,13 +76,13 @@ export function capacidadesDe(ctx: ContextoLiquidacion): CapacidadesLiquidacion 
   const esAprobada = estado === 'aprobada';
 
   return {
+    puedeEditarCabecera: esBorrador,
     puedeGenerar: esBorrador,
     puedeReliquidar: esBorrador,
     puedeGestionarAdicionales: esBorrador,
     puedeDesgenerar: esGenerada,
     puedeAprobar: esGenerada,
     puedeDesaprobar: esAprobada,
-    puedeEliminar: esBorrador,
   };
 }
 

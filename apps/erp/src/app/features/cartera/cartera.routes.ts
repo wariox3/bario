@@ -24,12 +24,10 @@ export const CARTERA_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(CARTERA_MODULE),
       {
-        // Inicio del módulo (vacío por ahora — sin estadísticas).
+        // Inicio del módulo: tablero de cuentas por cobrar.
         path: 'inicio',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
+          import('./inicio/cartera-inicio.component').then((m) => m.CarteraInicioComponent),
       },
       {
         path: 'pago',
@@ -46,6 +44,13 @@ export const CARTERA_ROUTES: Route[] = [
       // Masters compartidos (ver `masters-compartidos.routes.ts`).
       ...rutaContactos(),
       ...rutaCuentasBanco(),
+      {
+        path: 'proceso/validar-saldos',
+        loadChildren: () =>
+          import('@erp/features/documentos/validar-saldos/validar-saldos.routes').then((m) =>
+            m.validarSaldosRoutes('cobrar'),
+          ),
+      },
       {
         path: 'informes/cuenta-cobrar',
         loadChildren: () =>

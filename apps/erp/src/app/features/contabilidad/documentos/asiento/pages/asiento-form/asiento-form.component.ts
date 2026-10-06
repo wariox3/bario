@@ -19,7 +19,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -54,6 +54,8 @@ import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contab
 import { COMPROBANTE_ENDPOINT, COMPROBANTE_PARAMS } from '../../asiento.constants';
 import { asientoToFormValue, formValueToPayload } from '../../asiento.mapper';
 import type { AsientoRead } from '../../asiento.model';
+import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Asiento contable.
@@ -73,15 +75,19 @@ import type { AsientoRead } from '../../asiento.model';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-asiento-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
+    ContableDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputTextModule,
     TextareaModule,
     FieldErrorComponent,

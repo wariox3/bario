@@ -1,10 +1,22 @@
 @let acc = t().entities.programacion.acciones;
 @let det = t().entities.programacion.workspace;
+@let doc = t().documentActions.detail;
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<!-- ── Botonera: todo sale de capacidades() ──────────────────────────────────── -->
-<header class="flex flex-wrap items-center gap-2">
+<!--
+  ── Botonera ─────────────────────────────────────────────────────────────────
+  Va en <lib-page-actions>: queda pegada bajo el header al hacer scroll, como en
+  los formularios, para no perder el ciclo de vida al bajar por las tablas.
+  Mismo orden que la ficha de los documentos: volver suelto; editar, el ciclo de
+  vida y Utilidades fundidos en un segmento, todo a la izquierda como en las
+  fichas. Volver y Editar van grises. Solo Aprobar va relleno: es el
+  paso que lleva la nómina a contabilidad, como en los documentos. Todo sale de
+  capacidades(): lo que no aplica a la etapa se deshabilita, no se oculta.
+  Los <p-menu> van FUERA del grupo: su CSS une los botones con
+  `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
+-->
+<lib-page-actions>
   <p-button
     type="button"
     [label]="t().common.actions.back"
@@ -16,59 +28,80 @@
   />
 
   @if (programacion()) {
-    @if (capacidades().puedeEditarCabecera) {
+    <p-buttongroup>
+      <p-button
+        type="button"
+        [label]="t().common.actions.new"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-plus"
+        size="small"
+        (onClick)="onNew()"
+      />
       <p-button
         type="button"
         [label]="t().common.actions.edit"
-        icon="pi pi-pencil"
         severity="secondary"
         [outlined]="true"
+        icon="pi pi-pencil"
         size="small"
-        [disabled]="estaOcupado()"
+        [disabled]="!capacidades().puedeEditarCabecera || estaOcupado()"
         (onClick)="onEdit()"
       />
-    }
 
-    @if (capacidades().puedeGenerar) {
       <p-button
         type="button"
         [label]="acc.generar"
-        icon="pi pi-cog"
+        severity="secondary"
+        [outlined]="true"
         size="small"
         [loading]="accionEnCurso() === 'generar'"
-        [disabled]="estaOcupado()"
+        [disabled]="!capacidades().puedeGenerar || estaOcupado()"
         (onClick)="onGenerar()"
       />
-    }
-
-    @if (capacidades().puedeAprobar) {
       <p-button
         type="button"
         [label]="acc.aprobar"
-        icon="pi pi-check-circle"
         size="small"
         [loading]="accionEnCurso() === 'aprobar'"
-        [disabled]="estaOcupado()"
+        [disabled]="!capacidades().puedeAprobar || estaOcupado()"
         (onClick)="onAprobar()"
       />
-    }
-
-    @if (accionesSecundarias().length) {
       <p-button
         type="button"
-        [label]="t().common.actions.actions"
+        [label]="doc.imprimir"
+        icon="pi pi-print"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onImprimir()"
+      />
+      <p-button
+        type="button"
+        [label]="doc.acciones"
         icon="pi pi-chevron-down"
         iconPos="right"
         severity="secondary"
         [outlined]="true"
         size="small"
-        [disabled]="estaOcupado()"
         (onClick)="accionesMenu.toggle($event)"
       />
-      <p-menu #accionesMenu [popup]="true" [model]="accionesSecundarias()" appendTo="body" />
-    }
+      <p-button
+        type="button"
+        [label]="acc.utilidades"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="utilidadesMenu.toggle($event)"
+      />
+    </p-buttongroup>
+
+    <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
+    <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
   }
-</header>
+</lib-page-actions>
 
 @if (isLoading()) {
   <div
@@ -92,7 +125,7 @@
   <!-- ── Empleados y adicionales ─────────────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <p-tabs [value]="activeTab()" (valueChange)="activeTab.set($any($event))">
+      <p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
         <p-tablist>
           <p-tab value="renglones">{{ det.tabs.renglones }}</p-tab>
           <p-tab value="adicionales">{{ det.tabs.adicionales }}</p-tab>
@@ -103,7 +136,7 @@
             <p class="m-0 mb-3 text-[0.72rem] text-brand-muted">{{ det.renglonesHint }}</p>
             <app-programacion-renglones-tab
               [programacionId]="programacionId()"
-              [pagoTipoId]="p.pago_tipo_id"
+              [pagoTipoId]="p.pago_tipo"
               [capacidades]="capacidades()"
               [reloadToken]="reloadToken()"
               (totalChange)="onRenglonesChange($event)"
@@ -135,6 +168,7 @@
   [errors]="importar.errors()"
   [errorSummary]="importar.errorSummary()"
   [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
   [exampleConfig]="exampleConfig()"
   (importRequested)="importar.submit($event)"
 />

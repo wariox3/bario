@@ -14,14 +14,6 @@
     (onClick)="onBack()"
   />
   @if (cabecera()) {
-    <p-button
-      type="button"
-      [label]="t().common.actions.edit"
-      icon="pi pi-pencil"
-      size="small"
-      [disabled]="!isEditable()"
-      (onClick)="onEdit()"
-    />
     <app-document-detail-actions
       [documentoId]="id()"
       [document]="document()"
@@ -29,18 +21,43 @@
       [canDesaprobar]="capacidades().puedeDesaprobar"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (documentoChanged)="onDocumentoChanged()"
-    />
+    >
+      @if (document().capabilities.canCreate) {
+        <p-button
+          actionsStart
+          type="button"
+          [label]="t().common.actions.new"
+          severity="secondary"
+          [outlined]="true"
+          icon="pi pi-plus"
+          size="small"
+          (onClick)="onNew()"
+        />
+      }
+      <p-button
+        actionsStart
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        [disabled]="!isEditable()"
+        (onClick)="onEdit()"
+      />
 
-    <p-button
-      type="button"
-      [label]="t().entities.facturaVenta.utilidades.action"
-      icon="pi pi-chevron-down"
-      iconPos="right"
-      severity="secondary"
-      [outlined]="true"
-      size="small"
-      (onClick)="toggleUtilidades($event)"
-    />
+      <p-button
+        actionsEnd
+        type="button"
+        [label]="t().entities.facturaVenta.utilidades.action"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="toggleUtilidades($event)"
+      />
+    </app-document-detail-actions>
     <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
   }
 </header>
@@ -115,62 +132,83 @@
         <dt class="factura-venta-detail__label">{{ det.labels.sede }}</dt>
         <dd class="factura-venta-detail__value">{{ c.sede || '—' }}</dd>
       </div>
+      <!-- Lo que en el formulario va en "Más información": en la ficha, a la vista
+           con el resto (ningún campo se oculta), como en el ERP anterior. -->
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.ordenCompra }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.ordenCompra || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.remision }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.remision || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.asesor }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.asesor || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.resolucion }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.resolucion || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="factura-venta-detail__label">{{ det.labels.comentario }}</dt>
+        <dd class="factura-venta-detail__value whitespace-pre-line">
+          {{ c.comentario || '—' }}
+        </dd>
+      </div>
     </dl>
-
-    <!-- ── Líneas y pagos: mismo documento, misma card (espejo del formulario) ── -->
-    <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <p-tabs value="detalles">
-        <p-tablist>
-          <p-tab value="detalles">{{ t().entities.facturaVenta.form.tabs.detalles }}</p-tab>
-          <p-tab value="pagos">
-            {{ t().entities.facturaVenta.form.tabs.pagos }}
-            <!-- Mismo chip que el formulario: conteo, en rojo si lo recibido supera el total. -->
-            @if (pagos().length > 0) {
-              <span
-                class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
-                [class]="
-                  pagosResumen().excede
-                    ? 'bg-red-50 text-red-600'
-                    : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
-                "
-              >
-                {{ pagos().length }}
-              </span>
-            }
-          </p-tab>
-        </p-tablist>
-
-        <p-tabpanels>
-          <p-tabpanel value="detalles">
-            <app-comercial-documento-lineas-table
-              [lines]="lines()"
-              [linkable]="true"
-              (verAfectacion)="onVerAfectacion($event)"
-            />
-          </p-tabpanel>
-
-          <p-tabpanel value="pagos">
-            <app-documento-pagos-table
-              [pagos]="pagos()"
-              [anulable]="puedeAnularPagos()"
-              (anulado)="onDocumentoChanged()"
-            />
-          </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
-
-      <!-- Resumen del documento: fuera de los tabs, el mismo en Detalles y en Pagos -->
-      @if (lines().length > 0 || pagos().length > 0) {
-        <div class="mt-4">
-          <app-comercial-documento-resumen
-            [resumen]="resumen()"
-            [cantidad]="cantidadTotal()"
-            [pagos]="pagos().length > 0 ? pagosResumen() : null"
-          />
-        </div>
-      }
-    </div>
   </section>
+
+  <!-- Líneas: card propia; las tabs y la botonera de la tabla son su cabecera -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <p-tabs
+      class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
+      value="detalles"
+    >
+      <p-tablist>
+        <p-tab value="detalles">{{ t().entities.facturaVenta.form.tabs.detalles }}</p-tab>
+        <p-tab value="pagos">
+          {{ t().entities.facturaVenta.form.tabs.pagos }}
+          <!-- Mismo chip que el formulario: conteo, en rojo si lo recibido supera el total. -->
+          @if (pagos().length > 0) {
+            <span
+              class="ml-2 inline-block rounded-md px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums"
+              [class]="
+                pagosResumen().excede
+                  ? 'bg-red-50 text-red-600'
+                  : 'bg-[rgba(20,48,73,0.06)] text-brand-text'
+              "
+            >
+              {{ pagos().length }}
+            </span>
+          }
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="detalles">
+          <app-comercial-documento-lineas-table
+            [lines]="lines()"
+            [linkable]="true"
+            (verAfectacion)="onVerAfectacion($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="pagos">
+          <app-documento-pagos-table [pagos]="pagos()" />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </section>
+
+  <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
+  @if (lines().length > 0 || pagos().length > 0) {
+    <app-comercial-documento-resumen
+      [resumen]="resumen()"
+      [cantidad]="cantidadTotal()"
+      [pagos]="pagos().length > 0 ? pagosResumen() : null"
+    />
+  }
 }
 
 <app-import-dialog

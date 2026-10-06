@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { MascaraFechaDirective } from '@reddoc/ui';
 import { finalize } from 'rxjs';
 import {
   FileDownloadService,
@@ -41,7 +42,14 @@ import { CUENTA_COBRAR_CORTE_COLUMNS } from '../../cuenta-cobrar-corte.constants
 @Component({
   selector: 'app-cuenta-cobrar-corte-list',
   standalone: true,
-  imports: [FormsModule, ButtonModule, DatePickerModule, ListShellComponent, DataTableComponent],
+  imports: [
+    FormsModule,
+    ButtonModule,
+    DatePickerModule,
+    MascaraFechaDirective,
+    ListShellComponent,
+    DataTableComponent,
+  ],
   templateUrl: './cuenta-cobrar-corte-list.component.html',
   styleUrl: './cuenta-cobrar-corte-list.component.scss',
 })

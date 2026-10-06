@@ -2,9 +2,9 @@
 @let p = idPrefix();
 
 <!--
-  Panel de parámetros como **recuadro hermano del de la tabla**: mismo borde y
-  radius, para que la zona de "definir la consulta" se lea como una pieza y no
-  como campos flotando sobre la card.
+  Panel de parámetros como **cabecera del recuadro del informe**: va en el slot
+  [toolbar] de <lib-list-shell>, que le pone el marco y el divisor con la tabla,
+  igual que al toolbar de un listado.
 
   Dentro, una banda por pregunta (periodo / plan de cuentas / documento), cada
   una encabezada por su micro-etiqueta de grupo. Los campos de un rango viven

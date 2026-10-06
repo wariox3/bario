@@ -76,7 +76,9 @@
             class="lib-data-toolbar__btn lib-data-toolbar__btn--ghost"
             (click)="menu.toggle($event)"
           >
-            <i [class]="action.iconClass"></i>
+            @if (action.iconClass) {
+              <i [class]="action.iconClass"></i>
+            }
             <span>{{ translate(action.labelKey) }}</span>
             <i class="pi pi-chevron-down lib-data-toolbar__dropdown-caret"></i>
           </button>
@@ -93,7 +95,9 @@
             class="lib-data-toolbar__btn lib-data-toolbar__btn--ghost"
             (click)="actionInvoked.emit(action.id)"
           >
-            <i [class]="action.iconClass"></i>
+            @if (action.iconClass) {
+              <i [class]="action.iconClass"></i>
+            }
             <span>{{ translate(action.labelKey) }}</span>
           </button>
         }

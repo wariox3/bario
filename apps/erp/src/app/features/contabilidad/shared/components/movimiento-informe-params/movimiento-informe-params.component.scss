@@ -1,12 +1,9 @@
-// Recuadro hermano del de la tabla (`.list-shell__table`): mismo borde y radius,
-// para que "definir la consulta" se lea como una pieza y no como campos sueltos
-// flotando sobre la card. Borders-only, como todo el chrome del ERP.
+// Cabecera del recuadro del informe (`.list-shell__frame`): la zona de "definir
+// la consulta" encima de los resultados, como el toolbar en un listado. Sin
+// borde propio: el marco y el divisor con la tabla los pone el shell.
 .mi-params {
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(20 48 73 / 0.12);
-  border-radius: 12px;
-  overflow: hidden;
 
   // Filete entre las piezas apiladas del recuadro (fila de grupos, banda de
   // documento, error, botonera). Va sobre los hijos directos y no sobre la

@@ -79,20 +79,17 @@ export const NOTA_CREDITO_VENTA_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.notaCreditoVenta.columns.numero',
     type: 'text',
     width: '120px',
-    sortable: true,
   },
   {
     field: 'fecha',
     headerKey: 'entities.notaCreditoVenta.columns.fecha',
     type: 'date',
     width: '110px',
-    sortable: true,
   },
   {
     field: 'contacto_nombre_corto',
     headerKey: 'entities.notaCreditoVenta.columns.contacto',
     type: 'text',
-    sortable: true,
   },
   {
     field: 'total',
@@ -289,15 +286,16 @@ Además de los 6 pasos de arriba, una sola vez por módulo:
 `capabilities` es lo que el `BaseDocumentListComponent` lee para decidir qué mostrar.
 Todas las que no apliquen van en `false`.
 
-| Flag             | Efecto en la UI del listado                                      |
-| ---------------- | ---------------------------------------------------------------- |
-| `canCreate`      | Botón **"Nuevo"** en el toolbar → navega a la ruta `new`.        |
-| `canEdit`        | Acción **"Editar"** en el menú de fila → ruta `edit`.            |
-| `canDelete`      | Acción **"Eliminar"** de fila + botón contextual "Eliminar (N)". |
-| `canSelectRows`  | Checkboxes de selección múltiple.                                |
-| `canExportExcel` | (futuro) export. Hoy sin soporte en el gateway.                  |
-| `canExportZip`   | (futuro) export ZIP.                                             |
-| `canGenerate`    | (futuro) acción "Generar" (vía `extraActionIds`).                |
+| Flag                | Efecto en la UI del listado                                                                                                                                                                                                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `canCreate`         | Botón **"Nuevo"** en el toolbar → navega a la ruta `new`.                                                                                                                                                                                                              |
+| `canEdit`           | Acción **"Editar"** en el menú de fila → ruta `edit`.                                                                                                                                                                                                                  |
+| `canDelete`         | Acción **"Eliminar"** de fila + botón contextual "Eliminar (N)".                                                                                                                                                                                                       |
+| `canSelectRows`     | Checkboxes de selección múltiple.                                                                                                                                                                                                                                      |
+| `canExportExcel`    | (futuro) export. Hoy sin soporte en el gateway.                                                                                                                                                                                                                        |
+| `canExportZip`      | (futuro) export ZIP.                                                                                                                                                                                                                                                   |
+| `canGenerate`       | (futuro) acción "Generar" (vía `extraActionIds`).                                                                                                                                                                                                                      |
+| `canViewAfectacion` | Opcional. El `id` de la fila se vuelve enlace y abre la **afectación del documento** (`DocumentoAfectacionModalComponent`: el documento, su referencia y las líneas de otros documentos que lo afectan por cabecera, como los pagos). Por ahora solo factura de venta. |
 
 - **Documento solo-lista** (como `contrato-servicio`): **todas en `false`** y en
   `routes.ts` declarás solo `list` + redirect. El genérico muestra solo card + tabla

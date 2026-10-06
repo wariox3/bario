@@ -23,6 +23,7 @@ import {
   ErpContactoSelectComponent,
   FieldErrorComponent,
   PageActionsComponent,
+  MascaraFechaDirective,
 } from '@reddoc/ui';
 import {
   FormErrorService,
@@ -54,6 +55,8 @@ import type { InventarioDetalleRead } from '@erp/features/documentos/inventario/
 import { costoFieldFor, usaOperacionInventario } from '../../movimiento-documento.constants';
 import { movimientoToFormValue, formValueToPayload } from '../../movimiento-documento.mapper';
 import type { MovimientoRead } from '../../movimiento-documento.model';
+import { InventarioDocumentoResumenComponent } from '@erp/features/documentos/inventario/components/inventario-documento-resumen/inventario-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un movimiento de inventario.
@@ -76,15 +79,19 @@ import type { MovimientoRead } from '../../movimiento-documento.model';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-movimiento-documento-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
+    InventarioDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,

@@ -17,7 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -63,6 +63,11 @@ import { cuentaDetalleToFormValue } from '@erp/features/documentos/contable/cont
 import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contable-documento-detalle.model';
 import { facturaCompraToFormValue, formValueToPayload } from '../../factura-compra.mapper';
 import type { FacturaCompraRead } from '../../factura-compra.model';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 
 /**
  * Línea de documento leída al cargar en edición: la tabla `documento-detalle`
@@ -95,15 +100,22 @@ interface FlushableLineTable {
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-factura-compra-form',
   standalone: true,
   imports: [
+    InputTextModule,
+    TextareaModule,
+    MasInformacionComponent,
+    ContableDocumentoResumenComponent,
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TabsModule,
     FieldErrorComponent,
     PageActionsComponent,
@@ -189,6 +201,8 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
     cuentas: new FormArray<CuentaDetalleGroup>([]),
   });

@@ -56,6 +56,8 @@ import {
   formValueToPayload,
 } from '../../factura-venta-recurrente.mapper';
 import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.model';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de venta
@@ -75,10 +77,13 @@ import type { FacturaVentaRecurrenteRead } from '../../factura-venta-recurrente.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-factura-venta-recurrente-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -120,13 +125,6 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
   protected readonly asesorEndpoint = SELECT_ENDPOINTS.asesor;
   protected readonly asesorLabel = asesorLabel;
-
-  /**
-   * Sección "Más información" plegada/desplegada. Sus cuatro campos son opcionales
-   * y casi nunca se tocan: abiertos empujarían hacia abajo la tabla de líneas, que
-   * es a lo que la persona vino. Arranca cerrada siempre, también en edición.
-   */
-  protected readonly masInfoOpen = signal(false);
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;

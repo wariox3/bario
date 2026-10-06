@@ -37,6 +37,13 @@ export interface DocumentCapabilities {
   readonly canExportExcel: boolean;
   readonly canExportZip: boolean;
   readonly canGenerate: boolean;
+  /**
+   * El `id` de la fila del listado abre la **afectación del documento**: el
+   * documento, su documento de referencia y las líneas de otros documentos que
+   * lo afectan (`DocumentoAfectacionModalComponent` del ERP).
+   * Opcional y `false` por defecto: se enciende documento por documento.
+   */
+  readonly canViewAfectacion?: boolean;
 }
 
 /**

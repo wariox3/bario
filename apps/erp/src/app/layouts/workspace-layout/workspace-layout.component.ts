@@ -1,6 +1,8 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { DrawerModule } from 'primeng/drawer';
 import { ForbiddenPageStore, I18nService, TenantService } from '@reddoc/core';
 import { AppSwitcherComponent } from '@reddoc/ui';
@@ -84,22 +86,57 @@ export class WorkspaceLayoutComponent {
    */
   private readonly expandedAccordionId = signal<string | null>(null);
 
+  /**
+   * URL actual como signal. `router.isActive` no es reactivo: sin esto, el
+   * acordeón solo se re-sembraba al cambiar de módulo, y una navegación dentro
+   * del mismo módulo que no nace del sidebar (el enlace de una ficha del inicio,
+   * una miga, «volver», el historial) dejaba cerrado el acordeón del destino.
+   */
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
   protected readonly drawerVisible = signal(false);
 
   constructor() {
-    // Cada vez que cambia el módulo activo, sembramos el acordeón que contiene
-    // la ruta actual; si ninguno la contiene, el primero marcado
-    // `defaultExpanded: true`. El resto arranca cerrado.
+    // Al cambiar el módulo activo, sembramos el acordeón que contiene la ruta
+    // actual; si ninguno la contiene, el primero marcado `defaultExpanded: true`.
+    // El resto arranca cerrado.
     effect(() => {
-      const accordions = this.sections().filter(
-        (s): s is SidebarAccordion => s.kind === 'accordion',
-      );
-      const withActiveLeaf = accordions.find((s) =>
-        s.groups.some((g) => g.items.some((leaf) => this.isLeafActive(leaf))),
-      );
-      const seed = withActiveLeaf ?? accordions.find((s) => s.defaultExpanded === true);
+      const accordions = this.accordions();
+      const seed =
+        untracked(() => this.accordionWithActiveLeaf(accordions)) ??
+        accordions.find((s) => s.defaultExpanded === true);
       this.expandedAccordionId.set(seed?.id ?? null);
     });
+
+    // Al navegar dentro del módulo, abrimos el acordeón que contiene la ruta de
+    // destino, venga de donde venga la navegación. Si el destino no está en
+    // ningún acordeón (el inicio, una ruta suelta) se respeta el que la persona
+    // tenga abierto.
+    effect(() => {
+      this.currentUrl();
+      const active = untracked(() => this.accordionWithActiveLeaf(this.accordions()));
+      if (active) this.expandedAccordionId.set(active.id);
+    });
+  }
+
+  /** Acordeones de las secciones visibles del módulo activo. */
+  private readonly accordions = computed(() =>
+    this.sections().filter((s): s is SidebarAccordion => s.kind === 'accordion'),
+  );
+
+  /** El acordeón que contiene un leaf activo para la URL actual, si hay. */
+  private accordionWithActiveLeaf(
+    accordions: readonly SidebarAccordion[],
+  ): SidebarAccordion | undefined {
+    return accordions.find((s) =>
+      s.groups.some((g) => g.items.some((leaf) => this.isLeafActive(leaf))),
+    );
   }
 
   // ── API protegida (template) ──────────────────────────────────────────────

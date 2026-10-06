@@ -13,8 +13,9 @@ import { estadoDe, type EstadoProceso } from '../../../shared/proceso.estado';
 import type { Programacion } from '../../programacion.model';
 
 /**
- * Resumen de la cabecera de una programación: el periodo, el alcance, los
- * acumulados y en qué etapa del ciclo está.
+ * Resumen de la cabecera de una programación en tres columnas —qué y cuándo, a
+ * quién alcanza, cuánto suma—, el comentario a todo el ancho y en qué etapa del
+ * ciclo está.
  *
  * Las 17 banderas se muestran plegadas: solo las **activas**, y detrás de un
  * "ver más", porque son un detalle de configuración que se consulta poco una vez
@@ -62,8 +63,8 @@ export class ProgramacionResumenComponent {
     this.banderasVisibles.update((visible) => !visible);
   }
 
-  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`); sin fecha, vacío. */
   protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
+    return formatFechaLarga(date, '');
   }
 }

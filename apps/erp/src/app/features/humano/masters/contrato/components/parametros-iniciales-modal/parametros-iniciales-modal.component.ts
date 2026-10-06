@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { MascaraFechaDirective } from '@reddoc/ui';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { FormErrorService, I18nService, ToastService, fromIsoDate, toIsoDate } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
@@ -31,7 +32,7 @@ export interface ParametrosInicialesModalData {
 @Component({
   selector: 'app-parametros-iniciales-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonModule, DatePickerModule],
+  imports: [ReactiveFormsModule, ButtonModule, DatePickerModule, MascaraFechaDirective],
   templateUrl: './parametros-iniciales-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

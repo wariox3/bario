@@ -5,7 +5,13 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { finalize } from 'rxjs';
-import { FormErrorService, I18nService, ToastService, type ErpSelectOption } from '@reddoc/core';
+import {
+  FormErrorService,
+  I18nService,
+  ToastService,
+  type ErpSelectOption,
+  resolucionLabel,
+} from '@reddoc/core';
 import { ErpApiSelectComponent, FieldErrorComponent } from '@reddoc/ui';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import type { AppDict } from '@erp/i18n';
@@ -61,19 +67,8 @@ export class DocumentoTipoEditDialogComponent {
 
   protected readonly resolucionEndpoint = RESOLUCION_SELECCIONAR_ENDPOINT;
 
-  /**
-   * Etiqueta de la resolución: `prefijo número`, que es como se la nombra en la
-   * DIAN. El endpoint `seleccionar` **no devuelve `nombre`** —solo `id`,
-   * `prefijo` y `numero`—, así que sin esto el desplegable pintaría opciones en
-   * blanco. Cae al `nombre` compuesto de la opción sembrada y, en última
-   * instancia, al id.
-   */
-  protected readonly resolucionLabel = (option: ErpSelectOption): string => {
-    const prefijo = typeof option['prefijo'] === 'string' ? option['prefijo'] : '';
-    const numero = typeof option['numero'] === 'string' ? option['numero'] : '';
-    const compuesto = [prefijo, numero].filter(Boolean).join(' ');
-    return compuesto || option.nombre || `#${option.id}`;
-  };
+  /** Etiqueta `prefijo número` (el `seleccionar` no trae `nombre`). */
+  protected readonly resolucionLabel = resolucionLabel;
 
   protected readonly form = this.fb.group({
     consecutivo: this.fb.control<number | null>(null, [Validators.required, Validators.min(1)]),

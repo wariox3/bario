@@ -10,11 +10,12 @@ import type { AppDict } from '@erp/i18n';
 import { AsesorService } from '../../asesor.service';
 import { ASESOR_LIST_PATH } from '../../asesor.constants';
 import type { Asesor } from '../../asesor.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-asesor-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, TelefonoPipe],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent, TelefonoPipe],
   templateUrl: './asesor-detail.component.html',
   styleUrl: './asesor-detail.component.scss',
 })
@@ -73,6 +74,10 @@ export class AsesorDetailComponent implements OnInit {
     const a = this.asesor();
     if (!a) return;
     this.navigate(...ASESOR_LIST_PATH, 'editar', a.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...ASESOR_LIST_PATH, 'nuevo');
   }
 
   private loadAsesor(id: number): void {

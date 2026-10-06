@@ -8,17 +8,29 @@
 // Vivía inline en `apps/erp/src/styles.scss`, que era la única app que lo tenía.
 // Está acá para que las apps que comparten componentes (`@reddoc/ui`,
 // `@reddoc/feature-contenedores`) dibujen el mismo botón.
+// Compacto, a la escala de los botones del toolbar de los listados
+// (`lib-data-toolbar__btn`): 32px, `.78rem`, peso 600. A 43px pesaban más que el
+// contenido y desentonaban al lado de los filtros de las tablas.
 .p-button {
-  height: 43px;
-  padding: 0 0.85rem;
-  font-size: 0.9rem;
-  font-weight: 700;
+  height: 32px;
+  padding: 0 0.75rem;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
   letter-spacing: -0.01em;
-  border-radius: 8px;
+  border-radius: 7px;
   transition:
     background 0.15s ease,
     box-shadow 0.15s ease,
     border-color 0.15s ease;
+
+  .p-button-label {
+    font-weight: 600;
+  }
+
+  .p-button-icon {
+    font-size: 0.78rem;
+  }
 
   &:not(:disabled):hover {
     box-shadow: 0 3px 10px rgba(0 158 247 / 0.28);
@@ -26,6 +38,24 @@
 
   &:not(:disabled):active {
     transform: scale(0.97);
+  }
+}
+
+// Solo ícono: cuadrado, como el refrescar del toolbar.
+.p-button-icon-only {
+  width: 32px;
+  padding: 0;
+}
+
+// Excepción: el botón de ancho completo (`fluid`) es el llamado principal de las
+// páginas de auth, bajo inputs altos; compacto se leería como secundario.
+.p-button-fluid {
+  height: 43px;
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  .p-button-label {
+    font-weight: 700;
   }
 }
 
@@ -61,5 +91,28 @@
   .p-button:focus-visible {
     position: relative;
     z-index: 1;
+  }
+}
+
+// Menús que despliega un botón (Acciones, Opciones, Excel, el ⋮ de una fila, el
+// split button, el menú del perfil): a la escala del botón compacto. Sin esto
+// toman la letra de Aura (1rem), que se lee grande al lado de un botón de .78rem.
+//
+// Global y no por `styleClass`: el popup se monta en `<body>` (`appendTo`), fuera
+// del scss scopeado de quien lo declara, y cada menú repetía la misma regla
+// acotada por su clase. Sin capa, por la misma razón que `.p-button`.
+.p-menu,
+.p-tieredmenu,
+.p-contextmenu {
+  font-family: inherit;
+
+  :is(.p-menu-item-link, .p-tieredmenu-item-link, .p-contextmenu-item-link) {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  :is(.p-menu-item-icon, .p-tieredmenu-item-icon, .p-contextmenu-item-icon) {
+    font-size: 0.8rem;
   }
 }

@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <form [formGroup]="form" class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+  <form [formGroup]="form" class="flex flex-col gap-4">
     <!-- Empleado -->
     <div class="flex flex-col gap-1.5">
       <label for="contrato" class="text-[0.855rem] font-semibold text-brand-text">
@@ -78,39 +78,23 @@
       />
     </div>
 
-    <!-- Horas -->
+    <!-- Detalle: texto libre, con lugar para explicar el porqué del adicional -->
     <div class="flex flex-col gap-1.5">
-      <label for="horas" class="text-[0.855rem] font-semibold text-brand-text">
-        {{ m.fields.horas }}
-      </label>
-      <p-inputnumber
-        inputId="horas"
-        formControlName="horas"
-        mode="decimal"
-        [min]="0"
-        [maxFractionDigits]="2"
-        [fluid]="true"
-      />
-      <p class="m-0 text-[0.72rem] text-brand-muted">{{ m.fields.horasHint }}</p>
-    </div>
-
-    <!-- Detalle -->
-    <div class="flex flex-col gap-1.5 sm:col-span-2">
       <label for="detalle" class="text-[0.855rem] font-semibold text-brand-text">
         {{ m.fields.detalle }}
       </label>
-      <input
+      <textarea
         id="detalle"
-        pInputText
+        pTextarea
         formControlName="detalle"
-        type="text"
+        rows="4"
         maxlength="200"
-        class="w-full"
-      />
+        class="w-full resize-y"
+      ></textarea>
     </div>
 
     <!-- Aplica día laborado -->
-    <div class="flex items-center gap-2 sm:col-span-2">
+    <div class="flex items-center gap-2">
       <p-checkbox
         inputId="aplica_dia_laborado"
         [binary]="true"

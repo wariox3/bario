@@ -9,11 +9,12 @@ import type { AppDict } from '@turnos/i18n';
 import { ProgramadorService } from '../../programador.service';
 import { PROGRAMADOR_LIST_PATH } from '../../programador.constants';
 import type { Programador } from '../../programador.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-programador-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent, DetailHeaderComponent],
   templateUrl: './programador-detail.component.html',
   styleUrl: './programador-detail.component.scss',
 })
@@ -70,6 +71,10 @@ export class ProgramadorDetailComponent implements OnInit {
     const p = this.programador();
     if (!p) return;
     this.navigate(...PROGRAMADOR_LIST_PATH, 'editar', p.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...PROGRAMADOR_LIST_PATH, 'nuevo');
   }
 
   private loadProgramador(id: number): void {

@@ -42,13 +42,13 @@ const META: readonly DetalleColumnaMeta[] = [
   // ── Identificación ────────────────────────────────────────────────────────
   { field: 'id', clave: 'id', type: 'number', width: '80px', align: 'right' },
   {
-    field: 'aporte_contrato__contrato__contacto__numero_identificacion',
+    field: 'aporte_contrato__contacto_numero_identificacion',
     clave: 'identificacion',
     type: 'text',
     width: '140px',
   },
   {
-    field: 'aporte_contrato__contrato__contacto__nombre_corto',
+    field: 'aporte_contrato__contacto_nombre_corto',
     clave: 'empleado',
     type: 'text',
     width: '200px',

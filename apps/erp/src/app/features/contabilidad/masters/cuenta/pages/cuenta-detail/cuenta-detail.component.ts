@@ -20,6 +20,7 @@ import { CuentaService } from '../../cuenta.service';
 import { CUENTA_LIST_PATH } from '../../cuenta.constants';
 import type { Cuenta } from '../../cuenta.model';
 import { TrasladarMovimientosModalComponent } from '../../components/trasladar-movimientos-modal/trasladar-movimientos-modal.component';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /** Bandera de la cuenta como campo: etiqueta i18n + su valor. */
 interface CuentaCondicion {
@@ -38,7 +39,13 @@ interface CuentaNivel {
 @Component({
   selector: 'app-cuenta-detail',
   standalone: true,
-  imports: [ButtonModule, MenuModule, BreadcrumbComponent, TrasladarMovimientosModalComponent],
+  imports: [
+    ButtonGroupModule,
+    ButtonModule,
+    MenuModule,
+    BreadcrumbComponent,
+    TrasladarMovimientosModalComponent,
+  ],
   templateUrl: './cuenta-detail.component.html',
   styleUrl: './cuenta-detail.component.scss',
 })
@@ -160,6 +167,10 @@ export class CuentaDetailComponent implements OnInit {
     const c = this.cuenta();
     if (!c) return;
     this.navigate(...CUENTA_LIST_PATH, 'editar', c.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...CUENTA_LIST_PATH, 'nuevo');
   }
 
   protected toggleAcciones(event: Event): void {

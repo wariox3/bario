@@ -38,7 +38,6 @@ import type {
   OperacionInventario,
   ResumenInventario,
 } from '../../inventario-documento-detalle.types';
-import { InventarioDocumentoResumenComponent } from '../inventario-documento-resumen/inventario-documento-resumen.component';
 
 /**
  * Tabla de **líneas (detalles)** de un documento de inventario. Reutilizable por
@@ -67,7 +66,6 @@ import { InventarioDocumentoResumenComponent } from '../inventario-documento-res
     ConfirmDialogModule,
     ErpItemAutocompleteComponent,
     ErpApiSelectComponent,
-    InventarioDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './inventario-documento-detalles.component.html',
@@ -129,8 +127,15 @@ export class InventarioDocumentoDetallesComponent {
   /** Espejo reactivo del valor del array para la tabla y los totales. */
   protected readonly lines = signal<readonly InventarioDetalleFormRawValue[]>([]);
 
-  /** Resumen del documento: cantidad acumulada, subtotal y total. */
-  protected readonly resumen = computed<ResumenInventario>(() => resumenInventario(this.lines()));
+  /** Hay al menos una línea: la página pinta el resumen solo entonces. */
+  readonly hayLineas = computed(() => this.lines().length > 0);
+
+  /**
+   * Resumen del documento: cantidad acumulada, subtotal y total.
+   * Público: la página lo pinta fuera de la card de líneas, leyéndolo por
+   * referencia de plantilla (`#detallesTabla`).
+   */
+  readonly resumen = computed<ResumenInventario>(() => resumenInventario(this.lines()));
 
   /** Grupo persistiéndose ahora mismo (edición); bloquea su botón. */
   protected readonly savingGroup = signal<InventarioDetalleGroup | null>(null);

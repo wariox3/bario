@@ -285,8 +285,8 @@
             <tr>
               <td>{{ d.item_nombre }}</td>
               <td class="izip-table__num">{{ d.cantidad | number }}</td>
-              <td class="izip-table__num">{{ d.precio_unitario | number }}</td>
-              <td class="izip-table__num">{{ d.valor_total | number }}</td>
+              <td class="izip-table__num">{{ formatCop(d.precio_unitario) }}</td>
+              <td class="izip-table__num">{{ formatCop(d.valor_total) }}</td>
             </tr>
           } @empty {
             <tr>

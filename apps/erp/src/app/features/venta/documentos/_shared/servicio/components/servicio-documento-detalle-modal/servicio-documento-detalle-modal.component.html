@@ -435,7 +435,7 @@
             <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
               <span class="text-brand-muted">{{ d.fields.precio }}</span>
               <span class="tabular-nums text-brand-text">
-                {{ formValues().precio | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+                {{ formValues().precio | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
               </span>
             </div>
 
@@ -445,7 +445,7 @@
             >
               <span class="text-brand-muted">{{ d.summary.subtotal }}</span>
               <span class="font-medium tabular-nums text-brand-text">
-                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
               </span>
             </div>
 
@@ -461,7 +461,7 @@
               <span
                 class="text-[1.35rem] font-bold leading-none tracking-[-0.02em] tabular-nums text-[#143049]"
               >
-                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
               </span>
             </div>
           </div>

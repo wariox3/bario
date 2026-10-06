@@ -1,14 +1,13 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ContenedorDetalle, I18nService } from '@reddoc/core';
 import { ContenedorCreateFormComponent } from './contenedor-create-form.component';
-import { ContenedorCreationOverlayComponent } from '../creation-overlay/contenedor-creation-overlay.component';
 import type { ContenedoresTranslationsHost } from '../../i18n';
 
 @Component({
   selector: 'lib-contenedores-create-dialog',
   standalone: true,
-  imports: [DialogModule, ContenedorCreateFormComponent, ContenedorCreationOverlayComponent],
+  imports: [DialogModule, ContenedorCreateFormComponent],
   templateUrl: './contenedores-create-dialog.component.html',
   styleUrl: './contenedores-create-dialog.component.scss',
 })
@@ -24,10 +23,6 @@ export class ContenedoresCreateDialogComponent {
   readonly updated = output<void>();
 
   readonly isEditMode = computed(() => this.contenedor() !== null);
-
-  // Nombre de la empresa en creación; el overlay full-screen se renderiza fuera
-  // del <p-dialog> para no quedar contenido por el transform del modal.
-  protected readonly creationOverlayNombre = signal<string | null>(null);
 
   onCreated(): void {
     this.created.emit();

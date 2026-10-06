@@ -35,6 +35,18 @@ export interface ContenedoresDict {
       ownerCta: string;
       memberLocked: string;
     };
+    /** Badge de un contenedor que todavía no está `listo`: no se puede ingresar. */
+    estado: {
+      creando: string;
+      error: string;
+      /** CTA con el `paso` que reporta `/estado/`, tal cual llega (`{paso}`). */
+      creandoPaso: string;
+    };
+    /** Avisos al terminar la creación en segundo plano; `{nombre}` es la empresa. */
+    toasts: {
+      ready: { title: string; desc: string };
+      failed: { title: string; desc: string };
+    };
     /** Pill de la tarjeta/fila: el backend solo distingue propietario o no. */
     roles: {
       propietario: string;

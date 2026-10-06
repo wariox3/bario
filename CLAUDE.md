@@ -76,6 +76,7 @@ The 6 SPAs share the same skeleton:
 - **PrimeNG theme** — single `ReddocPreset` exported from `@reddoc/core` (navy `#143049` primary, sky `#77aad7` accent), used by every app via `providePrimeNG({ theme: { preset: ReddocPreset, ... } })`.
 - **Environments** — `src/environments/environment.ts` (dev), `.staging.ts`, `.prod.ts`. Swap via `fileReplacements` in `project.json`.
 - **Auth pages** — every app loads `LoginComponent`/`RegisterComponent`/etc. directly from `@reddoc/ui`. Per-app branding is provided via the `APP_BRANDING` token (`{ appName, tagline }`).
+- **Botón estándar** — cada `src/styles.scss` arranca con `@use` de `libs/styles/src/primeng/button` (y `overlays`): botones compactos de 32px, `fluid` a 43px. Una app nueva que lo omita queda con el botón por defecto de PrimeNG.
 - **Tailwind brand tokens** — each app's `src/tailwind.css` imports `libs/styles/src/tailwind/brand.css`, which exposes `--color-brand-*` and the `fade-up` / `drift1` / `drift2` animations as Tailwind v4 `@theme` values.
 - **Logos** — `libs/ui/src/assets/logos/` is wired in each app's `project.json` so `<img src="/logos/reddoc.svg">` resolves.
 
@@ -256,7 +257,9 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
   (`05/08/2026` — campos, tablas, fichas) o `formatFechaLarga` (`05 de agosto de 2026` — solo la
   cabecera de un documento). Un `<p-datepicker>` **no declara `dateFormat`**: lo hereda del
   translation global (`REDDOC_PRIMENG_ES`); solo se declara para mostrar otra cosa, como `mm/yy`
-  al elegir un mes. Nada de `toLocaleDateString` suelto ni de `iso.slice(0, 10)`.
+  al elegir un mes. Nada de `toLocaleDateString` suelto ni de `iso.slice(0, 10)`. Todo componente
+  que use `<p-datepicker>` suma `MascaraFechaDirective` (`@reddoc/ui`) a sus `imports`: el selector
+  es el propio elemento, así que sin el import el calendario queda sin máscara y nada avisa.
 - **Readonly by default** — prefer `readonly` properties and `readonly` arrays in configs and contracts.
 
 ## Tener en cuenta
@@ -264,6 +267,7 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - Para los textos no crees por ejemplo "Nueva Empresa" esta mal para nosotros, debe ser "Nueva empresa" no uses mayusculas al inicio de las palabras despues de la primera palabra
 - No comitees sin que yo te lo pida explicitamente
 - siempre procura usar clases de tailwind
+- Cuando un valor viene vacío (`null`, `undefined`, `''`) se deja la celda o el campo **vacío**: nada de `—`, `-` ni `N/A` como relleno. En plantillas basta `{{ valor }}` (Angular pinta vacío un `null`), sin `?? '—'` ni `|| '—'`; en helpers, `formatFechaCorta(valor, '')` y `return ''`
 
 ## Documentación de arquitectura
 

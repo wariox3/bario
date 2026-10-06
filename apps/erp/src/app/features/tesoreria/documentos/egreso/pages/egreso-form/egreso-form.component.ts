@@ -18,7 +18,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent } from '@reddoc/ui';
+import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -52,6 +52,8 @@ import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contab
 import { CUENTA_BANCO_ENDPOINT } from '../../egreso.constants';
 import { egresoToFormValue, formValueToPayload } from '../../egreso.mapper';
 import type { EgresoRead } from '../../egreso.model';
+import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Egreso (desembolso de
@@ -70,15 +72,19 @@ import type { EgresoRead } from '../../egreso.model';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-egreso-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
+    ContableDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,

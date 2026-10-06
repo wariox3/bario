@@ -18,7 +18,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -72,11 +77,9 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
 import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
 import type { NotaVentaRead } from '../../nota-documento.model';
-import {
-  METODO_PAGO_ENDPOINT,
-  NOTA_VENTA_REFERENCIA_ENDPOINT,
-  SEDE_ENDPOINT,
-} from '../../nota-documento.constants';
+import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../nota-documento.constants';
+import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una nota de venta. Lo comparten
@@ -102,11 +105,13 @@ import {
   selector: 'app-nota-documento-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TabsModule,
     TextareaModule,
     FieldErrorComponent,
@@ -114,6 +119,7 @@ import {
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
+    ErpDocumentoReferenciaSelectComponent,
     ComercialDocumentoDetallesComponent,
     DocumentoPagosComponent,
     ComercialDocumentoResumenComponent,
@@ -150,18 +156,15 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   );
 
   /** Tab activo del bloque (Detalles / Pagos / Más información). */
-  protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
+  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
 
   /**
    * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
    * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
    */
-  private readonly pestanasPorControl: Readonly<
-    Record<string, 'detalles' | 'pagos' | 'informacion'>
-  > = {
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'pagos'>> = {
     detalles: 'detalles',
     pagos: 'pagos',
-    comentario: 'informacion',
   };
 
   /**
@@ -172,39 +175,12 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
-  protected readonly referenciaEndpoint = NOTA_VENTA_REFERENCIA_ENDPOINT;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
 
   /** Cliente seleccionado: acota (y habilita) el select de documento referencia. */
-  private readonly contactoId = signal<number | null>(null);
-
-  /**
-   * Parámetros del select de documento referencia. Se reevalúa al cambiar el
-   * cliente: lista sus facturas de venta aprobadas (serializador `referencia`).
-   * Vacío mientras no haya cliente (el control queda deshabilitado y no consulta).
-   *
-   * TODO(nota-venta): pendiente confirmar con backend el contrato del endpoint de
-   * referencia antes de reactivar el select (está comentado en el template).
-   * Supuestos actuales (calcados del legacy):
-   *  - GET `/general/documento/` con `serializador=referencia`.
-   *  - Se filtra a facturas de venta aprobadas del cliente
-   *    (`documento_tipo__venta=True`, `documento_tipo__operacion=1`, `estado_aprobado=true`).
-   *  - El serializer devuelve `{ id, numero, fecha }` (se pinta `numero - fecha`).
-   */
-  protected readonly referenciaParams = computed<Record<string, string>>(() => {
-    const id = this.contactoId();
-    if (id == null) return {};
-    const params: Record<string, string> = {
-      contacto_id: String(id),
-      documento_tipo__venta: 'true',
-      documento_tipo__operacion: '1',
-      estado_aprobado: 'true',
-      serializador: 'referencia',
-    };
-    return params;
-  });
+  protected readonly contactoId = signal<number | null>(null);
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -555,16 +531,6 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     const toasts = this.t().entities.notaVenta.form.toasts;
     this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
-
-  /** Etiqueta de una opción del select de referencia: `número - fecha`. */
-  protected readonly referenciaLabel = (option: ErpSelectOption): string => {
-    const numero = option['numero'];
-    const fecha = option['fecha'];
-    if (numero != null && numero !== '') {
-      return fecha ? `${numero} - ${fecha}` : String(numero);
-    }
-    return option.nombre || '';
-  };
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {

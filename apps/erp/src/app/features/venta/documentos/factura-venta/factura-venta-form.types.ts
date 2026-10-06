@@ -17,6 +17,11 @@ export interface FacturaVentaFormRawValue {
   readonly plazo_pago: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
+  readonly orden_compra: string | null;
+  readonly remision: string | null;
+  readonly comentario: string | null;
+  readonly asesor: ErpSelectOption | null;
+  readonly resolucion: ErpSelectOption | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];
   readonly pagos: readonly PagoFormRawValue[];
 }

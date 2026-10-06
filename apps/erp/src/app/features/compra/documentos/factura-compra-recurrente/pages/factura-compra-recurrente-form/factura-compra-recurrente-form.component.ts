@@ -59,6 +59,8 @@ import {
 } from '../../factura-compra-recurrente.mapper';
 import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrente.model';
 import { SELECT_ENDPOINTS } from '@reddoc/core';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de compra
@@ -75,10 +77,13 @@ import { SELECT_ENDPOINTS } from '@reddoc/core';
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
+
 @Component({
   selector: 'app-factura-compra-recurrente-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
+    ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -143,17 +148,6 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     return id ? Number(id) : null;
   });
   protected readonly isSaving = signal(false);
-
-  /**
-   * Disclosure de "Datos adicionales" (orden de compra y comentario).
-   * Colapsado por defecto: son metadatos poco relevantes que no deben
-   * competir con la cabecera principal.
-   */
-  protected readonly adicionalesOpen = signal(false);
-
-  protected toggleAdicionales(): void {
-    this.adicionalesOpen.update((open) => !open);
-  }
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     compraDocumentoBreadcrumb(

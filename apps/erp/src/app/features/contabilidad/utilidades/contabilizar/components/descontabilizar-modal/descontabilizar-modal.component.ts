@@ -13,7 +13,7 @@ import {
   toIsoDate,
   type ErpSelectOption,
 } from '@reddoc/core';
-import { ErpApiSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, MascaraFechaDirective } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ContabilizarService } from '../../contabilizar.service';
 import { DESCONTABILIZAR_LIMITE } from '../../contabilizar.constants';
@@ -45,6 +45,7 @@ const DOCUMENTO_TIPO_ENDPOINT = '/general/documento-tipo/seleccionar/';
     DialogModule,
     ButtonModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputNumberModule,
     ErpApiSelectComponent,
   ],

@@ -203,6 +203,10 @@ export class AsientoDetailComponent implements OnInit {
     this.navigate(this.document().routes.edit, id);
   }
 
+  protected onNew(): void {
+    this.navigate(this.document().routes.new);
+  }
+
   protected toggleUtilidades(event: Event): void {
     this.utilidadesMenu()?.toggle(event);
   }

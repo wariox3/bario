@@ -95,24 +95,6 @@ body {
   border-left-width: 0;
 }
 
-// El overlay del menú del SplitButton (p-tieredmenu) se monta en el body, fuera
-// del alcance de los estilos scopeados, así que su tipografía no hereda la escala
-// compacta de la app y se ve "más grande". Igualamos su letra a la del menú del
-// perfil (user-menu) acotando por el menuStyleClass del control.
-.comercial-detalle-add-menu {
-  font-family: inherit;
-
-  .p-tieredmenu-item-link {
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-
-  .p-tieredmenu-item-icon {
-    font-size: 0.8rem;
-  }
-}
-
 // ─── Frame compartido de modales de acciones extra (DynamicDialog) ────────────
 // El dialog se teletransporta al body (fuera del alcance de estilos scoped), así
 // que su frame vive aquí. Replica el chrome de los modales inline del ERP

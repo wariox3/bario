@@ -1,8 +1,9 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MenuModule } from 'primeng/menu';
@@ -15,6 +16,7 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AporteContratosTabComponent } from '../../components/aporte-contratos-tab/aporte-contratos-tab.component';
 import { AporteDetallesTabComponent } from '../../components/aporte-detalles-tab/aporte-detalles-tab.component';
@@ -23,7 +25,7 @@ import { AporteResumenComponent } from '../../components/aporte-resumen/aporte-r
 import { APORTE_LIST_PATH } from '../../aporte.constants';
 import { CAPACIDADES_VACIAS, capacidadesDe, type CapacidadesAporte } from '../../aporte.estado';
 import type { Aporte } from '../../aporte.model';
-import { APORTE_EXPORTS, AporteService, type AporteExportKey } from '../../aporte.service';
+import { AporteService, cuerpoDe } from '../../aporte.service';
 
 /** Acciones del ciclo que se confirman antes de ejecutarse. */
 type AccionCiclo = 'generar' | 'desgenerar' | 'aprobar' | 'desaprobar';
@@ -39,8 +41,9 @@ type Pestania = 'contratos' | 'detalles' | 'entidades';
  * cabecera bloqueada y sigue necesitando este banco de trabajo — ver
  * `aporte.routes.ts`.
  *
- * Toda la botonera sale de `capacidadesDe(...)`: **ninguna condición se combina
- * en la plantilla**. Y las cuatro acciones del ciclo piden confirmación, porque
+ * Toda la botonera sale de `capacidadesDe(...)`, con el mismo estándar que la
+ * programación: lo que no aplica a la etapa se ve deshabilitado, no se oculta.
+ * Y las cuatro acciones del ciclo piden confirmación, porque
  * las cuatro tienen efecto sobre lo que la empresa paga:
  *
  * - **Generar** liquida el periodo y calcula lo que se le debe a cada entidad.
@@ -55,10 +58,12 @@ type Pestania = 'contratos' | 'detalles' | 'entidades';
   standalone: true,
   imports: [
     ButtonModule,
+    ButtonGroupModule,
     ConfirmDialogModule,
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
+    PageActionsComponent,
     AporteResumenComponent,
     AporteContratosTabComponent,
     AporteDetallesTabComponent,
@@ -73,6 +78,7 @@ export class AporteWorkspaceComponent implements OnInit {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -89,7 +95,16 @@ export class AporteWorkspaceComponent implements OnInit {
   /** Acción del ciclo en vuelo: bloquea toda la botonera. */
   protected readonly accionEnCurso = signal<AccionCiclo | null>(null);
 
-  protected readonly activeTab = signal<Pestania>('contratos');
+  /**
+   * Pestaña activa, en la URL (`?tab=entidades`) para que recargar o compartir
+   * el link no la pierda. Llega como input por `withComponentInputBinding`; un
+   * valor desconocido cae en contratos.
+   */
+  readonly tab = input<string>();
+  protected readonly activeTab = computed<Pestania>(() => {
+    const tab = this.tab();
+    return tab === 'detalles' || tab === 'entidades' ? tab : 'contratos';
+  });
 
   /** Contratos cargados; alimenta la capacidad de generar. */
   protected readonly contratos = signal(0);
@@ -114,63 +129,44 @@ export class AporteWorkspaceComponent implements OnInit {
   protected readonly estaOcupado = computed(() => this.accionEnCurso() !== null);
 
   /**
-   * Acciones secundarias del desplegable. Se arman según capacidades: una acción
-   * que no aplica a la etapa no aparece, en vez de mostrarse gris como en el ERP
-   * anterior.
+   * "Acciones": lo que revierte una etapa. Va siempre con sus dos ítems; el que no
+   * aplica a la etapa se ve deshabilitado, como el resto de la botonera.
    */
-  protected readonly accionesSecundarias = computed<MenuItem[]>(() => {
+  protected readonly accionesItems = computed<MenuItem[]>(() => {
     const c = this.capacidades();
     const labels = this.t().entities.aporte.acciones;
     const bloqueado = this.estaOcupado();
-    const items: MenuItem[] = [];
-
-    if (c.puedeDesgenerar) {
-      items.push({
-        label: labels.desgenerar,
-        icon: 'pi pi-undo',
-        disabled: bloqueado,
-        command: () => this.confirmar('desgenerar'),
-      });
-    }
-    if (c.puedeDesaprobar) {
-      items.push({
+    return [
+      {
         label: labels.desaprobar,
         icon: 'pi pi-times-circle',
-        disabled: bloqueado,
+        disabled: bloqueado || !c.puedeDesaprobar,
         command: () => this.confirmar('desaprobar'),
-      });
-    }
+      },
+      {
+        label: labels.desgenerar,
+        icon: 'pi pi-undo',
+        disabled: bloqueado || !c.puedeDesgenerar,
+        command: () => this.confirmar('desgenerar'),
+      },
+    ];
+  });
 
-    // Entregables y descargas: siempre al final, separados de lo que muta.
-    const descargas: MenuItem[] = [];
-    if (c.puedeGenerarPlano) {
-      descargas.push({
+  /**
+   * "Utilidades": el plano para el operador de PILA, que existe desde que se
+   * genera. El Excel vive en la pestaña de contratos, junto a lo que exporta.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => {
+    const c = this.capacidades();
+    const labels = this.t().entities.aporte.acciones;
+    return [
+      {
         label: labels.planoOperador,
         icon: 'pi pi-download',
+        disabled: !c.puedeGenerarPlano,
         command: () => this.planoOperador(),
-      });
-    }
-    descargas.push(
-      { label: labels.imprimir, icon: 'pi pi-file-pdf', command: () => this.imprimir() },
-      {
-        label: labels.exportContratos,
-        icon: 'pi pi-file-excel',
-        command: () => this.exportar('contratos'),
       },
-      {
-        label: labels.exportDetalles,
-        icon: 'pi pi-file-excel',
-        command: () => this.exportar('detalles'),
-      },
-      {
-        label: labels.exportEntidades,
-        icon: 'pi pi-file-excel',
-        command: () => this.exportar('entidades'),
-      },
-    );
-
-    if (items.length > 0) items.push({ separator: true });
-    return [...items, ...descargas];
+    ];
   });
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -201,12 +197,29 @@ export class AporteWorkspaceComponent implements OnInit {
 
   // ── Navegación ────────────────────────────────────────────────────────────
 
+  /**
+   * Cambiar de pestaña reescribe `?tab=` sin sumar al historial: "Atrás" vuelve a
+   * la página anterior, no a la pestaña anterior.
+   */
+  protected onTabChange(value: Pestania): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: value },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
   protected onBack(): void {
     this.navigateTo();
   }
 
   protected onEdit(): void {
     this.navigateTo('editar', this.aporteId());
+  }
+
+  protected onNew(): void {
+    this.navigateTo('nuevo');
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
@@ -217,6 +230,12 @@ export class AporteWorkspaceComponent implements OnInit {
 
   protected onAprobar(): void {
     this.confirmar('aprobar');
+  }
+
+  /** Se cargaron o quitaron contratos: la cabecera trae otros contadores. */
+  protected onCabeceraDesactualizada(): void {
+    const id = this.aporteId();
+    if (id) this.load(id);
   }
 
   /** Contratos informados por la pestaña: entran en el cálculo de capacidades. */
@@ -290,40 +309,18 @@ export class AporteWorkspaceComponent implements OnInit {
     this.descargar(this.service.planoOperadorUrl, 'plano-operador.txt');
   }
 
-  private imprimir(): void {
+  protected onImprimir(): void {
     this.descargar(this.service.imprimirUrl, 'aporte.pdf');
   }
 
-  /** Descargas del proceso: el id va en el body, como los pide el legacy. */
+  /** Descargas del proceso: el aporte va en el cuerpo, como en el resto de las acciones. */
   private descargar(url: string, archivo: string): void {
     const toasts = this.t().common.toasts;
     this.fileDownload
       .download(url, {
         method: 'POST',
-        body: { id: this.aporteId() },
+        body: cuerpoDe(this.aporteId()),
         fallbackFilename: archivo,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
-      });
-  }
-
-  /**
-   * Las tres exportaciones comparten forma: endpoint, serializador y el filtro que
-   * acota a este aporte (ver `APORTE_EXPORTS`).
-   */
-  private exportar(clave: AporteExportKey): void {
-    const config = APORTE_EXPORTS[clave];
-    const toasts = this.t().common.toasts;
-    this.fileDownload
-      .download(config.url, {
-        method: 'POST',
-        body: {
-          serializador: config.serializador,
-          [config.filtro]: this.aporteId(),
-        },
-        fallbackFilename: config.archivo,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

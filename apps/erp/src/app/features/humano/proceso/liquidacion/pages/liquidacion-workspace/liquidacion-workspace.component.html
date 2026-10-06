@@ -1,10 +1,22 @@
 @let acc = t().entities.liquidacion.acciones;
 @let det = t().entities.liquidacion.workspace;
+@let doc = t().documentActions.detail;
 
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<!-- ── Botonera: todo sale de capacidades() ──────────────────────────────────── -->
-<header class="flex flex-wrap items-center gap-2">
+<!--
+  ── Botonera ─────────────────────────────────────────────────────────────────
+  Va en <lib-page-actions>: queda pegada bajo el header al hacer scroll, como en
+  los formularios, para no perder el ciclo de vida al bajar por las tablas.
+  Mismo estándar que la programación y el aporte: volver suelto; editar, el
+  ciclo de vida y Acciones fundidos en un segmento, todo a la izquierda como en
+  las fichas. Volver y Editar van grises. Solo Aprobar va relleno: es
+  el paso que cierra la liquidación. Todo sale de capacidades(): lo que no aplica
+  a la etapa se deshabilita, no se oculta.
+  El <p-menu> va FUERA del grupo: su CSS une los botones con
+  `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
+-->
+<lib-page-actions>
   <p-button
     type="button"
     [label]="t().common.actions.back"
@@ -16,46 +28,60 @@
   />
 
   @if (liquidacion()) {
-    @if (capacidades().puedeGenerar) {
+    <p-buttongroup>
+      <p-button
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        [disabled]="!capacidades().puedeEditarCabecera || estaOcupado()"
+        (onClick)="onEdit()"
+      />
+
       <p-button
         type="button"
         [label]="acc.generar"
-        icon="pi pi-cog"
+        severity="secondary"
+        [outlined]="true"
         size="small"
         [loading]="accionEnCurso() === 'generar'"
-        [disabled]="estaOcupado()"
+        [disabled]="!capacidades().puedeGenerar || estaOcupado()"
         (onClick)="onGenerar()"
       />
-    }
-
-    @if (capacidades().puedeAprobar) {
+      <p-button
+        type="button"
+        [label]="doc.imprimir"
+        icon="pi pi-print"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="onImprimir()"
+      />
       <p-button
         type="button"
         [label]="acc.aprobar"
-        icon="pi pi-check-circle"
         size="small"
         [loading]="accionEnCurso() === 'aprobar'"
-        [disabled]="estaOcupado()"
+        [disabled]="!capacidades().puedeAprobar || estaOcupado()"
         (onClick)="onAprobar()"
       />
-    }
-
-    @if (accionesSecundarias().length) {
       <p-button
         type="button"
-        [label]="t().common.actions.actions"
+        [label]="doc.acciones"
         icon="pi pi-chevron-down"
         iconPos="right"
         severity="secondary"
         [outlined]="true"
         size="small"
-        [disabled]="estaOcupado()"
         (onClick)="accionesMenu.toggle($event)"
       />
-      <p-menu #accionesMenu [popup]="true" [model]="accionesSecundarias()" appendTo="body" />
-    }
+    </p-buttongroup>
+
+    <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
   }
-</header>
+</lib-page-actions>
 
 @if (isLoading()) {
   <div
@@ -76,16 +102,28 @@
 } @else if (liquidacion(); as l) {
   <app-liquidacion-resumen [liquidacion]="l" />
 
-  <!-- ── Adiciones y deducciones ─────────────────────────────────────────────── -->
+  <!-- ── Adicionales ─────────────────────────────────────────────────────────── -->
+  <!-- Tab único a propósito: mismo esqueleto que la programación y el aporte, así
+       el workspace se lee igual y sumar otra vista después no lo cambia. -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-      <p class="m-0 mb-3 text-[0.72rem] text-brand-muted">{{ det.adicionalesHint }}</p>
-      <app-liquidacion-adicionales-tab
-        [liquidacionId]="liquidacionId()"
-        [capacidades]="capacidades()"
-        [reloadToken]="reloadToken()"
-        (cambio)="onAdicionalesChange()"
-      />
+      <p-tabs value="adicionales">
+        <p-tablist>
+          <p-tab value="adicionales">{{ det.tabs.adicionales }}</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="adicionales">
+            <p class="m-0 mb-3 text-[0.72rem] text-brand-muted">{{ det.adicionalesHint }}</p>
+            <app-liquidacion-adicionales-tab
+              [liquidacionId]="liquidacionId()"
+              [capacidades]="capacidades()"
+              [reloadToken]="reloadToken()"
+              (cambio)="onAdicionalesChange()"
+            />
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </section>
 }

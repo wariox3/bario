@@ -92,7 +92,6 @@ import {
 } from '../../comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '../../comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '../../comercial-documento-detalle.types';
-import { ComercialDocumentoResumenComponent } from '../comercial-documento-resumen/comercial-documento-resumen.component';
 
 /**
  * Tabla de **líneas (detalles)** de un documento comercial. Reutilizable por
@@ -124,7 +123,6 @@ import { ComercialDocumentoResumenComponent } from '../comercial-documento-resum
     ErpItemAutocompleteComponent,
     ErpImpuestoSelectComponent,
     ErpApiSelectComponent,
-    ComercialDocumentoResumenComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './comercial-documento-detalles.component.html',
@@ -219,12 +217,6 @@ export class ComercialDocumentoDetallesComponent {
   readonly detalleEnabled = input<boolean>(true);
 
   /**
-   * Pinta el resumen del documento bajo la tabla. Default `true`; lo apaga el
-   * formulario que muestra un único resumen fuera de los tabs (común a Detalles y Pagos).
-   */
-  readonly resumenEnabled = input<boolean>(true);
-
-  /**
    * Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las
    * opcionales que el documento haya encendido.
    */
@@ -258,8 +250,15 @@ export class ComercialDocumentoDetallesComponent {
   /** Espejo reactivo del valor del array para la tabla, los totales y el resumen. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
 
-  /** Resumen del documento: subtotal, desglose por impuesto y total. */
-  protected readonly resumen = computed<ResumenDocumento>(() =>
+  /** Hay al menos una línea: la página pinta el resumen solo entonces. */
+  readonly hayLineas = computed(() => this.lines().length > 0);
+
+  /**
+   * Resumen del documento: subtotal, desglose por impuesto y total.
+   * Público: la página lo pinta fuera de la card de líneas, leyéndolo por
+   * referencia de plantilla (`#detallesTabla`).
+   */
+  readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),
   );
 

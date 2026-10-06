@@ -1,0 +1,135 @@
+@let f = t().entities.liquidacion.form;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
+  <lib-page-actions>
+    <p-button
+      type="button"
+      [label]="t().common.actions.back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="t().common.actions.save"
+      size="small"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="isSaving()"
+    />
+  </lib-page-actions>
+
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-user-minus text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 truncate text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ f.editTitle }}{{ empleado() ? ' · ' + empleado() : '' }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.sectionHint }}</p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Último pago general: de ahí arranca el conteo de días -->
+        <div class="flex flex-col gap-1.5">
+          <label
+            for="fecha_ultimo_pago"
+            class="text-[0.855rem] font-semibold tracking-[-0.025em] text-brand-text"
+          >
+            {{ f.fields.fechaUltimoPago }}
+          </label>
+          <p-datepicker
+            inputId="fecha_ultimo_pago"
+            formControlName="fecha_ultimo_pago"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label
+            for="fecha_ultimo_pago_cesantia"
+            class="text-[0.855rem] font-semibold tracking-[-0.025em] text-brand-text"
+          >
+            {{ f.fields.fechaUltimoPagoCesantia }}
+          </label>
+          <p-datepicker
+            inputId="fecha_ultimo_pago_cesantia"
+            formControlName="fecha_ultimo_pago_cesantia"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label
+            for="fecha_ultimo_pago_prima"
+            class="text-[0.855rem] font-semibold tracking-[-0.025em] text-brand-text"
+          >
+            {{ f.fields.fechaUltimoPagoPrima }}
+          </label>
+          <p-datepicker
+            inputId="fecha_ultimo_pago_prima"
+            formControlName="fecha_ultimo_pago_prima"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label
+            for="fecha_ultimo_pago_vacacion"
+            class="text-[0.855rem] font-semibold tracking-[-0.025em] text-brand-text"
+          >
+            {{ f.fields.fechaUltimoPagoVacacion }}
+          </label>
+          <p-datepicker
+            inputId="fecha_ultimo_pago_vacacion"
+            formControlName="fecha_ultimo_pago_vacacion"
+            [showIcon]="true"
+            appendTo="body"
+            [fluid]="true"
+          />
+        </div>
+
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-4">
+          <label
+            for="comentario"
+            class="text-[0.855rem] font-semibold tracking-[-0.025em] text-brand-text"
+          >
+            {{ f.fields.comentario }}
+          </label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            [maxlength]="comentarioMax"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+</form>

@@ -9,13 +9,13 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
 import {
+  DataFilterModalComponent,
   DataTableComponent,
   DataToolbarComponent,
   type PageChangeEvent,
@@ -27,9 +27,19 @@ import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/e
 import type { AppDict } from '@erp/i18n';
 import type { CapacidadesProgramacion } from '../../programacion.estado';
 import type { ProgramacionDetalle } from '../../programacion.model';
-import { PROGRAMACION_RENGLONES_PAGE_SIZE } from '../../programacion.constants';
+import {
+  PROGRAMACION_RENGLONES_PAGE_SIZE,
+  RENGLONES_FILTER_FIELDS,
+  tonoFechaDesde,
+  tonoFechaHasta,
+} from '../../programacion.constants';
 import { columnasDeRenglones, muestraHoras } from '../../programacion.renglones';
-import { ProgramacionService } from '../../programacion.service';
+import {
+  PROGRAMACION_EXPORTS,
+  ProgramacionService,
+  cuerpoExportacion,
+  type ProgramacionExportKey,
+} from '../../programacion.service';
 
 /**
  * Los **renglones** de la programación: un contrato por fila con su liquidación
@@ -46,17 +56,21 @@ import { ProgramacionService } from '../../programacion.service';
 @Component({
   selector: 'app-programacion-renglones-tab',
   standalone: true,
-  imports: [ConfirmDialogModule, DataTableComponent, DataToolbarComponent],
+  imports: [
+    ConfirmDialogModule,
+    DataFilterModalComponent,
+    DataTableComponent,
+    DataToolbarComponent,
+  ],
   providers: [ConfirmationService, DialogService],
   templateUrl: './programacion-renglones-tab.component.html',
 })
 export class ProgramacionRenglonesTabComponent {
   private readonly service = inject(ProgramacionService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly dialog = inject(DialogService);
-  private readonly tenant = inject(TenantService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
@@ -93,6 +107,19 @@ export class ProgramacionRenglonesTabComponent {
 
   /** Con horas hay que explicar las abreviaturas de las columnas. */
   protected readonly mostrarLeyenda = computed(() => muestraHoras(this.pagoTipoId()));
+
+  /**
+   * Qué colores de fecha hay en la página: la leyenda solo explica los que se
+   * ven. Sale de las mismas funciones que pintan las celdas.
+   */
+  protected readonly hayIngresoRetiro = computed(() =>
+    this.items().some(
+      (row) => tonoFechaDesde(row) === 'positive' || tonoFechaHasta(row) === 'positive',
+    ),
+  );
+  protected readonly hayErrorTerminacion = computed(() =>
+    this.items().some((row) => tonoFechaDesde(row) === 'critical'),
+  );
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
@@ -143,6 +170,48 @@ export class ProgramacionRenglonesTabComponent {
       : null,
   );
 
+  /**
+   * "Excel ▾" de la tabla: las tres exportaciones, junto a lo que exportan. El
+   * botón va sin ícono, solo los ítems lo llevan. Nómina y nómina detalle
+   * exportan documentos que existen desde que se genera: antes se ven
+   * deshabilitados, como el resto de la botonera.
+   */
+  protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
+    const sinNominas = !this.capacidades().puedeImprimirNominas;
+    return [
+      {
+        id: 'excel',
+        labelKey: 'entities.programacion.renglones.excel.action',
+        iconClass: '',
+        children: [
+          {
+            id: 'excel:renglones',
+            labelKey: 'entities.programacion.renglones.excel.detalle',
+            iconClass: 'pi pi-file-excel',
+          },
+          {
+            id: 'excel:nomina',
+            labelKey: 'entities.programacion.renglones.excel.nomina',
+            iconClass: 'pi pi-file-excel',
+            disabled: sinNominas,
+          },
+          {
+            id: 'excel:nominaDetalle',
+            labelKey: 'entities.programacion.renglones.excel.nominaDetalle',
+            iconClass: 'pi pi-file-excel',
+            disabled: sinNominas,
+          },
+        ],
+      },
+    ];
+  });
+
+  // ── Filtros ───────────────────────────────────────────────────────────────
+  // En memoria, no en el navegador: ver `RENGLONES_FILTER_FIELDS`.
+  protected readonly filterFields = RENGLONES_FILTER_FIELDS;
+  protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
+  protected readonly filtersVisible = signal(false);
+
   constructor() {
     effect(() => {
       this.programacionId();
@@ -161,8 +230,19 @@ export class ProgramacionRenglonesTabComponent {
     this.selectedRows.set(rows as ProgramacionDetalle[]);
   }
 
+  protected onFiltersApply(filters: readonly FilterCondition[]): void {
+    this.activeFilters.set(filters);
+    this.loadPage(0);
+  }
+
+  protected clearFilters(): void {
+    this.activeFilters.set([]);
+    this.loadPage(0);
+  }
+
   protected onToolbarAction(actionId: string): void {
     if (actionId === 'cargar-contratos') this.cargarContratos();
+    if (actionId.startsWith('excel:')) this.exportar(actionId.slice(6) as ProgramacionExportKey);
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
@@ -172,35 +252,19 @@ export class ProgramacionRenglonesTabComponent {
   }
 
   /**
-   * Abre la nómina que generó el renglón.
-   *
-   * En vez de un modal que vuelva a pintar el documento —lo que hacía el ERP
-   * anterior, con su propia copia de la cabecera y las líneas— se navega a la
-   * **ficha del documento de nómina que ya existe** en este ERP. El renglón solo
-   * conoce su propio id, así que primero se busca el documento por
-   * `programacion_detalle_id`.
+   * Muestra la nómina que generó el renglón en un modal de **solo lectura**,
+   * sin salir de la programación, como el ERP anterior: cabecera y conceptos,
+   * sin acciones. Lazy: el modal solo se usa con la programación generada.
    */
   private verNomina(renglonId: number): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return;
-
-    this.service
-      .nominaDelRenglon(renglonId)
+    from(import('../nomina-resumen-modal/nomina-resumen-modal.component'))
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (res) => {
-          const documento = res.results[0];
-          if (!documento) {
-            const toast = this.t().entities.programacion.renglones.toasts.sinNomina;
-            this.toast.warn(toast.title, toast.desc);
-            return;
-          }
-          void this.router.navigate(['/t', slug, 'humano', 'nomina', 'detalle', documento.id]);
-        },
-        error: () => {
-          const toast = this.t().entities.programacion.renglones.toasts.sinNomina;
-          this.toast.error(toast.title, toast.desc);
-        },
+      .subscribe(({ NominaResumenModalComponent }) => {
+        this.dialog.open(NominaResumenModalComponent, {
+          ...ENTITY_ACTION_DIALOG_DEFAULTS,
+          width: '84rem',
+          data: { renglonId },
+        });
       });
   }
 
@@ -292,7 +356,7 @@ export class ProgramacionRenglonesTabComponent {
   private eliminar(ids: readonly number[]): void {
     this.isBusy.set(true);
     this.service
-      .eliminarRenglones(ids)
+      .eliminarRenglones(this.programacionId(), ids)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isBusy.set(false)),
@@ -314,13 +378,32 @@ export class ProgramacionRenglonesTabComponent {
       });
   }
 
+  /**
+   * Las tres exportaciones comparten forma: endpoint, serializador y el filtro que
+   * las acota a esta programación (ver `PROGRAMACION_EXPORTS`).
+   */
+  private exportar(clave: ProgramacionExportKey): void {
+    const config = PROGRAMACION_EXPORTS[clave];
+    const toasts = this.t().common.toasts;
+    this.fileDownload
+      .download(config.url, {
+        method: 'POST',
+        body: cuerpoExportacion(clave, this.programacionId()),
+        fallbackFilename: config.archivo,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.toast.error(toasts.exportError.title, toasts.exportError.desc),
+      });
+  }
+
   private loadPage(page: number): void {
     const id = this.programacionId();
     if (!id) return;
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarRenglones(id, page + 1, this.pageSize)
+      .listarRenglones(id, page, this.pageSize, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
