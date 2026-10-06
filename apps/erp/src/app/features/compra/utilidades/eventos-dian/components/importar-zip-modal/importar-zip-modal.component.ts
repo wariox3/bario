@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { finalize, switchMap, throwError } from 'rxjs';
-import { I18nService, ToastService, type ErpSelectOption } from '@reddoc/core';
+import { I18nService, ToastService, type ErpSelectOption, formatCop } from '@reddoc/core';
 import { ErpApiSelectComponent, FieldErrorComponent } from '@reddoc/ui';
 import { ContactoService } from '@erp/features/general/masters/contacto/contacto.service';
 import type { ContactoPayload } from '@erp/features/general/masters/contacto/contacto.model';
@@ -69,6 +69,7 @@ export class ImportarZipModalComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly endpoints = ENDPOINTS;
+  protected readonly formatCop = formatCop;
 
   readonly visible = model<boolean>(false);
   readonly saved = output<void>();
