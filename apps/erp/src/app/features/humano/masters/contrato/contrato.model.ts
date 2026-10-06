@@ -65,14 +65,9 @@ export interface Contrato {
   readonly tiempo_nombre: string | null;
   readonly tipo_costo: number | null;
   readonly tipo_costo_nombre: string | null;
-  /**
-   * Centro de costo. El backend lo nombra `grupo_contabilidad` (vocabulario del
-   * ERP anterior, donde "grupo" era el de contabilidad); en la UI es «centro de
-   * costo», como en el resto del ERP. Ojo: `grupo`, acá al lado, es otra cosa —
-   * el grupo de nómina.
-   */
-  readonly grupo_contabilidad: number | null;
-  readonly grupo_contabilidad_nombre: string | null;
+  /** Centro de costo. Ojo: `grupo`, acá al lado, es otra cosa — el grupo de nómina. */
+  readonly centro_costo: number | null;
+  readonly centro_costo_nombre: string | null;
   readonly motivo_terminacion: number | null;
   readonly motivo_terminacion_nombre: string | null;
 }
@@ -104,7 +99,7 @@ export interface ContratoPayload {
   readonly entidad_pension: number | null;
   readonly entidad_salud: number | null;
   readonly grupo: number | null;
-  readonly grupo_contabilidad: number | null;
+  readonly centro_costo: number | null;
   readonly motivo_terminacion: number | null;
   readonly pension: number | null;
   readonly riesgo: number | null;
