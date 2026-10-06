@@ -2,12 +2,15 @@
 
 <!--
   Las acciones del documento fundidas en un solo segmento, que se lee como una pieza.
-  Lo propio de cada documento (su "Utilidades") entra al final del segmento por el
-  slot `[actionsEnd]`; su <p-menu> lo declara la ficha, fuera de este componente.
+  El Editar de la ficha entra al principio por el slot `[actionsStart]` y lo propio
+  de cada documento (su "Utilidades") al final por `[actionsEnd]`; su <p-menu> lo declara la ficha, fuera de este componente.
   Los <p-menu> van FUERA del grupo: su CSS une los botones con
   `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
 -->
 <p-buttongroup>
+  <!-- Editar de la ficha: primer segmento del grupo (slot `[actionsStart]`). -->
+  <ng-content select="[actionsStart]" />
+
   @if (showAprobacion()) {
     <p-button
       type="button"

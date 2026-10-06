@@ -15,17 +15,9 @@
     (onClick)="onBack()"
   />
   @if (contrato(); as c) {
-    <p-button
-      type="button"
-      [label]="t().common.actions.edit"
-      icon="pi pi-pencil"
-      size="small"
-      (onClick)="onEdit()"
-    />
-
-    <!-- Terminar y Utilidades fundidos en un segmento: las acciones sobre el
-         contrato, como el grupo de las fichas de documento, empujado a la derecha
-         (ml-auto). Volver y Editar van sueltos a la izquierda. Solo mientras el contrato siga vigente.
+    <!-- Editar, Terminar y Utilidades fundidos en un segmento, como el grupo de las
+         fichas de documento; Volver queda suelto. Terminar y Utilidades solo mientras
+         el contrato siga vigente: terminado, el grupo queda con Editar.
 
          Terminar queda como botón y no dentro de Utilidades: cierra el contrato
          y fabrica la liquidación, no es una utilidad más. Va en `danger` y no en
@@ -36,8 +28,17 @@
          Utilidades: lo que se corrige sobre un contrato vigente. Hoy solo los
          parámetros iniciales, igual que en el ERP anterior. Su <p-menu> va FUERA
          del grupo: un hermano detrás del último botón le quitaría el borde. -->
-    @if (!c.estado_terminado) {
-      <p-buttongroup class="ml-auto">
+    <p-buttongroup>
+      <p-button
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        (onClick)="onEdit()"
+      />
+      @if (!c.estado_terminado) {
         <p-button
           type="button"
           [label]="t().entities.contrato.terminar.action"
@@ -57,7 +58,9 @@
           size="small"
           (onClick)="toggleUtilidades($event)"
         />
-      </p-buttongroup>
+      }
+    </p-buttongroup>
+    @if (!c.estado_terminado) {
       <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
     }
   }

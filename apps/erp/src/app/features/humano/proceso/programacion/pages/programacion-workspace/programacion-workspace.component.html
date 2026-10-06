@@ -8,9 +8,9 @@
   ── Botonera ─────────────────────────────────────────────────────────────────
   Va en <lib-page-actions>: queda pegada bajo el header al hacer scroll, como en
   los formularios, para no perder el ciclo de vida al bajar por las tablas.
-  Mismo orden que la ficha de los documentos: volver y editar sueltos, el ciclo
-  de vida y Utilidades fundidos en un segmento, empujado a la derecha (ml-auto)
-  como en las fichas. Solo Aprobar va relleno: es el
+  Mismo orden que la ficha de los documentos: volver suelto; editar, el ciclo de
+  vida y Utilidades fundidos en un segmento, todo a la izquierda como en las
+  fichas. Volver y Editar van grises. Solo Aprobar va relleno: es el
   paso que lleva la nómina a contabilidad, como en los documentos. Todo sale de
   capacidades(): lo que no aplica a la etapa se deshabilita, no se oculta.
   Los <p-menu> van FUERA del grupo: su CSS une los botones con
@@ -28,16 +28,18 @@
   />
 
   @if (programacion()) {
-    <p-button
-      type="button"
-      [label]="t().common.actions.edit"
-      icon="pi pi-pencil"
-      size="small"
-      [disabled]="!capacidades().puedeEditarCabecera || estaOcupado()"
-      (onClick)="onEdit()"
-    />
+    <p-buttongroup>
+      <p-button
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        [disabled]="!capacidades().puedeEditarCabecera || estaOcupado()"
+        (onClick)="onEdit()"
+      />
 
-    <p-buttongroup class="ml-auto">
       <p-button
         type="button"
         [label]="acc.generar"

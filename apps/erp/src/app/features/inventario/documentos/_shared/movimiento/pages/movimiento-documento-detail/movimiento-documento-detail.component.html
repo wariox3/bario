@@ -14,14 +14,6 @@
     (onClick)="onBack()"
   />
   @if (cabecera()) {
-    <p-button
-      type="button"
-      [label]="t().common.actions.edit"
-      icon="pi pi-pencil"
-      size="small"
-      [disabled]="!isEditable()"
-      (onClick)="onEdit()"
-    />
     <!-- Los documentos de inventario no generan movimiento contable: sin "Contabilidad". -->
     <app-document-detail-actions
       [documentoId]="id()"
@@ -31,6 +23,18 @@
       [showContabilidad]="false"
       (documentoChanged)="onDocumentoChanged()"
     >
+      <p-button
+        actionsStart
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        [disabled]="!isEditable()"
+        (onClick)="onEdit()"
+      />
+
       <p-button
         actionsEnd
         type="button"

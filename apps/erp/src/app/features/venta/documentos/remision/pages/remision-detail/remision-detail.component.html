@@ -14,14 +14,6 @@
     (onClick)="onBack()"
   />
   @if (cabecera()) {
-    <p-button
-      type="button"
-      [label]="t().common.actions.edit"
-      icon="pi pi-pencil"
-      size="small"
-      [disabled]="!isEditable()"
-      (onClick)="onEdit()"
-    />
     <app-document-detail-actions
       [documentoId]="id()"
       [document]="document()"
@@ -31,7 +23,19 @@
       [canAnular]="capacidades().puedeAnular"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (documentoChanged)="onDocumentoChanged()"
-    />
+    >
+      <p-button
+        actionsStart
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        [disabled]="!isEditable()"
+        (onClick)="onEdit()"
+      />
+    </app-document-detail-actions>
   }
 </header>
 

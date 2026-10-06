@@ -1,6 +1,5 @@
 :host {
-  // Empuja la botonera a la derecha del header, separada de Volver/Editar.
-  margin-left: auto;
+  // Sigue a Volver/Editar a la izquierda; el gap del header los separa.
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
