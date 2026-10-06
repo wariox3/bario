@@ -4688,6 +4688,19 @@ export interface AppDict
         };
       };
     };
+    validarSaldos: {
+      porTipo: Record<
+        'cobrar' | 'pagar',
+        { description: string; confirmMessage: string; successDesc: string }
+      >;
+      name: string;
+      run: string;
+      confirm: { header: string; accept: string; cancel: string };
+      toasts: {
+        success: { title: string };
+        error: { title: string; desc: string };
+      };
+    };
     regenerarAfectado: {
       name: string;
       description: string;

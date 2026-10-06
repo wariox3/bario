@@ -6091,6 +6091,40 @@ export const es: AppDict = {
         },
       },
     },
+    validarSaldos: {
+      porTipo: {
+        cobrar: {
+          description:
+            'Este proceso recalcula el pago, lo afectado y el pendiente de cada cuenta por cobrar desde su origen y corrige los que no cuadren con lo guardado.',
+          confirmMessage:
+            'Se recalcularán los saldos de todas las cuentas por cobrar y se corregirán los que no cuadren. La operación puede tardar unos segundos.',
+          successDesc: 'Los saldos de las cuentas por cobrar se revisaron y corrigieron.',
+        },
+        pagar: {
+          description:
+            'Este proceso recalcula el pago, lo afectado y el pendiente de cada cuenta por pagar desde su origen y corrige los que no cuadren con lo guardado.',
+          confirmMessage:
+            'Se recalcularán los saldos de todas las cuentas por pagar y se corregirán los que no cuadren. La operación puede tardar unos segundos.',
+          successDesc: 'Los saldos de las cuentas por pagar se revisaron y corrigieron.',
+        },
+      },
+      name: 'Validar saldos',
+      run: 'Validar',
+      confirm: {
+        header: '¿Validar saldos?',
+        accept: 'Validar',
+        cancel: 'Cancelar',
+      },
+      toasts: {
+        success: {
+          title: 'Validación completada',
+        },
+        error: {
+          title: 'No se pudo validar',
+          desc: 'Ocurrió un error al validar los saldos. Intenta de nuevo.',
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:

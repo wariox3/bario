@@ -6025,6 +6025,40 @@ export const en: AppDict = {
         },
       },
     },
+    validarSaldos: {
+      porTipo: {
+        cobrar: {
+          description:
+            'This process recalculates the payment, affected and pending amounts of each receivable from its origin and fixes those that do not match what is stored.',
+          confirmMessage:
+            'The balances of all receivables will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+          successDesc: 'Receivable balances were checked and fixed.',
+        },
+        pagar: {
+          description:
+            'This process recalculates the payment, affected and pending amounts of each payable from its origin and fixes those that do not match what is stored.',
+          confirmMessage:
+            'The balances of all payables will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+          successDesc: 'Payable balances were checked and fixed.',
+        },
+      },
+      name: 'Validate balances',
+      run: 'Validate',
+      confirm: {
+        header: 'Validate balances?',
+        accept: 'Validate',
+        cancel: 'Cancel',
+      },
+      toasts: {
+        success: {
+          title: 'Validation completed',
+        },
+        error: {
+          title: 'Could not validate',
+          desc: 'An error occurred while validating the balances. Try again.',
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:

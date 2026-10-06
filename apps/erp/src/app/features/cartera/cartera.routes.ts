@@ -47,6 +47,13 @@ export const CARTERA_ROUTES: Route[] = [
       ...rutaContactos(),
       ...rutaCuentasBanco(),
       {
+        path: 'proceso/validar-saldos',
+        loadChildren: () =>
+          import('@erp/features/documentos/validar-saldos/validar-saldos.routes').then((m) =>
+            m.validarSaldosRoutes('cobrar'),
+          ),
+      },
+      {
         path: 'informes/cuenta-cobrar',
         loadChildren: () =>
           import('./informes/cuenta-cobrar/cuenta-cobrar.routes').then(

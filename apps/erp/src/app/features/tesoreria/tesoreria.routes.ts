@@ -49,6 +49,13 @@ export const TESORERIA_ROUTES: Route[] = [
       ...rutaContactos(),
       ...rutaCuentasBanco(),
       {
+        path: 'proceso/validar-saldos',
+        loadChildren: () =>
+          import('@erp/features/documentos/validar-saldos/validar-saldos.routes').then((m) =>
+            m.validarSaldosRoutes('pagar'),
+          ),
+      },
+      {
         path: 'informes/cuenta-pagar',
         loadChildren: () =>
           import('./informes/cuenta-pagar/cuenta-pagar.routes').then((m) => m.CUENTA_PAGAR_ROUTES),

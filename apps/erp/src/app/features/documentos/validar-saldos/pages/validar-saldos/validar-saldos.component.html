@@ -1,0 +1,28 @@
+<!--
+  Proceso "Validar saldos" (Cartera y Tesorería, según el `tipo` de la ruta). Misma
+  consola que los demás procesos de una acción: breadcrumb + card con el título,
+  panel centrado con explicación y botón.
+  Corrige saldos en bloque: pide confirmación y avisa el resultado solo con un toast.
+-->
+@let v = t().entities.validarSaldos;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="v.name">
+  <div table class="flex items-center justify-center p-8 max-[576px]:p-5">
+    <div class="flex w-full max-w-md flex-col items-center gap-5 text-center">
+      <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
+        <i class="pi pi-check-square text-[1.5rem]"></i>
+      </span>
+
+      <p class="m-0 text-[0.9rem] leading-relaxed text-brand-text/80">{{ textos().description }}</p>
+
+      <p-button
+        [label]="v.run"
+        icon="pi pi-search"
+        [loading]="status() === 'running'"
+        (onClick)="onValidar()"
+      />
+    </div>
+  </div>
+</lib-list-shell>
+
+<p-confirmDialog />
