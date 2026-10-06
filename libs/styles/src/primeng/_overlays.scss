@@ -39,3 +39,12 @@ p-confirmpopup,
 p-menu {
   display: contents;
 }
+
+// El diálogo de confirmación no tiene ancho propio: PrimeNG lo deja crecer con
+// el texto, así que un mensaje de dos frases salía en una sola línea de lado a
+// lado de la pantalla. Se le pone un tope para que el texto haga saltos de línea;
+// en pantallas angostas manda el ancho disponible. Un confirm que necesite más
+// lo puede seguir pidiendo con su `[style]`, que gana por ser estilo en línea.
+.p-confirmdialog {
+  width: min(28rem, calc(100vw - 2rem));
+}
