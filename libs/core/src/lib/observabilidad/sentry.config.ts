@@ -8,6 +8,6 @@ import type { SentryConfig } from './observabilidad';
  * secreto: termina en el bundle que descarga el navegador.
  */
 export const SENTRY_PRODUCCION: SentryConfig = {
-  dsn: '',
+  dsn: 'https://84fc278a8dfe75d7c9d392946b93138a@o4511552584744960.ingest.us.sentry.io/4512211479691264',
   environment: 'production',
 };
