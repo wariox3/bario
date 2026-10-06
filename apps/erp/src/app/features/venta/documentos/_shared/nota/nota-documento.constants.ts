@@ -11,14 +11,6 @@ export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
 
 /**
- * Endpoint (GET) que lista los documentos referenciables por la nota (facturas
- * de venta aprobadas del cliente). Reusa el endpoint genérico de documentos con
- * `serializador=referencia` (mismo contrato que el legacy). Es de uso único de
- * esta familia, por eso vive aquí y no en `SELECT_ENDPOINTS`.
- */
-export const NOTA_VENTA_REFERENCIA_ENDPOINT = '/general/documento/';
-
-/**
  * Construye las columnas del listado de una nota de venta para el namespace i18n
  * dado (`'notaCredito'`, `'notaDebito'`). La estructura es idéntica entre las
  * notas; solo cambian las claves i18n. Mismo set canónico de

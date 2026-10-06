@@ -2556,6 +2556,7 @@ export const es: AppDict = {
           documentoReferencia: 'Documento de referencia',
           documentoReferenciaPlaceholder: 'Selecciona la factura…',
           documentoReferenciaDisabled: 'Selecciona primero un cliente',
+          documentoReferenciaEmpty: 'El cliente no tiene facturas aprobadas con ese número.',
           sede: 'Sede',
           sedePlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',

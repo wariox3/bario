@@ -1938,6 +1938,7 @@ export interface AppDict
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           sede: string;
           sedePlaceholder: string;
           metodoPago: string;

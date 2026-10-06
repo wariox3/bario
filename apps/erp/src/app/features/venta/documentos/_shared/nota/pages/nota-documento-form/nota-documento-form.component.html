@@ -91,27 +91,23 @@
           />
         </div>
 
-        <!-- Documento de referencia (factura de venta aprobada del cliente) -->
-        <!-- TODO(nota-venta): select deshabilitado hasta confirmar el contrato del
-             backend del endpoint de referencia. Ver el TODO en
-             nota-documento-form.component.ts (referenciaParams/referenciaEndpoint).
-             Al reactivar, descomentar este bloque. -->
+        <!-- Documento de referencia: factura aprobada del cliente, con búsqueda por número -->
         <div class="flex flex-col gap-1.5">
-          <!-- <label for="documento_referencia" class="nota-documento-form__label">
+          <label for="documento_referencia" class="nota-documento-form__label">
             {{ f.fields.documentoReferencia }}
           </label>
-          <lib-api-select
+          <app-documento-referencia-select
             inputId="documento_referencia"
             formControlName="documento_referencia"
-            [endpoint]="referenciaEndpoint"
-            [params]="referenciaParams()"
-            [displayWith]="referenciaLabel"
+            cartera="cobrar"
+            [contactoId]="contactoId()"
+            [emptyMessage]="f.fields.documentoReferenciaEmpty"
             [placeholder]="
               form.controls.contacto.value
                 ? f.fields.documentoReferenciaPlaceholder
                 : f.fields.documentoReferenciaDisabled
             "
-          /> -->
+          />
         </div>
 
         <!-- Sede -->
