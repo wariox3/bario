@@ -82,6 +82,7 @@ import {
   NOTA_VENTA_REFERENCIA_ENDPOINT,
   SEDE_ENDPOINT,
 } from '../../nota-documento.constants';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una nota de venta. Lo comparten
@@ -107,6 +108,7 @@ import {
   selector: 'app-nota-documento-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -156,18 +158,15 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   );
 
   /** Tab activo del bloque (Detalles / Pagos / Más información). */
-  protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
+  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
 
   /**
    * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
    * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
    */
-  private readonly pestanasPorControl: Readonly<
-    Record<string, 'detalles' | 'pagos' | 'informacion'>
-  > = {
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'pagos'>> = {
     detalles: 'detalles',
     pagos: 'pagos',
-    comentario: 'informacion',
   };
 
   /**

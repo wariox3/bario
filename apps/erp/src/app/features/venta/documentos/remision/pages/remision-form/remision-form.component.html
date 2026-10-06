@@ -110,7 +110,12 @@
             [placeholder]="t().entities.remision.form.fields.almacenPlaceholder"
           />
         </div>
+      </div>
+    </div>
 
+    <!-- Más información: los opcionales que menos se tocan (como en el ERP anterior). -->
+    <app-mas-informacion [campos]="['asesor', 'comentario']">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         <!-- Asesor -->
         <div class="flex flex-col gap-1.5">
           <label for="asesor" class="remision-form__label">
@@ -143,7 +148,7 @@
           />
         </div>
       </div>
-    </div>
+    </app-mas-informacion>
   </section>
 
   <!-- Líneas: card propia; las tabs y la botonera de la tabla son su cabecera -->

@@ -56,6 +56,7 @@ import { costoFieldFor, usaOperacionInventario } from '../../movimiento-document
 import { movimientoToFormValue, formValueToPayload } from '../../movimiento-documento.mapper';
 import type { MovimientoRead } from '../../movimiento-documento.model';
 import { InventarioDocumentoResumenComponent } from '@erp/features/documentos/inventario/components/inventario-documento-resumen/inventario-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un movimiento de inventario.
@@ -83,6 +84,7 @@ import { InventarioDocumentoResumenComponent } from '@erp/features/documentos/in
   selector: 'app-movimiento-documento-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     InventarioDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,

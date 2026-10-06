@@ -133,67 +133,39 @@
       </div>
     </div>
 
-    <!-- ── Datos adicionales (disclosure colapsable) ────────────────────────
-         Metadatos poco relevantes (orden de compra y comentario). Colapsados
-         por defecto: cuestan una sola línea y no compiten con la cabecera
-         principal. Borders-only, muted — reusa el idioma del acordeón del
-         sidebar. -->
-    <button
-      type="button"
-      (click)="toggleAdicionales()"
-      [attr.aria-expanded]="adicionalesOpen()"
-      aria-controls="factura-compra-recurrente-adicionales"
-      class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-left transition-colors hover:bg-[rgba(20,48,73,0.04)]"
-    >
-      <i
-        class="pi pi-chevron-right text-[0.7rem] text-brand-muted transition-transform"
-        [class.rotate-90]="adicionalesOpen()"
-      ></i>
-      <span class="text-[0.85rem] font-medium text-brand-muted">
-        {{ t().entities.facturaCompraRecurrente.form.adicionales.title }}
-      </span>
-      <span class="ml-auto text-[0.72rem] text-brand-muted">
-        {{ t().entities.facturaCompraRecurrente.form.adicionales.hint }}
-      </span>
-    </button>
+    <!-- Más información: los opcionales que menos se tocan (como en el ERP anterior). -->
+    <app-mas-informacion [campos]="['orden_compra', 'comentario']">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Orden de compra -->
+        <div class="flex flex-col gap-1.5">
+          <label for="orden_compra" class="factura-compra-recurrente-form__label">
+            {{ t().entities.facturaCompraRecurrente.form.fields.ordenCompra }}
+          </label>
+          <input
+            id="orden_compra"
+            pInputText
+            formControlName="orden_compra"
+            maxlength="50"
+            class="w-full"
+          />
+        </div>
 
-    @if (adicionalesOpen()) {
-      <div
-        id="factura-compra-recurrente-adicionales"
-        class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4"
-      >
-        <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-          <!-- Orden de compra -->
-          <div class="flex flex-col gap-1.5">
-            <label for="orden_compra" class="factura-compra-recurrente-form__label">
-              {{ t().entities.facturaCompraRecurrente.form.fields.ordenCompra }}
-            </label>
-            <input
-              id="orden_compra"
-              pInputText
-              formControlName="orden_compra"
-              maxlength="50"
-              class="w-full"
-            />
-          </div>
-
-          <!-- Comentario -->
-          <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label for="comentario" class="factura-compra-recurrente-form__label">
-              {{ t().entities.facturaCompraRecurrente.form.fields.comentario }}
-            </label>
-            <textarea
-              id="comentario"
-              pTextarea
-              formControlName="comentario"
-              rows="3"
-              maxlength="500"
-              class="w-full"
-            ></textarea>
-          </div>
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="factura-compra-recurrente-form__label">
+            {{ t().entities.facturaCompraRecurrente.form.fields.comentario }}
+          </label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            maxlength="500"
+            class="w-full"
+          ></textarea>
         </div>
       </div>
-    }
+    </app-mas-informacion>
   </section>
 
   <!-- Líneas: card propia; las tabs y la botonera de la tabla son su cabecera -->

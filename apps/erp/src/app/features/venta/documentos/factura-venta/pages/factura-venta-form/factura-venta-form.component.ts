@@ -88,6 +88,7 @@ import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { facturaVentaToFormValue, formValueToPayload } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de venta.
@@ -110,6 +111,7 @@ import type { FacturaVentaRead } from '../../factura-venta.model';
   selector: 'app-factura-venta-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -163,22 +165,15 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   );
 
   /** Tab activo del bloque de líneas (Detalles / Pagos). */
-  protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
+  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
 
   /**
    * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
    * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
    */
-  private readonly pestanasPorControl: Readonly<
-    Record<string, 'detalles' | 'pagos' | 'informacion'>
-  > = {
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'pagos'>> = {
     detalles: 'detalles',
     pagos: 'pagos',
-    orden_compra: 'informacion',
-    remision: 'informacion',
-    asesor: 'informacion',
-    resolucion: 'informacion',
-    comentario: 'informacion',
   };
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;

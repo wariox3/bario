@@ -90,6 +90,7 @@ import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/come
 import { posDocumentoToFormValue, formValueToPayload } from '../../pos-documento.mapper';
 import type { PosDocumentoRead } from '../../pos-documento.model';
 import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un documento POS (punto de
@@ -117,6 +118,7 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
   selector: 'app-pos-documento-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -174,18 +176,15 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
    * patrón que la factura de compra: los bloques del documento comparten una card
    * en vez de apilarse. "Más información" agrupa los campos secundarios (comentario).
    */
-  protected readonly activeTab = signal<'detalles' | 'pagos' | 'informacion'>('detalles');
+  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
 
   /**
    * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
    * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
    */
-  private readonly pestanasPorControl: Readonly<
-    Record<string, 'detalles' | 'pagos' | 'informacion'>
-  > = {
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'pagos'>> = {
     detalles: 'detalles',
     pagos: 'pagos',
-    comentario: 'informacion',
   };
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;

@@ -169,20 +169,6 @@
           />
         </div>
 
-        <!-- Resolución -->
-        <div class="flex flex-col gap-1.5">
-          <label for="resolucion" class="documento-soporte-form__label">
-            {{ t().entities.documentoSoporte.form.fields.resolucion }}
-          </label>
-          <lib-api-select
-            inputId="resolucion"
-            formControlName="resolucion"
-            [endpoint]="resolucionEndpoint"
-            [params]="resolucionParams"
-            [placeholder]="t().entities.documentoSoporte.form.fields.resolucionPlaceholder"
-          />
-        </div>
-
         <!-- Sede -->
         <div class="flex flex-col gap-1.5">
           <label for="sede" class="documento-soporte-form__label">
@@ -209,6 +195,25 @@
             class="w-full"
           />
         </div>
+      </div>
+    </div>
+
+    <!-- Más información: los opcionales que menos se tocan (como en el ERP anterior). -->
+    <app-mas-informacion [campos]="['resolucion', 'comentario']">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Resolución -->
+        <div class="flex flex-col gap-1.5">
+          <label for="resolucion" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.resolucion }}
+          </label>
+          <lib-api-select
+            inputId="resolucion"
+            formControlName="resolucion"
+            [endpoint]="resolucionEndpoint"
+            [params]="resolucionParams"
+            [placeholder]="t().entities.documentoSoporte.form.fields.resolucionPlaceholder"
+          />
+        </div>
 
         <!-- Comentario -->
         <div class="flex flex-col gap-1.5 sm:col-span-2">
@@ -225,7 +230,7 @@
           ></textarea>
         </div>
       </div>
-    </div>
+    </app-mas-informacion>
   </section>
 
   <!-- Líneas: card propia; las tabs y la botonera de la tabla son su cabecera -->

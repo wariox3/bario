@@ -116,6 +116,30 @@
         <dt class="factura-venta-detail__label">{{ det.labels.sede }}</dt>
         <dd class="factura-venta-detail__value">{{ c.sede || '—' }}</dd>
       </div>
+      <!-- Lo que en el formulario va en "Más información": en la ficha, a la vista
+           con el resto (ningún campo se oculta), como en el ERP anterior. -->
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.ordenCompra }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.ordenCompra || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.remision }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.remision || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.asesor }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.asesor || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-detail__label">{{ det.labels.resolucion }}</dt>
+        <dd class="factura-venta-detail__value">{{ c.resolucion || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="factura-venta-detail__label">{{ det.labels.comentario }}</dt>
+        <dd class="factura-venta-detail__value whitespace-pre-line">
+          {{ c.comentario || '—' }}
+        </dd>
+      </div>
     </dl>
   </section>
 
@@ -143,7 +167,6 @@
             </span>
           }
         </p-tab>
-        <p-tab value="informacion">{{ t().entities.facturaVenta.form.tabs.informacion }}</p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -157,33 +180,6 @@
 
         <p-tabpanel value="pagos">
           <app-documento-pagos-table [pagos]="pagos()" />
-        </p-tabpanel>
-
-        <p-tabpanel value="informacion">
-          <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div class="flex flex-col gap-0.5">
-              <dt class="factura-venta-detail__label">{{ det.labels.ordenCompra }}</dt>
-              <dd class="factura-venta-detail__value">{{ c.ordenCompra || '—' }}</dd>
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <dt class="factura-venta-detail__label">{{ det.labels.remision }}</dt>
-              <dd class="factura-venta-detail__value">{{ c.remision || '—' }}</dd>
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <dt class="factura-venta-detail__label">{{ det.labels.asesor }}</dt>
-              <dd class="factura-venta-detail__value">{{ c.asesor || '—' }}</dd>
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <dt class="factura-venta-detail__label">{{ det.labels.resolucion }}</dt>
-              <dd class="factura-venta-detail__value">{{ c.resolucion || '—' }}</dd>
-            </div>
-            <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-              <dt class="factura-venta-detail__label">{{ det.labels.comentario }}</dt>
-              <dd class="factura-venta-detail__value whitespace-pre-line">
-                {{ c.comentario || '—' }}
-              </dd>
-            </div>
-          </dl>
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>

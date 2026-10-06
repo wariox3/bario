@@ -53,6 +53,7 @@ import { notaCreditoCompraToFormValue, formValueToPayload } from '../../nota-cre
 import type { NotaCreditoCompraRead } from '../../nota-credito-compra.model';
 import { NOTA_CREDITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-credito-compra.constants';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Nota crédito de compra.
@@ -73,6 +74,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
   selector: 'app-nota-credito-compra-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,

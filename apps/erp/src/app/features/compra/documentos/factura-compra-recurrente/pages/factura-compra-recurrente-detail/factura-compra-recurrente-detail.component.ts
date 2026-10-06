@@ -38,6 +38,7 @@ interface CabeceraView {
   readonly centroCosto: string | null;
   readonly sede: string | null;
   readonly ordenCompra: string | null;
+  readonly comentario: string | null;
   /**
    * La plantilla no se aprueba desde la ficha (el backend no atiende esa acción
    * para este tipo), pero el flag sigue mandando sobre `canEditRow`.
@@ -168,6 +169,7 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
             centroCosto: read.centro_costo_nombre ?? null,
             sede: read.sede_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
+            comentario: read.comentario ?? null,
             estadoAprobado: read.estado_aprobado,
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));

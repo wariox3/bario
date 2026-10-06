@@ -55,6 +55,7 @@ import { COMPROBANTE_ENDPOINT, COMPROBANTE_PARAMS } from '../../asiento.constant
 import { asientoToFormValue, formValueToPayload } from '../../asiento.mapper';
 import type { AsientoRead } from '../../asiento.model';
 import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Asiento contable.
@@ -79,6 +80,7 @@ import { ContableDocumentoResumenComponent } from '@erp/features/documentos/cont
   selector: 'app-asiento-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ContableDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,

@@ -55,6 +55,8 @@ interface CabeceraView {
   readonly plazoPago: string | null;
   readonly sede: string | null;
   readonly metodoPago: string | null;
+  readonly ordenCompra: string | null;
+  readonly comentario: string | null;
   /** Si ya está aprobado no se puede volver a aprobar (deshabilita la acción). */
   readonly estadoAprobado: boolean;
   /** Gobierna qué ofrece el diálogo "Contabilidad": contabilizar o descontabilizar. */
@@ -257,6 +259,8 @@ export class FacturaCompraDetailComponent implements OnInit {
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
+            ordenCompra: read.orden_compra ?? null,
+            comentario: read.comentario ?? null,
             estadoAprobado: read.estado_aprobado,
             estadoContabilizado: read.estado_contabilizado ?? false,
           });

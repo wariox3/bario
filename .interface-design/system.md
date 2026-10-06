@@ -747,6 +747,14 @@ Formulario y ficha de todo documento transaccional con líneas. Ejemplo vivo:
 y nómina electrónica, que no tienen tabla de líneas.
 
 - **Card 1, cabecera:** chip de ícono + título y los campos del documento.
+- **"Más información"** (2026-10-06): los opcionales que menos se tocan van plegados al pie de la
+  card 1 con `<app-mas-informacion [campos]="[…]">` (`features/documentos/components/`), nunca en
+  una pestaña junto a Detalles/Pagos. Qué va adentro sale del ERP anterior: el comentario siempre;
+  en las facturas de venta, además orden de compra, remisión, asesor (y resolución en la factura);
+  en remisión, el asesor; en documento soporte, la resolución; en factura de compra, la orden de
+  compra. El componente se abre solo al guardar si uno de sus `campos` es inválido, antes de que
+  `libFocusInvalid` lleve al campo. En la **ficha** esos valores van en la grilla de la cabecera,
+  a la vista con el resto (ningún campo se oculta).
 - **Card 2, líneas** (2026-10-06, antes iban en la misma card): sigue el estándar de los listados
   (`<lib-list-shell>`). Las tabs y la botonera de la tabla forman la **cabecera** de la card, con
   su padding y su divisor, y la tabla es el **cuerpo**, sin recuadro propio. Se separó porque con

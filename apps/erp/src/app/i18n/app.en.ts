@@ -10,6 +10,7 @@ export const en: AppDict = {
   accesosContenedor: accesosContenedorEn,
   common: {
     comingSoon: 'Coming soon.',
+    masInformacion: { title: 'More information', hint: 'optional' },
     accessDenied: {
       title: 'You do not have access',
       sub: 'This section is only for container administrators. Ask the company owner for access.',
@@ -2309,7 +2310,7 @@ export const en: AppDict = {
         createTitle: 'New sales invoice',
         editTitle: 'Edit sales invoice',
         sectionHint: 'Main document details',
-        tabs: { detalles: 'Details', pagos: 'Payments', informacion: 'More information' },
+        tabs: { detalles: 'Details', pagos: 'Payments' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2496,7 +2497,7 @@ export const en: AppDict = {
       form: {
         createHint: 'Main details of the new note',
         editHint: 'Update the note details',
-        tabs: { detalles: 'Details', pagos: 'Payments', informacion: 'More information' },
+        tabs: { detalles: 'Details', pagos: 'Payments' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2590,7 +2591,7 @@ export const en: AppDict = {
         createHint: 'Main details of the new document',
         editHint: 'Update the document details',
         pagosHint: 'Payments received at the point of sale',
-        tabs: { detalles: 'Details', pagos: 'Payments', informacion: 'More information' },
+        tabs: { detalles: 'Details', pagos: 'Payments' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2684,7 +2685,6 @@ export const en: AppDict = {
         createTitle: 'New recurring invoice',
         editTitle: 'Edit recurring invoice',
         sectionHint: 'Template used to generate sales invoices',
-        masInformacion: { title: 'More information', hint: 'optional' },
         fields: {
           cliente: 'Customer',
           clientePlaceholder: 'Search customer…',
@@ -2740,6 +2740,8 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           asesor: 'Sales rep',
           comentario: 'Comment',
+          ordenCompra: 'Purchase order',
+          remision: 'Delivery note',
         },
         notFound: {
           title: 'Invoice not found',
@@ -2782,6 +2784,8 @@ export const en: AppDict = {
           sedePlaceholder: 'Select…',
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
         },
         tabs: { detalles: 'Details', cuentas: 'Accounts' },
         validation: { required: 'This field is required' },
@@ -2822,6 +2826,8 @@ export const en: AppDict = {
           plazoPago: 'Payment terms',
           sede: 'Branch',
           metodoPago: 'Payment method',
+          ordenCompra: 'Purchase order',
+          comentario: 'Comment',
         },
         notFound: {
           title: 'Invoice not found',
@@ -3110,7 +3116,6 @@ export const en: AppDict = {
         createTitle: 'New recurring invoice',
         editTitle: 'Edit recurring invoice',
         sectionHint: 'Template used to generate the invoices',
-        adicionales: { title: 'Additional details', hint: 'optional' },
         fields: {
           proveedor: 'Supplier',
           proveedorPlaceholder: 'Search supplier…',
@@ -3163,6 +3168,7 @@ export const en: AppDict = {
           centroCosto: 'Cost center',
           sede: 'Branch',
           ordenCompra: 'Purchase order',
+          comentario: 'Comment',
         },
         notFound: {
           title: 'Invoice not found',

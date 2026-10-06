@@ -68,6 +68,8 @@ export interface AppDict
     AccesosContenedorTranslationsHost {
   common: {
     comingSoon: string;
+    /** Colapsable de los documentos con los campos opcionales que menos se tocan. */
+    masInformacion: { title: string; hint: string };
     accessDenied: {
       title: string;
       sub: string;
@@ -1736,7 +1738,7 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        tabs: { detalles: string; pagos: string; informacion: string };
+        tabs: { detalles: string; pagos: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -1928,7 +1930,7 @@ export interface AppDict
       form: {
         createHint: string;
         editHint: string;
-        tabs: { detalles: string; pagos: string; informacion: string };
+        tabs: { detalles: string; pagos: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -2009,7 +2011,7 @@ export interface AppDict
         editHint: string;
         /** Ayuda de la sección de pagos, matiz propio del POS (cobro en el acto). */
         pagosHint: string;
-        tabs: { detalles: string; pagos: string; informacion: string };
+        tabs: { detalles: string; pagos: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -2077,7 +2079,6 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        masInformacion: { title: string; hint: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -2115,6 +2116,8 @@ export interface AppDict
           metodoPago: string;
           asesor: string;
           comentario: string;
+          ordenCompra: string;
+          remision: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -2154,6 +2157,8 @@ export interface AppDict
           sedePlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
         };
         tabs: { detalles: string; cuentas: string };
         validation: { required: string };
@@ -2176,6 +2181,8 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           metodoPago: string;
+          ordenCompra: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };
@@ -2397,7 +2404,6 @@ export interface AppDict
         createTitle: string;
         editTitle: string;
         sectionHint: string;
-        adicionales: { title: string; hint: string };
         fields: {
           proveedor: string;
           proveedorPlaceholder: string;
@@ -2432,6 +2438,7 @@ export interface AppDict
           centroCosto: string;
           sede: string;
           ordenCompra: string;
+          comentario: string;
         };
         notFound: { title: string; desc: string };
       };

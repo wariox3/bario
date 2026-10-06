@@ -64,6 +64,7 @@ import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/co
 import { documentoSoporteToFormValue, formValueToPayload } from '../../documento-soporte.mapper';
 import type { DocumentoSoporteRead } from '../../documento-soporte.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Documento soporte.
@@ -84,6 +85,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
   selector: 'app-documento-soporte-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,

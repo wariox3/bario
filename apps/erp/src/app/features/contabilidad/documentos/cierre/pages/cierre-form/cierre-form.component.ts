@@ -41,6 +41,7 @@ import { cierreToFormValue, formValueToPayload } from '../../cierre.mapper';
 import type { CierreRead } from '../../cierre.model';
 import { CierreService } from '../../cierre.service';
 import { fecha31Diciembre } from '../../cierre.validators';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Cierre contable.
@@ -60,6 +61,7 @@ import { fecha31Diciembre } from '../../cierre.validators';
   selector: 'app-cierre-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,

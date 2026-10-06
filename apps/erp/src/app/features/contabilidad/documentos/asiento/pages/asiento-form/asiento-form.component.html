@@ -134,7 +134,12 @@
           />
           <p class="m-0 text-[0.72rem] text-brand-muted">{{ f.fields.centroCostoHint }}</p>
         </div>
+      </div>
+    </div>
 
+    <!-- Más información: los opcionales que menos se tocan (como en el ERP anterior). -->
+    <app-mas-informacion [campos]="['comentario']">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         <!-- Comentario -->
         <div class="flex flex-col gap-1.5 sm:col-span-2">
           <label for="comentario" class="asiento-form__label">{{ f.fields.comentario }}</label>
@@ -148,7 +153,7 @@
           ></textarea>
         </div>
       </div>
-    </div>
+    </app-mas-informacion>
   </section>
 
   <!-- Líneas: card propia; las tabs y la botonera de la tabla son su cabecera -->

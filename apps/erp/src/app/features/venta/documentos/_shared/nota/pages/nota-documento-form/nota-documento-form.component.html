@@ -145,6 +145,31 @@
         </div>
       </div>
     </div>
+
+    <!-- Más información: los opcionales que menos se tocan (como en el ERP anterior). -->
+    <app-mas-informacion [campos]="['comentario']">
+      <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+        <!-- Comentario -->
+        <div class="flex flex-col gap-1.5">
+          <label for="comentario" class="nota-documento-form__label">
+            {{ f.fields.comentario }}
+          </label>
+          <textarea
+            pTextarea
+            id="comentario"
+            formControlName="comentario"
+            rows="4"
+            [fluid]="true"
+            [placeholder]="f.fields.comentarioPlaceholder"
+            [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
+          ></textarea>
+          <lib-field-error
+            [control]="form.controls.comentario"
+            [messages]="{ maxlength: f.validation.comentarioMax }"
+          />
+        </div>
+      </div>
+    </app-mas-informacion>
   </section>
 
   <!-- Líneas: card propia; las tabs y la botonera de la tabla son su cabecera -->
@@ -175,7 +200,6 @@
             }
           </p-tab>
         }
-        <p-tab value="informacion">{{ f.tabs.informacion }}</p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -198,28 +222,6 @@
             />
           </p-tabpanel>
         }
-
-        <p-tabpanel value="informacion">
-          <!-- Comentario -->
-          <div class="flex flex-col gap-1.5 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-            <label for="comentario" class="nota-documento-form__label">
-              {{ f.fields.comentario }}
-            </label>
-            <textarea
-              pTextarea
-              id="comentario"
-              formControlName="comentario"
-              rows="4"
-              [fluid]="true"
-              [placeholder]="f.fields.comentarioPlaceholder"
-              [invalid]="form.controls.comentario.invalid && form.controls.comentario.touched"
-            ></textarea>
-            <lib-field-error
-              [control]="form.controls.comentario"
-              [messages]="{ maxlength: f.validation.comentarioMax }"
-            />
-          </div>
-        </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
   </section>

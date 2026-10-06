@@ -99,6 +99,14 @@
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.asesor }}</dt>
         <dd class="factura-venta-recurrente-detail__value">{{ c.asesor || '—' }}</dd>
       </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.ordenCompra }}</dt>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.ordenCompra || '—' }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-venta-recurrente-detail__label">{{ det.labels.remision }}</dt>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.remision || '—' }}</dd>
+      </div>
       <!-- El comentario ocupa el ancho: es prosa, no un dato de una línea. -->
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.comentario }}</dt>

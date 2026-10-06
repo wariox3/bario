@@ -24,6 +24,8 @@ export function facturaCompraToFormValue(
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
         : null,
+    orden_compra: read.orden_compra ?? null,
+    comentario: read.comentario ?? null,
   };
 }
 
@@ -49,6 +51,8 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
+    orden_compra: raw.orden_compra?.trim() || null,
+    comentario: raw.comentario?.trim() || null,
     ...(includeDetalles
       ? {
           detalles: [

@@ -53,6 +53,7 @@ import { notaDebitoCompraToFormValue, formValueToPayload } from '../../nota-debi
 import type { NotaDebitoCompraRead } from '../../nota-debito-compra.model';
 import { NOTA_DEBITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-debito-compra.constants';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Nota débito de compra.
@@ -73,6 +74,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
   selector: 'app-nota-debito-compra-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,

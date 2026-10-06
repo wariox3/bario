@@ -55,6 +55,7 @@ import { SEDE_ENDPOINT } from '../../remision.constants';
 import { remisionToFormValue, formValueToPayload } from '../../remision.mapper';
 import type { RemisionRead } from '../../remision.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Remisión.
@@ -79,6 +80,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
   selector: 'app-remision-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,

@@ -58,6 +58,7 @@ import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/co
 import { notaAjusteToFormValue, formValueToPayload } from '../../nota-ajuste.mapper';
 import type { NotaAjusteRead } from '../../nota-ajuste.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Nota ajuste.
@@ -78,6 +79,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
   selector: 'app-nota-ajuste-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,

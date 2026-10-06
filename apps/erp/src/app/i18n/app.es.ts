@@ -10,6 +10,7 @@ export const es: AppDict = {
   accesosContenedor: accesosContenedorEs,
   common: {
     comingSoon: 'Próximamente disponible.',
+    masInformacion: { title: 'Más información', hint: 'opcional' },
     accessDenied: {
       title: 'No tienes acceso',
       sub: 'Esta sección es solo para administradores del contenedor. Pídele acceso al propietario de la empresa.',
@@ -2360,7 +2361,7 @@ export const es: AppDict = {
         createTitle: 'Nueva factura de venta',
         editTitle: 'Editar factura de venta',
         sectionHint: 'Datos principales del documento',
-        tabs: { detalles: 'Detalles', pagos: 'Pagos', informacion: 'Más información' },
+        tabs: { detalles: 'Detalles', pagos: 'Pagos' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2547,7 +2548,7 @@ export const es: AppDict = {
       form: {
         createHint: 'Datos principales de la nueva nota',
         editHint: 'Actualiza los datos de la nota',
-        tabs: { detalles: 'Detalles', pagos: 'Pagos', informacion: 'Más información' },
+        tabs: { detalles: 'Detalles', pagos: 'Pagos' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2644,7 +2645,7 @@ export const es: AppDict = {
         createHint: 'Datos principales del nuevo documento',
         editHint: 'Actualiza los datos del documento',
         pagosHint: 'Cobros recibidos en el punto de venta',
-        tabs: { detalles: 'Detalles', pagos: 'Pagos', informacion: 'Más información' },
+        tabs: { detalles: 'Detalles', pagos: 'Pagos' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2738,7 +2739,6 @@ export const es: AppDict = {
         createTitle: 'Nueva factura recurrente',
         editTitle: 'Editar factura recurrente',
         sectionHint: 'Plantilla desde la que se generan las facturas de venta',
-        masInformacion: { title: 'Más información', hint: 'opcional' },
         fields: {
           cliente: 'Cliente',
           clientePlaceholder: 'Buscar cliente…',
@@ -2794,6 +2794,8 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           asesor: 'Asesor',
           comentario: 'Comentario',
+          ordenCompra: 'Orden de compra',
+          remision: 'Remisión',
         },
         notFound: {
           title: 'Factura no encontrada',
@@ -2836,6 +2838,8 @@ export const es: AppDict = {
           sedePlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
         },
         tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
         validation: { required: 'Este campo es requerido' },
@@ -2876,6 +2880,8 @@ export const es: AppDict = {
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
           metodoPago: 'Método de pago',
+          ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
         },
         notFound: {
           title: 'Factura no encontrada',
@@ -3164,7 +3170,6 @@ export const es: AppDict = {
         createTitle: 'Nueva factura recurrente',
         editTitle: 'Editar factura recurrente',
         sectionHint: 'Plantilla desde la que se generan las facturas',
-        adicionales: { title: 'Datos adicionales', hint: 'opcional' },
         fields: {
           proveedor: 'Proveedor',
           proveedorPlaceholder: 'Buscar proveedor…',
@@ -3217,6 +3222,7 @@ export const es: AppDict = {
           centroCosto: 'Centro de costo',
           sede: 'Sede',
           ordenCompra: 'Orden de compra',
+          comentario: 'Comentario',
         },
         notFound: {
           title: 'Factura no encontrada',
