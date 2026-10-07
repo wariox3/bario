@@ -172,6 +172,12 @@ export class ComercialDocumentoDetallesComponent {
   readonly contactoId = input<number | null>(null);
 
   /**
+   * Tipo del documento origen del que se importan líneas (`DOCUMENT_TYPE_ID`).
+   * `null` = el modal no filtra por tipo y trae pendientes de cualquier documento.
+   */
+  readonly importDocumentoTipoId = input<number | null>(null);
+
+  /**
    * Lista de precios del contacto de la cabecera (`precio_id` del contacto;
    * ver `precioListaDeContacto`). Solo aplica en `modo="venta"`: al elegir un
    * ítem se cotiza contra la lista y ese precio pisa el del ítem. `null` = sin
@@ -441,7 +447,10 @@ export class ComercialDocumentoDetallesComponent {
    */
   protected openImport(): void {
     if (this.importing()) return;
-    const data: ImportarDocumentoModalData = { contactoId: this.contactoId() };
+    const data: ImportarDocumentoModalData = {
+      contactoId: this.contactoId(),
+      documentoTipoId: this.importDocumentoTipoId(),
+    };
 
     from(
       import('@erp/core/module-config/importar-documento/components/importar-documento-modal/importar-documento-modal.component'),

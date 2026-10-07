@@ -26,6 +26,7 @@ import {
   MascaraFechaDirective,
 } from '@reddoc/ui';
 import {
+  DOCUMENT_TYPE_ID,
   FormErrorService,
   I18nService,
   calcularResumen,
@@ -176,6 +177,8 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     pagos: 'pagos',
   };
 
+  /** La factura de venta importa líneas pendientes solo de remisiones. */
+  protected readonly importDocumentoTipoId = DOCUMENT_TYPE_ID.REMISION;
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
