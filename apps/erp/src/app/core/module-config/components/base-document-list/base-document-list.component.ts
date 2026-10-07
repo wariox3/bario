@@ -17,6 +17,7 @@ import { finalize } from 'rxjs';
 import {
   FilterStorageService,
   I18nService,
+  extractErrorMessage,
   TenantService,
   ToastService,
   type ColumnDef,
@@ -492,11 +493,16 @@ export class BaseDocumentListComponent {
           this.selectedRows.set([]);
           this.loadList();
         },
-        error: () => {
+        // El mensaje del backend explica por qué no se pudo (p. ej. documento aprobado).
+        // Se recarga igual: con varios ids los DELETE van en paralelo y alguno pudo
+        // haberse completado antes del que falló.
+        error: (err: unknown) => {
           this.toast.error(
             this.translate('common.toasts.deleteError.title'),
-            this.translate('common.toasts.deleteError.desc'),
+            extractErrorMessage(err, this.translate('common.toasts.deleteError.desc')),
           );
+          this.selectedRows.set([]);
+          this.loadList();
         },
       });
   }
