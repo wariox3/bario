@@ -6314,6 +6314,72 @@ export const es: AppDict = {
     },
   },
   facturacionElectronica: {
+    rededoc: {
+      reintentar: 'Reintentar',
+      siguiente: 'Siguiente',
+      empresa: {
+        title: 'Empresa',
+        desc: 'Los datos guardados que se envían a RedEDoc.',
+        error: 'No se pudieron cargar los datos de la empresa.',
+      },
+      emisor: {
+        title: 'Emisor',
+        desc: 'Consultando el registro de tu empresa en RedEDoc…',
+        error: 'No se pudo consultar el registro de tu empresa.',
+        registrado: {
+          title: 'Tu empresa ya está creada en RedEDoc',
+          desc: 'Si cambiaste los datos de la empresa, actualízalos para enviarlos.',
+          actualizar: 'Actualizar',
+          desvincular: 'Desvincular',
+        },
+        noRegistrado: {
+          title: 'Tu empresa todavía no está creada en RedEDoc',
+          desc: 'Créala con estos datos para que pueda facturar electrónicamente.',
+          crear: 'Crear',
+          reasignar: 'Reasignar',
+        },
+      },
+      confirmDesvincular: {
+        header: 'Desvincular emisor',
+        message:
+          'Tu empresa dejará de estar vinculada en RedEDoc y no podrá facturar electrónicamente hasta crearla de nuevo. ¿Quieres continuar?',
+        accept: 'Desvincular',
+      },
+      confirmReasignar: {
+        header: 'Reasignar emisor',
+        message:
+          'Ya existe un emisor en RedEDoc con esta identificación. Vamos a vincularlo a esta empresa. ¿Quieres continuar?',
+        accept: 'Reasignar',
+      },
+      errorAccion: {
+        generico: 'RedEDoc no respondió como esperábamos. Intenta de nuevo en un momento.',
+        emisor: 'Emisor',
+        titulos: {
+          crear: 'No se pudo crear la empresa en RedEDoc',
+          actualizar: 'No se pudieron actualizar los datos en RedEDoc',
+          desvincular: 'No se pudo desvincular la empresa de RedEDoc',
+          reasignar: 'No se pudo reasignar el emisor en RedEDoc',
+        },
+      },
+      toasts: {
+        creado: {
+          title: 'Empresa creada',
+          desc: 'Ya puedes continuar con la facturación electrónica.',
+        },
+        actualizado: {
+          title: 'Datos actualizados',
+          desc: 'El registro de tu empresa en RedEDoc quedó al día.',
+        },
+        desvinculado: {
+          title: 'Emisor desvinculado',
+          desc: 'Tu empresa ya no está vinculada en RedEDoc.',
+        },
+        reasignado: {
+          title: 'Emisor reasignado',
+          desc: 'Tu empresa quedó vinculada al emisor existente en RedEDoc.',
+        },
+      },
+    },
     certificado: {
       estado: {
         venceLabel: 'Vence',
@@ -6365,24 +6431,10 @@ export const es: AppDict = {
       subtitle: 'Completa los datos de tu empresa para empezar a emitir.',
       pasos: {
         empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
+        rededoc: { label: 'RedEDoc', hint: 'Registro de la empresa como emisor' },
         certificado: { label: 'Certificado digital', hint: 'Archivo .p12 y su clave' },
         resolucion: { label: 'Resolución', hint: 'Numeración autorizada para facturar' },
         finalizar: { label: 'Terminar', hint: 'Revisión y activación' },
-      },
-      crearEmisor: {
-        confirm: {
-          header: 'Registrar tu empresa',
-          subtitle: 'Ante el proveedor de facturación electrónica',
-          intro: 'Guardamos tus datos. Vamos a dar de alta tu empresa con esta identidad:',
-          warning: 'Una vez registrada, estos datos no se pueden cambiar desde el ERP.',
-          accept: 'Registrar',
-        },
-        toasts: {
-          success: {
-            title: 'Empresa registrada',
-            desc: 'Ya podés continuar con la facturación electrónica.',
-          },
-        },
       },
       emisorCreado: {
         title: 'Tu empresa ya está registrada para facturar electrónicamente',

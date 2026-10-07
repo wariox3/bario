@@ -4855,6 +4855,31 @@ export interface AppDict
     };
   };
   facturacionElectronica: {
+    rededoc: {
+      reintentar: string;
+      siguiente: string;
+      empresa: { title: string; desc: string; error: string };
+      emisor: {
+        title: string;
+        desc: string;
+        error: string;
+        registrado: { title: string; desc: string; actualizar: string; desvincular: string };
+        noRegistrado: { title: string; desc: string; crear: string; reasignar: string };
+      };
+      confirmDesvincular: { header: string; message: string; accept: string };
+      confirmReasignar: { header: string; message: string; accept: string };
+      errorAccion: {
+        generico: string;
+        emisor: string;
+        titulos: { crear: string; actualizar: string; desvincular: string; reasignar: string };
+      };
+      toasts: {
+        creado: { title: string; desc: string };
+        actualizado: { title: string; desc: string };
+        desvinculado: { title: string; desc: string };
+        reasignado: { title: string; desc: string };
+      };
+    };
     certificado: {
       estado: {
         venceLabel: string;
@@ -4889,20 +4914,10 @@ export interface AppDict
       subtitle: string;
       pasos: {
         empresa: { label: string; hint: string };
+        rededoc: { label: string; hint: string };
         certificado: { label: string; hint: string };
         resolucion: { label: string; hint: string };
         finalizar: { label: string; hint: string };
-      };
-      /** Alta de la empresa como emisor ante el proveedor. */
-      crearEmisor: {
-        confirm: {
-          header: string;
-          subtitle: string;
-          intro: string;
-          warning: string;
-          accept: string;
-        };
-        toasts: { success: { title: string; desc: string } };
       };
       /** Aviso de solo lectura cuando la empresa ya es emisor. */
       emisorCreado: { title: string; desc: string; emisorLabel: string; copiar: string };

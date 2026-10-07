@@ -1,15 +1,16 @@
 /**
  * Pasos del asistente de facturación electrónica.
  *
- * **Esta constante es la costura por donde crece el asistente.** Los cuatro son
- * los del ERP anterior; «Datos de la empresa» y «Certificado digital» ya tienen
- * contenido. De los otros dos la API nueva todavía no expone nada (ni la
+ * **Esta constante es la costura por donde crece el asistente.** Cuatro son los
+ * del ERP anterior; «RedEDoc» es nuevo (el registro de la empresa como emisor,
+ * que antes iba en un diálogo al guardar). «Datos de la empresa», «RedEDoc» y
+ * «Certificado digital» ya tienen contenido. De los otros dos la API nueva todavía no expone nada (ni la
  * resolución del asistente ni `terminar-asistente/`), así que se declaran para
  * tener el camino a la vista y su panel muestra un «próximamente».
  *
  * Darle contenido a un paso = su rama en el `@switch` del asistente.
  */
-export type AsistenteStepId = 'empresa' | 'certificado' | 'resolucion' | 'finalizar';
+export type AsistenteStepId = 'empresa' | 'rededoc' | 'certificado' | 'resolucion' | 'finalizar';
 
 export interface AsistenteStep {
   readonly id: AsistenteStepId;
@@ -24,6 +25,11 @@ export const ASISTENTE_STEPS = [
     id: 'empresa',
     labelKey: 'facturacionElectronica.asistente.pasos.empresa.label',
     hintKey: 'facturacionElectronica.asistente.pasos.empresa.hint',
+  },
+  {
+    id: 'rededoc',
+    labelKey: 'facturacionElectronica.asistente.pasos.rededoc.label',
+    hintKey: 'facturacionElectronica.asistente.pasos.rededoc.hint',
   },
   {
     id: 'certificado',

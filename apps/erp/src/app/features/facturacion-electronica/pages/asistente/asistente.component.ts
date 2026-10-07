@@ -2,13 +2,11 @@ import { Component, DestroyRef, computed, effect, inject, input, signal } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, ToastService } from '@reddoc/core';
+import { I18nService } from '@reddoc/core';
 import { ParametroService } from '@erp/core/services/parametro.service';
-import { FacturaElectronicaService } from '../../factura-electronica.service';
 import type { AppDict } from '@erp/i18n';
 import { EmpresaConfigComponent } from '@erp/features/configuracion/components/empresa-config/empresa-config.component';
-import type { EmpresaConfigFormValue } from '@erp/features/configuracion/configuracion.mapper';
-import { CrearEmisorDialogComponent } from '../../components/crear-emisor-dialog/crear-emisor-dialog.component';
+import { RededocStepComponent } from '../../steps/rededoc/rededoc-step.component';
 import { CertificadoStepComponent } from '../../steps/certificado/certificado-step.component';
 import {
   ASISTENTE_STEPS,
@@ -28,12 +26,7 @@ import {
 @Component({
   selector: 'app-asistente-facturacion-electronica',
   standalone: true,
-  imports: [
-    EmpresaConfigComponent,
-    CrearEmisorDialogComponent,
-    CertificadoStepComponent,
-    ButtonModule,
-  ],
+  imports: [EmpresaConfigComponent, RededocStepComponent, CertificadoStepComponent, ButtonModule],
   templateUrl: './asistente.component.html',
   // Ancho acotado como Configuración: son formularios, no tablas. La grilla de
   // dos columnas la arma el template; el host solo centra y acota.
@@ -44,8 +37,6 @@ export class AsistenteComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly parametro = inject(ParametroService);
-  private readonly facturaElectronica = inject(FacturaElectronicaService);
-  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
@@ -153,64 +144,9 @@ export class AsistenteComponent {
       : this.t().configuracion.actions.save,
   );
 
-  /**
-   * Alta de emisor en vuelo.
-   *
-   * Guarda de reentrada: entre que se acepta la confirmación y responde el
-   * backend, el formulario vuelve a estar clickeable y un segundo submit
-   * dispararía un segundo alta. Crear dos emisores para la misma empresa no es
-   * algo que se arregle desde el front.
-   */
-  protected readonly registrando = signal(false);
-
-  /** Datos recién guardados, para que la confirmación muestre qué se registra. */
-  protected readonly datosGuardados = signal<EmpresaConfigFormValue | null>(null);
-
-  /** Visibilidad del diálogo de alta de emisor. */
-  protected readonly confirmVisible = signal(false);
-
-  protected onStepSaved(id: AsistenteStepId, valor?: EmpresaConfigFormValue): void {
+  protected onStepSaved(id: AsistenteStepId): void {
     this.completados.update((previos) => new Set(previos).add(id));
-
-    // El paso de datos de la empresa no termina al guardar: con la
-    // configuración ya persistida hay que dar de alta el emisor, que es lo
-    // irreversible. Por eso se confirma acá y no antes de guardar — guardar se
-    // puede deshacer editando; el alta no. Si el usuario cancela, sus datos
-    // quedan guardados y editables y puede registrar cuando quiera.
-    if (id === 'empresa' && !this.tieneEmisor()) {
-      if (!this.registrando()) {
-        this.datosGuardados.set(valor ?? null);
-        this.confirmVisible.set(true);
-      }
-      return;
-    }
-
     this.avanzarDesde(id);
-  }
-
-  protected crearEmisor(): void {
-    if (this.registrando()) return;
-    this.registrando.set(true);
-    this.facturaElectronica
-      .crearEmisor()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.registrando.set(false);
-          this.confirmVisible.set(false);
-          this.toast.success(
-            this.t().facturacionElectronica.asistente.crearEmisor.toasts.success.title,
-            this.t().facturacionElectronica.asistente.crearEmisor.toasts.success.desc,
-          );
-          // Releer el emisor antes de avanzar: es lo que deja el paso 1 en
-          // solo lectura si el usuario vuelve.
-          this.cargarEmisor();
-          this.avanzarDesde('empresa');
-        },
-        // El error lo muestra el interceptor; el usuario se queda en el paso
-        // con sus datos guardados y puede reintentar.
-        error: () => this.registrando.set(false),
-      });
   }
 
   protected avanzarDesde(id: AsistenteStepId): void {

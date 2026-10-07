@@ -6248,6 +6248,72 @@ export const en: AppDict = {
     },
   },
   facturacionElectronica: {
+    rededoc: {
+      reintentar: 'Retry',
+      siguiente: 'Next',
+      empresa: {
+        title: 'Company',
+        desc: 'The saved details sent to RedEDoc.',
+        error: 'We could not load the company details.',
+      },
+      emisor: {
+        title: 'Issuer',
+        desc: 'Checking your company registration in RedEDoc…',
+        error: 'We could not check your company registration.',
+        registrado: {
+          title: 'Your company is already created in RedEDoc',
+          desc: 'If you changed the company details, update them to send them.',
+          actualizar: 'Update',
+          desvincular: 'Unlink',
+        },
+        noRegistrado: {
+          title: 'Your company is not created in RedEDoc yet',
+          desc: 'Create it with these details so it can issue electronic invoices.',
+          crear: 'Create',
+          reasignar: 'Reassign',
+        },
+      },
+      confirmDesvincular: {
+        header: 'Unlink issuer',
+        message:
+          'Your company will no longer be linked in RedEDoc and cannot issue electronic invoices until it is created again. Do you want to continue?',
+        accept: 'Unlink',
+      },
+      confirmReasignar: {
+        header: 'Reassign issuer',
+        message:
+          'An issuer with this identification already exists in RedEDoc. We will link it to this company. Do you want to continue?',
+        accept: 'Reassign',
+      },
+      errorAccion: {
+        generico: 'RedEDoc did not respond as expected. Try again in a moment.',
+        emisor: 'Issuer',
+        titulos: {
+          crear: 'Could not create the company in RedEDoc',
+          actualizar: 'Could not update the details in RedEDoc',
+          desvincular: 'Could not unlink the company from RedEDoc',
+          reasignar: 'Could not reassign the issuer in RedEDoc',
+        },
+      },
+      toasts: {
+        creado: {
+          title: 'Company created',
+          desc: 'You can now continue with electronic invoicing.',
+        },
+        actualizado: {
+          title: 'Details updated',
+          desc: 'Your company registration in RedEDoc is up to date.',
+        },
+        desvinculado: {
+          title: 'Issuer unlinked',
+          desc: 'Your company is no longer linked in RedEDoc.',
+        },
+        reasignado: {
+          title: 'Issuer reassigned',
+          desc: 'Your company is now linked to the existing issuer in RedEDoc.',
+        },
+      },
+    },
     certificado: {
       estado: {
         venceLabel: 'Expires',
@@ -6299,24 +6365,10 @@ export const en: AppDict = {
       subtitle: 'Complete your company details to start issuing.',
       pasos: {
         empresa: { label: 'Company details', hint: 'Identity, contact and location' },
+        rededoc: { label: 'RedEDoc', hint: 'Company registration as issuer' },
         certificado: { label: 'Digital certificate', hint: '.p12 file and its password' },
         resolucion: { label: 'Resolution', hint: 'Authorized invoice numbering' },
         finalizar: { label: 'Finish', hint: 'Review and activation' },
-      },
-      crearEmisor: {
-        confirm: {
-          header: 'Register your company',
-          subtitle: 'With the electronic invoicing provider',
-          intro: 'Your details are saved. We will register your company with this identity:',
-          warning: 'Once registered, these details cannot be changed from the ERP.',
-          accept: 'Register',
-        },
-        toasts: {
-          success: {
-            title: 'Company registered',
-            desc: 'You can now continue with electronic invoicing.',
-          },
-        },
       },
       emisorCreado: {
         title: 'Your company is already registered for electronic invoicing',

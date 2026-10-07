@@ -142,7 +142,7 @@
         <app-empresa-config
           [submitLabel]="submitLabel()"
           [readonly]="tieneEmisor()"
-          (saved)="onStepSaved('empresa', $event)"
+          (saved)="onStepSaved('empresa')"
         />
 
         @if (tieneEmisor()) {
@@ -163,6 +163,9 @@
             />
           </div>
         }
+      }
+      @case ('rededoc') {
+        <app-rededoc-step (avanzar)="onStepSaved('rededoc')" />
       }
       @case ('certificado') {
         <app-certificado-step (avanzar)="avanzarDesde('certificado')" />
@@ -188,11 +191,3 @@
     }
   </div>
 </div>
-
-<!-- Confirmación del alta de emisor (paso 1). -->
-<app-crear-emisor-dialog
-  [(visible)]="confirmVisible"
-  [datos]="datosGuardados()"
-  [processing]="registrando()"
-  (confirmar)="crearEmisor()"
-/>
