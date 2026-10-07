@@ -1,19 +1,12 @@
-# Sentry — pendientes para activarlo
+# Sentry — pendientes
 
-Contexto: el frontend ya reporta errores a Sentry en las 6 SPA (erp, cuenta, transporte, pos, turnos, cliente), **solo en producción**. Todo está cableado; Sentry queda apagado mientras el DSN esté vacío. El landing no está integrado (es SSR y se configura distinto). El backend (Django) ya usa Sentry por su cuenta.
+Contexto: el frontend ya reporta errores a Sentry en las 6 SPA (erp, cuenta, transporte, pos, turnos, cliente), **solo en producción**. El DSN ya está puesto: en cuanto esto llega a producción, Sentry recibe errores reales. El landing no está integrado (es SSR y se configura distinto). El backend (Django) ya usa Sentry por su cuenta.
 
 Cómo está armado: ver la nota **Sentry (observabilidad)** en `CLAUDE.md` y el código en `libs/core/src/lib/observabilidad/`.
 
-## 1. DSN del proyecto de frontend ❌ PENDIENTE
+## 1. DSN del proyecto de frontend ✅ HECHO
 
-Pegar el DSN en **un solo lugar**: `libs/core/src/lib/observabilidad/sentry.config.ts`.
-
-```ts
-export const SENTRY_PRODUCCION: SentryConfig = {
-  dsn: 'https://<clave>@<org>.ingest.sentry.io/<proyecto>',
-  environment: 'production',
-};
-```
+Vive en **un solo lugar**: `libs/core/src/lib/observabilidad/sentry.config.ts`. Vaciarlo apaga Sentry en todas las apps.
 
 - Un solo proyecto de tipo **Angular** en Sentry para todas las apps; el tag `app` las separa.
 - Conviene crearlo en la misma organización que el proyecto de Django, para cruzar eventos.
@@ -33,9 +26,9 @@ En GitHub → Settings:
 
 El paso `Upload source maps to Sentry` de `.github/workflows/deploy.yml` los sube y el siguiente los borra antes del rsync: nunca llegan al servidor.
 
-## 3. Prueba de humo ❌ PENDIENTE
+## 3. Prueba de humo ✅ HECHA (2026-10-06)
 
-Antes de confiar en producción, probar en local:
+El error lanzado desde el ERP en local llegó a Sentry con sus tags. Para repetirla:
 
 1. En `apps/erp/src/environments/environment.ts` agregar **temporalmente**:
 
@@ -56,7 +49,9 @@ Antes de confiar en producción, probar en local:
 3. En Sentry, el evento debe aparecer con los tags `app: erp`, `tenant: <slug>`, el id del usuario y el entorno `development`.
 4. **Quitar** la línea de `environment.ts`. Dev y staging no reportan.
 
-Tras el primer deploy a producción, revisar que un error muestre el archivo `.ts` y la línea (source maps funcionando).
+Si el envío no sale, mirar la pestaña Network filtrando por `envelope`: un bloqueador de anuncios (uBlock Origin lo bloqueó en la prueba) corta la petición a `*.sentry.io`. Desactivarlo para `localhost` o ver el punto 6. Si la petición da 200 y el evento no aparece, revisar en Sentry el inbound filter de _localhost_.
+
+❌ PENDIENTE: tras el primer deploy a producción, revisar que un error muestre el archivo `.ts` y la línea (source maps funcionando).
 
 ## 4. Configuración dentro de Sentry ❌ PENDIENTE
 
@@ -68,6 +63,15 @@ Tras el primer deploy a producción, revisar que un error muestre el archivo `.t
 
 - El `request_id` solo llega cuando el error viene en el sobre `{ success: false, error, request_id }` (`ApiErrorResponse`). Un 500 que Django responde en HTML llega a Sentry **sin** `request_id` y no se puede cruzar. Pedir que el handler de excepciones de DRF devuelva siempre ese sobre, también en 500.
 - Confirmar que el Sentry de Django registra ese mismo `request_id` como tag, para buscarlo desde ambos lados.
+
+## 6. Túnel contra bloqueadores de anuncios ❌ PENDIENTE (evaluar)
+
+uBlock Origin, AdBlock y Brave bloquean `*.sentry.io` por defecto: los errores de un cliente con bloqueador **no llegan**. Antes de hacerlo, medir cuánto se pierde en la práctica.
+
+La solución estándar es que el SDK envíe a una ruta del propio dominio y el servidor la reenvíe a Sentry; al ser el mismo dominio de la app, los bloqueadores no la reconocen.
+
+- **Front** (una línea en `iniciarObservabilidad`): `tunnel: '/api/monitoreo'`.
+- **Servidor** (quien administre nginx o Django): reenviar `POST /api/monitoreo` a `https://o4511552584744960.ingest.us.sentry.io/api/4512211479691264/envelope/`. En nginx es un `location` con `proxy_pass`. Debe aceptar solo ese proyecto, para no quedar como proxy abierto.
 
 ## Qué reporta y qué no (referencia)
 

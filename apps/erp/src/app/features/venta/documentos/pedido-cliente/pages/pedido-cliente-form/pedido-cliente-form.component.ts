@@ -17,7 +17,12 @@ import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -80,6 +85,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
     DatePickerModule,
     MascaraFechaDirective,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ComercialDocumentoDetallesComponent,

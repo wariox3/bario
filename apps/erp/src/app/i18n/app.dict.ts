@@ -1552,6 +1552,7 @@ export interface AppDict
           salarioPositivo: string;
           cotizanteAprendizRequerido: string;
           cotizanteAprendizNoAplica: string;
+          fechaHastaAnterior: string;
         };
         toasts: {
           createSuccess: { title: string; desc: string };

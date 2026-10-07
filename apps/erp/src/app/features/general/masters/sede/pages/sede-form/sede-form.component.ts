@@ -84,11 +84,18 @@ export class SedeFormComponent implements OnInit {
     const operation = id ? this.service.update(Number(id), payload) : this.service.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.nav.ir();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.nav.ir();
+          return;
+        }
+        this.nav.ir('detalle', savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);

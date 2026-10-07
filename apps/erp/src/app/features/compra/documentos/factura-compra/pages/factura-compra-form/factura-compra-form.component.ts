@@ -17,7 +17,12 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TabsModule } from 'primeng/tabs';
-import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -66,6 +71,7 @@ import type { FacturaCompraRead } from '../../factura-compra.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { pestanaConPrimerError } from '@erp/features/documentos/tablas-en-vivo';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 
@@ -118,6 +124,7 @@ interface FlushableLineTable {
     MascaraFechaDirective,
     TabsModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
@@ -153,6 +160,15 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
 
   /** Tab activo del bloque de líneas (Detalles / Cuentas). */
   protected readonly activeTab = signal<'detalles' | 'cuentas'>('detalles');
+
+  /**
+   * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
+   * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
+   */
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'cuentas'>> = {
+    detalles: 'detalles',
+    cuentas: 'cuentas',
+  };
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
@@ -250,7 +266,14 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.form.pending || this.isSaving()) return;
+    if (this.isSaving()) return;
+    if (this.form.invalid || this.form.pending) {
+      // `libFocusInvalid` marca todo como tocado y lleva al primer campo con error, pero
+      // un panel inactivo está oculto: antes se abre la pestaña que lo contiene.
+      const pestana = pestanaConPrimerError(this.form, this.pestanasPorControl);
+      if (pestana) this.activeTab.set(pestana);
+      return;
+    }
 
     const id = this.id();
     const tables = this.lineTables();

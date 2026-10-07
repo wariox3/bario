@@ -10,6 +10,7 @@ import {
   ToastService,
   calcularResumen,
   type ResumenDocumento,
+  type DocumentoEstados,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
@@ -19,6 +20,7 @@ import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos/comercial/components/comercial-documento-lineas-table/comercial-documento-lineas-table.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
+import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
 import {
   comercialDetalleToFormValue,
@@ -40,10 +42,10 @@ interface CabeceraView {
   readonly ordenCompra: string | null;
   readonly comentario: string | null;
   /**
-   * La plantilla no se aprueba desde la ficha (el backend no atiende esa acción
-   * para este tipo), pero el flag sigue mandando sobre `canEditRow`.
+   * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
+   * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
    */
-  readonly estadoAprobado: boolean;
+  readonly estados: DocumentoEstados;
 }
 
 /**
@@ -63,6 +65,7 @@ interface CabeceraView {
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
     DocumentDetailActionsComponent,
+    DocumentEstadosComponent,
     AfectacionModalComponent,
     TabsModule,
   ],
@@ -106,7 +109,7 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
     if (!cab) return false;
     const canEditRow = this.document().canEditRow;
     if (!canEditRow) return true;
-    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estadoAprobado });
+    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
   });
 
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
@@ -174,7 +177,15 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
             sede: read.sede_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             comentario: read.comentario ?? null,
-            estadoAprobado: read.estado_aprobado,
+            estados: {
+              estado_aprobado: read.estado_aprobado,
+              estado_anulado: read.estado_anulado,
+              estado_contabilizado: read.estado_contabilizado,
+              estado_electronico: read.estado_electronico,
+              estado_electronico_enviado: read.estado_electronico_enviado,
+              estado_electronico_notificado: read.estado_electronico_notificado,
+              estado_generado: read.estado_generado,
+            },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
           this.isLoading.set(false);

@@ -2050,6 +2050,7 @@ export const en: AppDict = {
             'A SENA apprentice contract requires an apprentice contributor type (code 12 or 19)',
           cotizanteAprendizNoAplica:
             'This contract type does not allow the SENA apprentice contributor types',
+          fechaHastaAnterior: 'The end date cannot be earlier than the start date',
         },
         toasts: {
           createSuccess: {

@@ -117,11 +117,18 @@ export class CuentaBancoFormComponent implements OnInit {
       : this.cuentaBancoService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -189,6 +196,19 @@ export class CuentaBancoFormComponent implements OnInit {
       slug,
       currentModuleId(this.activeModule),
       ...CUENTA_BANCO_LIST_PATH,
+    ]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...CUENTA_BANCO_LIST_PATH,
+      'detalle',
+      id,
     ]);
   }
 }

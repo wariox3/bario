@@ -2101,6 +2101,7 @@ export const es: AppDict = {
             'El contrato de aprendiz del SENA exige un tipo de cotizante de aprendiz (código 12 o 19)',
           cotizanteAprendizNoAplica:
             'Este tipo de contrato no admite los tipos de cotizante de aprendiz del SENA',
+          fechaHastaAnterior: 'La fecha hasta no puede ser anterior a la fecha desde',
         },
         toasts: {
           createSuccess: { title: 'Contrato creado', desc: 'El contrato se creó correctamente' },
