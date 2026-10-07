@@ -48,3 +48,37 @@ p-menu {
 .p-confirmdialog {
   width: min(28rem, calc(100vw - 2rem));
 }
+
+// Botones de la confirmación: **una sola acción con color**.
+//
+// PrimeNG pinta "Cancelar" con el mismo relleno que la acción, así que las dos
+// opciones pesaban igual y había que leer para saber cuál comprometía algo. El
+// estándar: cancelar va como secundaria con borde (sin relleno, texto normal) y
+// el color queda solo para la acción — navy si construye, rojo si destruye
+// (`acceptButtonStyleClass: 'p-button-danger'`).
+//
+// Vive acá y no en cada `confirm({...})` porque es la regla, no una preferencia
+// de la pantalla: de ~60 confirmaciones solo unas 10 la declaraban a mano con
+// `rejectButtonProps`. Fuera de `@layer`, como el botón estándar, para pisar al
+// preset sin pelear especificidad.
+.p-confirmdialog .p-confirmdialog-reject-button {
+  background: transparent;
+  border-color: rgba(20 48 73 / 0.18);
+  color: var(--brand-text);
+
+  &:not(:disabled):hover {
+    background: rgba(19 38 60 / 0.04);
+    border-color: rgba(20 48 73 / 0.3);
+    color: var(--brand-text);
+    box-shadow: none;
+  }
+
+  &:not(:disabled):active {
+    background: rgba(19 38 60 / 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(20 48 73 / 0.35);
+    outline-offset: 2px;
+  }
+}
