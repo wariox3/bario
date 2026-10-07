@@ -171,12 +171,19 @@ export class ItemFormComponent implements OnInit {
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
         // Como modal, el ítem creado vuelve a quien lo pidió (la línea del
-        // documento lo selecciona); como página, se navega a la lista.
+        // documento lo selecciona); como página, se cae en su ficha para revisar
+        // lo que quedó almacenado. En alta el id sale de la respuesta del
+        // backend; si no viniera, se cae a la lista.
         if (this.dialogRef) {
           this.dialogRef.close(saved);
           return;
         }
-        this.navigateToList();
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -281,5 +288,18 @@ export class ItemFormComponent implements OnInit {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...ITEM_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...ITEM_LIST_PATH,
+      'detalle',
+      id,
+    ]);
   }
 }

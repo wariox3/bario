@@ -215,6 +215,8 @@ Regla: lo que solo importa a un master vive dentro del master.
 
 **Al guardar un documento se cae en su ficha, no en el listado:** crear y editar terminan en `routes.detail` para que la persona revise lo que quedó almacenado. En alta el id sale de la respuesta del `POST` (`extractDocumentoId`, en `@erp/core/module-config`); si no viniera, se cae al listado antes que navegar a una URL inválida. Excepción viva: depreciación y cierre, que al crear entran a `editar/:id` porque el documento nace vacío y sus líneas se cargan desde el form. Cancelar sigue volviendo al listado.
 
+**Lo mismo vale para los masters:** crear y editar terminan en `detalle/:id` (con `masterNav`, `this.nav.ir('detalle', id)`; si no, un `navigateToDetail(id)` junto al `navigateToList()`). En alta el id sale de la entidad que devuelve el `create` del servicio; si no viniera, se cae al listado. Si el master se abre como modal (ítem desde la línea de un documento), cierra el modal y devuelve lo guardado.
+
 **Para agregar un documento nuevo** (camino A):
 
 1. Crear `<modulo>.config.ts` que exporte `ModuleConfig` con sus `documents`.
