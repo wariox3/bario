@@ -22,6 +22,7 @@ import {
   ErpApiSelectComponent,
   ErpContactoSelectComponent,
   FieldErrorComponent,
+  FocusInvalidDirective,
   PageActionsComponent,
   MascaraFechaDirective,
 } from '@reddoc/ui';
@@ -94,6 +95,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     MascaraFechaDirective,
     TextareaModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,

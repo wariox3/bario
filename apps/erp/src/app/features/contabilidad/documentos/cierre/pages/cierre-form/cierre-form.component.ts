@@ -11,7 +11,12 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -72,6 +77,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     TabsModule,
     TextareaModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,

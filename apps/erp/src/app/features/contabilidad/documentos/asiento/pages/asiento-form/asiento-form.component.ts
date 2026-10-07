@@ -19,7 +19,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent, PageActionsComponent, MascaraFechaDirective } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -91,6 +96,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     InputTextModule,
     TextareaModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
