@@ -11,15 +11,22 @@ import {
   ToastService,
   calcularResumen,
   type ResumenDocumento,
+  type DocumentoEstados,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
-import type { DocumentEntityConfig } from '@erp/core/module-config';
+import {
+  CAPACIDADES_DOCUMENTO_VACIAS,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  capacidadesDocumento,
+} from '@erp/core/module-config';
+import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos/comercial/components/comercial-documento-lineas-table/comercial-documento-lineas-table.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
+import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
 import {
   comercialDetalleToFormValue,
@@ -43,10 +50,11 @@ interface CabeceraView {
   readonly centroCosto: string | null;
   readonly ordenCompra: string | null;
   readonly comentario: string | null;
-  /** Si ya está aprobado no se puede volver a aprobar (deshabilita la acción). */
-  readonly estadoAprobado: boolean;
-  /** Gobierna qué ofrece el diálogo "Contabilidad": contabilizar o descontabilizar. */
-  readonly estadoContabilizado: boolean;
+  /**
+   * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
+   * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
+   */
+  readonly estados: DocumentoEstados;
 }
 
 /**
@@ -65,6 +73,7 @@ interface CabeceraView {
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
     DocumentDetailActionsComponent,
+    DocumentEstadosComponent,
     AfectacionModalComponent,
     TabsModule,
   ],
@@ -108,7 +117,17 @@ export class NotaAjusteDetailComponent implements OnInit {
     if (!cab) return false;
     const canEditRow = this.document().canEditRow;
     if (!canEditRow) return true;
-    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estadoAprobado });
+    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
+  });
+
+  /**
+   * Qué acciones ofrece la botonera con las banderas actuales. La regla vive en
+   * `documento.estado.ts` (módulo puro y testeado), no en los `[disabled]` del
+   * template, que es donde el ERP anterior terminó contradiciéndose.
+   */
+  protected readonly capacidades = computed<CapacidadesDocumento>(() => {
+    const cab = this.cabecera();
+    return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
   });
 
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
@@ -190,8 +209,15 @@ export class NotaAjusteDetailComponent implements OnInit {
             centroCosto: read.centro_costo_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             comentario: read.comentario ?? null,
-            estadoAprobado: read.estado_aprobado,
-            estadoContabilizado: read.estado_contabilizado ?? false,
+            estados: {
+              estado_aprobado: read.estado_aprobado,
+              estado_anulado: read.estado_anulado,
+              estado_contabilizado: read.estado_contabilizado,
+              estado_electronico: read.estado_electronico,
+              estado_electronico_enviado: read.estado_electronico_enviado,
+              estado_electronico_notificado: read.estado_electronico_notificado,
+              estado_generado: read.estado_generado,
+            },
           });
           this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
           this.isLoading.set(false);

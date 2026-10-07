@@ -4,12 +4,24 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { TabsModule } from 'primeng/tabs';
-import { I18nService, TenantService, ToastService, formatFechaLarga } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  formatFechaLarga,
+  type DocumentoEstados,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
-import type { DocumentEntityConfig } from '@erp/core/module-config';
+import {
+  CAPACIDADES_DOCUMENTO_VACIAS,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  capacidadesDocumento,
+} from '@erp/core/module-config';
+import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
+import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import type { AppDict } from '@erp/i18n';
 import { ContableDocumentoLineasTableComponent } from '@erp/features/documentos/contable/components/contable-documento-lineas-table/contable-documento-lineas-table.component';
 import { cuentaDetalleToFormValue } from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
@@ -28,10 +40,11 @@ interface CabeceraView {
   readonly fecha: Date | null;
   readonly centroCosto: string | null;
   readonly comentario: string | null;
-  /** Si ya está aprobado no se puede volver a aprobar (deshabilita la acción). */
-  readonly estadoAprobado: boolean;
-  /** Gobierna qué ofrece el diálogo "Contabilidad": contabilizar o descontabilizar. */
-  readonly estadoContabilizado: boolean;
+  /**
+   * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
+   * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
+   */
+  readonly estados: DocumentoEstados;
 }
 
 /**
@@ -54,6 +67,7 @@ interface CabeceraView {
     BreadcrumbComponent,
     ContableDocumentoLineasTableComponent,
     DocumentDetailActionsComponent,
+    DocumentEstadosComponent,
   ],
   templateUrl: './cierre-detail.component.html',
   styleUrl: './cierre-detail.component.scss',
@@ -91,7 +105,17 @@ export class CierreDetailComponent implements OnInit {
     if (!cab) return false;
     const canEditRow = this.document().canEditRow;
     if (!canEditRow) return true;
-    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estadoAprobado });
+    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
+  });
+
+  /**
+   * Qué acciones ofrece la botonera con las banderas actuales. La regla vive en
+   * `documento.estado.ts` (módulo puro y testeado), no en los `[disabled]` del
+   * template, que es donde el ERP anterior terminó contradiciéndose.
+   */
+  protected readonly capacidades = computed<CapacidadesDocumento>(() => {
+    const cab = this.cabecera();
+    return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
   });
 
   /** Migas: módulo activo → listado del documento → identificador del documento abierto. */
@@ -165,8 +189,15 @@ export class CierreDetailComponent implements OnInit {
             fecha: fv.fecha ?? null,
             centroCosto: fv.centro_costo?.nombre ?? read.centro_costo_nombre ?? null,
             comentario: read.comentario ?? null,
-            estadoAprobado: read.estado_aprobado,
-            estadoContabilizado: read.estado_contabilizado ?? false,
+            estados: {
+              estado_aprobado: read.estado_aprobado,
+              estado_anulado: read.estado_anulado,
+              estado_contabilizado: read.estado_contabilizado,
+              estado_electronico: read.estado_electronico,
+              estado_electronico_enviado: read.estado_electronico_enviado,
+              estado_electronico_notificado: read.estado_electronico_notificado,
+              estado_generado: read.estado_generado,
+            },
           });
           this.isLoading.set(false);
         },
