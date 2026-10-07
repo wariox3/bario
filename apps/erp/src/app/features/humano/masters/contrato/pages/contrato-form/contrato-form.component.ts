@@ -49,6 +49,7 @@ import {
   esTipoCotizanteAprendiz,
 } from '../../contrato.constants';
 import { cotizanteCoherenteValidator } from '../../utils/cotizante-coherente.validator';
+import { fechaHastaPosteriorValidator } from '../../utils/fecha-hasta-posterior.validator';
 import { montoPositivo } from '../../../../shared/monto-positivo.validator';
 import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
 
@@ -68,10 +69,12 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
  * booleano correspondiente (`salud` / `pension` / `cesantias` / `caja`).
  *
  * Regla de negocio del tipo de contrato: si es indefinido (id
- * `CONTRATO_TIPO_INDEFINIDO_ID`) se oculta `fecha_hasta` en la UI y se le quita
- * el requerido, pero se le fija la fecha de hoy porque el backend no acepta
- * nulo. Solo en alta, al iniciar, se sugiere la fecha de hoy en
- * `fecha_desde` / `fecha_hasta`.
+ * `CONTRATO_TIPO_INDEFINIDO_ID`) se oculta `fecha_hasta` en la UI y se le quitan
+ * sus validadores, pero el backend la exige no nula: se la mantiene **igual a
+ * `fecha_desde`**, como el ERP anterior, para que nunca quede antes que ella.
+ * En los demás tipos `fecha_hasta` no puede ser anterior a `fecha_desde`
+ * (`fechaHastaPosteriorValidator`). Solo en alta, al iniciar, se sugiere la
+ * fecha de hoy en `fecha_desde` / `fecha_hasta`.
  *
  * Regla del tipo de cotizante: los códigos de aprendiz del SENA solo van con el
  * contrato de aprendiz — ver `syncTipoCotizante()` y
@@ -182,7 +185,10 @@ export class ContratoFormComponent implements OnInit {
     sucursal: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     tiempo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha_desde: this.fb.control<Date | null>(null, Validators.required),
-    fecha_hasta: this.fb.control<Date | null>(null, Validators.required),
+    fecha_hasta: this.fb.control<Date | null>(null, [
+      Validators.required,
+      fechaHastaPosteriorValidator,
+    ]),
     // Habilita que este contrato entre en la programación de turnos.
     habilitado_turno: this.fb.control<boolean>(false),
     // Remuneración
@@ -221,6 +227,9 @@ export class ContratoFormComponent implements OnInit {
     this.form.controls.contrato_tipo.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((value) => this.onContratoTipoChange(value));
+    this.form.controls.fecha_desde.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.sincronizarFechaHasta());
   }
 
   ngOnInit(): void {
@@ -236,23 +245,40 @@ export class ContratoFormComponent implements OnInit {
 
   /**
    * Regla de negocio según el tipo de contrato: si es indefinido oculta
-   * `fecha_hasta` en la UI y le quita el requerido, pero el backend exige un
-   * valor no nulo, así que se fija la fecha de hoy como placeholder; cualquier
-   * otro tipo la vuelve requerida.
+   * `fecha_hasta` en la UI y le quita los validadores (ver
+   * `sincronizarFechaHasta`); cualquier otro tipo la vuelve requerida y no
+   * anterior a `fecha_desde`.
    */
   private onContratoTipoChange(value: ErpSelectOption | null): void {
     this.contratoTipo.set(value);
     const fechaHasta = this.form.controls.fecha_hasta;
 
     if (this.isIndefinido()) {
-      fechaHasta.setValue(startOfToday(), { emitEvent: false });
       fechaHasta.clearValidators();
     } else {
-      fechaHasta.setValidators(Validators.required);
+      fechaHasta.setValidators([Validators.required, fechaHastaPosteriorValidator]);
     }
 
-    fechaHasta.updateValueAndValidity({ emitEvent: false });
+    this.sincronizarFechaHasta();
     this.syncTipoCotizante();
+  }
+
+  /**
+   * El indefinido no tiene fin, pero el backend exige `fecha_hasta` no nula y no
+   * anterior a `fecha_desde`. Fijarla una sola vez dejaba un valor oculto que
+   * quedaba atrás al mover `fecha_desde` hacia adelante, y el backend rechazaba
+   * el guardado sin un campo visible que corregir. Se la mantiene igual a
+   * `fecha_desde` cada vez que alguna de las dos cambia, como el ERP anterior.
+   *
+   * En los demás tipos solo se revalida: `fechaHastaPosteriorValidator` lee
+   * `fecha_desde`, así que su error depende de ella.
+   */
+  private sincronizarFechaHasta(): void {
+    const fechaHasta = this.form.controls.fecha_hasta;
+    if (this.isIndefinido()) {
+      fechaHasta.setValue(this.form.controls.fecha_desde.value, { emitEvent: false });
+    }
+    fechaHasta.updateValueAndValidity({ emitEvent: false });
   }
 
   /**
@@ -349,7 +375,12 @@ export class ContratoFormComponent implements OnInit {
       .getById(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (c) => this.form.patchValue(contratoToFormValue(c)),
+        next: (c) => {
+          this.form.patchValue(contratoToFormValue(c));
+          // El parche escribe `fecha_hasta` después de `contrato_tipo` y `fecha_desde`:
+          // en un indefinido guardado con otra fecha de fin, la regla se reaplica acá.
+          this.sincronizarFechaHasta();
+        },
         error: () => {
           const toasts = this.t().entities.contrato.form.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);

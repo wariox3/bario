@@ -167,6 +167,7 @@
             <p-datepicker
               inputId="fecha_hasta"
               formControlName="fecha_hasta"
+              [minDate]="form.controls.fecha_desde.value"
               [showIcon]="true"
               appendTo="body"
               [fluid]="true"
@@ -174,7 +175,10 @@
             />
             <lib-field-error
               [control]="form.controls.fecha_hasta"
-              [messages]="{ required: t().entities.contrato.form.validation.required }"
+              [messages]="{
+                required: t().entities.contrato.form.validation.required,
+                fechaHastaAnterior: t().entities.contrato.form.validation.fechaHastaAnterior,
+              }"
             />
           </div>
         }
