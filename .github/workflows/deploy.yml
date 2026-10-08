@@ -136,8 +136,17 @@ jobs:
             if [ -z "$changed" ]; then
               selected=""
             else
-              selected=$(npx nx show projects --affected --type=app \
-                --files="$(paste -sd, - <<<"$changed")")
+              # Nx recibe los archivos en un solo argumento (`--files=a,b,…`) y
+              # Linux no acepta uno de más de 128 KB: un release que acumula
+              # cientos de commits lo superaba ("Argument list too long"). Se
+              # consultan en tandas y se unen las apps.
+              mapfile -t files <<<"$changed"
+              selected=$(
+                for ((i = 0; i < ${#files[@]}; i += 200)); do
+                  npx nx show projects --affected --type=app \
+                    --files="$(IFS=,; echo "${files[*]:i:200}")"
+                done | sort -u
+              )
             fi
             reason="afectadas entre ${NX_BASE::7} y ${NX_HEAD::7}"
           fi
