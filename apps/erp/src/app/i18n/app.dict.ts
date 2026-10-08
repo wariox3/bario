@@ -270,6 +270,7 @@ export interface AppDict
         process: string;
         utility: string;
         report: string;
+        reception: string;
       };
     };
     userMenu: {
@@ -1797,6 +1798,8 @@ export interface AppDict
           remision: string;
           asesor: string;
           resolucion: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2166,10 +2169,13 @@ export interface AppDict
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
+          referenciaPrefijo: string;
+          referenciaNumero: string;
+          referenciaCue: string;
           comentario: string;
         };
         tabs: { detalles: string; cuentas: string };
-        validation: { required: string };
+        validation: { required: string; referenciaNumeroDigitos: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           createError: { title: string; desc: string };
@@ -2190,6 +2196,9 @@ export interface AppDict
           sede: string;
           metodoPago: string;
           ordenCompra: string;
+          referenciaPrefijo: string;
+          referenciaNumero: string;
+          referenciaCue: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -4422,151 +4431,69 @@ export interface AppDict
         pendiente: string;
       };
     };
-    eventosDian: {
+    /** Bandeja de documentos que los proveedores mandan al buzón de RedEDoc. */
+    documentoRecibido: {
       name: string;
-      subtitle: string;
+      cargar: string;
       columns: {
-        id: string;
-        numero: string;
         fecha: string;
-        codigo: string;
-        identificacion: string;
+        numero: string;
         proveedor: string;
-        referenciaPrefijo: string;
-        referenciaNumero: string;
+        nit: string;
+        tipo: string;
+        impuestos: string;
         total: string;
-        electronico: string;
-        documento: string;
-        recepcion: string;
-        aceptacion: string;
       };
-      eventoEstado: {
-        PE: string;
-        RZ: string;
-        RC: string;
-        AC: string;
-        RM: string;
-        EM: string;
-        none: string;
+      tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
+      filtros: {
+        buscar: string;
+        tipo: string;
+        desde: string;
+        hasta: string;
+        delCorreo: string;
+        quitarCorreo: string;
       };
-      actions: {
-        editar: string;
-        emitir: string;
-        gestionar: string;
-        descartar: string;
-      };
-      descartar: {
-        confirm: {
-          header: string;
-          message: string;
-          accept: string;
-        };
-      };
-      editar: {
+      empty: { title: string; sub: string };
+      carga: {
         title: string;
-        subtitle: string;
-        fields: {
-          prefijo: string;
-          numero: string;
-          cue: string;
-        };
-        save: string;
+        desc: string;
+        soltar: string;
+        formatos: string;
+        listo: string;
+        quitar: string;
+        cancelar: string;
+        cargar: string;
+        rechazoTipo: string;
+        rechazoTamano: string;
+        errorGenerico: string;
+        exito: { title: string; desc: string };
       };
-      gestion: {
-        subtitle: string;
-        hint: string;
-        steps: {
-          recibirDocumento: { title: string; button: string };
-          recibirBien: { title: string; button: string };
-          aceptar: { title: string; button: string };
-        };
-        fields: {
-          nombre: string;
-          apellido: string;
-          identificacion: string;
-          numeroIdentificacion: string;
-          cargo: string;
-          area: string;
-        };
-        validation: { required: string };
+    };
+    /** Correos (y cargas manuales) que llegaron a la recepción de RedEDoc. */
+    correoRecibido: {
+      name: string;
+      verDocumentos: string;
+      columns: {
+        recibido: string;
+        origen: string;
+        remitente: string;
+        asunto: string;
+        estado: string;
+        detalle: string;
+        documentos: string;
       };
-      importar: {
-        action: string;
-        title: string;
-        steps: {
-          archivo: { label: string; desc: string };
-          proveedor: { label: string; desc: string };
-          confirmar: { label: string; desc: string };
-        };
-        archivo: {
-          dropTitle: string;
-          dropHint: string;
-          importButton: string;
-        };
-        proveedor: {
-          warning: string;
-          fields: {
-            identificacion: string;
-            numeroIdentificacion: string;
-            nombreCorto: string;
-            ciudad: string;
-            direccion: string;
-            correo: string;
-            plazoPago: string;
-          };
-          save: string;
-        };
-        confirmar: {
-          grupo: string;
-          formaPago: string;
-          almacen: string;
-          create: string;
-          resumen: {
-            contacto: string;
-            identificacion: string;
-            numero: string;
-            prefijo: string;
-            fecha: string;
-            vence: string;
-            cue: string;
-            comentario: string;
-          };
-          detalles: {
-            item: string;
-            cantidad: string;
-            precio: string;
-            total: string;
-            empty: string;
-          };
-        };
-        validation: { required: string };
-        errors: { read: string; parse: string };
-        toasts: {
-          proveedor: { error: { title: string; desc: string } };
-          factura: {
-            success: { title: string; desc: string };
-            error: { title: string; desc: string };
-          };
-        };
-      };
-      toasts: {
-        emitir: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-        descartar: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-        editar: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-        gestion: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-      };
+      estados: Record<
+        | 'pendiente'
+        | 'procesado'
+        | 'sin_documentos'
+        | 'error'
+        | 'empresa_desconocida'
+        | 'confirmacion_reenvio',
+        string
+      >;
+      origenes: Record<'correo' | 'carga', string>;
+      filtros: { buscar: string; estado: string; origen: string; desde: string; hasta: string };
+      empty: { title: string; sub: string };
     };
     documentoElectronico: {
       name: string;
@@ -4854,7 +4781,31 @@ export interface AppDict
       };
     };
   };
-  facturacionElectronica: {
+  asistenteElectronico: {
+    rededoc: {
+      reintentar: string;
+      empresa: { title: string; desc: string; error: string };
+      emisor: {
+        title: string;
+        desc: string;
+        error: string;
+        registrado: { title: string; desc: string; actualizar: string; desvincular: string };
+        noRegistrado: { title: string; desc: string; crear: string; reasignar: string };
+      };
+      confirmDesvincular: { header: string; message: string; accept: string };
+      confirmReasignar: { header: string; message: string; accept: string };
+      errorAccion: {
+        generico: string;
+        emisor: string;
+        titulos: { crear: string; actualizar: string; desvincular: string; reasignar: string };
+      };
+      toasts: {
+        creado: { title: string; desc: string };
+        actualizado: { title: string; desc: string };
+        desvinculado: { title: string; desc: string };
+        reasignado: { title: string; desc: string };
+      };
+    };
     certificado: {
       estado: {
         venceLabel: string;
@@ -4876,36 +4827,83 @@ export interface AppDict
       };
       fields: { clave: string; claveHint: string };
       validation: { required: string };
-      errors: { tipo: string; tamano: string };
-      actions: { cargar: string; reemplazar: string; quitar: string };
+      errors: { tipo: string; tamano: string; requerido: string };
+      actions: { cargar: string; quitar: string; eliminar: string };
+      confirmEliminar: { header: string; message: string; accept: string };
+      consulta: { error: string; reintentar: string };
+      /** `{desde}` y `{hasta}`: fechas cortas de la vigencia. */
+      detalle: { vigencia: string };
       toasts: {
+        eliminado: { title: string; desc: string };
         success: { title: string; desc: string };
-        error: { title: string };
+      };
+      errorAccion: { generico: string; titulos: { cargar: string; eliminar: string } };
+      sinEmisor: { title: string; desc: string; accion: string };
+    };
+    habilitaciones: {
+      reintentar: string;
+      consulta: { error: string };
+      /** Una entrada por `SoftwareTipo`. */
+      tipos: Record<
+        'facturacion' | 'documento_equivalente' | 'nomina',
+        { title: string; desc: string }
+      >;
+      campos: { id: string; identificador: string; pin: string; testSetId: string };
+      enProceso: { title: string; desc: string };
+      continuarPendiente: string;
+      estado: { habilitado: string; pendiente: string };
+      sinSoftware: string;
+      actions: { configurar: string; actualizar: string };
+      actualizar: { title: string; pinHint: string };
+      crear: {
+        title: string;
+        desc: string;
+        pinHint: string;
+        uuidInvalido: string;
+        guardar: string;
+      };
+      errorAccion: { generico: string; titulo: string; tituloActualizar: string };
+      toasts: {
+        creado: { title: string; desc: string };
+        actualizado: { title: string; desc: string };
       };
     };
+    finalizar: {
+      siguiente: string;
+      estaciones: Record<
+        'enviada' | 'revision' | 'resoluciones' | 'emitir',
+        { title: string; desc: string }
+      >;
+      /** Para lectores de pantalla: el estado de cada estación. */
+      estados: Record<'hecho' | 'enCurso' | 'pendiente', string>;
+      ayuda: string;
+      finalizar: string;
+    };
+    /** Lo que cambia entre el asistente de venta y el de nómina. */
+    variantes: Record<
+      'venta' | 'nomina',
+      {
+        title: string;
+        subtitle: string;
+        /** Tira del inicio del módulo. */
+        invitacion: { title: string; desc: string };
+        /** Cabecera del cierre. */
+        finalizar: { title: string; desc: string };
+      }
+    >;
+    invitacion: { actions: { completar: string; omitir: string } };
+    /** Acceso desde Configuración; el título es el de la variante. */
+    acceso: { hint: string; desc: string; abrir: string };
     asistente: {
       eyebrow: string;
-      title: string;
-      subtitle: string;
       pasos: {
         empresa: { label: string; hint: string };
+        rededoc: { label: string; hint: string };
         certificado: { label: string; hint: string };
+        habilitaciones: { label: string; hint: string };
         resolucion: { label: string; hint: string };
         finalizar: { label: string; hint: string };
       };
-      /** Alta de la empresa como emisor ante el proveedor. */
-      crearEmisor: {
-        confirm: {
-          header: string;
-          subtitle: string;
-          intro: string;
-          warning: string;
-          accept: string;
-        };
-        toasts: { success: { title: string; desc: string } };
-      };
-      /** Aviso de solo lectura cuando la empresa ya es emisor. */
-      emisorCreado: { title: string; desc: string; emisorLabel: string; copiar: string };
       /** Panel de un paso todavía sin contenido. */
       pendiente: { title: string };
       actions: { guardarYContinuar: string; continuar: string };
@@ -4923,6 +4921,19 @@ export interface AppDict
       vencido: string;
       error: { title: string; desc: string };
     };
+    contratoResumen: {
+      titulo: string;
+      cifra: string;
+      terminados: string;
+      sinContratos: string;
+      deTotal: string;
+      corteAl: string;
+      movimiento: string;
+      ingresos: string;
+      retiros: string;
+      verContratos: string;
+      error: { title: string; desc: string };
+    };
     general: {
       /** Asistente de datos iniciales: solo en contenedores recién creados. */
       datosIniciales: {
@@ -4938,13 +4949,6 @@ export interface AppDict
           modelos: Readonly<Record<string, string>>;
           actions: { cerrar: string };
         };
-      };
-    };
-    venta: {
-      facturaElectronica: {
-        title: string;
-        desc: string;
-        actions: { completar: string };
       };
     };
   };
@@ -5027,7 +5031,7 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    tabs: { general: string; humano: string };
+    tabs: { general: string; humano: string; venta: string };
     unsavedChanges: string;
     actions: { save: string };
     general: {

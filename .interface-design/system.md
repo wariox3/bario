@@ -578,6 +578,22 @@ tabular-nums`. La **suma al pie**, tras `border-t-2 border-[rgba(20,48,73,0.12)]
 - **El parámetro recalculado sale de la propia respuesta** (`gen_asistente_datos_iniciales`), no de
   releer el endpoint de parámetros.
 
+## Regla: confirmación con una sola acción con color
+
+En un `confirm({...})` (y en cualquier modal de decisión) **solo la acción lleva color**; cancelar
+va como secundaria sin relleno. Con las dos rellenas pesaban igual y había que leer para saber
+cuál comprometía algo.
+
+- **Cancelar:** borde `rgba(20 48 73 / 0.18)`, fondo transparente, texto `--brand-text`. Hover con
+  el tinte de nav (`0.04`) y sin el glow azul del botón estándar.
+- **Aceptar:** navy (primario) si construye; `acceptButtonStyleClass: 'p-button-danger'` si
+  destruye (eliminar, desvincular, descontabilizar).
+- **Vive global** en `libs/styles/src/primeng/_overlays.scss` (`.p-confirmdialog-reject-button`),
+  fuera de `@layer`. Una confirmación nueva no declara `rejectButtonProps` ni
+  `rejectButtonStyleClass`: ya hereda el estándar.
+- En un `<p-dialog>` propio, la secundaria va como `severity="secondary"` `[text]="true"` a la
+  izquierda de la primaria (ver el chrome de `descontabilizar-modal`).
+
 ## Regla: `<p-datepicker>` va siempre con `[fluid]="true"`
 
 Sin `fluid` el datepicker es `inline-flex` y **conserva su ancho intrínseco**: el input (~177px) más

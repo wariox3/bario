@@ -14,12 +14,10 @@ export const HUMANO_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(HUMANO_MODULE),
       {
-        // Inicio del módulo (vacío por ahora — sin endpoints de estadísticas).
+        // Inicio del módulo: hoy solo la invitación a la nómina electrónica.
         path: 'inicio',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
+          import('./inicio/humano-inicio.component').then((m) => m.HumanoInicioComponent),
       },
       {
         path: 'nomina',

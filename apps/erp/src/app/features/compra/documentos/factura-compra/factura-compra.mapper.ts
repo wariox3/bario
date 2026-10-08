@@ -26,6 +26,9 @@ export function facturaCompraToFormValue(
         : null,
     orden_compra: read.orden_compra ?? null,
     comentario: read.comentario ?? null,
+    referencia_prefijo: read.referencia_prefijo ?? null,
+    referencia_numero: read.referencia_numero != null ? String(read.referencia_numero) : null,
+    referencia_cue: read.referencia_cue ?? null,
   };
 }
 
@@ -53,6 +56,9 @@ export function formValueToPayload(
     metodo_pago: raw.metodo_pago?.id ?? null,
     orden_compra: raw.orden_compra?.trim() || null,
     comentario: raw.comentario?.trim() || null,
+    referencia_prefijo: raw.referencia_prefijo?.trim() || null,
+    referencia_numero: raw.referencia_numero?.trim() ? Number(raw.referencia_numero) : null,
+    referencia_cue: raw.referencia_cue?.trim() || null,
     ...(includeDetalles
       ? {
           detalles: [

@@ -256,6 +256,7 @@ export const es: AppDict = {
         process: 'Proceso',
         utility: 'Utilidades',
         report: 'Informes',
+        reception: 'Recepción',
       },
     },
     userMenu: {
@@ -2438,6 +2439,8 @@ export const es: AppDict = {
           remision: 'Remisión',
           asesor: 'Asesor',
           resolucion: 'Resolución',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {
@@ -2847,10 +2850,16 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
+          referenciaPrefijo: 'Prefijo',
+          referenciaNumero: 'Número',
+          referenciaCue: 'CUE',
           comentario: 'Comentario',
         },
         tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
-        validation: { required: 'Este campo es requerido' },
+        validation: {
+          required: 'Este campo es requerido',
+          referenciaNumeroDigitos: 'Solo dígitos, máximo 10',
+        },
         toasts: {
           createSuccess: {
             title: 'Factura creada',
@@ -2889,6 +2898,9 @@ export const es: AppDict = {
           sede: 'Sede',
           metodoPago: 'Método de pago',
           ordenCompra: 'Orden de compra',
+          referenciaPrefijo: 'Prefijo de referencia',
+          referenciaNumero: 'Número de referencia',
+          referenciaCue: 'CUE de referencia',
           comentario: 'Comentario',
         },
         notFound: {
@@ -5740,197 +5752,84 @@ export const es: AppDict = {
         pendiente: 'Pendiente',
       },
     },
-    eventosDian: {
-      name: 'Eventos DIAN',
-      subtitle: 'Recibe documentos electrónicos de tus proveedores y envía sus acuses a la DIAN.',
+    documentoRecibido: {
+      name: 'Documentos',
+      cargar: 'Cargar archivo',
       columns: {
-        id: 'ID',
-        numero: 'Número',
         fecha: 'Fecha',
-        codigo: 'Código',
-        identificacion: 'Identificación',
+        numero: 'Número',
         proveedor: 'Proveedor',
-        referenciaPrefijo: 'Prefijo ref.',
-        referenciaNumero: 'Número ref.',
+        nit: 'NIT',
+        tipo: 'Tipo',
+        impuestos: 'Impuestos',
         total: 'Total',
-        electronico: 'Electrónico',
-        documento: 'Documento',
-        recepcion: 'Recepción',
-        aceptacion: 'Aceptación',
       },
-      eventoEstado: {
-        PE: 'Pendiente',
-        RZ: 'Rechazado',
-        RC: 'Recibido',
-        AC: 'Aceptado',
-        RM: 'Reclamo',
-        EM: 'Emitido',
-        none: '—',
+      tipos: {
+        factura_venta: 'Factura',
+        nota_credito: 'Nota crédito',
+        nota_debito: 'Nota débito',
       },
-      actions: {
-        editar: 'Editar',
-        emitir: 'Emitir',
-        gestionar: 'Gestionar estado',
-        descartar: 'Descartar',
+      filtros: {
+        buscar: 'Buscar por proveedor, NIT, número o CUE',
+        tipo: 'Tipo',
+        desde: 'Desde',
+        hasta: 'Hasta',
+        delCorreo: 'Del correo',
+        quitarCorreo: 'Quitar el filtro por correo',
       },
-      descartar: {
-        confirm: {
-          header: '¿Estás seguro de descartar?',
-          message: 'Esta acción no se puede revertir.',
-          accept: 'Sí, descartar',
-        },
+      empty: {
+        title: 'No hay documentos recibidos',
+        sub: 'Prueba con otro rango de fechas o carga el archivo que te envió el proveedor.',
       },
-      editar: {
-        title: 'Editar información',
-        subtitle: 'Corrige el prefijo, número y CUE de referencia del documento.',
-        fields: {
-          prefijo: 'Prefijo',
-          numero: 'Número',
-          cue: 'CUE',
-        },
-        save: 'Actualizar',
-      },
-      gestion: {
-        subtitle: 'Confirma tus datos para registrar el evento ante la DIAN.',
-        hint: '* Para no ingresar estos datos en cada evento, puedes editarlos en tu perfil.',
-        steps: {
-          recibirDocumento: {
-            title: 'Acuse de recibo de la factura',
-            button: 'Recibir documento',
-          },
-          recibirBien: {
-            title: 'Recibo del bien o servicio',
-            button: 'Recibir bien / servicio',
-          },
-          aceptar: {
-            title: 'Aceptación de la factura',
-            button: 'Aceptar factura',
-          },
-        },
-        fields: {
-          nombre: 'Nombre',
-          apellido: 'Apellido',
-          identificacion: 'Tipo de identificación',
-          numeroIdentificacion: 'Número de identificación',
-          cargo: 'Cargo',
-          area: 'Área',
-        },
-        validation: { required: 'Este campo es obligatorio.' },
-      },
-      importar: {
-        action: 'Importar ZIP',
-        title: 'Importar factura desde ZIP',
-        steps: {
-          archivo: { label: 'Archivo', desc: 'Sube el ZIP' },
-          proveedor: { label: 'Proveedor', desc: 'Datos del proveedor' },
-          confirmar: { label: 'Confirmar', desc: 'Revisa y crea' },
-        },
-        archivo: {
-          dropTitle: 'Arrastra el ZIP o haz clic para seleccionarlo',
-          dropHint: 'Archivo .zip de la factura electrónica DIAN',
-          importButton: 'Importar',
-        },
-        proveedor: {
-          warning: 'El proveedor de esta factura no existe. Créalo antes de generar la factura.',
-          fields: {
-            identificacion: 'Tipo de identificación',
-            numeroIdentificacion: 'Número de identificación',
-            nombreCorto: 'Nombre',
-            ciudad: 'Ciudad',
-            direccion: 'Dirección',
-            correo: 'Correo',
-            plazoPago: 'Plazo de pago',
-          },
-          save: 'Crear proveedor',
-        },
-        confirmar: {
-          grupo: 'Grupo contabilidad',
-          formaPago: 'Forma de pago',
-          almacen: 'Almacén',
-          create: 'Crear factura',
-          resumen: {
-            contacto: 'Proveedor',
-            identificacion: 'Identificación',
-            numero: 'Número',
-            prefijo: 'Prefijo',
-            fecha: 'Fecha',
-            vence: 'Vence',
-            cue: 'CUE',
-            comentario: 'Comentario',
-          },
-          detalles: {
-            item: 'Ítem',
-            cantidad: 'Cant.',
-            precio: 'Precio',
-            total: 'Total',
-            empty: 'El documento no trae líneas.',
-          },
-        },
-        validation: { required: 'Este campo es obligatorio.' },
-        errors: {
-          read: 'No se pudo leer el archivo. Intentá de nuevo.',
-          parse: 'No se pudo procesar el ZIP. Verificá que sea una factura electrónica válida.',
-        },
-        toasts: {
-          proveedor: {
-            error: {
-              title: 'Error al crear el proveedor',
-              desc: 'No se pudo crear el proveedor. Intentá de nuevo.',
-            },
-          },
-          factura: {
-            success: {
-              title: 'Factura creada',
-              desc: 'La factura se creó y aprobó correctamente.',
-            },
-            error: {
-              title: 'Error al crear la factura',
-              desc: 'No se pudo crear la factura. Intentá de nuevo.',
-            },
-          },
+      carga: {
+        title: 'Cargar documento',
+        desc: 'Sube el ZIP o el XML que te envió el proveedor cuando no llegó al buzón de recepción.',
+        soltar: 'Suelta el archivo o haz clic para elegirlo',
+        formatos: 'ZIP o XML, hasta 10 MB',
+        listo: 'Listo para cargar',
+        quitar: 'Quitar archivo',
+        cancelar: 'Cancelar',
+        cargar: 'Cargar',
+        rechazoTipo: 'El archivo debe ser un ZIP o un XML.',
+        rechazoTamano: 'El archivo supera los 10 MB.',
+        errorGenerico: 'No se pudo cargar el documento.',
+        exito: {
+          title: 'Documento cargado',
+          desc: 'Ya aparece en los documentos recibidos.',
         },
       },
-      toasts: {
-        emitir: {
-          success: {
-            title: 'Documento emitido',
-            desc: 'El documento se envió a la DIAN.',
-          },
-          error: {
-            title: 'Error al emitir',
-            desc: 'No se pudo emitir el documento. Intentá de nuevo.',
-          },
-        },
-        descartar: {
-          success: {
-            title: 'Documento descartado',
-            desc: 'El documento se descartó correctamente.',
-          },
-          error: {
-            title: 'Error al descartar',
-            desc: 'No se pudo descartar el documento. Intentá de nuevo.',
-          },
-        },
-        editar: {
-          success: {
-            title: 'Información actualizada',
-            desc: 'La referencia del documento se actualizó.',
-          },
-          error: {
-            title: 'Error al actualizar',
-            desc: 'No se pudo actualizar la referencia. Intentá de nuevo.',
-          },
-        },
-        gestion: {
-          success: {
-            title: 'Evento registrado',
-            desc: 'El evento se envió a la DIAN correctamente.',
-          },
-          error: {
-            title: 'Error al registrar el evento',
-            desc: 'No se pudo registrar el evento. Intentá de nuevo.',
-          },
-        },
+    },
+    correoRecibido: {
+      name: 'Correos',
+      verDocumentos: 'Ver los documentos de este correo',
+      columns: {
+        recibido: 'Recibido',
+        origen: 'Origen',
+        remitente: 'Remitente',
+        asunto: 'Asunto',
+        estado: 'Estado',
+        detalle: 'Detalle',
+        documentos: 'Documentos',
+      },
+      estados: {
+        pendiente: 'Pendiente',
+        procesado: 'Procesado',
+        sin_documentos: 'Sin documentos',
+        error: 'Error',
+        empresa_desconocida: 'Empresa desconocida',
+        confirmacion_reenvio: 'Confirmación de reenvío',
+      },
+      origenes: { correo: 'Correo', carga: 'Carga manual' },
+      filtros: {
+        buscar: 'Buscar por remitente, asunto o Message-ID',
+        estado: 'Estado',
+        origen: 'Origen',
+        desde: 'Desde',
+        hasta: 'Hasta',
+      },
+      empty: {
+        title: 'No llegaron correos',
+        sub: 'Prueba con otro rango de fechas o revisa que el proveedor envíe al buzón de recepción.',
       },
     },
     documentoElectronico: {
@@ -6313,7 +6212,72 @@ export const es: AppDict = {
       },
     },
   },
-  facturacionElectronica: {
+  asistenteElectronico: {
+    rededoc: {
+      reintentar: 'Reintentar',
+      empresa: {
+        title: 'Empresa',
+        desc: 'Los datos guardados que se envían a RedEDoc.',
+        error: 'No se pudieron cargar los datos de la empresa.',
+      },
+      emisor: {
+        title: 'Emisor',
+        desc: 'Consultando el registro de tu empresa en RedEDoc…',
+        error: 'No se pudo consultar el registro de tu empresa.',
+        registrado: {
+          title: 'Tu empresa ya está creada en RedEDoc',
+          desc: 'Si cambiaste los datos de la empresa, actualizalos para enviarlos.',
+          actualizar: 'Actualizar',
+          desvincular: 'Desvincular',
+        },
+        noRegistrado: {
+          title: 'Tu empresa todavía no está creada en RedEDoc',
+          desc: 'Creala con estos datos para que pueda emitir documentos electrónicos.',
+          crear: 'Crear',
+          reasignar: 'Reasignar',
+        },
+      },
+      confirmDesvincular: {
+        header: 'Desvincular emisor',
+        message:
+          'Tu empresa dejará de estar vinculada en RedEDoc y no podrá emitir documentos electrónicos hasta crearla de nuevo. ¿Querés continuar?',
+        accept: 'Desvincular',
+      },
+      confirmReasignar: {
+        header: 'Reasignar emisor',
+        message:
+          'Ya existe un emisor en RedEDoc con esta identificación. Vamos a vincularlo a esta empresa. ¿Querés continuar?',
+        accept: 'Reasignar',
+      },
+      errorAccion: {
+        generico: 'RedEDoc no respondió como esperábamos. Intentá de nuevo en un momento.',
+        emisor: 'Emisor',
+        titulos: {
+          crear: 'No se pudo crear la empresa en RedEDoc',
+          actualizar: 'No se pudieron actualizar los datos en RedEDoc',
+          desvincular: 'No se pudo desvincular la empresa de RedEDoc',
+          reasignar: 'No se pudo reasignar el emisor en RedEDoc',
+        },
+      },
+      toasts: {
+        creado: {
+          title: 'Empresa creada',
+          desc: 'Ya podés continuar con el asistente.',
+        },
+        actualizado: {
+          title: 'Datos actualizados',
+          desc: 'El registro de tu empresa en RedEDoc quedó al día.',
+        },
+        desvinculado: {
+          title: 'Emisor desvinculado',
+          desc: 'Tu empresa ya no está vinculada en RedEDoc.',
+        },
+        reasignado: {
+          title: 'Emisor reasignado',
+          desc: 'Tu empresa quedó vinculada al emisor existente en RedEDoc.',
+        },
+      },
+    },
     certificado: {
       estado: {
         venceLabel: 'Vence',
@@ -6321,9 +6285,10 @@ export const es: AppDict = {
         vigenteDesc: 'Tu certificado está vigente. No hace falta que hagas nada.',
         porVencerTitle: 'Tu certificado está por vencer',
         porVencerDesc:
-          'Cargá el nuevo antes de que caduque: sin certificado vigente no vas a poder emitir.',
+          'Sin certificado vigente no vas a poder emitir. Escribinos para renovarlo antes de que caduque.',
         vencidoTitle: 'Tu certificado venció',
-        vencidoDesc: 'No vas a poder emitir facturas electrónicas hasta que cargues uno nuevo.',
+        vencidoDesc:
+          'No vas a poder emitir documentos electrónicos hasta renovarlo. Escribinos para hacerlo.',
         faltan: { one: 'Falta 1 día', other: 'Faltan {dias} días' },
         venceHoy: 'Vence hoy',
         vencidoHace: { one: 'Venció hace 1 día', other: 'Venció hace {dias} días' },
@@ -6345,50 +6310,168 @@ export const es: AppDict = {
       errors: {
         tipo: 'El archivo debe ser {tipos}.',
         tamano: 'El archivo no puede pesar más de {max} MB.',
+        requerido: 'Seleccioná el archivo del certificado.',
       },
+      consulta: {
+        error: 'No se pudo consultar el certificado de tu empresa.',
+        reintentar: 'Reintentar',
+      },
+      detalle: { vigencia: 'Vigente del {desde} al {hasta}' },
       actions: {
         cargar: 'Cargar certificado',
-        reemplazar: 'Reemplazar certificado',
         quitar: 'Quitar el archivo',
+        eliminar: 'Eliminar certificado',
+      },
+      confirmEliminar: {
+        header: 'Eliminar certificado',
+        message:
+          'Tu empresa no podrá emitir documentos electrónicos hasta que cargues un certificado nuevo. ¿Querés continuar?',
+        accept: 'Eliminar',
       },
       toasts: {
+        eliminado: {
+          title: 'Certificado eliminado',
+          desc: 'Ya podés cargar un certificado nuevo.',
+        },
         success: {
           title: 'Certificado cargado',
           desc: 'Ya quedó registrado con su fecha de vencimiento.',
         },
-        error: { title: 'No pudimos cargar el certificado' },
       },
+      errorAccion: {
+        generico: 'RedEDoc no respondió como esperábamos. Intentá de nuevo en un momento.',
+        titulos: {
+          cargar: 'No se pudo cargar el certificado',
+          eliminar: 'No se pudo eliminar el certificado',
+        },
+      },
+      sinEmisor: {
+        title: 'Primero creá tu empresa en RedEDoc',
+        desc: 'El certificado digital se carga sobre el emisor de tu empresa, y todavía no existe.',
+        accion: 'Ir a RedEDoc',
+      },
+    },
+    habilitaciones: {
+      reintentar: 'Reintentar',
+      consulta: { error: 'No se pudo consultar el software de tu empresa.' },
+      tipos: {
+        facturacion: {
+          title: 'Facturación electrónica',
+          desc: 'Facturas de venta y sus notas crédito y débito.',
+        },
+        documento_equivalente: {
+          title: 'Documento equivalente POS',
+          desc: 'Tiquetes del punto de venta.',
+        },
+        nomina: { title: 'Nómina electrónica', desc: 'Soportes de pago de nómina.' },
+      },
+      enProceso: {
+        title: 'Tu set de pruebas está en proceso de habilitación',
+        desc: 'Te avisamos por correo cuando la DIAN lo apruebe.',
+      },
+      continuarPendiente: 'Configurá el set de pruebas de al menos un tipo para continuar.',
+      campos: {
+        id: 'Id',
+        identificador: 'Identificador del software',
+        pin: 'PIN',
+        testSetId: 'Set de pruebas (TestSetId)',
+      },
+      estado: { habilitado: 'Habilitado', pendiente: 'Pendiente de habilitar' },
+      sinSoftware: 'Todavía no configuraste el software para este tipo de documento.',
+      actions: { configurar: 'Configurar', actualizar: 'Actualizar' },
+      actualizar: {
+        title: 'Actualizar software',
+        pinHint: 'Dejalo vacío para conservar el PIN actual.',
+      },
+      crear: {
+        title: 'Configurar software',
+        desc: 'Copiá los datos tal como aparecen en el portal de habilitación de la DIAN.',
+        pinHint: 'Es el PIN que definiste al registrar el software. No se vuelve a mostrar.',
+        uuidInvalido:
+          'Debe tener 36 caracteres, con la forma xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.',
+        guardar: 'Guardar',
+      },
+      errorAccion: {
+        generico: 'RedEDoc no respondió como esperábamos. Intentá de nuevo en un momento.',
+        titulo: 'No se pudo guardar el software',
+        tituloActualizar: 'No se pudo actualizar el software',
+      },
+      toasts: {
+        actualizado: {
+          title: 'Software actualizado',
+          desc: 'Los cambios quedaron guardados en RedEDoc.',
+        },
+        creado: {
+          title: 'Software guardado',
+          desc: 'El set de pruebas quedó en proceso de habilitación.',
+        },
+      },
+    },
+    finalizar: {
+      siguiente: 'Qué sigue',
+      estaciones: {
+        enviada: {
+          title: 'Configuración enviada',
+          desc: 'Empresa, certificado y software quedaron registrados en RedEDoc.',
+        },
+        revision: {
+          title: 'La DIAN revisa tus habilitaciones',
+          desc: 'Valida tu set de pruebas. Mientras tanto no tenés que hacer nada.',
+        },
+        resoluciones: {
+          title: 'Registrá tus resoluciones',
+          desc: 'Con el correo de aprobación, seguí con el registro de tus resoluciones para empezar a facturar.',
+        },
+        emitir: {
+          title: 'Transmití tu nómina',
+          desc: 'Con el correo de aprobación ya podés enviar tus soportes de pago a la DIAN.',
+        },
+      },
+      estados: { hecho: 'hecho', enCurso: 'en curso', pendiente: 'pendiente' },
+      ayuda: 'Si necesitás cambiar algo, volvé a cualquier paso desde la izquierda.',
+      finalizar: 'Finalizar asistente',
+    },
+    variantes: {
+      venta: {
+        title: 'Facturación electrónica',
+        subtitle: 'Completá los datos de tu empresa para empezar a facturar electrónicamente.',
+        invitacion: {
+          title: 'Facturación electrónica',
+          desc: 'Completá la información de tu empresa y empezá a facturar electrónicamente.',
+        },
+        finalizar: {
+          title: 'Terminaste el proceso de facturación electrónica',
+          desc: 'Vas a recibir un correo cuando los set de pruebas sean aprobados, para que continúes con el registro de tus resoluciones.',
+        },
+      },
+      nomina: {
+        title: 'Nómina electrónica',
+        subtitle: 'Completá los datos de tu empresa para empezar a emitir nómina electrónica.',
+        invitacion: {
+          title: 'Nómina electrónica',
+          desc: 'Completá la información de tu empresa y empezá a emitir la nómina electrónica.',
+        },
+        finalizar: {
+          title: 'Terminaste el proceso de nómina electrónica',
+          desc: 'Vas a recibir un correo cuando el set de pruebas sea aprobado, para que empieces a transmitir tu nómina electrónica.',
+        },
+      },
+    },
+    invitacion: { actions: { completar: 'Completar', omitir: 'Omitir' } },
+    acceso: {
+      hint: 'Tu empresa en RedEDoc, el certificado digital y las habilitaciones ante la DIAN.',
+      desc: 'Volvé al asistente para revisar cómo quedó o cambiar algo. Cada paso muestra lo que ya está registrado.',
+      abrir: 'Abrir asistente',
     },
     asistente: {
       eyebrow: 'Asistente',
-      title: 'Facturación electrónica',
-      subtitle: 'Completa los datos de tu empresa para empezar a emitir.',
       pasos: {
         empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
+        rededoc: { label: 'RedEDoc', hint: 'Registro de la empresa como emisor' },
         certificado: { label: 'Certificado digital', hint: 'Archivo .p12 y su clave' },
+        habilitaciones: { label: 'Habilitaciones', hint: 'Software ante la DIAN' },
         resolucion: { label: 'Resolución', hint: 'Numeración autorizada para facturar' },
         finalizar: { label: 'Terminar', hint: 'Revisión y activación' },
-      },
-      crearEmisor: {
-        confirm: {
-          header: 'Registrar tu empresa',
-          subtitle: 'Ante el proveedor de facturación electrónica',
-          intro: 'Guardamos tus datos. Vamos a dar de alta tu empresa con esta identidad:',
-          warning: 'Una vez registrada, estos datos no se pueden cambiar desde el ERP.',
-          accept: 'Registrar',
-        },
-        toasts: {
-          success: {
-            title: 'Empresa registrada',
-            desc: 'Ya podés continuar con la facturación electrónica.',
-          },
-        },
-      },
-      emisorCreado: {
-        title: 'Tu empresa ya está registrada para facturar electrónicamente',
-        desc: 'Estos datos ya se enviaron al proveedor, así que no se pueden cambiar desde acá. Si algo quedó mal, escribinos.',
-        emisorLabel: 'Emisor',
-        copiar: 'Copiar el id del emisor',
       },
       pendiente: { title: 'Este paso todavía no está disponible' },
       actions: { guardarYContinuar: 'Guardar y continuar', continuar: 'Continuar' },
@@ -6418,6 +6501,22 @@ export const es: AppDict = {
         desc: 'Intenta de nuevo en un momento.',
       },
     },
+    contratoResumen: {
+      titulo: 'Contratos',
+      cifra: 'contratos activos',
+      terminados: 'terminados',
+      sinContratos: 'Aún no hay contratos',
+      deTotal: 'de',
+      corteAl: 'Corte al',
+      movimiento: 'Movimiento de',
+      ingresos: 'Ingresos',
+      retiros: 'Retiros',
+      verContratos: 'Ver contratos',
+      error: {
+        title: 'No se pudieron cargar los contratos',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Configuración rápida',
@@ -6439,13 +6538,6 @@ export const es: AppDict = {
           },
           actions: { cerrar: 'Empezar' },
         },
-      },
-    },
-    venta: {
-      facturaElectronica: {
-        title: 'Facturación electrónica',
-        desc: 'Completa la información de tu empresa y empieza a facturar electrónicamente.',
-        actions: { completar: 'Completar' },
       },
     },
   },
@@ -6586,7 +6678,7 @@ export const es: AppDict = {
   configuracion: {
     title: 'Configuración',
     subtitle: 'Parámetros de la empresa',
-    tabs: { general: 'General', humano: 'Humano' },
+    tabs: { general: 'General', humano: 'Humano', venta: 'Venta' },
     unsavedChanges: 'Cambios sin guardar',
     actions: { save: 'Guardar' },
     general: {

@@ -98,21 +98,22 @@ export abstract class BaseHttpService {
     file: File,
     fields?: Record<string, ParamValue>,
     fieldName = 'archivo',
+    opts?: RequestOptions,
   ): Observable<T> {
     const form = new FormData();
     form.append(fieldName, file, file.name);
     for (const [key, value] of Object.entries(fields ?? {})) {
       if (value != null) form.append(key, String(value));
     }
-    return this.post<T>(path, form);
+    return this.post<T>(path, form, undefined, opts);
   }
 
   protected put<T>(path: string, body: unknown): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}${path}`, body, { context: this.context() });
   }
 
-  protected patch<T>(path: string, body: unknown): Observable<T> {
-    return this.http.patch<T>(`${this.baseUrl}${path}`, body, { context: this.context() });
+  protected patch<T>(path: string, body: unknown, opts?: RequestOptions): Observable<T> {
+    return this.http.patch<T>(`${this.baseUrl}${path}`, body, { context: this.context(opts) });
   }
 
   protected delete<T = void>(path: string): Observable<T> {

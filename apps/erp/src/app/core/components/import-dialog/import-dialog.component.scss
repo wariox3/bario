@@ -42,62 +42,6 @@
   }
 }
 
-// ── Dropzone — los estados emergen de modificadores, no de !important.
-.cp-import-dialog__dropzone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2.25rem 1.5rem;
-  border: 2px dashed rgba(20, 48, 73, 0.15);
-  border-radius: 14px;
-  background: rgba(240, 249, 255, 0.4); // sky-50/40
-  text-align: center;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    transform 200ms ease;
-
-  &:hover {
-    background: rgba(240, 249, 255, 0.7); // sky-50/70
-    border-color: #7dd3fc; // sky-300
-  }
-
-  &:focus-visible {
-    outline: 2px solid #38bdf8; // sky-400
-    outline-offset: 2px;
-  }
-
-  &.is-drag-over {
-    background: #e0f2fe; // sky-100
-    border: 2px solid #0ea5e9; // sky-500
-    transform: scale(1.01);
-  }
-
-  &.is-error {
-    background: rgba(254, 242, 242, 0.5); // red-50/50
-    border-color: #fca5a5; // red-300
-  }
-}
-
-.cp-import-dialog__dropzone-icon {
-  display: inline-flex;
-  width: 56px;
-  height: 56px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  background: #f0f9ff; // sky-50
-  color: #0369a1; // sky-700
-  transition: color 150ms ease;
-
-  .cp-import-dialog__dropzone.is-error & {
-    background: #fef2f2; // red-50
-    color: #dc2626; // red-600
-  }
-}
-
 // ── File card — el botón "✕" tiene su propia presencia, no es un default.
 .cp-import-dialog__remove {
   display: inline-flex;

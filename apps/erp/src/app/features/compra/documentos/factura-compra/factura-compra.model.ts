@@ -27,6 +27,14 @@ export interface FacturaCompraRead extends DocumentoReadBase {
   readonly metodo_pago_nombre?: string | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
+  /**
+   * Referencia de la factura del proveedor (prefijo, número y CUE), como en el ERP
+   * anterior. **Todavía no los declara el backend** (`GenDocumento` no los trae):
+   * el read llega sin ellos y el `POST`/`PATCH` los descarta callado hasta entonces.
+   */
+  readonly referencia_prefijo?: string | null;
+  readonly referencia_numero?: number | null;
+  readonly referencia_cue?: string | null;
 }
 
 /** Body (POST/PATCH) de una factura de compra. */
@@ -37,6 +45,9 @@ export interface FacturaCompraPayload extends DocumentoPayloadBase {
   readonly metodo_pago: number | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
+  readonly referencia_prefijo: string | null;
+  readonly referencia_numero: number | null;
+  readonly referencia_cue: string | null;
   /**
    * Solo en alta: en edición las líneas transaccionan contra `documento-detalle`.
    * Mezcla líneas de ítem (comerciales) y de cuenta contable; el backend las

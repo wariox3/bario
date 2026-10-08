@@ -1,0 +1,16 @@
+<div class="flex gap-2.5 rounded-lg bg-red-50 px-3 py-2.5 text-red-700" role="alert">
+  <i class="pi pi-times-circle mt-0.5 text-[0.85rem]" aria-hidden="true"></i>
+  <div class="flex min-w-0 flex-1 flex-col gap-1">
+    <p class="m-0 text-[0.8rem] font-semibold">{{ titulo() }}</p>
+    @for (mensaje of error().mensajes; track $index) {
+      <p class="m-0 text-[0.78rem] leading-relaxed">{{ mensaje }}</p>
+    }
+    @if (error().emisorId !== null) {
+      <!-- El id del emisor es lo que se le cita a soporte: monoespaciada. -->
+      <p class="m-0 mt-0.5 text-[0.72rem] text-red-600">
+        {{ emisorLabel() }}
+        <span class="font-mono font-semibold tabular-nums">{{ error().emisorId }}</span>
+      </p>
+    }
+  </div>
+</div>

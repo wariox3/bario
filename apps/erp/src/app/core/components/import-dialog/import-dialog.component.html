@@ -45,34 +45,15 @@
         </div>
       }
 
-      <!-- Hidden input para el click-to-pick -->
-      <input
-        #fileInput
-        type="file"
-        [accept]="accept()"
-        class="hidden"
-        (change)="onFileInputChange($event)"
-      />
-
       @if (selectedFile(); as file) {
         <!-- File card (estado: archivo cargado) -->
-        <div
-          class="flex items-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 transition-opacity"
-          [class.opacity-60]="importing()"
+        <app-file-card
+          icon="pi-file-excel"
+          tono="emerald"
+          [nombre]="file.name"
+          [meta]="fileMetaText()"
+          [busy]="importing()"
         >
-          <span
-            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-700"
-          >
-            <i class="pi pi-file-excel text-[1.2rem]"></i>
-          </span>
-          <div class="min-w-0 flex-1">
-            <p class="m-0 truncate text-[0.875rem] font-semibold text-brand-text">
-              {{ file.name }}
-            </p>
-            <p class="m-0 mt-0.5 truncate text-[0.72rem] text-brand-muted">
-              {{ fileMetaText() }}
-            </p>
-          </div>
           <button
             type="button"
             class="cp-import-dialog__remove"
@@ -82,24 +63,21 @@
           >
             <i class="pi pi-times text-[0.8rem]"></i>
           </button>
-        </div>
+        </app-file-card>
       } @else {
-        <!-- Dropzone (estado: idle / hover / drag-over / error) -->
-        <div
-          class="cp-import-dialog__dropzone"
-          [class.is-drag-over]="dragOver()"
-          [class.is-error]="errorMessage() !== null"
-          role="button"
-          tabindex="0"
-          [attr.aria-label]="t().common.import.dropzone.primary"
-          (click)="openFilePicker()"
-          (keydown)="onDropzoneKeydown($event)"
-          (dragover)="onDragOver($event)"
-          (dragenter)="onDragOver($event)"
-          (dragleave)="onDragLeave($event)"
-          (drop)="onDrop($event)"
+        <app-file-dropzone
+          [accept]="accept()"
+          [maxSizeMB]="maxSizeMB()"
+          [disabled]="importing()"
+          [invalid]="errorMessage() !== null"
+          [ariaLabel]="t().common.import.dropzone.primary"
+          (fileSelected)="onFileSelected($event)"
+          (fileRejected)="onFileRejected($event)"
         >
-          <span class="cp-import-dialog__dropzone-icon">
+          <span
+            class="inline-flex h-14 w-14 items-center justify-center rounded-[14px] transition-colors"
+            [class]="errorMessage() !== null ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-700'"
+          >
             <i class="pi pi-file-excel text-[1.6rem]"></i>
           </span>
           <p class="m-0 mt-3 text-[0.9rem] font-semibold text-brand-text">
@@ -111,7 +89,7 @@
           <p class="m-0 mt-3 text-[0.72rem] text-brand-muted">
             {{ hintText() }}
           </p>
-        </div>
+        </app-file-dropzone>
 
         @if (errorMessage(); as msg) {
           <p class="m-0 text-[0.78rem] font-medium text-red-700">

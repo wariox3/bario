@@ -256,6 +256,7 @@ export const en: AppDict = {
         process: 'Process',
         utility: 'Utilities',
         report: 'Reports',
+        reception: 'Reception',
       },
     },
     userMenu: {
@@ -2387,6 +2388,8 @@ export const en: AppDict = {
           remision: 'Delivery note',
           asesor: 'Sales advisor',
           resolucion: 'Resolution',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {
@@ -2793,10 +2796,16 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
           ordenCompra: 'Purchase order',
+          referenciaPrefijo: 'Prefix',
+          referenciaNumero: 'Number',
+          referenciaCue: 'CUE',
           comentario: 'Comment',
         },
         tabs: { detalles: 'Details', cuentas: 'Accounts' },
-        validation: { required: 'This field is required' },
+        validation: {
+          required: 'This field is required',
+          referenciaNumeroDigitos: 'Digits only, up to 10',
+        },
         toasts: {
           createSuccess: {
             title: 'Invoice created',
@@ -2835,6 +2844,9 @@ export const en: AppDict = {
           sede: 'Branch',
           metodoPago: 'Payment method',
           ordenCompra: 'Purchase order',
+          referenciaPrefijo: 'Reference prefix',
+          referenciaNumero: 'Reference number',
+          referenciaCue: 'Reference CUE',
           comentario: 'Comment',
         },
         notFound: {
@@ -5672,199 +5684,84 @@ export const en: AppDict = {
         pendiente: 'Pending',
       },
     },
-    eventosDian: {
-      name: 'DIAN events',
-      subtitle:
-        'Receive electronic documents from your suppliers and send their acknowledgements to the DIAN.',
+    documentoRecibido: {
+      name: 'Documents',
+      cargar: 'Upload file',
       columns: {
-        id: 'ID',
-        numero: 'Number',
         fecha: 'Date',
-        codigo: 'Code',
-        identificacion: 'ID number',
+        numero: 'Number',
         proveedor: 'Supplier',
-        referenciaPrefijo: 'Ref. prefix',
-        referenciaNumero: 'Ref. number',
+        nit: 'Tax ID',
+        tipo: 'Type',
+        impuestos: 'Taxes',
         total: 'Total',
-        electronico: 'Electronic',
-        documento: 'Document',
-        recepcion: 'Receipt',
-        aceptacion: 'Acceptance',
       },
-      eventoEstado: {
-        PE: 'Pending',
-        RZ: 'Rejected',
-        RC: 'Received',
-        AC: 'Accepted',
-        RM: 'Claim',
-        EM: 'Issued',
-        none: '—',
+      tipos: {
+        factura_venta: 'Invoice',
+        nota_credito: 'Credit note',
+        nota_debito: 'Debit note',
       },
-      actions: {
-        editar: 'Edit',
-        emitir: 'Issue',
-        gestionar: 'Manage status',
-        descartar: 'Discard',
+      filtros: {
+        buscar: 'Search by supplier, tax ID, number or CUE',
+        tipo: 'Type',
+        desde: 'From',
+        hasta: 'To',
+        delCorreo: 'From email',
+        quitarCorreo: 'Remove the email filter',
       },
-      descartar: {
-        confirm: {
-          header: 'Discard this document?',
-          message: 'This action cannot be undone.',
-          accept: 'Yes, discard',
-        },
+      empty: {
+        title: 'No received documents',
+        sub: 'Try another date range or upload the file the supplier sent you.',
       },
-      editar: {
-        title: 'Edit information',
-        subtitle: 'Fix the document reference prefix, number and CUE.',
-        fields: {
-          prefijo: 'Prefix',
-          numero: 'Number',
-          cue: 'CUE',
-        },
-        save: 'Update',
-      },
-      gestion: {
-        subtitle: 'Confirm your details to register the event with the DIAN.',
-        hint: '* To avoid entering these details for each event, you can edit them in your profile.',
-        steps: {
-          recibirDocumento: {
-            title: 'Invoice receipt acknowledgement',
-            button: 'Receive document',
-          },
-          recibirBien: {
-            title: 'Receipt of goods or service',
-            button: 'Receive goods / service',
-          },
-          aceptar: {
-            title: 'Invoice acceptance',
-            button: 'Accept invoice',
-          },
-        },
-        fields: {
-          nombre: 'First name',
-          apellido: 'Last name',
-          identificacion: 'ID type',
-          numeroIdentificacion: 'ID number',
-          cargo: 'Role',
-          area: 'Area',
-        },
-        validation: { required: 'This field is required.' },
-      },
-      importar: {
-        action: 'Import ZIP',
-        title: 'Import invoice from ZIP',
-        steps: {
-          archivo: { label: 'File', desc: 'Upload the ZIP' },
-          proveedor: { label: 'Supplier', desc: 'Supplier details' },
-          confirmar: { label: 'Confirm', desc: 'Review and create' },
-        },
-        archivo: {
-          dropTitle: 'Drag the ZIP or click to select it',
-          dropHint: '.zip file of the DIAN electronic invoice',
-          importButton: 'Import',
-        },
-        proveedor: {
-          warning:
-            'The supplier for this invoice does not exist. Create it before generating the invoice.',
-          fields: {
-            identificacion: 'ID type',
-            numeroIdentificacion: 'ID number',
-            nombreCorto: 'Name',
-            ciudad: 'City',
-            direccion: 'Address',
-            correo: 'Email',
-            plazoPago: 'Payment term',
-          },
-          save: 'Create supplier',
-        },
-        confirmar: {
-          grupo: 'Accounting group',
-          formaPago: 'Payment method',
-          almacen: 'Warehouse',
-          create: 'Create invoice',
-          resumen: {
-            contacto: 'Supplier',
-            identificacion: 'ID number',
-            numero: 'Number',
-            prefijo: 'Prefix',
-            fecha: 'Date',
-            vence: 'Due',
-            cue: 'CUE',
-            comentario: 'Comment',
-          },
-          detalles: {
-            item: 'Item',
-            cantidad: 'Qty',
-            precio: 'Price',
-            total: 'Total',
-            empty: 'The document has no lines.',
-          },
-        },
-        validation: { required: 'This field is required.' },
-        errors: {
-          read: 'The file could not be read. Please try again.',
-          parse: 'The ZIP could not be processed. Make sure it is a valid electronic invoice.',
-        },
-        toasts: {
-          proveedor: {
-            error: {
-              title: 'Error creating the supplier',
-              desc: 'The supplier could not be created. Please try again.',
-            },
-          },
-          factura: {
-            success: {
-              title: 'Invoice created',
-              desc: 'The invoice was created and approved successfully.',
-            },
-            error: {
-              title: 'Error creating the invoice',
-              desc: 'The invoice could not be created. Please try again.',
-            },
-          },
+      carga: {
+        title: 'Upload document',
+        desc: 'Upload the ZIP or XML the supplier sent you when it did not reach the reception mailbox.',
+        soltar: 'Drop the file or click to choose it',
+        formatos: 'ZIP or XML, up to 10 MB',
+        listo: 'Ready to upload',
+        quitar: 'Remove file',
+        cancelar: 'Cancel',
+        cargar: 'Upload',
+        rechazoTipo: 'The file must be a ZIP or an XML.',
+        rechazoTamano: 'The file is larger than 10 MB.',
+        errorGenerico: 'Could not upload the document.',
+        exito: {
+          title: 'Document uploaded',
+          desc: 'It now shows in received documents.',
         },
       },
-      toasts: {
-        emitir: {
-          success: {
-            title: 'Document issued',
-            desc: 'The document was sent to the DIAN.',
-          },
-          error: {
-            title: 'Error issuing',
-            desc: 'The document could not be issued. Please try again.',
-          },
-        },
-        descartar: {
-          success: {
-            title: 'Document discarded',
-            desc: 'The document was discarded successfully.',
-          },
-          error: {
-            title: 'Error discarding',
-            desc: 'The document could not be discarded. Please try again.',
-          },
-        },
-        editar: {
-          success: {
-            title: 'Information updated',
-            desc: 'The document reference was updated.',
-          },
-          error: {
-            title: 'Error updating',
-            desc: 'The reference could not be updated. Please try again.',
-          },
-        },
-        gestion: {
-          success: {
-            title: 'Event registered',
-            desc: 'The event was sent to the DIAN successfully.',
-          },
-          error: {
-            title: 'Error registering the event',
-            desc: 'The event could not be registered. Please try again.',
-          },
-        },
+    },
+    correoRecibido: {
+      name: 'Emails',
+      verDocumentos: 'View the documents from this email',
+      columns: {
+        recibido: 'Received',
+        origen: 'Source',
+        remitente: 'Sender',
+        asunto: 'Subject',
+        estado: 'Status',
+        detalle: 'Detail',
+        documentos: 'Documents',
+      },
+      estados: {
+        pendiente: 'Pending',
+        procesado: 'Processed',
+        sin_documentos: 'No documents',
+        error: 'Error',
+        empresa_desconocida: 'Unknown company',
+        confirmacion_reenvio: 'Forwarding confirmation',
+      },
+      origenes: { correo: 'Email', carga: 'Manual upload' },
+      filtros: {
+        buscar: 'Search by sender, subject or Message-ID',
+        estado: 'Status',
+        origen: 'Source',
+        desde: 'From',
+        hasta: 'To',
+      },
+      empty: {
+        title: 'No emails received',
+        sub: 'Try another date range or check that the supplier sends to the reception mailbox.',
       },
     },
     documentoElectronico: {
@@ -6247,7 +6144,72 @@ export const en: AppDict = {
       },
     },
   },
-  facturacionElectronica: {
+  asistenteElectronico: {
+    rededoc: {
+      reintentar: 'Retry',
+      empresa: {
+        title: 'Company',
+        desc: 'The saved details sent to RedEDoc.',
+        error: 'We could not load the company details.',
+      },
+      emisor: {
+        title: 'Issuer',
+        desc: 'Checking your company registration in RedEDoc…',
+        error: 'We could not check your company registration.',
+        registrado: {
+          title: 'Your company is already created in RedEDoc',
+          desc: 'If you changed the company details, update them to send them.',
+          actualizar: 'Update',
+          desvincular: 'Unlink',
+        },
+        noRegistrado: {
+          title: 'Your company is not created in RedEDoc yet',
+          desc: 'Create it with these details so it can issue electronic documents.',
+          crear: 'Create',
+          reasignar: 'Reassign',
+        },
+      },
+      confirmDesvincular: {
+        header: 'Unlink issuer',
+        message:
+          'Your company will no longer be linked in RedEDoc and cannot issue electronic documents until it is created again. Do you want to continue?',
+        accept: 'Unlink',
+      },
+      confirmReasignar: {
+        header: 'Reassign issuer',
+        message:
+          'An issuer with this identification already exists in RedEDoc. We will link it to this company. Do you want to continue?',
+        accept: 'Reassign',
+      },
+      errorAccion: {
+        generico: 'RedEDoc did not respond as expected. Try again in a moment.',
+        emisor: 'Issuer',
+        titulos: {
+          crear: 'Could not create the company in RedEDoc',
+          actualizar: 'Could not update the details in RedEDoc',
+          desvincular: 'Could not unlink the company from RedEDoc',
+          reasignar: 'Could not reassign the issuer in RedEDoc',
+        },
+      },
+      toasts: {
+        creado: {
+          title: 'Company created',
+          desc: 'You can now continue with the wizard.',
+        },
+        actualizado: {
+          title: 'Details updated',
+          desc: 'Your company registration in RedEDoc is up to date.',
+        },
+        desvinculado: {
+          title: 'Issuer unlinked',
+          desc: 'Your company is no longer linked in RedEDoc.',
+        },
+        reasignado: {
+          title: 'Issuer reassigned',
+          desc: 'Your company is now linked to the existing issuer in RedEDoc.',
+        },
+      },
+    },
     certificado: {
       estado: {
         venceLabel: 'Expires',
@@ -6255,9 +6217,10 @@ export const en: AppDict = {
         vigenteDesc: 'Your certificate is valid. Nothing to do here.',
         porVencerTitle: 'Your certificate is about to expire',
         porVencerDesc:
-          'Upload the new one before it lapses: without a valid certificate you cannot issue.',
+          'Without a valid certificate you cannot issue. Contact us to renew it before it lapses.',
         vencidoTitle: 'Your certificate expired',
-        vencidoDesc: 'You cannot issue electronic invoices until you upload a new one.',
+        vencidoDesc:
+          'You cannot issue electronic documents until it is renewed. Contact us to do it.',
         faltan: { one: '1 day left', other: '{dias} days left' },
         venceHoy: 'Expires today',
         vencidoHace: { one: 'Expired 1 day ago', other: 'Expired {dias} days ago' },
@@ -6279,50 +6242,162 @@ export const en: AppDict = {
       errors: {
         tipo: 'The file must be {tipos}.',
         tamano: 'The file cannot exceed {max} MB.',
+        requerido: 'Select the certificate file.',
       },
+      consulta: {
+        error: 'We could not check your company certificate.',
+        reintentar: 'Retry',
+      },
+      detalle: { vigencia: 'Valid from {desde} to {hasta}' },
       actions: {
         cargar: 'Upload certificate',
-        reemplazar: 'Replace certificate',
         quitar: 'Remove file',
+        eliminar: 'Delete certificate',
+      },
+      confirmEliminar: {
+        header: 'Delete certificate',
+        message:
+          'Your company will not be able to issue electronic documents until you upload a new certificate. Do you want to continue?',
+        accept: 'Delete',
       },
       toasts: {
+        eliminado: {
+          title: 'Certificate deleted',
+          desc: 'You can now upload a new certificate.',
+        },
         success: {
           title: 'Certificate uploaded',
           desc: 'It is registered along with its expiry date.',
         },
-        error: { title: 'We could not upload the certificate' },
       },
+      errorAccion: {
+        generico: 'RedEDoc did not respond as expected. Try again in a moment.',
+        titulos: {
+          cargar: 'Could not upload the certificate',
+          eliminar: 'Could not delete the certificate',
+        },
+      },
+      sinEmisor: {
+        title: 'Create your company in RedEDoc first',
+        desc: 'The digital certificate is uploaded to your company issuer, which does not exist yet.',
+        accion: 'Go to RedEDoc',
+      },
+    },
+    habilitaciones: {
+      reintentar: 'Retry',
+      consulta: { error: 'We could not check your company software.' },
+      tipos: {
+        facturacion: {
+          title: 'Electronic invoicing',
+          desc: 'Sales invoices and their credit and debit notes.',
+        },
+        documento_equivalente: {
+          title: 'POS equivalent document',
+          desc: 'Point of sale tickets.',
+        },
+        nomina: { title: 'Electronic payroll', desc: 'Payroll payment records.' },
+      },
+      enProceso: {
+        title: 'Your test set is being enabled',
+        desc: 'We will email you once the DIAN approves it.',
+      },
+      continuarPendiente: 'Configure the test set for at least one type to continue.',
+      campos: {
+        id: 'Id',
+        identificador: 'Software identifier',
+        pin: 'PIN',
+        testSetId: 'Test set (TestSetId)',
+      },
+      estado: { habilitado: 'Enabled', pendiente: 'Pending enablement' },
+      sinSoftware: 'You have not configured the software for this document type yet.',
+      actions: { configurar: 'Configure', actualizar: 'Update' },
+      actualizar: {
+        title: 'Update software',
+        pinHint: 'Leave it empty to keep the current PIN.',
+      },
+      crear: {
+        title: 'Configure software',
+        desc: 'Copy the details exactly as they appear in the DIAN enablement portal.',
+        pinHint: 'The PIN you set when registering the software. It is not shown again.',
+        uuidInvalido:
+          'It must be 36 characters long, shaped like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.',
+        guardar: 'Save',
+      },
+      errorAccion: {
+        generico: 'RedEDoc did not respond as expected. Try again in a moment.',
+        titulo: 'We could not save the software',
+        tituloActualizar: 'We could not update the software',
+      },
+      toasts: {
+        actualizado: { title: 'Software updated', desc: 'The changes were saved in RedEDoc.' },
+        creado: { title: 'Software saved', desc: 'The test set is now being enabled.' },
+      },
+    },
+    finalizar: {
+      siguiente: 'What comes next',
+      estaciones: {
+        enviada: {
+          title: 'Setup sent',
+          desc: 'Company, certificate and software are registered in RedEDoc.',
+        },
+        revision: {
+          title: 'The DIAN reviews your enablements',
+          desc: 'It validates your test set. You do not need to do anything meanwhile.',
+        },
+        resoluciones: {
+          title: 'Register your resolutions',
+          desc: 'With the approval email, continue registering your resolutions to start invoicing.',
+        },
+        emitir: {
+          title: 'Send your payroll',
+          desc: 'With the approval email you can send your payroll records to the DIAN.',
+        },
+      },
+      estados: { hecho: 'done', enCurso: 'in progress', pendiente: 'pending' },
+      ayuda: 'If you need to change something, go back to any step on the left.',
+      finalizar: 'Finish wizard',
+    },
+    variantes: {
+      venta: {
+        title: 'Electronic invoicing',
+        subtitle: 'Complete your company details to start invoicing electronically.',
+        invitacion: {
+          title: 'Electronic invoicing',
+          desc: 'Complete your company information and start invoicing electronically.',
+        },
+        finalizar: {
+          title: 'You finished the electronic invoicing process',
+          desc: 'You will receive an email once the test sets are approved, so you can continue registering your resolutions.',
+        },
+      },
+      nomina: {
+        title: 'Electronic payroll',
+        subtitle: 'Complete your company details to start issuing electronic payroll.',
+        invitacion: {
+          title: 'Electronic payroll',
+          desc: 'Complete your company information and start issuing electronic payroll.',
+        },
+        finalizar: {
+          title: 'You finished the electronic payroll process',
+          desc: 'You will receive an email once the test set is approved, so you can start sending your electronic payroll.',
+        },
+      },
+    },
+    invitacion: { actions: { completar: 'Complete', omitir: 'Skip' } },
+    acceso: {
+      hint: 'Your company in RedEDoc, the digital certificate and the DIAN enablements.',
+      desc: 'Go back to the wizard to review the setup or change something. Each step shows what is already registered.',
+      abrir: 'Open wizard',
     },
     asistente: {
       eyebrow: 'Setup',
-      title: 'Electronic invoicing',
-      subtitle: 'Complete your company details to start issuing.',
       pasos: {
         empresa: { label: 'Company details', hint: 'Identity, contact and location' },
+        rededoc: { label: 'RedEDoc', hint: 'Company registration as issuer' },
         certificado: { label: 'Digital certificate', hint: '.p12 file and its password' },
+        habilitaciones: { label: 'Enablement', hint: 'Software with the DIAN' },
         resolucion: { label: 'Resolution', hint: 'Authorized invoice numbering' },
         finalizar: { label: 'Finish', hint: 'Review and activation' },
-      },
-      crearEmisor: {
-        confirm: {
-          header: 'Register your company',
-          subtitle: 'With the electronic invoicing provider',
-          intro: 'Your details are saved. We will register your company with this identity:',
-          warning: 'Once registered, these details cannot be changed from the ERP.',
-          accept: 'Register',
-        },
-        toasts: {
-          success: {
-            title: 'Company registered',
-            desc: 'You can now continue with electronic invoicing.',
-          },
-        },
-      },
-      emisorCreado: {
-        title: 'Your company is already registered for electronic invoicing',
-        desc: 'These details were already sent to the provider, so they cannot be changed here. Contact us if something is wrong.',
-        emisorLabel: 'Issuer',
-        copiar: 'Copy issuer id',
       },
       pendiente: { title: 'This step is not available yet' },
       actions: { guardarYContinuar: 'Save and continue', continuar: 'Continue' },
@@ -6352,6 +6427,22 @@ export const en: AppDict = {
         desc: 'Try again in a moment.',
       },
     },
+    contratoResumen: {
+      titulo: 'Contracts',
+      cifra: 'active contracts',
+      terminados: 'terminated',
+      sinContratos: 'No contracts yet',
+      deTotal: 'of',
+      corteAl: 'As of',
+      movimiento: 'Activity in',
+      ingresos: 'Hires',
+      retiros: 'Terminations',
+      verContratos: 'View contracts',
+      error: {
+        title: 'Could not load the contracts',
+        desc: 'Try again in a moment.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Quick setup',
@@ -6373,13 +6464,6 @@ export const en: AppDict = {
           },
           actions: { cerrar: 'Get started' },
         },
-      },
-    },
-    venta: {
-      facturaElectronica: {
-        title: 'Electronic invoicing',
-        desc: 'Complete your company information and start invoicing electronically.',
-        actions: { completar: 'Complete' },
       },
     },
   },
@@ -6520,7 +6604,7 @@ export const en: AppDict = {
   configuracion: {
     title: 'Settings',
     subtitle: 'Company parameters',
-    tabs: { general: 'General', humano: 'Payroll' },
+    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales' },
     unsavedChanges: 'Unsaved changes',
     actions: { save: 'Save' },
     general: {

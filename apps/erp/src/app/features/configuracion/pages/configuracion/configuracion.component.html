@@ -24,6 +24,7 @@
       <p-tablist>
         <p-tab value="general">{{ t().configuracion.tabs.general }}</p-tab>
         <p-tab value="humano">{{ t().configuracion.tabs.humano }}</p-tab>
+        <p-tab value="venta">{{ t().configuracion.tabs.venta }}</p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -34,8 +35,14 @@
           </div>
         </p-tabpanel>
         <p-tabpanel value="humano">
-          <div class="pt-7">
+          <div class="flex flex-col gap-5 pt-7">
+            <app-asistente-acceso variante="nomina" />
             <app-humano-config />
+          </div>
+        </p-tabpanel>
+        <p-tabpanel value="venta">
+          <div class="pt-7">
+            <app-asistente-acceso variante="venta" />
           </div>
         </p-tabpanel>
       </p-tabpanels>

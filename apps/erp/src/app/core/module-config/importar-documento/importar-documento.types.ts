@@ -47,9 +47,9 @@ export interface LineaPendienteApi {
   /** Id del documento (cabecera) origen. */
   readonly documento: number;
   /** Número del documento origen (puede venir `null`). */
-  readonly numero: number | null;
+  readonly documento_numero: number | null;
   /** Fecha del documento origen, `yyyy-MM-dd`. */
-  readonly fecha: string;
+  readonly documento_fecha: string;
   readonly contacto_id: number;
   readonly contacto_nombre_corto: string;
   /** Id del ítem de la línea origen. */
@@ -78,4 +78,9 @@ export interface LineaPendienteApi {
 export interface ImportarDocumentoModalData {
   /** Contacto del documento actual; filtra las pendientes. `null` = sin filtro. */
   readonly contactoId: number | null;
+  /**
+   * Tipo del documento origen (`DOCUMENT_TYPE_ID`); acota las pendientes a ese
+   * tipo, p. ej. la factura de venta solo trae remisiones. `null` = sin filtro.
+   */
+  readonly documentoTipoId: number | null;
 }
