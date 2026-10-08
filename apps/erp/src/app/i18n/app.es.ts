@@ -6602,6 +6602,22 @@ export const es: AppDict = {
         desc: 'Intenta de nuevo en un momento.',
       },
     },
+    contratoResumen: {
+      titulo: 'Contratos',
+      cifra: 'contratos activos',
+      terminados: 'terminados',
+      sinContratos: 'Aún no hay contratos',
+      deTotal: 'de',
+      corteAl: 'Corte al',
+      movimiento: 'Movimiento de',
+      ingresos: 'Ingresos',
+      retiros: 'Retiros',
+      verContratos: 'Ver contratos',
+      error: {
+        title: 'No se pudieron cargar los contratos',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Configuración rápida',

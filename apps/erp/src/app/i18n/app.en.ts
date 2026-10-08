@@ -6530,6 +6530,22 @@ export const en: AppDict = {
         desc: 'Try again in a moment.',
       },
     },
+    contratoResumen: {
+      titulo: 'Contracts',
+      cifra: 'active contracts',
+      terminados: 'terminated',
+      sinContratos: 'No contracts yet',
+      deTotal: 'of',
+      corteAl: 'As of',
+      movimiento: 'Activity in',
+      ingresos: 'Hires',
+      retiros: 'Terminations',
+      verContratos: 'View contracts',
+      error: {
+        title: 'Could not load the contracts',
+        desc: 'Try again in a moment.',
+      },
+    },
     general: {
       datosIniciales: {
         title: 'Quick setup',

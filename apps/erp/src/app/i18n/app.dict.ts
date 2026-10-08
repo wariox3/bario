@@ -4994,6 +4994,19 @@ export interface AppDict
       vencido: string;
       error: { title: string; desc: string };
     };
+    contratoResumen: {
+      titulo: string;
+      cifra: string;
+      terminados: string;
+      sinContratos: string;
+      deTotal: string;
+      corteAl: string;
+      movimiento: string;
+      ingresos: string;
+      retiros: string;
+      verContratos: string;
+      error: { title: string; desc: string };
+    };
     general: {
       /** Asistente de datos iniciales: solo en contenedores recién creados. */
       datosIniciales: {

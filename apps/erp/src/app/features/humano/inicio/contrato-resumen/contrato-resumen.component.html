@@ -1,0 +1,138 @@
+<!--
+  Ficha de contratos, compacta y del mismo cuerpo que la de cartera: rótulo y
+  fecha de corte, los activos como cifra principal con una barra contra el total,
+  y el movimiento del mes en filas. Borders-only, como el resto del ERP.
+-->
+@let r = t().inicio.contratoResumen;
+
+<section
+  class="animate-fade-up flex flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+  [attr.aria-busy]="estado() === 'cargando'"
+>
+  <header class="flex items-baseline justify-between gap-2 px-4 pt-3">
+    <h2 class="m-0 text-[0.66rem] font-bold uppercase tracking-[0.06em] text-brand-muted">
+      {{ r.titulo }}
+    </h2>
+    @if (estado() === 'listo') {
+      <span
+        class="text-[0.7rem] tabular-nums text-brand-muted"
+        [title]="r.corteAl + ' ' + fechaCorte()"
+      >
+        {{ fechaCorte() }}
+      </span>
+    }
+  </header>
+
+  @switch (estado()) {
+    @case ('cargando') {
+      <div class="flex flex-col gap-2.5 px-4 pt-2 pb-4" aria-hidden="true">
+        <div class="h-6 w-20 animate-pulse rounded-md bg-brand-surface-2"></div>
+        <div class="h-1.5 w-full animate-pulse rounded-full bg-brand-surface-2"></div>
+        <div class="h-3.5 w-full animate-pulse rounded-md bg-brand-surface-2"></div>
+        <div class="h-3.5 w-full animate-pulse rounded-md bg-brand-surface-2"></div>
+      </div>
+    }
+
+    @case ('error') {
+      <div class="flex items-start gap-2 px-4 pt-2 pb-4">
+        <i class="pi pi-exclamation-circle mt-0.5 text-[0.85rem] text-brand-muted"></i>
+        <div class="flex flex-col gap-0.5">
+          <span class="text-[0.8rem] font-semibold text-brand-text">{{ r.error.title }}</span>
+          <span class="text-[0.72rem] text-brand-muted">{{ r.error.desc }}</span>
+        </div>
+      </div>
+    }
+
+    @case ('listo') {
+      @if (resumen(); as res) {
+        <div class="flex flex-col gap-3 px-4 pt-1.5 pb-3">
+          <!-- Cifra principal: la planta de hoy -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-0.5">
+              <span
+                class="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] tabular-nums text-brand-navy"
+              >
+                {{ res.contratos_activos }}
+              </span>
+              <span class="text-[0.72rem] text-brand-muted">
+                @if (sinContratos()) {
+                  {{ r.sinContratos }}
+                } @else {
+                  {{ r.cifra }}
+                  <span class="tabular-nums"
+                    >· {{ res.contratos_terminados }} {{ r.terminados }}</span
+                  >
+                }
+              </span>
+            </div>
+
+            @if (!sinContratos()) {
+              <!-- Activos contra el total; el resto son los terminados -->
+              <div
+                class="h-1.5 w-full overflow-hidden rounded-full bg-[rgba(20,48,73,0.08)]"
+                role="meter"
+                aria-valuemin="0"
+                [attr.aria-valuemax]="res.contratos"
+                [attr.aria-valuenow]="res.contratos_activos"
+                [attr.aria-label]="res.contratos_activos + ' ' + r.deTotal + ' ' + res.contratos"
+              >
+                <div
+                  class="h-full rounded-full bg-brand-navy transition-[width] duration-500 ease-out"
+                  [style.width.%]="porcentajeActivos()"
+                ></div>
+              </div>
+            }
+          </div>
+
+          @if (!sinContratos()) {
+            <!-- Movimiento del mes de corte -->
+            <div class="flex flex-col gap-1.5 border-t border-[rgba(20,48,73,0.06)] pt-2.5">
+              <span class="text-[0.66rem] font-semibold text-brand-muted first-letter:uppercase">
+                {{ r.movimiento }} {{ mes() }}
+              </span>
+              <dl class="m-0 flex flex-col gap-1.5">
+                <div class="flex items-center justify-between gap-3">
+                  <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
+                    <i class="pi pi-arrow-down-right text-[0.6rem] text-emerald-600"></i>
+                    {{ r.ingresos }}
+                  </dt>
+                  <dd
+                    class="m-0 text-[0.8rem] font-semibold tabular-nums"
+                    [class.text-emerald-700]="res.ingresos_mes > 0"
+                    [class.text-brand-muted]="res.ingresos_mes <= 0"
+                  >
+                    {{ res.ingresos_mes }}
+                  </dd>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
+                    <i class="pi pi-arrow-up-right text-[0.6rem] text-brand-muted"></i>
+                    {{ r.retiros }}
+                  </dt>
+                  <dd
+                    class="m-0 text-[0.8rem] font-semibold tabular-nums"
+                    [class.text-brand-text]="res.retiros_mes > 0"
+                    [class.text-brand-muted]="res.retiros_mes <= 0"
+                  >
+                    {{ res.retiros_mes }}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          }
+        </div>
+
+        <!-- Al listado de contratos -->
+        <footer class="mt-auto border-t border-[rgba(20,48,73,0.06)] px-4 py-2">
+          <a
+            [routerLink]="contratosLink()"
+            class="inline-flex items-center gap-1.5 text-[0.75rem] font-semibold text-sky-700 transition-colors hover:text-brand-navy"
+          >
+            {{ r.verContratos }}
+            <i class="pi pi-arrow-right text-[0.62rem]"></i>
+          </a>
+        </footer>
+      }
+    }
+  }
+</section>
