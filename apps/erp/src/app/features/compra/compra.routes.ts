@@ -84,17 +84,17 @@ export const COMPRA_ROUTES: Route[] = [
           import('./documentos/nota-ajuste/nota-ajuste.routes').then((m) => m.NOTA_AJUSTE_ROUTES),
       },
       {
+        path: 'recepcion/documentos',
+        loadChildren: () =>
+          import('./recepcion/documento-recibido/documento-recibido.routes').then(
+            (m) => m.DOCUMENTO_RECIBIDO_ROUTES,
+          ),
+      },
+      {
         path: 'utilidades/documento-electronico',
         loadChildren: () =>
           import('./utilidades/documento-electronico/documento-electronico.routes').then(
             (m) => m.DOCUMENTO_ELECTRONICO_ROUTES,
-          ),
-      },
-      {
-        path: 'utilidades/eventos-dian',
-        loadChildren: () =>
-          import('./utilidades/eventos-dian/eventos-dian.routes').then(
-            (m) => m.EVENTOS_DIAN_ROUTES,
           ),
       },
       {

@@ -270,6 +270,7 @@ export interface AppDict
         process: string;
         utility: string;
         report: string;
+        reception: string;
       };
     };
     userMenu: {
@@ -4422,150 +4423,35 @@ export interface AppDict
         pendiente: string;
       };
     };
-    eventosDian: {
+    /** Bandeja de documentos que los proveedores mandan al buzón de RedEDoc. */
+    documentoRecibido: {
       name: string;
-      subtitle: string;
+      cargar: string;
       columns: {
-        id: string;
-        numero: string;
         fecha: string;
-        codigo: string;
-        identificacion: string;
+        numero: string;
         proveedor: string;
-        referenciaPrefijo: string;
-        referenciaNumero: string;
+        nit: string;
+        tipo: string;
+        impuestos: string;
         total: string;
-        electronico: string;
-        documento: string;
-        recepcion: string;
-        aceptacion: string;
       };
-      eventoEstado: {
-        PE: string;
-        RZ: string;
-        RC: string;
-        AC: string;
-        RM: string;
-        EM: string;
-        none: string;
-      };
-      actions: {
-        editar: string;
-        emitir: string;
-        gestionar: string;
-        descartar: string;
-      };
-      descartar: {
-        confirm: {
-          header: string;
-          message: string;
-          accept: string;
-        };
-      };
-      editar: {
+      tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
+      filtros: { buscar: string; tipo: string; desde: string; hasta: string };
+      empty: { title: string; sub: string };
+      carga: {
         title: string;
-        subtitle: string;
-        fields: {
-          prefijo: string;
-          numero: string;
-          cue: string;
-        };
-        save: string;
-      };
-      gestion: {
-        subtitle: string;
-        hint: string;
-        steps: {
-          recibirDocumento: { title: string; button: string };
-          recibirBien: { title: string; button: string };
-          aceptar: { title: string; button: string };
-        };
-        fields: {
-          nombre: string;
-          apellido: string;
-          identificacion: string;
-          numeroIdentificacion: string;
-          cargo: string;
-          area: string;
-        };
-        validation: { required: string };
-      };
-      importar: {
-        action: string;
-        title: string;
-        steps: {
-          archivo: { label: string; desc: string };
-          proveedor: { label: string; desc: string };
-          confirmar: { label: string; desc: string };
-        };
-        archivo: {
-          dropTitle: string;
-          dropHint: string;
-          importButton: string;
-        };
-        proveedor: {
-          warning: string;
-          fields: {
-            identificacion: string;
-            numeroIdentificacion: string;
-            nombreCorto: string;
-            ciudad: string;
-            direccion: string;
-            correo: string;
-            plazoPago: string;
-          };
-          save: string;
-        };
-        confirmar: {
-          grupo: string;
-          formaPago: string;
-          almacen: string;
-          create: string;
-          resumen: {
-            contacto: string;
-            identificacion: string;
-            numero: string;
-            prefijo: string;
-            fecha: string;
-            vence: string;
-            cue: string;
-            comentario: string;
-          };
-          detalles: {
-            item: string;
-            cantidad: string;
-            precio: string;
-            total: string;
-            empty: string;
-          };
-        };
-        validation: { required: string };
-        errors: { read: string; parse: string };
-        toasts: {
-          proveedor: { error: { title: string; desc: string } };
-          factura: {
-            success: { title: string; desc: string };
-            error: { title: string; desc: string };
-          };
-        };
-      };
-      toasts: {
-        emitir: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-        descartar: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-        editar: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-        gestion: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
+        desc: string;
+        soltar: string;
+        formatos: string;
+        listo: string;
+        quitar: string;
+        cancelar: string;
+        cargar: string;
+        rechazoTipo: string;
+        rechazoTamano: string;
+        errorGenerico: string;
+        exito: { title: string; desc: string };
       };
     };
     documentoElectronico: {

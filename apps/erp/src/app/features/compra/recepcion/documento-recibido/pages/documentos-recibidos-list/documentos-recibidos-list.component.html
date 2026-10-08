@@ -1,0 +1,91 @@
+<!--
+  Documentos recibidos (Compra › Recepción). Chrome estándar de <lib-list-shell>;
+  en el slot [toolbar], los filtros en línea a la izquierda y Cargar archivo a la
+  derecha. Las fechas van en un ancho acotado y `fluid`, como pide el sistema.
+-->
+@let d = t().entities.documentoRecibido;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="d.name">
+  <div toolbar class="flex flex-wrap items-end justify-between gap-3">
+    <div class="flex flex-wrap items-end gap-2">
+      <p-iconfield iconPosition="left" class="w-full sm:w-64">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="search"
+          pSize="small"
+          class="w-full"
+          [placeholder]="d.filtros.buscar"
+          [attr.aria-label]="d.filtros.buscar"
+          [ngModel]="busquedaInput()"
+          (ngModelChange)="busquedaInput.set($event)"
+        />
+      </p-iconfield>
+
+      <p-select
+        size="small"
+        class="w-40"
+        [options]="tipoOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="d.filtros.tipo"
+        [ariaLabel]="d.filtros.tipo"
+        [ngModel]="tipo()"
+        (ngModelChange)="onTipo($event)"
+        appendTo="body"
+      />
+
+      <div class="w-36">
+        <p-datepicker
+          size="small"
+          [fluid]="true"
+          [showIcon]="true"
+          [placeholder]="d.filtros.desde"
+          [ariaLabel]="d.filtros.desde"
+          [maxDate]="hasta()"
+          [ngModel]="desde()"
+          (ngModelChange)="onDesde($event)"
+          appendTo="body"
+        />
+      </div>
+      <div class="w-36">
+        <p-datepicker
+          size="small"
+          [fluid]="true"
+          [showIcon]="true"
+          [placeholder]="d.filtros.hasta"
+          [ariaLabel]="d.filtros.hasta"
+          [minDate]="desde()"
+          [ngModel]="hasta()"
+          (ngModelChange)="onHasta($event)"
+          appendTo="body"
+        />
+      </div>
+    </div>
+
+    <p-button
+      size="small"
+      icon="pi pi-upload"
+      [label]="d.cargar"
+      (onClick)="cargaVisible.set(true)"
+    />
+  </div>
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    emptyTitleKey="entities.documentoRecibido.empty.title"
+    emptySubKey="entities.documentoRecibido.empty.sub"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+  />
+</lib-list-shell>
+
+<app-cargar-documento-dialog [(visible)]="cargaVisible" (cargado)="onCargado()" />

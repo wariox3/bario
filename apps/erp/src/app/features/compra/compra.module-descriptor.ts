@@ -95,10 +95,6 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.documentoElectronico.name',
               path: 'utilidades/documento-electronico',
             },
-            {
-              labelKey: 'entities.eventosDian.name',
-              path: 'utilidades/eventos-dian',
-            },
           ],
         },
       ],
@@ -115,6 +111,23 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
             {
               labelKey: 'entities.cuentaPagar.name',
               path: 'informes/cuenta-pagar',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'compra-recepcion',
+      labelKey: 'layout.nav.sections.reception',
+      iconClass: 'pi pi-inbox',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.documentoRecibido.name',
+              path: 'recepcion/documentos',
             },
           ],
         },

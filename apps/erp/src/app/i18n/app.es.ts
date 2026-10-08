@@ -256,6 +256,7 @@ export const es: AppDict = {
         process: 'Proceso',
         utility: 'Utilidades',
         report: 'Informes',
+        reception: 'Recepción',
       },
     },
     userMenu: {
@@ -5740,196 +5741,48 @@ export const es: AppDict = {
         pendiente: 'Pendiente',
       },
     },
-    eventosDian: {
-      name: 'Eventos DIAN',
-      subtitle: 'Recibe documentos electrónicos de tus proveedores y envía sus acuses a la DIAN.',
+    documentoRecibido: {
+      name: 'Documentos recibidos',
+      cargar: 'Cargar archivo',
       columns: {
-        id: 'ID',
-        numero: 'Número',
         fecha: 'Fecha',
-        codigo: 'Código',
-        identificacion: 'Identificación',
+        numero: 'Número',
         proveedor: 'Proveedor',
-        referenciaPrefijo: 'Prefijo ref.',
-        referenciaNumero: 'Número ref.',
+        nit: 'NIT',
+        tipo: 'Tipo',
+        impuestos: 'Impuestos',
         total: 'Total',
-        electronico: 'Electrónico',
-        documento: 'Documento',
-        recepcion: 'Recepción',
-        aceptacion: 'Aceptación',
       },
-      eventoEstado: {
-        PE: 'Pendiente',
-        RZ: 'Rechazado',
-        RC: 'Recibido',
-        AC: 'Aceptado',
-        RM: 'Reclamo',
-        EM: 'Emitido',
-        none: '—',
+      tipos: {
+        factura_venta: 'Factura',
+        nota_credito: 'Nota crédito',
+        nota_debito: 'Nota débito',
       },
-      actions: {
-        editar: 'Editar',
-        emitir: 'Emitir',
-        gestionar: 'Gestionar estado',
-        descartar: 'Descartar',
+      filtros: {
+        buscar: 'Buscar por proveedor, NIT, número o CUFE',
+        tipo: 'Tipo',
+        desde: 'Desde',
+        hasta: 'Hasta',
       },
-      descartar: {
-        confirm: {
-          header: '¿Estás seguro de descartar?',
-          message: 'Esta acción no se puede revertir.',
-          accept: 'Sí, descartar',
-        },
+      empty: {
+        title: 'No hay documentos recibidos',
+        sub: 'Prueba con otro rango de fechas o carga el archivo que te envió el proveedor.',
       },
-      editar: {
-        title: 'Editar información',
-        subtitle: 'Corrige el prefijo, número y CUE de referencia del documento.',
-        fields: {
-          prefijo: 'Prefijo',
-          numero: 'Número',
-          cue: 'CUE',
-        },
-        save: 'Actualizar',
-      },
-      gestion: {
-        subtitle: 'Confirma tus datos para registrar el evento ante la DIAN.',
-        hint: '* Para no ingresar estos datos en cada evento, puedes editarlos en tu perfil.',
-        steps: {
-          recibirDocumento: {
-            title: 'Acuse de recibo de la factura',
-            button: 'Recibir documento',
-          },
-          recibirBien: {
-            title: 'Recibo del bien o servicio',
-            button: 'Recibir bien / servicio',
-          },
-          aceptar: {
-            title: 'Aceptación de la factura',
-            button: 'Aceptar factura',
-          },
-        },
-        fields: {
-          nombre: 'Nombre',
-          apellido: 'Apellido',
-          identificacion: 'Tipo de identificación',
-          numeroIdentificacion: 'Número de identificación',
-          cargo: 'Cargo',
-          area: 'Área',
-        },
-        validation: { required: 'Este campo es obligatorio.' },
-      },
-      importar: {
-        action: 'Importar ZIP',
-        title: 'Importar factura desde ZIP',
-        steps: {
-          archivo: { label: 'Archivo', desc: 'Sube el ZIP' },
-          proveedor: { label: 'Proveedor', desc: 'Datos del proveedor' },
-          confirmar: { label: 'Confirmar', desc: 'Revisa y crea' },
-        },
-        archivo: {
-          dropTitle: 'Arrastra el ZIP o haz clic para seleccionarlo',
-          dropHint: 'Archivo .zip de la factura electrónica DIAN',
-          importButton: 'Importar',
-        },
-        proveedor: {
-          warning: 'El proveedor de esta factura no existe. Créalo antes de generar la factura.',
-          fields: {
-            identificacion: 'Tipo de identificación',
-            numeroIdentificacion: 'Número de identificación',
-            nombreCorto: 'Nombre',
-            ciudad: 'Ciudad',
-            direccion: 'Dirección',
-            correo: 'Correo',
-            plazoPago: 'Plazo de pago',
-          },
-          save: 'Crear proveedor',
-        },
-        confirmar: {
-          grupo: 'Grupo contabilidad',
-          formaPago: 'Forma de pago',
-          almacen: 'Almacén',
-          create: 'Crear factura',
-          resumen: {
-            contacto: 'Proveedor',
-            identificacion: 'Identificación',
-            numero: 'Número',
-            prefijo: 'Prefijo',
-            fecha: 'Fecha',
-            vence: 'Vence',
-            cue: 'CUE',
-            comentario: 'Comentario',
-          },
-          detalles: {
-            item: 'Ítem',
-            cantidad: 'Cant.',
-            precio: 'Precio',
-            total: 'Total',
-            empty: 'El documento no trae líneas.',
-          },
-        },
-        validation: { required: 'Este campo es obligatorio.' },
-        errors: {
-          read: 'No se pudo leer el archivo. Intentá de nuevo.',
-          parse: 'No se pudo procesar el ZIP. Verificá que sea una factura electrónica válida.',
-        },
-        toasts: {
-          proveedor: {
-            error: {
-              title: 'Error al crear el proveedor',
-              desc: 'No se pudo crear el proveedor. Intentá de nuevo.',
-            },
-          },
-          factura: {
-            success: {
-              title: 'Factura creada',
-              desc: 'La factura se creó y aprobó correctamente.',
-            },
-            error: {
-              title: 'Error al crear la factura',
-              desc: 'No se pudo crear la factura. Intentá de nuevo.',
-            },
-          },
-        },
-      },
-      toasts: {
-        emitir: {
-          success: {
-            title: 'Documento emitido',
-            desc: 'El documento se envió a la DIAN.',
-          },
-          error: {
-            title: 'Error al emitir',
-            desc: 'No se pudo emitir el documento. Intentá de nuevo.',
-          },
-        },
-        descartar: {
-          success: {
-            title: 'Documento descartado',
-            desc: 'El documento se descartó correctamente.',
-          },
-          error: {
-            title: 'Error al descartar',
-            desc: 'No se pudo descartar el documento. Intentá de nuevo.',
-          },
-        },
-        editar: {
-          success: {
-            title: 'Información actualizada',
-            desc: 'La referencia del documento se actualizó.',
-          },
-          error: {
-            title: 'Error al actualizar',
-            desc: 'No se pudo actualizar la referencia. Intentá de nuevo.',
-          },
-        },
-        gestion: {
-          success: {
-            title: 'Evento registrado',
-            desc: 'El evento se envió a la DIAN correctamente.',
-          },
-          error: {
-            title: 'Error al registrar el evento',
-            desc: 'No se pudo registrar el evento. Intentá de nuevo.',
-          },
+      carga: {
+        title: 'Cargar documento',
+        desc: 'Sube el ZIP o el XML que te envió el proveedor cuando no llegó al buzón de recepción.',
+        soltar: 'Suelta el archivo o haz clic para elegirlo',
+        formatos: 'ZIP o XML, hasta 10 MB',
+        listo: 'Listo para cargar',
+        quitar: 'Quitar archivo',
+        cancelar: 'Cancelar',
+        cargar: 'Cargar',
+        rechazoTipo: 'El archivo debe ser un ZIP o un XML.',
+        rechazoTamano: 'El archivo supera los 10 MB.',
+        errorGenerico: 'No se pudo cargar el documento.',
+        exito: {
+          title: 'Documento cargado',
+          desc: 'Ya aparece en los documentos recibidos.',
         },
       },
     },
