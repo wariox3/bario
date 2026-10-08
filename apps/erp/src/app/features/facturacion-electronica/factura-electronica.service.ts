@@ -16,6 +16,8 @@ import type {
  */
 const SIN_TOAST: RequestOptions = { errorToast: false };
 
+const BASE = '/general/electronico/';
+
 /**
  * Facturación electrónica de la empresa en RedEDoc: el emisor y su certificado.
  * Endpoints de `/general/electronico/`.
@@ -31,11 +33,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    * apaga el toast del interceptor. Cualquier otro error sigue fallando.
    */
   consultarEmisor(): Observable<EmisorConsulta> {
-    return this.get<EmisorRedEDoc>(
-      '/general/electronico/emisor-consultar/',
-      undefined,
-      SIN_TOAST,
-    ).pipe(
+    return this.get<EmisorRedEDoc>(`${BASE}emisor-consultar/`, undefined, SIN_TOAST).pipe(
       map((emisor): EmisorConsulta => ({ registrado: true, emisor })),
       catchError((err: unknown) =>
         err instanceof HttpErrorResponse && err.status === HttpStatusCode.NotFound
@@ -50,7 +48,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    * Sin body, igual que el alta: el backend lee `GenConfiguracion`.
    */
   actualizarEmisor(): Observable<void> {
-    return this.patch<void>('/general/electronico/emisor-actualizar/', null, SIN_TOAST);
+    return this.patch<void>(`${BASE}emisor-actualizar/`, null, SIN_TOAST);
   }
 
   /**
@@ -59,7 +57,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    */
   consultarCertificado(): Observable<CertificadoRedEDoc | null> {
     return this.get<CertificadoConsultaResponse>(
-      '/general/electronico/certificado-consultar/',
+      `${BASE}certificado-consultar/`,
       undefined,
       SIN_TOAST,
     ).pipe(map((res) => res.results[0] ?? null));
@@ -67,12 +65,7 @@ export class FacturaElectronicaService extends BaseHttpService {
 
   /** Elimina el certificado digital de la empresa en RedEDoc. Sin body. */
   eliminarCertificado(): Observable<void> {
-    return this.post<void>(
-      '/general/electronico/certificado-eliminar/',
-      null,
-      undefined,
-      SIN_TOAST,
-    );
+    return this.post<void>(`${BASE}certificado-eliminar/`, null, undefined, SIN_TOAST);
   }
 
   /**
@@ -81,12 +74,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    * de ese error.
    */
   reasignarEmisor(emisor: number): Observable<void> {
-    return this.post<void>(
-      '/general/electronico/emisor-reasignar/',
-      { emisor },
-      undefined,
-      SIN_TOAST,
-    );
+    return this.post<void>(`${BASE}emisor-reasignar/`, { emisor }, undefined, SIN_TOAST);
   }
 
   /**
@@ -94,7 +82,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    * cuál es por el tenant.
    */
   desvincularEmisor(): Observable<void> {
-    return this.post<void>('/general/electronico/emisor-desvincular/', null, undefined, SIN_TOAST);
+    return this.post<void>(`${BASE}emisor-desvincular/`, null, undefined, SIN_TOAST);
   }
 
   /**
@@ -105,7 +93,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    * antes** de llamar acá. Si después cambian, se mandan con `actualizarEmisor`.
    */
   crearEmisor(): Observable<void> {
-    return this.post<void>('/general/electronico/emisor-crear/', null, undefined, SIN_TOAST);
+    return this.post<void>(`${BASE}emisor-crear/`, null, undefined, SIN_TOAST);
   }
 
   /**
@@ -116,7 +104,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    */
   cargarCertificado(archivo: File, clave: string): Observable<void> {
     return this.postFile<void>(
-      '/general/electronico/certificado-cargar/',
+      `${BASE}certificado-cargar/`,
       archivo,
       { clave },
       'archivo',

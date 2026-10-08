@@ -7,12 +7,17 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { PasswordModule } from 'primeng/password';
 import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
-import { I18nService, ToastService, formatFechaCorta } from '@reddoc/core';
+import { I18nService, ToastService, formatFechaCorta, fromIsoDate } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { FacturaElectronicaService } from '../../factura-electronica.service';
 import type { CertificadoRedEDoc } from '../../factura-electronica.model';
 import { parseRedEDocError, type RedEDocError } from '../../rededoc-error';
 import { RededocErrorComponent } from '../../components/rededoc-error/rededoc-error.component';
+import { EstadoErrorComponent } from '../../components/estado-error/estado-error.component';
+import { confirmacion } from '../../confirmacion';
+import { FileDropzoneComponent } from '@erp/core/components/file-dropzone/file-dropzone.component';
+import type { ArchivoRechazo } from '@erp/core/components/file-dropzone/validar-archivo';
+import { FileCardComponent } from '@erp/core/components/file-card/file-card.component';
 
 /** Estado del certificado del contenedor, del más urgente al más tranquilo. */
 export type CertificadoEstado = 'sin-certificado' | 'vencido' | 'por-vencer' | 'vigente';
@@ -23,19 +28,6 @@ const DIAS_AVISO = 30;
 /** Extensiones del certificado digital que emite la DIAN. */
 const ACCEPT = '.p12,.pfx';
 const MAX_MB = 5;
-
-/**
- * Convierte `AAAA-MM-DD` en una fecha **local**.
- *
- * `new Date('2027-03-14')` la interpreta como medianoche UTC: al oeste de
- * Greenwich el certificado aparecería venciendo el día anterior.
- */
-function parseFechaLocal(iso: string | null): Date | null {
-  if (!iso) return null;
-  const [anio, mes, dia] = iso.split('-').map(Number);
-  if (!anio || !mes || !dia) return null;
-  return new Date(anio, mes - 1, dia);
-}
 
 /** Días completos entre hoy y la fecha, negativo si ya pasó. */
 function diasHasta(fecha: Date): number {
@@ -70,6 +62,9 @@ function diasHasta(fecha: Date): number {
     FocusInvalidDirective,
     ConfirmDialogModule,
     RededocErrorComponent,
+    EstadoErrorComponent,
+    FileDropzoneComponent,
+    FileCardComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './certificado-step.component.html',
@@ -84,6 +79,7 @@ export class CertificadoStepComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly accept = ACCEPT;
+  protected readonly maxMb = MAX_MB;
 
   /** El usuario terminó con este paso y quiere seguir. */
   readonly avanzar = output<void>();
@@ -94,7 +90,6 @@ export class CertificadoStepComponent {
   protected readonly subiendo = signal(false);
   protected readonly eliminando = signal(false);
   protected readonly selectedFile = signal<File | null>(null);
-  protected readonly dragOver = signal(false);
   protected readonly fileError = signal<string | null>(null);
   /** ¿La empresa ya es emisor en RedEDoc? `null` mientras no se sepa. */
   protected readonly emisorRegistrado = signal<boolean | null>(null);
@@ -122,9 +117,7 @@ export class CertificadoStepComponent {
     clave: this.fb.nonNullable.control('', Validators.required),
   });
 
-  protected readonly venceDate = computed(() =>
-    parseFechaLocal(this.certificado()?.vigente_hasta ?? null),
-  );
+  protected readonly venceDate = computed(() => fromIsoDate(this.certificado()?.vigente_hasta));
 
   protected readonly dias = computed(() => {
     const fecha = this.venceDate();
@@ -157,9 +150,9 @@ export class CertificadoStepComponent {
     const vigencia = this.t()
       .facturacionElectronica.certificado.detalle.vigencia.replace(
         '{desde}',
-        formatFechaCorta(parseFechaLocal(cert.vigente_desde), ''),
+        formatFechaCorta(cert.vigente_desde, ''),
       )
-      .replace('{hasta}', formatFechaCorta(parseFechaLocal(cert.vigente_hasta), ''));
+      .replace('{hasta}', formatFechaCorta(cert.vigente_hasta, ''));
     return cert.alias ? `${cert.nombre_archivo} · ${vigencia}` : vigencia;
   });
 
@@ -217,16 +210,14 @@ export class CertificadoStepComponent {
   /** Eliminar deja a la empresa sin poder emitir: se confirma antes. */
   protected confirmarEliminar(): void {
     if (this.eliminando()) return;
-    const confirm = this.t().facturacionElectronica.certificado.confirmEliminar;
-    this.confirmation.confirm({
-      header: confirm.header,
-      message: confirm.message,
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: confirm.accept,
-      rejectLabel: this.t().common.actions.cancel,
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.eliminar(),
-    });
+    this.confirmation.confirm(
+      confirmacion(
+        this.t().facturacionElectronica.certificado.confirmEliminar,
+        this.t().common.actions.cancel,
+        () => this.eliminar(),
+        { destructiva: true },
+      ),
+    );
   }
 
   private eliminar(): void {
@@ -251,60 +242,25 @@ export class CertificadoStepComponent {
       });
   }
 
-  protected openFilePicker(input: HTMLInputElement): void {
-    if (this.subiendo()) return;
-    input.click();
-  }
-
-  protected onFileInputChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    if (file) this.aceptarArchivo(file);
-    // Permite volver a elegir el mismo archivo tras quitarlo.
-    input.value = '';
-  }
-
-  protected onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    if (this.subiendo()) return;
-    this.dragOver.set(true);
-  }
-
-  protected onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-  }
-
-  protected onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-    if (this.subiendo()) return;
-    const file = event.dataTransfer?.files?.[0] ?? null;
-    if (file) this.aceptarArchivo(file);
-  }
-
   protected quitarArchivo(): void {
     if (this.subiendo()) return;
     this.selectedFile.set(null);
     this.fileError.set(null);
   }
 
-  private aceptarArchivo(file: File): void {
-    const dict = this.t().facturacionElectronica.certificado.errors;
-    const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-
-    if (!ACCEPT.split(',').includes(extension)) {
-      this.selectedFile.set(null);
-      this.fileError.set(dict.tipo.replace('{tipos}', ACCEPT));
-      return;
-    }
-    if (file.size > MAX_MB * 1024 * 1024) {
-      this.selectedFile.set(null);
-      this.fileError.set(dict.tamano.replace('{max}', String(MAX_MB)));
-      return;
-    }
+  protected aceptarArchivo(file: File): void {
     this.fileError.set(null);
     this.selectedFile.set(file);
+  }
+
+  protected rechazarArchivo(motivo: ArchivoRechazo): void {
+    const dict = this.t().facturacionElectronica.certificado.errors;
+    this.selectedFile.set(null);
+    this.fileError.set(
+      motivo === 'tipo'
+        ? dict.tipo.replace('{tipos}', ACCEPT)
+        : dict.tamano.replace('{max}', String(MAX_MB)),
+    );
   }
 
   protected onSubmit(): void {

@@ -1,6 +1,6 @@
 import { Component, DestroyRef, computed, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import type { Subscription } from 'rxjs';
+import type { Observable, Subscription } from 'rxjs';
 import { NgTemplateOutlet } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -14,6 +14,8 @@ import { FacturaElectronicaService } from '../../factura-electronica.service';
 import type { EmisorConsulta } from '../../factura-electronica.model';
 import { parseRedEDocError, tieneCodigo, type RedEDocError } from '../../rededoc-error';
 import { RededocErrorComponent } from '../../components/rededoc-error/rededoc-error.component';
+import { EstadoErrorComponent } from '../../components/estado-error/estado-error.component';
+import { confirmacion } from '../../confirmacion';
 
 /**
  * Paso «RedEDoc»: el registro de la empresa como emisor.
@@ -49,7 +51,13 @@ function conDigito(numero: string | null | undefined, dv: string | null | undefi
 @Component({
   selector: 'app-rededoc-step',
   standalone: true,
-  imports: [ButtonModule, ConfirmDialogModule, NgTemplateOutlet, RededocErrorComponent],
+  imports: [
+    ButtonModule,
+    ConfirmDialogModule,
+    NgTemplateOutlet,
+    RededocErrorComponent,
+    EstadoErrorComponent,
+  ],
   providers: [ConfirmationService],
   templateUrl: './rededoc-step.component.html',
 })
@@ -62,6 +70,8 @@ export class RededocStepComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
+  /** Atajo al diccionario del paso. */
+  private readonly dict = computed(() => this.t().facturacionElectronica.rededoc);
 
   readonly avanzar = output<void>();
 
@@ -168,36 +178,22 @@ export class RededocStepComponent {
         },
         // El servicio apaga el toast del interceptor: el error se dice en la tarjeta.
         error: (err: unknown) => {
-          this.consultaError.set(
-            extractErrorMessage(err, this.t().facturacionElectronica.rededoc.emisor.error),
-          );
+          this.consultaError.set(extractErrorMessage(err, this.dict().emisor.error));
           this.consultaLoading.set(false);
         },
       });
   }
 
   protected crear(): void {
-    if (this.procesando()) return;
-    this.iniciar('crear');
-    this.facturaElectronica
-      .crearEmisor()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.terminar(this.t().facturacionElectronica.rededoc.toasts.creado),
-        error: (err: unknown) => this.fallo('crear', err),
-      });
+    this.ejecutar('crear', this.facturaElectronica.crearEmisor(), this.dict().toasts.creado);
   }
 
   protected actualizar(): void {
-    if (this.procesando()) return;
-    this.iniciar('actualizar');
-    this.facturaElectronica
-      .actualizarEmisor()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.terminar(this.t().facturacionElectronica.rededoc.toasts.actualizado),
-        error: (err: unknown) => this.fallo('actualizar', err),
-      });
+    this.ejecutar(
+      'actualizar',
+      this.facturaElectronica.actualizarEmisor(),
+      this.dict().toasts.actualizado,
+    );
   }
 
   /**
@@ -214,69 +210,61 @@ export class RededocStepComponent {
   protected confirmarReasignar(): void {
     const emisor = this.emisorReasignable();
     if (this.procesando() || emisor === null) return;
-    const confirm = this.t().facturacionElectronica.rededoc.confirmReasignar;
-    this.confirmation.confirm({
-      header: confirm.header,
-      message: confirm.message,
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: confirm.accept,
-      rejectLabel: this.t().common.actions.cancel,
-      accept: () => this.reasignar(emisor),
-    });
-  }
-
-  private reasignar(emisor: number): void {
-    this.iniciar('reasignar');
-    this.facturaElectronica
-      .reasignarEmisor(emisor)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.terminar(this.t().facturacionElectronica.rededoc.toasts.reasignado),
-        error: (err: unknown) => this.fallo('reasignar', err),
-      });
+    this.confirmation.confirm(
+      confirmacion(this.dict().confirmReasignar, this.t().common.actions.cancel, () =>
+        this.ejecutar(
+          'reasignar',
+          this.facturaElectronica.reasignarEmisor(emisor),
+          this.dict().toasts.reasignado,
+        ),
+      ),
+    );
   }
 
   /** Desvincular deja a la empresa sin poder facturar: se confirma antes. */
   protected confirmarDesvincular(): void {
     if (this.procesando()) return;
-    const confirm = this.t().facturacionElectronica.rededoc.confirmDesvincular;
-    this.confirmation.confirm({
-      header: confirm.header,
-      message: confirm.message,
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: confirm.accept,
-      rejectLabel: this.t().common.actions.cancel,
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.desvincular(),
-    });
+    this.confirmation.confirm(
+      confirmacion(
+        this.dict().confirmDesvincular,
+        this.t().common.actions.cancel,
+        () =>
+          this.ejecutar(
+            'desvincular',
+            this.facturaElectronica.desvincularEmisor(),
+            this.dict().toasts.desvinculado,
+          ),
+        { destructiva: true },
+      ),
+    );
   }
 
-  private desvincular(): void {
-    this.iniciar('desvincular');
-    this.facturaElectronica
-      .desvincularEmisor()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.terminar(this.t().facturacionElectronica.rededoc.toasts.desvinculado),
-        error: (err: unknown) => this.fallo('desvincular', err),
-      });
-  }
-
-  private iniciar(accion: AccionEmisor): void {
+  /**
+   * Corre una acción sobre el emisor: la marca en vuelo (guarda de reentrada:
+   * dos clics no crean dos emisores), y al terminar avisa y relee el emisor —de
+   * su estado salen los botones que siguen— o deja el error en la tarjeta.
+   */
+  private ejecutar(
+    accion: AccionEmisor,
+    peticion: Observable<void>,
+    exito: { readonly title: string; readonly desc: string },
+  ): void {
+    if (this.procesando()) return;
     this.procesando.set(accion);
     this.accionError.set(null);
-  }
-
-  private fallo(accion: AccionEmisor, err: unknown): void {
-    this.procesando.set(null);
-    const fallback = this.t().facturacionElectronica.rededoc.errorAccion.generico;
-    this.accionError.set({ accion, error: parseRedEDocError(err, fallback) });
-  }
-
-  /** Avisa y relee el emisor: de su estado salen los botones que siguen. */
-  private terminar(toast: { title: string; desc: string }): void {
-    this.procesando.set(null);
-    this.toast.success(toast.title, toast.desc);
-    this.consultar();
+    peticion.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.procesando.set(null);
+        this.toast.success(exito.title, exito.desc);
+        this.consultar();
+      },
+      error: (err: unknown) => {
+        this.procesando.set(null);
+        this.accionError.set({
+          accion,
+          error: parseRedEDocError(err, this.dict().errorAccion.generico),
+        });
+      },
+    });
   }
 }

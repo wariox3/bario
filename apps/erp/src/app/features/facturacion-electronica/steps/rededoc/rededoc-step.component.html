@@ -32,17 +32,11 @@
       @if (empresaLoading()) {
         <div class="h-40 animate-pulse rounded-lg bg-[rgba(20,48,73,0.06)]"></div>
       } @else if (empresaError()) {
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <p class="m-0 text-[0.8rem] text-red-600">{{ r.empresa.error }}</p>
-          <p-button
-            type="button"
-            icon="pi pi-refresh"
-            severity="secondary"
-            [outlined]="true"
-            [label]="r.reintentar"
-            (onClick)="cargarEmpresa()"
-          />
-        </div>
+        <app-estado-error
+          [mensaje]="r.empresa.error"
+          [reintentarLabel]="r.reintentar"
+          (reintentar)="cargarEmpresa()"
+        />
       } @else if (fichaEmpresa(); as ficha) {
         <ng-container *ngTemplateOutlet="fichaTpl; context: { $implicit: ficha }" />
       }
@@ -107,17 +101,11 @@
         <div class="h-24 animate-pulse rounded-lg bg-[rgba(20,48,73,0.06)]"></div>
       </div>
     } @else if (consultaError(); as mensaje) {
-      <div
-        class="flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] px-5 py-4"
-      >
-        <p class="m-0 text-[0.8rem] text-red-600">{{ mensaje }}</p>
-        <p-button
-          type="button"
-          icon="pi pi-refresh"
-          severity="secondary"
-          [outlined]="true"
-          [label]="r.reintentar"
-          (onClick)="consultar()"
+      <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+        <app-estado-error
+          [mensaje]="mensaje"
+          [reintentarLabel]="r.reintentar"
+          (reintentar)="consultar()"
         />
       </div>
     } @else if (c) {
