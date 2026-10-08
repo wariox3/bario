@@ -35,13 +35,14 @@
           </div>
         </p-tabpanel>
         <p-tabpanel value="humano">
-          <div class="pt-7">
+          <div class="flex flex-col gap-5 pt-7">
+            <app-asistente-acceso variante="nomina" />
             <app-humano-config />
           </div>
         </p-tabpanel>
         <p-tabpanel value="venta">
           <div class="pt-7">
-            <app-venta-config />
+            <app-asistente-acceso variante="venta" />
           </div>
         </p-tabpanel>
       </p-tabpanels>

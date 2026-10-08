@@ -78,11 +78,24 @@ export const appRoutes: Route[] = [
         path: 'facturacion-electronica',
         // Ruta global (no-módulo): limpia el módulo activo para ocultar el
         // sidebar. Configura la empresa, no un módulo — se entra desde el
-        // inicio de Venta, pero no pertenece a Venta.
+        // inicio de Venta, pero no pertenece a Venta. Mismo asistente que
+        // nómina; la variante dice cuál (ver `asistente-variante.ts`).
         resolve: { _module: erpModuleResolver(null) },
+        data: { variante: 'venta' },
         loadChildren: () =>
-          import('./features/facturacion-electronica/facturacion-electronica.routes').then(
-            (m) => m.FACTURACION_ELECTRONICA_ROUTES,
+          import('./features/asistente-electronico/asistente-electronico.routes').then(
+            (m) => m.ASISTENTE_ELECTRONICO_ROUTES,
+          ),
+      },
+      {
+        // El mismo asistente para nómina electrónica; se entra desde el
+        // inicio de Humano.
+        path: 'nomina-electronica',
+        resolve: { _module: erpModuleResolver(null) },
+        data: { variante: 'nomina' },
+        loadChildren: () =>
+          import('./features/asistente-electronico/asistente-electronico.routes').then(
+            (m) => m.ASISTENTE_ELECTRONICO_ROUTES,
           ),
       },
       {

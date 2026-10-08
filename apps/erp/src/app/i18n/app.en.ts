@@ -6247,7 +6247,7 @@ export const en: AppDict = {
       },
     },
   },
-  facturacionElectronica: {
+  asistenteElectronico: {
     rededoc: {
       reintentar: 'Retry',
       empresa: {
@@ -6267,7 +6267,7 @@ export const en: AppDict = {
         },
         noRegistrado: {
           title: 'Your company is not created in RedEDoc yet',
-          desc: 'Create it with these details so it can issue electronic invoices.',
+          desc: 'Create it with these details so it can issue electronic documents.',
           crear: 'Create',
           reasignar: 'Reassign',
         },
@@ -6275,7 +6275,7 @@ export const en: AppDict = {
       confirmDesvincular: {
         header: 'Unlink issuer',
         message:
-          'Your company will no longer be linked in RedEDoc and cannot issue electronic invoices until it is created again. Do you want to continue?',
+          'Your company will no longer be linked in RedEDoc and cannot issue electronic documents until it is created again. Do you want to continue?',
         accept: 'Unlink',
       },
       confirmReasignar: {
@@ -6297,7 +6297,7 @@ export const en: AppDict = {
       toasts: {
         creado: {
           title: 'Company created',
-          desc: 'You can now continue with electronic invoicing.',
+          desc: 'You can now continue with the wizard.',
         },
         actualizado: {
           title: 'Details updated',
@@ -6323,7 +6323,7 @@ export const en: AppDict = {
           'Without a valid certificate you cannot issue. Contact us to renew it before it lapses.',
         vencidoTitle: 'Your certificate expired',
         vencidoDesc:
-          'You cannot issue electronic invoices until it is renewed. Contact us to do it.',
+          'You cannot issue electronic documents until it is renewed. Contact us to do it.',
         faltan: { one: '1 day left', other: '{dias} days left' },
         venceHoy: 'Expires today',
         vencidoHace: { one: 'Expired 1 day ago', other: 'Expired {dias} days ago' },
@@ -6360,7 +6360,7 @@ export const en: AppDict = {
       confirmEliminar: {
         header: 'Delete certificate',
         message:
-          'Your company will not be able to issue electronic invoices until you upload a new certificate. Do you want to continue?',
+          'Your company will not be able to issue electronic documents until you upload a new certificate. Do you want to continue?',
         accept: 'Delete',
       },
       toasts: {
@@ -6402,7 +6402,7 @@ export const en: AppDict = {
       },
       enProceso: {
         title: 'Your test set is being enabled',
-        desc: 'We will email you once the DIAN approves it. Then you can link your invoicing resolutions.',
+        desc: 'We will email you once the DIAN approves it.',
       },
       continuarPendiente: 'Configure the test set for at least one type to continue.',
       campos: {
@@ -6437,8 +6437,6 @@ export const en: AppDict = {
       },
     },
     finalizar: {
-      title: 'You finished the electronic invoicing process',
-      desc: 'You will receive an email once the test sets are approved, so you can continue registering your resolutions.',
       siguiente: 'What comes next',
       estaciones: {
         enviada: {
@@ -6453,15 +6451,49 @@ export const en: AppDict = {
           title: 'Register your resolutions',
           desc: 'With the approval email, continue registering your resolutions to start invoicing.',
         },
+        emitir: {
+          title: 'Send your payroll',
+          desc: 'With the approval email you can send your payroll records to the DIAN.',
+        },
       },
       estados: { hecho: 'done', enCurso: 'in progress', pendiente: 'pending' },
       ayuda: 'If you need to change something, go back to any step on the left.',
       finalizar: 'Finish wizard',
     },
+    variantes: {
+      venta: {
+        title: 'Electronic invoicing',
+        subtitle: 'Complete your company details to start invoicing electronically.',
+        invitacion: {
+          title: 'Electronic invoicing',
+          desc: 'Complete your company information and start invoicing electronically.',
+        },
+        finalizar: {
+          title: 'You finished the electronic invoicing process',
+          desc: 'You will receive an email once the test sets are approved, so you can continue registering your resolutions.',
+        },
+      },
+      nomina: {
+        title: 'Electronic payroll',
+        subtitle: 'Complete your company details to start issuing electronic payroll.',
+        invitacion: {
+          title: 'Electronic payroll',
+          desc: 'Complete your company information and start issuing electronic payroll.',
+        },
+        finalizar: {
+          title: 'You finished the electronic payroll process',
+          desc: 'You will receive an email once the test set is approved, so you can start sending your electronic payroll.',
+        },
+      },
+    },
+    invitacion: { actions: { completar: 'Complete', omitir: 'Skip' } },
+    acceso: {
+      hint: 'Your company in RedEDoc, the digital certificate and the DIAN enablements.',
+      desc: 'Go back to the wizard to review the setup or change something. Each step shows what is already registered.',
+      abrir: 'Open wizard',
+    },
     asistente: {
       eyebrow: 'Setup',
-      title: 'Electronic invoicing',
-      subtitle: 'Complete your company details to start issuing.',
       pasos: {
         empresa: { label: 'Company details', hint: 'Identity, contact and location' },
         rededoc: { label: 'RedEDoc', hint: 'Company registration as issuer' },
@@ -6519,13 +6551,6 @@ export const en: AppDict = {
           },
           actions: { cerrar: 'Get started' },
         },
-      },
-    },
-    venta: {
-      facturaElectronica: {
-        title: 'Electronic invoicing',
-        desc: 'Complete your company information and start invoicing electronically.',
-        actions: { completar: 'Complete', omitir: 'Skip' },
       },
     },
   },
@@ -6668,14 +6693,6 @@ export const en: AppDict = {
     subtitle: 'Company parameters',
     tabs: { general: 'General', humano: 'Payroll', venta: 'Sales' },
     unsavedChanges: 'Unsaved changes',
-    venta: {
-      facturacionElectronica: {
-        title: 'Electronic invoicing',
-        hint: 'Your company in RedEDoc, the digital certificate and the DIAN enablements.',
-        desc: 'Go back to the wizard to review the setup or change something. Each step shows what is already registered.',
-        abrir: 'Open wizard',
-      },
-    },
     actions: { save: 'Save' },
     general: {
       parametros: {

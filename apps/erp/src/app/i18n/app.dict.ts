@@ -4854,7 +4854,7 @@ export interface AppDict
       };
     };
   };
-  facturacionElectronica: {
+  asistenteElectronico: {
     rededoc: {
       reintentar: string;
       empresa: { title: string; desc: string; error: string };
@@ -4942,19 +4942,33 @@ export interface AppDict
       };
     };
     finalizar: {
-      title: string;
-      desc: string;
       siguiente: string;
-      estaciones: Record<'enviada' | 'revision' | 'resoluciones', { title: string; desc: string }>;
+      estaciones: Record<
+        'enviada' | 'revision' | 'resoluciones' | 'emitir',
+        { title: string; desc: string }
+      >;
       /** Para lectores de pantalla: el estado de cada estación. */
       estados: Record<'hecho' | 'enCurso' | 'pendiente', string>;
       ayuda: string;
       finalizar: string;
     };
+    /** Lo que cambia entre el asistente de venta y el de nómina. */
+    variantes: Record<
+      'venta' | 'nomina',
+      {
+        title: string;
+        subtitle: string;
+        /** Tira del inicio del módulo. */
+        invitacion: { title: string; desc: string };
+        /** Cabecera del cierre. */
+        finalizar: { title: string; desc: string };
+      }
+    >;
+    invitacion: { actions: { completar: string; omitir: string } };
+    /** Acceso desde Configuración; el título es el de la variante. */
+    acceso: { hint: string; desc: string; abrir: string };
     asistente: {
       eyebrow: string;
-      title: string;
-      subtitle: string;
       pasos: {
         empresa: { label: string; hint: string };
         rededoc: { label: string; hint: string };
@@ -4995,13 +5009,6 @@ export interface AppDict
           modelos: Readonly<Record<string, string>>;
           actions: { cerrar: string };
         };
-      };
-    };
-    venta: {
-      facturaElectronica: {
-        title: string;
-        desc: string;
-        actions: { completar: string; omitir: string };
       };
     };
   };
@@ -5086,9 +5093,6 @@ export interface AppDict
     subtitle: string;
     tabs: { general: string; humano: string; venta: string };
     unsavedChanges: string;
-    venta: {
-      facturacionElectronica: { title: string; hint: string; desc: string; abrir: string };
-    };
     actions: { save: string };
     general: {
       parametros: { title: string; hint: string; groups: { fiscal: string; emision: string } };

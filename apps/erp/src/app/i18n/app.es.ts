@@ -6313,7 +6313,7 @@ export const es: AppDict = {
       },
     },
   },
-  facturacionElectronica: {
+  asistenteElectronico: {
     rededoc: {
       reintentar: 'Reintentar',
       empresa: {
@@ -6333,7 +6333,7 @@ export const es: AppDict = {
         },
         noRegistrado: {
           title: 'Tu empresa todavía no está creada en RedEDoc',
-          desc: 'Creala con estos datos para que pueda facturar electrónicamente.',
+          desc: 'Creala con estos datos para que pueda emitir documentos electrónicos.',
           crear: 'Crear',
           reasignar: 'Reasignar',
         },
@@ -6341,7 +6341,7 @@ export const es: AppDict = {
       confirmDesvincular: {
         header: 'Desvincular emisor',
         message:
-          'Tu empresa dejará de estar vinculada en RedEDoc y no podrá facturar electrónicamente hasta crearla de nuevo. ¿Querés continuar?',
+          'Tu empresa dejará de estar vinculada en RedEDoc y no podrá emitir documentos electrónicos hasta crearla de nuevo. ¿Querés continuar?',
         accept: 'Desvincular',
       },
       confirmReasignar: {
@@ -6363,7 +6363,7 @@ export const es: AppDict = {
       toasts: {
         creado: {
           title: 'Empresa creada',
-          desc: 'Ya podés continuar con la facturación electrónica.',
+          desc: 'Ya podés continuar con el asistente.',
         },
         actualizado: {
           title: 'Datos actualizados',
@@ -6389,7 +6389,7 @@ export const es: AppDict = {
           'Sin certificado vigente no vas a poder emitir. Escribinos para renovarlo antes de que caduque.',
         vencidoTitle: 'Tu certificado venció',
         vencidoDesc:
-          'No vas a poder emitir facturas electrónicas hasta renovarlo. Escribinos para hacerlo.',
+          'No vas a poder emitir documentos electrónicos hasta renovarlo. Escribinos para hacerlo.',
         faltan: { one: 'Falta 1 día', other: 'Faltan {dias} días' },
         venceHoy: 'Vence hoy',
         vencidoHace: { one: 'Venció hace 1 día', other: 'Venció hace {dias} días' },
@@ -6426,7 +6426,7 @@ export const es: AppDict = {
       confirmEliminar: {
         header: 'Eliminar certificado',
         message:
-          'Tu empresa no podrá emitir facturas electrónicas hasta que cargues un certificado nuevo. ¿Querés continuar?',
+          'Tu empresa no podrá emitir documentos electrónicos hasta que cargues un certificado nuevo. ¿Querés continuar?',
         accept: 'Eliminar',
       },
       toasts: {
@@ -6468,7 +6468,7 @@ export const es: AppDict = {
       },
       enProceso: {
         title: 'Tu set de pruebas está en proceso de habilitación',
-        desc: 'Te avisamos por correo cuando la DIAN lo apruebe. Ahí vas a poder asociar tus resoluciones de facturación.',
+        desc: 'Te avisamos por correo cuando la DIAN lo apruebe.',
       },
       continuarPendiente: 'Configurá el set de pruebas de al menos un tipo para continuar.',
       campos: {
@@ -6509,8 +6509,6 @@ export const es: AppDict = {
       },
     },
     finalizar: {
-      title: 'Terminaste el proceso de facturación electrónica',
-      desc: 'Vas a recibir un correo cuando los set de pruebas sean aprobados, para que continúes con el registro de tus resoluciones.',
       siguiente: 'Qué sigue',
       estaciones: {
         enviada: {
@@ -6525,15 +6523,49 @@ export const es: AppDict = {
           title: 'Registrá tus resoluciones',
           desc: 'Con el correo de aprobación, seguí con el registro de tus resoluciones para empezar a facturar.',
         },
+        emitir: {
+          title: 'Transmití tu nómina',
+          desc: 'Con el correo de aprobación ya podés enviar tus soportes de pago a la DIAN.',
+        },
       },
       estados: { hecho: 'hecho', enCurso: 'en curso', pendiente: 'pendiente' },
       ayuda: 'Si necesitás cambiar algo, volvé a cualquier paso desde la izquierda.',
       finalizar: 'Finalizar asistente',
     },
+    variantes: {
+      venta: {
+        title: 'Facturación electrónica',
+        subtitle: 'Completá los datos de tu empresa para empezar a facturar electrónicamente.',
+        invitacion: {
+          title: 'Facturación electrónica',
+          desc: 'Completá la información de tu empresa y empezá a facturar electrónicamente.',
+        },
+        finalizar: {
+          title: 'Terminaste el proceso de facturación electrónica',
+          desc: 'Vas a recibir un correo cuando los set de pruebas sean aprobados, para que continúes con el registro de tus resoluciones.',
+        },
+      },
+      nomina: {
+        title: 'Nómina electrónica',
+        subtitle: 'Completá los datos de tu empresa para empezar a emitir nómina electrónica.',
+        invitacion: {
+          title: 'Nómina electrónica',
+          desc: 'Completá la información de tu empresa y empezá a emitir la nómina electrónica.',
+        },
+        finalizar: {
+          title: 'Terminaste el proceso de nómina electrónica',
+          desc: 'Vas a recibir un correo cuando el set de pruebas sea aprobado, para que empieces a transmitir tu nómina electrónica.',
+        },
+      },
+    },
+    invitacion: { actions: { completar: 'Completar', omitir: 'Omitir' } },
+    acceso: {
+      hint: 'Tu empresa en RedEDoc, el certificado digital y las habilitaciones ante la DIAN.',
+      desc: 'Volvé al asistente para revisar cómo quedó o cambiar algo. Cada paso muestra lo que ya está registrado.',
+      abrir: 'Abrir asistente',
+    },
     asistente: {
       eyebrow: 'Asistente',
-      title: 'Facturación electrónica',
-      subtitle: 'Completá los datos de tu empresa para empezar a emitir.',
       pasos: {
         empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
         rededoc: { label: 'RedEDoc', hint: 'Registro de la empresa como emisor' },
@@ -6591,13 +6623,6 @@ export const es: AppDict = {
           },
           actions: { cerrar: 'Empezar' },
         },
-      },
-    },
-    venta: {
-      facturaElectronica: {
-        title: 'Facturación electrónica',
-        desc: 'Completa la información de tu empresa y empieza a facturar electrónicamente.',
-        actions: { completar: 'Completar', omitir: 'Omitir' },
       },
     },
   },
@@ -6740,14 +6765,6 @@ export const es: AppDict = {
     subtitle: 'Parámetros de la empresa',
     tabs: { general: 'General', humano: 'Humano', venta: 'Venta' },
     unsavedChanges: 'Cambios sin guardar',
-    venta: {
-      facturacionElectronica: {
-        title: 'Facturación electrónica',
-        hint: 'Tu empresa en RedEDoc, el certificado digital y las habilitaciones ante la DIAN.',
-        desc: 'Volvé al asistente para revisar cómo quedó o cambiar algo. Cada paso muestra lo que ya está registrado.',
-        abrir: 'Abrir asistente',
-      },
-    },
     actions: { save: 'Guardar' },
     general: {
       parametros: {
