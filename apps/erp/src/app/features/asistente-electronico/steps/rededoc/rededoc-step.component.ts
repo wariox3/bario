@@ -74,6 +74,8 @@ export class RededocStepComponent {
   private readonly dict = computed(() => this.t().asistenteElectronico.rededoc);
 
   readonly avanzar = output<void>();
+  /** Cambió el emisor en RedEDoc (crear, actualizar, desvincular, reasignar). */
+  readonly cambio = output<void>();
 
   protected readonly empresa = signal<Partial<ConfiguracionRead> | null>(null);
   protected readonly empresaLoading = signal(true);
@@ -257,6 +259,7 @@ export class RededocStepComponent {
         this.procesando.set(null);
         this.toast.success(exito.title, exito.desc);
         this.consultar();
+        this.cambio.emit();
       },
       error: (err: unknown) => {
         this.procesando.set(null);

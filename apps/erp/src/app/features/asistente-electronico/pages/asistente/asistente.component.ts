@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
@@ -9,6 +9,7 @@ import { HabilitacionesStepComponent } from '../../steps/habilitaciones/habilita
 import { FinalizarStepComponent } from '../../steps/finalizar/finalizar-step.component';
 import type { AsistenteElectronicoModulo } from '@erp/core/services/parametro.service';
 import { ASISTENTE_VARIANTES } from '../../asistente-variante';
+import { AsistenteEstadoStore, type PasoVerificable } from '../../asistente-estado.store';
 import {
   ASISTENTE_STEPS,
   type AsistenteStep,
@@ -39,6 +40,7 @@ import {
     FinalizarStepComponent,
   ],
   templateUrl: './asistente.component.html',
+  providers: [AsistenteEstadoStore],
   // Ancho acotado como Configuración: son formularios, no tablas. La grilla de
   // dos columnas la arma el template; el host solo centra y acota.
   host: { class: 'mx-auto block w-full max-w-[1200px]' },
@@ -47,6 +49,7 @@ export class AsistenteComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly estado = inject(AsistenteEstadoStore);
 
   protected readonly t = this.i18n.t;
   protected readonly steps = ASISTENTE_STEPS;
@@ -65,17 +68,20 @@ export class AsistenteComponent {
     () => ASISTENTE_STEPS.find((step) => step.id === this.paso()) ?? ASISTENTE_STEPS[0],
   );
 
-  /**
-   * Pasos ya guardados en esta sesión del asistente.
-   *
-   * Es memoria de la pantalla, no del backend: hoy no hay endpoint que recuerde
-   * el avance (el `terminar-asistente/` del ERP anterior no existe en la API
-   * nueva). Sirve para que el riel muestre el visto tras guardar.
-   */
-  private readonly completados = signal<ReadonlySet<AsistenteStepId>>(new Set());
+  constructor() {
+    // El check de cada paso sale del backend (ver `AsistenteEstadoStore`), no
+    // de lo que se hizo en esta pantalla: sobrevive a recargar y se cae si algo
+    // se deshace. Se comprueba al entrar y con cada variante.
+    effect(() => this.estado.iniciar(this.config()));
+  }
 
   protected isCompletado(id: AsistenteStepId): boolean {
-    return this.completados().has(id);
+    return this.estado.completados().has(id);
+  }
+
+  /** Un paso cambió algo en el backend: se vuelve a comprobar su check. */
+  protected onCambio(...pasos: readonly PasoVerificable[]): void {
+    pasos.forEach((paso) => this.estado.refrescar(paso));
   }
 
   protected isActivo(id: AsistenteStepId): boolean {
@@ -88,11 +94,6 @@ export class AsistenteComponent {
       ? this.t().asistenteElectronico.asistente.actions.guardarYContinuar
       : this.t().configuracion.actions.save,
   );
-
-  protected onStepSaved(id: AsistenteStepId): void {
-    this.completados.update((previos) => new Set(previos).add(id));
-    this.avanzarDesde(id);
-  }
 
   protected avanzarDesde(id: AsistenteStepId): void {
     const siguiente = this.siguienteDe(id);

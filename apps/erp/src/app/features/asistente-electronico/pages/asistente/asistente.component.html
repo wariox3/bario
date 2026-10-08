@@ -85,13 +85,21 @@
   <div class="animate-fade-up min-w-0">
     @switch (activeStep().id) {
       @case ('empresa') {
-        <app-empresa-config [submitLabel]="submitLabel()" (saved)="onStepSaved('empresa')" />
+        <app-empresa-config
+          [submitLabel]="submitLabel()"
+          (saved)="onCambio('empresa'); avanzarDesde('empresa')"
+        />
       }
       @case ('rededoc') {
-        <app-rededoc-step (avanzar)="onStepSaved('rededoc')" />
+        <!-- El certificado es del emisor: desvincular o reasignar también lo mueve. -->
+        <app-rededoc-step
+          (cambio)="onCambio('rededoc', 'certificado')"
+          (avanzar)="avanzarDesde('rededoc')"
+        />
       }
       @case ('certificado') {
         <app-certificado-step
+          (cambio)="onCambio('certificado')"
           (avanzar)="avanzarDesde('certificado')"
           (irARededoc)="irA('rededoc')"
         />
@@ -99,6 +107,7 @@
       @case ('habilitaciones') {
         <app-habilitaciones-step
           [modulo]="config().softwareModulo"
+          (cambio)="onCambio('habilitaciones')"
           (avanzar)="avanzarDesde('habilitaciones')"
         />
       }

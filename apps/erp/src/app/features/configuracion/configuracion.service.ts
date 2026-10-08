@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BaseHttpService } from '@reddoc/core';
+import { BaseHttpService, type RequestOptions } from '@reddoc/core';
 import type {
   ConfiguracionCampo,
   ConfiguracionPayload,
@@ -19,11 +19,19 @@ import type {
 export class ConfiguracionService extends BaseHttpService {
   private readonly resourcePath = '/general/configuracion/';
 
-  /** Trae solo los campos pedidos de la configuración de la empresa activa. */
-  obtener(campos: readonly ConfiguracionCampo[]): Observable<Partial<ConfiguracionRead>> {
-    return this.get<Partial<ConfiguracionRead>>(`${this.resourcePath}campos/`, {
-      campos: campos.join(','),
-    });
+  /**
+   * Trae solo los campos pedidos de la configuración de la empresa activa.
+   * `opts` permite apagar el toast cuando la lectura es una sonda silenciosa.
+   */
+  obtener(
+    campos: readonly ConfiguracionCampo[],
+    opts?: RequestOptions,
+  ): Observable<Partial<ConfiguracionRead>> {
+    return this.get<Partial<ConfiguracionRead>>(
+      `${this.resourcePath}campos/`,
+      { campos: campos.join(',') },
+      opts,
+    );
   }
 
   /** Persiste solo los campos enviados (actualización parcial). */

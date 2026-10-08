@@ -73,6 +73,8 @@ export class CertificadoStepComponent {
   readonly avanzar = output<void>();
   /** Falta el emisor: el usuario quiere ir a crearlo. */
   readonly irARededoc = output<void>();
+  /** Se cargó o eliminó el certificado en RedEDoc. */
+  readonly cambio = output<void>();
 
   protected readonly loading = signal(true);
   protected readonly subiendo = signal(false);
@@ -216,6 +218,7 @@ export class CertificadoStepComponent {
           // Se relee en vez de vaciarlo a mano: que la zona de carga aparezca
           // porque RedEDoc confirma que ya no hay certificado.
           this.cargarEstado();
+          this.cambio.emit();
         },
         error: (err: unknown) => {
           this.eliminando.set(false);
@@ -273,6 +276,7 @@ export class CertificadoStepComponent {
           // El vencimiento lo sabe el backend, no nosotros: se relee para que
           // la tarjeta muestre la fecha real del archivo recién subido.
           this.cargarEstado();
+          this.cambio.emit();
         },
         error: (err: unknown) => {
           this.subiendo.set(false);

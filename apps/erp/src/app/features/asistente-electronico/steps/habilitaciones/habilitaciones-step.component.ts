@@ -48,6 +48,8 @@ export class HabilitacionesStepComponent {
   /** Módulo de la variante: arma las tarjetas y es el `?modulo=` de la consulta. */
   readonly modulo = input.required<SoftwareModulo>();
   readonly avanzar = output<void>();
+  /** Se creó o actualizó un software. */
+  readonly cambio = output<void>();
 
   protected readonly software = signal<readonly SoftwareRedEDoc[] | null>(null);
   protected readonly loading = signal(true);
@@ -111,6 +113,12 @@ export class HabilitacionesStepComponent {
           this.loading.set(false);
         },
       });
+  }
+
+  /** El modal guardó: se relee acá y se avisa al asistente. */
+  protected onGuardado(): void {
+    this.consultar();
+    this.cambio.emit();
   }
 
   protected abrirCrear(tipo: SoftwareTipo): void {

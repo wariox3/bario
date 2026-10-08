@@ -86,11 +86,15 @@ export class ParametroService extends BaseHttpService {
   /**
    * ¿Hay que ofrecerle a este contenedor el asistente electrónico del módulo
    * (venta o nómina)? Como el de datos iniciales, el `true` es lo que hace
-   * aparecer la invitación.
+   * aparecer la invitación; `false` es que ya se terminó u omitió.
    */
-  asistenteElectronico(modulo: AsistenteElectronicoModulo): Observable<boolean> {
+  asistenteElectronico(modulo: AsistenteElectronicoModulo): Observable<boolean | null> {
     const campo = PARAMETRO_ASISTENTE[modulo];
-    return this.sonda([campo]).pipe(map((parametro) => parametro[campo] === true));
+    // `null` si el campo no vino (p. ej. el backend todavía no lo publica): no
+    // es lo mismo que `false`, que significa «ya se cerró».
+    return this.sonda([campo]).pipe(
+      map((parametro) => (typeof parametro[campo] === 'boolean' ? parametro[campo] : null)),
+    );
   }
 
   /**
