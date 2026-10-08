@@ -88,4 +88,25 @@ describe('FacturaElectronicaService', () => {
     expect(form.get('clave')).toBe('secreta');
     req.flush(null);
   });
+
+  describe('consultarSoftware', () => {
+    it('consulta por módulo y devuelve las filas', () => {
+      let resultado: readonly unknown[] | undefined;
+      service.consultarSoftware('facturacion').subscribe((r) => (resultado = r));
+      const req = http.expectOne((r) => r.url === '/api/general/electronico/software-consultar/');
+      expect(req.request.params.get('modulo')).toBe('facturacion');
+      req.flush({ count: 1, results: [{ id: 3, tipo: 'facturacion' }] });
+      expect(resultado).toEqual([{ id: 3, tipo: 'facturacion' }]);
+    });
+  });
+
+  describe('actualizarSoftware', () => {
+    it('manda PATCH con el id y solo lo que cambia', () => {
+      service.actualizarSoftware({ id: 3, identificador: 'abc' }).subscribe();
+      const req = http.expectOne('/api/general/electronico/software-actualizar/');
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual({ id: 3, identificador: 'abc' });
+      req.flush({});
+    });
+  });
 });

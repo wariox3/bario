@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { parseRedEDocError, tieneCodigo } from './rededoc-error';
+import { FormControl } from '@angular/forms';
+import { parseRedEDocError, repartirErrores, tieneCodigo } from './rededoc-error';
 
 function http400(body: unknown): HttpErrorResponse {
   return new HttpErrorResponse({ status: 400, error: body });
@@ -63,5 +64,33 @@ describe('parseRedEDocError', () => {
 
   it('sin nada legible cae al genérico, nunca a una lista vacía', () => {
     expect(parseRedEDocError(new Error('red'), 'genérico').mensajes).toEqual(['genérico']);
+  });
+});
+
+describe('repartirErrores', () => {
+  const error = (mensajes: readonly string[]) =>
+    parseRedEDocError(
+      http400({ errores: mensajes.map((mensaje) => ({ codigo: 'x', mensaje })) }),
+      'genérico',
+    );
+
+  it('lleva cada error a su input y devuelve el resto', () => {
+    const pin = new FormControl('');
+    const resto = repartirErrores(error(['pin: PIN inválido.', 'El emisor no existe.']), { pin });
+    expect(pin.errors).toEqual({ serverError: 'PIN inválido.' });
+    expect(pin.touched).toBe(true);
+    expect(resto?.mensajes).toEqual(['El emisor no existe.']);
+  });
+
+  it('si todos eran de campo no queda nada para la banda', () => {
+    const pin = new FormControl('');
+    expect(repartirErrores(error(['pin: PIN inválido.']), { pin })).toBeNull();
+  });
+
+  it('un campo que no está en el formulario sigue yendo a la banda', () => {
+    const pin = new FormControl('');
+    const original = error(['tipo: Tipo inválido.']);
+    expect(repartirErrores(original, { pin })).toBe(original);
+    expect(pin.errors).toBeNull();
   });
 });

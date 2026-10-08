@@ -96,6 +96,9 @@
           (irARededoc)="irA('rededoc')"
         />
       }
+      @case ('habilitaciones') {
+        <app-habilitaciones-step (avanzar)="avanzarDesde('habilitaciones')" />
+      }
       @default {
         <!--
           Andamio: el paso está declarado y se puede recorrer, pero su pantalla

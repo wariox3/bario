@@ -6386,6 +6386,56 @@ export const en: AppDict = {
         accion: 'Go to RedEDoc',
       },
     },
+    habilitaciones: {
+      reintentar: 'Retry',
+      consulta: { error: 'We could not check your company software.' },
+      tipos: {
+        facturacion: {
+          title: 'Electronic invoicing',
+          desc: 'Sales invoices and their credit and debit notes.',
+        },
+        documento_equivalente: {
+          title: 'POS equivalent document',
+          desc: 'Point of sale tickets.',
+        },
+        nomina: { title: 'Electronic payroll', desc: 'Payroll payment records.' },
+      },
+      enProceso: {
+        title: 'Your test set is being enabled',
+        desc: 'We will email you once the DIAN approves it. Then you can link your invoicing resolutions.',
+      },
+      continuarPendiente: 'Configure the test set for at least one type to continue.',
+      campos: {
+        id: 'Id',
+        identificador: 'Software identifier',
+        pin: 'PIN',
+        testSetId: 'Test set (TestSetId)',
+      },
+      estado: { habilitado: 'Enabled', pendiente: 'Pending enablement' },
+      sinSoftware: 'You have not configured the software for this document type yet.',
+      actions: { configurar: 'Configure', actualizar: 'Update' },
+      actualizar: {
+        title: 'Update software',
+        pinHint: 'Leave it empty to keep the current PIN.',
+      },
+      crear: {
+        title: 'Configure software',
+        desc: 'Copy the details exactly as they appear in the DIAN enablement portal.',
+        pinHint: 'The PIN you set when registering the software. It is not shown again.',
+        uuidInvalido:
+          'It must be 36 characters long, shaped like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.',
+        guardar: 'Save',
+      },
+      errorAccion: {
+        generico: 'RedEDoc did not respond as expected. Try again in a moment.',
+        titulo: 'We could not save the software',
+        tituloActualizar: 'We could not update the software',
+      },
+      toasts: {
+        actualizado: { title: 'Software updated', desc: 'The changes were saved in RedEDoc.' },
+        creado: { title: 'Software saved', desc: 'The test set is now being enabled.' },
+      },
+    },
     asistente: {
       eyebrow: 'Setup',
       title: 'Electronic invoicing',
@@ -6394,6 +6444,7 @@ export const en: AppDict = {
         empresa: { label: 'Company details', hint: 'Identity, contact and location' },
         rededoc: { label: 'RedEDoc', hint: 'Company registration as issuer' },
         certificado: { label: 'Digital certificate', hint: '.p12 file and its password' },
+        habilitaciones: { label: 'Enablement', hint: 'Software with the DIAN' },
         resolucion: { label: 'Resolution', hint: 'Authorized invoice numbering' },
         finalizar: { label: 'Finish', hint: 'Review and activation' },
       },

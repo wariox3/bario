@@ -3,14 +3,21 @@
  *
  * **Esta constante es la costura por donde crece el asistente.** Cuatro son los
  * del ERP anterior; «RedEDoc» es nuevo (el registro de la empresa como emisor,
- * que antes iba en un diálogo al guardar). «Datos de la empresa», «RedEDoc» y
- * «Certificado digital» ya tienen contenido. De los otros dos la API nueva todavía no expone nada (ni la
- * resolución del asistente ni `terminar-asistente/`), así que se declaran para
- * tener el camino a la vista y su panel muestra un «próximamente».
+ * que antes iba en un diálogo al guardar). «Habilitaciones» (el software ante
+ * la DIAN) también. Todos menos «Terminar» ya tienen contenido: de ese la API
+ * nueva todavía no expone nada (`terminar-asistente/`), así que se declara para
+ * tener el camino a la vista y su panel muestra un «próximamente». «Resolución»
+ * está comentado hasta que se defina.
  *
  * Darle contenido a un paso = su rama en el `@switch` del asistente.
  */
-export type AsistenteStepId = 'empresa' | 'rededoc' | 'certificado' | 'resolucion' | 'finalizar';
+export type AsistenteStepId =
+  | 'empresa'
+  | 'rededoc'
+  | 'certificado'
+  | 'habilitaciones'
+  | 'resolucion'
+  | 'finalizar';
 
 export interface AsistenteStep {
   readonly id: AsistenteStepId;
@@ -37,10 +44,16 @@ export const ASISTENTE_STEPS = [
     hintKey: 'facturacionElectronica.asistente.pasos.certificado.hint',
   },
   {
-    id: 'resolucion',
-    labelKey: 'facturacionElectronica.asistente.pasos.resolucion.label',
-    hintKey: 'facturacionElectronica.asistente.pasos.resolucion.hint',
+    id: 'habilitaciones',
+    labelKey: 'facturacionElectronica.asistente.pasos.habilitaciones.label',
+    hintKey: 'facturacionElectronica.asistente.pasos.habilitaciones.hint',
   },
+  // «Resolución» queda fuera por ahora; vuelve cuando se defina su pantalla.
+  // {
+  //   id: 'resolucion',
+  //   labelKey: 'facturacionElectronica.asistente.pasos.resolucion.label',
+  //   hintKey: 'facturacionElectronica.asistente.pasos.resolucion.hint',
+  // },
   {
     id: 'finalizar',
     labelKey: 'facturacionElectronica.asistente.pasos.finalizar.label',

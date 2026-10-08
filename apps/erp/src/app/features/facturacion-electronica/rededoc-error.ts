@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import type { AbstractControl } from '@angular/forms';
 import { extractErrorMessage } from '@reddoc/core';
 
 /** Un error puntual de RedEDoc, con el campo técnico separado del mensaje. */
@@ -74,4 +75,34 @@ export function parseRedEDocError(err: unknown, fallback: string): RedEDocError 
 /** ¿Alguno de los errores trae este código? */
 export function tieneCodigo(error: RedEDocError, codigo: string): boolean {
   return error.detalles.some((detalle) => detalle.codigo === codigo);
+}
+
+/**
+ * Lleva a su input los errores que nombran un campo del formulario
+ * (`clave: …`, `pin: …`) y devuelve el resto, para la banda de la acción;
+ * `null` si no quedó nada por mostrar ahí.
+ *
+ * El error de campo va como `serverError`: `lib-field-error` lo pinta debajo
+ * del input y lo borra solo cuando la persona lo edita.
+ */
+export function repartirErrores(
+  error: RedEDocError,
+  controles: Readonly<Record<string, AbstractControl>>,
+): RedEDocError | null {
+  const porCampo = new Map<AbstractControl, string[]>();
+  const resto: RedEDocErrorDetalle[] = [];
+  for (const detalle of error.detalles) {
+    const control =
+      detalle.campo && Object.hasOwn(controles, detalle.campo) ? controles[detalle.campo] : null;
+    if (control) porCampo.set(control, [...(porCampo.get(control) ?? []), detalle.mensaje]);
+    else resto.push(detalle);
+  }
+  for (const [control, mensajes] of porCampo) {
+    control.setErrors({ serverError: mensajes.join(' ') });
+    control.markAsTouched();
+  }
+  // Sin errores de campo (o solo con el `detail`) todo sigue yendo a la banda.
+  if (porCampo.size === 0) return error;
+  if (resto.length === 0) return null;
+  return { ...error, detalles: resto, mensajes: resto.map((detalle) => detalle.mensaje) };
 }

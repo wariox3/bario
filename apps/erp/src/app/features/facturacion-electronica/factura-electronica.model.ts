@@ -59,3 +59,48 @@ export interface CertificadoConsultaResponse {
   readonly count: number;
   readonly results: readonly CertificadoRedEDoc[];
 }
+
+/** Módulo de RedEDoc por el que se consulta el software (`?modulo=`). */
+export type SoftwareModulo = 'facturacion' | 'nomina';
+
+/** Tipo de documento que habilita un software; cada módulo agrupa los suyos. */
+export type SoftwareTipo = 'facturacion' | 'documento_equivalente' | 'nomina';
+
+/**
+ * Software del emisor ante la DIAN, una fila de
+ * `GET /general/electronico/software-consultar/?modulo=` (lista paginada DRF,
+ * a lo sumo una fila por tipo). El `pin` se envía al crear y nunca vuelve.
+ */
+export interface SoftwareRedEDoc {
+  readonly id: number;
+  readonly emisor: number;
+  readonly tipo: SoftwareTipo;
+  readonly modulo: SoftwareModulo;
+  readonly identificador: string;
+  readonly test_set_id: string;
+  readonly set_pruebas_aceptado: boolean;
+}
+
+export interface SoftwareConsultaResponse {
+  readonly count: number;
+  readonly results: readonly SoftwareRedEDoc[];
+}
+
+/** Body de `POST /general/electronico/software-crear/`. */
+export interface SoftwareCrearPayload {
+  readonly tipo: SoftwareTipo;
+  readonly identificador: string;
+  readonly pin: string;
+  readonly test_set_id: string;
+}
+
+/**
+ * Body de `PATCH /general/electronico/software-actualizar/`: el `id` dice cuál;
+ * lo que no viaja se conserva.
+ */
+export interface SoftwareActualizarPayload {
+  readonly id: number;
+  readonly identificador?: string;
+  readonly pin?: string;
+  readonly test_set_id?: string;
+}

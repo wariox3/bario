@@ -7,6 +7,11 @@ import type {
   CertificadoRedEDoc,
   EmisorConsulta,
   EmisorRedEDoc,
+  SoftwareActualizarPayload,
+  SoftwareConsultaResponse,
+  SoftwareCrearPayload,
+  SoftwareModulo,
+  SoftwareRedEDoc,
 } from './factura-electronica.model';
 
 /**
@@ -19,7 +24,8 @@ const SIN_TOAST: RequestOptions = { errorToast: false };
 const BASE = '/general/electronico/';
 
 /**
- * Facturación electrónica de la empresa en RedEDoc: el emisor y su certificado.
+ * Facturación electrónica de la empresa en RedEDoc: el emisor, su certificado
+ * y el software de cada módulo.
  * Endpoints de `/general/electronico/`.
  */
 @Injectable({ providedIn: 'root' })
@@ -110,5 +116,27 @@ export class FacturaElectronicaService extends BaseHttpService {
       'archivo',
       SIN_TOAST,
     );
+  }
+
+  /**
+   * Software del emisor para un módulo (`facturacion`, `nomina`): a lo sumo
+   * uno por tipo. Lista vacía si todavía no se creó ninguno.
+   */
+  consultarSoftware(modulo: SoftwareModulo): Observable<readonly SoftwareRedEDoc[]> {
+    return this.get<SoftwareConsultaResponse>(
+      `${BASE}software-consultar/`,
+      { modulo },
+      SIN_TOAST,
+    ).pipe(map((res) => res.results));
+  }
+
+  /** Registra el software de un tipo. El módulo lo deduce el backend del `tipo`. */
+  crearSoftware(payload: SoftwareCrearPayload): Observable<void> {
+    return this.post<void>(`${BASE}software-crear/`, payload, undefined, SIN_TOAST);
+  }
+
+  /** Actualiza un software ya registrado; lo que no viaja se conserva (PATCH). */
+  actualizarSoftware(payload: SoftwareActualizarPayload): Observable<void> {
+    return this.patch<void>(`${BASE}software-actualizar/`, payload, SIN_TOAST);
   }
 }

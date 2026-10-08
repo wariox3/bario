@@ -6452,6 +6452,62 @@ export const es: AppDict = {
         accion: 'Ir a RedEDoc',
       },
     },
+    habilitaciones: {
+      reintentar: 'Reintentar',
+      consulta: { error: 'No se pudo consultar el software de tu empresa.' },
+      tipos: {
+        facturacion: {
+          title: 'Facturación electrónica',
+          desc: 'Facturas de venta y sus notas crédito y débito.',
+        },
+        documento_equivalente: {
+          title: 'Documento equivalente POS',
+          desc: 'Tiquetes del punto de venta.',
+        },
+        nomina: { title: 'Nómina electrónica', desc: 'Soportes de pago de nómina.' },
+      },
+      enProceso: {
+        title: 'Tu set de pruebas está en proceso de habilitación',
+        desc: 'Te avisamos por correo cuando la DIAN lo apruebe. Ahí vas a poder asociar tus resoluciones de facturación.',
+      },
+      continuarPendiente: 'Configurá el set de pruebas de al menos un tipo para continuar.',
+      campos: {
+        id: 'Id',
+        identificador: 'Identificador del software',
+        pin: 'PIN',
+        testSetId: 'Set de pruebas (TestSetId)',
+      },
+      estado: { habilitado: 'Habilitado', pendiente: 'Pendiente de habilitar' },
+      sinSoftware: 'Todavía no configuraste el software para este tipo de documento.',
+      actions: { configurar: 'Configurar', actualizar: 'Actualizar' },
+      actualizar: {
+        title: 'Actualizar software',
+        pinHint: 'Dejalo vacío para conservar el PIN actual.',
+      },
+      crear: {
+        title: 'Configurar software',
+        desc: 'Copiá los datos tal como aparecen en el portal de habilitación de la DIAN.',
+        pinHint: 'Es el PIN que definiste al registrar el software. No se vuelve a mostrar.',
+        uuidInvalido:
+          'Debe tener 36 caracteres, con la forma xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.',
+        guardar: 'Guardar',
+      },
+      errorAccion: {
+        generico: 'RedEDoc no respondió como esperábamos. Intentá de nuevo en un momento.',
+        titulo: 'No se pudo guardar el software',
+        tituloActualizar: 'No se pudo actualizar el software',
+      },
+      toasts: {
+        actualizado: {
+          title: 'Software actualizado',
+          desc: 'Los cambios quedaron guardados en RedEDoc.',
+        },
+        creado: {
+          title: 'Software guardado',
+          desc: 'El set de pruebas quedó en proceso de habilitación.',
+        },
+      },
+    },
     asistente: {
       eyebrow: 'Asistente',
       title: 'Facturación electrónica',
@@ -6460,6 +6516,7 @@ export const es: AppDict = {
         empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
         rededoc: { label: 'RedEDoc', hint: 'Registro de la empresa como emisor' },
         certificado: { label: 'Certificado digital', hint: 'Archivo .p12 y su clave' },
+        habilitaciones: { label: 'Habilitaciones', hint: 'Software ante la DIAN' },
         resolucion: { label: 'Resolución', hint: 'Numeración autorizada para facturar' },
         finalizar: { label: 'Terminar', hint: 'Revisión y activación' },
       },

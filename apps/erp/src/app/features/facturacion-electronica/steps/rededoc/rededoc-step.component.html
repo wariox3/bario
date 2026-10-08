@@ -199,7 +199,8 @@
   </div>
 }
 
-<p-confirmdialog />
+<!-- Al body: el contenedor animado del asistente encierra lo `fixed`. -->
+<p-confirmdialog appendTo="body" />
 
 <!-- Ficha compartida por las dos tarjetas: mismos campos, en el mismo orden. -->
 <ng-template #fichaTpl let-ficha>

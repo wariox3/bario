@@ -11,7 +11,7 @@ import { I18nService, ToastService, formatFechaCorta, fromIsoDate } from '@reddo
 import type { AppDict } from '@erp/i18n';
 import { FacturaElectronicaService } from '../../factura-electronica.service';
 import type { CertificadoRedEDoc } from '../../factura-electronica.model';
-import { parseRedEDocError, type RedEDocError } from '../../rededoc-error';
+import { parseRedEDocError, repartirErrores, type RedEDocError } from '../../rededoc-error';
 import { RededocErrorComponent } from '../../components/rededoc-error/rededoc-error.component';
 import { EstadoErrorComponent } from '../../components/estado-error/estado-error.component';
 import { confirmacion } from '../../confirmacion';
@@ -289,19 +289,8 @@ export class CertificadoStepComponent {
   private fallo(accion: 'cargar' | 'eliminar', err: unknown): void {
     const fallback = this.t().facturacionElectronica.certificado.errorAccion.generico;
     const error = parseRedEDocError(err, fallback);
-    const deClave = error.detalles.filter((detalle) => detalle.campo === 'clave');
-    if (accion === 'cargar' && deClave.length > 0) {
-      const clave = this.form.controls.clave;
-      clave.setErrors({ serverError: deClave.map((detalle) => detalle.mensaje).join(' ') });
-      clave.markAsTouched();
-      if (deClave.length === error.detalles.length) return;
-      const resto = error.detalles.filter((detalle) => detalle.campo !== 'clave');
-      this.accionError.set({
-        accion,
-        error: { ...error, detalles: resto, mensajes: resto.map((detalle) => detalle.mensaje) },
-      });
-      return;
-    }
-    this.accionError.set({ accion, error });
+    const resto =
+      accion === 'cargar' ? repartirErrores(error, { clave: this.form.controls.clave }) : error;
+    this.accionError.set(resto ? { accion, error: resto } : null);
   }
 }

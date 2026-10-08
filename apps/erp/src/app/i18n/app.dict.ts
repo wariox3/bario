@@ -4913,6 +4913,34 @@ export interface AppDict
       errorAccion: { generico: string; titulos: { cargar: string; eliminar: string } };
       sinEmisor: { title: string; desc: string; accion: string };
     };
+    habilitaciones: {
+      reintentar: string;
+      consulta: { error: string };
+      /** Una entrada por `SoftwareTipo`. */
+      tipos: Record<
+        'facturacion' | 'documento_equivalente' | 'nomina',
+        { title: string; desc: string }
+      >;
+      campos: { id: string; identificador: string; pin: string; testSetId: string };
+      enProceso: { title: string; desc: string };
+      continuarPendiente: string;
+      estado: { habilitado: string; pendiente: string };
+      sinSoftware: string;
+      actions: { configurar: string; actualizar: string };
+      actualizar: { title: string; pinHint: string };
+      crear: {
+        title: string;
+        desc: string;
+        pinHint: string;
+        uuidInvalido: string;
+        guardar: string;
+      };
+      errorAccion: { generico: string; titulo: string; tituloActualizar: string };
+      toasts: {
+        creado: { title: string; desc: string };
+        actualizado: { title: string; desc: string };
+      };
+    };
     asistente: {
       eyebrow: string;
       title: string;
@@ -4921,6 +4949,7 @@ export interface AppDict
         empresa: { label: string; hint: string };
         rededoc: { label: string; hint: string };
         certificado: { label: string; hint: string };
+        habilitaciones: { label: string; hint: string };
         resolucion: { label: string; hint: string };
         finalizar: { label: string; hint: string };
       };
