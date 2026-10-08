@@ -52,7 +52,6 @@ export const COLUMNS: readonly ColumnDef[] = [
     separator: ' ',
     parts: [{ field: 'recibido_en', type: 'date' }, { field: 'recibido_hora' }],
     width: '150px',
-    sortable: true,
   },
   {
     field: 'origen',
@@ -69,7 +68,6 @@ export const COLUMNS: readonly ColumnDef[] = [
     type: 'enum',
     enumKeyPrefix: `${I18N}.estados`,
     width: '170px',
-    sortable: true,
     toneFor: (row) => {
       const estado = (row as CorreoRecibidoRow).estado;
       if (estado === 'procesado') return 'positive';
