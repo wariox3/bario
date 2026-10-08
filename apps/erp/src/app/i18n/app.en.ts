@@ -6250,7 +6250,6 @@ export const en: AppDict = {
   facturacionElectronica: {
     rededoc: {
       reintentar: 'Retry',
-      siguiente: 'Next',
       empresa: {
         title: 'Company',
         desc: 'The saved details sent to RedEDoc.',

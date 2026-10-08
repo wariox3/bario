@@ -6316,7 +6316,6 @@ export const es: AppDict = {
   facturacionElectronica: {
     rededoc: {
       reintentar: 'Reintentar',
-      siguiente: 'Siguiente',
       empresa: {
         title: 'Empresa',
         desc: 'Los datos guardados que se envían a RedEDoc.',
@@ -6328,13 +6327,13 @@ export const es: AppDict = {
         error: 'No se pudo consultar el registro de tu empresa.',
         registrado: {
           title: 'Tu empresa ya está creada en RedEDoc',
-          desc: 'Si cambiaste los datos de la empresa, actualízalos para enviarlos.',
+          desc: 'Si cambiaste los datos de la empresa, actualizalos para enviarlos.',
           actualizar: 'Actualizar',
           desvincular: 'Desvincular',
         },
         noRegistrado: {
           title: 'Tu empresa todavía no está creada en RedEDoc',
-          desc: 'Créala con estos datos para que pueda facturar electrónicamente.',
+          desc: 'Creala con estos datos para que pueda facturar electrónicamente.',
           crear: 'Crear',
           reasignar: 'Reasignar',
         },
@@ -6342,17 +6341,17 @@ export const es: AppDict = {
       confirmDesvincular: {
         header: 'Desvincular emisor',
         message:
-          'Tu empresa dejará de estar vinculada en RedEDoc y no podrá facturar electrónicamente hasta crearla de nuevo. ¿Quieres continuar?',
+          'Tu empresa dejará de estar vinculada en RedEDoc y no podrá facturar electrónicamente hasta crearla de nuevo. ¿Querés continuar?',
         accept: 'Desvincular',
       },
       confirmReasignar: {
         header: 'Reasignar emisor',
         message:
-          'Ya existe un emisor en RedEDoc con esta identificación. Vamos a vincularlo a esta empresa. ¿Quieres continuar?',
+          'Ya existe un emisor en RedEDoc con esta identificación. Vamos a vincularlo a esta empresa. ¿Querés continuar?',
         accept: 'Reasignar',
       },
       errorAccion: {
-        generico: 'RedEDoc no respondió como esperábamos. Intenta de nuevo en un momento.',
+        generico: 'RedEDoc no respondió como esperábamos. Intentá de nuevo en un momento.',
         emisor: 'Emisor',
         titulos: {
           crear: 'No se pudo crear la empresa en RedEDoc',
@@ -6364,7 +6363,7 @@ export const es: AppDict = {
       toasts: {
         creado: {
           title: 'Empresa creada',
-          desc: 'Ya puedes continuar con la facturación electrónica.',
+          desc: 'Ya podés continuar con la facturación electrónica.',
         },
         actualizado: {
           title: 'Datos actualizados',
@@ -6387,10 +6386,10 @@ export const es: AppDict = {
         vigenteDesc: 'Tu certificado está vigente. No hace falta que hagas nada.',
         porVencerTitle: 'Tu certificado está por vencer',
         porVencerDesc:
-          'Sin certificado vigente no vas a poder emitir. Escríbenos para renovarlo antes de que caduque.',
+          'Sin certificado vigente no vas a poder emitir. Escribinos para renovarlo antes de que caduque.',
         vencidoTitle: 'Tu certificado venció',
         vencidoDesc:
-          'No vas a poder emitir facturas electrónicas hasta renovarlo. Escríbenos para hacerlo.',
+          'No vas a poder emitir facturas electrónicas hasta renovarlo. Escribinos para hacerlo.',
         faltan: { one: 'Falta 1 día', other: 'Faltan {dias} días' },
         venceHoy: 'Vence hoy',
         vencidoHace: { one: 'Venció hace 1 día', other: 'Venció hace {dias} días' },
@@ -6412,7 +6411,7 @@ export const es: AppDict = {
       errors: {
         tipo: 'El archivo debe ser {tipos}.',
         tamano: 'El archivo no puede pesar más de {max} MB.',
-        requerido: 'Selecciona el archivo del certificado.',
+        requerido: 'Seleccioná el archivo del certificado.',
       },
       consulta: {
         error: 'No se pudo consultar el certificado de tu empresa.',
@@ -6427,13 +6426,13 @@ export const es: AppDict = {
       confirmEliminar: {
         header: 'Eliminar certificado',
         message:
-          'Tu empresa no podrá emitir facturas electrónicas hasta que cargues un certificado nuevo. ¿Quieres continuar?',
+          'Tu empresa no podrá emitir facturas electrónicas hasta que cargues un certificado nuevo. ¿Querés continuar?',
         accept: 'Eliminar',
       },
       toasts: {
         eliminado: {
           title: 'Certificado eliminado',
-          desc: 'Ya puedes cargar un certificado nuevo.',
+          desc: 'Ya podés cargar un certificado nuevo.',
         },
         success: {
           title: 'Certificado cargado',
@@ -6441,14 +6440,14 @@ export const es: AppDict = {
         },
       },
       errorAccion: {
-        generico: 'RedEDoc no respondió como esperábamos. Intenta de nuevo en un momento.',
+        generico: 'RedEDoc no respondió como esperábamos. Intentá de nuevo en un momento.',
         titulos: {
           cargar: 'No se pudo cargar el certificado',
           eliminar: 'No se pudo eliminar el certificado',
         },
       },
       sinEmisor: {
-        title: 'Primero crea tu empresa en RedEDoc',
+        title: 'Primero creá tu empresa en RedEDoc',
         desc: 'El certificado digital se carga sobre el emisor de tu empresa, y todavía no existe.',
         accion: 'Ir a RedEDoc',
       },
@@ -6456,7 +6455,7 @@ export const es: AppDict = {
     asistente: {
       eyebrow: 'Asistente',
       title: 'Facturación electrónica',
-      subtitle: 'Completa los datos de tu empresa para empezar a emitir.',
+      subtitle: 'Completá los datos de tu empresa para empezar a emitir.',
       pasos: {
         empresa: { label: 'Datos de la empresa', hint: 'Identidad, contacto y ubicación' },
         rededoc: { label: 'RedEDoc', hint: 'Registro de la empresa como emisor' },

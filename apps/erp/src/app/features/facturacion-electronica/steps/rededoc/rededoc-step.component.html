@@ -185,14 +185,14 @@
   </section>
 </div>
 
-<!-- «Siguiente» solo con el emisor creado: sin él no hay nada que configurar después. -->
+<!-- «Continuar» solo con el emisor creado: sin él no hay nada que configurar después. -->
 @if (consulta()?.registrado) {
   <div class="mt-5 flex items-center justify-end pb-1">
     <p-button
       type="button"
       icon="pi pi-arrow-right"
       iconPos="right"
-      [label]="r.siguiente"
+      [label]="t().facturacionElectronica.asistente.actions.continuar"
       [disabled]="procesando() !== null"
       (onClick)="avanzar.emit()"
     />

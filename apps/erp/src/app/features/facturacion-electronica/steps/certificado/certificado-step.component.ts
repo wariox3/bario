@@ -18,23 +18,11 @@ import { confirmacion } from '../../confirmacion';
 import { FileDropzoneComponent } from '@erp/core/components/file-dropzone/file-dropzone.component';
 import type { ArchivoRechazo } from '@erp/core/components/file-dropzone/validar-archivo';
 import { FileCardComponent } from '@erp/core/components/file-card/file-card.component';
-
-/** Estado del certificado del contenedor, del más urgente al más tranquilo. */
-export type CertificadoEstado = 'sin-certificado' | 'vencido' | 'por-vencer' | 'vigente';
-
-/** Días antes del vencimiento en los que ya se avisa. */
-const DIAS_AVISO = 30;
+import { diasHasta, estadoCertificado, type CertificadoEstado } from './certificado-estado';
 
 /** Extensiones del certificado digital que emite la DIAN. */
 const ACCEPT = '.p12,.pfx';
 const MAX_MB = 5;
-
-/** Días completos entre hoy y la fecha, negativo si ya pasó. */
-function diasHasta(fecha: Date): number {
-  const hoy = new Date();
-  const desde = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-  return Math.round((fecha.getTime() - desde.getTime()) / 86_400_000);
-}
 
 /**
  * Paso «Certificado digital» del asistente de facturación electrónica.
@@ -124,13 +112,7 @@ export class CertificadoStepComponent {
     return fecha ? diasHasta(fecha) : null;
   });
 
-  protected readonly estado = computed<CertificadoEstado>(() => {
-    const dias = this.dias();
-    if (dias === null) return 'sin-certificado';
-    if (dias < 0) return 'vencido';
-    if (dias <= DIAS_AVISO) return 'por-vencer';
-    return 'vigente';
-  });
+  protected readonly estado = computed<CertificadoEstado>(() => estadoCertificado(this.dias()));
 
   /**
    * La zona de carga solo aparece cuando RedEDoc confirma que hay emisor y que

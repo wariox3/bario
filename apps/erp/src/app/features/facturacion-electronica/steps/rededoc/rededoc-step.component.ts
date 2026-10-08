@@ -25,7 +25,7 @@ import { confirmacion } from '../../confirmacion';
  * existe en RedEDoc). De la segunda salen las acciones: crear si no está
  * creada; actualizar o desvincular si ya lo está.
  *
- * Cada acción termina releyendo el emisor, y «Siguiente» solo aparece con el
+ * Cada acción termina releyendo el emisor, y «Continuar» solo aparece con el
  * emisor creado: es lo que habilita el resto del asistente.
  *
  * Auto-contenido como el paso del certificado: carga, registra y solo avisa

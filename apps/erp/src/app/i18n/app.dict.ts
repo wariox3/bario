@@ -4857,7 +4857,6 @@ export interface AppDict
   facturacionElectronica: {
     rededoc: {
       reintentar: string;
-      siguiente: string;
       empresa: { title: string; desc: string; error: string };
       emisor: {
         title: string;
