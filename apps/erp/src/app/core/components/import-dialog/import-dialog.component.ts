@@ -2,14 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  ElementRef,
   computed,
   effect,
   inject,
   input,
   output,
   signal,
-  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
@@ -21,6 +19,9 @@ import { FileDownloadService, I18nService, toHora, ToastService } from '@reddoc/
 import type { AppDict } from '@erp/i18n';
 import { formatBytes } from '@erp/core/utils/format-bytes';
 import type { ExampleConfig, ImportError, ImportMaster } from './import-dialog.types';
+import { FileDropzoneComponent } from '../file-dropzone/file-dropzone.component';
+import type { ArchivoRechazo } from '../file-dropzone/validar-archivo';
+import { FileCardComponent } from '../file-card/file-card.component';
 
 /**
  * Dialog modal de importación de archivos para masters del ERP.
@@ -62,7 +63,15 @@ import type { ExampleConfig, ImportError, ImportMaster } from './import-dialog.t
 @Component({
   selector: 'app-import-dialog',
   standalone: true,
-  imports: [NgTemplateOutlet, DialogModule, ButtonModule, TabsModule, TooltipModule],
+  imports: [
+    NgTemplateOutlet,
+    DialogModule,
+    ButtonModule,
+    TabsModule,
+    TooltipModule,
+    FileDropzoneComponent,
+    FileCardComponent,
+  ],
   templateUrl: './import-dialog.component.html',
   styleUrl: './import-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -137,11 +146,8 @@ export class ImportDialogComponent {
 
   // ── Estado interno ────────────────────────────────────────────────────────
 
-  private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
-
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly uploadedAt = signal<string>('');
-  protected readonly dragOver = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly exampleDownloading = signal(false);
   /**
@@ -201,7 +207,6 @@ export class ImportDialogComponent {
       if (!this.visible()) {
         this.selectedFile.set(null);
         this.uploadedAt.set('');
-        this.dragOver.set(false);
         this.errorMessage.set(null);
         // Antes de importar, lo útil son los maestros (qué códigos escribir); los
         // errores todavía no existen. Si el listado no declara maestros, el tab de
@@ -226,47 +231,6 @@ export class ImportDialogComponent {
   protected onCancel(): void {
     if (this.importing()) return;
     this.visibleChange.emit(false);
-  }
-
-  /** Click sobre la dropzone → abre el explorador de archivos. */
-  protected openFilePicker(): void {
-    if (this.importing()) return;
-    this.fileInput()?.nativeElement.click();
-  }
-
-  /** Soporta abrir el picker con teclado (Enter / Space). */
-  protected onDropzoneKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this.openFilePicker();
-    }
-  }
-
-  protected onFileInputChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    if (file) this.acceptFile(file);
-    // Permitir re-seleccionar el mismo archivo si el usuario lo quita y vuelve a elegirlo.
-    input.value = '';
-  }
-
-  protected onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    if (this.importing()) return;
-    this.dragOver.set(true);
-  }
-
-  protected onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-  }
-
-  protected onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-    if (this.importing()) return;
-    const file = event.dataTransfer?.files?.[0] ?? null;
-    if (file) this.acceptFile(file);
   }
 
   protected clearSelectedFile(): void {
@@ -305,31 +269,15 @@ export class ImportDialogComponent {
 
   // ── Internos ──────────────────────────────────────────────────────────────
 
-  /**
-   * Valida tipo (extensión) y tamaño contra los inputs `accept` y `maxSizeMB`.
-   * Si pasa, el archivo se acepta y la dropzone se reemplaza por la file-card.
-   * Si no pasa, se muestra el mensaje de error sin aceptar el archivo.
-   */
-  private acceptFile(file: File): void {
-    const extensions = this.accept()
-      .split(',')
-      .map((s) => s.trim().toLowerCase())
-      .filter(Boolean);
-    const lowerName = file.name.toLowerCase();
-    const typeOk = extensions.length === 0 || extensions.some((ext) => lowerName.endsWith(ext));
-    if (!typeOk) {
-      this.errorMessage.set(this.t().common.import.dropzone.invalidType);
-      return;
-    }
-
-    const maxBytes = this.maxSizeMB() * 1024 * 1024;
-    if (file.size > maxBytes) {
-      this.errorMessage.set(this.t().common.import.dropzone.tooLarge);
-      return;
-    }
-
+  /** Archivo válido (lo validó la dropzone): reemplaza la dropzone por la file-card. */
+  protected onFileSelected(file: File): void {
     this.errorMessage.set(null);
     this.selectedFile.set(file);
     this.uploadedAt.set(toHora(new Date()));
+  }
+
+  protected onFileRejected(motivo: ArchivoRechazo): void {
+    const dict = this.t().common.import.dropzone;
+    this.errorMessage.set(motivo === 'tipo' ? dict.invalidType : dict.tooLarge);
   }
 }

@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  ElementRef,
   computed,
   effect,
   inject,
@@ -11,7 +10,6 @@ import {
   model,
   signal,
   untracked,
-  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
@@ -24,6 +22,8 @@ import type { AppDict } from '@erp/i18n';
 import { formatBytes } from '@erp/core/utils/format-bytes';
 import { ARCHIVO_TIPO, ArchivoService } from './archivo.service';
 import type { Archivo, ArchivoOwner } from './archivo.types';
+import { FileDropzoneComponent } from '../file-dropzone/file-dropzone.component';
+import type { ArchivoRechazo } from '../file-dropzone/validar-archivo';
 
 /**
  * Diálogo de **archivos adjuntos** de un documento o de un registro de master.
@@ -49,7 +49,7 @@ import type { Archivo, ArchivoOwner } from './archivo.types';
 @Component({
   selector: 'app-archivos-dialog',
   standalone: true,
-  imports: [DialogModule, ButtonModule, ConfirmDialogModule, DatePipe],
+  imports: [DialogModule, ButtonModule, ConfirmDialogModule, DatePipe, FileDropzoneComponent],
   providers: [ConfirmationService],
   templateUrl: './archivos-dialog.component.html',
   styleUrl: './archivos-dialog.component.scss',
@@ -106,8 +106,6 @@ export class ArchivosDialogComponent {
 
   // ── Estado ────────────────────────────────────────────────────────────────
 
-  private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
-
   protected readonly items = signal<readonly Archivo[]>([]);
   protected readonly isLoading = signal(false);
   protected readonly isUploading = signal(false);
@@ -115,7 +113,6 @@ export class ArchivosDialogComponent {
   protected readonly deletingId = signal<number | null>(null);
   /** Id del archivo que se está descargando; solo su fila muestra el spinner. */
   protected readonly downloadingId = signal<number | null>(null);
-  protected readonly dragOver = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
@@ -146,7 +143,6 @@ export class ArchivosDialogComponent {
       this.archivoTipo();
       untracked(() => {
         this.errorMessage.set(null);
-        this.dragOver.set(false);
         if (abierto && owner) {
           this.cargarLista(owner);
         } else {
@@ -171,44 +167,9 @@ export class ArchivosDialogComponent {
     return formatBytes(bytes);
   }
 
-  protected openFilePicker(): void {
-    if (this.isBusy()) return;
-    this.fileInput()?.nativeElement.click();
-  }
-
-  /** El picker también se abre con teclado: la dropzone es un `role="button"`. */
-  protected onDropzoneKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this.openFilePicker();
-    }
-  }
-
-  protected onFileInputChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    if (file) this.subir(file);
-    // Permite volver a elegir el mismo archivo si la carga falló.
-    input.value = '';
-  }
-
-  protected onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    if (this.isBusy()) return;
-    this.dragOver.set(true);
-  }
-
-  protected onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-  }
-
-  protected onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-    if (this.isBusy()) return;
-    const file = event.dataTransfer?.files?.[0] ?? null;
-    if (file) this.subir(file);
+  protected onFileRejected(motivo: ArchivoRechazo): void {
+    const dict = this.t().common.archivos.dropzone;
+    this.errorMessage.set(motivo === 'tipo' ? dict.invalidType : dict.tooLarge);
   }
 
   /**
@@ -268,23 +229,13 @@ export class ArchivosDialogComponent {
   }
 
   /**
-   * Valida extensión y tamaño contra `accept` / `maxSizeMB` antes de gastar una
-   * petición, y sube. El error de validación se muestra en el diálogo, no como
-   * toast: es sobre el archivo que el usuario acaba de soltar, y ahí lo mira.
+   * Sube el archivo que la dropzone ya validó (extensión y tamaño). El error de
+   * validación se muestra en el diálogo, no como toast: es sobre el archivo que
+   * el usuario acaba de soltar, y ahí lo mira.
    */
-  private subir(file: File): void {
+  protected subir(file: File): void {
     const owner = this.owner();
     if (!owner || this.isBusy()) return;
-
-    const dict = this.t().common.archivos.dropzone;
-    if (!this.esExtensionValida(file)) {
-      this.errorMessage.set(dict.invalidType);
-      return;
-    }
-    if (file.size > this.maxSizeMB() * 1024 * 1024) {
-      this.errorMessage.set(dict.tooLarge);
-      return;
-    }
 
     this.errorMessage.set(null);
     this.isUploading.set(true);
@@ -305,16 +256,6 @@ export class ArchivosDialogComponent {
           this.toast.error(toast.title, toast.desc);
         },
       });
-  }
-
-  private esExtensionValida(file: File): boolean {
-    const extensiones = this.accept()
-      .split(',')
-      .map((ext) => ext.trim().toLowerCase())
-      .filter(Boolean);
-    if (extensiones.length === 0) return true;
-    const nombre = file.name.toLowerCase();
-    return extensiones.some((ext) => nombre.endsWith(ext));
   }
 
   private eliminar(archivo: Archivo): void {
