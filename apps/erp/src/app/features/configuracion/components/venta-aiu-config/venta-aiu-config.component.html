@@ -1,0 +1,99 @@
+@if (loading()) {
+  <div class="h-40 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+} @else if (loadFailed()) {
+  <div
+    class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
+  >
+    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+    <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.toasts.loadError.desc }}</p>
+    <p-button
+      type="button"
+      [label]="t().common.actions.refresh"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="cargar()"
+    />
+  </div>
+} @else {
+  @let a = t().configuracion.venta.aiu;
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
+    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+        <span
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+        >
+          <i class="pi pi-percentage text-[1.05rem]"></i>
+        </span>
+        <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+          <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+            {{ a.section.title }}
+          </h2>
+          <p class="m-0 text-[0.75rem] text-brand-muted">{{ a.section.hint }}</p>
+        </div>
+      </div>
+
+      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+        <div class="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-3">
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="item_administracion"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ a.fields.administracion }}
+            </label>
+            <app-item-autocomplete
+              inputId="item_administracion"
+              formControlName="item_administracion"
+              [placeholder]="a.fields.placeholder"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="item_imprevisto"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ a.fields.imprevisto }}
+            </label>
+            <app-item-autocomplete
+              inputId="item_imprevisto"
+              formControlName="item_imprevisto"
+              [placeholder]="a.fields.placeholder"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="item_utilidad"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ a.fields.utilidad }}
+            </label>
+            <app-item-autocomplete
+              inputId="item_utilidad"
+              formControlName="item_utilidad"
+              [placeholder]="a.fields.placeholder"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex items-center justify-end gap-3 pb-1">
+      @if (form.dirty) {
+        <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
+          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+          {{ t().configuracion.unsavedChanges }}
+        </span>
+      }
+      <p-button
+        type="submit"
+        [label]="t().configuracion.actions.save"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        [disabled]="isSaving()"
+      />
+    </div>
+  </form>
+}

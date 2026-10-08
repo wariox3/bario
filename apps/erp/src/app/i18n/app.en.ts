@@ -6675,6 +6675,36 @@ export const en: AppDict = {
       },
       validation: { required: 'This field is required' },
     },
+    venta: {
+      tabs: { formato: 'Format', aiu: 'AIU' },
+      formato: {
+        section: {
+          title: 'Invoice format',
+          hint: 'Fixed texts printed on every sales invoice.',
+        },
+        fields: {
+          informacionSuperior: 'Top information',
+          informacionInferior: 'Bottom information',
+        },
+        hints: {
+          informacionSuperior: 'Shown at the top of the invoice.',
+          informacionInferior: 'Shown at the bottom of the invoice.',
+        },
+        validation: { max: 'Maximum 2000 characters' },
+      },
+      aiu: {
+        section: {
+          title: 'AIU',
+          hint: 'Items the invoice uses to charge administration, contingency and profit.',
+        },
+        fields: {
+          administracion: 'Administration item',
+          imprevisto: 'Contingency item',
+          utilidad: 'Profit item',
+          placeholder: 'Search item…',
+        },
+      },
+    },
     empresa: {
       sections: {
         identidad: {

@@ -5070,6 +5070,24 @@ export interface AppDict
       fields: { salarioMinimo: string; factor: string; auxilioTransporte: string };
       validation: { required: string };
     };
+    venta: {
+      tabs: { formato: string; aiu: string };
+      formato: {
+        section: { title: string; hint: string };
+        fields: { informacionSuperior: string; informacionInferior: string };
+        hints: { informacionSuperior: string; informacionInferior: string };
+        validation: { max: string };
+      };
+      aiu: {
+        section: { title: string; hint: string };
+        fields: {
+          administracion: string;
+          imprevisto: string;
+          utilidad: string;
+          placeholder: string;
+        };
+      };
+    };
     empresa: {
       sections: {
         identidad: { title: string; hint: string };

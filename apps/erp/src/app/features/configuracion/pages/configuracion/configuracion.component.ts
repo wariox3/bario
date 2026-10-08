@@ -5,6 +5,7 @@ import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { GeneralConfigComponent } from '../../components/general-config/general-config.component';
 import { HumanoConfigComponent } from '../../components/humano-config/humano-config.component';
+import { VentaConfigComponent } from '../../components/venta-config/venta-config.component';
 import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/components/asistente-acceso/asistente-acceso.component';
 
 /**
@@ -17,7 +18,13 @@ import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/co
 @Component({
   selector: 'app-configuracion',
   standalone: true,
-  imports: [TabsModule, GeneralConfigComponent, HumanoConfigComponent, AsistenteAccesoComponent],
+  imports: [
+    TabsModule,
+    GeneralConfigComponent,
+    HumanoConfigComponent,
+    VentaConfigComponent,
+    AsistenteAccesoComponent,
+  ],
   templateUrl: './configuracion.component.html',
   styleUrl: './configuracion.component.scss',
   // Ancho acotado a propósito: son formularios, no tablas. Las listas del ERP

@@ -6749,6 +6749,36 @@ export const es: AppDict = {
       },
       validation: { required: 'Este campo es obligatorio' },
     },
+    venta: {
+      tabs: { formato: 'Formato', aiu: 'AIU' },
+      formato: {
+        section: {
+          title: 'Formato de la factura',
+          hint: 'Textos fijos que acompañan cada factura de venta impresa.',
+        },
+        fields: {
+          informacionSuperior: 'Información superior',
+          informacionInferior: 'Información inferior',
+        },
+        hints: {
+          informacionSuperior: 'Aparece en la parte de arriba de la factura.',
+          informacionInferior: 'Aparece al pie de la factura.',
+        },
+        validation: { max: 'Máximo 2000 caracteres' },
+      },
+      aiu: {
+        section: {
+          title: 'AIU',
+          hint: 'Ítems con los que la factura liquida la administración, el imprevisto y la utilidad.',
+        },
+        fields: {
+          administracion: 'Ítem de administración',
+          imprevisto: 'Ítem de imprevisto',
+          utilidad: 'Ítem de utilidad',
+          placeholder: 'Buscar ítem…',
+        },
+      },
+    },
     empresa: {
       sections: {
         identidad: {
