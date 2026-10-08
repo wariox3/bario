@@ -31,7 +31,7 @@ export interface DocumentoRecibidoQuery {
   readonly page?: number;
   /** 1 a 100; el backend usa 25 por defecto. */
   readonly page_size?: number;
-  /** CUFE completo, NIT por el comienzo, o número y razón social en cualquier parte. */
+  /** CUE completo, NIT por el comienzo, o número y razón social en cualquier parte. */
   readonly search?: string;
   readonly documento_tipo?: DocumentoRecibidoTipo;
   /** NIT exacto del proveedor, sin DV. */

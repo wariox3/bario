@@ -2439,6 +2439,8 @@ export const es: AppDict = {
           remision: 'Remisión',
           asesor: 'Asesor',
           resolucion: 'Resolución',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {
@@ -2848,10 +2850,16 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
+          referenciaPrefijo: 'Prefijo',
+          referenciaNumero: 'Número',
+          referenciaCue: 'CUE',
           comentario: 'Comentario',
         },
         tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
-        validation: { required: 'Este campo es requerido' },
+        validation: {
+          required: 'Este campo es requerido',
+          referenciaNumeroDigitos: 'Solo dígitos, máximo 10',
+        },
         toasts: {
           createSuccess: {
             title: 'Factura creada',
@@ -2890,6 +2898,9 @@ export const es: AppDict = {
           sede: 'Sede',
           metodoPago: 'Método de pago',
           ordenCompra: 'Orden de compra',
+          referenciaPrefijo: 'Prefijo de referencia',
+          referenciaNumero: 'Número de referencia',
+          referenciaCue: 'CUE de referencia',
           comentario: 'Comentario',
         },
         notFound: {
@@ -5759,7 +5770,7 @@ export const es: AppDict = {
         nota_debito: 'Nota débito',
       },
       filtros: {
-        buscar: 'Buscar por proveedor, NIT, número o CUFE',
+        buscar: 'Buscar por proveedor, NIT, número o CUE',
         tipo: 'Tipo',
         desde: 'Desde',
         hasta: 'Hasta',

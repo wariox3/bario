@@ -178,7 +178,15 @@
     </div>
 
     <!-- Más información: los opcionales que menos se tocan (como en el ERP anterior). -->
-    <app-mas-informacion [campos]="['orden_compra', 'comentario']">
+    <app-mas-informacion
+      [campos]="[
+        'orden_compra',
+        'referencia_prefijo',
+        'referencia_numero',
+        'referencia_cue',
+        'comentario',
+      ]"
+    >
       <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         <!-- Orden de compra -->
         <div class="flex flex-col gap-1.5">
@@ -190,6 +198,53 @@
             pInputText
             formControlName="orden_compra"
             maxlength="50"
+            class="w-full"
+          />
+        </div>
+
+        <!-- Referencia de la factura del proveedor: prefijo + número, y el CUE -->
+        <div class="grid grid-cols-2 gap-x-4 sm:col-start-1">
+          <div class="flex flex-col gap-1.5">
+            <label for="referencia_prefijo" class="factura-compra-form__label">
+              {{ t().entities.facturaCompra.form.fields.referenciaPrefijo }}
+            </label>
+            <input
+              id="referencia_prefijo"
+              pInputText
+              formControlName="referencia_prefijo"
+              maxlength="50"
+              class="w-full"
+            />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="referencia_numero" class="factura-compra-form__label">
+              {{ t().entities.facturaCompra.form.fields.referenciaNumero }}
+            </label>
+            <input
+              id="referencia_numero"
+              pInputText
+              formControlName="referencia_numero"
+              inputmode="numeric"
+              maxlength="10"
+              class="w-full"
+            />
+            <lib-field-error
+              [control]="form.controls.referencia_numero"
+              [messages]="{
+                pattern: t().entities.facturaCompra.form.validation.referenciaNumeroDigitos,
+              }"
+            />
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="referencia_cue" class="factura-compra-form__label">
+            {{ t().entities.facturaCompra.form.fields.referenciaCue }}
+          </label>
+          <input
+            id="referencia_cue"
+            pInputText
+            formControlName="referencia_cue"
+            maxlength="150"
             class="w-full"
           />
         </div>

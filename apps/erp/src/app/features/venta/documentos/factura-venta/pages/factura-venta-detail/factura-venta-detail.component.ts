@@ -56,6 +56,7 @@ import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/co
 import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { facturaVentaToFormValue } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
+import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
 
 /** Cabecera legible de la factura para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -73,6 +74,8 @@ interface CabeceraView {
   readonly asesor: string | null;
   /** Hoy siempre `null`: el read no serializa la etiqueta de la resolución. */
   readonly resolucion: string | null;
+  /** CUE de la DIAN; hoy siempre `null` (el read aún no lo serializa). */
+  readonly cue: string | null;
   readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -136,6 +139,12 @@ export class FacturaVentaDetailComponent implements OnInit {
   readonly id = input<string>();
 
   protected readonly cabecera = signal<CabeceraView | null>(null);
+
+  /** Enlace a la consulta pública de la DIAN; `null` mientras no haya CUE. */
+  protected readonly dianUrl = computed(() => {
+    const cue = this.cabecera()?.cue;
+    return cue ? `${DIAN_DOCUMENT_URL}${cue}` : null;
+  });
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
   /** Pagos del documento (`documento-pago`), anulados incluidos, en la forma del front. */
@@ -310,6 +319,7 @@ export class FacturaVentaDetailComponent implements OnInit {
             remision: read.remision ?? null,
             asesor: read.asesor_nombre ?? null,
             resolucion: read.resolucion_nombre ?? null,
+            cue: read.cue ?? null,
             comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,

@@ -151,6 +151,21 @@
         <dd class="factura-venta-detail__value">{{ c.resolucion || '—' }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="factura-venta-detail__label">{{ det.labels.cue }}</dt>
+        <dd class="factura-venta-detail__value break-all">
+          {{ c.cue }}
+          @if (dianUrl(); as url) {
+            <a
+              class="ml-2 font-semibold text-sky-700 hover:underline"
+              [href]="url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ det.labels.verDian }}</a
+            >
+          }
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="factura-venta-detail__label">{{ det.labels.comentario }}</dt>
         <dd class="factura-venta-detail__value whitespace-pre-line">
           {{ c.comentario || '—' }}

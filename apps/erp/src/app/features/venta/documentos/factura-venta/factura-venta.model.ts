@@ -36,6 +36,11 @@ export interface FacturaVentaRead extends DocumentoReadBase {
    * muestra "—" hasta que el backend la mande, sin resolverla con otra consulta.
    */
   readonly resolucion_nombre?: string | null;
+  /**
+   * CUE con el que la DIAN validó la factura electrónica. **Todavía no lo manda el
+   * backend** (`GenDocumento` no lo serializa): la ficha lo deja vacío hasta entonces.
+   */
+  readonly cue?: string | null;
   /** Suma de los pagos no anulados (`documento-pago`). La mantiene el backend. */
   readonly pago?: string | null;
   /** Lo que queda por cobrar. El backend lo fija al aprobar (`total − pago`). */

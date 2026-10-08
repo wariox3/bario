@@ -63,6 +63,10 @@ interface CabeceraView {
   readonly sede: string | null;
   readonly metodoPago: string | null;
   readonly ordenCompra: string | null;
+  /** Referencia de la factura del proveedor; hoy vacía (el read aún no la trae). */
+  readonly referenciaPrefijo: string | null;
+  readonly referenciaNumero: number | null;
+  readonly referenciaCue: string | null;
   readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -283,6 +287,9 @@ export class FacturaCompraDetailComponent implements OnInit {
             sede: read.sede_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
+            referenciaPrefijo: read.referencia_prefijo ?? null,
+            referenciaNumero: read.referencia_numero ?? null,
+            referenciaCue: read.referencia_cue ?? null,
             comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,
