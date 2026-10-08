@@ -6387,9 +6387,10 @@ export const es: AppDict = {
         vigenteDesc: 'Tu certificado está vigente. No hace falta que hagas nada.',
         porVencerTitle: 'Tu certificado está por vencer',
         porVencerDesc:
-          'Cargá el nuevo antes de que caduque: sin certificado vigente no vas a poder emitir.',
+          'Sin certificado vigente no vas a poder emitir. Escríbenos para renovarlo antes de que caduque.',
         vencidoTitle: 'Tu certificado venció',
-        vencidoDesc: 'No vas a poder emitir facturas electrónicas hasta que cargues uno nuevo.',
+        vencidoDesc:
+          'No vas a poder emitir facturas electrónicas hasta renovarlo. Escríbenos para hacerlo.',
         faltan: { one: 'Falta 1 día', other: 'Faltan {dias} días' },
         venceHoy: 'Vence hoy',
         vencidoHace: { one: 'Venció hace 1 día', other: 'Venció hace {dias} días' },
@@ -6411,13 +6412,29 @@ export const es: AppDict = {
       errors: {
         tipo: 'El archivo debe ser {tipos}.',
         tamano: 'El archivo no puede pesar más de {max} MB.',
+        requerido: 'Selecciona el archivo del certificado.',
       },
+      consulta: {
+        error: 'No se pudo consultar el certificado de tu empresa.',
+        reintentar: 'Reintentar',
+      },
+      detalle: { vigencia: 'Vigente del {desde} al {hasta}' },
       actions: {
         cargar: 'Cargar certificado',
-        reemplazar: 'Reemplazar certificado',
         quitar: 'Quitar el archivo',
+        eliminar: 'Eliminar certificado',
+      },
+      confirmEliminar: {
+        header: 'Eliminar certificado',
+        message:
+          'Tu empresa no podrá emitir facturas electrónicas hasta que cargues un certificado nuevo. ¿Quieres continuar?',
+        accept: 'Eliminar',
       },
       toasts: {
+        eliminado: {
+          title: 'Certificado eliminado',
+          desc: 'Ya puedes cargar un certificado nuevo.',
+        },
         success: {
           title: 'Certificado cargado',
           desc: 'Ya quedó registrado con su fecha de vencimiento.',

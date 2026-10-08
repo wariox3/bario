@@ -3,17 +3,31 @@
 <!--
   Paso «Certificado digital».
 
-  Dos piezas: la **tarjeta de estado** (si ya hay certificado) y la **zona de
-  carga** (si corresponde subir uno). El estado no es un dato más: un
+  Dos piezas que se excluyen: la **tarjeta del certificado** (si RedEDoc ya
+  tiene uno, y entonces no se sube otro) o la **zona de carga** (si no hay). El estado no es un dato más: un
   certificado vencido es una empresa que no puede facturar, así que el color
   cambia con la urgencia —navy tranquilo, ámbar cuando quedan días, rojo cuando
   ya caducó— y el texto dice qué significa, no solo la fecha.
 -->
 @if (loading()) {
   <div class="h-40 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+} @else if (consultaError()) {
+  <section
+    class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-brand-surface px-5 py-4"
+  >
+    <p class="m-0 text-[0.82rem] text-red-600">{{ c.consulta.error }}</p>
+    <p-button
+      type="button"
+      icon="pi pi-refresh"
+      severity="secondary"
+      [outlined]="true"
+      [label]="c.consulta.reintentar"
+      (onClick)="cargarEstado()"
+    />
+  </section>
 } @else {
   <div class="flex flex-col gap-5">
-    @if (estado() !== 'sin-certificado') {
+    @if (certificado(); as cert) {
       @let vencido = estado() === 'vencido';
       @let porVencer = estado() === 'por-vencer';
 
@@ -85,24 +99,56 @@
           </div>
         </div>
 
-        @if (puedeReemplazar()) {
-          <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-3">
-            <p-button
+        <!--
+          El archivo que quedó cargado, con la misma tarjeta de archivo del
+          importar y de la zona de carga de este paso: el certificado se ve
+          igual antes y después de subirlo. Lo único que se puede hacer con él
+          es eliminarlo (con confirmación): recién ahí vuelve la zona de carga.
+        -->
+        <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+          <div
+            class="flex items-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3"
+          >
+            <span
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+            >
+              <i class="pi pi-file-check text-[1.2rem]" aria-hidden="true"></i>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p
+                class="m-0 truncate text-[0.875rem] font-semibold text-brand-text"
+                [title]="cert.nombre_archivo"
+              >
+                {{ cert.alias || cert.nombre_archivo }}
+              </p>
+              <p class="m-0 mt-0.5 truncate text-[0.72rem] text-brand-muted">
+                {{ archivoMetaTexto() }}
+              </p>
+            </div>
+            <!-- En la ranura del «quitar» de la carga, pero destructivo: hover rojo. -->
+            <button
               type="button"
-              size="small"
-              severity="secondary"
-              [outlined]="true"
-              icon="pi pi-refresh"
-              [label]="c.actions.reemplazar"
-              (onClick)="onReemplazar()"
-            />
+              class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-default disabled:opacity-50"
+              [disabled]="eliminando()"
+              [attr.aria-label]="c.actions.eliminar"
+              [title]="c.actions.eliminar"
+              (click)="confirmarEliminar()"
+            >
+              <i
+                class="pi text-[0.85rem]"
+                [class.pi-trash]="!eliminando()"
+                [class.pi-spin]="eliminando()"
+                [class.pi-spinner]="eliminando()"
+                aria-hidden="true"
+              ></i>
+            </button>
           </div>
-        }
+        </div>
       </section>
     }
 
     @if (puedeCargar()) {
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+      <form [formGroup]="form" libFocusInvalid (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
         <section
           class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
         >
@@ -133,7 +179,7 @@
                   <span
                     class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
                   >
-                    <i class="pi pi-shield text-[1.2rem]" aria-hidden="true"></i>
+                    <i class="pi pi-file text-[1.2rem]" aria-hidden="true"></i>
                   </span>
                   <p
                     class="m-0 min-w-0 flex-1 truncate text-[0.875rem] font-semibold text-brand-text"
@@ -237,7 +283,7 @@
             icon="pi pi-upload"
             [label]="c.actions.cargar"
             [loading]="subiendo()"
-            [disabled]="!puedeSubir()"
+            [disabled]="subiendo()"
           />
         </div>
       </form>
@@ -254,3 +300,5 @@
     }
   </div>
 }
+
+<p-confirmdialog />

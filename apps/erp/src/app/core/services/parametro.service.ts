@@ -97,16 +97,4 @@ export class ParametroService extends BaseHttpService {
       map((parametro) => parametro.gen_asistente_datos_iniciales === true),
     );
   }
-
-  /**
-   * Vencimiento del certificado digital, `null` si el contenedor no tiene uno.
-   *
-   * Lo escribe `cargar-certificado/` leyéndolo del propio archivo: el front no
-   * lo manda ni lo puede corregir.
-   */
-  certificadoVence(): Observable<string | null> {
-    return this.sonda(['gen_certificado_vence']).pipe(
-      map((parametro) => parametro.gen_certificado_vence ?? null),
-    );
-  }
 }

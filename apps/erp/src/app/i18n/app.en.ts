@@ -6321,9 +6321,10 @@ export const en: AppDict = {
         vigenteDesc: 'Your certificate is valid. Nothing to do here.',
         porVencerTitle: 'Your certificate is about to expire',
         porVencerDesc:
-          'Upload the new one before it lapses: without a valid certificate you cannot issue.',
+          'Without a valid certificate you cannot issue. Contact us to renew it before it lapses.',
         vencidoTitle: 'Your certificate expired',
-        vencidoDesc: 'You cannot issue electronic invoices until you upload a new one.',
+        vencidoDesc:
+          'You cannot issue electronic invoices until it is renewed. Contact us to do it.',
         faltan: { one: '1 day left', other: '{dias} days left' },
         venceHoy: 'Expires today',
         vencidoHace: { one: 'Expired 1 day ago', other: 'Expired {dias} days ago' },
@@ -6345,13 +6346,29 @@ export const en: AppDict = {
       errors: {
         tipo: 'The file must be {tipos}.',
         tamano: 'The file cannot exceed {max} MB.',
+        requerido: 'Select the certificate file.',
       },
+      consulta: {
+        error: 'We could not check your company certificate.',
+        reintentar: 'Retry',
+      },
+      detalle: { vigencia: 'Valid from {desde} to {hasta}' },
       actions: {
         cargar: 'Upload certificate',
-        reemplazar: 'Replace certificate',
         quitar: 'Remove file',
+        eliminar: 'Delete certificate',
+      },
+      confirmEliminar: {
+        header: 'Delete certificate',
+        message:
+          'Your company will not be able to issue electronic invoices until you upload a new certificate. Do you want to continue?',
+        accept: 'Delete',
       },
       toasts: {
+        eliminado: {
+          title: 'Certificate deleted',
+          desc: 'You can now upload a new certificate.',
+        },
         success: {
           title: 'Certificate uploaded',
           desc: 'It is registered along with its expiry date.',

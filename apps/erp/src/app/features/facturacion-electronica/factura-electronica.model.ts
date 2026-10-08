@@ -40,3 +40,22 @@ export interface EmisorRedEDoc {
 export type EmisorConsulta =
   | { readonly registrado: false }
   | { readonly registrado: true; readonly emisor: EmisorRedEDoc };
+
+/**
+ * Certificado digital del emisor en RedEDoc, una fila de
+ * `GET /general/electronico/certificado-consultar/` (lista paginada DRF).
+ * Las fechas llegan como `AAAA-MM-DD`.
+ */
+export interface CertificadoRedEDoc {
+  readonly id: number;
+  readonly emisor: number;
+  readonly alias: string;
+  readonly nombre_archivo: string;
+  readonly vigente_desde: string;
+  readonly vigente_hasta: string;
+}
+
+export interface CertificadoConsultaResponse {
+  readonly count: number;
+  readonly results: readonly CertificadoRedEDoc[];
+}

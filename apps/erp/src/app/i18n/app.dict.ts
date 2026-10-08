@@ -4901,9 +4901,14 @@ export interface AppDict
       };
       fields: { clave: string; claveHint: string };
       validation: { required: string };
-      errors: { tipo: string; tamano: string };
-      actions: { cargar: string; reemplazar: string; quitar: string };
+      errors: { tipo: string; tamano: string; requerido: string };
+      actions: { cargar: string; quitar: string; eliminar: string };
+      confirmEliminar: { header: string; message: string; accept: string };
+      consulta: { error: string; reintentar: string };
+      /** `{desde}` y `{hasta}`: fechas cortas de la vigencia. */
+      detalle: { vigencia: string };
       toasts: {
+        eliminado: { title: string; desc: string };
         success: { title: string; desc: string };
         error: { title: string };
       };

@@ -2,12 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { BaseHttpService, type RequestOptions } from '@reddoc/core';
-import type { EmisorConsulta, EmisorRedEDoc } from './factura-electronica.model';
+import type {
+  CertificadoConsultaResponse,
+  CertificadoRedEDoc,
+  EmisorConsulta,
+  EmisorRedEDoc,
+} from './factura-electronica.model';
 
 /**
  * Habilitación de facturación electrónica del contenedor.
  *
- * Endpoints de `/general/factura-electronica/`, el trámite ante el proveedor —
+ * Endpoints de `/general/electronico/`, el trámite ante el proveedor —
  * distinto de `ParametroService`, que solo **lee** en qué estado quedó
  * (`gen_factura_electronica_activa`, `gen_factura_electronica_emisor`).
  */
@@ -20,8 +25,6 @@ const SIN_TOAST: RequestOptions = { errorToast: false };
 
 @Injectable({ providedIn: 'root' })
 export class FacturaElectronicaService extends BaseHttpService {
-  private readonly resourcePath = '/general/factura-electronica/';
-
   /**
    * Consulta en RedEDoc si la empresa ya está registrada como emisor; de eso
    * depende si después se actualiza o se crea.
@@ -49,6 +52,21 @@ export class FacturaElectronicaService extends BaseHttpService {
    */
   actualizarEmisor(): Observable<unknown> {
     return this.patch<unknown>('/general/electronico/emisor-actualizar/', null, SIN_TOAST);
+  }
+
+  /**
+   * Certificado digital de la empresa en RedEDoc, `null` si todavía no cargó
+   * ninguno. El backend responde una lista paginada; hoy se toma el primero.
+   */
+  consultarCertificado(): Observable<CertificadoRedEDoc | null> {
+    return this.get<CertificadoConsultaResponse>(
+      '/general/electronico/certificado-consultar/',
+    ).pipe(map((res) => res.results[0] ?? null));
+  }
+
+  /** Elimina el certificado digital de la empresa en RedEDoc. Sin body. */
+  eliminarCertificado(): Observable<void> {
+    return this.post<void>('/general/electronico/certificado-eliminar/', null);
   }
 
   /**
@@ -93,6 +111,6 @@ export class FacturaElectronicaService extends BaseHttpService {
    * relee en vez de darlo por sabido.
    */
   cargarCertificado(archivo: File, clave: string): Observable<void> {
-    return this.postFile<void>(`${this.resourcePath}cargar-certificado/`, archivo, { clave });
+    return this.postFile<void>('/general/electronico/certificado-cargar/', archivo, { clave });
   }
 }
