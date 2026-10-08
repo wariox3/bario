@@ -1,5 +1,6 @@
 import { Component, DestroyRef, computed, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import type { Subscription } from 'rxjs';
 import { NgTemplateOutlet } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -11,7 +12,8 @@ import { EMPRESA_CAMPOS } from '@erp/features/configuracion/configuracion.consta
 import type { ConfiguracionRead } from '@erp/features/configuracion/configuracion.model';
 import { FacturaElectronicaService } from '../../factura-electronica.service';
 import type { EmisorConsulta } from '../../factura-electronica.model';
-import { parseRedEDocError, type RedEDocError } from '../../rededoc-error';
+import { parseRedEDocError, tieneCodigo, type RedEDocError } from '../../rededoc-error';
+import { RededocErrorComponent } from '../../components/rededoc-error/rededoc-error.component';
 
 /**
  * Paso «RedEDoc»: el registro de la empresa como emisor.
@@ -47,7 +49,7 @@ function conDigito(numero: string | null | undefined, dv: string | null | undefi
 @Component({
   selector: 'app-rededoc-step',
   standalone: true,
-  imports: [ButtonModule, ConfirmDialogModule, NgTemplateOutlet],
+  imports: [ButtonModule, ConfirmDialogModule, NgTemplateOutlet, RededocErrorComponent],
   providers: [ConfirmationService],
   templateUrl: './rededoc-step.component.html',
 })
@@ -118,6 +120,14 @@ export class RededocStepComponent {
     };
   });
 
+  /**
+   * Lecturas en vuelo. Cada relectura cancela la anterior: con dos «Reintentar»
+   * seguidos, o una relectura tras una acción mientras otra seguía en camino,
+   * ganaría la respuesta que llegue última y no la más reciente.
+   */
+  private empresaSub?: Subscription;
+  private consultaSub?: Subscription;
+
   constructor() {
     this.cargarEmpresa();
     this.consultar();
@@ -126,7 +136,8 @@ export class RededocStepComponent {
   protected cargarEmpresa(): void {
     this.empresaLoading.set(true);
     this.empresaError.set(false);
-    this.configuracion
+    this.empresaSub?.unsubscribe();
+    this.empresaSub = this.configuracion
       .obtener(EMPRESA_CAMPOS)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -146,7 +157,8 @@ export class RededocStepComponent {
     // esqueleto: la tarjeta cambia de estado sin parpadear.
     if (!this.consulta()) this.consultaLoading.set(true);
     this.consultaError.set(null);
-    this.facturaElectronica
+    this.consultaSub?.unsubscribe();
+    this.consultaSub = this.facturaElectronica
       .consultarEmisor()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -195,7 +207,7 @@ export class RededocStepComponent {
   protected readonly emisorReasignable = computed(() => {
     const fallo = this.accionError();
     if (!fallo || fallo.accion !== 'crear') return null;
-    return fallo.error.codigos.includes('emisor_duplicado') ? fallo.error.emisorId : null;
+    return tieneCodigo(fallo.error, 'emisor_duplicado') ? fallo.error.emisorId : null;
   });
 
   /** Reasignar se trae un emisor que ya existe: se confirma antes. */

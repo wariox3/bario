@@ -6439,7 +6439,18 @@ export const es: AppDict = {
           title: 'Certificado cargado',
           desc: 'Ya quedó registrado con su fecha de vencimiento.',
         },
-        error: { title: 'No pudimos cargar el certificado' },
+      },
+      errorAccion: {
+        generico: 'RedEDoc no respondió como esperábamos. Intenta de nuevo en un momento.',
+        titulos: {
+          cargar: 'No se pudo cargar el certificado',
+          eliminar: 'No se pudo eliminar el certificado',
+        },
+      },
+      sinEmisor: {
+        title: 'Primero crea tu empresa en RedEDoc',
+        desc: 'El certificado digital se carga sobre el emisor de tu empresa, y todavía no existe.',
+        accion: 'Ir a RedEDoc',
       },
     },
     asistente: {
@@ -6452,12 +6463,6 @@ export const es: AppDict = {
         certificado: { label: 'Certificado digital', hint: 'Archivo .p12 y su clave' },
         resolucion: { label: 'Resolución', hint: 'Numeración autorizada para facturar' },
         finalizar: { label: 'Terminar', hint: 'Revisión y activación' },
-      },
-      emisorCreado: {
-        title: 'Tu empresa ya está registrada para facturar electrónicamente',
-        desc: 'Estos datos ya se enviaron al proveedor, así que no se pueden cambiar desde acá. Si algo quedó mal, escribinos.',
-        emisorLabel: 'Emisor',
-        copiar: 'Copiar el id del emisor',
       },
       pendiente: { title: 'Este paso todavía no está disponible' },
       actions: { guardarYContinuar: 'Guardar y continuar', continuar: 'Continuar' },

@@ -10,19 +10,16 @@ import type {
 } from './factura-electronica.model';
 
 /**
- * Habilitación de facturación electrónica del contenedor.
- *
- * Endpoints de `/general/electronico/`, el trámite ante el proveedor —
- * distinto de `ParametroService`, que solo **lee** en qué estado quedó
- * (`gen_factura_electronica_activa`, `gen_factura_electronica_emisor`).
- */
-/**
- * Crear, actualizar y desvincular apagan el toast del interceptor: el paso
- * RedEDoc muestra el error en la tarjeta del emisor, con el detalle que manda
- * el backend (ver `parseRedEDocError`).
+ * Todas las peticiones apagan el toast del interceptor: cada paso muestra el
+ * error en su pantalla, con el detalle que manda el backend (ver
+ * `parseRedEDocError`). Un toast más sería el mismo mensaje dos veces.
  */
 const SIN_TOAST: RequestOptions = { errorToast: false };
 
+/**
+ * Facturación electrónica de la empresa en RedEDoc: el emisor y su certificado.
+ * Endpoints de `/general/electronico/`.
+ */
 @Injectable({ providedIn: 'root' })
 export class FacturaElectronicaService extends BaseHttpService {
   /**
@@ -34,9 +31,11 @@ export class FacturaElectronicaService extends BaseHttpService {
    * apaga el toast del interceptor. Cualquier otro error sigue fallando.
    */
   consultarEmisor(): Observable<EmisorConsulta> {
-    return this.get<EmisorRedEDoc>('/general/electronico/emisor-consultar/', undefined, {
-      errorToast: false,
-    }).pipe(
+    return this.get<EmisorRedEDoc>(
+      '/general/electronico/emisor-consultar/',
+      undefined,
+      SIN_TOAST,
+    ).pipe(
       map((emisor): EmisorConsulta => ({ registrado: true, emisor })),
       catchError((err: unknown) =>
         err instanceof HttpErrorResponse && err.status === HttpStatusCode.NotFound
@@ -50,8 +49,8 @@ export class FacturaElectronicaService extends BaseHttpService {
    * Actualiza en RedEDoc el emisor ya registrado con la configuración guardada.
    * Sin body, igual que el alta: el backend lee `GenConfiguracion`.
    */
-  actualizarEmisor(): Observable<unknown> {
-    return this.patch<unknown>('/general/electronico/emisor-actualizar/', null, SIN_TOAST);
+  actualizarEmisor(): Observable<void> {
+    return this.patch<void>('/general/electronico/emisor-actualizar/', null, SIN_TOAST);
   }
 
   /**
@@ -61,12 +60,19 @@ export class FacturaElectronicaService extends BaseHttpService {
   consultarCertificado(): Observable<CertificadoRedEDoc | null> {
     return this.get<CertificadoConsultaResponse>(
       '/general/electronico/certificado-consultar/',
+      undefined,
+      SIN_TOAST,
     ).pipe(map((res) => res.results[0] ?? null));
   }
 
   /** Elimina el certificado digital de la empresa en RedEDoc. Sin body. */
   eliminarCertificado(): Observable<void> {
-    return this.post<void>('/general/electronico/certificado-eliminar/', null);
+    return this.post<void>(
+      '/general/electronico/certificado-eliminar/',
+      null,
+      undefined,
+      SIN_TOAST,
+    );
   }
 
   /**
@@ -96,8 +102,7 @@ export class FacturaElectronicaService extends BaseHttpService {
    *
    * **Sin body a propósito**: el backend arma el registro con lo que hay en
    * `GenConfiguracion`, así que la configuración tiene que estar **guardada
-   * antes** de llamar acá. Al terminar, `gen_factura_electronica_emisor` deja
-   * de ser `null` — y a partir de ahí esos datos ya no se editan desde el ERP.
+   * antes** de llamar acá. Si después cambian, se mandan con `actualizarEmisor`.
    */
   crearEmisor(): Observable<void> {
     return this.post<void>('/general/electronico/emisor-crear/', null, undefined, SIN_TOAST);
@@ -106,11 +111,16 @@ export class FacturaElectronicaService extends BaseHttpService {
   /**
    * Sube el certificado digital con su clave (multipart `archivo` + `clave`).
    *
-   * El vencimiento no se envía: lo lee el backend del propio certificado y lo
-   * deja en `gen_certificado_vence`. Por eso, después de subir, el estado se
-   * relee en vez de darlo por sabido.
+   * La vigencia no se envía: la lee el backend del propio certificado. Por eso,
+   * después de subir, se relee `consultarCertificado` en vez de darla por sabida.
    */
   cargarCertificado(archivo: File, clave: string): Observable<void> {
-    return this.postFile<void>('/general/electronico/certificado-cargar/', archivo, { clave });
+    return this.postFile<void>(
+      '/general/electronico/certificado-cargar/',
+      archivo,
+      { clave },
+      'archivo',
+      SIN_TOAST,
+    );
   }
 }

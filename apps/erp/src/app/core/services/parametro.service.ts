@@ -74,18 +74,6 @@ export class ParametroService extends BaseHttpService {
   }
 
   /**
-   * Emisor con el que el contenedor quedó habilitado ante la DIAN.
-   *
-   * `null` = consultado y todavía no hay emisor. El campo es de solo lectura:
-   * lo escribe el flujo de habilitación, nunca el front.
-   */
-  facturaElectronicaEmisor(): Observable<number | null> {
-    return this.sonda(['gen_factura_electronica_emisor']).pipe(
-      map((parametro) => parametro.gen_factura_electronica_emisor ?? null),
-    );
-  }
-
-  /**
    * ¿Hay que ofrecerle a este contenedor el asistente de datos iniciales?
    *
    * Al revés que las otras sondas: acá el `true` es lo que hace aparecer algo

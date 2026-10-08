@@ -1,9 +1,6 @@
-import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { I18nService } from '@reddoc/core';
-import { ParametroService } from '@erp/core/services/parametro.service';
 import type { AppDict } from '@erp/i18n';
 import { EmpresaConfigComponent } from '@erp/features/configuracion/components/empresa-config/empresa-config.component';
 import { RededocStepComponent } from '../../steps/rededoc/rededoc-step.component';
@@ -26,7 +23,7 @@ import {
 @Component({
   selector: 'app-asistente-facturacion-electronica',
   standalone: true,
-  imports: [EmpresaConfigComponent, RededocStepComponent, CertificadoStepComponent, ButtonModule],
+  imports: [EmpresaConfigComponent, RededocStepComponent, CertificadoStepComponent],
   templateUrl: './asistente.component.html',
   // Ancho acotado como Configuración: son formularios, no tablas. La grilla de
   // dos columnas la arma el template; el host solo centra y acota.
@@ -36,8 +33,6 @@ export class AsistenteComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
-  private readonly parametro = inject(ParametroService);
-  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
   protected readonly steps = ASISTENTE_STEPS;
@@ -57,77 +52,6 @@ export class AsistenteComponent {
    * nueva). Sirve para que el riel muestre el visto tras guardar.
    */
   private readonly completados = signal<ReadonlySet<AsistenteStepId>>(new Set());
-
-  /**
-   * Emisor de facturación electrónica del contenedor
-   * (`gen_factura_electronica_emisor`).
-   *
-   * Tres estados: `undefined` = sin consultar todavía o la consulta falló;
-   * `null` = consultado y el contenedor no tiene emisor; un número = el emisor
-   * con el que quedó habilitado.
-   *
-   * Se pide al entrar al paso «Datos de la empresa» y se refresca cada vez que
-   * se vuelve a él: el valor puede cambiar mientras se recorre el asistente.
-   */
-  protected readonly emisor = signal<number | null | undefined>(undefined);
-
-  constructor() {
-    this.destroyRef.onDestroy(() => {
-      if (this.copiadoTimer) clearTimeout(this.copiadoTimer);
-    });
-
-    effect(() => {
-      if (this.activeStep().id !== 'empresa') return;
-      this.cargarEmisor();
-    });
-  }
-
-  private cargarEmisor(): void {
-    this.parametro
-      .facturaElectronicaEmisor()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (emisor) => this.emisor.set(emisor),
-        // Sin dato: se queda en `undefined`, que no es lo mismo que "no hay
-        // emisor". Quien lo consuma tiene que poder distinguirlos.
-        error: () => this.emisor.set(undefined),
-      });
-  }
-
-  /**
-   * ¿La empresa ya está dada de alta como emisor?
-   *
-   * Solo un id confirmado bloquea. `undefined` (sin consultar o consulta
-   * fallida) deja el formulario editable: ante la duda, que el usuario pueda
-   * trabajar — el backend rechaza igual si el alta ya existe.
-   */
-  protected readonly tieneEmisor = computed(() => typeof this.emisor() === 'number');
-
-  /** Feedback efímero del botón de copiar: el ícono pasa a visto y vuelve. */
-  protected readonly emisorCopiado = signal(false);
-  private copiadoTimer: ReturnType<typeof setTimeout> | null = null;
-
-  /**
-   * Copia el id del emisor al portapapeles.
-   *
-   * Es el número que el usuario va a tener que citarle a soporte, y
-   * transcribirlo a mano de la pantalla es justo donde se equivoca.
-   */
-  protected copiarEmisor(): void {
-    const emisor = this.emisor();
-    if (typeof emisor !== 'number') return;
-
-    void navigator.clipboard
-      .writeText(String(emisor))
-      .then(() => {
-        this.emisorCopiado.set(true);
-        if (this.copiadoTimer) clearTimeout(this.copiadoTimer);
-        this.copiadoTimer = setTimeout(() => this.emisorCopiado.set(false), 2000);
-      })
-      // Sin portapapeles (contexto inseguro o permiso denegado) el número sigue
-      // a la vista para copiarlo a mano; no vale un toast por eso.
-      .catch(() => undefined);
-  }
 
   protected isCompletado(id: AsistenteStepId): boolean {
     return this.completados().has(id);
@@ -161,10 +85,10 @@ export class AsistenteComponent {
   /**
    * Ir a un paso desde el riel.
    *
-   * Hoy cualquier paso es alcanzable: los tres últimos son placeholders y el
-   * sentido de tenerlos es poder recorrerlos. Cuando reciban contenido real hay
-   * que cerrar el salto hacia adelante (alcanzable = completado, activo, o el
-   * siguiente al último completado).
+   * Cualquier paso es alcanzable: el riel no sabe qué necesita cada uno. Cada
+   * paso valida su propio requisito contra el backend y, si falta, lo dice y
+   * ofrece volver (el certificado sin emisor manda a RedEDoc). Así un salto
+   * desde el riel, un enlace con `?paso=` o un reload caen en el mismo lugar.
    */
   protected irA(id: AsistenteStepId): void {
     void this.router.navigate([], {

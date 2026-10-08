@@ -6373,7 +6373,18 @@ export const en: AppDict = {
           title: 'Certificate uploaded',
           desc: 'It is registered along with its expiry date.',
         },
-        error: { title: 'We could not upload the certificate' },
+      },
+      errorAccion: {
+        generico: 'RedEDoc did not respond as expected. Try again in a moment.',
+        titulos: {
+          cargar: 'Could not upload the certificate',
+          eliminar: 'Could not delete the certificate',
+        },
+      },
+      sinEmisor: {
+        title: 'Create your company in RedEDoc first',
+        desc: 'The digital certificate is uploaded to your company issuer, which does not exist yet.',
+        accion: 'Go to RedEDoc',
       },
     },
     asistente: {
@@ -6386,12 +6397,6 @@ export const en: AppDict = {
         certificado: { label: 'Digital certificate', hint: '.p12 file and its password' },
         resolucion: { label: 'Resolution', hint: 'Authorized invoice numbering' },
         finalizar: { label: 'Finish', hint: 'Review and activation' },
-      },
-      emisorCreado: {
-        title: 'Your company is already registered for electronic invoicing',
-        desc: 'These details were already sent to the provider, so they cannot be changed here. Contact us if something is wrong.',
-        emisorLabel: 'Issuer',
-        copiar: 'Copy issuer id',
       },
       pendiente: { title: 'This step is not available yet' },
       actions: { guardarYContinuar: 'Save and continue', continuar: 'Continue' },

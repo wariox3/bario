@@ -4910,8 +4910,9 @@ export interface AppDict
       toasts: {
         eliminado: { title: string; desc: string };
         success: { title: string; desc: string };
-        error: { title: string };
       };
+      errorAccion: { generico: string; titulos: { cargar: string; eliminar: string } };
+      sinEmisor: { title: string; desc: string; accion: string };
     };
     asistente: {
       eyebrow: string;
@@ -4924,8 +4925,6 @@ export interface AppDict
         resolucion: { label: string; hint: string };
         finalizar: { label: string; hint: string };
       };
-      /** Aviso de solo lectura cuando la empresa ya es emisor. */
-      emisorCreado: { title: string; desc: string; emisorLabel: string; copiar: string };
       /** Panel de un paso todavía sin contenido. */
       pendiente: { title: string };
       actions: { guardarYContinuar: string; continuar: string };

@@ -1,15 +1,18 @@
 import { Component, DestroyRef, computed, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map, of, switchMap, type Subscription } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { PasswordModule } from 'primeng/password';
 import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
-import { FormErrorService, I18nService, ToastService, formatFechaCorta } from '@reddoc/core';
+import { I18nService, ToastService, formatFechaCorta } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { FacturaElectronicaService } from '../../factura-electronica.service';
 import type { CertificadoRedEDoc } from '../../factura-electronica.model';
+import { parseRedEDocError, type RedEDocError } from '../../rededoc-error';
+import { RededocErrorComponent } from '../../components/rededoc-error/rededoc-error.component';
 
 /** Estado del certificado del contenedor, del más urgente al más tranquilo. */
 export type CertificadoEstado = 'sin-certificado' | 'vencido' | 'por-vencer' | 'vigente';
@@ -46,7 +49,11 @@ function diasHasta(fecha: Date): number {
  *
  * Auto-contenido: consulta el certificado en RedEDoc
  * (`certificado-consultar/`), sube el archivo y lo relee. Solo avisa hacia
- * afuera cuando el usuario quiere avanzar.
+ * afuera cuando el usuario quiere avanzar, o volver a RedEDoc si falta el emisor.
+ *
+ * **Requisito:** el certificado es del emisor, así que sin emisor no hay nada
+ * que consultar ni cargar. Se verifica acá y no en el riel: un salto desde el
+ * riel, un enlace con `?paso=` o un reload caen en el mismo estado.
  *
  * Regla de negocio: **con un certificado cargado no se sube otro**, ni siquiera
  * vencido. La pantalla muestra el que hay; el color solo dice su urgencia. Para
@@ -62,13 +69,13 @@ function diasHasta(fecha: Date): number {
     FieldErrorComponent,
     FocusInvalidDirective,
     ConfirmDialogModule,
+    RededocErrorComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './certificado-step.component.html',
 })
 export class CertificadoStepComponent {
   private readonly facturaElectronica = inject(FacturaElectronicaService);
-  private readonly formErrors = inject(FormErrorService);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -80,6 +87,8 @@ export class CertificadoStepComponent {
 
   /** El usuario terminó con este paso y quiere seguir. */
   readonly avanzar = output<void>();
+  /** Falta el emisor: el usuario quiere ir a crearlo. */
+  readonly irARededoc = output<void>();
 
   protected readonly loading = signal(true);
   protected readonly subiendo = signal(false);
@@ -87,6 +96,8 @@ export class CertificadoStepComponent {
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly dragOver = signal(false);
   protected readonly fileError = signal<string | null>(null);
+  /** ¿La empresa ya es emisor en RedEDoc? `null` mientras no se sepa. */
+  protected readonly emisorRegistrado = signal<boolean | null>(null);
   /** Certificado cargado en RedEDoc; `null` si todavía no hay ninguno. */
   protected readonly certificado = signal<CertificadoRedEDoc | null>(null);
   /**
@@ -94,6 +105,18 @@ export class CertificadoStepComponent {
    * certificado, la regla es no subir otro, así que se pide reintentar.
    */
   protected readonly consultaError = signal(false);
+
+  /**
+   * Última acción que falló y por qué, en la pantalla y no en un toast. Los
+   * errores de la clave no llegan acá: van debajo de su campo.
+   */
+  protected readonly accionError = signal<{
+    readonly accion: 'cargar' | 'eliminar';
+    readonly error: RedEDocError;
+  } | null>(null);
+
+  /** Lectura en vuelo; cada relectura cancela la anterior (gana la más reciente). */
+  private estadoSub?: Subscription;
 
   protected readonly form = this.fb.group({
     clave: this.fb.nonNullable.control('', Validators.required),
@@ -116,9 +139,12 @@ export class CertificadoStepComponent {
     return 'vigente';
   });
 
-  /** La zona de carga solo aparece cuando RedEDoc confirma que no hay certificado. */
+  /**
+   * La zona de carga solo aparece cuando RedEDoc confirma que hay emisor y que
+   * no hay certificado: ante la duda no se ofrece subir.
+   */
   protected readonly puedeCargar = computed(
-    () => !this.consultaError() && this.certificado() === null,
+    () => !this.consultaError() && this.emisorRegistrado() === true && this.certificado() === null,
   );
 
   /**
@@ -162,11 +188,22 @@ export class CertificadoStepComponent {
   protected cargarEstado(): void {
     this.loading.set(true);
     this.consultaError.set(false);
-    this.facturaElectronica
-      .consultarCertificado()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.estadoSub?.unsubscribe();
+    this.estadoSub = this.facturaElectronica
+      .consultarEmisor()
+      .pipe(
+        switchMap((emisor) =>
+          emisor.registrado
+            ? this.facturaElectronica
+                .consultarCertificado()
+                .pipe(map((certificado) => ({ registrado: true, certificado })))
+            : of({ registrado: false, certificado: null }),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
-        next: (certificado) => {
+        next: ({ registrado, certificado }) => {
+          this.emisorRegistrado.set(registrado);
           this.certificado.set(certificado);
           this.loading.set(false);
         },
@@ -194,6 +231,7 @@ export class CertificadoStepComponent {
 
   private eliminar(): void {
     this.eliminando.set(true);
+    this.accionError.set(null);
     const toast = this.t().facturacionElectronica.certificado.toasts.eliminado;
     this.facturaElectronica
       .eliminarCertificado()
@@ -206,8 +244,10 @@ export class CertificadoStepComponent {
           // porque RedEDoc confirma que ya no hay certificado.
           this.cargarEstado();
         },
-        // El error lo muestra el interceptor; el certificado sigue a la vista.
-        error: () => this.eliminando.set(false),
+        error: (err: unknown) => {
+          this.eliminando.set(false);
+          this.fallo('eliminar', err);
+        },
       });
   }
 
@@ -280,6 +320,7 @@ export class CertificadoStepComponent {
       return;
     }
     this.subiendo.set(true);
+    this.accionError.set(null);
 
     const dict = this.t().facturacionElectronica.certificado;
     this.facturaElectronica
@@ -297,10 +338,32 @@ export class CertificadoStepComponent {
         },
         error: (err: unknown) => {
           this.subiendo.set(false);
-          // Una clave incorrecta es el error más probable, y el backend la
-          // señala por campo: que aterrice bajo la clave, no en un toast.
-          this.formErrors.handle(this.form, err, dict.toasts.error.title);
+          this.fallo('cargar', err);
         },
       });
+  }
+
+  /**
+   * Reparte el error de RedEDoc. Una clave incorrecta es lo más probable y el
+   * backend la señala con el prefijo `clave:`: esa va debajo de su campo (y se
+   * borra sola al editarla); el resto, a la banda junto al botón.
+   */
+  private fallo(accion: 'cargar' | 'eliminar', err: unknown): void {
+    const fallback = this.t().facturacionElectronica.certificado.errorAccion.generico;
+    const error = parseRedEDocError(err, fallback);
+    const deClave = error.detalles.filter((detalle) => detalle.campo === 'clave');
+    if (accion === 'cargar' && deClave.length > 0) {
+      const clave = this.form.controls.clave;
+      clave.setErrors({ serverError: deClave.map((detalle) => detalle.mensaje).join(' ') });
+      clave.markAsTouched();
+      if (deClave.length === error.detalles.length) return;
+      const resto = error.detalles.filter((detalle) => detalle.campo !== 'clave');
+      this.accionError.set({
+        accion,
+        error: { ...error, detalles: resto, mensajes: resto.map((detalle) => detalle.mensaje) },
+      });
+      return;
+    }
+    this.accionError.set({ accion, error });
   }
 }

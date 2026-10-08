@@ -25,6 +25,34 @@
       (onClick)="cargarEstado()"
     />
   </section>
+} @else if (emisorRegistrado() === false) {
+  <!--
+    Sin emisor no hay sobre qué cargar el certificado. No es un error ni algo
+    roto: es un paso que falta, así que se dice qué hacer y se lleva ahí.
+  -->
+  <section
+    class="flex flex-col items-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-12 text-center"
+  >
+    <span
+      class="flex h-10 w-10 items-center justify-center rounded-[10px] bg-amber-50 text-amber-700"
+    >
+      <i class="pi pi-building text-[1.05rem]" aria-hidden="true"></i>
+    </span>
+    <div class="max-w-sm">
+      <p class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ c.sinEmisor.title }}
+      </p>
+      <p class="m-0 mt-1 text-[0.78rem] leading-relaxed text-brand-muted">
+        {{ c.sinEmisor.desc }}
+      </p>
+    </div>
+    <p-button
+      type="button"
+      icon="pi pi-arrow-left"
+      [label]="c.sinEmisor.accion"
+      (onClick)="irARededoc.emit()"
+    />
+  </section>
 } @else {
   <div class="flex flex-col gap-5">
     @if (certificado(); as cert) {
@@ -143,6 +171,14 @@
               ></i>
             </button>
           </div>
+          @if (accionError(); as fallo) {
+            <div class="mt-3">
+              <app-rededoc-error
+                [titulo]="c.errorAccion.titulos[fallo.accion]"
+                [error]="fallo.error"
+              />
+            </div>
+          }
         </div>
       </section>
     }
@@ -276,6 +312,10 @@
             </div>
           </div>
         </section>
+
+        @if (accionError(); as fallo) {
+          <app-rededoc-error [titulo]="c.errorAccion.titulos[fallo.accion]" [error]="fallo.error" />
+        }
 
         <div class="flex items-center justify-end pb-1">
           <p-button
