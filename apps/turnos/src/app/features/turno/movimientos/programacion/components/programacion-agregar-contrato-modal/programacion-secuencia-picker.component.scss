@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+// Chip de posición inicial: número arriba + código del turno abajo.
+.secuencia-pos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 2.4rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(20, 48, 73, 0.15);
+  border-radius: 8px;
+  background: var(--p-surface-0, #fff);
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background 120ms;
+
+  &:hover {
+    border-color: rgba(20, 48, 73, 0.35);
+    background: rgba(20, 48, 73, 0.03);
+  }
+
+  &--active {
+    border-color: #143049;
+    background: #143049;
+
+    .secuencia-pos__num {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .secuencia-pos__codigo {
+      color: #fff;
+    }
+  }
+}
+
+.secuencia-pos__num {
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--brand-muted, #64748b);
+}
+
+.secuencia-pos__codigo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--brand-text, #143049);
+  font-family: monospace;
+}

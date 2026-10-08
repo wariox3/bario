@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import type { ResolveFn } from '@angular/router';
 import { ModuleRegistryService } from '../module-registry.service';
 import { ModuleNavigationStore } from '../module-navigation.store';
-import type { ModuleConfig } from '../types/module-config.types';
+import type { ModuleConfig } from '@reddoc/core';
 
 /**
  * Crea un resolver que carga el `ModuleConfig` del id indicado y lo registra

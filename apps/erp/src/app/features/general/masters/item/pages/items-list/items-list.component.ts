@@ -26,6 +26,10 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ItemService } from '../../item.service';
 import type { Item } from '../../item.model';
@@ -33,6 +37,7 @@ import {
   ITEMS_COLUMNS,
   ITEMS_FILTER_FIELDS,
   ITEMS_FILTERS_STORAGE_KEY,
+  ITEMS_IMPORT_MASTERS,
   ITEMS_QUICK_SEARCH_FIELD,
   ITEMS_PRIMARY_ACTION,
   ITEMS_ROW_ACTIONS,
@@ -57,6 +62,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './items-list.component.html',
@@ -68,6 +74,7 @@ export class ItemsListComponent {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
@@ -92,19 +99,32 @@ export class ItemsListComponent {
 
   protected readonly isExportingExcel = signal(false);
 
+  /** Plantilla de ejemplo que sirve el backend para armar el archivo. */
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/general/item/importar-ejemplo/',
+  };
+
+  /** Estado del diálogo de importación (visibilidad, progreso, errores, maestros). */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: ITEMS_IMPORT_MASTERS,
+  });
+
   // ── Derivados ─────────────────────────────────────────────────────────────
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   /**
-   * Migas: módulo (General, navegable a su home) → entidad actual (Items).
-   * El item es un master del módulo `general`, por eso el segmento es fijo.
+   * Migas: módulo activo (navegable a su home) → entidad actual (Items).
+   * El módulo se deriva del `ActiveModuleStore` (master compartido entre módulos).
    */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, currentModuleId(this.activeModule)] : undefined,
       },
       { label: this.t().entities.item.name },
     ];
@@ -112,9 +132,11 @@ export class ItemsListComponent {
 
   protected readonly columns = ITEMS_COLUMNS;
   protected readonly filterFields = ITEMS_FILTER_FIELDS;
-  protected readonly rowActions = ITEMS_ROW_ACTIONS;
-  protected readonly primaryAction = ITEMS_PRIMARY_ACTION;
-  protected readonly trailingActions = ITEMS_TRAILING_ACTIONS;
+  protected readonly acciones = masterActions(MODELO.general.item, {
+    row: ITEMS_ROW_ACTIONS,
+    primary: ITEMS_PRIMARY_ACTION,
+    trailing: ITEMS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -179,14 +201,13 @@ export class ItemsListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateToDetail((row as Item).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
       case 'new':
         this.router.navigate(this.buildRouteCommands('nuevo'));
+        break;
+      case 'import':
+        this.importar.open();
         break;
       case 'export-excel':
         this.exportExcel();
@@ -311,11 +332,11 @@ export class ItemsListComponent {
 
   /**
    * Construye los segmentos absolutos para `router.navigate` dentro del feature.
-   * Resulta en `/t/<slug>/general/items/<...path>`.
+   * Resulta en `/t/<slug>/<módulo activo>/items/<...path>`.
    */
   private buildRouteCommands(...subPath: (string | number)[]): (string | number)[] {
     const slug = this.tenant.currentSlug();
     if (!slug) throw new Error('Cannot navigate without an active tenant slug.');
-    return ['/t', slug, 'general', 'items', ...subPath];
+    return ['/t', slug, currentModuleId(this.activeModule), 'items', ...subPath];
   }
 }

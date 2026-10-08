@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 
 /** Discriminador producto/servicio del item (control `tipo` del form). */
 export type ItemTipo = 'producto' | 'servicio';

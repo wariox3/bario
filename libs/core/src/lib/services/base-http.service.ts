@@ -2,9 +2,27 @@ import { inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ENVIRONMENT } from '../tokens';
+import { ERROR_TOAST } from '../interceptors/error-http-context';
 import { TENANT_SCOPED } from '../tenant/tenant-http-context';
 
 export type ParamValue = string | number | boolean | null | undefined;
+
+/** Ajustes por petición, para los casos que se salen del default del servicio. */
+export interface RequestOptions {
+  /**
+   * `false` = el `errorInterceptor` no muestra su toast: la pantalla renderiza
+   * el error por su cuenta (ver `ERROR_TOAST`). El error sigue llegando al
+   * `error:` del suscriptor.
+   */
+  readonly errorToast?: boolean;
+  /**
+   * Override puntual del scope de tenant del servicio, para servicios con
+   * endpoints mixtos (ej. `ContenedorService` es global pero
+   * `usuario-cliente-permiso/` viaja con `X-Tenant`). Sin valor, manda el
+   * `tenantScoped` de la clase.
+   */
+  readonly tenantScoped?: boolean;
+}
 
 export function buildHttpParams(params: Record<string, ParamValue>): HttpParams {
   let httpParams = new HttpParams();
@@ -30,15 +48,23 @@ export abstract class BaseHttpService {
    */
   protected readonly tenantScoped: boolean = true;
 
-  /** Context HTTP con el scope de tenant declarado por el servicio. */
-  private context(): HttpContext {
-    return new HttpContext().set(TENANT_SCOPED, this.tenantScoped);
+  /**
+   * Context HTTP con el scope de tenant del servicio y, si el llamador lo pide,
+   * el opt-out del toast de error (cuando la pantalla muestra el error ella).
+   */
+  private context(opts?: RequestOptions): HttpContext {
+    const context = new HttpContext().set(TENANT_SCOPED, opts?.tenantScoped ?? this.tenantScoped);
+    return opts?.errorToast === false ? context.set(ERROR_TOAST, false) : context;
   }
 
-  protected get<T>(path: string, params?: Record<string, ParamValue>): Observable<T> {
+  protected get<T>(
+    path: string,
+    params?: Record<string, ParamValue>,
+    opts?: RequestOptions,
+  ): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}${path}`, {
       params: buildHttpParams(params ?? {}),
-      context: this.context(),
+      context: this.context(opts),
     });
   }
 
@@ -46,19 +72,48 @@ export abstract class BaseHttpService {
     path: string,
     body: unknown,
     params?: Record<string, ParamValue>,
+    opts?: RequestOptions,
   ): Observable<T> {
     return this.http.post<T>(`${this.baseUrl}${path}`, body, {
       params: buildHttpParams(params ?? {}),
-      context: this.context(),
+      context: this.context(opts),
     });
+  }
+
+  /**
+   * POST multipart de **un archivo**, para los endpoints de importación.
+   *
+   * El backend recibe el archivo en el campo `archivo` en todos los recursos de
+   * importación, así que la convención se declara una vez acá y no en cada
+   * servicio. `fieldName` la corre para los pocos endpoints que nombran su campo
+   * de otra forma (el logotipo de la empresa lo llama `logotipo`). `fields` suma
+   * los campos de contexto que pida el endpoint (`conciliacion_id`, etc.); los
+   * `null`/`undefined` se omiten, igual que en `buildHttpParams`.
+   *
+   * No se fija `Content-Type` a propósito: con un `FormData`, el navegador tiene
+   * que ponerlo él para incluir el `boundary`.
+   */
+  protected postFile<T>(
+    path: string,
+    file: File,
+    fields?: Record<string, ParamValue>,
+    fieldName = 'archivo',
+    opts?: RequestOptions,
+  ): Observable<T> {
+    const form = new FormData();
+    form.append(fieldName, file, file.name);
+    for (const [key, value] of Object.entries(fields ?? {})) {
+      if (value != null) form.append(key, String(value));
+    }
+    return this.post<T>(path, form, undefined, opts);
   }
 
   protected put<T>(path: string, body: unknown): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}${path}`, body, { context: this.context() });
   }
 
-  protected patch<T>(path: string, body: unknown): Observable<T> {
-    return this.http.patch<T>(`${this.baseUrl}${path}`, body, { context: this.context() });
+  protected patch<T>(path: string, body: unknown, opts?: RequestOptions): Observable<T> {
+    return this.http.patch<T>(`${this.baseUrl}${path}`, body, { context: this.context(opts) });
   }
 
   protected delete<T = void>(path: string): Observable<T> {

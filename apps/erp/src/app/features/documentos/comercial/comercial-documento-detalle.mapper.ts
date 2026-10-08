@@ -12,14 +12,16 @@ import type {
   ComercialDetalleRead,
   ComercialDetallePayload,
 } from './comercial-documento-detalle.model';
-import type {
-  ComercialDetalleFormRawValue,
-  ImpuestoSeleccionarOption,
-} from './comercial-documento-detalle.types';
+import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
 
-/** Subtotal bruto de la línea: `cantidad × precio`. */
+/**
+ * Subtotal bruto de la línea: `cantidad × precio`, redondeado a centavos. Con
+ * cantidad y precio decimales el producto puede tener más de dos decimales
+ * (`1.5 × 33.33 = 49.995`); sin redondear, el resumen sumaría un valor distinto
+ * al que pinta la fila.
+ */
 export function lineBruto(line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio'>): number {
-  return (line.cantidad ?? 0) * (line.precio ?? 0);
+  return redondearMoneda((line.cantidad ?? 0) * (line.precio ?? 0));
 }
 
 /** Monto del descuento: `bruto × desc%/100`, redondeado. */
@@ -33,14 +35,14 @@ export function lineDescuento(
 export function lineBase(
   line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio' | 'descuento'>,
 ): number {
-  return lineBruto(line) - lineDescuento(line);
+  return redondearMoneda(lineBruto(line) - lineDescuento(line));
 }
 
 /** Suma de los montos de impuesto ya calculados de la línea. */
 export function lineImpuesto(
   line: Pick<ComercialDetalleFormRawValue, 'impuestos_totales'>,
 ): number {
-  return line.impuestos_totales.reduce((s, i) => s + i.total, 0);
+  return redondearMoneda(line.impuestos_totales.reduce((s, i) => s + i.total, 0));
 }
 
 /** Neto de la línea: `base + impuesto`. */
@@ -50,7 +52,7 @@ export function lineNeto(
     'cantidad' | 'precio' | 'descuento' | 'impuestos_totales'
   >,
 ): number {
-  return lineBase(line) + lineImpuesto(line);
+  return redondearMoneda(lineBase(line) + lineImpuesto(line));
 }
 
 /**
@@ -68,6 +70,50 @@ export function recomputeImpuestosLinea(
   return calcularImpuestosLinea(lineBase(line), tasas);
 }
 
+/** Redondeo a 2 decimales para precios unitarios (el precio admite centavos). */
+function redondearPrecio(valor: number): number {
+  return Math.round((valor + Number.EPSILON) * 100) / 100;
+}
+
+/**
+ * Fracción total de los impuestos de la línea que **suman** (`operacion > 0`),
+ * p. ej. IVA 19% sobre base 100 → `0.19`. Las retenciones no participan: no
+ * hacen parte de un precio final al público — se descuentan al pagar.
+ */
+function fraccionImpuestosPositivos(
+  line: Pick<ComercialDetalleFormRawValue, 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  const ids = new Set(line.impuestos_ids);
+  return line.impuestos_disponibles
+    .filter((t) => ids.has(t.id) && (t.operacion ?? 1) > 0)
+    .reduce((s, t) => s + (t.porcentaje / 100) * (t.porcentajeBase / 100), 0);
+}
+
+/**
+ * Precio unitario **final** (con los impuestos que suman) que produce el precio
+ * actual de la línea: `precio × (1 + Σ fracciones)`. Siembra el campo del
+ * popover "precio con impuestos incluidos".
+ */
+export function precioUnitarioConImpuestos(
+  line: Pick<ComercialDetalleFormRawValue, 'precio' | 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  return redondearPrecio((line.precio ?? 0) * (1 + fraccionImpuestosPositivos(line)));
+}
+
+/**
+ * Deshace los impuestos de la línea de un precio unitario final: la inversa
+ * exacta del kernel. Los impuestos son **aditivos sobre la misma base** (así los
+ * calcula `calcularImpuestosLinea`), por eso se divide por `1 + Σ fracciones` —
+ * no en cadena tasa por tasa como hacía el legacy, que con varias tasas era
+ * inconsistente con su propio cálculo hacia adelante.
+ */
+export function precioUnitarioSinImpuestos(
+  precioFinal: number,
+  line: Pick<ComercialDetalleFormRawValue, 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  return redondearPrecio(precioFinal / (1 + fraccionImpuestosPositivos(line)));
+}
+
 /** Adapta una línea comercial al contrato mínimo del kernel de resumen. */
 export function toLineaCalculo(line: ComercialDetalleFormRawValue): LineaCalculo {
   return {
@@ -77,26 +123,30 @@ export function toLineaCalculo(line: ComercialDetalleFormRawValue): LineaCalculo
   };
 }
 
-/** Opción del catálogo `impuesto/seleccionar/` → `TasaImpuesto` (base 100 por defecto). */
-export function tasaFromImpuestoOption(opt: ImpuestoSeleccionarOption): TasaImpuesto {
-  return {
-    id: opt.id,
-    nombre: opt.nombre,
-    porcentaje: parseFloat(opt.porcentaje ?? '0'),
-    porcentajeBase: parseFloat(opt.porcentaje_base ?? '100'),
-  };
-}
-
-/** Tasas de **venta** del ítem (opcionalmente acotadas a `ids`) como `TasaImpuesto[]`. */
-export function tasasDeVentaDelItem(item: Item, ids?: readonly number[]): TasaImpuesto[] {
+/**
+ * Tasas de **venta o compra** del ítem (opcionalmente acotadas a `ids`) como
+ * `TasaImpuesto[]`. El `modo` selecciona el flag del ítem a filtrar
+ * (`impuesto_venta` vs `impuesto_compra`): un documento comercial de venta usa
+ * los de venta; uno de compra, los de compra.
+ */
+export function tasasDelItem(
+  item: Item,
+  modo: 'venta' | 'compra',
+  ids?: readonly number[],
+): TasaImpuesto[] {
   const idSet = ids ? new Set(ids) : null;
   return (item.impuestos ?? [])
-    .filter((imp) => imp.impuesto_venta && (!idSet || idSet.has(imp.impuesto)))
+    .filter(
+      (imp) =>
+        (modo === 'venta' ? imp.impuesto_venta : imp.impuesto_compra) &&
+        (!idSet || idSet.has(imp.impuesto)),
+    )
     .map((imp) => ({
       id: imp.impuesto,
-      nombre: imp.impuesto_nombre ?? '',
+      nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
       porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
       porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+      operacion: imp.impuesto_operacion ?? 1,
     }));
 }
 
@@ -110,16 +160,27 @@ export function comercialDetalleToFormValue(
     item: read.item != null ? { id: read.item, nombre: read.item_nombre ?? '', precio } : null,
     cantidad: toFiniteNumber(read.cantidad),
     precio,
-    descuento: toFiniteNumber(read.descuento) ?? 0,
+    descuento: toFiniteNumber(read.porcentaje_descuento) ?? 0,
     impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
-    impuestos_totales: (read.impuestos ?? []).map((imp) => ({
-      id: imp.impuesto,
-      nombre: imp.impuesto_nombre ?? '',
-      total: Math.round(parseFloat(imp.total ?? '0')),
-    })),
+    impuestos_totales: (read.impuestos ?? []).map((imp) => {
+      // El backend guarda el monto sin signo y manda la operación aparte, así
+      // que el signo sale de ahí. Si faltara, el monto queda como llegó y la
+      // tabla de edición lo corrige contra el catálogo (`normalizarImpuestosLeidos`).
+      const parsed = toFiniteNumber(imp.total) ?? 0;
+      const total =
+        imp.impuesto_operacion == null
+          ? parsed
+          : Math.abs(parsed) * (imp.impuesto_operacion < 0 ? -1 : 1);
+      return {
+        id: imp.impuesto,
+        nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
+        total,
+      };
+    }),
     // Se rellenan al re-seleccionar el ítem; vacías preservan los montos cargados.
     impuestos_disponibles: [],
     detalle: read.detalle ?? null,
+    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     documento_detalle_afectado: read.documento_detalle_afectado ?? null,
   };
 }
@@ -142,11 +203,13 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
   const cantidad = toFiniteNumber(row.cantidad);
   const tasas: TasaImpuesto[] = row.impuestos.map((imp) => ({
     id: imp.impuesto,
-    nombre: imp.impuesto_nombre ?? '',
+    nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
     porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
     porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+    // La fila pendiente manda la operación; el default solo cubre su ausencia.
+    operacion: imp.impuesto_operacion ?? 1,
   }));
-  const base = (cantidad ?? 0) * precio;
+  const base = redondearMoneda((cantidad ?? 0) * precio);
   return {
     id: null,
     item: { id: row.item_id, nombre: row.item_nombre, precio },
@@ -157,6 +220,8 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     impuestos_totales: calcularImpuestosLinea(base, tasas),
     impuestos_disponibles: tasas,
     detalle: null,
+    // La fila pendiente no trae almacén: la línea importada nace sin él.
+    almacen: null,
     documento_detalle_afectado: row.id,
   };
 }
@@ -169,9 +234,15 @@ export function comercialDetalleToPayload(
     item: raw.item?.id ?? null,
     cantidad: raw.cantidad ?? null,
     precio: (raw.precio ?? 0).toFixed(2),
-    descuento: (raw.descuento ?? 0).toFixed(2),
+    porcentaje_descuento: (raw.descuento ?? 0).toFixed(2),
     detalle: raw.detalle?.trim() || null,
+    almacen: raw.almacen?.id ?? null,
     impuestos_ids: raw.impuestos_ids,
     documento_detalle_afectado: raw.documento_detalle_afectado,
   };
+}
+
+/** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+export function totalCantidad(lines: readonly ComercialDetalleFormRawValue[]): number {
+  return lines.reduce((acc, line) => acc + (line.cantidad ?? 0), 0);
 }

@@ -1,0 +1,370 @@
+@let p = t().seguridad.usuarios.detalle.permisos;
+
+<div class="flex flex-col gap-4">
+  <!-- Flags especiales: solo se pintan cuando aplican. -->
+  @if (tieneFlags()) {
+    <div class="flex flex-wrap gap-2">
+      @if (permiso()?.is_superuser) {
+        <span
+          class="inline-flex items-center gap-1.5 rounded-md bg-brand-navy px-2.5 py-1 text-[0.78rem] font-medium text-white"
+        >
+          <i class="pi pi-shield text-[0.7rem]" aria-hidden="true"></i>
+          {{ p.flags.superuser }}
+        </span>
+      }
+      @if (permiso()?.is_staff) {
+        <span
+          class="inline-flex items-center gap-1.5 rounded-md bg-[rgba(20,48,73,0.06)] px-2.5 py-1 text-[0.78rem] font-medium text-brand-navy"
+        >
+          <i class="pi pi-id-card text-[0.7rem]" aria-hidden="true"></i>
+          {{ p.flags.staff }}
+        </span>
+      }
+    </div>
+  }
+
+  @if (misPermisos().length === 0) {
+    <!-- Sin permisos directos: placeholder de crecimiento con el CTA dentro. -->
+    <div
+      class="flex flex-col items-center gap-3 rounded-xl border border-dashed border-[rgba(20,48,73,0.2)] px-6 py-10 text-center"
+    >
+      <i class="pi pi-key text-xl text-brand-muted opacity-60" aria-hidden="true"></i>
+      <div>
+        <p class="m-0 text-[0.9rem] font-bold text-brand-text">{{ p.empty.title }}</p>
+        <p class="m-0 mt-1 max-w-80 text-[0.78rem] leading-relaxed text-brand-muted">
+          {{ p.empty.desc }}
+        </p>
+      </div>
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-plus"
+        [label]="p.agregar"
+        (onClick)="abrirPicker()"
+      />
+    </div>
+  } @else {
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <span class="text-[0.78rem] text-brand-muted">{{ countLabel() }}</span>
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-plus"
+        [outlined]="true"
+        [label]="p.agregar"
+        (onClick)="abrirPicker()"
+      />
+    </div>
+
+    <!-- Lo que tiene, con el mismo diseño de la matriz del picker: bandas por
+         app, fila por modelo y las 4 acciones como columnas. Check navy = lo
+         tiene (tocarlo lo quita); punto = no lo tiene (se agrega en el modal). -->
+    <div class="max-h-[28rem] overflow-auto">
+      <table class="w-full min-w-[32rem] table-fixed border-separate border-spacing-0">
+        <thead>
+          <tr>
+            <th
+              class="sticky top-0 z-10 border-b border-[rgba(20,48,73,0.1)] bg-white pb-2 text-left text-[0.7rem] font-semibold text-brand-muted"
+            >
+              {{ p.modeloHeader }}
+            </th>
+            @for (accion of acciones; track accion) {
+              <th
+                class="sticky top-0 z-10 w-16 border-b border-[rgba(20,48,73,0.1)] bg-white pb-2 text-center text-[0.7rem] font-semibold text-brand-muted sm:w-20"
+              >
+                {{ p.acciones[accion] }}
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (grupo of misPermisos(); track grupo.app) {
+            <tr>
+              <td colspan="5" class="border-b border-[rgba(20,48,73,0.1)] pt-4 pb-1.5">
+                <span
+                  class="inline-block text-[0.65rem] font-semibold tracking-[0.08em] text-brand-muted uppercase first-letter:uppercase"
+                >
+                  {{ grupo.app }}
+                </span>
+              </td>
+            </tr>
+            @for (fila of grupo.modelos; track fila.modelo) {
+              <tr class="transition-colors hover:bg-[rgba(20,48,73,0.02)]">
+                <td class="border-b border-[rgba(20,48,73,0.04)] py-2 pr-3">
+                  <span class="block truncate text-[0.85rem] text-brand-text">
+                    {{ fila.label }}
+                  </span>
+                  @if (fila.extras.length > 0) {
+                    <span class="mt-1 flex flex-wrap gap-1">
+                      @for (extra of fila.extras; track extra.id) {
+                        <button
+                          type="button"
+                          [class]="extraChipClass(true)"
+                          [disabled]="estaPendiente(extra.id)"
+                          [title]="p.quitarHint.replace('{permiso}', extra.nombre)"
+                          (click)="toggle(extra)"
+                        >
+                          <i class="pi pi-check text-[0.55rem]" aria-hidden="true"></i>
+                          {{ extra.accion }}
+                        </button>
+                      }
+                    </span>
+                  }
+                </td>
+                @for (accion of acciones; track accion) {
+                  <td class="border-b border-[rgba(20,48,73,0.04)] py-2 text-center align-middle">
+                    @if (fila.porAccion.get(accion); as celda) {
+                      <button
+                        type="button"
+                        [class]="celdaClass(true)"
+                        [disabled]="estaPendiente(celda.id)"
+                        [attr.aria-label]="celda.nombre"
+                        [title]="p.quitarHint.replace('{permiso}', celda.nombre)"
+                        (click)="toggle(celda)"
+                      >
+                        <i class="pi pi-check text-[0.55rem]" aria-hidden="true"></i>
+                      </button>
+                    } @else {
+                      <!-- No lo tiene: hueco clickeable como en el picker. El id
+                           se resuelve contra el catálogo al tocar. -->
+                      <button
+                        type="button"
+                        [class]="celdaClass(false)"
+                        [disabled]="estaPendienteCelda(fila.modelo, accion)"
+                        [attr.aria-label]="accion + '_' + fila.modelo"
+                        [title]="p.agregarHint.replace('{permiso}', accion + '_' + fila.modelo)"
+                        (click)="agregarDesdeLista(fila.modelo, accion)"
+                      >
+                        <i class="pi pi-check text-[0.55rem]" aria-hidden="true"></i>
+                      </button>
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">{{ p.hint }}</p>
+</div>
+
+<!-- Picker: la matriz del catálogo, solo cuando se quiere agregar. -->
+<p-dialog
+  [visible]="pickerAbierto()"
+  (visibleChange)="pickerAbierto.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '820px', maxWidth: '94vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+      >
+        <i class="pi pi-key text-[1.1rem] text-brand-blue"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] leading-tight font-extrabold tracking-[-0.03em] text-brand-navy"
+        >
+          {{ p.dialog.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ p.dialog.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (pickerAbierto()) {
+    <div class="flex flex-col gap-4 pt-1">
+      <!-- Buscador (resuelto en el backend). -->
+      <div class="flex flex-wrap items-center gap-3">
+        <label class="relative min-w-0 grow sm:max-w-72">
+          <i
+            class="pi pi-search pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[0.75rem] text-brand-muted"
+            aria-hidden="true"
+          ></i>
+          <input
+            type="search"
+            class="w-full rounded-lg border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] py-2 pr-3 pl-9 text-[0.85rem] text-brand-text transition-colors placeholder:text-brand-muted focus:border-[rgba(20,48,73,0.35)] focus:outline-none"
+            [placeholder]="p.search"
+            [value]="busqueda()"
+            (input)="onBusquedaInput($event)"
+          />
+        </label>
+        @if (isBuscando()) {
+          <i
+            class="pi pi-spin pi-spinner ml-auto text-[0.8rem] text-brand-muted"
+            aria-hidden="true"
+          ></i>
+        }
+      </div>
+
+      <!-- Pills por app (?app=). -->
+      <div class="flex flex-wrap gap-1.5">
+        <button
+          type="button"
+          [class]="pillClass(appActiva() === null)"
+          [attr.aria-pressed]="appActiva() === null"
+          (click)="seleccionarApp(null)"
+        >
+          {{ p.todas }}
+        </button>
+        @for (app of apps(); track app) {
+          <button
+            type="button"
+            class="first-letter:uppercase"
+            [class]="pillClass(appActiva() === app)"
+            [attr.aria-pressed]="appActiva() === app"
+            (click)="seleccionarApp(app)"
+          >
+            {{ app }}
+          </button>
+        }
+      </div>
+
+      @if (isLoadingInicial()) {
+        <div class="flex items-center justify-center py-10 text-brand-muted">
+          <i class="pi pi-spin pi-spinner text-xl" aria-hidden="true"></i>
+        </div>
+      } @else if (grupos().length === 0) {
+        <div
+          class="rounded-lg bg-[rgba(19,38,60,0.03)] px-4 py-6 text-center text-[0.8rem] text-brand-muted"
+        >
+          {{ p.noResults }}
+        </div>
+      } @else {
+        <!-- Altura acotada con scroll propio y thead sticky (border-separate:
+             con border-collapse los bordes no viajan con el header pegado). -->
+        <div
+          class="max-h-[24rem] overflow-auto transition-opacity"
+          [class.opacity-60]="isBuscando()"
+          [class.pointer-events-none]="isBuscando()"
+        >
+          <table class="w-full min-w-[32rem] table-fixed border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <th
+                  class="sticky top-0 z-10 border-b border-[rgba(20,48,73,0.1)] bg-white pb-2 text-left text-[0.7rem] font-semibold text-brand-muted"
+                >
+                  {{ p.modeloHeader }}
+                </th>
+                @for (accion of acciones; track accion) {
+                  <th
+                    class="sticky top-0 z-10 w-16 border-b border-[rgba(20,48,73,0.1)] bg-white pb-2 text-center text-[0.7rem] font-semibold text-brand-muted sm:w-20"
+                  >
+                    {{ p.acciones[accion] }}
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (grupo of grupos(); track grupo.app) {
+                <!-- Banda de app: micro-label con el único divisor fuerte. -->
+                <tr>
+                  <td colspan="5" class="border-b border-[rgba(20,48,73,0.1)] pt-4 pb-1.5">
+                    <span
+                      class="inline-block text-[0.65rem] font-semibold tracking-[0.08em] text-brand-muted uppercase first-letter:uppercase"
+                    >
+                      {{ grupo.app }}
+                    </span>
+                  </td>
+                </tr>
+                @for (fila of grupo.modelos; track fila.modelo) {
+                  <tr class="transition-colors hover:bg-[rgba(20,48,73,0.02)]">
+                    <td class="border-b border-[rgba(20,48,73,0.04)] py-2 pr-3">
+                      <div class="flex items-center gap-2">
+                        <span class="min-w-0 flex-1 truncate text-[0.85rem] text-brand-text">
+                          {{ fila.label }}
+                        </span>
+                        <!-- Contador n/total: dice cuántas tiene y da todas de un
+                             clic (o las quita, si ya las tiene todas). Con una
+                             sola acción en la fila no aporta nada y no se pinta. -->
+                        @if (filaTotal(fila) > 1) {
+                          @let asignadas = filaAsignadas(fila);
+                          @let total = filaTotal(fila);
+                          <button
+                            type="button"
+                            [class]="filaTodoClass(asignadas, total)"
+                            [disabled]="filaPendiente(fila)"
+                            [attr.aria-pressed]="asignadas === total"
+                            [title]="filaTitulo(fila)"
+                            [attr.aria-label]="filaTitulo(fila)"
+                            (click)="toggleFila(fila)"
+                          >
+                            {{ asignadas }}/{{ total }}
+                          </button>
+                        }
+                      </div>
+                      <!-- Permisos custom del modelo (fuera de las 4 acciones
+                           estándar). El ícono siempre reserva su espacio. -->
+                      @if (fila.extras.length > 0) {
+                        <span class="mt-1 flex flex-wrap gap-1">
+                          @for (extra of fila.extras; track extra.id) {
+                            <button
+                              type="button"
+                              [class]="extraChipClass(tieneAsignado(extra.id))"
+                              [disabled]="estaPendiente(extra.id)"
+                              [attr.aria-pressed]="tieneAsignado(extra.id)"
+                              [title]="extra.nombre"
+                              (click)="toggle(extra)"
+                            >
+                              <i
+                                class="pi pi-check text-[0.55rem]"
+                                [class.opacity-0]="!tieneAsignado(extra.id)"
+                                aria-hidden="true"
+                              ></i>
+                              {{ extra.accion }}
+                            </button>
+                          }
+                        </span>
+                      }
+                    </td>
+                    @for (accion of acciones; track accion) {
+                      <td
+                        class="border-b border-[rgba(20,48,73,0.04)] py-2 text-center align-middle"
+                      >
+                        @if (fila.porAccion.get(accion); as celda) {
+                          <!-- Check navy = lo tiene, hueco = se le puede dar.
+                               La caja es idéntica en ambos estados. -->
+                          <button
+                            type="button"
+                            [class]="celdaClass(tieneAsignado(celda.id))"
+                            [disabled]="estaPendiente(celda.id)"
+                            [attr.aria-pressed]="tieneAsignado(celda.id)"
+                            [attr.aria-label]="celda.nombre"
+                            [title]="celda.nombre"
+                            (click)="toggle(celda)"
+                          >
+                            <i class="pi pi-check text-[0.55rem]" aria-hidden="true"></i>
+                          </button>
+                        } @else {
+                          <!-- Esa combinación modelo × acción no vino en la consulta. -->
+                          <span class="text-[0.9rem] text-[rgba(20,48,73,0.18)]">·</span>
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <!-- Paginación de servidor: la matriz nunca trae el catálogo entero. -->
+        @if (totalResultados() > limite()) {
+          <p-paginator
+            [first]="(pagina() - 1) * limite()"
+            [rows]="limite()"
+            [totalRecords]="totalResultados()"
+            (onPageChange)="onPage($event)"
+          />
+        }
+      }
+    </div>
+  }
+</p-dialog>

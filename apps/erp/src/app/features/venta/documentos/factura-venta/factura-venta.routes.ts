@@ -1,5 +1,5 @@
 import type { Route } from '@angular/router';
-import { activeDocumentResolver } from '@erp/core/module-config';
+import { activeDocumentResolver, editableDocumentResolver } from '@erp/core/module-config';
 import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
 
 /**
@@ -16,8 +16,8 @@ import { unsavedChangesGuard } from '@erp/core/guards/unsaved-changes.guard';
  * (`venta.routes.ts`) ya cargó `VENTA_CONFIG`.
  *
  * `nuevo` / `editar` comparten el `FacturaVentaFormComponent` (cabecera
- * específica de la factura de venta). `detalle` queda en placeholder hasta que
- * se implemente la vista de detalle.
+ * específica de la factura de venta); `detalle` muestra la ficha solo lectura
+ * (`FacturaVentaDetailComponent`).
  */
 export const FACTURA_VENTA_ROUTES: Route[] = [
   {
@@ -41,6 +41,11 @@ export const FACTURA_VENTA_ROUTES: Route[] = [
       },
       {
         path: 'editar/:id',
+        // Puerta de edición: bloquea (redirige) si `canEditRow` declara el
+        // documento no editable —p. ej. aprobado, incluso por URL directa— y, si
+        // es editable, entrega la cabecera al form (input `documentoEdit`) para
+        // que no la vuelva a pedir.
+        resolve: { documentoEdit: editableDocumentResolver() },
         canDeactivate: [unsavedChangesGuard],
         loadComponent: () =>
           import('./pages/factura-venta-form/factura-venta-form.component').then(
@@ -50,8 +55,8 @@ export const FACTURA_VENTA_ROUTES: Route[] = [
       {
         path: 'detalle/:id',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
+          import('./pages/factura-venta-detail/factura-venta-detail.component').then(
+            (m) => m.FacturaVentaDetailComponent,
           ),
       },
     ],

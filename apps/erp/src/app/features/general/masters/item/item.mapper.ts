@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { Item, ItemImpuesto, ItemPayload } from './item.model';
 import type { ItemFormRawValue } from './pages/item-form/item-form.types';
 
@@ -22,7 +22,10 @@ function impuestoOptions(
   if (!impuestos) return [];
   return impuestos
     .filter((i) => (tipo === 'venta' ? i.impuesto_venta : i.impuesto_compra))
-    .map((i) => ({ id: i.impuesto, nombre: i.impuesto_nombre ?? '' }));
+    .map((i) => ({
+      id: i.impuesto,
+      nombre: i.impuesto_nombre_extendido ?? i.impuesto_nombre ?? '',
+    }));
 }
 
 /**

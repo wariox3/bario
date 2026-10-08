@@ -1,0 +1,35 @@
+.tenant-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0; // permite que el nombre trunque dentro del flex del header
+
+  &__mono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--brand-navy);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  &__name {
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--brand-text);
+
+    @media (max-width: 768px) {
+      max-width: 120px;
+    }
+  }
+}

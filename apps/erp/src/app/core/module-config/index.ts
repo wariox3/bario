@@ -27,10 +27,10 @@ export type {
   EntityRoutes,
   DocumentEntityConfig,
   DocumentCapabilities,
+  EditableRowContext,
   InventoryEffect,
-  ImportDescriptor,
-} from './types/entity-config.types';
-export type { ModuleConfig } from './types/module-config.types';
+} from '@reddoc/core';
+export type { ModuleConfig } from '@reddoc/core';
 
 // Registry
 export { MODULE_REGISTRY } from './module-registry.token';
@@ -48,12 +48,13 @@ export {
   activeDocumentResolver,
   DOCUMENT_KEY_ROUTE_PARAM,
 } from './resolvers/active-document.resolver';
+export { editableDocumentResolver } from './resolvers/editable-document.resolver';
 
 // Data gateway
-export { ENTITY_DATA_GATEWAY } from './data/entity-data-gateway';
-export type { EntityDataGateway } from './data/entity-data-gateway';
-export { HttpEntityDataGateway } from './data/http-entity-data-gateway.service';
-export { DocumentoDetalleService } from './data/documento-detalle.service';
+export { ENTITY_DATA_GATEWAY } from '@reddoc/core';
+export type { EntityDataGateway } from '@reddoc/core';
+export { HttpEntityDataGateway } from '@reddoc/core';
+export { DocumentoDetalleService } from '@reddoc/core';
 
 // Importar desde documento (servicio + tipos; el modal NO se exporta para no
 // arrastrar PrimeNG al bundle inicial — se carga vía loadComponent).
@@ -65,6 +66,20 @@ export type {
   ImportarDocumentoModalData,
 } from './importar-documento/importar-documento.types';
 
+// Agregar documento (cruce de cartera: servicio + tipos; el modal NO se exporta
+// para no arrastrar PrimeNG al bundle inicial — se carga vía import() dinámico).
+export { AgregarDocumentoService } from './agregar-documento/agregar-documento.service';
+export type { DocumentosPendientesPage } from './agregar-documento/agregar-documento.service';
+export type {
+  CarteraTipo,
+  DocumentoPendienteApi,
+  AgregarDocumentoModalData,
+} from './agregar-documento/agregar-documento.types';
+export { AGREGAR_DOCUMENTO_FILTER_FIELDS } from './agregar-documento/agregar-documento.constants';
+// Reglas del cruce (cuenta + naturaleza de la línea enlazada). Módulo puro.
+export { resolverCruce } from './agregar-documento/cruce.rules';
+export type { CruceResuelto, CuentaCruce, NaturalezaCruce } from './agregar-documento/cruce.rules';
+
 // Acciones extra (Strategy + registro)
 // NOTA: se exportan SOLO el contrato, el token y los providers. Los strategies
 // y sus modales NO se exportan desde aquí para no arrastrar PrimeNG (datepicker,
@@ -73,12 +88,19 @@ export type { EntityActionStrategy, EntityActionContext } from './actions/entity
 export { ENTITY_ACTION_STRATEGY } from './actions/entity-action.token';
 export { ENTITY_ACTION_PROVIDERS } from './actions/entity-action.providers';
 
+// Navegación tras guardar (id del documento en la respuesta del gateway)
+export { extractDocumentoId } from './navigation/extract-documento-id';
+
+// Estado del documento (eje de aprobación). Módulo puro, sin Angular.
+export { capacidadesDocumento, CAPACIDADES_DOCUMENTO_VACIAS } from './estado/documento.estado';
+export type { CapacidadesDocumento } from './estado/documento.estado';
+
 // Storage helper
 export { buildEntityStorageKey } from './storage/build-entity-storage-key';
 
 // Constants del dominio
-export { DOCUMENT_TYPE_ID } from './constants/document-types.constants';
-export type { DocumentTypeId, DocumentTypeKey } from './constants/document-types.constants';
+export { DOCUMENT_TYPE_ID } from '@reddoc/core';
+export type { DocumentTypeId, DocumentTypeKey } from '@reddoc/core';
 
 // Components
 // NOTA: BaseDocumentListComponent NO se exporta desde aquí para evitar que

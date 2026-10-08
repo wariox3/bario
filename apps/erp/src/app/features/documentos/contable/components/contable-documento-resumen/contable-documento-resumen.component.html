@@ -1,0 +1,34 @@
+@let r = t().entities.cuentaDetalle.resumen;
+
+<div class="flex justify-end">
+  <div
+    class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
+  >
+    <div class="flex flex-col gap-1.5">
+      <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+        <span class="text-brand-muted">{{ r.debitos }}</span>
+        <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().debitos) }}</span>
+      </div>
+      <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+        <span class="text-brand-muted">{{ r.creditos }}</span>
+        <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().creditos) }}</span>
+      </div>
+      @if (showDescuadre() && descuadre() !== 0) {
+        <div
+          class="mt-1 flex items-baseline justify-between gap-2 border-t border-amber-200 pt-1.5 text-[0.8rem] font-semibold text-amber-700"
+        >
+          <span>{{ r.diferencia }}</span>
+          <span class="tabular-nums">{{ formatMoney(descuadre()) }}</span>
+        </div>
+      }
+      @if (showTotal()) {
+        <div
+          class="mt-1 flex items-baseline justify-between gap-2 border-t border-[rgba(20,48,73,0.1)] pt-1.5 text-[0.8rem] font-semibold"
+        >
+          <span class="text-brand-text">{{ r.total }}</span>
+          <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().total) }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

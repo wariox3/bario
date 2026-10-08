@@ -5,11 +5,11 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiSelectComponent } from '@erp/core/components/api-select/erp-api-select.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { CuentaService } from '../../cuenta.service';
 import {
@@ -33,19 +33,21 @@ import { longitudPar, noIniciaCon, soloDigitos } from '../../utils/cuenta-codigo
  * Cascada `clase → grupo → cuenta`: grupo y cuenta arrancan deshabilitados y se
  * habilitan al elegir su padre. Las opciones de cada nivel se filtran por rango
  * de id (`grupoParams` / `cuentaParams`, derivados del padre) que alimenta el
- * `[params]` reactivo del `<app-api-select>`. Al cambiar un padre se limpian sus
+ * `[params]` reactivo del `<lib-api-select>`. Al cambiar un padre se limpian sus
  * hijos.
  */
 @Component({
   selector: 'app-cuenta-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
   ],
   templateUrl: './cuenta-form.component.html',
@@ -152,7 +154,7 @@ export class CuentaFormComponent implements OnInit {
     ),
     exige_base: this.fb.control<boolean>(false),
     exige_contacto: this.fb.control<boolean>(false),
-    exige_grupo: this.fb.control<boolean>(false),
+    exige_centro_costo: this.fb.control<boolean>(false),
     permite_movimiento: this.fb.control<boolean>(false),
   });
 
@@ -201,11 +203,18 @@ export class CuentaFormComponent implements OnInit {
     const operation = id ? this.service.update(Number(id), payload) : this.service.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -252,5 +261,11 @@ export class CuentaFormComponent implements OnInit {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...CUENTA_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate(['/t', slug, ...CUENTA_LIST_PATH, 'detalle', id]);
   }
 }

@@ -1,18 +1,18 @@
-import { fromIsoDate, toIsoDate } from '@reddoc/core';
+import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { FacturaVentaRead, FacturaVentaPayload } from './factura-venta.model';
 import type { FacturaVentaFormRawValue } from './factura-venta-form.types';
 
 /**
  * Read-model (GET) → valores de cabecera del formulario (edición).
- * No incluye `detalles` (se poblan aparte en el `FormArray`).
+ * No incluye `detalles` ni `pagos` (se pueblan aparte en sus `FormArray`; los pagos
+ * vienen de `documento-pago`, no de la cabecera).
  */
 export function facturaVentaToFormValue(
   read: FacturaVentaRead,
-): Partial<Omit<FacturaVentaFormRawValue, 'detalles'>> {
+): Partial<Omit<FacturaVentaFormRawValue, 'detalles' | 'pagos'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     fecha_vence: fromIsoDate(read.fecha_vence),
     plazo_pago:
@@ -24,6 +24,15 @@ export function facturaVentaToFormValue(
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
         : null,
+    orden_compra: read.orden_compra ?? null,
+    remision: read.remision ?? null,
+    comentario: read.comentario ?? null,
+    asesor: read.asesor != null ? { id: read.asesor, nombre: read.asesor_nombre ?? '' } : null,
+    // Sin etiqueta en el read: `lib-api-select` hidrata la opción por id contra su catálogo.
+    resolucion:
+      read.resolucion != null
+        ? { id: read.resolucion, nombre: read.resolucion_nombre ?? '' }
+        : null,
   };
 }
 
@@ -32,7 +41,8 @@ export function facturaVentaToFormValue(
  *
  * `documento_tipo` proviene del `documentTypeId` del `DocumentEntityConfig`.
  * En **edición** se omiten los detalles (`includeDetalles=false`): transaccionan
- * en vivo contra `documento-detalle`. En **alta** viajan embebidos.
+ * en vivo contra `documento-detalle`. En **alta** viajan embebidos. Los pagos nunca
+ * viajan en el documento: se registran aparte en `documento-pago`.
  */
 export function formValueToPayload(
   raw: FacturaVentaFormRawValue,
@@ -47,6 +57,11 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
+    orden_compra: raw.orden_compra?.trim() || null,
+    remision: raw.remision?.trim() || null,
+    comentario: raw.comentario?.trim() || null,
+    asesor: raw.asesor?.id ?? null,
+    resolucion: raw.resolucion?.id ?? null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };
 }

@@ -1,13 +1,19 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
 import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
+import {
+  formatCop,
   FormErrorService,
   I18nService,
   TenantService,
@@ -15,38 +21,47 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-import {
-  ContratoAutocompleteComponent,
-  type ContratoOption,
-} from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { CreditoService } from '../../credito.service';
-import { CONCEPTO_ENDPOINT, CREDITO_LIST_PATH } from '../../credito.constants';
+import { CONCEPTO_ENDPOINT, CREDITO_LIST_PATH, CONCEPTO_PARAMS } from '../../credito.constants';
 import { creditoToFormValue, formValueToPayload } from '../../credito.mapper';
+import { montoPositivo } from '../../../../shared/monto-positivo.validator';
+import {
+  cuotaNoSuperaTotal,
+  cuotaSugerida,
+  cuotasNecesarias,
+  mismoMontoVisible,
+  planDeCuotas,
+  type PlanDeCuotas,
+} from '../../utils/credito-cuotas';
 
 /**
  * Formulario de alta/edición de crédito de empleado.
  *
  * Master del módulo Humano (camino B). La misma página cubre crear y editar: sin
  * `:id` → alta (sugiere hoy en fecha_inicio); con `:id` → edición. `contrato` usa
- * `<app-contrato-autocomplete>` y `concepto` usa `<app-api-autocomplete>` (búsqueda
+ * `<lib-contrato-autocomplete>` y `concepto` usa `<lib-api-autocomplete>` (búsqueda
  * por `nombre__icontains`).
  */
 @Component({
   selector: 'app-credito-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputNumberModule,
     DatePickerModule,
+    MascaraFechaDirective,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ContratoAutocompleteComponent,
-    ErpApiAutocompleteComponent,
+    ErpApiSelectComponent,
   ],
   templateUrl: './credito-form.component.html',
   styleUrl: './credito-form.component.scss',
@@ -64,6 +79,7 @@ export class CreditoFormComponent implements OnInit {
   protected readonly t = this.i18n.t;
 
   protected readonly conceptoEndpoint = CONCEPTO_ENDPOINT;
+  protected readonly conceptoParams = CONCEPTO_PARAMS;
 
   /** Id del crédito a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -86,17 +102,86 @@ export class CreditoFormComponent implements OnInit {
     ];
   });
 
-  protected readonly form = this.fb.group({
-    contrato: this.fb.control<ContratoOption | null>(null, Validators.required),
-    concepto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    fecha_inicio: this.fb.control<Date | null>(null, Validators.required),
-    total: this.fb.control<number | null>(null, Validators.required),
-    cuota: this.fb.control<number | null>(null, Validators.required),
-    cantidad_cuotas: this.fb.control<number | null>(null, Validators.required),
-    inactivo: [false],
-    aplica_prima: [false],
-    aplica_cesantia: [false],
+  protected readonly form = this.fb.group(
+    {
+      contrato: this.fb.control<ContratoOption | null>(null, Validators.required),
+      concepto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+      fecha_inicio: this.fb.control<Date | null>(null, Validators.required),
+      total: this.fb.control<number | null>(null, [Validators.required, montoPositivo]),
+      cuota: this.fb.control<number | null>(null, [Validators.required, montoPositivo]),
+      cantidad_cuotas: this.fb.control<number | null>(null, [Validators.required, montoPositivo]),
+      inactivo: [false],
+      aplica_prima: [false],
+      aplica_cesantia: [false],
+    },
+    // Compara dos campos, así que vive en el grupo y no en un control.
+    { validators: cuotaNoSuperaTotal },
+  );
+
+  /** Valor del form como signal, para derivar el plan de cuotas sin suscripciones. */
+  private readonly valores = toSignal(this.form.valueChanges, { initialValue: this.form.value });
+
+  /**
+   * Cómo queda el crédito con lo que se lleva escrito. No es una advertencia: la
+   * cantidad de cuotas se deriva sola, así que siempre cuadra. Está para
+   * confirmar lo que se va a crear —sobre todo cuando la última cuota es menor,
+   * que es lo normal si el total no se divide exacto—.
+   */
+  protected readonly plan = computed<PlanDeCuotas | null>(() => {
+    const v = this.valores();
+    return planDeCuotas(v.total ?? null, v.cuota ?? null, v.cantidad_cuotas ?? null);
   });
+
+  /** Resumen en palabras: «10 cuotas de $ 1.000» / «… y una final de $ 1.000». */
+  protected readonly planTexto = computed(() => {
+    const plan = this.plan();
+    const cuota = this.valores().cuota ?? 0;
+    if (!plan || !cuota) return '';
+    const m = this.t().entities.credito.form.plan;
+
+    // Se compara como se imprime: una diferencia de centavos no se ve, y
+    // anunciar «una final de $ 10.909» junto a cuotas de $ 10.909 no dice nada.
+    if (mismoMontoVisible(plan.ultima, cuota)) {
+      return m.exacto.replace('{cuotas}', String(plan.cuotas)).replace('{monto}', formatCop(cuota));
+    }
+    return m.conFinal
+      .replace('{cuotas}', String(plan.cuotas - 1))
+      .replace('{monto}', formatCop(cuota))
+      .replace('{final}', formatCop(plan.ultima));
+  });
+
+  constructor() {
+    // Se pacta un monto y un plazo, y la cuota es lo que se quiere averiguar:
+    // por eso va última y se llena sola. Tocar el total o la cantidad la
+    // recalcula, así nada cambia por encima de donde se está escribiendo.
+    this.form.controls.total.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.derivarCuota());
+    this.form.controls.cantidad_cuotas.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.derivarCuota());
+
+    // Camino inverso: quien pacta el descuento por período escribe la cuota y
+    // la cantidad se ajusta. El campo que se toca manda.
+    this.form.controls.cuota.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.derivarCantidad());
+  }
+
+  /** `emitEvent: false` en los dos: si no, cada cálculo dispararía el otro. */
+  private derivarCantidad(): void {
+    const { total, cuota } = this.form.getRawValue();
+    const cuotas = cuotasNecesarias(total, cuota);
+    if (cuotas !== null) {
+      this.form.controls.cantidad_cuotas.setValue(cuotas, { emitEvent: false });
+    }
+  }
+
+  private derivarCuota(): void {
+    const { total, cantidad_cuotas } = this.form.getRawValue();
+    const sugerida = cuotaSugerida(total, cantidad_cuotas);
+    if (sugerida !== null) this.form.controls.cuota.setValue(sugerida, { emitEvent: false });
+  }
 
   ngOnInit(): void {
     const id = this.id();
@@ -119,11 +204,18 @@ export class CreditoFormComponent implements OnInit {
       : this.creditoService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -142,7 +234,8 @@ export class CreditoFormComponent implements OnInit {
       .getById(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (c) => this.form.patchValue(creditoToFormValue(c)),
+        // `emitEvent: false`: cargar un crédito guardado no debe recalcular su cuota.
+        next: (c) => this.form.patchValue(creditoToFormValue(c), { emitEvent: false }),
         error: () => {
           const toasts = this.t().entities.credito.form.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
@@ -154,5 +247,11 @@ export class CreditoFormComponent implements OnInit {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...CREDITO_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate(['/t', slug, ...CREDITO_LIST_PATH, 'detalle', id]);
   }
 }

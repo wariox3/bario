@@ -14,7 +14,11 @@ export function creditoToFormValue(c: Credito): Partial<CreditoFormRawValue> {
   return {
     contrato:
       c.contrato != null
-        ? { id: c.contrato, nombre: c.contrato_nombre ?? '', numero_identificacion: '' }
+        ? {
+            id: c.contrato,
+            nombre: c.contrato_nombre ?? '',
+            numero_identificacion: c.contrato_contacto_numero_identificacion ?? '',
+          }
         : null,
     concepto: c.concepto != null ? { id: c.concepto, nombre: c.concepto_nombre ?? '' } : null,
     fecha_inicio: fromIsoDate(c.fecha_inicio),

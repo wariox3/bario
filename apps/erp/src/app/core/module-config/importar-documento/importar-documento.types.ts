@@ -13,11 +13,22 @@
 export interface LineaPendienteImpuesto {
   /** Id del impuesto (FK). */
   readonly impuesto: number;
+  /** Nombre corto (`"IVA"`). Para mostrar se prefiere `impuesto_nombre_extendido`. */
   readonly impuesto_nombre?: string | null;
+  /** Nombre para mostrar (`"IVA 19% ventas"`), si el serializador lo manda. */
+  readonly impuesto_nombre_extendido?: string | null;
   /** Porcentaje del impuesto, e.g. `"19.00"`. */
   readonly impuesto_porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.00"`. */
   readonly impuesto_porcentaje_base?: string | null;
+  /**
+   * Operación sobre el total: `1` suma, `-1` resta (retención). El serializador
+   * de `pendiente/` la manda (verificado contra la respuesta real el
+   * 2026-09-10; el OpenAPI documenta ahí otro serializer y no sirve para esto).
+   * Opcional por prudencia: sin ella el mapper asume `1` y una retención
+   * importada no restaría.
+   */
+  readonly impuesto_operacion?: number | null;
 }
 
 /**
@@ -36,11 +47,11 @@ export interface LineaPendienteApi {
   /** Id del documento (cabecera) origen. */
   readonly documento: number;
   /** Número del documento origen (puede venir `null`). */
-  readonly numero: number | null;
+  readonly documento_numero: number | null;
   /** Fecha del documento origen, `yyyy-MM-dd`. */
-  readonly fecha: string;
+  readonly documento_fecha: string;
   readonly contacto_id: number;
-  readonly contacto_nombre: string;
+  readonly contacto_nombre_corto: string;
   /** Id del ítem de la línea origen. */
   readonly item_id: number;
   /** Nombre del ítem. */
@@ -67,4 +78,9 @@ export interface LineaPendienteApi {
 export interface ImportarDocumentoModalData {
   /** Contacto del documento actual; filtra las pendientes. `null` = sin filtro. */
   readonly contactoId: number | null;
+  /**
+   * Tipo del documento origen (`DOCUMENT_TYPE_ID`); acota las pendientes a ese
+   * tipo, p. ej. la factura de venta solo trae remisiones. `null` = sin filtro.
+   */
+  readonly documentoTipoId: number | null;
 }

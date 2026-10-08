@@ -1,0 +1,45 @@
+@let m = t().configuracion.general.documentoTipo;
+
+@if (!puedeVer()) {
+  <!--
+    Mismo estado de acceso denegado que usan las pantallas completas: sin
+    permiso no hay falla que reportar, hay una regla funcionando. Sin `backLink`
+    no dibuja botón de salida, que acá sobra: la persona sigue en Configuración
+    y el resto de la pestaña le funciona.
+  -->
+  <app-access-denied [message]="t().common.accessDenied.subPermission" />
+} @else if (loadFailed()) {
+  <div class="flex flex-col items-center justify-center gap-3 py-12 text-center">
+    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+    <p class="m-0 text-sm text-brand-muted">{{ m.toasts.loadError.desc }}</p>
+    <p-button
+      type="button"
+      [label]="t().common.actions.refresh"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="cargar()"
+    />
+  </div>
+} @else {
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [rowActions]="acciones.rowActions()"
+    [scrollHeight]="tableHeight"
+    emptyTitleKey="configuracion.general.documentoTipo.empty.title"
+    emptySubKey="configuracion.general.documentoTipo.empty.sub"
+    (pageChange)="onPageChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+}
+
+<app-documento-tipo-edit-dialog
+  [(visible)]="dialogVisible"
+  [tipo]="selectedTipo()"
+  (saved)="onSaved()"
+/>

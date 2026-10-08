@@ -8,6 +8,12 @@
 }
 
 .lib-data-table {
+  // Separador entre partes de una columna `combined` (ej. `816 / 368`): discreto.
+  &__cell-sep {
+    margin: 0 0.35em;
+    color: var(--brand-muted);
+  }
+
   &__select-col {
     width: 38px;
     text-align: center;
@@ -81,14 +87,6 @@
     }
   }
 
-  &__row--clickable {
-    cursor: pointer;
-
-    &:hover {
-      background: rgba(19 38 60 / 0.025);
-    }
-  }
-
   &__empty {
     display: flex;
     flex-direction: column;
@@ -140,10 +138,32 @@
       color: #16a34a;
     }
 
+    // `booleanTone: 'negative'`: el «sí» de un estado adverso (inactivo, vencido).
+    // Ámbar y no rojo — es una condición del registro, no un error que atender.
+    &--adverse {
+      background: #fffbeb;
+      color: #b45309;
+    }
+
+    // El «no» va neutro con cualquier tono: no está inactivo no es un logro.
     &--false {
       background: rgba(20 48 73 / 0.06);
       color: var(--brand-muted);
     }
+  }
+
+  // `ColumnDef.toneFor`: la celda entera se tiñe con los mismos pares que los
+  // badges, así una fecha marcada se lee de un vistazo sin cambiar su formato.
+  &__cell--positive {
+    background: #f0fdf4;
+    color: #16a34a;
+    font-weight: 600;
+  }
+
+  &__cell--critical {
+    background: #fef2f2;
+    color: #dc2626;
+    font-weight: 600;
   }
 
   &__paginator-count {
@@ -184,8 +204,18 @@
 
   // El bloque "sin registros" llena el alto del contenedor scrollable.
   // Solo cuando la tabla está vacía: con datos la tabla mantiene alto auto.
-  .p-datatable-table-container:has(.lib-data-table__empty) .p-datatable-table {
-    height: 100%;
+  .p-datatable-table-container:has(.lib-data-table__empty) {
+    .p-datatable-table {
+      height: 100%;
+    }
+
+    // Al estirar la tabla el sobrante se reparte entre TODAS sus filas, también
+    // la del header (que por eso crecia solo en vacio). En tablas `height` es
+    // minimo, no maximo: el thead queda a su alto de contenido y todo el
+    // sobrante cae en la fila del empty state.
+    .p-datatable-thead > tr > th {
+      height: 1px;
+    }
   }
 
   // Contenedor scrollable (el que recibe el alto y hace el scroll vertical).

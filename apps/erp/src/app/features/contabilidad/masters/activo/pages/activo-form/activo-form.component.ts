@@ -6,7 +6,12 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -15,10 +20,8 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
@@ -36,20 +39,23 @@ import { activoToFormValue, formValueToPayload } from '../../activo.mapper';
  * Master del módulo Contabilidad (camino B). La misma página cubre crear y
  * editar: sin `:id` → alta (sugiere hoy en fecha_compra/fecha_activacion); con
  * `:id` → edición. Las FK `activo_grupo`, `metodo_depreciacion` y `centro_costo`
- * usan `<app-api-select>`; las cuentas contables (`cuenta_gasto`,
+ * usan `<lib-api-select>`; las cuentas contables (`cuenta_gasto`,
  * `cuenta_depreciacion`) usan `<app-cuenta-select>`.
  */
 @Component({
   selector: 'app-activo-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     InputNumberModule,
     DatePickerModule,
+    MascaraFechaDirective,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
     ErpCuentaSelectComponent,
   ],
@@ -134,11 +140,18 @@ export class ActivoFormComponent implements OnInit {
       : this.activoService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -169,5 +182,11 @@ export class ActivoFormComponent implements OnInit {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...ACTIVO_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate(['/t', slug, ...ACTIVO_LIST_PATH, 'detalle', id]);
   }
 }

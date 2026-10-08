@@ -14,6 +14,12 @@ export interface Item {
   readonly referencia: string | null;
   readonly precio: number;
   readonly costo: number;
+  /**
+   * Costo promedio ponderado de las existencias. Lo usan las salidas de almacén
+   * para valorizar la línea. Opcional: campo **supuesto** a partir del ERP
+   * legacy, pendiente de confirmar en el read del ítem del API nuevo.
+   */
+  readonly costo_promedio?: number | null;
   readonly producto: boolean;
   readonly servicio: boolean;
   readonly inventario: boolean;
@@ -49,9 +55,14 @@ export interface Item {
 export interface ItemImpuesto {
   readonly id?: number;
   readonly impuesto: number;
+  /** Nombre corto (`"IVA"`). Para mostrar se prefiere `impuesto_nombre_extendido`. */
   readonly impuesto_nombre?: string | null;
+  /** Nombre para mostrar (`"IVA 19% ventas"`). */
+  readonly impuesto_nombre_extendido?: string | null;
   readonly impuesto_venta?: boolean;
   readonly impuesto_compra?: boolean;
+  /** Operación sobre el total: `1` suma (IVA…), `-1` resta (retenciones). */
+  readonly impuesto_operacion?: number;
   /** Porcentaje del impuesto, e.g. `"19.00"`. */
   readonly impuesto_porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.00"` o `"10.00"` para AIU. */

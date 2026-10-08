@@ -1,0 +1,53 @@
+@let a = t().entities.programacion.adicionales;
+
+<div class="flex flex-col gap-3">
+  <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <lib-data-toolbar
+      [primaryAction]="primaryAction()"
+      [trailingActions]="trailingActions()"
+      [searchEnabled]="false"
+      [filtersEnabled]="false"
+      [deleteSelectedEnabled]="hasSelection() && capacidades().puedeGestionarAdicionales"
+      [deleteSelectedCount]="selectedRows().length"
+      (actionInvoked)="onToolbarAction($event)"
+      (deleteSelected)="removeSelected()"
+    />
+
+    <lib-data-table
+      [columns]="columns"
+      [items]="items()"
+      [totalCount]="totalCount()"
+      [loading]="isLoading()"
+      [pageSize]="pageSize()"
+      [currentPage]="currentPage()"
+      [selectionMode]="selectionMode()"
+      [selectedRows]="selectedRows()"
+      [rowActions]="rowActions()"
+      (pageChange)="onPageChange($event)"
+      (selectionChange)="onSelectionChange($event)"
+      (rowActionInvoked)="onRowAction($event)"
+    />
+  </div>
+
+  <!-- Leyenda de las abreviaturas, igual que en la tabla de empleados -->
+  <p class="m-0 text-[0.72rem] leading-relaxed text-brand-muted">
+    <span class="font-semibold">{{ a.leyenda.titulo }}:</span>
+    {{ a.leyenda.contenido }}
+  </p>
+</div>
+
+<app-import-dialog
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
+  [title]="t().entities.programacion.adicionales.import.title"
+  [subtitle]="t().entities.programacion.adicionales.import.subtitle"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
+  [exampleConfig]="exampleConfig"
+  (importRequested)="importar.submit($event)"
+/>
+
+<p-confirmDialog />

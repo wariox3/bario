@@ -14,17 +14,96 @@ export default [
         'error',
         {
           enforceBuildableLibDependency: true,
-          // `@erp/*` es un alias intra-app de apps/erp para evitar
-          // imports relativos profundos (`../../../../../i18n`) ahora que
-          // los masters viven en `features/<modulo>/masters/<entity>/pages/<page>/`.
-          // Se permite explícitamente porque el alias resuelve solo dentro de
-          // apps/erp; el resto del monorepo no puede usarlo (no se declara
-          // un alias equivalente para los otros apps).
-          allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$', '^@erp/'],
+          // `@erp/*` (apps/erp) y `@turnos/*` (apps/turnos) son alias intra-app
+          // para evitar imports relativos profundos (`../../../../../i18n`) ahora
+          // que los masters viven en `features/<modulo>/masters/<entity>/pages/<page>/`.
+          // Ambos alias están en `tsconfig.base.json`, así que resuelven desde
+          // cualquier proyecto y este `allow` los exime del boundary global. La
+          // barrera cross-app (que una app no importe el alias de la otra) NO la
+          // da este `allow`, sino los overrides `no-restricted-imports` de abajo.
+          //
+          // `@reddoc/feature-contenedores/i18n` es el entry point del diccionario.
+          // El lib se carga lazy (`loadComponent`), pero `provideI18n` recibe un
+          // objeto estático y cada `app.es.ts` tiene que importarlo eager. La regla
+          // "static imports of lazy-loaded libraries" es de granularidad proyecto y
+          // no ve que `src/i18n.ts` no importa `src/index.ts`: son grafos disjuntos,
+          // así que el chunk lazy del componente sobrevive. Eximimos ese specifier
+          // exacto, no el barrel: importar `@reddoc/feature-contenedores` estático
+          // sigue siendo un error, que es lo que de verdad rompería la laziness.
+          allow: [
+            '^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$',
+            '^@erp/',
+            '^@turnos/',
+            '^@reddoc/feature-contenedores/i18n$',
+          ],
           depConstraints: [
             {
               sourceTag: '*',
               onlyDependOnLibsWithTags: ['*'],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Guard cross-app: `apps/turnos` no puede usar el alias intra-app del ERP.
+    files: ['apps/turnos/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@erp/*'],
+              message:
+                'apps/turnos no puede importar el alias @erp/* (app ajena). Usá @reddoc/* para lo compartido o rutas propias @turnos/*.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Guard cross-app: `apps/erp` no puede usar el alias intra-app de turnos.
+    files: ['apps/erp/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@turnos/*'],
+              message:
+                'apps/erp no puede importar el alias @turnos/* (app ajena). Usá @reddoc/* para lo compartido o rutas propias @erp/*.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Los descriptores de módulo no pueden entrar por el barrel de permisos.
+    //
+    // El ciclo: `@erp/core/permissions` → `permissions.service.ts` →
+    // `@erp/core/erp-modules` → el registry → los descriptores → de vuelta al
+    // barrel. Como el descriptor evalúa `MODELO` en el literal de su menú, el
+    // ciclo se cierra en runtime y revienta al arrancar (TDZ), no al compilar.
+    //
+    // Por eso el import va **profundo**, a `modelo.catalog`, que es una hoja sin
+    // dependencias. Los `import type` sí pueden ir por el barrel: se borran en
+    // la compilación y no participan del ciclo.
+    files: ['apps/erp/**/*.module-descriptor.ts'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@erp/core/permissions',
+              message:
+                'Import profundo en los descriptores: usá @erp/core/permissions/modelo.catalog. El barrel arrastra PermissionsService → ERP_MODULES → los descriptores, y ese ciclo revienta al arrancar.',
+              allowTypeImports: true,
             },
           ],
         },

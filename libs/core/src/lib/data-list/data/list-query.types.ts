@@ -25,6 +25,13 @@ export type FilterOperator =
   | 'isNull'; // el campo es / no es nulo (el `value` booleano indica cuál)
 
 /**
+ * Cómo se encadena una condición con la anterior. El backend evalúa la lista
+ * **en secuencia** y asume `AND` cuando no se declara, así que solo hace falta
+ * nombrarlo para armar un `OR`.
+ */
+export type FilterLogic = 'AND' | 'OR';
+
+/**
  * Condición de filtro tal como la emite el componente de filtros
  * y la consume el gateway.
  */
@@ -32,6 +39,11 @@ export interface FilterCondition {
   readonly field: string;
   readonly operator: FilterOperator;
   readonly value: string | number | boolean | readonly (string | number)[];
+  /**
+   * Encadenamiento con la condición anterior. Se omite en el primer filtro (no
+   * hay nada con qué encadenar) y en los `AND`, que son el default del backend.
+   */
+  readonly logic?: FilterLogic;
 }
 
 /** Dirección de ordenamiento. */

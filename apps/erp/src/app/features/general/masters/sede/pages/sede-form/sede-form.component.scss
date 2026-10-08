@@ -1,0 +1,12 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sede-form__label {
+  font-size: 0.855rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--brand-text);
+}

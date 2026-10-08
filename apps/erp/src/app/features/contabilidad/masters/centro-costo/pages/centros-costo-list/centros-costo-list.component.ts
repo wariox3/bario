@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,6 +26,9 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CentroCostoService } from '../../centro-costo.service';
 import type { CentroCosto } from '../../centro-costo.model';
@@ -33,6 +39,7 @@ import {
   CENTROS_COSTO_QUICK_SEARCH_FIELD,
   CENTROS_COSTO_PRIMARY_ACTION,
   CENTROS_COSTO_ROW_ACTIONS,
+  CENTROS_COSTO_TRAILING_ACTIONS,
 } from '../../centro-costo.constants';
 
 @Component({
@@ -44,6 +51,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './centros-costo-list.component.html',
@@ -51,6 +59,7 @@ import {
 })
 export class CentrosCostoListComponent {
   private readonly service = inject(CentroCostoService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
@@ -74,6 +83,19 @@ export class CentrosCostoListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/contabilidad/centro-costo/importar-ejemplo/',
+  };
+
+  /** Estado del diálogo de importación (visibilidad, progreso, errores, maestros). */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+  });
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -89,8 +111,11 @@ export class CentrosCostoListComponent {
 
   protected readonly columns = CENTROS_COSTO_COLUMNS;
   protected readonly filterFields = CENTROS_COSTO_FILTER_FIELDS;
-  protected readonly rowActions = CENTROS_COSTO_ROW_ACTIONS;
-  protected readonly primaryAction = CENTROS_COSTO_PRIMARY_ACTION;
+  protected readonly acciones = masterActions(MODELO.contabilidad.centroCosto, {
+    row: CENTROS_COSTO_ROW_ACTIONS,
+    primary: CENTROS_COSTO_PRIMARY_ACTION,
+    trailing: CENTROS_COSTO_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -145,12 +170,18 @@ export class CentrosCostoListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as CentroCosto).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'import':
+        this.importar.open();
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +192,31 @@ export class CentrosCostoListComponent {
     const ids = this.selectedRows().map((c) => c.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/contabilidad/centro-costo/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'centros-costo.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {

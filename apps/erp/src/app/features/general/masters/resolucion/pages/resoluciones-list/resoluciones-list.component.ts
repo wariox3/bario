@@ -1,14 +1,15 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
-  TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,16 +24,19 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
-import { ActiveModuleStore } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
+import { ActiveModuleStore, masterNav } from '@erp/core/erp-modules';
 import { ResolucionService } from '../../resolucion.service';
 import type { Resolucion, ResolucionTipo } from '../../resolucion.model';
 import {
   RESOLUCIONES_COLUMNS,
   RESOLUCIONES_FILTER_FIELDS,
   RESOLUCIONES_QUICK_SEARCH_FIELD,
+  RESOLUCION_SEGMENT,
   RESOLUCIONES_PRIMARY_ACTION,
   RESOLUCIONES_ROW_ACTIONS,
+  RESOLUCIONES_TRAILING_ACTIONS,
   resolucionTipoFilter,
   resolucionesFiltersStorageKey,
 } from '../../resolucion.constants';
@@ -53,16 +57,17 @@ import {
 })
 export class ResolucionesListComponent {
   private readonly service = inject(ResolucionService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
-  private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
-  private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  private readonly nav = masterNav(RESOLUCION_SEGMENT);
 
   /** Módulo activo (venta/compra) del que cuelga este listado. */
   protected readonly tipo = computed<ResolucionTipo>(() =>
@@ -84,23 +89,21 @@ export class ResolucionesListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
-  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
-    const slug = this.tenant.currentSlug();
-    const tipo = this.tipo();
-    const moduleName =
-      tipo === 'compra' ? this.t().modules.compra.name : this.t().modules.venta.name;
-    return [
-      { label: moduleName, routerLink: slug ? ['/t', slug, tipo] : undefined },
-      { label: this.t().entities.resolucion.name },
-    ];
-  });
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
+    this.nav.crumbs(this.t().entities.resolucion.name),
+  );
 
   protected readonly columns = RESOLUCIONES_COLUMNS;
   protected readonly filterFields = RESOLUCIONES_FILTER_FIELDS;
-  protected readonly rowActions = RESOLUCIONES_ROW_ACTIONS;
-  protected readonly primaryAction = RESOLUCIONES_PRIMARY_ACTION;
+  protected readonly acciones = masterActions(MODELO.general.resolucion, {
+    row: RESOLUCIONES_ROW_ACTIONS,
+    primary: RESOLUCIONES_PRIMARY_ACTION,
+    trailing: RESOLUCIONES_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -144,10 +147,10 @@ export class ResolucionesListComponent {
     const resolucion = event.row as Resolucion;
     switch (event.actionId) {
       case 'view':
-        this.navigateTo('detalle', resolucion.id);
+        this.nav.ir('detalle', resolucion.id);
         break;
       case 'edit':
-        this.navigateTo('editar', resolucion.id);
+        this.nav.ir('editar', resolucion.id);
         break;
       case 'delete':
         this.confirmRemove([resolucion.id]);
@@ -155,12 +158,15 @@ export class ResolucionesListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as Resolucion).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.nav.ir('nuevo');
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -171,6 +177,32 @@ export class ResolucionesListComponent {
     const ids = this.selectedRows().map((r) => r.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/general/resolucion/excel/', {
+        method: 'POST',
+        body: {
+          // Mantiene el filtro fijo del módulo (venta/compra) que aplica el listado.
+          filtros: buildFiltros([resolucionTipoFilter(this.tipo()), ...this.activeFilters()]),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'resoluciones.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {
@@ -241,11 +273,5 @@ export class ResolucionesListComponent {
           );
         },
       });
-  }
-
-  private navigateTo(...subPath: (string | number)[]): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) throw new Error('Cannot navigate without an active tenant slug.');
-    void this.router.navigate(['/t', slug, this.tipo(), 'resoluciones', ...subPath]);
   }
 }

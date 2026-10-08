@@ -1,0 +1,143 @@
+@let inv = t().seguridad.usuarios.invitar;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '640px', maxWidth: '94vw' }"
+  styleClass="rd-invite-dialog"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50">
+        <i class="pi pi-send text-[1.05rem] text-sky-700"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+        >
+          {{ inv.title }}
+          @if (contenedor(); as empresa) {
+            <span class="ml-1 font-semibold text-brand-muted">· {{ empresa.cliente_nombre }}</span>
+          }
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ inv.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Body -->
+  @if (visible()) {
+    <form (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="invitar-usuario"
+          class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
+        >
+          {{ inv.fields.usuario }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <p-autocomplete
+          inputId="invitar-usuario"
+          [ngModel]="selection()"
+          (ngModelChange)="selection.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [suggestions]="suggestions()"
+          (completeMethod)="onSearch($event)"
+          (onSelect)="onSelect($event)"
+          optionLabel="email"
+          [forceSelection]="true"
+          [minLength]="3"
+          [delay]="300"
+          appendTo="body"
+          inputStyleClass="w-full"
+          [placeholder]="inv.fields.usuarioPlaceholder"
+        >
+          <ng-template pTemplate="item" let-user>
+            <div class="flex items-center gap-2.5 py-0.5">
+              <span
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[rgba(20,48,73,0.06)] text-[0.65rem] font-bold text-brand-navy"
+              >
+                {{ initials(user) }}
+              </span>
+              <div class="flex flex-col leading-tight">
+                <span class="text-[0.82rem] font-semibold text-brand-navy">
+                  {{ user.nombre_corto ?? user.email }}
+                </span>
+                @if (user.nombre_corto) {
+                  <span class="text-[0.7rem] text-brand-muted">{{ user.email }}</span>
+                }
+              </div>
+            </div>
+          </ng-template>
+        </p-autocomplete>
+        @if (!selectedUser() && selection()) {
+          <span class="flex items-center gap-1.5 text-[0.7rem] tracking-[0.01em] text-red-600">
+            <i class="pi pi-times-circle text-[0.7rem]"></i>
+            {{ inv.fields.usuarioInvalid }}
+          </span>
+        } @else {
+          <span class="text-[0.72rem] text-brand-muted">{{ inv.fields.usuarioHint }}</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="invitar-grupos"
+          class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
+        >
+          {{ inv.fields.grupos }}
+        </label>
+        <p-multiselect
+          inputId="invitar-grupos"
+          [options]="grupos()"
+          [ngModel]="selectedGrupoIds()"
+          (ngModelChange)="selectedGrupoIds.set($event ?? [])"
+          [ngModelOptions]="{ standalone: true }"
+          optionLabel="nombre"
+          optionValue="id"
+          dataKey="id"
+          display="chip"
+          [maxSelectedLabels]="3"
+          [showClear]="true"
+          [loading]="isLoadingGrupos()"
+          [placeholder]="inv.fields.gruposPlaceholder"
+          [emptyMessage]="inv.fields.gruposEmpty"
+          appendTo="body"
+          [fluid]="true"
+        />
+        <span class="text-[0.72rem] text-brand-muted">{{ inv.fields.gruposHint }}</span>
+      </div>
+
+      <!--
+        El rol no se pide acá a propósito: se cambia desde la fila del listado.
+      -->
+
+      <lib-accesos-contenedor
+        [contenedor]="contenedor()"
+        [(selected)]="selectedAccesoIds"
+        inputIdPrefix="invitar-acceso"
+      />
+
+      <!--
+        Sin botón de cancelar: la única acción es enviar. Para salir está la X
+        del encabezado (y el click afuera), como en cualquier diálogo.
+      -->
+      <div class="flex justify-end pb-1">
+        <p-button
+          type="submit"
+          size="small"
+          icon="pi pi-send"
+          [label]="isSending() ? inv.sending : inv.submit"
+          [loading]="isSending()"
+          [disabled]="!selectedUser() || isSending()"
+        />
+      </div>
+    </form>
+  }
+</p-dialog>

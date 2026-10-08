@@ -1,0 +1,16 @@
+@if (!vacio()) {
+  @let d = t().entities.vencimiento;
+
+  <p class="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-[0.72rem] text-amber-700">
+    <i class="pi pi-exclamation-circle text-[0.7rem]" aria-hidden="true"></i>
+    <span>{{ mensajeDesvio() }}</span>
+    <button
+      type="button"
+      class="rounded-[5px] px-1 py-0.5 font-medium underline decoration-amber-700/40 underline-offset-2 transition-colors hover:bg-amber-50 hover:decoration-amber-700"
+      [title]="d.usarTitle"
+      (click)="restablecer.emit()"
+    >
+      {{ etiquetaRestablecer() }}
+    </button>
+  </p>
+}

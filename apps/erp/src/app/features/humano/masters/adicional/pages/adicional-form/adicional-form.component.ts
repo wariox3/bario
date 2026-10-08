@@ -6,31 +6,30 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
 import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-import {
-  ContratoAutocompleteComponent,
-  type ContratoOption,
-} from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
-import { CONCEPTO_ENDPOINT, ADICIONAL_LIST_PATH } from '../../adicional.constants';
+import { CONCEPTO_ENDPOINT, ADICIONAL_LIST_PATH, CONCEPTO_PARAMS } from '../../adicional.constants';
 import { adicionalToFormValue, formValueToPayload } from '../../adicional.mapper';
+import { montoPositivo } from '../../../../shared/monto-positivo.validator';
 
 /**
  * Formulario de alta/edición de adicional de empleado.
  *
  * Master del módulo Humano (camino B). La misma página cubre crear y editar: sin
- * `:id` → alta; con `:id` → edición. `contrato` usa `<app-contrato-autocomplete>`
- * y `concepto` usa `<app-api-autocomplete>` (búsqueda por `nombre__icontains`).
+ * `:id` → alta; con `:id` → edición. `contrato` usa `<lib-contrato-autocomplete>`
+ * y `concepto` usa `<lib-api-autocomplete>` (búsqueda por `nombre__icontains`).
  */
 @Component({
   selector: 'app-adicional-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -38,6 +37,7 @@ import { adicionalToFormValue, formValueToPayload } from '../../adicional.mapper
     TextareaModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ContratoAutocompleteComponent,
     ErpApiAutocompleteComponent,
   ],
@@ -57,6 +57,7 @@ export class AdicionalFormComponent implements OnInit {
   protected readonly t = this.i18n.t;
 
   protected readonly conceptoEndpoint = CONCEPTO_ENDPOINT;
+  protected readonly conceptoParams = CONCEPTO_PARAMS;
 
   /** Id del adicional a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -82,7 +83,9 @@ export class AdicionalFormComponent implements OnInit {
   protected readonly form = this.fb.group({
     contrato: this.fb.control<ContratoOption | null>(null, Validators.required),
     concepto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    valor: this.fb.control<number | null>(null, Validators.required),
+    // Un adicional descuenta o suma, pero su valor se captura en positivo: el
+    // signo lo pone el concepto, no quien digita. Y cero no es un adicional.
+    valor: this.fb.control<number | null>(null, [Validators.required, montoPositivo]),
     detalle: [''],
     aplica_dia_laborado: [false],
     inactivo: [false],
@@ -105,11 +108,18 @@ export class AdicionalFormComponent implements OnInit {
       : this.adicionalService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -140,5 +150,11 @@ export class AdicionalFormComponent implements OnInit {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...ADICIONAL_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate(['/t', slug, ...ADICIONAL_LIST_PATH, 'detalle', id]);
   }
 }

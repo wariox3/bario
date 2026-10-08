@@ -1,10 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { EMPTY, type Observable } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
-import { I18nService, ToastService } from '@reddoc/core';
+import { ENTITY_DATA_GATEWAY, I18nService, ToastService } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
-import { ENTITY_DATA_GATEWAY } from '../../data/entity-data-gateway';
 import type { EntityActionContext, EntityActionStrategy } from '../entity-action-strategy';
 
 /**

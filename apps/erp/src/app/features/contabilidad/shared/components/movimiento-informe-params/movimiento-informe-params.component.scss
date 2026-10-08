@@ -1,0 +1,132 @@
+// Cabecera del recuadro del informe (`.list-shell__frame`): la zona de "definir
+// la consulta" encima de los resultados, como el toolbar en un listado. Sin
+// borde propio: el marco y el divisor con la tabla los pone el shell.
+.mi-params {
+  display: flex;
+  flex-direction: column;
+
+  // Filete entre las piezas apiladas del recuadro (fila de grupos, banda de
+  // documento, error, botonera). Va sobre los hijos directos y no sobre la
+  // clase de banda: dentro de una fila los hermanos se separan en vertical, no
+  // en horizontal, y una regla por clase alcanzaría a los dos casos.
+  > * + * {
+    border-top: 1px solid rgba(20 48 73 / 0.08);
+  }
+}
+
+// Periodo y plan de cuentas comparten fila. Apilados por defecto; lado a lado
+// cuando hay ancho de sobra, que es donde el reparto en dos columnas se lee
+// mejor que una lista de bandas.
+.mi-params__row {
+  display: flex;
+  flex-direction: column;
+
+  > .mi-params__band + .mi-params__band {
+    border-top: 1px solid rgba(20 48 73 / 0.08);
+  }
+}
+
+@media (min-width: 1024px) {
+  .mi-params__row {
+    flex-direction: row;
+
+    > .mi-params__band {
+      // `1 1 0` reparte el ancho en partes iguales sin que el contenido decida:
+      // con `auto` la banda de cuentas (tres controles) se comería a la de
+      // periodo.
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    > .mi-params__band + .mi-params__band {
+      border-top: 0;
+      border-left: 1px solid rgba(20 48 73 / 0.08);
+    }
+  }
+}
+
+// Una banda por pregunta: micro-encabezado arriba y campos debajo. El
+// encabezado va arriba y no en una columna a la izquierda porque con dos grupos
+// compartiendo fila esa columna se come el ancho que necesitan los campos.
+.mi-params__band {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.7rem 0.9rem;
+  min-width: 0;
+}
+
+// Micro-encabezado de grupo: el mismo `group-label` del panel del app-switcher
+// y de la ficha de detalle. Se distingue de la etiqueta de campo por caja y
+// peso, nunca por color.
+.mi-params__group {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
+// Los campos fluyen y envuelven, pero acotados: sin `max-width` un rango de dos
+// campos se estira hasta los extremos y deja de leerse como par.
+.mi-params__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem 0.9rem;
+}
+
+// Alcanza también a los campos proyectados por `ng-content`: son descendientes
+// DOM de este contenedor, así el informe que los aporta no repite medidas ni
+// estilos de etiqueta (que era la duplicación del panel anterior).
+:host ::ng-deep .mi-params__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  // Base de 9rem y no de 11: con dos grupos repartiéndose la fila, 11rem hacía
+  // envolver el par de fechas justo en el ancho donde entra la vista de dos
+  // columnas — el rango partido es lo que este panel vino a arreglar.
+  flex: 1 1 9rem;
+  max-width: 15rem;
+  min-width: 0;
+}
+
+:host ::ng-deep .mi-params__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--brand-muted);
+}
+
+// La bandera no es un campo etiquetado: se alinea al pie de la fila, sin robar
+// una ranura de campo como hacía en la grilla anterior.
+.mi-params__check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  // Los campos alinean por abajo; esto sube la casilla para que quede centrada
+  // contra el alto del input, no colgada de su base.
+  padding-bottom: 0.5rem;
+}
+
+// Rojo y no ámbar porque un rango invertido es imposible, no un desvío
+// legítimo. El filete lo pone la regla de hijos del recuadro.
+.mi-params__error {
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.78rem;
+  color: var(--p-red-500, #ef4444);
+}
+
+// Pie del recuadro: definir la consulta y lanzarla son el mismo gesto.
+.mi-params__actions {
+  padding: 0.55rem 0.9rem;
+}
+
+// Apilado: los campos sueltan su tope de ancho para aprovechar la fila.
+@media (max-width: 768px) {
+  :host ::ng-deep .mi-params__field {
+    max-width: none;
+  }
+}

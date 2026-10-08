@@ -1,11 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { EMPTY, from, type Observable } from 'rxjs';
 import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
-import { extractErrorMessage, I18nService, ToastService } from '@reddoc/core';
+import { DOCUMENT_TYPE_ID, extractErrorMessage, I18nService, ToastService } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { DialogService } from 'primeng/dynamicdialog';
-import { DOCUMENT_TYPE_ID } from '../../constants/document-types.constants';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '../entity-action-dialog.defaults';
 import type { EntityActionContext, EntityActionStrategy } from '../entity-action-strategy';
 import { GenerarDocumentoService } from './generar-documento.service';

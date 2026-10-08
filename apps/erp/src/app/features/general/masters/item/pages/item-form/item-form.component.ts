@@ -1,33 +1,59 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, forkJoin, of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
+import { FieldErrorComponent, FocusInvalidDirective, PageActionsComponent } from '@reddoc/ui';
+import {
+  ErpSelectDataService,
+  type ErpSelectOption,
+  FormErrorService,
+  I18nService,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
-import { ErpSelectDataService, type ErpSelectOption } from '@erp/core/data/erp-select-data.service';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ItemService } from '../../item.service';
 import { ITEM_LIST_PATH } from '../../item.constants';
 import { formValueToPayload, itemToFormValue } from '../../item.mapper';
 
 /**
+ * Opción del catálogo de impuestos etiquetada con el **nombre extendido**
+ * (`"IVA 19% ventas"`), que es como se muestra el impuesto en todo el ERP. El
+ * multiselect etiqueta por `nombre`, así que se normaliza al llegar.
+ */
+function conNombreExtendido(option: ErpSelectOption): ErpSelectOption {
+  const extendido = option['nombre_extendido'];
+  return typeof extendido === 'string' && extendido ? { ...option, nombre: extendido } : option;
+}
+
+/**
  * Formulario de alta/edición de item.
  *
  * Master del módulo General (camino B). La misma página cubre crear y editar:
  * sin `:id` → alta; con `:id` → edición (el id llega por `withComponentInputBinding`).
+ *
+ * También sirve como **modal** (alta inline desde la línea de un documento): si
+ * hay un `DynamicDialogRef` inyectable es que lo abrió un `DialogService`, y en
+ * ese modo esconde el chrome de página (breadcrumb, barra pegajosa), pinta su
+ * propio encabezado/pie y al guardar **cierra devolviendo el ítem creado** en
+ * vez de navegar a la lista.
  */
 @Component({
   selector: 'app-item-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
@@ -37,6 +63,7 @@ import { formValueToPayload, itemToFormValue } from '../../item.mapper';
     RadioButtonModule,
     MultiSelectModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpCuentaSelectComponent,
   ],
   templateUrl: './item-form.component.html',
@@ -49,9 +76,15 @@ export class ItemFormComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  /** Presente solo cuando el form vive en un modal (alta inline); `null` como página. */
+  private readonly dialogRef = inject(DynamicDialogRef, { optional: true });
+
+  /** `true` cuando el form se abrió como modal desde un documento. */
+  protected readonly isModal = this.dialogRef !== null;
 
   protected readonly t = this.i18n.t;
 
@@ -63,14 +96,15 @@ export class ItemFormComponent implements OnInit {
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
+    const moduleId = currentModuleId(this.activeModule);
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, moduleId] : undefined,
       },
       {
         label: this.t().entities.item.name,
-        routerLink: slug ? ['/t', slug, ...ITEM_LIST_PATH] : undefined,
+        routerLink: slug ? ['/t', slug, moduleId, ...ITEM_LIST_PATH] : undefined,
       },
       { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
     ];
@@ -103,6 +137,13 @@ export class ItemFormComponent implements OnInit {
   /** Servicio no maneja existencias: ocultamos/forzamos `inventario`. */
   protected readonly esServicio = signal(false);
 
+  /**
+   * El ítem ya se movió en documentos. Bloquea su **naturaleza** —tipo y manejo
+   * de inventario—, no sus datos: precio, nombre, cuentas e impuestos se siguen
+   * editando. Siempre `false` en alta.
+   */
+  protected readonly enUso = signal(false);
+
   constructor() {
     this.setupFormReactions();
     this.loadImpuestos();
@@ -125,11 +166,24 @@ export class ItemFormComponent implements OnInit {
       : this.itemService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Como modal, el ítem creado vuelve a quien lo pidió (la línea del
+        // documento lo selecciona); como página, se cae en su ficha para revisar
+        // lo que quedó almacenado. En alta el id sale de la respuesta del
+        // backend; si no viniera, se cae a la lista.
+        if (this.dialogRef) {
+          this.dialogRef.close(saved);
+          return;
+        }
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -140,6 +194,10 @@ export class ItemFormComponent implements OnInit {
   }
 
   protected onCancel(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close(null);
+      return;
+    }
     this.navigateToList();
   }
 
@@ -156,7 +214,10 @@ export class ItemFormComponent implements OnInit {
 
   /**
    * Si el item es servicio, `inventario` se fuerza a `false` y se deshabilita
-   * (un servicio no maneja existencias). Al volver a producto, se rehabilita.
+   * (un servicio no maneja existencias). Al volver a producto, se rehabilita —
+   * salvo que el ítem esté en uso, que es un bloqueo de mayor jerarquía: sin ese
+   * `if`, cargar un ítem en uso rehabilitaría el checkbox que `enUso` acaba de
+   * apagar, porque `patchValue` dispara esta misma reacción.
    */
   private applyTipo(tipo: 'producto' | 'servicio'): void {
     const esServicio = tipo === 'servicio';
@@ -165,9 +226,19 @@ export class ItemFormComponent implements OnInit {
     if (esServicio) {
       inventario.setValue(false, { emitEvent: false });
       inventario.disable({ emitEvent: false });
-    } else {
+    } else if (!this.enUso()) {
       inventario.enable({ emitEvent: false });
     }
+  }
+
+  /**
+   * Apaga lo que un ítem ya movido no puede cambiar. Un control deshabilitado no
+   * viaja en el payload, así que el bloqueo es real y no solo visual.
+   */
+  private aplicarBloqueoPorUso(): void {
+    this.enUso.set(true);
+    this.form.controls.tipo.disable({ emitEvent: false });
+    this.form.controls.inventario.disable({ emitEvent: false });
   }
 
   private loadImpuestos(): void {
@@ -175,24 +246,35 @@ export class ItemFormComponent implements OnInit {
       .fetchOptions('/general/impuesto/seleccionar/', { venta: 'True' })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (options) => this.impuestosVentaOptions.set(options),
+        next: (options) => this.impuestosVentaOptions.set(options.map(conNombreExtendido)),
         error: () => this.impuestosVentaOptions.set([]),
       });
     this.selectData
       .fetchOptions('/general/impuesto/seleccionar/', { compra: 'True' })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (options) => this.impuestosCompraOptions.set(options),
+        next: (options) => this.impuestosCompraOptions.set(options.map(conNombreExtendido)),
         error: () => this.impuestosCompraOptions.set([]),
       });
   }
 
+  /**
+   * Trae el ítem y su estado de uso **juntos**, para que el formulario nazca ya
+   * bloqueado en vez de habilitar los campos y apagarlos un instante después.
+   *
+   * La consulta de uso degrada a `false` ante cualquier error: si `validar-uso/`
+   * falla, el formulario abre igual en vez de dejar la pantalla sin cargar.
+   * Deja de proteger, pero no rompe.
+   */
   private loadItem(id: number): void {
-    this.itemService
-      .getById(id)
+    forkJoin({
+      item: this.itemService.getById(id),
+      enUso: this.itemService.validarUso(id).pipe(catchError(() => of(false))),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (item) => {
+        next: ({ item, enUso }) => {
+          if (enUso) this.aplicarBloqueoPorUso();
           this.form.patchValue(itemToFormValue(item));
         },
         error: () => {
@@ -205,6 +287,19 @@ export class ItemFormComponent implements OnInit {
   private navigateToList(): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    void this.router.navigate(['/t', slug, ...ITEM_LIST_PATH]);
+    void this.router.navigate(['/t', slug, currentModuleId(this.activeModule), ...ITEM_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...ITEM_LIST_PATH,
+      'detalle',
+      id,
+    ]);
   }
 }

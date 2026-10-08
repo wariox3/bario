@@ -1,0 +1,76 @@
+@let r = t().entities.programacion.renglones;
+
+<div class="flex flex-col gap-3">
+  <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+    <lib-data-toolbar
+      [primaryAction]="primaryAction()"
+      [trailingActions]="trailingActions()"
+      [searchEnabled]="false"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      [deleteSelectedEnabled]="hasSelection() && capacidades().puedeEliminarRenglon"
+      [deleteSelectedCount]="selectedRows().length"
+      (actionInvoked)="onToolbarAction($event)"
+      (filtersToggle)="filtersVisible.set(true)"
+      (filtersClear)="clearFilters()"
+      (deleteSelected)="removeSelected()"
+    />
+
+    <lib-data-table
+      [columns]="columns()"
+      [items]="items()"
+      [totalCount]="totalCount()"
+      [loading]="isLoading()"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage()"
+      [selectionMode]="selectionMode()"
+      [selectedRows]="selectedRows()"
+      [rowActions]="rowActions()"
+      (pageChange)="onPageChange($event)"
+      (selectionChange)="onSelectionChange($event)"
+      (rowActionInvoked)="onRowAction($event)"
+    />
+  </div>
+
+  <!-- Colores de las fechas: solo los que aparecen en la página -->
+  @if (hayIngresoRetiro() || hayErrorTerminacion()) {
+    <p class="m-0 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.72rem] text-brand-muted">
+      @if (hayIngresoRetiro()) {
+        <span class="inline-flex items-center gap-1.5">
+          <span
+            class="h-2.5 w-2.5 rounded-[3px] bg-green-50 ring-1 ring-green-600/50"
+            aria-hidden="true"
+          ></span>
+          {{ r.marcas.ingresoRetiro }}
+        </span>
+      }
+      @if (hayErrorTerminacion()) {
+        <span class="inline-flex items-center gap-1.5">
+          <span
+            class="h-2.5 w-2.5 rounded-[3px] bg-red-50 ring-1 ring-red-600/50"
+            aria-hidden="true"
+          ></span>
+          {{ r.marcas.errorTerminacion }}
+        </span>
+      }
+    </p>
+  }
+
+  <!-- Leyenda de las abreviaturas: solo cuando la tabla desglosa horas -->
+  @if (mostrarLeyenda()) {
+    <p class="m-0 text-[0.72rem] leading-relaxed text-brand-muted">
+      <span class="font-semibold">{{ r.leyenda.titulo }}:</span>
+      {{ r.leyenda.contenido }}
+    </p>
+  }
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />

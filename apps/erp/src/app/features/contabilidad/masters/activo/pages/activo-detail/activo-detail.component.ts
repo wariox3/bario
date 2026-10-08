@@ -1,19 +1,30 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, TenantService, ToastService, formatCop } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  formatCop,
+  formatFechaCorta,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
 import { ACTIVO_LIST_PATH } from '../../activo.constants';
 import type { Activo } from '../../activo.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
+
+/** Une `código - nombre` de una cuenta, descartando lo que falte. */
+function unirCuenta(codigo?: string | null, nombre?: string | null): string {
+  return [codigo, nombre].filter(Boolean).join(' - ');
+}
 
 @Component({
   selector: 'app-activo-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent, DatePipe],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './activo-detail.component.html',
   styleUrl: './activo-detail.component.scss',
 })
@@ -33,6 +44,37 @@ export class ActivoDetailComponent implements OnInit {
   protected readonly activo = signal<Activo | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  /** Importes en pesos. `formatCop` resuelve el nulo y el valor como string. */
+  protected readonly valorCompraFmt = computed(() => {
+    const a = this.activo();
+    return a?.valor_compra != null ? formatCop(a.valor_compra) : '';
+  });
+
+  protected readonly depreciacionInicialFmt = computed(() => {
+    const a = this.activo();
+    return a?.depreciacion_inicial != null ? formatCop(a.depreciacion_inicial) : '';
+  });
+
+  /**
+   * Cuentas contables como `código - nombre`. Se arman acá y no en el template:
+   * dos interpolaciones vecinas quedan en líneas distintas al formatear y el
+   * colapso de espacios mete un blanco de más.
+   */
+  protected readonly cuentaGasto = computed(() => {
+    const a = this.activo();
+    return unirCuenta(a?.cuenta_gasto_codigo, a?.cuenta_gasto_nombre);
+  });
+
+  protected readonly cuentaDepreciacion = computed(() => {
+    const a = this.activo();
+    return unirCuenta(a?.cuenta_depreciacion_codigo, a?.cuenta_depreciacion_nombre);
+  });
+
+  /** Fecha del sistema (`05/08/2026`). Vacío si no hay, para que caiga al guion. */
+  protected fecha(iso: string | null | undefined): string {
+    return formatFechaCorta(iso);
+  }
 
   /** Migas: módulo Contabilidad → listado de activos → nombre abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -71,6 +113,10 @@ export class ActivoDetailComponent implements OnInit {
     const a = this.activo();
     if (!a) return;
     this.navigate(...ACTIVO_LIST_PATH, 'editar', a.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...ACTIVO_LIST_PATH, 'nuevo');
   }
 
   private loadActivo(id: number): void {

@@ -1,8 +1,14 @@
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
-  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
-  <header class="flex items-center gap-2">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
+  <lib-page-actions>
     <p-button
       type="button"
       [label]="t().common.actions.back"
@@ -18,9 +24,9 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
-  </header>
+  </lib-page-actions>
 
   <!-- ── Sección: Información principal ────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
@@ -62,6 +68,7 @@
             type="text"
             formControlName="prefijo"
             maxlength="10"
+            libUppercase
             fluid
           />
           <lib-field-error
@@ -170,11 +177,14 @@
           <p-datepicker
             inputId="fecha_desde"
             formControlName="fecha_desde"
-            dateFormat="yy-mm-dd"
             [showIcon]="true"
             appendTo="body"
             [fluid]="true"
             [invalid]="form.controls.fecha_desde.invalid && form.controls.fecha_desde.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.fecha_desde"
+            [messages]="{ required: t().entities.resolucion.form.validation.required }"
           />
         </div>
 
@@ -187,15 +197,19 @@
           <p-datepicker
             inputId="fecha_hasta"
             formControlName="fecha_hasta"
-            dateFormat="yy-mm-dd"
             [showIcon]="true"
             appendTo="body"
             [fluid]="true"
+            [minDate]="form.controls.fecha_desde.value ?? undefined"
             [invalid]="
               (form.controls.fecha_hasta.invalid && form.controls.fecha_hasta.touched) ||
               (!!form.errors?.['rangoFechasInvalido'] &&
                 (form.controls.fecha_hasta.dirty || form.controls.fecha_desde.dirty))
             "
+          />
+          <lib-field-error
+            [control]="form.controls.fecha_hasta"
+            [messages]="{ required: t().entities.resolucion.form.validation.required }"
           />
           @if (
             form.errors?.['rangoFechasInvalido'] &&

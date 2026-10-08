@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
-import { getInitials } from '@reddoc/core';
+import { getInitials, FORMATO_FECHA } from '@reddoc/core';
 import { ButtonModule } from 'primeng/button';
 import { Suscripcion } from '../../models/suscripcion.model';
 import {
@@ -18,6 +18,9 @@ import {
   templateUrl: './suscripcion-card.component.html',
 })
 export class SuscripcionCardComponent {
+  /** Formato de fecha del sistema, para el `| date` de la plantilla. */
+  protected readonly formatoFecha = FORMATO_FECHA.angular;
+
   private readonly router = inject(Router);
 
   readonly suscripcion = input.required<Suscripcion>();

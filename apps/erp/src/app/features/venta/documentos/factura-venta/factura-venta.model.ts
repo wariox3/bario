@@ -16,6 +16,8 @@ import type { ComercialDetallePayload } from '@erp/features/documentos/comercial
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de venta. */
 export interface FacturaVentaRead extends DocumentoReadBase {
+  /** Número (consecutivo) del documento que asigna el backend. */
+  readonly numero: string | null;
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly plazo_pago_nombre?: string | null;
@@ -23,6 +25,26 @@ export interface FacturaVentaRead extends DocumentoReadBase {
   readonly sede_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
+  readonly orden_compra?: string | null;
+  readonly remision?: string | null;
+  readonly comentario?: string | null;
+  readonly asesor?: number | null;
+  readonly asesor_nombre?: string | null;
+  readonly resolucion?: number | null;
+  /**
+   * Etiqueta de la resolución. Hoy el read **no la serializa** (solo la FK): la ficha
+   * muestra "—" hasta que el backend la mande, sin resolverla con otra consulta.
+   */
+  readonly resolucion_nombre?: string | null;
+  /**
+   * CUE con el que la DIAN validó la factura electrónica. **Todavía no lo manda el
+   * backend** (`GenDocumento` no lo serializa): la ficha lo deja vacío hasta entonces.
+   */
+  readonly cue?: string | null;
+  /** Suma de los pagos no anulados (`documento-pago`). La mantiene el backend. */
+  readonly pago?: string | null;
+  /** Lo que queda por cobrar. El backend lo fija al aprobar (`total − pago`). */
+  readonly pendiente?: string | null;
 }
 
 /** Body (POST/PATCH) de una factura de venta. */
@@ -31,6 +53,11 @@ export interface FacturaVentaPayload extends DocumentoPayloadBase {
   readonly plazo_pago: number | null;
   readonly sede: number | null;
   readonly metodo_pago: number | null;
+  readonly orden_compra: string | null;
+  readonly remision: string | null;
+  readonly comentario: string | null;
+  readonly asesor: number | null;
+  readonly resolucion: number | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
 }

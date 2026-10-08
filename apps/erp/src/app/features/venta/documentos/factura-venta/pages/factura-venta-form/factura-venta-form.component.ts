@@ -16,45 +16,80 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { TabsModule } from 'primeng/tabs';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
+import {
+  DOCUMENT_TYPE_ID,
   FormErrorService,
   I18nService,
+  calcularResumen,
   startOfToday,
   TenantService,
   ToastService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
-import { ErpContactoSelectComponent } from '@erp/core/components/contacto-select/erp-contacto-select.component';
+import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
+import { ErpContactoSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent, ErpAsesorSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ErpSelectDataService, SELECT_ENDPOINTS, resolucionLabel } from '@reddoc/core';
 import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpSelectDataService } from '@erp/core/data/erp-select-data.service';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
+import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
 import {
   METODO_PAGO_ENDPOINT,
-  PLAZO_PAGO_ENDPOINT,
+  RESOLUCION_ENDPOINT,
   SEDE_ENDPOINT,
 } from '../../factura-venta.constants';
+import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
+import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
+import {
+  setupVencimientoAutocompute,
+  type VencimientoAutocompute,
+} from '@erp/features/documentos/comercial/vencimiento-autocompute';
+import { VencimientoHintComponent } from '@erp/features/documentos/comercial/components/vencimiento-hint/vencimiento-hint.component';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import {
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  totalCantidad,
+} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
+import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
+import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
+import {
+  guardarTablasEnSerie,
+  pestanaConPrimerError,
+  registrarPagosDeAlta,
+  type TablaEnVivoDocumento,
+} from '@erp/features/documentos/tablas-en-vivo';
+import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
+import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
+import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
+import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
+import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
+import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { facturaVentaToFormValue, formValueToPayload } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
-
-/** Fila del endpoint `plazo-pago/seleccionar/` con los días que aporta el plazo. */
-interface PlazoPagoOption extends ErpSelectOption {
-  readonly dias?: number | null;
-}
+import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de venta.
@@ -68,8 +103,8 @@ interface PlazoPagoOption extends ErpSelectOption {
  * A diferencia de la familia *servicio*, la cabecera comercial es específica de
  * cada documento (los campos de una factura ≠ los de una nota débito): por eso
  * este form vive dentro de `factura-venta/` y no en un _shared. La **tabla de
- * detalles** —esa sí compartida entre documentos comerciales— se compone vía
- * `<app-comercial-documento-detalles>` recibiendo el `FormArray` de líneas.
+ * detalles** y la **sección de pagos** —compartidas entre documentos— van en
+ * tabs dentro de la misma card de la cabecera, cada una recibiendo su `FormArray`.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -77,15 +112,26 @@ interface PlazoPagoOption extends ErpSelectOption {
   selector: 'app-factura-venta-form',
   standalone: true,
   imports: [
+    MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     ConfirmDialogModule,
     DatePickerModule,
+    MascaraFechaDirective,
+    TabsModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
+    ErpAsesorSelectComponent,
+    InputTextModule,
+    TextareaModule,
     ComercialDocumentoDetallesComponent,
+    DocumentoPagosComponent,
+    ComercialDocumentoResumenComponent,
+    VencimientoHintComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './factura-venta-form.component.html',
@@ -99,19 +145,48 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly confirmation = inject(ConfirmationService);
+  private readonly pagoService = inject(DocumentoPagoService);
 
   protected readonly t = this.i18n.t;
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
-  protected readonly plazoPagoEndpoint = PLAZO_PAGO_ENDPOINT;
+  /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
+  private readonly pagosTable = viewChild(DocumentoPagosComponent);
+
+  /** Guardado en curso en la tabla de líneas o la de pagos: el botón Guardar espera a que termine. */
+  protected readonly tablasOcupadas = computed(
+    () => (this.detallesTable()?.ocupado() ?? false) || (this.pagosTable()?.ocupado() ?? false),
+  );
+
+  /** Tab activo del bloque de líneas (Detalles / Pagos). */
+  protected readonly activeTab = signal<'detalles' | 'pagos'>('detalles');
+
+  /**
+   * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
+   * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
+   */
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'pagos'>> = {
+    detalles: 'detalles',
+    pagos: 'pagos',
+  };
+
+  /** La factura de venta importa líneas pendientes solo de remisiones. */
+  protected readonly importDocumentoTipoId = DOCUMENT_TYPE_ID.REMISION;
+  protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly resolucionEndpoint = RESOLUCION_ENDPOINT;
+  protected readonly resolucionLabel = resolucionLabel;
+
+  /** Solo resoluciones de venta, como el ERP anterior (la de compra es del documento soporte). */
+  protected readonly resolucionParams = { venta: 'True' } as const;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -122,6 +197,13 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   /** Id del documento a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
 
+  /**
+   * Cabecera pre-cargada por `editableDocumentResolver` (clave de ruta
+   * `documentoEdit`). En edición llega ya resuelta y el form la reúsa en vez de
+   * volver a pedirla; `null`/ausente en alta o si el resolver hizo fail-open.
+   */
+  readonly documentoEdit = input<unknown>();
+
   protected readonly isEditMode = computed(() => !!this.id());
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
@@ -131,14 +213,38 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   });
   protected readonly isSaving = signal(false);
 
-  /** Mapa `idPlazo → días` para autocalcular la fecha de vencimiento. */
-  private readonly plazoDias = new Map<number, number>();
+  /** Espejo reactivo de las líneas para calcular el total del documento. */
+  protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+
+  /** Resumen del documento: lo pinta el aside bajo los tabs, igual en Detalles y Pagos. */
+  protected readonly resumen = computed(() => calcularResumen(this.lines().map(toLineaCalculo)));
+
+  /** Total del documento: contra él se validan y se prellenan los pagos. */
+  protected readonly totalGeneral = computed(() => this.resumen().total);
+
+  /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+
+  /** Espejo reactivo de los pagos para el resumen y la validación del guardado. */
+  protected readonly pagosLines = signal<readonly PagoFormRawValue[]>([]);
+
+  /** Recibido, saldo y exceso de los pagos frente al total. */
+  protected readonly pagosResumen = computed(() =>
+    calcularPagos(this.pagosLines(), this.totalGeneral()),
+  );
+
+  /**
+   * `true` cuando lo recibido supera el total. No bloquea guardar —el backend lo frena
+   * al aprobar—: tiñe la pestaña y el resumen avisa que no se podrá aprobar.
+   */
+  protected readonly pagosExceden = computed(() => this.pagosResumen().excede);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
-    ventaDocumentoBreadcrumb(
+    documentoBreadcrumb(
+      this.activeModule,
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
     ),
@@ -151,63 +257,121 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    // Más información: opcionales, con el largo que acepta el backend.
+    orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    remision: this.fb.control<string | null>(null, Validators.maxLength(50)),
+    asesor: this.fb.control<ErpSelectOption | null>(null),
+    resolucion: this.fb.control<ErpSelectOption | null>(null),
+    comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
+    pagos: new FormArray<PagoGroup>([]),
   });
 
+  /**
+   * Estado del vencimiento (días del plazo, fecha que dicta y desvío), para que
+   * `<app-vencimiento-hint>` explique bajo el campo de dónde salió la fecha.
+   */
+  protected readonly vencimiento: VencimientoAutocompute;
+
   constructor() {
-    // Autocálculo del vencimiento: al cambiar fecha o plazo, vencimiento =
-    // fecha + días del plazo. El campo sigue siendo editable; las ediciones
-    // manuales se conservan hasta el próximo cambio de fecha/plazo.
-    const recompute = () => this.recomputeVencimiento();
-    this.form.controls.fecha.valueChanges
+    // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
+    this.vencimiento = setupVencimientoAutocompute({
+      fecha: this.form.controls.fecha,
+      plazoPago: this.form.controls.plazo_pago,
+      fechaVence: this.form.controls.fecha_vence,
+      selectData: this.selectData,
+      destroyRef: this.destroyRef,
+      endpoint: this.plazoPagoEndpoint,
+    });
+
+    // Al elegir cliente, adopta su plazo de pago pactado. Cambiar el plazo
+    // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
+    // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
+    setupPlazoPagoDesdeContacto({
+      contacto: this.form.controls.contacto,
+      plazoPago: this.form.controls.plazo_pago,
+      origen: 'cliente',
+      destroyRef: this.destroyRef,
+    });
+
+    // Espejo reactivo de las líneas para el total del documento.
+    this.form.controls.detalles.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(recompute);
-    this.form.controls.plazo_pago.valueChanges
+      .subscribe(() => this.lines.set(this.form.controls.detalles.getRawValue()));
+
+    // Espejo reactivo de los pagos para el resumen y la validación del guardado.
+    this.form.controls.pagos.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(recompute);
+      .subscribe(() => this.pagosLines.set(this.form.controls.pagos.getRawValue()));
+  }
+
+  /** Getter tipado del `FormArray` de pagos (para el chip de la pestaña). */
+  protected get pagos(): FormArray<PagoGroup> {
+    return this.form.controls.pagos;
+  }
+
+  /** Lista de precios del cliente elegido; cotiza cada ítem de la tabla de líneas. */
+  protected precioListaId(): number | null {
+    return precioListaDeContacto(this.form.controls.contacto.value);
   }
 
   ngOnInit(): void {
-    this.loadPlazoDias();
     const id = this.id();
-    if (id) this.loadDocumento(Number(id));
+    if (!id) return;
+    // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
+    // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
+    const prefetched = this.documentoEdit();
+    if (prefetched) {
+      this.applyCabecera(prefetched as FacturaVentaRead);
+      this.loadLineas(Number(id));
+    } else {
+      this.loadDocumento(Number(id));
+    }
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.form.pending || this.isSaving()) return;
-
-    const id = this.id();
-    const detalles = this.detallesTable();
-    // En edición las líneas transaccionan aparte (no viajan en el payload de la
-    // cabecera). Para que no se pierdan, antes de guardar el documento se
-    // flushean las pendientes; si hay líneas incompletas se avisa y se aborta.
-    if (id && detalles) {
-      if (detalles.hasInvalidPending()) {
-        const toast = this.t().entities.comercialDetalle.toasts.incompleteLines;
-        this.toast.warn(toast.title, toast.desc);
-        return;
-      }
-      if (detalles.pendingCount() > 0) {
-        this.isSaving.set(true);
-        // Flush silencioso: el éxito lo confirma el toast del documento; aquí solo
-        // se reporta si el guardado de líneas falla (si no, sería un fallo mudo).
-        detalles
-          .saveAll()
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => this.persistCabecera(id),
-            error: () => {
-              this.isSaving.set(false);
-              const toast = this.t().entities.comercialDetalle.toasts.lineSaveError;
-              this.toast.error(toast.title, toast.desc);
-            },
-          });
-        return;
-      }
+    if (this.isSaving() || this.tablasOcupadas()) return;
+    if (this.form.invalid || this.form.pending) {
+      // `libFocusInvalid` marca todo como tocado y lleva al primer campo con error, pero
+      // un panel inactivo está oculto: antes se abre la pestaña que lo contiene.
+      const pestana = pestanaConPrimerError(this.form, this.pestanasPorControl);
+      if (pestana) this.activeTab.set(pestana);
+      return;
     }
 
+    const id = this.id();
+    if (!id) {
+      // Alta: las líneas viajan embebidas; los pagos se registran al crear.
+      this.isSaving.set(true);
+      this.persistCabecera(id);
+      return;
+    }
+
+    // Edición: líneas y pagos transaccionan aparte, así que antes de guardar el
+    // documento se persisten sus pendientes (el form ya es válido: no hay incompletos).
+    const tablas = this.tablasEnVivo();
+
     this.isSaving.set(true);
-    this.persistCabecera(id);
+    // Flush silencioso y en serie (líneas, luego pagos): el éxito lo confirma el toast
+    // del documento; el helper solo reporta la tabla que falle.
+    guardarTablasEnSerie(tablas, this.toast)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        complete: () => this.persistCabecera(id),
+        error: () => this.isSaving.set(false),
+      });
+  }
+
+  /** Tablas que transaccionan en vivo, en el orden en que se guardan. */
+  private tablasEnVivo(): readonly TablaEnVivoDocumento[] {
+    const { comercialDetalle, documentoPago } = this.t().entities;
+    return [
+      { tabla: this.detallesTable(), errorAlGuardar: comercialDetalle.toasts.lineSaveError },
+      {
+        tabla: this.pagosTable(),
+        errorAlGuardar: documentoPago.toasts.saveError,
+      },
+    ];
   }
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
@@ -224,11 +388,37 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       : this.gateway.create(this.document(), payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.isSaving.set(false);
+      next: (saved) => {
+        // Guardar limpia el estado "sucio": navegar a la ficha pasa por el guard
+        // de salida y, sin esto, el camino feliz preguntaría por cambios ya guardados.
+        this.form.markAsPristine();
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha del documento, para revisar lo que quedó
+        // almacenado. En alta el id sale de la respuesta del backend; si no
+        // viniera, se cae a la lista antes que navegar a una URL inválida.
+        const savedId = id ?? extractDocumentoId(saved);
+        if (savedId == null) {
+          this.isSaving.set(false);
+          this.navigateToList();
+          return;
+        }
+        // Alta: los pagos no viajan embebidos, se registran contra el documento recién
+        // creado. Si alguno falla el documento ya existe: el helper avisa con el motivo
+        // del backend y se abre igual su ficha, desde donde se edita para agregarlos.
+        registrarPagosDeAlta(
+          id ? undefined : this.pagosTable(),
+          Number(savedId),
+          this.toast,
+          this.t().entities.documentoPago.toasts.noRegistrados,
+        )
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            complete: () => {
+              this.isSaving.set(false);
+              this.navigateToDetail(savedId);
+            },
+          });
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -248,27 +438,17 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
    * hay pendientes y no molesta). Solo aplica en edición.
    */
   canDeactivate(): boolean | Observable<boolean> {
-    const detalles = this.detallesTable();
-    if (!detalles || detalles.pendingCount() === 0) return true;
-
-    const labels = this.t().entities.comercialDetalle;
-    return new Observable<boolean>((subscriber) => {
-      this.confirmation.confirm({
-        header: labels.leaveHeader,
-        message: labels.leaveMessage,
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: labels.leaveConfirm,
-        rejectLabel: this.t().common.actions.cancel,
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: () => {
-          subscriber.next(true);
-          subscriber.complete();
-        },
-        reject: () => {
-          subscriber.next(false);
-          subscriber.complete();
-        },
-      });
+    return canLeaveDocumentForm({
+      form: this.form,
+      pendingLines:
+        (this.detallesTable()?.pendingCount() ?? 0) + (this.pagosTable()?.pendingCount() ?? 0),
+      // En edición los pagos transaccionan aparte, como las líneas: los cuenta `pendingLines`.
+      lineControls: ['detalles', 'pagos'],
+      // En alta nada persiste aparte: tocar una línea o un pago y salir también pierde trabajo.
+      enAlta: !this.id(),
+      confirmation: this.confirmation,
+      labels: this.t().entities.comercialDetalle,
+      cancelLabel: this.t().common.actions.cancel,
     });
   }
 
@@ -281,80 +461,96 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
     if (id != null) this.loadDocumento(id);
   }
 
+  /**
+   * Carga completa (cabecera + líneas). La cabecera (`documento/:id/`) ya no
+   * embebe los detalles: las líneas se traen aparte de
+   * `documento-detalle/?documento_id=`. Se usa como fallback de la carga inicial
+   * (si el resolver no pre-cargó la cabecera) y para recargar tras importar.
+   */
   private loadDocumento(id: number): void {
-    // La cabecera (`documento/:id/`) ya no embebe los detalles: las líneas se
-    // traen aparte de `documento-detalle/?documento_id=`. Las dos peticiones son
-    // independientes, así que cargan en paralelo y se pueblan juntas.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.pagoService.listarPorDocumento(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
-          const read = cabecera as FacturaVentaRead;
-          // `emitEvent: false`: no disparar el autocálculo y respetar el
-          // vencimiento que viene del backend.
-          this.form.patchValue(facturaVentaToFormValue(read), { emitEvent: false });
-          const detalles = this.form.controls.detalles;
-          detalles.clear();
-          for (const line of lineas)
-            detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+        next: ({ cabecera, lineas, pagos }) => {
+          this.applyCabecera(cabecera as FacturaVentaRead);
+          this.populateLineas(lineas);
+          this.populatePagos(pagos);
         },
-        error: () => {
-          const toasts = this.t().entities.facturaVenta.form.toasts;
-          this.toast.error(toasts.loadError.title, toasts.loadError.desc);
-        },
+        error: () => this.notifyLoadError(),
       });
   }
 
-  /** Carga el mapa `idPlazo → días` para el autocálculo del vencimiento. */
-  private loadPlazoDias(): void {
-    this.selectData
-      .fetchOptions<PlazoPagoOption>(PLAZO_PAGO_ENDPOINT)
+  /** Carga líneas y pagos (la cabecera ya la aportó el resolver). */
+  private loadLineas(id: number): void {
+    forkJoin({
+      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.pagoService.listarPorDocumento(id),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (plazos) => {
-          for (const plazo of plazos) {
-            if (plazo.dias != null) this.plazoDias.set(plazo.id, plazo.dias);
-          }
-          // Si ya hay fecha + plazo elegidos, refrescar el vencimiento.
-          this.recomputeVencimiento();
+        next: ({ lineas, pagos }) => {
+          this.populateLineas(lineas);
+          this.populatePagos(pagos);
         },
-        error: () => {
-          // Sin días disponibles el vencimiento queda manual (sigue editable).
-        },
+        error: () => this.notifyLoadError(),
       });
   }
 
-  /** vencimiento = fecha + días del plazo (si ambos y los días están disponibles). */
-  private recomputeVencimiento(): void {
-    const fecha = this.form.controls.fecha.value;
-    const plazoId = this.form.controls.plazo_pago.value?.id;
-    if (!fecha || plazoId == null) return;
-    const dias = this.plazoDias.get(plazoId);
-    if (dias == null) return;
+  /**
+   * Pobla la cabecera en el form. `emitEvent: false`: no disparar el autocálculo
+   * y respetar el vencimiento que viene del backend. Los pagos no vienen en la
+   * cabecera: se traen de `documento-pago` junto con las líneas.
+   */
+  private applyCabecera(read: FacturaVentaRead): void {
+    this.form.patchValue(facturaVentaToFormValue(read), { emitEvent: false });
+  }
 
-    const vencimiento = new Date(fecha);
-    vencimiento.setDate(vencimiento.getDate() + dias);
-    this.form.controls.fecha_vence.setValue(vencimiento, { emitEvent: false });
+  /** Reemplaza el `FormArray` de pagos con los del backend (anulados incluidos, de solo lectura). */
+  private populatePagos(pagos: readonly PagoRead[]): void {
+    const arr = this.form.controls.pagos;
+    arr.clear();
+    for (const pago of pagos) arr.push(createPagoGroup(pagoReadToFormValue(pago)));
+  }
+
+  /** Reemplaza el FormArray de detalles con las líneas recibidas. */
+  private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
+    const detalles = this.form.controls.detalles;
+    detalles.clear();
+    for (const line of lineas)
+      detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+  }
+
+  private notifyLoadError(): void {
+    const toasts = this.t().entities.facturaVenta.form.toasts;
+    this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return;
-    const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, 'venta', ...segments]);
+    this.navigate(this.document().routes.list);
   }
 
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
+  /** Abre la ficha del documento guardado (`routes.detail` + id). */
+  private navigateToDetail(id: string | number): void {
+    this.navigate(this.document().routes.detail, String(id));
+  }
+
+  /** Construye la ruta absoluta del documento dentro del tenant y el módulo. */
+  private navigate(routePath: string, extra?: string): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    const segments = routePath.split('/').filter(Boolean);
+    const commands: (string | number)[] = [
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...segments,
+    ];
+    if (extra) commands.push(extra);
+    void this.router.navigate(commands);
   }
 }

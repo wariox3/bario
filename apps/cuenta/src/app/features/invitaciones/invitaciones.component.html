@@ -87,7 +87,7 @@
                 {{ inv.cliente_nombre }}
               </span>
               <span class="truncate text-[0.72rem] text-brand-muted">
-                Invitado por {{ inviterLabel(inv) }} · {{ inv.fecha | date: 'dd/MM/yyyy' }}
+                Invitado por {{ inviterLabel(inv) }} · {{ inv.fecha | date: formatoFecha }}
               </span>
             </div>
 

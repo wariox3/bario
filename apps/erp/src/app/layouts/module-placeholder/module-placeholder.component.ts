@@ -62,16 +62,6 @@ export class ModulePlaceholderComponent {
   protected readonly moduleName = computed(() => {
     const descriptor = this.activeModule.activeDescriptor();
     if (!descriptor) return '';
-    return this.translateKey(descriptor.displayNameKey);
+    return this.i18n.translate(descriptor.displayNameKey);
   });
-
-  private translateKey(key: string): string {
-    const parts = key.split('.');
-    let current: unknown = this.t();
-    for (const part of parts) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
-  }
 }

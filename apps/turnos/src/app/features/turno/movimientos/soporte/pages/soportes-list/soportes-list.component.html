@@ -1,0 +1,44 @@
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.soporte.name">
+  <lib-data-toolbar
+    toolbar
+    [trailingActions]="trailingActions"
+    [searchPlaceholderKey]="'entities.soporte.searchPlaceholder'"
+    [searchValue]="searchValue()"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    [deleteSelectedEnabled]="hasSelection()"
+    [deleteSelectedCount]="selectedRows().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+    (deleteSelected)="removeSelected()"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    [rowActions]="rowActions"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />

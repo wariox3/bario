@@ -1,0 +1,28 @@
+@let a = t().asistenteElectronico.invitacion.actions;
+
+<!--
+  La tira compartida de los inicios. Omitir va como texto secundario, igual
+  que en datos iniciales: lo que ofrecemos es uno solo.
+-->
+@if (visible()) {
+  <app-inicio-invitacion [icon]="config().icono" [title]="textos().title" [desc]="textos().desc">
+    <p-button
+      type="button"
+      size="small"
+      [text]="true"
+      severity="secondary"
+      [label]="a.omitir"
+      [loading]="omitiendo()"
+      (onClick)="omitir()"
+    />
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      [label]="a.completar"
+      [disabled]="omitiendo()"
+      (onClick)="completar()"
+    />
+  </app-inicio-invitacion>
+}

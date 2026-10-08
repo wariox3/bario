@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.comercial-detalle-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+// Cabecera: etiquetas discretas en mayúscula, sticky al hacer scroll (igual que
+// la familia servicio, para uniformidad entre tablas de detalle).
+.comercial-detalle-table__th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--brand-muted, #64748b);
+  // Opaco para que las filas no se transparenten bajo el header al scrollear.
+  background: #f8f9fa;
+  // box-shadow en vez de border-bottom: con border-collapse el borde se despega
+  // del header sticky al scrollear; el inset shadow se mantiene fijo.
+  box-shadow: inset 0 -1px 0 rgba(20, 48, 73, 0.1);
+}
+
+.comercial-detalle-table__td {
+  padding: 0.45rem 0.6rem;
+  vertical-align: middle;
+}
+
+// Separador entre filas (no border-bottom en cada celda): más limpio al scrollear.
+.comercial-detalle-table__row + .comercial-detalle-table__row .comercial-detalle-table__td {
+  border-top: 1px solid rgba(20, 48, 73, 0.07);
+}
+
+.comercial-detalle-table__row:hover .comercial-detalle-table__td {
+  background: rgba(20, 48, 73, 0.015);
+}

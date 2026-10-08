@@ -1,14 +1,14 @@
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.contacto.name">
   <lib-data-toolbar
     toolbar
-    [primaryAction]="primaryAction"
-    [trailingActions]="trailingActions"
+    [primaryAction]="acciones.primaryAction()"
+    [trailingActions]="acciones.trailingActions()"
     [searchEnabled]="false"
     [searchValue]="searchValue()"
     [searchPlaceholderKey]="'entities.contacto.searchPlaceholder'"
     [filtersEnabled]="true"
     [activeFiltersCount]="activeFilters().length"
-    [deleteSelectedEnabled]="hasSelection()"
+    [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
     [deleteSelectedCount]="selectedRows().length"
     (searched)="onSearchChange($event)"
     (actionInvoked)="onToolbarAction($event)"
@@ -28,13 +28,11 @@
     [sort]="sort()"
     selectionMode="multiple"
     [selectedRows]="selectedRows()"
-    [rowActions]="rowActions"
-    [rowClickable]="true"
+    [rowActions]="acciones.rowActions()"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
     (selectionChange)="onSelectionChange($event)"
     (rowActionInvoked)="onRowAction($event)"
-    (rowClick)="onRowClick($event)"
   />
 </lib-list-shell>
 
@@ -49,15 +47,15 @@
 <p-confirmDialog />
 
 <app-import-dialog
-  [visible]="importVisible()"
-  (visibleChange)="onImportVisibleChange($event)"
+  [visible]="importar.visible()"
+  (visibleChange)="importar.setVisible($event)"
   [title]="t().entities.contacto.import.title"
   [subtitle]="t().entities.contacto.import.subtitle"
-  [importing]="importLoading()"
-  [errors]="importErrors()"
-  [errorSummary]="importErrorSummary()"
-  [errorTotal]="importErrorTotal()"
-  [mastersTouched]="importMasters()"
-  (importRequested)="onImportRequested($event)"
+  [importing]="importar.loading()"
+  [errors]="importar.errors()"
+  [errorSummary]="importar.errorSummary()"
+  [errorTotal]="importar.errorTotal()"
+  [masters]="importar.masters"
+  (importRequested)="importar.submit($event)"
   [exampleConfig]="exampleConfig"
 />

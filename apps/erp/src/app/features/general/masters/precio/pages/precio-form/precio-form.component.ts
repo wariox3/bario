@@ -6,9 +6,21 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
+import {
+  FormErrorService,
+  I18nService,
+  TenantService,
+  ToastService,
+  startOfToday,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { PrecioService } from '../../precio.service';
 import { PRECIO_LIST_PATH } from '../../precio.constants';
@@ -25,13 +37,16 @@ import { precioToFormValue, formValueToPayload } from '../../precio.mapper';
   selector: 'app-precio-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     DatePickerModule,
+    MascaraFechaDirective,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
   ],
   templateUrl: './precio-form.component.html',
   styleUrl: './precio-form.component.scss',
@@ -42,6 +57,7 @@ export class PrecioFormComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -56,24 +72,27 @@ export class PrecioFormComponent implements OnInit {
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
+    const moduleId = currentModuleId(this.activeModule);
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, moduleId] : undefined,
       },
       {
         label: this.t().entities.precio.name,
-        routerLink: slug ? ['/t', slug, ...PRECIO_LIST_PATH] : undefined,
+        routerLink: slug ? ['/t', slug, moduleId, ...PRECIO_LIST_PATH] : undefined,
       },
       { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
     ];
   });
 
+  /**
+   * `venta` y `compra` no son campos del formulario: los fija el mapper. Ver
+   * `formValueToPayload`.
+   */
   protected readonly form = this.fb.group({
     nombre: ['', Validators.required],
-    venta: [false],
-    compra: [false],
-    fecha_vence: [null as Date | null],
+    fecha_vence: [startOfToday() as Date | null, Validators.required],
   });
 
   ngOnInit(): void {
@@ -93,11 +112,18 @@ export class PrecioFormComponent implements OnInit {
       : this.precioService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -127,6 +153,24 @@ export class PrecioFormComponent implements OnInit {
   private navigateToList(): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    void this.router.navigate(['/t', slug, ...PRECIO_LIST_PATH]);
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...PRECIO_LIST_PATH,
+    ]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...PRECIO_LIST_PATH,
+      'detalle',
+      id,
+    ]);
   }
 }

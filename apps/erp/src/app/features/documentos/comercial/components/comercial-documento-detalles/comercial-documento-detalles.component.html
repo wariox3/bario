@@ -1,8 +1,29 @@
 <p-confirmdialog />
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col">
   <!-- Toolbar -->
-  <div class="flex items-center justify-end gap-2">
+  <div
+    class="flex items-center justify-end gap-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-2.5 max-[576px]:px-4"
+  >
+    @if (scannerEnabled()) {
+      <!-- Lector de código de barras (flujo pistola): Enter agrega la línea y el
+           input queda enfocado para el siguiente escaneo. -->
+      <span class="relative mr-auto">
+        <i
+          class="pi pi-barcode absolute top-1/2 left-2.5 -translate-y-1/2 text-[0.8rem] text-brand-muted"
+        ></i>
+        <input
+          pInputText
+          type="text"
+          class="w-56 !pl-8"
+          pSize="small"
+          [placeholder]="t().entities.comercialDetalle.scanner.placeholder"
+          [attr.aria-label]="t().entities.comercialDetalle.scanner.placeholder"
+          (keydown.enter)="$event.preventDefault(); onScan($event)"
+          autocomplete="off"
+        />
+      </span>
+    }
     @if (documentId() !== null && pendingCount() > 0) {
       <span
         class="mr-auto inline-flex items-center gap-1.5 text-[0.74rem] font-medium text-amber-600"
@@ -16,7 +37,7 @@
         icon="pi pi-save"
         [label]="t().entities.comercialDetalle.saveAll + ' (' + pendingCount() + ')'"
         [loading]="savingAll()"
-        [disabled]="savingAll()"
+        [disabled]="ocupado()"
         (onClick)="onSaveAllClick()"
       />
     }
@@ -42,7 +63,7 @@
     }
   </div>
 
-  <div class="max-h-[30rem] overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <div class="max-h-[30rem] overflow-auto">
     <table class="comercial-detalle-table">
       <thead>
         <tr>
@@ -52,10 +73,15 @@
           <th class="comercial-detalle-table__th min-w-[16rem] text-left">
             {{ t().entities.comercialDetalle.columns.item }}
           </th>
+          @if (almacenEnabled()) {
+            <th class="comercial-detalle-table__th w-36 text-left">
+              {{ t().entities.comercialDetalle.columns.almacen }}
+            </th>
+          }
           <th class="comercial-detalle-table__th w-24 text-right">
             {{ t().entities.comercialDetalle.columns.cantidad }}
           </th>
-          <th class="comercial-detalle-table__th w-32 text-right">
+          <th class="comercial-detalle-table__th w-40 text-right">
             {{ t().entities.comercialDetalle.columns.precio }}
           </th>
           <th class="comercial-detalle-table__th w-24 text-right">
@@ -64,15 +90,17 @@
           <th class="comercial-detalle-table__th w-32 text-right">
             {{ t().entities.comercialDetalle.columns.subtotal }}
           </th>
-          <th class="comercial-detalle-table__th min-w-[9rem] text-left">
+          <th class="comercial-detalle-table__th w-32 text-left">
             {{ t().entities.comercialDetalle.columns.impuesto }}
           </th>
           <th class="comercial-detalle-table__th w-32 text-right">
             {{ t().entities.comercialDetalle.columns.neto }}
           </th>
-          <th class="comercial-detalle-table__th min-w-[12rem] text-left">
-            {{ t().entities.comercialDetalle.columns.detalle }}
-          </th>
+          @if (detalleEnabled()) {
+            <th class="comercial-detalle-table__th min-w-[12rem] text-left">
+              {{ t().entities.comercialDetalle.columns.detalle }}
+            </th>
+          }
           <th class="comercial-detalle-table__th w-20 text-center">
             {{ t().entities.comercialDetalle.columns.acciones }}
           </th>
@@ -100,8 +128,21 @@
                 formControlName="item"
                 [placeholder]="t().entities.comercialDetalle.itemPlaceholder"
                 [invalid]="row.controls.item.invalid && row.controls.item.touched"
+                [allowCreate]="true"
+                [createLabel]="t().entities.comercialDetalle.createItem"
+                (createRequested)="onCreateItem(row)"
               />
             </td>
+
+            @if (almacenEnabled()) {
+              <td class="comercial-detalle-table__td">
+                <lib-api-select
+                  formControlName="almacen"
+                  [endpoint]="almacenEndpoint"
+                  [placeholder]="t().entities.comercialDetalle.almacenPlaceholder"
+                />
+              </td>
+            }
 
             <td class="comercial-detalle-table__td">
               <p-inputnumber
@@ -115,16 +156,62 @@
             </td>
 
             <td class="comercial-detalle-table__td">
-              <p-inputnumber
-                formControlName="precio"
-                mode="decimal"
-                [min]="0"
-                [minFractionDigits]="0"
-                [maxFractionDigits]="2"
-                prefix="$ "
-                [fluid]="true"
-                inputStyleClass="text-right"
-              />
+              <div class="flex items-center gap-1">
+                <p-inputnumber
+                  class="min-w-0 flex-1"
+                  formControlName="precio"
+                  mode="decimal"
+                  [min]="0"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  prefix="$ "
+                  [fluid]="true"
+                  inputStyleClass="text-right"
+                />
+                <!-- Precio con impuestos incluidos → precio base (extraer IVA) -->
+                <button
+                  type="button"
+                  class="shrink-0 rounded-md p-1 text-brand-muted transition-colors hover:bg-sky-50 hover:text-sky-700"
+                  [pTooltip]="t().entities.comercialDetalle.extraerIva.title"
+                  [attr.aria-label]="t().entities.comercialDetalle.extraerIva.title"
+                  (click)="openExtraerIva(extraerIvaOp, $event, row)"
+                >
+                  <i class="pi pi-percentage text-[0.7rem]"></i>
+                </button>
+              </div>
+              <p-popover #extraerIvaOp>
+                <div class="flex w-64 flex-col gap-2">
+                  <span class="text-[0.72rem] font-semibold text-brand-text">
+                    {{ t().entities.comercialDetalle.extraerIva.title }}
+                  </span>
+                  <p-inputnumber
+                    [ngModel]="extraerIvaValor()"
+                    (ngModelChange)="extraerIvaValor.set($event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    mode="decimal"
+                    [min]="0"
+                    [maxFractionDigits]="2"
+                    prefix="$ "
+                    [fluid]="true"
+                    inputStyleClass="text-right"
+                  />
+                  <div class="flex items-center justify-between text-[0.75rem]">
+                    <span class="text-brand-muted">
+                      {{ t().entities.comercialDetalle.extraerIva.baseLabel }}
+                    </span>
+                    <span class="font-semibold tabular-nums text-brand-text">
+                      {{ formatMoney(extraerIvaBase()) }}
+                    </span>
+                  </div>
+                  <p-button
+                    type="button"
+                    size="small"
+                    icon="pi pi-check"
+                    [label]="t().entities.comercialDetalle.extraerIva.apply"
+                    (onClick)="applyExtraerIva(extraerIvaOp)"
+                  />
+                </div>
+              </p-popover>
             </td>
 
             <td class="comercial-detalle-table__td">
@@ -144,35 +231,16 @@
             </td>
 
             <td class="comercial-detalle-table__td">
-              <button
-                type="button"
-                class="group flex w-full flex-wrap items-center gap-1 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-sky-50"
-                (click)="impuestoOp.toggle($event)"
-              >
-                @for (imp of impuestosOf(i); track imp.id) {
-                  <span
-                    class="inline-flex items-center rounded-md border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.05)] px-1.5 py-0.5 text-[0.68rem] font-medium leading-none text-brand-text"
-                  >
-                    {{ imp.nombre }}
-                  </span>
-                } @empty {
-                  <span class="inline-flex items-center gap-1 text-[0.72rem] text-brand-muted">
-                    <i class="pi pi-plus text-[0.6rem]"></i>
-                    {{ t().entities.comercialDetalle.impuestosAdd }}
-                  </span>
-                }
-                <i
-                  class="pi pi-pencil text-[0.62rem] text-transparent transition-colors group-hover:text-brand-muted"
-                ></i>
-              </button>
-              <p-popover #impuestoOp>
-                <div class="flex w-72 flex-col gap-2">
-                  <span class="text-[0.72rem] font-semibold text-brand-text">
-                    {{ t().entities.comercialDetalle.impuestosTitle }}
-                  </span>
-                  <app-impuesto-select [formControl]="row.controls.impuestos_ids" />
-                </div>
-              </p-popover>
+              <app-impuesto-select
+                variant="celda"
+                [formControl]="row.controls.impuestos_ids"
+                [catalogo]="impuestosCatalog()"
+                [baseLinea]="baseOf(i)"
+                [placeholder]="t().entities.comercialDetalle.impuestosAdd"
+                [tituloPanel]="t().entities.comercialDetalle.impuestosTitle"
+                [quitarLabel]="t().entities.comercialDetalle.impuestosRemove"
+                [filtroPlaceholder]="t().entities.comercialDetalle.impuestosBuscar"
+              />
             </td>
 
             <td
@@ -181,14 +249,16 @@
               {{ formatMoney(netoOf(i)) }}
             </td>
 
-            <td class="comercial-detalle-table__td">
-              <input
-                pInputText
-                formControlName="detalle"
-                class="w-full"
-                [placeholder]="t().entities.comercialDetalle.detallePlaceholder"
-              />
-            </td>
+            @if (detalleEnabled()) {
+              <td class="comercial-detalle-table__td">
+                <input
+                  pInputText
+                  formControlName="detalle"
+                  class="w-full"
+                  [placeholder]="t().entities.comercialDetalle.detallePlaceholder"
+                />
+              </td>
+            }
 
             <td class="comercial-detalle-table__td">
               <div class="flex items-center justify-center gap-0.5">
@@ -196,33 +266,37 @@
                   <button
                     type="button"
                     (click)="saveLinea(row)"
-                    [disabled]="isSavingRow(row)"
+                    [disabled]="ocupado()"
                     [pTooltip]="t().entities.comercialDetalle.saveLine"
                     [attr.aria-label]="t().entities.comercialDetalle.saveLine"
-                    class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
+                    class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
                   >
                     @if (isSavingRow(row)) {
-                      <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+                      <i class="pi pi-spin pi-spinner text-[0.72rem]"></i>
                     } @else {
-                      <i class="pi pi-check text-[0.78rem]"></i>
+                      <i class="pi pi-check text-[0.72rem]"></i>
                     }
                   </button>
                 }
                 <button
                   type="button"
                   (click)="removeLinea(row)"
+                  [disabled]="ocupado()"
                   [pTooltip]="t().entities.comercialDetalle.removeLine"
                   [attr.aria-label]="t().entities.comercialDetalle.removeLine"
-                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                  class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-default disabled:opacity-60"
                 >
-                  <i class="pi pi-trash text-[0.78rem]"></i>
+                  <i class="pi pi-trash text-[0.72rem]"></i>
                 </button>
               </div>
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="10" class="px-5 py-8 text-center text-sm text-brand-muted">
+            <td
+              [attr.colspan]="columnCount()"
+              class="px-5 py-8 text-center text-sm text-brand-muted"
+            >
               <i class="pi pi-inbox mr-2"></i>{{ t().entities.comercialDetalle.empty }}
             </td>
           </tr>
@@ -230,50 +304,4 @@
       </tbody>
     </table>
   </div>
-
-  @if (detalles().controls.length > 0) {
-    <!-- Resumen del documento -->
-    <div class="flex justify-end">
-      <div
-        class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
-      >
-        <div class="flex flex-col gap-1.5">
-          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-            <span class="text-brand-muted">{{
-              t().entities.comercialDetalle.resumen.subtotal
-            }}</span>
-            <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().subtotal) }}</span>
-          </div>
-          @if (resumen().descuento > 0) {
-            <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-              <span class="text-brand-muted">{{
-                t().entities.comercialDetalle.resumen.descuento
-              }}</span>
-              <span class="tabular-nums text-brand-text"
-                >− {{ formatMoney(resumen().descuento) }}</span
-              >
-            </div>
-          }
-          @for (imp of resumen().impuestos; track imp.id) {
-            <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-              <span class="text-brand-muted">{{ imp.nombre }}</span>
-              <span class="tabular-nums text-brand-text">{{ formatMoney(imp.total) }}</span>
-            </div>
-          }
-          <div
-            class="mt-1 flex items-baseline justify-between gap-2 border-t border-[rgba(20,48,73,0.1)] pt-2.5"
-          >
-            <span class="text-[0.78rem] font-semibold text-brand-text">
-              {{ t().entities.comercialDetalle.resumen.total }}
-            </span>
-            <span
-              class="text-[1.35rem] font-bold leading-none tracking-[-0.02em] tabular-nums text-[#143049]"
-            >
-              {{ formatMoney(resumen().total) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
 </div>

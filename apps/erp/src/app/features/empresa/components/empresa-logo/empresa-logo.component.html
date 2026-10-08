@@ -1,0 +1,28 @@
+<!--
+  Solo el marco: el rótulo del grupo lo pone la ficha, que es quien conoce el
+  idioma de sus columnas.
+
+  El marco tira a cuadrado y no a apaisado: la mayoría de los logotipos traen aire
+  arriba y abajo, y en una franja baja quedaban flotando en una raya. Con `contain`
+  el logotipo apaisado sigue entrando entero —sobra fondo, no se recorta— y el
+  vertical deja de verse aplastado. El alto además empareja esta columna con las
+  dos de datos que tiene al lado.
+-->
+@if (loading()) {
+  <div class="h-36 w-44 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+} @else {
+  <app-erp-image-upload
+    [imageUrl]="imageUrl()"
+    [alt]="t().empresa.logo.alt"
+    [disabled]="isSaving()"
+    [maintainAspectRatio]="false"
+    format="png"
+    fit="contain"
+    accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+    [hint]="t().empresa.logo.formats"
+    width="11rem"
+    height="9rem"
+    (imageSelected)="onImageSelected($event)"
+    (imageRemoved)="onImageRemoved()"
+  />
+}

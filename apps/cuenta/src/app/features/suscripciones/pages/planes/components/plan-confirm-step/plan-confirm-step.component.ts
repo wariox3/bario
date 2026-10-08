@@ -1,11 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import {
+  formatCiudad,
+  formatFechaCorta,
   getPlanDescription,
   getPlanFeatures,
   resolvePlanCategory,
   resolvePlanTier,
 } from '@reddoc/core';
 import type { PlanFeature } from '@reddoc/core';
+import { TelefonoPipe } from '@reddoc/ui';
 import { BillingProfile } from '../../../../models/billing-profile.model';
 import { SuscripcionTipo } from '../../../../models/suscripcion-tipo.model';
 import {
@@ -17,6 +20,7 @@ import {
 @Component({
   selector: 'app-plan-confirm-step',
   standalone: true,
+  imports: [TelefonoPipe],
   templateUrl: './plan-confirm-step.component.html',
   host: { class: 'block' },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +34,12 @@ export class PlanConfirmStepComponent {
 
   readonly cambiarPlan = output<void>();
   readonly cambiarFacturacion = output<void>();
+
+  /** `Amagá — Antioquia`; sin departamento queda solo el nombre. */
+  readonly ciudadLabel = computed(() => {
+    const bp = this.billingProfile();
+    return bp ? formatCiudad(bp.ciudad, bp.departamento) : '';
+  });
 
   readonly tierName = computed(() => {
     const nombre = this.plan().nombre;
@@ -107,11 +117,7 @@ export class PlanConfirmStepComponent {
     } else {
       next.setMonth(now.getMonth() + 1);
     }
-    return next.toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return formatFechaCorta(next);
   });
 
   onCambiarPlan(): void {

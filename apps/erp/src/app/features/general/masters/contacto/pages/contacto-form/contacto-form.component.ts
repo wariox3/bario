@@ -1,18 +1,40 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  type ElementRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FieldErrorComponent } from '@reddoc/ui';
-import { FormErrorService, I18nService, TenantService, ToastService } from '@reddoc/core';
-import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import {
-  ErpApiSelectComponent,
-  ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
+  CiudadAutocompleteComponent,
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  PhoneInputComponent,
+} from '@reddoc/ui';
+import {
+  CIUDAD_FUENTE,
+  FormErrorService,
+  I18nService,
+  SELECT_ENDPOINTS,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
+import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { ErpApiSelectComponent, ErpAsesorSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ErpApiAutocompleteComponent } from '@reddoc/ui';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
 import { CONTACTO_LIST_PATH, TIPO_PERSONA } from '../../contacto.constants';
@@ -33,14 +55,19 @@ import {
   selector: 'app-contacto-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     CheckboxModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ErpApiSelectComponent,
+    ErpAsesorSelectComponent,
     ErpApiAutocompleteComponent,
+    PhoneInputComponent,
+    CiudadAutocompleteComponent,
   ],
   templateUrl: './contacto-form.component.html',
   styleUrl: './contacto-form.component.scss',
@@ -51,11 +78,18 @@ export class ContactoFormComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  /** Ciudades dentro del tenant: el ERP siempre trabaja dentro de uno. */
+  protected readonly ciudadFuente = CIUDAD_FUENTE.erp;
+
+  /** Endpoints `seleccionar` de catálogos compartidos, para los `<app-api-*>` del template. */
+  protected readonly endpoints = SELECT_ENDPOINTS;
 
   /** Id del contacto a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -65,14 +99,15 @@ export class ContactoFormComponent implements OnInit {
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
+    const moduleId = currentModuleId(this.activeModule);
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, moduleId] : undefined,
       },
       {
         label: this.t().entities.contacto.name,
-        routerLink: slug ? ['/t', slug, ...CONTACTO_LIST_PATH] : undefined,
+        routerLink: slug ? ['/t', slug, moduleId, ...CONTACTO_LIST_PATH] : undefined,
       },
       { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
     ];
@@ -83,6 +118,16 @@ export class ContactoFormComponent implements OnInit {
 
   protected readonly esCliente = signal(true);
   protected readonly esProveedor = signal(false);
+
+  /** Cards que se revelan al marcar cada clasificación; usadas para hacer scroll. */
+  private readonly clienteSection = viewChild<ElementRef<HTMLElement>>('clienteSection');
+  private readonly proveedorSection = viewChild<ElementRef<HTMLElement>>('proveedorSection');
+
+  /**
+   * Suprime el auto-scroll mientras se hidrata el form en edición: el
+   * `patchValue` dispara `valueChanges` y no queremos saltar la vista al cargar.
+   */
+  private isHydrating = false;
 
   /** Consulta DIAN en vuelo (deshabilita el botón y muestra spinner). */
   protected readonly isConsultingDian = signal(false);
@@ -97,6 +142,7 @@ export class ContactoFormComponent implements OnInit {
 
   /** El endpoint de precio devuelve listas de venta y compra; filtramos venta. */
   protected readonly precioParams: Record<string, string> = { venta: 'True' };
+
   protected readonly form = this.fb.group({
     tipo_persona: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     responsabilidad: this.fb.control<ErpSelectOption | null>(null, Validators.required),
@@ -148,11 +194,18 @@ export class ContactoFormComponent implements OnInit {
       : this.contactoService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -236,6 +289,18 @@ export class ContactoFormComponent implements OnInit {
 
   // ── Internos ────────────────────────────────────────────────────────────────
 
+  /**
+   * Hace scroll suave hacia la card recién revelada. La sección se renderiza vía
+   * `@if` tras actualizar el signal, así que esperamos un frame a que esté en el
+   * DOM. No actúa durante la hidratación en edición.
+   */
+  private scrollToSection(section: () => ElementRef<HTMLElement> | undefined): void {
+    if (this.isHydrating || typeof requestAnimationFrame === 'undefined') return;
+    requestAnimationFrame(() => {
+      section()?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   /** Conecta los `valueChanges` del form a los signals y al async validator. */
   private setupFormReactions(): void {
     const { controls } = this.form;
@@ -249,13 +314,19 @@ export class ContactoFormComponent implements OnInit {
 
     controls.cliente.valueChanges.pipe(takeUntilDestroyed()).subscribe((v) => {
       const esCliente = v ?? false;
+      const seActivo = esCliente && !this.esCliente();
       this.esCliente.set(esCliente);
       this.applyClienteValidators(esCliente);
+      if (seActivo) this.scrollToSection(this.clienteSection);
     });
 
-    controls.proveedor.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe((v) => this.esProveedor.set(v ?? false));
+    controls.proveedor.valueChanges.pipe(takeUntilDestroyed()).subscribe((v) => {
+      const esProveedor = v ?? false;
+      const seActivo = esProveedor && !this.esProveedor();
+      this.esProveedor.set(esProveedor);
+      this.applyProveedorValidators(esProveedor);
+      if (seActivo) this.scrollToSection(this.proveedorSection);
+    });
 
     // El dígito de verificación se deriva del número de identificación.
     controls.numero_identificacion.valueChanges.pipe(takeUntilDestroyed()).subscribe((numero) => {
@@ -277,8 +348,9 @@ export class ContactoFormComponent implements OnInit {
       controls.numero_identificacion.updateValueAndValidity();
     });
 
-    // Estado inicial del requerido de plazo_pago según el flag cliente.
+    // Estado inicial de los requeridos según los flags cliente/proveedor.
     this.applyClienteValidators(controls.cliente.value ?? false);
+    this.applyProveedorValidators(controls.proveedor.value ?? false);
   }
 
   /**
@@ -290,6 +362,18 @@ export class ContactoFormComponent implements OnInit {
     const { plazo_pago } = this.form.controls;
     plazo_pago.setValidators(esCliente ? [Validators.required] : []);
     plazo_pago.updateValueAndValidity();
+  }
+
+  /**
+   * `plazo_pago_proveedor` solo es obligatorio cuando el contacto es proveedor:
+   * de él salen los días de vencimiento de la factura de compra (entre otros, la
+   * importación de eventos DIAN lo usa para armar el documento). Fuera de ese
+   * caso la card se oculta y exigirlo dejaría el form inválido sin campo visible.
+   */
+  private applyProveedorValidators(esProveedor: boolean): void {
+    const { plazo_pago_proveedor } = this.form.controls;
+    plazo_pago_proveedor.setValidators(esProveedor ? [Validators.required] : []);
+    plazo_pago_proveedor.updateValueAndValidity();
   }
 
   /**
@@ -319,7 +403,9 @@ export class ContactoFormComponent implements OnInit {
             numero_identificacion: c.numero_identificacion,
             identificacion_id: c.identificacion,
           });
+          this.isHydrating = true;
           this.form.patchValue(contactoToFormValue(c));
+          this.isHydrating = false;
         },
         error: () => {
           const toasts = this.t().entities.contacto.form.toasts;
@@ -331,6 +417,24 @@ export class ContactoFormComponent implements OnInit {
   private navigateToList(): void {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
-    void this.router.navigate(['/t', slug, ...CONTACTO_LIST_PATH]);
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...CONTACTO_LIST_PATH,
+    ]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate([
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...CONTACTO_LIST_PATH,
+      'detalle',
+      id,
+    ]);
   }
 }

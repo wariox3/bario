@@ -234,22 +234,3 @@
     margin-left: 0.1rem;
   }
 }
-
-// El popup de `<p-menu>` se monta con `appendTo="body"`, fuera del host, por lo
-// que su tipografía no la alcanza el scss scopeado. Regla global (vía `::ng-deep`
-// inicial) acotada por el styleClass del menú, para que los ítems usen la misma
-// escala que el toolbar (DM Sans heredado de body, tamaño/peso compactos) y no la
-// default de Aura, que se veía inconsistente con el resto de textos.
-::ng-deep .lib-data-toolbar__menu {
-  font-family: inherit;
-
-  .p-menu-item-link {
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-
-  .p-menu-item-icon {
-    font-size: 0.8rem;
-  }
-}

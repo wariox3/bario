@@ -1,0 +1,77 @@
+<!--
+  Informe "Auxiliar general".
+  El panel de parámetros es un recuadro hermano del de la tabla, con una banda
+  por pregunta; los tres parámetros propios (contacto, número, comprobante) se
+  proyectan en la banda "documento" y la botonera cierra el recuadro. Sin botón
+  de PDF: la familia de endpoints nueva no lo sirve.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <app-movimiento-informe-params toolbar [form]="form" idPrefix="ag" [showDetalle]="true">
+    <!--
+      Los tres acotan por igualdad contra el movimiento, así que van por
+      selector (o número exacto) y no por texto libre.
+    -->
+    <div class="mi-params__field">
+      <label for="ag-contacto" class="mi-params__label">{{ d.params.contacto }}</label>
+      <lib-contacto-select
+        inputId="ag-contacto"
+        [formControl]="contacto"
+        [placeholder]="d.params.contactoPlaceholder"
+      />
+    </div>
+
+    <div class="mi-params__field">
+      <label for="ag-numero" class="mi-params__label">{{ d.params.numero }}</label>
+      <p-inputnumber
+        inputId="ag-numero"
+        [formControl]="numero"
+        [useGrouping]="false"
+        [min]="0"
+        [fluid]="true"
+        [placeholder]="d.params.numeroPlaceholder"
+      />
+    </div>
+
+    <div class="mi-params__field">
+      <label for="ag-comprobante" class="mi-params__label">{{ d.params.comprobante }}</label>
+      <lib-api-autocomplete
+        inputId="ag-comprobante"
+        [formControl]="comprobante"
+        [endpoint]="comprobanteEndpoint"
+        [placeholder]="d.params.comprobantePlaceholder"
+      />
+    </div>
+
+    <app-movimiento-informe-actions
+      acciones
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="soportaPdf"
+      [exportingPdf]="isExportingPdf()"
+      [hint]="hint()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </app-movimiento-informe-params>
+
+  <app-movimiento-informe-table
+    table
+    [rows]="rows()"
+    [amounts]="montos()"
+    [empty]="empty"
+    [totales]="totales()"
+    [loading]="isLoading()"
+    [generated]="generated()"
+    [showContacto]="true"
+    [showMovimiento]="true"
+    [totalCount]="totalCount()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="onPageChange($event)"
+  />
+</lib-list-shell>

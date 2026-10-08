@@ -1,24 +1,23 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
-import { FieldErrorComponent } from '@reddoc/ui';
 import {
-  FormErrorService,
-  I18nService,
-  TenantService,
-  ToastService,
-  startOfToday,
-} from '@reddoc/core';
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
+import { FormErrorService, I18nService, ToastService, startOfToday } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ActiveModuleStore } from '@erp/core/erp-modules';
+import { UppercaseDirective } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
+import { ActiveModuleStore, masterNav } from '@erp/core/erp-modules';
 import { ResolucionService } from '../../resolucion.service';
-import { CONSECUTIVO_MAX } from '../../resolucion.constants';
+import { CONSECUTIVO_MAX, RESOLUCION_SEGMENT } from '../../resolucion.constants';
 import type { ResolucionTipo } from '../../resolucion.model';
 import { resolucionToFormValue, formValueToPayload } from '../../resolucion.mapper';
 import {
@@ -32,19 +31,24 @@ import {
  * Master compartido enrutado desde Venta y Compra. El `tipo` (venta/compra) se
  * deriva del módulo activo (`ActiveModuleStore`) y fija el flag del payload —
  * el usuario no lo edita. La misma página cubre crear y editar: sin `:id` →
- * alta (sugiere hoy en fecha_desde/fecha_hasta); con `:id` → edición.
+ * alta (sugiere hoy en fecha_desde; deja fecha_hasta vacío); con `:id` →
+ * edición.
  */
 @Component({
   selector: 'app-resolucion-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputTextModule,
     InputNumberModule,
     DatePickerModule,
+    MascaraFechaDirective,
     FieldErrorComponent,
+    PageActionsComponent,
+    UppercaseDirective,
   ],
   templateUrl: './resolucion-form.component.html',
   styleUrl: './resolucion-form.component.scss',
@@ -54,13 +58,13 @@ export class ResolucionFormComponent implements OnInit {
   private readonly resolucionService = inject(ResolucionService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
-  private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
+
+  private readonly nav = masterNav(RESOLUCION_SEGMENT);
 
   /** Id de la resolución a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -73,20 +77,11 @@ export class ResolucionFormComponent implements OnInit {
     this.activeModule.activeId() === 'compra' ? 'compra' : 'venta',
   );
 
-  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
-    const slug = this.tenant.currentSlug();
-    const tipo = this.tipo();
-    const moduleName =
-      tipo === 'compra' ? this.t().modules.compra.name : this.t().modules.venta.name;
-    return [
-      { label: moduleName, routerLink: slug ? ['/t', slug, tipo] : undefined },
-      {
-        label: this.t().entities.resolucion.name,
-        routerLink: slug ? ['/t', slug, tipo, 'resoluciones'] : undefined,
-      },
-      { label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new },
-    ];
-  });
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
+    this.nav.crumbs(this.t().entities.resolucion.name, {
+      label: this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
+    }),
+  );
 
   protected readonly form = this.fb.group(
     {
@@ -111,8 +106,9 @@ export class ResolucionFormComponent implements OnInit {
     if (id) {
       this.loadResolucion(Number(id));
     } else {
-      const today = startOfToday();
-      this.form.patchValue({ fecha_desde: today, fecha_hasta: today });
+      // Solo sugerimos el inicio de vigencia; el vencimiento es una decisión
+      // consciente (una resolución vigente "de hoy a hoy" no tiene sentido).
+      this.form.patchValue({ fecha_desde: startOfToday() });
     }
   }
 
@@ -128,11 +124,18 @@ export class ResolucionFormComponent implements OnInit {
       : this.resolucionService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.nav.ir();
+          return;
+        }
+        this.nav.ir('detalle', savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -143,7 +146,7 @@ export class ResolucionFormComponent implements OnInit {
   }
 
   protected onCancel(): void {
-    this.navigateToList();
+    this.nav.ir();
   }
 
   private loadResolucion(id: number): void {
@@ -157,11 +160,5 @@ export class ResolucionFormComponent implements OnInit {
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });
-  }
-
-  private navigateToList(): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return;
-    void this.router.navigate(['/t', slug, this.tipo(), 'resoluciones']);
   }
 }

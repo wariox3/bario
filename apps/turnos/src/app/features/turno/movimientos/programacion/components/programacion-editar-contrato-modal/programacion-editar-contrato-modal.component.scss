@@ -1,0 +1,27 @@
+@use '../../styles/tabla-dias';
+
+:host {
+  display: block;
+}
+
+// Grid editable multi-puesto (banda por puesto + fila por contrato): mismo lenguaje
+// visual que `programacion-grid`. Las reglas de la tabla de días viven en el partial
+// compartido; acá solo lo específico de este modal.
+@include tabla-dias.editable;
+
+// Casilla en conflicto (mismo día en dos puestos): ámbar de advertencia —corregible
+// en cliente, distinto del rojo de rechazo del backend. Va tras el mixin (después de
+// `--error`) para ganarle el fondo si coincidieran.
+.editar-grid__td--conflicto {
+  background: rgba(245, 158, 11, 0.12);
+
+  .editar-grid__input {
+    border-color: #f59e0b;
+  }
+}
+
+// Chip de horario del puesto (variante teal del chip de grupo).
+.editar-grid__group-chip--horario {
+  background: rgba(15, 118, 110, 0.09);
+  color: #0f766e;
+}

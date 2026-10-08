@@ -1,0 +1,10 @@
+@use '../../styles/tabla-dias';
+
+:host {
+  display: block;
+}
+
+// Grid editable multi-contrato (banda por contrato + fila editable): mismo lenguaje
+// visual que `programacion-grid`, eje transpuesto del modal de contrato. Todas las
+// reglas de la tabla de días viven en el partial compartido.
+@include tabla-dias.editable;

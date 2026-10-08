@@ -47,6 +47,22 @@ describe('buildFiltros', () => {
     ]);
   });
 
+  it('emite operador_logico solo cuando la condición lo declara', () => {
+    const filters: FilterCondition[] = [
+      { field: 'cuenta__codigo', operator: 'gte', value: '1105' },
+      { field: 'cuenta__codigo', operator: 'lte', value: '1199', logic: 'AND' },
+    ];
+    expect(buildFiltros(filters)).toEqual([
+      { propiedad: 'cuenta__codigo', operador: '>=', valor: '1105' },
+      { propiedad: 'cuenta__codigo', operador: '<=', valor: '1199', operador_logico: 'AND' },
+    ]);
+  });
+
+  it('no agrega la clave operador_logico cuando la condición no la trae', () => {
+    const [filtro] = buildFiltros([{ field: 'nombre', operator: 'eq', value: 'x' }]);
+    expect('operador_logico' in filtro).toBe(false);
+  });
+
   it('serializa is_null con su valor booleano (vacío / no vacío)', () => {
     const filters: FilterCondition[] = [
       { field: 'correo', operator: 'isNull', value: true },

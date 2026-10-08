@@ -23,11 +23,14 @@ import {
   IdentificacionService,
   ToastService,
   FormErrorService,
+  normalizarCelular,
 } from '@reddoc/core';
 import {
   CiudadAutocompleteComponent,
   IdentificacionSelectComponent,
   FieldErrorComponent,
+  FocusInvalidDirective,
+  PhoneInputComponent,
 } from '@reddoc/ui';
 import { Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
@@ -41,7 +44,7 @@ interface BillingProfileForm {
   numero: FormControl<string>;
   nombre: FormControl<string>;
   email: FormControl<string>;
-  telefono: FormControl<string>;
+  celular: FormControl<string>;
   direccion: FormControl<string>;
   ciudad: FormControl<Ciudad | null>;
 }
@@ -57,6 +60,8 @@ interface BillingProfileForm {
     CiudadAutocompleteComponent,
     IdentificacionSelectComponent,
     FieldErrorComponent,
+    FocusInvalidDirective,
+    PhoneInputComponent,
   ],
   templateUrl: './billing-profile-create-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -107,9 +112,9 @@ export class BillingProfileCreateDialogComponent {
     email: this.fb.nonNullable.control('', {
       validators: [Validators.required, Validators.email],
     }),
-    telefono: this.fb.nonNullable.control('', {
-      validators: [Validators.required, Validators.pattern(/^[0-9]{7,15}$/)],
-    }),
+    // Wompi exige el celular en E.164 y antes se adivinaba el `+57` al armar su
+    // payload. Ahora el indicativo se elige acá y viaja en el propio valor.
+    celular: this.fb.nonNullable.control('', { validators: [Validators.required] }),
     direccion: this.fb.nonNullable.control('', {
       validators: [Validators.required, Validators.minLength(5), Validators.maxLength(255)],
     }),
@@ -165,7 +170,7 @@ export class BillingProfileCreateDialogComponent {
       numero: v.numero,
       nombre: v.nombre,
       email: v.email,
-      telefono: v.telefono,
+      celular: v.celular,
       direccion: v.direccion,
       ciudad: v.ciudad,
     };
@@ -201,16 +206,20 @@ export class BillingProfileCreateDialogComponent {
   private hydrateFromProfile(p: BillingProfile): void {
     // El backend devuelve ciudad_id + ciudad_nombre, así que podemos armar el
     // Ciudad sin depender de las sugerencias actuales del autocomplete: PrimeNG
-    // muestra la etiqueta a partir del optionLabel del valor.
+    // muestra la etiqueta a partir del optionLabel del valor. El departamento
+    // viaja con él para que el campo muestre lo mismo al reabrir que al elegir
+    // (`Amagá — Antioquia`); sin él un municipio homónimo es indistinguible.
     const ciudad =
-      p.ciudad_id !== undefined && p.ciudad ? { id: p.ciudad_id, nombre: p.ciudad } : null;
+      p.ciudad_id !== undefined && p.ciudad
+        ? { id: p.ciudad_id, nombre: p.ciudad, departamento_nombre: p.departamento ?? null }
+        : null;
 
     this.form.reset({
       identificacion: null,
       numero: p.numero,
       nombre: p.nombre,
       email: p.email,
-      telefono: p.telefono,
+      celular: normalizarCelular(p.celular),
       direccion: p.direccion,
       ciudad,
     });
@@ -234,7 +243,7 @@ export class BillingProfileCreateDialogComponent {
       numero: '',
       nombre: '',
       email: '',
-      telefono: '',
+      celular: '',
       direccion: '',
       ciudad: null,
     });

@@ -7,7 +7,11 @@ export const ROUTE_PATHS = {
     verifyEmail: '/auth/verify-email',
     resendVerification: '/auth/resend-verification',
   },
-  dashboard: {
-    root: '/dashboard',
+  contenedores: {
+    root: '/contenedores',
+  },
+  tenant: {
+    /** Home del tenant en la app turnos: la pantalla de inicio. */
+    home: (slug: string) => `/t/${slug}/inicio`,
   },
 };

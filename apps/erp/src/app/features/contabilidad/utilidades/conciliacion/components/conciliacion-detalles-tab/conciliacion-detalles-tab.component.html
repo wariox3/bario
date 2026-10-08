@@ -1,0 +1,32 @@
+<div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.12)]">
+  <lib-data-toolbar
+    [primaryAction]="primaryAction()"
+    [trailingActions]="trailingActions()"
+    [searchEnabled]="false"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filtersClear)="clearFilters()"
+  />
+
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage()"
+    (pageChange)="onPageChange($event)"
+  />
+</div>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />

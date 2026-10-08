@@ -17,8 +17,10 @@ import { finalize } from 'rxjs';
 import {
   FilterStorageService,
   I18nService,
+  extractErrorMessage,
   TenantService,
   ToastService,
+  type ColumnDef,
   type FilterCondition,
   type ListQuery,
   type SortSpec,
@@ -38,14 +40,24 @@ import type {
 } from '@reddoc/feature-base';
 import { ENTITY_ACTION_STRATEGY } from '../../actions/entity-action.token';
 import type { EntityActionStrategy } from '../../actions/entity-action-strategy';
-import { ENTITY_DATA_GATEWAY } from '../../data/entity-data-gateway';
+import {
+  type DocumentEntityConfig,
+  type EditableRowContext,
+  ENTITY_DATA_GATEWAY,
+} from '@reddoc/core';
 import { MissingModuleContextError } from '../../errors/config.errors';
 import { ModuleNavigationStore } from '../../module-navigation.store';
 import { buildEntityStorageKey } from '../../storage/build-entity-storage-key';
-import type { DocumentEntityConfig } from '../../types/entity-config.types';
+import { DocumentoAfectacionModalComponent } from '../documento-afectacion-modal/documento-afectacion-modal.component';
 
 /** Tamaño de página default mientras `DocumentEntityConfig` no exponga `paginationDefaults`. */
 const DEFAULT_PAGE_SIZE = 25;
+
+/**
+ * Acción de la celda `id` cuando el documento declara `canViewAfectacion`. Sale
+ * por `rowActionInvoked`, como las acciones de fila.
+ */
+const AFECTACION_ACTION_ID = 'afectacion';
 
 /** Acción primaria "Nuevo" del toolbar — derivada de `capabilities.canCreate`. */
 const NEW_ACTION: ToolbarAction = {
@@ -84,6 +96,7 @@ const NEW_ACTION: ToolbarAction = {
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
+    DocumentoAfectacionModalComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './base-document-list.component.html',
@@ -121,10 +134,31 @@ export class BaseDocumentListComponent {
   protected readonly selectedRows = signal<readonly unknown[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
+  /** Modal de afectación (solo documentos con `canViewAfectacion`). */
+  protected readonly afectacionVisible = signal(false);
+  protected readonly afectacionDocumentoId = signal<number | null>(null);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
-  protected readonly columns = computed(() => this.document().columns);
   protected readonly capabilities = computed(() => this.document().capabilities);
+
+  /**
+   * Columnas del documento. Con `canViewAfectacion`, la del `id` se vuelve
+   * clicable y abre la afectación: se marca aquí y no en cada `*.constants.ts`,
+   * así encenderla en un documento es solo su capability.
+   */
+  protected readonly columns = computed<readonly ColumnDef[]>(() => {
+    const columns = this.document().columns;
+    if (!this.capabilities().canViewAfectacion) return columns;
+    return columns.map((col) =>
+      col.field === 'id'
+        ? {
+            ...col,
+            cellAction: AFECTACION_ACTION_ID,
+            cellActionLabelKey: 'documentActions.afectacion.ver',
+          }
+        : col,
+    );
+  });
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   /** Campos filtrables declarados por el documento (vacío ⇒ sin filtros). */
@@ -150,15 +184,30 @@ export class BaseDocumentListComponent {
   });
 
   /**
-   * Acciones extra del toolbar, agrupadas en un único dropdown "Acciones" (el
-   * toolbar lo renderiza como menú cuando el `ToolbarAction` trae `children`).
-   * Al elegir un hijo, el toolbar emite su `id` → lo resuelve `onToolbarAction`.
-   * Vacío ⇒ sin dropdown.
+   * Acciones extra del toolbar, repartidas según el `placement` de cada strategy:
+   * las de `'button'` quedan como botones sueltos y el resto se agrupa en un
+   * único dropdown "Acciones" (el toolbar lo renderiza como menú cuando el
+   * `ToolbarAction` trae `children`). Orden final:
+   *
+   *   [botón suelto…] [Acciones ▾] │ [refresh] [Nuevo]
+   *
+   * Al elegir un hijo del dropdown, el toolbar emite el `id` **del hijo** → lo
+   * resuelve `onToolbarAction` igual que un botón suelto. Cada grupo se omite si
+   * queda vacío: un documento sin acciones no dibuja nada, y uno cuyas acciones
+   * son todas `'button'` no dibuja el dropdown.
    */
   protected readonly trailingActions = computed<readonly ToolbarAction[]>(() => {
-    const children = this.availableStrategies().map((s) => s.toolbarAction);
-    if (children.length === 0) return [];
+    const strategies = this.availableStrategies();
+    const standalone = strategies
+      .filter((s) => s.placement === 'button')
+      .map((s) => s.toolbarAction);
+    const children = strategies
+      .filter((s) => (s.placement ?? 'menu') === 'menu')
+      .map((s) => s.toolbarAction);
+
+    if (children.length === 0) return standalone;
     return [
+      ...standalone,
       {
         id: 'actions',
         labelKey: 'common.actions.actions',
@@ -209,10 +258,22 @@ export class BaseDocumentListComponent {
     const caps = this.capabilities();
     const actions: RowAction[] = [];
     if (caps.canEdit) {
+      // La acción se oculta por fila según la política declarativa del
+      // documento (`canEditRow`): un documento aprobado, p. ej., no se edita.
+      const canEditRow = this.document().canEditRow;
       actions.push({
         id: 'edit',
         labelKey: 'common.actions.edit',
         iconClass: 'pi pi-pencil',
+        inline: true,
+        visibleFor: canEditRow ? (row) => canEditRow(row as EditableRowContext) : undefined,
+      });
+    }
+    if (caps.canView) {
+      actions.push({
+        id: 'view',
+        labelKey: 'common.actions.view',
+        iconClass: 'pi pi-eye',
         inline: true,
       });
     }
@@ -305,6 +366,7 @@ export class BaseDocumentListComponent {
       ?.execute({
         document: this.document(),
         query: this.currentQuery(),
+        selectedIds: this.currentSelectedIds(),
         reload: () => this.loadList(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -319,13 +381,26 @@ export class BaseDocumentListComponent {
     const id = this.extractId(event.row);
     if (id === null) return;
     switch (event.actionId) {
+      case 'view':
+        this.navigateToDetail(id);
+        break;
       case 'edit':
         this.navigateToEdit(id);
         break;
       case 'delete':
         this.confirmRemove([id]);
         break;
+      case AFECTACION_ACTION_ID:
+        this.openAfectacion(id);
+        break;
     }
+  }
+
+  private openAfectacion(id: string | number): void {
+    const documentoId = Number(id);
+    if (!Number.isFinite(documentoId)) return;
+    this.afectacionDocumentoId.set(documentoId);
+    this.afectacionVisible.set(true);
   }
 
   protected navigateToNew(): void {
@@ -333,9 +408,7 @@ export class BaseDocumentListComponent {
   }
 
   protected removeSelected(): void {
-    const ids = this.selectedRows()
-      .map((row) => this.extractId(row))
-      .filter((id): id is string | number => id !== null);
+    const ids = this.currentSelectedIds();
     if (ids.length === 0) return;
     this.confirmRemove(ids);
   }
@@ -353,6 +426,13 @@ export class BaseDocumentListComponent {
   }
 
   // ── Internos ──────────────────────────────────────────────────────────────
+
+  /** Ids de las filas seleccionadas; alimenta las acciones masivas del toolbar. */
+  private currentSelectedIds(): readonly (string | number)[] {
+    return this.selectedRows()
+      .map((row) => this.extractId(row))
+      .filter((id): id is string | number => id !== null);
+  }
 
   /** Query activo (filtros/orden/paginación) que comparten `loadList` y las acciones. */
   private currentQuery(): ListQuery {
@@ -413,17 +493,26 @@ export class BaseDocumentListComponent {
           this.selectedRows.set([]);
           this.loadList();
         },
-        error: () => {
+        // El mensaje del backend explica por qué no se pudo (p. ej. documento aprobado).
+        // Se recarga igual: con varios ids los DELETE van en paralelo y alguno pudo
+        // haberse completado antes del que falló.
+        error: (err: unknown) => {
           this.toast.error(
             this.translate('common.toasts.deleteError.title'),
-            this.translate('common.toasts.deleteError.desc'),
+            extractErrorMessage(err, this.translate('common.toasts.deleteError.desc')),
           );
+          this.selectedRows.set([]);
+          this.loadList();
         },
       });
   }
 
   private navigateToEdit(id: string | number): void {
     this.router.navigate([...this.buildRouteCommands(this.document().routes.edit), id]);
+  }
+
+  private navigateToDetail(id: string | number): void {
+    this.router.navigate([...this.buildRouteCommands(this.document().routes.detail), id]);
   }
 
   /**

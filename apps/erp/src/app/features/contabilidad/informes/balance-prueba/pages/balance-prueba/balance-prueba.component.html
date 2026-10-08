@@ -1,0 +1,40 @@
+<!--
+  Informe "Balance de prueba".
+  Chrome estándar (<lib-list-shell>), pero el slot [toolbar] no lleva el toolbar
+  de filtros sino el panel de parámetros del reporte, que cierra con su propia
+  botonera. La tabla arranca vacía hasta Generar; a partir de ahí pagina, pinta
+  la jerarquía del plan de cuentas y los totales del pie vienen de la acción
+  `totales/` (cubren el informe completo, no la página). Sin PDF: la familia de
+  endpoints nueva no lo sirve.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <app-movimiento-informe-params toolbar [form]="form" idPrefix="bp">
+    <app-movimiento-informe-actions
+      acciones
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="soportaPdf"
+      [exportingPdf]="isExportingPdf()"
+      [hint]="hint()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </app-movimiento-informe-params>
+
+  <app-movimiento-informe-table
+    table
+    [rows]="rows()"
+    [amounts]="montos()"
+    [empty]="empty"
+    [totales]="totales()"
+    [loading]="isLoading()"
+    [generated]="generated()"
+    [totalCount]="totalCount()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="onPageChange($event)"
+  />
+</lib-list-shell>

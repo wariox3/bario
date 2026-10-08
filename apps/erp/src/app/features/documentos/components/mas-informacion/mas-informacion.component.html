@@ -1,0 +1,25 @@
+@let m = t().common.masInformacion;
+
+<button
+  type="button"
+  (click)="abierto.set(!abierto())"
+  [attr.aria-expanded]="abierto()"
+  [attr.aria-controls]="panelId"
+  class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-5 py-3 text-left transition-colors hover:bg-[rgba(20,48,73,0.04)] max-[576px]:px-4"
+>
+  <i
+    class="pi pi-chevron-right text-[0.7rem] text-brand-muted transition-transform"
+    [class.rotate-90]="abierto()"
+  ></i>
+  <span class="text-[0.85rem] font-medium text-brand-muted">{{ m.title }}</span>
+  <span class="ml-auto text-[0.72rem] text-brand-muted">{{ m.hint }}</span>
+</button>
+
+<!-- `hidden` y no @if: plegado, los controles siguen en el DOM. -->
+<div
+  [id]="panelId"
+  [hidden]="!abierto()"
+  class="border-t border-[rgba(20,48,73,0.08)] px-5 py-5 max-[576px]:px-4 max-[576px]:py-4"
+>
+  <ng-content />
+</div>

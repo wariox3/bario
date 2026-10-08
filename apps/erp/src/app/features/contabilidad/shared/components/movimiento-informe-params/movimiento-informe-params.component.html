@@ -1,0 +1,132 @@
+@let d = t().entities.informeCuentas;
+@let p = idPrefix();
+
+<!--
+  Panel de parámetros como **cabecera del recuadro del informe**: va en el slot
+  [toolbar] de <lib-list-shell>, que le pone el marco y el divisor con la tabla,
+  igual que al toolbar de un listado.
+
+  Dentro, una banda por pregunta (periodo / plan de cuentas / documento), cada
+  una encabezada por su micro-etiqueta de grupo. Los campos de un rango viven
+  siempre en la misma banda: partidos en dos filas dejan de leerse como rango,
+  que es lo que pasaba con la grilla `auto-fit` anterior.
+-->
+<form [formGroup]="form()" class="mi-params">
+  <!--
+    Periodo y plan de cuentas comparten fila: son las dos preguntas de "qué
+    cubre el informe". El filete entre ellas es vertical arriba de 1024px y pasa
+    a horizontal al apilarse.
+  -->
+  <div class="mi-params__row">
+    <!-- Periodo. Obligatorio para el backend: acota el informe entero. -->
+    <div class="mi-params__band">
+      <span class="mi-params__group">{{ d.groups.periodo }}</span>
+      <div class="mi-params__fields">
+        <div class="mi-params__field">
+          <label [for]="p + '-fecha-desde'" class="mi-params__label">{{
+            d.params.fechaDesde
+          }}</label>
+          <p-datepicker
+            [inputId]="p + '-fecha-desde'"
+            formControlName="fecha_desde"
+            [showIcon]="true"
+            [readonlyInput]="true"
+            appendTo="body"
+            [fluid]="true"
+          />
+        </div>
+
+        <div class="mi-params__field">
+          <label [for]="p + '-fecha-hasta'" class="mi-params__label">{{
+            d.params.fechaHasta
+          }}</label>
+          <p-datepicker
+            [inputId]="p + '-fecha-hasta'"
+            formControlName="fecha_hasta"
+            [showIcon]="true"
+            [readonlyInput]="true"
+            appendTo="body"
+            [fluid]="true"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!--
+      Plan de cuentas: el rango viaja como filtros sobre cuenta__codigo (vacío =
+      todo el plan). `solo_con_saldo` vive acá y no en una celda propia porque es
+      otra forma de decir "qué cuentas entran".
+    -->
+    @if (showCuentas()) {
+      <div class="mi-params__band">
+        <span class="mi-params__group">{{ d.groups.cuentas }}</span>
+        <div class="mi-params__fields">
+          <div class="mi-params__field">
+            <label [for]="p + '-cuenta-desde'" class="mi-params__label">{{
+              d.params.cuentaDesde
+            }}</label>
+            <app-cuenta-select
+              [inputId]="p + '-cuenta-desde'"
+              formControlName="cuenta_desde"
+              [placeholder]="d.params.cuentaPlaceholder"
+            />
+          </div>
+
+          <div class="mi-params__field">
+            <label [for]="p + '-cuenta-hasta'" class="mi-params__label">{{
+              d.params.cuentaHasta
+            }}</label>
+            <app-cuenta-select
+              [inputId]="p + '-cuenta-hasta'"
+              formControlName="cuenta_hasta"
+              [placeholder]="d.params.cuentaPlaceholder"
+            />
+          </div>
+
+          @if (showSoloConSaldo()) {
+            <div class="mi-params__check">
+              <p-checkbox
+                [inputId]="p + '-solo-con-saldo'"
+                formControlName="solo_con_saldo"
+                [binary]="true"
+              />
+              <label [for]="p + '-solo-con-saldo'" class="text-[0.82rem]">{{
+                d.params.soloConSaldo
+              }}</label>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Parámetros propios del informe (tercero, número, comprobante). -->
+  @if (showDetalle()) {
+    <div class="mi-params__band">
+      <span class="mi-params__group">{{ d.groups.documento }}</span>
+      <div class="mi-params__fields">
+        <ng-content />
+      </div>
+    </div>
+  }
+
+  <!--
+    Errores del rango (validador a nivel de formulario). Banda propia para que
+    el mensaje no empuje los campos ni quede colgando fuera del recuadro.
+  -->
+  @if (form().touched || form().dirty) {
+    @if (form().hasError('rangoInvertido')) {
+      <p class="mi-params__error">{{ d.validation.rangoInvertido }}</p>
+    } @else if (form().hasError('anioDistinto')) {
+      <p class="mi-params__error">{{ d.validation.anioDistinto }}</p>
+    }
+  }
+
+  <!--
+    La botonera cierra el recuadro: definir la consulta y lanzarla son el mismo
+    gesto, así que comparten pieza en vez de quedar como una fila suelta debajo.
+  -->
+  <div class="mi-params__actions">
+    <ng-content select="[acciones]" />
+  </div>
+</form>

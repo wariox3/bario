@@ -4,8 +4,15 @@ import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 export const PRECIOS_FILTERS_STORAGE_KEY = 'precios:filters:v1';
 export const PRECIOS_QUICK_SEARCH_FIELD = 'nombre';
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const PRECIO_LIST_PATH = ['general', 'precios'] as const;
+/**
+ * Tope del importe de una línea de precio: el `DecimalField` del backend admite
+ * 8 enteros y 2 decimales (`^-?\d{0,8}(?:\.\d{0,2})?$`). Se acota el input para
+ * que el usuario no escriba lo que el servidor va a rechazar con un 400 seco.
+ */
+export const VR_PRECIO_MAX = 99_999_999.99;
+
+/** Segmento de ruta del listado, relativo al módulo activo (se antepone en runtime). */
+export const PRECIO_LIST_PATH = ['precios'] as const;
 
 export const PRECIOS_COLUMNS: readonly ColumnDef[] = [
   {
@@ -19,18 +26,6 @@ export const PRECIOS_COLUMNS: readonly ColumnDef[] = [
     field: 'nombre',
     headerKey: 'entities.precio.columns.nombre',
     type: 'text',
-  },
-  {
-    field: 'venta',
-    headerKey: 'entities.precio.columns.venta',
-    type: 'boolean',
-    align: 'center',
-  },
-  {
-    field: 'compra',
-    headerKey: 'entities.precio.columns.compra',
-    type: 'boolean',
-    align: 'center',
   },
   {
     field: 'fecha_vence',
@@ -58,3 +53,14 @@ export const PRECIOS_PRIMARY_ACTION: ToolbarAction = {
   labelKey: 'common.actions.new',
   iconClass: 'pi pi-plus',
 };
+
+export const PRECIOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: 'actions',
+    labelKey: 'common.actions.actions',
+    iconClass: '',
+    children: [
+      { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
+    ],
+  },
+];

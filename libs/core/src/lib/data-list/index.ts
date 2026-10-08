@@ -8,16 +8,27 @@
  *  - Serialización al body `{filtros, ordenamientos, …}` del backend (`buildListBody`).
  *  - Persistencia de filtros en localStorage (`FilterStorageService`).
  *
- * El framework configuracional específico del ERP (registry de módulos,
- * resolvers, gateway, base-document-list, etc.) vive en
- * `apps/erp/src/app/core/module-config/`, no aquí.
+ * El núcleo compartido del framework configuracional de documentos (tipos
+ * `DocumentEntityConfig`/`ModuleConfig`, gateway `ENTITY_DATA_GATEWAY` +
+ * `HttpEntityDataGateway`, `DocumentoDetalleService`) vive al lado, en
+ * `libs/core/documento`. Lo específico del ERP (registry de módulos, resolvers,
+ * `BaseDocumentListComponent`) queda en `apps/erp/src/app/core/module-config/`.
  */
 
 // Types
-export type { ColumnDef, ColumnValueType, ColumnAlignment } from './types/column-def.types';
+export type {
+  BooleanTone,
+  CellTone,
+  ColumnDef,
+  ColumnValueType,
+  ColumnAlignment,
+  ColumnPart,
+  ColumnPartType,
+} from './types/column-def.types';
 export type { FilterField, FilterFieldType } from './types/filter-field.types';
 export type {
   FilterCondition,
+  FilterLogic,
   FilterOperator,
   ListQuery,
   ListResponse,
@@ -29,6 +40,7 @@ export type {
 export { FILTER_OPERATORS, getOperatorsForType, getOperatorDef } from './filters/filter-operators';
 export type { FilterOperatorDef, FilterValueKind } from './filters/filter-operators';
 export { quickSearchCondition } from './filters/quick-search';
+export { applyClientFilters, matchesCondition } from './filters/match-conditions';
 
 // Query serialization
 export { serializeListQuery } from './data/serialize-list-query';

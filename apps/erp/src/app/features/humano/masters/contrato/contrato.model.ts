@@ -12,6 +12,8 @@ export interface Contrato {
   readonly salario: string | number | null;
   readonly auxilio_transporte: boolean;
   readonly salario_integral: boolean;
+  /** Habilita la programación de turnos para este contrato. */
+  readonly habilitado_turno: boolean;
   readonly estado_terminado: boolean;
   readonly comentario: string | null;
   readonly fecha_ultimo_pago: string | null;
@@ -22,7 +24,15 @@ export interface Contrato {
   readonly contrato_tipo: number | null;
   readonly contrato_tipo_nombre: string | null;
   readonly contacto: number | null;
-  readonly contacto_nombre: string | null;
+  readonly contacto_nombre_corto: string | null;
+  /**
+   * Cédula del empleado, para el addon del autocomplete en edición y la ficha
+   * del detalle. Opcional a propósito: es un campo del **contacto**, no del
+   * contrato —el contrato solo guarda la FK—, así que el backend lo expone como
+   * companion y hasta que lo agregue llega `undefined`. Quien lo lea debe caer a
+   * vacío, nunca asumirlo presente.
+   */
+  readonly contacto_numero_identificacion?: string | null;
   readonly ciudad_contrato: number | null;
   readonly ciudad_contrato_nombre: string | null;
   readonly ciudad_labora: number | null;
@@ -55,6 +65,7 @@ export interface Contrato {
   readonly tiempo_nombre: string | null;
   readonly tipo_costo: number | null;
   readonly tipo_costo_nombre: string | null;
+  /** Centro de costo. Ojo: `grupo`, acá al lado, es otra cosa — el grupo de nómina. */
   readonly centro_costo: number | null;
   readonly centro_costo_nombre: string | null;
   readonly motivo_terminacion: number | null;
@@ -71,6 +82,7 @@ export interface ContratoPayload {
   readonly salario: number | null;
   readonly auxilio_transporte: boolean;
   readonly salario_integral: boolean;
+  readonly habilitado_turno: boolean;
   readonly comentario: string | null;
   readonly fecha_ultimo_pago: string | null;
   readonly fecha_ultimo_pago_prima: string | null;

@@ -1,0 +1,51 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+// Etiqueta de cada dato de la ficha (término de la definition list).
+// Micro-encabezado de un sub-bloque dentro de una card: se distingue de la
+// etiqueta de campo por caja y peso, no por color. Mismo `group-label` que usan
+// la ficha de contacto y el panel del app-switcher.
+.contrato-detail__group {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
+.contrato-detail__label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--brand-muted);
+}
+
+// Valor de cada dato.
+.contrato-detail__value {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--brand-text);
+  word-break: break-word;
+}
+
+// Bandera apagada: un «No» es un valor, no un dato que falta. Atenuarlo deja que
+// la columna se escanee por los «Sí».
+.contrato-detail__value--off {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.65;
+}
+
+// Dato ausente: presente en la ficha pero sin competir al escanear la columna.
+.contrato-detail__value--empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
+}

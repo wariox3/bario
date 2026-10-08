@@ -5,20 +5,31 @@ import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { GeneralConfigComponent } from '../../components/general-config/general-config.component';
 import { HumanoConfigComponent } from '../../components/humano-config/humano-config.component';
+import { VentaConfigComponent } from '../../components/venta-config/venta-config.component';
+import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/components/asistente-acceso/asistente-acceso.component';
 
 /**
  * Shell de Configuración de la empresa.
  *
  * Aloja las áreas en pestañas horizontales; la activa viaja en `?seccion=` para
  * deep-link. Cada área es auto-contenida (lee y guarda solo sus campos), así que
- * el shell no carga datos. Pestañas: General (UVT) y Humano.
+ * el shell no carga datos. Pestañas: General (UVT), Humano y Venta.
  */
 @Component({
   selector: 'app-configuracion',
   standalone: true,
-  imports: [TabsModule, GeneralConfigComponent, HumanoConfigComponent],
+  imports: [
+    TabsModule,
+    GeneralConfigComponent,
+    HumanoConfigComponent,
+    VentaConfigComponent,
+    AsistenteAccesoComponent,
+  ],
   templateUrl: './configuracion.component.html',
-  host: { class: 'mx-auto flex w-full max-w-[1200px] flex-col gap-6' },
+  styleUrl: './configuracion.component.scss',
+  // Ancho acotado a propósito: son formularios, no tablas. Las listas del ERP
+  // van a todo el ancho; esta página se lee mejor en una columna de 1200px.
+  host: { class: 'mx-auto flex w-full max-w-[1200px] flex-col' },
 })
 export class ConfiguracionComponent {
   private readonly router = inject(Router);

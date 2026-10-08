@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,6 +26,9 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ActivoService } from '../../activo.service';
 import type { Activo } from '../../activo.model';
@@ -30,9 +36,11 @@ import {
   ACTIVOS_COLUMNS,
   ACTIVOS_FILTER_FIELDS,
   ACTIVOS_FILTERS_STORAGE_KEY,
+  ACTIVOS_IMPORT_MASTERS,
   ACTIVOS_QUICK_SEARCH_FIELD,
   ACTIVOS_PRIMARY_ACTION,
   ACTIVOS_ROW_ACTIONS,
+  ACTIVOS_TRAILING_ACTIONS,
 } from '../../activo.constants';
 
 @Component({
@@ -44,6 +52,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './activos-list.component.html',
@@ -51,6 +60,7 @@ import {
 })
 export class ActivosListComponent {
   private readonly service = inject(ActivoService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
@@ -74,6 +84,20 @@ export class ActivosListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/contabilidad/activo/importar-ejemplo/',
+  };
+
+  /** Estado del diálogo de importación (visibilidad, progreso, errores, maestros). */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: ACTIVOS_IMPORT_MASTERS,
+  });
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -89,8 +113,11 @@ export class ActivosListComponent {
 
   protected readonly columns = ACTIVOS_COLUMNS;
   protected readonly filterFields = ACTIVOS_FILTER_FIELDS;
-  protected readonly rowActions = ACTIVOS_ROW_ACTIONS;
-  protected readonly primaryAction = ACTIVOS_PRIMARY_ACTION;
+  protected readonly acciones = masterActions(MODELO.contabilidad.activo, {
+    row: ACTIVOS_ROW_ACTIONS,
+    primary: ACTIVOS_PRIMARY_ACTION,
+    trailing: ACTIVOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -145,12 +172,18 @@ export class ActivosListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as Activo).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'import':
+        this.importar.open();
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +194,31 @@ export class ActivosListComponent {
     const ids = this.selectedRows().map((a) => a.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/contabilidad/activo/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'activos.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {

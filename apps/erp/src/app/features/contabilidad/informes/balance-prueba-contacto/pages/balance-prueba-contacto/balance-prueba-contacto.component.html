@@ -1,0 +1,49 @@
+<!--
+  Informe "Balance de prueba por contacto".
+  Misma forma que el balance de prueba —comparte panel, botonera y tabla— con
+  las columnas del tercero encendidas y el selector de contacto proyectado en la
+  banda "documento". Sin botón de PDF: la familia de endpoints nueva no lo sirve.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <app-movimiento-informe-params toolbar [form]="form" idPrefix="bpc" [showDetalle]="true">
+    <div class="mi-params__field">
+      <label for="bpc-contacto" class="mi-params__label">{{ d.params.contacto }}</label>
+      <lib-contacto-select
+        inputId="bpc-contacto"
+        [formControl]="contacto"
+        [placeholder]="d.params.contactoPlaceholder"
+      />
+    </div>
+
+    <app-movimiento-informe-actions
+      acciones
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="soportaPdf"
+      [exportingPdf]="isExportingPdf()"
+      [hint]="hint()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </app-movimiento-informe-params>
+
+  <app-movimiento-informe-table
+    table
+    [rows]="rows()"
+    [amounts]="montos()"
+    [empty]="empty"
+    [totales]="totales()"
+    [loading]="isLoading()"
+    [generated]="generated()"
+    [showContacto]="true"
+    [totalCount]="totalCount()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="onPageChange($event)"
+  />
+</lib-list-shell>

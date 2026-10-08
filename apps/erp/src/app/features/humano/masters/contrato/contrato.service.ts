@@ -7,6 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
+import type { Liquidacion } from '@erp/features/humano/proceso/liquidacion/liquidacion.model';
 import type { Contrato, ContratoPayload } from './contrato.model';
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +34,11 @@ export class ContratoService extends BaseHttpService {
     return this.put<Contrato>(`${this.resourcePath}${id}/`, payload);
   }
 
+  /** Importación masiva desde un archivo Excel. */
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
+  }
+
   remove(ids: readonly number[]): Observable<void> {
     if (ids.length === 0) {
       return new Observable<void>((subscriber) => {
@@ -43,4 +49,58 @@ export class ContratoService extends BaseHttpService {
     const deletions = ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`));
     return forkJoin(deletions).pipe(map(() => undefined));
   }
+
+  // ── Terminación ───────────────────────────────────────────────────────────
+
+  /**
+   * Termina el contrato.
+   *
+   * **No es un `update` más**: el backend cierra el contrato y con eso **fabrica
+   * la liquidación** del empleado. Por eso vive acá y no en el formulario, y por
+   * eso la pantalla confirma diciendo qué va a pasar.
+   *
+   * Responde la **liquidación ya calculada**: el modal la muestra y ofrece abrirla.
+   */
+  terminar(payload: TerminarContratoPayload): Observable<Liquidacion> {
+    return this.post<Liquidacion>(`${this.resourcePath}terminar/`, payload);
+  }
+
+  /**
+   * Fechas de último pago con las que arranca la liquidación.
+   *
+   * Deciden **desde cuándo** se liquida cada prestación, así que se cargan antes
+   * de terminar el contrato: corregirlas después obliga a reliquidar.
+   *
+   * ⚠️ El ERP anterior las guarda con un `PUT` sobre el propio contrato y las lee
+   * con `serializador=parametros_iniciales`. Acá se reusa `update` para no
+   * inventar un endpoint; ver el pendiente en `humano/PENDIENTES.md`.
+   */
+  guardarParametrosIniciales(
+    id: number,
+    payload: ParametrosInicialesPayload,
+  ): Observable<Contrato> {
+    return this.patch<Contrato>(`${this.resourcePath}${id}/`, payload);
+  }
+}
+
+/**
+ * Lo que pide `terminar/`: cuándo y por qué se cierra el contrato.
+ *
+ * ⚠️ **Acá las FK sí llevan `_id`**, al revés que en el `PUT` del contrato. Es una
+ * acción con su propio serializer de request (`TerminarContratoRequest` en el
+ * schema), no el del modelo, y los tres campos son obligatorios. Se portó sin
+ * sufijo siguiendo la convención general y el backend respondió 400.
+ */
+export interface TerminarContratoPayload {
+  readonly contrato_id: number;
+  readonly fecha_terminacion: string | null;
+  readonly motivo_terminacion_id: number | null;
+}
+
+/** Las cuatro fechas de último pago del contrato. */
+export interface ParametrosInicialesPayload {
+  readonly fecha_ultimo_pago: string | null;
+  readonly fecha_ultimo_pago_prima: string | null;
+  readonly fecha_ultimo_pago_cesantia: string | null;
+  readonly fecha_ultimo_pago_vacacion: string | null;
 }

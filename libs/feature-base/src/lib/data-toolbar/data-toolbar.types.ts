@@ -14,11 +14,16 @@ export interface ToolbarAction {
   readonly id: string;
   /** Clave i18n del label visible. */
   readonly labelKey: string;
-  /** Clase PrimeIcon, p. ej. `'pi pi-plus'`. */
+  /** Clase PrimeIcon, p. ej. `'pi pi-plus'`. Vacía para un botón solo con texto. */
   readonly iconClass: string;
   /**
    * Sub-acciones. Cuando está presente el botón se convierte en un dropdown;
    * `actionInvoked` emitirá el `id` del hijo seleccionado, no el del padre.
    */
   readonly children?: readonly ToolbarAction[];
+  /**
+   * Solo para los hijos de un dropdown: el ítem se ve pero no se puede elegir.
+   * Para lo que la etapa todavía no permite, en vez de ocultarlo.
+   */
+  readonly disabled?: boolean;
 }

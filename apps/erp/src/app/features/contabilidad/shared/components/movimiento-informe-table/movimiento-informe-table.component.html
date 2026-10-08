@@ -1,0 +1,140 @@
+@let d = t().entities.informeCuentas;
+@let lista = t().common.list;
+
+<div class="mi-table__wrapper" [class.mi-table__wrapper--loading]="loading() && !isEmpty()">
+  <!-- `--empty` estira la tabla para que el bloque "sin datos" llene el recuadro. -->
+  <table class="mi-table" [class.mi-table--empty]="isEmpty()">
+    <thead>
+      <tr>
+        @if (showUbicacion()) {
+          <th class="mi-table__th min-w-[11rem] text-left" scope="col">{{ d.columns.clase }}</th>
+          <th class="mi-table__th min-w-[12rem] text-left" scope="col">{{ d.columns.grupo }}</th>
+        }
+        <th class="mi-table__th w-32 text-left" scope="col">{{ d.columns.cuenta }}</th>
+        <th class="mi-table__th min-w-[13rem] text-left" scope="col">{{ d.columns.nombre }}</th>
+        @if (showContacto()) {
+          <th class="mi-table__th w-32 text-left" scope="col">{{ d.columns.identificacion }}</th>
+          <th class="mi-table__th min-w-[10rem] text-left" scope="col">{{ d.columns.contacto }}</th>
+        }
+        @if (showMovimientoId()) {
+          <th class="mi-table__th w-28 text-right" scope="col">{{ d.columns.movimiento }}</th>
+        }
+        @if (showMovimiento()) {
+          <th class="mi-table__th w-32 text-left" scope="col">{{ d.columns.comprobante }}</th>
+          <th class="mi-table__th w-24 text-right" scope="col">{{ d.columns.numero }}</th>
+          <th class="mi-table__th w-32 text-left" scope="col">{{ d.columns.fecha }}</th>
+        }
+        @if (showDetalle()) {
+          <th class="mi-table__th min-w-[13rem] text-left" scope="col">{{ d.columns.detalle }}</th>
+        }
+        <!-- Los importes los declara cada informe: no hay un set común. -->
+        @for (monto of amounts(); track monto.field) {
+          <th class="mi-table__th w-36 text-right" scope="col">{{ monto.label }}</th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      <!--
+        `track $index`: las filas de subtotal llegan con `cuenta_id: null` (solo
+        las de tipo AUXILIAR lo traen), así que trackear por id daría claves
+        duplicadas y Angular lo rechaza.
+      -->
+      @for (fila of filas(); track $index) {
+        <tr
+          class="mi-table__row"
+          [class.mi-table__row--subtotal]="fila.esSubtotal"
+          [class.mi-table__row--detalle]="fila.esDetalle"
+        >
+          @if (showUbicacion()) {
+            <td class="mi-table__td whitespace-normal">{{ fila.row.clase }}</td>
+            <td class="mi-table__td whitespace-normal">{{ fila.row.grupo }}</td>
+          }
+          <td class="mi-table__td tabular-nums">{{ fila.row.codigo }}</td>
+          <td class="mi-table__td whitespace-normal">{{ fila.row.nombre }}</td>
+          @if (showContacto()) {
+            <td class="mi-table__td tabular-nums">{{ fila.row.identificacion }}</td>
+            <td class="mi-table__td whitespace-normal">{{ fila.row.contacto }}</td>
+          }
+          @if (showMovimientoId()) {
+            <td class="mi-table__td text-right tabular-nums">{{ fila.row.movimiento_id }}</td>
+          }
+          @if (showMovimiento()) {
+            <td class="mi-table__td">{{ fila.row.comprobante }}</td>
+            <td class="mi-table__td text-right tabular-nums">{{ fila.row.numero }}</td>
+            <td class="mi-table__td tabular-nums">{{ formatFecha(fila.row.fecha) }}</td>
+          }
+          @if (showDetalle()) {
+            <td class="mi-table__td whitespace-normal">{{ fila.row.detalle }}</td>
+          }
+          @for (monto of amounts(); track monto.field) {
+            <td class="mi-table__td text-right tabular-nums">
+              {{ montoDeFila(fila.row, monto) }}
+            </td>
+          }
+        </tr>
+      } @empty {
+        <!-- Mismo bloque que `<lib-data-table>`: ícono atenuado, título y pista. -->
+        @let copy = generated() ? empty().noData : empty().notGenerated;
+        <tr>
+          <td [attr.colspan]="columnCount()" class="mi-table__empty-cell">
+            <div class="mi-table__empty">
+              <i class="pi pi-inbox mi-table__empty-icon"></i>
+              <p class="mi-table__empty-title">{{ copy.title }}</p>
+              <p class="mi-table__empty-sub">{{ copy.sub }}</p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+
+    <!--
+      Totales del informe completo (acción `totales/`), no de la página: con el
+      informe paginado y con subtotales intercalados, sumar lo que se ve no
+      diría nada del cuadre. Si débito y crédito no coinciden se resalta, y solo
+      sobre esas dos columnas: pintar los cuatro importes no diría cuál falla.
+    -->
+    @if (totalesVisibles(); as tot) {
+      <tfoot>
+        <tr>
+          <td class="mi-table__tf" [attr.colspan]="identityColumnCount()">
+            {{ d.columns.total }}
+            @if (descuadrado()) {
+              <span class="mi-table__warn" [title]="d.descuadre">
+                <i class="pi pi-exclamation-triangle"></i> {{ d.descuadre }}
+              </span>
+            }
+          </td>
+          @for (monto of amounts(); track monto.field) {
+            <td
+              class="mi-table__tf text-right tabular-nums"
+              [class.mi-table__tf--warn]="resaltaDescuadre(monto)"
+            >
+              {{ montoDeTotal(tot, monto) }}
+            </td>
+          }
+        </tr>
+      </tfoot>
+    }
+  </table>
+</div>
+
+<!--
+  Pie: paginador centrado y el contador pegado a la derecha, igual que
+  `<lib-data-table>`. El contador va fuera del `<p-paginator>` para no depender
+  de sus templates internos.
+-->
+@if (totalCount() > 0) {
+  <div class="mi-table__footer">
+    <p-paginator
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="page() * pageSize()"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      (onPageChange)="pageChange.emit($event)"
+    />
+    <span class="mi-table__count">
+      {{ rangeStart() }}–{{ rangeEnd() }} {{ lista.of }} {{ totalCount() }} {{ lista.records }}
+    </span>
+  </div>
+}

@@ -1,19 +1,24 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { DrawerModule } from 'primeng/drawer';
-import { I18nService, TenantService } from '@reddoc/core';
+import { ForbiddenPageStore, I18nService, TenantService } from '@reddoc/core';
+import { AppSwitcherComponent } from '@reddoc/ui';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { ActiveModuleStore } from '@erp/core/erp-modules';
+import { PermissionsService, visibleSections } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ModuleBarComponent } from '../module-bar/module-bar.component';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
+import { AccessDeniedPageComponent } from '@erp/core/components/access-denied/access-denied.page';
 import type {
   SidebarAccordion,
   SidebarLeafItem,
   SidebarSection,
   SidebarSimpleItem,
-} from '../sidebar/sidebar-menu.types';
+} from '@erp/core/erp-modules';
 
 /**
  * Layout principal del workspace de un tenant.
@@ -29,11 +34,14 @@ import type {
   imports: [
     RouterOutlet,
     RouterLink,
+    RouterLinkActive,
     NgTemplateOutlet,
     DrawerModule,
     UserMenuComponent,
+    AppSwitcherComponent,
     ModuleBarComponent,
     TenantBadgeComponent,
+    AccessDeniedPageComponent,
   ],
   templateUrl: './workspace-layout.component.html',
   styleUrl: './workspace-layout.component.scss',
@@ -42,9 +50,17 @@ export class WorkspaceLayoutComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly tenant = inject(TenantService);
   private readonly activeModuleStore = inject(ActiveModuleStore);
+  private readonly permissions = inject(PermissionsService);
+  private readonly forbiddenPage = inject(ForbiddenPageStore);
   private readonly router = inject(Router);
 
   protected readonly t = this.i18n.t;
+
+  /**
+   * Motivo del 403 que bloqueó la pantalla actual, o `null` si no hay bloqueo.
+   * Lo escribe el `errorInterceptor` y se limpia solo al navegar.
+   */
+  protected readonly forbiddenMessage = this.forbiddenPage.message;
 
   /** Slug del tenant activo; necesario para resolver paths absolutos. */
   protected readonly tenantSlug = this.tenant.currentSlug;
@@ -52,30 +68,75 @@ export class WorkspaceLayoutComponent {
   /** Descriptor del módulo activo, o `null` si estamos en una ruta global. */
   protected readonly activeDescriptor = this.activeModuleStore.activeDescriptor;
 
-  /** Secciones del sidebar: las del módulo activo, o vacío si no hay módulo. */
-  protected readonly sections = computed<readonly SidebarSection[]>(
-    () => this.activeDescriptor()?.menu ?? [],
+  /**
+   * Secciones del sidebar: las del módulo activo podadas a lo que el usuario
+   * puede ver, o vacío si no hay módulo. Un link que el usuario no puede abrir
+   * no se ofrece — el `permissionGuard` de la ruta es la otra mitad, para quien
+   * llega por URL directa.
+   */
+  protected readonly sections = computed<readonly SidebarSection[]>(() =>
+    visibleSections(this.activeDescriptor()?.menu ?? [], (modelo) =>
+      this.permissions.canShowInMenu(modelo),
+    ),
   );
 
-  /** Ids de acordeones expandidos. Reinicia al cambiar de módulo. */
-  private readonly expandedAccordionIds = signal<ReadonlySet<string>>(new Set());
+  /**
+   * Id del único acordeón expandido, o `null` si están todos cerrados.
+   * Solo uno puede estar abierto a la vez: abrir uno cierra el anterior.
+   */
+  private readonly expandedAccordionId = signal<string | null>(null);
+
+  /**
+   * URL actual como signal. `router.isActive` no es reactivo: sin esto, el
+   * acordeón solo se re-sembraba al cambiar de módulo, y una navegación dentro
+   * del mismo módulo que no nace del sidebar (el enlace de una ficha del inicio,
+   * una miga, «volver», el historial) dejaba cerrado el acordeón del destino.
+   */
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
 
   protected readonly drawerVisible = signal(false);
 
   constructor() {
-    // Cada vez que cambia el módulo activo, sembramos como expandidos solo los
-    // acordeones marcados `defaultExpanded: true`. El resto arranca cerrado.
+    // Al cambiar el módulo activo, sembramos el acordeón que contiene la ruta
+    // actual; si ninguno la contiene, el primero marcado `defaultExpanded: true`.
+    // El resto arranca cerrado.
     effect(() => {
-      const expandedIds = this.sections()
-        .filter((s): s is SidebarAccordion => s.kind === 'accordion')
-        .filter(
-          (s) =>
-            s.defaultExpanded === true ||
-            s.groups.some((g) => g.items.some((leaf) => this.isLeafActive(leaf))),
-        )
-        .map((s) => s.id);
-      this.expandedAccordionIds.set(new Set(expandedIds));
+      const accordions = this.accordions();
+      const seed =
+        untracked(() => this.accordionWithActiveLeaf(accordions)) ??
+        accordions.find((s) => s.defaultExpanded === true);
+      this.expandedAccordionId.set(seed?.id ?? null);
     });
+
+    // Al navegar dentro del módulo, abrimos el acordeón que contiene la ruta de
+    // destino, venga de donde venga la navegación. Si el destino no está en
+    // ningún acordeón (el inicio, una ruta suelta) se respeta el que la persona
+    // tenga abierto.
+    effect(() => {
+      this.currentUrl();
+      const active = untracked(() => this.accordionWithActiveLeaf(this.accordions()));
+      if (active) this.expandedAccordionId.set(active.id);
+    });
+  }
+
+  /** Acordeones de las secciones visibles del módulo activo. */
+  private readonly accordions = computed(() =>
+    this.sections().filter((s): s is SidebarAccordion => s.kind === 'accordion'),
+  );
+
+  /** El acordeón que contiene un leaf activo para la URL actual, si hay. */
+  private accordionWithActiveLeaf(
+    accordions: readonly SidebarAccordion[],
+  ): SidebarAccordion | undefined {
+    return accordions.find((s) =>
+      s.groups.some((g) => g.items.some((leaf) => this.isLeafActive(leaf))),
+    );
   }
 
   // ── API protegida (template) ──────────────────────────────────────────────
@@ -89,16 +150,12 @@ export class WorkspaceLayoutComponent {
   }
 
   protected isExpanded(accordionId: string): boolean {
-    return this.expandedAccordionIds().has(accordionId);
+    return this.expandedAccordionId() === accordionId;
   }
 
+  /** Abre el acordeón y cierra el que estuviera abierto; re-click lo cierra. */
   protected toggleAccordion(accordionId: string): void {
-    this.expandedAccordionIds.update((current) => {
-      const next = new Set(current);
-      if (next.has(accordionId)) next.delete(accordionId);
-      else next.add(accordionId);
-      return next;
-    });
+    this.expandedAccordionId.update((current) => (current === accordionId ? null : accordionId));
   }
 
   protected toggleDrawer(): void {
@@ -119,20 +176,21 @@ export class WorkspaceLayoutComponent {
     return this.buildPath(leaf.path);
   }
 
-  /** Indica si un leaf item debe marcarse como activo según la URL actual. */
+  /**
+   * Indica si un leaf item debe marcarse como activo según la URL actual.
+   *
+   * El match usa `leaf.activeMatch` (la raíz declarada por los documentos) o,
+   * en su defecto, el propio `path`. Así el layout no infiere la raíz recortando
+   * sufijos: cada item declara qué prefijo lo activa.
+   */
   protected isLeafActive(leaf: SidebarLeafItem): boolean {
-    const parentPath = this.buildPath(this.leafParentPath(leaf.path));
-    return this.router.isActive(parentPath, {
+    const contextPath = this.buildPath(leaf.activeMatch ?? leaf.path);
+    return this.router.isActive(contextPath, {
       paths: 'subset',
       queryParams: 'ignored',
       matrixParams: 'ignored',
       fragment: 'ignored',
     });
-  }
-
-  private leafParentPath(relativePath: string): string {
-    const segments = relativePath.split('/');
-    return segments.length > 1 ? segments.slice(0, -1).join('/') : relativePath;
   }
 
   private buildPath(relativePath: string): string {

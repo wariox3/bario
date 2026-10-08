@@ -1,6 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import type { DocumentEntityConfig } from './types/entity-config.types';
-import type { ModuleConfig } from './types/module-config.types';
+import { type DocumentEntityConfig, type ModuleConfig } from '@reddoc/core';
 
 /**
  * Mantiene el módulo y el documento activos según la ruta actual del

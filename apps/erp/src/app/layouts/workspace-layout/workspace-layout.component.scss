@@ -169,10 +169,26 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding: 1.75rem;
+  // Este padding es también el "gutter" de la página: lo publicamos para que las
+  // piezas que necesitan sangrar hasta el borde (`<lib-page-actions>`) lo lean en
+  // vez de repetir el número y su breakpoint.
+  --page-gutter: 1.75rem;
+  // Arriba el gutter NO va como padding sino como espaciador en el flujo (el
+  // ::before): con padding-top en el scrollport los navegadores no acuerdan
+  // dónde ancla un sticky (Gecko lo suma al `top`, Blink/WebKit no) y la barra
+  // de acciones quedaría pegada a alturas distintas según el navegador. Con el
+  // espaciador, todos anclan en la línea del header.
+  padding: 0 var(--page-gutter) var(--page-gutter);
+
+  &::before {
+    content: '';
+    display: block;
+    flex: none;
+    height: var(--page-gutter);
+  }
 
   @media (max-width: 768px) {
-    padding: 1.25rem;
+    --page-gutter: 1.25rem;
   }
 }
 

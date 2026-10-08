@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,16 +26,19 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { GrupoService } from '../../grupo.service';
 import type { Grupo } from '../../grupo.model';
 import {
   GRUPOS_COLUMNS,
+  GRUPOS_DEFAULT_SORT,
   GRUPOS_FILTER_FIELDS,
   GRUPOS_FILTERS_STORAGE_KEY,
   GRUPOS_QUICK_SEARCH_FIELD,
   GRUPOS_PRIMARY_ACTION,
   GRUPOS_ROW_ACTIONS,
+  GRUPOS_TRAILING_ACTIONS,
 } from '../../grupo.constants';
 
 @Component({
@@ -51,6 +57,7 @@ import {
 })
 export class GruposListComponent {
   private readonly service = inject(GrupoService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
@@ -66,13 +73,15 @@ export class GruposListComponent {
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(25);
-  protected readonly sort = signal<readonly SortSpec[]>([]);
+  protected readonly sort = signal<readonly SortSpec[]>(GRUPOS_DEFAULT_SORT);
   protected readonly selectedRows = signal<readonly Grupo[]>([]);
   protected readonly searchValue = signal('');
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
     this.filterStorage.read(GRUPOS_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+
+  protected readonly isExportingExcel = signal(false);
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
@@ -89,8 +98,11 @@ export class GruposListComponent {
 
   protected readonly columns = GRUPOS_COLUMNS;
   protected readonly filterFields = GRUPOS_FILTER_FIELDS;
-  protected readonly rowActions = GRUPOS_ROW_ACTIONS;
-  protected readonly primaryAction = GRUPOS_PRIMARY_ACTION;
+  protected readonly acciones = masterActions(MODELO.humano.grupo, {
+    row: GRUPOS_ROW_ACTIONS,
+    primary: GRUPOS_PRIMARY_ACTION,
+    trailing: GRUPOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -145,12 +157,15 @@ export class GruposListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as Grupo).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +176,31 @@ export class GruposListComponent {
     const ids = this.selectedRows().map((g) => g.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/humano/grupo/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'grupos.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {

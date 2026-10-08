@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import type { ErpModuleDescriptor } from './erp-module.types';
-import { ERP_MODULES } from './erp-modules.registry';
+import { ERP_ALL_MODULES } from './erp-modules.registry';
 
 /**
  * Estado del módulo activo del ERP.
@@ -19,7 +19,9 @@ export class ActiveModuleStore {
   readonly activeDescriptor = computed<ErpModuleDescriptor | null>(() => {
     const id = this._activeId();
     if (!id) return null;
-    return ERP_MODULES.find((m) => m.id === id) ?? null;
+    // Busca en todos los descriptores, no solo en los del topbar: áreas como
+    // Seguridad también aportan sidebar.
+    return ERP_ALL_MODULES.find((m) => m.id === id) ?? null;
   });
 
   setActive(id: string | null): void {

@@ -1,0 +1,62 @@
+<!--
+  Informe "Estado de resultados".
+  El más simple de los nueve: el panel solo muestra el periodo (sin rango de
+  cuentas ni banderas) y la tabla va plana, con clase y grupo al frente. Sin PDF.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <app-movimiento-informe-params
+    toolbar
+    [form]="form"
+    idPrefix="er"
+    [showCuentas]="false"
+    [showSoloConSaldo]="false"
+    [showDetalle]="true"
+  >
+    <!--
+      Centro de costo: no hay selector propio en el ERP, se usa el autocomplete
+      genérico contra su master, como en sede-form y contrato-form.
+    -->
+    <div class="mi-params__field">
+      <label for="er-centro-costo" class="mi-params__label">{{ d.params.centroCosto }}</label>
+      <lib-api-autocomplete
+        inputId="er-centro-costo"
+        [formControl]="centroCosto"
+        [endpoint]="centroCostoEndpoint"
+        [placeholder]="d.params.centroCostoPlaceholder"
+      />
+    </div>
+
+    <app-movimiento-informe-actions
+      acciones
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="soportaPdf"
+      [exportingPdf]="isExportingPdf()"
+      [hint]="hint()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </app-movimiento-informe-params>
+
+  <app-movimiento-informe-table
+    table
+    [rows]="rows()"
+    [amounts]="montos()"
+    [empty]="empty"
+    [totales]="totales()"
+    [loading]="isLoading()"
+    [generated]="generated()"
+    [showUbicacion]="true"
+    [jerarquia]="false"
+    [descuadre]="false"
+    [totalCount]="totalCount()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="onPageChange($event)"
+  />
+</lib-list-shell>

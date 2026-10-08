@@ -1,0 +1,112 @@
+<section class="flex flex-col gap-6">
+  <!-- Encabezado -->
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl font-semibold text-surface-900">{{ t().turnoInicio.title }}</h1>
+      <p class="text-sm text-surface-500">{{ t().turnoInicio.subtitle }}</p>
+    </div>
+
+    <!-- Selector de rango (presets) -->
+    <div
+      class="inline-flex flex-wrap items-center gap-1 rounded-lg border border-surface-200 bg-surface-0 p-1"
+    >
+      @for (preset of presets; track preset.id) {
+        <button
+          type="button"
+          [disabled]="loading()"
+          (click)="selectPreset(preset.id)"
+          class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+          [class]="
+            selectedPreset() === preset.id
+              ? 'bg-primary-600 text-white'
+              : 'text-surface-600 hover:bg-surface-100'
+          "
+        >
+          {{ t().turnoInicio.ranges[preset.labelKey] }}
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (firstLoad()) {
+    <!-- Primera carga -->
+    <div class="flex items-center justify-center gap-3 py-20 text-surface-500">
+      <i class="pi pi-spin pi-spinner text-xl"></i>
+      <span class="text-sm">{{ t().turnoInicio.loading }}</span>
+    </div>
+  } @else if (error()) {
+    <!-- Error -->
+    <div
+      class="flex items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 py-16 text-red-600"
+    >
+      <i class="pi pi-exclamation-triangle text-xl"></i>
+      <span class="text-sm">{{ t().turnoInicio.error }}</span>
+    </div>
+  } @else {
+    <!-- Contenido: se atenúa durante una recarga (cambio de preset) -->
+    <div
+      class="flex flex-col gap-6 transition-opacity"
+      [class.pointer-events-none]="loading()"
+      [class.opacity-60]="loading()"
+      [attr.aria-busy]="loading()"
+    >
+      <!-- Tarjetas KPI -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        @for (kpi of kpis(); track kpi.labelKey) {
+          <article
+            class="flex items-center gap-4 rounded-xl border border-surface-200 bg-surface-0 p-5"
+          >
+            <span
+              class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600"
+            >
+              <i [class]="kpi.iconClass" class="text-xl"></i>
+            </span>
+            <div class="flex flex-col">
+              <span class="text-2xl font-semibold text-surface-900">{{ kpi.value }}</span>
+              <span class="text-sm text-surface-500">
+                {{ t().turnoInicio.kpis[kpi.labelKey] }}
+              </span>
+            </div>
+          </article>
+        }
+      </div>
+
+      <!-- Gráficos -->
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <article class="rounded-xl border border-surface-200 bg-surface-0 p-5">
+          <h2 class="mb-4 text-base font-medium text-surface-700">
+            {{ t().turnoInicio.charts.jornada }}
+          </h2>
+          <div class="h-72">
+            <p-chart
+              type="bar"
+              [data]="jornadaData()"
+              [options]="barOptions"
+              [style]="{ height: '100%' }"
+            />
+          </div>
+        </article>
+
+        <article class="rounded-xl border border-surface-200 bg-surface-0 p-5 lg:col-span-2">
+          <h2 class="mb-4 text-base font-medium text-surface-700">
+            {{ t().turnoInicio.charts.tendencia }}
+          </h2>
+          @if (hasSerie()) {
+            <div class="h-72">
+              <p-chart
+                type="line"
+                [data]="tendenciaData()"
+                [options]="lineOptions"
+                [style]="{ height: '100%' }"
+              />
+            </div>
+          } @else {
+            <div class="flex h-72 items-center justify-center text-sm text-surface-400">
+              {{ t().turnoInicio.empty }}
+            </div>
+          }
+        </article>
+      </div>
+    </div>
+  }
+</section>

@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { TENANT_SCOPED } from '../tenant/tenant-http-context';
 import { ENVIRONMENT } from '../tokens';
+import { buildHttpParams, type ParamValue } from '../services/base-http.service';
 import { parseFilename, triggerBrowserDownload } from './file-download.utils';
 
 export interface FileDownloadOptions {
@@ -14,6 +15,8 @@ export interface FileDownloadOptions {
   readonly method?: 'GET' | 'POST';
   /** Body opcional cuando `method = 'POST'`. */
   readonly body?: unknown;
+  /** Query params opcionales (aplican tanto a `GET` como a `POST`). */
+  readonly params?: Record<string, ParamValue>;
 }
 
 /**
@@ -37,6 +40,7 @@ export class FileDownloadService {
     const url = `${this.baseUrl}${path}`;
     const context = new HttpContext().set(TENANT_SCOPED, options.tenantScoped ?? true);
     const fallback = options.fallbackFilename ?? 'download';
+    const params = options.params ? buildHttpParams(options.params) : undefined;
 
     const request$ =
       (options.method ?? 'GET') === 'POST'
@@ -44,11 +48,13 @@ export class FileDownloadService {
             observe: 'response',
             responseType: 'blob',
             context,
+            params,
           })
         : this.http.get(url, {
             observe: 'response',
             responseType: 'blob',
             context,
+            params,
           });
 
     return request$.pipe(

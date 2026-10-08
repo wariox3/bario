@@ -41,6 +41,7 @@ function defaultMessage(key: string, error: unknown): string | null {
 @Component({
   selector: 'lib-field-error',
   standalone: true,
+  host: { '[style.display]': "errorMessage() ? null : 'none'" },
   template: `
     @if (errorMessage(); as message) {
       <span class="mt-1 text-[0.7rem] tracking-[0.01em] text-red-600">{{ message }}</span>

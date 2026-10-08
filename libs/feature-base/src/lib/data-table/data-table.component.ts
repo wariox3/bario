@@ -1,4 +1,4 @@
-import { CommonModule, formatDate, formatNumber } from '@angular/common';
+import { CommonModule, formatNumber } from '@angular/common';
 import {
   Component,
   LOCALE_ID,
@@ -17,8 +17,10 @@ import type { MenuItem, SortMeta } from 'primeng/api';
 import {
   I18nService,
   formatCop,
+  formatFechaCorta,
   toFiniteNumber,
   type ColumnDef,
+  type ColumnPart,
   type SortSpec,
 } from '@reddoc/core';
 import type { PageChangeEvent, RowAction, RowActionInvokedEvent } from './data-table.types';
@@ -74,10 +76,11 @@ export class DataTableComponent {
   readonly sort = input<readonly SortSpec[]>([]);
   readonly rowActions = input<readonly RowAction[]>([]);
   /**
-   * Habilita el click sobre la fila (cursor + emisión de `rowClick`). Por
-   * defecto `false` para no insinuar interactividad en tablas que no navegan.
+   * Predicado opcional que decide si una fila concreta es seleccionable. Las
+   * filas excluidas no pintan checkbox y quedan fuera del "seleccionar todo"
+   * del header (vía `rowSelectable` de PrimeNG). Default: todas las filas.
    */
-  readonly rowClickable = input<boolean>(false);
+  readonly selectableFor = input<((row: unknown) => boolean) | undefined>(undefined);
   readonly dataKey = input<string>('id');
   readonly emptyTitleKey = input<string>('common.list.empty.title');
   readonly emptySubKey = input<string>('common.list.empty.sub');
@@ -88,7 +91,6 @@ export class DataTableComponent {
   readonly sortChange = output<readonly SortSpec[]>();
   readonly selectionChange = output<unknown[]>();
   readonly rowActionInvoked = output<RowActionInvokedEvent>();
-  readonly rowClick = output<unknown>();
 
   // ── Colaboradores ─────────────────────────────────────────────────────────
   private readonly i18n = inject<I18nService<unknown>>(I18nService);
@@ -169,13 +171,32 @@ export class DataTableComponent {
     return n === null ? '' : formatNumber(n, this.locale, '1.0-2');
   }
 
-  /** Fecha localizada (acepta ISO string, epoch o `Date`). */
+  /**
+   * Fecha en el formato del sistema —`05/08/2026`— aceptando ISO, epoch o `Date`.
+   *
+   * No usa el `mediumDate` del locale: en es-CO da `5/08/2026`, sin el cero del
+   * día, y una columna de fechas se escanea por su alineación.
+   */
   protected dateCell(value: unknown): string {
-    if (value === null || value === undefined || value === '') return '';
-    try {
-      return formatDate(value as string | number | Date, 'mediumDate', this.locale);
-    } catch {
-      return String(value);
+    return formatFechaCorta(value as string | number | Date | null | undefined);
+  }
+
+  /**
+   * Formatea una parte de una columna `combined`, leyendo su `field` de la fila y
+   * aplicando el formateo de su `type` (default `text`). Reusa los formateadores de
+   * celda para que el par se vea consistente con las columnas simples.
+   */
+  protected formatPart(row: unknown, part: ColumnPart): string {
+    const value = this.readValue(row, part.field);
+    switch (part.type) {
+      case 'number':
+        return this.numberCell(value);
+      case 'currency':
+        return this.currencyCell(value);
+      case 'date':
+        return this.dateCell(value);
+      default:
+        return value === null || value === undefined ? '' : String(value);
     }
   }
 
@@ -194,9 +215,33 @@ export class DataTableComponent {
     return action.visibleFor?.(row) ?? true;
   }
 
+  /**
+   * ¿La fila tiene al menos una acción de menú visible? Si no, el botón ⋮ no
+   * se pinta: un menú que abre vacío es peor que ningún menú.
+   */
+  protected hasMenuActionsFor(row: unknown): boolean {
+    return this.menuActions().some((action) => this.isActionVisible(action, row));
+  }
+
   /** Emite la invocación de una acción inline (botón siempre visible). */
   protected invokeRowAction(action: RowAction, row: unknown): void {
     this.rowActionInvoked.emit({ actionId: action.id, row });
+  }
+
+  /**
+   * Clic en una celda clicable (`ColumnDef.cellAction`): sale por el mismo
+   * `rowActionInvoked` que las acciones de fila, así el consumidor la atiende
+   * en su handler de siempre.
+   */
+  protected invokeCellAction(col: ColumnDef, row: unknown): void {
+    if (!col.cellAction) return;
+    this.rowActionInvoked.emit({ actionId: col.cellAction, row });
+  }
+
+  /** ¿La celda tiene un valor que mostrar? Una vacía no se vuelve enlace. */
+  protected hasValue(row: unknown, field: string): boolean {
+    const value = this.readValue(row, field);
+    return value !== null && value !== undefined && value !== '';
   }
 
   /**
@@ -240,15 +285,17 @@ export class DataTableComponent {
     this.selectionChange.emit(Array.isArray(rows) ? rows : [rows]);
   }
 
-  /**
-   * Click sobre una fila. Solo emite si `rowClickable` está activo. Las celdas
-   * de selección y de acciones detienen la propagación en el template, así que
-   * usar el checkbox o el menú no dispara la navegación.
-   */
-  protected onRowClicked(row: unknown): void {
-    if (!this.rowClickable()) return;
-    this.rowClick.emit(row);
+  /** ¿Esta fila es seleccionable? (predicado por fila; sin predicado, todas). */
+  protected isRowSelectable(row: unknown): boolean {
+    return this.selectableFor()?.(row) ?? true;
   }
+
+  /**
+   * Adaptador para `[rowSelectable]` de p-table: protege también el
+   * "seleccionar todo" del header. Arrow property para conservar `this`.
+   */
+  protected readonly primeRowSelectable = (event: { data: unknown }): boolean =>
+    this.isRowSelectable(event.data);
 
   /**
    * Traduce el evento de ordenamiento multi-columna de PrimeNG

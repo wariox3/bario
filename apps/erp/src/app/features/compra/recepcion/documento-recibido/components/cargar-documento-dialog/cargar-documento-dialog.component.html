@@ -1,0 +1,86 @@
+@let c = t().entities.documentoRecibido.carga;
+
+<p-dialog
+  [header]="c.title"
+  [visible]="visible()"
+  (visibleChange)="$event ? visible.set(true) : cerrar()"
+  [modal]="true"
+  [draggable]="false"
+  [closable]="!cargando()"
+  [style]="{ width: '30rem' }"
+  [breakpoints]="{ '640px': '95vw' }"
+>
+  <div class="flex flex-col gap-3">
+    <p class="m-0 text-[0.8rem] text-brand-muted">{{ c.desc }}</p>
+
+    @if (archivo(); as file) {
+      <app-file-card
+        [nombre]="file.name"
+        [meta]="c.listo"
+        icon="pi-file-arrow-up"
+        [busy]="cargando()"
+      >
+        <button
+          type="button"
+          class="inline-flex h-7 w-7 items-center justify-center rounded-md text-brand-muted transition-colors hover:bg-[rgba(20,48,73,0.06)] hover:text-brand-text disabled:opacity-50"
+          [disabled]="cargando()"
+          [attr.aria-label]="c.quitar"
+          (click)="quitar()"
+        >
+          <i class="pi pi-times text-[0.8rem]"></i>
+        </button>
+      </app-file-card>
+    } @else {
+      <app-file-dropzone
+        [accept]="accept"
+        [maxSizeMB]="maxMb"
+        [invalid]="errores().length > 0"
+        [ariaLabel]="c.soltar"
+        (fileSelected)="onArchivo($event)"
+        (fileRejected)="onRechazo($event)"
+      >
+        <span
+          class="inline-flex h-14 w-14 items-center justify-center rounded-[14px] transition-colors"
+          [class]="errores().length > 0 ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-700'"
+        >
+          <i class="pi pi-file-arrow-up text-[1.6rem]"></i>
+        </span>
+        <p class="m-0 mt-3 text-[0.9rem] font-semibold text-brand-text">{{ c.soltar }}</p>
+        <p class="m-0 mt-1 text-[0.72rem] text-brand-muted">{{ c.formatos }}</p>
+      </app-file-dropzone>
+    }
+
+    @if (errores().length > 0) {
+      <div
+        class="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5"
+        role="alert"
+      >
+        <i class="pi pi-exclamation-circle mt-0.5 text-[0.85rem] text-red-600"></i>
+        <ul class="m-0 flex list-none flex-col gap-0.5 p-0 text-[0.78rem] text-red-700">
+          @for (msg of errores(); track $index) {
+            <li>{{ msg }}</li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      [label]="c.cancelar"
+      [text]="true"
+      severity="secondary"
+      size="small"
+      [disabled]="cargando()"
+      (onClick)="cerrar()"
+    />
+    <p-button
+      [label]="c.cargar"
+      icon="pi pi-upload"
+      size="small"
+      [loading]="cargando()"
+      [disabled]="!archivo()"
+      (onClick)="cargar()"
+    />
+  </ng-template>
+</p-dialog>

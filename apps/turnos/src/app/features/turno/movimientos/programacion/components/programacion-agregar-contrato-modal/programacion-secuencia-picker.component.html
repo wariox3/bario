@@ -1,0 +1,32 @@
+@let m = t().entities.programacion.detail.programacionModal;
+
+@if (posiciones().length) {
+  <div class="flex flex-wrap items-end gap-3">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-[0.78rem] font-medium text-brand-muted">{{ m.posicionLabel }}</span>
+      <div class="flex flex-wrap gap-1.5">
+        @for (p of posiciones(); track p.pos) {
+          <button
+            type="button"
+            class="secuencia-pos"
+            [class.secuencia-pos--active]="posicionInicial() === p.pos"
+            (click)="onSeleccionar(p.pos)"
+          >
+            <span class="secuencia-pos__num">{{ p.pos }}</span>
+            <span class="secuencia-pos__codigo">{{ p.codigo }}</span>
+          </button>
+        }
+      </div>
+    </div>
+    <p-button
+      type="button"
+      [label]="m.secuenciaCalcular"
+      icon="pi pi-calculator"
+      severity="info"
+      [outlined]="true"
+      [loading]="calculando()"
+      [disabled]="!puedeCalcular()"
+      (onClick)="onCalcular()"
+    />
+  </div>
+}

@@ -1,5 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
+import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
+import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const ITEMS_FILTERS_STORAGE_KEY = 'items:filters:v1';
 
@@ -10,8 +12,8 @@ export const ITEMS_FILTERS_STORAGE_KEY = 'items:filters:v1';
  */
 export const ITEMS_QUICK_SEARCH_FIELD = 'nombre';
 
-/** Segmentos de ruta del listado, relativos al tenant. */
-export const ITEM_LIST_PATH = ['general', 'items'] as const;
+/** Segmento de ruta del listado, relativo al módulo activo (se antepone en runtime). */
+export const ITEM_LIST_PATH = ['items'] as const;
 
 export const ITEMS_COLUMNS: readonly ColumnDef[] = [
   {
@@ -88,7 +90,17 @@ export const ITEMS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
     labelKey: 'common.actions.actions',
     iconClass: '',
     children: [
+      { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
     ],
   },
 ];
+
+/**
+ * Maestros que ofrece el diálogo de importación de ítems.
+ *
+ * De todo el catálogo, el archivo del ítem solo necesita códigos de impuesto:
+ * las cuentas contables que también referencia son datos **del tenant**, y el
+ * usuario las consulta en el PUC de su propia empresa, no en un XLSX global.
+ */
+export const ITEMS_IMPORT_MASTERS: readonly ImportMaster[] = IMPORT_MASTERS_ALL;

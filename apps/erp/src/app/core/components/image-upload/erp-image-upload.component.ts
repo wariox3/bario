@@ -40,13 +40,33 @@ export class ErpImageUploadComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
 
-  /** URL de la imagen actual (absoluta). `null` → muestra el placeholder. */
+  /** URL de la imagen actual (absoluta o data-URL). `null` → muestra el placeholder. */
   readonly imageUrl = input<string | null>(null);
   readonly width = input<string>('220px');
   readonly height = input<string>('160px');
   readonly disabled = input<boolean>(false);
-  /** Relación de aspecto del recorte (1 = cuadrado). */
+  /** Relación de aspecto del recorte (1 = cuadrado). Se ignora si el recorte es libre. */
   readonly aspectRatio = input<number>(1);
+  /**
+   * `false` = recorte libre. Lo pide un logotipo, que suele ser apaisado: forzarlo
+   * a la proporción del marco lo deforma o le corta media palabra.
+   */
+  readonly maintainAspectRatio = input<boolean>(true);
+  /**
+   * Formato del recorte. `png` conserva la transparencia —lo que necesita un
+   * logotipo, que se imprime sobre fondos que no son blancos—; `jpeg` pesa menos
+   * y alcanza para una foto.
+   */
+  readonly format = input<'jpeg' | 'png'>('jpeg');
+  /**
+   * Cómo llena la imagen su marco. `cover` recorta para no dejar aire (una foto);
+   * `contain` la muestra entera aunque sobre espacio (un logotipo).
+   */
+  readonly fit = input<'cover' | 'contain'>('cover');
+  /** Formatos que ofrece el selector de archivos del sistema. */
+  readonly accept = input<string>('.png,.jpg,.jpeg,image/png,image/jpeg');
+  /** Pie con los formatos aceptados. Sin valor, el genérico del diccionario. */
+  readonly hint = input<string>();
   readonly alt = input<string>('');
 
   /** Data-URL base64 del recorte listo para subir. */

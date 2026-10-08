@@ -7,8 +7,30 @@
  * - `date`:     fecha formateada (acepta ISO o Date)
  * - `boolean`:  badge sí/no
  * - `enum`:     valor traducido via clave i18n (`enumKeyPrefix.<value>`)
+ * - `combined`: varias props en una celda (`parts`), unidas por `separator`
  */
-export type ColumnValueType = 'text' | 'number' | 'currency' | 'date' | 'boolean' | 'enum';
+export type ColumnValueType =
+  | 'text'
+  | 'number'
+  | 'currency'
+  | 'date'
+  | 'boolean'
+  | 'enum'
+  | 'combined';
+
+/** Formateo admitido por cada parte de una columna `combined` (sin anidar ni i18n). */
+export type ColumnPartType = 'text' | 'number' | 'currency' | 'date';
+
+/**
+ * Una parte de una columna `combined`: qué campo leer y cómo formatearlo. Ej. para
+ * mostrar `horas / horas_programadas`, dos partes `{ field, type: 'number' }`.
+ */
+export interface ColumnPart {
+  /** Nombre del campo en el row (acceso por `row[field]`). */
+  readonly field: string;
+  /** Formateo de esta parte. Default `'text'`. */
+  readonly type?: ColumnPartType;
+}
 
 /** Alineación horizontal del contenido de la columna. */
 export type ColumnAlignment = 'left' | 'center' | 'right';
@@ -21,6 +43,15 @@ export type ColumnAlignment = 'left' | 'center' | 'right';
  * columnas y la tabla itera sobre ellas para renderizar header + celda según
  * el `type`.
  */
+/** Qué significa un `true` en una columna booleana: un estado deseable o uno adverso. */
+export type BooleanTone = 'positive' | 'negative';
+
+/**
+ * Tono con el que se resalta una celda según su fila (`ColumnDef.toneFor`):
+ * `positive` marca un hecho a notar (verde), `critical` un problema (rojo).
+ */
+export type CellTone = 'positive' | 'critical';
+
 export interface ColumnDef {
   /** Nombre del campo en el row (acceso por `row[field]`). */
   readonly field: string;
@@ -46,4 +77,39 @@ export interface ColumnDef {
    * Permite personalizar por columna: `'common.boolAccepted'` → "Aceptado/Rechazado".
    */
   readonly booleanKeyPrefix?: string;
+  /**
+   * Para `type === 'boolean'`: qué significa que el valor sea verdadero.
+   *
+   * El badge se pintaba siempre verde en `true`, así que una columna como
+   * `inactivo` mostraba «Sí» en verde —el color decía lo contrario del dato—.
+   * Con `'negative'` el verdadero se pinta en ámbar; el falso queda neutro en
+   * ambos casos, porque «no está inactivo» no es un logro que destacar.
+   *
+   * Default `'positive'`: las columnas que no lo declaran no cambian.
+   */
+  readonly booleanTone?: BooleanTone;
+  /**
+   * Para `type === 'combined'`: las partes a mostrar en la misma celda, cada una
+   * formateada según su `type` y unidas por `separator`. El `field` de la columna se
+   * mantiene para la key/orden; las partes definen qué se pinta.
+   */
+  readonly parts?: readonly ColumnPart[];
+  /** Para `type === 'combined'`: separador entre partes. Default `'/'`. */
+  readonly separator?: string;
+  /**
+   * Resalta la celda según la fila: devuelve el tono, o `null` para dejarla
+   * normal. Para marcas que el dato trae aparte de su valor —una fecha que cae
+   * en un ingreso, un error de la fila—; la página que lo use explica los
+   * colores con una leyenda.
+   */
+  readonly toneFor?: (row: unknown) => CellTone | null;
+  /**
+   * Vuelve la celda clicable: se pinta como enlace y al clic la tabla emite
+   * `rowActionInvoked` con este id, por el mismo canal que las acciones de fila.
+   * La tabla no sabe qué hace la acción; lo decide el consumidor en su handler.
+   * Una celda sin valor no se vuelve enlace: no hay nada que abrir.
+   */
+  readonly cellAction?: string;
+  /** Clave i18n del tooltip y `aria-label` de la celda clicable (`cellAction`). */
+  readonly cellActionLabelKey?: string;
 }

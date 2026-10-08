@@ -1,0 +1,19 @@
+<p-tabs [value]="subseccion()" (valueChange)="subseccion.set($any($event))">
+  <p-tablist>
+    <p-tab value="formato">{{ t().configuracion.venta.tabs.formato }}</p-tab>
+    <p-tab value="aiu">{{ t().configuracion.venta.tabs.aiu }}</p-tab>
+  </p-tablist>
+
+  <p-tabpanels>
+    <p-tabpanel value="formato">
+      <div class="pt-5">
+        <app-venta-formato-config />
+      </div>
+    </p-tabpanel>
+    <p-tabpanel value="aiu">
+      <div class="pt-5">
+        <app-venta-aiu-config />
+      </div>
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>

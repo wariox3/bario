@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { EmpleadoOption } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
 
 /**
@@ -17,6 +17,8 @@ export interface ContratoFormRawValue {
   readonly tiempo: ErpSelectOption | null;
   readonly fecha_desde: Date | null;
   readonly fecha_hasta: Date | null;
+  /** Habilita la programación de turnos para este contrato. */
+  readonly habilitado_turno: boolean | null;
   // Remuneración
   readonly salario: number | null;
   readonly auxilio_transporte: boolean | null;

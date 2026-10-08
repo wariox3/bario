@@ -1,4 +1,11 @@
-import { fromHora, fromIsoDate, toFiniteNumber, toHora, toIsoDate } from '@reddoc/core';
+import {
+  documentoContactoToOption,
+  fromHora,
+  fromIsoDate,
+  toFiniteNumber,
+  toHora,
+  toIsoDate,
+} from '@reddoc/core';
 import type {
   ServicioDocumentoRead,
   ServicioDocumentoPayload,
@@ -16,8 +23,7 @@ export function servicioDocumentoToFormValue(
   read: ServicioDocumentoRead,
 ): Partial<Omit<ServicioDocumentoFormRawValue, 'detalles'>> {
   return {
-    contacto:
-      read.contacto != null ? { id: read.contacto, nombre: read.contacto_nombre ?? '' } : null,
+    contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     sector: read.sector != null ? { id: read.sector, nombre: read.sector_nombre ?? '' } : null,
     estrato: read.estrato,
@@ -69,13 +75,17 @@ export function detalleToFormValue(
     impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
     impuestos_totales: (read.impuestos ?? []).map((imp) => ({
       id: imp.impuesto,
-      nombre: imp.impuesto_nombre ?? '',
-      total: Math.round(parseFloat(imp.total ?? '0')),
+      nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
+      total: toFiniteNumber(imp.total) ?? 0,
     })),
     horas: toFiniteNumber(read.horas),
     horas_diurnas: toFiniteNumber(read.horas_diurnas),
     horas_nocturnas: toFiniteNumber(read.horas_nocturnas),
+    horas_programadas: toFiniteNumber(read.horas_programadas),
+    horas_diurnas_programadas: toFiniteNumber(read.horas_diurnas_programadas),
+    horas_nocturnas_programadas: toFiniteNumber(read.horas_nocturnas_programadas),
     precio_minimo: toFiniteNumber(read.precio_minimo),
+    documento_detalle_afectado: read.documento_detalle_afectado ?? null,
   };
 }
 
@@ -135,5 +145,6 @@ export function detalleToPayload(raw: DetalleFormRawValue): ServicioDocumentoDet
     horas_nocturnas: (raw.horas_nocturnas ?? 0).toFixed(2),
     precio_minimo: (raw.precio_minimo ?? 0).toFixed(2),
     impuestos_ids: raw.impuestos_ids,
+    documento_detalle_afectado: raw.documento_detalle_afectado,
   };
 }

@@ -1,0 +1,103 @@
+<!--
+  Ficha de saldo de cartera, compacta: rótulo y fecha de corte, el pendiente
+  como cifra principal y sus dos partes (vigente · vencido) en filas. Borders-only,
+  como el resto del ERP. Los puntos marcan cada parte: verde lo vigente, rojo lo
+  vencido; el monto vencido se pinta en rojo solo si hay algo vencido.
+-->
+@let r = t().inicio.carteraResumen;
+
+<section
+  class="animate-fade-up flex flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+  [attr.aria-busy]="estado() === 'cargando'"
+>
+  <header class="flex items-baseline justify-between gap-2 px-4 pt-3">
+    <h2 class="m-0 text-[0.66rem] font-bold uppercase tracking-[0.06em] text-brand-muted">
+      {{ textos().titulo }}
+    </h2>
+    @if (estado() === 'listo') {
+      <span
+        class="text-[0.7rem] tabular-nums text-brand-muted"
+        [title]="r.saldoAl + ' ' + fechaCorte()"
+      >
+        {{ fechaCorte() }}
+      </span>
+    }
+  </header>
+
+  @switch (estado()) {
+    @case ('cargando') {
+      <div class="flex flex-col gap-2.5 px-4 pt-2 pb-4" aria-hidden="true">
+        <div class="h-6 w-32 animate-pulse rounded-md bg-brand-surface-2"></div>
+        <div class="h-3.5 w-full animate-pulse rounded-md bg-brand-surface-2"></div>
+        <div class="h-3.5 w-full animate-pulse rounded-md bg-brand-surface-2"></div>
+      </div>
+    }
+
+    @case ('error') {
+      <div class="flex items-start gap-2 px-4 pt-2 pb-4">
+        <i class="pi pi-exclamation-circle mt-0.5 text-[0.85rem] text-brand-muted"></i>
+        <div class="flex flex-col gap-0.5">
+          <span class="text-[0.8rem] font-semibold text-brand-text">{{ r.error.title }}</span>
+          <span class="text-[0.72rem] text-brand-muted">{{ r.error.desc }}</span>
+        </div>
+      </div>
+    }
+
+    @case ('listo') {
+      @if (resumen(); as res) {
+        <div class="flex flex-col gap-3 px-4 pt-1.5 pb-3">
+          <!-- Cifra principal -->
+          <div class="flex flex-col gap-0.5">
+            <span
+              class="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] tabular-nums text-brand-navy"
+            >
+              {{ formatMoney(res.total_pendiente) }}
+            </span>
+            <span class="text-[0.72rem] text-brand-muted">
+              {{ sinPendiente() ? textos().sinPendiente : textos().cifra }}
+            </span>
+          </div>
+
+          @if (!sinPendiente()) {
+            <!-- Las dos partes del saldo -->
+            <dl class="m-0 flex flex-col gap-1.5 border-t border-[rgba(20,48,73,0.06)] pt-2.5">
+              <div class="flex items-center justify-between gap-3">
+                <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                  {{ r.vigente }}
+                </dt>
+                <dd class="m-0 text-[0.8rem] font-semibold tabular-nums text-brand-text">
+                  {{ formatMoney(res.total_pendiente_vigente) }}
+                </dd>
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
+                  <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                  {{ r.vencido }}
+                </dt>
+                <dd
+                  class="m-0 text-[0.8rem] font-semibold tabular-nums"
+                  [class.text-red-600]="hayVencido()"
+                  [class.text-brand-muted]="!hayVencido()"
+                >
+                  {{ formatMoney(res.total_pendiente_vencido) }}
+                </dd>
+              </div>
+            </dl>
+          }
+        </div>
+
+        <!-- Al informe de pendientes -->
+        <footer class="mt-auto border-t border-[rgba(20,48,73,0.06)] px-4 py-2">
+          <a
+            [routerLink]="informeLink()"
+            class="inline-flex items-center gap-1.5 text-[0.75rem] font-semibold text-sky-700 transition-colors hover:text-brand-navy"
+          >
+            {{ textos().verInforme }}
+            <i class="pi pi-arrow-right text-[0.62rem]"></i>
+          </a>
+        </footer>
+      }
+    }
+  }
+</section>

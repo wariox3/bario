@@ -2,23 +2,26 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  ElementRef,
   computed,
   effect,
   inject,
   input,
   output,
   signal,
-  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgTemplateOutlet } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TabsModule } from 'primeng/tabs';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileDownloadService, I18nService, toHora, ToastService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import type { ExampleConfig, ImportError, MasterTouched } from './import-dialog.types';
+import { formatBytes } from '@erp/core/utils/format-bytes';
+import type { ExampleConfig, ImportError, ImportMaster } from './import-dialog.types';
+import { FileDropzoneComponent } from '../file-dropzone/file-dropzone.component';
+import type { ArchivoRechazo } from '../file-dropzone/validar-archivo';
+import { FileCardComponent } from '../file-card/file-card.component';
 
 /**
  * Dialog modal de importación de archivos para masters del ERP.
@@ -31,14 +34,17 @@ import type { ExampleConfig, ImportError, MasterTouched } from './import-dialog.
  * - Validación local de tipo y tamaño antes de aceptar el archivo.
  * - Descarga del archivo "Ejemplo" reusando `FileDownloadService` de `@reddoc/core`
  *   (cookies HTTP-only y `X-Tenant` ya van por interceptores).
+ * - Tab "Maestros": los archivos de referencia que el consumidor declara por
+ *   `masters` se ofrecen como descarga directa (son URLs públicas externas, no
+ *   pasan por el API — por eso no usan `FileDownloadService`).
  * - Reset del estado al cerrarse (al reabrir vuelve limpio).
  *
  * Lo que delega al consumidor:
  * - HTTP del upload: recibe el `File` por `(importRequested)` y el consumidor
  *   arma `FormData` y postea contra su endpoint específico.
  * - Estado de progreso: el consumidor setea `importing` durante el upload.
- * - Resultados: el consumidor alimenta `errors` y `mastersTouched` para
- *   poblar los tabs cuando el backend responda.
+ * - Resultados: el consumidor alimenta `errors` (+ `errorSummary`/`errorTotal`)
+ *   con lo que responda el backend para poblar el tab "Errores".
  *
  * Ejemplo de uso:
  * ```html
@@ -49,6 +55,7 @@ import type { ExampleConfig, ImportError, MasterTouched } from './import-dialog.
  *   [exampleConfig]="{ mode: 'enabled', endpoint: '/general/contacto/plantilla/' }"
  *   [importing]="importLoading()"
  *   [errors]="importErrors()"
+ *   [masters]="CONTACTOS_IMPORT_MASTERS"
  *   (importRequested)="onImportRequested($event)"
  * />
  * ```
@@ -56,7 +63,15 @@ import type { ExampleConfig, ImportError, MasterTouched } from './import-dialog.
 @Component({
   selector: 'app-import-dialog',
   standalone: true,
-  imports: [DialogModule, ButtonModule, TabsModule, TooltipModule],
+  imports: [
+    NgTemplateOutlet,
+    DialogModule,
+    ButtonModule,
+    TabsModule,
+    TooltipModule,
+    FileDropzoneComponent,
+    FileCardComponent,
+  ],
   templateUrl: './import-dialog.component.html',
   styleUrl: './import-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,14 +110,27 @@ export class ImportDialogComponent {
   /** Errores reportados por el backend (ya capados a 100); alimentan el tab "Errores". */
   readonly errors = input<readonly ImportError[]>([]);
 
+  /**
+   * Advertencia sobre lo que la importación va a hacer, mostrada antes de subir.
+   * Vacío ⇒ no se pinta. La usan las importaciones cuyo efecto no es obvio —las
+   * que **reemplazan** lo que hay en pantalla, o las que **suman** a lo que ya
+   * está guardado—; el consumidor decide cuándo mostrarla, para que no se vuelva
+   * un cartel permanente que nadie lee.
+   */
+  readonly notice = input<string>('');
+
   /** Mensaje resumen del error (el `detail` del backend); se muestra como banner. */
   readonly errorSummary = input<string>('');
 
   /** Total real de errores; si supera a los mostrados se indica el truncado. */
   readonly errorTotal = input<number>(0);
 
-  /** Resumen por master/catálogo; alimenta el tab "Maestros". */
-  readonly mastersTouched = input<readonly MasterTouched[]>([]);
+  /**
+   * Maestros del listado: archivos de referencia descargables que alimentan el
+   * tab "Maestros". Cada lista declara los suyos con `IMPORT_MASTER.*`
+   * (ver `import-masters.constant.ts`); vacío ⇒ el tab muestra su empty state.
+   */
+  readonly masters = input<readonly ImportMaster[]>([]);
 
   /** Emitido cuando el usuario hace click en "Importar" con un archivo válido. */
   readonly importRequested = output<File>();
@@ -118,13 +146,14 @@ export class ImportDialogComponent {
 
   // ── Estado interno ────────────────────────────────────────────────────────
 
-  private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
-
   protected readonly selectedFile = signal<File | null>(null);
   protected readonly uploadedAt = signal<string>('');
-  protected readonly dragOver = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly exampleDownloading = signal(false);
+  /**
+   * Tab visible. Arranca en errores y el reset de cierre lo recalcula: con
+   * maestros declarados, la primera apertura muestra "Maestros" (ver constructor).
+   */
   protected readonly activeTab = signal<'errors' | 'masters'>('errors');
 
   // ── Derivados ─────────────────────────────────────────────────────────────
@@ -136,6 +165,14 @@ export class ImportDialogComponent {
   protected readonly errorTruncated = computed(() => this.errorTotal() > this.errors().length);
 
   protected readonly exampleVisible = computed(() => this.exampleConfig() !== null);
+
+  /**
+   * El tab "Maestros" existe solo si hay maestros que ofrecer. Una importación
+   * de líneas nunca los tiene, y una pestaña que siempre lleva a un vacío
+   * promete algo que no llega. Sin ella queda un solo panel, y un tab solitario
+   * es chrome sin función: los errores se muestran sin pestañera.
+   */
+  protected readonly mastersVisible = computed(() => this.masters().length > 0);
 
   protected readonly exampleEnabled = computed(() => {
     const cfg = this.exampleConfig();
@@ -170,9 +207,11 @@ export class ImportDialogComponent {
       if (!this.visible()) {
         this.selectedFile.set(null);
         this.uploadedAt.set('');
-        this.dragOver.set(false);
         this.errorMessage.set(null);
-        this.activeTab.set('errors');
+        // Antes de importar, lo útil son los maestros (qué códigos escribir); los
+        // errores todavía no existen. Si el listado no declara maestros, el tab de
+        // errores es el único con contenido posible.
+        this.activeTab.set(this.mastersVisible() ? 'masters' : 'errors');
       }
     });
 
@@ -194,47 +233,6 @@ export class ImportDialogComponent {
     this.visibleChange.emit(false);
   }
 
-  /** Click sobre la dropzone → abre el explorador de archivos. */
-  protected openFilePicker(): void {
-    if (this.importing()) return;
-    this.fileInput()?.nativeElement.click();
-  }
-
-  /** Soporta abrir el picker con teclado (Enter / Space). */
-  protected onDropzoneKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this.openFilePicker();
-    }
-  }
-
-  protected onFileInputChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    if (file) this.acceptFile(file);
-    // Permitir re-seleccionar el mismo archivo si el usuario lo quita y vuelve a elegirlo.
-    input.value = '';
-  }
-
-  protected onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    if (this.importing()) return;
-    this.dragOver.set(true);
-  }
-
-  protected onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-  }
-
-  protected onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.dragOver.set(false);
-    if (this.importing()) return;
-    const file = event.dataTransfer?.files?.[0] ?? null;
-    if (file) this.acceptFile(file);
-  }
-
   protected clearSelectedFile(): void {
     if (this.importing()) return;
     this.selectedFile.set(null);
@@ -254,7 +252,10 @@ export class ImportDialogComponent {
 
     this.exampleDownloading.set(true);
     this.fileDownload
-      .download(cfg.endpoint, { fallbackFilename: cfg.filename ?? 'ejemplo.xlsx' })
+      .download(cfg.endpoint, {
+        fallbackFilename: cfg.filename ?? 'ejemplo.xlsx',
+        params: cfg.params,
+      })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.exampleDownloading.set(false),
@@ -268,41 +269,15 @@ export class ImportDialogComponent {
 
   // ── Internos ──────────────────────────────────────────────────────────────
 
-  /**
-   * Valida tipo (extensión) y tamaño contra los inputs `accept` y `maxSizeMB`.
-   * Si pasa, el archivo se acepta y la dropzone se reemplaza por la file-card.
-   * Si no pasa, se muestra el mensaje de error sin aceptar el archivo.
-   */
-  private acceptFile(file: File): void {
-    const extensions = this.accept()
-      .split(',')
-      .map((s) => s.trim().toLowerCase())
-      .filter(Boolean);
-    const lowerName = file.name.toLowerCase();
-    const typeOk = extensions.length === 0 || extensions.some((ext) => lowerName.endsWith(ext));
-    if (!typeOk) {
-      this.errorMessage.set(this.t().common.import.dropzone.invalidType);
-      return;
-    }
-
-    const maxBytes = this.maxSizeMB() * 1024 * 1024;
-    if (file.size > maxBytes) {
-      this.errorMessage.set(this.t().common.import.dropzone.tooLarge);
-      return;
-    }
-
+  /** Archivo válido (lo validó la dropzone): reemplaza la dropzone por la file-card. */
+  protected onFileSelected(file: File): void {
     this.errorMessage.set(null);
     this.selectedFile.set(file);
     this.uploadedAt.set(toHora(new Date()));
   }
-}
 
-// ── Helpers locales ─────────────────────────────────────────────────────────
-
-/** Formatea bytes a "B" / "KB" / "MB" con 1 decimal donde corresponde. */
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  const kb = n / 1024;
-  if (kb < 1024) return `${kb.toFixed(1)} KB`;
-  return `${(kb / 1024).toFixed(2)} MB`;
+  protected onFileRejected(motivo: ArchivoRechazo): void {
+    const dict = this.t().common.import.dropzone;
+    this.errorMessage.set(motivo === 'tipo' ? dict.invalidType : dict.tooLarge);
+  }
 }

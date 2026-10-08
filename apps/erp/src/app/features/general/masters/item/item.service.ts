@@ -44,6 +44,29 @@ export class ItemService extends BaseHttpService {
   }
 
   /**
+   * ¿El ítem ya se movió en documentos?
+   *
+   * Lo consulta el formulario en edición para bloquear lo que ya no se puede
+   * cambiar: el tipo (producto/servicio) y el manejo de inventario. No es una
+   * regla cosmética — un ítem con movimientos que pasa a servicio deja su kardex
+   * colgando de algo que ya no maneja existencias, y desde el front no hay forma
+   * de recomponerlo.
+   *
+   * `GET /general/item/{id}/validar-uso/` → `{ uso: boolean }`
+   * (operación `general_item_validar_uso_retrieve` del schema del contenedor).
+   */
+  validarUso(id: number): Observable<boolean> {
+    return this.get<{ uso: boolean }>(`${this.resourcePath}${id}/validar-uso/`).pipe(
+      map((respuesta) => respuesta.uso),
+    );
+  }
+
+  /** Importación masiva desde un archivo Excel. */
+  importar(file: File): Observable<unknown> {
+    return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
+  }
+
+  /**
    * Carga (o reemplaza) la imagen del item con un data-URL/base64 ya recortado.
    * TODO(backend): confirmar endpoint y payload en el API nuevo (reddocapi.uk).
    * Estimado a partir del legacy (`general/item/cargar-imagen/`).

@@ -1,0 +1,64 @@
+<!--
+  Utilidad "Enviar nómina electrónica" (Humano).
+  Lista única con el chrome estándar de <lib-list-shell> (breadcrumb + card +
+  tabla embebida). En el slot [toolbar] van los filtros a la izquierda y los
+  botones Descartar/Emitir a la derecha, en la misma fila. Selección múltiple
+  para operar en lote.
+-->
+<lib-list-shell
+  [breadcrumb]="breadcrumbItems()"
+  [title]="t().entities.enviarNominaElectronica.name"
+>
+  <div toolbar class="nomina-dte-toolbar">
+    <lib-data-toolbar
+      class="nomina-dte-toolbar__filters"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+    />
+    <p-button
+      size="small"
+      severity="danger"
+      [outlined]="true"
+      icon="pi pi-ban"
+      [label]="t().entities.enviarNominaElectronica.actions.descartar"
+      [disabled]="!canDescartar()"
+      (onClick)="onDescartar()"
+    />
+    <p-button
+      size="small"
+      icon="pi pi-send"
+      [label]="t().entities.enviarNominaElectronica.actions.emitir"
+      [loading]="isProcessing()"
+      [disabled]="!canEmitir()"
+      (onClick)="onEmitir()"
+    />
+  </div>
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />

@@ -1,0 +1,70 @@
+import type { Route } from '@angular/router';
+import { rutaContactos, rutaCuentasBanco } from '../masters-compartidos.routes';
+import { erpModuleResolver, moduleIndexRoute } from '@erp/core/erp-modules';
+import { activeModuleResolver } from '@erp/core/module-config';
+import { CARTERA_MODULE } from './cartera.module-descriptor';
+
+/**
+ * Rutas del módulo Cartera.
+ *
+ * Encadena dos resolvers ortogonales en la ruta raíz:
+ *  - `erpModuleResolver('cartera')`: registra el módulo activo en
+ *    `ActiveModuleStore` para que el topbar y el sidebar se sincronicen.
+ *  - `activeModuleResolver('cartera')`: carga `CARTERA_CONFIG` desde el registry
+ *    y lo deja en `ModuleNavigationStore`, para que `activeDocumentResolver(...)`
+ *    resuelva sus documentos dentro de `documentos/<doc>/<doc>.routes.ts`.
+ */
+export const CARTERA_ROUTES: Route[] = [
+  {
+    path: '',
+    resolve: {
+      _navModule: erpModuleResolver('cartera'),
+      _docModule: activeModuleResolver('cartera'),
+    },
+    children: [
+      moduleIndexRoute(CARTERA_MODULE),
+      {
+        // Inicio del módulo: tablero de cuentas por cobrar.
+        path: 'inicio',
+        loadComponent: () =>
+          import('./inicio/cartera-inicio.component').then((m) => m.CarteraInicioComponent),
+      },
+      {
+        path: 'pago',
+        loadChildren: () => import('./documentos/pago/pago.routes').then((m) => m.PAGO_ROUTES),
+      },
+      {
+        // Carcasa: shell vacío, pendiente de implementar como documento (CxC, tipo 18).
+        path: 'saldo-inicial',
+        loadChildren: () =>
+          import('./documentos/saldo-inicial/saldo-inicial.routes').then(
+            (m) => m.SALDO_INICIAL_ROUTES,
+          ),
+      },
+      // Masters compartidos (ver `masters-compartidos.routes.ts`).
+      ...rutaContactos(),
+      ...rutaCuentasBanco(),
+      {
+        path: 'proceso/validar-saldos',
+        loadChildren: () =>
+          import('@erp/features/documentos/validar-saldos/validar-saldos.routes').then((m) =>
+            m.validarSaldosRoutes('cobrar'),
+          ),
+      },
+      {
+        path: 'informes/cuenta-cobrar',
+        loadChildren: () =>
+          import('./informes/cuenta-cobrar/cuenta-cobrar.routes').then(
+            (m) => m.CUENTA_COBRAR_ROUTES,
+          ),
+      },
+      {
+        path: 'informes/cuenta-cobrar-corte',
+        loadChildren: () =>
+          import('./informes/cuenta-cobrar-corte/cuenta-cobrar-corte.routes').then(
+            (m) => m.CUENTA_COBRAR_CORTE_ROUTES,
+          ),
+      },
+    ],
+  },
+];

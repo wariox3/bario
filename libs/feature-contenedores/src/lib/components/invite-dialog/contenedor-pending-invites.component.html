@@ -1,0 +1,70 @@
+<div class="flex flex-col gap-2.5">
+  <div class="overflow-hidden rounded-lg border border-[rgba(20,48,73,0.1)]">
+    @if (isLoading()) {
+      <ul class="divide-y divide-[rgba(20,48,73,0.06)]">
+        @for (item of [1, 2, 3]; track $index) {
+          <li class="flex items-center gap-3 px-3.5 py-2.5">
+            <div class="h-9 w-9 shrink-0 rounded-lg bg-[rgba(20,48,73,0.06)] animate-pulse"></div>
+            <div class="flex flex-1 flex-col gap-1.5">
+              <div class="h-[0.7rem] w-1/3 rounded bg-[rgba(20,48,73,0.08)] animate-pulse"></div>
+              <div class="h-[0.6rem] w-1/2 rounded bg-[rgba(20,48,73,0.06)] animate-pulse"></div>
+            </div>
+            <div class="h-5 w-20 rounded-full bg-[rgba(20,48,73,0.06)] animate-pulse"></div>
+          </li>
+        }
+      </ul>
+    } @else if (invitations().length === 0) {
+      <div class="flex flex-col items-center gap-1 px-4 py-7 text-center">
+        <span
+          class="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(20,48,73,0.05)]"
+        >
+          <i class="pi pi-clock text-[0.95rem] text-brand-muted"></i>
+        </span>
+        <p class="m-0 mt-1.5 text-[0.82rem] font-semibold text-brand-navy">
+          {{ t().contenedores.invite.pending.empty.title }}
+        </p>
+        <p class="m-0 text-[0.72rem] text-brand-muted">
+          {{ t().contenedores.invite.pending.empty.sub }}
+        </p>
+      </div>
+    } @else {
+      <ul class="max-h-[280px] divide-y divide-[rgba(20,48,73,0.06)] overflow-y-auto">
+        @for (invite of invitations(); track invite.id) {
+          <li class="flex items-center gap-3 px-3.5 py-2.5">
+            <!-- Monogram -->
+            <span
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[rgba(20,48,73,0.06)] text-[0.72rem] font-bold tracking-[-0.01em] text-brand-navy"
+            >
+              {{ initials(invite) }}
+            </span>
+
+            <!-- Name + email -->
+            <div class="flex min-w-0 flex-1 flex-col leading-tight">
+              <span class="truncate text-[0.85rem] font-semibold text-brand-navy">
+                {{ invite.usuario_invitado_nombre_corto || invite.usuario_invitado_correo }}
+              </span>
+              @if (invite.usuario_invitado_nombre_corto) {
+                <span class="truncate text-[0.72rem] text-brand-muted">
+                  {{ invite.usuario_invitado_correo }}
+                </span>
+              }
+            </div>
+
+            <!-- Estado + meta -->
+            <div class="flex shrink-0 flex-col items-end gap-1">
+              <span
+                class="rounded-full border px-2 py-[0.1rem] text-[0.65rem] font-semibold leading-none"
+                [ngClass]="estadoClass(invite.estado)"
+              >
+                {{ estadoLabel(invite.estado) }}
+              </span>
+              <span class="text-[0.65rem] leading-none text-brand-muted">
+                {{ invite.rol_nombre }} · {{ invite.fecha | date: formatoFecha }}
+              </span>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

@@ -1,0 +1,168 @@
+@let p = programacion();
+@let res = t().entities.programacion.resumen;
+@let estados = t().entities.programacion.estados;
+
+<section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+  <div class="flex flex-wrap items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+    <span
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+    >
+      <i class="pi pi-users text-[1rem]"></i>
+    </span>
+    <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+      <h2 class="m-0 truncate text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.programacion.name }}
+      </h2>
+    </div>
+
+    <!-- Etapa del ciclo: es la información que decide qué se puede hacer -->
+    <span
+      class="rounded-full px-2.5 py-1 text-[0.7rem] font-bold uppercase tracking-[0.03em]"
+      [class]="
+        estado() === 'aprobada'
+          ? 'bg-emerald-50 text-emerald-700'
+          : estado() === 'generada'
+            ? 'bg-sky-50 text-sky-700'
+            : 'bg-amber-50 text-amber-700'
+      "
+    >
+      {{ estados[estado()] }}
+    </span>
+  </div>
+
+  <!--
+    Tres columnas que se leen como la nómina: qué programación y de cuándo, a
+    quién alcanza, y cuánto suma. El total cierra la última; el comentario va
+    debajo, a todo el ancho, porque es texto libre y necesita lugar.
+  -->
+  <div
+    class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+  >
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.id }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ p.id }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.nombre }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.nombre || ''"
+        >
+          {{ p.nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.fechaDesde }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium text-brand-text">
+          {{ formatFecha(fechaDesde()) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.fechaHasta }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium text-brand-text">
+          {{ formatFecha(fechaHasta()) }}
+        </dd>
+      </div>
+    </dl>
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.pagoTipo }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.pago_tipo_nombre || ''"
+        >
+          {{ p.pago_tipo_nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.grupo }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.grupo_nombre || ''"
+        >
+          {{ p.grupo_nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.periodo }}</dt>
+        <dd
+          class="m-0 min-w-0 truncate text-right text-[0.85rem] font-medium text-brand-text"
+          [title]="p.periodo_nombre || ''"
+        >
+          {{ p.periodo_nombre || '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.dias }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ p.dias ?? '' }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.contratos }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ p.contratos ?? 0 }}
+        </dd>
+      </div>
+    </dl>
+    <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.devengado }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ formatMoney(devengado()) }}
+        </dd>
+      </div>
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="text-[0.75rem] text-brand-muted">{{ res.labels.deduccion }}</dt>
+        <dd class="m-0 text-right text-[0.85rem] font-medium tabular-nums text-brand-text">
+          {{ formatMoney(deduccion()) }}
+        </dd>
+      </div>
+      <div
+        class="mt-auto flex items-baseline justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] pt-2"
+      >
+        <dt class="text-[0.8rem] font-semibold text-brand-text">{{ res.labels.total }}</dt>
+        <dd class="m-0 text-right text-[0.95rem] font-bold tabular-nums text-brand-text">
+          {{ formatMoney(total()) }}
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="flex flex-col gap-0.5 border-t border-[rgba(20,48,73,0.08)] px-5 py-3">
+    <span class="text-[0.75rem] text-brand-muted">{{ res.labels.comentario }}</span>
+    <p class="m-0 whitespace-pre-line text-[0.85rem] text-brand-text">{{ p.comentario || '' }}</p>
+  </div>
+
+  <!-- Banderas activas, plegadas -->
+  <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-3">
+    <button
+      type="button"
+      class="flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[0.75rem] font-semibold text-brand-blue"
+      (click)="toggleBanderas()"
+    >
+      <i
+        class="pi text-[0.7rem]"
+        [class]="banderasVisibles() ? 'pi-chevron-up' : 'pi-chevron-down'"
+      ></i>
+      {{ res.conceptos }} ({{ banderasActivas().length }})
+    </button>
+
+    @if (banderasVisibles()) {
+      <div class="mt-2.5 flex flex-wrap gap-1.5">
+        @for (bandera of banderasActivas(); track bandera) {
+          <span
+            class="rounded-md bg-[rgba(20,48,73,0.05)] px-2 py-0.5 text-[0.72rem] text-brand-text"
+          >
+            {{ bandera }}
+          </span>
+        } @empty {
+          <span class="text-[0.72rem] text-brand-muted">{{ res.sinConceptos }}</span>
+        }
+      </div>
+    }
+  </div>
+</section>

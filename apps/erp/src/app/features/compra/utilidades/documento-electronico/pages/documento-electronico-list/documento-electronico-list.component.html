@@ -1,0 +1,50 @@
+<!--
+  Utilidad "Documento electrónico" (Compra).
+  Lista única con el chrome estándar de <lib-list-shell> (breadcrumb + card +
+  tabla embebida). En el slot [toolbar] van los filtros (lib-data-toolbar) a la
+  izquierda y el botón Emitir a la derecha, en la misma fila. Selección múltiple
+  para emitir en lote.
+-->
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.documentoElectronico.name">
+  <div toolbar class="dte-toolbar">
+    <lib-data-toolbar
+      class="dte-toolbar__filters"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+    />
+    <p-button
+      size="small"
+      icon="pi pi-send"
+      [label]="t().entities.documentoElectronico.actions.emitir"
+      [loading]="isProcessing()"
+      [disabled]="!canEmitir()"
+      (onClick)="onEmitir()"
+    />
+  </div>
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>

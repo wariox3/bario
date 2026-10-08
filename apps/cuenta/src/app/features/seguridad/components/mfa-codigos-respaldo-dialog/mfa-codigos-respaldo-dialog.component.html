@@ -1,0 +1,125 @@
+<!-- Sin X, sin Escape, sin clic afuera: estos códigos no se vuelven a mostrar y
+     cerrar sin querer es una pérdida irreversible. La única salida es confirmar. -->
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [closeOnEscape]="false"
+  [style]="{ width: '480px' }"
+  [breakpoints]="{ '576px': '92vw' }"
+  appendTo="body"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-navy"
+      >
+        <i class="pi pi-key text-[1.1rem] text-white"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          Guarda tus códigos de respaldo
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          Es la única vez que los vas a ver
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <div class="flex flex-col gap-[1.1rem]">
+      <!-- Cómo se guardan. NO se promete que sirvan para entrar: hoy el login no acepta
+           códigos de respaldo, y prometerlo dejaría afuera a quien pierda su método
+           creyendo que tiene una salida. Revisar este texto cuando el backend los acepte. -->
+      <div
+        class="flex items-start gap-2.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] bg-[rgba(20,48,73,0.02)] px-3.5 py-2.5"
+      >
+        <span
+          class="mt-[0.05rem] flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-[6px] bg-[rgba(20,48,73,0.06)] text-brand-navy"
+        >
+          <i class="pi pi-info-circle text-[0.7rem]"></i>
+        </span>
+        <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">
+          Cada uno de estos códigos sirve
+          <strong class="font-semibold text-brand-text">una sola vez</strong>. Guárdalos donde
+          guardarías una llave: no en la misma cuenta de correo.
+        </p>
+      </div>
+
+      <!-- Los códigos: mono y en dos columnas, para leerlos y transcribirlos sin perderse -->
+      <div
+        class="grid grid-cols-2 gap-x-3 gap-y-1.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] px-3.5 py-3"
+      >
+        @for (columna of columnas(); track $index) {
+          <div class="flex flex-col gap-1.5">
+            @for (codigo of columna; track codigo) {
+              <span
+                class="rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-1 text-center font-mono text-[0.82rem] font-semibold tracking-[0.06em] text-brand-text"
+              >
+                {{ codigo }}
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Llevárselos: dos caminos, ambos secundarios al hecho de guardarlos -->
+      <div class="flex items-center gap-2">
+        <p-button
+          [label]="copiado() ? '¡Copiado!' : 'Copiar'"
+          [icon]="copiado() ? 'pi pi-check' : 'pi pi-copy'"
+          [outlined]="true"
+          severity="secondary"
+          size="small"
+          styleClass="w-full"
+          class="flex-1"
+          (onClick)="copiar()"
+        />
+        <p-button
+          [label]="descargado() ? 'Descargado' : 'Descargar .txt'"
+          [icon]="descargado() ? 'pi pi-check' : 'pi pi-download'"
+          [outlined]="true"
+          severity="secondary"
+          size="small"
+          styleClass="w-full"
+          class="flex-1"
+          (onClick)="descargar()"
+        />
+      </div>
+
+      <!-- La confirmación explícita: el usuario declara, no el sistema asume -->
+      <label
+        for="mfa-codigos-guardados"
+        class="flex cursor-pointer items-start gap-2.5 rounded-[9px] border border-[rgba(20,48,73,0.12)] px-3.5 py-2.5 transition-colors hover:bg-[rgba(20,48,73,0.02)]"
+      >
+        <p-checkbox
+          [ngModel]="guardados()"
+          (ngModelChange)="guardados.set($event)"
+          [binary]="true"
+          inputId="mfa-codigos-guardados"
+        />
+        <span class="text-[0.78rem] leading-relaxed text-brand-text">
+          Ya guardé mis códigos en un lugar seguro
+        </span>
+      </label>
+    </div>
+  }
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end pt-2">
+      <p-button
+        label="Listo"
+        icon="pi pi-check"
+        [disabled]="!guardados()"
+        (onClick)="confirmar()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

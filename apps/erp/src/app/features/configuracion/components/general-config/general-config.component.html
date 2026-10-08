@@ -1,76 +1,154 @@
-@if (loading()) {
-  <div class="h-40 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
-} @else if (loadFailed()) {
-  <div
-    class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
-  >
-    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
-    <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.toasts.loadError.desc }}</p>
-    <p-button
-      type="button"
-      [label]="t().common.actions.refresh"
-      icon="pi pi-refresh"
-      [outlined]="true"
-      severity="secondary"
-      (onClick)="cargar()"
-    />
-  </div>
-} @else {
-  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-        <span
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-        >
-          <i class="pi pi-calculator text-[1.05rem]"></i>
-        </span>
-        <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-          <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-            {{ t().configuracion.general.uvt.title }}
-          </h2>
-          <p class="m-0 text-[0.75rem] text-brand-muted">
-            {{ t().configuracion.general.uvt.hint }}
-          </p>
-        </div>
-      </div>
-
-      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-        <div class="flex max-w-xs flex-col gap-1.5">
-          <label for="uvt" class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text">
-            {{ t().configuracion.general.uvt.label }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <p-inputnumber
-            inputId="uvt"
-            formControlName="uvt"
-            mode="currency"
-            currency="COP"
-            locale="es-CO"
-            [fluid]="true"
-            [invalid]="form.controls.uvt.invalid && form.controls.uvt.touched"
-          />
-          <lib-field-error
-            [control]="form.controls.uvt"
-            [messages]="{ required: t().configuracion.general.validation.required }"
-          />
-        </div>
-      </div>
-    </section>
-
-    <div class="flex items-center justify-end gap-3 pb-1">
-      @if (form.dirty) {
-        <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
-          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-          {{ t().configuracion.unsavedChanges }}
-        </span>
-      }
+<div class="flex flex-col gap-5">
+  @if (loading()) {
+    <div class="h-40 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+  } @else if (loadFailed()) {
+    <div
+      class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
+    >
+      <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+      <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.toasts.loadError.desc }}</p>
       <p-button
-        type="submit"
-        [label]="t().configuracion.actions.save"
-        icon="pi pi-check"
-        [loading]="isSaving()"
-        [disabled]="form.invalid || isSaving()"
+        type="button"
+        [label]="t().common.actions.refresh"
+        icon="pi pi-refresh"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="cargar()"
       />
     </div>
-  </form>
-}
+  } @else {
+    <form [formGroup]="form" libFocusInvalid (ngSubmit)="onSave()">
+      <section
+        class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+      >
+        <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+          <span
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+          >
+            <i class="pi pi-sliders-h text-[1.05rem]"></i>
+          </span>
+          <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+            <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+              {{ t().configuracion.general.parametros.title }}
+            </h2>
+            <p class="m-0 text-[0.75rem] text-brand-muted">
+              {{ t().configuracion.general.parametros.hint }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-2 lg:divide-x lg:divide-y-0"
+        >
+          <!-- Grupo: tributario -->
+          <div class="px-5 py-4 max-[576px]:px-4">
+            <p
+              class="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-brand-muted opacity-70"
+            >
+              {{ t().configuracion.general.parametros.groups.fiscal }}
+            </p>
+
+            <div class="mt-3 flex max-w-xs flex-col gap-1.5">
+              <label
+                for="uvt"
+                class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+              >
+                {{ t().configuracion.general.uvt.label }}
+                <span class="ml-px text-red-500">*</span>
+              </label>
+              <p-inputnumber
+                inputId="uvt"
+                formControlName="uvt"
+                mode="currency"
+                currency="COP"
+                locale="es-CO"
+                [fluid]="true"
+                [invalid]="form.controls.uvt.invalid && form.controls.uvt.touched"
+              />
+              <lib-field-error
+                [control]="form.controls.uvt"
+                [messages]="{ required: t().configuracion.general.validation.required }"
+              />
+              <p class="m-0 text-[0.75rem] text-brand-muted">
+                {{ t().configuracion.general.uvt.hint }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Grupo: documentos electrónicos -->
+          <div class="px-5 py-4 max-[576px]:px-4">
+            <p
+              class="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-brand-muted opacity-70"
+            >
+              {{ t().configuracion.general.parametros.groups.emision }}
+            </p>
+
+            <label
+              for="emitir_automaticamente"
+              class="mt-3 flex cursor-pointer items-start gap-2.5"
+            >
+              <p-checkbox
+                inputId="emitir_automaticamente"
+                formControlName="emitir_automaticamente"
+                [binary]="true"
+              />
+              <span class="flex flex-col gap-[0.15rem]">
+                <span class="text-[0.85rem] font-medium text-brand-text">
+                  {{ t().configuracion.general.emitirAutomaticamente.label }}
+                </span>
+                <span class="text-[0.75rem] text-brand-muted">
+                  {{ t().configuracion.general.emitirAutomaticamente.hint }}
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] px-5 py-3"
+        >
+          @if (form.dirty) {
+            <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+              {{ t().configuracion.unsavedChanges }}
+            </span>
+          }
+          <p-button
+            type="submit"
+            [label]="t().configuracion.actions.save"
+            icon="pi pi-check"
+            [loading]="isSaving()"
+            [disabled]="isSaving()"
+          />
+        </div>
+      </section>
+    </form>
+  }
+
+  <!--
+    Tipos de documento. Fuera del formulario a propósito: cada fila se guarda por
+    su cuenta contra su propio endpoint, así que no comparte el botón Guardar de
+    los campos de la configuración ni depende de que esa carga haya salido bien.
+  -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ t().configuracion.general.documentoTipo.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">
+          {{ t().configuracion.general.documentoTipo.hint }}
+        </p>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <app-documento-tipo-table />
+    </div>
+  </section>
+</div>

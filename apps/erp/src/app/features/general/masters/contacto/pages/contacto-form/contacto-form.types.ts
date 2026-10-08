@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 
 /**
  * Forma cruda del FormGroup del contacto (lo que devuelve `form.getRawValue()`).

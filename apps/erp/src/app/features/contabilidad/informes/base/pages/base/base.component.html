@@ -1,0 +1,64 @@
+<!--
+  Informe "Base".
+  El primero de los planos: sin jerarquía, sin `solo_con_saldo` y con sus propios
+  importes (débito, crédito, base). El panel lleva el selector de contacto
+  proyectado en la banda "documento". Sin PDF: el ERP anterior ni siquiera ponía
+  el botón acá.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <app-movimiento-informe-params
+    toolbar
+    [form]="form"
+    idPrefix="ib"
+    [showSoloConSaldo]="false"
+    [showDetalle]="true"
+  >
+    <div class="mi-params__field">
+      <label for="ib-contacto" class="mi-params__label">{{ d.params.contacto }}</label>
+      <lib-contacto-select
+        inputId="ib-contacto"
+        [formControl]="contacto"
+        [placeholder]="d.params.contactoPlaceholder"
+      />
+    </div>
+
+    <app-movimiento-informe-actions
+      acciones
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="soportaPdf"
+      [exportingPdf]="isExportingPdf()"
+      [hint]="hint()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </app-movimiento-informe-params>
+
+  <!--
+    `jerarquia` y `descuadre` apagados: todas las filas son del mismo tipo, y
+    nada obliga a que débito iguale a crédito en un listado de bases gravables.
+  -->
+  <app-movimiento-informe-table
+    table
+    [rows]="rows()"
+    [amounts]="montos()"
+    [empty]="empty"
+    [totales]="totales()"
+    [loading]="isLoading()"
+    [generated]="generated()"
+    [showContacto]="true"
+    [showMovimiento]="true"
+    [showDetalle]="true"
+    [jerarquia]="false"
+    [descuadre]="false"
+    [totalCount]="totalCount()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="onPageChange($event)"
+  />
+</lib-list-shell>

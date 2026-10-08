@@ -1,0 +1,11 @@
+// El único bloque que no vive en clases de Tailwind: el par de alturas con
+// fallback (`100vh` y luego `100dvh`) son dos declaraciones de la misma
+// propiedad, y el orden de las clases en el atributo no decide cuál gana.
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; // fallback
+  height: 100dvh; // mejor en móvil (barra de URL dinámica)
+  overflow: hidden; // el documento no scrollea; lo hacen el sidebar y el main
+  background: var(--brand-bg);
+}

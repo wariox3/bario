@@ -1,0 +1,179 @@
+@let m = t().entities.contrato.terminar;
+
+@if (liquidacion(); as l) {
+  <!-- Después: la liquidación que fabricó el backend, resumida -->
+  @let r = m.resultado;
+  @let prestaciones = t().entities.liquidacion.prestaciones;
+
+  <div class="flex flex-col gap-5">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-emerald-100"
+      >
+        <i class="pi pi-check text-[1.1rem] text-emerald-700"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+        >
+          {{ r.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ r.subtitle }}{{ datos.empleado ? ' · ' + datos.empleado : '' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- El total es lo que se busca primero; el periodo lo explica -->
+    <div
+      class="flex flex-wrap items-end justify-between gap-3 rounded-xl border border-[rgba(20,48,73,0.08)] bg-slate-50 px-4 py-3.5"
+    >
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-brand-muted">
+          {{ r.total }}
+        </span>
+        <span class="text-[1.5rem] font-extrabold tabular-nums tracking-[-0.02em] text-brand-navy">
+          {{ formatMoney(l.total) }}
+        </span>
+      </div>
+      <div class="flex flex-col items-end gap-0.5">
+        <span class="text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-brand-muted">
+          {{ r.periodo }}
+        </span>
+        <span class="text-[0.8rem] font-medium tabular-nums text-brand-text">{{ periodo() }}</span>
+      </div>
+    </div>
+
+    <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2">
+      @for (key of prestacionKeys; track key) {
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.8rem] text-brand-muted">{{ prestaciones[key] }}</dt>
+          <dd class="m-0 text-[0.85rem] font-semibold tabular-nums text-brand-text">
+            {{ formatMoney(l[key]) }}
+          </dd>
+        </div>
+      }
+      @if (tieneMonto(l.adicion)) {
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.8rem] text-brand-muted">{{ r.adiciones }}</dt>
+          <dd class="m-0 text-[0.85rem] font-semibold tabular-nums text-brand-text">
+            {{ formatMoney(l.adicion) }}
+          </dd>
+        </div>
+      }
+      @if (tieneMonto(l.deduccion)) {
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[0.8rem] text-brand-muted">{{ r.deducciones }}</dt>
+          <dd class="m-0 text-[0.85rem] font-semibold tabular-nums text-red-700">
+            − {{ formatMoney(l.deduccion) }}
+          </dd>
+        </div>
+      }
+    </dl>
+
+    <p class="m-0 text-[0.78rem] leading-relaxed text-brand-muted">
+      <i class="pi pi-info-circle mr-1.5"></i>{{ r.nota }}
+    </p>
+
+    <div
+      class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5"
+    >
+      <p-button type="button" [label]="r.cerrar" (onClick)="onClose()" />
+    </div>
+  </div>
+} @else {
+  <!-- Antes: desde cuándo se liquida, fecha y motivo -->
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    libFocusInvalid
+    autocomplete="off"
+    class="flex flex-col gap-5"
+  >
+    <!-- Header: badge + título + a quién se le termina -->
+    <div class="flex items-center gap-3.5">
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-amber-100">
+        <i class="pi pi-ban text-[1.1rem] text-amber-700"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+        >
+          {{ m.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ datos.empleado || m.subtitle }}
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+      <!-- Fecha de terminación -->
+      <div class="flex flex-col gap-1.5">
+        <label for="fecha_terminacion" class="text-[0.855rem] font-semibold text-brand-text">
+          {{ m.fields.fecha }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <p-datepicker
+          inputId="fecha_terminacion"
+          formControlName="fecha_terminacion"
+          [showIcon]="true"
+          [minDate]="minFecha"
+          appendTo="body"
+          [fluid]="true"
+          [invalid]="
+            form.controls.fecha_terminacion.invalid && form.controls.fecha_terminacion.touched
+          "
+        />
+        <lib-field-error
+          [control]="form.controls.fecha_terminacion"
+          [messages]="{
+            required: m.validation.required,
+            antesDelInicio: m.validation.antesDelInicio,
+          }"
+        />
+      </div>
+
+      <!-- Motivo -->
+      <div class="flex flex-col gap-1.5">
+        <label for="motivo_terminacion" class="text-[0.855rem] font-semibold text-brand-text">
+          {{ m.fields.motivo }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <lib-api-select
+          inputId="motivo_terminacion"
+          formControlName="motivo_terminacion"
+          [endpoint]="motivoEndpoint"
+          [placeholder]="m.fields.seleccionar"
+          [invalid]="
+            form.controls.motivo_terminacion.invalid && form.controls.motivo_terminacion.touched
+          "
+        />
+        <lib-field-error
+          [control]="form.controls.motivo_terminacion"
+          [messages]="{ required: m.validation.required }"
+        />
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div
+      class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5"
+    >
+      <p-button
+        type="button"
+        [label]="t().common.actions.cancel"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onClose()"
+      />
+      <p-button
+        type="submit"
+        [label]="m.submit"
+        severity="danger"
+        [loading]="isSaving()"
+        [disabled]="isSaving()"
+      />
+    </div>
+  </form>
+}

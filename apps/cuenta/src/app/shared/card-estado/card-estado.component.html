@@ -1,0 +1,23 @@
+<div class="flex flex-col items-center gap-2.5 px-5 py-10 text-center">
+  <span
+    class="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[rgba(20,48,73,0.06)] text-brand-muted"
+  >
+    <i [class]="icono()" class="text-[1.05rem]"></i>
+  </span>
+
+  <p class="m-0 text-[0.85rem] font-semibold text-brand-text">{{ titulo() }}</p>
+
+  @if (descripcion(); as texto) {
+    <p class="m-0 max-w-[22rem] text-[0.75rem] leading-relaxed text-brand-muted">{{ texto }}</p>
+  }
+
+  @if (accion(); as etiqueta) {
+    <p-button
+      [label]="etiqueta"
+      [icon]="iconoAccion()"
+      [text]="true"
+      size="small"
+      (onClick)="accionar.emit()"
+    />
+  }
+</div>

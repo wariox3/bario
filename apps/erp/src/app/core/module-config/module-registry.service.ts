@@ -5,7 +5,7 @@ import {
   UnknownModuleError,
 } from './errors/config.errors';
 import { MODULE_REGISTRY } from './module-registry.token';
-import type { ModuleConfig } from './types/module-config.types';
+import type { ModuleConfig } from '@reddoc/core';
 
 /**
  * Carga `ModuleConfig` desde el `MODULE_REGISTRY` inyectado y cachea

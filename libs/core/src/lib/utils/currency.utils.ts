@@ -23,8 +23,8 @@ function copFormatter(locale: string): Intl.NumberFormat {
     formatter = new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     });
     formatters.set(locale, formatter);
   }
@@ -32,7 +32,7 @@ function copFormatter(locale: string): Intl.NumberFormat {
 }
 
 /**
- * Formatea un monto a pesos colombianos sin decimales (`$ 120.600`).
+ * Formatea un monto a pesos colombianos con dos decimales (`$ 120.600,00`).
  *
  * Acepta string/number/unknown del backend (con o sin cola de ceros) y lo
  * normaliza antes de formatear. Un valor no numérico produce `''`.

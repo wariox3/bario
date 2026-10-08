@@ -78,10 +78,15 @@ export class RegenerarAfectadoComponent {
     const dict = this.t().entities.regenerarAfectado;
     this.confirmation.confirm({
       header: dict.confirm.header,
+      // No es destructivo (recálculo idempotente): ícono informativo, no de alerta.
+      icon: 'pi pi-info-circle',
       message: dict.confirm.message,
-      icon: 'pi pi-exclamation-triangle',
       acceptLabel: dict.confirm.accept,
       rejectLabel: dict.confirm.cancel,
+      acceptIcon: 'pi pi-sync',
+      // Jerarquía visual: "Regenerar" primario (relleno) vs "Cancelar" quieto
+      // (outlined secundario) — así los dos botones no salen del mismo color.
+      rejectButtonStyleClass: 'p-button-outlined p-button-secondary',
       accept: () => this.execute(),
     });
   }

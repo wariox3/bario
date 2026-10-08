@@ -8,11 +8,12 @@ import type { AppDict } from '@erp/i18n';
 import { AdicionalService } from '../../adicional.service';
 import { ADICIONAL_LIST_PATH } from '../../adicional.constants';
 import type { Adicional } from '../../adicional.model';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-adicional-detail',
   standalone: true,
-  imports: [ButtonModule, BreadcrumbComponent],
+  imports: [ButtonGroupModule, ButtonModule, BreadcrumbComponent],
   templateUrl: './adicional-detail.component.html',
   styleUrl: './adicional-detail.component.scss',
 })
@@ -32,6 +33,12 @@ export class AdicionalDetailComponent implements OnInit {
   protected readonly adicional = signal<Adicional | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
+
+  /** Valor del adicional en pesos. `formatCop` ya resuelve el nulo y el string. */
+  protected readonly valorFormateado = computed(() => {
+    const a = this.adicional();
+    return a?.valor != null ? formatCop(a.valor) : '';
+  });
 
   /** Migas: módulo Humano → listado de adicionales → contrato abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -70,6 +77,10 @@ export class AdicionalDetailComponent implements OnInit {
     const a = this.adicional();
     if (!a) return;
     this.navigate(...ADICIONAL_LIST_PATH, 'editar', a.id);
+  }
+
+  protected onNew(): void {
+    this.navigate(...ADICIONAL_LIST_PATH, 'nuevo');
   }
 
   private loadAdicional(id: number): void {

@@ -4,10 +4,16 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { forkJoin, startWith } from 'rxjs';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { FieldErrorComponent } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
@@ -18,12 +24,15 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ventaDocumentoBreadcrumb } from '@erp/features/venta/shared/venta-breadcrumb';
-import { ErpContactoSelectComponent } from '@erp/core/components/contacto-select/erp-contacto-select.component';
+import { ErpContactoSelectComponent } from '@reddoc/ui';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
 import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import { DocumentoDetalleService, ENTITY_DATA_GATEWAY } from '@erp/core/module-config';
+  DOCUMENT_TYPE_ID,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import { ConfiguracionService } from '@erp/core/services/configuracion.service';
 import type { AppDict } from '@erp/i18n';
@@ -39,6 +48,7 @@ import type {
 } from '../../servicio-documento.model';
 import { createDetalleGroup, type DetalleGroup } from '../../servicio-documento-detalle.form';
 import { ServicioDocumentoDetallesComponent } from '../../components/servicio-documento-detalles/servicio-documento-detalles.component';
+import { ServicioDocumentoResumenComponent } from '@erp/features/venta/documentos/_shared/servicio/components/servicio-documento-resumen/servicio-documento-resumen.component';
 
 /**
  * Formulario de alta/edición de un **documento de servicio** (vigilancia):
@@ -55,17 +65,23 @@ import { ServicioDocumentoDetallesComponent } from '../../components/servicio-do
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  * Las líneas de servicio (detalles) se editan en `app-servicio-documento-detalles`.
  */
+
 @Component({
   selector: 'app-servicio-documento-form',
   standalone: true,
   imports: [
+    ServicioDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
+    TabsModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputNumberModule,
     SelectModule,
     FieldErrorComponent,
+    FocusInvalidDirective,
+    PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ServicioDocumentoDetallesComponent,
@@ -96,6 +112,13 @@ export class ServicioDocumentoFormComponent implements OnInit {
   /** Id del documento a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
 
+  /**
+   * Cabecera pre-cargada por `editableDocumentResolver` (clave de ruta
+   * `documentoEdit`). En edición llega ya resuelta y el form la reúsa en vez de
+   * volver a pedirla; `null`/ausente en alta o si el resolver hizo fail-open.
+   */
+  readonly documentoEdit = input<unknown>();
+
   protected readonly isEditMode = computed(() => !!this.id());
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
@@ -105,11 +128,20 @@ export class ServicioDocumentoFormComponent implements OnInit {
   });
   protected readonly isSaving = signal(false);
 
+  /**
+   * Solo en pedido servicio: una línea con horas ya programadas congela su
+   * cobertura (los turnos del puesto ya existen). El resto de la familia edita
+   * sus líneas sin restricción.
+   */
+  protected readonly lockCoberturaOnProgramadas = computed(
+    () => this.document().documentTypeId === DOCUMENT_TYPE_ID.PEDIDO_SERVICIO,
+  );
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
     ventaDocumentoBreadcrumb(
       this.t(),
       this.tenant.currentSlug(),
-      this.translateKey(this.document().displayNameKey),
+      this.i18n.translate(this.document().displayNameKey),
       this.document().id,
       this.isEditMode() ? this.t().common.actions.edit : this.t().common.actions.new,
     ),
@@ -150,10 +182,20 @@ export class ServicioDocumentoFormComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.id();
-    if (id) {
-      this.loadDocumento(Number(id));
-    } else {
+    if (!id) {
       this.prefillSalarioMinimo();
+      return;
+    }
+    // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
+    // pedimos las líneas (que heredan el salario de la cabecera). Sin resolved
+    // (fail-open) cae a la carga completa.
+    const prefetched = this.documentoEdit();
+    if (prefetched) {
+      const read = prefetched as ServicioDocumentoRead;
+      this.applyCabecera(read);
+      this.loadLineas(Number(id), toFiniteNumber(read.salario));
+    } else {
+      this.loadDocumento(Number(id));
     }
   }
 
@@ -174,11 +216,16 @@ export class ServicioDocumentoFormComponent implements OnInit {
       : this.gateway.create(this.document(), payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha del documento, para revisar lo que quedó
+        // almacenado. En alta el id sale de la respuesta del backend; si no
+        // viniera, se cae a la lista antes que navegar a una URL inválida.
+        const savedId = id ?? extractDocumentoId(saved);
+        if (savedId != null) this.navigateToDetail(savedId);
+        else this.navigateToList();
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -192,10 +239,13 @@ export class ServicioDocumentoFormComponent implements OnInit {
     this.navigateToList();
   }
 
+  /**
+   * Carga completa (cabecera + líneas). La cabecera (`documento/:id/`) ya no
+   * embebe los detalles: las líneas se traen aparte de
+   * `documento-detalle/?documento_id=`. Se usa como fallback de la carga inicial
+   * cuando el resolver no pre-cargó la cabecera.
+   */
   private loadDocumento(id: number): void {
-    // La cabecera (`documento/:id/`) ya no embebe los detalles: las líneas se
-    // traen aparte de `documento-detalle/?documento_id=`. Las dos peticiones son
-    // independientes, así que cargan en paralelo y se pueblan juntas.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
       lineas: this.detalleService.listarPorDocumento<ServicioDocumentoDetalleRead>(id),
@@ -204,19 +254,46 @@ export class ServicioDocumentoFormComponent implements OnInit {
       .subscribe({
         next: ({ cabecera, lineas }) => {
           const read = cabecera as ServicioDocumentoRead;
-          // El salario viaja en la cabecera; cada línea lo hereda.
-          const salarioDoc = toFiniteNumber(read.salario);
-          this.form.patchValue(servicioDocumentoToFormValue(read));
-          const detalles = this.form.controls.detalles;
-          detalles.clear();
-          for (const line of lineas)
-            detalles.push(createDetalleGroup(detalleToFormValue(line, salarioDoc)));
+          this.applyCabecera(read);
+          this.populateLineas(lineas, toFiniteNumber(read.salario));
         },
-        error: () => {
-          const toasts = this.t().entities.servicioDocumento.form.toasts;
-          this.toast.error(toasts.loadError.title, toasts.loadError.desc);
-        },
+        error: () => this.notifyLoadError(),
       });
+  }
+
+  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
+  private loadLineas(id: number, salarioDoc: number | null): void {
+    this.detalleService
+      .listarPorDocumento<ServicioDocumentoDetalleRead>(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lineas) => this.populateLineas(lineas, salarioDoc),
+        error: () => this.notifyLoadError(),
+      });
+  }
+
+  /** Pobla la cabecera en el form. */
+  private applyCabecera(read: ServicioDocumentoRead): void {
+    this.form.patchValue(servicioDocumentoToFormValue(read));
+  }
+
+  /**
+   * Reemplaza el FormArray de detalles con las líneas recibidas. El salario
+   * viaja en la cabecera; cada línea lo hereda.
+   */
+  private populateLineas(
+    lineas: readonly ServicioDocumentoDetalleRead[],
+    salarioDoc: number | null,
+  ): void {
+    const detalles = this.form.controls.detalles;
+    detalles.clear();
+    for (const line of lineas)
+      detalles.push(createDetalleGroup(detalleToFormValue(line, salarioDoc)));
+  }
+
+  private notifyLoadError(): void {
+    const toasts = this.t().entities.servicioDocumento.form.toasts;
+    this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
 
   private prefillSalarioMinimo(): void {
@@ -236,19 +313,21 @@ export class ServicioDocumentoFormComponent implements OnInit {
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return;
-    const segments = this.document().routes.list.split('/').filter(Boolean);
-    void this.router.navigate(['/t', slug, 'venta', ...segments]);
+    this.navigate(this.document().routes.list);
   }
 
-  /** Resuelve una clave i18n con notación de punto (p. ej. `displayNameKey`). */
-  private translateKey(key: string): string {
-    let current: unknown = this.t();
-    for (const part of key.split('.')) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
+  /** Abre la ficha del documento guardado (`routes.detail` + id). */
+  private navigateToDetail(id: string | number): void {
+    this.navigate(this.document().routes.detail, String(id));
+  }
+
+  /** Construye la ruta absoluta del documento dentro del tenant y el módulo. */
+  private navigate(routePath: string, extra?: string): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    const segments = routePath.split('/').filter(Boolean);
+    const commands: (string | number)[] = ['/t', slug, 'venta', ...segments];
+    if (extra) commands.push(extra);
+    void this.router.navigate(commands);
   }
 }

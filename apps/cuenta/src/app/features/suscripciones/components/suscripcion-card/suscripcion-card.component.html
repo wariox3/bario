@@ -59,11 +59,11 @@
           [class.text-rose-500]="st.tone === 'danger'"
         ></i>
         <span class="font-medium text-brand-text tabular-nums">{{
-          s.fecha_inicio | date: 'dd/MM/yy'
+          s.fecha_inicio | date: formatoFecha
         }}</span>
         <span class="text-brand-muted opacity-40">→</span>
         <span class="font-medium text-brand-text tabular-nums">{{
-          s.fecha_fin | date: 'dd/MM/yy'
+          s.fecha_fin | date: formatoFecha
         }}</span>
       </div>
       <div

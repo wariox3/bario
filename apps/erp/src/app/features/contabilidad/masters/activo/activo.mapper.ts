@@ -1,5 +1,5 @@
 import { fromIsoDate, toFiniteNumber, toIsoDate } from '@reddoc/core';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
 import type { Activo, ActivoPayload } from './activo.model';
 import type { ActivoFormRawValue } from './pages/activo-form/activo-form.types';
 
@@ -18,7 +18,7 @@ function cuentaOption(
  * Adapta el read-model (`Activo`) a los valores del reactive form.
  *
  * Las FK se reagrupan en `{ id, nombre }` con el companion `*_nombre` que
- * devuelve el backend (los `<app-api-select>` resuelven la etiqueta por `id`,
+ * devuelve el backend (los `<lib-api-select>` resuelven la etiqueta por `id`,
  * pero las cuentas usan `<app-cuenta-select>`, cuya etiqueta es `código - nombre`).
  * Los montos llegan como string Decimal → se normalizan a número.
  */

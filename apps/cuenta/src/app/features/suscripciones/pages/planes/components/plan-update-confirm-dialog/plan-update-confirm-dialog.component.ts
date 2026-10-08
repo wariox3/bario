@@ -9,6 +9,7 @@ import {
   getSuscripcionFrecuenciaLabel,
 } from '../../../../suscripcion.utils';
 import { formatCop } from '../../utils/plan-pricing';
+import { formatFechaCorta } from '@reddoc/core';
 
 @Component({
   selector: 'app-plan-update-confirm-dialog',
@@ -72,5 +73,5 @@ export class PlanUpdateConfirmDialogComponent {
 }
 
 function formatHumanDate(date: Date): string {
-  return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  return formatFechaCorta(date);
 }

@@ -1,0 +1,8 @@
+:host {
+  // Debe comportarse como flex item del contenedor padre (la barra de título)
+  // para que un `ml-auto` puesto en el host empuje los badges a la derecha.
+  // Con `display: contents` el host saldría del layout y `ml-auto` no aplicaría.
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}

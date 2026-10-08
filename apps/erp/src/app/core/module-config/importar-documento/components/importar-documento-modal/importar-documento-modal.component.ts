@@ -25,13 +25,18 @@ import type { ImportarDocumentoModalData, LineaPendienteApi } from '../../import
 /** Columnas de la tabla de líneas pendientes (solo lectura, selección múltiple). */
 const IMPORTAR_DOCUMENTO_COLUMNS: readonly ColumnDef[] = [
   {
-    field: 'documento',
+    field: 'documento_numero',
     headerKey: 'documentImport.columns.documento',
     type: 'number',
     width: '7rem',
   },
-  { field: 'fecha', headerKey: 'documentImport.columns.fecha', type: 'date', width: '8rem' },
-  { field: 'contacto_nombre', headerKey: 'documentImport.columns.contacto', type: 'text' },
+  {
+    field: 'documento_fecha',
+    headerKey: 'documentImport.columns.fecha',
+    type: 'date',
+    width: '8rem',
+  },
+  { field: 'contacto_nombre_corto', headerKey: 'documentImport.columns.contacto', type: 'text' },
   { field: 'item_nombre', headerKey: 'documentImport.columns.item', type: 'text' },
   {
     field: 'cantidad',
@@ -140,9 +145,23 @@ export class ImportarDocumentoModalComponent {
     this.ref.close(null);
   }
 
-  /** Arma el `ListQuery` con el filtro por contacto (si lo hay) + orden + página. */
+  /**
+   * Arma el `ListQuery`: solo documentos aprobados, del contacto y del tipo origen
+   * (si los hay) + orden + página. El saldo pendiente > 0 lo garantiza el backend.
+   */
   private buildQuery(): ListQuery {
-    const filters: FilterCondition[] = [];
+    const filters: FilterCondition[] = [
+      // se comenta mientras el back agrega el campo
+      // { field: 'documento__estado_aprobado', operator: 'eq', value: true },
+    ];
+    const documentoTipoId = this.data?.documentoTipoId;
+    if (documentoTipoId != null) {
+      filters.push({
+        field: 'documento__documento_tipo_id',
+        operator: 'eq',
+        value: documentoTipoId,
+      });
+    }
     const contactoId = this.data?.contactoId;
     if (contactoId != null) {
       filters.push({ field: 'documento__contacto_id', operator: 'eq', value: contactoId });

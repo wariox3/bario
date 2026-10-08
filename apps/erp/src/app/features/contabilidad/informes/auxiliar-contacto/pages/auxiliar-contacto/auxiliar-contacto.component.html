@@ -1,0 +1,82 @@
+<!--
+  Informe "Auxiliar por contacto".
+  Composición pura de las piezas compartidas: el panel con el trío del auxiliar
+  (contacto, número, comprobante) proyectado en la banda "documento", y la tabla
+  con las columnas del tercero más la referencia al asiento. Sin botón de PDF:
+  la familia de endpoints nueva no lo sirve.
+-->
+@let d = t().entities.informeCuentas;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="nombre">
+  <app-movimiento-informe-params toolbar [form]="form" idPrefix="atc" [showDetalle]="true">
+    <!--
+      Los tres acotan por igualdad contra el movimiento, así que van por
+      selector (o número exacto) y no por texto libre.
+    -->
+    <div class="mi-params__field">
+      <label for="atc-contacto" class="mi-params__label">{{ d.params.contacto }}</label>
+      <lib-contacto-select
+        inputId="atc-contacto"
+        [formControl]="contacto"
+        [placeholder]="d.params.contactoPlaceholder"
+      />
+    </div>
+
+    <div class="mi-params__field">
+      <label for="atc-numero" class="mi-params__label">{{ d.params.numero }}</label>
+      <p-inputnumber
+        inputId="atc-numero"
+        [formControl]="numero"
+        [useGrouping]="false"
+        [min]="0"
+        [fluid]="true"
+        [placeholder]="d.params.numeroPlaceholder"
+      />
+    </div>
+
+    <div class="mi-params__field">
+      <label for="atc-comprobante" class="mi-params__label">{{ d.params.comprobante }}</label>
+      <lib-api-autocomplete
+        inputId="atc-comprobante"
+        [formControl]="comprobante"
+        [endpoint]="comprobanteEndpoint"
+        [placeholder]="d.params.comprobantePlaceholder"
+      />
+    </div>
+
+    <app-movimiento-informe-actions
+      acciones
+      [loading]="isLoading()"
+      [exportingExcel]="isExportingExcel()"
+      [busy]="isBusy()"
+      [canExport]="canExport()"
+      [showPdf]="soportaPdf"
+      [exportingPdf]="isExportingPdf()"
+      [hint]="hint()"
+      (generar)="generar()"
+      (excel)="exportExcel()"
+      (pdf)="exportPdf()"
+    />
+  </app-movimiento-informe-params>
+
+  <!--
+    `showMovimientoId` y no `showMovimiento`: este informe no trae comprobante,
+    número ni fecha en sus filas, así que el id del asiento es lo único que
+    distingue una fila de detalle de otra.
+  -->
+  <app-movimiento-informe-table
+    table
+    [rows]="rows()"
+    [amounts]="montos()"
+    [empty]="empty"
+    [totales]="totales()"
+    [loading]="isLoading()"
+    [generated]="generated()"
+    [showContacto]="true"
+    [showMovimientoId]="true"
+    [totalCount]="totalCount()"
+    [page]="page()"
+    [pageSize]="pageSize()"
+    (pageChange)="onPageChange($event)"
+  />
+</lib-list-shell>

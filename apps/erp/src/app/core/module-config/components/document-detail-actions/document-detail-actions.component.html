@@ -1,0 +1,94 @@
+@let a = t().documentActions.detail;
+
+<!--
+  Las acciones del documento fundidas en un solo segmento, que se lee como una pieza.
+  El Editar de la ficha entra al principio por el slot `[actionsStart]` y lo propio
+  de cada documento (su "Utilidades") al final por `[actionsEnd]`; su <p-menu> lo declara la ficha, fuera de este componente.
+  Los <p-menu> van FUERA del grupo: su CSS une los botones con
+  `p-button:not(:last-child)`, y un hermano detrás del último le quitaría el borde.
+-->
+<p-buttongroup>
+  <!-- Editar de la ficha: primer segmento del grupo (slot `[actionsStart]`). -->
+  <ng-content select="[actionsStart]" />
+
+  @if (showAprobacion()) {
+    <p-button
+      type="button"
+      [label]="a.aprobar"
+      icon="pi pi-check-circle"
+      size="small"
+      [loading]="enCurso() === 'aprobar'"
+      [disabled]="!canAprobar() || enCurso() !== null"
+      (onClick)="onAccionEstado('aprobar')"
+    />
+  }
+
+  @if (showImprimir()) {
+    <p-button
+      type="button"
+      [label]="a.imprimir"
+      icon="pi pi-print"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [loading]="enCurso() === 'imprimir'"
+      [disabled]="!canImprimir() || enCurso() !== null"
+      (onClick)="onImprimir()"
+    />
+  }
+
+  @if (showEmitir()) {
+    <p-button
+      type="button"
+      [label]="a.emitir"
+      icon="pi pi-send"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [disabled]="!canEmitir()"
+      (onClick)="emitir.emit()"
+    />
+  }
+
+  @if (accionesItems().length > 0) {
+    <p-button
+      type="button"
+      [label]="a.acciones"
+      icon="pi pi-chevron-down"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="toggleAcciones($event)"
+    />
+  }
+
+  <p-button
+    type="button"
+    [label]="a.opciones"
+    icon="pi pi-chevron-down"
+    iconPos="right"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="toggleOpciones($event)"
+  />
+
+  <ng-content select="[actionsEnd]" />
+</p-buttongroup>
+
+@if (accionesItems().length > 0) {
+  <p-menu #accionesMenu [popup]="true" [model]="accionesItems()" appendTo="body" />
+}
+<p-menu #opcionesMenu [popup]="true" [model]="opcionesItems()" appendTo="body" />
+<app-archivos-dialog [(visible)]="archivosVisible" [owner]="archivosOwner()" />
+@if (showContabilidad()) {
+  <app-contabilidad-dialog
+    [(visible)]="contabilidadVisible"
+    [documentoId]="documentoId()"
+    [contabilizado]="contabilizado()"
+    [canContabilizar]="canContabilizar()"
+    (contabilizacionChanged)="documentoChanged.emit()"
+  />
+}
+<p-confirmdialog />

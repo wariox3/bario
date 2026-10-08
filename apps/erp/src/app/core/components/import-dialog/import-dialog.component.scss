@@ -1,3 +1,10 @@
+// El host no es más que el envoltorio del diálogo: el diálogo se pinta `fixed`,
+// así que fuera del flujo no pierde nada y deja de cobrar el `gap` del
+// contenedor que lo declara. Misma razón que `_overlays.scss` en libs/styles.
+:host {
+  display: contents;
+}
+
 // ── Dialog shell — hereda el lenguaje visual de los dialogs del proyecto:
 //    radius 16px, sombra suave + larga, padding propio del header/content/footer.
 //    El mismo patrón vive en contenedores/components/{delete,create,invite}-dialog.
@@ -32,62 +39,6 @@
   .p-tabpanels {
     padding: 1rem 0 0;
     min-height: 96px;
-  }
-}
-
-// ── Dropzone — los estados emergen de modificadores, no de !important.
-.cp-import-dialog__dropzone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2.25rem 1.5rem;
-  border: 2px dashed rgba(20, 48, 73, 0.15);
-  border-radius: 14px;
-  background: rgba(240, 249, 255, 0.4); // sky-50/40
-  text-align: center;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    transform 200ms ease;
-
-  &:hover {
-    background: rgba(240, 249, 255, 0.7); // sky-50/70
-    border-color: #7dd3fc; // sky-300
-  }
-
-  &:focus-visible {
-    outline: 2px solid #38bdf8; // sky-400
-    outline-offset: 2px;
-  }
-
-  &.is-drag-over {
-    background: #e0f2fe; // sky-100
-    border: 2px solid #0ea5e9; // sky-500
-    transform: scale(1.01);
-  }
-
-  &.is-error {
-    background: rgba(254, 242, 242, 0.5); // red-50/50
-    border-color: #fca5a5; // red-300
-  }
-}
-
-.cp-import-dialog__dropzone-icon {
-  display: inline-flex;
-  width: 56px;
-  height: 56px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  background: #f0f9ff; // sky-50
-  color: #0369a1; // sky-700
-  transition: color 150ms ease;
-
-  .cp-import-dialog__dropzone.is-error & {
-    background: #fef2f2; // red-50
-    color: #dc2626; // red-600
   }
 }
 
@@ -126,6 +77,20 @@
   padding: 0.85rem 0.25rem;
 }
 
+// ── Aviso previo — franja informativa, no de error: anuncia lo que va a pasar.
+.cp-import-dialog__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(20, 48, 73, 0.12);
+  border-radius: 10px;
+  background: rgba(20, 48, 73, 0.02);
+  color: var(--brand-text);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
 // ── Errores de importación ────────────────────────────────────────────────
 // Banner de resumen (el `detail` del backend): rojo tenue, una sola línea de
 // contexto antes de la tabla.
@@ -149,14 +114,18 @@
 }
 
 // Tabla scrolleable (hasta 100 filas) con header pegajoso; borders-only.
-.cp-import-dialog__errors {
+// Errores y maestros comparten la caja: son la misma lectura tabular dentro del
+// mismo diálogo, y separarlas solo produciría dos estilos que se desincronizan.
+.cp-import-dialog__errors,
+.cp-import-dialog__masters {
   max-height: 240px;
   overflow-y: auto;
   border: 1px solid rgba(20, 48, 73, 0.1);
   border-radius: 10px;
 }
 
-.cp-import-dialog__errors-table {
+.cp-import-dialog__errors-table,
+.cp-import-dialog__masters-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8rem;
@@ -210,6 +179,40 @@
 .cp-import-dialog__errors-msg {
   color: var(--brand-text);
   line-height: 1.4;
+}
+
+// ── Maestros ──────────────────────────────────────────────────────────────
+// Columna de acción: solo el botón de descarga, angosta y alineada a la derecha.
+.cp-import-dialog__masters-actioncol {
+  width: 3rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+// Descarga directa a una URL pública externa: es un enlace de verdad
+// (`<a target="_blank">`), no un botón que simula uno — así el navegador ofrece
+// "abrir en pestaña nueva" y el usuario ve a dónde va.
+.cp-import-dialog__masters-download {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  color: var(--color-brand-muted);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &:hover {
+    background: rgba(240, 249, 255, 0.9); // sky-50/90
+    color: #0369a1; // sky-700
+  }
+
+  &:focus-visible {
+    outline: 2px solid #38bdf8; // sky-400
+    outline-offset: 2px;
+  }
 }
 
 // ── Botón "Descargar ejemplo" — auxiliar, ghost; vive a la izquierda del footer.

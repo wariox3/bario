@@ -1,17 +1,13 @@
 <lib-breadcrumb [items]="breadcrumb()" />
 
-<section class="list-shell__card">
-  <!-- Cabecera compacta: solo el título; el total de registros lo da el paginador -->
-  <header class="list-shell__head">
-    <h1 class="list-shell__title">{{ title() }}</h1>
-  </header>
+<h1 class="list-shell__title">{{ title() }}</h1>
 
-  <!-- Cuerpo: botonera (proyectada) encima de la tabla embebida en un recuadro -->
-  <div class="list-shell__body">
-    <ng-content select="[toolbar]" />
+<!-- Un solo recuadro: la botonera (proyectada) es su cabecera y la tabla el
+     cuerpo. El total de registros lo da el paginador. -->
+<section class="list-shell__frame">
+  <ng-content select="[toolbar]" />
 
-    <div class="list-shell__table">
-      <ng-content select="[table]" />
-    </div>
+  <div class="list-shell__table">
+    <ng-content select="[table]" />
   </div>
 </section>

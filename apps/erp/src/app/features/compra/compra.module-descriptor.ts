@@ -1,11 +1,57 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
+import { MODELO } from '@erp/core/permissions/modelo.catalog';
 
 export const COMPRA_MODULE: ErpModuleDescriptor = {
   id: 'compra',
+  accessFlag: 'acceso_compra',
   displayNameKey: 'modules.compra.name',
   iconClass: 'pi pi-shopping-cart',
-  defaultChildPath: 'resoluciones',
+  defaultChildPath: 'inicio',
   menu: [
+    { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
+    {
+      kind: 'accordion',
+      id: 'compra-documentos',
+      labelKey: 'layout.nav.sections.document',
+      iconClass: 'pi pi-file',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.facturaCompraRecurrente.name',
+              path: 'factura-compra-recurrente/list',
+              activeMatch: 'factura-compra-recurrente',
+            },
+            {
+              labelKey: 'entities.facturaCompra.name',
+              path: 'factura-compra/list',
+              activeMatch: 'factura-compra',
+            },
+            {
+              labelKey: 'entities.notaCreditoCompra.name',
+              path: 'nota-credito-compra/list',
+              activeMatch: 'nota-credito-compra',
+            },
+            {
+              labelKey: 'entities.notaDebitoCompra.name',
+              path: 'nota-debito-compra/list',
+              activeMatch: 'nota-debito-compra',
+            },
+            {
+              labelKey: 'entities.documentoSoporte.name',
+              path: 'documento-soporte/list',
+              activeMatch: 'documento-soporte',
+            },
+            {
+              labelKey: 'entities.notaAjuste.name',
+              path: 'nota-ajuste/list',
+              activeMatch: 'nota-ajuste',
+            },
+          ],
+        },
+      ],
+    },
     {
       kind: 'accordion',
       id: 'compra-administracion',
@@ -14,7 +60,80 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
       defaultExpanded: true,
       groups: [
         {
-          items: [{ labelKey: 'entities.resolucion.name', path: 'resoluciones' }],
+          items: [
+            { labelKey: 'entities.item.name', path: 'items', modelo: MODELO.general.item },
+            {
+              labelKey: 'entities.contacto.name',
+              path: 'contactos',
+              modelo: MODELO.general.contacto,
+            },
+            {
+              labelKey: 'entities.resolucion.name',
+              path: 'resoluciones',
+              modelo: MODELO.general.resolucion,
+            },
+            {
+              labelKey: 'entities.formaPago.name',
+              path: 'formas-pago',
+              modelo: MODELO.general.formaPago,
+            },
+            { labelKey: 'entities.almacen.name', path: 'almacenes' },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'compra-utilidades',
+      labelKey: 'layout.nav.sections.utility',
+      iconClass: 'pi pi-bolt',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.documentoElectronico.name',
+              path: 'utilidades/documento-electronico',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'compra-informes',
+      labelKey: 'layout.nav.sections.report',
+      iconClass: 'pi pi-chart-bar',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.cuentaPagar.name',
+              path: 'informes/cuenta-pagar',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'compra-recepcion',
+      labelKey: 'layout.nav.sections.reception',
+      iconClass: 'pi pi-inbox',
+      defaultExpanded: true,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.documentoRecibido.name',
+              path: 'recepcion/documentos',
+            },
+            {
+              labelKey: 'entities.correoRecibido.name',
+              path: 'recepcion/correos',
+            },
+          ],
         },
       ],
     },

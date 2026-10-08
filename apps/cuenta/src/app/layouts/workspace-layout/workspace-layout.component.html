@@ -25,7 +25,15 @@
     </nav>
   </aside>
 
-  <main class="flex-1 min-w-0 overflow-y-auto p-7 max-[768px]:p-5">
+  <!--
+    El gutter de arriba va como espaciador `::before` en el flujo, no como
+    padding-top: los navegadores no acuerdan desde dónde ancla un sticky cuyo
+    scrollport tiene padding superior. `--page-gutter` publica ese mismo valor
+    para las piezas que necesitan sangrar hasta el borde (`<lib-page-actions>`).
+  -->
+  <main
+    class="flex flex-col flex-1 min-w-0 min-h-0 overflow-y-auto [--page-gutter:1.75rem] max-[768px]:[--page-gutter:1.25rem] px-(--page-gutter) pb-(--page-gutter) before:content-[''] before:block before:flex-none before:h-(--page-gutter)"
+  >
     <router-outlet />
   </main>
 </div>

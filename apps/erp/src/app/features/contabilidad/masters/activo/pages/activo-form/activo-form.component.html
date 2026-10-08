@@ -1,8 +1,14 @@
 <lib-breadcrumb [items]="breadcrumbItems()" />
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off" class="flex flex-col gap-5">
-  <!-- ── Encabezado de página ──────────────────────────────────────────────── -->
-  <header class="flex items-center gap-2">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- ── Barra de acciones ─────────────────────────────────────────────────── -->
+  <lib-page-actions>
     <p-button
       type="button"
       [label]="t().common.actions.back"
@@ -18,9 +24,9 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="form.invalid || form.pending || isSaving()"
+      [disabled]="isSaving()"
     />
-  </header>
+  </lib-page-actions>
 
   <!-- ── Sección 1: Información general ────────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
@@ -93,6 +99,10 @@
             {{ t().entities.activo.form.fields.marca }}
           </label>
           <input id="marca" pInputText type="text" formControlName="marca" maxlength="100" fluid />
+          <lib-field-error
+            [control]="form.controls.marca"
+            [messages]="{ maxlength: t().entities.activo.form.validation.maxLength }"
+          />
         </div>
 
         <!-- Serie -->
@@ -101,6 +111,10 @@
             {{ t().entities.activo.form.fields.serie }}
           </label>
           <input id="serie" pInputText type="text" formControlName="serie" maxlength="100" fluid />
+          <lib-field-error
+            [control]="form.controls.serie"
+            [messages]="{ maxlength: t().entities.activo.form.validation.maxLength }"
+          />
         </div>
 
         <!-- Modelo -->
@@ -115,6 +129,7 @@
             [maxFractionDigits]="0"
             [fluid]="true"
           />
+          <lib-field-error [control]="form.controls.modelo" />
         </div>
 
         <!-- Grupo de activo -->
@@ -123,7 +138,7 @@
             {{ t().entities.activo.form.fields.activoGrupo }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="activo_grupo"
             formControlName="activo_grupo"
             [endpoint]="activoGrupoEndpoint"
@@ -165,7 +180,7 @@
             {{ t().entities.activo.form.fields.metodoDepreciacion }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="metodo_depreciacion"
             formControlName="metodo_depreciacion"
             [suggestedIndex]="0"
@@ -194,6 +209,7 @@
             [maxFractionDigits]="0"
             [fluid]="true"
           />
+          <lib-field-error [control]="form.controls.duracion" />
         </div>
 
         <!-- Valor de compra -->
@@ -210,6 +226,7 @@
             prefix="$ "
             [fluid]="true"
           />
+          <lib-field-error [control]="form.controls.valor_compra" />
         </div>
 
         <!-- Depreciación inicial -->
@@ -226,6 +243,7 @@
             prefix="$ "
             [fluid]="true"
           />
+          <lib-field-error [control]="form.controls.depreciacion_inicial" />
         </div>
 
         <!-- Fecha de compra -->
@@ -236,7 +254,6 @@
           <p-datepicker
             inputId="fecha_compra"
             formControlName="fecha_compra"
-            dateFormat="yy-mm-dd"
             [showIcon]="true"
             appendTo="body"
             [fluid]="true"
@@ -251,7 +268,6 @@
           <p-datepicker
             inputId="fecha_activacion"
             formControlName="fecha_activacion"
-            dateFormat="yy-mm-dd"
             [showIcon]="true"
             appendTo="body"
             [fluid]="true"
@@ -266,7 +282,6 @@
           <p-datepicker
             inputId="fecha_baja"
             formControlName="fecha_baja"
-            dateFormat="yy-mm-dd"
             [showIcon]="true"
             appendTo="body"
             [fluid]="true"
@@ -340,7 +355,7 @@
             {{ t().entities.activo.form.fields.centroCosto }}
             <span class="ml-px text-red-500">*</span>
           </label>
-          <app-api-select
+          <lib-api-select
             inputId="centro_costo"
             formControlName="centro_costo"
             [endpoint]="centroCostoEndpoint"

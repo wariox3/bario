@@ -1,0 +1,52 @@
+// Toolbar de reporte: la fecha de corte (protagonista) a la izquierda, acciones
+// a la derecha. Vive en el slot [toolbar] de list-shell, que ya aporta el gutter
+// sobre el recuadro de la tabla.
+.cccorte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--brand-navy);
+  }
+
+  // La fecha a la escala de los botones de al lado (32px, como el buscador del
+  // toolbar de los listados), para que la fila se lea pareja.
+  &__field ::ng-deep {
+    .p-datepicker-input {
+      height: 32px;
+      padding-block: 0;
+      font-size: 0.8rem;
+    }
+
+    .p-datepicker-dropdown {
+      width: 32px;
+      height: 32px;
+
+      .p-icon,
+      .pi {
+        width: 0.78rem;
+        height: 0.78rem;
+        font-size: 0.78rem;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+}

@@ -1,5 +1,5 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-import type { ContratoOption } from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import type { ErpSelectOption } from '@reddoc/core';
+import type { ContratoOption } from '@reddoc/ui';
 
 /**
  * Forma cruda del FormGroup de la novedad (lo que devuelve `form.getRawValue()`).
@@ -20,7 +20,6 @@ export interface NovedadFormRawValue {
   fecha_hasta_periodo: Date | null;
   dias_dinero: number | null;
   dias_disfrutados: number | null;
-  dias_disfrutados_reales: number | null;
   // Referencia
   novedad_referencia: ErpSelectOption | null;
 }

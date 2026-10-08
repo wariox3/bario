@@ -1,3 +1,4 @@
+import { normalizarCelular } from '@reddoc/core';
 import type { Contacto, ContactoPayload } from './contacto.model';
 import type { ContactoFormRawValue } from './pages/contacto-form/contacto-form.types';
 import { TIPO_PERSONA } from './contacto.constants';
@@ -8,9 +9,10 @@ import { construirNombreCorto } from './utils/nombre-corto.util';
  *
  * Los selects/autocompletes guardan `ErpSelectOption` ({ id, nombre }), por lo
  * que el id pelado del FK + su `*_nombre` se reagrupan en objetos. Para los
- * `app-api-select` el `nombre` puede ir vacío: el select resuelve la etiqueta
- * contra sus opciones por `id`. Para los `app-api-autocomplete` (ciudad, banco)
- * el `nombre` sí importa porque la etiqueta sale del valor.
+ * `lib-api-select` el `nombre` puede ir vacío: el select resuelve la etiqueta
+ * contra sus opciones por `id`. Para los autocompletes (ciudad, banco) el
+ * `nombre` sí importa porque la etiqueta sale del valor — y la ciudad además
+ * lleva su `departamento_nombre`, del que sale la etiqueta que ve el usuario.
  */
 export function contactoToFormValue(c: Contacto): Partial<ContactoFormRawValue> {
   return {
@@ -27,8 +29,17 @@ export function contactoToFormValue(c: Contacto): Partial<ContactoFormRawValue> 
     apellido1: c.apellido1 ?? '',
     apellido2: c.apellido2 ?? '',
     telefono: c.telefono ?? '',
-    celular: c.celular ?? '',
-    ciudad: { id: c.ciudad, nombre: c.ciudad_nombre },
+    // Los celulares guardados antes de `lib-phone-input` son dígitos pelados:
+    // normalizados a E.164 el campo no nace inválido al abrir la edición.
+    celular: normalizarCelular(c.celular),
+    // El departamento viaja con la ciudad para que el campo muestre lo mismo al
+    // reabrir que al elegir (`Albania — La Guajira`); sin él, un municipio
+    // homónimo se vuelve indistinguible al editar.
+    ciudad: {
+      id: c.ciudad,
+      nombre: c.ciudad_nombre,
+      departamento_nombre: c.departamento_nombre ?? null,
+    },
     direccion: c.direccion ?? '',
     barrio: c.barrio ?? '',
     correo: c.correo ?? '',
@@ -37,7 +48,7 @@ export function contactoToFormValue(c: Contacto): Partial<ContactoFormRawValue> 
     empleado: c.empleado,
     plazo_pago: c.plazo_pago != null ? { id: c.plazo_pago, nombre: '' } : null,
     precio: c.precio != null ? { id: c.precio, nombre: '' } : null,
-    asesor: c.asesor != null ? { id: c.asesor, nombre: '' } : null,
+    asesor: c.asesor != null ? { id: c.asesor, nombre: c.asesor_nombre_corto ?? '' } : null,
     correo_facturacion_electronica: c.correo_facturacion_electronica ?? '',
     banco: c.banco != null ? { id: c.banco, nombre: c.banco_nombre ?? '' } : null,
     numero_cuenta: c.numero_cuenta ?? '',

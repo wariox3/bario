@@ -24,18 +24,23 @@ import {
   REDDOC_PRIMENG_ES,
   authInterceptor,
   errorInterceptor,
+  observabilidadInterceptor,
+  provideObservabilidad,
   provideI18n,
 } from '@reddoc/core';
-import { authEs, authEn } from '@reddoc/ui';
+import { authEs, authEn, phoneInputEs, phoneInputEn } from '@reddoc/ui';
 import { AuthService } from './features/auth/services/auth.service';
 import { ROUTE_PATHS } from './core/constants/route-paths.constants';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideObservabilidad(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([authInterceptor, errorInterceptor, observabilidadInterceptor]),
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -48,7 +53,10 @@ export const appConfig: ApplicationConfig = {
       translation: REDDOC_PRIMENG_ES,
     }),
     MessageService,
-    provideI18n({ es: { auth: authEs }, en: { auth: authEn } }),
+    provideI18n({
+      es: { auth: authEs, phoneInput: phoneInputEs },
+      en: { auth: authEn, phoneInput: phoneInputEn },
+    }),
     { provide: ENVIRONMENT, useValue: environment },
     {
       provide: ROUTE_PATHS_TOKEN,

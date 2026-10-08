@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,6 +26,7 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { CargoService } from '../../cargo.service';
 import type { Cargo } from '../../cargo.model';
@@ -33,6 +37,7 @@ import {
   CARGOS_QUICK_SEARCH_FIELD,
   CARGOS_PRIMARY_ACTION,
   CARGOS_ROW_ACTIONS,
+  CARGOS_TRAILING_ACTIONS,
 } from '../../cargo.constants';
 
 @Component({
@@ -51,6 +56,7 @@ import {
 })
 export class CargosListComponent {
   private readonly service = inject(CargoService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
@@ -74,6 +80,8 @@ export class CargosListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -89,8 +97,11 @@ export class CargosListComponent {
 
   protected readonly columns = CARGOS_COLUMNS;
   protected readonly filterFields = CARGOS_FILTER_FIELDS;
-  protected readonly rowActions = CARGOS_ROW_ACTIONS;
-  protected readonly primaryAction = CARGOS_PRIMARY_ACTION;
+  protected readonly acciones = masterActions(MODELO.humano.cargo, {
+    row: CARGOS_ROW_ACTIONS,
+    primary: CARGOS_PRIMARY_ACTION,
+    trailing: CARGOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -145,12 +156,15 @@ export class CargosListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as Cargo).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +175,31 @@ export class CargosListComponent {
     const ids = this.selectedRows().map((c) => c.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/humano/cargo/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'cargos.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {

@@ -1,0 +1,134 @@
+@let dict = t().documentActions.contabilidad;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isBusy()"
+  [dismissableMask]="!isBusy()"
+  [style]="{ width: '1340px', maxWidth: '96vw' }"
+  styleClass="cp-contabilidad-dialog"
+>
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-book text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ dict.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ dict.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ── Body ─────────────────────────────────────────────────────────────── -->
+  @if (visible()) {
+    <div class="flex flex-col gap-4">
+      @if (descuadrado()) {
+        <p
+          class="m-0 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-[0.8rem] font-semibold text-amber-800"
+          role="alert"
+        >
+          <i class="pi pi-exclamation-triangle text-[0.85rem]"></i>
+          <span>{{ dict.descuadre }}</span>
+          <span class="ml-auto tabular-nums">{{ formatMoney(descuadre()) }}</span>
+        </p>
+      }
+
+      <div class="cp-contabilidad-dialog__table">
+        <lib-data-table
+          [columns]="columns"
+          [items]="items()"
+          [totalCount]="totalCount()"
+          [loading]="isLoading()"
+          [pageSize]="pageSize()"
+          [currentPage]="currentPage()"
+          scrollHeight="380px"
+          emptyTitleKey="documentActions.contabilidad.empty.title"
+          emptySubKey="documentActions.contabilidad.empty.desc"
+          (pageChange)="onPageChange($event)"
+        />
+      </div>
+
+      @if (showTotales()) {
+        <div class="flex justify-end">
+          <div
+            class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
+          >
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+                <span class="text-brand-muted">{{ dict.totales.debitos }}</span>
+                <span class="tabular-nums text-brand-text">
+                  {{ formatMoney(totales().debitos) }}
+                </span>
+              </div>
+              <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+                <span class="text-brand-muted">{{ dict.totales.creditos }}</span>
+                <span class="tabular-nums text-brand-text">
+                  {{ formatMoney(totales().creditos) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center gap-3 border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.exportExcel"
+        icon="pi pi-file-excel"
+        [outlined]="true"
+        severity="secondary"
+        [loading]="isExporting()"
+        [disabled]="isExporting() || documentoId() === null"
+        (onClick)="exportarExcel()"
+      />
+      <div class="ml-auto flex items-center gap-3">
+        <p-button
+          type="button"
+          [label]="t().common.actions.close"
+          [outlined]="true"
+          severity="secondary"
+          [disabled]="isBusy()"
+          (onClick)="onClose()"
+        />
+        @if (contabilizado()) {
+          <p-button
+            type="button"
+            [label]="dict.descontabilizar"
+            icon="pi pi-undo"
+            severity="secondary"
+            [loading]="isProcessing()"
+            [disabled]="isBusy() || !canContabilizar() || documentoId() === null"
+            (onClick)="descontabilizar()"
+          />
+        } @else {
+          <p-button
+            type="button"
+            [label]="dict.contabilizar"
+            icon="pi pi-check"
+            [loading]="isProcessing()"
+            [disabled]="isBusy() || !canContabilizar() || documentoId() === null"
+            (onClick)="contabilizar()"
+          />
+        }
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

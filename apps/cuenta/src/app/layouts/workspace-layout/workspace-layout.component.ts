@@ -21,8 +21,8 @@ interface NavItem {
     DrawerModule,
     UserMenuComponent,
   ],
-  host: { class: 'flex flex-col min-h-screen bg-brand-bg' },
   templateUrl: './workspace-layout.component.html',
+  styleUrl: './workspace-layout.component.scss',
 })
 export class WorkspaceLayoutComponent {
   readonly navItems: NavItem[] = [

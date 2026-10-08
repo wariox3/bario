@@ -1,0 +1,55 @@
+@let g = t().seguridad.usuarios.detalle.grupos;
+
+<div class="flex flex-col gap-4">
+  <p class="m-0 text-[0.8rem] text-brand-muted">{{ countLabel() }}</p>
+
+  @if (isLoadingCatalogo()) {
+    <div class="flex items-center justify-center py-10 text-brand-muted">
+      <i class="pi pi-spin pi-spinner text-xl" aria-hidden="true"></i>
+    </div>
+  } @else if (items().length > 0) {
+    <!--
+      El catálogo completo, siempre: cada vertical es una ficha toggleable.
+      Encendida = navy (pertenece); apagada = tenue. Tocar cambia el estado.
+    -->
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      @for (grupo of items(); track grupo.id) {
+        @let on = esMiembro(grupo.id);
+        <button
+          type="button"
+          class="group flex cursor-pointer items-center gap-3 rounded-lg border px-3.5 py-3 text-left transition-colors disabled:cursor-default disabled:opacity-60"
+          [class]="
+            on
+              ? 'border-[rgba(20,48,73,0.22)] bg-[rgba(20,48,73,0.05)]'
+              : 'border-[rgba(19,38,60,0.08)] hover:bg-[rgba(19,38,60,0.03)]'
+          "
+          [attr.aria-pressed]="on"
+          [disabled]="estaPendiente(grupo.id)"
+          (click)="toggle(grupo.id)"
+        >
+          <span
+            class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors"
+            [class]="
+              on
+                ? 'bg-brand-navy text-white'
+                : 'border border-[rgba(19,38,60,0.25)] text-transparent group-hover:text-brand-muted'
+            "
+          >
+            <i class="pi text-[0.6rem]" [class]="on ? 'pi-check' : 'pi-plus'" aria-hidden="true">
+            </i>
+          </span>
+          <span
+            class="min-w-0 truncate text-[0.85rem] transition-colors"
+            [class]="on ? 'font-semibold text-brand-navy' : 'font-medium text-brand-muted'"
+          >
+            {{ grupo.nombre }}
+          </span>
+        </button>
+      }
+    </div>
+  } @else {
+    <p class="m-0 text-[0.8rem] text-brand-muted">{{ g.emptyCatalog }}</p>
+  }
+
+  <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">{{ g.hint }}</p>
+</div>

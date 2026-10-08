@@ -1,0 +1,62 @@
+<!--
+  Utilidad "Contabilizar".
+  Lista con el chrome estándar de <lib-list-shell>. En el slot [toolbar] van los
+  filtros a la izquierda y las dos acciones a la derecha: Descontabilizar (abre
+  su modal, opera por rango) y Contabilizar (sobre la selección).
+-->
+@let d = t().entities.contabilizar;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="d.name">
+  <div toolbar class="contabilizar-toolbar">
+    <lib-data-toolbar
+      class="contabilizar-toolbar__filters"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+    />
+    <p-button
+      size="small"
+      severity="danger"
+      [outlined]="true"
+      icon="pi pi-undo"
+      [label]="d.actions.descontabilizar"
+      [disabled]="isProcessing()"
+      (onClick)="openDescontabilizar()"
+    />
+    <p-button
+      size="small"
+      icon="pi pi-check-square"
+      [label]="d.actions.contabilizar"
+      [loading]="isProcessing()"
+      [disabled]="!canContabilizar()"
+      (onClick)="onContabilizar()"
+    />
+  </div>
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-descontabilizar-modal [(visible)]="descontabilizarVisible" (done)="onDescontabilizado()" />

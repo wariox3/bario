@@ -6,8 +6,6 @@ import type { PrecioFormRawValue } from './pages/precio-form/precio-form.types';
 export function precioToFormValue(p: Precio): Partial<PrecioFormRawValue> {
   return {
     nombre: p.nombre,
-    venta: p.venta,
-    compra: p.compra,
     fecha_vence: fromIsoDate(p.fecha_vence),
   };
 }
@@ -15,12 +13,17 @@ export function precioToFormValue(p: Precio): Partial<PrecioFormRawValue> {
 /**
  * Construye el write-model (`PrecioPayload`) desde el valor crudo del form.
  * La fecha Date → 'yyyy-mm-dd' (o `null` si vacía).
+ *
+ * `venta` y `compra` viajan fijos y no se preguntan en pantalla: una lista de
+ * precios creada desde el ERP es de venta. Es lo mismo que hace el ERP anterior
+ * —los declara en su `FormGroup` con estos valores y nunca los pinta— y lo que
+ * mantiene el payload completo para el backend, que sí espera los dos campos.
  */
 export function formValueToPayload(v: PrecioFormRawValue): PrecioPayload {
   return {
     nombre: v.nombre ?? '',
-    venta: v.venta ?? false,
-    compra: v.compra ?? false,
+    venta: true,
+    compra: false,
     fecha_vence: toIsoDate(v.fecha_vence),
   };
 }

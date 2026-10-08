@@ -1,0 +1,59 @@
+@let d = t().entities.nominaElectronica.generar;
+
+<div class="flex flex-col gap-5">
+  <!-- Header: badge + título + subtítulo (estándar de modales del ERP) -->
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-bolt text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ d.title }}
+      </h2>
+      <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ d.subtitle }}</p>
+    </div>
+  </div>
+
+  <!-- Body + footer -->
+  <form class="flex flex-col gap-[1.1rem]" (ngSubmit)="confirm()">
+    <div class="flex flex-col">
+      <label
+        for="generar-nomina-electronica-periodo"
+        class="mb-1.5 flex items-center gap-2 text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy"
+      >
+        {{ d.periodo }}
+      </label>
+      <p-datepicker
+        inputId="generar-nomina-electronica-periodo"
+        [ngModel]="periodo()"
+        (ngModelChange)="periodo.set($event)"
+        name="periodo"
+        view="month"
+        dateFormat="mm/yy"
+        [showIcon]="true"
+        appendTo="body"
+        [fluid]="true"
+      />
+      @if (!periodo()) {
+        <small class="mt-1 text-[0.72rem] text-red-600">{{ d.validation.required }}</small>
+      }
+    </div>
+
+    <div
+      class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5"
+    >
+      <p-button
+        type="button"
+        [label]="t().common.actions.cancel"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="cancel()"
+      />
+      <p-button type="submit" [label]="d.submit" [disabled]="!periodo()" />
+    </div>
+  </form>
+</div>

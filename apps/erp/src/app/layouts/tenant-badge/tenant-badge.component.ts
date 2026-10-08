@@ -27,7 +27,7 @@ export class TenantBadgeComponent {
 
   /** Nombre legible del contenedor; cae al slug como respaldo defensivo. */
   protected readonly nombre = computed(
-    () => this.tenant.currentContenedor()?.nombre ?? this.tenant.currentSlug() ?? '',
+    () => this.tenant.currentContenedor()?.cliente_nombre ?? this.tenant.currentSlug() ?? '',
   );
 
   /** Inicial para el monograma; tolera nombres truncados manteniendo identidad. */

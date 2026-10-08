@@ -39,8 +39,8 @@ export interface DocumentoListRowBase {
   readonly documento_tipo: number;
   readonly documento_tipo_nombre: string | null;
   readonly contacto: number | null;
-  readonly contacto_nombre: string | null;
-  readonly tercero_numero_identificacion: string | null;
+  readonly contacto_nombre_corto: string | null;
+  readonly contacto_numero_identificacion: string | null;
   readonly resolucion: number | null;
   readonly plazo_pago: number | null;
   readonly asesor: number | null;
@@ -60,12 +60,48 @@ export interface DocumentoListRowBase {
   readonly estado_contabilizado: boolean;
 }
 
+/**
+ * Banderas de **estado** (ciclo de vida) comunes a cualquier documento. El
+ * backend las devuelve tanto en la fila del listado como en el read del detalle.
+ * Solo `estado_aprobado` es transversal a todo documento; el resto es opcional
+ * porque no toda familia las usa (p. ej. las electrónicas solo aplican a los que
+ * se emiten a la DIAN). La ficha de detalle las pinta como badges.
+ */
+export interface DocumentoEstados {
+  readonly estado_aprobado: boolean;
+  readonly estado_anulado?: boolean;
+  readonly estado_contabilizado?: boolean;
+  readonly estado_electronico?: boolean;
+  readonly estado_electronico_enviado?: boolean;
+  readonly estado_electronico_notificado?: boolean;
+  readonly estado_generado?: boolean;
+}
+
 /** Cabecera de un documento leída desde la API en edición (`GET …/documento/:id/`). */
-export interface DocumentoReadBase {
+export interface DocumentoReadBase extends DocumentoEstados {
   readonly id: number;
   readonly contacto: number | null;
-  /** Nombre del contacto para etiquetar el autocomplete al cargar en edición. */
-  readonly contacto_nombre?: string | null;
+  /**
+   * Nombre corto del contacto, para etiquetar el autocomplete al cargar en
+   * edición. Es `nombre_corto` en el master; el documento lo serializa con el
+   * prefijo del FK, igual que `contacto_numero_identificacion`.
+   */
+  readonly contacto_nombre_corto?: string | null;
+  /**
+   * Identificación del contacto. Completa la etiqueta del autocomplete en
+   * edición (`identificación - nombre`, ver `documentoContactoToOption`).
+   */
+  readonly contacto_numero_identificacion?: string | null;
+  /**
+   * Lista de precios pactada con el contacto. Es el mismo dato que
+   * `contacto/seleccionar/` expone como `precio_id`; el documento lo serializa
+   * con el prefijo del FK. Al editar, la tabla de líneas lo necesita para
+   * cotizar un ítem nuevo contra la lista del cliente sin re-elegir el contacto
+   * (ver `documentoContactoToOption` y `precioListaDeContacto`).
+   */
+  readonly contacto_precio_id?: number | null;
+  /** Nombre de esa lista de precios (`"mundialista"`). Informativo. */
+  readonly contacto_precio_nombre?: string | null;
   /** Fecha en formato `yyyy-MM-dd`. */
   readonly fecha: string | null;
 }
@@ -81,6 +117,12 @@ export interface DocumentoPayloadBase {
 export interface DocumentoDetalleReadBase {
   /** Id de la línea (para distinguir existente vs nueva al editar). */
   readonly id?: number | null;
+  /**
+   * Discriminador de familia de línea que comparte la tabla `documento-detalle`:
+   * `'I'` (ítem de inventario), `'C'` (cuenta contable), etc. Permite separar las
+   * líneas al cargar un documento en edición. Ausente en backends que no lo envíen.
+   */
+  readonly tipo_registro?: string | null;
   readonly item: number | null;
   readonly item_nombre?: string | null;
   readonly cantidad: string | number | null;
@@ -101,11 +143,27 @@ export interface DocumentoDetallePayloadBase {
 export interface DocumentoDetalleImpuestoRead {
   /** Id del impuesto (FK), p.ej. 1 = IVA 19%. Es lo que espera el multiselector. */
   readonly impuesto: number;
+  /** Nombre corto (`"IVA"`). Para mostrar se prefiere `impuesto_nombre_extendido`. */
   readonly impuesto_nombre?: string | null;
+  /**
+   * Nombre para mostrar (`"IVA 19% ventas"`). **El backend aún no lo serializa
+   * en la línea del documento** (sí en los impuestos del ítem y en el catálogo
+   * `impuesto/seleccionar/`): mientras no llegue, los mappers caen a
+   * `impuesto_nombre` y la tabla de edición reetiqueta contra el catálogo.
+   */
+  readonly impuesto_nombre_extendido?: string | null;
   /** Porcentaje del impuesto, e.g. `"19.000000"`. */
   readonly porcentaje?: string | null;
   /** Porcentaje de la base sobre la que aplica, e.g. `"100.000000"` o `"10.000000"` para AIU. */
   readonly porcentaje_base?: string | null;
   /** Monto ya calculado por el backend, e.g. `"796537.456000"`. */
   readonly total?: string | null;
+  /**
+   * Operación sobre el total: `1` suma, `-1` resta (retención). `total` llega
+   * sin signo, así que es este campo el que decide si una retención resta: los
+   * mappers le aplican el signo al leer la línea. Opcional por si un serializer
+   * no lo mandara — sin él la magnitud queda como vino y el signo lo corrige la
+   * tabla de edición contra el catálogo de impuestos.
+   */
+  readonly impuesto_operacion?: number | null;
 }

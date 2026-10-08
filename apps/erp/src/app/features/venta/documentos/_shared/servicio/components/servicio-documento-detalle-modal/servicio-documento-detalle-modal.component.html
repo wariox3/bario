@@ -52,7 +52,7 @@
         <label for="m-puesto" class="detalle-modal__label">
           {{ d.fields.puesto }}<span class="ml-px text-red-500">*</span>
         </label>
-        <app-api-select
+        <lib-api-select
           inputId="m-puesto"
           formControlName="puesto"
           [endpoint]="puestoEndpoint"
@@ -82,7 +82,6 @@
                 <p-datepicker
                   inputId="m-fdesde"
                   formControlName="fecha_desde"
-                  dateFormat="yy-mm-dd"
                   [showIcon]="true"
                   appendTo="body"
                   [fluid]="true"
@@ -95,7 +94,6 @@
                 <i class="pi pi-arrow-right text-[0.7rem] text-brand-muted"></i>
                 <p-datepicker
                   formControlName="fecha_hasta"
-                  dateFormat="yy-mm-dd"
                   [showIcon]="true"
                   appendTo="body"
                   [fluid]="true"
@@ -146,7 +144,7 @@
               <label for="m-modalidad" class="detalle-modal__label">
                 {{ d.fields.modalidad }}<span class="ml-px text-red-500">*</span>
               </label>
-              <app-api-select
+              <lib-api-select
                 inputId="m-modalidad"
                 formControlName="modalidad"
                 [endpoint]="modalidadEndpoint"
@@ -184,7 +182,8 @@
                   <button
                     type="button"
                     (click)="toggleDia($index)"
-                    class="h-8 w-10 rounded-md text-[0.72rem] font-semibold transition-colors"
+                    [disabled]="coberturaBloqueada()"
+                    class="h-8 w-10 rounded-md text-[0.72rem] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                     [class]="
                       formValues().dias_semana.includes($index)
                         ? 'bg-[#143049] text-white'
@@ -197,7 +196,8 @@
                 <button
                   type="button"
                   (click)="toggleFestivo()"
-                  class="h-8 rounded-md px-3 text-[0.72rem] font-semibold transition-colors"
+                  [disabled]="coberturaBloqueada()"
+                  class="h-8 rounded-md px-3 text-[0.72rem] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   [class]="
                     formValues().festivo
                       ? 'bg-[#143049] text-white'
@@ -212,7 +212,17 @@
 
           <!-- Columna derecha: tarifador supervigilancia (slim, vertical) -->
           <div class="w-full shrink-0 lg:w-[19rem]">
-            @if (calcResult(); as r) {
+            @if (coberturaBloqueada()) {
+              <div
+                class="flex h-full min-h-[8rem] flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[rgba(20,48,73,0.12)] bg-white/40 px-4 py-5 text-center leading-snug"
+              >
+                <i class="pi pi-lock text-[1.1rem] text-brand-muted"></i>
+                <span class="text-[0.78rem] font-semibold text-brand-text">
+                  {{ d.lockedCobertura.title }}
+                </span>
+                <span class="text-[0.74rem] text-brand-muted">{{ d.lockedCobertura.hint }}</span>
+              </div>
+            } @else if (calcResult(); as r) {
               <div
                 class="flex flex-col gap-2.5 rounded-lg border border-[rgba(20,48,73,0.1)] bg-white p-3.5 transition-opacity"
                 [class.opacity-50]="calcLoading()"
@@ -425,7 +435,7 @@
             <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
               <span class="text-brand-muted">{{ d.fields.precio }}</span>
               <span class="tabular-nums text-brand-text">
-                {{ formValues().precio | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+                {{ formValues().precio | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
               </span>
             </div>
 
@@ -435,7 +445,7 @@
             >
               <span class="text-brand-muted">{{ d.summary.subtotal }}</span>
               <span class="font-medium tabular-nums text-brand-text">
-                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
               </span>
             </div>
 
@@ -451,7 +461,7 @@
               <span
                 class="text-[1.35rem] font-bold leading-none tracking-[-0.02em] tabular-nums text-[#143049]"
               >
-                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+                {{ subtotal() | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
               </span>
             </div>
           </div>

@@ -5,13 +5,21 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DividerModule } from 'primeng/divider';
 import { AuthService } from '../../../auth/services/auth.service';
 import { PerfilService } from '../../services/perfil.service';
-import { ToastService, FormErrorService } from '@reddoc/core';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { ToastService, FormErrorService, normalizarCelular } from '@reddoc/core';
+import { FieldErrorComponent, FocusInvalidDirective, PhoneInputComponent } from '@reddoc/ui';
 
 @Component({
   selector: 'app-perfil-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonModule, InputTextModule, DividerModule, FieldErrorComponent],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    InputTextModule,
+    DividerModule,
+    FieldErrorComponent,
+    FocusInvalidDirective,
+    PhoneInputComponent,
+  ],
   templateUrl: './perfil-form.component.html',
 })
 export class PerfilFormComponent implements OnInit {
@@ -28,10 +36,10 @@ export class PerfilFormComponent implements OnInit {
 
   readonly form = this.fb.group({
     nombre_corto: ['', Validators.maxLength(255)],
-    celular: [
-      '',
-      [Validators.required, Validators.maxLength(50), Validators.pattern(/^\+?[0-9\s\-()]{7,50}$/)],
-    ],
+    // El celular se guarda en E.164 (`+573153334455`): el indicativo va en el
+    // mismo campo y lo compone `lib-phone-input`, que además valida el formato
+    // (`celularE164` / `celularLongitud`). Acá solo queda la obligatoriedad.
+    celular: ['', Validators.required],
     numero_identificacion: [
       '',
       [Validators.required, Validators.maxLength(20), Validators.pattern(/^[0-9]{5,20}$/)],
@@ -44,7 +52,10 @@ export class PerfilFormComponent implements OnInit {
     if (user) {
       this.form.patchValue({
         nombre_corto: user.nombre_corto ?? '',
-        celular: user.celular ?? '',
+        // Los celulares guardados antes de `lib-phone-input` vienen sin `+` o
+        // con separadores: normalizados, el campo no nace inválido. Queda
+        // pristine, así que no se escribe nada hasta que la persona guarde.
+        celular: normalizarCelular(user.celular),
         numero_identificacion: user.numero_identificacion ?? '',
         email: user.email,
       });

@@ -1,0 +1,23 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+// Etiqueta de cada dato de la cabecera (término de la definition list).
+.servicio-documento-detail__label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--brand-muted);
+}
+
+// Valor de cada dato.
+.servicio-documento-detail__value {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--brand-text);
+  word-break: break-word;
+}

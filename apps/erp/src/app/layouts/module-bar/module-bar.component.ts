@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18nService, TenantService } from '@reddoc/core';
 import { ActiveModuleStore, ERP_MODULES, type ErpModuleDescriptor } from '@erp/core/erp-modules';
-import { PermissionsService } from '@erp/core/permissions';
+import { PermissionsService, hasVisibleMenu, type ModeloId } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 
 interface VisibleModule {
@@ -43,9 +43,13 @@ export class ModuleBarComponent {
     const slug = this.tenant.currentSlug();
     if (!slug) return [];
     const activeId = this.activeModule.activeId();
-    return ERP_MODULES.filter((m) => this.permissions.canAccessModule(m.id)).map((m) =>
-      this.toVisible(m, slug, activeId),
-    );
+    const can = (modelo?: ModeloId) => this.permissions.canShowInMenu(modelo);
+    // Dos filtros distintos: el plan del tenant dice si el módulo existe, los
+    // permisos del usuario dicen si le queda algo adentro. Un módulo del plan
+    // sin ninguna entrada alcanzable abre a un sidebar vacío — no se muestra.
+    return ERP_MODULES.filter(
+      (m) => this.permissions.canAccessModule(m.id) && hasVisibleMenu(m.menu, can),
+    ).map((m) => this.toVisible(m, slug, activeId));
   });
 
   private toVisible(

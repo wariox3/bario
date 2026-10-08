@@ -1,24 +1,29 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, map } from 'rxjs';
-import { BaseHttpService, IdentificacionService, PaginatedResponse } from '@reddoc/core';
+import { BaseHttpService, Ciudad, IdentificacionService, PaginatedResponse } from '@reddoc/core';
 import {
   BillingProfile,
   BillingProfileDraft,
   BillingProfilePayload,
 } from '../models/billing-profile.model';
 
-/** Forma cruda del contacto tal como llega del backend. */
+/**
+ * Forma cruda del contacto tal como llega de `/contenedor/contacto/lista-usuario/`
+ * (`CtnContactoListaUsuario`). `departamento_nombre` solo lo trae este listado:
+ * el detalle por id (`CtnContacto`) se queda en `ciudad_nombre`.
+ */
 interface ContactoApi {
   readonly id: number;
   readonly numero_identificacion: string;
   readonly digito_verificacion: string | null;
   readonly nombre_corto: string;
   readonly direccion: string;
-  readonly telefono: string;
+  readonly celular: string;
   readonly correo: string;
   readonly identificacion: number;
   readonly ciudad: number;
   readonly ciudad_nombre: string;
+  readonly departamento_nombre: string | null;
   readonly usuario: number;
 }
 
@@ -39,10 +44,11 @@ export class BillingProfilesService extends BaseHttpService {
           numero: c.numero_identificacion,
           nombre: c.nombre_corto,
           email: c.correo,
-          telefono: c.telefono,
+          celular: c.celular,
           direccion: c.direccion,
           ciudad: c.ciudad_nombre,
           ciudad_id: c.ciudad,
+          departamento: c.departamento_nombre,
         }));
       }),
     );
@@ -68,7 +74,7 @@ export class BillingProfilesService extends BaseHttpService {
 
   private prepare(draft: BillingProfileDraft): {
     tipo: { id: number; nombre: string };
-    ciudad: { id: number; nombre: string };
+    ciudad: Ciudad;
     payload: BillingProfilePayload;
   } {
     const tipo = draft.identificacion;
@@ -84,7 +90,7 @@ export class BillingProfilesService extends BaseHttpService {
         numero_identificacion: draft.numero,
         nombre_corto: draft.nombre,
         correo: draft.email,
-        telefono: draft.telefono,
+        celular: draft.celular,
         direccion: draft.direccion,
         ciudad: ciudad.id,
       },
@@ -95,7 +101,7 @@ export class BillingProfilesService extends BaseHttpService {
     id: number,
     draft: BillingProfileDraft,
     tipo: { id: number; nombre: string },
-    ciudad: { id: number; nombre: string },
+    ciudad: Ciudad,
   ): BillingProfile {
     return {
       id,
@@ -103,10 +109,13 @@ export class BillingProfilesService extends BaseHttpService {
       numero: draft.numero,
       nombre: draft.nombre,
       email: draft.email,
-      telefono: draft.telefono,
+      celular: draft.celular,
       direccion: draft.direccion,
+      // El departamento viene del `Ciudad` elegido en el autocomplete, así que la
+      // tarjeta se lee igual recién guardada que al recargar desde el listado.
       ciudad: ciudad.nombre,
       ciudad_id: ciudad.id,
+      departamento: ciudad.departamento_nombre ?? null,
     };
   }
 }

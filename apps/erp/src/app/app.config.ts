@@ -20,6 +20,7 @@ import { environment } from '../environments/environment';
 import {
   APP_BRANDING,
   AUTH_DEFAULT_SKIP_URLS,
+  CURRENT_APP,
   ENVIRONMENT,
   ROUTE_PATHS_TOKEN,
   AUTH_SERVICE,
@@ -30,7 +31,11 @@ import {
   errorInterceptor,
   tenantInterceptor,
   provideI18n,
+  provideObservabilidad,
+  observabilidadInterceptor,
+  TENANT_ROUTES,
 } from '@reddoc/core';
+import type { ReddocAppId } from '@reddoc/core';
 import { AuthService } from './features/auth/services/auth.service';
 import { ROUTE_PATHS } from './core/constants/route-paths.constants';
 import {
@@ -50,9 +55,17 @@ export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'es-CO' },
     provideBrowserGlobalErrorListeners(),
+    provideObservabilidad(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([authInterceptor, tenantInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,
+        tenantInterceptor,
+        errorInterceptor,
+        observabilidadInterceptor,
+      ]),
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -90,7 +103,16 @@ export const appConfig: ApplicationConfig = {
       provide: APP_BRANDING,
       useValue: { appName: 'ERP', tagline: 'Gestiona tu empresa desde un solo lugar.' },
     },
+    { provide: CURRENT_APP, useValue: 'erp' satisfies ReddocAppId },
     { provide: AUTH_SERVICE, useExisting: AuthService },
+    {
+      provide: TENANT_ROUTES,
+      useValue: {
+        contenedoresRoot: ROUTE_PATHS.contenedores.root,
+        login: ROUTE_PATHS.auth.login,
+        tenantHome: (slug: string) => ROUTE_PATHS.tenant.home(slug),
+      },
+    },
     { provide: MODULE_REGISTRY, useValue: ERP_MODULE_REGISTRY },
     { provide: ENTITY_DATA_GATEWAY, useExisting: HttpEntityDataGateway },
     {

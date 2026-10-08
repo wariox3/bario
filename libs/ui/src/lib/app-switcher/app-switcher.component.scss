@@ -1,0 +1,139 @@
+.app-switcher {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+// ─── Trigger (waffle) ─────────────────────────────────────────────────────────
+// Mismo lenguaje que la hamburguesa del header: 32×32, ícono muted, hover tenue.
+
+.app-switcher__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: var(--brand-muted);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+
+  i {
+    font-size: 1rem;
+  }
+
+  &:hover,
+  &--active {
+    background: rgba(19 38 60 / 0.06);
+    color: var(--brand-text);
+  }
+}
+
+// ─── Panel flotante ───────────────────────────────────────────────────────────
+
+.app-switcher__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60; // por encima del header (z-50)
+  width: 260px;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid rgba(19 38 60 / 0.08);
+  border-radius: 10px;
+  // Whisper: apenas despega el panel del contenido, sin dramatismo.
+  box-shadow: 0 10px 30px rgba(19 38 60 / 0.1);
+  animation: app-switcher-in 0.12s ease;
+}
+
+@keyframes app-switcher-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-switcher__heading {
+  margin: 0 0 0.5rem;
+  padding: 0 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brand-muted);
+  opacity: 0.7;
+}
+
+// ─── Grilla de apps ───────────────────────────────────────────────────────────
+
+.app-switcher__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+}
+
+.app-switcher__app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 0.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.12s ease;
+
+  &:not(&--soon):hover {
+    background: rgba(19 38 60 / 0.04);
+  }
+
+  &--soon {
+    cursor: default;
+  }
+}
+
+// Monograma navy con glifo blanco — el mismo idioma de identidad del tenant-badge.
+.app-switcher__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--brand-navy);
+  color: #fff;
+
+  i {
+    font-size: 1.15rem;
+  }
+
+  &--soon {
+    background: transparent;
+    border: 1px dashed rgba(19 38 60 / 0.2);
+    color: var(--brand-muted);
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+.app-switcher__name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--brand-text);
+  line-height: 1.1;
+}
+
+.app-switcher__app--soon .app-switcher__name {
+  color: var(--brand-muted);
+  font-weight: 400;
+}

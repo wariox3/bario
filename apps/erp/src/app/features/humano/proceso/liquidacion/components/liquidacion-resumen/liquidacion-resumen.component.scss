@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+
+// Dato ausente: presente en el resumen pero sin competir al escanear la columna.
+.liquidacion-resumen__empty {
+  font-weight: 400;
+  color: var(--brand-muted);
+  opacity: 0.55;
+}

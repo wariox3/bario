@@ -1,4 +1,14 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  LOCALE_ID,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { formatNumber } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,6 +18,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import {
+  CIUDAD_FUENTE,
   FormErrorService,
   I18nService,
   TenantService,
@@ -15,15 +26,31 @@ import {
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { ErpApiSelectComponent } from '@erp/core/components/api-select/erp-api-select.component';
-import { ErpApiAutocompleteComponent } from '@erp/core/components/api-autocomplete/erp-api-autocomplete.component';
+import {
+  CiudadAutocompleteComponent,
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
+import { ErpApiSelectComponent } from '@reddoc/ui';
 import { EmpleadoAutocompleteComponent } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
 import type { EmpleadoOption } from '@erp/core/components/empleado-autocomplete/empleado-autocomplete.component';
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
+import type { ErpSelectOption } from '@reddoc/core';
+import { SELECT_ENDPOINTS } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionService } from '@erp/core/services/configuracion.service';
 import { ContratoService } from '../../contrato.service';
-import { CONTRATO_LIST_PATH, CONTRATO_TIPO_INDEFINIDO_ID } from '../../contrato.constants';
+import {
+  CONTRATO_LIST_PATH,
+  CONTRATO_TIPO_APRENDIZ_SENA_ID,
+  CONTRATO_TIPO_INDEFINIDO_ID,
+  TIPO_COTIZANTE_DEPENDIENTE,
+  esTipoCotizanteAprendiz,
+} from '../../contrato.constants';
+import { cotizanteCoherenteValidator } from '../../utils/cotizante-coherente.validator';
+import { fechaHastaPosteriorValidator } from '../../utils/fecha-hasta-posterior.validator';
+import { montoPositivo } from '../../../../shared/monto-positivo.validator';
 import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
 
 /**
@@ -32,20 +59,27 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
  * Master del módulo Humano (camino B). La misma página cubre crear y editar:
  * sin `:id` → alta; con `:id` → edición (el id llega por `withComponentInputBinding`).
  *
- * Todas las FK están cableadas a sus endpoints `seleccionar/` vía `<app-api-select>`
+ * Todas las FK están cableadas a sus endpoints `seleccionar/` vía `<lib-api-select>`
  * (`contacto` usa `<app-empleado-autocomplete>`, que pinta la identificación al lado;
- * `ciudad_contrato` / `ciudad_labora` usan `<app-api-autocomplete>` con búsqueda contra
- * `/general/ciudad/seleccionar/`). Las FK de humano apuntan a `/humano/<slug>/seleccionar/`
+ * `ciudad_contrato` / `ciudad_labora` usan `<lib-ciudad-autocomplete>`, que muestra el
+ * departamento para desambiguar municipios homónimos). Las FK de humano apuntan a `/humano/<slug>/seleccionar/`
  * y `centro_costo` a `/contabilidad/centro-costo/seleccionar/`. Las cuatro entidades de
  * seguridad social (`entidad_salud`, `entidad_pension`, `entidad_cesantias`, `entidad_caja`)
  * comparten el endpoint `/humano/entidad/seleccionar/` discriminado por el query param
  * booleano correspondiente (`salud` / `pension` / `cesantias` / `caja`).
  *
  * Regla de negocio del tipo de contrato: si es indefinido (id
- * `CONTRATO_TIPO_INDEFINIDO_ID`) se oculta `fecha_hasta` en la UI y se le quita
- * el requerido, pero se le fija la fecha de hoy porque el backend no acepta
- * nulo. Solo en alta, al iniciar, se sugiere la fecha de hoy en
- * `fecha_desde` / `fecha_hasta`.
+ * `CONTRATO_TIPO_INDEFINIDO_ID`) se oculta `fecha_hasta` en la UI y se le quitan
+ * sus validadores, pero el backend la exige no nula: se la mantiene **igual a
+ * `fecha_desde`**, como el ERP anterior, para que nunca quede antes que ella.
+ * En los demás tipos `fecha_hasta` no puede ser anterior a `fecha_desde`
+ * (`fechaHastaPosteriorValidator`). Solo en alta, al iniciar, se sugiere la
+ * fecha de hoy en `fecha_desde` / `fecha_hasta`.
+ *
+ * Regla del tipo de cotizante: los códigos de aprendiz del SENA solo van con el
+ * contrato de aprendiz — ver `syncTipoCotizante()` y
+ * `cotizanteCoherenteValidator`. En alta se siembra "Dependiente" (código `01`),
+ * que es lo que cotiza cualquier otro vínculo.
  */
 @Component({
   selector: 'app-contrato-form',
@@ -55,12 +89,16 @@ import { contratoToFormValue, formValueToPayload } from '../../contrato.mapper';
     BreadcrumbComponent,
     ButtonModule,
     DatePickerModule,
+    MascaraFechaDirective,
     InputNumberModule,
     CheckboxModule,
     TextareaModule,
+    FieldErrorComponent,
+    PageActionsComponent,
+    FocusInvalidDirective,
     ErpApiSelectComponent,
-    ErpApiAutocompleteComponent,
     EmpleadoAutocompleteComponent,
+    CiudadAutocompleteComponent,
   ],
   templateUrl: './contrato-form.component.html',
   styleUrl: './contrato-form.component.scss',
@@ -75,8 +113,31 @@ export class ContratoFormComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly configuracion = inject(ConfiguracionService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly locale = inject(LOCALE_ID);
 
   protected readonly t = this.i18n.t;
+
+  /** Ciudades dentro del tenant: el ERP siempre trabaja dentro de uno. */
+  protected readonly ciudadFuente = CIUDAD_FUENTE.erp;
+
+  /** Endpoints `seleccionar` de catálogos compartidos, para los `<app-api-*>` del template. */
+  protected readonly endpoints = SELECT_ENDPOINTS;
+
+  /**
+   * Etiqueta `I – 0,522 %` para la clase de riesgo laboral.
+   *
+   * El endpoint ya manda `nombre` como `"I - 0.522"`, pero con punto decimal y
+   * sin unidad: así la tarifa se lee como si fuera parte del código de la clase.
+   * Se recompone desde `codigo` y `porcentaje` —los cinco porcentajes de ley
+   * traen tres decimales, de ahí el `1.3-3` fijo— y ante cualquier fila que no
+   * traiga ambos campos cae al `nombre` crudo antes que dejar la opción coja.
+   */
+  protected readonly riesgoLabel = (option: ErpSelectOption): string => {
+    const codigo = option['codigo'];
+    const porcentaje = Number(option['porcentaje']);
+    if (typeof codigo !== 'string' || !Number.isFinite(porcentaje)) return option.nombre;
+    return `${codigo} – ${formatNumber(porcentaje, this.locale, '1.3-3')} %`;
+  };
 
   /** Id del contrato a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -93,6 +154,11 @@ export class ContratoFormComponent implements OnInit {
   /** `true` cuando el tipo de contrato es indefinido → sin `fecha_hasta`. */
   protected readonly isIndefinido = computed(
     () => this.contratoTipo()?.id === CONTRATO_TIPO_INDEFINIDO_ID,
+  );
+
+  /** `true` cuando el tipo de contrato es el de aprendiz del SENA. */
+  private readonly isAprendizSena = computed(
+    () => this.contratoTipo()?.id === CONTRATO_TIPO_APRENDIZ_SENA_ID,
   );
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -119,9 +185,14 @@ export class ContratoFormComponent implements OnInit {
     sucursal: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     tiempo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha_desde: this.fb.control<Date | null>(null, Validators.required),
-    fecha_hasta: this.fb.control<Date | null>(null, Validators.required),
+    fecha_hasta: this.fb.control<Date | null>(null, [
+      Validators.required,
+      fechaHastaPosteriorValidator,
+    ]),
+    // Habilita que este contrato entre en la programación de turnos.
+    habilitado_turno: this.fb.control<boolean>(false),
     // Remuneración
-    salario: this.fb.control<number | null>(null, Validators.required),
+    salario: this.fb.control<number | null>(null, [Validators.required, montoPositivo]),
     auxilio_transporte: this.fb.control<boolean>(true),
     salario_integral: this.fb.control<boolean>(false),
     tipo_costo: this.fb.control<ErpSelectOption | null>(null),
@@ -134,7 +205,10 @@ export class ContratoFormComponent implements OnInit {
     entidad_cesantias: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     entidad_caja: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     riesgo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    tipo_cotizante: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    tipo_cotizante: this.fb.control<ErpSelectOption | null>(null, [
+      Validators.required,
+      cotizanteCoherenteValidator,
+    ]),
     subtipo_cotizante: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     ciudad_contrato: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     ciudad_labora: this.fb.control<ErpSelectOption | null>(null, Validators.required),
@@ -153,6 +227,9 @@ export class ContratoFormComponent implements OnInit {
     this.form.controls.contrato_tipo.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((value) => this.onContratoTipoChange(value));
+    this.form.controls.fecha_desde.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.sincronizarFechaHasta());
   }
 
   ngOnInit(): void {
@@ -162,27 +239,83 @@ export class ContratoFormComponent implements OnInit {
     } else {
       this.prefillRemuneracion();
       this.suggestToday();
+      this.form.controls.tipo_cotizante.setValue(TIPO_COTIZANTE_DEPENDIENTE);
     }
   }
 
   /**
    * Regla de negocio según el tipo de contrato: si es indefinido oculta
-   * `fecha_hasta` en la UI y le quita el requerido, pero el backend exige un
-   * valor no nulo, así que se fija la fecha de hoy como placeholder; cualquier
-   * otro tipo la vuelve requerida.
+   * `fecha_hasta` en la UI y le quita los validadores (ver
+   * `sincronizarFechaHasta`); cualquier otro tipo la vuelve requerida y no
+   * anterior a `fecha_desde`.
    */
   private onContratoTipoChange(value: ErpSelectOption | null): void {
     this.contratoTipo.set(value);
     const fechaHasta = this.form.controls.fecha_hasta;
 
     if (this.isIndefinido()) {
-      fechaHasta.setValue(startOfToday(), { emitEvent: false });
       fechaHasta.clearValidators();
     } else {
-      fechaHasta.setValidators(Validators.required);
+      fechaHasta.setValidators([Validators.required, fechaHastaPosteriorValidator]);
     }
 
+    this.sincronizarFechaHasta();
+    this.syncTipoCotizante();
+  }
+
+  /**
+   * El indefinido no tiene fin, pero el backend exige `fecha_hasta` no nula y no
+   * anterior a `fecha_desde`. Fijarla una sola vez dejaba un valor oculto que
+   * quedaba atrás al mover `fecha_desde` hacia adelante, y el backend rechazaba
+   * el guardado sin un campo visible que corregir. Se la mantiene igual a
+   * `fecha_desde` cada vez que alguna de las dos cambia, como el ERP anterior.
+   *
+   * En los demás tipos solo se revalida: `fechaHastaPosteriorValidator` lee
+   * `fecha_desde`, así que su error depende de ella.
+   */
+  private sincronizarFechaHasta(): void {
+    const fechaHasta = this.form.controls.fecha_hasta;
+    if (this.isIndefinido()) {
+      fechaHasta.setValue(this.form.controls.fecha_desde.value, { emitEvent: false });
+    }
     fechaHasta.updateValueAndValidity({ emitEvent: false });
+  }
+
+  /**
+   * Regla de negocio del tipo de cotizante: los códigos de aprendiz del SENA
+   * (`12` lectiva y `19` productiva) solo corresponden al contrato de aprendiz,
+   * y ese contrato no admite ningún otro. Al cambiar el vínculo laboral se
+   * descarta la selección que dejó de corresponder:
+   *
+   * - hacia aprendiz → se limpia, para que el usuario elija entre lectiva y
+   *   productiva (nada permite adivinar en cuál etapa entra);
+   * - saliendo de aprendiz → pasa a "Dependiente" (código `01`), que es lo que
+   *   cotiza cualquier otro vínculo. También cubre el campo **vacío**: es el
+   *   estado en el que lo deja el paso anterior, y sin esto un ida y vuelta por
+   *   aprendiz terminaba sin cotizante.
+   *
+   * Un cotizante que no es de aprendiz y ya estaba elegido (p. ej. "Estudiantes",
+   * código `23`) se respeta: la regla descarta lo que dejó de corresponder, no
+   * impone Dependiente sobre una elección válida.
+   *
+   * En edición no reescribe nada: `contratoToFormValue` parchea `contrato_tipo`
+   * **antes** que `tipo_cotizante`, así que el valor guardado pisa lo que haga
+   * esta regla. Una combinación incoherente ya guardada la denuncia
+   * `cotizanteCoherenteValidator` en vez de corregirse en silencio.
+   */
+  private syncTipoCotizante(): void {
+    const control = this.form.controls.tipo_cotizante;
+    const actualEsAprendiz = esTipoCotizanteAprendiz(control.value?.id);
+
+    if (this.isAprendizSena()) {
+      if (control.value && !actualEsAprendiz) control.setValue(null);
+    } else if (actualEsAprendiz || !control.value) {
+      control.setValue(TIPO_COTIZANTE_DEPENDIENTE);
+    }
+
+    // El validador lee `contrato_tipo`, que acaba de cambiar: sin esto el error
+    // quedaría calculado contra el vínculo laboral anterior.
+    control.updateValueAndValidity({ emitEvent: false });
   }
 
   /**
@@ -196,6 +329,12 @@ export class ContratoFormComponent implements OnInit {
     if (!this.form.controls.fecha_hasta.value) this.form.controls.fecha_hasta.setValue(today);
   }
 
+  /**
+   * El botón de guardar **no** se deshabilita por formulario inválido: un botón
+   * muerto no explica qué falta ni deja avanzar. El intento en blanco es el que
+   * revela — `libFocusInvalid` en el `<form>` marca todo como tocado y salta al
+   * primer campo con error; acá solo se corta.
+   */
   protected onSubmit(): void {
     if (this.form.invalid || this.form.pending || this.isSaving()) return;
     this.isSaving.set(true);
@@ -206,11 +345,18 @@ export class ContratoFormComponent implements OnInit {
     const operation = id ? this.service.update(Number(id), payload) : this.service.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -229,7 +375,12 @@ export class ContratoFormComponent implements OnInit {
       .getById(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (c) => this.form.patchValue(contratoToFormValue(c)),
+        next: (c) => {
+          this.form.patchValue(contratoToFormValue(c));
+          // El parche escribe `fecha_hasta` después de `contrato_tipo` y `fecha_desde`:
+          // en un indefinido guardado con otra fecha de fin, la regla se reaplica acá.
+          this.sincronizarFechaHasta();
+        },
         error: () => {
           const toasts = this.t().entities.contrato.form.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
@@ -249,7 +400,10 @@ export class ContratoFormComponent implements OnInit {
       .subscribe({
         next: (campos) => {
           const salario = campos['hum_salario_minimo'];
-          if (salario != null) this.form.controls.salario.setValue(salario);
+          // Un contenedor sin salario mínimo configurado devuelve 0. Sembrarlo
+          // dejaría el formulario inválido de entrada, con el botón de guardar
+          // apagado y sin nada tocado que explique por qué.
+          if (salario != null && salario > 0) this.form.controls.salario.setValue(salario);
         },
         error: () => {
           // Pre-llenado opcional: si falla, el usuario digita los valores manualmente.
@@ -261,5 +415,11 @@ export class ContratoFormComponent implements OnInit {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...CONTRATO_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate(['/t', slug, ...CONTRATO_LIST_PATH, 'detalle', id]);
   }
 }

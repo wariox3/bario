@@ -1,11 +1,12 @@
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.grupo.name">
   <lib-data-toolbar
     toolbar
-    [primaryAction]="primaryAction"
+    [primaryAction]="acciones.primaryAction()"
+    [trailingActions]="acciones.trailingActions()"
     [searchPlaceholderKey]="'entities.grupo.searchPlaceholder'"
     [filtersEnabled]="true"
     [activeFiltersCount]="activeFilters().length"
-    [deleteSelectedEnabled]="hasSelection()"
+    [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
     [deleteSelectedCount]="selectedRows().length"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
@@ -24,13 +25,11 @@
     [sort]="sort()"
     selectionMode="multiple"
     [selectedRows]="selectedRows()"
-    [rowActions]="rowActions"
-    [rowClickable]="true"
+    [rowActions]="acciones.rowActions()"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
     (selectionChange)="onSelectionChange($event)"
     (rowActionInvoked)="onRowAction($event)"
-    (rowClick)="onRowClick($event)"
   />
 </lib-list-shell>
 

@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -28,11 +27,9 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import type {
-  ImportError,
-  MasterTouched,
-} from '@erp/core/components/import-dialog/import-dialog.types';
-import { parseImportErrors } from '@erp/core/components/import-dialog/import-dialog.utils';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
 import type { Contacto } from '../../contacto.model';
@@ -41,6 +38,7 @@ import {
   CONTACTOS_FILTER_FIELDS,
   CONTACTOS_FILTERS_STORAGE_KEY,
   CONTACTOS_QUICK_SEARCH_FIELD,
+  CONTACTOS_IMPORT_MASTERS,
   CONTACTOS_PRIMARY_ACTION,
   CONTACTOS_ROW_ACTIONS,
   CONTACTOS_TRAILING_ACTIONS,
@@ -77,6 +75,7 @@ export class ContactosListComponent {
   private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
@@ -105,26 +104,27 @@ export class ContactosListComponent {
   };
 
   protected readonly isExportingExcel = signal(false);
-  protected readonly importVisible = signal(false);
-  protected readonly importLoading = signal(false);
-  protected readonly importErrors = signal<readonly ImportError[]>([]);
-  protected readonly importErrorSummary = signal('');
-  protected readonly importErrorTotal = signal(0);
-  protected readonly importMasters = signal<readonly MasterTouched[]>([]);
+
+  /** Estado del diálogo de importación (visibilidad, progreso, errores, maestros). */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: CONTACTOS_IMPORT_MASTERS,
+  });
 
   // ── Derivados ─────────────────────────────────────────────────────────────
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   /**
-   * Migas: módulo (General, navegable a su home) → entidad actual (Contactos).
-   * El contacto es un master del módulo `general`, por eso el segmento es fijo.
+   * Migas: módulo activo (navegable a su home) → entidad actual (Contactos).
+   * El módulo se deriva del `ActiveModuleStore` (master compartido entre módulos).
    */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     return [
       {
-        label: this.t().modules.general.name,
-        routerLink: slug ? ['/t', slug, 'general'] : undefined,
+        label: resolveModuleName(this.activeModule, this.t()),
+        routerLink: slug ? ['/t', slug, currentModuleId(this.activeModule)] : undefined,
       },
       { label: this.t().entities.contacto.name },
     ];
@@ -132,9 +132,12 @@ export class ContactosListComponent {
 
   protected readonly columns = CONTACTOS_COLUMNS;
   protected readonly filterFields = CONTACTOS_FILTER_FIELDS;
-  protected readonly rowActions = CONTACTOS_ROW_ACTIONS;
-  protected readonly primaryAction = CONTACTOS_PRIMARY_ACTION;
-  protected readonly trailingActions = CONTACTOS_TRAILING_ACTIONS;
+
+  protected readonly acciones = masterActions(MODELO.general.contacto, {
+    row: CONTACTOS_ROW_ACTIONS,
+    primary: CONTACTOS_PRIMARY_ACTION,
+    trailing: CONTACTOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -199,10 +202,6 @@ export class ContactosListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateToDetail((row as Contacto).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
       case 'new':
@@ -212,78 +211,9 @@ export class ContactosListComponent {
         this.exportExcel();
         break;
       case 'import':
-        this.importVisible.set(true);
+        this.importar.open();
         break;
     }
-  }
-
-  protected onImportVisibleChange(value: boolean): void {
-    this.importVisible.set(value);
-  }
-
-  protected onImportRequested(file: File): void {
-    if (this.importLoading()) return;
-    this.importLoading.set(true);
-    // Limpia el resultado del intento anterior (al reintentar tras corregir).
-    this.clearImportErrors();
-    this.service
-      .importar(file)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.importLoading.set(false)),
-      )
-      .subscribe({
-        next: (result) => {
-          // [DEBUG-IMPORT] temporal: ver qué llega en un 200.
-          console.debug('[import] next result =', result, '→ parsed =', parseImportErrors(result));
-          // El backend puede reportar los errores de validación en un 200
-          // ("No se procesó ningún registro"); si los trae, los mostramos en vez
-          // de tratarlo como éxito.
-          if (this.applyImportErrors(parseImportErrors(result))) return;
-          const toasts = this.t().common.import.toasts;
-          this.toast.success(toasts.success.title, toasts.success.desc);
-          this.importVisible.set(false);
-          this.clearImportErrors();
-          this.importMasters.set([]);
-          this.loadList();
-        },
-        error: (err: HttpErrorResponse) => {
-          // [DEBUG-IMPORT] temporal: ver status y body del error.
-          console.debug(
-            '[import] error status =',
-            err.status,
-            'err.error =',
-            err.error,
-            '→ parsed =',
-            parseImportErrors(err.error),
-          );
-          // Errores de validación (4xx) con el mismo shape. Si no hay estructura
-          // (red/desconocido) → toast genérico.
-          if (!this.applyImportErrors(parseImportErrors(err.error))) {
-            const toasts = this.t().common.import.toasts;
-            this.toast.error(toasts.error.title, toasts.error.desc);
-          }
-        },
-      });
-  }
-
-  /**
-   * Vuelca los errores parseados en los signals del diálogo. Devuelve `true` si
-   * había errores/resumen (para que el llamador no siga el camino de éxito).
-   */
-  private applyImportErrors(parsed: ReturnType<typeof parseImportErrors>): boolean {
-    if (parsed.errors.length === 0 && !parsed.summary) return false;
-    this.importErrors.set(parsed.errors);
-    this.importErrorSummary.set(parsed.summary);
-    this.importErrorTotal.set(parsed.total);
-    return true;
-  }
-
-  /** Resetea el resultado de errores de importación (tabla + resumen). */
-  private clearImportErrors(): void {
-    this.importErrors.set([]);
-    this.importErrorSummary.set('');
-    this.importErrorTotal.set(0);
   }
 
   protected onSearchChange(value: string): void {
@@ -410,11 +340,11 @@ export class ContactosListComponent {
 
   /**
    * Construye los segmentos absolutos para `router.navigate` dentro del feature.
-   * Resulta en `/t/<slug>/general/contactos/<...path>`.
+   * Resulta en `/t/<slug>/<módulo activo>/contactos/<...path>`.
    */
   private buildRouteCommands(...subPath: (string | number)[]): (string | number)[] {
     const slug = this.tenant.currentSlug();
     if (!slug) throw new Error('Cannot navigate without an active tenant slug.');
-    return ['/t', slug, 'general', 'contactos', ...subPath];
+    return ['/t', slug, currentModuleId(this.activeModule), 'contactos', ...subPath];
   }
 }

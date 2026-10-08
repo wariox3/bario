@@ -1,0 +1,84 @@
+// Los overlays no ocupan lugar en el flujo.
+//
+// Un `<p-dialog>` / `<p-confirmdialog>` cerrado no pinta nada, pero su elemento
+// **sigue existiendo en el DOM**: Angular vacía el contenido, no borra el host.
+// Y casi toda página del ERP es un `display:flex` con `gap` (`:host` de la
+// página, o el `flex flex-col gap-*` de un campo), donde el `gap` se cobra por
+// posición y no por contenido — un item de 0×0 separa igual a sus dos vecinos.
+// Resultado: dos overlays declarados entre el encabezado y la primera card
+// empujan la card `2 × gap` hacia abajo, sin nada visible que lo explique.
+//
+// `display: contents` hace que el elemento no genere caja propia: cerrado no
+// cuesta nada, y abierto tampoco cambia nada, porque la máscara del diálogo es
+// `position: fixed` y no participa del flujo de ningún modo.
+//
+// Va fuera de `@layer` por la misma razón que `_button.scss`: PrimeNG emite en
+// `@layer primeng` y las reglas sin capa ganan sin pelear especificidad.
+//
+// Un componente propio que envuelva un overlay (`app-*-modal`) necesita lo
+// mismo en su `:host` — esta regla alcanza al `<p-dialog>` de adentro, no al
+// wrapper. Ver `.interface-design/system.md`.
+//
+// `p-toast` queda **fuera** de la lista: es el único de la familia cuyo host
+// *es* la caja del overlay (PrimeNG 20 le pone `class="p-toast"` y el
+// `position: fixed; top/right: 20px` por host binding, no en un div interno).
+// Con `display: contents` se pierde esa caja y los mensajes caen al flujo,
+// estirados de lado a lado. Y no lo necesita: al ser `fixed` nunca ocupó lugar.
+//
+// `p-menu` entra por la misma puerta, con un matiz: en modo popup su contenido
+// se monta en `<body>` (`appendTo`), así que el host no queda vacío por estar
+// cerrado — queda vacío **siempre**. Es el caso que se ve en la botonera de una
+// ficha: cada menú declarado junto a su botón cobra un `gap` extra, y el
+// "Utilidades" que va después de la botonera aparece separado del resto por un
+// espacio que ningún margen explica.
+p-confirmdialog,
+p-dialog,
+p-drawer,
+p-popover,
+p-confirmpopup,
+p-menu {
+  display: contents;
+}
+
+// El diálogo de confirmación no tiene ancho propio: PrimeNG lo deja crecer con
+// el texto, así que un mensaje de dos frases salía en una sola línea de lado a
+// lado de la pantalla. Se le pone un tope para que el texto haga saltos de línea;
+// en pantallas angostas manda el ancho disponible. Un confirm que necesite más
+// lo puede seguir pidiendo con su `[style]`, que gana por ser estilo en línea.
+.p-confirmdialog {
+  width: min(28rem, calc(100vw - 2rem));
+}
+
+// Botones de la confirmación: **una sola acción con color**.
+//
+// PrimeNG pinta "Cancelar" con el mismo relleno que la acción, así que las dos
+// opciones pesaban igual y había que leer para saber cuál comprometía algo. El
+// estándar: cancelar va como secundaria con borde (sin relleno, texto normal) y
+// el color queda solo para la acción — navy si construye, rojo si destruye
+// (`acceptButtonStyleClass: 'p-button-danger'`).
+//
+// Vive acá y no en cada `confirm({...})` porque es la regla, no una preferencia
+// de la pantalla: de ~60 confirmaciones solo unas 10 la declaraban a mano con
+// `rejectButtonProps`. Fuera de `@layer`, como el botón estándar, para pisar al
+// preset sin pelear especificidad.
+.p-confirmdialog .p-confirmdialog-reject-button {
+  background: transparent;
+  border-color: rgba(20 48 73 / 0.18);
+  color: var(--brand-text);
+
+  &:not(:disabled):hover {
+    background: rgba(19 38 60 / 0.04);
+    border-color: rgba(20 48 73 / 0.3);
+    color: var(--brand-text);
+    box-shadow: none;
+  }
+
+  &:not(:disabled):active {
+    background: rgba(19 38 60 / 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(20 48 73 / 0.35);
+    outline-offset: 2px;
+  }
+}

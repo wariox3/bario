@@ -48,7 +48,7 @@ apps/
   cliente/      SPA + PrimeNG, port 4207 — portal de clientes
 libs/
   core/         Auth, tokens, theme, i18n, tenant + data-list building blocks (cross-app)
-  ui/           Shared standalone components: TurnstileComponent + auth pages
+  ui/           Shared standalone components: TurnstileComponent + auth pages + AppSwitcherComponent
   feature-base/ DataTableComponent (tonto, cross-app)
   styles/       SCSS design tokens + Tailwind @theme (brand colors, animations)
 ```
@@ -58,7 +58,7 @@ Path aliases:
 - **Cross-app (libs)**: `@reddoc/core`, `@reddoc/ui`, `@reddoc/feature-base`, `@reddoc/styles`.
 - **Intra-app (solo erp)**: `@erp/*` → `apps/erp/src/app/*`. Permitido por excepción en `@nx/enforce-module-boundaries` para evitar paths relativos profundos (los masters viven anidados en `features/<modulo>/masters/<entity>/pages/<page>/`). Úsalo para imports cross-feature (`@erp/core/...`, `@erp/i18n`, `@erp/layouts/...`). Para hermanos del mismo bounded context, sigue con relativos cortos (`./contacto.service`).
 
-**Lo que ES cross-app va en libs/. Lo que es ERP-específico vive en `apps/erp/src/app/core/`** — incluyendo el framework configuracional de documentos.
+**Lo que ES cross-app va en libs/. Lo que es ERP-específico vive en `apps/erp/src/app/core/`.** El **núcleo compartido** del framework configuracional de documentos (tipos, gateway y `DocumentoDetalleService`) vive en `libs/core/documento` porque también lo consume `apps/turnos`; solo el registry, resolvers y `BaseDocumentListComponent` quedan en el ERP.
 
 ### landing
 
@@ -76,6 +76,8 @@ The 6 SPAs share the same skeleton:
 - **PrimeNG theme** — single `ReddocPreset` exported from `@reddoc/core` (navy `#143049` primary, sky `#77aad7` accent), used by every app via `providePrimeNG({ theme: { preset: ReddocPreset, ... } })`.
 - **Environments** — `src/environments/environment.ts` (dev), `.staging.ts`, `.prod.ts`. Swap via `fileReplacements` in `project.json`.
 - **Auth pages** — every app loads `LoginComponent`/`RegisterComponent`/etc. directly from `@reddoc/ui`. Per-app branding is provided via the `APP_BRANDING` token (`{ appName, tagline }`).
+- **Botón estándar** — cada `src/styles.scss` arranca con `@use` de `libs/styles/src/primeng/button` (y `overlays`): botones compactos de 32px, `fluid` a 43px. Una app nueva que lo omita queda con el botón por defecto de PrimeNG.
+- **Sentry (observabilidad)** — cada SPA llama `iniciarObservabilidad({ app, sentry: environment.sentry })` en `main.ts` antes del bootstrap, suma `provideObservabilidad()` a sus providers y `observabilidadInterceptor` **último** en `withInterceptors`. Solo `environment.prod.ts` declara `sentry: SENTRY_PRODUCCION`; el DSN vive únicamente en `libs/core/src/lib/observabilidad/sentry.config.ts`. HTTP lo reporta solo el interceptor (5xx); nunca se envían cuerpos, cabeceras ni datos del usuario salvo su id. Una app nueva que omita esto queda sin reporte de errores y nada avisa. Lo pendiente (secrets de source maps, alertas, túnel contra bloqueadores) está en `docs/sentry-integracion-pendientes.md`.
 - **Tailwind brand tokens** — each app's `src/tailwind.css` imports `libs/styles/src/tailwind/brand.css`, which exposes `--color-brand-*` and the `fade-up` / `drift1` / `drift2` animations as Tailwind v4 `@theme` values.
 - **Logos** — `libs/ui/src/assets/logos/` is wired in each app's `project.json` so `<img src="/logos/reddoc.svg">` resolves.
 
@@ -94,11 +96,12 @@ BaseAuthService<TUser extends BaseUsuario>   (libs/core)
 
 | Token               | Purpose                                                                                                              |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `ENVIRONMENT`       | `{ apiUrl, turnstileSiteKey, cuentaUrl? }`                                                                           |
+| `ENVIRONMENT`       | `{ apiUrl, turnstileSiteKey, cuentaUrl?, erpUrl?, turnosUrl? }` — las `<app>Url` alimentan el app-switcher           |
 | `ROUTE_PATHS_TOKEN` | `{ auth: { login, register, forgotPassword, resetPassword, resendVerification, verifyEmail }, dashboard: { root } }` |
 | `AUTH_SERVICE`      | `useExisting: AuthService` — exposes `AuthServiceContract` to interceptors, guards, and shared auth pages            |
 | `AUTH_SKIP_URLS`    | String array of API paths that bypass the 401-refresh logic                                                          |
 | `APP_BRANDING`      | `{ appName, tagline? }` — consumed by the shared auth pages in `@reddoc/ui` to render per-app brand panel            |
+| `CURRENT_APP`       | `ReddocAppId` (`'erp' \| 'turnos'`) — quién soy; el app-switcher lo usa para excluirse de su propia lista            |
 
 **Guards** (`authGuard`, `publicGuard`) inject `AUTH_SERVICE` and `ROUTE_PATHS_TOKEN`.
 
@@ -116,6 +119,8 @@ Cualquier app del monorepo puede usarlos para construir listas paginadas.
 
 - `TurnstileComponent` (`lib-turnstile`) — Cloudflare Turnstile widget. Reads `turnstileSiteKey` from `ENVIRONMENT`. Dev key `1x00000000000000000000AA` always passes.
 - Auth pages (`LoginComponent`, `RegisterComponent`, `ForgotPasswordComponent`, `ResetPasswordComponent`, `ResendVerificationComponent`, `VerifyEmailComponent`) — fully implemented; each app routes to them via eager `component:` (Nx prohibits mixing lazy + static imports of the same lib).
+- `AppSwitcherComponent` (`lib-app-switcher`) — waffle en el header (`app-header__actions`) que salta entre apps hermanas. Requiere que la app provea `CURRENT_APP` y declare las `<app>Url` de sus hermanas en `ENVIRONMENT`. Trae su propio dict (`AppSwitcherTranslationsHost` + `appSwitcherEs/En`), igual que las auth pages. Lo usan erp y turnos.
+- `PageActionsComponent` (`lib-page-actions`) — la fila de botones de una página (volver / guardar). Se pega bajo el header al hacer scroll y solo entonces se viste de fondo + filete. Se usa envolviendo los botones, sin inputs. El sangrado lateral sale de `--page-gutter`, que **cada layout declara sobre su scrollport** con el valor de su padding (ya lo hacen los `workspace-layout` de erp y turnos); un layout que no la declare cae al default de `1.75rem`. El scrollport **no debe llevar `padding-top`** (los navegadores no acuerdan desde dónde ancla un sticky con padding superior): el gutter de arriba va como espaciador `::before` en el flujo. Ver el patrón completo en `.interface-design/system.md`.
 - Assets: `src/assets/logos/reddoc.svg` and `reddoc-on-dark.svg` — copied into each app's build via `project.json` assets glob.
 
 ### libs/feature-base — building blocks de listados
@@ -127,28 +132,44 @@ Cualquier app del monorepo puede usarlos para construir listas paginadas.
 
 El ERP usa un **enfoque híbrido** (documentado en `docs/architecture/erp-module-architecture.md`):
 
-| Camino                                   | A quién aplica                                                                                                       | Cómo se implementa                                                                                                                                                                       |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Framework configuracional (camino A)** | Documentos transaccionales (factura, nota crédito, etc.) sobre `/api/documento` discriminado por `documento_tipo_id` | `DocumentEntityConfig` declarativo + `MODULE_REGISTRY` lazy + resolvers + `BaseDocumentListComponent`. Todo vive en **`apps/erp/src/app/core/module-config/`** porque es ERP-específico. |
-| **Features directos (camino B)**         | Masters administrativos (contacto, ítem, sede, almacén, etc.) con endpoint propio                                    | Cada master: `services/*.service.ts` (extends `BaseHttpService`) + `pages/*-list/*-list.component.ts` que compone `<lib-data-table>` con inputs concretos                                |
-| **Building blocks compartidos**          | Ambos caminos + otras apps potencialmente                                                                            | `<lib-data-table>` (`@reddoc/feature-base`), tipos `ColumnDef`/`FilterField`/`ListQuery`, `serializeListQuery`, `FilterStorageService` (todos en `@reddoc/core` data-list)               |
+| Camino                                   | A quién aplica                                                                                                       | Cómo se implementa                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework configuracional (camino A)** | Documentos transaccionales (factura, nota crédito, etc.) sobre `/api/documento` discriminado por `documento_tipo_id` | `DocumentEntityConfig` declarativo + `MODULE_REGISTRY` lazy + resolvers + `BaseDocumentListComponent`. El **núcleo compartido** (tipos, `ENTITY_DATA_GATEWAY`/`HttpEntityDataGateway`, `DocumentoDetalleService`, `DOCUMENT_TYPE_ID`) vive en **`libs/core/documento`** (vía `@reddoc/core`, lo consumen erp y turnos); lo **ERP-específico** (registry, resolvers, store, actions, storage, `BaseDocumentListComponent`) vive en **`apps/erp/src/app/core/module-config/`**. |
+| **Features directos (camino B)**         | Masters administrativos (contacto, ítem, sede, almacén, etc.) con endpoint propio                                    | Cada master: `services/*.service.ts` (extends `BaseHttpService`) + `pages/*-list/*-list.component.ts` que compone `<lib-data-table>` con inputs concretos                                                                                                                                                                                                                                                                                                                     |
+| **Building blocks compartidos**          | Ambos caminos + otras apps potencialmente                                                                            | `<lib-data-table>` (`@reddoc/feature-base`), tipos `ColumnDef`/`FilterField`/`ListQuery`, `serializeListQuery`, `FilterStorageService` (todos en `@reddoc/core` data-list)                                                                                                                                                                                                                                                                                                    |
 
-**Estructura del framework configuracional en el ERP**:
+**Estructura del framework configuracional**:
+
+El **núcleo compartido** vive en `libs/core/documento/` (expuesto por `@reddoc/core`, consumido por erp y turnos):
+
+```
+libs/core/src/lib/documento/
+├── entity-config.types.ts       DocumentEntityConfig, ModuleConfig, EntityConfig, capabilities
+├── module-config.types.ts       ModuleConfig
+├── documento.types.ts           Read/Payload base de documento y detalle
+├── document-types.constants.ts  DOCUMENT_TYPE_ID
+├── entity-data-gateway.ts       ENTITY_DATA_GATEWAY (token) + EntityDataGateway (interface)
+├── http-entity-data-gateway.service.ts  HttpEntityDataGateway
+├── documento-detalle.service.ts DocumentoDetalleService
+└── index.ts
+```
+
+Lo **ERP-específico** queda en `apps/erp/src/app/core/module-config/`:
 
 ```
 apps/erp/src/app/core/module-config/
-├── types/                       DocumentEntityConfig, ModuleConfig, capabilities
 ├── module-registry.token.ts     InjectionToken + ModuleConfigLoader / ModuleRegistry
 ├── module-registry.constant.ts  ERP_MODULE_REGISTRY (módulos transaccionales)
 ├── module-registry.service.ts   Carga lazy + cache + validación
 ├── module-navigation.store.ts   Signals del módulo/documento activos
 ├── resolvers/                   activeModuleResolver, activeDocumentResolver
-├── data/                        EntityDataGateway (interface) + HttpEntityDataGateway
+├── data/                        documento.service.ts (el gateway compartido vive en libs/core/documento)
 ├── storage/                     buildEntityStorageKey (usa EntityConfig)
 ├── errors/                      Errores tipados del dominio
+├── importar-documento/          Importación desde documento afectado
 ├── components/
 │   └── base-document-list/      BaseDocumentListComponent (lazy load — NO exportar desde el barrel)
-└── index.ts                     Barrel sin BaseDocumentListComponent: evita jalar PrimeNG al initial bundle
+└── index.ts                     Re-exporta los tipos desde @reddoc/core; sin BaseDocumentListComponent (evita PrimeNG en el initial bundle)
 ```
 
 El `BaseDocumentListComponent` se importa **siempre vía `loadComponent`** desde las rutas de documentos, no por barrel.
@@ -158,7 +179,7 @@ El `BaseDocumentListComponent` se importa **siempre vía `loadComponent`** desde
 - **Topbar** (`apps/erp/src/app/layouts/module-bar/`): renderiza un link por cada módulo habilitado por `PermissionsService`. Highlight al activo.
 - **Sidebar** (`apps/erp/src/app/layouts/workspace-layout/`): se filtra al módulo activo leyendo `ActiveModuleStore.activeDescriptor().menu`. Empty state cuando no hay módulo activo (ej: `/t/:slug/dashboard`).
 - **Active module store** (`apps/erp/src/app/core/erp-modules/active-module.store.ts`): signal escrito por `erpModuleResolver(id)` puesto en la ruta raíz de cada `<modulo>.routes.ts`.
-- **Permisos** (`apps/erp/src/app/core/permissions/permissions.service.ts`): stub que retorna todos los ids. Cuando el backend exponga flags `plan_*` en `Contenedor`, solo cambia el `computed`.
+- **Permisos** (`apps/erp/src/app/core/permissions/`): tres ejes ortogonales — qué módulos compró el tenant (flags `acceso_*` del contenedor), qué puede hacer el usuario sobre cada modelo del backend (`GET /general/modelo/<id>/permiso/`, pedido al entrar al feature) y si administra el contenedor (`rol_id`). Ver `docs/guides/permisos-erp.md` antes de tocarlo.
 
 **Estructura de carpetas dentro de un módulo (camino B)**: cada master es un bounded context auto-contenido bajo `masters/<entity>/`:
 
@@ -189,6 +210,12 @@ Regla: lo que solo importa a un master vive dentro del master.
 2. En `<modulo>.routes.ts`, delegar: `{ path: '<plural>', loadChildren: () => import('./masters/<entity>/<entity>.routes').then(m => m.<ENTITY>_ROUTES) }`. URL: `/t/:slug/<modulo>/<plural>`.
 3. Entrada en el `menu` del `<modulo>.module-descriptor.ts` (path relativo: `<plural>`).
 4. Claves i18n `entities.<entity>.*` en `app.es.ts` / `app.en.ts`.
+
+**Formularios (masters y documentos):** el botón de guardar **no** se deshabilita por `form.invalid` — un botón muerto no explica qué falta ni deja avanzar. Va `[disabled]="isSaving()"` y `libFocusInvalid` (`FocusInvalidDirective`, de `@reddoc/ui`) sobre el `<form>`: al intentar guardar en blanco marca todo como tocado —así aparece cada `<lib-field-error>`— y lleva a la persona al primer campo que falta. El guard `if (form.invalid …) return;` del `onSubmit` no cambia.
+
+**Al guardar un documento se cae en su ficha, no en el listado:** crear y editar terminan en `routes.detail` para que la persona revise lo que quedó almacenado. En alta el id sale de la respuesta del `POST` (`extractDocumentoId`, en `@erp/core/module-config`); si no viniera, se cae al listado antes que navegar a una URL inválida. Excepción viva: depreciación y cierre, que al crear entran a `editar/:id` porque el documento nace vacío y sus líneas se cargan desde el form. Cancelar sigue volviendo al listado.
+
+**Lo mismo vale para los masters:** crear y editar terminan en `detalle/:id` (con `masterNav`, `this.nav.ir('detalle', id)`; si no, un `navigateToDetail(id)` junto al `navigateToList()`). En alta el id sale de la entidad que devuelve el `create` del servicio; si no viniera, se cae al listado. Si el master se abre como modal (ítem desde la línea de un documento), cierra el modal y devuelve lo guardado.
 
 **Para agregar un documento nuevo** (camino A):
 
@@ -228,16 +255,28 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - **SCSS** — component styles are scoped; global Tailwind brand tokens live in `libs/styles/src/tailwind/brand.css`. Avoid inline styles.
 - **Typed errors** — never `throw new Error('msg')` generic. Define a specific class extending `Error`.
 - **No `any`** — use `unknown` + narrowing where the type is genuinely unknown.
+- **Fechas** — el formato sale de `FORMATO_FECHA` (`@reddoc/core`), única fuente para las tres
+  notaciones (PrimeNG, `| date` de Angular, y con hora). Para pintar: `formatFechaCorta`
+  (`05/08/2026` — campos, tablas, fichas) o `formatFechaLarga` (`05 de agosto de 2026` — solo la
+  cabecera de un documento). Un `<p-datepicker>` **no declara `dateFormat`**: lo hereda del
+  translation global (`REDDOC_PRIMENG_ES`); solo se declara para mostrar otra cosa, como `mm/yy`
+  al elegir un mes. Nada de `toLocaleDateString` suelto ni de `iso.slice(0, 10)`. Todo componente
+  que use `<p-datepicker>` suma `MascaraFechaDirective` (`@reddoc/ui`) a sus `imports`: el selector
+  es el propio elemento, así que sin el import el calendario queda sin máscara y nada avisa.
 - **Readonly by default** — prefer `readonly` properties and `readonly` arrays in configs and contracts.
 
 ## Tener en cuenta
 
 - Para los textos no crees por ejemplo "Nueva Empresa" esta mal para nosotros, debe ser "Nueva empresa" no uses mayusculas al inicio de las palabras despues de la primera palabra
+- No comitees sin que yo te lo pida explicitamente
 - siempre procura usar clases de tailwind
+- Cuando un valor viene vacío (`null`, `undefined`, `''`) se deja la celda o el campo **vacío**: nada de `—`, `-` ni `N/A` como relleno. En plantillas basta `{{ valor }}` (Angular pinta vacío un `null`), sin `?? '—'` ni `|| '—'`; en helpers, `formatFechaCorta(valor, '')` y `return ''`
 
 ## Documentación de arquitectura
 
 - `docs/architecture/erp-module-architecture.md` — decisión arquitectónica completa del framework de módulos del ERP (enfoque híbrido v2.0). Leerlo antes de agregar masters o documentos al ERP.
 - `docs/guides/agregar-modulo-erp.md` — guía paso a paso (recetario) para agregar un módulo nuevo al ERP sin perderse: esqueleto navegable en 5 pasos + cómo sumar masters/documentos y el menú del sidebar.
 - `docs/guides/agregar-documento-erp.md` — guía paso a paso para agregar un documento transaccional (camino A): `DocumentEntityConfig`, registro en el `ModuleConfig`/registry, rutas con resolvers y capabilities. Incluye el caso "primer documento del módulo".
+- `docs/guides/permisos-erp.md` — cómo se decide qué ve y qué puede abrir un usuario dentro del tenant, explicado como recorrido en 6 pasos (de dónde salen los permisos → topbar → sidebar → ruta → botones → 403 del backend). Cubre los tres ejes (plan del tenant / permisos del usuario / rol de contenedor), el catálogo de modelos del backend (`MODELO`, espejo de `gen_modelo`), `withPermission` y el `ForbiddenPageStore`. Leerlo antes de tocar permisos o de sumar un master a un módulo ya migrado.
+- `docs/guides/importar-erp.md` — cómo funciona la **importación por Excel** de un listado: el `ImportDialogComponent` (tonto) + el `importar(file)` multipart del servicio + `parseImportErrors`. Distingue las tres cosas que el diálogo ofrece y que se confunden: el archivo del usuario, la **plantilla** (`…/importar-ejemplo/`, del backend) y los **maestros** (XLSX públicos de consulta, declarados por listado con `IMPORT_MASTER.*`). Leerlo antes de sumar importación a un master.
 - `docs/guides/agregar-accion-extra-erp.md` — guía paso a paso para agregar una **acción extra** a un documento (botón en el dropdown "Acciones" que abre su propio modal y endpoint): patrón `EntityActionStrategy` + registro en `ENTITY_ACTION_PROVIDERS` + `extraActionIds`. Ejemplo vivo: "Generar" en pedido-servicio.

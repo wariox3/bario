@@ -1,4 +1,4 @@
-import { daysBetween, fromIsoDate, startOfToday } from '@reddoc/core';
+import { daysBetween, fromIsoDate, startOfToday, formatFechaCorta } from '@reddoc/core';
 import { Suscripcion } from './models/suscripcion.model';
 
 export type SuscripcionTone = 'success' | 'warn' | 'danger';
@@ -63,6 +63,5 @@ export function formatSuscripcionId(id: number): string {
 }
 
 export function formatSuscripcionFechaFin(iso: string): string {
-  const date = fromIsoDate(iso);
-  return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  return formatFechaCorta(iso);
 }

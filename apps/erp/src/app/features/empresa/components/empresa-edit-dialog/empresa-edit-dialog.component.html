@@ -1,0 +1,52 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  [dismissableMask]="!isSaving()"
+  [style]="{ width: '72rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-pencil text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] leading-tight font-bold tracking-tight text-brand-text">
+          {{ t().empresa.dialog.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] text-brand-muted">
+          {{ t().empresa.dialog.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <app-empresa-config [hideActions]="true" (saved)="onSaved()" />
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      type="button"
+      severity="secondary"
+      [text]="true"
+      [label]="t().common.actions.cancel"
+      [disabled]="isSaving()"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      type="button"
+      [label]="t().common.actions.save"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="isSaving()"
+      (onClick)="onSubmit()"
+    />
+  </ng-template>
+</p-dialog>

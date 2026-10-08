@@ -5,7 +5,13 @@
   [style.height]="height()"
 >
   @if (hasImage()) {
-    <img [src]="imageUrl()" [alt]="alt()" class="h-full w-full object-cover" />
+    <img
+      [src]="imageUrl()"
+      [alt]="alt()"
+      class="h-full w-full"
+      [class.object-cover]="fit() === 'cover'"
+      [class.object-contain]="fit() === 'contain'"
+    />
   } @else {
     <div class="flex h-full w-full flex-col items-center justify-center gap-1.5 text-brand-muted">
       <i class="pi pi-image text-2xl opacity-50"></i>
@@ -41,12 +47,14 @@
   }
 </div>
 
-<p class="mt-1.5 text-[0.68rem] leading-snug text-brand-muted">{{ t().common.imageUpload.hint }}</p>
+<p class="mt-1.5 text-[0.68rem] leading-snug text-brand-muted">
+  {{ hint() ?? t().common.imageUpload.hint }}
+</p>
 
 <input
   #fileInput
   type="file"
-  accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+  [accept]="accept()"
   class="hidden"
   (change)="onFileSelected($event)"
 />
@@ -67,12 +75,12 @@
     <div class="overflow-hidden rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface-2">
       <image-cropper
         [imageChangedEvent]="fileChangeEvent()"
-        [maintainAspectRatio]="true"
+        [maintainAspectRatio]="maintainAspectRatio()"
         [aspectRatio]="aspectRatio()"
         [resizeToWidth]="512"
         [onlyScaleDown]="true"
         output="base64"
-        format="jpeg"
+        [format]="format()"
         [imageQuality]="90"
         (imageCropped)="onImageCropped($event)"
       />

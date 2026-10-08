@@ -1,0 +1,132 @@
+@let m = t().configuracion.general.documentoTipo;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  [dismissableMask]="!isSaving()"
+  [style]="{ width: '48rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-pencil text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.dialog.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] text-brand-muted">
+          {{ tipo()?.nombre }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <!--
+      Sin `libFocusInvalid`: esa directiva salta al primer campo inválido al
+      hacer submit, y acá no tendría a dónde saltar —los cuatro campos entran a
+      la vez en el modal— ni llegaría a correr con el botón del pie, que vive
+      fuera del <form>. `onSubmit` ya marca todo como tocado, que es lo que hace
+      aparecer los mensajes.
+    -->
+    <form [formGroup]="form" class="flex flex-col gap-5 pt-1" (ngSubmit)="onSubmit()">
+      <section class="flex flex-col gap-3">
+        <p
+          class="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-brand-muted opacity-70"
+        >
+          {{ m.dialog.groups.numeracion }}
+        </p>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="consecutivo" class="text-[0.8rem] font-medium text-brand-text">
+              {{ m.fields.consecutivo }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-inputnumber
+              inputId="consecutivo"
+              formControlName="consecutivo"
+              [useGrouping]="false"
+              [min]="1"
+              [fluid]="true"
+              [invalid]="form.controls.consecutivo.invalid && form.controls.consecutivo.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.consecutivo"
+              [messages]="{ required: m.validation.required, min: m.validation.consecutivoMin }"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="resolucion" class="text-[0.8rem] font-medium text-brand-text">
+              {{ m.fields.resolucion }}
+            </label>
+            <!--
+              Con equis: un tipo de documento sin resolución es un estado
+              legítimo y hay que poder volver a él. Sin ella, elegir una
+              resolución por error sería irreversible desde la pantalla.
+            -->
+            <lib-api-select
+              inputId="resolucion"
+              formControlName="resolucion"
+              [endpoint]="resolucionEndpoint"
+              [displayWith]="resolucionLabel"
+              filterBy="prefijo,numero"
+              [placeholder]="m.fields.resolucionPlaceholder"
+              [showClear]="true"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <p
+          class="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-brand-muted opacity-70"
+        >
+          {{ m.dialog.groups.cuentas }}
+        </p>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="cuenta_cobrar" class="text-[0.8rem] font-medium text-brand-text">
+              {{ m.fields.cuentaCobrar }}
+            </label>
+            <app-cuenta-select inputId="cuenta_cobrar" formControlName="cuenta_cobrar" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="cuenta_pagar" class="text-[0.8rem] font-medium text-brand-text">
+              {{ m.fields.cuentaPagar }}
+            </label>
+            <app-cuenta-select inputId="cuenta_pagar" formControlName="cuenta_pagar" />
+          </div>
+        </div>
+      </section>
+    </form>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      severity="secondary"
+      [text]="true"
+      [label]="t().common.actions.cancel"
+      [disabled]="isSaving()"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      [label]="t().configuracion.actions.save"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="isSaving()"
+      (onClick)="onSubmit()"
+    />
+  </ng-template>
+</p-dialog>

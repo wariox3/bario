@@ -5,10 +5,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import {
+  FileDownloadService,
   FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
+  buildFiltros,
+  buildOrdenamientos,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -23,6 +26,9 @@ import {
   type PageChangeEvent,
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ContratoService } from '../../contrato.service';
 import type { Contrato } from '../../contrato.model';
@@ -30,9 +36,11 @@ import {
   CONTRATOS_COLUMNS,
   CONTRATOS_FILTER_FIELDS,
   CONTRATOS_FILTERS_STORAGE_KEY,
+  CONTRATOS_IMPORT_MASTERS,
   CONTRATOS_PRIMARY_ACTION,
   CONTRATOS_QUICK_SEARCH_FIELD,
   CONTRATOS_ROW_ACTIONS,
+  CONTRATOS_TRAILING_ACTIONS,
 } from '../../contrato.constants';
 
 @Component({
@@ -44,6 +52,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './contratos-list.component.html',
@@ -51,6 +60,7 @@ import {
 })
 export class ContratosListComponent {
   private readonly service = inject(ContratoService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
@@ -74,6 +84,8 @@ export class ContratosListComponent {
   );
   protected readonly filtersVisible = signal(false);
 
+  protected readonly isExportingExcel = signal(false);
+
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -89,8 +101,25 @@ export class ContratosListComponent {
 
   protected readonly columns = CONTRATOS_COLUMNS;
   protected readonly filterFields = CONTRATOS_FILTER_FIELDS;
-  protected readonly rowActions = CONTRATOS_ROW_ACTIONS;
-  protected readonly primaryAction = CONTRATOS_PRIMARY_ACTION;
+
+  /** Plantilla de ejemplo que sirve el backend para armar el archivo. */
+  protected readonly exampleConfig = {
+    mode: 'enabled' as const,
+    endpoint: '/humano/contrato/importar-ejemplo/',
+  };
+
+  /** Estado del diálogo de importación masiva. */
+  protected readonly importar = importState({
+    upload: (file) => this.service.importar(file),
+    onImported: () => this.loadList(),
+    masters: CONTRATOS_IMPORT_MASTERS,
+  });
+
+  protected readonly acciones = masterActions(MODELO.humano.contrato, {
+    row: CONTRATOS_ROW_ACTIONS,
+    primary: CONTRATOS_PRIMARY_ACTION,
+    trailing: CONTRATOS_TRAILING_ACTIONS,
+  });
 
   constructor() {
     this.loadList();
@@ -145,12 +174,18 @@ export class ContratosListComponent {
     }
   }
 
-  protected onRowClick(row: unknown): void {
-    this.navigateTo('detalle', (row as Contrato).id);
-  }
-
   protected onToolbarAction(actionId: string): void {
-    if (actionId === 'new') this.navigateTo('nuevo');
+    switch (actionId) {
+      case 'new':
+        this.navigateTo('nuevo');
+        break;
+      case 'import':
+        this.importar.open();
+        break;
+      case 'export-excel':
+        this.exportExcel();
+        break;
+    }
   }
 
   protected onRefresh(): void {
@@ -161,6 +196,31 @@ export class ContratosListComponent {
     const ids = this.selectedRows().map((c) => c.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  private exportExcel(): void {
+    if (this.isExportingExcel()) return;
+    this.isExportingExcel.set(true);
+    this.fileDownload
+      .download('/humano/contrato/excel/', {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros(this.activeFilters()),
+          ordenamientos: buildOrdenamientos(this.sort()),
+        },
+        fallbackFilename: 'contratos.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isExportingExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   private loadList(): void {

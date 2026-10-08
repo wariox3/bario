@@ -18,4 +18,11 @@ export const CONTRATO_ROUTES: Route[] = [
     loadComponent: () =>
       import('./pages/contrato-form/contrato-form.component').then((m) => m.ContratoFormComponent),
   },
+  {
+    path: 'detalle/:id',
+    loadComponent: () =>
+      import('./pages/contrato-detail/contrato-detail.component').then(
+        (m) => m.ContratoDetailComponent,
+      ),
+  },
 ];

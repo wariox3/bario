@@ -1,0 +1,277 @@
+<p-confirmdialog />
+
+<div class="flex flex-col">
+  <!-- Toolbar -->
+  <div
+    class="flex items-center justify-end gap-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-2.5 max-[576px]:px-4"
+  >
+    @if (documentId() !== null && pendingCount() > 0) {
+      <span
+        class="mr-auto inline-flex items-center gap-1.5 text-[0.74rem] font-medium text-amber-600"
+      >
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        {{ pendingCount() }} {{ t().entities.cuentaDetalle.pendingSuffix }}
+      </span>
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-save"
+        [label]="t().entities.cuentaDetalle.saveAll + ' (' + pendingCount() + ')'"
+        [loading]="savingAll()"
+        [disabled]="savingAll()"
+        (onClick)="onSaveAllClick()"
+      />
+    }
+    @if (agregarDocumentoEnabled()) {
+      <!-- El tooltip vive en el span: un botón deshabilitado no emite eventos de
+           mouse, así que colgado del botón nunca se vería. -->
+      <span
+        [pTooltip]="contactoId() === null ? t().documentAdd.needsContacto : ''"
+        tooltipPosition="top"
+      >
+        <p-button
+          type="button"
+          size="small"
+          icon="pi pi-file-plus"
+          [label]="t().documentAdd.buttonLabel"
+          [outlined]="true"
+          [loading]="addingDocumentos()"
+          [disabled]="contactoId() === null || addingDocumentos()"
+          (onClick)="openAgregarDocumento()"
+        />
+      </span>
+    }
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-plus"
+      [label]="t().entities.cuentaDetalle.addLine"
+      [outlined]="true"
+      (onClick)="addLinea()"
+    />
+  </div>
+
+  <div class="max-h-[30rem] overflow-auto">
+    <table class="contable-detalle-table">
+      <thead>
+        <tr>
+          <th class="contable-detalle-table__th w-10 text-center">
+            {{ t().entities.cuentaDetalle.columns.linea }}
+          </th>
+          @if (showNumero()) {
+            <th class="contable-detalle-table__th w-28 text-left">
+              {{ t().entities.cuentaDetalle.columns.numero }}
+            </th>
+          }
+          @if (showDocumento()) {
+            <th class="contable-detalle-table__th w-44 text-left">
+              {{ t().entities.cuentaDetalle.columns.documento }}
+            </th>
+          }
+          <th class="contable-detalle-table__th min-w-[18rem] text-left">
+            {{ t().entities.cuentaDetalle.columns.cuenta }}
+          </th>
+          @if (showContacto()) {
+            <th class="contable-detalle-table__th min-w-[14rem] text-left">
+              {{ t().entities.cuentaDetalle.columns.contacto }}
+            </th>
+          }
+          <th class="contable-detalle-table__th w-40 text-left">
+            {{ t().entities.cuentaDetalle.columns.naturaleza }}
+          </th>
+          @if (showCentroCosto()) {
+            <th class="contable-detalle-table__th w-44 text-left">
+              {{ t().entities.cuentaDetalle.columns.centroCosto }}
+            </th>
+          }
+          <th class="contable-detalle-table__th w-40 text-right">
+            {{ t().entities.cuentaDetalle.columns.valor }}
+          </th>
+          @if (showBase()) {
+            <th class="contable-detalle-table__th w-36 text-right">
+              {{ t().entities.cuentaDetalle.columns.base }}
+            </th>
+          }
+          @if (showDetalle()) {
+            <th class="contable-detalle-table__th min-w-[14rem] text-left">
+              {{ t().entities.cuentaDetalle.columns.detalle }}
+            </th>
+          }
+          <th class="contable-detalle-table__th w-20 text-center">
+            {{ t().entities.cuentaDetalle.columns.acciones }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of detalles().controls; track row; let i = $index) {
+          <tr
+            [formGroup]="row"
+            class="contable-detalle-table__row"
+            [class.contable-detalle-table__row--pending]="isPending(row)"
+          >
+            <td class="contable-detalle-table__td text-center text-brand-muted tabular-nums">
+              @if (isPending(row)) {
+                <span
+                  class="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 align-middle"
+                  [pTooltip]="t().entities.cuentaDetalle.pendingSuffix"
+                ></span>
+              }
+              {{ i + 1 }}
+            </td>
+
+            @if (showNumero()) {
+              <td class="contable-detalle-table__td">
+                <p-inputnumber
+                  formControlName="numero"
+                  mode="decimal"
+                  [min]="0"
+                  [useGrouping]="false"
+                  [maxFractionDigits]="0"
+                  [fluid]="true"
+                />
+              </td>
+            }
+
+            @if (showDocumento()) {
+              <td class="contable-detalle-table__td">
+                @if (row.controls.documento_afectado.value !== null) {
+                  <div class="flex flex-col gap-0.5">
+                    <span class="text-[0.78rem] font-medium text-brand-text">
+                      {{ row.controls.documento_afectado_tipo.value }}
+                    </span>
+                    <span class="text-[0.72rem] text-brand-muted tabular-nums">
+                      {{
+                        row.controls.documento_afectado_numero.value ??
+                          row.controls.documento_afectado.value
+                      }}
+                    </span>
+                  </div>
+                } @else {
+                  <span class="text-brand-muted">—</span>
+                }
+              </td>
+            }
+
+            <td class="contable-detalle-table__td">
+              <app-cuenta-select
+                formControlName="cuenta"
+                [placeholder]="t().entities.cuentaDetalle.cuentaPlaceholder"
+                [invalid]="row.controls.cuenta.invalid && row.controls.cuenta.touched"
+              />
+            </td>
+
+            @if (showContacto()) {
+              <td class="contable-detalle-table__td">
+                <lib-contacto-select
+                  formControlName="contacto"
+                  [placeholder]="t().entities.cuentaDetalle.contactoPlaceholder"
+                />
+              </td>
+            }
+
+            <td class="contable-detalle-table__td">
+              <p-select
+                formControlName="naturaleza"
+                [options]="naturalezaOptions()"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                [fluid]="true"
+              />
+            </td>
+
+            @if (showCentroCosto()) {
+              <td class="contable-detalle-table__td">
+                <lib-api-select
+                  formControlName="centro_costo"
+                  [endpoint]="centroCostoEndpoint"
+                  [placeholder]="t().entities.cuentaDetalle.centroCostoPlaceholder"
+                />
+              </td>
+            }
+
+            <td class="contable-detalle-table__td">
+              <p-inputnumber
+                formControlName="valor"
+                mode="decimal"
+                [min]="0"
+                [minFractionDigits]="0"
+                [maxFractionDigits]="2"
+                prefix="$ "
+                [fluid]="true"
+                inputStyleClass="text-right"
+              />
+            </td>
+
+            @if (showBase()) {
+              <td class="contable-detalle-table__td">
+                <p-inputnumber
+                  formControlName="base"
+                  mode="decimal"
+                  [min]="0"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  prefix="$ "
+                  [fluid]="true"
+                  inputStyleClass="text-right"
+                />
+              </td>
+            }
+
+            @if (showDetalle()) {
+              <td class="contable-detalle-table__td">
+                <input
+                  pInputText
+                  formControlName="detalle"
+                  type="text"
+                  maxlength="200"
+                  class="w-full"
+                  [placeholder]="t().entities.cuentaDetalle.detallePlaceholder"
+                />
+              </td>
+            }
+
+            <td class="contable-detalle-table__td">
+              <div class="flex items-center justify-center gap-0.5">
+                @if (canSaveRow(row)) {
+                  <button
+                    type="button"
+                    (click)="saveLinea(row)"
+                    [disabled]="isSavingRow(row)"
+                    [pTooltip]="t().entities.cuentaDetalle.saveLine"
+                    [attr.aria-label]="t().entities.cuentaDetalle.saveLine"
+                    class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
+                  >
+                    @if (isSavingRow(row)) {
+                      <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
+                    } @else {
+                      <i class="pi pi-check text-[0.78rem]"></i>
+                    }
+                  </button>
+                }
+                <button
+                  type="button"
+                  (click)="removeLinea(row)"
+                  [pTooltip]="t().entities.cuentaDetalle.removeLine"
+                  [attr.aria-label]="t().entities.cuentaDetalle.removeLine"
+                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                >
+                  <i class="pi pi-trash text-[0.78rem]"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td
+              [attr.colspan]="columnCount()"
+              class="px-5 py-8 text-center text-sm text-brand-muted"
+            >
+              <i class="pi pi-inbox mr-2"></i>{{ t().entities.cuentaDetalle.empty }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

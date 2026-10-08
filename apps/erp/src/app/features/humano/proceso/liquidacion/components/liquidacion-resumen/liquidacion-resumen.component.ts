@@ -1,0 +1,78 @@
+import { Component, computed, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import {
+  I18nService,
+  TenantService,
+  formatCop,
+  toFiniteNumber,
+  formatFechaCorta,
+} from '@reddoc/core';
+import type { AppDict } from '@erp/i18n';
+import { CONTRATO_LIST_PATH } from '@erp/features/humano/masters/contrato/contrato.constants';
+import { estadoDe, type EstadoProceso } from '../../../shared/proceso.estado';
+import { LIQUIDACION_PRESTACIONES } from '../../liquidacion.constants';
+import type { Liquidacion } from '../../liquidacion.model';
+
+/**
+ * Resumen de una liquidación: el empleado, el periodo liquidado, las cuatro
+ * prestaciones y los totales.
+ *
+ * Cada prestación se muestra con **desde cuándo se contó y cuántos días**, que es
+ * lo que explica su monto. El interés de cesantías no tiene ninguno de los dos:
+ * se calcula sobre la cesantía, así que esas celdas van vacías a propósito.
+ *
+ * Las cuatro se recorren desde `LIQUIDACION_PRESTACIONES` en vez de repartirlas
+ * en una tabla de ocho columnas con media docena de celdas vacías para cuadrar la
+ * grilla, como hace el ERP anterior.
+ */
+@Component({
+  selector: 'app-liquidacion-resumen',
+  standalone: true,
+  imports: [RouterLink],
+  templateUrl: './liquidacion-resumen.component.html',
+  styleUrl: './liquidacion-resumen.component.scss',
+})
+export class LiquidacionResumenComponent {
+  private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly tenant = inject(TenantService);
+  protected readonly t = this.i18n.t;
+
+  readonly liquidacion = input.required<Liquidacion>();
+
+  protected readonly formatMoney = formatCop;
+
+  /** Etapa del ciclo, para el badge. */
+  protected readonly estado = computed<EstadoProceso>(() => estadoDe(this.liquidacion()));
+
+  /** Las cuatro prestaciones con su etiqueta, monto, días y fecha ya resueltos. */
+  protected readonly prestaciones = computed(() => {
+    const liquidacion = this.liquidacion();
+    return LIQUIDACION_PRESTACIONES.map(({ labelKey, valor, dias, ultimoPago }) => ({
+      label: this.i18n.translate(labelKey),
+      valor: toFiniteNumber(liquidacion[valor]) ?? 0,
+      dias: dias ? toFiniteNumber(liquidacion[dias]) : null,
+      ultimoPago: ultimoPago ? this.formatFecha(liquidacion[ultimoPago] as string | null) : null,
+    }));
+  });
+
+  /** Ficha del contrato del que salió la liquidación; `null` si no hay a dónde ir. */
+  protected readonly contratoLink = computed<readonly (string | number)[] | null>(() => {
+    const contrato = this.liquidacion().contrato;
+    const slug = this.tenant.currentSlug();
+    if (contrato == null || !slug) return null;
+    return ['/t', slug, ...CONTRATO_LIST_PATH, 'detalle', contrato];
+  });
+
+  /** Días liquidados: llegan como decimal en string (`"30.00"`). */
+  protected readonly dias = computed(() => toFiniteNumber(this.liquidacion().dias) ?? 0);
+
+  protected readonly salario = computed(() => toFiniteNumber(this.liquidacion().salario) ?? 0);
+  protected readonly adicion = computed(() => toFiniteNumber(this.liquidacion().adicion) ?? 0);
+  protected readonly deduccion = computed(() => toFiniteNumber(this.liquidacion().deduccion) ?? 0);
+  protected readonly total = computed(() => toFiniteNumber(this.liquidacion().total) ?? 0);
+
+  /** Fecha corta (`30/07/2026`); `—` si no hay valor. */
+  protected formatFecha(value: string | null): string {
+    return formatFechaCorta(value, '—');
+  }
+}

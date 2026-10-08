@@ -2,27 +2,43 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { FieldErrorComponent } from '@reddoc/ui';
+import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionService } from '../../configuracion.service';
 import { GENERAL_CAMPOS } from '../../configuracion.constants';
 import { configuracionToGeneralForm, generalFormToPayload } from '../../configuracion.mapper';
+import { DocumentoTipoTableComponent } from './documento-tipo-table/documento-tipo-table.component';
 
 /** Campos del backend (prefijados) → controles del form (sin prefijo). */
-const GENERAL_FIELD_MAP = { gen_uvt: 'uvt' };
+const GENERAL_FIELD_MAP = {
+  gen_uvt: 'uvt',
+  gen_emitir_automaticamente: 'emitir_automaticamente',
+};
 
 /**
- * Área "General" de la configuración: la UVT (`gen_uvt`).
+ * Área "General" de la configuración: la UVT (`gen_uvt`) y la emisión
+ * automática de documentos electrónicos (`gen_emitir_automaticamente`).
  *
  * Auto-contenida: lee y guarda solo sus campos (`GENERAL_CAMPOS`). La UVT es la
- * base de los cálculos fiscales, por eso vive en su propia sección destacada.
+ * base de los cálculos fiscales, por eso vive en su propia sección destacada;
+ * la emisión automática va en la suya porque no es un parámetro de cálculo sino
+ * una decisión sobre cómo salen los documentos hacia la DIAN.
  */
 @Component({
   selector: 'app-general-config',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonModule, InputNumberModule, FieldErrorComponent],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    CheckboxModule,
+    InputNumberModule,
+    FieldErrorComponent,
+    FocusInvalidDirective,
+    DocumentoTipoTableComponent,
+  ],
   templateUrl: './general-config.component.html',
 })
 export class GeneralConfigComponent {
@@ -41,6 +57,7 @@ export class GeneralConfigComponent {
 
   protected readonly form = this.fb.group({
     uvt: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
+    emitir_automaticamente: this.fb.nonNullable.control(false),
   });
 
   constructor() {

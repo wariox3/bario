@@ -1,7 +1,6 @@
 import type { Observable } from 'rxjs';
-import type { ListQuery } from '@reddoc/core';
+import { type DocumentEntityConfig, type ListQuery } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
-import type { DocumentEntityConfig } from '../types/entity-config.types';
 
 /**
  * Contexto que el listado anfitrión (`BaseDocumentListComponent`) entrega a un
@@ -19,6 +18,12 @@ export interface EntityActionContext {
    * acciones que operan sobre lo que el usuario está viendo (ej. exportar).
    */
   readonly query: ListQuery;
+  /**
+   * Ids de las filas seleccionadas (checkbox) al momento de disparar la acción.
+   * Vacío si no hay selección. Lo consumen las acciones masivas (ej. generar
+   * seleccionados); las que operan sobre el query completo pueden ignorarlo.
+   */
+  readonly selectedIds: readonly (string | number)[];
   /** Recarga la lista. El strategy lo llama tras una operación exitosa. */
   readonly reload: () => void;
 }
@@ -44,6 +49,18 @@ export interface EntityActionStrategy {
    * Su `id` debe ser igual a `this.id` para que el dispatch por id sea directo.
    */
   readonly toolbarAction: ToolbarAction;
+
+  /**
+   * Dónde vive el botón en el toolbar. Default `'menu'`.
+   *
+   *  - `'menu'`: un ítem más del dropdown "Acciones" (lo normal — mantiene el
+   *    toolbar corto cuando un documento acumula acciones).
+   *  - `'button'`: botón suelto a la izquierda del dropdown. Reservado para la
+   *    acción **de rutina** del documento, la que se usa cada vez que se entra
+   *    al listado y no merece un click de más (ej. "Generar todos" en una
+   *    plantilla recurrente).
+   */
+  readonly placement?: 'menu' | 'button';
 
   /**
    * Filtro fino opcional, además de `extraActionIds`. Default: disponible.

@@ -15,7 +15,7 @@ import type { PendienteFacturar } from './pendiente-facturar.model';
  */
 export const PENDIENTE_FACTURAR_INFORME = 'pendiente_facturar';
 
-/** Endpoint del informe (acciones: `lista/`, `exportar/`, `totales/`). */
+/** Endpoint del informe (acciones: `lista/`, `excel/`). */
 export const PENDIENTE_FACTURAR_ENDPOINT = '/general/documento-detalle-informe/';
 
 /**
@@ -33,7 +33,7 @@ export class PendienteFacturarService extends BaseHttpService {
   private readonly resourcePath = PENDIENTE_FACTURAR_ENDPOINT;
 
   /** URL absoluta de la acción de exportar (la usa `FileDownloadService`). */
-  readonly exportUrl = `${PENDIENTE_FACTURAR_ENDPOINT}exportar/`;
+  readonly exportUrl = `${PENDIENTE_FACTURAR_ENDPOINT}excel/`;
 
   list(query: ListQuery): Observable<PaginatedResponse<PendienteFacturar>> {
     return this.post<PaginatedResponse<PendienteFacturar>>(

@@ -31,7 +31,7 @@ export const ESTRATO_OPTIONS: readonly { readonly label: string; readonly value:
  * un documento necesita divergir, deja de usar la factory para esa columna.
  *
  * Los `field` mapean el shape real del endpoint `general/documento/lista/`:
- * la identificación del tercero llega como `tercero_numero_identificacion`,
+ * la identificación del tercero llega como `contacto_numero_identificacion`,
  * los montos como `currency` y los estados como flags booleanos.
  */
 export function buildServicioColumns(i18nNamespace: string): readonly ColumnDef[] {
@@ -57,13 +57,13 @@ export function buildServicioColumns(i18nNamespace: string): readonly ColumnDef[
       width: '110px',
     },
     {
-      field: 'tercero_numero_identificacion',
+      field: 'contacto_numero_identificacion',
       headerKey: `${ns}.identificacion`,
       type: 'text',
       width: '140px',
     },
     {
-      field: 'contacto_nombre',
+      field: 'contacto_nombre_corto',
       headerKey: `${ns}.contacto`,
       type: 'text',
     },

@@ -1,0 +1,25 @@
+// Chrome del diálogo de invitación.
+//
+// Lo comparten las dos pantallas que invitan a un contenedor: la lista de
+// empresas (`@reddoc/feature-contenedores`) y los usuarios del contenedor
+// activo (ERP · seguridad). Son diálogos distintos —uno trae tabs de miembros
+// e invitaciones, el otro es solo el formulario— pero se ven igual: mismo
+// aire, misma línea bajo el encabezado.
+//
+// Va deliberadamente FUERA de `@layer`, por lo mismo que `_button.scss`: las
+// reglas del preset de PrimeNG viven en `@layer primeng` y una regla sin capa
+// las pisa sin pelear especificidad.
+.rd-invite-dialog {
+  .p-dialog-header {
+    padding: 1.25rem 1.5rem 0.75rem;
+    border-bottom: 1px solid rgba(20, 48, 73, 0.08);
+  }
+
+  .p-dialog-content {
+    padding: 1.25rem 1.5rem 0.5rem;
+  }
+
+  .p-dialog-footer {
+    padding: 0 1.5rem 1.1rem;
+  }
+}

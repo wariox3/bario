@@ -1,8 +1,82 @@
-import type { AuthTranslationsHost } from '@reddoc/ui';
+import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
+import type {
+  AccesosContenedorTranslationsHost,
+  AppSwitcherTranslationsHost,
+  AuthTranslationsHost,
+  PhoneInputTranslationsHost,
+} from '@reddoc/ui';
 
-export interface AppDict extends AuthTranslationsHost {
+/**
+ * Los 42 campos de la línea liquidada del aporte a seguridad social.
+ *
+ * Se declara aparte porque el diccionario lo usa dos veces con las mismas claves:
+ * `siglas` (el encabezado corto de la tabla) y `nombres` (qué significa cada uno,
+ * para la leyenda). Tenerlo tipado una sola vez impide que una de las dos se
+ * quede corta. Las claves las consume `aporte.detalles.ts`.
+ */
+export interface AporteDetalleCampos {
+  id: string;
+  identificacion: string;
+  empleado: string;
+  contrato: string;
+  ing: string;
+  ret: string;
+  vsp: string;
+  vst: string;
+  sln: string;
+  ige: string;
+  lma: string;
+  vac: string;
+  lrm: string;
+  dIrp: string;
+  si: string;
+  salario: string;
+  h: string;
+  dP: string;
+  dS: string;
+  dR: string;
+  dC: string;
+  bcP: string;
+  bcS: string;
+  bcR: string;
+  bcC: string;
+  tP: string;
+  tS: string;
+  tR: string;
+  tC: string;
+  tSena: string;
+  tIcbf: string;
+  cP: string;
+  fSol: string;
+  fSub: string;
+  volAfi: string;
+  volApo: string;
+  cS: string;
+  cR: string;
+  cC: string;
+  cSena: string;
+  cIcbf: string;
+  total: string;
+}
+
+export interface AppDict
+  extends
+    AuthTranslationsHost,
+    AppSwitcherTranslationsHost,
+    PhoneInputTranslationsHost,
+    ContenedoresTranslationsHost,
+    AccesosContenedorTranslationsHost {
   common: {
     comingSoon: string;
+    /** Colapsable de los documentos con los campos opcionales que menos se tocan. */
+    masInformacion: { title: string; hint: string };
+    accessDenied: {
+      title: string;
+      sub: string;
+      subPermission: string;
+      subModule: string;
+      back: string;
+    };
     actions: {
       new: string;
       actions: string;
@@ -12,6 +86,7 @@ export interface AppDict extends AuthTranslationsHost {
       deleteSelected: string;
       cancel: string;
       back: string;
+      close: string;
       save: string;
       menuLabel: string;
       filters: string;
@@ -19,12 +94,16 @@ export interface AppDict extends AuthTranslationsHost {
       clearSearch: string;
       refresh: string;
       exportExcel: string;
+      exportPdf: string;
       import: string;
       export: string;
+      options: string;
     };
     search: {
       placeholder: string;
     };
+    /** Meses del año en orden, índices 0..11. */
+    months: string[];
     list: {
       records: string;
       of: string;
@@ -79,6 +158,39 @@ export interface AppDict extends AuthTranslationsHost {
         esFalso: string;
       };
     };
+    /**
+     * Diálogo de **archivos adjuntos** (`ArchivosDialogComponent`), que abre el
+     * menú "Opciones → Archivos" de las fichas de detalle.
+     */
+    archivos: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      columns: { fecha: string; nombre: string; tamano: string; acciones: string };
+      dropzone: {
+        primary: string;
+        /** Soporta el placeholder `{max}` (tamaño máximo en MB). */
+        hint: string;
+        invalidType: string;
+        tooLarge: string;
+      };
+      uploading: string;
+      download: string;
+      delete: string;
+      confirmDelete: {
+        header: string;
+        /** Soporta el placeholder `{nombre}`. */
+        message: string;
+      };
+      toasts: {
+        loadError: { title: string; desc: string };
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        downloadError: { title: string; desc: string };
+      };
+    };
     import: {
       dropzone: {
         primary: string;
@@ -95,6 +207,32 @@ export interface AppDict extends AuthTranslationsHost {
       removeFile: string;
       tabs: { errors: string; masters: string };
       emptyStates: { errors: string; masters: string };
+      /**
+       * Tab "Maestros": los archivos de referencia descargables que acompañan a
+       * una importación. Las claves de `names` son los `ImportMasterId` de
+       * `import-dialog.types.ts`; el diálogo indexa este objeto con el id, así
+       * que agregar un maestro sin su nombre acá rompe el build.
+       */
+      masters: {
+        hint: string;
+        nameHeader: string;
+        download: string;
+        names: {
+          ciudad: string;
+          comprobanteCodigo: string;
+          comprobante: string;
+          impuesto: string;
+          banco: string;
+          cuentaBancoClase: string;
+          activoGrupo: string;
+          metodoDepreciacion: string;
+          tipoCotizante: string;
+          subtipoCotizante: string;
+          entidad: string;
+          tipoContrato: string;
+          costoTipo: string;
+        };
+      };
       errors: {
         rowHeader: string;
         messageHeader: string;
@@ -123,21 +261,24 @@ export interface AppDict extends AuthTranslationsHost {
     };
     nav: {
       dashboard: string;
+      home: string;
       account: string;
       empty: string;
       sections: {
         master: string;
         document: string;
         process: string;
-        movement: string;
         utility: string;
         report: string;
+        reception: string;
       };
     };
     userMenu: {
       label: string;
       myContainers: string;
       manageAccount: string;
+      myCompany: string;
+      security: string;
       settings: string;
       logout: string;
     };
@@ -152,6 +293,117 @@ export interface AppDict extends AuthTranslationsHost {
       cancel: string;
       success: { title: string; desc: string };
       error: { title: string; desc: string };
+    };
+    generarRecurrente: {
+      seleccionadosLabel: string;
+      modalHeader: string;
+      modalSubtitle: string;
+      todosLabel: string;
+      todosModalHeader: string;
+      todosModalSubtitle: string;
+      todosWarning: string;
+      periodoLabel: string;
+      submit: string;
+      cancel: string;
+      sinDestino: string;
+      noSelection: { title: string; desc: string };
+      success: { title: string; desc: string };
+      /** `desc` habla de la selección; `descTodos`, del período completo. */
+      empty: { title: string; desc: string; descTodos: string };
+      error: { title: string; desc: string };
+    };
+    detail: {
+      aprobar: string;
+      desaprobar: string;
+      acciones: string;
+      imprimir: string;
+      opciones: string;
+      archivos: string;
+      contabilidad: string;
+      anular: string;
+      emitir: string;
+      confirmAprobar: { message: string; header: string };
+      confirmDesaprobar: { message: string; header: string };
+      confirmAnular: { message: string; header: string };
+      confirmEmitir: { message: string; header: string };
+      toasts: {
+        aprobarSuccess: { title: string; desc: string };
+        aprobarError: { title: string; desc: string };
+        desaprobarSuccess: { title: string; desc: string };
+        desaprobarError: { title: string; desc: string };
+        anularSuccess: { title: string; desc: string };
+        anularError: { title: string; desc: string };
+        emitirSuccess: { title: string; desc: string };
+        emitirError: { title: string; desc: string };
+        imprimirError: { title: string; desc: string };
+        editBloqueado: { title: string; desc: string };
+      };
+    };
+    /** Diálogo "Contabilidad" de las fichas: el libro del documento y sus acciones. */
+    contabilidad: {
+      title: string;
+      subtitle: string;
+      contabilizar: string;
+      descontabilizar: string;
+      /** Alerta cuando débitos y créditos no coinciden. */
+      descuadre: string;
+      totales: { debitos: string; creditos: string };
+      empty: { title: string; desc: string };
+      toasts: {
+        loadError: { title: string; desc: string };
+        contabilizarSuccess: { title: string; desc: string };
+        contabilizarError: { title: string; desc: string };
+        descontabilizarSuccess: { title: string; desc: string };
+        descontabilizarError: { title: string; desc: string };
+      };
+    };
+    estados: {
+      aprobado: string;
+      contabilizado: string;
+      electronico: string;
+      enviadoDian: string;
+      notificado: string;
+      generado: string;
+      anulado: string;
+    };
+    afectacion: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      porDocumento: {
+        subtitle: string;
+        empty: string;
+        cols: { concepto: string; valor: string };
+      };
+      ver: string;
+      cols: {
+        id: string;
+        documento: string;
+        item: string;
+        cantidad: string;
+        precio: string;
+        periodo: string;
+        puesto: string;
+        modalidad: string;
+        subtotal: string;
+        baseImpuesto: string;
+        impuesto: string;
+        total: string;
+      };
+      cards: { documento: string; documentoAfectado: string };
+      campos: { detalleId: string; documentoId: string; fecha: string; contacto: string };
+      programaciones: {
+        title: string;
+        empty: string;
+        cols: {
+          contrato: string;
+          horas: string;
+          horasDiurnas: string;
+          horasNocturnas: string;
+        };
+      };
+      close: string;
+      loadError: { title: string; desc: string };
     };
   };
   documentImport: {
@@ -178,16 +430,73 @@ export interface AppDict extends AuthTranslationsHost {
       addError: { title: string; desc: string };
     };
   };
+  documentAdd: {
+    buttonLabel: string;
+    needsContacto: string;
+    modalHeader: string;
+    modalSubtitle: string;
+    showAllContacts: string;
+    selected: string;
+    totalSelected: string;
+    submit: string;
+    cancel: string;
+    columns: {
+      tipo: string;
+      numero: string;
+      fecha: string;
+      fechaVence: string;
+      contacto: string;
+      total: string;
+      afectado: string;
+      pendiente: string;
+    };
+    filters: {
+      id: string;
+      documentoTipoId: string;
+      identificacion: string;
+    };
+    toasts: {
+      loadError: { title: string; desc: string };
+      addSuccess: { title: string; desc: string };
+      addError: { title: string; desc: string };
+    };
+  };
   modules: {
     general: { name: string };
     compra: { name: string };
     venta: { name: string };
     inventario: { name: string };
-    turno: { name: string };
     contabilidad: { name: string };
+    tesoreria: { name: string };
+    cartera: { name: string };
     humano: { name: string };
   };
   entities: {
+    almacen: {
+      name: string;
+      searchPlaceholder: string;
+      columns: { id: string; nombre: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: { nombre: string };
+        validation: { required: string; maxLength: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
     asesor: {
       name: string;
       searchPlaceholder: string;
@@ -198,7 +507,12 @@ export interface AppDict extends AuthTranslationsHost {
         createSubtitle: string;
         editSubtitle: string;
         fields: { nombreCorto: string; celular: string; correo: string };
-        validation: { required: string; email: string };
+        validation: {
+          required: string;
+          email: string;
+          celularInvalido: string;
+          celularLongitud: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -208,6 +522,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -242,6 +557,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -250,12 +566,45 @@ export interface AppDict extends AuthTranslationsHost {
       name: string;
       searchPlaceholder: string;
       columns: { id: string; nombre: string; venta: string; compra: string; fechaVence: string };
+      /** Tabla de ítems de la lista (`PrecioItemsComponent`). */
+      items: {
+        title: string;
+        addLine: string;
+        empty: { title: string; desc: string };
+        columns: {
+          id: string;
+          item: string;
+          referencia: string;
+          precio: string;
+          acciones: string;
+        };
+        itemPlaceholder: string;
+        import: {
+          title: string;
+          subtitle: string;
+          /** Solo se muestra si hay filas sin guardar. */
+          notice: string;
+        };
+        confirmDelete: {
+          header: string;
+          /** Soporta el placeholder `{item}`. */
+          message: string;
+        };
+        toasts: {
+          loadError: { title: string; desc: string };
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          updateError: { title: string; desc: string };
+          deleteSuccess: { title: string; desc: string };
+          deleteError: { title: string; desc: string };
+        };
+      };
       form: {
         createTitle: string;
         editTitle: string;
         createSubtitle: string;
         editSubtitle: string;
-        fields: { nombre: string; venta: string; compra: string; fechaVence: string };
+        fields: { nombre: string; fechaVence: string };
         validation: { required: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -266,6 +615,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -281,6 +631,8 @@ export interface AppDict extends AuthTranslationsHost {
         consecutivoHasta: string;
         fechaDesde: string;
         fechaHasta: string;
+        venta: string;
+        compra: string;
       };
       form: {
         createTitle: string;
@@ -312,6 +664,10 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
+        /** Campo compuesto: a qué documentos aplica la resolución. */
+        labels: { aplicaA: string };
+        vigencia: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -377,6 +733,8 @@ export interface AppDict extends AuthTranslationsHost {
         validation: {
           required: string;
           emailInvalid: string;
+          celularInvalido: string;
+          celularLongitud: string;
           numeroIdentificacionExistente: string;
         };
         submitCreate: string;
@@ -396,22 +754,17 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
-        title: string;
-        subtitle: string;
-        sections: {
-          general: string;
-          contacto: string;
-          ubicacion: string;
-          cliente: string;
-          proveedor: string;
-        };
-        labels: { codigoCiiu: string; codigoPostal: string };
+        /** Micro-encabezados de los grupos dentro de la card de la ficha. */
+        groups: { identificacion: string; contacto: string; ubicacion: string };
+        sections: { general: string; cliente: string; proveedor: string };
+        labels: { codigoCiiu: string; documento: string; nombreCompleto: string };
         notFound: { title: string; desc: string };
       };
     };
     item: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         codigo: string;
@@ -430,6 +783,8 @@ export interface AppDict extends AuthTranslationsHost {
         sections: { principal: string; preciosImpuestos: string; cuentas: string };
         sectionsHint: { principal: string; preciosImpuestos: string; cuentas: string };
         clasificacion: string;
+        /** Aviso del ítem ya movido en documentos (bloquea tipo e inventario). */
+        enUso: { titulo: string; hint: string };
         fields: {
           codigo: string;
           nombre: string;
@@ -465,7 +820,20 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
-        sections: { precios: string; impuestos: string; cuentas: string };
+        eyebrow: string;
+        sections: {
+          general: string;
+          preciosImpuestos: string;
+          precios: string;
+          impuestos: string;
+          cuentas: string;
+        };
+        /** Micro-encabezados de los grupos de la card de información general. */
+        groups: { identificacion: string; clasificacion: string };
+        /** Entradas del menú "Opciones" del detalle. */
+        /** Entrada del menú "Opciones" y su subtítulo en el diálogo. */
+        opciones: { imagenes: string };
+        opcionesHint: { imagenes: string };
         labels: { impuestosVenta: string; impuestosCompra: string; sinImpuestos: string };
         notFound: { title: string; desc: string };
         toasts: {
@@ -476,186 +844,45 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
     };
-    puesto: {
+    seguridadSocial: {
       name: string;
-      searchPlaceholder: string;
       columns: {
         id: string;
-        nombre: string;
-        direccion: string;
-        celular: string;
-        latitud: string;
-        longitud: string;
-        comentario: string;
-        estado: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
       };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        cancel: string;
-        submitCreate: string;
-        submitEdit: string;
-        sections: { principal: string };
-        sectionsHint: { principal: string };
+      filters: { aprobado: string; anulado: string; contabilizado: string };
+      /** Columnas de la tabla de lineas de la ficha. */
+      detalle: { id: string; detalle: string; pago: string };
+      detail: {
+        sections: { general: string; montos: string; aportes: string };
         fields: {
-          nombre: string;
-          direccion: string;
-          celular: string;
-          latitud: string;
-          longitud: string;
-          comentario: string;
-          ciudad: string;
-          ciudadPlaceholder: string;
-          contacto: string;
-          contactoPlaceholder: string;
-          centroCosto: string;
-          centroCostoPlaceholder: string;
-          programador: string;
-          programadorPlaceholder: string;
+          numero: string;
+          desde: string;
+          hasta: string;
+          empleado: string;
+          contrato: string;
+          programacionDetalle: string;
+          salario: string;
+          baseCotizacion: string;
+          basePrestacion: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+          cue: string;
         };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
+        verEnDian: string;
         notFound: { title: string; desc: string };
-        sections: { ubicacion: string; relaciones: string; comentario: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-    };
-    programador: {
-      name: string;
-      searchPlaceholder: string;
-      columns: { id: string; nombre: string; estado: string };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        cancel: string;
-        submitCreate: string;
-        submitEdit: string;
-        sections: { principal: string };
-        sectionsHint: { principal: string };
-        fields: { nombre: string };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
-        notFound: { title: string; desc: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-    };
-    secuencia: {
-      name: string;
-      searchPlaceholder: string;
-      columns: {
-        id: string;
-        codigo: string;
-        nombre: string;
-        horas: string;
-        dias: string;
-        homologar: string;
-        estado: string;
-      };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        cancel: string;
-        submitCreate: string;
-        submitEdit: string;
-        sections: { principal: string; diasMes: string; diasSemana: string };
-        sectionsHint: { principal: string; diasMes: string; diasSemana: string };
-        fields: {
-          codigo: string;
-          nombre: string;
-          horas: string;
-          dias: string;
-          homologar: string;
-          lunes: string;
-          martes: string;
-          miercoles: string;
-          jueves: string;
-          viernes: string;
-          sabado: string;
-          domingo: string;
-          festivo: string;
-          domingoFestivo: string;
-        };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
-        notFound: { title: string; desc: string };
-        sections: { principal: string; diasMes: string; diasSemana: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-    };
-    turno: {
-      name: string;
-      searchPlaceholder: string;
-      columns: {
-        id: string;
-        codigo: string;
-        nombre: string;
-        horaInicio: string;
-        horaFin: string;
-        horas: string;
-        horasDiurnas: string;
-        horasNocturnas: string;
-        color: string;
-        estado: string;
-      };
-      form: {
-        createTitle: string;
-        editTitle: string;
-        createSubtitle: string;
-        editSubtitle: string;
-        fields: {
-          codigo: string;
-          nombre: string;
-          horaInicio: string;
-          horaFin: string;
-          horas: string;
-          horasDiurnas: string;
-          horasNocturnas: string;
-          color: string;
-        };
-        validation: { required: string };
-        toasts: {
-          createSuccess: { title: string; desc: string };
-          editSuccess: { title: string; desc: string };
-          createError: { title: string; desc: string };
-          editError: { title: string; desc: string };
-          loadError: { title: string; desc: string };
-        };
-      };
-      detail: {
-        notFound: { title: string; desc: string };
-        sections: { principal: string };
-        activo: string;
-        toasts: { loadError: { title: string; desc: string } };
       };
     };
     sucursal: {
@@ -678,6 +905,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -685,7 +913,7 @@ export interface AppDict extends AuthTranslationsHost {
     grupo: {
       name: string;
       searchPlaceholder: string;
-      columns: { id: string; nombre: string; periodo: string };
+      columns: { id: string; nombre: string; periodo: string; dias: string };
       periodos: { 1: string; 2: string };
       form: {
         createTitle: string;
@@ -703,6 +931,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -727,6 +956,7 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
         activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
@@ -735,6 +965,7 @@ export interface AppDict extends AuthTranslationsHost {
     centroCosto: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: { id: string; codigo: string; nombre: string; estado: string };
       form: {
         createTitle: string;
@@ -757,6 +988,63 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
+        activo: string;
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    formaPago: {
+      name: string;
+      searchPlaceholder: string;
+      columns: { id: string; nombre: string; cuenta: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: { nombre: string; cuenta: string; cuentaPlaceholder: string };
+        validation: { required: string; maxlength: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    sede: {
+      name: string;
+      searchPlaceholder: string;
+      columns: { id: string; codigo: string; nombre: string; centroCosto: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: {
+          nombre: string;
+          codigo: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+        };
+        validation: { required: string; maxlength: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -764,7 +1052,16 @@ export interface AppDict extends AuthTranslationsHost {
     cuenta: {
       name: string;
       searchPlaceholder: string;
-      columns: { codigo: string; nombre: string; clase: string; movimiento: string };
+      import: { title: string; subtitle: string };
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        movimiento: string;
+        exigeBase: string;
+        exigeContacto: string;
+        exigeCentroCosto: string;
+      };
       form: {
         createTitle: string;
         editTitle: string;
@@ -782,7 +1079,7 @@ export interface AppDict extends AuthTranslationsHost {
           permiteMovimiento: string;
           exigeBase: string;
           exigeContacto: string;
-          exigeGrupo: string;
+          exigeCentroCosto: string;
         };
         validation: {
           required: string;
@@ -800,13 +1097,34 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
+        groups: { identificacion: string; jerarquia: string; condiciones: string };
+        fields: { codigoClase: string; codigoGrupo: string; codigoCuenta: string };
+        acciones: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
+        traslado: {
+          menuItem: string;
+          title: string;
+          subtitle: string;
+          submit: string;
+          destino: string;
+          warning: string;
+          fields: { cuentaOrigen: string; cuentaOrigenPlaceholder: string };
+          validation: { required: string; mismaCuenta: string };
+          confirm: { header: string; message: string; accept: string };
+          toasts: {
+            success: { title: string; desc: string };
+            vacio: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
       };
     };
     activo: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
       columns: {
         id: string;
         codigo: string;
@@ -853,6 +1171,111 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string; contabilizacion: string };
+        groups: { identificacion: string; depreciacion: string; vida: string };
+        dadoDeBaja: string;
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    periodo: {
+      name: string;
+      /** 13 entradas: enero..diciembre (índices 0..11) + cierre (12). */
+      meses: string[];
+      panel: { emptyAnios: string; emptyTitle: string; emptySub: string };
+      estados: { abierto: string; bloqueado: string; cerrado: string; inconsistencia: string };
+      acciones: {
+        nuevoAnio: string;
+        verInconsistencias: string;
+        bloquear: string;
+        desbloquear: string;
+        cerrar: string;
+      };
+      confirms: { cerrar: { header: string; message: string } };
+      anioNuevo: {
+        title: string;
+        subtitle: string;
+        field: { anio: string; anioPlaceholder: string };
+        validation: { required: string; rango: string };
+        submit: string;
+      };
+      inconsistencias: {
+        title: string;
+        columns: { comprobante: string; numero: string; documento: string; descripcion: string };
+        empty: string;
+        loadError: string;
+      };
+      toasts: {
+        bloquearSuccess: { title: string; desc: string };
+        bloquearError: { title: string; desc: string };
+        desbloquearSuccess: { title: string; desc: string };
+        desbloquearError: { title: string; desc: string };
+        cerrarSuccess: { title: string; desc: string };
+        cerrarError: { title: string; desc: string };
+        crearSuccess: { title: string; desc: string };
+        crearError: { title: string; desc: string };
+        loadError: { title: string; desc: string };
+      };
+    };
+    empleado: {
+      name: string;
+      searchPlaceholder: string;
+      import: { title: string; subtitle: string };
+      columns: {
+        id: string;
+        identificacion: string;
+        identificacion_abreviatura: string;
+        nombre: string;
+        correo: string;
+        celular: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        sections: { banca: string };
+        sectionsHint: { banca: string };
+        fields: {
+          identificacion: string;
+          numeroIdentificacion: string;
+          nombre1: string;
+          nombre2: string;
+          apellido1: string;
+          apellido2: string;
+          telefono: string;
+          celular: string;
+          ciudad: string;
+          ciudadPlaceholder: string;
+          direccion: string;
+          barrio: string;
+          correo: string;
+          banco: string;
+          bancoPlaceholder: string;
+          numeroCuenta: string;
+          cuentaBancoClase: string;
+        };
+        validation: {
+          required: string;
+          emailInvalid: string;
+          celularInvalido: string;
+          celularLongitud: string;
+          numeroIdentificacionExistente: string;
+        };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        /** Micro-encabezados de los grupos de la card de información general. */
+        groups: { identificacion: string; contacto: string; ubicacion: string };
+        sections: { general: string; banca: string };
+        /** Campos compuestos, que no salen de un solo campo del backend. */
+        labels: { documento: string; nombreCompleto: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -860,8 +1283,18 @@ export interface AppDict extends AuthTranslationsHost {
     credito: {
       name: string;
       searchPlaceholder: string;
+      pagos: {
+        title: string;
+        empty: string;
+        loadError: string;
+        total: string;
+        columns: { id: string; fecha: string; documento: string; pago: string };
+      };
       columns: {
-        contrato: string;
+        id: string;
+        identificacion: string;
+        nombre: string;
+        validarCuotas: string;
         concepto: string;
         inicio: string;
         total: string;
@@ -889,11 +1322,17 @@ export interface AppDict extends AuthTranslationsHost {
           total: string;
           cuota: string;
           cantidadCuotas: string;
+          cuotaHint: string;
           inactivo: string;
           aplicaPrima: string;
           aplicaCesantia: string;
         };
-        validation: { required: string };
+        plan: { exacto: string; conFinal: string };
+        validation: {
+          required: string;
+          mayorQueCero: string;
+          cuotaSuperaTotal: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -903,6 +1342,8 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
+        groups: { asignacion: string; saldo: string; cuotas: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -911,13 +1352,16 @@ export interface AppDict extends AuthTranslationsHost {
       name: string;
       searchPlaceholder: string;
       columns: {
-        contrato: string;
+        id: string;
+        codigo: string;
+        identificacion: string;
+        nombre: string;
+        contratoId: string;
+        conceptoId: string;
         concepto: string;
         valor: string;
-        horas: string;
         detalle: string;
         aplicaDiaLaborado: string;
-        permanente: string;
         inactivo: string;
       };
       form: {
@@ -937,7 +1381,12 @@ export interface AppDict extends AuthTranslationsHost {
           aplicaDiaLaborado: string;
           inactivo: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          mayorQueCero: string;
+          cuotaSuperaTotal: string;
+          valorPositivo: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -947,6 +1396,9 @@ export interface AppDict extends AuthTranslationsHost {
         };
       };
       detail: {
+        sections: { general: string };
+        groups: { asignacion: string; valores: string; condiciones: string };
+        activo: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -955,8 +1407,12 @@ export interface AppDict extends AuthTranslationsHost {
       name: string;
       searchPlaceholder: string;
       columns: {
+        id: string;
         novedadTipo: string;
-        contrato: string;
+        codigo: string;
+        identificacion: string;
+        nombre: string;
+        contratoId: string;
         fechaDesde: string;
         fechaHasta: string;
         dias: string;
@@ -982,9 +1438,9 @@ export interface AppDict extends AuthTranslationsHost {
           fechaHastaPeriodo: string;
           diasDinero: string;
           diasDisfrutados: string;
-          diasDisfrutadosReales: string;
         };
-        validation: { required: string; min: string; rangoFechas: string };
+        hints: { dias: string; diasUno: string };
+        validation: { required: string; min: string; maxLength: string; rangoFechas: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -993,10 +1449,40 @@ export interface AppDict extends AuthTranslationsHost {
           loadError: { title: string; desc: string };
         };
       };
+      detail: {
+        sections: { general: string; vacaciones: string; empresaEntidad: string };
+        groups: {
+          empleado: string;
+          fechas: string;
+          liquidacion: string;
+          dias: string;
+          disfrute: string;
+          dinero: string;
+          empresa: string;
+          entidad: string;
+        };
+        fields: {
+          contratoId: string;
+          prorroga: string;
+          baseCotizacionPropuesto: string;
+          baseCotizacion: string;
+          diasDisfrutadosReales: string;
+          pagoDiaDisfrute: string;
+          pagoDisfrute: string;
+          pagoDiaDinero: string;
+          pagoDinero: string;
+          horas: string;
+          pago: string;
+        };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
     };
     contrato: {
       name: string;
       searchPlaceholder: string;
+      import: { title: string; subtitle: string };
+      utilidades: { action: string };
       columns: {
         empleado: string;
         contratoTipo: string;
@@ -1029,6 +1515,7 @@ export interface AppDict extends AuthTranslationsHost {
         fields: {
           contacto: string;
           contactoPlaceholder: string;
+          identificacion: string;
           contratoTipo: string;
           cargo: string;
           grupo: string;
@@ -1036,6 +1523,7 @@ export interface AppDict extends AuthTranslationsHost {
           tiempo: string;
           fechaDesde: string;
           fechaHasta: string;
+          habilitadoTurno: string;
           salario: string;
           aplicaAuxilioTransporte: string;
           salarioIntegral: string;
@@ -1060,7 +1548,13 @@ export interface AppDict extends AuthTranslationsHost {
           fechaUltimoPagoVacacion: string;
           comentario: string;
         };
-        validation: { required: string };
+        validation: {
+          required: string;
+          salarioPositivo: string;
+          cotizanteAprendizRequerido: string;
+          cotizanteAprendizNoAplica: string;
+          fechaHastaAnterior: string;
+        };
         toasts: {
           createSuccess: { title: string; desc: string };
           editSuccess: { title: string; desc: string };
@@ -1069,20 +1563,190 @@ export interface AppDict extends AuthTranslationsHost {
           loadError: { title: string; desc: string };
         };
       };
+      terminar: {
+        action: string;
+        title: string;
+        subtitle: string;
+        submit: string;
+        fields: { fecha: string; motivo: string; seleccionar: string };
+        validation: { required: string; antesDelInicio: string };
+        /** Resumen de la liquidación que respondió `terminar/`. */
+        resultado: {
+          title: string;
+          subtitle: string;
+          periodo: string;
+          total: string;
+          adiciones: string;
+          deducciones: string;
+          nota: string;
+          cerrar: string;
+        };
+        toasts: {
+          error: { title: string };
+        };
+      };
+      parametrosIniciales: {
+        action: string;
+        title: string;
+        subtitle: string;
+        hint: string;
+        fields: { general: string; prima: string; cesantia: string; vacacion: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string };
+        };
+      };
+      detail: {
+        eyebrow: string;
+        sections: { general: string; contabilidad: string; seguridadSocial: string };
+        groups: {
+          identificacion: string;
+          vigencia: string;
+          remuneracion: string;
+          terminacion: string;
+        };
+        estado: { activo: string; terminado: string };
+        boolean: { si: string; no: string };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
     };
-    facturaVenta: {
+    pedidoCliente: {
       name: string;
       columns: {
+        id: string;
         numero: string;
         fecha: string;
+        identificacion: string;
         contacto: string;
+        subtotal: string;
+        impuesto: string;
         total: string;
-        estado: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
       };
       form: {
         createTitle: string;
         editTitle: string;
         sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          identificacion: string;
+          fecha: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    remision: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          sede: string;
+          sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
+        };
+        validation: { required: string; comentarioMax: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          identificacion: string;
+          fecha: string;
+          sede: string;
+          almacen: string;
+          asesor: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    facturaVenta: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        tabs: { detalles: string; pagos: string };
         fields: {
           cliente: string;
           clientePlaceholder: string;
@@ -1094,6 +1758,354 @@ export interface AppDict extends AuthTranslationsHost {
           sedePlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          ordenCompraPlaceholder: string;
+          remision: string;
+          remisionPlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          resolucion: string;
+          resolucionPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
+        };
+        validation: {
+          required: string;
+          ordenCompraMax: string;
+          remisionMax: string;
+          comentarioMax: string;
+        };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          identificacion: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+          ordenCompra: string;
+          remision: string;
+          asesor: string;
+          resolucion: string;
+          cue: string;
+          verDian: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+      utilidades: {
+        action: string;
+        importarDetalle: string;
+      };
+      import: {
+        title: string;
+        subtitle: string;
+        notice: string;
+      };
+    };
+    facturaPos: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+    };
+    /**
+     * Factura POS electrónica (tipo 24). Mismo listado que la factura POS: las
+     * páginas (form y detalle) las comparte la familia y viven en
+     * `posDocumento`; acá solo van el nombre visible y las etiquetas del listado.
+     */
+    facturaPosElectronica: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+    };
+    /**
+     * Cuenta de cobro (tipo 17). Documento de la familia POS (cabecera + detalles
+     * + pagos) pero sin efecto de inventario ni transmisión electrónica; las
+     * páginas las comparte la familia y viven en `posDocumento`. Acá solo van el
+     * nombre visible y las etiquetas del listado.
+     */
+    cuentaCobro: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
+    /**
+     * Textos del **form y la ficha compartidos por la familia POS** (factura POS,
+     * factura POS electrónica…). El nombre del documento no vive acá: lo resuelve
+     * cada página desde el `displayNameKey` de su `DocumentEntityConfig`.
+     */
+    /** Nota crédito de venta (tipo 2). Listado; form/ficha en `notaVenta`. */
+    notaCredito: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: { aprobado: string; anulado: string; contabilizado: string };
+    };
+    /** Nota débito de venta (tipo 3). Listado; form/ficha en `notaVenta`. */
+    notaDebito: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: { aprobado: string; anulado: string; contabilizado: string };
+    };
+    /**
+     * Textos del **form y la ficha compartidos por las notas de venta** (nota
+     * crédito, nota débito). El nombre del documento no vive acá: lo resuelve cada
+     * página desde el `displayNameKey` de su `DocumentEntityConfig`.
+     */
+    notaVenta: {
+      form: {
+        createHint: string;
+        editHint: string;
+        tabs: { detalles: string; pagos: string };
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
+          sede: string;
+          sedePlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
+        };
+        validation: { required: string; comentarioMax: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string; pagos: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          identificacion: string;
+          fecha: string;
+          documentoReferencia: string;
+          sede: string;
+          metodoPago: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    /**
+     * Sección de pagos compartida (`<app-documento-pagos>`): factura POS, nota
+     * crédito de venta y demás documentos que se cobran en el acto.
+     */
+    documentoPago: {
+      hint: string;
+      add: string;
+      empty: string;
+      removePago: string;
+      savePago: string;
+      saveAll: string;
+      pendingSuffix: string;
+      anulado: string;
+      confirmDelete: string;
+      columns: {
+        id: string;
+        cuentaBanco: string;
+        monto: string;
+        acciones: string;
+        estado: string;
+      };
+      cuentaBancoPlaceholder: string;
+      totalRecibido: string;
+      saldo: string;
+      excedenHint: string;
+      toasts: {
+        sinDetalles: { title: string; desc: string };
+        sinSaldo: { title: string; desc: string };
+        saveSuccess: { title: string; desc: string };
+        saveError: { title: string; desc: string };
+        allSaved: { title: string; desc: string };
+        incompletos: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        noRegistrados: { title: string; desc: string };
+      };
+    };
+    posDocumento: {
+      form: {
+        createHint: string;
+        editHint: string;
+        /** Ayuda de la sección de pagos, matiz propio del POS (cobro en el acto). */
+        pagosHint: string;
+        tabs: { detalles: string; pagos: string };
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          ordenCompra: string;
+          ordenCompraPlaceholder: string;
+          comentario: string;
+          comentarioPlaceholder: string;
+        };
+        validation: { required: string; ordenCompraMax: string; comentarioMax: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string; pagos: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          identificacion: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+          asesor: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    facturaVentaRecurrente: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          remision: string;
+          asesor: string;
+          asesorPlaceholder: string;
+          comentario: string;
         };
         validation: { required: string };
         toasts: {
@@ -1104,6 +2116,738 @@ export interface AppDict extends AuthTranslationsHost {
           loadError: { title: string; desc: string };
         };
       };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          cliente: string;
+          identificacion: string;
+          plazoPago: string;
+          sede: string;
+          almacen: string;
+          metodoPago: string;
+          asesor: string;
+          comentario: string;
+          ordenCompra: string;
+          remision: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    facturaCompra: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        tabs: { detalles: string; cuentas: string };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          identificacion: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+      utilidades: {
+        action: string;
+        importarDetalle: string;
+      };
+      import: {
+        title: string;
+        subtitle: string;
+        notice: string;
+      };
+    };
+    documentoSoporte: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
+          resolucion: string;
+          resolucionPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          identificacion: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          sede: string;
+          metodoPago: string;
+          formaPago: string;
+          resolucion: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    notaCreditoCompra: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          identificacion: string;
+          fecha: string;
+          documentoReferencia: string;
+          centroCosto: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    notaDebitoCompra: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          identificacion: string;
+          fecha: string;
+          documentoReferencia: string;
+          centroCosto: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    facturaCompraRecurrente: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          sede: string;
+          sedePlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          proveedor: string;
+          identificacion: string;
+          plazoPago: string;
+          formaPago: string;
+          centroCosto: string;
+          sede: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    notaAjuste: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          plazoPagoPlaceholder: string;
+          metodoPago: string;
+          metodoPagoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          identificacion: string;
+          fecha: string;
+          fechaVence: string;
+          plazoPago: string;
+          metodoPago: string;
+          centroCosto: string;
+          ordenCompra: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    pago: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        cliente: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          cliente: string;
+          clientePlaceholder: string;
+          fecha: string;
+          cuentaBanco: string;
+          cuentaBancoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          negativeTotal: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          cliente: string;
+          identificacion: string;
+          fecha: string;
+          cuentaBanco: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    saldoInicial: {
+      name: string;
+    };
+    cierre: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        sections: { lineas: string };
+        lineasHint: string;
+        cargar: string;
+        eliminarTodos: string;
+        confirmDeleteAll: { header: string; message: string };
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          fecha: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string; noEs31Diciembre: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          cargarSuccess: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+          deleteAllSuccess: { title: string; desc: string };
+          deleteAllError: { title: string; desc: string };
+        };
+      };
+      cargar: {
+        modalHeader: string;
+        modalSubtitle: string;
+        submit: string;
+        fields: { cuentaDesde: string; cuentaHasta: string; cuentaCierre: string };
+        validation: { required: string };
+      };
+      detail: {
+        sections: { general: string; lineas: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          identificacion: string;
+          fecha: string;
+          centroCosto: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    depreciacion: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        sections: { activos: string };
+        activosHint: string;
+        cargarActivos: string;
+        confirmReload: { header: string; message: string };
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          fecha: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          cargarSuccess: { title: string; desc: string };
+          cargarVacio: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+          limpiarError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; activos: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          identificacion: string;
+          fecha: string;
+          centroCosto: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    depreciacionLinea: {
+      empty: string;
+      removeLine: string;
+      confirmDeleteLine: string;
+      total: string;
+      columns: {
+        linea: string;
+        activo: string;
+        codigo: string;
+        nombre: string;
+        dias: string;
+        valor: string;
+        acciones: string;
+      };
+    };
+    asiento: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        soporte: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          fecha: string;
+          soporte: string;
+          soportePlaceholder: string;
+          comprobante: string;
+          comprobantePlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          centroCostoHint: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          unbalanced: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          identificacion: string;
+          fecha: string;
+          soporte: string;
+          comprobante: string;
+          centroCosto: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+      utilidades: {
+        action: string;
+        importarDetalle: string;
+      };
+      import: {
+        title: string;
+        subtitle: string;
+        notice: string;
+      };
+    };
+    egreso: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        proveedor: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          proveedor: string;
+          proveedorPlaceholder: string;
+          fecha: string;
+          cuentaBanco: string;
+          cuentaBancoPlaceholder: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          negativeTotal: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          proveedor: string;
+          identificacion: string;
+          fecha: string;
+          cuentaBanco: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+    };
+    vencimiento: {
+      desvio: {
+        mas: { one: string; other: string };
+        menos: { one: string; other: string };
+      };
+      usar: string;
+      usarTitle: string;
+      anteriorAFecha: string;
     };
     comercialDetalle: {
       title: string;
@@ -1119,12 +2863,24 @@ export interface AppDict extends AuthTranslationsHost {
       leaveConfirm: string;
       impuestosTitle: string;
       impuestosAdd: string;
+      impuestosRemove: string;
+      impuestosBuscar: string;
       itemPlaceholder: string;
       detallePlaceholder: string;
+      almacenPlaceholder: string;
       confirmDeleteLine: string;
+      createItem: string;
+      extraerIva: { title: string; baseLabel: string; apply: string };
+      scanner: {
+        placeholder: string;
+        notFound: { title: string; desc: string };
+        ambiguous: { title: string; desc: string };
+      };
       columns: {
         linea: string;
+        ref: string;
         item: string;
+        almacen: string;
         cantidad: string;
         precio: string;
         descuento: string;
@@ -1137,8 +2893,206 @@ export interface AppDict extends AuthTranslationsHost {
       resumen: {
         subtotal: string;
         descuento: string;
+        cantidad: string;
+        totalImpuestos: string;
         total: string;
       };
+      toasts: {
+        lineSaveSuccess: { title: string; desc: string };
+        lineSaveError: { title: string; desc: string };
+        allSaved: { title: string; desc: string };
+        incompleteLines: { title: string; desc: string };
+      };
+    };
+    entrada: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
+    salida: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
+    traslado: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+    };
+    movimientoContable: {
+      name: string;
+      import: { title: string; subtitle: string };
+      columns: {
+        id: string;
+        numero: string;
+        comprobante: string;
+        fecha: string;
+        contacto: string;
+        identificacion: string;
+        cuenta: string;
+        centroCosto: string;
+        debito: string;
+        credito: string;
+        base: string;
+        detalle: string;
+      };
+    };
+    movimientoInventario: {
+      form: {
+        createHint: string;
+        editHint: string;
+        fields: {
+          contacto: string;
+          contactoPlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
+          fecha: string;
+          comentario: string;
+        };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          identificacion: string;
+          almacen: string;
+          fecha: string;
+          comentario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+      utilidades: {
+        action: string;
+        importarDetalle: string;
+      };
+      import: {
+        title: string;
+        subtitle: string;
+        notice: string;
+      };
+    };
+    inventarioDetalle: {
+      title: string;
+      hint: string;
+      empty: string;
+      addLine: string;
+      removeLine: string;
+      saveLine: string;
+      saveAll: string;
+      pendingSuffix: string;
+      leaveHeader: string;
+      leaveMessage: string;
+      leaveConfirm: string;
+      itemPlaceholder: string;
+      almacenPlaceholder: string;
+      confirmDeleteLine: string;
+      columns: {
+        linea: string;
+        item: string;
+        almacen: string;
+        operacion: string;
+        cantidad: string;
+        costo: string;
+        total: string;
+        acciones: string;
+      };
+      /** Sentido del movimiento por línea; solo lo usa el traslado. */
+      operaciones: {
+        suma: string;
+        resta: string;
+      };
+      resumen: {
+        cantidad: string;
+        subtotal: string;
+        total: string;
+      };
+      toasts: {
+        lineSaveSuccess: { title: string; desc: string };
+        lineSaveError: { title: string; desc: string };
+        allSaved: { title: string; desc: string };
+        incompleteLines: { title: string; desc: string };
+      };
+    };
+    cuentaDetalle: {
+      empty: string;
+      addLine: string;
+      removeLine: string;
+      saveLine: string;
+      saveAll: string;
+      pendingSuffix: string;
+      cuentaPlaceholder: string;
+      contactoPlaceholder: string;
+      centroCostoPlaceholder: string;
+      detallePlaceholder: string;
+      confirmDeleteLine: string;
+      naturaleza: { debito: string; credito: string };
+      columns: {
+        linea: string;
+        id: string;
+        numero: string;
+        documento: string;
+        documentoTipo: string;
+        cuenta: string;
+        contacto: string;
+        naturaleza: string;
+        centroCosto: string;
+        valor: string;
+        base: string;
+        detalle: string;
+        acciones: string;
+      };
+      resumen: { debitos: string; creditos: string; total: string; diferencia: string };
       toasts: {
         lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };
@@ -1212,10 +3166,1461 @@ export interface AppDict extends AuthTranslationsHost {
         horas: string;
         horasDiurnas: string;
         horasNocturnas: string;
-        iva: string;
         valor: string;
-        valorPendiente: string;
         total: string;
+        afectado: string;
+        valorPendiente: string;
+      };
+    };
+    programacion: {
+      name: string;
+      columns: {
+        id: string;
+        nombre: string;
+        pagoTipo: string;
+        grupo: string;
+        periodo: string;
+        fechaDesde: string;
+        fechaHasta: string;
+        dias: string;
+        contratos: string;
+        total: string;
+        generado: string;
+        aprobado: string;
+      };
+      estados: { borrador: string; generada: string; aprobada: string };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        conceptosHint: string;
+        sections: { conceptos: string };
+        fields: {
+          pagoTipo: string;
+          grupo: string;
+          grupoHint: string;
+          nombre: string;
+          nombrePlaceholder: string;
+          fechaDesde: string;
+          fechaHasta: string;
+          comentario: string;
+          seleccionar: string;
+        };
+        validation: {
+          required: string;
+          rangoInvalido: string;
+          /** `{requeridos}` y `{duracion}`: días que debe durar el rango y los que dura. */
+          duracionPeriodo: string;
+          /** `{fecha}`: la fecha hasta que cierra el periodo. */
+          usarFechaSugerida: string;
+          usarFechaSugeridaTitle: string;
+        };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          noEditable: { title: string; desc: string };
+        };
+      };
+      resumen: {
+        conceptos: string;
+        sinConceptos: string;
+        labels: {
+          id: string;
+          nombre: string;
+          fechaDesde: string;
+          fechaHasta: string;
+          pagoTipo: string;
+          grupo: string;
+          periodo: string;
+          dias: string;
+          contratos: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+          comentario: string;
+        };
+      };
+      workspace: {
+        tabs: { renglones: string; adicionales: string };
+        renglonesHint: string;
+        adicionalesHint: string;
+        notFound: { title: string; desc: string };
+      };
+      editarRenglon: {
+        title: string;
+        subtitle: string;
+        diasTransporte: string;
+        salario: string;
+        salarioPromedio: string;
+        cesantiaPropuesta: string;
+        interesPropuesto: string;
+        primaPropuesta: string;
+        banderasHint: string;
+        sections: { horas: string; banderas: string };
+        horas: {
+          diurna: string;
+          nocturna: string;
+          festiva_diurna: string;
+          festiva_nocturna: string;
+          extra_diurna: string;
+          extra_nocturna: string;
+          extra_festiva_diurna: string;
+          extra_festiva_nocturna: string;
+          recargo_nocturno: string;
+          recargo_festivo_diurno: string;
+          recargo_festivo_nocturno: string;
+        };
+        banderas: {
+          pago_horas: string;
+          pago_auxilio_transporte: string;
+          pago_incapacidad: string;
+          pago_licencia: string;
+          pago_vacacion: string;
+          descuento_salud: string;
+          descuento_pension: string;
+          descuento_fondo_solidaridad: string;
+          descuento_retencion_fuente: string;
+          descuento_credito: string;
+          descuento_embargo: string;
+          adicional: string;
+        };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      adicionales: {
+        createTitle: string;
+        editTitle: string;
+        subtitle: string;
+        import: { title: string; subtitle: string };
+        fields: {
+          contrato: string;
+          contratoPlaceholder: string;
+          concepto: string;
+          conceptoPlaceholder: string;
+          valor: string;
+          detalle: string;
+          aplicaDiaLaborado: string;
+        };
+        validation: { required: string; valorMinimo: string };
+        columns: {
+          id: string;
+          identificacion: string;
+          empleado: string;
+          contrato: string;
+          conceptoId: string;
+          concepto: string;
+          valor: string;
+          detalle: string;
+          aplicaDiaLaborado: string;
+        };
+        /** Abreviaturas de la tabla, bajo ella como en la de empleados. */
+        leyenda: { titulo: string; contenido: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+        };
+      };
+      importarHoras: {
+        title: string;
+        subtitle: string;
+      };
+      acciones: {
+        generar: string;
+        desgenerar: string;
+        aprobar: string;
+        desaprobar: string;
+        notificar: string;
+        importarHoras: string;
+        imprimir: string;
+        imprimirNominas: string;
+        utilidades: string;
+        confirmaciones: {
+          generar: { header: string; message: string };
+          desgenerar: { header: string; message: string };
+          aprobar: { header: string; message: string };
+          desaprobar: { header: string; message: string };
+          notificar: { header: string; message: string };
+        };
+        toasts: {
+          generar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desgenerar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          aprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desaprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          notificar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      renglones: {
+        cargarContratos: string;
+        verNomina: string;
+        /** Modal de solo lectura de la nómina de un renglón. */
+        nominaResumen: { title: string };
+        confirmEliminar: { header: string; message: string };
+        confirmRecargar: { header: string; message: string };
+        leyenda: { titulo: string; contenido: string };
+        /** Leyenda de los colores de las fechas (`tonoFechaDesde` / `tonoFechaHasta`). */
+        marcas: { ingresoRetiro: string; errorTerminacion: string };
+        /** Dropdown "Excel" de la tabla de empleados. */
+        excel: { action: string; detalle: string; nomina: string; nominaDetalle: string };
+        toasts: {
+          cargarSuccess: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+          sinNomina: { title: string; desc: string };
+        };
+        columns: {
+          id: string;
+          identificacion: string;
+          empleado: string;
+          contrato: string;
+          desde: string;
+          hasta: string;
+          salario: string;
+          diasTransporte: string;
+          dias: string;
+          promedio: string;
+          basePrestacion: string;
+          total: string;
+        };
+        horas: {
+          diurna: string;
+          nocturna: string;
+          festivaDiurna: string;
+          festivaNocturna: string;
+          extraDiurna: string;
+          extraNocturna: string;
+          extraFestivaDiurna: string;
+          extraFestivaNocturna: string;
+          recargoNocturno: string;
+          recargoFestivoDiurno: string;
+          recargoFestivoNocturno: string;
+        };
+      };
+      grupos: { pagos: string; descuentos: string; prestaciones: string; base: string };
+      banderas: {
+        pagoHoras: string;
+        pagoAuxilioTransporte: string;
+        pagoIncapacidad: string;
+        pagoLicencia: string;
+        pagoVacacion: string;
+        pagoPrima: string;
+        pagoCesantia: string;
+        pagoInteres: string;
+        descuentoSalud: string;
+        descuentoPension: string;
+        descuentoFondoSolidaridad: string;
+        descuentoRetencionFuente: string;
+        descuentoCredito: string;
+        descuentoEmbargo: string;
+        adicional: string;
+        basePrestacionMinimo: string;
+        basePrestacionMinimoSalario: string;
+      };
+    };
+    liquidacion: {
+      name: string;
+      columns: {
+        id: string;
+        contrato: string;
+        identificacion: string;
+        empleado: string;
+        desde: string;
+        hasta: string;
+        salario: string;
+        dias: string;
+        cesantia: string;
+        interes: string;
+        prima: string;
+        vacacion: string;
+        adicion: string;
+        deduccion: string;
+        total: string;
+        generado: string;
+        aprobado: string;
+      };
+      estados: { borrador: string; generada: string; aprobada: string };
+      prestaciones: { cesantia: string; interes: string; prima: string; vacacion: string };
+      resumen: {
+        prestacionesTitle: string;
+        labels: {
+          id: string;
+          empleado: string;
+          identificacion: string;
+          contrato: string;
+          fecha: string;
+          desde: string;
+          hasta: string;
+          ultimoPago: string;
+          dias: string;
+          salario: string;
+          prestacion: string;
+          valor: string;
+          adicion: string;
+          deduccion: string;
+          total: string;
+          comentario: string;
+        };
+      };
+      form: {
+        editTitle: string;
+        sectionHint: string;
+        fields: {
+          fechaUltimoPago: string;
+          fechaUltimoPagoCesantia: string;
+          fechaUltimoPagoPrima: string;
+          fechaUltimoPagoVacacion: string;
+          comentario: string;
+        };
+        toasts: {
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          noEditable: { title: string; desc: string };
+        };
+      };
+      workspace: {
+        tabs: { adicionales: string };
+        adicionalesHint: string;
+        notFound: { title: string; desc: string };
+      };
+      acciones: {
+        generar: string;
+        reliquidar: string;
+        desgenerar: string;
+        aprobar: string;
+        desaprobar: string;
+        confirmaciones: {
+          generar: { header: string; message: string };
+          reliquidar: { header: string; message: string };
+          desgenerar: { header: string; message: string };
+          aprobar: { header: string; message: string };
+          desaprobar: { header: string; message: string };
+        };
+        toasts: {
+          generar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          reliquidar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desgenerar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          aprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desaprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      adicionales: {
+        nuevaAdicion: string;
+        nuevaDeduccion: string;
+        createAdicionTitle: string;
+        createDeduccionTitle: string;
+        editTitle: string;
+        subtitleAdicion: string;
+        subtitleDeduccion: string;
+        confirmEliminar: { header: string; message: string };
+        fields: {
+          concepto: string;
+          valor: string;
+          detalle: string;
+          detallePlaceholder: string;
+          seleccionar: string;
+        };
+        validation: { required: string; valorMinimo: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+        columns: {
+          id: string;
+          codigo: string;
+          concepto: string;
+          detalle: string;
+          adicional: string;
+          deduccion: string;
+        };
+      };
+      toasts: { loadError: { title: string; desc: string } };
+    };
+    aporte: {
+      name: string;
+      columns: {
+        id: string;
+        anio: string;
+        mes: string;
+        sucursal: string;
+        empleados: string;
+        contratos: string;
+        lineas: string;
+        cotizacionTotal: string;
+        generado: string;
+        aprobado: string;
+      };
+      estados: { borrador: string; generada: string; aprobada: string };
+      presentaciones: { sucursal: string; unica: string };
+      cotizaciones: {
+        pension: string;
+        solidaridad: string;
+        subsistencia: string;
+        voluntarioAfiliado: string;
+        voluntarioAportante: string;
+        salud: string;
+        riesgos: string;
+        caja: string;
+        sena: string;
+        icbf: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        entidadesTitle: string;
+        entidadesHint: string;
+        fields: {
+          anio: string;
+          mes: string;
+          sucursal: string;
+          presentacion: string;
+          presentacionHint: string;
+          entidadRiesgo: string;
+          entidadSena: string;
+          entidadIcbf: string;
+          seleccionar: string;
+        };
+        validation: { required: string; anioRango: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+          noEditable: { title: string; desc: string };
+        };
+      };
+      resumen: {
+        valoresTitle: string;
+        labels: {
+          sucursal: string;
+          mes: string;
+          anio: string;
+          presentacion: string;
+          entidadRiesgo: string;
+          entidadSena: string;
+          entidadIcbf: string;
+          empleados: string;
+          contratos: string;
+          lineas: string;
+          baseCotizacion: string;
+          total: string;
+        };
+      };
+      workspace: {
+        tabs: { contratos: string; detalles: string; entidades: string };
+        contratosHint: string;
+        detallesHint: string;
+        entidadesHint: string;
+        notFound: { title: string; desc: string };
+      };
+      acciones: {
+        generar: string;
+        desgenerar: string;
+        aprobar: string;
+        desaprobar: string;
+        planoOperador: string;
+        utilidades: string;
+        confirmaciones: {
+          generar: { header: string; message: string };
+          desgenerar: { header: string; message: string };
+          aprobar: { header: string; message: string };
+          desaprobar: { header: string; message: string };
+        };
+        toasts: {
+          generar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desgenerar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          aprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          desaprobar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      excel: { action: string; detalle: string };
+      contratos: {
+        cargarContratos: string;
+        leyenda: { titulo: string; contenido: string };
+        confirmEliminar: { header: string; message: string };
+        confirmRecargar: { header: string; message: string };
+        toasts: {
+          cargarSuccess: { title: string; desc: string };
+          cargarError: { title: string; desc: string };
+        };
+        columns: {
+          id: string;
+          identificacion: string;
+          empleado: string;
+          contrato: string;
+          desde: string;
+          hasta: string;
+          novedad: string;
+          baseCotizacion: string;
+          dias: string;
+          salario: string;
+        };
+        novedades: {
+          ninguna: string;
+          ingreso: string;
+          retiro: string;
+          ingresoRetiro: string;
+          error: string;
+        };
+      };
+      trazabilidad: {
+        verDetalle: string;
+        title: string;
+        sinEmpleado: string;
+        subtitle: string;
+        total: string;
+        documentos: {
+          title: string;
+          empty: string;
+          columns: {
+            id: string;
+            tipo: string;
+            numero: string;
+            desde: string;
+            hasta: string;
+            contrato: string;
+            salario: string;
+            ibc: string;
+            ibp: string;
+            devengado: string;
+            deduccion: string;
+            neto: string;
+          };
+        };
+        detalles: {
+          title: string;
+          empty: string;
+          columns: {
+            id: string;
+            tipo: string;
+            numero: string;
+            conceptoId: string;
+            concepto: string;
+            detalle: string;
+            porcentaje: string;
+            horas: string;
+            dias: string;
+            valorHora: string;
+            devengado: string;
+            deduccion: string;
+            ibc: string;
+            ibp: string;
+          };
+        };
+      };
+      entidades: {
+        columns: { id: string; tipo: string; entidad: string; cotizacion: string };
+        subtotal: string;
+        totalGeneral: string;
+        empty: { title: string; sub: string };
+      };
+      detalles: {
+        columns: { id: string; empleado: string; contrato: string };
+        leyendaTitulo: string;
+        /** Valores de las banderas de novedad en la tabla (`Sí` / `—`). */
+        novedad: { true: string; false: string };
+        /**
+         * Encabezados cortos. Son códigos PILA, iguales en los dos idiomas; su
+         * significado va en `nombres`, con las mismas claves.
+         */
+        siglas: AporteDetalleCampos;
+        nombres: AporteDetalleCampos;
+      };
+    };
+    nomina: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      detail: {
+        sections: { general: string; liquidacion: string; conceptos: string };
+        labels: {
+          numero: string;
+          empleado: string;
+          desde: string;
+          hasta: string;
+          contrato: string;
+          programacionDetalle: string;
+          comentario: string;
+          cue: string;
+          verDian: string;
+          salario: string;
+          basePrestacion: string;
+          baseCotizacion: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+        };
+        tooltips: { basePrestacion: string; baseCotizacion: string };
+        notFound: { title: string; desc: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    nominaDetalle: {
+      empty: string;
+      columns: {
+        linea: string;
+        codigo: string;
+        concepto: string;
+        detalle: string;
+        credito: string;
+        porcentaje: string;
+        horas: string;
+        dias: string;
+        valorHora: string;
+        operacion: string;
+        devengado: string;
+        deduccion: string;
+        basePrestacion: string;
+        baseCotizacion: string;
+        baseImpuesto: string;
+      };
+      tooltips: {
+        credito: string;
+        horas: string;
+        dias: string;
+        basePrestacion: string;
+        baseCotizacion: string;
+      };
+      operaciones: { suma: string; resta: string; neutro: string };
+    };
+    /** Piezas compartidas por los informes contables de saldos por cuenta. */
+    informeCuentas: {
+      generar: string;
+      descuadre: string;
+      /** Micro-encabezados de las bandas del panel de parámetros. */
+      groups: {
+        periodo: string;
+        cuentas: string;
+        documento: string;
+      };
+      /** Aviso: los parámetros cambiaron y lo que se ve quedó viejo. */
+      paramsStale: string;
+      params: {
+        fechaDesde: string;
+        fechaHasta: string;
+        cuentaDesde: string;
+        cuentaHasta: string;
+        cuentaPlaceholder: string;
+        contacto: string;
+        contactoPlaceholder: string;
+        numero: string;
+        numeroPlaceholder: string;
+        comprobante: string;
+        comprobantePlaceholder: string;
+        /** Dimensión del movimiento — no confundir con el `grupo` del plan de cuentas. */
+        centroCosto: string;
+        centroCostoPlaceholder: string;
+        incluirCierre: string;
+        soloConMovimiento: string;
+        /** Familia nueva: el contrato renombró `cuenta_con_movimiento`. */
+        soloConSaldo: string;
+      };
+      validation: {
+        rangoInvertido: string;
+        anioDistinto: string;
+      };
+      columns: {
+        cuenta: string;
+        nombre: string;
+        identificacion: string;
+        contacto: string;
+        comprobante: string;
+        numero: string;
+        fecha: string;
+        /** Id del asiento — solo el auxiliar de cuenta, que no trae comprobante. */
+        movimiento: string;
+        /** Texto escrito al contabilizar — solo el informe base. */
+        detalle: string;
+        /** Base gravable de la línea — solo el informe base. */
+        base: string;
+        /** Los dos importes del certificado de retención. */
+        baseRetenido: string;
+        retenido: string;
+        /** Ubicación en el plan e importe único — solo los estados financieros. */
+        clase: string;
+        grupo: string;
+        saldo: string;
+        saldoAnterior: string;
+        debito: string;
+        credito: string;
+        saldoActual: string;
+        /** Solo el balance de prueba: su contrato nuevo lo llama `saldo_final`. */
+        saldoFinal: string;
+        total: string;
+      };
+      empty: {
+        notGenerated: string;
+        noData: string;
+      };
+    };
+    balancePrueba: {
+      name: string;
+      /**
+       * Empty state propio (título + pista), que es la forma canónica del ERP.
+       * Los otros 8 informes siguen con las dos líneas sueltas de
+       * `informeCuentas.empty`, que su tabla pinta en una sola celda.
+       */
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    balancePruebaContacto: {
+      name: string;
+      /** Empty state propio, igual que el resto de la familia nueva. */
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    auxiliarCuenta: {
+      name: string;
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    auxiliarGeneral: {
+      name: string;
+      /** Empty state propio, igual que el balance de prueba (misma tabla). */
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    auxiliarContacto: {
+      name: string;
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    conciliacion: {
+      name: string;
+      columns: { id: string; fechaDesde: string; fechaHasta: string; cuentaBanco: string };
+      detalleColumns: {
+        id: string;
+        tipo: string;
+        numero: string;
+        fecha: string;
+        cuenta: string;
+        debito: string;
+        credito: string;
+        detalle: string;
+        conciliado: string;
+      };
+      soporteColumns: {
+        id: string;
+        fecha: string;
+        debito: string;
+        credito: string;
+        detalle: string;
+        conciliado: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        sectionHint: string;
+        tabs: { detalles: string; soporte: string };
+        fields: {
+          cuentaBanco: string;
+          cuentaBancoPlaceholder: string;
+          fechaDesde: string;
+          fechaHasta: string;
+        };
+        validation: { required: string; rangoInvalido: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          createError: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          editError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      detail: {
+        sections: { general: string };
+        tabs: { detalles: string; soporte: string };
+        labels: {
+          id: string;
+          cuentaBanco: string;
+          cuentaContable: string;
+          fechaDesde: string;
+          fechaHasta: string;
+        };
+        notFound: { title: string; desc: string };
+      };
+      detalleTab: {
+        cargar: string;
+        conciliar: string;
+        limpiar: string;
+        confirmLimpiar: { header: string; message: string };
+        toasts: {
+          cargar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          conciliar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+          limpiar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+      soporteTab: {
+        cargar: string;
+        limpiar: string;
+        plantillaNoDisponible: string;
+        import: { title: string; subtitle: string };
+        confirmLimpiar: { header: string; message: string };
+        toasts: {
+          limpiar: {
+            success: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
+      };
+    };
+    contabilizar: {
+      name: string;
+      actions: { contabilizar: string; descontabilizar: string };
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+      };
+      descontabilizar: {
+        title: string;
+        subtitle: string;
+        submit: string;
+        warning: string;
+        fields: {
+          fechaDesde: string;
+          fechaHasta: string;
+          numeroDesde: string;
+          numeroHasta: string;
+          documentoTipo: string;
+          documentoTipoPlaceholder: string;
+        };
+        validation: { rangoInvertido: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+          empty: { title: string; desc: string };
+          parcial: { title: string; desc: string };
+        };
+      };
+      toasts: {
+        contabilizar: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
+    };
+    estadoFinanciero: {
+      columns: {
+        clase: string;
+        grupo: string;
+        cuenta: string;
+        cuentaNombre: string;
+        saldo: string;
+      };
+    };
+    estadoResultados: {
+      name: string;
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    estadoSituacionFinanciera: {
+      name: string;
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    certificadoRetencion: {
+      name: string;
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    informeBase: {
+      name: string;
+      empty: {
+        notGenerated: { title: string; sub: string };
+        noData: { title: string; sub: string };
+      };
+    };
+    nominaInforme: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+      };
+      filters: {
+        empleadoIdentificacion: string;
+        empleadoNombre: string;
+        aprobado: string;
+        anulado: string;
+      };
+    };
+    nominaDetalleInforme: {
+      name: string;
+      columns: {
+        id: string;
+        documento: string;
+        numero: string;
+        identificacion: string;
+        empleado: string;
+        fecha: string;
+        fechaDesde: string;
+        fechaHasta: string;
+        detalle: string;
+        porcentaje: string;
+        dias: string;
+        valorHora: string;
+        operacion: string;
+        pago: string;
+        basePrestacion: string;
+        baseCotizacion: string;
+      };
+      filters: { empleadoIdentificacion: string; empleadoNombre: string };
+      /** Claves = valor crudo de `operacion` (1 suma, -1 resta, 0 neutro). */
+      operaciones: { '1': string; '0': string; '-1': string };
+    };
+    nominaElectronica: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        empleado: string;
+        baseCotizacion: string;
+        basePrestacion: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+        contabilizado: string;
+      };
+      /** Columnas de la pestaña con las nóminas que componen el consolidado. */
+      origen: {
+        id: string;
+        numero: string;
+        desde: string;
+        hasta: string;
+        identificacion: string;
+        empleado: string;
+        salario: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+      };
+      /** Columnas de la pestaña con los conceptos consolidados. */
+      detalle: {
+        id: string;
+        concepto: string;
+        baseCotizacion: string;
+        basePrestacion: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+      };
+      detail: {
+        sections: { general: string; montos: string; composicion: string };
+        tabs: { origen: string; detalle: string };
+        fields: {
+          numero: string;
+          fecha: string;
+          empleado: string;
+          identificacion: string;
+          baseCotizacion: string;
+          basePrestacion: string;
+          devengado: string;
+          deduccion: string;
+          total: string;
+          cune: string;
+        };
+        verEnDian: string;
+        sinCune: string;
+        emptyOrigen: string;
+        emptyDetalle: string;
+        notFound: { title: string; desc: string };
+      };
+      /** Acción "Generar" del toolbar de la lista. */
+      generar: {
+        buttonLabel: string;
+        title: string;
+        subtitle: string;
+        periodo: string;
+        submit: string;
+        submitting: string;
+        validation: { required: string };
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+        emitirAhora: { header: string; message: string; accept: string; reject: string };
+      };
+    };
+    nominaElectronicaInforme: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        empleado: string;
+        contrato: string;
+        salario: string;
+        baseCotizacion: string;
+        basePrestacion: string;
+        devengado: string;
+        deduccion: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+      };
+      filters: {
+        fechaHasta: string;
+        empleadoIdentificacion: string;
+        empleadoNombre: string;
+        aprobado: string;
+        anulado: string;
+        electronico: string;
+      };
+    };
+    existencia: {
+      name: string;
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        referencia: string;
+        existencia: string;
+        remision: string;
+        disponible: string;
+        negativo: string;
+        inactivo: string;
+      };
+    };
+    existenciaAlmacen: {
+      name: string;
+      columns: {
+        id: string;
+        codigo: string;
+        item: string;
+        referencia: string;
+        almacen: string;
+        existencia: string;
+        remision: string;
+        disponible: string;
+        costoPromedio: string;
+      };
+    };
+    inventarioValorizado: {
+      name: string;
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        referencia: string;
+        existencia: string;
+        remision: string;
+        disponible: string;
+        costoPromedio: string;
+        costoTotal: string;
+      };
+    };
+    historialMovimiento: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        documentoTipo: string;
+        fecha: string;
+        contacto: string;
+        almacen: string;
+        itemCodigo: string;
+        detalle: string;
+        item: string;
+        cantidad: string;
+        costo: string;
+        precio: string;
+      };
+    };
+    ventaItem: {
+      name: string;
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        itemId: string;
+        item: string;
+        cantidad: string;
+        precio: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+      };
+    };
+    cuentaCobrar: {
+      name: string;
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        fechaVence: string;
+        identificacion: string;
+        contacto: string;
+        contactoId: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        pago: string;
+        afectado: string;
+        pendiente: string;
+      };
+    };
+    cuentaCobrarCorte: {
+      name: string;
+      fechaCorte: string;
+      generar: string;
+      empty: { title: string; sub: string };
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        fechaVence: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        pago: string;
+        saldo: string;
+      };
+    };
+    cuentaPagar: {
+      name: string;
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        fechaVence: string;
+        identificacion: string;
+        contacto: string;
+        contactoId: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+        afectado: string;
+        pendiente: string;
+      };
+    };
+    /** Bandeja de documentos que los proveedores mandan al buzón de RedEDoc. */
+    documentoRecibido: {
+      name: string;
+      cargar: string;
+      columns: {
+        fecha: string;
+        numero: string;
+        proveedor: string;
+        nit: string;
+        tipo: string;
+        impuestos: string;
+        total: string;
+      };
+      tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
+      filtros: {
+        buscar: string;
+        tipo: string;
+        desde: string;
+        hasta: string;
+        delCorreo: string;
+        quitarCorreo: string;
+      };
+      empty: { title: string; sub: string };
+      carga: {
+        title: string;
+        desc: string;
+        soltar: string;
+        formatos: string;
+        listo: string;
+        quitar: string;
+        cancelar: string;
+        cargar: string;
+        rechazoTipo: string;
+        rechazoTamano: string;
+        errorGenerico: string;
+        exito: { title: string; desc: string };
+      };
+    };
+    /** Correos (y cargas manuales) que llegaron a la recepción de RedEDoc. */
+    correoRecibido: {
+      name: string;
+      verDocumentos: string;
+      columns: {
+        recibido: string;
+        origen: string;
+        remitente: string;
+        asunto: string;
+        estado: string;
+        detalle: string;
+        documentos: string;
+      };
+      estados: Record<
+        | 'pendiente'
+        | 'procesado'
+        | 'sin_documentos'
+        | 'error'
+        | 'empresa_desconocida'
+        | 'confirmacion_reenvio',
+        string
+      >;
+      origenes: Record<'correo' | 'carga', string>;
+      filtros: { buscar: string; estado: string; origen: string; desde: string; hasta: string };
+      empty: { title: string; sub: string };
+    };
+    documentoElectronico: {
+      name: string;
+      subtitle: string;
+      actions: {
+        emitir: string;
+      };
+      columns: {
+        id: string;
+        documentoTipo: string;
+        numero: string;
+        fecha: string;
+        cliente: string;
+        total: string;
+        estado: string;
+      };
+      estado: {
+        enviado: string;
+        pendiente: string;
+      };
+      filters: {
+        notificado: string;
+        enviado: string;
+      };
+      toasts: {
+        emitir: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
+    };
+    enviarFacturaElectronica: {
+      name: string;
+      subtitle: string;
+      tabs: {
+        emitir: string;
+        notificar: string;
+      };
+      actions: {
+        emitir: string;
+        notificar: string;
+        descartar: string;
+      };
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        cliente: string;
+        total: string;
+        estado: string;
+      };
+      estado: {
+        descartado: string;
+        enviado: string;
+        pendiente: string;
+      };
+      filters: {
+        notificado: string;
+        enviado: string;
+      };
+      descartar: {
+        confirm: {
+          header: string;
+          message: string;
+          accept: string;
+        };
+      };
+      toasts: {
+        emitir: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+        notificar: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+        descartar: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
+    };
+    enviarNominaElectronica: {
+      name: string;
+      actions: {
+        emitir: string;
+        descartar: string;
+      };
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        empleado: string;
+        total: string;
+        estado: string;
+      };
+      estado: {
+        enviado: string;
+        pendiente: string;
+      };
+      filters: {
+        notificado: string;
+        enviado: string;
+      };
+      descartar: {
+        confirm: {
+          header: string;
+          message: string;
+          accept: string;
+        };
+      };
+      toasts: {
+        emitir: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+        descartar: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
+    };
+    validarSaldos: {
+      porTipo: Record<
+        'cobrar' | 'pagar',
+        { description: string; confirmMessage: string; successDesc: string }
+      >;
+      name: string;
+      run: string;
+      confirm: { header: string; accept: string; cancel: string };
+      toasts: {
+        success: { title: string };
+        error: { title: string; desc: string };
       };
     };
     regenerarAfectado: {
@@ -1280,6 +4685,7 @@ export interface AppDict extends AuthTranslationsHost {
           lineLabel: string;
           coverage: string;
           subtotalCol: string;
+          documentoAfectadoCol: string;
           contractSummaryTitle: string;
           contractSubtotal: string;
           contractTotal: string;
@@ -1322,6 +4728,10 @@ export interface AppDict extends AuthTranslationsHost {
             impuestos: string;
             impuestosPlaceholder: string;
           };
+          lockedCobertura: {
+            title: string;
+            hint: string;
+          };
           contactoRequired: string;
           sectorRequired: string;
           estratoRequired: string;
@@ -1350,144 +4760,309 @@ export interface AppDict extends AuthTranslationsHost {
           };
         };
       };
+      detail: {
+        sections: { general: string; detalles: string };
+        labels: {
+          numero: string;
+          contacto: string;
+          identificacion: string;
+          fecha: string;
+          sector: string;
+          estrato: string;
+          salario: string;
+        };
+        notFound: { title: string; desc: string };
+      };
     };
   };
-  contenedores: {
-    list: {
-      title: string;
-      subtitle: string;
-      newButton: string;
+  asistenteElectronico: {
+    rededoc: {
+      reintentar: string;
+      empresa: { title: string; desc: string; error: string };
+      emisor: {
+        title: string;
+        desc: string;
+        error: string;
+        registrado: { title: string; desc: string; actualizar: string; desvincular: string };
+        noRegistrado: { title: string; desc: string; crear: string; reasignar: string };
+      };
+      confirmDesvincular: { header: string; message: string; accept: string };
+      confirmReasignar: { header: string; message: string; accept: string };
+      errorAccion: {
+        generico: string;
+        emisor: string;
+        titulos: { crear: string; actualizar: string; desvincular: string; reasignar: string };
+      };
+      toasts: {
+        creado: { title: string; desc: string };
+        actualizado: { title: string; desc: string };
+        desvinculado: { title: string; desc: string };
+        reasignado: { title: string; desc: string };
+      };
+    };
+    certificado: {
+      estado: {
+        venceLabel: string;
+        vigenteTitle: string;
+        vigenteDesc: string;
+        porVencerTitle: string;
+        porVencerDesc: string;
+        vencidoTitle: string;
+        vencidoDesc: string;
+        /** Cuánto falta / hace cuánto venció; `one` es 1 día, `other` lleva `{dias}`. */
+        faltan: { one: string; other: string };
+        venceHoy: string;
+        vencidoHace: { one: string; other: string };
+      };
+      upload: {
+        title: string;
+        hint: string;
+        dropzone: { primary: string; secondary: string; hint: string };
+      };
+      fields: { clave: string; claveHint: string };
+      validation: { required: string };
+      errors: { tipo: string; tamano: string; requerido: string };
+      actions: { cargar: string; quitar: string; eliminar: string };
+      confirmEliminar: { header: string; message: string; accept: string };
+      consulta: { error: string; reintentar: string };
+      /** `{desde}` y `{hasta}`: fechas cortas de la vigencia. */
+      detalle: { vigencia: string };
+      toasts: {
+        eliminado: { title: string; desc: string };
+        success: { title: string; desc: string };
+      };
+      errorAccion: { generico: string; titulos: { cargar: string; eliminar: string } };
+      sinEmisor: { title: string; desc: string; accion: string };
+    };
+    habilitaciones: {
+      reintentar: string;
+      consulta: { error: string };
+      /** Una entrada por `SoftwareTipo`. */
+      tipos: Record<
+        'facturacion' | 'documento_equivalente' | 'nomina',
+        { title: string; desc: string }
+      >;
+      campos: { id: string; identificador: string; pin: string; testSetId: string };
+      enProceso: { title: string; desc: string };
+      continuarPendiente: string;
+      estado: { habilitado: string; pendiente: string };
+      sinSoftware: string;
+      actions: { configurar: string; actualizar: string };
+      actualizar: { title: string; pinHint: string };
+      crear: {
+        title: string;
+        desc: string;
+        pinHint: string;
+        uuidInvalido: string;
+        guardar: string;
+      };
+      errorAccion: { generico: string; titulo: string; tituloActualizar: string };
+      toasts: {
+        creado: { title: string; desc: string };
+        actualizado: { title: string; desc: string };
+      };
+    };
+    finalizar: {
+      siguiente: string;
+      estaciones: Record<
+        'enviada' | 'revision' | 'resoluciones' | 'emitir',
+        { title: string; desc: string }
+      >;
+      /** Para lectores de pantalla: el estado de cada estación. */
+      estados: Record<'hecho' | 'enCurso' | 'pendiente', string>;
+      ayuda: string;
+      finalizar: string;
+    };
+    /** Lo que cambia entre el asistente de venta y el de nómina. */
+    variantes: Record<
+      'venta' | 'nomina',
+      {
+        title: string;
+        subtitle: string;
+        /** Tira del inicio del módulo. */
+        invitacion: { title: string; desc: string };
+        /** Cabecera del cierre. */
+        finalizar: { title: string; desc: string };
+      }
+    >;
+    invitacion: { actions: { completar: string; omitir: string } };
+    /** Acceso desde Configuración; el título es el de la variante. */
+    acceso: { hint: string; desc: string; abrir: string };
+    asistente: {
+      eyebrow: string;
+      pasos: {
+        empresa: { label: string; hint: string };
+        rededoc: { label: string; hint: string };
+        certificado: { label: string; hint: string };
+        habilitaciones: { label: string; hint: string };
+        resolucion: { label: string; hint: string };
+        finalizar: { label: string; hint: string };
+      };
+      /** Panel de un paso todavía sin contenido. */
+      pendiente: { title: string };
+      actions: { guardarYContinuar: string; continuar: string };
+    };
+  };
+  /** Copy de los inicios (landing) de cada módulo. */
+  inicio: {
+    carteraResumen: {
+      porTipo: Record<
+        'cobrar' | 'pagar',
+        { titulo: string; cifra: string; sinPendiente: string; verInforme: string }
+      >;
+      saldoAl: string;
+      vigente: string;
+      vencido: string;
+      error: { title: string; desc: string };
+    };
+    contratoResumen: {
+      titulo: string;
+      cifra: string;
+      terminados: string;
+      sinContratos: string;
+      deTotal: string;
+      corteAl: string;
+      movimiento: string;
+      ingresos: string;
+      retiros: string;
+      verContratos: string;
+      error: { title: string; desc: string };
+    };
+    general: {
+      /** Asistente de datos iniciales: solo en contenedores recién creados. */
+      datosIniciales: {
+        title: string;
+        desc: string;
+        actions: { cargar: string; omitir: string };
+        /** Acuse de la siembra: qué entró al contenedor. */
+        resultado: {
+          title: string;
+          desc: string;
+          /** Etiqueta de la línea de suma, al pie del recibo. */
+          totalLabel: string;
+          modelos: Readonly<Record<string, string>>;
+          actions: { cerrar: string };
+        };
+      };
+    };
+  };
+  seguridad: {
+    title: string;
+    menu: { usuarios: string };
+    usuarios: {
       searchPlaceholder: string;
-      enter: string;
-      status: { active: string; inactive: string };
-      summary: {
-        containers: { one: string; other: string };
-        active: { one: string; other: string };
-      };
-      actions: {
-        menuLabel: string;
-        invite: string;
-        edit: string;
-        updateSubscription: string;
-        delete: string;
-      };
-      view: {
-        list: string;
-        grid: string;
-      };
-      empty: {
-        noResults: { title: string; sub: string };
-        noContenedores: { title: string; sub: string; cta: string };
-      };
-      expired: {
-        badge: string;
-        ownerCta: string;
-        memberLocked: string;
-      };
-    };
-    create: {
-      title: string;
-      subtitle: string;
-      fields: {
-        name: string;
-        namePlaceholder: string;
-        phone: string;
-        phonePlaceholder: string;
-        email: string;
-        emailPlaceholder: string;
-      };
-      validation: {
-        nameRequired: string;
-        nameMin2: string;
-        phoneRequired: string;
-        phoneMax20: string;
-        emailRequired: string;
-        emailInvalid: string;
-      };
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    edit: {
-      title: string;
-      subtitle: string;
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    delete: {
-      title: string;
-      subtitle: string;
-      warning: string;
-      containerLabel: string;
-      confirmLabel: string;
-      confirmError: string;
-      submit: string;
-      cancel: string;
-      toasts: {
-        success: { title: string; desc: string };
-        error: { title: string; desc: string };
-      };
-    };
-    invite: {
-      title: string;
-      subtitle: string;
-      tabs: { members: string; pending: string };
-      form: {
-        label: string;
-        placeholder: string;
-        invalid: string;
+      columns: { nombre: string; correo: string; propietario: string };
+      /** Labels de la columna booleana `propietario` (`booleanKeyPrefix`). */
+      propietarioBadge: { true: string; false: string };
+      actions: { invitar: string };
+      empty: { title: string; sub: string };
+      invitar: {
+        title: string;
+        subtitle: string;
+        fields: {
+          usuario: string;
+          usuarioPlaceholder: string;
+          usuarioHint: string;
+          usuarioInvalid: string;
+          grupos: string;
+          gruposPlaceholder: string;
+          gruposHint: string;
+          gruposEmpty: string;
+        };
         submit: string;
         sending: string;
       };
-      pending: {
-        estados: { P: string; A: string; R: string };
-        count: { one: string; other: string };
-        empty: { title: string; sub: string };
-        toasts: { loadError: { title: string; desc: string } };
-      };
-      members: {
-        title: string;
-        count: { one: string; other: string };
-        empty: { title: string; sub: string };
-        you: string;
-        roles: {
-          propietario: string;
-          administrador: string;
-          usuario: string;
+      detalle: {
+        eyebrow: string;
+        tabs: { grupos: string; permisos: string };
+        fields: { usuarioId: string };
+        accesoHint: string;
+        notFound: { title: string; desc: string };
+        propietario: { title: string; desc: string };
+        grupos: {
+          count: { zero: string; one: string; other: string };
+          emptyCatalog: string;
+          hint: string;
+          toasts: {
+            added: { title: string; desc: string };
+            removed: { title: string; desc: string };
+          };
         };
-        removeAria: string;
+        permisos: {
+          flags: { superuser: string; staff: string };
+          agregar: string;
+          empty: { title: string; desc: string };
+          dialog: { title: string; subtitle: string };
+          quitarHint: string;
+          agregarHint: string;
+          /** Contador n/4 de la fila: dar o quitar todas las acciones del modelo. */
+          fila: { darHint: string; quitarHint: string };
+          search: string;
+          todas: string;
+          modeloHeader: string;
+          acciones: { view: string; add: string; change: string; delete: string };
+          count: { zero: string; one: string; other: string };
+          noResults: string;
+          hint: string;
+          toasts: {
+            added: { title: string; desc: string };
+            removed: { title: string; desc: string };
+            filaAdded: { title: string; desc: string };
+            filaRemoved: { title: string; desc: string };
+          };
+        };
       };
-      remove: {
-        title: string;
-        desc: string;
-        confirm: string;
-        cancel: string;
-      };
-      close: string;
+      confirms: { deleteHeader: string; deleteOne: string; deleteMany: string };
       toasts: {
-        sent: { title: string; desc: string };
-        sendError: { title: string; desc: string };
-        removed: { title: string; desc: string };
-        removeError: { title: string; desc: string };
         loadError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+        inviteSuccess: { title: string; desc: string };
+        inviteError: { title: string; desc: string };
       };
     };
   };
   configuracion: {
     title: string;
     subtitle: string;
-    tabs: { general: string; humano: string };
+    tabs: { general: string; humano: string; venta: string };
     unsavedChanges: string;
     actions: { save: string };
     general: {
-      uvt: { title: string; hint: string; label: string };
+      parametros: { title: string; hint: string; groups: { fiscal: string; emision: string } };
+      uvt: { hint: string; label: string };
+      emitirAutomaticamente: { label: string; hint: string };
+      documentoTipo: {
+        title: string;
+        hint: string;
+        columns: {
+          id: string;
+          nombre: string;
+          consecutivo: string;
+          resolucion: string;
+          resolucionNumero: string;
+          resolucionPrefijo: string;
+          venta: string;
+          compra: string;
+          cuentaCobrar: string;
+          cuentaPagar: string;
+        };
+        fields: {
+          consecutivo: string;
+          resolucion: string;
+          resolucionPlaceholder: string;
+          cuentaCobrar: string;
+          cuentaPagar: string;
+        };
+        dialog: { title: string; groups: { numeracion: string; cuentas: string } };
+        validation: { required: string; consecutivoMin: string };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
       validation: { required: string };
     };
     humano: {
@@ -1495,28 +5070,71 @@ export interface AppDict extends AuthTranslationsHost {
       fields: { salarioMinimo: string; factor: string; auxilioTransporte: string };
       validation: { required: string };
     };
+    venta: {
+      tabs: { formato: string; aiu: string };
+      formato: {
+        section: { title: string; hint: string };
+        fields: { informacionSuperior: string; informacionInferior: string };
+        hints: { informacionSuperior: string; informacionInferior: string };
+        validation: { max: string };
+      };
+      aiu: {
+        section: { title: string; hint: string };
+        fields: {
+          administracion: string;
+          imprevisto: string;
+          utilidad: string;
+          placeholder: string;
+        };
+      };
+    };
     empresa: {
       sections: {
         identidad: { title: string; hint: string };
         contacto: { title: string; hint: string };
       };
       fields: {
+        razonSocial: string;
         nombreCorto: string;
         tipoPersona: string;
+        /** Rótulo del campo compuesto tipo · número · DV. */
+        identificacionGroup: string;
         identificacion: string;
         numeroIdentificacion: string;
         digitoVerificacion: string;
         direccion: string;
         ciudad: string;
+        ciudadPlaceholder: string;
         telefono: string;
         correo: string;
       };
-      validation: { required: string; emailInvalid: string };
+      validation: { required: string; emailInvalid: string; onlyDigits: string };
     };
     toasts: {
       saveSuccess: { title: string; desc: string };
       saveError: { title: string; desc: string };
       loadError: { title: string; desc: string };
+    };
+  };
+  /**
+   * Página «Mi empresa». Los campos del formulario **no** viven acá: son los de
+   * `configuracion.empresa`, porque el componente que los pinta lo comparte con
+   * el asistente de facturación electrónica. Acá solo va lo propio de la página.
+   */
+  empresa: {
+    title: string;
+    subtitle: string;
+    groups: { logotipo: string; identificacion: string; contacto: string };
+    dialog: { title: string; subtitle: string };
+    logo: {
+      formats: string;
+      alt: string;
+      toasts: {
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        removeSuccess: { title: string; desc: string };
+        removeError: { title: string; desc: string };
+      };
     };
   };
 }

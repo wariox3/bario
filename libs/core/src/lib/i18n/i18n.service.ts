@@ -10,6 +10,20 @@ export class I18nService<TDict = unknown> {
   readonly lang = this._lang.asReadonly();
   readonly t = computed<TDict>(() => this.dicts[this._lang()]);
 
+  /**
+   * Resuelve una clave i18n con notación de punto (p. ej. `modules.compra.name`)
+   * contra el diccionario del idioma activo. Devuelve la propia clave si la ruta
+   * no existe o no termina en un string, para que la UI no muestre vacío.
+   */
+  translate(key: string): string {
+    let current: unknown = this.t();
+    for (const part of key.split('.')) {
+      if (current === null || typeof current !== 'object') return key;
+      current = (current as Record<string, unknown>)[part];
+    }
+    return typeof current === 'string' ? current : key;
+  }
+
   setLang(lang: Lang): void {
     if (!SUPPORTED_LANGS.includes(lang)) return;
     this._lang.set(lang);

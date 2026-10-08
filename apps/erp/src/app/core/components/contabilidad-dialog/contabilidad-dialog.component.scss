@@ -1,0 +1,38 @@
+// El host no es más que el envoltorio del diálogo: el diálogo se pinta `fixed`,
+// así que fuera del flujo no pierde nada y deja de cobrar el `gap` del
+// contenedor que lo declara. Misma razón que `_overlays.scss` en libs/styles.
+:host {
+  display: contents;
+}
+
+// ── Dialog shell — mismo chrome que el resto de los diálogos del ERP:
+//    radius 16px, sombra suave + larga, paddings propios. Gemelo del
+//    `cp-archivos-dialog`, con el que comparte el menú "Opciones" de la ficha.
+:host ::ng-deep .cp-contabilidad-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(20 48 73 / 0.04),
+    0 20px 60px rgba(20 48 73 / 0.14) !important;
+
+  .p-dialog-header {
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: none;
+  }
+
+  .p-dialog-content {
+    padding: 1.25rem 1.5rem 0.75rem;
+  }
+
+  .p-dialog-footer {
+    padding: 0 1.5rem 1.1rem;
+  }
+}
+
+// ── Tabla — la caja borders-only del ERP; el scroll lo pone `lib-data-table`
+//    con su `scrollHeight`, acá solo se enmarca.
+.cp-contabilidad-dialog__table {
+  overflow: hidden;
+  border: 1px solid rgba(20, 48, 73, 0.1);
+  border-radius: 10px;
+}

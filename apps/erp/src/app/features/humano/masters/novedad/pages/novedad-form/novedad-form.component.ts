@@ -1,38 +1,40 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
-import { FieldErrorComponent } from '@reddoc/ui';
+import {
+  FieldErrorComponent,
+  FocusInvalidDirective,
+  PageActionsComponent,
+  MascaraFechaDirective,
+} from '@reddoc/ui';
 import {
   FormErrorService,
   I18nService,
   TenantService,
   ToastService,
+  formatFechaCorta,
   startOfToday,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import {
-  ErpApiSelectComponent,
-  type ErpSelectOption,
-} from '@erp/core/components/api-select/erp-api-select.component';
-import {
-  ContratoAutocompleteComponent,
-  type ContratoOption,
-} from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import { ErpApiSelectComponent } from '@reddoc/ui';
+import type { ErpSelectOption } from '@reddoc/core';
+import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
+import { SELECT_ENDPOINTS } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { NovedadService } from '../../novedad.service';
 import {
+  NOVEDAD_DETALLE_MAX_LENGTH,
   NOVEDAD_LIST_PATH,
   NOVEDAD_REFERENCIA_CONTRATO_PARAM,
   NOVEDAD_REFERENCIA_ENDPOINT,
   NOVEDAD_REFERENCIA_TIPO_PARAM,
-  NOVEDAD_TIPO_ENDPOINT,
 } from '../../novedad.constants';
-import { esVacaciones, requiereReferencia } from '../../novedad.rules';
+import { diasDeNovedad, esVacaciones, requiereReferencia } from '../../novedad.rules';
 import { dateRangeValidator } from '../../utils/date-range.validator';
 import { novedadToFormValue, formValueToPayload } from '../../novedad.mapper';
 
@@ -51,13 +53,16 @@ import { novedadToFormValue, formValueToPayload } from '../../novedad.mapper';
   selector: 'app-novedad-form',
   standalone: true,
   imports: [
+    FocusInvalidDirective,
     ReactiveFormsModule,
     BreadcrumbComponent,
     ButtonModule,
     InputNumberModule,
     DatePickerModule,
+    MascaraFechaDirective,
     TextareaModule,
     FieldErrorComponent,
+    PageActionsComponent,
     ContratoAutocompleteComponent,
     ErpApiSelectComponent,
   ],
@@ -76,7 +81,8 @@ export class NovedadFormComponent implements OnInit {
 
   protected readonly t = this.i18n.t;
 
-  protected readonly novedadTipoEndpoint = NOVEDAD_TIPO_ENDPOINT;
+  protected readonly novedadTipoEndpoint = SELECT_ENDPOINTS.novedadTipo;
+  protected readonly detalleMaxLength = NOVEDAD_DETALLE_MAX_LENGTH;
   protected readonly novedadReferenciaEndpoint = NOVEDAD_REFERENCIA_ENDPOINT;
   /** Referencia estable para no re-disparar el fetch del selector en cada ciclo de CD. */
   protected readonly tipoParams: Record<string, string> = { limit: '100' };
@@ -96,7 +102,10 @@ export class NovedadFormComponent implements OnInit {
     requiereReferencia(this.tipoId(), this.contratoId()),
   );
 
-  /** Filtros del selector de referencia: se recargan al cambiar contrato o tipo. */
+  /**
+   * Filtros del selector de referencia: se recargan al cambiar contrato o tipo.
+   * Hoy el backend los ignora (ver `NOVEDAD_REFERENCIA_*_PARAM`).
+   */
   protected readonly referenciaParams = computed<Record<string, string>>(() => {
     const contrato = this.contratoId();
     const tipo = this.tipoId();
@@ -106,6 +115,17 @@ export class NovedadFormComponent implements OnInit {
       limit: '100',
     };
   });
+
+  /**
+   * Etiqueta de una novedad de referencia. El endpoint no trae `nombre` (una
+   * novedad no tiene): la identifica su id —lo que mostraba el ERP anterior— y
+   * sus fechas la ubican en el tiempo, que es lo que se busca al prorrogar.
+   */
+  protected readonly referenciaDisplay = (option: ErpSelectOption): string => {
+    const desde = formatFechaCorta(option['fecha_desde'] as string | null, '—');
+    const hasta = formatFechaCorta(option['fecha_hasta'] as string | null, '—');
+    return `#${option.id} · ${desde} → ${hasta}`;
+  };
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
@@ -128,13 +148,12 @@ export class NovedadFormComponent implements OnInit {
       contrato: this.fb.control<ContratoOption | null>(null, Validators.required),
       fecha_desde: this.fb.control<Date | null>(null, Validators.required),
       fecha_hasta: this.fb.control<Date | null>(null, Validators.required),
-      detalle: [''],
+      detalle: ['', Validators.maxLength(NOVEDAD_DETALLE_MAX_LENGTH)],
       // Vacaciones (validadores aplicados dinámicamente según el tipo)
       fecha_desde_periodo: this.fb.control<Date | null>(null),
       fecha_hasta_periodo: this.fb.control<Date | null>(null),
       dias_dinero: this.fb.control<number | null>(0),
       dias_disfrutados: this.fb.control<number | null>(0),
-      dias_disfrutados_reales: this.fb.control<number | null>(0),
       // Referencia
       novedad_referencia: this.fb.control<ErpSelectOption | null>(null),
     },
@@ -158,6 +177,25 @@ export class NovedadFormComponent implements OnInit {
       .subscribe((option) => this.contratoId.set(option?.id ?? null));
   }
 
+  /** Valor del form como signal, para derivar los días sin suscripciones. */
+  private readonly valores = toSignal(this.form.valueChanges, { initialValue: this.form.value });
+
+  /**
+   * Días que dura la novedad, extremos incluidos. Se muestra —no se escribe— y
+   * es lo que viaja al backend, que ya no lo calcula por su cuenta.
+   */
+  protected readonly dias = computed(() =>
+    diasDeNovedad(this.valores().fecha_desde ?? null, this.valores().fecha_hasta ?? null),
+  );
+
+  /** Texto del hint de duración, con los días ya interpolados. */
+  protected readonly diasHint = computed(() => {
+    const dias = this.dias();
+    if (dias === null) return null;
+    const hints = this.t().entities.novedad.form.hints;
+    return (dias === 1 ? hints.diasUno : hints.dias).replace('{dias}', String(dias));
+  });
+
   ngOnInit(): void {
     const id = this.id();
     if (id) {
@@ -180,11 +218,18 @@ export class NovedadFormComponent implements OnInit {
       : this.novedadService.create(payload);
 
     operation.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
+      next: (saved) => {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        this.navigateToList();
+        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
+        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        const savedId = id ? Number(id) : saved?.id;
+        if (savedId == null) {
+          this.navigateToList();
+          return;
+        }
+        this.navigateToDetail(savedId);
       },
       error: (err: unknown) => {
         this.isSaving.set(false);
@@ -216,48 +261,33 @@ export class NovedadFormComponent implements OnInit {
    * se mutan validadores → fácil de auditar y mantener.
    */
   private aplicarValidadoresVacaciones(activo: boolean): void {
-    const {
-      fecha_desde_periodo,
-      fecha_hasta_periodo,
-      dias_dinero,
-      dias_disfrutados,
-      dias_disfrutados_reales,
-    } = this.form.controls;
+    const { fecha_desde_periodo, fecha_hasta_periodo, dias_dinero, dias_disfrutados } =
+      this.form.controls;
+    const controles = [fecha_desde_periodo, fecha_hasta_periodo, dias_dinero, dias_disfrutados];
 
     if (activo) {
       fecha_desde_periodo.setValidators(Validators.required);
       fecha_hasta_periodo.setValidators(Validators.required);
       dias_dinero.setValidators([Validators.required, Validators.min(0)]);
       dias_disfrutados.setValidators([Validators.required, Validators.min(0)]);
-      dias_disfrutados_reales.setValidators([Validators.required, Validators.min(1)]);
     } else {
-      for (const control of [
-        fecha_desde_periodo,
-        fecha_hasta_periodo,
-        dias_dinero,
-        dias_disfrutados,
-        dias_disfrutados_reales,
-      ]) {
-        control.clearValidators();
-      }
+      for (const control of controles) control.clearValidators();
     }
 
-    for (const control of [
-      fecha_desde_periodo,
-      fecha_hasta_periodo,
-      dias_dinero,
-      dias_disfrutados,
-      dias_disfrutados_reales,
-    ]) {
-      control.updateValueAndValidity({ emitEvent: false });
-    }
+    for (const control of controles) control.updateValueAndValidity({ emitEvent: false });
   }
 
-  /** Defaults de vacaciones — solo ante cambio del usuario (1/1/1 al activar, reset al salir). */
+  /**
+   * Defaults de vacaciones — solo ante cambio del usuario.
+   *
+   * Al activar se propone lo corriente: tantos días disfrutados como dura la
+   * novedad y ninguno en dinero. Es una sugerencia editable, no una regla: los
+   * disfrutados pueden contarse en hábiles y los de dinero no se toman.
+   */
   private aplicarValoresVacaciones(activo: boolean): void {
     if (activo) {
       this.form.patchValue(
-        { dias_dinero: 1, dias_disfrutados: 1, dias_disfrutados_reales: 1 },
+        { dias_dinero: 0, dias_disfrutados: this.dias() ?? 0 },
         { emitEvent: false },
       );
     } else {
@@ -265,7 +295,6 @@ export class NovedadFormComponent implements OnInit {
         {
           dias_dinero: 0,
           dias_disfrutados: 0,
-          dias_disfrutados_reales: 0,
           fecha_desde_periodo: null,
           fecha_hasta_periodo: null,
         },
@@ -297,5 +326,11 @@ export class NovedadFormComponent implements OnInit {
     const slug = this.tenant.currentSlug();
     if (!slug) return;
     void this.router.navigate(['/t', slug, ...NOVEDAD_LIST_PATH]);
+  }
+
+  private navigateToDetail(id: number): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    void this.router.navigate(['/t', slug, ...NOVEDAD_LIST_PATH, 'detalle', id]);
   }
 }

@@ -1,0 +1,310 @@
+import {
+  Component,
+  DestroyRef,
+  type OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { TabsModule } from 'primeng/tabs';
+import type { MenuItem } from 'primeng/api';
+import { Menu, MenuModule } from 'primeng/menu';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  formatFechaLarga,
+  type DocumentoEstados,
+} from '@reddoc/core';
+import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
+import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
+import {
+  CAPACIDADES_DOCUMENTO_VACIAS,
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  capacidadesDocumento,
+} from '@erp/core/module-config';
+import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/module-config';
+import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
+import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
+import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
+import { importState } from '@erp/core/components/import-dialog/import-state';
+import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
+import type { AppDict } from '@erp/i18n';
+import { ContableDocumentoLineasTableComponent } from '@erp/features/documentos/contable/components/contable-documento-lineas-table/contable-documento-lineas-table.component';
+import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
+import {
+  calcularResumenContable,
+  cuentaDetalleToFormValue,
+} from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
+import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contable-documento-detalle.model';
+import type {
+  CuentaDetalleFormRawValue,
+  ResumenContable,
+} from '@erp/features/documentos/contable/contable-documento-detalle.types';
+import { asientoToFormValue } from '../../asiento.mapper';
+import type { AsientoRead } from '../../asiento.model';
+
+/** Cabecera legible del asiento para la ficha (solo lo que trae `getById`). */
+interface CabeceraView {
+  readonly numero: string | null;
+  readonly contacto: string | null;
+  /** Identificación del contacto (`contacto_numero_identificacion` del read). */
+  readonly identificacion: string | null;
+  readonly fecha: Date | null;
+  readonly soporte: string | null;
+  readonly comprobante: string | null;
+  readonly centroCosto: string | null;
+  readonly comentario: string | null;
+  /**
+   * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
+   * ficha y las acciones de la botonera (p. ej. no se re-aprueba lo ya aprobado).
+   */
+  readonly estados: DocumentoEstados;
+}
+
+/**
+ * Ficha (detalle) de un **Asiento contable** — solo lectura.
+ *
+ * Espeja `PagoDetailComponent`: misma familia contable, con la cabecera propia
+ * del asiento (soporte, comprobante, centro de costo) y las líneas con las
+ * columnas que imputa —número, contacto, centro de costo, base y glosa—. Carga
+ * (`ENTITY_DATA_GATEWAY`) y líneas (`DocumentoDetalleService`) en paralelo, igual
+ * que el form. El resumen marca la diferencia si el asiento no cuadra.
+ *
+ * Suma un dropdown **Utilidades** con la importación de líneas por Excel. Vive
+ * acá y no en el formulario porque la importación necesita un documento ya
+ * creado —el backend recibe el id del padre— y la ficha es el único lugar donde
+ * siempre lo hay.
+ */
+@Component({
+  selector: 'app-asiento-detail',
+  standalone: true,
+  imports: [
+    ButtonModule,
+    BreadcrumbComponent,
+    ContableDocumentoLineasTableComponent,
+    ContableDocumentoResumenComponent,
+    DocumentDetailActionsComponent,
+    DocumentEstadosComponent,
+    MenuModule,
+    ImportDialogComponent,
+    TabsModule,
+  ],
+  templateUrl: './asiento-detail.component.html',
+  styleUrl: './asiento-detail.component.scss',
+})
+export class AsientoDetailComponent implements OnInit {
+  private readonly gateway = inject(ENTITY_DATA_GATEWAY);
+  private readonly detalleService = inject(DocumentoDetalleService);
+  private readonly tenant = inject(TenantService);
+  private readonly activeModule = inject(ActiveModuleStore);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+
+  protected readonly t = this.i18n.t;
+
+  /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
+  readonly document = input.required<DocumentEntityConfig>();
+
+  /** Id del documento (route param `:id`, vía `withComponentInputBinding`). */
+  readonly id = input<string>();
+
+  protected readonly cabecera = signal<CabeceraView | null>(null);
+  /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
+  protected readonly lines = signal<readonly CuentaDetalleFormRawValue[]>([]);
+  protected readonly isLoading = signal(true);
+  protected readonly notFound = signal(false);
+
+  /**
+   * ¿Es editable el documento según su política declarativa (`canEditRow`)?
+   * Misma fuente que la lista y el resolver de la ruta de edición: si la regla
+   * dice que no (p. ej. ya aprobado), el botón "editar" queda deshabilitado.
+   */
+  protected readonly isEditable = computed(() => {
+    const cab = this.cabecera();
+    if (!cab) return false;
+    const canEditRow = this.document().canEditRow;
+    if (!canEditRow) return true;
+    return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
+  });
+
+  /**
+   * Qué acciones ofrece la botonera con las banderas actuales. La regla vive en
+   * `documento.estado.ts` (módulo puro y testeado), no en los `[disabled]` del
+   * template, que es donde el ERP anterior terminó contradiciéndose.
+   */
+  protected readonly capacidades = computed<CapacidadesDocumento>(() => {
+    const cab = this.cabecera();
+    return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
+  });
+
+  /** Resumen contable del asiento: débitos y créditos (y la diferencia si no cuadra). */
+  protected readonly resumen = computed<ResumenContable>(() =>
+    calcularResumenContable(this.lines()),
+  );
+
+  private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
+
+  /**
+   * Entradas del dropdown "Utilidades". `computed` por la misma razón que en la
+   * ficha del contrato: recrear el array en cada detección de cambios le hace
+   * perder el primer click a `p-menu`.
+   *
+   * Importar se deshabilita sobre un asiento no editable —aprobado, típicamente—
+   * porque el backend responde 400 en ese caso: mejor decirlo en el menú que
+   * dejar que el usuario elija un archivo para nada.
+   */
+  protected readonly utilidadesItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.asiento.utilidades.importarDetalle,
+      icon: 'pi pi-upload',
+      disabled: !this.isEditable(),
+      command: () => this.importar.open(),
+    },
+  ]);
+
+  /**
+   * Plantilla de importación de líneas. El endpoint es el genérico de
+   * `documento-detalle`, pero el `documento` no es decorativo: el backend arma
+   * las columnas según el tipo del padre, así que sin él no hay plantilla.
+   */
+  protected readonly exampleConfig = computed<ExampleConfig>(() => ({
+    mode: 'enabled',
+    endpoint: this.detalleService.importarEjemploEndpoint,
+    params: { documento: this.id() },
+    filename: 'detalle-asiento.xlsx',
+  }));
+
+  /**
+   * Estado del diálogo de importación de líneas. Al terminar recarga la ficha
+   * entera y no solo las líneas: el backend recalcula los totales del documento
+   * al cerrar la importación, así que la cabecera también quedó vieja.
+   */
+  protected readonly importar = importState({
+    upload: (file) => this.detalleService.importar(Number(this.id()), file),
+    onImported: () => this.loadDocumento(Number(this.id())),
+  });
+
+  /** Migas: módulo activo → listado del documento → identificador del documento abierto. */
+  protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
+    documentoBreadcrumb(
+      this.activeModule,
+      this.t(),
+      this.tenant.currentSlug(),
+      this.i18n.translate(this.document().displayNameKey),
+      this.document().id,
+      `ID ${this.id() ?? ''}`,
+    ),
+  );
+
+  ngOnInit(): void {
+    const rawId = this.id();
+    const id = rawId != null ? Number(rawId) : NaN;
+    if (!Number.isFinite(id)) {
+      this.isLoading.set(false);
+      this.notFound.set(true);
+      return;
+    }
+    this.loadDocumento(id);
+  }
+
+  protected onBack(): void {
+    this.navigate(this.document().routes.list);
+  }
+
+  protected onEdit(): void {
+    const id = this.id();
+    if (!id) return;
+    this.navigate(this.document().routes.edit, id);
+  }
+
+  protected onNew(): void {
+    this.navigate(this.document().routes.new);
+  }
+
+  protected toggleUtilidades(event: Event): void {
+    this.utilidadesMenu()?.toggle(event);
+  }
+
+  /**
+   * La botonera cambió el estado del documento en el backend —lo aprobó,
+   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
+   * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
+   */
+  protected onDocumentoChanged(): void {
+    const id = this.id();
+    if (!id) return;
+    this.loadDocumento(Number(id));
+  }
+
+  private loadDocumento(id: number): void {
+    // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
+    forkJoin({
+      cabecera: this.gateway.getById(this.document(), id),
+      lineas: this.detalleService.listarPorDocumento<CuentaDetalleRead>(id),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ cabecera, lineas }) => {
+          const read = cabecera as AsientoRead;
+          const fv = asientoToFormValue(read);
+          this.cabecera.set({
+            numero: read.numero ?? null,
+            contacto: read.contacto_nombre_corto ?? null,
+            identificacion: read.contacto_numero_identificacion ?? null,
+            fecha: fv.fecha ?? null,
+            soporte: read.soporte ?? null,
+            comprobante: fv.comprobante?.nombre ?? read.comprobante_nombre ?? null,
+            centroCosto: fv.centro_costo?.nombre ?? read.centro_costo_nombre ?? null,
+            comentario: read.comentario ?? null,
+            estados: {
+              estado_aprobado: read.estado_aprobado,
+              estado_anulado: read.estado_anulado,
+              estado_contabilizado: read.estado_contabilizado,
+              estado_electronico: read.estado_electronico,
+              estado_electronico_enviado: read.estado_electronico_enviado,
+              estado_electronico_notificado: read.estado_electronico_notificado,
+              estado_generado: read.estado_generado,
+            },
+          });
+          this.lines.set(lineas.map((line) => cuentaDetalleToFormValue(line)));
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.isLoading.set(false);
+          this.notFound.set(true);
+          const toasts = this.t().entities.asiento.form.toasts;
+          this.toast.error(toasts.loadError.title, toasts.loadError.desc);
+        },
+      });
+  }
+
+  /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
+  protected formatFecha(date: Date | null): string {
+    return formatFechaLarga(date, '—');
+  }
+
+  /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */
+  private navigate(routePath: string, extra?: string): void {
+    const slug = this.tenant.currentSlug();
+    if (!slug) return;
+    const segments = routePath.split('/').filter(Boolean);
+    const commands: (string | number)[] = [
+      '/t',
+      slug,
+      currentModuleId(this.activeModule),
+      ...segments,
+    ];
+    if (extra) commands.push(extra);
+    void this.router.navigate(commands);
+  }
+}

@@ -1,5 +1,5 @@
-import type { ErpSelectOption } from '@erp/core/components/api-select/erp-api-select.component';
-import type { ContratoOption } from '@erp/core/components/contrato-autocomplete/contrato-autocomplete.component';
+import type { ErpSelectOption } from '@reddoc/core';
+import type { ContratoOption } from '@reddoc/ui';
 
 /**
  * Forma cruda del FormGroup del crédito (lo que devuelve `form.getRawValue()`).
