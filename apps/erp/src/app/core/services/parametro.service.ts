@@ -28,7 +28,24 @@ export interface ParametroRead {
    * pasa por `plantilla/cargar/` o `plantilla/descartar/`.
    */
   readonly gen_asistente_datos_iniciales: boolean;
+  /**
+   * ¿Hay que ofrecerle el asistente de facturación electrónica (venta)?
+   *
+   * Nace en `true` y lo apaga `asistente-terminar/`, que se llama tanto al
+   * omitir la invitación del inicio de Venta como al finalizar el asistente.
+   */
+  readonly gen_asistente_electronico_venta: boolean;
+  /** Lo mismo para el asistente de nómina electrónica. */
+  readonly gen_asistente_electronico_nomina: boolean;
 }
+
+/** Módulo con asistente electrónico propio: cada uno tiene su parámetro. */
+export type AsistenteElectronicoModulo = 'venta' | 'nomina';
+
+const PARAMETRO_ASISTENTE = {
+  venta: 'gen_asistente_electronico_venta',
+  nomina: 'gen_asistente_electronico_nomina',
+} as const satisfies Record<AsistenteElectronicoModulo, keyof ParametroRead>;
 
 /** Nombre de campo pedible (todo menos el `id`). */
 export type ParametroCampo = keyof Omit<ParametroRead, 'id'>;
@@ -66,11 +83,14 @@ export class ParametroService extends BaseHttpService {
     );
   }
 
-  /** ¿La facturación electrónica ya está activa en este contenedor? */
-  facturaElectronicaActiva(): Observable<boolean> {
-    return this.sonda(['gen_factura_electronica_activa']).pipe(
-      map((parametro) => parametro.gen_factura_electronica_activa === true),
-    );
+  /**
+   * ¿Hay que ofrecerle a este contenedor el asistente electrónico del módulo
+   * (venta o nómina)? Como el de datos iniciales, el `true` es lo que hace
+   * aparecer la invitación.
+   */
+  asistenteElectronico(modulo: AsistenteElectronicoModulo): Observable<boolean> {
+    const campo = PARAMETRO_ASISTENTE[modulo];
+    return this.sonda([campo]).pipe(map((parametro) => parametro[campo] === true));
   }
 
   /**

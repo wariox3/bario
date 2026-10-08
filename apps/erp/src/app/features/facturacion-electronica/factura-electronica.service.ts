@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { BaseHttpService, type RequestOptions } from '@reddoc/core';
+import type { AsistenteElectronicoModulo } from '@erp/core/services/parametro.service';
 import type {
   CertificadoConsultaResponse,
   CertificadoRedEDoc,
@@ -138,5 +139,17 @@ export class FacturaElectronicaService extends BaseHttpService {
   /** Actualiza un software ya registrado; lo que no viaja se conserva (PATCH). */
   actualizarSoftware(payload: SoftwareActualizarPayload): Observable<void> {
     return this.patch<void>(`${BASE}software-actualizar/`, payload, SIN_TOAST);
+  }
+
+  /**
+   * Cierra el asistente del módulo: apaga su `gen_asistente_electronico_<modulo>`,
+   * así el inicio de ese módulo deja de invitar. Sirve igual para omitirlo que
+   * para terminarlo.
+   *
+   * Con el toast del interceptor, a diferencia del resto: quienes lo llaman (la
+   * tira del inicio, el pie del cierre) no tienen dónde mostrar el error.
+   */
+  terminarAsistente(modulo: AsistenteElectronicoModulo): Observable<void> {
+    return this.post<void>(`${BASE}asistente-terminar/`, { modulo });
   }
 }

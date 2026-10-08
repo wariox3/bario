@@ -4941,6 +4941,16 @@ export interface AppDict
         actualizado: { title: string; desc: string };
       };
     };
+    finalizar: {
+      title: string;
+      desc: string;
+      siguiente: string;
+      estaciones: Record<'enviada' | 'revision' | 'resoluciones', { title: string; desc: string }>;
+      /** Para lectores de pantalla: el estado de cada estación. */
+      estados: Record<'hecho' | 'enCurso' | 'pendiente', string>;
+      ayuda: string;
+      finalizar: string;
+    };
     asistente: {
       eyebrow: string;
       title: string;
@@ -4991,7 +5001,7 @@ export interface AppDict
       facturaElectronica: {
         title: string;
         desc: string;
-        actions: { completar: string };
+        actions: { completar: string; omitir: string };
       };
     };
   };
@@ -5074,8 +5084,11 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    tabs: { general: string; humano: string };
+    tabs: { general: string; humano: string; venta: string };
     unsavedChanges: string;
+    venta: {
+      facturacionElectronica: { title: string; hint: string; desc: string; abrir: string };
+    };
     actions: { save: string };
     general: {
       parametros: { title: string; hint: string; groups: { fiscal: string; emision: string } };

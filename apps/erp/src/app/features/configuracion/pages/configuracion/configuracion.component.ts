@@ -5,18 +5,19 @@ import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { GeneralConfigComponent } from '../../components/general-config/general-config.component';
 import { HumanoConfigComponent } from '../../components/humano-config/humano-config.component';
+import { VentaConfigComponent } from '../../components/venta-config/venta-config.component';
 
 /**
  * Shell de Configuración de la empresa.
  *
  * Aloja las áreas en pestañas horizontales; la activa viaja en `?seccion=` para
  * deep-link. Cada área es auto-contenida (lee y guarda solo sus campos), así que
- * el shell no carga datos. Pestañas: General (UVT) y Humano.
+ * el shell no carga datos. Pestañas: General (UVT), Humano y Venta.
  */
 @Component({
   selector: 'app-configuracion',
   standalone: true,
-  imports: [TabsModule, GeneralConfigComponent, HumanoConfigComponent],
+  imports: [TabsModule, GeneralConfigComponent, HumanoConfigComponent, VentaConfigComponent],
   templateUrl: './configuracion.component.html',
   styleUrl: './configuracion.component.scss',
   // Ancho acotado a propósito: son formularios, no tablas. Las listas del ERP

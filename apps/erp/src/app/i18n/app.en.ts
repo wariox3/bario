@@ -6436,6 +6436,28 @@ export const en: AppDict = {
         creado: { title: 'Software saved', desc: 'The test set is now being enabled.' },
       },
     },
+    finalizar: {
+      title: 'You finished the electronic invoicing process',
+      desc: 'You will receive an email once the test sets are approved, so you can continue registering your resolutions.',
+      siguiente: 'What comes next',
+      estaciones: {
+        enviada: {
+          title: 'Setup sent',
+          desc: 'Company, certificate and software are registered in RedEDoc.',
+        },
+        revision: {
+          title: 'The DIAN reviews your enablements',
+          desc: 'It validates your test set. You do not need to do anything meanwhile.',
+        },
+        resoluciones: {
+          title: 'Register your resolutions',
+          desc: 'With the approval email, continue registering your resolutions to start invoicing.',
+        },
+      },
+      estados: { hecho: 'done', enCurso: 'in progress', pendiente: 'pending' },
+      ayuda: 'If you need to change something, go back to any step on the left.',
+      finalizar: 'Finish wizard',
+    },
     asistente: {
       eyebrow: 'Setup',
       title: 'Electronic invoicing',
@@ -6503,7 +6525,7 @@ export const en: AppDict = {
       facturaElectronica: {
         title: 'Electronic invoicing',
         desc: 'Complete your company information and start invoicing electronically.',
-        actions: { completar: 'Complete' },
+        actions: { completar: 'Complete', omitir: 'Skip' },
       },
     },
   },
@@ -6644,8 +6666,16 @@ export const en: AppDict = {
   configuracion: {
     title: 'Settings',
     subtitle: 'Company parameters',
-    tabs: { general: 'General', humano: 'Payroll' },
+    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales' },
     unsavedChanges: 'Unsaved changes',
+    venta: {
+      facturacionElectronica: {
+        title: 'Electronic invoicing',
+        hint: 'Your company in RedEDoc, the digital certificate and the DIAN enablements.',
+        desc: 'Go back to the wizard to review the setup or change something. Each step shows what is already registered.',
+        abrir: 'Open wizard',
+      },
+    },
     actions: { save: 'Save' },
     general: {
       parametros: {

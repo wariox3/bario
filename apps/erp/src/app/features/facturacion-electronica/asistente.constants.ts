@@ -4,10 +4,9 @@
  * **Esta constante es la costura por donde crece el asistente.** Cuatro son los
  * del ERP anterior; «RedEDoc» es nuevo (el registro de la empresa como emisor,
  * que antes iba en un diálogo al guardar). «Habilitaciones» (el software ante
- * la DIAN) también. Todos menos «Terminar» ya tienen contenido: de ese la API
- * nueva todavía no expone nada (`terminar-asistente/`), así que se declara para
- * tener el camino a la vista y su panel muestra un «próximamente». «Resolución»
- * está comentado hasta que se defina.
+ * la DIAN) también. «Terminar» es el cierre: no guarda nada (la API nueva no
+ * tiene `terminar-asistente/`), solo dice qué sigue. «Resolución» está
+ * comentado hasta que se defina.
  *
  * Darle contenido a un paso = su rama en el `@switch` del asistente.
  */

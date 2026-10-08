@@ -99,6 +99,9 @@
       @case ('habilitaciones') {
         <app-habilitaciones-step (avanzar)="avanzarDesde('habilitaciones')" />
       }
+      @case ('finalizar') {
+        <app-finalizar-step />
+      }
       @default {
         <!--
           Andamio: el paso está declarado y se puede recorrer, pero su pantalla

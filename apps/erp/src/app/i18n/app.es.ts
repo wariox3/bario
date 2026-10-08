@@ -6508,6 +6508,28 @@ export const es: AppDict = {
         },
       },
     },
+    finalizar: {
+      title: 'Terminaste el proceso de facturación electrónica',
+      desc: 'Vas a recibir un correo cuando los set de pruebas sean aprobados, para que continúes con el registro de tus resoluciones.',
+      siguiente: 'Qué sigue',
+      estaciones: {
+        enviada: {
+          title: 'Configuración enviada',
+          desc: 'Empresa, certificado y software quedaron registrados en RedEDoc.',
+        },
+        revision: {
+          title: 'La DIAN revisa tus habilitaciones',
+          desc: 'Valida tu set de pruebas. Mientras tanto no tenés que hacer nada.',
+        },
+        resoluciones: {
+          title: 'Registrá tus resoluciones',
+          desc: 'Con el correo de aprobación, seguí con el registro de tus resoluciones para empezar a facturar.',
+        },
+      },
+      estados: { hecho: 'hecho', enCurso: 'en curso', pendiente: 'pendiente' },
+      ayuda: 'Si necesitás cambiar algo, volvé a cualquier paso desde la izquierda.',
+      finalizar: 'Finalizar asistente',
+    },
     asistente: {
       eyebrow: 'Asistente',
       title: 'Facturación electrónica',
@@ -6575,7 +6597,7 @@ export const es: AppDict = {
       facturaElectronica: {
         title: 'Facturación electrónica',
         desc: 'Completa la información de tu empresa y empieza a facturar electrónicamente.',
-        actions: { completar: 'Completar' },
+        actions: { completar: 'Completar', omitir: 'Omitir' },
       },
     },
   },
@@ -6716,8 +6738,16 @@ export const es: AppDict = {
   configuracion: {
     title: 'Configuración',
     subtitle: 'Parámetros de la empresa',
-    tabs: { general: 'General', humano: 'Humano' },
+    tabs: { general: 'General', humano: 'Humano', venta: 'Venta' },
     unsavedChanges: 'Cambios sin guardar',
+    venta: {
+      facturacionElectronica: {
+        title: 'Facturación electrónica',
+        hint: 'Tu empresa en RedEDoc, el certificado digital y las habilitaciones ante la DIAN.',
+        desc: 'Volvé al asistente para revisar cómo quedó o cambiar algo. Cada paso muestra lo que ya está registrado.',
+        abrir: 'Abrir asistente',
+      },
+    },
     actions: { save: 'Guardar' },
     general: {
       parametros: {

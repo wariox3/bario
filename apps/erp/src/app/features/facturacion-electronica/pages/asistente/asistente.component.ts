@@ -6,6 +6,7 @@ import { EmpresaConfigComponent } from '@erp/features/configuracion/components/e
 import { RededocStepComponent } from '../../steps/rededoc/rededoc-step.component';
 import { CertificadoStepComponent } from '../../steps/certificado/certificado-step.component';
 import { HabilitacionesStepComponent } from '../../steps/habilitaciones/habilitaciones-step.component';
+import { FinalizarStepComponent } from '../../steps/finalizar/finalizar-step.component';
 import {
   ASISTENTE_STEPS,
   type AsistenteStep,
@@ -29,6 +30,7 @@ import {
     RededocStepComponent,
     CertificadoStepComponent,
     HabilitacionesStepComponent,
+    FinalizarStepComponent,
   ],
   templateUrl: './asistente.component.html',
   // Ancho acotado como Configuración: son formularios, no tablas. La grilla de

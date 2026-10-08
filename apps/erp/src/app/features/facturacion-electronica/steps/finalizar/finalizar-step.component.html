@@ -1,0 +1,125 @@
+@let f = t().facturacionElectronica.finalizar;
+
+<!--
+  Cierre del asistente. Una sola superficie: la cabecera con la atmósfera del
+  acuse (grilla, halo, marca de agua) se disuelve en el «qué sigue» sin ningún
+  borde que las separe. Sin verde: el éxito lo dicen el glifo y el copy en
+  pasado, como en el resto del ERP.
+-->
+<section
+  class="relative overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+>
+  <!-- Atmósfera: decorativa, nada que leer. -->
+  <div
+    class="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle,rgba(20,48,73,0.14)_1px,transparent_1.6px)] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.85),transparent_88%)] bg-[size:14px_14px]"
+    aria-hidden="true"
+  ></div>
+  <div
+    class="pointer-events-none absolute -top-20 left-1/2 h-64 w-[28rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(119,170,215,0.28),transparent)]"
+    aria-hidden="true"
+  ></div>
+  <i
+    class="pi pi-send pointer-events-none absolute top-6 -right-5 -rotate-[10deg] text-[7.5rem] text-[rgba(20,48,73,0.05)]"
+    aria-hidden="true"
+  ></i>
+
+  <!-- ── Cabecera ─────────────────────────────────────────────────────────── -->
+  <div class="relative flex flex-col items-center px-6 pt-12 pb-8 text-center">
+    <span
+      class="flex h-12 w-12 items-center justify-center rounded-[14px] bg-sky-50 text-sky-700 ring-1 ring-[rgba(20,48,73,0.06)]"
+    >
+      <i class="pi pi-check-circle text-[1.3rem]" aria-hidden="true"></i>
+    </span>
+    <h2 class="m-0 mt-4 text-[1.25rem] leading-tight font-bold tracking-[-0.02em] text-brand-navy">
+      {{ f.title }}
+    </h2>
+    <p class="m-0 mt-2 max-w-[34rem] text-[0.85rem] leading-relaxed text-brand-muted">
+      {{ f.desc }}
+    </p>
+  </div>
+
+  <!-- ── Qué sigue: el riel del asistente, más allá del asistente ─────────── -->
+  <div class="relative mx-auto w-full max-w-[30rem] px-6 pb-8">
+    <p
+      class="m-0 mb-4 text-[0.65rem] font-bold tracking-[0.09em] text-brand-muted uppercase opacity-70"
+    >
+      {{ f.siguiente }}
+    </p>
+
+    <ol class="m-0 flex list-none flex-col p-0">
+      @for (estacion of estaciones; track estacion.clave; let last = $last) {
+        @let texto = f.estaciones[estacion.clave];
+        <li class="relative flex gap-3.5" [class.pb-5]="!last">
+          @if (!last) {
+            <!-- Hilo hasta la siguiente: sólido lo recorrido, punteado lo que falta. -->
+            <span
+              class="absolute top-9 bottom-1 left-[15px]"
+              [class]="
+                estacion.estado === 'hecho'
+                  ? 'w-px bg-[rgba(20,48,73,0.3)]'
+                  : 'w-0 border-l border-dashed border-[rgba(20,48,73,0.2)]'
+              "
+              aria-hidden="true"
+            ></span>
+          }
+
+          <span
+            class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+            [class]="
+              estacion.estado === 'hecho'
+                ? 'bg-brand-navy text-white'
+                : estacion.estado === 'enCurso'
+                  ? 'bg-sky-50 text-sky-700 ring-4 ring-[rgba(119,170,215,0.18)]'
+                  : 'border border-[rgba(20,48,73,0.18)] bg-brand-surface text-brand-muted'
+            "
+          >
+            @switch (estacion.estado) {
+              @case ('hecho') {
+                <i class="pi pi-check text-[0.72rem]" aria-hidden="true"></i>
+              }
+              @case ('enCurso') {
+                <!-- Lo único que se mueve: lo que está pasando ahora. -->
+                <span
+                  class="h-2 w-2 rounded-full bg-sky-600 motion-safe:animate-pulse"
+                  aria-hidden="true"
+                ></span>
+              }
+              @default {
+                <i class="pi pi-file-edit text-[0.72rem]" aria-hidden="true"></i>
+              }
+            }
+          </span>
+
+          <div class="min-w-0 pt-[0.3rem]">
+            <p
+              class="m-0 text-[0.85rem] leading-tight"
+              [class]="
+                estacion.estado === 'pendiente'
+                  ? 'font-medium text-brand-muted'
+                  : 'font-semibold text-brand-text'
+              "
+            >
+              {{ texto.title }}
+              <span class="sr-only">· {{ f.estados[estacion.estado] }}</span>
+            </p>
+            <p class="m-0 mt-1 text-[0.75rem] leading-snug text-brand-muted">{{ texto.desc }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </div>
+
+  <!-- ── Pie ──────────────────────────────────────────────────────────────── -->
+  <div
+    class="relative flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] px-5 py-3"
+  >
+    <p class="m-0 text-[0.75rem] text-brand-muted">{{ f.ayuda }}</p>
+    <p-button
+      type="button"
+      icon="pi pi-check"
+      [label]="f.finalizar"
+      [loading]="finalizando()"
+      (onClick)="finalizar()"
+    />
+  </div>
+</section>

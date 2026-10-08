@@ -1,6 +1,7 @@
 <!--
   Invitación a facturar electrónicamente: la tira compartida de los inicios
-  (`app-inicio-invitacion`), con el ícono y el copy de facturación.
+  (`app-inicio-invitacion`), con el ícono y el copy de facturación. Como en
+  datos iniciales, omitir va como texto secundario: lo que ofrecemos es uno.
 -->
 @if (mostrarInvitacion()) {
   <app-inicio-invitacion
@@ -11,9 +12,19 @@
     <p-button
       type="button"
       size="small"
+      [text]="true"
+      severity="secondary"
+      [label]="t().inicio.venta.facturaElectronica.actions.omitir"
+      [loading]="omitiendo()"
+      (onClick)="onOmitir()"
+    />
+    <p-button
+      type="button"
+      size="small"
       icon="pi pi-arrow-right"
       iconPos="right"
       [label]="t().inicio.venta.facturaElectronica.actions.completar"
+      [disabled]="omitiendo()"
       (onClick)="onCompletar()"
     />
   </app-inicio-invitacion>

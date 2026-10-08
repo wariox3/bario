@@ -109,4 +109,14 @@ describe('FacturaElectronicaService', () => {
       req.flush({});
     });
   });
+
+  describe('terminarAsistente', () => {
+    it('dice qué asistente se termina', () => {
+      service.terminarAsistente('venta').subscribe();
+      const req = http.expectOne('/api/general/electronico/asistente-terminar/');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ modulo: 'venta' });
+      req.flush({});
+    });
+  });
 });

@@ -1,10 +1,11 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { InicioInvitacionComponent } from '@erp/core/components/inicio-invitacion/inicio-invitacion.component';
 import { I18nService, TenantService } from '@reddoc/core';
 import { ParametroService } from '@erp/core/services/parametro.service';
+import { FacturaElectronicaService } from '@erp/features/facturacion-electronica/factura-electronica.service';
 import type { AppDict } from '@erp/i18n';
 
 /**
@@ -29,30 +30,54 @@ export class VentaInicioComponent {
   private readonly parametro = inject(ParametroService);
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
+  private readonly facturaElectronica = inject(FacturaElectronicaService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
 
   /**
    * `null` = todavía no sabemos (petición en vuelo o fallida).
    *
-   * Los tres estados importan: solo con un `false` **confirmado** invitamos.
-   * Si arrancara en `false` la tira parpadearía en toda entrada al módulo,
-   * incluso en contenedores que ya facturan electrónicamente.
+   * Los tres estados importan: solo con un `true` **confirmado** invitamos. Si
+   * arrancara en `true` la tira parpadearía en toda entrada al módulo, incluso
+   * en contenedores que ya terminaron u omitieron el asistente.
    */
-  private readonly facturaElectronicaActiva = signal<boolean | null>(null);
+  private readonly asistentePendiente = signal<boolean | null>(null);
 
-  /** La invitación aparece solo si el contenedor confirmó que NO está activa. */
-  protected readonly mostrarInvitacion = computed(() => this.facturaElectronicaActiva() === false);
+  /** La invitación aparece solo si el backend confirmó que el asistente sigue pendiente. */
+  protected readonly mostrarInvitacion = computed(() => this.asistentePendiente() === true);
+
+  /** «Omitir» en vuelo: carga en su botón y bloquea «Completar». */
+  protected readonly omitiendo = signal(false);
 
   constructor() {
     this.parametro
-      .facturaElectronicaActiva()
+      .asistenteElectronico('venta')
       .pipe(takeUntilDestroyed())
       .subscribe({
-        next: (activa) => this.facturaElectronicaActiva.set(activa),
+        next: (pendiente) => this.asistentePendiente.set(pendiente),
         // Sin dato no hay invitación: preferimos no ofrecer nada antes que
-        // ofrecerle activar a quien quizá ya activó.
-        error: () => this.facturaElectronicaActiva.set(null),
+        // insistirle a quien quizá ya lo terminó.
+        error: () => this.asistentePendiente.set(null),
+      });
+  }
+
+  /**
+   * La empresa no quiere el asistente: se cierra igual que al terminarlo y la
+   * tira se va. Si falla, el interceptor ya avisó; solo se libera el botón.
+   */
+  protected onOmitir(): void {
+    if (this.omitiendo()) return;
+    this.omitiendo.set(true);
+    this.facturaElectronica
+      .terminarAsistente('venta')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.omitiendo.set(false);
+          this.asistentePendiente.set(false);
+        },
+        error: () => this.omitiendo.set(false),
       });
   }
 
