@@ -2169,13 +2169,10 @@ export interface AppDict
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
-          referenciaPrefijo: string;
-          referenciaNumero: string;
-          referenciaCue: string;
           comentario: string;
         };
         tabs: { detalles: string; cuentas: string };
-        validation: { required: string; referenciaNumeroDigitos: string };
+        validation: { required: string };
         toasts: {
           createSuccess: { title: string; desc: string };
           createError: { title: string; desc: string };
@@ -2196,9 +2193,6 @@ export interface AppDict
           sede: string;
           metodoPago: string;
           ordenCompra: string;
-          referenciaPrefijo: string;
-          referenciaNumero: string;
-          referenciaCue: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -5075,6 +5069,24 @@ export interface AppDict
       section: { title: string; hint: string };
       fields: { salarioMinimo: string; factor: string; auxilioTransporte: string };
       validation: { required: string };
+    };
+    venta: {
+      tabs: { formato: string; aiu: string };
+      formato: {
+        section: { title: string; hint: string };
+        fields: { informacionSuperior: string; informacionInferior: string };
+        hints: { informacionSuperior: string; informacionInferior: string };
+        validation: { max: string };
+      };
+      aiu: {
+        section: { title: string; hint: string };
+        fields: {
+          administracion: string;
+          imprevisto: string;
+          utilidad: string;
+          placeholder: string;
+        };
+      };
     };
     empresa: {
       sections: {

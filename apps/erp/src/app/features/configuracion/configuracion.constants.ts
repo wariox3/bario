@@ -23,6 +23,27 @@ export const HUMANO_CAMPOS = [
   'hum_auxilio_transporte',
 ] as const satisfies readonly ConfiguracionCampo[];
 
+// ── Área Venta ────────────────────────────────────────────────────────────────
+
+/** Campos de la sub-pestaña Formato de Venta (textos de la factura impresa). */
+export const VENTA_FORMATO_CAMPOS = [
+  'ven_factura_informacion_superior',
+  'ven_factura_informacion_inferior',
+] as const satisfies readonly ConfiguracionCampo[];
+
+/**
+ * Campos de la sub-pestaña AIU de Venta. Lee también los `_nombre` para pintar
+ * cada ítem sin otra consulta; se persisten solo los ids.
+ */
+export const VENTA_AIU_CAMPOS = [
+  'ven_item_administracion',
+  'ven_item_administracion_nombre',
+  'ven_item_imprevisto',
+  'ven_item_imprevisto_nombre',
+  'ven_item_utilidad',
+  'ven_item_utilidad_nombre',
+] as const satisfies readonly ConfiguracionCampo[];
+
 // ── Área Empresa (datos de la empresa) ────────────────────────────────────────
 
 /**

@@ -2796,16 +2796,10 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
           ordenCompra: 'Purchase order',
-          referenciaPrefijo: 'Prefix',
-          referenciaNumero: 'Number',
-          referenciaCue: 'CUE',
           comentario: 'Comment',
         },
         tabs: { detalles: 'Details', cuentas: 'Accounts' },
-        validation: {
-          required: 'This field is required',
-          referenciaNumeroDigitos: 'Digits only, up to 10',
-        },
+        validation: { required: 'This field is required' },
         toasts: {
           createSuccess: {
             title: 'Invoice created',
@@ -2844,9 +2838,6 @@ export const en: AppDict = {
           sede: 'Branch',
           metodoPago: 'Payment method',
           ordenCompra: 'Purchase order',
-          referenciaPrefijo: 'Reference prefix',
-          referenciaNumero: 'Reference number',
-          referenciaCue: 'Reference CUE',
           comentario: 'Comment',
         },
         notFound: {
@@ -6683,6 +6674,36 @@ export const en: AppDict = {
         auxilioTransporte: 'Transport allowance',
       },
       validation: { required: 'This field is required' },
+    },
+    venta: {
+      tabs: { formato: 'Format', aiu: 'AIU' },
+      formato: {
+        section: {
+          title: 'Invoice format',
+          hint: 'Fixed texts printed on every sales invoice.',
+        },
+        fields: {
+          informacionSuperior: 'Top information',
+          informacionInferior: 'Bottom information',
+        },
+        hints: {
+          informacionSuperior: 'Shown at the top of the invoice.',
+          informacionInferior: 'Shown at the bottom of the invoice.',
+        },
+        validation: { max: 'Maximum 2000 characters' },
+      },
+      aiu: {
+        section: {
+          title: 'AIU',
+          hint: 'Items the invoice uses to charge administration, contingency and profit.',
+        },
+        fields: {
+          administracion: 'Administration item',
+          imprevisto: 'Contingency item',
+          utilidad: 'Profit item',
+          placeholder: 'Search item…',
+        },
+      },
     },
     empresa: {
       sections: {

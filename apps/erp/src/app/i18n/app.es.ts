@@ -2850,16 +2850,10 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
-          referenciaPrefijo: 'Prefijo',
-          referenciaNumero: 'Número',
-          referenciaCue: 'CUE',
           comentario: 'Comentario',
         },
         tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
-        validation: {
-          required: 'Este campo es requerido',
-          referenciaNumeroDigitos: 'Solo dígitos, máximo 10',
-        },
+        validation: { required: 'Este campo es requerido' },
         toasts: {
           createSuccess: {
             title: 'Factura creada',
@@ -2898,9 +2892,6 @@ export const es: AppDict = {
           sede: 'Sede',
           metodoPago: 'Método de pago',
           ordenCompra: 'Orden de compra',
-          referenciaPrefijo: 'Prefijo de referencia',
-          referenciaNumero: 'Número de referencia',
-          referenciaCue: 'CUE de referencia',
           comentario: 'Comentario',
         },
         notFound: {
@@ -6757,6 +6748,36 @@ export const es: AppDict = {
         auxilioTransporte: 'Auxilio de transporte',
       },
       validation: { required: 'Este campo es obligatorio' },
+    },
+    venta: {
+      tabs: { formato: 'Formato', aiu: 'AIU' },
+      formato: {
+        section: {
+          title: 'Formato de la factura',
+          hint: 'Textos fijos que acompañan cada factura de venta impresa.',
+        },
+        fields: {
+          informacionSuperior: 'Información superior',
+          informacionInferior: 'Información inferior',
+        },
+        hints: {
+          informacionSuperior: 'Aparece en la parte de arriba de la factura.',
+          informacionInferior: 'Aparece al pie de la factura.',
+        },
+        validation: { max: 'Máximo 2000 caracteres' },
+      },
+      aiu: {
+        section: {
+          title: 'AIU',
+          hint: 'Ítems con los que la factura liquida la administración, el imprevisto y la utilidad.',
+        },
+        fields: {
+          administracion: 'Ítem de administración',
+          imprevisto: 'Ítem de imprevisto',
+          utilidad: 'Ítem de utilidad',
+          placeholder: 'Buscar ítem…',
+        },
+      },
     },
     empresa: {
       sections: {

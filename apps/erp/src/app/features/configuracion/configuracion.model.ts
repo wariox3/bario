@@ -3,7 +3,7 @@
  *
  * Las columnas usan prefijos por dominio funcional (`gen_*`, `hum_*`), que NO
  * coinciden 1:1 con las pestañas de la UI: la pestaña General edita los
- * `gen_empresa_*`; la pestaña Venta (futura) edita `gen_uvt` + los `hum_*`.
+ * `gen_empresa_*`; la pestaña Venta edita los `ven_*`.
  *
  * Los montos pueden llegar del backend como string con cola de ceros
  * (`"120600.000000"`); se normalizan al consumirlos.
@@ -43,6 +43,22 @@ export interface ConfiguracionRead {
   readonly gen_empresa_telefono: string | null;
   readonly gen_empresa_correo: string | null;
   readonly gen_empresa_imagen: string | null;
+
+  // Formato de la factura de venta (área Venta)
+  /** Texto libre que la factura impresa lleva arriba. */
+  readonly ven_factura_informacion_superior: string | null;
+  /** Texto libre que la factura impresa lleva abajo. */
+  readonly ven_factura_informacion_inferior: string | null;
+
+  // AIU de la factura de venta (área Venta): ítems con que se liquidan la
+  // administración, el imprevisto y la utilidad. FK a `GenItem`; el `_nombre` es
+  // de solo lectura.
+  readonly ven_item_administracion: number | null;
+  readonly ven_item_administracion_nombre?: string | null;
+  readonly ven_item_imprevisto: number | null;
+  readonly ven_item_imprevisto_nombre?: string | null;
+  readonly ven_item_utilidad: number | null;
+  readonly ven_item_utilidad_nombre?: string | null;
 }
 
 /** Nombre de columna pedible/persistible (todo menos el `id`). */

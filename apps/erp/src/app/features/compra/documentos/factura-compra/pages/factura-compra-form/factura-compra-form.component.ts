@@ -219,9 +219,6 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
-    referencia_prefijo: this.fb.control<string | null>(null, Validators.maxLength(50)),
-    referencia_numero: this.fb.control<string | null>(null, Validators.pattern(/^\d{1,10}$/)),
-    referencia_cue: this.fb.control<string | null>(null, Validators.maxLength(150)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
     cuentas: new FormArray<CuentaDetalleGroup>([]),
   });
