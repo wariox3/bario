@@ -2796,16 +2796,10 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
           ordenCompra: 'Purchase order',
-          referenciaPrefijo: 'Prefix',
-          referenciaNumero: 'Number',
-          referenciaCue: 'CUE',
           comentario: 'Comment',
         },
         tabs: { detalles: 'Details', cuentas: 'Accounts' },
-        validation: {
-          required: 'This field is required',
-          referenciaNumeroDigitos: 'Digits only, up to 10',
-        },
+        validation: { required: 'This field is required' },
         toasts: {
           createSuccess: {
             title: 'Invoice created',
@@ -2844,9 +2838,6 @@ export const en: AppDict = {
           sede: 'Branch',
           metodoPago: 'Payment method',
           ordenCompra: 'Purchase order',
-          referenciaPrefijo: 'Reference prefix',
-          referenciaNumero: 'Reference number',
-          referenciaCue: 'Reference CUE',
           comentario: 'Comment',
         },
         notFound: {

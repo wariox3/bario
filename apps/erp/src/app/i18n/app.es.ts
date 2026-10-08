@@ -2850,16 +2850,10 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
-          referenciaPrefijo: 'Prefijo',
-          referenciaNumero: 'Número',
-          referenciaCue: 'CUE',
           comentario: 'Comentario',
         },
         tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
-        validation: {
-          required: 'Este campo es requerido',
-          referenciaNumeroDigitos: 'Solo dígitos, máximo 10',
-        },
+        validation: { required: 'Este campo es requerido' },
         toasts: {
           createSuccess: {
             title: 'Factura creada',
@@ -2898,9 +2892,6 @@ export const es: AppDict = {
           sede: 'Sede',
           metodoPago: 'Método de pago',
           ordenCompra: 'Orden de compra',
-          referenciaPrefijo: 'Prefijo de referencia',
-          referenciaNumero: 'Número de referencia',
-          referenciaCue: 'CUE de referencia',
           comentario: 'Comentario',
         },
         notFound: {

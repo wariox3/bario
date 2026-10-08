@@ -19,10 +19,6 @@ export interface FacturaCompraFormRawValue {
   readonly metodo_pago: ErpSelectOption | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
-  readonly referencia_prefijo: string | null;
-  /** Texto del input; el mapper lo pasa a número. */
-  readonly referencia_numero: string | null;
-  readonly referencia_cue: string | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];
   readonly cuentas: readonly CuentaDetalleFormRawValue[];
 }
