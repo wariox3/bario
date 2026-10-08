@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -9,37 +9,36 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { catchError, debounceTime, distinctUntilChanged, finalize, of, switchMap } from 'rxjs';
-import {
-  I18nService,
-  TenantService,
-  ToastService,
-  fromIsoDate,
-  toIsoDate,
-  type SortSpec,
-} from '@reddoc/core';
+import { I18nService, TenantService, toIsoDate, type SortSpec } from '@reddoc/core';
 import {
   DataTableComponent,
   ListShellComponent,
   type BreadcrumbItem,
   type PageChangeEvent,
+  type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { MascaraFechaDirective } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
-import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
-import { COLUMNS, TIPOS } from '../../documento-recibido.constants';
 import {
-  toDocumentoRecibidoRow,
-  type DocumentoRecibidoOrden,
-  type DocumentoRecibidoQuery,
-  type DocumentoRecibidoRow,
-  type DocumentoRecibidoTipo,
-} from '../../documento-recibido.model';
-import { DocumentoRecibidoService } from '../../documento-recibido.service';
+  CELL_ACTION_DOCUMENTOS,
+  COLUMNS,
+  ESTADOS,
+  ORIGENES,
+  toCorreoRecibidoRow,
+  type CorreoRecibidoRow,
+} from '../../correo-recibido.constants';
+import type {
+  CorreoRecibidoEstado,
+  CorreoRecibidoOrden,
+  CorreoRecibidoOrigen,
+  CorreoRecibidoQuery,
+} from '../../correo-recibido.model';
+import { CorreoRecibidoService } from '../../correo-recibido.service';
 
 const PAGE_SIZE = 25;
 /** Orden del backend cuando no se pide otro: los más recientes primero. */
-const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 'desc' }];
+const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'recibido_en', direction: 'desc' }];
 
 function inicioDeMes(): Date {
   const hoy = new Date();
@@ -52,20 +51,16 @@ function finDeMes(): Date {
 }
 
 /**
- * Documentos recibidos (Compra › Recepción): la bandeja de lo que los
- * proveedores mandan al buzón del emisor en RedEDoc.
+ * Correos (Compra › Recepción): cada correo que llegó al buzón —o archivo que se
+ * cargó a mano—, en qué estado quedó y, si falló, por qué. Es la pantalla de
+ * soporte para cuando un proveedor dice que envió la factura y no aparece.
  *
- * Los filtros van a la vista en la barra —búsqueda, tipo y rango de emisión—
- * porque el endpoint no habla `campo__operador` sino parámetros propios. El
- * rango arranca en el mes en curso, que es lo que el backend aplica sin fechas:
- * así la pantalla dice qué está mostrando. A la derecha, **Cargar archivo**
- * para lo que no llegó por correo.
- *
- * Desde Correos se llega con `?correo=&desde=&hasta=`: los documentos que salieron
- * de ese correo, con un chip para quitar el filtro y volver a la bandeja.
+ * Misma barra que Documentos (búsqueda, estado, origen y rango de llegada, que
+ * arranca en el mes en curso). La cantidad de documentos de cada correo abre
+ * Documentos filtrado por ese correo.
  */
 @Component({
-  selector: 'app-documentos-recibidos-list',
+  selector: 'app-correos-recibidos-list',
   standalone: true,
   imports: [
     FormsModule,
@@ -78,47 +73,43 @@ function finDeMes(): Date {
     MascaraFechaDirective,
     ListShellComponent,
     DataTableComponent,
-    CargarDocumentoDialogComponent,
   ],
-  templateUrl: './documentos-recibidos-list.component.html',
+  templateUrl: './correos-recibidos-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DocumentosRecibidosListComponent {
-  private readonly service = inject(DocumentoRecibidoService);
+export class CorreosRecibidosListComponent {
+  private readonly service = inject(CorreoRecibidoService);
   private readonly tenant = inject(TenantService);
-  private readonly toast = inject(ToastService);
-  private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
+  private readonly activeModule = inject(ActiveModuleStore);
   protected readonly t = inject<I18nService<AppDict>>(I18nService).t;
 
   protected readonly columns = COLUMNS;
 
   // ── Filtros ───────────────────────────────────────────────────────────────
-  /** Lo que se escribe; la búsqueda que viaja es `busqueda`, ya con debounce. */
   protected readonly busquedaInput = signal('');
   private readonly busqueda = signal('');
-  protected readonly tipo = signal<DocumentoRecibidoTipo | null>(null);
+  protected readonly estado = signal<CorreoRecibidoEstado | null>(null);
+  protected readonly origen = signal<CorreoRecibidoOrigen | null>(null);
   protected readonly desde = signal<Date | null>(inicioDeMes());
   protected readonly hasta = signal<Date | null>(finDeMes());
-  /** Correo del que salieron los documentos, si se llegó desde Correos. */
-  protected readonly correo = signal<number | null>(null);
 
   // ── Tabla ─────────────────────────────────────────────────────────────────
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(PAGE_SIZE);
   protected readonly sort = signal<readonly SortSpec[]>(DEFAULT_SORT);
-  protected readonly items = signal<readonly DocumentoRecibidoRow[]>([]);
+  protected readonly items = signal<readonly CorreoRecibidoRow[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(true);
-  /** Cambia para forzar una recarga con la misma consulta (tras cargar un archivo). */
-  private readonly recargas = signal(0);
 
-  protected readonly cargaVisible = signal(false);
+  protected readonly estadoOptions = computed(() => {
+    const estados = this.t().entities.correoRecibido.estados;
+    return ESTADOS.map((value) => ({ value, label: estados[value] }));
+  });
 
-  protected readonly tipoOptions = computed(() => {
-    const tipos = this.t().entities.documentoRecibido.tipos;
-    return TIPOS.map((value) => ({ value, label: tipos[value] }));
+  protected readonly origenOptions = computed(() => {
+    const origenes = this.t().entities.correoRecibido.origenes;
+    return ORIGENES.map((value) => ({ value, label: origenes[value] }));
   });
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -128,30 +119,27 @@ export class DocumentosRecibidosListComponent {
         label: resolveModuleName(this.activeModule, this.t()),
         routerLink: slug ? ['/t', slug, currentModuleId(this.activeModule)] : undefined,
       },
-      { label: this.t().entities.documentoRecibido.name },
+      { label: this.t().entities.correoRecibido.name },
     ];
   });
 
-  private readonly query = computed<DocumentoRecibidoQuery>(() => {
+  private readonly query = computed<CorreoRecibidoQuery>(() => {
     const orden = this.sort()[0];
-    this.recargas();
     return {
       page: this.currentPage() + 1,
       page_size: this.pageSize(),
       search: this.busqueda().trim() || undefined,
-      documento_tipo: this.tipo() ?? undefined,
-      correo: this.correo() ?? undefined,
+      estado: this.estado() ?? undefined,
+      origen: this.origen() ?? undefined,
       desde: toIsoDate(this.desde()) ?? undefined,
       hasta: toIsoDate(this.hasta()) ?? undefined,
       ordering: orden
-        ? ((orden.direction === 'desc' ? `-${orden.field}` : orden.field) as DocumentoRecibidoOrden)
+        ? ((orden.direction === 'desc' ? `-${orden.field}` : orden.field) as CorreoRecibidoOrden)
         : undefined,
     };
   });
 
   constructor() {
-    this.leerFiltrosDeUrl();
-
     toObservable(this.busquedaInput)
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
       .subscribe((texto) => {
@@ -171,36 +159,18 @@ export class DocumentosRecibidosListComponent {
         takeUntilDestroyed(),
       )
       .subscribe((res) => {
-        this.items.set(res ? res.results.map(toDocumentoRecibidoRow) : []);
+        this.items.set(res ? res.results.map(toCorreoRecibidoRow) : []);
         this.totalCount.set(res?.count ?? 0);
       });
   }
 
-  /** Toma de la URL el correo y el rango con que lo abre Correos. */
-  private leerFiltrosDeUrl(): void {
-    const params = this.route.snapshot.queryParamMap;
-    const correo = Number(params.get('correo'));
-    if (Number.isInteger(correo) && correo > 0) this.correo.set(correo);
-    const desde = fromIsoDate(params.get('desde'));
-    const hasta = fromIsoDate(params.get('hasta'));
-    if (desde) this.desde.set(desde);
-    if (hasta) this.hasta.set(hasta);
-  }
-
-  /** Quita el filtro por correo y lo saca de la URL; el rango queda como está. */
-  protected quitarCorreo(): void {
-    this.correo.set(null);
+  protected onEstado(estado: CorreoRecibidoEstado | null): void {
+    this.estado.set(estado);
     this.currentPage.set(0);
-    void this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { correo: null, desde: null, hasta: null },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    });
   }
 
-  protected onTipo(tipo: DocumentoRecibidoTipo | null): void {
-    this.tipo.set(tipo);
+  protected onOrigen(origen: CorreoRecibidoOrigen | null): void {
+    this.origen.set(origen);
     this.currentPage.set(0);
   }
 
@@ -224,9 +194,27 @@ export class DocumentosRecibidosListComponent {
     this.currentPage.set(0);
   }
 
-  protected onCargado(): void {
-    const c = this.t().entities.documentoRecibido.carga;
-    this.toast.success(c.exito.title, c.exito.desc);
-    this.recargas.update((n) => n + 1);
+  /**
+   * Abre Documentos filtrado por el correo. Documentos filtra la emisión y sin
+   * fechas cae al mes en curso, así que se le pasa el rango de emisión de los
+   * documentos del correo: una factura de septiembre que llegó en octubre
+   * también aparece.
+   */
+  protected onCellAction(event: RowActionInvokedEvent): void {
+    if (event.actionId !== CELL_ACTION_DOCUMENTOS) return;
+    const correo = event.row as CorreoRecibidoRow;
+    const slug = this.tenant.currentSlug();
+    if (!slug || correo.documentos.length === 0) return;
+    const fechas = correo.documentos.map((d) => d.fecha_emision).sort();
+    void this.router.navigate(
+      ['/t', slug, currentModuleId(this.activeModule), 'recepcion', 'documentos'],
+      {
+        queryParams: {
+          correo: correo.id,
+          desde: fechas[0],
+          hasta: fechas[fechas.length - 1],
+        },
+      },
+    );
   }
 }

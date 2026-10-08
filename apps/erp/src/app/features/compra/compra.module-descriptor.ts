@@ -129,6 +129,10 @@ export const COMPRA_MODULE: ErpModuleDescriptor = {
               labelKey: 'entities.documentoRecibido.name',
               path: 'recepcion/documentos',
             },
+            {
+              labelKey: 'entities.correoRecibido.name',
+              path: 'recepcion/correos',
+            },
           ],
         },
       ],

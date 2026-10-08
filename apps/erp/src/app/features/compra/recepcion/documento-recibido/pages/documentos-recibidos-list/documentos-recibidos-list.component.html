@@ -62,6 +62,23 @@
           appendTo="body"
         />
       </div>
+
+      @if (correo(); as id) {
+        <span
+          class="inline-flex h-8 items-center gap-1.5 rounded-full border border-[rgba(20,48,73,0.12)] bg-sky-50 pr-1 pl-3 text-[0.75rem] font-semibold text-sky-800"
+        >
+          <i class="pi pi-envelope text-[0.7rem]"></i>
+          {{ d.filtros.delCorreo }} #{{ id }}
+          <button
+            type="button"
+            class="inline-flex h-6 w-6 items-center justify-center rounded-full text-sky-700 transition-colors hover:bg-sky-100"
+            [attr.aria-label]="d.filtros.quitarCorreo"
+            (click)="quitarCorreo()"
+          >
+            <i class="pi pi-times text-[0.65rem]"></i>
+          </button>
+        </span>
+      }
     </div>
 
     <p-button

@@ -5674,7 +5674,7 @@ export const en: AppDict = {
       },
     },
     documentoRecibido: {
-      name: 'Received documents',
+      name: 'Documents',
       cargar: 'Upload file',
       columns: {
         fecha: 'Date',
@@ -5695,6 +5695,8 @@ export const en: AppDict = {
         tipo: 'Type',
         desde: 'From',
         hasta: 'To',
+        delCorreo: 'From email',
+        quitarCorreo: 'Remove the email filter',
       },
       empty: {
         title: 'No received documents',
@@ -5716,6 +5718,39 @@ export const en: AppDict = {
           title: 'Document uploaded',
           desc: 'It now shows in received documents.',
         },
+      },
+    },
+    correoRecibido: {
+      name: 'Emails',
+      verDocumentos: 'View the documents from this email',
+      columns: {
+        recibido: 'Received',
+        origen: 'Source',
+        remitente: 'Sender',
+        asunto: 'Subject',
+        estado: 'Status',
+        detalle: 'Detail',
+        documentos: 'Documents',
+      },
+      estados: {
+        pendiente: 'Pending',
+        procesado: 'Processed',
+        sin_documentos: 'No documents',
+        error: 'Error',
+        empresa_desconocida: 'Unknown company',
+        confirmacion_reenvio: 'Forwarding confirmation',
+      },
+      origenes: { correo: 'Email', carga: 'Manual upload' },
+      filtros: {
+        buscar: 'Search by sender, subject or Message-ID',
+        estado: 'Status',
+        origen: 'Source',
+        desde: 'From',
+        hasta: 'To',
+      },
+      empty: {
+        title: 'No emails received',
+        sub: 'Try another date range or check that the supplier sends to the reception mailbox.',
       },
     },
     documentoElectronico: {

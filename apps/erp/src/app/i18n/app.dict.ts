@@ -4437,7 +4437,14 @@ export interface AppDict
         total: string;
       };
       tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
-      filtros: { buscar: string; tipo: string; desde: string; hasta: string };
+      filtros: {
+        buscar: string;
+        tipo: string;
+        desde: string;
+        hasta: string;
+        delCorreo: string;
+        quitarCorreo: string;
+      };
       empty: { title: string; sub: string };
       carga: {
         title: string;
@@ -4453,6 +4460,32 @@ export interface AppDict
         errorGenerico: string;
         exito: { title: string; desc: string };
       };
+    };
+    /** Correos (y cargas manuales) que llegaron a la recepción de RedEDoc. */
+    correoRecibido: {
+      name: string;
+      verDocumentos: string;
+      columns: {
+        recibido: string;
+        origen: string;
+        remitente: string;
+        asunto: string;
+        estado: string;
+        detalle: string;
+        documentos: string;
+      };
+      estados: Record<
+        | 'pendiente'
+        | 'procesado'
+        | 'sin_documentos'
+        | 'error'
+        | 'empresa_desconocida'
+        | 'confirmacion_reenvio',
+        string
+      >;
+      origenes: Record<'correo' | 'carga', string>;
+      filtros: { buscar: string; estado: string; origen: string; desde: string; hasta: string };
+      empty: { title: string; sub: string };
     };
     documentoElectronico: {
       name: string;

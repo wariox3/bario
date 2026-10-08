@@ -5742,7 +5742,7 @@ export const es: AppDict = {
       },
     },
     documentoRecibido: {
-      name: 'Documentos recibidos',
+      name: 'Documentos',
       cargar: 'Cargar archivo',
       columns: {
         fecha: 'Fecha',
@@ -5763,6 +5763,8 @@ export const es: AppDict = {
         tipo: 'Tipo',
         desde: 'Desde',
         hasta: 'Hasta',
+        delCorreo: 'Del correo',
+        quitarCorreo: 'Quitar el filtro por correo',
       },
       empty: {
         title: 'No hay documentos recibidos',
@@ -5784,6 +5786,39 @@ export const es: AppDict = {
           title: 'Documento cargado',
           desc: 'Ya aparece en los documentos recibidos.',
         },
+      },
+    },
+    correoRecibido: {
+      name: 'Correos',
+      verDocumentos: 'Ver los documentos de este correo',
+      columns: {
+        recibido: 'Recibido',
+        origen: 'Origen',
+        remitente: 'Remitente',
+        asunto: 'Asunto',
+        estado: 'Estado',
+        detalle: 'Detalle',
+        documentos: 'Documentos',
+      },
+      estados: {
+        pendiente: 'Pendiente',
+        procesado: 'Procesado',
+        sin_documentos: 'Sin documentos',
+        error: 'Error',
+        empresa_desconocida: 'Empresa desconocida',
+        confirmacion_reenvio: 'Confirmación de reenvío',
+      },
+      origenes: { correo: 'Correo', carga: 'Carga manual' },
+      filtros: {
+        buscar: 'Buscar por remitente, asunto o Message-ID',
+        estado: 'Estado',
+        origen: 'Origen',
+        desde: 'Desde',
+        hasta: 'Hasta',
+      },
+      empty: {
+        title: 'No llegaron correos',
+        sub: 'Prueba con otro rango de fechas o revisa que el proveedor envíe al buzón de recepción.',
       },
     },
     documentoElectronico: {

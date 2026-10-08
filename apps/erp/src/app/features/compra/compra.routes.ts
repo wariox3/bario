@@ -91,6 +91,13 @@ export const COMPRA_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'recepcion/correos',
+        loadChildren: () =>
+          import('./recepcion/correo-recibido/correo-recibido.routes').then(
+            (m) => m.CORREO_RECIBIDO_ROUTES,
+          ),
+      },
+      {
         path: 'utilidades/documento-electronico',
         loadChildren: () =>
           import('./utilidades/documento-electronico/documento-electronico.routes').then(

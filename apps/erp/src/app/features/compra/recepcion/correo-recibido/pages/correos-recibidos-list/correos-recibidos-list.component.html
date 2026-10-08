@@ -1,0 +1,94 @@
+<!--
+  Correos (Compra › Recepción). Mismo chrome y misma barra que Documentos:
+  filtros en línea a la izquierda; sin acciones a la derecha.
+-->
+@let c = t().entities.correoRecibido;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="c.name">
+  <div toolbar class="flex flex-wrap items-end gap-2">
+    <p-iconfield iconPosition="left" class="w-full sm:w-64">
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        pSize="small"
+        class="w-full"
+        [placeholder]="c.filtros.buscar"
+        [attr.aria-label]="c.filtros.buscar"
+        [ngModel]="busquedaInput()"
+        (ngModelChange)="busquedaInput.set($event)"
+      />
+    </p-iconfield>
+
+    <p-select
+      size="small"
+      class="w-48"
+      [options]="estadoOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [showClear]="true"
+      [placeholder]="c.filtros.estado"
+      [ariaLabel]="c.filtros.estado"
+      [ngModel]="estado()"
+      (ngModelChange)="onEstado($event)"
+      appendTo="body"
+    />
+
+    <p-select
+      size="small"
+      class="w-36"
+      [options]="origenOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [showClear]="true"
+      [placeholder]="c.filtros.origen"
+      [ariaLabel]="c.filtros.origen"
+      [ngModel]="origen()"
+      (ngModelChange)="onOrigen($event)"
+      appendTo="body"
+    />
+
+    <div class="w-36">
+      <p-datepicker
+        size="small"
+        [fluid]="true"
+        [showIcon]="true"
+        [placeholder]="c.filtros.desde"
+        [ariaLabel]="c.filtros.desde"
+        [maxDate]="hasta()"
+        [ngModel]="desde()"
+        (ngModelChange)="onDesde($event)"
+        appendTo="body"
+      />
+    </div>
+    <div class="w-36">
+      <p-datepicker
+        size="small"
+        [fluid]="true"
+        [showIcon]="true"
+        [placeholder]="c.filtros.hasta"
+        [ariaLabel]="c.filtros.hasta"
+        [minDate]="desde()"
+        [ngModel]="hasta()"
+        (ngModelChange)="onHasta($event)"
+        appendTo="body"
+      />
+    </div>
+  </div>
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    emptyTitleKey="entities.correoRecibido.empty.title"
+    emptySubKey="entities.correoRecibido.empty.sub"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowActionInvoked)="onCellAction($event)"
+  />
+</lib-list-shell>
