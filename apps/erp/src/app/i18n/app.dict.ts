@@ -2176,6 +2176,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
@@ -2201,6 +2203,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           ordenCompra: string;
           comentario: string;
@@ -2256,6 +2259,8 @@ export interface AppDict
           resolucionPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2278,6 +2283,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           formaPago: string;
           resolucion: string;
@@ -2439,6 +2445,8 @@ export interface AppDict
           centroCostoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2460,6 +2468,7 @@ export interface AppDict
           formaPago: string;
           centroCosto: string;
           sede: string;
+          almacen: string;
           ordenCompra: string;
           comentario: string;
         };

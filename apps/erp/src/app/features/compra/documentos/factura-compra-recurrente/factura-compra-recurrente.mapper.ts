@@ -29,6 +29,7 @@ export function facturaCompraRecurrenteToFormValue(
         ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
         : null,
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
+    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     orden_compra: read.orden_compra ?? null,
     comentario: read.comentario ?? null,
   };
@@ -54,6 +55,7 @@ export function formValueToPayload(
     forma_pago: raw.forma_pago?.id ?? null,
     centro_costo: raw.centro_costo?.id ?? null,
     sede: raw.sede?.id ?? null,
+    almacen: raw.almacen?.id ?? null,
     orden_compra: raw.orden_compra?.trim() || null,
     comentario: raw.comentario?.trim() || null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),

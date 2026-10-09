@@ -47,6 +47,7 @@ interface CabeceraView {
   readonly fechaVence: Date | null;
   readonly plazoPago: string | null;
   readonly sede: string | null;
+  readonly almacen: string | null;
   readonly metodoPago: string | null;
   readonly formaPago: string | null;
   readonly resolucion: string | null;
@@ -208,6 +209,7 @@ export class DocumentoSoporteDetailComponent implements OnInit {
             fechaVence: ds.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
+            almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
             resolucion: read.resolucion_nombre ?? null,
@@ -237,7 +239,7 @@ export class DocumentoSoporteDetailComponent implements OnInit {
 
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
+    return formatFechaLarga(date, '');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/compra/<...routePath>[/extra]`. */

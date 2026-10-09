@@ -102,15 +102,15 @@
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-detail__label">{{ det.labels.numero }}</dt>
-        <dd class="factura-compra-detail__value">{{ c.numero || '—' }}</dd>
+        <dd class="factura-compra-detail__value">{{ c.numero }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
         <dt class="factura-compra-detail__label">{{ det.labels.proveedor }}</dt>
-        <dd class="factura-compra-detail__value">{{ c.proveedor || '—' }}</dd>
+        <dd class="factura-compra-detail__value">{{ c.proveedor }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-detail__label">{{ det.labels.identificacion }}</dt>
-        <dd class="factura-compra-detail__value tabular-nums">{{ c.identificacion || '—' }}</dd>
+        <dd class="factura-compra-detail__value tabular-nums">{{ c.identificacion }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-detail__label">{{ det.labels.fecha }}</dt>
@@ -122,23 +122,27 @@
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-detail__label">{{ det.labels.plazoPago }}</dt>
-        <dd class="factura-compra-detail__value">{{ c.plazoPago || '—' }}</dd>
+        <dd class="factura-compra-detail__value">{{ c.plazoPago }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-detail__label">{{ det.labels.metodoPago }}</dt>
-        <dd class="factura-compra-detail__value">{{ c.metodoPago || '—' }}</dd>
+        <dd class="factura-compra-detail__value">{{ c.metodoPago }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-detail__label">{{ det.labels.sede }}</dt>
-        <dd class="factura-compra-detail__value">{{ c.sede || '—' }}</dd>
+        <dd class="factura-compra-detail__value">{{ c.sede }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-compra-detail__label">{{ det.labels.almacen }}</dt>
+        <dd class="factura-compra-detail__value">{{ c.almacen }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-detail__label">{{ det.labels.ordenCompra }}</dt>
-        <dd class="factura-compra-detail__value">{{ c.ordenCompra || '—' }}</dd>
+        <dd class="factura-compra-detail__value">{{ c.ordenCompra }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="factura-compra-detail__label">{{ det.labels.comentario }}</dt>
-        <dd class="factura-compra-detail__value whitespace-pre-line">{{ c.comentario || '—' }}</dd>
+        <dd class="factura-compra-detail__value whitespace-pre-line">{{ c.comentario }}</dd>
       </div>
     </dl>
   </section>
@@ -158,6 +162,7 @@
           <app-comercial-documento-lineas-table
             [lines]="lines()"
             [linkable]="true"
+            [almacenEnabled]="true"
             (verAfectacion)="onVerAfectacion($event)"
           />
         </p-tabpanel>
