@@ -91,28 +91,23 @@
           />
         </div>
 
-        <!-- Documento de referencia (facturas de compra aprobadas del proveedor) -->
-        <!-- TODO(nota-debito-compra): select deshabilitado hasta confirmar el
-             contrato del backend del endpoint de referencia. Ver el TODO en
-             nota-debito-compra-form.component.ts (referenciaParams/referenciaEndpoint)
-             y la nota de memoria project-nota-credito-compra.md. Al reactivar,
-             descomentar este bloque. -->
+        <!-- Documento de referencia (facturas de compra del proveedor) -->
         <div class="flex flex-col gap-1.5">
-          <!-- <label for="documento_referencia" class="nota-debito-compra-form__label">
+          <label for="documento_referencia" class="nota-debito-compra-form__label">
             {{ t().entities.notaDebitoCompra.form.fields.documentoReferencia }}
           </label>
-          <lib-api-select
+          <app-documento-referencia-select
             inputId="documento_referencia"
             formControlName="documento_referencia"
-            [endpoint]="referenciaEndpoint"
-            [params]="referenciaParams()"
-            [displayWith]="referenciaLabel"
+            [documentoClaseId]="referenciaDocumentoClaseId"
+            [contactoId]="contactoId()"
+            [emptyMessage]="t().entities.notaDebitoCompra.form.fields.documentoReferenciaEmpty"
             [placeholder]="
               form.controls.contacto.value
                 ? t().entities.notaDebitoCompra.form.fields.documentoReferenciaPlaceholder
                 : t().entities.notaDebitoCompra.form.fields.documentoReferenciaDisabled
             "
-          /> -->
+          />
         </div>
 
         <!-- Centro de costo -->

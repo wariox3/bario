@@ -1957,17 +1957,6 @@ export interface AppDict
           comentario: string;
           comentarioPlaceholder: string;
         };
-        cargarReferencia: {
-          button: string;
-          confirmHeader: string;
-          confirmMessage: string;
-          confirmAccept: string;
-          toasts: {
-            success: { title: string; desc: string };
-            sinLineas: { title: string; desc: string };
-            error: { title: string; desc: string };
-          };
-        };
         validation: { required: string; comentarioMax: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -2320,6 +2309,7 @@ export interface AppDict
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
           comentario: string;
@@ -2378,6 +2368,7 @@ export interface AppDict
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
           comentario: string;
@@ -2495,6 +2486,10 @@ export interface AppDict
           proveedorPlaceholder: string;
           fecha: string;
           fechaVence: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           plazoPago: string;
           plazoPagoPlaceholder: string;
           metodoPago: string;
@@ -2521,6 +2516,7 @@ export interface AppDict
           identificacion: string;
           fecha: string;
           fechaVence: string;
+          documentoReferencia: string;
           plazoPago: string;
           metodoPago: string;
           centroCosto: string;
@@ -2862,6 +2858,17 @@ export interface AppDict
       anteriorAFecha: string;
     };
     comercialDetalle: {
+      cargarReferencia: {
+        button: string;
+        confirmHeader: string;
+        confirmMessage: string;
+        confirmAccept: string;
+        toasts: {
+          success: { title: string; desc: string };
+          sinLineas: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
       title: string;
       hint: string;
       empty: string;

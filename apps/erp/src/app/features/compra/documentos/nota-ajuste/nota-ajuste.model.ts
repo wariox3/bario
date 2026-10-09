@@ -6,8 +6,8 @@
  * **extienden** el contrato base común (`Documento*Base` en `@reddoc/core`).
  *
  * Es de la familia comercial (mismas líneas ítem/cantidad/precio que la factura
- * de compra) y suma a la cabecera el centro de costo, la orden de compra y el
- * comentario. El "grupo" del legacy es el centro de costo (`centro_costo`).
+ * de compra) y suma a la cabecera el documento soporte que ajusta, el centro de
+ * costo, la orden de compra y el comentario. El "grupo" del legacy es el centro de costo (`centro_costo`).
  */
 import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
 import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
@@ -16,6 +16,10 @@ import type { ComercialDetallePayload } from '@erp/features/documentos/comercial
 export interface NotaAjusteRead extends DocumentoReadBase {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
+  /** FK al documento soporte que la nota ajusta. */
+  readonly documento_referencia: number | null;
+  /** Número del documento referenciado (para pintar el select en edición). */
+  readonly documento_referencia_numero?: string | null;
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly plazo_pago_nombre?: string | null;
@@ -29,6 +33,7 @@ export interface NotaAjusteRead extends DocumentoReadBase {
 
 /** Body (POST/PATCH) de una nota ajuste. */
 export interface NotaAjustePayload extends DocumentoPayloadBase {
+  readonly documento_referencia: number | null;
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly metodo_pago: number | null;

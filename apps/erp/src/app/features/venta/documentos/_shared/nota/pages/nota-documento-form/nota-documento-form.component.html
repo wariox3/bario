@@ -111,19 +111,11 @@
               "
             />
             @if (cargaLineasReferencia()) {
-              <p-button
-                class="nota-documento-form__cargar"
-                type="button"
-                icon="pi pi-download"
-                [label]="f.cargarReferencia.button"
-                severity="secondary"
-                [outlined]="true"
-                size="small"
-                [loading]="cargandoReferencia()"
-                [disabled]="
-                  !form.controls.documento_referencia.value || tablasOcupadas() || isSaving()
-                "
-                (onClick)="onCargarReferencia()"
+              <app-cargar-lineas-referencia
+                [referenciaId]="form.controls.documento_referencia.value?.id ?? null"
+                [tabla]="detallesTable()"
+                [disabled]="isSaving()"
+                (recargar)="recargarLineas()"
               />
             }
           </div>

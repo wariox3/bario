@@ -2575,24 +2575,6 @@ export const es: AppDict = {
           comentario: 'Comentario',
           comentarioPlaceholder: 'Observaciones del documento',
         },
-        cargarReferencia: {
-          button: 'Cargar líneas',
-          confirmHeader: 'Reemplazar líneas',
-          confirmMessage:
-            'Las líneas actuales de la nota se reemplazarán por las de la factura. ¿Continuar?',
-          confirmAccept: 'Reemplazar',
-          toasts: {
-            success: {
-              title: 'Líneas cargadas',
-              desc: 'La nota tiene ahora las líneas de la factura',
-            },
-            sinLineas: { title: 'Sin líneas', desc: 'La factura de referencia no tiene líneas' },
-            error: {
-              title: 'Error al cargar',
-              desc: 'No se pudieron cargar las líneas de la factura',
-            },
-          },
-        },
         validation: {
           required: 'Este campo es requerido',
           comentarioMax: 'Máximo 500 caracteres',
@@ -3051,6 +3033,7 @@ export const es: AppDict = {
           documentoReferencia: 'Documento referencia',
           documentoReferenciaPlaceholder: 'Selecciona la factura…',
           documentoReferenciaDisabled: 'Selecciona primero un proveedor',
+          documentoReferenciaEmpty: 'El proveedor no tiene facturas que coincidan.',
           centroCosto: 'Centro de costo',
           centroCostoPlaceholder: 'Selecciona…',
           comentario: 'Comentario',
@@ -3130,6 +3113,7 @@ export const es: AppDict = {
           documentoReferencia: 'Documento referencia',
           documentoReferenciaPlaceholder: 'Selecciona la factura…',
           documentoReferenciaDisabled: 'Selecciona primero un proveedor',
+          documentoReferenciaEmpty: 'El proveedor no tiene facturas que coincidan.',
           centroCosto: 'Centro de costo',
           centroCostoPlaceholder: 'Selecciona…',
           comentario: 'Comentario',
@@ -3289,6 +3273,10 @@ export const es: AppDict = {
           proveedorPlaceholder: 'Buscar proveedor…',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
+          documentoReferencia: 'Documento referencia',
+          documentoReferenciaPlaceholder: 'Selecciona el documento soporte…',
+          documentoReferenciaDisabled: 'Selecciona primero un proveedor',
+          documentoReferenciaEmpty: 'El proveedor no tiene documentos soporte que coincidan.',
           plazoPago: 'Plazo de pago',
           plazoPagoPlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
@@ -3333,6 +3321,7 @@ export const es: AppDict = {
           identificacion: 'Identificación',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
+          documentoReferencia: 'Documento referencia',
           plazoPago: 'Plazo de pago',
           metodoPago: 'Método de pago',
           centroCosto: 'Centro de costo',
@@ -3774,6 +3763,24 @@ export const es: AppDict = {
       anteriorAFecha: 'El vencimiento no puede ser anterior a la fecha.',
     },
     comercialDetalle: {
+      cargarReferencia: {
+        button: 'Cargar líneas',
+        confirmHeader: 'Reemplazar líneas',
+        confirmMessage:
+          'Las líneas actuales se reemplazarán por las del documento de referencia. ¿Continuar?',
+        confirmAccept: 'Reemplazar',
+        toasts: {
+          success: {
+            title: 'Líneas cargadas',
+            desc: 'El documento tiene ahora las líneas del documento de referencia',
+          },
+          sinLineas: { title: 'Sin líneas', desc: 'El documento de referencia no tiene líneas' },
+          error: {
+            title: 'Error al cargar',
+            desc: 'No se pudieron cargar las líneas del documento de referencia',
+          },
+        },
+      },
       title: 'Detalles',
       hint: 'Productos y servicios del documento',
       empty: 'Aún no hay líneas. Agrega la primera para empezar',
