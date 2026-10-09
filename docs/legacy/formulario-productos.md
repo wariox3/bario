@@ -365,8 +365,15 @@ Ordenados por impacto:
    suman — aditivas sobre la misma base, no en cadena como el legacy, que con varias tasas era
    inconsistente con su propio cálculo) y las retenciones no participan (no hacen parte de un
    precio al público).
-10. **AIU** — §6.7. No existe el modal (el kernel ya está listo); rediseñar sin porcentajes
-    hardcodeados 9/3/5.
+10. ~~**AIU**~~ — §6.7. **Corregido el 2026-10-09**: opción "AIU" en el split button "Agregar
+    línea" de la factura de venta (`aiuEnabled`) → `AiuModalComponent`. Ítem y valor base, y por
+    concepto su ítem (precargado de Configuración › Venta › AIU, cambiable) y su porcentaje
+    (9/3/5, `AIU_PORCENTAJES_INICIALES`; **bloqueado por ahora**, el control nace `disabled`),
+    con vista previa en vivo. Las 4
+    líneas se arman con `aiuLineaToFormValue` (`features/documentos/comercial/aiu.ts`) **sin pasar
+    por la selección del ítem**, así la lista de precios del contacto ya no pisa el valor del AIU
+    (bug del legacy); los ítems se leen en paralelo y en edición se guardan en un solo `masivo/`.
+    Pendiente de backend: porcentajes AIU propios de la empresa en la configuración.
 11. ~~**Congelar el formulario de edición si el documento está aprobado**~~ — §6.9. **Falso
     gap** (fe de erratas de esta auditoría, verificado el 2026-08-31): la URL directa SÍ está
     cubierta — `editableDocumentResolver` corre en la ruta `editar/:id`, evalúa la misma política

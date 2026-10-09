@@ -2890,6 +2890,27 @@ export interface AppDict
       confirmDeleteLine: string;
       createItem: string;
       extraerIva: { title: string; baseLabel: string; apply: string };
+      aiu: {
+        menuLabel: string;
+        title: string;
+        subtitle: string;
+        configIncompleta: string;
+        fields: {
+          itemBase: string;
+          valorBase: string;
+          item: string;
+          porcentaje: string;
+          valor: string;
+        };
+        conceptos: { administracion: string; imprevisto: string; utilidad: string };
+        total: string;
+        submit: string;
+        validation: { required: string; valorMin: string; porcentajeRango: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
       scanner: {
         placeholder: string;
         notFound: { title: string; desc: string };

@@ -3806,6 +3806,39 @@ export const es: AppDict = {
         baseLabel: 'Precio base',
         apply: 'Aplicar precio base',
       },
+      aiu: {
+        menuLabel: 'AIU',
+        title: 'Configuración AIU',
+        subtitle: 'Administración, imprevisto y utilidad sobre el valor base',
+        configIncompleta:
+          'Faltan ítems por configurar. Elígelos aquí o déjalos fijos en Configuración › Venta › AIU.',
+        fields: {
+          itemBase: 'Ítem base',
+          valorBase: 'Valor base',
+          item: 'Ítem',
+          porcentaje: 'Porcentaje',
+          valor: 'Valor',
+        },
+        conceptos: {
+          administracion: 'Administración',
+          imprevisto: 'Imprevisto',
+          utilidad: 'Utilidad',
+        },
+        total: 'Total antes de impuestos',
+        submit: 'Agregar líneas',
+        validation: {
+          required: 'Este campo es obligatorio',
+          valorMin: 'Debe ser mayor que cero',
+          porcentajeRango: 'Debe estar entre 0 y 100',
+        },
+        toasts: {
+          success: { title: 'AIU agregado', desc: 'Se agregaron las líneas del AIU al documento' },
+          error: {
+            title: 'Error al agregar el AIU',
+            desc: 'No se pudieron agregar las líneas del AIU',
+          },
+        },
+      },
       scanner: {
         placeholder: 'Escanear código de barras',
         notFound: {

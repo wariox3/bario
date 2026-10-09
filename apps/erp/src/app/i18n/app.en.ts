@@ -3743,6 +3743,36 @@ export const en: AppDict = {
         baseLabel: 'Base price',
         apply: 'Apply base price',
       },
+      aiu: {
+        menuLabel: 'AIU',
+        title: 'AIU setup',
+        subtitle: 'Administration, contingency and profit over the base value',
+        configIncompleta:
+          'Some items are not configured. Pick them here or set them in Settings › Sales › AIU.',
+        fields: {
+          itemBase: 'Base item',
+          valorBase: 'Base value',
+          item: 'Item',
+          porcentaje: 'Percentage',
+          valor: 'Value',
+        },
+        conceptos: {
+          administracion: 'Administration',
+          imprevisto: 'Contingency',
+          utilidad: 'Profit',
+        },
+        total: 'Total before taxes',
+        submit: 'Add lines',
+        validation: {
+          required: 'This field is required',
+          valorMin: 'Must be greater than zero',
+          porcentajeRango: 'Must be between 0 and 100',
+        },
+        toasts: {
+          success: { title: 'AIU added', desc: 'The AIU lines were added to the document' },
+          error: { title: 'Could not add the AIU', desc: 'The AIU lines could not be added' },
+        },
+      },
       scanner: {
         placeholder: 'Scan barcode',
         notFound: {

@@ -1,0 +1,170 @@
+@let a = t().entities.comercialDetalle.aiu;
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  libFocusInvalid
+  autocomplete="off"
+  class="flex flex-col gap-5"
+>
+  <!-- Header: badge + título + subtítulo (estándar de modales del ERP) -->
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-percentage text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex min-w-0 flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ a.title }}
+      </h2>
+      <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ a.subtitle }}</p>
+    </div>
+  </div>
+
+  @if (configIncompleta()) {
+    <p
+      class="m-0 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-[0.78rem] leading-relaxed text-amber-800"
+    >
+      <i class="pi pi-info-circle mt-0.5"></i>
+      <span>{{ a.configIncompleta }}</span>
+    </p>
+  }
+
+  <!-- Valor base del contrato -->
+  <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-[1fr_14rem]">
+    <div class="flex min-w-0 flex-col gap-1.5">
+      <label for="aiu_item_base" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ a.fields.itemBase }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <app-item-autocomplete
+        inputId="aiu_item_base"
+        formControlName="item_base"
+        [placeholder]="t().entities.comercialDetalle.itemPlaceholder"
+        [invalid]="form.controls.item_base.invalid && form.controls.item_base.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.item_base"
+        [messages]="{ required: a.validation.required }"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="aiu_valor_base" class="text-[0.855rem] font-semibold text-brand-text">
+        {{ a.fields.valorBase }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-inputnumber
+        inputId="aiu_valor_base"
+        formControlName="valor_base"
+        mode="decimal"
+        [min]="0"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="2"
+        prefix="$ "
+        [fluid]="true"
+        inputStyleClass="text-right"
+        [invalid]="form.controls.valor_base.invalid && form.controls.valor_base.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.valor_base"
+        [messages]="{ required: a.validation.required, min: a.validation.valorMin }"
+      />
+    </div>
+  </div>
+
+  <!-- Conceptos: ítem, porcentaje y valor resultante -->
+  <div class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)]">
+    <div
+      class="hidden grid-cols-[1fr_7rem_9rem] gap-x-4 border-b border-[rgba(20,48,73,0.08)] bg-slate-50 px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.06em] text-brand-muted sm:grid"
+    >
+      <span>{{ a.fields.item }}</span>
+      <span class="text-right">{{ a.fields.porcentaje }}</span>
+      <span class="text-right">{{ a.fields.valor }}</span>
+    </div>
+
+    @for (concepto of conceptos; track concepto) {
+      @let grupo = form.controls[concepto];
+      <div
+        [formGroup]="grupo"
+        class="grid grid-cols-1 gap-x-4 gap-y-2 border-b border-[rgba(20,48,73,0.06)] px-4 py-3 last:border-b-0 sm:grid-cols-[1fr_7rem_9rem] sm:items-start"
+      >
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <label [for]="'aiu_item_' + concepto" class="text-[0.8rem] font-semibold text-brand-text">
+            {{ a.conceptos[concepto] }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          @if (loading()) {
+            <div class="h-[2.1rem] animate-pulse rounded-md bg-[rgba(20,48,73,0.06)]"></div>
+          } @else {
+            <app-item-autocomplete
+              [inputId]="'aiu_item_' + concepto"
+              formControlName="item"
+              [placeholder]="t().entities.comercialDetalle.itemPlaceholder"
+              [invalid]="grupo.controls.item.invalid && grupo.controls.item.touched"
+            />
+          }
+          <lib-field-error
+            [control]="grupo.controls.item"
+            [messages]="{ required: a.validation.required }"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5 sm:pt-[1.55rem]">
+          <p-inputnumber
+            [inputId]="'aiu_porcentaje_' + concepto"
+            formControlName="porcentaje"
+            mode="decimal"
+            [min]="0"
+            [max]="100"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            suffix=" %"
+            [fluid]="true"
+            inputStyleClass="text-right"
+            [ariaLabel]="a.fields.porcentaje + ' · ' + a.conceptos[concepto]"
+            [invalid]="grupo.controls.porcentaje.invalid && grupo.controls.porcentaje.touched"
+          />
+          <lib-field-error
+            [control]="grupo.controls.porcentaje"
+            [messages]="{
+              required: a.validation.required,
+              min: a.validation.porcentajeRango,
+              max: a.validation.porcentajeRango,
+            }"
+          />
+        </div>
+
+        <span
+          class="text-right text-[0.9rem] font-semibold tabular-nums text-brand-text sm:pt-[2.05rem]"
+        >
+          {{ formatMoney(valores()[concepto]) }}
+        </span>
+      </div>
+    }
+
+    <div
+      class="flex items-baseline justify-between gap-3 border-t border-[rgba(20,48,73,0.08)] bg-slate-50 px-4 py-3"
+    >
+      <span class="text-[0.78rem] font-semibold text-brand-muted">{{ a.total }}</span>
+      <span class="text-[1.05rem] font-extrabold tabular-nums text-brand-navy">
+        {{ formatMoney(total()) }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="onCancel()"
+    />
+    <p-button type="submit" icon="pi pi-plus" [label]="a.submit" />
+  </div>
+</form>
