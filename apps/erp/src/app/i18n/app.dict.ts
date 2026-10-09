@@ -1757,6 +1757,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
@@ -1794,6 +1796,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           ordenCompra: string;
           remision: string;

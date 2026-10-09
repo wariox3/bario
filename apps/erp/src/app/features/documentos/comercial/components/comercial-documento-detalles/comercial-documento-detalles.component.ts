@@ -571,11 +571,18 @@ export class ComercialDocumentoDetallesComponent {
    * Agrega líneas ya resueltas (importadas o del AIU) según el modo:
    *  - alta → las empuja al `FormArray` (se guardan al crear el documento);
    *  - edición → alta masiva (`masivo/`) en una request; el padre recarga al terminar.
+   *
+   * La línea que llega sin almacén hereda el de la cabecera, igual que una
+   * agregada a mano (`almacenPorDefecto`).
    */
   private agregarLineas(
-    formValues: readonly ComercialDetalleFormRawValue[],
+    lineas: readonly ComercialDetalleFormRawValue[],
     toasts: AgregarLineasToasts,
   ): void {
+    const almacen = this.almacenPorDefecto();
+    const formValues = lineas.map((linea) =>
+      linea.almacen == null && almacen != null ? { ...linea, almacen } : linea,
+    );
     const docId = this.documentId();
     if (docId == null) {
       for (const value of formValues) this.detalles().push(createComercialDetalleGroup(value));

@@ -23,6 +23,9 @@ export interface FacturaVentaRead extends DocumentoReadBase {
   readonly plazo_pago_nombre?: string | null;
   readonly sede: number | null;
   readonly sede_nombre?: string | null;
+  /** Almacén general: el que heredan las líneas nuevas. */
+  readonly almacen?: number | null;
+  readonly almacen_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
   readonly orden_compra?: string | null;
@@ -33,7 +36,7 @@ export interface FacturaVentaRead extends DocumentoReadBase {
   readonly resolucion?: number | null;
   /**
    * Etiqueta de la resolución. Hoy el read **no la serializa** (solo la FK): la ficha
-   * muestra "—" hasta que el backend la mande, sin resolverla con otra consulta.
+   * la deja vacía hasta que el backend la mande, sin resolverla con otra consulta.
    */
   readonly resolucion_nombre?: string | null;
   /**
@@ -52,6 +55,7 @@ export interface FacturaVentaPayload extends DocumentoPayloadBase {
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly sede: number | null;
+  readonly almacen: number | null;
   readonly metodo_pago: number | null;
   readonly orden_compra: string | null;
   readonly remision: string | null;
