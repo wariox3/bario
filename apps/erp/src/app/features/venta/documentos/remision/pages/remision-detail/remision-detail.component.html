@@ -21,7 +21,7 @@
       [canDesaprobar]="capacidades().puedeDesaprobar"
       [showAnular]="true"
       [canAnular]="capacidades().puedeAnular"
-      [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
+      [showContabilidad]="false"
       (documentoChanged)="onDocumentoChanged()"
     >
       @if (document().capabilities.canCreate) {
