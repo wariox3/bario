@@ -1955,6 +1955,8 @@ export interface AppDict
           documentoReferenciaEmpty: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           comentario: string;
@@ -1978,6 +1980,7 @@ export interface AppDict
           fecha: string;
           documentoReferencia: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           comentario: string;
         };
@@ -2036,6 +2039,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           asesor: string;
@@ -2064,6 +2069,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           asesor: string;
           ordenCompra: string;

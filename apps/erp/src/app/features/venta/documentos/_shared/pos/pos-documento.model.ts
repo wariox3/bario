@@ -26,6 +26,9 @@ export interface PosDocumentoRead extends DocumentoReadBase {
   readonly plazo_pago_nombre?: string | null;
   readonly sede: number | null;
   readonly sede_nombre?: string | null;
+  /** Almacén general: el que heredan las líneas nuevas. */
+  readonly almacen?: number | null;
+  readonly almacen_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
   readonly asesor: number | null;
@@ -43,6 +46,7 @@ export interface PosDocumentoPayload extends DocumentoPayloadBase {
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly sede: number | null;
+  readonly almacen: number | null;
   readonly metodo_pago: number | null;
   readonly asesor: number | null;
   readonly orden_compra: string | null;

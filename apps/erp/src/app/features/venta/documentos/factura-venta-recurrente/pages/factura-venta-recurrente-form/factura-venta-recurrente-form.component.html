@@ -131,6 +131,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
+            [suggestedIndex]="almacenSuggestedIndex()"
             [placeholder]="t().entities.facturaVentaRecurrente.form.fields.almacenPlaceholder"
           />
         </div>
@@ -219,6 +220,8 @@
             [documentId]="documentId()"
             [contactoId]="form.controls.contacto.value?.id ?? null"
             [precioListaId]="precioListaId()"
+            [almacenEnabled]="true"
+            [almacenPorDefecto]="form.controls.almacen.value"
             (imported)="onImported()"
           />
         </p-tabpanel>
