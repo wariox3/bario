@@ -96,18 +96,29 @@
           <label for="documento_referencia" class="nota-documento-form__label">
             {{ f.fields.documentoReferencia }}
           </label>
-          <app-documento-referencia-select
-            inputId="documento_referencia"
-            formControlName="documento_referencia"
-            cartera="cobrar"
-            [contactoId]="contactoId()"
-            [emptyMessage]="f.fields.documentoReferenciaEmpty"
-            [placeholder]="
-              form.controls.contacto.value
-                ? f.fields.documentoReferenciaPlaceholder
-                : f.fields.documentoReferenciaDisabled
-            "
-          />
+          <div class="flex items-stretch gap-2">
+            <app-documento-referencia-select
+              class="min-w-0 flex-1"
+              inputId="documento_referencia"
+              formControlName="documento_referencia"
+              [documentoClaseId]="referenciaDocumentoClaseId"
+              [contactoId]="contactoId()"
+              [emptyMessage]="f.fields.documentoReferenciaEmpty"
+              [placeholder]="
+                form.controls.contacto.value
+                  ? f.fields.documentoReferenciaPlaceholder
+                  : f.fields.documentoReferenciaDisabled
+              "
+            />
+            @if (cargaLineasReferencia()) {
+              <app-cargar-lineas-referencia
+                [referenciaId]="form.controls.documento_referencia.value?.id ?? null"
+                [tabla]="detallesTable()"
+                [disabled]="isSaving()"
+                (recargar)="recargarLineas()"
+              />
+            }
+          </div>
         </div>
 
         <!-- Sede -->

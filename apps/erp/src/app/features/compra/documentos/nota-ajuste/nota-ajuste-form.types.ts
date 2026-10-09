@@ -13,6 +13,8 @@ export interface NotaAjusteFormRawValue {
   readonly contacto: ErpSelectOption | null;
   readonly fecha: Date | null;
   readonly fecha_vence: Date | null;
+  /** Documento soporte que la nota ajusta. */
+  readonly documento_referencia: ErpSelectOption | null;
   readonly plazo_pago: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
   readonly centro_costo: ErpSelectOption | null;

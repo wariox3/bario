@@ -14,24 +14,33 @@ import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'pri
 import { Subject, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { formatFechaCorta, type ErpSelectOption } from '@reddoc/core';
-import type { CarteraTipo } from '@erp/core/module-config';
 import {
   DocumentoReferenciaService,
   type DocumentoReferenciaApi,
 } from './documento-referencia.service';
 
+/** Opción del desplegable: la etiqueta del control más el tipo, que se pinta debajo. */
+interface ReferenciaOption extends ErpSelectOption {
+  readonly tipo: string;
+}
+
 /** Etiqueta de un documento referenciable: `número - fecha` (como el legacy). */
-function toReferenciaOption(doc: DocumentoReferenciaApi): ErpSelectOption {
+function toReferenciaOption(doc: DocumentoReferenciaApi): ReferenciaOption {
   const numero = doc.numero != null && doc.numero !== '' ? String(doc.numero) : `#${doc.id}`;
   const fecha = formatFechaCorta(doc.fecha, '');
-  return { id: doc.id, nombre: fecha ? `${numero} - ${fecha}` : numero };
+  return {
+    id: doc.id,
+    nombre: fecha ? `${numero} - ${fecha}` : numero,
+    tipo: doc.documento_tipo_nombre ?? '',
+  };
 }
 
 /**
  * Selector **con búsqueda** del documento que referencia una nota (crédito o
- * débito): las facturas aprobadas del contacto de la cabecera. Al enfocar lista
- * las más recientes; al teclear un número busca esa factura en el servidor, así
- * un cliente con muchas facturas no depende de un desplegable precargado.
+ * débito): los documentos del contacto de la cabecera de la clase indicada, vía
+ * `general/documento/seleccionar-referencia/`. Al enfocar lista sin filtro; al
+ * teclear busca en el servidor (`search`), así un cliente con muchas facturas no
+ * depende de un desplegable precargado.
  *
  * Sin contacto no consulta: la nota primero elige el cliente y el form deshabilita
  * el control mientras tanto. Emite un `ErpSelectOption` (`{ id, nombre }`), el
@@ -65,7 +74,16 @@ function toReferenciaOption(doc: DocumentoReferenciaApi): ErpSelectOption {
       [showClear]="true"
       appendTo="body"
       autocomplete="off"
-    />
+    >
+      <ng-template #item let-opt>
+        <span class="flex min-w-0 flex-col">
+          <span class="truncate">{{ opt.nombre }}</span>
+          @if (opt.tipo) {
+            <span class="truncate text-[0.72rem] text-brand-muted">{{ opt.tipo }}</span>
+          }
+        </span>
+      </ng-template>
+    </p-autocomplete>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -82,10 +100,10 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
 
   @ViewChild(AutoComplete) private readonly ac?: AutoComplete;
 
-  /** Contacto de la cabecera: acota la búsqueda a sus facturas. */
+  /** Contacto de la cabecera: acota la búsqueda a sus documentos. */
   readonly contactoId = input<number | null>(null);
-  /** Familia de la nota: `cobrar` (venta) o `pagar` (compra). */
-  readonly cartera = input<CarteraTipo>('cobrar');
+  /** Clase del documento referenciable (`documento_clase_id`, p. ej. `100` = factura de venta). */
+  readonly documentoClaseId = input.required<number>();
   readonly inputId = input<string>('');
   readonly placeholder = input<string>('');
   readonly emptyMessage = input<string>('');
@@ -93,7 +111,7 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
 
   readonly value = signal<ErpSelectOption | null>(null);
   readonly disabled = signal(false);
-  readonly suggestions = signal<ErpSelectOption[]>([]);
+  readonly suggestions = signal<ReferenciaOption[]>([]);
 
   private onChangeFn: (value: ErpSelectOption | null) => void = () => undefined;
   private onTouchedFn: () => void = () => undefined;
@@ -106,12 +124,12 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
   constructor() {
     this.query$
       .pipe(
-        switchMap((numero) => {
+        switchMap((search) => {
           const contactoId = this.contactoId();
-          if (contactoId == null) return of<ErpSelectOption[]>([]);
-          return this.service.buscar(contactoId, this.cartera(), numero).pipe(
+          if (contactoId == null) return of<ReferenciaOption[]>([]);
+          return this.service.buscar(contactoId, this.documentoClaseId(), search).pipe(
             map((docs) => docs.map(toReferenciaOption)),
-            catchError(() => of<ErpSelectOption[]>([])),
+            catchError(() => of<ReferenciaOption[]>([])),
           );
         }),
         takeUntilDestroyed(this.destroyRef),
@@ -141,7 +159,7 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
     if (next !== null) this.skipNextFocus = true;
   }
 
-  /** Cada enfoque lista las facturas más recientes, sin el filtro de la búsqueda anterior. */
+  /** Cada enfoque lista los documentos sin el filtro de la búsqueda anterior. */
   onFocusInput(): void {
     if (this.skipNextFocus) {
       this.skipNextFocus = false;

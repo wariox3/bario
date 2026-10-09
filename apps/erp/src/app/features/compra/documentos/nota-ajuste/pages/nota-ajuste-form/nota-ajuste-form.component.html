@@ -162,6 +162,20 @@
           />
         </div>
 
+        <!-- Orden de compra -->
+        <div class="flex flex-col gap-1.5">
+          <label for="orden_compra" class="nota-ajuste-form__label">
+            {{ t().entities.notaAjuste.form.fields.ordenCompra }}
+          </label>
+          <input
+            id="orden_compra"
+            pInputText
+            formControlName="orden_compra"
+            maxlength="50"
+            class="w-full"
+          />
+        </div>
+
         <!-- Centro de costo -->
         <div class="flex flex-col gap-1.5">
           <label for="centro_costo" class="nota-ajuste-form__label">
@@ -175,18 +189,32 @@
           />
         </div>
 
-        <!-- Orden de compra -->
+        <!-- Documento de referencia (documentos soporte del proveedor) -->
         <div class="flex flex-col gap-1.5">
-          <label for="orden_compra" class="nota-ajuste-form__label">
-            {{ t().entities.notaAjuste.form.fields.ordenCompra }}
+          <label for="documento_referencia" class="nota-ajuste-form__label">
+            {{ t().entities.notaAjuste.form.fields.documentoReferencia }}
           </label>
-          <input
-            id="orden_compra"
-            pInputText
-            formControlName="orden_compra"
-            maxlength="50"
-            class="w-full"
-          />
+          <div class="flex items-stretch gap-2">
+            <app-documento-referencia-select
+              class="min-w-0 flex-1"
+              inputId="documento_referencia"
+              formControlName="documento_referencia"
+              [documentoClaseId]="referenciaDocumentoClaseId"
+              [contactoId]="contactoId()"
+              [emptyMessage]="t().entities.notaAjuste.form.fields.documentoReferenciaEmpty"
+              [placeholder]="
+                form.controls.contacto.value
+                  ? t().entities.notaAjuste.form.fields.documentoReferenciaPlaceholder
+                  : t().entities.notaAjuste.form.fields.documentoReferenciaDisabled
+              "
+            />
+            <app-cargar-lineas-referencia
+              [referenciaId]="form.controls.documento_referencia.value?.id ?? null"
+              [tabla]="detallesTable()"
+              [disabled]="isSaving()"
+              (recargar)="recargarLineas()"
+            />
+          </div>
         </div>
       </div>
     </div>

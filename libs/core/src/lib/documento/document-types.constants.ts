@@ -58,3 +58,17 @@ export type DocumentTypeKey = keyof typeof DOCUMENT_TYPE_ID;
 
 /** Valor numérico (id del backend) de un tipo de documento registrado. */
 export type DocumentTypeId = (typeof DOCUMENT_TYPE_ID)[DocumentTypeKey];
+
+/**
+ * IDs del catálogo `documento_clase` del backend: la clase agrupa tipos de
+ * documento (p. ej. la factura electrónica y la POS son tipos distintos de una
+ * misma familia). La piden los endpoints que filtran por familia, como
+ * `documento/seleccionar-referencia/` (`documento_clase_id`).
+ *
+ * Solo están las clases que el front usa; el resto se suma al necesitarlas.
+ */
+export const DOCUMENTO_CLASE_ID = {
+  FACTURA_VENTA: 100,
+  FACTURA_COMPRA: 300,
+  DOCUMENTO_SOPORTE: 303,
+} as const;

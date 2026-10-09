@@ -26,6 +26,7 @@ import {
   switchMap,
   tap,
   throwError,
+  toArray,
 } from 'rxjs';
 import { FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -278,7 +279,9 @@ export class ComercialDocumentoDetallesComponent {
    * Hay un guardado en curso (una línea con su ✓ o un lote). El form padre deshabilita
    * "Guardar" mientras tanto: guardar a la vez reenviaría líneas que aún no tienen `id`.
    */
-  readonly ocupado = computed(() => this.savingAll() || this.savingGroup() !== null);
+  readonly ocupado = computed(
+    () => this.savingAll() || this.savingGroup() !== null || this.importing(),
+  );
 
   /** Filas ya cableadas al fetch de impuestos del ítem (evita doble suscripción). */
   private readonly wired = new WeakSet<ComercialDetalleGroup>();
@@ -515,6 +518,40 @@ export class ComercialDocumentoDetallesComponent {
           this.toast.error(toast.title, toast.desc);
         },
       });
+  }
+
+  /**
+   * Reemplaza **todas** las líneas por `values` (p. ej. las de la factura que
+   * referencia una nota). La confirmación es del llamador.
+   *
+   * - Alta: vacía el `FormArray` y empuja las nuevas; se guardan al crear.
+   * - Edición: borra las líneas persistidas una por una —el backend no tiene
+   *   borrado masivo— y crea las nuevas con `masivo/`. No es atómico: si algo
+   *   falla a mitad, el llamador debe recargar las líneas para ver lo que quedó.
+   */
+  reemplazarLineas(values: readonly ComercialDetalleFormRawValue[]): Observable<void> {
+    const docId = this.documentId();
+    if (docId == null) {
+      this.detalles().clear();
+      for (const value of values) this.detalles().push(createComercialDetalleGroup(value));
+      return of(undefined);
+    }
+    const ids = this.detalles()
+      .getRawValue()
+      .map((line) => line.id)
+      .filter((id): id is number => id != null);
+    this.importing.set(true);
+    return from(ids).pipe(
+      concatMap((id) => this.detalleService.eliminar(id)),
+      toArray(),
+      switchMap(() =>
+        values.length > 0
+          ? this.detalleService.crearMasivo(docId, values.map(comercialDetalleToPayload))
+          : of(null),
+      ),
+      map(() => undefined),
+      finalize(() => this.importing.set(false)),
+    );
   }
 
   /** Pide confirmación y, al aceptar, elimina la línea (persiste en edición). */

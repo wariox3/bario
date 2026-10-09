@@ -1,16 +1,6 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 
 /**
- * Endpoint (GET) que lista los documentos referenciables por la nota crédito.
- *
- * Reusa el endpoint genérico de documentos con el `serializador=referencia`
- * (mismo contrato que el legacy). Se acota por proveedor + tipo COMPRA + estado
- * aprobado desde el formulario. Es de uso único de esta feature, por eso vive
- * aquí y no en `SELECT_ENDPOINTS` (que centraliza solo catálogos cross-form).
- */
-export const NOTA_CREDITO_COMPRA_REFERENCIA_ENDPOINT = '/general/documento/';
-
-/**
  * Columnas visibles del listado de Nota crédito de compra.
  *
  * Mismo set canónico de `DocumentoListRowBase` que la factura de compra (id,

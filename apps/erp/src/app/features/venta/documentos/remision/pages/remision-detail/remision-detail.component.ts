@@ -188,7 +188,7 @@ export class RemisionDetailComponent implements OnInit {
 
   /**
    * La botonera cambió el estado del documento en el backend —lo aprobó,
-   * desaprobó, anuló o (des)contabilizó—: se recarga la ficha para que la
+   * desaprobó o anuló—: se recarga la ficha para que la
    * cabecera (y la propia botonera, que lee de ella su estado) reflejen el nuevo.
    */
   protected onDocumentoChanged(): void {

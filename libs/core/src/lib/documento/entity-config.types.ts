@@ -100,6 +100,13 @@ export interface DocumentEntityConfig {
    */
   readonly hasPagos?: boolean;
   /**
+   * El form ofrece **cargar las líneas del documento referencia** (botón junto al
+   * select de referencia): reemplaza las líneas por las de la factura. Lo lee la
+   * familia de notas de venta: la nota crédito arranca igual a la factura que
+   * devuelve; la débito agrega cobros nuevos y no lo necesita. Se omite ⇒ sin botón.
+   */
+  readonly cargaLineasReferencia?: boolean;
+  /**
    * Versión del schema. Se usa como sufijo en la clave de localStorage
    * para invalidar filtros guardados cuando el shape cambia.
    */

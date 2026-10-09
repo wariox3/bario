@@ -118,6 +118,7 @@ export type {
 } from './lib/documento';
 export {
   DOCUMENT_TYPE_ID,
+  DOCUMENTO_CLASE_ID,
   ENTITY_DATA_GATEWAY,
   HttpEntityDataGateway,
   DocumentoDetalleService,

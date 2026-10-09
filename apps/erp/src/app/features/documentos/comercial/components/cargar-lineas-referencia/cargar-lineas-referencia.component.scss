@@ -1,0 +1,12 @@
+// Va junto al select de referencia: el botón global mide 32px y al lado del
+// input quedaba más bajo que el campo. Se estira a la altura del input (el
+// contenedor del padre usa `items-stretch`).
+:host,
+p-button {
+  display: flex;
+}
+
+:host ::ng-deep .p-button {
+  height: 100%;
+  padding: 0 1rem;
+}
