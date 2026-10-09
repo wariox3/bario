@@ -9,6 +9,11 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /** Endpoint `seleccionar` de métodos de pago. */
 export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
+/**
+ * Clase del documento que referencia una nota de venta (`documento_clase_id` de
+ * `seleccionar-referencia/`): `100` = factura de venta.
+ */
+export const REFERENCIA_DOCUMENTO_CLASE_ID = 100;
 
 /**
  * Construye las columnas del listado de una nota de venta para el namespace i18n

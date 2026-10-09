@@ -2516,7 +2516,7 @@ export const en: AppDict = {
           documentoReferencia: 'Reference document',
           documentoReferenciaPlaceholder: 'Select the invoice…',
           documentoReferenciaDisabled: 'Select a customer first',
-          documentoReferenciaEmpty: 'The customer has no approved invoices with that number.',
+          documentoReferenciaEmpty: 'The customer has no matching invoices.',
           sede: 'Branch',
           sedePlaceholder: 'Select…',
           metodoPago: 'Payment method',

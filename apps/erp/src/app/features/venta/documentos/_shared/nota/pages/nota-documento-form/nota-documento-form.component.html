@@ -99,7 +99,7 @@
           <app-documento-referencia-select
             inputId="documento_referencia"
             formControlName="documento_referencia"
-            cartera="cobrar"
+            [documentoClaseId]="referenciaDocumentoClaseId"
             [contactoId]="contactoId()"
             [emptyMessage]="f.fields.documentoReferenciaEmpty"
             [placeholder]="

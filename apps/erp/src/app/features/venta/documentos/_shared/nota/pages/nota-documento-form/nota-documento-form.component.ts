@@ -77,7 +77,11 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
 import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
 import type { NotaVentaRead } from '../../nota-documento.model';
-import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../nota-documento.constants';
+import {
+  METODO_PAGO_ENDPOINT,
+  REFERENCIA_DOCUMENTO_CLASE_ID,
+  SEDE_ENDPOINT,
+} from '../../nota-documento.constants';
 import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
@@ -175,6 +179,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly referenciaDocumentoClaseId = REFERENCIA_DOCUMENTO_CLASE_ID;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
