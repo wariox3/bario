@@ -1671,6 +1671,7 @@ export const es: AppDict = {
         },
         empty: 'Este periodo no tiene inconsistencias.',
         loadError: 'No se pudieron cargar las inconsistencias.',
+        abrirDocumento: 'Abrir documento en otra pestaña',
       },
       toasts: {
         bloquearSuccess: {

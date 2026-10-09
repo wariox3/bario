@@ -1629,6 +1629,7 @@ export const en: AppDict = {
         },
         empty: 'This period has no inconsistencies.',
         loadError: 'Inconsistencies could not be loaded.',
+        abrirDocumento: 'Open document in a new tab',
       },
       toasts: {
         bloquearSuccess: { title: 'Period locked', desc: 'The period was locked successfully' },

@@ -1204,6 +1204,7 @@ export interface AppDict
         columns: { comprobante: string; numero: string; documento: string; descripcion: string };
         empty: string;
         loadError: string;
+        abrirDocumento: string;
       };
       toasts: {
         bloquearSuccess: { title: string; desc: string };
