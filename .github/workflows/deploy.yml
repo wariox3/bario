@@ -91,6 +91,11 @@ jobs:
         with:
           main-branch-name: ${{ github.ref_name }}
 
+      # Un push directo a dev/main no pasa por el CI de los PR: sin esto se
+      # desplegaría con pruebas rotas. Mismo rango que decide qué apps salen.
+      - name: Test affected
+        run: npx nx affected -t test --ci
+
       - name: Resolve apps to deploy
         id: affected
         env:
