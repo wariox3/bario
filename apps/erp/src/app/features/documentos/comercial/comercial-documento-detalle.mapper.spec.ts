@@ -2,6 +2,7 @@ import { calcularImpuestosLinea, type TasaImpuesto } from '@reddoc/core';
 import {
   comercialDetalleToFormValue,
   comercialDetalleToPayload,
+  lineaReferenciaToFormValue,
   precioUnitarioConImpuestos,
   precioUnitarioSinImpuestos,
   totalCantidad,
@@ -27,6 +28,7 @@ describe('comercial detalle · descuento', () => {
     impuestos_totales: [],
     impuestos_disponibles: [],
     detalle: null,
+    almacen: null,
     documento_detalle_afectado: null,
   };
 
@@ -67,6 +69,7 @@ describe('comercial detalle · total cantidad', () => {
     impuestos_totales: [],
     impuestos_disponibles: [],
     detalle: null,
+    almacen: null,
     documento_detalle_afectado: null,
   });
 
@@ -180,5 +183,46 @@ describe('comercial detalle · precio con impuestos incluidos', () => {
     const tasas = linea([IVA_19, CONSUMO_8]);
     const final = precioUnitarioConImpuestos({ precio: 2941.18, ...tasas });
     expect(precioUnitarioSinImpuestos(final, tasas)).toBe(2941.18);
+  });
+});
+
+/**
+ * "Cargar líneas" de la nota: copia la línea de la factura como línea nueva. Sin
+ * `id` (se crea, no pisa la de la factura) y sin pool de tasas, para que la tabla
+ * lo siembre y recalcule los montos.
+ */
+describe('comercial detalle · línea de la factura referencia', () => {
+  const read: ComercialDetalleRead = {
+    id: 40,
+    item: 3,
+    item_nombre: 'Ítem',
+    cantidad: '2.00',
+    precio: '1000.00',
+    porcentaje_descuento: '10.00',
+    detalle: 'Nota de la línea',
+    almacen: 5,
+    almacen_nombre: 'Principal',
+    documento_detalle_afectado: 12,
+    impuestos: [
+      { impuesto: 1, impuesto_nombre: 'IVA 19%', total: '342.00', impuesto_operacion: 1 },
+    ],
+  };
+
+  it('se crea como línea nueva, sin id ni vínculo con otra línea', () => {
+    const linea = lineaReferenciaToFormValue(read);
+    expect(linea.id).toBeNull();
+    expect(linea.documento_detalle_afectado).toBeNull();
+    expect(linea.impuestos_disponibles).toEqual([]);
+  });
+
+  it('conserva ítem, cantidad, precio, descuento, impuestos, nota y almacén', () => {
+    const linea = lineaReferenciaToFormValue(read);
+    expect(linea.item).toEqual({ id: 3, nombre: 'Ítem', precio: 1000 });
+    expect(linea.cantidad).toBe(2);
+    expect(linea.precio).toBe(1000);
+    expect(linea.descuento).toBe(10);
+    expect(linea.impuestos_ids).toEqual([1]);
+    expect(linea.detalle).toBe('Nota de la línea');
+    expect(linea.almacen).toEqual({ id: 5, nombre: 'Principal' });
   });
 });

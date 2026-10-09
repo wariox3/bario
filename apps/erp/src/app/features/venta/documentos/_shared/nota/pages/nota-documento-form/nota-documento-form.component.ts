@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, forkJoin, of } from 'rxjs';
+import { Observable, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -52,6 +52,7 @@ import {
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import {
   comercialDetalleToFormValue,
+  lineaReferenciaToFormValue,
   toLineaCalculo,
   totalCantidad,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
@@ -180,6 +181,13 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
   protected readonly referenciaDocumentoClaseId = REFERENCIA_DOCUMENTO_CLASE_ID;
+
+  /** El documento ofrece cargar las líneas de su factura referencia (la nota crédito). */
+  protected readonly cargaLineasReferencia = computed(
+    () => this.document().cargaLineasReferencia === true,
+  );
+  /** Carga de las líneas de la referencia en curso; deshabilita el botón. */
+  protected readonly cargandoReferencia = signal(false);
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -524,6 +532,86 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
+  /**
+   * "Cargar líneas": reemplaza las líneas de la nota por las de la factura
+   * referencia. Si ya hay líneas con ítem pide confirmación (una fila vacía no
+   * cuenta: no hay nada que perder). No copia los pagos: son de la factura.
+   */
+  protected onCargarReferencia(): void {
+    const referencia = this.form.controls.documento_referencia.value;
+    if (referencia == null || this.cargandoReferencia()) return;
+    const conLineas = this.form.controls.detalles.getRawValue().some((l) => l.item != null);
+    if (!conLineas) {
+      this.cargarLineasReferencia(referencia.id);
+      return;
+    }
+    const textos = this.t().entities.notaVenta.form.cargarReferencia;
+    this.confirmation.confirm({
+      header: textos.confirmHeader,
+      message: textos.confirmMessage,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: textos.confirmAccept,
+      rejectLabel: this.t().common.actions.cancel,
+      accept: () => this.cargarLineasReferencia(referencia.id),
+    });
+  }
+
+  /**
+   * Trae las líneas de la factura y se las pasa a la tabla para que reemplace las
+   * de la nota (en alta en memoria; en edición contra la API). En edición se
+   * recargan las líneas al terminar, salga bien o mal: el reemplazo no es atómico
+   * y la tabla debe mostrar lo que quedó en el backend.
+   */
+  private cargarLineasReferencia(referenciaId: number): void {
+    const tabla = this.detallesTable();
+    if (!tabla) return;
+    const toasts = this.t().entities.notaVenta.form.cargarReferencia.toasts;
+    this.cargandoReferencia.set(true);
+    this.detalleService
+      .listarPorDocumento<ComercialDetalleRead>(referenciaId)
+      .pipe(
+        map((lineas) => lineas.map(lineaReferenciaToFormValue)),
+        switchMap((values) =>
+          values.length === 0
+            ? of(0)
+            : tabla.reemplazarLineas(values).pipe(map(() => values.length)),
+        ),
+        finalize(() => this.cargandoReferencia.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (cargadas) => {
+          if (cargadas === 0) {
+            this.toast.warn(toasts.sinLineas.title, toasts.sinLineas.desc);
+            return;
+          }
+          this.form.controls.detalles.markAsDirty();
+          this.toast.success(toasts.success.title, toasts.success.desc);
+          this.recargarLineas();
+        },
+        error: () => {
+          this.toast.error(toasts.error.title, toasts.error.desc);
+          this.recargarLineas();
+        },
+      });
+  }
+
+  /**
+   * En edición trae las líneas persistidas (ids y montos del backend) sin tocar la
+   * cabecera, que puede tener cambios sin guardar —como la referencia recién elegida—.
+   */
+  private recargarLineas(): void {
+    const id = this.documentId();
+    if (id == null) return;
+    this.detalleService
+      .listarPorDocumento<ComercialDetalleRead>(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lineas) => this.populateLineas(lineas),
+        error: () => this.notifyLoadError(),
+      });
+  }
+
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
     detalles.clear();

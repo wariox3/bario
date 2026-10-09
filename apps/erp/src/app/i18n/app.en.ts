@@ -2524,6 +2524,17 @@ export const en: AppDict = {
           comentario: 'Comment',
           comentarioPlaceholder: 'Document notes',
         },
+        cargarReferencia: {
+          button: 'Load lines',
+          confirmHeader: 'Replace lines',
+          confirmMessage: "The note's current lines will be replaced by the invoice's. Continue?",
+          confirmAccept: 'Replace',
+          toasts: {
+            success: { title: 'Lines loaded', desc: 'The note now has the invoice lines' },
+            sinLineas: { title: 'No lines', desc: 'The reference invoice has no lines' },
+            error: { title: 'Load error', desc: 'The invoice lines could not be loaded' },
+          },
+        },
         validation: {
           required: 'This field is required',
           comentarioMax: 'Max 500 characters',

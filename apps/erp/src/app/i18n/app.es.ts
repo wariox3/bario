@@ -2575,6 +2575,24 @@ export const es: AppDict = {
           comentario: 'Comentario',
           comentarioPlaceholder: 'Observaciones del documento',
         },
+        cargarReferencia: {
+          button: 'Cargar líneas',
+          confirmHeader: 'Reemplazar líneas',
+          confirmMessage:
+            'Las líneas actuales de la nota se reemplazarán por las de la factura. ¿Continuar?',
+          confirmAccept: 'Reemplazar',
+          toasts: {
+            success: {
+              title: 'Líneas cargadas',
+              desc: 'La nota tiene ahora las líneas de la factura',
+            },
+            sinLineas: { title: 'Sin líneas', desc: 'La factura de referencia no tiene líneas' },
+            error: {
+              title: 'Error al cargar',
+              desc: 'No se pudieron cargar las líneas de la factura',
+            },
+          },
+        },
         validation: {
           required: 'Este campo es requerido',
           comentarioMax: 'Máximo 500 caracteres',

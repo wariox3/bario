@@ -1957,6 +1957,17 @@ export interface AppDict
           comentario: string;
           comentarioPlaceholder: string;
         };
+        cargarReferencia: {
+          button: string;
+          confirmHeader: string;
+          confirmMessage: string;
+          confirmAccept: string;
+          toasts: {
+            success: { title: string; desc: string };
+            sinLineas: { title: string; desc: string };
+            error: { title: string; desc: string };
+          };
+        };
         validation: { required: string; comentarioMax: string };
         toasts: {
           createSuccess: { title: string; desc: string };
