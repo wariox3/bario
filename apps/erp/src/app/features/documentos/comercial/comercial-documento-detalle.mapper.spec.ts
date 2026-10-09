@@ -1,6 +1,9 @@
+import { calcularImpuestosLinea, type TasaImpuesto } from '@reddoc/core';
 import {
   comercialDetalleToFormValue,
   comercialDetalleToPayload,
+  precioUnitarioConImpuestos,
+  precioUnitarioSinImpuestos,
   totalCantidad,
 } from './comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from './comercial-documento-detalle.model';
@@ -73,5 +76,109 @@ describe('comercial detalle · total cantidad', () => {
 
   it('suma cantidades decimales e ignora la vacía', () => {
     expect(totalCantidad([linea(2), linea(1.5), linea(null)])).toBe(3.5);
+  });
+});
+
+/**
+ * Popover «precio con impuestos incluidos»: invierte el kernel. Los impuestos que
+ * suman son aditivos sobre la misma base, así que el precio base es
+ * `final / (1 + Σ fracciones)`; las retenciones no hacen parte del precio final.
+ */
+describe('comercial detalle · precio con impuestos incluidos', () => {
+  const IVA_19: TasaImpuesto = {
+    id: 1,
+    nombre: 'IVA 19%',
+    porcentaje: 19,
+    porcentajeBase: 100,
+    operacion: 1,
+  };
+  const CONSUMO_8: TasaImpuesto = {
+    id: 2,
+    nombre: 'Consumo 8%',
+    porcentaje: 8,
+    porcentajeBase: 100,
+    operacion: 1,
+  };
+  const RETEFUENTE: TasaImpuesto = {
+    id: 3,
+    nombre: 'Retefuente 2.5%',
+    porcentaje: 2.5,
+    porcentajeBase: 100,
+    operacion: -1,
+  };
+  const IVA_AIU: TasaImpuesto = {
+    id: 4,
+    nombre: 'IVA 19% AIU',
+    porcentaje: 19,
+    porcentajeBase: 10,
+    operacion: 1,
+  };
+
+  const linea = (tasas: readonly TasaImpuesto[], ids = tasas.map((t) => t.id)) => ({
+    impuestos_ids: ids,
+    impuestos_disponibles: tasas,
+  });
+
+  /** Neto de una unidad calculado hacia adelante con el kernel (solo lo que suma). */
+  const netoUnitario = (precio: number, tasas: readonly TasaImpuesto[]): number =>
+    calcularImpuestosLinea(precio, tasas)
+      .filter((imp) => imp.total > 0)
+      .reduce((s, imp) => s + imp.total, precio);
+
+  it('quita el IVA de un precio final', () => {
+    expect(precioUnitarioSinImpuestos(10000, linea([IVA_19]))).toBe(8403.36);
+  });
+
+  it('con varias tasas divide por la suma, no en cadena como el legacy', () => {
+    const base = precioUnitarioSinImpuestos(10000, linea([IVA_19, CONSUMO_8]));
+    expect(base).toBe(7874.02);
+    // En cadena (10000 / 1.19 / 1.08) daría 7780.67, que el kernel no devuelve a 10000.
+    expect(netoUnitario(base, [IVA_19, CONSUMO_8])).toBe(10000);
+  });
+
+  it('ignora las retenciones: no hacen parte del precio final', () => {
+    expect(precioUnitarioSinImpuestos(10000, linea([IVA_19, RETEFUENTE]))).toBe(8403.36);
+    expect(precioUnitarioConImpuestos({ precio: 8403.36, ...linea([IVA_19, RETEFUENTE]) })).toBe(
+      10000,
+    );
+  });
+
+  it('respeta el porcentaje de base (AIU)', () => {
+    // IVA 19% sobre el 10% de la base ⇒ fracción 0.019.
+    expect(precioUnitarioSinImpuestos(10000, linea([IVA_AIU]))).toBe(9813.54);
+  });
+
+  it('solo cuenta las tasas elegidas en la línea', () => {
+    expect(precioUnitarioSinImpuestos(10000, linea([IVA_19, CONSUMO_8], [1]))).toBe(8403.36);
+  });
+
+  it('sin impuestos deja el precio igual', () => {
+    expect(precioUnitarioSinImpuestos(10000, linea([]))).toBe(10000);
+    expect(precioUnitarioSinImpuestos(10000, linea([IVA_19], []))).toBe(10000);
+  });
+
+  it('una tasa sin operación cuenta como impuesto que suma', () => {
+    const sinOperacion: TasaImpuesto = {
+      id: 1,
+      nombre: 'IVA 19%',
+      porcentaje: 19,
+      porcentajeBase: 100,
+    };
+    expect(precioUnitarioSinImpuestos(10000, linea([sinOperacion]))).toBe(8403.36);
+  });
+
+  it('siembra el popover con el precio final de la línea, redondeado a centavos', () => {
+    expect(precioUnitarioConImpuestos({ precio: 8403.36, ...linea([IVA_19]) })).toBe(10000);
+    expect(precioUnitarioConImpuestos({ precio: 1000, ...linea([IVA_19, CONSUMO_8]) })).toBe(1270);
+  });
+
+  it('una línea sin precio siembra cero', () => {
+    expect(precioUnitarioConImpuestos({ precio: null, ...linea([IVA_19]) })).toBe(0);
+  });
+
+  it('ida y vuelta conserva el precio base', () => {
+    const tasas = linea([IVA_19, CONSUMO_8]);
+    const final = precioUnitarioConImpuestos({ precio: 2941.18, ...tasas });
+    expect(precioUnitarioSinImpuestos(final, tasas)).toBe(2941.18);
   });
 });
