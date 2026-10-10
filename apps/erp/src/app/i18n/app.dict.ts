@@ -1757,6 +1757,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
@@ -1794,6 +1796,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           ordenCompra: string;
           remision: string;
@@ -1952,6 +1955,8 @@ export interface AppDict
           documentoReferenciaEmpty: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           comentario: string;
@@ -1975,6 +1980,7 @@ export interface AppDict
           fecha: string;
           documentoReferencia: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           comentario: string;
         };
@@ -2033,6 +2039,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           asesor: string;
@@ -2061,6 +2069,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           asesor: string;
           ordenCompra: string;
@@ -2167,6 +2176,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
@@ -2192,6 +2203,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           ordenCompra: string;
           comentario: string;
@@ -2247,6 +2259,8 @@ export interface AppDict
           resolucionPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2269,6 +2283,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           formaPago: string;
           resolucion: string;
@@ -2430,6 +2445,8 @@ export interface AppDict
           centroCostoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2451,6 +2468,7 @@ export interface AppDict
           formaPago: string;
           centroCosto: string;
           sede: string;
+          almacen: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2890,6 +2908,27 @@ export interface AppDict
       confirmDeleteLine: string;
       createItem: string;
       extraerIva: { title: string; baseLabel: string; apply: string };
+      aiu: {
+        menuLabel: string;
+        title: string;
+        subtitle: string;
+        configIncompleta: string;
+        fields: {
+          itemBase: string;
+          valorBase: string;
+          item: string;
+          porcentaje: string;
+          valor: string;
+        };
+        conceptos: { administracion: string; imprevisto: string; utilidad: string };
+        total: string;
+        submit: string;
+        validation: { required: string; valorMin: string; porcentajeRango: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
       scanner: {
         placeholder: string;
         notFound: { title: string; desc: string };

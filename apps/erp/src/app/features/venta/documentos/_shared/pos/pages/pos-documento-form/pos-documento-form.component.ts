@@ -189,6 +189,7 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
 
   /** Filtra el autocomplete de contacto a clientes. */
@@ -208,6 +209,12 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   readonly documentoEdit = input<unknown>();
 
   protected readonly isEditMode = computed(() => !!this.id());
+
+  /**
+   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   */
+  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
@@ -268,6 +275,7 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
     fecha_vence: this.fb.control<Date | null>(null, Validators.required),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
+    almacen: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     asesor: this.fb.control<ErpSelectOption | null>(null),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),

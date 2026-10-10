@@ -41,7 +41,7 @@
         (onClick)="onSaveAllClick()"
       />
     }
-    @if (importEnabled()) {
+    @if (addLineMenu().length > 0) {
       <p-splitbutton
         [label]="t().entities.comercialDetalle.addLine"
         icon="pi pi-plus"

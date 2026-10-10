@@ -26,6 +26,9 @@ export interface NotaVentaRead extends DocumentoReadBase {
   readonly documento_referencia_numero?: string | null;
   readonly sede: number | null;
   readonly sede_nombre?: string | null;
+  /** Almacén general (solo la nota crédito lo muestra: `almacenGeneral` del config). */
+  readonly almacen?: number | null;
+  readonly almacen_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
   readonly comentario: string | null;
@@ -39,6 +42,7 @@ export interface NotaVentaRead extends DocumentoReadBase {
 export interface NotaVentaPayload extends DocumentoPayloadBase {
   readonly documento_referencia: number | null;
   readonly sede: number | null;
+  readonly almacen: number | null;
   readonly metodo_pago: number | null;
   readonly comentario: string | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */

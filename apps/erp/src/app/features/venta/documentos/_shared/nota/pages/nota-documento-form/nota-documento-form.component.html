@@ -132,6 +132,20 @@
           />
         </div>
 
+        @if (conAlmacenGeneral()) {
+          <!-- Almacén general: lo heredan las líneas nuevas; cada una lo puede cambiar. -->
+          <div class="flex flex-col gap-1.5">
+            <label for="almacen" class="nota-documento-form__label">{{ f.fields.almacen }}</label>
+            <lib-api-select
+              inputId="almacen"
+              formControlName="almacen"
+              [endpoint]="almacenEndpoint"
+              [suggestedIndex]="almacenSuggestedIndex()"
+              [placeholder]="f.fields.almacenPlaceholder"
+            />
+          </div>
+        }
+
         <!-- Método de pago -->
         <div class="flex flex-col gap-1.5">
           <label for="metodo_pago" class="nota-documento-form__label">
@@ -216,6 +230,8 @@
             [documentId]="documentId()"
             [contactoId]="form.controls.contacto.value?.id ?? null"
             [precioListaId]="precioListaId()"
+            [almacenEnabled]="true"
+            [almacenPorDefecto]="form.controls.almacen.value"
             (imported)="onImported()"
           />
         </p-tabpanel>

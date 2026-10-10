@@ -258,6 +258,7 @@
             [detalles]="form.controls.detalles"
             [documentId]="documentId()"
             [contactoId]="form.controls.contacto.value?.id ?? null"
+            [almacenEnabled]="true"
             (imported)="onImported()"
           />
         </p-tabpanel>

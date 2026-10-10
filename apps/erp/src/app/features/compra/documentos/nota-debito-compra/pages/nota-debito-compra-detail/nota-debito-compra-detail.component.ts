@@ -228,7 +228,7 @@ export class NotaDebitoCompraDetailComponent implements OnInit {
 
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
+    return formatFechaLarga(date, '');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/compra/<...routePath>[/extra]`. */

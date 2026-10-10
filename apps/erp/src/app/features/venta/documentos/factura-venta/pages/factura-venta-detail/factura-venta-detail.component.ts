@@ -68,6 +68,7 @@ interface CabeceraView {
   readonly fechaVence: Date | null;
   readonly plazoPago: string | null;
   readonly sede: string | null;
+  readonly almacen: string | null;
   readonly metodoPago: string | null;
   readonly ordenCompra: string | null;
   readonly remision: string | null;
@@ -314,6 +315,7 @@ export class FacturaVentaDetailComponent implements OnInit {
             fechaVence: fv.fecha_vence ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
+            almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             remision: read.remision ?? null,
@@ -346,7 +348,7 @@ export class FacturaVentaDetailComponent implements OnInit {
 
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
+    return formatFechaLarga(date, '');
   }
 
   /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */

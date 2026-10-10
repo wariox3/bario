@@ -27,6 +27,7 @@ import {
 import {
   DOCUMENTO_CLASE_ID,
   FormErrorService,
+  SELECT_ENDPOINTS,
   I18nService,
   calcularResumen,
   startOfToday,
@@ -177,6 +178,13 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected readonly conPagos = computed(() => this.document().hasPagos === true);
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+
+  /**
+   * La cabecera lleva almacén general (la nota crédito, como el ERP anterior; la
+   * débito no). Las líneas muestran su almacén siempre.
+   */
+  protected readonly conAlmacenGeneral = computed(() => this.document().almacenGeneral === true);
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
   protected readonly referenciaDocumentoClaseId = DOCUMENTO_CLASE_ID.FACTURA_VENTA;
 
@@ -204,6 +212,12 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   readonly documentoEdit = input<unknown>();
 
   protected readonly isEditMode = computed(() => !!this.id());
+
+  /**
+   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   */
+  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
@@ -262,6 +276,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     documento_referencia: this.fb.control<ErpSelectOption | null>({ value: null, disabled: true }),
     sede: this.fb.control<ErpSelectOption | null>(null),
+    almacen: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
