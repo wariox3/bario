@@ -4626,7 +4626,6 @@ export interface AppDict
     };
     documentoElectronico: {
       name: string;
-      subtitle: string;
       columns: {
         id: string;
         documentoTipo: string;
@@ -4649,16 +4648,6 @@ export interface AppDict
     };
     enviarFacturaElectronica: {
       name: string;
-      subtitle: string;
-      tabs: {
-        emitir: string;
-        notificar: string;
-      };
-      actions: {
-        emitir: string;
-        notificar: string;
-        descartar: string;
-      };
       columns: {
         id: string;
         numero: string;
@@ -4666,13 +4655,6 @@ export interface AppDict
         fecha: string;
         cliente: string;
         total: string;
-        estado: string;
-      };
-      estado: {
-        descartado: string;
-        error: string;
-        enviado: string;
-        pendiente: string;
       };
       filters: {
         notificado: string;
@@ -4687,10 +4669,6 @@ export interface AppDict
       };
       toasts: {
         emitir: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-        notificar: {
           success: { title: string; desc: string };
           error: { title: string; desc: string };
         };

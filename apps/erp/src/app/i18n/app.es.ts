@@ -6030,7 +6030,6 @@ export const es: AppDict = {
     },
     documentoElectronico: {
       name: 'Documento electrónico',
-      subtitle: 'Emite tus documentos electrónicos de compra a la DIAN.',
       columns: {
         id: 'ID',
         documentoTipo: 'Tipo',
@@ -6059,16 +6058,6 @@ export const es: AppDict = {
     },
     enviarFacturaElectronica: {
       name: 'Enviar factura electrónica',
-      subtitle: 'Emite tus facturas a la DIAN y notifícalas a tus clientes.',
-      tabs: {
-        emitir: 'Emitir',
-        notificar: 'Notificar',
-      },
-      actions: {
-        emitir: 'Emitir',
-        notificar: 'Notificar',
-        descartar: 'Descartar',
-      },
       columns: {
         id: 'ID',
         numero: 'Número',
@@ -6076,13 +6065,6 @@ export const es: AppDict = {
         fecha: 'Fecha',
         cliente: 'Cliente',
         total: 'Total',
-        estado: 'Estado',
-      },
-      estado: {
-        descartado: 'Descartado',
-        error: 'Error',
-        enviado: 'Esperando respuesta',
-        pendiente: 'Pendiente',
       },
       filters: {
         notificado: 'Notificado',
@@ -6105,16 +6087,6 @@ export const es: AppDict = {
           error: {
             title: 'Error al emitir',
             desc: 'No se pudieron emitir algunos documentos. Intentá de nuevo.',
-          },
-        },
-        notificar: {
-          success: {
-            title: 'Documentos notificados',
-            desc: 'Los documentos seleccionados se notificaron al cliente.',
-          },
-          error: {
-            title: 'Error al notificar',
-            desc: 'No se pudieron notificar algunos documentos. Intentá de nuevo.',
           },
         },
         descartar: {

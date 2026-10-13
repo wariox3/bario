@@ -59,7 +59,10 @@ import { facturaVentaToFormValue } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
 import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
 import { ElectronicoLogModalComponent } from '@erp/features/documentos/electronico/components/electronico-log-modal/electronico-log-modal.component';
-import { EnviarFacturaElectronicaService } from '@erp/features/venta/utilidades/enviar-factura-electronica/enviar-factura-electronica.service';
+import {
+  DocumentoElectronicoEmisionService,
+  DocumentoElectronicoErrorService,
+} from '@erp/core/documento-electronico';
 
 /** Cabecera legible de la factura para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -132,7 +135,8 @@ export class FacturaVentaDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly pagoService = inject(DocumentoPagoService);
-  private readonly electronicoService = inject(EnviarFacturaElectronicaService);
+  private readonly electronicoService = inject(DocumentoElectronicoEmisionService);
+  private readonly electronicoErrores = inject(DocumentoElectronicoErrorService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
@@ -340,7 +344,8 @@ export class FacturaVentaDetailComponent implements OnInit {
   /**
    * Envía esta factura a la DIAN por el mismo `emitir/` de la utilidad de envío
    * (lote de un solo id) y recarga la ficha: el estado electrónico y el CUE
-   * cambian en el backend, no aquí.
+   * cambian en el backend, no aquí. El 200 no dice que salió bien: si la factura
+   * vuelve en `con_error`, el aviso muestra los motivos de su último intento.
    */
   private onEmitir(): void {
     const id = Number(this.id());
@@ -353,15 +358,34 @@ export class FacturaVentaDetailComponent implements OnInit {
         finalize(() => this.isEmitiendo.set(false)),
       )
       .subscribe({
-        next: () => {
+        next: (resultado) => {
+          this.loadDocumento(id);
+          if (resultado.con_error.includes(id)) {
+            this.avisarErrorEmision(id);
+            return;
+          }
           const ts = this.t().entities.facturaVenta.electronico.toasts.emitirSuccess;
           this.toast.success(ts.title, ts.desc);
-          this.loadDocumento(id);
         },
         error: (err: unknown) => {
           const ts = this.t().entities.facturaVenta.electronico.toasts.emitirError;
           this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
+      });
+  }
+
+  /** La factura no se emitió: avisa con los mensajes de su último intento. */
+  private avisarErrorEmision(id: number): void {
+    const ts = this.t().entities.facturaVenta.electronico.toasts.emitirError;
+    this.electronicoErrores
+      .errores(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const motivos = response.results.map((error) => error.mensaje).join(' ');
+          this.toast.error(ts.title, motivos || ts.desc);
+        },
+        error: () => this.toast.error(ts.title, ts.desc),
       });
   }
 

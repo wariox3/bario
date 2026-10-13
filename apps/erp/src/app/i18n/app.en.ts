@@ -5956,7 +5956,6 @@ export const en: AppDict = {
     },
     documentoElectronico: {
       name: 'Electronic document',
-      subtitle: 'Issue your purchase electronic documents to the DIAN.',
       columns: {
         id: 'ID',
         documentoTipo: 'Type',
@@ -5985,16 +5984,6 @@ export const en: AppDict = {
     },
     enviarFacturaElectronica: {
       name: 'Send electronic invoice',
-      subtitle: 'Issue your invoices to the DIAN and notify your customers.',
-      tabs: {
-        emitir: 'Issue',
-        notificar: 'Notify',
-      },
-      actions: {
-        emitir: 'Issue',
-        notificar: 'Notify',
-        descartar: 'Discard',
-      },
       columns: {
         id: 'ID',
         numero: 'Number',
@@ -6002,13 +5991,6 @@ export const en: AppDict = {
         fecha: 'Date',
         cliente: 'Customer',
         total: 'Total',
-        estado: 'Status',
-      },
-      estado: {
-        descartado: 'Discarded',
-        error: 'Error',
-        enviado: 'Awaiting response',
-        pendiente: 'Pending',
       },
       filters: {
         notificado: 'Notified',
@@ -6031,16 +6013,6 @@ export const en: AppDict = {
           error: {
             title: 'Error issuing',
             desc: 'Some documents could not be issued. Please try again.',
-          },
-        },
-        notificar: {
-          success: {
-            title: 'Documents notified',
-            desc: 'The selected documents were notified to the customer.',
-          },
-          error: {
-            title: 'Error notifying',
-            desc: 'Some documents could not be notified. Please try again.',
           },
         },
         descartar: {
