@@ -9,10 +9,11 @@ export class DataUrlInvalidoError extends Error {
 /**
  * Data-URL base64 → `File`, para los endpoints que reciben multipart.
  *
- * El recortador de imágenes emite un data-URL y `cargar-logotipo/` espera un
- * archivo; esta es la costura entre los dos. El MIME sale del propio data-URL,
- * no de un parámetro: si el recorte cambia de PNG a JPEG, el archivo lo sigue
- * sin que nadie lo actualice acá.
+ * El recortador de imágenes emite un data-URL y los endpoints de carga (el
+ * logotipo, las imágenes de un registro) esperan un archivo; esta es la costura
+ * entre los dos. El MIME sale del propio data-URL, no de un parámetro: si el
+ * recorte cambia de PNG a JPEG, el archivo lo sigue sin que nadie lo actualice
+ * acá.
  */
 export function dataUrlToFile(dataUrl: string, nombreBase: string): File {
   const match = /^data:([^;,]+);base64,(.*)$/s.exec(dataUrl);

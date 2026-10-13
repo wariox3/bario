@@ -112,7 +112,8 @@
     <div
       class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-[auto_1.3fr_1fr] lg:divide-x lg:divide-y-0"
     >
-      <!-- La imagen es el "qué es esto" de un ítem: va primera y sin rótulo. -->
+      <!-- La imagen es el "qué es esto" de un ítem: va primera y sin rótulo.
+           Es la principal de la galería; marco y recorte cuadrados. -->
       <div class="flex items-start justify-center px-5 py-4">
         <app-erp-image-upload
           [imageUrl]="imageUrl()"
@@ -300,12 +301,11 @@
   </section>
 }
 
-<app-archivos-dialog
+<app-imagenes-dialog
   [visible]="imagenesVisible()"
-  (visibleChange)="onArchivosVisibleChange($event)"
-  [owner]="archivosOwner()"
+  (visibleChange)="onImagenesVisibleChange($event)"
+  [owner]="imagenesOwner()"
   [title]="t().entities.item.detail.opciones.imagenes"
   [subtitle]="t().entities.item.detail.opcionesHint.imagenes"
-  [accept]="archivosAccept"
-  [archivoTipo]="archivosTipo"
+  (cambio)="onImagenesCambio()"
 />

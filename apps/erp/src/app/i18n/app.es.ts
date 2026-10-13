@@ -176,6 +176,45 @@ export const es: AppDict = {
         },
       },
     },
+    imagenes: {
+      title: 'Imágenes',
+      subtitle: 'Fotos de este registro',
+      empty: 'Todavía no hay imágenes.',
+      principal: 'Principal',
+      marcarPrincipal: 'Marcar como principal',
+      delete: 'Eliminar',
+      uploading: 'Subiendo imagen…',
+      dropzone: {
+        primary: 'Arrastrá una imagen o hacé clic para elegirla',
+        hint: 'PNG, JPG o WEBP, hasta {max} MB',
+        invalidType: 'La imagen no tiene un formato válido.',
+        tooLarge: 'La imagen supera el tamaño máximo permitido.',
+      },
+      confirmDelete: {
+        header: 'Confirmar eliminación',
+        message: '¿Querés eliminar esta imagen? Esta acción no se puede revertir.',
+        messagePrincipal:
+          'Es la imagen principal. ¿Querés eliminarla? Esta acción no se puede revertir.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron obtener las imágenes. Intentá de nuevo.',
+        },
+        uploadSuccess: { title: 'Imagen cargada', desc: 'La imagen se agregó correctamente.' },
+        uploadError: { title: 'No se pudo cargar', desc: 'Revisá la imagen y volvé a intentarlo.' },
+        principalSuccess: {
+          title: 'Imagen principal actualizada',
+          desc: 'Esta imagen ahora representa al registro.',
+        },
+        principalError: {
+          title: 'No se pudo actualizar',
+          desc: 'Intentá de nuevo en unos segundos.',
+        },
+        deleteSuccess: { title: 'Imagen eliminada', desc: 'La imagen se eliminó correctamente.' },
+        deleteError: { title: 'No se pudo eliminar', desc: 'Intentá de nuevo en unos segundos.' },
+      },
+    },
     import: {
       dropzone: {
         primary: 'Arrastrá tu archivo Excel aquí',
@@ -1262,7 +1301,7 @@ export const es: AppDict = {
         },
         groups: { identificacion: 'Identificación', clasificacion: 'Clasificación' },
         opciones: { imagenes: 'Imágenes' },
-        opcionesHint: { imagenes: 'Fotos del ítem, además de la principal' },
+        opcionesHint: { imagenes: 'Fotos del ítem; la principal es la de la ficha' },
         labels: {
           impuestosVenta: 'Impuestos de venta',
           impuestosCompra: 'Impuestos de compra',

@@ -41,11 +41,13 @@ export interface Item {
   readonly cuenta_inventario_codigo?: string | null;
   readonly impuestos?: readonly ItemImpuesto[];
   /**
-   * Imagen del item. Se asume URL absoluta lista para `<img>`. Si el backend la
-   * devuelve como ruta relativa, anteponer la base en el único punto que la lee
-   * (`imageUrl` en `ItemDetailComponent`).
+   * Imagen principal del ítem, ya resuelta por el backend (solo lectura). La
+   * galería completa vive en `general/imagen/`; esto es la que la representa.
+   * `null` si el ítem no tiene imágenes.
    */
-  readonly imagen?: string | null;
+  readonly imagen_principal_url?: string | null;
+  /** Misma imagen en versión reducida, para listados y selectores. */
+  readonly imagen_principal_url_miniatura?: string | null;
 }
 
 /**

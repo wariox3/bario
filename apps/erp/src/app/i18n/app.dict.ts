@@ -191,6 +191,41 @@ export interface AppDict
         downloadError: { title: string; desc: string };
       };
     };
+    /**
+     * Galería de **imágenes** de un registro (`ImagenesDialogComponent`), con su
+     * imagen principal.
+     */
+    imagenes: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      principal: string;
+      marcarPrincipal: string;
+      delete: string;
+      uploading: string;
+      dropzone: {
+        primary: string;
+        /** Soporta el placeholder `{max}` (tamaño máximo en MB). */
+        hint: string;
+        invalidType: string;
+        tooLarge: string;
+      };
+      confirmDelete: {
+        header: string;
+        message: string;
+        /** Variante para la principal: avisa que el registro se queda sin ella. */
+        messagePrincipal: string;
+      };
+      toasts: {
+        loadError: { title: string; desc: string };
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        principalSuccess: { title: string; desc: string };
+        principalError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+      };
+    };
     import: {
       dropzone: {
         primary: string;

@@ -176,6 +176,38 @@ export const en: AppDict = {
         },
       },
     },
+    imagenes: {
+      title: 'Images',
+      subtitle: 'Photos of this record',
+      empty: 'There are no images yet.',
+      principal: 'Main',
+      marcarPrincipal: 'Set as main',
+      delete: 'Delete',
+      uploading: 'Uploading image…',
+      dropzone: {
+        primary: 'Drag an image or click to choose one',
+        hint: 'PNG, JPG or WEBP, up to {max} MB',
+        invalidType: 'The image format is not valid.',
+        tooLarge: 'The image exceeds the maximum allowed size.',
+      },
+      confirmDelete: {
+        header: 'Confirm deletion',
+        message: 'Delete this image? This action cannot be undone.',
+        messagePrincipal: 'This is the main image. Delete it? This action cannot be undone.',
+      },
+      toasts: {
+        loadError: { title: 'Load failed', desc: 'Could not fetch the images. Try again.' },
+        uploadSuccess: { title: 'Image uploaded', desc: 'The image was added successfully.' },
+        uploadError: { title: 'Upload failed', desc: 'Check the image and try again.' },
+        principalSuccess: {
+          title: 'Main image updated',
+          desc: 'This image now represents the record.',
+        },
+        principalError: { title: 'Update failed', desc: 'Try again in a few seconds.' },
+        deleteSuccess: { title: 'Image deleted', desc: 'The image was deleted successfully.' },
+        deleteError: { title: 'Delete failed', desc: 'Try again in a few seconds.' },
+      },
+    },
     import: {
       dropzone: {
         primary: 'Drag your Excel file here',
@@ -1246,7 +1278,7 @@ export const en: AppDict = {
         },
         groups: { identificacion: 'Identification', clasificacion: 'Classification' },
         opciones: { imagenes: 'Images' },
-        opcionesHint: { imagenes: 'Item photos, beyond the main one' },
+        opcionesHint: { imagenes: 'Item photos; the main one is shown on the record' },
         labels: {
           impuestosVenta: 'Sales taxes',
           impuestosCompra: 'Purchase taxes',
