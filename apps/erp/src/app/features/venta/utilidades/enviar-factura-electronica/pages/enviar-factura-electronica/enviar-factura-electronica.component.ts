@@ -180,8 +180,9 @@ function toViewRow(row: DocumentoElectronicoRow): DocumentoElectronicoViewRow {
  *    Acción batch *Notificar*.
  *
  * Cada tab es un `TabController` (lista + filtros + selección); el componente
- * solo orquesta las acciones batch, que disparan un request por documento
- * seleccionado (`forkJoin`) y recargan al terminar.
+ * solo orquesta las acciones batch y recarga al terminar. *Emitir* manda la
+ * selección en un solo request (`{ ids }`); *Notificar* y *Descartar* disparan
+ * uno por documento (`forkJoin`).
  */
 @Component({
   selector: 'app-enviar-factura-electronica',
@@ -286,7 +287,7 @@ export class EnviarFacturaElectronicaComponent {
     const ids = this.emitibles().map((row) => row.id);
     if (ids.length === 0) return;
     this.runBatch(
-      ids.map((id) => this.service.emitir(id)),
+      [this.service.emitir(ids)],
       this.emitir,
       this.t().entities.enviarFacturaElectronica.toasts.emitir,
     );

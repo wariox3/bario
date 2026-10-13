@@ -21,15 +21,15 @@ const DOCUMENTO_ENDPOINT = '/general/documento/';
  *    filtros permanentes del tab) + los filtros del usuario. Reusa la
  *    convención estándar de listados (`POST …/lista/` con `{ filtros,
  *    ordenamientos }` y paginación en query params).
- *  - `emitir` / `notificar`: envían **un** documento a la DIAN / al cliente.
- *  - `descartar`: marca un documento como no-emitible.
+ *  - `emitir`: envía la selección a la DIAN en **un** request (`{ ids }`).
+ *  - `notificar` / `descartar`: notifican al cliente / marcan como no-emitible
+ *    **un** documento; el componente los orquesta con `forkJoin` sobre la
+ *    selección.
  *
- * Las acciones son **por documento** (un request por id): el componente las
- * orquesta con `forkJoin` sobre la selección, replicando el comportamiento del
- * legacy. Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
+ * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  *
- * **Supuesto pendiente de confirmar con backend**: los paths `emitir/`,
- * `notificar/` y `electronico_descartar/` siguen vigentes en reddocapi.uk.
+ * **Supuesto pendiente de confirmar con backend**: los paths `notificar/` y
+ * `electronico_descartar/` siguen vigentes en reddocapi.uk.
  */
 @Injectable({ providedIn: 'root' })
 export class EnviarFacturaElectronicaService extends BaseHttpService {
@@ -48,9 +48,13 @@ export class EnviarFacturaElectronicaService extends BaseHttpService {
     );
   }
 
-  /** Emite un documento a la DIAN. */
-  emitir(documentoId: number): Observable<unknown> {
-    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { documento_id: documentoId });
+  /**
+   * Emite un lote de documentos a la DIAN en un solo request (`{ ids }`). El
+   * backend valida el lote completo antes de enviar el primero: si uno no
+   * cumple, no se envía ninguno.
+   */
+  emitir(documentoIds: readonly number[]): Observable<unknown> {
+    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { ids: documentoIds });
   }
 
   /** Notifica al cliente un documento ya emitido. */

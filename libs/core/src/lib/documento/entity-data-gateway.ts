@@ -67,9 +67,9 @@ export interface EntityDataGateway {
   /**
    * Emite un documento electrónico a la DIAN vía `POST <endpoint>/emitir/`.
    *
-   * Ojo: el body va con **`documento_id`**, no `id` como el resto de las
-   * acciones. La asimetría es del backend, no un desliz de acá — las tres
-   * utilidades electrónicas del ERP (venta, compra, humano) la replican igual.
+   * Ojo: el body va como lote, **`{ ids: [id] }`**, no `{ id }` como el resto
+   * de las acciones. Las tres utilidades electrónicas del ERP (venta, compra,
+   * humano) mandan la selección entera en ese mismo `ids`.
    */
   emitir(entity: EntityConfig, id: string | number): Observable<unknown>;
 

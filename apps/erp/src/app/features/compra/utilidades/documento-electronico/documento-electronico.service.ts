@@ -21,14 +21,9 @@ const DOCUMENTO_ENDPOINT = '/general/documento/';
  *    filtros permanentes) + los filtros del usuario. Convención estándar de
  *    listados (`POST …/lista/` con `{ filtros, ordenamientos }` y paginación en
  *    query params).
- *  - `emitir`: envía **un** documento a la DIAN.
+ *  - `emitir`: envía la selección a la DIAN en **un** request (`{ ids }`).
  *
- * La emisión es **por documento** (un request por id): el componente la orquesta
- * con `forkJoin` sobre la selección, replicando el legacy. Tenant-scoped por
- * defecto (lo hereda de `BaseHttpService`).
- *
- * **Supuesto pendiente de confirmar con backend**: el path `emitir/` sigue
- * vigente en reddocapi.uk.
+ * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
 @Injectable({ providedIn: 'root' })
 export class DocumentoElectronicoService extends BaseHttpService {
@@ -47,8 +42,12 @@ export class DocumentoElectronicoService extends BaseHttpService {
     );
   }
 
-  /** Emite un documento a la DIAN. */
-  emitir(documentoId: number): Observable<unknown> {
-    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { documento_id: documentoId });
+  /**
+   * Emite un lote de documentos a la DIAN en un solo request (`{ ids }`). El
+   * backend valida el lote completo antes de enviar el primero: si uno no
+   * cumple, no se envía ninguno.
+   */
+  emitir(documentoIds: readonly number[]): Observable<unknown> {
+    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { ids: documentoIds });
   }
 }

@@ -21,17 +21,14 @@ const DOCUMENTO_ENDPOINT = '/general/documento/';
  *    permanentes) + los filtros del usuario. Convención estándar de listados
  *    (`POST …/lista/` con `{ filtros, ordenamientos }` y paginación en query
  *    params).
- *  - `emitir`: envía **una** nómina a la DIAN.
- *  - `descartar`: la marca como no-emitible (irreversible).
+ *  - `emitir`: envía la selección a la DIAN en **un** request (`{ ids }`).
+ *  - `descartar`: marca **una** nómina como no-emitible (irreversible); el
+ *    componente lo orquesta con `forkJoin` sobre la selección.
  *
- * Las acciones son **por documento** (un request por id): el componente las
- * orquesta con `forkJoin` sobre la selección, replicando el legacy.
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  *
- * **Supuestos pendientes de confirmar con backend**: los paths `emitir/` y
- * `electronico_descartar/` siguen vigentes en reddocapi.uk, y cada uno espera
- * su propio nombre de parámetro (`documento_id` vs `id`) — una asimetría del
- * backend que las tres utilidades electrónicas replican igual.
+ * **Supuesto pendiente de confirmar con backend**: el path
+ * `electronico_descartar/` sigue vigente en reddocapi.uk.
  */
 @Injectable({ providedIn: 'root' })
 export class EnviarNominaElectronicaService extends BaseHttpService {
@@ -50,9 +47,13 @@ export class EnviarNominaElectronicaService extends BaseHttpService {
     );
   }
 
-  /** Emite una nómina a la DIAN. */
-  emitir(documentoId: number): Observable<unknown> {
-    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { documento_id: documentoId });
+  /**
+   * Emite un lote de nóminas a la DIAN en un solo request (`{ ids }`). El
+   * backend valida el lote completo antes de enviar el primero: si uno no
+   * cumple, no se envía ninguno.
+   */
+  emitir(documentoIds: readonly number[]): Observable<unknown> {
+    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { ids: documentoIds });
   }
 
   /** Descarta una nómina del envío electrónico (irreversible). */
