@@ -74,9 +74,9 @@ describe('buildFiltros', () => {
     ]);
   });
 
-  it('serializa listas (operador in) a CSV', () => {
+  it('manda las listas (operador in) como array', () => {
     const filters: FilterCondition[] = [{ field: 'id', operator: 'in', value: [1, 2, 3] }];
-    expect(buildFiltros(filters)).toEqual([{ propiedad: 'id', operador: 'in', valor: '1,2,3' }]);
+    expect(buildFiltros(filters)).toEqual([{ propiedad: 'id', operador: 'in', valor: [1, 2, 3] }]);
   });
 });
 
