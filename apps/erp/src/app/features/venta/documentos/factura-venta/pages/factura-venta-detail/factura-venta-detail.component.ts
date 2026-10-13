@@ -10,12 +10,13 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import type { MenuItem } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
 import { TabsModule } from 'primeng/tabs';
 import {
+  extractErrorMessage,
   formatFechaLarga,
   I18nService,
   TenantService,
@@ -57,6 +58,7 @@ import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/come
 import { facturaVentaToFormValue } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
 import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
+import { EnviarFacturaElectronicaService } from '@erp/features/venta/utilidades/enviar-factura-electronica/enviar-factura-electronica.service';
 
 /** Cabecera legible de la factura para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -100,6 +102,9 @@ interface CabeceraView {
  * que la ficha del asiento. Vive acá y no en el formulario porque la
  * importación necesita un documento ya creado —el backend recibe el id del
  * padre— y la ficha es el único lugar donde siempre lo hay.
+ *
+ * Y un dropdown **Electrónico** con *Emitir*: envía la factura a la DIAN
+ * cuando está aprobada y aún no se notificó.
  */
 @Component({
   selector: 'app-factura-venta-detail',
@@ -124,6 +129,7 @@ export class FacturaVentaDetailComponent implements OnInit {
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
   private readonly pagoService = inject(DocumentoPagoService);
+  private readonly electronicoService = inject(EnviarFacturaElectronicaService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
@@ -213,6 +219,30 @@ export class FacturaVentaDetailComponent implements OnInit {
     },
   ]);
 
+  private readonly electronicoMenu = viewChild<Menu>('electronicoMenu');
+
+  /** `true` mientras viaja el `emitir/`: evita un doble envío a la DIAN. */
+  protected readonly isEmitiendo = signal(false);
+
+  /**
+   * Se emite una factura aprobada que todavía no se notificó. Antes de aprobar
+   * el backend la rechaza, y una ya notificada no tiene nada más que enviar.
+   */
+  protected readonly puedeEmitir = computed(() => {
+    const estados = this.cabecera()?.estados;
+    return !!estados?.estado_aprobado && !estados.estado_electronico_notificado;
+  });
+
+  /** Entradas del dropdown "Electrónico"; `computed` por la misma razón que Utilidades. */
+  protected readonly electronicoItems = computed<MenuItem[]>(() => [
+    {
+      label: this.t().entities.facturaVenta.electronico.emitir,
+      icon: 'pi pi-send',
+      disabled: !this.puedeEmitir() || this.isEmitiendo(),
+      command: () => this.onEmitir(),
+    },
+  ]);
+
   /**
    * Plantilla de importación de líneas. El endpoint es el genérico de
    * `documento-detalle`, pero el `documento` no es decorativo: el backend arma
@@ -280,6 +310,38 @@ export class FacturaVentaDetailComponent implements OnInit {
 
   protected toggleUtilidades(event: Event): void {
     this.utilidadesMenu()?.toggle(event);
+  }
+
+  protected toggleElectronico(event: Event): void {
+    this.electronicoMenu()?.toggle(event);
+  }
+
+  /**
+   * Envía esta factura a la DIAN por el mismo `emitir/` de la utilidad de envío
+   * (lote de un solo id) y recarga la ficha: el estado electrónico y el CUE
+   * cambian en el backend, no aquí.
+   */
+  private onEmitir(): void {
+    const id = Number(this.id());
+    if (!Number.isFinite(id) || this.isEmitiendo()) return;
+    this.isEmitiendo.set(true);
+    this.electronicoService
+      .emitir([id])
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isEmitiendo.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          const ts = this.t().entities.facturaVenta.electronico.toasts.emitirSuccess;
+          this.toast.success(ts.title, ts.desc);
+          this.loadDocumento(id);
+        },
+        error: (err: unknown) => {
+          const ts = this.t().entities.facturaVenta.electronico.toasts.emitirError;
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
+        },
+      });
   }
 
   /**

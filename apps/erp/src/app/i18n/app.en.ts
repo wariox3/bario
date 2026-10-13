@@ -2458,6 +2458,20 @@ export const en: AppDict = {
         action: 'Tools',
         importarDetalle: 'Import lines',
       },
+      electronico: {
+        action: 'Electronic',
+        emitir: 'Issue',
+        toasts: {
+          emitirSuccess: {
+            title: 'Invoice issued',
+            desc: 'The invoice was sent to the DIAN.',
+          },
+          emitirError: {
+            title: 'Could not issue',
+            desc: 'The invoice could not be sent to the DIAN.',
+          },
+        },
+      },
       import: {
         title: 'Import lines',
         subtitle: 'Upload an Excel file with the lines to add to this invoice',

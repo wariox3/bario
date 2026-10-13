@@ -1847,6 +1847,14 @@ export interface AppDict
         action: string;
         importarDetalle: string;
       };
+      electronico: {
+        action: string;
+        emitir: string;
+        toasts: {
+          emitirSuccess: { title: string; desc: string };
+          emitirError: { title: string; desc: string };
+        };
+      };
       import: {
         title: string;
         subtitle: string;

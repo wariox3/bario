@@ -2509,6 +2509,20 @@ export const es: AppDict = {
         action: 'Utilidades',
         importarDetalle: 'Importar detalle',
       },
+      electronico: {
+        action: 'Electrónico',
+        emitir: 'Emitir',
+        toasts: {
+          emitirSuccess: {
+            title: 'Factura emitida',
+            desc: 'La factura se envió a la DIAN.',
+          },
+          emitirError: {
+            title: 'No se pudo emitir',
+            desc: 'La factura no se pudo enviar a la DIAN.',
+          },
+        },
+      },
       import: {
         title: 'Importar detalle',
         subtitle: 'Sube un Excel con las líneas a cargar en esta factura',
