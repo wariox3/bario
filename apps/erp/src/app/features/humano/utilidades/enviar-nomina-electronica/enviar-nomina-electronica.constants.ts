@@ -1,14 +1,10 @@
 import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
 import { DOCUMENT_TYPE_ID } from '@reddoc/core';
-import type { EnviarNominaElectronicaViewRow } from './enviar-nomina-electronica.model';
-
-/** Clic en el estado "Error" de una fila: abre el modal con sus motivos. */
-export const VER_ERROR_ACTION_ID = 'ver-error';
 
 /**
  * Constantes de la utilidad **Enviar nómina electrónica** (Humano).
  *
- * Declara los filtros permanentes, las columnas, los campos filtrables por el
+ * Alimentan `ENVIAR_NOMINA_ELECTRONICA_CONFIG`. Declara los filtros permanentes, las columnas, los campos filtrables por el
  * usuario y la storage key de los filtros.
  */
 
@@ -33,7 +29,7 @@ export const BASE_FILTERS: readonly FilterCondition[] = [
   { field: 'documento_tipo_id', operator: 'eq', value: DOCUMENT_TYPE_ID.NOMINA_ELECTRONICA },
 ];
 
-/** Columnas del listado: identificación de la nómina + empleado + estado electrónico. */
+/** Columnas propias del listado. La de Estado la agrega `EmitirDocumentoElectronicoComponent`. */
 export const COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.columns.id`, type: 'number', width: '70px', align: 'right' },
   { field: 'numero', headerKey: `${I18N}.columns.numero`, type: 'text', width: '110px' },
@@ -45,23 +41,6 @@ export const COLUMNS: readonly ColumnDef[] = [
     type: 'currency',
     width: '140px',
     align: 'right',
-  },
-  {
-    field: 'estado_electronico_estado',
-    headerKey: `${I18N}.columns.estado`,
-    type: 'enum',
-    width: '160px',
-    align: 'center',
-    enumKeyPrefix: `${I18N}.estado`,
-    // Solo "Error" es un enlace: abre el detalle de por qué falló la emisión.
-    cellAction: VER_ERROR_ACTION_ID,
-    cellActionFor: (row) =>
-      (row as EnviarNominaElectronicaViewRow).estado_electronico_estado === 'error',
-    cellActionLabelKey: 'documentActions.errorElectronico.ver',
-    toneFor: (row) =>
-      (row as EnviarNominaElectronicaViewRow).estado_electronico_estado === 'error'
-        ? 'critical'
-        : null,
   },
 ];
 

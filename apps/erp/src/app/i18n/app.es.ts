@@ -6131,22 +6131,12 @@ export const es: AppDict = {
     },
     enviarNominaElectronica: {
       name: 'Enviar nómina electrónica',
-      actions: {
-        emitir: 'Emitir',
-        descartar: 'Descartar',
-      },
       columns: {
         id: 'ID',
         numero: 'Número',
         fecha: 'Fecha',
         empleado: 'Empleado',
         total: 'Total',
-        estado: 'Estado',
-      },
-      estado: {
-        error: 'Error',
-        enviado: 'Esperando respuesta',
-        pendiente: 'Pendiente',
       },
       filters: {
         notificado: 'Notificado',

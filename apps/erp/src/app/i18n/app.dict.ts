@@ -4702,22 +4702,12 @@ export interface AppDict
     };
     enviarNominaElectronica: {
       name: string;
-      actions: {
-        emitir: string;
-        descartar: string;
-      };
       columns: {
         id: string;
         numero: string;
         fecha: string;
         empleado: string;
         total: string;
-        estado: string;
-      };
-      estado: {
-        error: string;
-        enviado: string;
-        pendiente: string;
       };
       filters: {
         notificado: string;

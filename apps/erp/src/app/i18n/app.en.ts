@@ -6057,22 +6057,12 @@ export const en: AppDict = {
     },
     enviarNominaElectronica: {
       name: 'Send electronic payroll',
-      actions: {
-        emitir: 'Issue',
-        descartar: 'Discard',
-      },
       columns: {
         id: 'ID',
         numero: 'Number',
         fecha: 'Date',
         empleado: 'Employee',
         total: 'Total',
-        estado: 'Status',
-      },
-      estado: {
-        error: 'Error',
-        enviado: 'Awaiting response',
-        pendiente: 'Pending',
       },
       filters: {
         notificado: 'Notified',
