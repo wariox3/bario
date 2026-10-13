@@ -70,6 +70,20 @@ export const RESOLUCIONES_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.resolucion.columns.fechaHasta',
     type: 'date',
   },
+  {
+    field: 'estado_validado',
+    headerKey: 'entities.resolucion.columns.estadoValidado',
+    type: 'boolean',
+    align: 'center',
+  },
+  {
+    field: 'estado_inactivo',
+    headerKey: 'entities.resolucion.columns.estadoInactivo',
+    type: 'boolean',
+    align: 'center',
+    // Una resolución inactiva ya venció: el «sí» es una condición adversa.
+    booleanTone: 'negative',
+  },
 ];
 
 export const RESOLUCIONES_FILTER_FIELDS: readonly FilterField[] = [
@@ -102,7 +116,15 @@ export const RESOLUCIONES_PRIMARY_ACTION: ToolbarAction = {
   iconClass: 'pi pi-plus',
 };
 
+/** Id del botón que valida las resoluciones del módulo contra la DIAN. */
+export const RESOLUCIONES_VALIDAR_DIAN_ACTION_ID = 'validar-dian';
+
 export const RESOLUCIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: RESOLUCIONES_VALIDAR_DIAN_ACTION_ID,
+    labelKey: 'entities.resolucion.actions.validarDian',
+    iconClass: '',
+  },
   {
     id: 'actions',
     labelKey: 'common.actions.actions',

@@ -633,6 +633,15 @@ export interface AppDict
         fechaHasta: string;
         venta: string;
         compra: string;
+        estadoValidado: string;
+        estadoInactivo: string;
+      };
+      actions: {
+        validarDian: string;
+      };
+      toasts: {
+        validarSuccess: { title: string; desc: string };
+        validarError: { title: string; desc: string };
       };
       form: {
         createTitle: string;

@@ -10,6 +10,7 @@ import {
   ToastService,
   buildFiltros,
   buildOrdenamientos,
+  extractErrorMessage,
   quickSearchCondition,
   type FilterCondition,
   type ListQuery,
@@ -37,6 +38,7 @@ import {
   RESOLUCIONES_PRIMARY_ACTION,
   RESOLUCIONES_ROW_ACTIONS,
   RESOLUCIONES_TRAILING_ACTIONS,
+  RESOLUCIONES_VALIDAR_DIAN_ACTION_ID,
   resolucionTipoFilter,
   resolucionesFiltersStorageKey,
 } from '../../resolucion.constants';
@@ -90,6 +92,7 @@ export class ResolucionesListComponent {
   protected readonly filtersVisible = signal(false);
 
   protected readonly isExportingExcel = signal(false);
+  protected readonly isValidating = signal(false);
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
@@ -104,6 +107,18 @@ export class ResolucionesListComponent {
     primary: RESOLUCIONES_PRIMARY_ACTION,
     trailing: RESOLUCIONES_TRAILING_ACTIONS,
   });
+
+  /**
+   * Validar con la DIAN reescribe `estado_validado` y `estado_inactivo`: es una
+   * edición, así que el botón solo lo ve quien puede editar resoluciones.
+   */
+  protected readonly trailingActions = computed(() =>
+    this.acciones.puedeEditar()
+      ? this.acciones.trailingActions()
+      : this.acciones
+          .trailingActions()
+          .filter((action) => action.id !== RESOLUCIONES_VALIDAR_DIAN_ACTION_ID),
+  );
 
   constructor() {
     this.loadList();
@@ -166,6 +181,9 @@ export class ResolucionesListComponent {
       case 'export-excel':
         this.exportExcel();
         break;
+      case RESOLUCIONES_VALIDAR_DIAN_ACTION_ID:
+        this.validarDian();
+        break;
     }
   }
 
@@ -177,6 +195,32 @@ export class ResolucionesListComponent {
     const ids = this.selectedRows().map((r) => r.id);
     if (ids.length === 0) return;
     this.confirmRemove(ids);
+  }
+
+  /** Valida contra la DIAN las resoluciones del módulo activo y recarga la tabla. */
+  private validarDian(): void {
+    if (this.isValidating()) return;
+    const toasts = this.t().entities.resolucion.toasts;
+    this.isValidating.set(true);
+    this.service
+      .validar(this.tipo())
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isValidating.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success(toasts.validarSuccess.title, toasts.validarSuccess.desc);
+          this.loadList();
+        },
+        // El 400 trae el motivo en `detail` (sin software aceptado, la DIAN no
+        // devolvió rangos); el 404, que la empresa no tiene emisor.
+        error: (err: unknown) =>
+          this.toast.error(
+            toasts.validarError.title,
+            extractErrorMessage(err, toasts.validarError.desc),
+          ),
+      });
   }
 
   private exportExcel(): void {

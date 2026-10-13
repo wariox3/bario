@@ -7,7 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { Resolucion, ResolucionPayload } from './resolucion.model';
+import type { Resolucion, ResolucionPayload, ResolucionTipo } from './resolucion.model';
 
 @Injectable({ providedIn: 'root' })
 export class ResolucionService extends BaseHttpService {
@@ -31,6 +31,18 @@ export class ResolucionService extends BaseHttpService {
 
   update(id: number, payload: ResolucionPayload): Observable<Resolucion> {
     return this.put<Resolucion>(`${this.resourcePath}${id}/`, payload);
+  }
+
+  /**
+   * Valida contra la DIAN las resoluciones vigentes del módulo (`{ venta: true }`
+   * o `{ compra: true }`) e inactiva las vencidas. Responde 404 sin emisor y 400
+   * con el motivo en `detail` si la DIAN no devuelve rangos. Sin el toast del
+   * interceptor: el aviso lo da la lista, con el motivo, para no duplicarlo.
+   */
+  validar(tipo: ResolucionTipo): Observable<unknown> {
+    return this.post<unknown>(this.resourcePath + 'validar/', { [tipo]: true }, undefined, {
+      errorToast: false,
+    });
   }
 
   remove(ids: readonly number[]): Observable<void> {

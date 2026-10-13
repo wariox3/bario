@@ -16,6 +16,10 @@ export interface Resolucion {
   readonly fecha_hasta: string | null;
   readonly venta: boolean;
   readonly compra: boolean;
+  /** Lo marca `validar/` según lo que responda la DIAN. Solo lectura. */
+  readonly estado_validado: boolean;
+  /** Vencida: `validar/` la inactiva al pasar su `fecha_hasta`. */
+  readonly estado_inactivo: boolean;
 }
 
 /** Payload para crear o actualizar una resolución. */

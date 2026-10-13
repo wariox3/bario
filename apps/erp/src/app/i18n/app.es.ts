@@ -799,6 +799,21 @@ export const es: AppDict = {
         fechaHasta: 'Fecha hasta',
         venta: 'Venta',
         compra: 'Compra',
+        estadoValidado: 'Validado',
+        estadoInactivo: 'Inactivo',
+      },
+      actions: {
+        validarDian: 'Validar DIAN',
+      },
+      toasts: {
+        validarSuccess: {
+          title: 'Resoluciones validadas',
+          desc: 'Las resoluciones se validaron con la DIAN.',
+        },
+        validarError: {
+          title: 'Error al validar',
+          desc: 'No se pudieron validar las resoluciones con la DIAN.',
+        },
       },
       form: {
         createTitle: 'Nueva resolución',
