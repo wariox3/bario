@@ -4556,9 +4556,10 @@ export interface AppDict
       columns: {
         id: string;
         documentoTipo: string;
+        resolucion: string;
         numero: string;
         fecha: string;
-        cliente: string;
+        proveedor: string;
         total: string;
         estado: string;
       };
