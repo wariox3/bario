@@ -87,47 +87,47 @@
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.cliente }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.cliente || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.cliente }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.identificacion }}</dt>
         <dd class="factura-venta-recurrente-detail__value tabular-nums">
-          {{ c.identificacion || '—' }}
+          {{ c.identificacion }}
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.plazoPago }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.plazoPago || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.plazoPago }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.metodoPago }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.metodoPago || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.metodoPago }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.sede }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.sede || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.sede }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.almacen }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.almacen || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.almacen }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.asesor }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.asesor || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.asesor }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.ordenCompra }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.ordenCompra || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.ordenCompra }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.remision }}</dt>
-        <dd class="factura-venta-recurrente-detail__value">{{ c.remision || '—' }}</dd>
+        <dd class="factura-venta-recurrente-detail__value">{{ c.remision }}</dd>
       </div>
       <!-- El comentario ocupa el ancho: es prosa, no un dato de una línea. -->
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="factura-venta-recurrente-detail__label">{{ det.labels.comentario }}</dt>
         <dd class="factura-venta-recurrente-detail__value whitespace-pre-line">
-          {{ c.comentario || '—' }}
+          {{ c.comentario }}
         </dd>
       </div>
     </dl>
@@ -148,6 +148,7 @@
           <app-comercial-documento-lineas-table
             [lines]="lines()"
             [linkable]="true"
+            [almacenEnabled]="true"
             (verAfectacion)="onVerAfectacion($event)"
           />
         </p-tabpanel>

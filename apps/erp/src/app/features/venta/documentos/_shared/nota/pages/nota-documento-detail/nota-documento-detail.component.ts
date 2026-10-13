@@ -52,6 +52,7 @@ interface CabeceraView {
   readonly fecha: Date | null;
   readonly documentoReferencia: string | null;
   readonly sede: string | null;
+  readonly almacen: string | null;
   readonly metodoPago: string | null;
   readonly comentario: string | null;
   /**
@@ -120,6 +121,9 @@ export class NotaDocumentoDetailComponent implements OnInit {
   protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   /** ¿Se cobra en el acto? Lo declara la config (`hasPagos`); sin él no hay pestaña de pagos. */
   protected readonly conPagos = computed(() => this.document().hasPagos === true);
+
+  /** La cabecera lleva almacén general (la nota crédito); lo declara la config. */
+  protected readonly conAlmacenGeneral = computed(() => this.document().almacenGeneral === true);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -236,6 +240,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
             fecha: fv.fecha ?? null,
             documentoReferencia: read.documento_referencia_numero ?? null,
             sede: read.sede_nombre ?? null,
+            almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             comentario: read.comentario ?? null,
             estados: {
@@ -263,7 +268,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
 
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
+    return formatFechaLarga(date, '');
   }
 
   /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */

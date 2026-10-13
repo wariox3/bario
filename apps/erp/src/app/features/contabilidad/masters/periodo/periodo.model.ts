@@ -30,9 +30,11 @@ export interface Periodo {
  */
 export interface PeriodoInconsistencia {
   readonly comprobante_id: number | null;
+  readonly comprobante_nombre: string | null;
   readonly numero: number | null;
   readonly cuenta_id: number | null;
   readonly documento_id: number | null;
+  readonly documento_tipo_id: number | null;
   readonly documento_tipo_nombre: string | null;
   readonly inconsistencia: string;
 }

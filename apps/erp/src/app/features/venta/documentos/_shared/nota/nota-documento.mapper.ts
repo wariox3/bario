@@ -19,6 +19,7 @@ export function notaVentaToFormValue(
         ? { id: read.documento_referencia, nombre: read.documento_referencia_numero ?? '' }
         : null,
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
+    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     metodo_pago:
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
@@ -48,6 +49,7 @@ export function formValueToPayload(
     fecha: toIsoDate(raw.fecha),
     documento_referencia: raw.documento_referencia?.id ?? null,
     sede: raw.sede?.id ?? null,
+    almacen: raw.almacen?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
     comentario: comentario ? comentario : null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),

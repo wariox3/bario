@@ -100,6 +100,20 @@ export interface DocumentEntityConfig {
    */
   readonly hasPagos?: boolean;
   /**
+   * El form ofrece **cargar las líneas del documento referencia** (botón junto al
+   * select de referencia): reemplaza las líneas por las de la factura. Lo lee la
+   * familia de notas de venta: la nota crédito arranca igual a la factura que
+   * devuelve; la débito agrega cobros nuevos y no lo necesita. Se omite ⇒ sin botón.
+   */
+  readonly cargaLineasReferencia?: boolean;
+  /**
+   * La cabecera lleva **almacén general**, el que heredan las líneas nuevas. Lo
+   * leen las páginas que comparten documentos con y sin él (la familia de notas
+   * de venta: la nota crédito lo tiene, la débito no, como en el ERP anterior).
+   * La columna de almacén por línea no depende de esto. Se omite ⇒ sin campo.
+   */
+  readonly almacenGeneral?: boolean;
+  /**
    * Versión del schema. Se usa como sufijo en la clave de localStorage
    * para invalidar filtros guardados cuando el shape cambia.
    */

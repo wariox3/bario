@@ -89,39 +89,43 @@
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-1">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.proveedor }}</dt>
-        <dd class="factura-compra-recurrente-detail__value">{{ c.proveedor || '—' }}</dd>
+        <dd class="factura-compra-recurrente-detail__value">{{ c.proveedor }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.identificacion }}</dt>
         <dd class="factura-compra-recurrente-detail__value tabular-nums">
-          {{ c.identificacion || '—' }}
+          {{ c.identificacion }}
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.plazoPago }}</dt>
-        <dd class="factura-compra-recurrente-detail__value">{{ c.plazoPago || '—' }}</dd>
+        <dd class="factura-compra-recurrente-detail__value">{{ c.plazoPago }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.formaPago }}</dt>
-        <dd class="factura-compra-recurrente-detail__value">{{ c.formaPago || '—' }}</dd>
+        <dd class="factura-compra-recurrente-detail__value">{{ c.formaPago }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.centroCosto }}</dt>
-        <dd class="factura-compra-recurrente-detail__value">{{ c.centroCosto || '—' }}</dd>
+        <dd class="factura-compra-recurrente-detail__value">{{ c.centroCosto }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.sede }}</dt>
-        <dd class="factura-compra-recurrente-detail__value">{{ c.sede || '—' }}</dd>
+        <dd class="factura-compra-recurrente-detail__value">{{ c.sede }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="factura-compra-recurrente-detail__label">{{ det.labels.almacen }}</dt>
+        <dd class="factura-compra-recurrente-detail__value">{{ c.almacen }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.ordenCompra }}</dt>
-        <dd class="factura-compra-recurrente-detail__value">{{ c.ordenCompra || '—' }}</dd>
+        <dd class="factura-compra-recurrente-detail__value">{{ c.ordenCompra }}</dd>
       </div>
       <!-- El comentario ocupa el ancho: es prosa, no un dato de una línea. -->
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="factura-compra-recurrente-detail__label">{{ det.labels.comentario }}</dt>
         <dd class="factura-compra-recurrente-detail__value whitespace-pre-line">
-          {{ c.comentario || '—' }}
+          {{ c.comentario }}
         </dd>
       </div>
     </dl>
@@ -142,6 +146,7 @@
           <app-comercial-documento-lineas-table
             [lines]="lines()"
             [linkable]="true"
+            [almacenEnabled]="true"
             (verAfectacion)="onVerAfectacion($event)"
           />
         </p-tabpanel>

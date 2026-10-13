@@ -45,6 +45,7 @@ interface CabeceraView {
   readonly identificacion: string | null;
   readonly fecha: Date | null;
   readonly fechaVence: Date | null;
+  readonly documentoReferencia: string | null;
   readonly plazoPago: string | null;
   readonly metodoPago: string | null;
   readonly centroCosto: string | null;
@@ -204,6 +205,7 @@ export class NotaAjusteDetailComponent implements OnInit {
             identificacion: read.contacto_numero_identificacion ?? null,
             fecha: na.fecha ?? null,
             fechaVence: na.fecha_vence ?? null,
+            documentoReferencia: read.documento_referencia_numero ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             centroCosto: read.centro_costo_nombre ?? null,
@@ -233,7 +235,7 @@ export class NotaAjusteDetailComponent implements OnInit {
 
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
-    return formatFechaLarga(date, '—');
+    return formatFechaLarga(date, '');
   }
 
   /** Navega dentro del tenant activo: `/t/<slug>/compra/<...routePath>[/extra]`. */

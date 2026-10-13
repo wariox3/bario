@@ -1204,6 +1204,7 @@ export interface AppDict
         columns: { comprobante: string; numero: string; documento: string; descripcion: string };
         empty: string;
         loadError: string;
+        abrirDocumento: string;
       };
       toasts: {
         bloquearSuccess: { title: string; desc: string };
@@ -1756,6 +1757,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
@@ -1793,6 +1796,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           ordenCompra: string;
           remision: string;
@@ -1951,6 +1955,8 @@ export interface AppDict
           documentoReferenciaEmpty: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           comentario: string;
@@ -1974,6 +1980,7 @@ export interface AppDict
           fecha: string;
           documentoReferencia: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           comentario: string;
         };
@@ -2032,6 +2039,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           asesor: string;
@@ -2060,6 +2069,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           asesor: string;
           ordenCompra: string;
@@ -2166,6 +2176,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
           ordenCompra: string;
@@ -2191,6 +2203,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           ordenCompra: string;
           comentario: string;
@@ -2246,6 +2259,8 @@ export interface AppDict
           resolucionPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2268,6 +2283,7 @@ export interface AppDict
           fechaVence: string;
           plazoPago: string;
           sede: string;
+          almacen: string;
           metodoPago: string;
           formaPago: string;
           resolucion: string;
@@ -2308,6 +2324,7 @@ export interface AppDict
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
           comentario: string;
@@ -2366,6 +2383,7 @@ export interface AppDict
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
           comentario: string;
@@ -2427,6 +2445,8 @@ export interface AppDict
           centroCostoPlaceholder: string;
           sede: string;
           sedePlaceholder: string;
+          almacen: string;
+          almacenPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2448,6 +2468,7 @@ export interface AppDict
           formaPago: string;
           centroCosto: string;
           sede: string;
+          almacen: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2483,6 +2504,10 @@ export interface AppDict
           proveedorPlaceholder: string;
           fecha: string;
           fechaVence: string;
+          documentoReferencia: string;
+          documentoReferenciaPlaceholder: string;
+          documentoReferenciaDisabled: string;
+          documentoReferenciaEmpty: string;
           plazoPago: string;
           plazoPagoPlaceholder: string;
           metodoPago: string;
@@ -2509,6 +2534,7 @@ export interface AppDict
           identificacion: string;
           fecha: string;
           fechaVence: string;
+          documentoReferencia: string;
           plazoPago: string;
           metodoPago: string;
           centroCosto: string;
@@ -2850,6 +2876,17 @@ export interface AppDict
       anteriorAFecha: string;
     };
     comercialDetalle: {
+      cargarReferencia: {
+        button: string;
+        confirmHeader: string;
+        confirmMessage: string;
+        confirmAccept: string;
+        toasts: {
+          success: { title: string; desc: string };
+          sinLineas: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
       title: string;
       hint: string;
       empty: string;
@@ -2871,6 +2908,27 @@ export interface AppDict
       confirmDeleteLine: string;
       createItem: string;
       extraerIva: { title: string; baseLabel: string; apply: string };
+      aiu: {
+        menuLabel: string;
+        title: string;
+        subtitle: string;
+        configIncompleta: string;
+        fields: {
+          itemBase: string;
+          valorBase: string;
+          item: string;
+          porcentaje: string;
+          valor: string;
+        };
+        conceptos: { administracion: string; imprevisto: string; utilidad: string };
+        total: string;
+        submit: string;
+        validation: { required: string; valorMin: string; porcentajeRango: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
       scanner: {
         placeholder: string;
         notFound: { title: string; desc: string };
@@ -4498,9 +4556,10 @@ export interface AppDict
       columns: {
         id: string;
         documentoTipo: string;
+        resolucion: string;
         numero: string;
         fecha: string;
-        cliente: string;
+        proveedor: string;
         total: string;
         estado: string;
       };

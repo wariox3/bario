@@ -186,6 +186,25 @@ export function comercialDetalleToFormValue(
 }
 
 /**
+ * Copia una línea del **documento referencia** (la factura de una nota) como línea
+ * **nueva** de la nota: `id = null` para que se cree (POST), y con el pool de
+ * tasas vacío para que la tabla lo siembre del catálogo y recalcule los montos.
+ *
+ * `documento_detalle_afectado` queda en `null`: el legacy tampoco enlazaba la
+ * línea origen y falta confirmar con el backend si en las notas ese vínculo
+ * descuenta lo pendiente de la factura.
+ */
+export function lineaReferenciaToFormValue(
+  read: ComercialDetalleRead,
+): ComercialDetalleFormRawValue {
+  return {
+    ...comercialDetalleToFormValue(read),
+    id: null,
+    documento_detalle_afectado: null,
+  };
+}
+
+/**
  * Adapta una **fila pendiente** (`POST documento-detalle/pendiente/`) a una línea
  * **nueva** del formulario para "importar desde documento". La fila ya trae todo
  * (item, precio, cantidad, impuestos), así que no se requiere lectura extra:

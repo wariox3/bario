@@ -25,7 +25,9 @@ import {
   MascaraFechaDirective,
 } from '@reddoc/ui';
 import {
+  DOCUMENTO_CLASE_ID,
   FormErrorService,
+  SELECT_ENDPOINTS,
   I18nService,
   calcularResumen,
   startOfToday,
@@ -78,6 +80,7 @@ import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.servic
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
 import type { NotaVentaRead } from '../../nota-documento.model';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../nota-documento.constants';
+import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comercial/components/cargar-lineas-referencia/cargar-lineas-referencia.component';
 import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
@@ -120,6 +123,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
     ErpDocumentoReferenciaSelectComponent,
+    CargarLineasReferenciaComponent,
     ComercialDocumentoDetallesComponent,
     DocumentoPagosComponent,
     ComercialDocumentoResumenComponent,
@@ -145,7 +149,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected readonly t = this.i18n.t;
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
-  private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
+  protected readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
   private readonly pagosTable = viewChild(DocumentoPagosComponent);
@@ -174,8 +178,20 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected readonly conPagos = computed(() => this.document().hasPagos === true);
 
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
-  protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
 
+  /**
+   * La cabecera lleva almacén general (la nota crédito, como el ERP anterior; la
+   * débito no). Las líneas muestran su almacén siempre.
+   */
+  protected readonly conAlmacenGeneral = computed(() => this.document().almacenGeneral === true);
+  protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly referenciaDocumentoClaseId = DOCUMENTO_CLASE_ID.FACTURA_VENTA;
+
+  /** El documento ofrece cargar las líneas de su factura referencia (la nota crédito). */
+  protected readonly cargaLineasReferencia = computed(
+    () => this.document().cargaLineasReferencia === true,
+  );
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;
 
@@ -196,6 +212,12 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   readonly documentoEdit = input<unknown>();
 
   protected readonly isEditMode = computed(() => !!this.id());
+
+  /**
+   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   */
+  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
@@ -254,6 +276,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     documento_referencia: this.fb.control<ErpSelectOption | null>({ value: null, disabled: true }),
     sede: this.fb.control<ErpSelectOption | null>(null),
+    almacen: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
@@ -519,6 +542,22 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
+  /**
+   * En edición trae las líneas persistidas (ids y montos del backend) sin tocar la
+   * cabecera, que puede tener cambios sin guardar —como la referencia recién elegida—.
+   */
+  protected recargarLineas(): void {
+    const id = this.documentId();
+    if (id == null) return;
+    this.detalleService
+      .listarPorDocumento<ComercialDetalleRead>(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lineas) => this.populateLineas(lineas),
+        error: () => this.notifyLoadError(),
+      });
+  }
+
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
     detalles.clear();

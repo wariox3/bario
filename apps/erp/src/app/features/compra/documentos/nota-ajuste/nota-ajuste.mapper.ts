@@ -14,6 +14,10 @@ export function notaAjusteToFormValue(
     contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
     fecha_vence: fromIsoDate(read.fecha_vence),
+    documento_referencia:
+      read.documento_referencia != null
+        ? { id: read.documento_referencia, nombre: read.documento_referencia_numero ?? '' }
+        : null,
     plazo_pago:
       read.plazo_pago != null
         ? { id: read.plazo_pago, nombre: read.plazo_pago_nombre ?? '' }
@@ -48,6 +52,7 @@ export function formValueToPayload(
     contacto: raw.contacto?.id ?? null,
     fecha: toIsoDate(raw.fecha),
     fecha_vence: toIsoDate(raw.fecha_vence),
+    documento_referencia: raw.documento_referencia?.id ?? null,
     plazo_pago: raw.plazo_pago?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
     centro_costo: raw.centro_costo?.id ?? null,

@@ -23,6 +23,10 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   inventoryEffect: 'inflow',
   // Se cobra en el acto: el form y la ficha compartidos muestran la pestaña de pagos.
   hasPagos: true,
+  // Arranca igual a la factura que devuelve: el form carga sus líneas con un botón.
+  cargaLineasReferencia: true,
+  // Lleva almacén general en la cabecera, como el ERP anterior (la débito no).
+  almacenGeneral: true,
   schemaVersion: 1,
   columns: NOTA_CREDITO_COLUMNS,
   filters: NOTA_CREDITO_FILTERS,

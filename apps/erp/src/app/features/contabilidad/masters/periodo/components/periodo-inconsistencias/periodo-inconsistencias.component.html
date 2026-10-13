@@ -16,9 +16,9 @@
     <p class="m-0 text-[0.85rem] text-brand-muted">{{ i.empty }}</p>
   </div>
 } @else {
-  <div class="overflow-x-auto rounded-lg border border-[rgba(20,48,73,0.1)]">
+  <div class="max-h-[60vh] overflow-auto rounded-lg border border-[rgba(20,48,73,0.1)]">
     <table class="w-full border-collapse text-[0.82rem]">
-      <thead>
+      <thead class="sticky top-0 z-10 bg-white">
         <tr
           class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-brand-muted"
         >
@@ -31,9 +31,24 @@
       <tbody>
         @for (row of inconsistencias(); track $index) {
           <tr class="border-b border-[rgba(20,48,73,0.06)] last:border-0">
-            <td class="px-3 py-2 text-brand-text">{{ row.comprobante_id ?? '—' }}</td>
-            <td class="px-3 py-2 text-brand-text">{{ row.numero ?? '—' }}</td>
-            <td class="px-3 py-2 text-brand-muted">{{ row.documento_tipo_nombre || '—' }}</td>
+            <td class="px-3 py-2 text-brand-text">{{ row.comprobante_nombre }}</td>
+            <td class="px-3 py-2 text-brand-text">{{ row.numero }}</td>
+            <td class="px-3 py-2 text-brand-muted">
+              @if (rutaDocumento(row); as ruta) {
+                <a
+                  [routerLink]="ruta"
+                  target="_blank"
+                  rel="noopener"
+                  [title]="i.abrirDocumento"
+                  class="inline-flex items-center gap-1.5 font-medium text-sky-700 underline-offset-2 transition-colors hover:text-brand-navy hover:underline"
+                >
+                  {{ row.documento_tipo_nombre }}
+                  <i class="pi pi-external-link text-[0.65rem]" aria-hidden="true"></i>
+                </a>
+              } @else {
+                {{ row.documento_tipo_nombre }}
+              }
+            </td>
             <td class="px-3 py-2 text-brand-text">{{ row.inconsistencia }}</td>
           </tr>
         }

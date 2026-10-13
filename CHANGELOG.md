@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.1](https://github.com/wariox3/bario/compare/v0.1.0...v0.1.1) (2026-10-13)
+
+### Features
+
+- **compra:** almacén general y por línea en los documentos de compra ([56ab835](https://github.com/wariox3/bario/commit/56ab835e66b3850b80fe7ae9a109967ceb441a8d))
+- **compra:** documento electrónico muestra proveedor y resolución ([776ac03](https://github.com/wariox3/bario/commit/776ac035ce7d87f624bb6d07a1b18f1050f737fa))
+- **compra:** las notas de compra eligen su referencia y cargan sus líneas ([838e349](https://github.com/wariox3/bario/commit/838e349bc0736b453310606cd09ad9d841f13fcd))
+- **configuracion:** el tipo de documento filtra sus resoluciones por módulo ([1ced244](https://github.com/wariox3/bario/commit/1ced244b33f7a4a0b44c7d110ea452f8a712e7cb))
+- **periodo:** enlazar cada inconsistencia a su documento ([167d030](https://github.com/wariox3/bario/commit/167d030573e6b8a341c4b15a3ca47f00480b3405))
+- **remision:** quitar la opción de contabilizar de la ficha ([ca8959c](https://github.com/wariox3/bario/commit/ca8959c7f165b04ba9f0c3bd5222af11a717f38b))
+- **venta:** almacén general y por línea en el resto de documentos ([011929a](https://github.com/wariox3/bario/commit/011929a6dbe0cc027817f8f24b7b6347fe486666))
+- **venta:** la factura de venta agrega líneas AIU desde un modal ([d3a46c7](https://github.com/wariox3/bario/commit/d3a46c7c992db29ac66b35bd09f792b225805106))
+- **venta:** la factura de venta maneja almacén general y por línea ([8608b8a](https://github.com/wariox3/bario/commit/8608b8a21c1b7c4889cfdb130a71bc38dccb5fe8))
+- **venta:** la nota crédito carga las líneas de su factura de referencia ([82b8c9d](https://github.com/wariox3/bario/commit/82b8c9d92f029652b0e61dea6a8e2ad7ea8487ae))
+- **venta:** las notas buscan su referencia en seleccionar-referencia ([876a131](https://github.com/wariox3/bario/commit/876a131d2ffef354db0f6c861a41c8dede7b2d91))
+
+### Bug Fixes
+
+- **compra:** documento electrónico lee el número de la resolución ([fa4ebe7](https://github.com/wariox3/bario/commit/fa4ebe7b4b9638c42ab8e9492b7cd14666f59542))
+- **documento:** emitir envía la selección como lote de ids ([07e1cef](https://github.com/wariox3/bario/commit/07e1cef5fac21eb67188f694747675fbcc96b549))
+
 ## [0.1.0](https://github.com/wariox3/bario/compare/v0.0.2...v0.1.0) (2026-10-08)
 
 ### Features

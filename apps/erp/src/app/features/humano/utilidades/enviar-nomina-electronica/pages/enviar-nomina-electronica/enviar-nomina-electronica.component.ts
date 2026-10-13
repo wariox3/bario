@@ -44,11 +44,11 @@ import {
  * (`<lib-list-shell>`): breadcrumb + card + toolbar (filtros + botones) + tabla
  * con selección múltiple.
  *
- * Dos acciones batch, cada una un request por documento seleccionado
- * (`forkJoin`), con recarga al terminar:
- *  - **Emitir**: solo las filas aún no enviadas
+ * Dos acciones batch, con recarga al terminar:
+ *  - **Emitir**: un solo request con los ids de las filas aún no enviadas
  *    (`estado_electronico_enviado === false`), como en el legacy.
- *  - **Descartar**: irreversible, va con confirmación.
+ *  - **Descartar**: un request por documento (`forkJoin`); irreversible, va
+ *    con confirmación.
  *
  * A diferencia de la utilidad de venta no hay paso de *notificar*: la nómina se
  * emite y ahí termina el ciclo.
@@ -174,7 +174,7 @@ export class EnviarNominaElectronicaComponent {
     const ids = this.emitibles().map((row) => row.id);
     if (ids.length === 0) return;
     this.runBatch(
-      ids.map((id) => this.service.emitir(id)),
+      [this.service.emitir(ids)],
       this.t().entities.enviarNominaElectronica.toasts.emitir,
     );
   }

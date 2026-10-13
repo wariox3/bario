@@ -25,7 +25,7 @@ import {
   MascaraFechaDirective,
 } from '@reddoc/ui';
 import {
-  DOCUMENT_TYPE_ID,
+  DOCUMENTO_CLASE_ID,
   FormErrorService,
   I18nService,
   startOfToday,
@@ -56,7 +56,8 @@ import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import { notaCreditoCompraToFormValue, formValueToPayload } from '../../nota-credito-compra.mapper';
 import type { NotaCreditoCompraRead } from '../../nota-credito-compra.model';
-import { NOTA_CREDITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-credito-compra.constants';
+import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
+import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comercial/components/cargar-lineas-referencia/cargar-lineas-referencia.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
@@ -93,6 +94,8 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
+    ErpDocumentoReferenciaSelectComponent,
+    CargarLineasReferenciaComponent,
     ComercialDocumentoDetallesComponent,
     TabsModule,
   ],
@@ -115,42 +118,18 @@ export class NotaCreditoCompraFormComponent implements OnInit, CanComponentDeact
   protected readonly t = this.i18n.t;
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
-  private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
+  protected readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   // Endpoints de catálogos compartidos (fuente única en select-endpoints.ts).
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
-  protected readonly referenciaEndpoint = NOTA_CREDITO_COMPRA_REFERENCIA_ENDPOINT;
+  /** Clase de los documentos que la nota puede referenciar: la factura de compra. */
+  protected readonly referenciaDocumentoClaseId = DOCUMENTO_CLASE_ID.FACTURA_COMPRA;
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
 
   /** Proveedor seleccionado: acota (y habilita) el select de documento referencia. */
-  private readonly contactoId = signal<number | null>(null);
-
-  /**
-   * Parámetros del select de documento referencia. Se reevalúa al cambiar el
-   * proveedor: lista sus facturas de compra aprobadas (serializador `referencia`).
-   * Vacío mientras no haya proveedor (el control queda deshabilitado y no consulta).
-   *
-   * TODO(nota-credito-compra): pendiente confirmar con backend el contrato del
-   * endpoint de referencia antes de reactivar el select (está comentado en el
-   * template). Supuestos actuales (ver memoria project-nota-credito-compra.md):
-   *  - GET `/general/documento/` con `serializador=referencia`.
-   *  - Se filtra por `documento_tipo_id=5` (factura de compra). El legacy usaba
-   *    `documento_tipo__documento_clase_id=300` (clase, no tipo) → decidir cuál.
-   *  - El serializer devuelve `{ id, numero, fecha }` (se pinta `numero - fecha`).
-   */
-  protected readonly referenciaParams = computed<Record<string, string>>(() => {
-    const id = this.contactoId();
-    if (id == null) return {};
-    const params: Record<string, string> = {
-      contacto_id: String(id),
-      documento_tipo_id: String(DOCUMENT_TYPE_ID.COMPRA),
-      estado_aprobado: 'true',
-      serializador: 'referencia',
-    };
-    return params;
-  });
+  protected readonly contactoId = signal<number | null>(null);
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -379,6 +358,15 @@ export class NotaCreditoCompraFormComponent implements OnInit, CanComponentDeact
     else ref.enable({ emitEvent: false });
   }
 
+  /**
+   * Tras "Cargar líneas" en edición (ya persistidas), vuelve a leer solo las
+   * líneas: recargar la cabecera pisaría una referencia elegida sin guardar.
+   */
+  protected recargarLineas(): void {
+    const id = this.documentId();
+    if (id != null) this.loadLineas(id);
+  }
+
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
@@ -391,16 +379,6 @@ export class NotaCreditoCompraFormComponent implements OnInit, CanComponentDeact
     const toasts = this.t().entities.notaCreditoCompra.form.toasts;
     this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
-
-  /** Etiqueta de una opción del select de referencia: `número - fecha`. */
-  protected readonly referenciaLabel = (option: ErpSelectOption): string => {
-    const numero = option['numero'];
-    const fecha = option['fecha'];
-    if (numero != null && numero !== '') {
-      return fecha ? `${numero} - ${fecha}` : String(numero);
-    }
-    return option.nombre || '';
-  };
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {

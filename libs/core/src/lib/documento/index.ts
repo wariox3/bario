@@ -17,7 +17,7 @@ export type {
   EntityConfig,
 } from './entity-config.types';
 export type { ModuleConfig } from './module-config.types';
-export { DOCUMENT_TYPE_ID } from './document-types.constants';
+export { DOCUMENT_TYPE_ID, DOCUMENTO_CLASE_ID } from './document-types.constants';
 export type { DocumentTypeId, DocumentTypeKey } from './document-types.constants';
 export { ENTITY_DATA_GATEWAY } from './entity-data-gateway';
 export type { EntityDataGateway } from './entity-data-gateway';

@@ -26,6 +26,7 @@ import {
   MascaraFechaDirective,
 } from '@reddoc/ui';
 import {
+  DOCUMENTO_CLASE_ID,
   FormErrorService,
   I18nService,
   startOfToday,
@@ -64,6 +65,8 @@ import { notaAjusteToFormValue, formValueToPayload } from '../../nota-ajuste.map
 import type { NotaAjusteRead } from '../../nota-ajuste.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
+import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comercial/components/cargar-lineas-referencia/cargar-lineas-referencia.component';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Nota ajuste.
@@ -74,7 +77,8 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
  * él el `documentTypeId`, las claves i18n y la ruta de la lista.
  *
  * Es de la familia comercial (misma tabla de líneas que la factura de compra,
- * en `modo="compra"`), y suma a la cabecera el centro de costo, la orden de
+ * en `modo="compra"`), y suma a la cabecera el documento soporte que ajusta
+ * (con "Cargar líneas" para traer sus líneas), el centro de costo, la orden de
  * compra y el comentario.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
@@ -99,6 +103,8 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
+    ErpDocumentoReferenciaSelectComponent,
+    CargarLineasReferenciaComponent,
     ComercialDocumentoDetallesComponent,
     VencimientoHintComponent,
     TabsModule,
@@ -123,7 +129,7 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
   protected readonly t = this.i18n.t;
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
-  private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
+  protected readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   // Endpoints de catálogos compartidos (fuente única en select-endpoints.ts).
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
@@ -132,6 +138,12 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
+
+  /** Clase de los documentos que la nota puede referenciar: el documento soporte. */
+  protected readonly referenciaDocumentoClaseId = DOCUMENTO_CLASE_ID.DOCUMENTO_SOPORTE;
+
+  /** Proveedor seleccionado: acota (y habilita) el select de documento referencia. */
+  protected readonly contactoId = signal<number | null>(null);
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -169,6 +181,7 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
     contacto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
     fecha_vence: this.fb.control<Date | null>(null, Validators.required),
+    documento_referencia: this.fb.control<ErpSelectOption | null>({ value: null, disabled: true }),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     centro_costo: this.fb.control<ErpSelectOption | null>(null),
@@ -203,6 +216,12 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
       origen: 'proveedor',
       destroyRef: this.destroyRef,
     });
+
+    // El documento referencia depende del proveedor: al cambiarlo se acota su
+    // búsqueda, se habilita el control y se limpia la referencia previa.
+    this.form.controls.contacto.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((contacto) => this.onContactoChange(contacto?.id ?? null));
   }
 
   ngOnInit(): void {
@@ -355,6 +374,38 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
    */
   private applyCabecera(read: NotaAjusteRead): void {
     this.form.patchValue(notaAjusteToFormValue(read), { emitEvent: false });
+    this.syncReferenciaState();
+  }
+
+  /**
+   * Sincroniza el select de documento referencia con el proveedor cargado (sin
+   * limpiar la referencia). Se usa al poblar en edición, donde el patch no emitió.
+   */
+  private syncReferenciaState(): void {
+    const id = this.form.controls.contacto.value?.id ?? null;
+    this.contactoId.set(id);
+    const ref = this.form.controls.documento_referencia;
+    if (id == null) ref.disable({ emitEvent: false });
+    else ref.enable({ emitEvent: false });
+  }
+
+  /** Reacciona a un cambio de proveedor hecho por el usuario. */
+  private onContactoChange(id: number | null): void {
+    this.contactoId.set(id);
+    const ref = this.form.controls.documento_referencia;
+    // La referencia previa pertenecía a otro proveedor: se descarta.
+    ref.setValue(null, { emitEvent: false });
+    if (id == null) ref.disable({ emitEvent: false });
+    else ref.enable({ emitEvent: false });
+  }
+
+  /**
+   * Tras "Cargar líneas" en edición (ya persistidas), vuelve a leer solo las
+   * líneas: recargar la cabecera pisaría una referencia elegida sin guardar.
+   */
+  protected recargarLineas(): void {
+    const id = this.documentId();
+    if (id != null) this.loadLineas(id);
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */

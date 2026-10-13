@@ -25,7 +25,7 @@ import {
   MascaraFechaDirective,
 } from '@reddoc/ui';
 import {
-  DOCUMENT_TYPE_ID,
+  DOCUMENTO_CLASE_ID,
   FormErrorService,
   I18nService,
   startOfToday,
@@ -56,7 +56,7 @@ import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/
 import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import { notaDebitoCompraToFormValue, formValueToPayload } from '../../nota-debito-compra.mapper';
 import type { NotaDebitoCompraRead } from '../../nota-debito-compra.model';
-import { NOTA_DEBITO_COMPRA_REFERENCIA_ENDPOINT } from '../../nota-debito-compra.constants';
+import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
@@ -93,6 +93,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     PageActionsComponent,
     ErpContactoSelectComponent,
     ErpApiSelectComponent,
+    ErpDocumentoReferenciaSelectComponent,
     ComercialDocumentoDetallesComponent,
     TabsModule,
   ],
@@ -119,38 +120,14 @@ export class NotaDebitoCompraFormComponent implements OnInit, CanComponentDeacti
 
   // Endpoints de catálogos compartidos (fuente única en select-endpoints.ts).
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
-  protected readonly referenciaEndpoint = NOTA_DEBITO_COMPRA_REFERENCIA_ENDPOINT;
+  /** Clase de los documentos que la nota puede referenciar: la factura de compra. */
+  protected readonly referenciaDocumentoClaseId = DOCUMENTO_CLASE_ID.FACTURA_COMPRA;
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
 
   /** Proveedor seleccionado: acota (y habilita) el select de documento referencia. */
-  private readonly contactoId = signal<number | null>(null);
-
-  /**
-   * Parámetros del select de documento referencia. Se reevalúa al cambiar el
-   * proveedor: lista sus facturas de compra aprobadas (serializador `referencia`).
-   * Vacío mientras no haya proveedor (el control queda deshabilitado y no consulta).
-   *
-   * TODO(nota-debito-compra): pendiente confirmar con backend el contrato del
-   * endpoint de referencia antes de reactivar el select (está comentado en el
-   * template). Supuestos actuales (ver memoria project-nota-credito-compra.md):
-   *  - GET `/general/documento/` con `serializador=referencia`.
-   *  - Se filtra por `documento_tipo_id=5` (factura de compra). El legacy usaba
-   *    `documento_tipo__documento_clase_id=301` (clase, no tipo) → decidir cuál.
-   *  - El serializer devuelve `{ id, numero, fecha }` (se pinta `numero - fecha`).
-   */
-  protected readonly referenciaParams = computed<Record<string, string>>(() => {
-    const id = this.contactoId();
-    if (id == null) return {};
-    const params: Record<string, string> = {
-      contacto_id: String(id),
-      documento_tipo_id: String(DOCUMENT_TYPE_ID.COMPRA),
-      estado_aprobado: 'true',
-      serializador: 'referencia',
-    };
-    return params;
-  });
+  protected readonly contactoId = signal<number | null>(null);
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -391,16 +368,6 @@ export class NotaDebitoCompraFormComponent implements OnInit, CanComponentDeacti
     const toasts = this.t().entities.notaDebitoCompra.form.toasts;
     this.toast.error(toasts.loadError.title, toasts.loadError.desc);
   }
-
-  /** Etiqueta de una opción del select de referencia: `número - fecha`. */
-  protected readonly referenciaLabel = (option: ErpSelectOption): string => {
-    const numero = option['numero'];
-    const fecha = option['fecha'];
-    if (numero != null && numero !== '') {
-      return fecha ? `${numero} - ${fecha}` : String(numero);
-    }
-    return option.nombre || '';
-  };
 
   /** Vuelve a la lista del documento activo, derivando la ruta de `routes.list`. */
   private navigateToList(): void {
