@@ -270,6 +270,29 @@ export const en: AppDict = {
     },
   },
   documentActions: {
+    emisionElectronica: {
+      actions: { emitir: 'Emit', descartar: 'Discard' },
+      columns: { estado: 'Status' },
+      estado: { error: 'Error', enviado: 'Awaiting response', pendiente: 'Pending' },
+    },
+    errorElectronico: {
+      ver: 'See the error detail',
+      title: 'Emission error',
+      subtitle: 'Why the emission of document failed',
+      loading: 'Loading the error detail…',
+      empty: 'There are no errors recorded for this document.',
+      fase: { validacion: 'Validation', emision: 'Emission' },
+      toasts: {
+        parcial: {
+          title: 'Some documents were not emitted',
+          desc: 'The ones that failed are in Error status: click it to see why.',
+        },
+        fallo: {
+          title: 'No document was emitted',
+          desc: 'They are in Error status: click it to see why.',
+        },
+      },
+    },
     generar: {
       buttonLabel: 'Generate',
       modalHeader: 'Generate document',
@@ -428,6 +451,43 @@ export const en: AppDict = {
       notificado: 'Notified',
       generado: 'Generated',
       anulado: 'Voided',
+    },
+    electronicoLog: {
+      title: 'Electronic information',
+      subtitle: 'Emails to the customer and DIAN validations',
+      close: 'Close',
+      loadError: {
+        title: 'Could not load the information',
+        desc: 'Try again in a few seconds.',
+      },
+      envios: {
+        title: 'Emails to the customer',
+        envio: 'Email',
+        copia: 'Cc:',
+        empty: 'The document has not been emailed yet.',
+        sinEventos: 'The email provider has not reported anything for this email yet.',
+      },
+      eventos: {
+        enviado: 'Sent',
+        entregado: 'Delivered',
+        abierto: 'Opened',
+        abierto_primera: 'Opened',
+        clic: 'Link clicked',
+        diferido: 'Deferred',
+        rebote_suave: 'Soft bounce',
+        rebote_duro: 'Bounced',
+        rebote: 'Bounced',
+        correo_invalido: 'Invalid email',
+        invalido: 'Invalid email',
+        bloqueado: 'Blocked',
+        queja: 'Marked as spam',
+        spam: 'Marked as spam',
+        error: 'Error',
+      },
+      validaciones: {
+        title: 'DIAN validations',
+        empty: 'The DIAN reported no validations.',
+      },
     },
     afectacion: {
       title: 'Document traceability',
@@ -792,6 +852,58 @@ export const en: AppDict = {
         fechaHasta: 'Date to',
         venta: 'Sales',
         compra: 'Purchases',
+        estadoValidado: 'Validated',
+        estadoInactivo: 'Inactive',
+      },
+      actions: {
+        dian: 'DIAN',
+        validar: 'Validate',
+        lista: 'List',
+      },
+      toasts: {
+        validarSuccess: {
+          title: 'Resolutions validated',
+          desc: 'The resolutions were validated with DIAN.',
+        },
+        validarError: {
+          title: 'Validation error',
+          desc: 'The resolutions could not be validated with DIAN.',
+        },
+      },
+      dian: {
+        title: 'DIAN resolutions',
+        subtitle: 'The ones the electronic invoicing service has for your issuer',
+        importar: 'Import',
+        columns: {
+          prefijo: 'Prefix',
+          numero: 'Number',
+          fecha: 'Date',
+          rangoDesde: 'Range from',
+          rangoHasta: 'Range to',
+          consecutivoActual: 'Current consecutive',
+          vigenteDesde: 'Valid from',
+          vigenteHasta: 'Valid to',
+          activa: 'Active',
+          importada: 'Imported',
+        },
+        empty: {
+          title: 'No resolutions',
+          desc: 'The electronic invoicing service has no resolutions for your issuer.',
+        },
+        toasts: {
+          importSuccess: {
+            title: 'Resolution imported',
+            desc: 'The resolution was brought from DIAN, already validated.',
+          },
+          importError: {
+            title: 'Import error',
+            desc: 'The resolution could not be imported.',
+          },
+          loadError: {
+            title: 'Loading error',
+            desc: 'The DIAN resolutions could not be loaded.',
+          },
+        },
       },
       form: {
         createTitle: 'New resolution',
@@ -2308,6 +2420,7 @@ export const en: AppDict = {
         aprobado: 'Apr',
         anulado: 'Voi',
         contabilizado: 'Pos',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Approved',
@@ -2404,6 +2517,21 @@ export const en: AppDict = {
       utilidades: {
         action: 'Tools',
         importarDetalle: 'Import lines',
+      },
+      electronico: {
+        action: 'Electronic',
+        emitir: 'Issue',
+        informacion: 'Information',
+        toasts: {
+          emitirSuccess: {
+            title: 'Invoice issued',
+            desc: 'The invoice was sent to the DIAN.',
+          },
+          emitirError: {
+            title: 'Could not issue',
+            desc: 'The invoice could not be sent to the DIAN.',
+          },
+        },
       },
       import: {
         title: 'Import lines',
@@ -5827,11 +5955,7 @@ export const en: AppDict = {
       },
     },
     documentoElectronico: {
-      name: 'Electronic document',
-      subtitle: 'Issue your purchase electronic documents to the DIAN.',
-      actions: {
-        emitir: 'Issue',
-      },
+      name: 'Issue electronic document',
       columns: {
         id: 'ID',
         documentoTipo: 'Type',
@@ -5840,15 +5964,18 @@ export const en: AppDict = {
         fecha: 'Date',
         proveedor: 'Supplier',
         total: 'Total',
-        estado: 'Status',
-      },
-      estado: {
-        enviado: 'Awaiting response',
-        pendiente: 'Pending',
       },
       filters: {
         notificado: 'Notified',
         enviado: 'Sent',
+      },
+      descartar: {
+        confirm: {
+          header: 'Discard these documents?',
+          message:
+            'This cannot be undone. A discarded document can no longer be sent electronically.',
+          accept: 'Yes, discard',
+        },
       },
       toasts: {
         emitir: {
@@ -5861,32 +5988,27 @@ export const en: AppDict = {
             desc: 'Some documents could not be issued. Please try again.',
           },
         },
+        descartar: {
+          success: {
+            title: 'Documents discarded',
+            desc: 'The selected documents were discarded.',
+          },
+          error: {
+            title: 'Could not discard',
+            desc: 'Some documents could not be discarded. Please try again.',
+          },
+        },
       },
     },
     enviarFacturaElectronica: {
-      name: 'Send electronic invoice',
-      subtitle: 'Issue your invoices to the DIAN and notify your customers.',
-      tabs: {
-        emitir: 'Issue',
-        notificar: 'Notify',
-      },
-      actions: {
-        emitir: 'Issue',
-        notificar: 'Notify',
-        descartar: 'Discard',
-      },
+      name: 'Issue electronic document',
       columns: {
         id: 'ID',
         numero: 'Number',
+        resolucion: 'Resolution',
         fecha: 'Date',
         cliente: 'Customer',
         total: 'Total',
-        estado: 'Status',
-      },
-      estado: {
-        descartado: 'Discarded',
-        enviado: 'Awaiting response',
-        pendiente: 'Pending',
       },
       filters: {
         notificado: 'Notified',
@@ -5911,16 +6033,6 @@ export const en: AppDict = {
             desc: 'Some documents could not be issued. Please try again.',
           },
         },
-        notificar: {
-          success: {
-            title: 'Documents notified',
-            desc: 'The selected documents were notified to the customer.',
-          },
-          error: {
-            title: 'Error notifying',
-            desc: 'Some documents could not be notified. Please try again.',
-          },
-        },
         descartar: {
           success: {
             title: 'Documents discarded',
@@ -5934,22 +6046,13 @@ export const en: AppDict = {
       },
     },
     enviarNominaElectronica: {
-      name: 'Send electronic payroll',
-      actions: {
-        emitir: 'Issue',
-        descartar: 'Discard',
-      },
+      name: 'Issue electronic document',
       columns: {
         id: 'ID',
         numero: 'Number',
         fecha: 'Date',
         empleado: 'Employee',
         total: 'Total',
-        estado: 'Status',
-      },
-      estado: {
-        enviado: 'Awaiting response',
-        pendiente: 'Pending',
       },
       filters: {
         notificado: 'Notified',
@@ -6017,6 +6120,29 @@ export const en: AppDict = {
         error: {
           title: 'Could not validate',
           desc: 'An error occurred while validating the balances. Try again.',
+        },
+      },
+    },
+    validarDepreciacion: {
+      name: 'Validate depreciation',
+      description:
+        'This process recalculates the accumulated depreciation and remaining balance of each asset from its approved depreciation documents and fixes those that do not match what is stored.',
+      run: 'Validate',
+      confirm: {
+        header: 'Validate depreciation?',
+        message:
+          'The depreciation of all assets will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+        accept: 'Validate',
+        cancel: 'Cancel',
+      },
+      toasts: {
+        success: {
+          title: 'Validation completed',
+          desc: 'Asset depreciation was checked and fixed.',
+        },
+        error: {
+          title: 'Could not validate',
+          desc: 'An error occurred while validating the depreciation. Try again.',
         },
       },
     },

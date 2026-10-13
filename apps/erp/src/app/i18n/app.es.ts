@@ -270,6 +270,29 @@ export const es: AppDict = {
     },
   },
   documentActions: {
+    emisionElectronica: {
+      actions: { emitir: 'Emitir', descartar: 'Descartar' },
+      columns: { estado: 'Estado' },
+      estado: { error: 'Error', enviado: 'Esperando respuesta', pendiente: 'Pendiente' },
+    },
+    errorElectronico: {
+      ver: 'Ver el detalle del error',
+      title: 'Error al emitir',
+      subtitle: 'Por qué falló la emisión del documento',
+      loading: 'Cargando el detalle del error…',
+      empty: 'No hay errores registrados para este documento.',
+      fase: { validacion: 'Validación', emision: 'Emisión' },
+      toasts: {
+        parcial: {
+          title: 'Algunos documentos no se emitieron',
+          desc: 'Los que fallaron quedaron en estado Error: haz clic en él para ver el motivo.',
+        },
+        fallo: {
+          title: 'No se emitió ningún documento',
+          desc: 'Quedaron en estado Error: haz clic en él para ver el motivo.',
+        },
+      },
+    },
     generar: {
       buttonLabel: 'Generar',
       modalHeader: 'Generar documento',
@@ -428,6 +451,43 @@ export const es: AppDict = {
       notificado: 'Notificado',
       generado: 'Generado',
       anulado: 'Anulado',
+    },
+    electronicoLog: {
+      title: 'Información electrónica',
+      subtitle: 'Envíos al cliente y validaciones de la DIAN',
+      close: 'Cerrar',
+      loadError: {
+        title: 'No se pudo cargar la información',
+        desc: 'Intenta de nuevo en unos segundos.',
+      },
+      envios: {
+        title: 'Envíos al cliente',
+        envio: 'Envío',
+        copia: 'Copia:',
+        empty: 'El documento aún no se ha enviado por correo.',
+        sinEventos: 'El proveedor de correo aún no reporta nada de este envío.',
+      },
+      eventos: {
+        enviado: 'Enviado',
+        entregado: 'Entregado',
+        abierto: 'Abierto',
+        abierto_primera: 'Abierto',
+        clic: 'Clic en el enlace',
+        diferido: 'Diferido',
+        rebote_suave: 'Rebote temporal',
+        rebote_duro: 'Rebote',
+        rebote: 'Rebote',
+        correo_invalido: 'Correo inválido',
+        invalido: 'Correo inválido',
+        bloqueado: 'Bloqueado',
+        queja: 'Marcado como spam',
+        spam: 'Marcado como spam',
+        error: 'Error',
+      },
+      validaciones: {
+        title: 'Validaciones DIAN',
+        empty: 'La DIAN no reportó validaciones.',
+      },
     },
     afectacion: {
       title: 'Afectación del documento',
@@ -799,6 +859,58 @@ export const es: AppDict = {
         fechaHasta: 'Fecha hasta',
         venta: 'Venta',
         compra: 'Compra',
+        estadoValidado: 'Validado',
+        estadoInactivo: 'Inactivo',
+      },
+      actions: {
+        dian: 'DIAN',
+        validar: 'Validar',
+        lista: 'Lista',
+      },
+      toasts: {
+        validarSuccess: {
+          title: 'Resoluciones validadas',
+          desc: 'Las resoluciones se validaron con la DIAN.',
+        },
+        validarError: {
+          title: 'Error al validar',
+          desc: 'No se pudieron validar las resoluciones con la DIAN.',
+        },
+      },
+      dian: {
+        title: 'Resoluciones en la DIAN',
+        subtitle: 'Las que el servicio de facturación electrónica tiene de tu emisor',
+        importar: 'Importar',
+        columns: {
+          prefijo: 'Prefijo',
+          numero: 'Número',
+          fecha: 'Fecha',
+          rangoDesde: 'Rango desde',
+          rangoHasta: 'Rango hasta',
+          consecutivoActual: 'Consecutivo actual',
+          vigenteDesde: 'Vigente desde',
+          vigenteHasta: 'Vigente hasta',
+          activa: 'Activa',
+          importada: 'Importada',
+        },
+        empty: {
+          title: 'Sin resoluciones',
+          desc: 'El servicio de facturación electrónica no tiene resoluciones de tu emisor.',
+        },
+        toasts: {
+          importSuccess: {
+            title: 'Resolución importada',
+            desc: 'La resolución se trajo de la DIAN ya validada.',
+          },
+          importError: {
+            title: 'Error al importar',
+            desc: 'No se pudo importar la resolución.',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudieron cargar las resoluciones de la DIAN.',
+          },
+        },
       },
       form: {
         createTitle: 'Nueva resolución',
@@ -2359,6 +2471,7 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Aprobado',
@@ -2455,6 +2568,21 @@ export const es: AppDict = {
       utilidades: {
         action: 'Utilidades',
         importarDetalle: 'Importar detalle',
+      },
+      electronico: {
+        action: 'Electrónico',
+        emitir: 'Emitir',
+        informacion: 'Información',
+        toasts: {
+          emitirSuccess: {
+            title: 'Factura emitida',
+            desc: 'La factura se envió a la DIAN.',
+          },
+          emitirError: {
+            title: 'No se pudo emitir',
+            desc: 'La factura no se pudo enviar a la DIAN.',
+          },
+        },
       },
       import: {
         title: 'Importar detalle',
@@ -5901,11 +6029,7 @@ export const es: AppDict = {
       },
     },
     documentoElectronico: {
-      name: 'Documento electrónico',
-      subtitle: 'Emite tus documentos electrónicos de compra a la DIAN.',
-      actions: {
-        emitir: 'Emitir',
-      },
+      name: 'Emitir documento electrónico',
       columns: {
         id: 'ID',
         documentoTipo: 'Tipo',
@@ -5914,53 +6038,6 @@ export const es: AppDict = {
         fecha: 'Fecha',
         proveedor: 'Proveedor',
         total: 'Total',
-        estado: 'Estado',
-      },
-      estado: {
-        enviado: 'Esperando respuesta',
-        pendiente: 'Pendiente',
-      },
-      filters: {
-        notificado: 'Notificado',
-        enviado: 'Enviado',
-      },
-      toasts: {
-        emitir: {
-          success: {
-            title: 'Documentos emitidos',
-            desc: 'Los documentos seleccionados se enviaron a la DIAN.',
-          },
-          error: {
-            title: 'Error al emitir',
-            desc: 'No se pudieron emitir algunos documentos. Intentá de nuevo.',
-          },
-        },
-      },
-    },
-    enviarFacturaElectronica: {
-      name: 'Enviar factura electrónica',
-      subtitle: 'Emite tus facturas a la DIAN y notifícalas a tus clientes.',
-      tabs: {
-        emitir: 'Emitir',
-        notificar: 'Notificar',
-      },
-      actions: {
-        emitir: 'Emitir',
-        notificar: 'Notificar',
-        descartar: 'Descartar',
-      },
-      columns: {
-        id: 'ID',
-        numero: 'Número',
-        fecha: 'Fecha',
-        cliente: 'Cliente',
-        total: 'Total',
-        estado: 'Estado',
-      },
-      estado: {
-        descartado: 'Descartado',
-        enviado: 'Esperando respuesta',
-        pendiente: 'Pendiente',
       },
       filters: {
         notificado: 'Notificado',
@@ -5985,14 +6062,49 @@ export const es: AppDict = {
             desc: 'No se pudieron emitir algunos documentos. Intentá de nuevo.',
           },
         },
-        notificar: {
+        descartar: {
           success: {
-            title: 'Documentos notificados',
-            desc: 'Los documentos seleccionados se notificaron al cliente.',
+            title: 'Documentos descartados',
+            desc: 'Los documentos seleccionados se descartaron correctamente.',
           },
           error: {
-            title: 'Error al notificar',
-            desc: 'No se pudieron notificar algunos documentos. Intentá de nuevo.',
+            title: 'Error al descartar',
+            desc: 'No se pudieron descartar algunos documentos. Intentá de nuevo.',
+          },
+        },
+      },
+    },
+    enviarFacturaElectronica: {
+      name: 'Emitir documento electrónico',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        resolucion: 'Resolución',
+        fecha: 'Fecha',
+        cliente: 'Cliente',
+        total: 'Total',
+      },
+      filters: {
+        notificado: 'Notificado',
+        enviado: 'Enviado',
+      },
+      descartar: {
+        confirm: {
+          header: '¿Estás seguro de descartar?',
+          message:
+            'Esta acción no se puede revertir. Si descartas un documento, ya no podrá enviarse electrónicamente en otro momento.',
+          accept: 'Sí, descartar',
+        },
+      },
+      toasts: {
+        emitir: {
+          success: {
+            title: 'Documentos emitidos',
+            desc: 'Los documentos seleccionados se enviaron a la DIAN.',
+          },
+          error: {
+            title: 'Error al emitir',
+            desc: 'No se pudieron emitir algunos documentos. Intentá de nuevo.',
           },
         },
         descartar: {
@@ -6008,22 +6120,13 @@ export const es: AppDict = {
       },
     },
     enviarNominaElectronica: {
-      name: 'Enviar nómina electrónica',
-      actions: {
-        emitir: 'Emitir',
-        descartar: 'Descartar',
-      },
+      name: 'Emitir documento electrónico',
       columns: {
         id: 'ID',
         numero: 'Número',
         fecha: 'Fecha',
         empleado: 'Empleado',
         total: 'Total',
-        estado: 'Estado',
-      },
-      estado: {
-        enviado: 'Esperando respuesta',
-        pendiente: 'Pendiente',
       },
       filters: {
         notificado: 'Notificado',
@@ -6091,6 +6194,29 @@ export const es: AppDict = {
         error: {
           title: 'No se pudo validar',
           desc: 'Ocurrió un error al validar los saldos. Intenta de nuevo.',
+        },
+      },
+    },
+    validarDepreciacion: {
+      name: 'Validar depreciación',
+      description:
+        'Este proceso recalcula la depreciación acumulada y el saldo por depreciar de cada activo desde sus documentos de depreciación aprobados y corrige los que no cuadren con lo guardado.',
+      run: 'Validar',
+      confirm: {
+        header: '¿Validar depreciación?',
+        message:
+          'Se recalculará la depreciación de todos los activos y se corregirán los que no cuadren. La operación puede tardar unos segundos.',
+        accept: 'Validar',
+        cancel: 'Cancelar',
+      },
+      toasts: {
+        success: {
+          title: 'Validación completada',
+          desc: 'La depreciación de los activos se revisó y corrigió.',
+        },
+        error: {
+          title: 'No se pudo validar',
+          desc: 'Ocurrió un error al validar la depreciación. Intenta de nuevo.',
         },
       },
     },

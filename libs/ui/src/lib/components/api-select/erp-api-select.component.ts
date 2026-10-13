@@ -80,6 +80,13 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   /** Posición (0-based) a auto-seleccionar cuando cargan las opciones y el control está vacío. `null` lo desactiva. */
   readonly suggestedIndex = input<number | null>(null);
   /**
+   * Opción a auto-seleccionar por **contenido**, cuando la posición no sirve
+   * porque el backend no garantiza el orden (p. ej. el método de pago con
+   * `codigo === '1'`). Gana sobre `suggestedIndex`; si ninguna cumple, no
+   * sugiere nada. Mismas reglas: solo con el control vacío.
+   */
+  readonly suggestedMatch = input<((option: ErpSelectOption) => boolean) | null>(null);
+  /**
    * Formatea la etiqueta de la opción (seleccionada y en el desplegable). Por
    * default se muestra `nombre`; pásalo para componer otros campos, p. ej.
    * `(o) => \`${o.id} - ${o.nombre}\``. La opción puede tipar campos extra del
@@ -192,14 +199,16 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   }
 
   /**
-   * Sugiere una opción por defecto por posición cuando el control está vacío.
-   * No pisa una selección existente ni un valor cargado en edición. El índice
-   * nulo o fuera de rango no hace nada.
+   * Sugiere una opción por defecto —por contenido (`suggestedMatch`) o por
+   * posición (`suggestedIndex`)— cuando el control está vacío. No pisa una
+   * selección existente ni un valor cargado en edición. Sin coincidencia, o con
+   * el índice nulo o fuera de rango, no hace nada.
    */
   private applySuggestion(options: ErpSelectOption[]): void {
+    if (this.value() !== null) return;
+    const match = this.suggestedMatch();
     const index = this.suggestedIndex();
-    if (index === null || this.value() !== null) return;
-    const option = options[index];
+    const option = match ? options.find(match) : index !== null ? options[index] : undefined;
     if (option) this.onValueChange(option);
   }
 }

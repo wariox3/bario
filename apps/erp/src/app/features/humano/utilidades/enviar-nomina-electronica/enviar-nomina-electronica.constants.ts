@@ -4,7 +4,7 @@ import { DOCUMENT_TYPE_ID } from '@reddoc/core';
 /**
  * Constantes de la utilidad **Enviar nómina electrónica** (Humano).
  *
- * Declara los filtros permanentes, las columnas, los campos filtrables por el
+ * Alimentan `ENVIAR_NOMINA_ELECTRONICA_CONFIG`. Declara los filtros permanentes, las columnas, los campos filtrables por el
  * usuario y la storage key de los filtros.
  */
 
@@ -29,7 +29,7 @@ export const BASE_FILTERS: readonly FilterCondition[] = [
   { field: 'documento_tipo_id', operator: 'eq', value: DOCUMENT_TYPE_ID.NOMINA_ELECTRONICA },
 ];
 
-/** Columnas del listado: identificación de la nómina + empleado + estado electrónico. */
+/** Columnas propias del listado. La de Estado la agrega `EmitirDocumentoElectronicoComponent`. */
 export const COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.columns.id`, type: 'number', width: '70px', align: 'right' },
   { field: 'numero', headerKey: `${I18N}.columns.numero`, type: 'text', width: '110px' },
@@ -41,14 +41,6 @@ export const COLUMNS: readonly ColumnDef[] = [
     type: 'currency',
     width: '140px',
     align: 'right',
-  },
-  {
-    field: 'estado_electronico_estado',
-    headerKey: `${I18N}.columns.estado`,
-    type: 'enum',
-    width: '160px',
-    align: 'center',
-    enumKeyPrefix: `${I18N}.estado`,
   },
 ];
 

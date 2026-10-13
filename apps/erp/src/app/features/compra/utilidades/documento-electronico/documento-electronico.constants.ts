@@ -3,7 +3,7 @@ import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
 /**
  * Constantes de la utilidad **Documento electrónico** (Compra).
  *
- * Declara:
+ * Alimentan `DOCUMENTO_ELECTRONICO_CONFIG`. Declara:
  *  - Los **filtros permanentes** (`BASE_FILTERS`) que acotan el listado a los
  *    documentos electrónicos de compra aprobados y pendientes de emitir. Se
  *    inyectan como `baseFilters` de `buildListBody`, antes de los del usuario;
@@ -35,7 +35,7 @@ export const BASE_FILTERS: readonly FilterCondition[] = [
   },
 ];
 
-/** Columnas del listado: identificación del documento + tipo + estado electrónico. */
+/** Columnas propias del listado. La de Estado la agrega `EmitirDocumentoElectronicoComponent`. */
 export const COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.columns.id`, type: 'number', width: '70px', align: 'right' },
   {
@@ -59,14 +59,6 @@ export const COLUMNS: readonly ColumnDef[] = [
     type: 'currency',
     width: '140px',
     align: 'right',
-  },
-  {
-    field: 'estado_electronico_estado',
-    headerKey: `${I18N}.columns.estado`,
-    type: 'enum',
-    width: '160px',
-    align: 'center',
-    enumKeyPrefix: `${I18N}.estado`,
   },
 ];
 
