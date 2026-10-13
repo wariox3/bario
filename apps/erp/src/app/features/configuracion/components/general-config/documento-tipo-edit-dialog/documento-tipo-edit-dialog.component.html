@@ -78,6 +78,7 @@
               inputId="resolucion"
               formControlName="resolucion"
               [endpoint]="resolucionEndpoint"
+              [params]="resolucionParams()"
               [displayWith]="resolucionLabel"
               filterBy="prefijo,numero"
               [placeholder]="m.fields.resolucionPlaceholder"

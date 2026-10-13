@@ -164,13 +164,11 @@ export class HttpEntityDataGateway implements EntityDataGateway {
 
   /**
    * Emite el documento a la DIAN: `POST <endpoint>/emitir/` con
-   * **`{ documento_id }`** — no `{ id }` como el resto de las acciones. El
-   * backend nombra así este parámetro y solo este; ver el comentario del
-   * contrato.
+   * **`{ ids: [id] }`** — el endpoint recibe un lote; desde la ficha va de a uno.
    */
   emitir(entity: EntityConfig, id: string | number): Observable<unknown> {
     return this.http.post(`${entity.endpoint}/emitir/`, {
-      documento_id: id,
+      ids: [Number(id)],
     });
   }
 

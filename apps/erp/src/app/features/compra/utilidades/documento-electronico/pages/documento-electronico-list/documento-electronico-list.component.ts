@@ -1,7 +1,7 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
-import { forkJoin, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import {
   FilterStorageService,
   I18nService,
@@ -42,8 +42,8 @@ import {
  * Sigue el chrome estándar de listas (`<lib-list-shell>`): breadcrumb + card +
  * toolbar (filtros + botón Emitir) + tabla con selección múltiple.
  *
- * La acción **Emitir** dispara un request por documento seleccionado
- * (`forkJoin`) y recarga al terminar. Solo se emiten filas aún no enviadas
+ * La acción **Emitir** manda la selección en un solo request (`{ ids }`) y
+ * recarga al terminar. Solo se emiten filas aún no enviadas
  * (`estado_electronico_enviado === false`), como en el legacy.
  */
 @Component({
@@ -159,7 +159,8 @@ export class DocumentoElectronicoListComponent {
 
     const toast = this.t().entities.documentoElectronico.toasts.emitir;
     this.isProcessing.set(true);
-    forkJoin(ids.map((id) => this.service.emitir(id)))
+    this.service
+      .emitir(ids)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
