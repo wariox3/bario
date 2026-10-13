@@ -1,0 +1,167 @@
+@let dict = t().documentActions.corregir;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  [dismissableMask]="!isSaving()"
+  [style]="{ width: '1180px', maxWidth: '96vw' }"
+  styleClass="cp-corregir-dialog"
+>
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-wrench text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ dict.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ dict.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ── Body ─────────────────────────────────────────────────────────────── -->
+  @if (visible()) {
+    @if (isLoading() && !cabecera()) {
+      <div class="flex items-center justify-center py-16 text-brand-muted">
+        <i class="pi pi-spin pi-spinner text-xl"></i>
+      </div>
+    } @else if (loadFailed()) {
+      <p class="m-0 py-12 text-center text-[0.85rem] text-brand-muted">
+        {{ dict.toasts.loadError.desc }}
+      </p>
+    } @else if (cabecera(); as cab) {
+      <div class="flex flex-col gap-5">
+        <!-- Cabecera -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="corregir-sede" class="cp-corregir-dialog__label">
+              {{ dict.fields.sede }}
+            </label>
+            <lib-api-select
+              inputId="corregir-sede"
+              [endpoint]="sedeEndpoint"
+              [ngModel]="cab.sede"
+              (ngModelChange)="setSede($event)"
+              [showClear]="true"
+              [placeholder]="dict.fields.seleccionar"
+            />
+          </div>
+        </div>
+
+        <!-- Líneas -->
+        <div class="cp-corregir-dialog__table overflow-x-auto">
+          <table class="w-full min-w-[960px] border-collapse text-[0.78rem]">
+            <thead>
+              <tr class="bg-[rgba(20,48,73,0.04)] text-left text-brand-muted">
+                <th class="cp-corregir-dialog__th w-[70px] text-right">{{ dict.cols.id }}</th>
+                <th class="cp-corregir-dialog__th">{{ dict.cols.descripcion }}</th>
+                <th class="cp-corregir-dialog__th w-[90px] text-right">{{ dict.cols.cantidad }}</th>
+                <th class="cp-corregir-dialog__th w-[120px] text-right">{{ dict.cols.precio }}</th>
+                <th class="cp-corregir-dialog__th w-[120px] text-right">
+                  {{ dict.cols.subtotal }}
+                </th>
+                <th class="cp-corregir-dialog__th w-[150px]">{{ dict.cols.base }}</th>
+                <th class="cp-corregir-dialog__th w-[200px]">{{ dict.cols.centroCosto }}</th>
+                <th class="cp-corregir-dialog__th w-[230px]">{{ dict.cols.contacto }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (linea of lineas(); track linea.id) {
+                <tr class="border-t border-[rgba(20,48,73,0.08)] text-brand-text">
+                  <td class="cp-corregir-dialog__td text-right tabular-nums">{{ linea.id }}</td>
+                  <td class="cp-corregir-dialog__td">{{ linea.descripcion }}</td>
+                  <td class="cp-corregir-dialog__td text-right tabular-nums">
+                    {{ linea.cantidad }}
+                  </td>
+                  <td class="cp-corregir-dialog__td text-right tabular-nums">
+                    {{ formatMoney(linea.precio) }}
+                  </td>
+                  <td class="cp-corregir-dialog__td text-right tabular-nums">
+                    {{ formatMoney(linea.subtotal) }}
+                  </td>
+                  <td class="cp-corregir-dialog__td">
+                    <!-- Base y contacto son propios solo de las líneas de cuenta. -->
+                    @if (linea.esCuenta) {
+                      <p-inputnumber
+                        [inputId]="'corregir-base-' + linea.id"
+                        [ngModel]="linea.base"
+                        (ngModelChange)="setLinea(linea.id, { base: $event })"
+                        mode="decimal"
+                        [min]="0"
+                        [minFractionDigits]="0"
+                        [maxFractionDigits]="2"
+                        [fluid]="true"
+                        size="small"
+                      />
+                    }
+                  </td>
+                  <td class="cp-corregir-dialog__td">
+                    <lib-api-autocomplete
+                      [inputId]="'corregir-centro-costo-' + linea.id"
+                      [endpoint]="centroCostoEndpoint"
+                      [minLength]="0"
+                      [ngModel]="linea.centroCosto"
+                      (ngModelChange)="setLinea(linea.id, { centroCosto: $event })"
+                      [placeholder]="dict.fields.buscar"
+                    />
+                  </td>
+                  <td class="cp-corregir-dialog__td">
+                    @if (linea.esCuenta) {
+                      <lib-contacto-select
+                        [inputId]="'corregir-contacto-' + linea.id"
+                        [ngModel]="linea.contacto"
+                        (ngModelChange)="setLinea(linea.id, { contacto: $event })"
+                        [placeholder]="dict.fields.buscar"
+                      />
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="py-10 text-center text-brand-muted">
+                    {{ dict.empty }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.cancel"
+        [outlined]="true"
+        severity="secondary"
+        [disabled]="isSaving()"
+        (onClick)="onCancel()"
+      />
+      <p-button
+        type="button"
+        [label]="t().common.actions.save"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        [disabled]="isSaving() || isLoading() || !cabecera()"
+        (onClick)="onGuardar()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

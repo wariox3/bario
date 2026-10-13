@@ -19,6 +19,7 @@
       [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
+      [canCorregir]="capacidades().puedeCorregir"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (documentoChanged)="onDocumentoChanged()"
     >
@@ -74,6 +75,7 @@
       #electronico
       [documentoId]="documentoId()"
       [estados]="cab.estados"
+      [document]="document()"
       (documentoChanged)="onDocumentoChanged()"
     />
     <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />

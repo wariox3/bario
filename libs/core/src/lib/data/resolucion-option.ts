@@ -13,3 +13,11 @@ export function resolucionLabel(option: ErpSelectOption): string {
   const compuesto = [prefijo, numero].filter(Boolean).join(' ');
   return compuesto || option.nombre || `#${option.id}`;
 }
+
+/**
+ * Filtro del `resolucion/seleccionar/` que deja fuera las resoluciones
+ * inactivas: sin él, el desplegable ofrece también las vencidas o dadas de
+ * baja. Va en todo selector de resolución, junto al de módulo
+ * (`{ ...RESOLUCION_ACTIVA_PARAMS, venta: 'True' }`).
+ */
+export const RESOLUCION_ACTIVA_PARAMS = { estado_inactivo: 'False' } as const;

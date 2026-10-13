@@ -337,6 +337,7 @@ export interface AppDict
       opciones: string;
       archivos: string;
       contabilidad: string;
+      corregir: string;
       anular: string;
       emitir: string;
       confirmAprobar: { message: string; header: string };
@@ -391,6 +392,53 @@ export interface AppDict
       toasts: {
         emitirSuccess: { title: string; desc: string };
         emitirError: { title: string; desc: string };
+      };
+      /** Diálogo "Corregir": la cabecera que viaja a la DIAN. */
+      corregir: {
+        action: string;
+        title: string;
+        subtitle: string;
+        fields: {
+          numero: string;
+          resolucion: string;
+          fecha: string;
+          fechaVence: string;
+          seleccionar: string;
+        };
+        validation: { required: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+          sinCambios: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+    };
+    /** Diálogo "Corregir" del dropdown "Opciones" de la ficha. */
+    corregir: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      fields: {
+        sede: string;
+        seleccionar: string;
+        buscar: string;
+      };
+      cols: {
+        id: string;
+        descripcion: string;
+        cantidad: string;
+        precio: string;
+        subtotal: string;
+        base: string;
+        centroCosto: string;
+        contacto: string;
+      };
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+        sinCambios: { title: string; desc: string };
+        loadError: { title: string; desc: string };
       };
     };
     electronicoLog: {

@@ -91,4 +91,11 @@
     (contabilizacionChanged)="documentoChanged.emit()"
   />
 }
+@if (document().capabilities.canCorregir) {
+  <app-corregir-documento-dialog
+    [(visible)]="corregirVisible"
+    [documentoId]="documentoId()"
+    (corregido)="documentoChanged.emit()"
+  />
+}
 <p-confirmdialog />

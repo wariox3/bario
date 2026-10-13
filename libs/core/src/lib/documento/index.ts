@@ -11,6 +11,7 @@ export type {
   EntityKind,
   InventoryEffect,
   DocumentCapabilities,
+  DocumentElectronicoConfig,
   EditableRowContext,
   EntityRoutes,
   DocumentEntityConfig,

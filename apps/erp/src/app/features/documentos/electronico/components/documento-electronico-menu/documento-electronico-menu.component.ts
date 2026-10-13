@@ -16,6 +16,7 @@ import {
   extractErrorMessage,
   I18nService,
   ToastService,
+  type DocumentEntityConfig,
   type DocumentoEstados,
 } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
@@ -23,13 +24,16 @@ import {
   DocumentoElectronicoEmisionService,
   DocumentoElectronicoErrorService,
 } from '@erp/core/documento-electronico';
+import { capacidadesDocumento } from '@erp/core/module-config';
 import { ElectronicoLogModalComponent } from '../electronico-log-modal/electronico-log-modal.component';
+import { CorregirElectronicoDialogComponent } from '../corregir-electronico-dialog/corregir-electronico-dialog.component';
 
 /**
  * Dropdown **Electrónico** de la ficha de un documento electrónico (factura de
  * venta, documento soporte…): *Emitir* lo envía a la DIAN cuando está aprobado
- * y aún no se notificó, e *Información* abre el rastro de envíos y las
- * validaciones DIAN.
+ * y aún no se notificó, *Corregir* arregla la cabecera que viaja a la DIAN
+ * (número, resolución y fechas) mientras no haya salido, e *Información* abre
+ * el rastro de envíos y las validaciones DIAN.
  *
  * Agnóstico del tipo de documento: recibe el id y las banderas de estado, y
  * avisa con `documentoChanged` tras emitir para que la ficha se recargue —el
@@ -46,13 +50,13 @@ import { ElectronicoLogModalComponent } from '../electronico-log-modal/electroni
  * <p-button actionsEnd [label]="t().documentActions.electronico.action"
  *   [loading]="electronico.isEmitiendo()" (onClick)="electronico.toggle($event)" … />
  * …
- * <app-documento-electronico-menu #electronico [documentoId]="…" [estados]="…" />
+ * <app-documento-electronico-menu #electronico [documentoId]="…" [estados]="…" [document]="…" />
  * ```
  */
 @Component({
   selector: 'app-documento-electronico-menu',
   standalone: true,
-  imports: [MenuModule, ElectronicoLogModalComponent],
+  imports: [MenuModule, ElectronicoLogModalComponent, CorregirElectronicoDialogComponent],
   templateUrl: './documento-electronico-menu.component.html',
 })
 export class DocumentoElectronicoMenuComponent {
@@ -66,8 +70,10 @@ export class DocumentoElectronicoMenuComponent {
 
   readonly documentoId = input.required<number | null>();
   readonly estados = input.required<DocumentoEstados>();
+  /** Documento activo: Corregir sale de su config (`electronico`) y va por su gateway. */
+  readonly document = input.required<DocumentEntityConfig>();
 
-  /** Se emitió el documento (con o sin error): la ficha debe recargarse. */
+  /** Se emitió o se corrigió el documento: la ficha debe recargarse. */
   readonly documentoChanged = output<void>();
 
   private readonly menu = viewChild<Menu>('menu');
@@ -77,6 +83,13 @@ export class DocumentoElectronicoMenuComponent {
 
   /** Control del modal "Información". */
   protected readonly logVisible = signal(false);
+  /** Control del diálogo "Corregir". */
+  protected readonly corregirVisible = signal(false);
+
+  /** Misma regla pura que la botonera: aprobado, sin contabilizar y sin salir a la DIAN. */
+  private readonly puedeCorregir = computed(
+    () => capacidadesDocumento(this.estados()).puedeCorregirElectronico,
+  );
 
   /**
    * Se emite un documento aprobado que todavía no se notificó. Antes de aprobar
@@ -89,24 +102,37 @@ export class DocumentoElectronicoMenuComponent {
 
   /**
    * Entradas del menú. `computed` porque recrear el array en cada detección de
-   * cambios le hace perder el primer click a `p-menu`. Información solo se
+   * cambios le hace perder el primer click a `p-menu`. Corregir solo aparece si
+   * el documento se declara electrónico en su config. Información solo se
    * habilita con el documento ya notificado: antes el backend no tiene rastro y
    * responde error ("nunca ha sido notificado").
    */
-  protected readonly items = computed<MenuItem[]>(() => [
-    {
-      label: this.t().documentActions.electronico.emitir,
-      icon: 'pi pi-send',
-      disabled: !this.puedeEmitir() || this.isEmitiendo(),
-      command: () => this.onEmitir(),
-    },
-    {
-      label: this.t().documentActions.electronico.informacion,
+  protected readonly items = computed<MenuItem[]>(() => {
+    const e = this.t().documentActions.electronico;
+    const items: MenuItem[] = [
+      {
+        label: e.emitir,
+        icon: 'pi pi-send',
+        disabled: !this.puedeEmitir() || this.isEmitiendo(),
+        command: () => this.onEmitir(),
+      },
+    ];
+    if (this.document().electronico) {
+      items.push({
+        label: e.corregir.action,
+        icon: 'pi pi-pencil',
+        disabled: !this.puedeCorregir() || this.isEmitiendo(),
+        command: () => this.corregirVisible.set(true),
+      });
+    }
+    items.push({
+      label: e.informacion,
       icon: 'pi pi-info-circle',
       disabled: !this.estados().estado_electronico_notificado,
       command: () => this.logVisible.set(true),
-    },
-  ]);
+    });
+    return items;
+  });
 
   /** Abre/cierra el menú; lo llama el botón de la ficha. */
   toggle(event: Event): void {

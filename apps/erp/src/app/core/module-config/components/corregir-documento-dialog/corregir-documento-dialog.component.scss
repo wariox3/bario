@@ -1,0 +1,52 @@
+// El host solo envuelve al diálogo, que se pinta `fixed`: fuera del flujo para
+// no cobrar el `gap` del contenedor. Misma razón que `_overlays.scss`.
+:host {
+  display: contents;
+}
+
+// ── Dialog shell — mismo chrome que Contabilidad y Archivos, sus vecinos del
+//    dropdown "Opciones".
+:host ::ng-deep .cp-corregir-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(20 48 73 / 0.04),
+    0 20px 60px rgba(20 48 73 / 0.14) !important;
+
+  .p-dialog-header {
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: none;
+  }
+
+  .p-dialog-content {
+    padding: 1.25rem 1.5rem 0.75rem;
+  }
+
+  .p-dialog-footer {
+    padding: 0 1.5rem 1.1rem;
+  }
+}
+
+.cp-corregir-dialog__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-brand-text);
+}
+
+// ── Tabla — la caja borders-only del ERP.
+.cp-corregir-dialog__table {
+  border: 1px solid rgba(20, 48, 73, 0.1);
+  border-radius: 10px;
+}
+
+.cp-corregir-dialog__th {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cp-corregir-dialog__td {
+  padding: 0.4rem 0.75rem;
+  vertical-align: middle;
+}

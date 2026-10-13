@@ -15,7 +15,7 @@ const DOCUMENTO_ENDPOINT = '/general/documento/';
 
 /**
  * Emisión electrónica sobre `/general/documento/`: listar lo que hay por
- * emitir, emitir y descartar. Igual para facturas de venta, documentos de
+ * emitir, emitir, corregir la cabecera antes de emitir y descartar. Igual para facturas de venta, documentos de
  * compra y nóminas; lo que cambia son los filtros permanentes.
  */
 @Injectable({ providedIn: 'root' })
@@ -43,6 +43,20 @@ export class DocumentoElectronicoEmisionService extends BaseHttpService {
     return this.post<EmitirResultado>(
       `${DOCUMENTO_ENDPOINT}emitir/`,
       { ids: documentoIds },
+      undefined,
+      { errorToast: false },
+    );
+  }
+
+  /**
+   * Corrige la cabecera que viaja a la DIAN (número, resolución y fechas) de
+   * un documento que aún no salió. Solo viajan las claves que cambiaron. Sin el
+   * toast del interceptor: el aviso lo da el diálogo, con el motivo del backend.
+   */
+  actualizarElectronico(id: number, cambios: object): Observable<unknown> {
+    return this.post<unknown>(
+      `${DOCUMENTO_ENDPOINT}actualizar-electronico/`,
+      { id, ...cambios },
       undefined,
       { errorToast: false },
     );

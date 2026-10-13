@@ -39,7 +39,12 @@ import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/co
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent, ErpAsesorSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService, SELECT_ENDPOINTS, resolucionLabel } from '@reddoc/core';
+import {
+  ErpSelectDataService,
+  RESOLUCION_ACTIVA_PARAMS,
+  SELECT_ENDPOINTS,
+  resolucionLabel,
+} from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -188,7 +193,7 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected readonly resolucionLabel = resolucionLabel;
 
   /** Solo resoluciones de venta, como el ERP anterior (la de compra es del documento soporte). */
-  protected readonly resolucionParams = { venta: 'True' } as const;
+  protected readonly resolucionParams = { ...RESOLUCION_ACTIVA_PARAMS, venta: 'True' } as const;
 
   /** Filtra el autocomplete de contacto a clientes. */
   protected readonly contactoParams = { cliente: 'True' } as const;

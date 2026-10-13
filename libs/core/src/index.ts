@@ -128,6 +128,7 @@ export type {
   EntityKind,
   InventoryEffect,
   DocumentCapabilities,
+  DocumentElectronicoConfig,
   EditableRowContext,
   EntityRoutes,
   DocumentEntityConfig,
@@ -209,6 +210,7 @@ export {
   buildContactoLabel,
   asesorLabel,
   resolucionLabel,
+  RESOLUCION_ACTIVA_PARAMS,
 } from './lib/data';
 export type { ErpSelectOption } from './lib/data';
 export * from './lib/data-list';

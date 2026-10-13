@@ -27,6 +27,7 @@ export type {
   EntityRoutes,
   DocumentEntityConfig,
   DocumentCapabilities,
+  DocumentElectronicoConfig,
   EditableRowContext,
   InventoryEffect,
 } from '@reddoc/core';

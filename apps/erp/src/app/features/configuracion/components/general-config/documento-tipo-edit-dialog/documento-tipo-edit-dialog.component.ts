@@ -20,6 +20,7 @@ import {
   I18nService,
   ToastService,
   type ErpSelectOption,
+  RESOLUCION_ACTIVA_PARAMS,
   resolucionLabel,
 } from '@reddoc/core';
 import { ErpApiSelectComponent, FieldErrorComponent } from '@reddoc/ui';
@@ -81,15 +82,15 @@ export class DocumentoTipoEditDialogComponent {
   protected readonly resolucionLabel = resolucionLabel;
 
   /**
-   * Solo las resoluciones del módulo del tipo: las de venta para un tipo de
-   * venta, las de compra para uno de compra. Un tipo que no es de ninguno (o de
-   * ambos) ve el catálogo completo.
+   * Solo las resoluciones activas del módulo del tipo: las de venta para un
+   * tipo de venta, las de compra para uno de compra. Un tipo que no es de
+   * ninguno (o de ambos) ve todas las activas.
    */
   protected readonly resolucionParams = computed((): Record<string, string> => {
     const tipo = this.tipo();
-    if (tipo?.venta && !tipo.compra) return { venta: 'True' };
-    if (tipo?.compra && !tipo.venta) return { compra: 'True' };
-    return {};
+    if (tipo?.venta && !tipo.compra) return { ...RESOLUCION_ACTIVA_PARAMS, venta: 'True' };
+    if (tipo?.compra && !tipo.venta) return { ...RESOLUCION_ACTIVA_PARAMS, compra: 'True' };
+    return { ...RESOLUCION_ACTIVA_PARAMS };
   });
 
   protected readonly form = this.fb.group({

@@ -348,6 +348,7 @@ export const es: AppDict = {
       opciones: 'Opciones',
       archivos: 'Archivos',
       contabilidad: 'Contabilidad',
+      corregir: 'Corregir',
       anular: 'Anular',
       emitir: 'Emitir',
       confirmAprobar: {
@@ -464,6 +465,57 @@ export const es: AppDict = {
         emitirError: {
           title: 'No se pudo emitir',
           desc: 'El documento no se pudo enviar a la DIAN.',
+        },
+      },
+      corregir: {
+        action: 'Corregir',
+        title: 'Corregir para la DIAN',
+        subtitle: 'Número, resolución y fechas antes de emitir',
+        fields: {
+          numero: 'Número',
+          resolucion: 'Resolución',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          seleccionar: 'Selecciona…',
+        },
+        validation: { required: 'Este campo es obligatorio' },
+        toasts: {
+          success: { title: 'Documento corregido', desc: 'Ya puedes volver a emitirlo.' },
+          error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
+          sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
+          loadError: {
+            title: 'No se pudo cargar',
+            desc: 'No se pudo cargar el documento para corregirlo.',
+          },
+        },
+      },
+    },
+    corregir: {
+      title: 'Corregir documento',
+      subtitle: 'Ajusta la sede y los datos contables sin desaprobar',
+      empty: 'El documento no tiene líneas',
+      fields: {
+        sede: 'Sede',
+        seleccionar: 'Selecciona…',
+        buscar: 'Buscar…',
+      },
+      cols: {
+        id: 'ID',
+        descripcion: 'Ítem o cuenta',
+        cantidad: 'Cantidad',
+        precio: 'Precio',
+        subtotal: 'Subtotal',
+        base: 'Base',
+        centroCosto: 'Centro de costo',
+        contacto: 'Contacto',
+      },
+      toasts: {
+        success: { title: 'Documento corregido', desc: 'Se guardaron las correcciones.' },
+        error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
+        sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
+        loadError: {
+          title: 'No se pudo cargar',
+          desc: 'No se pudo cargar el documento para corregirlo.',
         },
       },
     },

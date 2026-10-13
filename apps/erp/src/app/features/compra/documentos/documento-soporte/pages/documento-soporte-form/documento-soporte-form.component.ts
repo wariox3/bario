@@ -37,7 +37,7 @@ import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-br
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
+import { ErpSelectDataService, RESOLUCION_ACTIVA_PARAMS, SELECT_ENDPOINTS } from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -140,8 +140,8 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
-  /** Filtra el select de resolución a las de compra. */
-  protected readonly resolucionParams = { compra: 'True' } as const;
+  /** Filtra el select de resolución a las de compra activas. */
+  protected readonly resolucionParams = { ...RESOLUCION_ACTIVA_PARAMS, compra: 'True' } as const;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();

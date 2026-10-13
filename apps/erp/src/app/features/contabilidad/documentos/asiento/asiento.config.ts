@@ -52,6 +52,7 @@ export const ASIENTO_CONFIG: DocumentEntityConfig = {
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
+    canCorregir: true,
   },
   // Un asiento aprobado ya movió los saldos: no se edita. Regla única consumida
   // por la lista, el detalle y el resolver de la ruta de edición.

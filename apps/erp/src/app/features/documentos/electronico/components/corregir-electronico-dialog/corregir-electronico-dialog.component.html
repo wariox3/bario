@@ -1,0 +1,155 @@
+@let dict = t().documentActions.electronico.corregir;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  [dismissableMask]="!isSaving()"
+  [style]="{ width: '640px', maxWidth: '96vw' }"
+  styleClass="cp-corregir-electronico-dialog"
+>
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-send text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ dict.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ dict.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ── Body ─────────────────────────────────────────────────────────────── -->
+  @if (visible()) {
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-16 text-brand-muted">
+        <i class="pi pi-spin pi-spinner text-xl"></i>
+      </div>
+    } @else if (loadFailed()) {
+      <p class="m-0 py-12 text-center text-[0.85rem] text-brand-muted">
+        {{ dict.toasts.loadError.desc }}
+      </p>
+    } @else {
+      <!-- Las acciones van dentro del <form> y no en el footer del diálogo:
+           `libFocusInvalid` escucha el submit del propio form. -->
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        libFocusInvalid
+        autocomplete="off"
+        class="flex flex-col gap-5"
+      >
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="corregir-electronico-numero" class="cp-corregir-electronico-dialog__label">
+              {{ dict.fields.numero }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-inputnumber
+              inputId="corregir-electronico-numero"
+              formControlName="numero"
+              [useGrouping]="false"
+              [min]="1"
+              [fluid]="true"
+              [invalid]="form.controls.numero.invalid && form.controls.numero.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.numero"
+              [messages]="{ required: dict.validation.required, min: dict.validation.required }"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="corregir-electronico-resolucion"
+              class="cp-corregir-electronico-dialog__label"
+            >
+              {{ dict.fields.resolucion }}
+            </label>
+            <lib-api-select
+              inputId="corregir-electronico-resolucion"
+              formControlName="resolucion"
+              [endpoint]="resolucionEndpoint"
+              [params]="resolucionParams()"
+              [displayWith]="resolucionLabel"
+              filterBy="prefijo,numero"
+              [showClear]="true"
+              [placeholder]="dict.fields.seleccionar"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="corregir-electronico-fecha" class="cp-corregir-electronico-dialog__label">
+              {{ dict.fields.fecha }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <p-datepicker
+              inputId="corregir-electronico-fecha"
+              formControlName="fecha"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fecha.invalid && form.controls.fecha.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fecha"
+              [messages]="{ required: dict.validation.required }"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
+              for="corregir-electronico-fecha-vence"
+              class="cp-corregir-electronico-dialog__label"
+            >
+              {{ dict.fields.fechaVence }}
+            </label>
+            <p-datepicker
+              inputId="corregir-electronico-fecha-vence"
+              formControlName="fechaVence"
+              [showIcon]="true"
+              appendTo="body"
+              [fluid]="true"
+              [invalid]="form.controls.fechaVence.invalid && form.controls.fechaVence.touched"
+            />
+            <lib-field-error
+              [control]="form.controls.fechaVence"
+              [messages]="{ vencimientoAnterior: t().entities.vencimiento.anteriorAFecha }"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-4">
+          <p-button
+            type="button"
+            [label]="t().common.actions.cancel"
+            [outlined]="true"
+            severity="secondary"
+            [disabled]="isSaving()"
+            (onClick)="onCancel()"
+          />
+          <p-button
+            type="submit"
+            [label]="t().common.actions.save"
+            icon="pi pi-check"
+            [loading]="isSaving()"
+            [disabled]="isSaving()"
+          />
+        </div>
+      </form>
+    }
+  }
+</p-dialog>

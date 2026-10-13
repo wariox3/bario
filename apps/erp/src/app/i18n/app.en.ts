@@ -348,6 +348,7 @@ export const en: AppDict = {
       opciones: 'Options',
       archivos: 'Files',
       contabilidad: 'Accounting',
+      corregir: 'Correct',
       anular: 'Void',
       emitir: 'Issue',
       confirmAprobar: {
@@ -464,6 +465,57 @@ export const en: AppDict = {
         emitirError: {
           title: 'Could not issue',
           desc: 'The document could not be sent to the DIAN.',
+        },
+      },
+      corregir: {
+        action: 'Correct',
+        title: 'Correct for the DIAN',
+        subtitle: 'Number, resolution and dates before issuing',
+        fields: {
+          numero: 'Number',
+          resolucion: 'Resolution',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          seleccionar: 'Select…',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          success: { title: 'Document corrected', desc: 'You can issue it again now.' },
+          error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
+          sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
+          loadError: {
+            title: 'Could not load',
+            desc: 'The document could not be loaded for correction.',
+          },
+        },
+      },
+    },
+    corregir: {
+      title: 'Correct document',
+      subtitle: 'Adjust the branch and accounting data without unapproving',
+      empty: 'The document has no lines',
+      fields: {
+        sede: 'Branch',
+        seleccionar: 'Select…',
+        buscar: 'Search…',
+      },
+      cols: {
+        id: 'ID',
+        descripcion: 'Item or account',
+        cantidad: 'Quantity',
+        precio: 'Price',
+        subtotal: 'Subtotal',
+        base: 'Base',
+        centroCosto: 'Cost center',
+        contacto: 'Contact',
+      },
+      toasts: {
+        success: { title: 'Document corrected', desc: 'The corrections were saved.' },
+        error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
+        sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
+        loadError: {
+          title: 'Could not load',
+          desc: 'The document could not be loaded for correction.',
         },
       },
     },

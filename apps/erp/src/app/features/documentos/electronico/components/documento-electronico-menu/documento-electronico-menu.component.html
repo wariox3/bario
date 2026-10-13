@@ -1,2 +1,10 @@
 <p-menu #menu [popup]="true" [model]="items()" appendTo="body" />
 <app-electronico-log-modal [(visible)]="logVisible" [documentoId]="documentoId()" />
+@if (document().electronico) {
+  <app-corregir-electronico-dialog
+    [(visible)]="corregirVisible"
+    [documentoId]="documentoId()"
+    [document]="document()"
+    (corregido)="documentoChanged.emit()"
+  />
+}

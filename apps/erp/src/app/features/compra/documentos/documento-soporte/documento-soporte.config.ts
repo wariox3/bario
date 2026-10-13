@@ -42,9 +42,13 @@ export const DOCUMENTO_SOPORTE_CONFIG: DocumentEntityConfig = {
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
+    canCorregir: true,
   },
   // Un documento aprobado ya no se edita. Regla única consumida por la lista,
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
   extraActionIds: ['export-excel'],
+  // Se emite a la DIAN: el dropdown Electrónico corrige su cabecera con las
+  // resoluciones de compra.
+  electronico: { resolucionParams: { compra: 'True' } },
 };
