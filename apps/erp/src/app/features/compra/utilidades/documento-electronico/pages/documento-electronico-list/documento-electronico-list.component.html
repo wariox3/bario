@@ -38,6 +38,7 @@
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
     (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
   />
 </lib-list-shell>
 
@@ -48,3 +49,5 @@
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />
+
+<app-error-electronico-dialog [(visible)]="errorVisible" [documento]="errorDocumento()" />

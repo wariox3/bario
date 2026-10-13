@@ -17,7 +17,7 @@
  */
 
 /** Estado electrónico derivado que pinta el badge de la columna "Estado". */
-export type DocumentoElectronicoEstado = 'enviado' | 'pendiente';
+export type DocumentoElectronicoEstado = 'error' | 'enviado' | 'pendiente';
 
 /**
  * Fila del listado de la utilidad. Subconjunto de `DocumentoListRowBase` más la
@@ -33,6 +33,8 @@ export interface DocumentoElectronicoRow {
   readonly contacto_nombre_corto: string | null;
   readonly total: string | null;
   readonly estado_electronico_enviado: boolean;
+  /** El último intento de emitir falló; los motivos están en `documento-electronico-error/`. */
+  readonly estado_electronico_error?: boolean;
 }
 
 /**
@@ -45,12 +47,13 @@ export interface DocumentoElectronicoViewRow extends DocumentoElectronicoRow {
 }
 
 /**
- * Deriva el estado electrónico visible, replicando la lógica del legacy: si ya
- * se envió a la DIAN queda "esperando respuesta" (`enviado`); si no, sigue
- * `pendiente` (aún emitible).
+ * Deriva el estado electrónico visible: "error" si el último intento falló;
+ * si ya se envió a la DIAN queda "esperando respuesta" (`enviado`); si no,
+ * sigue `pendiente` (aún emitible).
  */
 export function resolverEstadoElectronico(
   row: DocumentoElectronicoRow,
 ): DocumentoElectronicoEstado {
+  if (row.estado_electronico_error) return 'error';
   return row.estado_electronico_enviado ? 'enviado' : 'pendiente';
 }

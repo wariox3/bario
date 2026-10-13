@@ -7,6 +7,7 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  extractErrorMessage,
   type FilterCondition,
   type ListQuery,
   type SortSpec,
@@ -18,6 +19,7 @@ import {
   ListShellComponent,
   type BreadcrumbItem,
   type PageChangeEvent,
+  type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
@@ -32,7 +34,10 @@ import {
   COLUMNS,
   FILTERS_STORAGE_KEY,
   FILTER_FIELDS,
+  VER_ERROR_ACTION_ID,
 } from '../../documento-electronico.constants';
+import { clasificarEmision } from '@erp/core/documento-electronico';
+import { ErrorElectronicoDialogComponent } from '@erp/core/documento-electronico/components/error-electronico-dialog/error-electronico-dialog.component';
 
 /**
  * Utilidad **Documento electrónico** del módulo Compra.
@@ -55,6 +60,7 @@ import {
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
+    ErrorElectronicoDialogComponent,
   ],
   templateUrl: './documento-electronico-list.component.html',
   styleUrl: './documento-electronico-list.component.scss',
@@ -75,6 +81,10 @@ export class DocumentoElectronicoListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly isProcessing = signal(false);
+
+  /** Documento cuyo error de emisión muestra el modal. */
+  protected readonly errorDocumento = signal<DocumentoElectronicoViewRow | null>(null);
+  protected readonly errorVisible = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
@@ -153,11 +163,24 @@ export class DocumentoElectronicoListComponent {
     this.selectedRows.set(rows as DocumentoElectronicoViewRow[]);
   }
 
+  /** Clic en el estado "Error" de una fila: abre el detalle del error. */
+  protected onRowAction(event: RowActionInvokedEvent): void {
+    if (event.actionId !== VER_ERROR_ACTION_ID) return;
+    this.errorDocumento.set(event.row as DocumentoElectronicoViewRow);
+    this.errorVisible.set(true);
+  }
+
+  /**
+   * Emite la selección en un solo request. El 200 no dice que todo salió bien:
+   * el aviso se elige según `con_error`, y los que fallaron quedan en "Error"
+   * al recargar.
+   */
   protected onEmitir(): void {
     const ids = this.emitibles().map((row) => row.id);
     if (ids.length === 0) return;
 
     const toast = this.t().entities.documentoElectronico.toasts.emitir;
+    const conError = this.t().documentActions.errorElectronico.toasts;
     this.isProcessing.set(true);
     this.service
       .emitir(ids)
@@ -170,8 +193,21 @@ export class DocumentoElectronicoListComponent {
         }),
       )
       .subscribe({
-        next: () => this.toast.success(toast.success.title, toast.success.desc),
-        error: () => this.toast.error(toast.error.title, toast.error.desc),
+        next: (resultado) => {
+          switch (clasificarEmision(resultado)) {
+            case 'exito':
+              this.toast.success(toast.success.title, toast.success.desc);
+              break;
+            case 'parcial':
+              this.toast.warn(conError.parcial.title, conError.parcial.desc);
+              break;
+            case 'fallo':
+              this.toast.error(conError.fallo.title, conError.fallo.desc);
+              break;
+          }
+        },
+        error: (err: unknown) =>
+          this.toast.error(toast.error.title, extractErrorMessage(err, toast.error.desc)),
       });
   }
 

@@ -17,6 +17,7 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  extractErrorMessage,
   type FilterCondition,
   type ListQuery,
   type SortSpec,
@@ -49,7 +50,8 @@ import {
   NOTIFICAR_FILTER_FIELDS,
   VER_ERROR_ACTION_ID,
 } from '../../enviar-factura-electronica.constants';
-import { ErrorElectronicoDialogComponent } from '../../components/error-electronico-dialog/error-electronico-dialog.component';
+import { clasificarEmision } from '@erp/core/documento-electronico';
+import { ErrorElectronicoDialogComponent } from '@erp/core/documento-electronico/components/error-electronico-dialog/error-electronico-dialog.component';
 
 /** Dependencias que un `TabController` comparte con el componente host. */
 interface TabDeps {
@@ -303,14 +305,43 @@ export class EnviarFacturaElectronicaComponent {
 
   // ── Acciones batch ──────────────────────────────────────────────────────────
 
+  /**
+   * Emite la selección en un solo request. El 200 no dice que todo salió bien:
+   * el aviso se elige según `con_error`, y los que fallaron quedan en "Error"
+   * al recargar.
+   */
   protected onEmitir(): void {
     const ids = this.emitibles().map((row) => row.id);
     if (ids.length === 0) return;
-    this.runBatch(
-      [this.service.emitir(ids)],
-      this.emitir,
-      this.t().entities.enviarFacturaElectronica.toasts.emitir,
-    );
+    const toast = this.t().entities.enviarFacturaElectronica.toasts.emitir;
+    const conError = this.t().documentActions.errorElectronico.toasts;
+    this.isProcessing.set(true);
+    this.service
+      .emitir(ids)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.isProcessing.set(false);
+          this.emitir.reload();
+        }),
+      )
+      .subscribe({
+        next: (resultado) => {
+          switch (clasificarEmision(resultado)) {
+            case 'exito':
+              this.toast.success(toast.success.title, toast.success.desc);
+              break;
+            case 'parcial':
+              this.toast.warn(conError.parcial.title, conError.parcial.desc);
+              break;
+            case 'fallo':
+              this.toast.error(conError.fallo.title, conError.fallo.desc);
+              break;
+          }
+        },
+        error: (err: unknown) =>
+          this.toast.error(toast.error.title, extractErrorMessage(err, toast.error.desc)),
+      });
   }
 
   protected onNotificar(): void {

@@ -284,6 +284,18 @@ export interface AppDict
     };
   };
   documentActions: {
+    errorElectronico: {
+      ver: string;
+      title: string;
+      subtitle: string;
+      loading: string;
+      empty: string;
+      fase: { validacion: string; emision: string };
+      toasts: {
+        parcial: { title: string; desc: string };
+        fallo: { title: string; desc: string };
+      };
+    };
     generar: {
       buttonLabel: string;
       modalHeader: string;
@@ -4624,6 +4636,7 @@ export interface AppDict
         estado: string;
       };
       estado: {
+        error: string;
         enviado: string;
         pendiente: string;
       };
@@ -4664,14 +4677,6 @@ export interface AppDict
         error: string;
         enviado: string;
         pendiente: string;
-      };
-      error: {
-        ver: string;
-        title: string;
-        subtitle: string;
-        loading: string;
-        empty: string;
-        fase: { validacion: string; emision: string };
       };
       filters: {
         notificado: string;

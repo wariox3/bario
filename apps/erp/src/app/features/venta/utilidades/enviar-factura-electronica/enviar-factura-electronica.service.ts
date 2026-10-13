@@ -2,17 +2,14 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 import {
   BaseHttpService,
-  buildFiltros,
   buildListBody,
   buildListParams,
   type FilterCondition,
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type {
-  DocumentoElectronicoError,
-  DocumentoElectronicoRow,
-} from './enviar-factura-electronica.model';
+import type { DocumentoElectronicoRow } from './enviar-factura-electronica.model';
+import type { EmitirResultado } from '@erp/core/documento-electronico';
 
 /** Endpoint de cabeceras de documento (compartido por toda la familia). */
 const DOCUMENTO_ENDPOINT = '/general/documento/';
@@ -53,32 +50,24 @@ export class EnviarFacturaElectronicaService extends BaseHttpService {
   }
 
   /**
-   * Emite un lote de documentos a la DIAN en un solo request (`{ ids }`). El
-   * backend valida el lote completo antes de enviar el primero: si uno no
-   * cumple, no se envía ninguno.
+   * Emite un lote de documentos a la DIAN en un solo request (`{ ids }`). Cada
+   * uno va por su cuenta: el 200 trae `emitidos` y `con_error`, y los que
+   * fallaron quedan con `estado_electronico_error`. Solo falla lo que no es de
+   * ningún documento (400 sin asistente o emisor, 502 si el servicio no
+   * responde); ese aviso lo da la pantalla con el motivo, sin el del interceptor.
    */
-  emitir(documentoIds: readonly number[]): Observable<unknown> {
-    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { ids: documentoIds });
+  emitir(documentoIds: readonly number[]): Observable<EmitirResultado> {
+    return this.post<EmitirResultado>(
+      `${DOCUMENTO_ENDPOINT}emitir/`,
+      { ids: documentoIds },
+      undefined,
+      { errorToast: false },
+    );
   }
 
   /** Notifica al cliente un documento ya emitido. */
   notificar(documentoId: number): Observable<unknown> {
     return this.post<unknown>(`${DOCUMENTO_ENDPOINT}notificar/`, { documento_id: documentoId });
-  }
-
-  /**
-   * Errores del último intento de emitir un documento: `POST
-   * documento-electronico-error/lista/` filtrando por `documento_id`. Cada
-   * intento reemplaza los del anterior.
-   */
-  errores(documentoId: number): Observable<PaginatedResponse<DocumentoElectronicoError>> {
-    return this.post<PaginatedResponse<DocumentoElectronicoError>>(
-      '/general/documento-electronico-error/lista/',
-      {
-        filtros: buildFiltros([{ field: 'documento_id', operator: 'eq', value: documentoId }]),
-        ordenamientos: [],
-      },
-    );
   }
 
   /** Descarta un documento del envío electrónico (irreversible). */

@@ -57,18 +57,6 @@ export function resolverResolucionEtiqueta(row: DocumentoElectronicoRow): string
 }
 
 /**
- * Error de un intento de emisión (`GenDocumentoElectronicoError`). Cada intento
- * reemplaza los errores del anterior.
- */
-export interface DocumentoElectronicoError {
-  readonly id: number;
-  readonly documento: number;
-  readonly fase: 'validacion' | 'emision';
-  readonly mensaje: string;
-  readonly fecha: string;
-}
-
-/**
  * Deriva el estado electrónico visible de una fila, replicando la lógica del
  * legacy: descartado tiene prioridad; luego "error" (el último intento falló);
  * luego "enviado" (esperando respuesta de la DIAN); si no, "pendiente" (aún

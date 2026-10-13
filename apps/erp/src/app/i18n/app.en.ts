@@ -270,6 +270,24 @@ export const en: AppDict = {
     },
   },
   documentActions: {
+    errorElectronico: {
+      ver: 'See the error detail',
+      title: 'Emission error',
+      subtitle: 'Why the emission of document failed',
+      loading: 'Loading the error detail…',
+      empty: 'There are no errors recorded for this document.',
+      fase: { validacion: 'Validation', emision: 'Emission' },
+      toasts: {
+        parcial: {
+          title: 'Some documents were not emitted',
+          desc: 'The ones that failed are in Error status: click it to see why.',
+        },
+        fallo: {
+          title: 'No document was emitted',
+          desc: 'They are in Error status: click it to see why.',
+        },
+      },
+    },
     generar: {
       buttonLabel: 'Generate',
       modalHeader: 'Generate document',
@@ -5948,6 +5966,7 @@ export const en: AppDict = {
         estado: 'Status',
       },
       estado: {
+        error: 'Error',
         enviado: 'Awaiting response',
         pendiente: 'Pending',
       },
@@ -5994,14 +6013,6 @@ export const en: AppDict = {
         error: 'Error',
         enviado: 'Awaiting response',
         pendiente: 'Pending',
-      },
-      error: {
-        ver: 'See the error detail',
-        title: 'Emission error',
-        subtitle: 'Why the emission of invoice failed',
-        loading: 'Loading the error detail…',
-        empty: 'There are no errors recorded for this invoice.',
-        fase: { validacion: 'Validation', emision: 'Emission' },
       },
       filters: {
         notificado: 'Notified',

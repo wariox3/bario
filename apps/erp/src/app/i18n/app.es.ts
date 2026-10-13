@@ -270,6 +270,24 @@ export const es: AppDict = {
     },
   },
   documentActions: {
+    errorElectronico: {
+      ver: 'Ver el detalle del error',
+      title: 'Error al emitir',
+      subtitle: 'Por qué falló la emisión del documento',
+      loading: 'Cargando el detalle del error…',
+      empty: 'No hay errores registrados para este documento.',
+      fase: { validacion: 'Validación', emision: 'Emisión' },
+      toasts: {
+        parcial: {
+          title: 'Algunos documentos no se emitieron',
+          desc: 'Los que fallaron quedaron en estado Error: haz clic en él para ver el motivo.',
+        },
+        fallo: {
+          title: 'No se emitió ningún documento',
+          desc: 'Quedaron en estado Error: haz clic en él para ver el motivo.',
+        },
+      },
+    },
     generar: {
       buttonLabel: 'Generar',
       modalHeader: 'Generar documento',
@@ -6022,6 +6040,7 @@ export const es: AppDict = {
         estado: 'Estado',
       },
       estado: {
+        error: 'Error',
         enviado: 'Esperando respuesta',
         pendiente: 'Pendiente',
       },
@@ -6068,14 +6087,6 @@ export const es: AppDict = {
         error: 'Error',
         enviado: 'Esperando respuesta',
         pendiente: 'Pendiente',
-      },
-      error: {
-        ver: 'Ver el detalle del error',
-        title: 'Error al emitir',
-        subtitle: 'Por qué falló la emisión de la factura',
-        loading: 'Cargando el detalle del error…',
-        empty: 'No hay errores registrados para esta factura.',
-        fase: { validacion: 'Validación', emision: 'Emisión' },
       },
       filters: {
         notificado: 'Notificado',

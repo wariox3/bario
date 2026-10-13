@@ -78,7 +78,7 @@ export const EMITIR_COLUMNS: readonly ColumnDef[] = [
     cellAction: VER_ERROR_ACTION_ID,
     cellActionFor: (row) =>
       (row as DocumentoElectronicoViewRow).estado_electronico_estado === 'error',
-    cellActionLabelKey: `${I18N}.error.ver`,
+    cellActionLabelKey: 'documentActions.errorElectronico.ver',
     toneFor: (row) =>
       (row as DocumentoElectronicoViewRow).estado_electronico_estado === 'error'
         ? 'critical'
