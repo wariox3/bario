@@ -452,6 +452,21 @@ export const es: AppDict = {
       generado: 'Generado',
       anulado: 'Anulado',
     },
+    electronico: {
+      action: 'Electrónico',
+      emitir: 'Emitir',
+      informacion: 'Información',
+      toasts: {
+        emitirSuccess: {
+          title: 'Documento emitido',
+          desc: 'El documento se envió a la DIAN.',
+        },
+        emitirError: {
+          title: 'No se pudo emitir',
+          desc: 'El documento no se pudo enviar a la DIAN.',
+        },
+      },
+    },
     electronicoLog: {
       title: 'Información electrónica',
       subtitle: 'Envíos al cliente y validaciones de la DIAN',
@@ -2569,21 +2584,6 @@ export const es: AppDict = {
         action: 'Utilidades',
         importarDetalle: 'Importar detalle',
       },
-      electronico: {
-        action: 'Electrónico',
-        emitir: 'Emitir',
-        informacion: 'Información',
-        toasts: {
-          emitirSuccess: {
-            title: 'Factura emitida',
-            desc: 'La factura se envió a la DIAN.',
-          },
-          emitirError: {
-            title: 'No se pudo emitir',
-            desc: 'La factura no se pudo enviar a la DIAN.',
-          },
-        },
-      },
       import: {
         title: 'Importar detalle',
         subtitle: 'Sube un Excel con las líneas a cargar en esta factura',
@@ -3065,11 +3065,13 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Aprobado',
         anulado: 'Anulado',
         contabilizado: 'Contabilizado',
+        electronico: 'Electrónico',
       },
       form: {
         createTitle: 'Nuevo documento soporte',

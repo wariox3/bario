@@ -452,6 +452,21 @@ export const en: AppDict = {
       generado: 'Generated',
       anulado: 'Voided',
     },
+    electronico: {
+      action: 'Electronic',
+      emitir: 'Issue',
+      informacion: 'Information',
+      toasts: {
+        emitirSuccess: {
+          title: 'Document issued',
+          desc: 'The document was sent to the DIAN.',
+        },
+        emitirError: {
+          title: 'Could not issue',
+          desc: 'The document could not be sent to the DIAN.',
+        },
+      },
+    },
     electronicoLog: {
       title: 'Electronic information',
       subtitle: 'Emails to the customer and DIAN validations',
@@ -2518,21 +2533,6 @@ export const en: AppDict = {
         action: 'Tools',
         importarDetalle: 'Import lines',
       },
-      electronico: {
-        action: 'Electronic',
-        emitir: 'Issue',
-        informacion: 'Information',
-        toasts: {
-          emitirSuccess: {
-            title: 'Invoice issued',
-            desc: 'The invoice was sent to the DIAN.',
-          },
-          emitirError: {
-            title: 'Could not issue',
-            desc: 'The invoice could not be sent to the DIAN.',
-          },
-        },
-      },
       import: {
         title: 'Import lines',
         subtitle: 'Upload an Excel file with the lines to add to this invoice',
@@ -3011,11 +3011,13 @@ export const en: AppDict = {
         aprobado: 'Apr',
         anulado: 'Void',
         contabilizado: 'Post',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Approved',
         anulado: 'Voided',
         contabilizado: 'Posted',
+        electronico: 'Electronic',
       },
       form: {
         createTitle: 'New support document',

@@ -383,6 +383,16 @@ export interface AppDict
       generado: string;
       anulado: string;
     };
+    /** Dropdown "Electrónico" de la ficha de un documento electrónico. */
+    electronico: {
+      action: string;
+      emitir: string;
+      informacion: string;
+      toasts: {
+        emitirSuccess: { title: string; desc: string };
+        emitirError: { title: string; desc: string };
+      };
+    };
     electronicoLog: {
       title: string;
       subtitle: string;
@@ -1880,15 +1890,6 @@ export interface AppDict
         action: string;
         importarDetalle: string;
       };
-      electronico: {
-        action: string;
-        emitir: string;
-        informacion: string;
-        toasts: {
-          emitirSuccess: { title: string; desc: string };
-          emitirError: { title: string; desc: string };
-        };
-      };
       import: {
         title: string;
         subtitle: string;
@@ -2311,11 +2312,13 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       filters: {
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       form: {
         createTitle: string;

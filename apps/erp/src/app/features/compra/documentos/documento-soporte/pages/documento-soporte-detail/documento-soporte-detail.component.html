@@ -13,7 +13,7 @@
     size="small"
     (onClick)="onBack()"
   />
-  @if (cabecera()) {
+  @if (cabecera(); as cab) {
     <app-document-detail-actions
       [documentoId]="id()"
       [document]="document()"
@@ -45,7 +45,26 @@
         [disabled]="!isEditable()"
         (onClick)="onEdit()"
       />
+
+      <p-button
+        actionsEnd
+        type="button"
+        [label]="t().documentActions.electronico.action"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [loading]="electronico.isEmitiendo()"
+        (onClick)="electronico.toggle($event)"
+      />
     </app-document-detail-actions>
+    <app-documento-electronico-menu
+      #electronico
+      [documentoId]="documentoId()"
+      [estados]="cab.estados"
+      (documentoChanged)="onDocumentoChanged()"
+    />
   }
 </header>
 

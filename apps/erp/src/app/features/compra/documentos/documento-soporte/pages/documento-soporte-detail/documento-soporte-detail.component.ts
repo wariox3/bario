@@ -28,6 +28,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
+import { DocumentoElectronicoMenuComponent } from '@erp/features/documentos/electronico/components/documento-electronico-menu/documento-electronico-menu.component';
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
@@ -78,6 +79,7 @@ interface CabeceraView {
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
+    DocumentoElectronicoMenuComponent,
     TabsModule,
   ],
   templateUrl: './documento-soporte-detail.component.html',
@@ -110,6 +112,12 @@ export class DocumentoSoporteDetailComponent implements OnInit {
   protected readonly afectacionVisible = signal(false);
   /** Id del detalle base que consulta el modal de afectación (línea o su REF). */
   protected readonly afectacionDetalleId = signal<number | null>(null);
+
+  /** Id numérico para el dropdown Electrónico; `null` si la ruta no trae uno válido. */
+  protected readonly documentoId = computed(() => {
+    const id = Number(this.id());
+    return Number.isFinite(id) ? id : null;
+  });
 
   /**
    * ¿Es editable el documento según su política declarativa (`canEditRow`)?
