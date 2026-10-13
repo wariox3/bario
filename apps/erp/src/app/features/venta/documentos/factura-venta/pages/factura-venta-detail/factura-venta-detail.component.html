@@ -76,6 +76,7 @@
 </header>
 
 <app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
+<app-electronico-log-modal [(visible)]="electronicoLogVisible" [documentoId]="documentoId()" />
 
 @if (isLoading()) {
   <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->

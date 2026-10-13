@@ -58,6 +58,7 @@ import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/come
 import { facturaVentaToFormValue } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
 import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
+import { ElectronicoLogModalComponent } from '@erp/features/documentos/electronico/components/electronico-log-modal/electronico-log-modal.component';
 import { EnviarFacturaElectronicaService } from '@erp/features/venta/utilidades/enviar-factura-electronica/enviar-factura-electronica.service';
 
 /** Cabecera legible de la factura para la ficha (solo lo que trae `getById`). */
@@ -103,8 +104,9 @@ interface CabeceraView {
  * importación necesita un documento ya creado —el backend recibe el id del
  * padre— y la ficha es el único lugar donde siempre lo hay.
  *
- * Y un dropdown **Electrónico** con *Emitir*: envía la factura a la DIAN
- * cuando está aprobada y aún no se notificó.
+ * Y un dropdown **Electrónico** con *Emitir* —envía la factura a la DIAN cuando
+ * está aprobada y aún no se notificó— e *Información*, que abre el rastro de
+ * envíos al cliente y las validaciones DIAN.
  */
 @Component({
   selector: 'app-factura-venta-detail',
@@ -118,6 +120,7 @@ interface CabeceraView {
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
+    ElectronicoLogModalComponent,
     MenuModule,
     TabsModule,
     ImportDialogComponent,
@@ -233,13 +236,31 @@ export class FacturaVentaDetailComponent implements OnInit {
     return !!estados?.estado_aprobado && !estados.estado_electronico_notificado;
   });
 
-  /** Entradas del dropdown "Electrónico"; `computed` por la misma razón que Utilidades. */
+  /** Control del modal "Información" del dropdown Electrónico. */
+  protected readonly electronicoLogVisible = signal(false);
+  /** Id numérico para el modal; `null` si la ruta no trae uno válido. */
+  protected readonly documentoId = computed(() => {
+    const id = Number(this.id());
+    return Number.isFinite(id) ? id : null;
+  });
+
+  /**
+   * Entradas del dropdown "Electrónico"; `computed` por la misma razón que
+   * Utilidades. Información solo se habilita con la factura ya notificada: antes
+   * el backend no tiene rastro y responde error ("nunca ha sido notificado").
+   */
   protected readonly electronicoItems = computed<MenuItem[]>(() => [
     {
       label: this.t().entities.facturaVenta.electronico.emitir,
       icon: 'pi pi-send',
       disabled: !this.puedeEmitir() || this.isEmitiendo(),
       command: () => this.onEmitir(),
+    },
+    {
+      label: this.t().entities.facturaVenta.electronico.informacion,
+      icon: 'pi pi-info-circle',
+      disabled: !this.cabecera()?.estados.estado_electronico_notificado,
+      command: () => this.electronicoLogVisible.set(true),
     },
   ]);
 

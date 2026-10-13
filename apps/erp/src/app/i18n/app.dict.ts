@@ -366,6 +366,22 @@ export interface AppDict
       generado: string;
       anulado: string;
     };
+    electronicoLog: {
+      title: string;
+      subtitle: string;
+      close: string;
+      loadError: { title: string; desc: string };
+      envios: {
+        title: string;
+        envio: string;
+        copia: string;
+        empty: string;
+        sinEventos: string;
+      };
+      /** Mapa abierto: un evento que no esté acá se muestra con su clave. */
+      eventos: Readonly<Record<string, string>>;
+      validaciones: { title: string; empty: string };
+    };
     afectacion: {
       title: string;
       subtitle: string;
@@ -1850,6 +1866,7 @@ export interface AppDict
       electronico: {
         action: string;
         emitir: string;
+        informacion: string;
         toasts: {
           emitirSuccess: { title: string; desc: string };
           emitirError: { title: string; desc: string };

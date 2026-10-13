@@ -429,6 +429,43 @@ export const es: AppDict = {
       generado: 'Generado',
       anulado: 'Anulado',
     },
+    electronicoLog: {
+      title: 'Información electrónica',
+      subtitle: 'Envíos al cliente y validaciones de la DIAN',
+      close: 'Cerrar',
+      loadError: {
+        title: 'No se pudo cargar la información',
+        desc: 'Intenta de nuevo en unos segundos.',
+      },
+      envios: {
+        title: 'Envíos al cliente',
+        envio: 'Envío',
+        copia: 'Copia:',
+        empty: 'El documento aún no se ha enviado por correo.',
+        sinEventos: 'El proveedor de correo aún no reporta nada de este envío.',
+      },
+      eventos: {
+        enviado: 'Enviado',
+        entregado: 'Entregado',
+        abierto: 'Abierto',
+        abierto_primera: 'Abierto',
+        clic: 'Clic en el enlace',
+        diferido: 'Diferido',
+        rebote_suave: 'Rebote temporal',
+        rebote_duro: 'Rebote',
+        rebote: 'Rebote',
+        correo_invalido: 'Correo inválido',
+        invalido: 'Correo inválido',
+        bloqueado: 'Bloqueado',
+        queja: 'Marcado como spam',
+        spam: 'Marcado como spam',
+        error: 'Error',
+      },
+      validaciones: {
+        title: 'Validaciones DIAN',
+        empty: 'La DIAN no reportó validaciones.',
+      },
+    },
     afectacion: {
       title: 'Afectación del documento',
       subtitle: 'El documento, su documento afectado y los detalles que lo afectan',
@@ -2512,6 +2549,7 @@ export const es: AppDict = {
       electronico: {
         action: 'Electrónico',
         emitir: 'Emitir',
+        informacion: 'Información',
         toasts: {
           emitirSuccess: {
             title: 'Factura emitida',

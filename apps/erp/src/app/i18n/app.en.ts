@@ -429,6 +429,43 @@ export const en: AppDict = {
       generado: 'Generated',
       anulado: 'Voided',
     },
+    electronicoLog: {
+      title: 'Electronic information',
+      subtitle: 'Emails to the customer and DIAN validations',
+      close: 'Close',
+      loadError: {
+        title: 'Could not load the information',
+        desc: 'Try again in a few seconds.',
+      },
+      envios: {
+        title: 'Emails to the customer',
+        envio: 'Email',
+        copia: 'Cc:',
+        empty: 'The document has not been emailed yet.',
+        sinEventos: 'The email provider has not reported anything for this email yet.',
+      },
+      eventos: {
+        enviado: 'Sent',
+        entregado: 'Delivered',
+        abierto: 'Opened',
+        abierto_primera: 'Opened',
+        clic: 'Link clicked',
+        diferido: 'Deferred',
+        rebote_suave: 'Soft bounce',
+        rebote_duro: 'Bounced',
+        rebote: 'Bounced',
+        correo_invalido: 'Invalid email',
+        invalido: 'Invalid email',
+        bloqueado: 'Blocked',
+        queja: 'Marked as spam',
+        spam: 'Marked as spam',
+        error: 'Error',
+      },
+      validaciones: {
+        title: 'DIAN validations',
+        empty: 'The DIAN reported no validations.',
+      },
+    },
     afectacion: {
       title: 'Document traceability',
       subtitle: 'The document, its affected document and the details that affect it',
@@ -2461,6 +2498,7 @@ export const en: AppDict = {
       electronico: {
         action: 'Electronic',
         emitir: 'Issue',
+        informacion: 'Information',
         toasts: {
           emitirSuccess: {
             title: 'Invoice issued',
