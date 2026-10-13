@@ -2476,6 +2476,8 @@ export interface AppDict
           formaPago: string;
           resolucion: string;
           ordenCompra: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };

@@ -29,7 +29,14 @@ export interface DocumentoSoporteRead extends DocumentoReadBase {
   readonly forma_pago: number | null;
   readonly forma_pago_nombre?: string | null;
   readonly resolucion: number | null;
-  readonly resolucion_nombre?: string | null;
+  /** La etiqueta se arma con prefijo y número (`resolucionLabel`): el read no trae nombre. */
+  readonly resolucion_prefijo?: string | null;
+  readonly resolucion_numero?: string | null;
+  /**
+   * CUDS con el que la DIAN validó el documento soporte. **Todavía no lo manda el
+   * backend** (`GenDocumento` no lo serializa): la ficha lo deja vacío hasta entonces.
+   */
+  readonly cue?: string | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
 }

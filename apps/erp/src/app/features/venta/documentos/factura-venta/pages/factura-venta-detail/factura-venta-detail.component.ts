@@ -21,6 +21,7 @@ import {
   TenantService,
   ToastService,
   calcularResumen,
+  resolucionTexto,
   type DocumentoEstados,
   type ResumenDocumento,
 } from '@reddoc/core';
@@ -331,7 +332,7 @@ export class FacturaVentaDetailComponent implements OnInit {
             ordenCompra: read.orden_compra ?? null,
             remision: read.remision ?? null,
             asesor: read.asesor_nombre ?? null,
-            resolucion: read.resolucion_nombre ?? null,
+            resolucion: resolucionTexto(read),
             cue: read.cue ?? null,
             comentario: read.comentario ?? null,
             estados: {

@@ -3265,6 +3265,8 @@ export const es: AppDict = {
           formaPago: 'Forma de pago',
           resolucion: 'Resolución',
           ordenCompra: 'Orden de compra',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {
