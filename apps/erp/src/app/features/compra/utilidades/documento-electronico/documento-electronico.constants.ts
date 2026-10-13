@@ -1,10 +1,9 @@
 import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
-import type { DocumentoElectronicoViewRow } from './documento-electronico.model';
 
 /**
  * Constantes de la utilidad **Documento electrónico** (Compra).
  *
- * Declara:
+ * Alimentan `DOCUMENTO_ELECTRONICO_CONFIG`. Declara:
  *  - Los **filtros permanentes** (`BASE_FILTERS`) que acotan el listado a los
  *    documentos electrónicos de compra aprobados y pendientes de emitir. Se
  *    inyectan como `baseFilters` de `buildListBody`, antes de los del usuario;
@@ -36,10 +35,7 @@ export const BASE_FILTERS: readonly FilterCondition[] = [
   },
 ];
 
-/** Clic en el estado "Error" de una fila: abre el modal con sus motivos. */
-export const VER_ERROR_ACTION_ID = 'ver-error';
-
-/** Columnas del listado: identificación del documento + tipo + estado electrónico. */
+/** Columnas propias del listado. La de Estado la agrega `EmitirDocumentoElectronicoComponent`. */
 export const COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.columns.id`, type: 'number', width: '70px', align: 'right' },
   {
@@ -63,23 +59,6 @@ export const COLUMNS: readonly ColumnDef[] = [
     type: 'currency',
     width: '140px',
     align: 'right',
-  },
-  {
-    field: 'estado_electronico_estado',
-    headerKey: `${I18N}.columns.estado`,
-    type: 'enum',
-    width: '160px',
-    align: 'center',
-    enumKeyPrefix: `${I18N}.estado`,
-    // Solo "Error" es un enlace: abre el detalle de por qué falló la emisión.
-    cellAction: VER_ERROR_ACTION_ID,
-    cellActionFor: (row) =>
-      (row as DocumentoElectronicoViewRow).estado_electronico_estado === 'error',
-    cellActionLabelKey: 'documentActions.errorElectronico.ver',
-    toneFor: (row) =>
-      (row as DocumentoElectronicoViewRow).estado_electronico_estado === 'error'
-        ? 'critical'
-        : null,
   },
 ];
 

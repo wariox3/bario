@@ -1,23 +1,34 @@
 <!--
-  Utilidad "Documento electrónico" (Compra).
-  Lista única con el chrome estándar de <lib-list-shell> (breadcrumb + card +
-  tabla embebida). En el slot [toolbar] van los filtros (lib-data-toolbar) a la
-  izquierda y el botón Emitir a la derecha, en la misma fila. Selección múltiple
-  para emitir en lote.
+  Emitir documento electrónico: chrome estándar de <lib-list-shell> (migas +
+  card + tabla). En el slot [toolbar] van los filtros a la izquierda y los
+  botones Descartar (si la pantalla lo ofrece) y Emitir a la derecha.
 -->
-<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().entities.documentoElectronico.name">
-  <div toolbar class="dte-toolbar">
+@let comunes = t().documentActions.emisionElectronica;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="textos().name">
+  <div toolbar class="flex items-center gap-2">
     <lib-data-toolbar
-      class="dte-toolbar__filters"
+      class="min-w-0 flex-1"
       [filtersEnabled]="true"
       [activeFiltersCount]="activeFilters().length"
       (filtersToggle)="openFilters()"
       (filtersClear)="clearFilters()"
     />
+    @if (config().descartable) {
+      <p-button
+        size="small"
+        severity="danger"
+        [outlined]="true"
+        icon="pi pi-ban"
+        [label]="comunes.actions.descartar"
+        [disabled]="!canDescartar()"
+        (onClick)="onDescartar()"
+      />
+    }
     <p-button
       size="small"
       icon="pi pi-send"
-      [label]="t().entities.documentoElectronico.actions.emitir"
+      [label]="comunes.actions.emitir"
       [loading]="isProcessing()"
       [disabled]="!canEmitir()"
       (onClick)="onEmitir()"
@@ -26,7 +37,7 @@
 
   <lib-data-table
     table
-    [columns]="columns"
+    [columns]="columns()"
     [items]="items()"
     [totalCount]="totalCount()"
     [loading]="isLoading()"
@@ -43,11 +54,13 @@
 </lib-list-shell>
 
 <lib-data-filter-modal
-  [fields]="filterFields"
+  [fields]="config().filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />
+
+<p-confirmDialog />
 
 <app-error-electronico-dialog [(visible)]="errorVisible" [documento]="errorDocumento()" />

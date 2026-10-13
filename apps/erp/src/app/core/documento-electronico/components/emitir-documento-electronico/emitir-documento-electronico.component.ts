@@ -1,7 +1,9 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { finalize, forkJoin } from 'rxjs';
 import {
   FilterStorageService,
   I18nService,
@@ -23,83 +25,93 @@ import {
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
-import { DocumentoElectronicoService } from '../../documento-electronico.service';
+import { DocumentoElectronicoEmisionService } from '../../documento-electronico-emision.service';
+import { clasificarEmision } from '../../documento-electronico.types';
+import type {
+  DocumentoPorEmitirFila,
+  EmitirDocumentoElectronicoConfig,
+} from '../../emision-electronica.types';
 import {
-  DocumentoElectronicoRow,
-  DocumentoElectronicoViewRow,
-  resolverEstadoElectronico,
-} from '../../documento-electronico.model';
-import {
-  BASE_FILTERS,
-  COLUMNS,
-  FILTERS_STORAGE_KEY,
-  FILTER_FIELDS,
+  ESTADO_ELECTRONICO_COLUMN,
   VER_ERROR_ACTION_ID,
-} from '../../documento-electronico.constants';
-import { clasificarEmision } from '@erp/core/documento-electronico';
-import { ErrorElectronicoDialogComponent } from '@erp/core/documento-electronico/components/error-electronico-dialog/error-electronico-dialog.component';
+  aFilaPorEmitir,
+} from '../../estado-electronico';
+import { ErrorElectronicoDialogComponent } from '../error-electronico-dialog/error-electronico-dialog.component';
 
 /**
- * Utilidad **Documento electrónico** del módulo Compra.
+ * Pantalla **Emitir documento electrónico**: la lista de lo que hay por emitir
+ * a la DIAN, igual para facturas de venta, documentos de compra y nóminas.
  *
- * Lista de una sola vista (sin tabs, a diferencia de la utilidad de venta):
- * documentos electrónicos de compra aprobados y pendientes de emitir a la DIAN.
- * Sigue el chrome estándar de listas (`<lib-list-shell>`): breadcrumb + card +
- * toolbar (filtros + botón Emitir) + tabla con selección múltiple.
+ * Cada módulo solo aporta su `EmitirDocumentoElectronicoConfig` por el
+ * `data.config` de la ruta: filtros permanentes, columnas, filtros del usuario,
+ * textos y si ofrece Descartar. El resto es común:
+ *  - **Emitir**: un solo request con las seleccionadas aún no enviadas. El 200
+ *    no dice que todo salió bien: el aviso se elige según `con_error`.
+ *  - **Descartar** (opcional): irreversible, con confirmación; un request por
+ *    documento.
+ *  - **Estado**: la columna la agrega el componente; "Error" abre el modal con
+ *    los motivos del último intento.
  *
- * La acción **Emitir** manda la selección en un solo request (`{ ids }`) y
- * recarga al terminar. Solo se emiten filas aún no enviadas
- * (`estado_electronico_enviado === false`), como en el legacy.
+ * ```ts
+ * { path: '', loadComponent: () => import('…').then((m) => m.EmitirDocumentoElectronicoComponent),
+ *   data: { config: ENVIAR_NOMINA_ELECTRONICA } }
+ * ```
  */
 @Component({
-  selector: 'app-documento-electronico-list',
+  selector: 'app-emitir-documento-electronico',
   standalone: true,
   imports: [
     ButtonModule,
+    ConfirmDialogModule,
     ListShellComponent,
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
     ErrorElectronicoDialogComponent,
   ],
-  templateUrl: './documento-electronico-list.component.html',
-  styleUrl: './documento-electronico-list.component.scss',
+  providers: [ConfirmationService],
+  templateUrl: './emitir-documento-electronico.component.html',
 })
-export class DocumentoElectronicoListComponent {
-  private readonly service = inject(DocumentoElectronicoService);
+export class EmitirDocumentoElectronicoComponent implements OnInit {
+  private readonly service = inject(DocumentoElectronicoEmisionService);
   private readonly filterStorage = inject(FilterStorageService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
 
-  // ── Estado ──────────────────────────────────────────────────────────────────
-  protected readonly items = signal<readonly DocumentoElectronicoViewRow[]>([]);
+  /** Lo que distingue a la pantalla; llega por el `data.config` de la ruta. */
+  readonly config = input.required<EmitirDocumentoElectronicoConfig>();
+
+  protected readonly textos = computed(() => this.config().textos(this.t()));
+  protected readonly columns = computed(() => [
+    ...this.config().columns,
+    ESTADO_ELECTRONICO_COLUMN,
+  ]);
+
+  // ── Estado ────────────────────────────────────────────────────────────────
+  protected readonly items = signal<readonly DocumentoPorEmitirFila[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly isProcessing = signal(false);
-
-  /** Documento cuyo error de emisión muestra el modal. */
-  protected readonly errorDocumento = signal<DocumentoElectronicoViewRow | null>(null);
-  protected readonly errorVisible = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
-  protected readonly selectedRows = signal<readonly DocumentoElectronicoViewRow[]>([]);
-  protected readonly activeFilters = signal<readonly FilterCondition[]>(
-    this.filterStorage.read(FILTERS_STORAGE_KEY),
-  );
+  protected readonly selectedRows = signal<readonly DocumentoPorEmitirFila[]>([]);
+  protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
+
+  /** Documento cuyo error de emisión muestra el modal. */
+  protected readonly errorDocumento = signal<DocumentoPorEmitirFila | null>(null);
+  protected readonly errorVisible = signal(false);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
 
-  /**
-   * Migas: módulo activo (navegable a su home) → esta utilidad. El módulo se
-   * deriva del `ActiveModuleStore` (fijado por el `erpModuleResolver` raíz).
-   */
+  /** Migas: módulo activo (navegable a su home) → esta pantalla. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     return [
@@ -107,11 +119,11 @@ export class DocumentoElectronicoListComponent {
         label: resolveModuleName(this.activeModule, this.t()),
         routerLink: slug ? ['/t', slug, currentModuleId(this.activeModule)] : undefined,
       },
-      { label: this.t().entities.documentoElectronico.name },
+      { label: this.textos().name },
     ];
   });
 
-  /** Seleccionados que aún se pueden emitir (los "esperando respuesta" se excluyen). */
+  /** Seleccionadas que aún se pueden emitir (las "esperando respuesta" se excluyen). */
   private readonly emitibles = computed(() =>
     this.selectedRows().filter((row) => !row.estado_electronico_enviado),
   );
@@ -120,10 +132,14 @@ export class DocumentoElectronicoListComponent {
     () => !this.isProcessing() && this.emitibles().length > 0,
   );
 
-  protected readonly columns = COLUMNS;
-  protected readonly filterFields = FILTER_FIELDS;
+  /** Descartar aplica a cualquier selección: saca el documento del ciclo. */
+  protected readonly canDescartar = computed(
+    () => !this.isProcessing() && this.selectedRows().length > 0,
+  );
 
-  constructor() {
+  /** Los inputs del router se asignan antes de `ngOnInit`, no en el constructor. */
+  ngOnInit(): void {
+    this.activeFilters.set(this.filterStorage.read(this.config().storageKey));
     this.loadList();
   }
 
@@ -147,50 +163,40 @@ export class DocumentoElectronicoListComponent {
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
     this.activeFilters.set(filters);
-    this.filterStorage.write(FILTERS_STORAGE_KEY, filters);
+    this.filterStorage.write(this.config().storageKey, filters);
     this.currentPage.set(0);
     this.loadList();
   }
 
   protected clearFilters(): void {
     this.activeFilters.set([]);
-    this.filterStorage.clear(FILTERS_STORAGE_KEY);
+    this.filterStorage.clear(this.config().storageKey);
     this.currentPage.set(0);
     this.loadList();
   }
 
   protected onSelectionChange(rows: unknown[]): void {
-    this.selectedRows.set(rows as DocumentoElectronicoViewRow[]);
+    this.selectedRows.set(rows as DocumentoPorEmitirFila[]);
   }
 
   /** Clic en el estado "Error" de una fila: abre el detalle del error. */
   protected onRowAction(event: RowActionInvokedEvent): void {
     if (event.actionId !== VER_ERROR_ACTION_ID) return;
-    this.errorDocumento.set(event.row as DocumentoElectronicoViewRow);
+    this.errorDocumento.set(event.row as DocumentoPorEmitirFila);
     this.errorVisible.set(true);
   }
 
-  /**
-   * Emite la selección en un solo request. El 200 no dice que todo salió bien:
-   * el aviso se elige según `con_error`, y los que fallaron quedan en "Error"
-   * al recargar.
-   */
   protected onEmitir(): void {
     const ids = this.emitibles().map((row) => row.id);
     if (ids.length === 0) return;
-
-    const toast = this.t().entities.documentoElectronico.toasts.emitir;
+    const toast = this.textos().toasts.emitir;
     const conError = this.t().documentActions.errorElectronico.toasts;
     this.isProcessing.set(true);
     this.service
       .emitir(ids)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => {
-          this.isProcessing.set(false);
-          this.selectedRows.set([]);
-          this.loadList();
-        }),
+        finalize(() => this.terminarAccion()),
       )
       .subscribe({
         next: (resultado) => {
@@ -211,7 +217,41 @@ export class DocumentoElectronicoListComponent {
       });
   }
 
+  protected onDescartar(): void {
+    const ids = this.selectedRows().map((row) => row.id);
+    const { descartar, toasts } = this.textos();
+    if (ids.length === 0 || !descartar || !toasts.descartar) return;
+    const toast = toasts.descartar;
+    this.confirmation.confirm({
+      header: descartar.confirm.header,
+      message: descartar.confirm.message,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: descartar.confirm.accept,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.isProcessing.set(true);
+        forkJoin(ids.map((id) => this.service.descartar(id)))
+          .pipe(
+            takeUntilDestroyed(this.destroyRef),
+            finalize(() => this.terminarAccion()),
+          )
+          .subscribe({
+            next: () => this.toast.success(toast.success.title, toast.success.desc),
+            error: () => this.toast.error(toast.error.title, toast.error.desc),
+          });
+      },
+    });
+  }
+
   // ── Internos ──────────────────────────────────────────────────────────────
+
+  /** Tras emitir o descartar: suelta los botones, limpia la selección y recarga. */
+  private terminarAccion(): void {
+    this.isProcessing.set(false);
+    this.selectedRows.set([]);
+    this.loadList();
+  }
 
   private loadList(): void {
     const query: ListQuery = {
@@ -223,14 +263,14 @@ export class DocumentoElectronicoListComponent {
 
     this.isLoading.set(true);
     this.service
-      .listar(query, BASE_FILTERS)
+      .listar(query, this.config().baseFilters)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
         next: (response) => {
-          this.items.set(response.results.map(toViewRow));
+          this.items.set(response.results.map(aFilaPorEmitir));
           this.totalCount.set(response.count);
           this.selectedRows.set([]);
         },
@@ -244,9 +284,4 @@ export class DocumentoElectronicoListComponent {
         },
       });
   }
-}
-
-/** Enriquece una fila cruda con su estado electrónico derivado. */
-function toViewRow(row: DocumentoElectronicoRow): DocumentoElectronicoViewRow {
-  return { ...row, estado_electronico_estado: resolverEstadoElectronico(row) };
 }

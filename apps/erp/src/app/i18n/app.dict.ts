@@ -284,6 +284,11 @@ export interface AppDict
     };
   };
   documentActions: {
+    emisionElectronica: {
+      actions: { emitir: string; descartar: string };
+      columns: { estado: string };
+      estado: { error: string; enviado: string; pendiente: string };
+    };
     errorElectronico: {
       ver: string;
       title: string;
@@ -4622,9 +4627,6 @@ export interface AppDict
     documentoElectronico: {
       name: string;
       subtitle: string;
-      actions: {
-        emitir: string;
-      };
       columns: {
         id: string;
         documentoTipo: string;
@@ -4633,12 +4635,6 @@ export interface AppDict
         fecha: string;
         proveedor: string;
         total: string;
-        estado: string;
-      };
-      estado: {
-        error: string;
-        enviado: string;
-        pendiente: string;
       };
       filters: {
         notificado: string;

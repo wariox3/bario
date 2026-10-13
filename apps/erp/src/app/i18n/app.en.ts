@@ -270,6 +270,11 @@ export const en: AppDict = {
     },
   },
   documentActions: {
+    emisionElectronica: {
+      actions: { emitir: 'Emit', descartar: 'Discard' },
+      columns: { estado: 'Status' },
+      estado: { error: 'Error', enviado: 'Awaiting response', pendiente: 'Pending' },
+    },
     errorElectronico: {
       ver: 'See the error detail',
       title: 'Emission error',
@@ -5952,9 +5957,6 @@ export const en: AppDict = {
     documentoElectronico: {
       name: 'Electronic document',
       subtitle: 'Issue your purchase electronic documents to the DIAN.',
-      actions: {
-        emitir: 'Issue',
-      },
       columns: {
         id: 'ID',
         documentoTipo: 'Type',
@@ -5963,12 +5965,6 @@ export const en: AppDict = {
         fecha: 'Date',
         proveedor: 'Supplier',
         total: 'Total',
-        estado: 'Status',
-      },
-      estado: {
-        error: 'Error',
-        enviado: 'Awaiting response',
-        pendiente: 'Pending',
       },
       filters: {
         notificado: 'Notified',

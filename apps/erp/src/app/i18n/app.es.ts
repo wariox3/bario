@@ -270,6 +270,11 @@ export const es: AppDict = {
     },
   },
   documentActions: {
+    emisionElectronica: {
+      actions: { emitir: 'Emitir', descartar: 'Descartar' },
+      columns: { estado: 'Estado' },
+      estado: { error: 'Error', enviado: 'Esperando respuesta', pendiente: 'Pendiente' },
+    },
     errorElectronico: {
       ver: 'Ver el detalle del error',
       title: 'Error al emitir',
@@ -6026,9 +6031,6 @@ export const es: AppDict = {
     documentoElectronico: {
       name: 'Documento electrónico',
       subtitle: 'Emite tus documentos electrónicos de compra a la DIAN.',
-      actions: {
-        emitir: 'Emitir',
-      },
       columns: {
         id: 'ID',
         documentoTipo: 'Tipo',
@@ -6037,12 +6039,6 @@ export const es: AppDict = {
         fecha: 'Fecha',
         proveedor: 'Proveedor',
         total: 'Total',
-        estado: 'Estado',
-      },
-      estado: {
-        error: 'Error',
-        enviado: 'Esperando respuesta',
-        pendiente: 'Pendiente',
       },
       filters: {
         notificado: 'Notificado',
