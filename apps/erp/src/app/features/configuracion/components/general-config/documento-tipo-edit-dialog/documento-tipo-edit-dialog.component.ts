@@ -1,4 +1,14 @@
-import { Component, DestroyRef, effect, inject, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -69,6 +79,18 @@ export class DocumentoTipoEditDialogComponent {
 
   /** Etiqueta `prefijo número` (el `seleccionar` no trae `nombre`). */
   protected readonly resolucionLabel = resolucionLabel;
+
+  /**
+   * Solo las resoluciones del módulo del tipo: las de venta para un tipo de
+   * venta, las de compra para uno de compra. Un tipo que no es de ninguno (o de
+   * ambos) ve el catálogo completo.
+   */
+  protected readonly resolucionParams = computed((): Record<string, string> => {
+    const tipo = this.tipo();
+    if (tipo?.venta && !tipo.compra) return { venta: 'True' };
+    if (tipo?.compra && !tipo.venta) return { compra: 'True' };
+    return {};
+  });
 
   protected readonly form = this.fb.group({
     consecutivo: this.fb.control<number | null>(null, [Validators.required, Validators.min(1)]),
