@@ -38,6 +38,7 @@ import {
   RESOLUCIONES_PRIMARY_ACTION,
   RESOLUCIONES_ROW_ACTIONS,
   RESOLUCIONES_TRAILING_ACTIONS,
+  RESOLUCIONES_DIAN_ACTION_ID,
   RESOLUCIONES_VALIDAR_DIAN_ACTION_ID,
   resolucionTipoFilter,
   resolucionesFiltersStorageKey,
@@ -110,14 +111,15 @@ export class ResolucionesListComponent {
 
   /**
    * Validar con la DIAN reescribe `estado_validado` y `estado_inactivo`: es una
-   * edición, así que el botón solo lo ve quien puede editar resoluciones.
+   * edición, así que el dropdown "DIAN" solo lo ve quien puede editar
+   * resoluciones.
    */
   protected readonly trailingActions = computed(() =>
     this.acciones.puedeEditar()
       ? this.acciones.trailingActions()
       : this.acciones
           .trailingActions()
-          .filter((action) => action.id !== RESOLUCIONES_VALIDAR_DIAN_ACTION_ID),
+          .filter((action) => action.id !== RESOLUCIONES_DIAN_ACTION_ID),
   );
 
   constructor() {

@@ -803,7 +803,8 @@ export const es: AppDict = {
         estadoInactivo: 'Inactivo',
       },
       actions: {
-        validarDian: 'Validar DIAN',
+        dian: 'DIAN',
+        validar: 'Validar',
       },
       toasts: {
         validarSuccess: {

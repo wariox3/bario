@@ -796,7 +796,8 @@ export const en: AppDict = {
         estadoInactivo: 'Inactive',
       },
       actions: {
-        validarDian: 'Validate DIAN',
+        dian: 'DIAN',
+        validar: 'Validate',
       },
       toasts: {
         validarSuccess: {

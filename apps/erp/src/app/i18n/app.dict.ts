@@ -637,7 +637,8 @@ export interface AppDict
         estadoInactivo: string;
       };
       actions: {
-        validarDian: string;
+        dian: string;
+        validar: string;
       };
       toasts: {
         validarSuccess: { title: string; desc: string };

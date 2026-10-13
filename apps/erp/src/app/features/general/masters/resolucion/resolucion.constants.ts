@@ -116,14 +116,24 @@ export const RESOLUCIONES_PRIMARY_ACTION: ToolbarAction = {
   iconClass: 'pi pi-plus',
 };
 
-/** Id del botón que valida las resoluciones del módulo contra la DIAN. */
+/** Dropdown "DIAN": agrupa las acciones contra la DIAN. */
+export const RESOLUCIONES_DIAN_ACTION_ID = 'dian';
+
+/** Valida las resoluciones del módulo contra la DIAN. */
 export const RESOLUCIONES_VALIDAR_DIAN_ACTION_ID = 'validar-dian';
 
 export const RESOLUCIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
   {
-    id: RESOLUCIONES_VALIDAR_DIAN_ACTION_ID,
-    labelKey: 'entities.resolucion.actions.validarDian',
+    id: RESOLUCIONES_DIAN_ACTION_ID,
+    labelKey: 'entities.resolucion.actions.dian',
     iconClass: '',
+    children: [
+      {
+        id: RESOLUCIONES_VALIDAR_DIAN_ACTION_ID,
+        labelKey: 'entities.resolucion.actions.validar',
+        iconClass: 'pi pi-verified',
+      },
+    ],
   },
   {
     id: 'actions',
