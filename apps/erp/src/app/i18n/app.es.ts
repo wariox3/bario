@@ -6029,7 +6029,7 @@ export const es: AppDict = {
       },
     },
     documentoElectronico: {
-      name: 'Documento electrónico',
+      name: 'Emitir documento electrónico',
       columns: {
         id: 'ID',
         documentoTipo: 'Tipo',
@@ -6057,7 +6057,7 @@ export const es: AppDict = {
       },
     },
     enviarFacturaElectronica: {
-      name: 'Enviar factura electrónica',
+      name: 'Emitir documento electrónico',
       columns: {
         id: 'ID',
         numero: 'Número',
@@ -6102,7 +6102,7 @@ export const es: AppDict = {
       },
     },
     enviarNominaElectronica: {
-      name: 'Enviar nómina electrónica',
+      name: 'Emitir documento electrónico',
       columns: {
         id: 'ID',
         numero: 'Número',

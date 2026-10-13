@@ -5955,7 +5955,7 @@ export const en: AppDict = {
       },
     },
     documentoElectronico: {
-      name: 'Electronic document',
+      name: 'Issue electronic document',
       columns: {
         id: 'ID',
         documentoTipo: 'Type',
@@ -5983,7 +5983,7 @@ export const en: AppDict = {
       },
     },
     enviarFacturaElectronica: {
-      name: 'Send electronic invoice',
+      name: 'Issue electronic document',
       columns: {
         id: 'ID',
         numero: 'Number',
@@ -6028,7 +6028,7 @@ export const en: AppDict = {
       },
     },
     enviarNominaElectronica: {
-      name: 'Send electronic payroll',
+      name: 'Issue electronic document',
       columns: {
         id: 'ID',
         numero: 'Number',
