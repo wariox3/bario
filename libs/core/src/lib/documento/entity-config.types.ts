@@ -44,6 +44,26 @@ export interface DocumentCapabilities {
    * Opcional y `false` por defecto: se enciende documento por documento.
    */
   readonly canViewAfectacion?: boolean;
+  /**
+   * "Corregir" en el dropdown "Opciones" de la ficha: arregla un documento
+   * aprobado sin desaprobarlo —la sede y los datos contables de sus líneas—.
+   * Opcional y `false` por defecto: inventario, procesos generados y
+   * plantillas no lo ofrecen.
+   */
+  readonly canCorregir?: boolean;
+}
+
+/**
+ * Un documento **electrónico** —se emite a la DIAN—. Lo lee el dropdown
+ * "Electrónico" de la ficha, que con esto corrige la cabecera que viaja a la
+ * DIAN (número, resolución y fechas).
+ */
+export interface DocumentElectronicoConfig {
+  /**
+   * Params del `seleccionar` de resoluciones del documento, p. ej.
+   * `{ venta: 'True' }`. El filtro de activas lo suma quien consulta.
+   */
+  readonly resolucionParams: Readonly<Record<string, string>>;
 }
 
 /**
@@ -155,6 +175,8 @@ export interface DocumentEntityConfig {
    * Cada id debe corresponder a un `EntityActionStrategy` registrado.
    */
   readonly extraActionIds?: readonly string[];
+  /** Solo en los documentos que se emiten a la DIAN. */
+  readonly electronico?: DocumentElectronicoConfig;
 }
 
 /**

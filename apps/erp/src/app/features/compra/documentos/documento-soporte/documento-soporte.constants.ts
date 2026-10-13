@@ -89,6 +89,13 @@ export const DOCUMENTO_SOPORTE_COLUMNS: readonly ColumnDef[] = [
     width: '70px',
     align: 'center',
   },
+  {
+    field: 'estado_electronico',
+    headerKey: 'entities.documentoSoporte.columns.electronico',
+    type: 'boolean',
+    width: '70px',
+    align: 'center',
+  },
 ];
 
 /**
@@ -116,6 +123,11 @@ export const DOCUMENTO_SOPORTE_FILTERS: readonly FilterField[] = [
   {
     name: 'estado_anulado',
     displayNameKey: 'entities.documentoSoporte.filters.anulado',
+    type: 'boolean',
+  },
+  {
+    name: 'estado_electronico',
+    displayNameKey: 'entities.documentoSoporte.filters.electronico',
     type: 'boolean',
   },
   {

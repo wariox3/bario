@@ -11,7 +11,7 @@ import { I18nService, ToastService } from '@reddoc/core';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
 import type { AppDict } from '@erp/i18n';
 import { EmpresaLogotipoService } from '../../empresa-logotipo.service';
-import { dataUrlToFile } from '../../utils/data-url.util';
+import { dataUrlToFile } from '@erp/core/utils/data-url.util';
 
 /** Nombre del archivo que viaja en el multipart. La extensión la pone el MIME del recorte. */
 const NOMBRE_ARCHIVO = 'logotipo';

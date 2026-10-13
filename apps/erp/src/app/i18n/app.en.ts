@@ -176,6 +176,38 @@ export const en: AppDict = {
         },
       },
     },
+    imagenes: {
+      title: 'Images',
+      subtitle: 'Photos of this record',
+      empty: 'There are no images yet.',
+      principal: 'Main',
+      marcarPrincipal: 'Set as main',
+      delete: 'Delete',
+      uploading: 'Uploading image…',
+      dropzone: {
+        primary: 'Drag an image or click to choose one',
+        hint: 'PNG, JPG or WEBP, up to {max} MB',
+        invalidType: 'The image format is not valid.',
+        tooLarge: 'The image exceeds the maximum allowed size.',
+      },
+      confirmDelete: {
+        header: 'Confirm deletion',
+        message: 'Delete this image? This action cannot be undone.',
+        messagePrincipal: 'This is the main image. Delete it? This action cannot be undone.',
+      },
+      toasts: {
+        loadError: { title: 'Load failed', desc: 'Could not fetch the images. Try again.' },
+        uploadSuccess: { title: 'Image uploaded', desc: 'The image was added successfully.' },
+        uploadError: { title: 'Upload failed', desc: 'Check the image and try again.' },
+        principalSuccess: {
+          title: 'Main image updated',
+          desc: 'This image now represents the record.',
+        },
+        principalError: { title: 'Update failed', desc: 'Try again in a few seconds.' },
+        deleteSuccess: { title: 'Image deleted', desc: 'The image was deleted successfully.' },
+        deleteError: { title: 'Delete failed', desc: 'Try again in a few seconds.' },
+      },
+    },
     import: {
       dropzone: {
         primary: 'Drag your Excel file here',
@@ -282,6 +314,7 @@ export const en: AppDict = {
       loading: 'Loading the error detail…',
       empty: 'There are no errors recorded for this document.',
       fase: { validacion: 'Validation', emision: 'Emission' },
+      cols: { fase: 'Phase', mensaje: 'Message', fecha: 'Date' },
       toasts: {
         parcial: {
           title: 'Some documents were not emitted',
@@ -348,6 +381,7 @@ export const en: AppDict = {
       opciones: 'Options',
       archivos: 'Files',
       contabilidad: 'Accounting',
+      corregir: 'Correct',
       anular: 'Void',
       emitir: 'Issue',
       confirmAprobar: {
@@ -452,6 +486,72 @@ export const en: AppDict = {
       generado: 'Generated',
       anulado: 'Voided',
     },
+    electronico: {
+      action: 'Electronic',
+      emitir: 'Issue',
+      informacion: 'Information',
+      toasts: {
+        emitirSuccess: {
+          title: 'Document issued',
+          desc: 'The document was sent to the DIAN.',
+        },
+        emitirError: {
+          title: 'Could not issue',
+          desc: 'The document could not be sent to the DIAN.',
+        },
+      },
+      corregir: {
+        action: 'Correct',
+        title: 'Correct for the DIAN',
+        subtitle: 'Number, resolution and dates before issuing',
+        fields: {
+          numero: 'Number',
+          resolucion: 'Resolution',
+          fecha: 'Date',
+          fechaVence: 'Due date',
+          seleccionar: 'Select…',
+        },
+        validation: { required: 'This field is required' },
+        toasts: {
+          success: { title: 'Document corrected', desc: 'You can issue it again now.' },
+          error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
+          sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
+          loadError: {
+            title: 'Could not load',
+            desc: 'The document could not be loaded for correction.',
+          },
+        },
+      },
+    },
+    corregir: {
+      title: 'Correct document',
+      subtitle: 'Adjust the branch and accounting data without unapproving',
+      empty: 'The document has no lines',
+      fields: {
+        sede: 'Branch',
+        seleccionar: 'Select…',
+        buscar: 'Search…',
+      },
+      cols: {
+        id: 'ID',
+        descripcion: 'Item or account',
+        cantidad: 'Quantity',
+        precio: 'Price',
+        subtotal: 'Subtotal',
+        base: 'Base',
+        centroCosto: 'Cost center',
+        contacto: 'Contact',
+      },
+      toasts: {
+        success: { title: 'Document corrected', desc: 'The corrections were saved.' },
+        error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
+        sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
+        loadError: {
+          title: 'Could not load',
+          desc: 'The document could not be loaded for correction.',
+        },
+      },
+    },
     electronicoLog: {
       title: 'Electronic information',
       subtitle: 'Emails to the customer and DIAN validations',
@@ -463,9 +563,16 @@ export const en: AppDict = {
       envios: {
         title: 'Emails to the customer',
         envio: 'Email',
-        copia: 'Cc:',
+        copia: 'Cc',
         empty: 'The document has not been emailed yet.',
-        sinEventos: 'The email provider has not reported anything for this email yet.',
+        sinEventos: 'No reports',
+        cols: {
+          destinatario: 'Recipient',
+          estado: 'Status',
+          enviado: 'Sent',
+          entregado: 'Delivered',
+          abierto: 'Opened',
+        },
       },
       eventos: {
         enviado: 'Sent',
@@ -487,6 +594,33 @@ export const en: AppDict = {
       validaciones: {
         title: 'DIAN validations',
         empty: 'The DIAN reported no validations.',
+        cols: { fecha: 'Date', detalle: 'Detail' },
+      },
+      vista: { label: 'Emails view', resumen: 'Summary', eventos: 'Events' },
+      eventosCols: {
+        fecha: 'Date',
+        destinatario: 'Recipient',
+        evento: 'Event',
+        envio: 'Email',
+        ip: 'IP',
+      },
+      acciones: {
+        renotificar: 'Notify again',
+        descargarXml: 'Download XML',
+        toasts: {
+          renotificarSuccess: {
+            title: 'Document notified again',
+            desc: 'The email was sent to the customer again.',
+          },
+          renotificarError: {
+            title: 'Could not notify again',
+            desc: 'Try again in a few seconds.',
+          },
+          xmlError: {
+            title: 'Could not download the XML',
+            desc: 'Try again in a few seconds.',
+          },
+        },
       },
     },
     afectacion: {
@@ -1178,7 +1312,7 @@ export const en: AppDict = {
         },
         groups: { identificacion: 'Identification', clasificacion: 'Classification' },
         opciones: { imagenes: 'Images' },
-        opcionesHint: { imagenes: 'Item photos, beyond the main one' },
+        opcionesHint: { imagenes: 'Item photos; the main one is shown on the record' },
         labels: {
           impuestosVenta: 'Sales taxes',
           impuestosCompra: 'Purchase taxes',
@@ -2518,21 +2652,6 @@ export const en: AppDict = {
         action: 'Tools',
         importarDetalle: 'Import lines',
       },
-      electronico: {
-        action: 'Electronic',
-        emitir: 'Issue',
-        informacion: 'Information',
-        toasts: {
-          emitirSuccess: {
-            title: 'Invoice issued',
-            desc: 'The invoice was sent to the DIAN.',
-          },
-          emitirError: {
-            title: 'Could not issue',
-            desc: 'The invoice could not be sent to the DIAN.',
-          },
-        },
-      },
       import: {
         title: 'Import lines',
         subtitle: 'Upload an Excel file with the lines to add to this invoice',
@@ -3011,11 +3130,13 @@ export const en: AppDict = {
         aprobado: 'Apr',
         anulado: 'Void',
         contabilizado: 'Post',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Approved',
         anulado: 'Voided',
         contabilizado: 'Posted',
+        electronico: 'Electronic',
       },
       form: {
         createTitle: 'New support document',
@@ -3083,6 +3204,8 @@ export const en: AppDict = {
           formaPago: 'Payment form',
           resolucion: 'Resolution',
           ordenCompra: 'Purchase order',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {

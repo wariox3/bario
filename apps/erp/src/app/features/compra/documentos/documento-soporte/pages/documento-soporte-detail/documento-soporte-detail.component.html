@@ -13,12 +13,13 @@
     size="small"
     (onClick)="onBack()"
   />
-  @if (cabecera()) {
+  @if (cabecera(); as cab) {
     <app-document-detail-actions
       [documentoId]="id()"
       [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
+      [canCorregir]="capacidades().puedeCorregir"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (documentoChanged)="onDocumentoChanged()"
     >
@@ -45,7 +46,27 @@
         [disabled]="!isEditable()"
         (onClick)="onEdit()"
       />
+
+      <p-button
+        actionsEnd
+        type="button"
+        [label]="t().documentActions.electronico.action"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [loading]="electronico.isEmitiendo()"
+        (onClick)="electronico.toggle($event)"
+      />
     </app-document-detail-actions>
+    <app-documento-electronico-menu
+      #electronico
+      [documentoId]="documentoId()"
+      [estados]="cab.estados"
+      [document]="document()"
+      (documentoChanged)="onDocumentoChanged()"
+    />
   }
 </header>
 
@@ -134,6 +155,21 @@
       <div class="flex flex-col gap-0.5">
         <dt class="documento-soporte-detail__label">{{ det.labels.ordenCompra }}</dt>
         <dd class="documento-soporte-detail__value">{{ c.ordenCompra }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="documento-soporte-detail__label">{{ det.labels.cue }}</dt>
+        <dd class="documento-soporte-detail__value break-all">
+          {{ c.cue }}
+          @if (dianUrl(); as url) {
+            <a
+              class="ml-2 font-semibold text-sky-700 hover:underline"
+              [href]="url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ det.labels.verDian }}</a
+            >
+          }
+        </dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="documento-soporte-detail__label">{{ det.labels.comentario }}</dt>

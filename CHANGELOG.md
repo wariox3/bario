@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.3](https://github.com/wariox3/bario/compare/v0.1.2...v0.1.3) (2026-10-13)
+
+### Features
+
+- **documento-electronico:** dropdown Electrónico compartido y en documento soporte ([70248ee](https://github.com/wariox3/bario/commit/70248ee88016bf6ae136b439c7d9da873dbf710d))
+- **documento-electronico:** información electrónica en tablas, renotificar y descargar XML ([005767f](https://github.com/wariox3/bario/commit/005767fae0614dfa699a1b46abeeae39b5183408))
+- **documento-electronico:** los errores de emisión se ven en una tabla ([da07497](https://github.com/wariox3/bario/commit/da07497841ecb5adaa11778c5d2ac29dc8af2d5b))
+- **documento:** corregir contable desde Opciones y corregir DIAN desde Electrónico ([7ec1c1f](https://github.com/wariox3/bario/commit/7ec1c1febfa4bacd88426a872bdced30d0697c47))
+- **item:** las imágenes del ítem van por general/imagen ([d7b51bc](https://github.com/wariox3/bario/commit/d7b51bc47432981d19b619735b36ed0e2fa54334))
+
+### Bug Fixes
+
+- **documento:** la resolución se arma con prefijo y número; CUE en documento soporte ([5de2118](https://github.com/wariox3/bario/commit/5de21188e2bbdcb9f7730d2da4c0aff7fcced59e))
+- **empresa:** el logotipo se muestra y se recorta en cuadrado ([6e3f20c](https://github.com/wariox3/bario/commit/6e3f20c2400f703381b65d412469d024bfdc0705))
+
 ## [0.1.2](https://github.com/wariox3/bario/compare/v0.1.1...v0.1.2) (2026-10-13)
 
 ### Features

@@ -18,6 +18,8 @@ describe('capacidadesDocumento — sin aprobar', () => {
       puedeAprobar: true,
       puedeDesaprobar: false,
       puedeAnular: false,
+      puedeCorregir: false,
+      puedeCorregirElectronico: false,
     });
   });
 });
@@ -28,6 +30,8 @@ describe('capacidadesDocumento — aprobado', () => {
       puedeAprobar: false,
       puedeDesaprobar: true,
       puedeAnular: true,
+      puedeCorregir: true,
+      puedeCorregirElectronico: true,
     });
   });
 });
@@ -58,6 +62,8 @@ describe('capacidadesDocumento — anulado', () => {
       puedeAprobar: false,
       puedeDesaprobar: false,
       puedeAnular: false,
+      puedeCorregir: false,
+      puedeCorregirElectronico: false,
     });
   });
 
@@ -69,11 +75,13 @@ describe('capacidadesDocumento — anulado', () => {
 });
 
 describe('capacidadesDocumento — banderas ausentes', () => {
-  it('trata la bandera que no vino como "no": un read con solo aprobado abre las tres', () => {
+  it('trata la bandera que no vino como "no": un read con solo aprobado abre las tres y corregir', () => {
     expect(capacidadesDocumento({ estado_aprobado: true })).toEqual({
       puedeAprobar: false,
       puedeDesaprobar: true,
       puedeAnular: true,
+      puedeCorregir: true,
+      puedeCorregirElectronico: true,
     });
   });
 });
@@ -84,6 +92,55 @@ describe('CAPACIDADES_DOCUMENTO_VACIAS', () => {
       puedeAprobar: false,
       puedeDesaprobar: false,
       puedeAnular: false,
+      puedeCorregir: false,
+      puedeCorregirElectronico: false,
     });
+  });
+});
+
+describe('capacidadesDocumento — corregir (contable)', () => {
+  it('se abre con el documento aprobado', () => {
+    expect(capacidadesDocumento(APROBADO).puedeCorregir).toBe(true);
+  });
+
+  it('se cierra contabilizado: el asiento ya tomó los datos', () => {
+    expect(capacidadesDocumento(CONTABILIZADO).puedeCorregir).toBe(false);
+  });
+
+  it('sigue abierta enviado a la DIAN: sede y líneas no viajan en lo emitido', () => {
+    expect(capacidadesDocumento(ENVIADO).puedeCorregir).toBe(true);
+    expect(capacidadesDocumento({ ...APROBADO, estado_electronico: true }).puedeCorregir).toBe(
+      true,
+    );
+  });
+
+  it('no aplica sin aprobar', () => {
+    expect(capacidadesDocumento(SIN_APROBAR).puedeCorregir).toBe(false);
+  });
+});
+
+describe('capacidadesDocumento — corregir (DIAN)', () => {
+  it('se abre aprobado y sin emitir, falle o no la emisión', () => {
+    expect(capacidadesDocumento(APROBADO).puedeCorregirElectronico).toBe(true);
+  });
+
+  it('se cierra contabilizado', () => {
+    expect(capacidadesDocumento(CONTABILIZADO).puedeCorregirElectronico).toBe(false);
+  });
+
+  it('se cierra en cuanto el documento sale hacia la DIAN', () => {
+    expect(capacidadesDocumento(ENVIADO).puedeCorregirElectronico).toBe(false);
+    expect(
+      capacidadesDocumento({ ...APROBADO, estado_electronico: true }).puedeCorregirElectronico,
+    ).toBe(false);
+    expect(
+      capacidadesDocumento({ ...APROBADO, estado_electronico_notificado: true })
+        .puedeCorregirElectronico,
+    ).toBe(false);
+  });
+
+  it('no aplica sin aprobar ni anulado', () => {
+    expect(capacidadesDocumento(SIN_APROBAR).puedeCorregirElectronico).toBe(false);
+    expect(capacidadesDocumento(ANULADO).puedeCorregirElectronico).toBe(false);
   });
 });

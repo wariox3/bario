@@ -1,0 +1,162 @@
+@let dict = t().common.imagenes;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isBusy()"
+  [dismissableMask]="!isBusy()"
+  [style]="{ width: '620px', maxWidth: '94vw' }"
+  styleClass="cp-imagenes-dialog"
+>
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-images text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ headerTitle() }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ headerSubtitle() }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ── Body ─────────────────────────────────────────────────────────────── -->
+  @if (visible()) {
+    <div class="flex flex-col gap-4">
+      <app-file-dropzone
+        size="sm"
+        [accept]="accept()"
+        [maxSizeMB]="maxSizeMB()"
+        [disabled]="isBusy()"
+        [invalid]="errorMessage() !== null"
+        [ariaLabel]="dict.dropzone.primary"
+        (fileSelected)="subir($event)"
+        (fileRejected)="onFileRejected($event)"
+      >
+        @if (isUploading()) {
+          <i class="pi pi-spin pi-spinner text-[1.1rem] text-sky-700"></i>
+          <span class="text-[0.85rem] font-semibold text-brand-text">{{ dict.uploading }}</span>
+        } @else {
+          <i class="pi pi-cloud-upload text-[1.1rem] text-sky-700"></i>
+          <span class="text-[0.85rem] font-semibold text-brand-text">
+            {{ dict.dropzone.primary }}
+          </span>
+          <span class="text-[0.75rem] text-brand-muted">{{ dropzoneHint() }}</span>
+        }
+      </app-file-dropzone>
+
+      @if (errorMessage(); as msg) {
+        <p class="m-0 text-[0.78rem] font-medium text-red-700">
+          <i class="pi pi-exclamation-circle mr-1 text-[0.78rem]"></i>
+          {{ msg }}
+        </p>
+      }
+
+      <!-- Grilla -->
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-10 text-brand-muted">
+          <i class="pi pi-spin pi-spinner text-lg"></i>
+        </div>
+      } @else if (items().length === 0) {
+        <div class="flex items-center gap-2 px-1 py-5">
+          <i class="pi pi-image text-[1.1rem] text-brand-muted opacity-60"></i>
+          <p class="m-0 text-[0.8rem] text-brand-muted">{{ dict.empty }}</p>
+        </div>
+      } @else {
+        <!-- Tarjetas cuadradas, como el marco de la ficha: la miniatura entra
+             entera (`contain`) para que se vea qué se va a mostrar. -->
+        <ul
+          class="m-0 grid max-h-[340px] list-none grid-cols-2 gap-3 overflow-y-auto p-0 sm:grid-cols-3"
+        >
+          @for (imagen of items(); track imagen.id) {
+            <li
+              class="flex flex-col overflow-hidden rounded-xl border bg-brand-surface"
+              [class.border-sky-300]="imagen.principal"
+              [class.border-[rgba(20,48,73,0.1)]]="!imagen.principal"
+            >
+              <div class="relative aspect-square bg-brand-surface-2">
+                @if (imagen.url_miniatura ?? imagen.url; as src) {
+                  <img [src]="src" alt="" class="h-full w-full object-contain" />
+                } @else {
+                  <div class="flex h-full w-full items-center justify-center text-brand-muted">
+                    <i class="pi pi-image text-xl opacity-50"></i>
+                  </div>
+                }
+                @if (imagen.principal) {
+                  <span
+                    class="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-sky-700 px-2 py-0.5 text-[0.68rem] font-semibold text-white"
+                  >
+                    <i class="pi pi-star-fill text-[0.6rem]"></i>
+                    {{ dict.principal }}
+                  </span>
+                }
+              </div>
+
+              <div
+                class="flex items-center justify-end gap-1 border-t border-[rgba(20,48,73,0.08)] px-1.5 py-1"
+              >
+                @if (workingId() === imagen.id) {
+                  <span class="inline-flex h-7 w-7 items-center justify-center text-brand-muted">
+                    <i class="pi pi-spin pi-spinner text-[0.8rem]"></i>
+                  </span>
+                } @else {
+                  @if (!imagen.principal) {
+                    <p-button
+                      icon="pi pi-star"
+                      [text]="true"
+                      [rounded]="true"
+                      size="small"
+                      severity="secondary"
+                      [ariaLabel]="dict.marcarPrincipal"
+                      [pTooltip]="dict.marcarPrincipal"
+                      [disabled]="isBusy()"
+                      (onClick)="marcarPrincipal(imagen)"
+                    />
+                  }
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="danger"
+                    [ariaLabel]="dict.delete"
+                    [disabled]="isBusy()"
+                    (onClick)="confirmarEliminar(imagen)"
+                  />
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.close"
+        [outlined]="true"
+        severity="secondary"
+        [disabled]="isBusy()"
+        (onClick)="onClose()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog />

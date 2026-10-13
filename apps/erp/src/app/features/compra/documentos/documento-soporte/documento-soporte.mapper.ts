@@ -1,4 +1,9 @@
-import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
+import {
+  documentoContactoToOption,
+  fromIsoDate,
+  resolucionDesdeRead,
+  toIsoDate,
+} from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { DocumentoSoporteRead, DocumentoSoportePayload } from './documento-soporte.model';
 import type { DocumentoSoporteFormRawValue } from './documento-soporte-form.types';
@@ -28,10 +33,7 @@ export function documentoSoporteToFormValue(
       read.forma_pago != null
         ? { id: read.forma_pago, nombre: read.forma_pago_nombre ?? '' }
         : null,
-    resolucion:
-      read.resolucion != null
-        ? { id: read.resolucion, nombre: read.resolucion_nombre ?? '' }
-        : null,
+    resolucion: resolucionDesdeRead(read),
     orden_compra: read.orden_compra ?? null,
     comentario: read.comentario ?? null,
   };

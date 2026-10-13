@@ -10,9 +10,11 @@ import {
   TenantService,
   ToastService,
   calcularResumen,
+  resolucionTexto,
   type ResumenDocumento,
   type DocumentoEstados,
 } from '@reddoc/core';
+import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
 import {
@@ -28,6 +30,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
+import { DocumentoElectronicoMenuComponent } from '@erp/features/documentos/electronico/components/documento-electronico-menu/documento-electronico-menu.component';
 import {
   comercialDetalleToFormValue,
   toLineaCalculo,
@@ -52,6 +55,7 @@ interface CabeceraView {
   readonly formaPago: string | null;
   readonly resolucion: string | null;
   readonly ordenCompra: string | null;
+  readonly cue: string | null;
   readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -78,6 +82,7 @@ interface CabeceraView {
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
+    DocumentoElectronicoMenuComponent,
     TabsModule,
   ],
   templateUrl: './documento-soporte-detail.component.html',
@@ -111,10 +116,22 @@ export class DocumentoSoporteDetailComponent implements OnInit {
   /** Id del detalle base que consulta el modal de afectación (línea o su REF). */
   protected readonly afectacionDetalleId = signal<number | null>(null);
 
+  /** Id numérico para el dropdown Electrónico; `null` si la ruta no trae uno válido. */
+  protected readonly documentoId = computed(() => {
+    const id = Number(this.id());
+    return Number.isFinite(id) ? id : null;
+  });
+
   /**
    * ¿Es editable el documento según su política declarativa (`canEditRow`)?
    * Misma fuente que la lista y el resolver de la ruta de edición.
    */
+  /** Consulta pública del documento en la DIAN; solo con CUE, para no abrir una vacía. */
+  protected readonly dianUrl = computed(() => {
+    const cue = this.cabecera()?.cue;
+    return cue ? `${DIAN_DOCUMENT_URL}${cue}` : null;
+  });
+
   protected readonly isEditable = computed(() => {
     const cab = this.cabecera();
     if (!cab) return false;
@@ -212,8 +229,9 @@ export class DocumentoSoporteDetailComponent implements OnInit {
             almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             formaPago: read.forma_pago_nombre ?? null,
-            resolucion: read.resolucion_nombre ?? null,
+            resolucion: resolucionTexto(read),
             ordenCompra: read.orden_compra ?? null,
+            cue: read.cue ?? null,
             comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,

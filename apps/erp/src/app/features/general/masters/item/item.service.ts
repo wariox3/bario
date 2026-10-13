@@ -67,24 +67,6 @@ export class ItemService extends BaseHttpService {
   }
 
   /**
-   * Carga (o reemplaza) la imagen del item con un data-URL/base64 ya recortado.
-   * TODO(backend): confirmar endpoint y payload en el API nuevo (reddocapi.uk).
-   * Estimado a partir del legacy (`general/item/cargar-imagen/`).
-   */
-  cargarImagen(id: number, base64: string): Observable<{ mensaje?: string }> {
-    return this.post<{ mensaje?: string }>(`${this.resourcePath}cargar-imagen/`, { id, base64 });
-  }
-
-  /**
-   * Elimina la imagen del item.
-   * TODO(backend): confirmar endpoint y payload en el API nuevo (reddocapi.uk).
-   * Estimado a partir del legacy (`general/item/eliminar-imagen/`).
-   */
-  eliminarImagen(id: number): Observable<{ mensaje?: string }> {
-    return this.post<{ mensaje?: string }>(`${this.resourcePath}eliminar-imagen/`, { id });
-  }
-
-  /**
    * Elimina uno o varios items.
    * El backend de masters no expone batch-delete, así que paralelizamos
    * DELETEs individuales con `forkJoin`.

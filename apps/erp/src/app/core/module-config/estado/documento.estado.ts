@@ -39,6 +39,17 @@ export interface CapacidadesDocumento {
   readonly puedeDesaprobar: boolean;
   /** Anular: irreversible, congela el documento. No es lo mismo que desaprobar. */
   readonly puedeAnular: boolean;
+  /**
+   * Corrección **contable** (dropdown Opciones): sede y datos contables de las
+   * líneas, sin desaprobar. Que el documento la ofrezca lo decide su config
+   * (`capabilities.canCorregir`); esto dice solo si su estado la permite.
+   */
+  readonly puedeCorregir: boolean;
+  /**
+   * Corrección **DIAN** (dropdown Electrónico): número, resolución y fechas de
+   * la cabecera. Solo la ofrecen los documentos con config `electronico`.
+   */
+  readonly puedeCorregirElectronico: boolean;
 }
 
 /**
@@ -49,6 +60,8 @@ export interface CapacidadesDocumento {
  * | Aprobar    | sí          | no       | no            | no             | no      |
  * | Desaprobar | no          | sí       | no            | sí             | no      |
  * | Anular     | no          | sí       | sí            | no             | no      |
+ * | Corregir   | no          | sí       | no            | sí             | no      |
+ * | Corr. DIAN | no          | sí       | no            | no             | no      |
  *
  * Cuatro cosas que la tabla deja ver mejor que un template:
  *
@@ -62,6 +75,14 @@ export interface CapacidadesDocumento {
  *   ya contabilizado exigiría revertir el asiento. El legacy solo lo respetaba
  *   en remisión y factura de venta; acá vale para todos, que es la regla que las
  *   otras 23 fichas deberían haber tenido.
+ * - **Las dos correcciones exigen no contabilizado.** El asiento ya tomó los
+ *   datos —la sede y las líneas, o la fecha y el número—: se descontabiliza,
+ *   se corrige y se vuelve a contabilizar.
+ * - **La contable no mira la DIAN; la DIAN, sí.** Sede y líneas no viajan en
+ *   lo emitido, así que se corrigen aunque el documento ya haya salido. Número,
+ *   resolución y fechas sí: una vez en camino o aceptado, cambiarlos lo
+ *   dejaría distinto de lo que recibió la DIAN. Antes de eso se corrige haya
+ *   fallado o no la emisión.
  * - **Todo pasa por aprobar.** Sin aprobación no hay nada que revertir ni anular.
  *
  * Recibe el `DocumentoEstados` de `@reddoc/core` tal cual, con sus banderas
@@ -71,15 +92,24 @@ export interface CapacidadesDocumento {
  */
 export function capacidadesDocumento(estados: DocumentoEstados): CapacidadesDocumento {
   if (estados.estado_anulado) {
-    return { puedeAprobar: false, puedeDesaprobar: false, puedeAnular: false };
+    return {
+      puedeAprobar: false,
+      puedeDesaprobar: false,
+      puedeAnular: false,
+      puedeCorregir: false,
+      puedeCorregirElectronico: false,
+    };
   }
 
   const aprobado = estados.estado_aprobado ?? false;
+  const corregible = aprobado && !estados.estado_contabilizado;
 
   return {
     puedeAprobar: !aprobado,
     puedeDesaprobar: aprobado && !estados.estado_contabilizado,
     puedeAnular: aprobado && !estados.estado_electronico_enviado,
+    puedeCorregir: corregible,
+    puedeCorregirElectronico: corregible && !enviadoDian(estados),
   };
 }
 
@@ -88,3 +118,15 @@ export const CAPACIDADES_DOCUMENTO_VACIAS: CapacidadesDocumento = capacidadesDoc
   estado_aprobado: false,
   estado_anulado: true,
 });
+
+/**
+ * ¿El documento ya salió hacia la DIAN? Cualquiera de las tres banderas lo dice:
+ * en camino (`enviado`), emitido (`electronico`) o notificado al cliente.
+ */
+function enviadoDian(estados: DocumentoEstados): boolean {
+  return (
+    !!estados.estado_electronico_enviado ||
+    !!estados.estado_electronico ||
+    !!estados.estado_electronico_notificado
+  );
+}

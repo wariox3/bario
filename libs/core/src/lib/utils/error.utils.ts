@@ -55,3 +55,37 @@ export function extractErrorMessage(err: unknown, fallback: string): string {
   const { message, messageFromBody } = normalizeInternal(err);
   return messageFromBody ? message : fallback;
 }
+
+/**
+ * `extractErrorMessage` para peticiones `responseType: 'blob'` (descargas): ahí
+ * el cuerpo del error llega como `Blob` y no se puede leer el `detail` sin
+ * antes pasarlo a texto. Un cuerpo que no es JSON cae al `fallback`.
+ */
+export async function extractBlobErrorMessage(err: unknown, fallback: string): Promise<string> {
+  if (!(err instanceof HttpErrorResponse) || !(err.error instanceof Blob)) {
+    return extractErrorMessage(err, fallback);
+  }
+  try {
+    const body: unknown = JSON.parse(await leerTexto(err.error));
+    const parsed = new HttpErrorResponse({
+      error: body,
+      headers: err.headers,
+      status: err.status,
+      statusText: err.statusText,
+      url: err.url ?? undefined,
+    });
+    return extractErrorMessage(parsed, fallback);
+  } catch {
+    return fallback;
+  }
+}
+
+/** `FileReader` y no `Blob.text()`: este último no existe en el jsdom de los tests. */
+function leerTexto(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(blob);
+  });
+}

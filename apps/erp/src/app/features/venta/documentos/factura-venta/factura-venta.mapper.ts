@@ -1,4 +1,9 @@
-import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
+import {
+  documentoContactoToOption,
+  fromIsoDate,
+  resolucionDesdeRead,
+  toIsoDate,
+} from '@reddoc/core';
 import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { FacturaVentaRead, FacturaVentaPayload } from './factura-venta.model';
 import type { FacturaVentaFormRawValue } from './factura-venta-form.types';
@@ -29,11 +34,7 @@ export function facturaVentaToFormValue(
     remision: read.remision ?? null,
     comentario: read.comentario ?? null,
     asesor: read.asesor != null ? { id: read.asesor, nombre: read.asesor_nombre ?? '' } : null,
-    // Sin etiqueta en el read: `lib-api-select` hidrata la opción por id contra su catálogo.
-    resolucion:
-      read.resolucion != null
-        ? { id: read.resolucion, nombre: read.resolucion_nombre ?? '' }
-        : null,
+    resolucion: resolucionDesdeRead(read),
   };
 }
 

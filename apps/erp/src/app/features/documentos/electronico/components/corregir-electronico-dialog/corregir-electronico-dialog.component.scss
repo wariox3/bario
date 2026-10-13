@@ -1,0 +1,30 @@
+// El host solo envuelve al diálogo, que se pinta `fixed`: fuera del flujo para
+// no cobrar el `gap` del contenedor. Misma razón que `_overlays.scss`.
+:host {
+  display: contents;
+}
+
+// ── Dialog shell — mismo chrome que el resto de los diálogos del ERP.
+:host ::ng-deep .cp-corregir-electronico-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(20 48 73 / 0.04),
+    0 20px 60px rgba(20 48 73 / 0.14) !important;
+
+  .p-dialog-header {
+    padding: 1.5rem 1.5rem 0;
+    border-bottom: none;
+  }
+
+  // Sin footer propio: las acciones viven al pie del <form>.
+  .p-dialog-content {
+    padding: 1.25rem 1.5rem 1.1rem;
+  }
+}
+
+.cp-corregir-electronico-dialog__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-brand-text);
+}

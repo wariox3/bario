@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { type Observable, of, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
@@ -17,10 +18,12 @@ import type { MenuItem } from 'primeng/api';
 import { I18nService, TenantService, ToastService } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
-import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
-import { ARCHIVO_TIPO } from '@erp/core/components/archivos-dialog/archivo.service';
+import { ImagenesDialogComponent } from '@erp/core/components/imagenes-dialog/imagenes-dialog.component';
+import { ImagenService } from '@erp/core/components/imagenes-dialog/imagen.service';
+import type { Imagen } from '@erp/core/components/imagenes-dialog/imagen.types';
 import { MODELO } from '@erp/core/permissions';
 import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
+import { dataUrlToFile } from '@erp/core/utils/data-url.util';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ItemService } from '../../item.service';
@@ -51,13 +54,14 @@ interface CuentaRow {
 }
 
 /**
- * Detalle (ficha) de un item — solo lectura, salvo la imagen.
+ * Detalle (ficha) de un item — solo lectura, salvo las imágenes.
  *
  * Master del módulo General (camino B). Llega desde el listado (`detalle/:id`)
  * para verificar de un vistazo qué es el item (imagen, nombre, código, tipo,
  * clasificación), sus precios, impuestos y cuentas contables antes de
- * vender/editar. La imagen sí es editable: se carga/elimina vía el componente
- * reusable.
+ * vender/editar. Las imágenes sí son editables: la principal desde el
+ * encabezado y la galería completa desde "Opciones → Imágenes", las dos contra
+ * `general/imagen/`.
  *
  * Sigue el patrón "ficha de detalle en grupos" del sistema (ver
  * `.interface-design/system.md`), igual que la ficha del contacto: **una** card
@@ -75,13 +79,14 @@ interface CuentaRow {
     BreadcrumbComponent,
     CurrencyPipe,
     ErpImageUploadComponent,
-    ArchivosDialogComponent,
+    ImagenesDialogComponent,
   ],
   templateUrl: './item-detail.component.html',
   styleUrl: './item-detail.component.scss',
 })
 export class ItemDetailComponent implements OnInit {
   private readonly itemService = inject(ItemService);
+  private readonly imagenService = inject(ImagenService);
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
@@ -117,20 +122,11 @@ export class ItemDetailComponent implements OnInit {
     },
   ]);
 
-  /** Dueño de los archivos: este ítem. `null` hasta que la ficha carga. */
-  protected readonly archivosOwner = computed<ArchivoOwner | null>(() => {
+  /** Dueño de las imágenes: este ítem. `null` hasta que la ficha carga. */
+  protected readonly imagenesOwner = computed<ArchivoOwner | null>(() => {
     const it = this.item();
     return it ? { modelo: MODELO.general.item, objetoId: it.id } : null;
   });
-
-  /**
-   * La galería del ítem administra el tipo **imagen** del backend: lista y sube
-   * solo esas, y por eso el picker se acota a los formatos que el backend acepta
-   * como tal. La imagen principal es otra cosa —vive en el encabezado y va por
-   * `item/cargar-imagen/`—; esta guarda las demás fotos del ítem.
-   */
-  protected readonly archivosTipo = ARCHIVO_TIPO.IMAGEN;
-  protected readonly archivosAccept = '.png,.jpg,.jpeg';
 
   /** Migas: módulo General → listado de items → nombre del item abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -151,11 +147,8 @@ export class ItemDetailComponent implements OnInit {
     return items;
   });
 
-  /**
-   * URL de la imagen para el `<img>`. Punto único de ajuste: si el backend
-   * devolviera una ruta relativa en vez de absoluta, anteponer aquí la base.
-   */
-  protected readonly imageUrl = computed(() => this.item()?.imagen ?? null);
+  /** La principal, que el backend ya resuelve en el propio ítem. */
+  protected readonly imageUrl = computed(() => this.item()?.imagen_principal_url ?? null);
 
   /** Tipo del item para el pill principal. */
   protected readonly tipo = computed<'producto' | 'servicio' | null>(() => {
@@ -230,8 +223,14 @@ export class ItemDetailComponent implements OnInit {
     this.opcionesMenu().toggle(event);
   }
 
-  protected onArchivosVisibleChange(visible: boolean): void {
+  protected onImagenesVisibleChange(visible: boolean): void {
     this.imagenesVisible.set(visible);
+  }
+
+  /** La galería pudo mover la principal: se vuelve a leer el ítem. */
+  protected onImagenesCambio(): void {
+    const it = this.item();
+    if (it) this.loadItem(it.id);
   }
 
   protected onBack(): void {
@@ -248,48 +247,84 @@ export class ItemDetailComponent implements OnInit {
     this.navigate(...ITEM_LIST_PATH, 'nuevo');
   }
 
+  /**
+   * El encabezado muestra la principal, así que subir desde ahí es **cambiar**
+   * la principal: se agrega a la galería y, si el backend no la dejó como
+   * principal (porque ya había otra), se la marca. La anterior queda en la
+   * galería.
+   */
   protected onImageSelected(base64: string): void {
     const it = this.item();
-    if (!it || this.isSavingImage()) return;
+    const owner = this.imagenesOwner();
+    if (!it || !owner || this.isSavingImage()) return;
+
+    const toasts = this.t().entities.item.detail.toasts;
+    let archivo: File;
+    try {
+      archivo = dataUrlToFile(base64, 'imagen');
+    } catch {
+      this.toast.error(toasts.imageUploadError.title, toasts.imageUploadError.desc);
+      return;
+    }
+
     this.isSavingImage.set(true);
-    this.itemService
-      .cargarImagen(it.id, base64)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.imagenService
+      .cargar(owner, archivo)
+      .pipe(
+        switchMap((imagen) =>
+          imagen.principal ? of(imagen) : this.imagenService.marcarPrincipal(imagen.id),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: () => {
           this.isSavingImage.set(false);
-          const toasts = this.t().entities.item.detail.toasts.imageUploadSuccess;
-          this.toast.success(toasts.title, toasts.desc);
+          this.toast.success(toasts.imageUploadSuccess.title, toasts.imageUploadSuccess.desc);
           this.loadItem(it.id);
         },
         error: () => {
           this.isSavingImage.set(false);
-          const toasts = this.t().entities.item.detail.toasts.imageUploadError;
-          this.toast.error(toasts.title, toasts.desc);
+          this.toast.error(toasts.imageUploadError.title, toasts.imageUploadError.desc);
+          // La subida pudo quedar hecha aunque fallara el marcado.
+          this.loadItem(it.id);
         },
       });
   }
 
+  /**
+   * Quitar desde el encabezado borra la principal. El ítem trae su URL pero no
+   * su id, así que se busca en la galería (la principal viene primera).
+   */
   protected onImageRemoved(): void {
     const it = this.item();
-    if (!it || this.isSavingImage()) return;
+    const owner = this.imagenesOwner();
+    if (!it || !owner || this.isSavingImage()) return;
+
+    const toasts = this.t().entities.item.detail.toasts;
     this.isSavingImage.set(true);
-    this.itemService
-      .eliminarImagen(it.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.imagenService
+      .listar(owner)
+      .pipe(
+        switchMap((imagenes) => this.eliminarPrincipal(imagenes)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: () => {
           this.isSavingImage.set(false);
-          const toasts = this.t().entities.item.detail.toasts.imageRemoveSuccess;
-          this.toast.success(toasts.title, toasts.desc);
+          this.toast.success(toasts.imageRemoveSuccess.title, toasts.imageRemoveSuccess.desc);
           this.loadItem(it.id);
         },
         error: () => {
           this.isSavingImage.set(false);
-          const toasts = this.t().entities.item.detail.toasts.imageRemoveError;
-          this.toast.error(toasts.title, toasts.desc);
+          this.toast.error(toasts.imageRemoveError.title, toasts.imageRemoveError.desc);
         },
       });
+  }
+
+  /** Sin principal en la galería no hay nada que borrar: se recarga y listo. */
+  private eliminarPrincipal(imagenes: readonly Imagen[]): Observable<void> {
+    const principal = imagenes.find((imagen) => imagen.principal);
+    return principal ? this.imagenService.eliminar(principal.id) : of(undefined);
   }
 
   private loadItem(id: number): void {

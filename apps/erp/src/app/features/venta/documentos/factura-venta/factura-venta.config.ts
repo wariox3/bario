@@ -43,6 +43,7 @@ export const FACTURA_VENTA_CONFIG: DocumentEntityConfig = {
     canExportZip: false,
     canGenerate: false,
     canViewAfectacion: true,
+    canCorregir: true,
   },
   // Un documento aprobado ya no se edita. Regla única consumida por la lista,
   // el detalle y el resolver de la ruta de edición.
@@ -51,4 +52,7 @@ export const FACTURA_VENTA_CONFIG: DocumentEntityConfig = {
   // registrado en ENTITY_ACTION_PROVIDERS):
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
   extraActionIds: ['export-excel'],
+  // Se emite a la DIAN: el dropdown Electrónico corrige su cabecera con las
+  // resoluciones de venta.
+  electronico: { resolucionParams: { venta: 'True' } },
 };

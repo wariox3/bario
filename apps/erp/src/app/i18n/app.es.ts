@@ -176,6 +176,45 @@ export const es: AppDict = {
         },
       },
     },
+    imagenes: {
+      title: 'Imágenes',
+      subtitle: 'Fotos de este registro',
+      empty: 'Todavía no hay imágenes.',
+      principal: 'Principal',
+      marcarPrincipal: 'Marcar como principal',
+      delete: 'Eliminar',
+      uploading: 'Subiendo imagen…',
+      dropzone: {
+        primary: 'Arrastrá una imagen o hacé clic para elegirla',
+        hint: 'PNG, JPG o WEBP, hasta {max} MB',
+        invalidType: 'La imagen no tiene un formato válido.',
+        tooLarge: 'La imagen supera el tamaño máximo permitido.',
+      },
+      confirmDelete: {
+        header: 'Confirmar eliminación',
+        message: '¿Querés eliminar esta imagen? Esta acción no se puede revertir.',
+        messagePrincipal:
+          'Es la imagen principal. ¿Querés eliminarla? Esta acción no se puede revertir.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron obtener las imágenes. Intentá de nuevo.',
+        },
+        uploadSuccess: { title: 'Imagen cargada', desc: 'La imagen se agregó correctamente.' },
+        uploadError: { title: 'No se pudo cargar', desc: 'Revisá la imagen y volvé a intentarlo.' },
+        principalSuccess: {
+          title: 'Imagen principal actualizada',
+          desc: 'Esta imagen ahora representa al registro.',
+        },
+        principalError: {
+          title: 'No se pudo actualizar',
+          desc: 'Intentá de nuevo en unos segundos.',
+        },
+        deleteSuccess: { title: 'Imagen eliminada', desc: 'La imagen se eliminó correctamente.' },
+        deleteError: { title: 'No se pudo eliminar', desc: 'Intentá de nuevo en unos segundos.' },
+      },
+    },
     import: {
       dropzone: {
         primary: 'Arrastrá tu archivo Excel aquí',
@@ -282,6 +321,7 @@ export const es: AppDict = {
       loading: 'Cargando el detalle del error…',
       empty: 'No hay errores registrados para este documento.',
       fase: { validacion: 'Validación', emision: 'Emisión' },
+      cols: { fase: 'Fase', mensaje: 'Mensaje', fecha: 'Fecha' },
       toasts: {
         parcial: {
           title: 'Algunos documentos no se emitieron',
@@ -348,6 +388,7 @@ export const es: AppDict = {
       opciones: 'Opciones',
       archivos: 'Archivos',
       contabilidad: 'Contabilidad',
+      corregir: 'Corregir',
       anular: 'Anular',
       emitir: 'Emitir',
       confirmAprobar: {
@@ -452,6 +493,72 @@ export const es: AppDict = {
       generado: 'Generado',
       anulado: 'Anulado',
     },
+    electronico: {
+      action: 'Electrónico',
+      emitir: 'Emitir',
+      informacion: 'Información',
+      toasts: {
+        emitirSuccess: {
+          title: 'Documento emitido',
+          desc: 'El documento se envió a la DIAN.',
+        },
+        emitirError: {
+          title: 'No se pudo emitir',
+          desc: 'El documento no se pudo enviar a la DIAN.',
+        },
+      },
+      corregir: {
+        action: 'Corregir',
+        title: 'Corregir para la DIAN',
+        subtitle: 'Número, resolución y fechas antes de emitir',
+        fields: {
+          numero: 'Número',
+          resolucion: 'Resolución',
+          fecha: 'Fecha',
+          fechaVence: 'Fecha de vencimiento',
+          seleccionar: 'Selecciona…',
+        },
+        validation: { required: 'Este campo es obligatorio' },
+        toasts: {
+          success: { title: 'Documento corregido', desc: 'Ya puedes volver a emitirlo.' },
+          error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
+          sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
+          loadError: {
+            title: 'No se pudo cargar',
+            desc: 'No se pudo cargar el documento para corregirlo.',
+          },
+        },
+      },
+    },
+    corregir: {
+      title: 'Corregir documento',
+      subtitle: 'Ajusta la sede y los datos contables sin desaprobar',
+      empty: 'El documento no tiene líneas',
+      fields: {
+        sede: 'Sede',
+        seleccionar: 'Selecciona…',
+        buscar: 'Buscar…',
+      },
+      cols: {
+        id: 'ID',
+        descripcion: 'Ítem o cuenta',
+        cantidad: 'Cantidad',
+        precio: 'Precio',
+        subtotal: 'Subtotal',
+        base: 'Base',
+        centroCosto: 'Centro de costo',
+        contacto: 'Contacto',
+      },
+      toasts: {
+        success: { title: 'Documento corregido', desc: 'Se guardaron las correcciones.' },
+        error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
+        sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
+        loadError: {
+          title: 'No se pudo cargar',
+          desc: 'No se pudo cargar el documento para corregirlo.',
+        },
+      },
+    },
     electronicoLog: {
       title: 'Información electrónica',
       subtitle: 'Envíos al cliente y validaciones de la DIAN',
@@ -463,9 +570,16 @@ export const es: AppDict = {
       envios: {
         title: 'Envíos al cliente',
         envio: 'Envío',
-        copia: 'Copia:',
+        copia: 'Copia',
         empty: 'El documento aún no se ha enviado por correo.',
-        sinEventos: 'El proveedor de correo aún no reporta nada de este envío.',
+        sinEventos: 'Sin reportes',
+        cols: {
+          destinatario: 'Destinatario',
+          estado: 'Estado',
+          enviado: 'Enviado',
+          entregado: 'Entregado',
+          abierto: 'Abierto',
+        },
       },
       eventos: {
         enviado: 'Enviado',
@@ -487,6 +601,33 @@ export const es: AppDict = {
       validaciones: {
         title: 'Validaciones DIAN',
         empty: 'La DIAN no reportó validaciones.',
+        cols: { fecha: 'Fecha', detalle: 'Detalle' },
+      },
+      vista: { label: 'Vista de los envíos', resumen: 'Resumen', eventos: 'Eventos' },
+      eventosCols: {
+        fecha: 'Fecha',
+        destinatario: 'Destinatario',
+        evento: 'Evento',
+        envio: 'Envío',
+        ip: 'IP',
+      },
+      acciones: {
+        renotificar: 'Renotificar',
+        descargarXml: 'Descargar XML',
+        toasts: {
+          renotificarSuccess: {
+            title: 'Documento renotificado',
+            desc: 'Se reenvió el correo al cliente.',
+          },
+          renotificarError: {
+            title: 'No se pudo renotificar',
+            desc: 'Intenta de nuevo en unos segundos.',
+          },
+          xmlError: {
+            title: 'No se pudo descargar el XML',
+            desc: 'Intenta de nuevo en unos segundos.',
+          },
+        },
       },
     },
     afectacion: {
@@ -1194,7 +1335,7 @@ export const es: AppDict = {
         },
         groups: { identificacion: 'Identificación', clasificacion: 'Clasificación' },
         opciones: { imagenes: 'Imágenes' },
-        opcionesHint: { imagenes: 'Fotos del ítem, además de la principal' },
+        opcionesHint: { imagenes: 'Fotos del ítem; la principal es la de la ficha' },
         labels: {
           impuestosVenta: 'Impuestos de venta',
           impuestosCompra: 'Impuestos de compra',
@@ -2569,21 +2710,6 @@ export const es: AppDict = {
         action: 'Utilidades',
         importarDetalle: 'Importar detalle',
       },
-      electronico: {
-        action: 'Electrónico',
-        emitir: 'Emitir',
-        informacion: 'Información',
-        toasts: {
-          emitirSuccess: {
-            title: 'Factura emitida',
-            desc: 'La factura se envió a la DIAN.',
-          },
-          emitirError: {
-            title: 'No se pudo emitir',
-            desc: 'La factura no se pudo enviar a la DIAN.',
-          },
-        },
-      },
       import: {
         title: 'Importar detalle',
         subtitle: 'Sube un Excel con las líneas a cargar en esta factura',
@@ -3065,11 +3191,13 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Aprobado',
         anulado: 'Anulado',
         contabilizado: 'Contabilizado',
+        electronico: 'Electrónico',
       },
       form: {
         createTitle: 'Nuevo documento soporte',
@@ -3137,6 +3265,8 @@ export const es: AppDict = {
           formaPago: 'Forma de pago',
           resolucion: 'Resolución',
           ordenCompra: 'Orden de compra',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {

@@ -191,6 +191,41 @@ export interface AppDict
         downloadError: { title: string; desc: string };
       };
     };
+    /**
+     * Galería de **imágenes** de un registro (`ImagenesDialogComponent`), con su
+     * imagen principal.
+     */
+    imagenes: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      principal: string;
+      marcarPrincipal: string;
+      delete: string;
+      uploading: string;
+      dropzone: {
+        primary: string;
+        /** Soporta el placeholder `{max}` (tamaño máximo en MB). */
+        hint: string;
+        invalidType: string;
+        tooLarge: string;
+      };
+      confirmDelete: {
+        header: string;
+        message: string;
+        /** Variante para la principal: avisa que el registro se queda sin ella. */
+        messagePrincipal: string;
+      };
+      toasts: {
+        loadError: { title: string; desc: string };
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        principalSuccess: { title: string; desc: string };
+        principalError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+      };
+    };
     import: {
       dropzone: {
         primary: string;
@@ -296,6 +331,7 @@ export interface AppDict
       loading: string;
       empty: string;
       fase: { validacion: string; emision: string };
+      cols: { fase: string; mensaje: string; fecha: string };
       toasts: {
         parcial: { title: string; desc: string };
         fallo: { title: string; desc: string };
@@ -337,6 +373,7 @@ export interface AppDict
       opciones: string;
       archivos: string;
       contabilidad: string;
+      corregir: string;
       anular: string;
       emitir: string;
       confirmAprobar: { message: string; header: string };
@@ -383,6 +420,63 @@ export interface AppDict
       generado: string;
       anulado: string;
     };
+    /** Dropdown "Electrónico" de la ficha de un documento electrónico. */
+    electronico: {
+      action: string;
+      emitir: string;
+      informacion: string;
+      toasts: {
+        emitirSuccess: { title: string; desc: string };
+        emitirError: { title: string; desc: string };
+      };
+      /** Diálogo "Corregir": la cabecera que viaja a la DIAN. */
+      corregir: {
+        action: string;
+        title: string;
+        subtitle: string;
+        fields: {
+          numero: string;
+          resolucion: string;
+          fecha: string;
+          fechaVence: string;
+          seleccionar: string;
+        };
+        validation: { required: string };
+        toasts: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+          sinCambios: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+    };
+    /** Diálogo "Corregir" del dropdown "Opciones" de la ficha. */
+    corregir: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      fields: {
+        sede: string;
+        seleccionar: string;
+        buscar: string;
+      };
+      cols: {
+        id: string;
+        descripcion: string;
+        cantidad: string;
+        precio: string;
+        subtotal: string;
+        base: string;
+        centroCosto: string;
+        contacto: string;
+      };
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+        sinCambios: { title: string; desc: string };
+        loadError: { title: string; desc: string };
+      };
+    };
     electronicoLog: {
       title: string;
       subtitle: string;
@@ -394,10 +488,34 @@ export interface AppDict
         copia: string;
         empty: string;
         sinEventos: string;
+        cols: {
+          destinatario: string;
+          estado: string;
+          enviado: string;
+          entregado: string;
+          abierto: string;
+        };
       };
       /** Mapa abierto: un evento que no esté acá se muestra con su clave. */
       eventos: Readonly<Record<string, string>>;
-      validaciones: { title: string; empty: string };
+      validaciones: { title: string; empty: string; cols: { fecha: string; detalle: string } };
+      vista: { label: string; resumen: string; eventos: string };
+      eventosCols: {
+        fecha: string;
+        destinatario: string;
+        evento: string;
+        envio: string;
+        ip: string;
+      };
+      acciones: {
+        renotificar: string;
+        descargarXml: string;
+        toasts: {
+          renotificarSuccess: { title: string; desc: string };
+          renotificarError: { title: string; desc: string };
+          xmlError: { title: string; desc: string };
+        };
+      };
     };
     afectacion: {
       title: string;
@@ -1880,15 +1998,6 @@ export interface AppDict
         action: string;
         importarDetalle: string;
       };
-      electronico: {
-        action: string;
-        emitir: string;
-        informacion: string;
-        toasts: {
-          emitirSuccess: { title: string; desc: string };
-          emitirError: { title: string; desc: string };
-        };
-      };
       import: {
         title: string;
         subtitle: string;
@@ -2311,11 +2420,13 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       filters: {
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       form: {
         createTitle: string;
@@ -2365,6 +2476,8 @@ export interface AppDict
           formaPago: string;
           resolucion: string;
           ordenCompra: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };

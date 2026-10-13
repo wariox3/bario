@@ -24,6 +24,7 @@ import {
 } from '@reddoc/core';
 import { ArchivosDialogComponent } from '@erp/core/components/archivos-dialog/archivos-dialog.component';
 import { ContabilidadDialogComponent } from '@erp/core/components/contabilidad-dialog/contabilidad-dialog.component';
+import { CorregirDocumentoDialogComponent } from '../corregir-documento-dialog/corregir-documento-dialog.component';
 import { MODELO } from '@erp/core/permissions';
 import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.types';
 import type { AppDict } from '@erp/i18n';
@@ -53,7 +54,7 @@ const CONFIRMACION: Readonly<
 /**
  * Botonera de acciones de un documento en su **vista de detalle**: Aprobar,
  * Imprimir, un dropdown "Acciones" (Desaprobar y, opcionalmente, Anular) y un
- * dropdown "Opciones" (Archivos y Contabilidad). Compartida por todas las
+ * dropdown "Opciones" (Archivos, Contabilidad y Corregir). Compartida por todas las
  * fichas de detalle.
  *
  * Todas van en un `p-buttongroup`, que las lee como una sola pieza.
@@ -90,6 +91,7 @@ const CONFIRMACION: Readonly<
     MenuModule,
     ArchivosDialogComponent,
     ContabilidadDialogComponent,
+    CorregirDocumentoDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './document-detail-actions.component.html',
@@ -126,6 +128,14 @@ export class DocumentDetailActionsComponent {
   readonly canAnular = input<boolean>(true);
   readonly canEmitir = input<boolean>(true);
   readonly canContabilizar = input<boolean>(true);
+  /**
+   * Habilita "Corregir". Default `false`, al revés que los demás `can*`:
+   * corregir un documento que no lo admite —sin aprobar o ya contabilizado—
+   * rompe datos, así que la ficha tiene que decirlo con
+   * `capacidades().puedeCorregir`. Que aparezca lo decide el config
+   * (`capabilities.canCorregir`).
+   */
+  readonly canCorregir = input<boolean>(false);
 
   /**
    * Estado de contabilización del documento, para el diálogo "Contabilidad".
@@ -174,6 +184,7 @@ export class DocumentDetailActionsComponent {
 
   protected readonly archivosVisible = signal(false);
   protected readonly contabilidadVisible = signal(false);
+  protected readonly corregirVisible = signal(false);
 
   /**
    * Acción en vuelo. Mientras hay una, sus botones muestran carga y no aceptan
@@ -245,6 +256,14 @@ export class DocumentDetailActionsComponent {
         icon: 'pi pi-book',
         disabled: sinDocumento,
         command: () => this.contabilidadVisible.set(true),
+      });
+    }
+    if (this.document().capabilities.canCorregir) {
+      items.push({
+        label: a.corregir,
+        icon: 'pi pi-wrench',
+        disabled: !this.canCorregir() || sinDocumento,
+        command: () => this.corregirVisible.set(true),
       });
     }
     return items;
