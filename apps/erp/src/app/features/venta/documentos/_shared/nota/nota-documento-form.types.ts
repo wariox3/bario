@@ -15,6 +15,7 @@ export interface NotaVentaFormRawValue {
   readonly fecha: Date | null;
   readonly documento_referencia: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
+  readonly almacen: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
   readonly comentario: string | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];

@@ -124,6 +124,7 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
@@ -142,6 +143,12 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   readonly documentoEdit = input<unknown>();
 
   protected readonly isEditMode = computed(() => !!this.id());
+
+  /**
+   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   */
+  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
@@ -167,6 +174,7 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     forma_pago: this.fb.control<ErpSelectOption | null>(null),
     centro_costo: this.fb.control<ErpSelectOption | null>(null),
     sede: this.fb.control<ErpSelectOption | null>(null),
+    almacen: this.fb.control<ErpSelectOption | null>(null),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),

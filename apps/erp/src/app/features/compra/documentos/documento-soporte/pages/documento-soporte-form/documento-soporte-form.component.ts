@@ -133,6 +133,7 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
 
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
+  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
   protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
   protected readonly resolucionEndpoint = RESOLUCION_ENDPOINT;
@@ -157,6 +158,12 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
 
   protected readonly isEditMode = computed(() => !!this.id());
 
+  /**
+   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   */
+  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
+
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
     const id = this.id();
@@ -180,6 +187,7 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
     fecha_vence: this.fb.control<Date | null>(null, Validators.required),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
+    almacen: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     forma_pago: this.fb.control<ErpSelectOption | null>(null),
     resolucion: this.fb.control<ErpSelectOption | null>(null),

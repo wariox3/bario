@@ -20,6 +20,7 @@ export function posDocumentoToFormValue(
         ? { id: read.plazo_pago, nombre: read.plazo_pago_nombre ?? '' }
         : null,
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
+    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
     metodo_pago:
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
@@ -53,6 +54,7 @@ export function formValueToPayload(
     fecha_vence: toIsoDate(raw.fecha_vence),
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
+    almacen: raw.almacen?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
     asesor: raw.asesor?.id ?? null,
     orden_compra: ordenCompra ? ordenCompra : null,

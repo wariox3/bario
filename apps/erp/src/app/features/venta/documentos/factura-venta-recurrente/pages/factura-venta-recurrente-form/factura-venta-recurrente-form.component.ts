@@ -145,6 +145,12 @@ export class FacturaVentaRecurrenteFormComponent implements OnInit, CanComponent
 
   protected readonly isEditMode = computed(() => !!this.id());
 
+  /**
+   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   */
+  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
+
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
     const id = this.id();

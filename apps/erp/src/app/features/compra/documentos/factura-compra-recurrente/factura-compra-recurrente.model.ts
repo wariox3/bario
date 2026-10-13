@@ -26,6 +26,9 @@ export interface FacturaCompraRecurrenteRead extends DocumentoReadBase {
   readonly centro_costo_nombre?: string | null;
   readonly sede: number | null;
   readonly sede_nombre?: string | null;
+  /** Almacén general: el que heredan las líneas nuevas. */
+  readonly almacen?: number | null;
+  readonly almacen_nombre?: string | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
 }
@@ -36,6 +39,7 @@ export interface FacturaCompraRecurrentePayload extends DocumentoPayloadBase {
   readonly forma_pago: number | null;
   readonly centro_costo: number | null;
   readonly sede: number | null;
+  readonly almacen: number | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */

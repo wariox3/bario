@@ -93,6 +93,13 @@ import {
 } from '../../comercial-documento-detalle.mapper';
 import type { ComercialDetalleRead } from '../../comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '../../comercial-documento-detalle.types';
+import { aiuLineaToFormValue, type AiuLinea } from '../../aiu';
+
+/** Toasts con que cierra un agregado de líneas (importar desde documento, AIU). */
+interface AgregarLineasToasts {
+  readonly success: { readonly title: string; readonly desc: string };
+  readonly error: { readonly title: string; readonly desc: string };
+}
 
 /**
  * Tabla de **líneas (detalles)** de un documento comercial. Reutilizable por
@@ -167,6 +174,12 @@ export class ComercialDocumentoDetallesComponent {
   readonly importEnabled = input<boolean>(false);
 
   /**
+   * Habilita la opción **AIU** del botón "Agregar línea": agrega el valor base y
+   * sus líneas de administración, imprevisto y utilidad. Solo la factura de venta.
+   */
+  readonly aiuEnabled = input<boolean>(false);
+
+  /**
    * Contacto del documento actual (de la cabecera del form padre). Acota las
    * líneas pendientes del modal de importación a ese contacto.
    */
@@ -232,8 +245,8 @@ export class ComercialDocumentoDetallesComponent {
   );
 
   /**
-   * Avisa al padre que se importaron líneas en **edición** (ya persistidas vía
-   * `masivo/`) para que recargue el documento y refresque el `FormArray` con los
+   * Avisa al padre que se agregaron líneas en **edición** —importadas o del
+   * AIU, ya persistidas vía `masivo/`— para que recargue el documento y refresque el `FormArray` con los
    * ids y montos autoritativos del backend.
    */
   readonly imported = output<void>();
@@ -242,16 +255,30 @@ export class ComercialDocumentoDetallesComponent {
   protected readonly importing = signal(false);
 
   /**
-   * Acciones del dropdown del botón "Agregar línea" (SplitButton). Hoy solo
-   * "importar desde documento"; se deshabilita sin contacto (acota las pendientes).
+   * Acciones del dropdown del botón "Agregar línea" (SplitButton), según lo que
+   * el documento encienda: "importar desde documento" (se deshabilita sin
+   * contacto, que acota las pendientes) y "AIU".
    */
   protected readonly addLineMenu = computed<MenuItem[]>(() => [
-    {
-      label: this.t().documentImport.buttonLabel,
-      icon: 'pi pi-file-import',
-      disabled: this.contactoId() === null,
-      command: () => this.openImport(),
-    },
+    ...(this.importEnabled()
+      ? [
+          {
+            label: this.t().documentImport.buttonLabel,
+            icon: 'pi pi-file-import',
+            disabled: this.contactoId() === null,
+            command: () => this.openImport(),
+          },
+        ]
+      : []),
+    ...(this.aiuEnabled()
+      ? [
+          {
+            label: this.t().entities.comercialDetalle.aiu.menuLabel,
+            icon: 'pi pi-percentage',
+            command: () => this.openAiu(),
+          },
+        ]
+      : []),
   ]);
 
   /** Espejo reactivo del valor del array para la tabla, los totales y el resumen. */
@@ -482,41 +509,100 @@ export class ComercialDocumentoDetallesComponent {
    * modo: alta → push virtual al `FormArray`; edición → alta masiva + recarga del padre.
    */
   private resolveAndAdd(rows: readonly LineaPendienteApi[]): void {
-    const formValues = rows.map(pendienteLineaToFormValue);
-    const docId = this.documentId();
-    if (docId == null) this.addImportedLocal(formValues);
-    else this.persistImported(docId, formValues);
+    const toasts = this.t().documentImport.toasts;
+    this.agregarLineas(rows.map(pendienteLineaToFormValue), {
+      success: toasts.addSuccess,
+      error: toasts.addError,
+    });
   }
 
-  /** Alta: empuja las líneas resueltas al `FormArray` (se guardan al crear el documento). */
-  private addImportedLocal(formValues: readonly ComercialDetalleFormRawValue[]): void {
-    for (const value of formValues) this.detalles().push(createComercialDetalleGroup(value));
-    const toast = this.t().documentImport.toasts.addSuccess;
-    this.toast.success(toast.title, toast.desc);
+  /**
+   * Abre el modal **AIU** (lazy) y, con las 4 líneas que devuelve (base,
+   * administración, imprevisto, utilidad), lee cada ítem para sus impuestos de
+   * venta y las agrega. El modal solo calcula; aquí se resuelve y persiste.
+   */
+  protected openAiu(): void {
+    if (this.importing()) return;
+    from(import('../aiu-modal/aiu-modal.component'))
+      .pipe(
+        switchMap(({ AiuModalComponent }) => {
+          const ref = this.dialog.open(AiuModalComponent, {
+            ...ENTITY_ACTION_DIALOG_DEFAULTS,
+            // Un clic afuera no debe descartar un AIU a medio digitar.
+            dismissableMask: false,
+            width: '46rem',
+          });
+          return ref ? ref.onClose : EMPTY;
+        }),
+        filter((lineas: unknown): lineas is AiuLinea[] => Array.isArray(lineas)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((lineas) => this.resolveAiu(lineas));
   }
 
-  /** Edición: alta masiva (`masivo/`) en una request; el padre recarga al terminar. */
-  private persistImported(
-    docId: number,
-    formValues: readonly ComercialDetalleFormRawValue[],
-  ): void {
+  /**
+   * Lee los ítems del AIU en paralelo y arma sus líneas con el precio calculado
+   * (sin pasar por la selección de la tabla, que lo pisaría con la lista de
+   * precios del contacto; ver `aiuLineaToFormValue`).
+   */
+  private resolveAiu(lineas: readonly AiuLinea[]): void {
+    const toasts = this.t().entities.comercialDetalle.aiu.toasts;
     this.importing.set(true);
-    const detalles = formValues.map(comercialDetalleToPayload);
-    this.detalleService
-      .crearMasivo(docId, detalles)
+    forkJoin(lineas.map((linea) => this.itemService.getById(linea.item.id)))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        next: (items) => {
+          // Se apaga aquí y no en un `finalize`: en edición `agregarLineas` lo
+          // vuelve a encender por el `masivo/`, que sigue en vuelo al completar.
           this.importing.set(false);
-          const toast = this.t().documentImport.toasts.addSuccess;
-          this.toast.success(toast.title, toast.desc);
-          this.imported.emit();
+          this.agregarLineas(
+            items.map((item, i) => aiuLineaToFormValue(item, lineas[i].precio)),
+            toasts,
+          );
         },
         error: () => {
           this.importing.set(false);
-          const toast = this.t().documentImport.toasts.addError;
-          this.toast.error(toast.title, toast.desc);
+          this.toast.error(toasts.error.title, toasts.error.desc);
         },
+      });
+  }
+
+  /**
+   * Agrega líneas ya resueltas (importadas o del AIU) según el modo:
+   *  - alta → las empuja al `FormArray` (se guardan al crear el documento);
+   *  - edición → alta masiva (`masivo/`) en una request; el padre recarga al terminar.
+   *
+   * La línea que llega sin almacén hereda el de la cabecera, igual que una
+   * agregada a mano (`almacenPorDefecto`).
+   */
+  private agregarLineas(
+    lineas: readonly ComercialDetalleFormRawValue[],
+    toasts: AgregarLineasToasts,
+  ): void {
+    const almacen = this.almacenPorDefecto();
+    const formValues = lineas.map((linea) =>
+      linea.almacen == null && almacen != null ? { ...linea, almacen } : linea,
+    );
+    const docId = this.documentId();
+    if (docId == null) {
+      for (const value of formValues) this.detalles().push(createComercialDetalleGroup(value));
+      this.toast.success(toasts.success.title, toasts.success.desc);
+      return;
+    }
+
+    this.importing.set(true);
+    this.detalleService
+      .crearMasivo(docId, formValues.map(comercialDetalleToPayload))
+      .pipe(
+        finalize(() => this.importing.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success(toasts.success.title, toasts.success.desc);
+          this.imported.emit();
+        },
+        error: () => this.toast.error(toasts.error.title, toasts.error.desc),
       });
   }
 

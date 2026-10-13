@@ -15,6 +15,7 @@ export interface PosDocumentoFormRawValue {
   readonly fecha_vence: Date | null;
   readonly plazo_pago: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
+  readonly almacen: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
   readonly asesor: ErpSelectOption | null;
   readonly orden_compra: string | null;

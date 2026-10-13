@@ -107,6 +107,13 @@ export interface DocumentEntityConfig {
    */
   readonly cargaLineasReferencia?: boolean;
   /**
+   * La cabecera lleva **almacén general**, el que heredan las líneas nuevas. Lo
+   * leen las páginas que comparten documentos con y sin él (la familia de notas
+   * de venta: la nota crédito lo tiene, la débito no, como en el ERP anterior).
+   * La columna de almacén por línea no depende de esto. Se omite ⇒ sin campo.
+   */
+  readonly almacenGeneral?: boolean;
+  /**
    * Versión del schema. Se usa como sufijo en la clave de localStorage
    * para invalidar filtros guardados cuando el shape cambia.
    */
