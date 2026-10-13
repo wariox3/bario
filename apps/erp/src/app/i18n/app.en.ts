@@ -5931,6 +5931,7 @@ export const en: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Number',
+        resolucion: 'Resolution',
         fecha: 'Date',
         cliente: 'Customer',
         total: 'Total',

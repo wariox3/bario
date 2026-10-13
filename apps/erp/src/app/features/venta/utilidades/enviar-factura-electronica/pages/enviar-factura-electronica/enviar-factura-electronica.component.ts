@@ -35,6 +35,7 @@ import {
   DocumentoElectronicoRow,
   DocumentoElectronicoViewRow,
   resolverEstadoElectronico,
+  resolverResolucionEtiqueta,
 } from '../../enviar-factura-electronica.model';
 import {
   EMITIR_BASE_FILTERS,
@@ -167,7 +168,11 @@ class TabController {
 
 /** Enriquece una fila cruda con su estado electrónico derivado. */
 function toViewRow(row: DocumentoElectronicoRow): DocumentoElectronicoViewRow {
-  return { ...row, estado_electronico_estado: resolverEstadoElectronico(row) };
+  return {
+    ...row,
+    estado_electronico_estado: resolverEstadoElectronico(row),
+    resolucion_etiqueta: resolverResolucionEtiqueta(row),
+  };
 }
 
 /**

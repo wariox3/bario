@@ -27,6 +27,8 @@ export type DocumentoElectronicoEstado = 'descartado' | 'enviado' | 'pendiente';
 export interface DocumentoElectronicoRow {
   readonly id: number;
   readonly numero: string | null;
+  readonly resolucion_prefijo?: string | null;
+  readonly resolucion_numero?: string | null;
   readonly fecha: string | null;
   readonly contacto_nombre_corto: string | null;
   readonly total: string | null;
@@ -43,6 +45,13 @@ export interface DocumentoElectronicoRow {
  */
 export interface DocumentoElectronicoViewRow extends DocumentoElectronicoRow {
   readonly estado_electronico_estado: DocumentoElectronicoEstado;
+  /** `prefijo número` de la resolución; vacío si el documento no tiene. */
+  readonly resolucion_etiqueta: string;
+}
+
+/** Une prefijo y número de la resolución (`SETP 18760000001`), sin relleno si faltan. */
+export function resolverResolucionEtiqueta(row: DocumentoElectronicoRow): string {
+  return [row.resolucion_prefijo, row.resolucion_numero].filter(Boolean).join(' ');
 }
 
 /**
