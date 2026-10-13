@@ -296,6 +296,7 @@ export interface AppDict
       loading: string;
       empty: string;
       fase: { validacion: string; emision: string };
+      cols: { fase: string; mensaje: string; fecha: string };
       toasts: {
         parcial: { title: string; desc: string };
         fallo: { title: string; desc: string };

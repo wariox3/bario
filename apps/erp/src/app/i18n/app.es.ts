@@ -282,6 +282,7 @@ export const es: AppDict = {
       loading: 'Cargando el detalle del error…',
       empty: 'No hay errores registrados para este documento.',
       fase: { validacion: 'Validación', emision: 'Emisión' },
+      cols: { fase: 'Fase', mensaje: 'Mensaje', fecha: 'Fecha' },
       toasts: {
         parcial: {
           title: 'Algunos documentos no se emitieron',

@@ -7,7 +7,7 @@
   [draggable]="false"
   [resizable]="false"
   [dismissableMask]="true"
-  [style]="{ width: '720px', maxWidth: '96vw' }"
+  [style]="{ width: '860px', maxWidth: '96vw' }"
   styleClass="cp-error-electronico-dialog"
 >
   <ng-template pTemplate="header">
@@ -39,25 +39,36 @@
     } @else if (errores().length === 0) {
       <p class="m-0 text-[0.8rem] text-brand-muted">{{ dict.empty }}</p>
     } @else {
-      <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
-        @for (error of errores(); track error.id) {
-          <li
-            class="flex flex-col gap-1.5 rounded-[10px] border border-red-100 bg-red-50/40 px-3.5 py-3"
-          >
-            <div class="flex items-center justify-between gap-3">
-              <span
-                class="rounded-full bg-red-100 px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-red-800"
+      <div class="overflow-hidden rounded-[10px] border border-[rgba(20,48,73,0.1)]">
+        <div class="max-h-[420px] overflow-auto">
+          <table class="w-full border-collapse text-[0.8rem]">
+            <thead class="sticky top-0 z-10 bg-white">
+              <tr
+                class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-[0.72rem] font-semibold text-brand-muted"
               >
-                {{ dict.fase[error.fase] }}
-              </span>
-              <span class="text-[0.72rem] tabular-nums text-brand-muted">
-                {{ error.fecha | date: formatoFecha }}
-              </span>
-            </div>
-            <p class="m-0 text-[0.85rem] leading-snug text-brand-text">{{ error.mensaje }}</p>
-          </li>
-        }
-      </ul>
+                <th class="w-[110px] px-3.5 py-2.5">{{ dict.cols.fase }}</th>
+                <th class="px-3.5 py-2.5">{{ dict.cols.mensaje }}</th>
+                <th class="w-[150px] whitespace-nowrap px-3.5 py-2.5">{{ dict.cols.fecha }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (error of errores(); track error.id) {
+                <tr
+                  class="border-t border-[rgba(20,48,73,0.08)] align-top text-brand-text first:border-t-0"
+                >
+                  <td class="px-3.5 py-2.5 font-semibold text-red-700">
+                    {{ dict.fase[error.fase] }}
+                  </td>
+                  <td class="px-3.5 py-2.5 leading-snug">{{ error.mensaje }}</td>
+                  <td class="whitespace-nowrap px-3.5 py-2.5 tabular-nums text-brand-muted">
+                    {{ error.fecha | date: formatoFecha }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
     }
   }
 

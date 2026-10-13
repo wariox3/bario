@@ -31,7 +31,7 @@ export interface DocumentoConError {
  * electrónica de venta, Documento electrónico de compra).
  *
  * Al abrir pide los errores del documento (`documento-electronico-error/lista/`)
- * y los lista con su fase (validación o emisión), el mensaje y la fecha. Cada
+ * y los muestra en una tabla: fase (validación o emisión), mensaje y fecha. Cada
  * intento reemplaza los del anterior, así que lo que se ve es el último. Al
  * cerrar se vacía, para que otra fila no muestre un instante los de esta.
  */
