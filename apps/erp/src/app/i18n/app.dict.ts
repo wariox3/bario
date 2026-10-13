@@ -191,6 +191,41 @@ export interface AppDict
         downloadError: { title: string; desc: string };
       };
     };
+    /**
+     * Galería de **imágenes** de un registro (`ImagenesDialogComponent`), con su
+     * imagen principal.
+     */
+    imagenes: {
+      title: string;
+      subtitle: string;
+      empty: string;
+      principal: string;
+      marcarPrincipal: string;
+      delete: string;
+      uploading: string;
+      dropzone: {
+        primary: string;
+        /** Soporta el placeholder `{max}` (tamaño máximo en MB). */
+        hint: string;
+        invalidType: string;
+        tooLarge: string;
+      };
+      confirmDelete: {
+        header: string;
+        message: string;
+        /** Variante para la principal: avisa que el registro se queda sin ella. */
+        messagePrincipal: string;
+      };
+      toasts: {
+        loadError: { title: string; desc: string };
+        uploadSuccess: { title: string; desc: string };
+        uploadError: { title: string; desc: string };
+        principalSuccess: { title: string; desc: string };
+        principalError: { title: string; desc: string };
+        deleteSuccess: { title: string; desc: string };
+        deleteError: { title: string; desc: string };
+      };
+    };
     import: {
       dropzone: {
         primary: string;
@@ -453,10 +488,34 @@ export interface AppDict
         copia: string;
         empty: string;
         sinEventos: string;
+        cols: {
+          destinatario: string;
+          estado: string;
+          enviado: string;
+          entregado: string;
+          abierto: string;
+        };
       };
       /** Mapa abierto: un evento que no esté acá se muestra con su clave. */
       eventos: Readonly<Record<string, string>>;
-      validaciones: { title: string; empty: string };
+      validaciones: { title: string; empty: string; cols: { fecha: string; detalle: string } };
+      vista: { label: string; resumen: string; eventos: string };
+      eventosCols: {
+        fecha: string;
+        destinatario: string;
+        evento: string;
+        envio: string;
+        ip: string;
+      };
+      acciones: {
+        renotificar: string;
+        descargarXml: string;
+        toasts: {
+          renotificarSuccess: { title: string; desc: string };
+          renotificarError: { title: string; desc: string };
+          xmlError: { title: string; desc: string };
+        };
+      };
     };
     afectacion: {
       title: string;
@@ -2417,6 +2476,8 @@ export interface AppDict
           formaPago: string;
           resolucion: string;
           ordenCompra: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };

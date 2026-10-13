@@ -1,4 +1,10 @@
-import { fromIsoDate, toFiniteNumber, toIsoDate, type ErpSelectOption } from '@reddoc/core';
+import {
+  fromIsoDate,
+  resolucionDesdeRead,
+  toFiniteNumber,
+  toIsoDate,
+  type ErpSelectOption,
+} from '@reddoc/core';
 
 /**
  * Modelo y diff de la **corrección DIAN** (dropdown Electrónico): la cabecera
@@ -39,16 +45,7 @@ export interface CabeceraElectronicaPatch {
 export function aCabeceraElectronica(read: CorregirElectronicoRead): CabeceraElectronica {
   return {
     numero: toFiniteNumber(read.numero),
-    // `resolucionLabel` arma la etiqueta con prefijo y número; el read los trae sueltos.
-    resolucion:
-      read.resolucion == null
-        ? null
-        : {
-            id: read.resolucion,
-            nombre: '',
-            prefijo: read.resolucion_prefijo ?? '',
-            numero: read.resolucion_numero ?? '',
-          },
+    resolucion: resolucionDesdeRead(read),
     fecha: fromIsoDate(read.fecha),
     fechaVence: fromIsoDate(read.fecha_vence),
   };

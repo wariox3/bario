@@ -176,6 +176,45 @@ export const es: AppDict = {
         },
       },
     },
+    imagenes: {
+      title: 'Imágenes',
+      subtitle: 'Fotos de este registro',
+      empty: 'Todavía no hay imágenes.',
+      principal: 'Principal',
+      marcarPrincipal: 'Marcar como principal',
+      delete: 'Eliminar',
+      uploading: 'Subiendo imagen…',
+      dropzone: {
+        primary: 'Arrastrá una imagen o hacé clic para elegirla',
+        hint: 'PNG, JPG o WEBP, hasta {max} MB',
+        invalidType: 'La imagen no tiene un formato válido.',
+        tooLarge: 'La imagen supera el tamaño máximo permitido.',
+      },
+      confirmDelete: {
+        header: 'Confirmar eliminación',
+        message: '¿Querés eliminar esta imagen? Esta acción no se puede revertir.',
+        messagePrincipal:
+          'Es la imagen principal. ¿Querés eliminarla? Esta acción no se puede revertir.',
+      },
+      toasts: {
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron obtener las imágenes. Intentá de nuevo.',
+        },
+        uploadSuccess: { title: 'Imagen cargada', desc: 'La imagen se agregó correctamente.' },
+        uploadError: { title: 'No se pudo cargar', desc: 'Revisá la imagen y volvé a intentarlo.' },
+        principalSuccess: {
+          title: 'Imagen principal actualizada',
+          desc: 'Esta imagen ahora representa al registro.',
+        },
+        principalError: {
+          title: 'No se pudo actualizar',
+          desc: 'Intentá de nuevo en unos segundos.',
+        },
+        deleteSuccess: { title: 'Imagen eliminada', desc: 'La imagen se eliminó correctamente.' },
+        deleteError: { title: 'No se pudo eliminar', desc: 'Intentá de nuevo en unos segundos.' },
+      },
+    },
     import: {
       dropzone: {
         primary: 'Arrastrá tu archivo Excel aquí',
@@ -531,9 +570,16 @@ export const es: AppDict = {
       envios: {
         title: 'Envíos al cliente',
         envio: 'Envío',
-        copia: 'Copia:',
+        copia: 'Copia',
         empty: 'El documento aún no se ha enviado por correo.',
-        sinEventos: 'El proveedor de correo aún no reporta nada de este envío.',
+        sinEventos: 'Sin reportes',
+        cols: {
+          destinatario: 'Destinatario',
+          estado: 'Estado',
+          enviado: 'Enviado',
+          entregado: 'Entregado',
+          abierto: 'Abierto',
+        },
       },
       eventos: {
         enviado: 'Enviado',
@@ -555,6 +601,33 @@ export const es: AppDict = {
       validaciones: {
         title: 'Validaciones DIAN',
         empty: 'La DIAN no reportó validaciones.',
+        cols: { fecha: 'Fecha', detalle: 'Detalle' },
+      },
+      vista: { label: 'Vista de los envíos', resumen: 'Resumen', eventos: 'Eventos' },
+      eventosCols: {
+        fecha: 'Fecha',
+        destinatario: 'Destinatario',
+        evento: 'Evento',
+        envio: 'Envío',
+        ip: 'IP',
+      },
+      acciones: {
+        renotificar: 'Renotificar',
+        descargarXml: 'Descargar XML',
+        toasts: {
+          renotificarSuccess: {
+            title: 'Documento renotificado',
+            desc: 'Se reenvió el correo al cliente.',
+          },
+          renotificarError: {
+            title: 'No se pudo renotificar',
+            desc: 'Intenta de nuevo en unos segundos.',
+          },
+          xmlError: {
+            title: 'No se pudo descargar el XML',
+            desc: 'Intenta de nuevo en unos segundos.',
+          },
+        },
       },
     },
     afectacion: {
@@ -1262,7 +1335,7 @@ export const es: AppDict = {
         },
         groups: { identificacion: 'Identificación', clasificacion: 'Clasificación' },
         opciones: { imagenes: 'Imágenes' },
-        opcionesHint: { imagenes: 'Fotos del ítem, además de la principal' },
+        opcionesHint: { imagenes: 'Fotos del ítem; la principal es la de la ficha' },
         labels: {
           impuestosVenta: 'Impuestos de venta',
           impuestosCompra: 'Impuestos de compra',
@@ -3192,6 +3265,8 @@ export const es: AppDict = {
           formaPago: 'Forma de pago',
           resolucion: 'Resolución',
           ordenCompra: 'Orden de compra',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {

@@ -34,11 +34,9 @@ export interface FacturaVentaRead extends DocumentoReadBase {
   readonly asesor?: number | null;
   readonly asesor_nombre?: string | null;
   readonly resolucion?: number | null;
-  /**
-   * Etiqueta de la resolución. Hoy el read **no la serializa** (solo la FK): la ficha
-   * la deja vacía hasta que el backend la mande, sin resolverla con otra consulta.
-   */
-  readonly resolucion_nombre?: string | null;
+  /** La etiqueta se arma con prefijo y número (`resolucionLabel`): el read no trae nombre. */
+  readonly resolucion_prefijo?: string | null;
+  readonly resolucion_numero?: string | null;
   /**
    * CUE con el que la DIAN validó la factura electrónica. **Todavía no lo manda el
    * backend** (`GenDocumento` no lo serializa): la ficha lo deja vacío hasta entonces.

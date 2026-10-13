@@ -62,6 +62,7 @@ export type {
   AppBranding,
 } from './lib/tokens';
 export {
+  extractBlobErrorMessage,
   extractErrorMessage,
   isUnverifiedAccountError,
   parseApiError,
@@ -209,10 +210,12 @@ export {
   SELECT_ENDPOINTS,
   buildContactoLabel,
   asesorLabel,
+  resolucionDesdeRead,
   resolucionLabel,
+  resolucionTexto,
   RESOLUCION_ACTIVA_PARAMS,
 } from './lib/data';
-export type { ErpSelectOption } from './lib/data';
+export type { ErpSelectOption, ResolucionRead } from './lib/data';
 export * from './lib/data-list';
 export * from './lib/plans';
 export { normalizeHttpError, classifyStatus, NON_FIELD_KEY } from './lib/utils/error-normalizer';
