@@ -6179,6 +6179,29 @@ export const es: AppDict = {
         },
       },
     },
+    validarDepreciacion: {
+      name: 'Validar depreciación',
+      description:
+        'Este proceso recalcula la depreciación acumulada y el saldo por depreciar de cada activo desde sus documentos de depreciación aprobados y corrige los que no cuadren con lo guardado.',
+      run: 'Validar',
+      confirm: {
+        header: '¿Validar depreciación?',
+        message:
+          'Se recalculará la depreciación de todos los activos y se corregirán los que no cuadren. La operación puede tardar unos segundos.',
+        accept: 'Validar',
+        cancel: 'Cancelar',
+      },
+      toasts: {
+        success: {
+          title: 'Validación completada',
+          desc: 'La depreciación de los activos se revisó y corrigió.',
+        },
+        error: {
+          title: 'No se pudo validar',
+          desc: 'Ocurrió un error al validar la depreciación. Intenta de nuevo.',
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerar afectado',
       description:

@@ -1,0 +1,5 @@
+:host {
+  // Bloque (no flex:1): el shell colapsa al alto de su contenido en vez de
+  // llenar el viewport, porque esta página no tiene una tabla que scrollee.
+  display: block;
+}

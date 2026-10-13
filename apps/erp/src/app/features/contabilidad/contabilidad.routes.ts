@@ -65,6 +65,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'proceso/validar-depreciacion',
+        loadChildren: () =>
+          import('./procesos/validar-depreciacion/validar-depreciacion.routes').then(
+            (m) => m.VALIDAR_DEPRECIACION_ROUTES,
+          ),
+      },
+      {
         path: 'informes/movimientos',
         loadChildren: () =>
           import('./informes/movimiento/movimiento.routes').then((m) => m.MOVIMIENTO_ROUTES),

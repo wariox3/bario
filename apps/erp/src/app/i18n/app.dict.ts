@@ -4722,6 +4722,16 @@ export interface AppDict
         error: { title: string; desc: string };
       };
     };
+    validarDepreciacion: {
+      name: string;
+      description: string;
+      run: string;
+      confirm: { header: string; message: string; accept: string; cancel: string };
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+      };
+    };
     regenerarAfectado: {
       name: string;
       description: string;

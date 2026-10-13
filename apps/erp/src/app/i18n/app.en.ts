@@ -6105,6 +6105,29 @@ export const en: AppDict = {
         },
       },
     },
+    validarDepreciacion: {
+      name: 'Validate depreciation',
+      description:
+        'This process recalculates the accumulated depreciation and remaining balance of each asset from its approved depreciation documents and fixes those that do not match what is stored.',
+      run: 'Validate',
+      confirm: {
+        header: 'Validate depreciation?',
+        message:
+          'The depreciation of all assets will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+        accept: 'Validate',
+        cancel: 'Cancel',
+      },
+      toasts: {
+        success: {
+          title: 'Validation completed',
+          desc: 'Asset depreciation was checked and fixed.',
+        },
+        error: {
+          title: 'Could not validate',
+          desc: 'An error occurred while validating the depreciation. Try again.',
+        },
+      },
+    },
     regenerarAfectado: {
       name: 'Regenerate affected',
       description:
