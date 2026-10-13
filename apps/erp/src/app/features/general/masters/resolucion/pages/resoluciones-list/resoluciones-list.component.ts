@@ -39,10 +39,12 @@ import {
   RESOLUCIONES_ROW_ACTIONS,
   RESOLUCIONES_TRAILING_ACTIONS,
   RESOLUCIONES_DIAN_ACTION_ID,
+  RESOLUCIONES_LISTA_DIAN_ACTION_ID,
   RESOLUCIONES_VALIDAR_DIAN_ACTION_ID,
   resolucionTipoFilter,
   resolucionesFiltersStorageKey,
 } from '../../resolucion.constants';
+import { ResolucionDianDialogComponent } from '../../components/resolucion-dian-dialog/resolucion-dian-dialog.component';
 
 @Component({
   selector: 'app-resoluciones-list',
@@ -53,6 +55,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ConfirmDialogModule,
+    ResolucionDianDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './resoluciones-list.component.html',
@@ -94,6 +97,7 @@ export class ResolucionesListComponent {
 
   protected readonly isExportingExcel = signal(false);
   protected readonly isValidating = signal(false);
+  protected readonly listaDianVisible = signal(false);
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
 
@@ -185,6 +189,9 @@ export class ResolucionesListComponent {
         break;
       case RESOLUCIONES_VALIDAR_DIAN_ACTION_ID:
         this.validarDian();
+        break;
+      case RESOLUCIONES_LISTA_DIAN_ACTION_ID:
+        this.listaDianVisible.set(true);
         break;
     }
   }

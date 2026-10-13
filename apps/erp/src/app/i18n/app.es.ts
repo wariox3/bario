@@ -805,6 +805,7 @@ export const es: AppDict = {
       actions: {
         dian: 'DIAN',
         validar: 'Validar',
+        lista: 'Lista',
       },
       toasts: {
         validarSuccess: {
@@ -814,6 +815,41 @@ export const es: AppDict = {
         validarError: {
           title: 'Error al validar',
           desc: 'No se pudieron validar las resoluciones con la DIAN.',
+        },
+      },
+      dian: {
+        title: 'Resoluciones en la DIAN',
+        subtitle: 'Las que el servicio de facturación electrónica tiene de tu emisor',
+        importar: 'Importar',
+        columns: {
+          prefijo: 'Prefijo',
+          numero: 'Número',
+          fecha: 'Fecha',
+          rangoDesde: 'Rango desde',
+          rangoHasta: 'Rango hasta',
+          consecutivoActual: 'Consecutivo actual',
+          vigenteDesde: 'Vigente desde',
+          vigenteHasta: 'Vigente hasta',
+          activa: 'Activa',
+          importada: 'Importada',
+        },
+        empty: {
+          title: 'Sin resoluciones',
+          desc: 'El servicio de facturación electrónica no tiene resoluciones de tu emisor.',
+        },
+        toasts: {
+          importSuccess: {
+            title: 'Resolución importada',
+            desc: 'La resolución se trajo de la DIAN ya validada.',
+          },
+          importError: {
+            title: 'Error al importar',
+            desc: 'No se pudo importar la resolución.',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No se pudieron cargar las resoluciones de la DIAN.',
+          },
         },
       },
       form: {

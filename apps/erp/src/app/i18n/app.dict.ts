@@ -639,10 +639,34 @@ export interface AppDict
       actions: {
         dian: string;
         validar: string;
+        lista: string;
       };
       toasts: {
         validarSuccess: { title: string; desc: string };
         validarError: { title: string; desc: string };
+      };
+      dian: {
+        title: string;
+        subtitle: string;
+        importar: string;
+        columns: {
+          prefijo: string;
+          numero: string;
+          fecha: string;
+          rangoDesde: string;
+          rangoHasta: string;
+          consecutivoActual: string;
+          vigenteDesde: string;
+          vigenteHasta: string;
+          activa: string;
+          importada: string;
+        };
+        empty: { title: string; desc: string };
+        toasts: {
+          loadError: { title: string; desc: string };
+          importSuccess: { title: string; desc: string };
+          importError: { title: string; desc: string };
+        };
       };
       form: {
         createTitle: string;

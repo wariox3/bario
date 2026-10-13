@@ -42,3 +42,9 @@
 />
 
 <p-confirmDialog />
+
+<app-resolucion-dian-dialog
+  [(visible)]="listaDianVisible"
+  [puedeImportar]="acciones.puedeCrear()"
+  (imported)="onRefresh()"
+/>
