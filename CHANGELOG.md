@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.2](https://github.com/wariox3/bario/compare/v0.1.1...v0.1.2) (2026-10-13)
+
+### Features
+
+- **compra:** emitir documento electrónico ofrece Descartar ([8b3a7b0](https://github.com/wariox3/bario/commit/8b3a7b0a34fa342a658ffc8bd7ac445a99b36e10))
+- **contabilidad:** proceso validar depreciación ([8206f0a](https://github.com/wariox3/bario/commit/8206f0a838667dcb3133de2bf546bf105808385c))
+- **documento-electronico:** error de emisión compartido y aviso por `con_error` ([8f5f5bf](https://github.com/wariox3/bario/commit/8f5f5bfecad7443d36bc260e1b5f0dcfa452dee0))
+- **documento-electronico:** las tres utilidades se llaman Emitir documento electrónico ([2413011](https://github.com/wariox3/bario/commit/24130113c98fbe3616719b9be474734699ecd0f0))
+- **documento-electronico:** pantalla compartida para emitir documentos electrónicos ([506eb08](https://github.com/wariox3/bario/commit/506eb089c6270a29f10eec47a22b1693816f36d7))
+- **feature-base:** la celda clicable se puede habilitar por fila ([82da6fc](https://github.com/wariox3/bario/commit/82da6fc7594b3e9bbeebc7ad29c43f0b49dc0b26))
+- **humano:** enviar nómina electrónica muestra el error de emisión ([1ac5181](https://github.com/wariox3/bario/commit/1ac5181e15b02c99ecd91e0db6db68d6acecda66))
+- **resolucion:** la validación con la DIAN pasa a un dropdown "DIAN" ([31432b8](https://github.com/wariox3/bario/commit/31432b89164188a0d3ed73d0102da6fb491578c1))
+- **resolucion:** lista e importación de resoluciones desde la DIAN ([15c8b3e](https://github.com/wariox3/bario/commit/15c8b3ed0be717686f1aa262601abee34744eb05))
+- **resolucion:** validar las resoluciones con la DIAN desde el listado ([e93db13](https://github.com/wariox3/bario/commit/e93db138d246281a8bc39bf4154837c531d9a2b4))
+- **venta:** el listado de factura de venta muestra el estado electrónico ([9e8fb90](https://github.com/wariox3/bario/commit/9e8fb9050fc3565fdabe95c219cdb80a0ad295e2))
+- **venta:** emitir la factura de venta desde su ficha ([c8f5ec4](https://github.com/wariox3/bario/commit/c8f5ec431e22407be78e8259a3fe986ea16c2295))
+- **venta:** enviar factura electrónica muestra la resolución ([9ec7060](https://github.com/wariox3/bario/commit/9ec7060c069b30ba5730539cdbdc41aadb178617))
+- **venta:** información electrónica de la factura de venta ([e251c22](https://github.com/wariox3/bario/commit/e251c22218511721c7302f93687b80a0a76e9b6f))
+- **venta:** la factura de venta sugiere sede, almacén y método de pago ([5fa0805](https://github.com/wariox3/bario/commit/5fa0805a9c2e8c30eab71f4dda915d243b30d876))
+- **venta:** ver el detalle del error al emitir una factura electrónica ([e6c2f3f](https://github.com/wariox3/bario/commit/e6c2f3fc5c0100275af6d7a0ac06d08fed245297))
+
+### Bug Fixes
+
+- **core:** el filtro `in` de los listados manda la lista como array ([ddeaec2](https://github.com/wariox3/bario/commit/ddeaec21c54f2b8e12dc374de0a0917d78664f86))
+
+### Refactoring
+
+- **humano:** enviar nómina electrónica usa la pantalla compartida de emisión ([7bf2908](https://github.com/wariox3/bario/commit/7bf290878c4dbdb41d1f1ede256b4d2aac12031c))
+- **venta:** enviar factura electrónica usa la pantalla compartida y sin Notificar ([8cc1049](https://github.com/wariox3/bario/commit/8cc1049c56bd744355d8168f9b5b5ac1110a5bab))
+
 ## [0.1.1](https://github.com/wariox3/bario/compare/v0.1.0...v0.1.1) (2026-10-13)
 
 ### Features
