@@ -2,7 +2,7 @@
   <lib-data-toolbar
     toolbar
     [primaryAction]="acciones.primaryAction()"
-    [trailingActions]="acciones.trailingActions()"
+    [trailingActions]="trailingActions()"
     [searchPlaceholderKey]="'entities.resolucion.searchPlaceholder'"
     [filtersEnabled]="true"
     [activeFiltersCount]="activeFilters().length"
@@ -42,3 +42,9 @@
 />
 
 <p-confirmDialog />
+
+<app-resolucion-dian-dialog
+  [(visible)]="listaDianVisible"
+  [puedeImportar]="acciones.puedeCrear()"
+  (imported)="onRefresh()"
+/>

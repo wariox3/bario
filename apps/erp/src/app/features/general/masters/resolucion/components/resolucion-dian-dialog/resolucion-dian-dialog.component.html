@@ -1,0 +1,64 @@
+@let dict = t().entities.resolucion.dian;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '1100px', maxWidth: '96vw' }"
+  styleClass="cp-resolucion-dian-dialog"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-list text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ dict.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ dict.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <div class="cp-resolucion-dian-dialog__table">
+      <lib-data-table
+        [columns]="columns"
+        [items]="items()"
+        [totalCount]="totalCount()"
+        [loading]="isLoading() || importandoId() !== null"
+        [pageSize]="pageSize"
+        [currentPage]="currentPage()"
+        [rowsPerPageOptions]="rowsPerPageOptions"
+        scrollHeight="420px"
+        emptyTitleKey="entities.resolucion.dian.empty.title"
+        emptySubKey="entities.resolucion.dian.empty.desc"
+        [rowActions]="rowActions()"
+        (pageChange)="onPageChange($event)"
+        (rowActionInvoked)="onRowAction($event)"
+      />
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.close"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onClose()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

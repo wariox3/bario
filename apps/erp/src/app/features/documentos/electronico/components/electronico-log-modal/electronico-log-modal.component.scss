@@ -1,0 +1,73 @@
+:host {
+  display: contents;
+}
+
+// Micro-label: mismo lenguaje que los del modal de afectación.
+.log__micro-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-muted, #64748b);
+}
+
+// ── Ruta de entrega ──────────────────────────────────────────────────────────
+// Cada paso es un punto unido al siguiente por un tramo. Los pasos ya recorridos
+// quedan en gris; el último —el estado actual del correo— toma el color de lo
+// que dice: navy si avanzó, rojo si rebotó.
+.log__paso {
+  --tono: rgba(20, 48, 73, 0.35);
+
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 7rem;
+  max-width: 12rem;
+
+  &[data-tono='negativo'] {
+    --tono: #dc2626;
+  }
+}
+
+.log__punto {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--tono);
+}
+
+.log__tramo {
+  height: 1px;
+  flex: 1;
+  margin-inline: 0.35rem;
+  background: rgba(20, 48, 73, 0.14);
+}
+
+.log__etiqueta {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--brand-muted, #64748b);
+}
+
+.log__paso--actual {
+  &[data-tono='positivo'],
+  &[data-tono='neutro'] {
+    --tono: var(--brand-navy, #143049);
+  }
+
+  .log__punto {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tono) 16%, transparent);
+  }
+
+  .log__etiqueta {
+    font-weight: 700;
+    color: var(--brand-text, #143049);
+  }
+
+  &[data-tono='negativo'] .log__etiqueta {
+    color: #dc2626;
+  }
+}

@@ -284,6 +284,23 @@ export interface AppDict
     };
   };
   documentActions: {
+    emisionElectronica: {
+      actions: { emitir: string; descartar: string };
+      columns: { estado: string };
+      estado: { error: string; enviado: string; pendiente: string };
+    };
+    errorElectronico: {
+      ver: string;
+      title: string;
+      subtitle: string;
+      loading: string;
+      empty: string;
+      fase: { validacion: string; emision: string };
+      toasts: {
+        parcial: { title: string; desc: string };
+        fallo: { title: string; desc: string };
+      };
+    };
     generar: {
       buttonLabel: string;
       modalHeader: string;
@@ -365,6 +382,22 @@ export interface AppDict
       notificado: string;
       generado: string;
       anulado: string;
+    };
+    electronicoLog: {
+      title: string;
+      subtitle: string;
+      close: string;
+      loadError: { title: string; desc: string };
+      envios: {
+        title: string;
+        envio: string;
+        copia: string;
+        empty: string;
+        sinEventos: string;
+      };
+      /** Mapa abierto: un evento que no esté acá se muestra con su clave. */
+      eventos: Readonly<Record<string, string>>;
+      validaciones: { title: string; empty: string };
     };
     afectacion: {
       title: string;
@@ -633,6 +666,40 @@ export interface AppDict
         fechaHasta: string;
         venta: string;
         compra: string;
+        estadoValidado: string;
+        estadoInactivo: string;
+      };
+      actions: {
+        dian: string;
+        validar: string;
+        lista: string;
+      };
+      toasts: {
+        validarSuccess: { title: string; desc: string };
+        validarError: { title: string; desc: string };
+      };
+      dian: {
+        title: string;
+        subtitle: string;
+        importar: string;
+        columns: {
+          prefijo: string;
+          numero: string;
+          fecha: string;
+          rangoDesde: string;
+          rangoHasta: string;
+          consecutivoActual: string;
+          vigenteDesde: string;
+          vigenteHasta: string;
+          activa: string;
+          importada: string;
+        };
+        empty: { title: string; desc: string };
+        toasts: {
+          loadError: { title: string; desc: string };
+          importSuccess: { title: string; desc: string };
+          importError: { title: string; desc: string };
+        };
       };
       form: {
         createTitle: string;
@@ -1736,6 +1803,7 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       filters: {
         aprobado: string;
@@ -1811,6 +1879,15 @@ export interface AppDict
       utilidades: {
         action: string;
         importarDetalle: string;
+      };
+      electronico: {
+        action: string;
+        emitir: string;
+        informacion: string;
+        toasts: {
+          emitirSuccess: { title: string; desc: string };
+          emitirError: { title: string; desc: string };
+        };
       };
       import: {
         title: string;
@@ -4549,10 +4626,6 @@ export interface AppDict
     };
     documentoElectronico: {
       name: string;
-      subtitle: string;
-      actions: {
-        emitir: string;
-      };
       columns: {
         id: string;
         documentoTipo: string;
@@ -4561,47 +4634,6 @@ export interface AppDict
         fecha: string;
         proveedor: string;
         total: string;
-        estado: string;
-      };
-      estado: {
-        enviado: string;
-        pendiente: string;
-      };
-      filters: {
-        notificado: string;
-        enviado: string;
-      };
-      toasts: {
-        emitir: {
-          success: { title: string; desc: string };
-          error: { title: string; desc: string };
-        };
-      };
-    };
-    enviarFacturaElectronica: {
-      name: string;
-      subtitle: string;
-      tabs: {
-        emitir: string;
-        notificar: string;
-      };
-      actions: {
-        emitir: string;
-        notificar: string;
-        descartar: string;
-      };
-      columns: {
-        id: string;
-        numero: string;
-        fecha: string;
-        cliente: string;
-        total: string;
-        estado: string;
-      };
-      estado: {
-        descartado: string;
-        enviado: string;
-        pendiente: string;
       };
       filters: {
         notificado: string;
@@ -4619,7 +4651,35 @@ export interface AppDict
           success: { title: string; desc: string };
           error: { title: string; desc: string };
         };
-        notificar: {
+        descartar: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
+    };
+    enviarFacturaElectronica: {
+      name: string;
+      columns: {
+        id: string;
+        numero: string;
+        resolucion: string;
+        fecha: string;
+        cliente: string;
+        total: string;
+      };
+      filters: {
+        notificado: string;
+        enviado: string;
+      };
+      descartar: {
+        confirm: {
+          header: string;
+          message: string;
+          accept: string;
+        };
+      };
+      toasts: {
+        emitir: {
           success: { title: string; desc: string };
           error: { title: string; desc: string };
         };
@@ -4631,21 +4691,12 @@ export interface AppDict
     };
     enviarNominaElectronica: {
       name: string;
-      actions: {
-        emitir: string;
-        descartar: string;
-      };
       columns: {
         id: string;
         numero: string;
         fecha: string;
         empleado: string;
         total: string;
-        estado: string;
-      };
-      estado: {
-        enviado: string;
-        pendiente: string;
       };
       filters: {
         notificado: string;
@@ -4679,6 +4730,16 @@ export interface AppDict
       confirm: { header: string; accept: string; cancel: string };
       toasts: {
         success: { title: string };
+        error: { title: string; desc: string };
+      };
+    };
+    validarDepreciacion: {
+      name: string;
+      description: string;
+      run: string;
+      confirm: { header: string; message: string; accept: string; cancel: string };
+      toasts: {
+        success: { title: string; desc: string };
         error: { title: string; desc: string };
       };
     };

@@ -1,0 +1,66 @@
+<!--
+  Emitir documento electrónico: chrome estándar de <lib-list-shell> (migas +
+  card + tabla). En el slot [toolbar] van los filtros a la izquierda y los
+  botones Descartar (si la pantalla lo ofrece) y Emitir a la derecha.
+-->
+@let comunes = t().documentActions.emisionElectronica;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="textos().name">
+  <div toolbar class="flex items-center gap-2">
+    <lib-data-toolbar
+      class="min-w-0 flex-1"
+      [filtersEnabled]="true"
+      [activeFiltersCount]="activeFilters().length"
+      (filtersToggle)="openFilters()"
+      (filtersClear)="clearFilters()"
+    />
+    @if (config().descartable) {
+      <p-button
+        size="small"
+        severity="danger"
+        [outlined]="true"
+        icon="pi pi-ban"
+        [label]="comunes.actions.descartar"
+        [disabled]="!canDescartar()"
+        (onClick)="onDescartar()"
+      />
+    }
+    <p-button
+      size="small"
+      icon="pi pi-send"
+      [label]="comunes.actions.emitir"
+      [loading]="isProcessing()"
+      [disabled]="!canEmitir()"
+      (onClick)="onEmitir()"
+    />
+  </div>
+
+  <lib-data-table
+    table
+    [columns]="columns()"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="config().filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmDialog />
+
+<app-error-electronico-dialog [(visible)]="errorVisible" [documento]="errorDocumento()" />

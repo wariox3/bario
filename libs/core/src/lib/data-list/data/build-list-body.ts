@@ -78,7 +78,8 @@ export const BACKEND_OPERATOR: Readonly<Record<FilterOperator, string>> = {
 export interface BackendFilter {
   readonly propiedad: string;
   readonly operador: string;
-  readonly valor: string | number | boolean;
+  /** El operador `in` lleva la lista como array: `["SETP", "EPOS"]`. */
+  readonly valor: string | number | boolean | readonly (string | number)[];
   /**
    * Cómo se encadena con el filtro anterior. El backend evalúa la lista en
    * secuencia y asume `AND`, así que solo se emite cuando la condición lo
@@ -101,21 +102,10 @@ function toBackendFilter(condition: FilterCondition): BackendFilter {
   return {
     propiedad: condition.field,
     operador: BACKEND_OPERATOR[condition.operator],
-    valor: normalizeFilterValue(condition.value),
+    valor: condition.value,
     // Solo cuando la condición lo declara: la clave ausente ya significa `AND`.
     ...(condition.logic ? { operador_logico: condition.logic } : {}),
   };
-}
-
-/**
- * `Array.isArray` no estrecha sobre `readonly`, por eso serializamos las listas
- * a CSV de forma explícita; el resto de valores pasa tal cual.
- */
-function normalizeFilterValue(value: FilterCondition['value']): string | number | boolean {
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-    return value;
-  }
-  return value.join(',');
 }
 
 /** Codifica un `SortSpec` al formato `campo` / `-campo` (desc) del backend. */

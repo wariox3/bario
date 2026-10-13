@@ -1,10 +1,9 @@
 import type { Route } from '@angular/router';
+import { ENVIAR_FACTURA_ELECTRONICA_CONFIG } from './enviar-factura-electronica.config';
 
 /**
- * Rutas de la utilidad **Enviar factura electrónica** del módulo Venta.
- *
- * Utilidad de una sola página (dos tabs internos). El componente se carga lazy
- * para mantener su bundle separado del resto del módulo.
+ * Rutas de la utilidad **Enviar factura electrónica** del módulo Venta: la
+ * pantalla compartida de emisión con la configuración de facturas.
  *
  * URL: `/t/:tenantSlug/venta/utilidades/enviar-factura-electronica`
  */
@@ -12,8 +11,9 @@ export const ENVIAR_FACTURA_ELECTRONICA_ROUTES: Route[] = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/enviar-factura-electronica/enviar-factura-electronica.component').then(
-        (m) => m.EnviarFacturaElectronicaComponent,
+      import('@erp/core/documento-electronico/components/emitir-documento-electronico/emitir-documento-electronico.component').then(
+        (m) => m.EmitirDocumentoElectronicoComponent,
       ),
+    data: { config: ENVIAR_FACTURA_ELECTRONICA_CONFIG },
   },
 ];

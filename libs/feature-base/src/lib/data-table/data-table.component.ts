@@ -234,8 +234,14 @@ export class DataTableComponent {
    * en su handler de siempre.
    */
   protected invokeCellAction(col: ColumnDef, row: unknown): void {
-    if (!col.cellAction) return;
+    if (!col.cellAction || !this.isCellActionable(col, row)) return;
     this.rowActionInvoked.emit({ actionId: col.cellAction, row });
+  }
+
+  /** ¿La celda es un enlace? Hace falta acción, valor y que `cellActionFor` la habilite. */
+  protected isCellActionable(col: ColumnDef, row: unknown): boolean {
+    if (!col.cellAction || !this.hasValue(row, col.field)) return false;
+    return col.cellActionFor?.(row) ?? true;
   }
 
   /** ¿La celda tiene un valor que mostrar? Una vacía no se vuelve enlace. */

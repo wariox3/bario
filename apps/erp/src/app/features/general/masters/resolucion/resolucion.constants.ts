@@ -1,6 +1,6 @@
 import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
-import type { ResolucionTipo } from './resolucion.model';
+import type { ResolucionDianRow, ResolucionTipo } from './resolucion.model';
 
 export const RESOLUCIONES_QUICK_SEARCH_FIELD = 'prefijo';
 
@@ -70,6 +70,20 @@ export const RESOLUCIONES_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.resolucion.columns.fechaHasta',
     type: 'date',
   },
+  {
+    field: 'estado_validado',
+    headerKey: 'entities.resolucion.columns.estadoValidado',
+    type: 'boolean',
+    align: 'center',
+  },
+  {
+    field: 'estado_inactivo',
+    headerKey: 'entities.resolucion.columns.estadoInactivo',
+    type: 'boolean',
+    align: 'center',
+    // Una resolución inactiva ya venció: el «sí» es una condición adversa.
+    booleanTone: 'negative',
+  },
 ];
 
 export const RESOLUCIONES_FILTER_FIELDS: readonly FilterField[] = [
@@ -102,7 +116,33 @@ export const RESOLUCIONES_PRIMARY_ACTION: ToolbarAction = {
   iconClass: 'pi pi-plus',
 };
 
+/** Dropdown "DIAN": agrupa las acciones contra la DIAN. */
+export const RESOLUCIONES_DIAN_ACTION_ID = 'dian';
+
+/** Valida las resoluciones del módulo contra la DIAN. */
+export const RESOLUCIONES_VALIDAR_DIAN_ACTION_ID = 'validar-dian';
+
+/** Abre el modal con las resoluciones del servicio de facturación electrónica. */
+export const RESOLUCIONES_LISTA_DIAN_ACTION_ID = 'lista-dian';
+
 export const RESOLUCIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
+  {
+    id: RESOLUCIONES_DIAN_ACTION_ID,
+    labelKey: 'entities.resolucion.actions.dian',
+    iconClass: '',
+    children: [
+      {
+        id: RESOLUCIONES_VALIDAR_DIAN_ACTION_ID,
+        labelKey: 'entities.resolucion.actions.validar',
+        iconClass: 'pi pi-verified',
+      },
+      {
+        id: RESOLUCIONES_LISTA_DIAN_ACTION_ID,
+        labelKey: 'entities.resolucion.actions.lista',
+        iconClass: 'pi pi-list',
+      },
+    ],
+  },
   {
     id: 'actions',
     labelKey: 'common.actions.actions',
@@ -110,5 +150,69 @@ export const RESOLUCIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
     children: [
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
     ],
+  },
+];
+
+/** Acción de fila del modal "Lista": trae esa resolución a la empresa. */
+export const RESOLUCIONES_DIAN_IMPORTAR_ACTION_ID = 'importar';
+
+export const RESOLUCIONES_DIAN_ROW_ACTIONS: readonly RowAction[] = [
+  {
+    id: RESOLUCIONES_DIAN_IMPORTAR_ACTION_ID,
+    labelKey: 'entities.resolucion.dian.importar',
+    iconClass: 'pi pi-download',
+    inline: true,
+    // Ya está en la empresa: importarla otra vez daría el 400 del backend.
+    visibleFor: (row) => !(row as ResolucionDianRow).importada,
+  },
+];
+
+/** `lista-dian/` pagina de a 10, sin dejar elegir el tamaño. */
+export const RESOLUCIONES_DIAN_PAGE_SIZE = 10;
+
+const DIAN_COLUMNS = 'entities.resolucion.dian.columns';
+
+/** Columnas del modal "Lista": las resoluciones del servicio de facturación electrónica. */
+export const RESOLUCIONES_DIAN_COLUMNS: readonly ColumnDef[] = [
+  { field: 'prefijo', headerKey: `${DIAN_COLUMNS}.prefijo`, type: 'text', width: '90px' },
+  { field: 'numero_resolucion', headerKey: `${DIAN_COLUMNS}.numero`, type: 'text' },
+  { field: 'fecha_resolucion', headerKey: `${DIAN_COLUMNS}.fecha`, type: 'date', width: '110px' },
+  {
+    field: 'rango_desde',
+    headerKey: `${DIAN_COLUMNS}.rangoDesde`,
+    type: 'number',
+    align: 'right',
+  },
+  {
+    field: 'rango_hasta',
+    headerKey: `${DIAN_COLUMNS}.rangoHasta`,
+    type: 'number',
+    align: 'right',
+  },
+  {
+    field: 'vigente_desde',
+    headerKey: `${DIAN_COLUMNS}.vigenteDesde`,
+    type: 'date',
+    width: '110px',
+  },
+  {
+    field: 'vigente_hasta',
+    headerKey: `${DIAN_COLUMNS}.vigenteHasta`,
+    type: 'date',
+    width: '110px',
+  },
+  {
+    field: 'activa',
+    headerKey: `${DIAN_COLUMNS}.activa`,
+    type: 'boolean',
+    width: '90px',
+    align: 'center',
+  },
+  {
+    field: 'importada',
+    headerKey: `${DIAN_COLUMNS}.importada`,
+    type: 'boolean',
+    width: '100px',
+    align: 'center',
   },
 ];

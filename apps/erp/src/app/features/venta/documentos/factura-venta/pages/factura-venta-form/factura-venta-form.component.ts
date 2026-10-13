@@ -51,6 +51,7 @@ import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
 import {
   METODO_PAGO_ENDPOINT,
+  METODO_PAGO_NO_DEFINIDO,
   RESOLUCION_ENDPOINT,
   SEDE_ENDPOINT,
 } from '../../factura-venta.constants';
@@ -208,10 +209,20 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected readonly isEditMode = computed(() => !!this.id());
 
   /**
-   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * En alta, sede y almacén auto-seleccionan la primera opción (como el
    * legacy): lo habitual es tener una sola. En edición manda la del documento.
    */
-  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
+  protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
+
+  /**
+   * En alta, el método de pago sugiere "Instrumento no definido". Se busca por
+   * su código DIAN (`1`), no por posición: el catálogo no llega en ese orden.
+   */
+  protected readonly metodoPagoSugerido = computed(() =>
+    this.isEditMode()
+      ? null
+      : (option: ErpSelectOption) => option['codigo'] === METODO_PAGO_NO_DEFINIDO,
+  );
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {

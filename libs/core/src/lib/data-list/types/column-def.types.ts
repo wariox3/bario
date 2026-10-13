@@ -110,6 +110,11 @@ export interface ColumnDef {
    * Una celda sin valor no se vuelve enlace: no hay nada que abrir.
    */
   readonly cellAction?: string;
+  /**
+   * Restringe `cellAction` a las filas que devuelven `true` (p. ej. solo el
+   * estado "Error" abre su detalle). Sin él, toda celda con valor es clicable.
+   */
+  readonly cellActionFor?: (row: unknown) => boolean;
   /** Clave i18n del tooltip y `aria-label` de la celda clicable (`cellAction`). */
   readonly cellActionLabelKey?: string;
 }

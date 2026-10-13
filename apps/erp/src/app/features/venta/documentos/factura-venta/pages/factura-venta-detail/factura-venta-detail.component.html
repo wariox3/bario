@@ -49,6 +49,18 @@
       <p-button
         actionsEnd
         type="button"
+        [label]="t().entities.facturaVenta.electronico.action"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [loading]="isEmitiendo()"
+        (onClick)="toggleElectronico($event)"
+      />
+      <p-button
+        actionsEnd
+        type="button"
         [label]="t().entities.facturaVenta.utilidades.action"
         icon="pi pi-chevron-down"
         iconPos="right"
@@ -59,10 +71,12 @@
       />
     </app-document-detail-actions>
     <p-menu #utilidadesMenu [popup]="true" [model]="utilidadesItems()" appendTo="body" />
+    <p-menu #electronicoMenu [popup]="true" [model]="electronicoItems()" appendTo="body" />
   }
 </header>
 
 <app-afectacion-modal [(visible)]="afectacionVisible" [detalleId]="afectacionDetalleId()" />
+<app-electronico-log-modal [(visible)]="electronicoLogVisible" [documentoId]="documentoId()" />
 
 @if (isLoading()) {
   <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->

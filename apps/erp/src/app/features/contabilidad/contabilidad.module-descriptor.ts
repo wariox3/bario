@@ -97,6 +97,23 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
     },
     {
       kind: 'accordion',
+      id: 'contabilidad-proceso',
+      labelKey: 'layout.nav.sections.process',
+      iconClass: 'pi pi-sync',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.validarDepreciacion.name',
+              path: 'proceso/validar-depreciacion',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
       id: 'contabilidad-informes',
       labelKey: 'layout.nav.sections.report',
       iconClass: 'pi pi-chart-bar',
