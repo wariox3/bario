@@ -18,7 +18,7 @@
  */
 
 /** Estado electrónico derivado que pinta el badge de la columna "Estado". */
-export type NominaElectronicaEstado = 'enviado' | 'pendiente';
+export type NominaElectronicaEstado = 'error' | 'enviado' | 'pendiente';
 
 /**
  * Fila del listado de la utilidad. Subconjunto de `DocumentoListRowBase` más la
@@ -32,6 +32,8 @@ export interface EnviarNominaElectronicaRow {
   readonly contacto_nombre_corto: string | null;
   readonly total: string | null;
   readonly estado_electronico_enviado: boolean;
+  /** El último intento de emitir falló; los motivos están en `documento-electronico-error/`. */
+  readonly estado_electronico_error?: boolean;
 }
 
 /**
@@ -44,14 +46,16 @@ export interface EnviarNominaElectronicaViewRow extends EnviarNominaElectronicaR
 }
 
 /**
- * Deriva el estado electrónico visible: si ya se envió a la DIAN queda
- * "esperando respuesta" (`enviado`); si no, sigue `pendiente` (aún emitible).
+ * Deriva el estado electrónico visible: "error" si el último intento falló;
+ * si ya se envió a la DIAN queda "esperando respuesta" (`enviado`); si no,
+ * sigue `pendiente` (aún emitible).
  *
  * El legacy contemplaba un tercer badge, "Descartado", inalcanzable: su propio
- * filtro permanente excluía los descartados. Por eso acá solo hay dos estados.
+ * filtro permanente excluía los descartados. Por eso acá no está.
  */
 export function resolverEstadoElectronico(
   row: EnviarNominaElectronicaRow,
 ): NominaElectronicaEstado {
+  if (row.estado_electronico_error) return 'error';
   return row.estado_electronico_enviado ? 'enviado' : 'pendiente';
 }

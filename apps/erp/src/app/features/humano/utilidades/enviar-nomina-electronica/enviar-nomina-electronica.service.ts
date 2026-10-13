@@ -8,6 +8,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
+import type { EmitirResultado } from '@erp/core/documento-electronico';
 import type { EnviarNominaElectronicaRow } from './enviar-nomina-electronica.model';
 
 /** Endpoint de cabeceras de documento (compartido por toda la familia). */
@@ -48,12 +49,19 @@ export class EnviarNominaElectronicaService extends BaseHttpService {
   }
 
   /**
-   * Emite un lote de nóminas a la DIAN en un solo request (`{ ids }`). El
-   * backend valida el lote completo antes de enviar el primero: si uno no
-   * cumple, no se envía ninguno.
+   * Emite un lote de nóminas a la DIAN en un solo request (`{ ids }`). Cada una
+   * va por su cuenta: el 200 trae `emitidos` y `con_error`, y las que fallaron
+   * quedan con `estado_electronico_error`. Solo falla lo que no es de ninguna
+   * (400 sin asistente o emisor, 502 si el servicio no responde); ese aviso lo
+   * da la pantalla con el motivo, sin el del interceptor.
    */
-  emitir(documentoIds: readonly number[]): Observable<unknown> {
-    return this.post<unknown>(`${DOCUMENTO_ENDPOINT}emitir/`, { ids: documentoIds });
+  emitir(documentoIds: readonly number[]): Observable<EmitirResultado> {
+    return this.post<EmitirResultado>(
+      `${DOCUMENTO_ENDPOINT}emitir/`,
+      { ids: documentoIds },
+      undefined,
+      { errorToast: false },
+    );
   }
 
   /** Descarta una nómina del envío electrónico (irreversible). */

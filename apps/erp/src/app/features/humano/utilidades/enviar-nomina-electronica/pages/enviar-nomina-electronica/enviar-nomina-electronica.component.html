@@ -50,6 +50,7 @@
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
     (selectionChange)="onSelectionChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
   />
 </lib-list-shell>
 
@@ -62,3 +63,5 @@
 />
 
 <p-confirmDialog />
+
+<app-error-electronico-dialog [(visible)]="errorVisible" [documento]="errorDocumento()" />

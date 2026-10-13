@@ -6148,6 +6148,7 @@ export const es: AppDict = {
         estado: 'Estado',
       },
       estado: {
+        error: 'Error',
         enviado: 'Esperando respuesta',
         pendiente: 'Pendiente',
       },

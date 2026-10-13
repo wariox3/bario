@@ -4719,6 +4719,7 @@ export interface AppDict
         estado: string;
       };
       estado: {
+        error: string;
         enviado: string;
         pendiente: string;
       };

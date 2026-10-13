@@ -6074,6 +6074,7 @@ export const en: AppDict = {
         estado: 'Status',
       },
       estado: {
+        error: 'Error',
         enviado: 'Awaiting response',
         pendiente: 'Pending',
       },

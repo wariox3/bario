@@ -1,5 +1,9 @@
 import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
 import { DOCUMENT_TYPE_ID } from '@reddoc/core';
+import type { EnviarNominaElectronicaViewRow } from './enviar-nomina-electronica.model';
+
+/** Clic en el estado "Error" de una fila: abre el modal con sus motivos. */
+export const VER_ERROR_ACTION_ID = 'ver-error';
 
 /**
  * Constantes de la utilidad **Enviar nómina electrónica** (Humano).
@@ -49,6 +53,15 @@ export const COLUMNS: readonly ColumnDef[] = [
     width: '160px',
     align: 'center',
     enumKeyPrefix: `${I18N}.estado`,
+    // Solo "Error" es un enlace: abre el detalle de por qué falló la emisión.
+    cellAction: VER_ERROR_ACTION_ID,
+    cellActionFor: (row) =>
+      (row as EnviarNominaElectronicaViewRow).estado_electronico_estado === 'error',
+    cellActionLabelKey: 'documentActions.errorElectronico.ver',
+    toneFor: (row) =>
+      (row as EnviarNominaElectronicaViewRow).estado_electronico_estado === 'error'
+        ? 'critical'
+        : null,
   },
 ];
 
