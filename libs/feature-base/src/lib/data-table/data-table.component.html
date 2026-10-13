@@ -68,7 +68,7 @@
           [class.lib-data-table__cell--positive]="col.toneFor?.(row) === 'positive'"
           [class.lib-data-table__cell--critical]="col.toneFor?.(row) === 'critical'"
         >
-          @if (col.cellAction && hasValue(row, col.field)) {
+          @if (isCellActionable(col, row)) {
             <button
               type="button"
               class="cursor-pointer border-0 bg-transparent p-0 font-medium text-sky-700 underline-offset-2 tabular-nums hover:underline focus-visible:underline"
