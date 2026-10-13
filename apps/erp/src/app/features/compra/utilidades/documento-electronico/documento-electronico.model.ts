@@ -29,7 +29,7 @@ export interface DocumentoElectronicoRow {
   readonly numero: string | null;
   readonly fecha: string | null;
   readonly documento_tipo_nombre: string | null;
-  readonly resolucion_nombre?: string | null;
+  readonly resolucion_numero?: string | null;
   readonly contacto_nombre_corto: string | null;
   readonly total: string | null;
   readonly estado_electronico_enviado: boolean;

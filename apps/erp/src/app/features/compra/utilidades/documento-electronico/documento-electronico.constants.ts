@@ -45,7 +45,7 @@ export const COLUMNS: readonly ColumnDef[] = [
     width: '160px',
   },
   {
-    field: 'resolucion_nombre',
+    field: 'resolucion_numero',
     headerKey: `${I18N}.columns.resolucion`,
     type: 'text',
     width: '160px',
