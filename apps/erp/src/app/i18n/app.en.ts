@@ -5969,6 +5969,14 @@ export const en: AppDict = {
         notificado: 'Notified',
         enviado: 'Sent',
       },
+      descartar: {
+        confirm: {
+          header: 'Discard these documents?',
+          message:
+            'This cannot be undone. A discarded document can no longer be sent electronically.',
+          accept: 'Yes, discard',
+        },
+      },
       toasts: {
         emitir: {
           success: {
@@ -5978,6 +5986,16 @@ export const en: AppDict = {
           error: {
             title: 'Error issuing',
             desc: 'Some documents could not be issued. Please try again.',
+          },
+        },
+        descartar: {
+          success: {
+            title: 'Documents discarded',
+            desc: 'The selected documents were discarded.',
+          },
+          error: {
+            title: 'Could not discard',
+            desc: 'Some documents could not be discarded. Please try again.',
           },
         },
       },

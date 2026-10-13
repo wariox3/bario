@@ -4639,8 +4639,19 @@ export interface AppDict
         notificado: string;
         enviado: string;
       };
+      descartar: {
+        confirm: {
+          header: string;
+          message: string;
+          accept: string;
+        };
+      };
       toasts: {
         emitir: {
+          success: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+        descartar: {
           success: { title: string; desc: string };
           error: { title: string; desc: string };
         };

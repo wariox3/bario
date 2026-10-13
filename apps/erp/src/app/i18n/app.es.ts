@@ -6043,6 +6043,14 @@ export const es: AppDict = {
         notificado: 'Notificado',
         enviado: 'Enviado',
       },
+      descartar: {
+        confirm: {
+          header: '¿Estás seguro de descartar?',
+          message:
+            'Esta acción no se puede revertir. Si descartas un documento, ya no podrá enviarse electrónicamente en otro momento.',
+          accept: 'Sí, descartar',
+        },
+      },
       toasts: {
         emitir: {
           success: {
@@ -6052,6 +6060,16 @@ export const es: AppDict = {
           error: {
             title: 'Error al emitir',
             desc: 'No se pudieron emitir algunos documentos. Intentá de nuevo.',
+          },
+        },
+        descartar: {
+          success: {
+            title: 'Documentos descartados',
+            desc: 'Los documentos seleccionados se descartaron correctamente.',
+          },
+          error: {
+            title: 'Error al descartar',
+            desc: 'No se pudieron descartar algunos documentos. Intentá de nuevo.',
           },
         },
       },

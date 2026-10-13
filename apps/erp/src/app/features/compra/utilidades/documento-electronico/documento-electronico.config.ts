@@ -8,13 +8,13 @@ import {
 
 /**
  * Compra → Documento electrónico: los documentos electrónicos de compra por
- * emitir. Sin Descartar.
+ * emitir. Con Descartar, que saca el documento del ciclo para siempre.
  */
 export const DOCUMENTO_ELECTRONICO_CONFIG: EmitirDocumentoElectronicoConfig = {
   baseFilters: BASE_FILTERS,
   columns: COLUMNS,
   filterFields: FILTER_FIELDS,
   storageKey: FILTERS_STORAGE_KEY,
-  descartable: false,
+  descartable: true,
   textos: (t) => t.entities.documentoElectronico,
 };
