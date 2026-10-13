@@ -1,0 +1,75 @@
+@let dict = t().entities.enviarFacturaElectronica.error;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '720px', maxWidth: '96vw' }"
+  styleClass="cp-error-electronico-dialog"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-red-50 text-red-700"
+      >
+        <i class="pi pi-exclamation-circle text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ dict.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ dict.subtitle }} {{ documento()?.numero }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    @if (isLoading()) {
+      <p class="m-0 flex items-center gap-2 text-[0.8rem] text-brand-muted">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>{{ dict.loading }}</span>
+      </p>
+    } @else if (errores().length === 0) {
+      <p class="m-0 text-[0.8rem] text-brand-muted">{{ dict.empty }}</p>
+    } @else {
+      <ul class="m-0 flex list-none flex-col gap-2.5 p-0">
+        @for (error of errores(); track error.id) {
+          <li
+            class="flex flex-col gap-1.5 rounded-[10px] border border-red-100 bg-red-50/40 px-3.5 py-3"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <span
+                class="rounded-full bg-red-100 px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-red-800"
+              >
+                {{ dict.fase[error.fase] }}
+              </span>
+              <span class="text-[0.72rem] tabular-nums text-brand-muted">
+                {{ error.fecha | date: formatoFecha }}
+              </span>
+            </div>
+            <p class="m-0 text-[0.85rem] leading-snug text-brand-text">{{ error.mensaje }}</p>
+          </li>
+        }
+      </ul>
+    }
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.close"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="visible.set(false)"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

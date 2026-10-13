@@ -4661,8 +4661,17 @@ export interface AppDict
       };
       estado: {
         descartado: string;
+        error: string;
         enviado: string;
         pendiente: string;
+      };
+      error: {
+        ver: string;
+        title: string;
+        subtitle: string;
+        loading: string;
+        empty: string;
+        fase: { validacion: string; emision: string };
       };
       filters: {
         notificado: string;

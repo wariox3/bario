@@ -66,6 +66,7 @@
             (pageChange)="emitir.onPageChange($event)"
             (sortChange)="emitir.onSortChange($event)"
             (selectionChange)="emitir.onSelectionChange($event)"
+            (rowActionInvoked)="onEmitirRowAction($event)"
           />
         </div>
       </p-tabpanel>
@@ -130,3 +131,5 @@
 />
 
 <p-confirmDialog />
+
+<app-error-electronico-dialog [(visible)]="errorVisible" [documento]="errorDocumento()" />

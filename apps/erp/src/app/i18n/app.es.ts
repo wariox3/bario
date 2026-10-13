@@ -6065,8 +6065,17 @@ export const es: AppDict = {
       },
       estado: {
         descartado: 'Descartado',
+        error: 'Error',
         enviado: 'Esperando respuesta',
         pendiente: 'Pendiente',
+      },
+      error: {
+        ver: 'Ver el detalle del error',
+        title: 'Error al emitir',
+        subtitle: 'Por qué falló la emisión de la factura',
+        loading: 'Cargando el detalle del error…',
+        empty: 'No hay errores registrados para esta factura.',
+        fase: { validacion: 'Validación', emision: 'Emisión' },
       },
       filters: {
         notificado: 'Notificado',

@@ -2,13 +2,17 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 import {
   BaseHttpService,
+  buildFiltros,
   buildListBody,
   buildListParams,
   type FilterCondition,
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type { DocumentoElectronicoRow } from './enviar-factura-electronica.model';
+import type {
+  DocumentoElectronicoError,
+  DocumentoElectronicoRow,
+} from './enviar-factura-electronica.model';
 
 /** Endpoint de cabeceras de documento (compartido por toda la familia). */
 const DOCUMENTO_ENDPOINT = '/general/documento/';
@@ -60,6 +64,21 @@ export class EnviarFacturaElectronicaService extends BaseHttpService {
   /** Notifica al cliente un documento ya emitido. */
   notificar(documentoId: number): Observable<unknown> {
     return this.post<unknown>(`${DOCUMENTO_ENDPOINT}notificar/`, { documento_id: documentoId });
+  }
+
+  /**
+   * Errores del último intento de emitir un documento: `POST
+   * documento-electronico-error/lista/` filtrando por `documento_id`. Cada
+   * intento reemplaza los del anterior.
+   */
+  errores(documentoId: number): Observable<PaginatedResponse<DocumentoElectronicoError>> {
+    return this.post<PaginatedResponse<DocumentoElectronicoError>>(
+      '/general/documento-electronico-error/lista/',
+      {
+        filtros: buildFiltros([{ field: 'documento_id', operator: 'eq', value: documentoId }]),
+        ordenamientos: [],
+      },
+    );
   }
 
   /** Descarta un documento del envío electrónico (irreversible). */

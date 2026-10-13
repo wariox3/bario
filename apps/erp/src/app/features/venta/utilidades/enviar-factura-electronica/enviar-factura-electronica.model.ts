@@ -17,7 +17,7 @@
  */
 
 /** Estado electrónico derivado que pinta el badge de la columna "Estado". */
-export type DocumentoElectronicoEstado = 'descartado' | 'enviado' | 'pendiente';
+export type DocumentoElectronicoEstado = 'descartado' | 'error' | 'enviado' | 'pendiente';
 
 /**
  * Fila del listado de la utilidad. Es un subconjunto de `DocumentoListRowBase`
@@ -36,6 +36,8 @@ export interface DocumentoElectronicoRow {
   readonly estado_electronico_enviado: boolean;
   readonly estado_electronico_notificado: boolean;
   readonly estado_electronico_descartado: boolean;
+  /** El último intento de emitir falló; los motivos están en `documento-electronico-error/`. */
+  readonly estado_electronico_error?: boolean;
 }
 
 /**
@@ -55,14 +57,28 @@ export function resolverResolucionEtiqueta(row: DocumentoElectronicoRow): string
 }
 
 /**
+ * Error de un intento de emisión (`GenDocumentoElectronicoError`). Cada intento
+ * reemplaza los errores del anterior.
+ */
+export interface DocumentoElectronicoError {
+  readonly id: number;
+  readonly documento: number;
+  readonly fase: 'validacion' | 'emision';
+  readonly mensaje: string;
+  readonly fecha: string;
+}
+
+/**
  * Deriva el estado electrónico visible de una fila, replicando la lógica del
- * legacy: descartado tiene prioridad; luego "enviado" (esperando respuesta de
- * la DIAN); si no, "pendiente" (aún emitible).
+ * legacy: descartado tiene prioridad; luego "error" (el último intento falló);
+ * luego "enviado" (esperando respuesta de la DIAN); si no, "pendiente" (aún
+ * emitible).
  */
 export function resolverEstadoElectronico(
   row: DocumentoElectronicoRow,
 ): DocumentoElectronicoEstado {
   if (row.estado_electronico_descartado) return 'descartado';
+  if (row.estado_electronico_error) return 'error';
   if (row.estado_electronico_enviado) return 'enviado';
   return 'pendiente';
 }

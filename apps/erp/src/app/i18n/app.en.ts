@@ -5991,8 +5991,17 @@ export const en: AppDict = {
       },
       estado: {
         descartado: 'Discarded',
+        error: 'Error',
         enviado: 'Awaiting response',
         pendiente: 'Pending',
+      },
+      error: {
+        ver: 'See the error detail',
+        title: 'Emission error',
+        subtitle: 'Why the emission of invoice failed',
+        loading: 'Loading the error detail…',
+        empty: 'There are no errors recorded for this invoice.',
+        fase: { validacion: 'Validation', emision: 'Emission' },
       },
       filters: {
         notificado: 'Notified',

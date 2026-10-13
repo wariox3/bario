@@ -28,6 +28,7 @@ import {
   DataToolbarComponent,
   type BreadcrumbItem,
   type PageChangeEvent,
+  type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { EnviarFacturaElectronicaService } from '../../enviar-factura-electronica.service';
@@ -46,7 +47,9 @@ import {
   NOTIFICAR_COLUMNS,
   NOTIFICAR_FILTERS_STORAGE_KEY,
   NOTIFICAR_FILTER_FIELDS,
+  VER_ERROR_ACTION_ID,
 } from '../../enviar-factura-electronica.constants';
+import { ErrorElectronicoDialogComponent } from '../../components/error-electronico-dialog/error-electronico-dialog.component';
 
 /** Dependencias que un `TabController` comparte con el componente host. */
 interface TabDeps {
@@ -200,6 +203,7 @@ function toViewRow(row: DocumentoElectronicoRow): DocumentoElectronicoViewRow {
     DataTableComponent,
     DataToolbarComponent,
     DataFilterModalComponent,
+    ErrorElectronicoDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './enviar-factura-electronica.component.html',
@@ -250,6 +254,10 @@ export class EnviarFacturaElectronicaComponent {
   /** Tab activo (`'emitir' | 'notificar'`). Controla el `<p-tabs>`. */
   protected readonly activeTab = signal<'emitir' | 'notificar'>('emitir');
 
+  /** Documento cuyo error de emisión muestra el modal (`null` = cerrado). */
+  protected readonly errorDocumento = signal<DocumentoElectronicoViewRow | null>(null);
+  protected readonly errorVisible = signal(false);
+
   /** `true` mientras corre una acción batch — bloquea los botones. */
   protected readonly isProcessing = signal(false);
 
@@ -278,6 +286,13 @@ export class EnviarFacturaElectronicaComponent {
 
   constructor() {
     this.emitir.ensureLoaded();
+  }
+
+  /** Clic en el estado "Error" de una fila del tab Emitir. */
+  protected onEmitirRowAction(event: RowActionInvokedEvent): void {
+    if (event.actionId !== VER_ERROR_ACTION_ID) return;
+    this.errorDocumento.set(event.row as DocumentoElectronicoViewRow);
+    this.errorVisible.set(true);
   }
 
   protected onTabChange(value: string): void {

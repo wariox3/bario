@@ -1,4 +1,5 @@
 import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
+import type { DocumentoElectronicoViewRow } from './enviar-factura-electronica.model';
 
 /**
  * Constantes de la utilidad **Enviar factura electrónica**.
@@ -42,6 +43,9 @@ export const NOTIFICAR_BASE_FILTERS: readonly FilterCondition[] = [
   { field: 'documento_tipo__documento_clase__grupo', operator: 'eq', value: GRUPO_FACTURAS },
 ];
 
+/** Clic en el estado "Error" de una fila: abre el modal con sus motivos. */
+export const VER_ERROR_ACTION_ID = 'ver-error';
+
 // ── Columnas ──────────────────────────────────────────────────────────────────
 
 /** Columnas del tab Emitir: identificación del documento + estado electrónico. */
@@ -70,6 +74,15 @@ export const EMITIR_COLUMNS: readonly ColumnDef[] = [
     width: '160px',
     align: 'center',
     enumKeyPrefix: `${I18N}.estado`,
+    // Solo "Error" es un enlace: abre el detalle de por qué falló la emisión.
+    cellAction: VER_ERROR_ACTION_ID,
+    cellActionFor: (row) =>
+      (row as DocumentoElectronicoViewRow).estado_electronico_estado === 'error',
+    cellActionLabelKey: `${I18N}.error.ver`,
+    toneFor: (row) =>
+      (row as DocumentoElectronicoViewRow).estado_electronico_estado === 'error'
+        ? 'critical'
+        : null,
   },
 ];
 
