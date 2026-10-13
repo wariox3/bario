@@ -2411,6 +2411,7 @@ export const es: AppDict = {
         aprobado: 'Apr',
         anulado: 'Anu',
         contabilizado: 'Con',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Aprobado',

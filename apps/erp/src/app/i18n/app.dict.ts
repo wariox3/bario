@@ -1770,6 +1770,7 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       filters: {
         aprobado: string;

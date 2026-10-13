@@ -92,6 +92,13 @@ export const FACTURA_VENTA_COLUMNS: readonly ColumnDef[] = [
     width: '70px',
     align: 'center',
   },
+  {
+    field: 'estado_electronico',
+    headerKey: 'entities.facturaVenta.columns.electronico',
+    type: 'boolean',
+    width: '70px',
+    align: 'center',
+  },
 ];
 
 /**
