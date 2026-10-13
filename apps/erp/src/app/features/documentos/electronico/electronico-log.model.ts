@@ -14,8 +14,14 @@ export interface ElectronicoLogResponse {
 export interface ElectronicoLog {
   readonly correos: readonly ElectronicoCorreo[];
   readonly eventos: readonly ElectronicoEvento[];
-  /** Forma aún no vista con datos: se pinta de forma genérica (ver `validacionTexto`). */
-  readonly validaciones: readonly unknown[];
+  readonly validaciones: readonly ElectronicoValidacion[];
+}
+
+/** Lo que el servicio reportó al validar el documento (p. ej. un correo bloqueado). */
+export interface ElectronicoValidacion {
+  readonly codigoValidacionPk: number;
+  readonly fecha: string | null;
+  readonly descripcion: string | null;
 }
 
 /** Un envío del documento por correo. `codigoCorreoPk` es el id del mensaje SMTP. */
@@ -41,5 +47,7 @@ export interface ElectronicoEvento {
   readonly motivo: string | null;
   /** Milisegundos desde epoch: más fino que `fecha`, que empata en el mismo segundo. */
   readonly epoca: string | null;
+  /** IP desde la que se reportó el evento (la del lector en una apertura). */
+  readonly ipEnvio?: string | null;
   readonly correoFecha: string | null;
 }

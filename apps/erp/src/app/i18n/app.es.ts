@@ -570,9 +570,16 @@ export const es: AppDict = {
       envios: {
         title: 'Envíos al cliente',
         envio: 'Envío',
-        copia: 'Copia:',
+        copia: 'Copia',
         empty: 'El documento aún no se ha enviado por correo.',
-        sinEventos: 'El proveedor de correo aún no reporta nada de este envío.',
+        sinEventos: 'Sin reportes',
+        cols: {
+          destinatario: 'Destinatario',
+          estado: 'Estado',
+          enviado: 'Enviado',
+          entregado: 'Entregado',
+          abierto: 'Abierto',
+        },
       },
       eventos: {
         enviado: 'Enviado',
@@ -594,6 +601,33 @@ export const es: AppDict = {
       validaciones: {
         title: 'Validaciones DIAN',
         empty: 'La DIAN no reportó validaciones.',
+        cols: { fecha: 'Fecha', detalle: 'Detalle' },
+      },
+      vista: { label: 'Vista de los envíos', resumen: 'Resumen', eventos: 'Eventos' },
+      eventosCols: {
+        fecha: 'Fecha',
+        destinatario: 'Destinatario',
+        evento: 'Evento',
+        envio: 'Envío',
+        ip: 'IP',
+      },
+      acciones: {
+        renotificar: 'Renotificar',
+        descargarXml: 'Descargar XML',
+        toasts: {
+          renotificarSuccess: {
+            title: 'Documento renotificado',
+            desc: 'Se reenvió el correo al cliente.',
+          },
+          renotificarError: {
+            title: 'No se pudo renotificar',
+            desc: 'Intenta de nuevo en unos segundos.',
+          },
+          xmlError: {
+            title: 'No se pudo descargar el XML',
+            desc: 'Intenta de nuevo en unos segundos.',
+          },
+        },
       },
     },
     afectacion: {

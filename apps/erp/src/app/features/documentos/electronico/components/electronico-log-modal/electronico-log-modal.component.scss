@@ -11,63 +11,91 @@
   color: var(--brand-muted, #64748b);
 }
 
-// ── Ruta de entrega ──────────────────────────────────────────────────────────
-// Cada paso es un punto unido al siguiente por un tramo. Los pasos ya recorridos
-// quedan en gris; el último —el estado actual del correo— toma el color de lo
-// que dice: navy si avanzó, rojo si rebotó.
-.log__paso {
-  --tono: rgba(20, 48, 73, 0.35);
+// ── Estado del destinatario ──────────────────────────────────────────────────
+// Punto + etiqueta de la etapa más avanzada: navy si avanzó, rojo si rebotó,
+// gris si el proveedor reportó algo que no es ni lo uno ni lo otro.
+.log__estado {
+  --tono: rgba(20, 48, 73, 0.4);
 
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 7rem;
-  max-width: 12rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--brand-text, #143049);
+
+  &[data-tono='positivo'] {
+    --tono: var(--brand-navy, #143049);
+  }
 
   &[data-tono='negativo'] {
     --tono: #dc2626;
+    color: #dc2626;
+  }
+
+  &[data-tono='neutro'] {
+    color: var(--brand-muted, #64748b);
   }
 }
 
 .log__punto {
-  width: 0.55rem;
-  height: 0.55rem;
+  width: 0.45rem;
+  height: 0.45rem;
   flex-shrink: 0;
   border-radius: 999px;
   background: var(--tono);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tono) 16%, transparent);
 }
 
-.log__tramo {
-  height: 1px;
-  flex: 1;
-  margin-inline: 0.35rem;
-  background: rgba(20, 48, 73, 0.14);
+// ── Switch de vista ──────────────────────────────────────────────────────────
+// El mismo control segmentado del listado de empresas (`cl-view-toggle`), con
+// texto porque las dos vistas son tablas y un ícono solo no las distingue.
+.log__vista {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  padding: 2px;
+  background: rgba(19 38 60 / 0.04);
+  border: 1px solid rgba(19 38 60 / 0.12);
+  border-radius: 8px;
 }
 
-.log__etiqueta {
-  margin-top: 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 500;
+.log__vista-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 24px;
+  padding: 0 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--brand-muted, #64748b);
-}
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color 120ms ease-out,
+    color 120ms ease-out;
 
-.log__paso--actual {
-  &[data-tono='positivo'],
-  &[data-tono='neutro'] {
-    --tono: var(--brand-navy, #143049);
+  .pi {
+    font-size: 0.7rem;
   }
 
-  .log__punto {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tono) 16%, transparent);
+  &:hover:not(.log__vista-btn--activo) {
+    color: var(--brand-navy, #143049);
   }
 
-  .log__etiqueta {
-    font-weight: 700;
-    color: var(--brand-text, #143049);
+  &--activo {
+    background: #fff;
+    color: var(--brand-navy, #143049);
+    box-shadow: 0 1px 2px rgba(19 38 60 / 0.08);
   }
 
-  &[data-tono='negativo'] .log__etiqueta {
-    color: #dc2626;
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(19 38 60 / 0.12);
   }
 }

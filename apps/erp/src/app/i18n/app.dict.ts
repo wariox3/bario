@@ -488,10 +488,34 @@ export interface AppDict
         copia: string;
         empty: string;
         sinEventos: string;
+        cols: {
+          destinatario: string;
+          estado: string;
+          enviado: string;
+          entregado: string;
+          abierto: string;
+        };
       };
       /** Mapa abierto: un evento que no esté acá se muestra con su clave. */
       eventos: Readonly<Record<string, string>>;
-      validaciones: { title: string; empty: string };
+      validaciones: { title: string; empty: string; cols: { fecha: string; detalle: string } };
+      vista: { label: string; resumen: string; eventos: string };
+      eventosCols: {
+        fecha: string;
+        destinatario: string;
+        evento: string;
+        envio: string;
+        ip: string;
+      };
+      acciones: {
+        renotificar: string;
+        descargarXml: string;
+        toasts: {
+          renotificarSuccess: { title: string; desc: string };
+          renotificarError: { title: string; desc: string };
+          xmlError: { title: string; desc: string };
+        };
+      };
     };
     afectacion: {
       title: string;

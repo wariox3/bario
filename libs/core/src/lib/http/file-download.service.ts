@@ -1,6 +1,7 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
+import { ERROR_TOAST } from '../interceptors/error-http-context';
 import { TENANT_SCOPED } from '../tenant/tenant-http-context';
 import { ENVIRONMENT } from '../tokens';
 import { buildHttpParams, type ParamValue } from '../services/base-http.service';
@@ -17,6 +18,11 @@ export interface FileDownloadOptions {
   readonly body?: unknown;
   /** Query params opcionales (aplican tanto a `GET` como a `POST`). */
   readonly params?: Record<string, ParamValue>;
+  /**
+   * `false` apaga el toast del interceptor: el caller avisa por su cuenta (el
+   * cuerpo del error llega como `Blob`; ver `extractBlobErrorMessage`).
+   */
+  readonly errorToast?: boolean;
 }
 
 /**
@@ -38,7 +44,9 @@ export class FileDownloadService {
 
   download(path: string, options: FileDownloadOptions = {}): Observable<void> {
     const url = `${this.baseUrl}${path}`;
-    const context = new HttpContext().set(TENANT_SCOPED, options.tenantScoped ?? true);
+    const context = new HttpContext()
+      .set(TENANT_SCOPED, options.tenantScoped ?? true)
+      .set(ERROR_TOAST, options.errorToast ?? true);
     const fallback = options.fallbackFilename ?? 'download';
     const params = options.params ? buildHttpParams(options.params) : undefined;
 

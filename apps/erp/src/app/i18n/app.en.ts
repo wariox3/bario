@@ -563,9 +563,16 @@ export const en: AppDict = {
       envios: {
         title: 'Emails to the customer',
         envio: 'Email',
-        copia: 'Cc:',
+        copia: 'Cc',
         empty: 'The document has not been emailed yet.',
-        sinEventos: 'The email provider has not reported anything for this email yet.',
+        sinEventos: 'No reports',
+        cols: {
+          destinatario: 'Recipient',
+          estado: 'Status',
+          enviado: 'Sent',
+          entregado: 'Delivered',
+          abierto: 'Opened',
+        },
       },
       eventos: {
         enviado: 'Sent',
@@ -587,6 +594,33 @@ export const en: AppDict = {
       validaciones: {
         title: 'DIAN validations',
         empty: 'The DIAN reported no validations.',
+        cols: { fecha: 'Date', detalle: 'Detail' },
+      },
+      vista: { label: 'Emails view', resumen: 'Summary', eventos: 'Events' },
+      eventosCols: {
+        fecha: 'Date',
+        destinatario: 'Recipient',
+        evento: 'Event',
+        envio: 'Email',
+        ip: 'IP',
+      },
+      acciones: {
+        renotificar: 'Notify again',
+        descargarXml: 'Download XML',
+        toasts: {
+          renotificarSuccess: {
+            title: 'Document notified again',
+            desc: 'The email was sent to the customer again.',
+          },
+          renotificarError: {
+            title: 'Could not notify again',
+            desc: 'Try again in a few seconds.',
+          },
+          xmlError: {
+            title: 'Could not download the XML',
+            desc: 'Try again in a few seconds.',
+          },
+        },
       },
     },
     afectacion: {

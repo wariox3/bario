@@ -62,6 +62,7 @@ export type {
   AppBranding,
 } from './lib/tokens';
 export {
+  extractBlobErrorMessage,
   extractErrorMessage,
   isUnverifiedAccountError,
   parseApiError,
