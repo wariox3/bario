@@ -1,0 +1,92 @@
+<!--
+  Gráfica de ventas del período, a todo el ancho de la grilla del inicio (el host
+  es `contents`). El selector de período vive en la propia card: es lo único que
+  gobierna. Segmentado y no dropdown: son dos opciones y se cambia de un clic,
+  viéndolas a ambas. Al cambiar se atenúa lo pintado en vez de volver al esqueleto.
+-->
+@let v = t().inicio.ventaResumen;
+
+<section
+  class="animate-fade-up flex h-full flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface sm:col-span-2 lg:col-span-4"
+  [attr.aria-busy]="estado() === 'cargando'"
+>
+  <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 px-5 pt-4">
+    <div class="flex flex-col gap-0.5">
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ v.titulo }}
+      </h2>
+      <p class="m-0 text-[0.75rem] text-brand-muted">{{ v.desc }}</p>
+    </div>
+    <div
+      class="inline-flex rounded-lg border border-[rgba(20,48,73,0.12)] bg-brand-surface p-0.5"
+      role="radiogroup"
+      [attr.aria-label]="v.periodo.aria"
+    >
+      @for (opcion of periodos; track opcion) {
+        <button
+          type="button"
+          role="radio"
+          class="rounded-md px-3 py-1 text-[0.78rem] font-medium transition-colors"
+          [class]="
+            periodo() === opcion
+              ? 'bg-[rgba(20,48,73,0.08)] text-brand-navy'
+              : 'text-brand-muted hover:bg-[rgba(20,48,73,0.04)] hover:text-brand-text'
+          "
+          [attr.aria-checked]="periodo() === opcion"
+          (click)="periodo.set(opcion)"
+        >
+          {{ v.periodo[opcion] }}
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (resumen(); as res) {
+    <!-- La cifra del período, sobre la gráfica que la desglosa. -->
+    <div
+      class="flex items-baseline gap-2 px-5 pt-3 transition-opacity"
+      [class.opacity-50]="recargando()"
+    >
+      <span
+        class="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] tabular-nums text-brand-navy"
+      >
+        {{ formatMoney(res.totales.total) }}
+      </span>
+      <span class="inline-block text-[0.72rem] first-letter:uppercase text-brand-muted">
+        {{ rotuloPeriodo() }}
+      </span>
+    </div>
+    <div class="relative px-3 pt-2 pb-3 transition-opacity" [class.opacity-50]="recargando()">
+      <div class="h-64">
+        <p-chart
+          type="bar"
+          [data]="datosGrafica()"
+          [options]="opcionesGrafica()"
+          [style]="{ height: '100%' }"
+        />
+      </div>
+      @if (sinVentas()) {
+        <!-- Sin ventas el eje queda: el período se ve, solo que vacío. -->
+        <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <span
+            class="rounded-md border border-[rgba(20,48,73,0.1)] bg-brand-surface px-3 py-1.5 text-[0.78rem] text-brand-muted"
+          >
+            {{ v.sinVentas[res.periodo] }}
+          </span>
+        </div>
+      }
+    </div>
+  } @else if (estado() === 'cargando') {
+    <div class="px-5 pt-3 pb-5" aria-hidden="true">
+      <div class="h-64 animate-pulse rounded-md bg-brand-surface-2"></div>
+    </div>
+  } @else {
+    <div class="flex items-start gap-2 px-5 pt-3 pb-5">
+      <i class="pi pi-exclamation-circle mt-0.5 text-[0.85rem] text-brand-muted"></i>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.8rem] font-semibold text-brand-text">{{ v.error.title }}</span>
+        <span class="text-[0.72rem] text-brand-muted">{{ v.error.desc }}</span>
+      </div>
+    </div>
+  }
+</section>

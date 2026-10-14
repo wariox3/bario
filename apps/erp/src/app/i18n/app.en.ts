@@ -6723,6 +6723,18 @@ export const en: AppDict = {
     },
   },
   inicio: {
+    ventaResumen: {
+      periodo: { aria: 'Sales period', mes: 'This month', anio: 'This year' },
+      titulo: 'Total sales',
+      desc: 'Taxes included; credit notes subtract.',
+      sinVentas: { mes: 'No sales this month yet', anio: 'No sales this year yet' },
+      documento: 'document',
+      documentos: 'documents',
+      error: {
+        title: "Sales couldn't be loaded",
+        desc: 'Try again in a moment.',
+      },
+    },
     carteraResumen: {
       porTipo: {
         cobrar: {
@@ -6763,6 +6775,7 @@ export const en: AppDict = {
       },
     },
     general: {
+      titulo: 'Business summary',
       datosIniciales: {
         title: 'Quick setup',
         desc: 'Set the default values and get the system running right away.',

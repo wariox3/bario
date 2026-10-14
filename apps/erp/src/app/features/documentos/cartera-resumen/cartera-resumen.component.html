@@ -2,12 +2,13 @@
   Ficha de saldo de cartera, compacta: rótulo y fecha de corte, el pendiente
   como cifra principal y sus dos partes (vigente · vencido) en filas. Borders-only,
   como el resto del ERP. Los puntos marcan cada parte: verde lo vigente, rojo lo
-  vencido; el monto vencido se pinta en rojo solo si hay algo vencido.
+  vencido; el monto vencido se pinta en rojo solo si hay algo vencido. Las filas
+  van siempre, aun en cero: así las fichas vecinas conservan la misma forma.
 -->
 @let r = t().inicio.carteraResumen;
 
 <section
-  class="animate-fade-up flex flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+  class="animate-fade-up flex h-full flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
   [attr.aria-busy]="estado() === 'cargando'"
 >
   <header class="flex items-baseline justify-between gap-2 px-4 pt-3">
@@ -58,33 +59,35 @@
             </span>
           </div>
 
-          @if (!sinPendiente()) {
-            <!-- Las dos partes del saldo -->
-            <dl class="m-0 flex flex-col gap-1.5 border-t border-[rgba(20,48,73,0.06)] pt-2.5">
-              <div class="flex items-center justify-between gap-3">
-                <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
-                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                  {{ r.vigente }}
-                </dt>
-                <dd class="m-0 text-[0.8rem] font-semibold tabular-nums text-brand-text">
-                  {{ formatMoney(res.total_pendiente_vigente) }}
-                </dd>
-              </div>
-              <div class="flex items-center justify-between gap-3">
-                <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
-                  <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                  {{ r.vencido }}
-                </dt>
-                <dd
-                  class="m-0 text-[0.8rem] font-semibold tabular-nums"
-                  [class.text-red-600]="hayVencido()"
-                  [class.text-brand-muted]="!hayVencido()"
-                >
-                  {{ formatMoney(res.total_pendiente_vencido) }}
-                </dd>
-              </div>
-            </dl>
-          }
+          <!-- Las dos partes del saldo: siempre, aun en cero, para que la ficha no se encoja -->
+          <dl class="m-0 flex flex-col gap-1.5 border-t border-[rgba(20,48,73,0.06)] pt-2.5">
+            <div class="flex items-center justify-between gap-3">
+              <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                {{ r.vigente }}
+              </dt>
+              <dd
+                class="m-0 text-[0.8rem] font-semibold tabular-nums"
+                [class.text-brand-text]="res.total_pendiente_vigente > 0"
+                [class.text-brand-muted]="res.total_pendiente_vigente <= 0"
+              >
+                {{ formatMoney(res.total_pendiente_vigente) }}
+              </dd>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <dt class="flex items-center gap-2 text-[0.75rem] text-brand-text">
+                <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                {{ r.vencido }}
+              </dt>
+              <dd
+                class="m-0 text-[0.8rem] font-semibold tabular-nums"
+                [class.text-red-600]="hayVencido()"
+                [class.text-brand-muted]="!hayVencido()"
+              >
+                {{ formatMoney(res.total_pendiente_vencido) }}
+              </dd>
+            </div>
+          </dl>
         </div>
 
         <!-- Al informe de pendientes -->

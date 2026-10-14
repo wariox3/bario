@@ -6810,6 +6810,18 @@ export const es: AppDict = {
     },
   },
   inicio: {
+    ventaResumen: {
+      periodo: { aria: 'Período de las ventas', mes: 'Mes actual', anio: 'Año actual' },
+      titulo: 'Total de ventas',
+      desc: 'Con impuestos incluidos; las notas crédito restan.',
+      sinVentas: { mes: 'Aún no hay ventas este mes', anio: 'Aún no hay ventas este año' },
+      documento: 'documento',
+      documentos: 'documentos',
+      error: {
+        title: 'No se pudieron cargar las ventas',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
     carteraResumen: {
       porTipo: {
         cobrar: {
@@ -6850,6 +6862,7 @@ export const es: AppDict = {
       },
     },
     general: {
+      titulo: 'Resumen del negocio',
       datosIniciales: {
         title: 'Configuración rápida',
         desc: 'Establece los valores predeterminados y haz que el sistema funcione al instante.',

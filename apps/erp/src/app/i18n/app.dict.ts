@@ -5145,6 +5145,17 @@ export interface AppDict
   };
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
+    /** Gráfica de ventas, compartida por los inicios de General y Venta. */
+    ventaResumen: {
+      /** Selector del período (mes o año en curso). */
+      periodo: { aria: string; mes: string; anio: string };
+      titulo: string;
+      desc: string;
+      sinVentas: { mes: string; anio: string };
+      documento: string;
+      documentos: string;
+      error: { title: string; desc: string };
+    };
     carteraResumen: {
       porTipo: Record<
         'cobrar' | 'pagar',
@@ -5169,6 +5180,8 @@ export interface AppDict
       error: { title: string; desc: string };
     };
     general: {
+      /** Encabezado del inicio: el resumen del negocio. */
+      titulo: string;
       /** Asistente de datos iniciales: solo en contenedores recién creados. */
       datosIniciales: {
         title: string;
