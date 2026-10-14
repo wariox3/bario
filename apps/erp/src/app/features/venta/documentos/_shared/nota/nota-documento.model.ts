@@ -35,6 +35,8 @@ export interface NotaVentaRead extends DocumentoReadBase {
   readonly documento_concepto_correccion?: number | null;
   readonly documento_concepto_correccion_nombre?: string | null;
   readonly comentario: string | null;
+  /** CUE con el que la DIAN validó la nota electrónica; vacío hasta que se emite. */
+  readonly cue?: string | null;
   /** Suma de los pagos no anulados (`documento-pago`). La mantiene el backend. */
   readonly pago?: string | null;
   /** Lo que queda por cobrar. El backend lo fija al aprobar (`total − pago`). */

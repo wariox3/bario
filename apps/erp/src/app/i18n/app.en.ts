@@ -2803,6 +2803,8 @@ export const en: AppDict = {
           almacen: 'Warehouse',
           metodoPago: 'Payment method',
           conceptoCorreccion: 'Correction concept',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {
@@ -2927,6 +2929,8 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           asesor: 'Sales rep',
           ordenCompra: 'Purchase order',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {
@@ -3548,6 +3552,8 @@ export const en: AppDict = {
           conceptoCorreccion: 'Correction concept',
           centroCosto: 'Cost center',
           ordenCompra: 'Purchase order',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {

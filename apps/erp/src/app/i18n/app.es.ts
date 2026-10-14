@@ -2864,6 +2864,8 @@ export const es: AppDict = {
           almacen: 'Almacén',
           metodoPago: 'Método de pago',
           conceptoCorreccion: 'Concepto corrección',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {
@@ -2988,6 +2990,8 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           asesor: 'Asesor',
           ordenCompra: 'Orden de compra',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {
@@ -3609,6 +3613,8 @@ export const es: AppDict = {
           conceptoCorreccion: 'Concepto corrección',
           centroCosto: 'Centro de costo',
           ordenCompra: 'Orden de compra',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {

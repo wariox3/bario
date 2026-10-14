@@ -87,7 +87,7 @@
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="seguridad-social-detail__label">{{ det.fields.cue }}</dt>
         <dd class="seguridad-social-detail__value break-all">
-          {{ c.cue || '—' }}
+          {{ c.cue }}
           @if (dianUrl(); as url) {
             <a
               class="ml-2 font-semibold text-sky-700 hover:underline"

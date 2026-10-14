@@ -2172,6 +2172,8 @@ export interface AppDict
           almacen: string;
           metodoPago: string;
           conceptoCorreccion: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2263,6 +2265,8 @@ export interface AppDict
           metodoPago: string;
           asesor: string;
           ordenCompra: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2736,6 +2740,8 @@ export interface AppDict
           conceptoCorreccion: string;
           centroCosto: string;
           ordenCompra: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };

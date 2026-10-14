@@ -77,7 +77,7 @@ interface CabeceraView {
   readonly asesor: string | null;
   /** Hoy siempre `null`: el read no serializa la etiqueta de la resolución. */
   readonly resolucion: string | null;
-  /** CUE de la DIAN; hoy siempre `null` (el read aún no lo serializa). */
+  /** CUE de la DIAN; vacío mientras la factura no se haya emitido. */
   readonly cue: string | null;
   readonly comentario: string | null;
   /**

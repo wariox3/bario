@@ -31,6 +31,8 @@ export interface NotaAjusteRead extends DocumentoReadBase {
   readonly centro_costo_nombre?: string | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
+  /** CUE con el que la DIAN validó la nota de ajuste; vacío hasta que se emite. */
+  readonly cue?: string | null;
 }
 
 /** Body (POST/PATCH) de una nota ajuste. */

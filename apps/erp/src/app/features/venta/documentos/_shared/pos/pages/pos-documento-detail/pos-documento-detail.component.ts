@@ -27,6 +27,8 @@ import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
+import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
+import { DocumentoElectronicoMenuComponent } from '@erp/features/documentos/electronico/components/documento-electronico-menu/documento-electronico-menu.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
 import {
   comercialDetalleToFormValue,
@@ -57,6 +59,8 @@ interface CabeceraView {
   readonly metodoPago: string | null;
   readonly asesor: string | null;
   readonly ordenCompra: string | null;
+  /** CUE de la DIAN; vacío mientras no se haya emitido (o si el POS no es electrónico). */
+  readonly cue: string | null;
   readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -90,6 +94,7 @@ interface CabeceraView {
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
+    DocumentoElectronicoMenuComponent,
     TabsModule,
   ],
   templateUrl: './pos-documento-detail.component.html',
@@ -113,6 +118,21 @@ export class PosDocumentoDetailComponent implements OnInit {
 
   /** Id del documento (route param `:id`, vía `withComponentInputBinding`). */
   readonly id = input<string>();
+
+  /** Id como número para el dropdown Electrónico (`null` si la ruta no lo trae). */
+  protected readonly documentoIdNumero = computed(() => {
+    const id = this.id();
+    return id ? Number(id) : null;
+  });
+
+  /** Solo la POS electrónica se emite a la DIAN: ella trae el menú y el CUE. */
+  protected readonly esElectronico = computed(() => this.document().electronico != null);
+
+  /** Enlace a la consulta pública de la DIAN; `null` mientras no haya CUE. */
+  protected readonly dianUrl = computed(() => {
+    const cue = this.cabecera()?.cue;
+    return cue ? `${DIAN_DOCUMENT_URL}${cue}` : null;
+  });
 
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
@@ -243,6 +263,7 @@ export class PosDocumentoDetailComponent implements OnInit {
             metodoPago: read.metodo_pago_nombre ?? null,
             asesor: read.asesor_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
+            cue: read.cue ?? null,
             comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,
