@@ -6,6 +6,7 @@ import {
   tenantSlugMatchGuard,
 } from '@reddoc/core';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
+import { ventaAccessGuard } from './core/acceso/venta-access.guard';
 
 export const appRoutes: Route[] = [
   { path: '', pathMatch: 'full', canActivate: [rootRedirectGuard], children: [] },
@@ -37,7 +38,7 @@ export const appRoutes: Route[] = [
     // El tenant se resuelve al matchear (ver `tenantAccessGuard`): los guards
     // anidados que dependan de él corren antes que cualquier `canActivate`.
     canMatch: [tenantSlugMatchGuard, tenantAccessGuard],
-    canActivate: [authGuard],
+    canActivate: [authGuard, ventaAccessGuard],
     loadComponent: () =>
       import('./layouts/workspace-layout/workspace-layout.component').then(
         (m) => m.WorkspaceLayoutComponent,

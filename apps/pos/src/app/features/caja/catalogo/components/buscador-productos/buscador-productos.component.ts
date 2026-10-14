@@ -5,6 +5,7 @@ import {
   type ElementRef,
   afterNextRender,
   inject,
+  input,
   output,
   signal,
   viewChild,
@@ -40,6 +41,9 @@ export class BuscadorProductosComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
+
+  /** El usuario puede crear ítems: si no, no se ofrece el botón. */
+  readonly puedeCrearItem = input(true);
 
   readonly buscar = output<CriterioBusqueda>();
   /** Crear un ítem; lleva el código escrito si se estaba buscando por código. */
@@ -96,7 +100,8 @@ export class BuscadorProductosComponent {
     this.buscar.emit({ modo: this.modo(), texto });
   }
 
-  private enfocar(): void {
+  /** Lleva el foco al campo. Público: la caja lo usa con F3, «/» y el lector. */
+  enfocar(): void {
     this.campo().nativeElement.focus();
   }
 }

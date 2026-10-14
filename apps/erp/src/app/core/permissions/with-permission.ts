@@ -1,7 +1,7 @@
 import type { Route } from '@angular/router';
 import { accessDeniedTwin, assertTwinnablePath } from './access-denied-route';
 import { PERMISSION_ROUTE_DATA_KEY, permissionGuard } from './permission.guard';
-import type { ModeloId } from './modelo.catalog';
+import type { ModeloId } from '@reddoc/core';
 
 /**
  * Protege una ruta con el modelo del backend que la gobierna, devolviendo el

@@ -36,6 +36,9 @@ export default [
             '^@turnos/',
             '^@pos/',
             '^@reddoc/feature-contenedores/i18n$',
+            // Entry points de `@reddoc/ui` para lo que las apps cargan eager (páginas de
+            // auth y diccionarios), así no arrastran el barrel al bundle inicial.
+            '^@reddoc/ui/(auth|i18n)$',
           ],
           depConstraints: [
             {
@@ -110,9 +113,9 @@ export default [
     // barrel. Como el descriptor evalúa `MODELO` en el literal de su menú, el
     // ciclo se cierra en runtime y revienta al arrancar (TDZ), no al compilar.
     //
-    // Por eso el import va **profundo**, a `modelo.catalog`, que es una hoja sin
-    // dependencias. Los `import type` sí pueden ir por el barrel: se borran en
-    // la compilación y no participan del ciclo.
+    // Por eso `MODELO` se importa de `@reddoc/core`, donde el catálogo es una
+    // hoja sin dependencias del ERP. Los `import type` sí pueden ir por el
+    // barrel: se borran en la compilación y no participan del ciclo.
     files: ['apps/erp/**/*.module-descriptor.ts'],
     rules: {
       '@typescript-eslint/no-restricted-imports': [
@@ -122,7 +125,7 @@ export default [
             {
               name: '@erp/core/permissions',
               message:
-                'Import profundo en los descriptores: usá @erp/core/permissions/modelo.catalog. El barrel arrastra PermissionsService → ERP_MODULES → los descriptores, y ese ciclo revienta al arrancar.',
+                'En los descriptores, MODELO va desde @reddoc/core. El barrel arrastra PermissionsService → ERP_MODULES → los descriptores, y ese ciclo revienta al arrancar.',
               allowTypeImports: true,
             },
           ],

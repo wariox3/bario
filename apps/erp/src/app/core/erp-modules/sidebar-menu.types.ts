@@ -1,6 +1,6 @@
+import type { ModeloId } from '@reddoc/core';
 // Import profundo y `type`-only a propósito: el barrel de permisos importa de
 // vuelta estos tipos para filtrar el menú, y pasar por él acá cerraría el ciclo.
-import type { ModeloId } from '../permissions/modelo.catalog';
 
 /**
  * Tipos del menú del sidebar declarativo.

@@ -121,6 +121,9 @@ export class CobroDialogComponent {
   protected readonly cobroPendiente = this.carritos.cobroPendiente;
   protected readonly sugerencias = computed(() => sugerenciasEfectivo(this.total()));
 
+  /** El diálogo ya no existe: un cobro que termina después no emite nada. */
+  private destruido = false;
+
   /** Medio elegido; hoy siempre efectivo, pero la solicitud ya lo lleva. */
   private medio: MedioPagoPos = MEDIOS_PAGO_POS[0];
 
@@ -141,6 +144,8 @@ export class CobroDialogComponent {
     this.form.controls.recibido.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((valor) => this.recibido.set(valor ?? 0));
+
+    this.destroyRef.onDestroy(() => (this.destruido = true));
 
     // Cada vez que se abre, arranca limpio con los valores de la caja.
     effect(() => {
@@ -191,7 +196,7 @@ export class CobroDialogComponent {
         this.error.set(null);
         this.ventas
           .eliminar(pendiente.documentoId)
-          .pipe(takeUntilDestroyed(this.destroyRef))
+          // Sin atarse al diálogo: si se cierra a mitad, la venta igual se desbloquea.
           .subscribe({
             next: () => {
               this.descartando.set(false);
@@ -253,7 +258,11 @@ export class CobroDialogComponent {
 
     this.cobroService
       .cobrar(solicitud)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      // Sin `takeUntilDestroyed` a propósito: si el diálogo se destruye a mitad del
+      // cobro (se navega a otra sección, se rota la tablet), cortar el pipeline
+      // dejaría un documento creado sin marcar la venta como pendiente, y el
+      // siguiente intento duplicaría la factura. El cobro termina igual y sus
+      // efectos quedan en `CarritosStore`, que vive en la raíz.
       .subscribe({
         next: (evento) => {
           if (evento.tipo === 'fase') {
@@ -264,7 +273,7 @@ export class CobroDialogComponent {
           this.ventaCobrada.set({ documentoId: evento.documentoId, total, cambio: vuelto });
           this.carritos.cerrarCobrada(uuid);
           this.vista.set('exito');
-          this.cobrada.emit();
+          if (!this.destruido) this.cobrada.emit();
         },
         error: (err: unknown) => this.alFallar(err, uuid),
       });

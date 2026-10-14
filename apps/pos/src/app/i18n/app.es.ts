@@ -1,5 +1,5 @@
 import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEs, appSwitcherEs, authEs, phoneInputEs } from '@reddoc/ui';
+import { accesosContenedorEs, appSwitcherEs, authEs, phoneInputEs } from '@reddoc/ui/i18n';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
@@ -177,7 +177,7 @@ export const es: AppDict = {
       modo: 'Buscar por',
       porNombre: 'Nombre',
       porCodigo: 'Código',
-      placeholderNombre: 'Buscar por nombre o código',
+      placeholderNombre: 'Buscar por nombre o código (F3)',
       placeholderCodigo: 'Escanea o escribe el código y presiona Enter',
       limpiar: 'Limpiar búsqueda',
       nuevoItem: 'Nuevo ítem',
@@ -221,9 +221,11 @@ export const es: AppDict = {
         desc: 'Termina o descarta el cobro antes de cambiar la venta.',
       },
     },
+    compacta: { verVenta: 'Ver venta', titulo: 'Venta' },
     tabs: {
       label: 'Ventas abiertas',
       nueva: 'Nueva venta',
+      atajoNueva: 'Nueva venta (F4)',
       opciones: 'Opciones de la venta',
       renombrar: 'Renombrar',
       nombre: 'Nombre de la venta',
@@ -248,6 +250,7 @@ export const es: AppDict = {
       vacioDesc: 'Toca un producto o escanea su código para agregarlo.',
       cancelar: 'Cancelar',
       cobrar: 'Cobrar',
+      atajoCobrar: 'Cobrar (F2)',
       retomarCobro: 'Retomar cobro',
       cobroPendiente: 'Cobro sin terminar. La venta no se puede cambiar; quedó en el documento',
       resumen: {
@@ -399,6 +402,12 @@ export const es: AppDict = {
           desc: 'Puedes imprimir la venta desde el historial.',
         },
       },
+    },
+  },
+  acceso: {
+    sinVenta: {
+      title: 'Sin módulo de venta',
+      desc: 'Esta empresa no tiene contratado el módulo de venta, que es el que usa la caja.',
     },
   },
   historial: {

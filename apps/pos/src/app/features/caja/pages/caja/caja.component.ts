@@ -5,13 +5,23 @@ import {
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { I18nService, TenantService, ToastService, type Item } from '@reddoc/core';
+import { DrawerModule } from 'primeng/drawer';
+import {
+  I18nService,
+  MODELO,
+  ModelPermissionsService,
+  TenantService,
+  ToastService,
+  formatCop,
+  type Item,
+} from '@reddoc/core';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../configuracion/configuracion-caja.store';
 import { CatalogoStore, type CriterioBusqueda } from '../../catalogo/catalogo.store';
@@ -37,11 +47,15 @@ import { CarritoTabsComponent } from '../../carrito/components/carrito-tabs/carr
   selector: 'app-caja',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'flex min-h-0 flex-1 flex-col' },
+  host: {
+    class: 'flex min-h-0 flex-1 flex-col',
+    '(document:keydown)': 'onTecla($event)',
+  },
   imports: [
     RouterLink,
     ButtonModule,
     ConfirmDialogModule,
+    DrawerModule,
     BuscadorProductosComponent,
     ProductoCardComponent,
     CarritoPanelComponent,
@@ -73,12 +87,84 @@ export class CajaComponent {
     () => `/t/${this.tenant.currentSlug() ?? ''}/configuracion`,
   );
 
+  /**
+   * Permisos del usuario sobre ítems y contactos: deciden si se ofrecen el ítem
+   * rápido, la estrella de favorito y el cliente rápido. Mientras no llegan (o
+   * si la consulta falla) se permite; el backend responde 403 si corresponde.
+   */
+  private readonly permisos = inject(ModelPermissionsService);
+  protected readonly puedeCrearItem = computed(() =>
+    this.permisos.allows(MODELO.general.item, 'crear'),
+  );
+  protected readonly puedeFavorito = computed(() =>
+    this.permisos.allows(MODELO.general.item, 'editar'),
+  );
+
+  /**
+   * Pantalla angosta (tablet, móvil): el catálogo ocupa todo y la venta pasa a
+   * un drawer que se abre desde la barra inferior.
+   */
+  protected readonly compacta = signal(false);
+  protected readonly ventaVisible = signal(false);
+  protected readonly cantidadVenta = this.carritos.cantidadTotal;
+  protected readonly totalVenta = computed(() => formatCop(this.carritos.resumen().total));
+
+  private readonly buscador = viewChild(BuscadorProductosComponent);
+  private readonly panel = viewChild(CarritoPanelComponent);
+
   constructor() {
+    const consulta = window.matchMedia(CONSULTA_COMPACTA);
+    const alCambiar = (e: MediaQueryListEvent | MediaQueryList): void =>
+      this.compacta.set(e.matches);
+    alCambiar(consulta);
+    consulta.addEventListener('change', alCambiar);
+    this.destroyRef.onDestroy(() => consulta.removeEventListener('change', alCambiar));
+
+    for (const modelo of [MODELO.general.item, MODELO.general.contacto]) {
+      this.permisos.load(modelo).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    }
     this.catalogo.buscar({ modo: 'nombre', texto: '' });
     inject(ConsumidorFinalService)
       .resolver()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((contacto) => this.carritos.usarContactoPorDefecto(contacto));
+  }
+
+  /**
+   * Atajos de la caja: F2 cobra, F4 abre una venta nueva, F3 o «/» llevan al
+   * buscador. Además, si se teclea sin ningún campo con foco (el lector de
+   * barras dispara teclas donde esté el foco), el foco salta al buscador antes
+   * de que llegue la tecla, para no perder la lectura. Con un modal abierto no
+   * se intercepta nada: el modal manda.
+   */
+  protected onTecla(event: KeyboardEvent): void {
+    if (event.defaultPrevented || hayModalAbierto()) return;
+    switch (event.key) {
+      case 'F2':
+        event.preventDefault();
+        // En pantalla angosta el panel vive en el drawer: primero se abre.
+        if (this.compacta() && !this.ventaVisible()) this.ventaVisible.set(true);
+        else this.panel()?.cobrar();
+        return;
+      case 'F4':
+        event.preventDefault();
+        this.carritos.nueva();
+        this.buscador()?.enfocar();
+        return;
+      case 'F3':
+        event.preventDefault();
+        this.buscador()?.enfocar();
+        return;
+    }
+    if (escribiendoEnCampo(event.target)) return;
+    if (event.key === '/') {
+      event.preventDefault();
+      this.buscador()?.enfocar();
+      return;
+    }
+    if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      this.buscador()?.enfocar();
+    }
   }
 
   protected onBuscar(criterio: CriterioBusqueda): void {
@@ -140,4 +226,18 @@ export class CajaComponent {
     if (severidad === 'warn') this.toast.warn(tx.title, tx.desc);
     else this.toast.error(tx.title, tx.desc);
   }
+}
+
+/** Por debajo de `lg` (1024px) la venta pasa al drawer. */
+const CONSULTA_COMPACTA = '(max-width: 1023.98px)';
+
+/** Hay un diálogo modal de PrimeNG abierto (cobro, edición, confirmación…). */
+function hayModalAbierto(): boolean {
+  return document.querySelector('.p-dialog-mask') !== null;
+}
+
+/** El foco está en algo que recibe texto: ahí las teclas son de la persona. */
+function escribiendoEnCampo(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }

@@ -18,15 +18,17 @@
         [disabled]="bloqueada()"
         (ngModelChange)="onContacto($event)"
       />
-      <p-button
-        type="button"
-        icon="pi pi-user-plus"
-        severity="secondary"
-        [outlined]="true"
-        [ariaLabel]="tx.nuevoCliente"
-        [disabled]="bloqueada()"
-        (onClick)="creandoCliente.set(true)"
-      />
+      @if (puedeCrearCliente()) {
+        <p-button
+          type="button"
+          icon="pi pi-user-plus"
+          severity="secondary"
+          [outlined]="true"
+          [ariaLabel]="tx.nuevoCliente"
+          [disabled]="bloqueada()"
+          (onClick)="creandoCliente.set(true)"
+        />
+      }
     </div>
   </div>
 
@@ -114,7 +116,8 @@
         [label]="bloqueada() ? tx.retomarCobro : tx.cobrar"
         icon="pi pi-wallet"
         [fluid]="true"
-        (onClick)="onCobrar()"
+        [title]="tx.atajoCobrar"
+        (onClick)="cobrar()"
       />
     </div>
   </div>

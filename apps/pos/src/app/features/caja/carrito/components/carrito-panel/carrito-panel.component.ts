@@ -11,7 +11,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { I18nService, ToastService, formatCop, type ErpSelectOption } from '@reddoc/core';
+import {
+  I18nService,
+  MODELO,
+  ModelPermissionsService,
+  ToastService,
+  formatCop,
+  type ErpSelectOption,
+} from '@reddoc/core';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../../configuracion/configuracion-caja.store';
@@ -63,6 +70,10 @@ export class CarritoPanelComponent {
 
   protected readonly cobrando = signal(false);
   protected readonly creandoCliente = signal(false);
+  private readonly permisos = inject(ModelPermissionsService);
+  protected readonly puedeCrearCliente = computed(() =>
+    this.permisos.allows(MODELO.general.contacto, 'crear'),
+  );
   protected readonly bloqueada = computed(() => this.store.cobroPendiente() !== null);
 
   protected readonly contactoParams = { cliente: 'True' } as const;
@@ -84,8 +95,12 @@ export class CarritoPanelComponent {
     if (this.store.fijarCantidad(itemId, cantidad) === 'sinStock') this.avisarSinStock();
   }
 
-  /** Abre el cobro si la venta se puede cobrar; si no, dice qué falta. */
-  protected onCobrar(): void {
+  /**
+   * Abre el cobro si la venta se puede cobrar; si no, dice qué falta. Público:
+   * la caja lo dispara también con F2.
+   */
+  cobrar(): void {
+    if (this.cobrando()) return;
     const tx = this.t().caja.cobro.requisitos;
     const venta = this.store.activo();
     if (!venta.cobro) {

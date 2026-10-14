@@ -50,16 +50,18 @@
     </div>
   </button>
 
-  <button
-    type="button"
-    class="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 transition-colors hover:text-amber-500"
-    [class]="p.favorito ? 'text-amber-500' : 'text-brand-muted'"
-    [attr.aria-pressed]="p.favorito"
-    [attr.aria-label]="p.favorito ? tx.quitarFavorito : tx.marcarFavorito"
-    (click)="onFavorito()"
-  >
-    <i class="pi text-sm" [class]="p.favorito ? 'pi-star-fill' : 'pi-star'"></i>
-  </button>
+  @if (puedeFavorito()) {
+    <button
+      type="button"
+      class="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 transition-colors hover:text-amber-500"
+      [class]="p.favorito ? 'text-amber-500' : 'text-brand-muted'"
+      [attr.aria-pressed]="p.favorito"
+      [attr.aria-label]="p.favorito ? tx.quitarFavorito : tx.marcarFavorito"
+      (click)="onFavorito()"
+    >
+      <i class="pi text-sm" [class]="p.favorito ? 'pi-star-fill' : 'pi-star'"></i>
+    </button>
+  }
 
   @if (cantidad() > 0) {
     <span

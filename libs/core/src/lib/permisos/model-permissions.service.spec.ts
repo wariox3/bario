@@ -2,7 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { AUTH_SERVICE, ENVIRONMENT, TenantService } from '@reddoc/core';
+import { TenantService } from '../tenant/tenant.service';
+import { AUTH_SERVICE, ENVIRONMENT } from '../tokens';
 import { MODELO } from './modelo.catalog';
 import { ModelPermissionsService } from './model-permissions.service';
 

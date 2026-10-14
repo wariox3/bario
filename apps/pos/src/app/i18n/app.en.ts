@@ -1,5 +1,5 @@
 import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEn, appSwitcherEn, authEn, phoneInputEn } from '@reddoc/ui';
+import { accesosContenedorEn, appSwitcherEn, authEn, phoneInputEn } from '@reddoc/ui/i18n';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
@@ -177,7 +177,7 @@ export const en: AppDict = {
       modo: 'Search by',
       porNombre: 'Name',
       porCodigo: 'Code',
-      placeholderNombre: 'Search by name or code',
+      placeholderNombre: 'Search by name or code (F3)',
       placeholderCodigo: 'Scan or type the code and press Enter',
       limpiar: 'Clear search',
       nuevoItem: 'New item',
@@ -221,9 +221,11 @@ export const en: AppDict = {
         desc: 'Finish or discard the charge before changing the sale.',
       },
     },
+    compacta: { verVenta: 'View sale', titulo: 'Sale' },
     tabs: {
       label: 'Open sales',
       nueva: 'New sale',
+      atajoNueva: 'New sale (F4)',
       opciones: 'Sale options',
       renombrar: 'Rename',
       nombre: 'Sale name',
@@ -248,6 +250,7 @@ export const en: AppDict = {
       vacioDesc: 'Tap a product or scan its code to add it.',
       cancelar: 'Cancel',
       cobrar: 'Charge',
+      atajoCobrar: 'Charge (F2)',
       retomarCobro: 'Resume charge',
       cobroPendiente: 'Unfinished charge. The sale cannot change; it was saved as document',
       resumen: {
@@ -399,6 +402,12 @@ export const en: AppDict = {
           desc: 'You can print the sale from the history.',
         },
       },
+    },
+  },
+  acceso: {
+    sinVenta: {
+      title: 'No sales module',
+      desc: 'This company has not purchased the sales module, which the register uses.',
     },
   },
   historial: {

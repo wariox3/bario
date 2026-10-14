@@ -369,6 +369,34 @@ mismo (1.48 MB). Va al sprint 5.
 **Terminado cuando:** release del POS en staging probada por una persona con un
 lector de códigos y una impresora, y el `CHANGELOG` lo refleja.
 
+**Estado (2026-10-15).** Hecho lo que depende del front:
+
+- **Acceso:** `ventaAccessGuard` exige `acceso_venta` (sin flags, pasa).
+  Permisos por modelo: sin `crear` sobre ítem o contacto no se ofrecen el ítem
+  rápido ni el cliente rápido; sin `editar` sobre ítem no hay estrella de
+  favorito. Para eso `ModelPermissionsService`, `MODELO` y sus tipos pasaron a
+  `libs/core/permisos`; el ERP los re-exporta desde `@erp/core/permissions`.
+  Los documentos no tienen permiso propio en el backend (comparten
+  `general.documento`), así que cobrar no se condiciona.
+- **Teclado y lector:** F2 cobra, F4 abre venta, F3 o «/» van al buscador; una
+  tecla sin campo con foco salta al buscador antes de llegar.
+- **Tablet:** por debajo de 1024px la venta pasa a un drawer con barra inferior.
+- **Robustez del cobro:** el cobro y el descarte ya no se cortan si el diálogo se
+  destruye a mitad (navegar, rotar la tablet); antes eso podía dejar un documento
+  creado sin marcar la venta como pendiente.
+- **Bundle inicial:** 1.45 → 1.14 MB con los entry points `@reddoc/ui/auth` y
+  `@reddoc/ui/i18n`. Budget del POS: aviso 1.2 MB, error 1.3 MB.
+- **Documentación:** `docs/guides/pos.md` y `CLAUDE.md`.
+- **Environments:** staging y producción con las URLs de las apps hermanas.
+
+Pendiente fuera del front: secrets `POS_DEV_DEPLOY_PATH` / `POS_PROD_DEPLOY_PATH`
+y el sitio en el servidor, la clave de Turnstile de staging, el dominio del POS
+(para `posUrl` en ERP y turnos), la prueba en staging con lector e impresora, y
+el `CHANGELOG`, que lo genera `npm run release`.
+
+Propuesta abierta: aplicar los entry points de `@reddoc/ui` al ERP (1.89 MB con
+límite 1.9) y a turnos (1.48 MB).
+
 ---
 
 ## Fuera de alcance (registrado para después)

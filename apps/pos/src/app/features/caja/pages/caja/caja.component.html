@@ -4,10 +4,8 @@
 <div class="flex min-h-0 flex-1 flex-col gap-3">
   <app-carrito-tabs />
 
-  <div class="flex min-h-0 flex-1 gap-4 max-lg:flex-col">
-    <div
-      class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto pr-1 max-lg:overflow-visible"
-    >
+  <div class="flex min-h-0 flex-1 gap-4">
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
       @if (!configuracionCompleta()) {
         <div
           class="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
@@ -29,7 +27,11 @@
         </div>
       }
 
-      <app-buscador-productos (buscar)="onBuscar($event)" (nuevoItem)="onNuevoItem($event)" />
+      <app-buscador-productos
+        [puedeCrearItem]="puedeCrearItem()"
+        (buscar)="onBuscar($event)"
+        (nuevoItem)="onNuevoItem($event)"
+      />
 
       @switch (catalogo.estado()) {
         @case ('cargando') {
@@ -78,6 +80,7 @@
                 <app-producto-card
                   [producto]="producto"
                   [cantidad]="cantidades().get(producto.id) ?? 0"
+                  [puedeFavorito]="puedeFavorito()"
                   (agregar)="onAgregar($event)"
                   (alternarFavorito)="onAlternarFavorito($event)"
                 />
@@ -101,12 +104,44 @@
       }
     </div>
 
-    <app-carrito-panel
-      (cobrada)="catalogo.recargar()"
-      class="flex min-h-0 w-[380px] shrink-0 flex-col max-lg:h-[36rem] max-lg:w-full"
-    />
+    @if (!compacta()) {
+      <app-carrito-panel
+        (cobrada)="catalogo.recargar()"
+        class="flex min-h-0 w-[380px] shrink-0 flex-col"
+      />
+    }
   </div>
+
+  @if (compacta()) {
+    <!-- Tablet/móvil: la venta vive en un drawer; esta barra la resume y la abre. -->
+    <button
+      type="button"
+      class="flex shrink-0 items-center justify-between gap-3 rounded-xl bg-[var(--brand-navy)] px-4 py-3 text-white"
+      (click)="ventaVisible.set(true)"
+    >
+      <span class="flex items-center gap-2 text-[0.85rem] font-semibold">
+        <i class="pi pi-shopping-cart" aria-hidden="true"></i>
+        {{ tx.compacta.verVenta }}
+        <span class="rounded-full bg-white/20 px-2 font-mono text-[0.75rem] tabular-nums">
+          {{ cantidadVenta() }}
+        </span>
+      </span>
+      <span class="font-mono text-base font-bold tabular-nums">{{ totalVenta() }}</span>
+    </button>
+  }
 </div>
+
+@if (compacta()) {
+  <p-drawer
+    [visible]="ventaVisible()"
+    (visibleChange)="ventaVisible.set($event)"
+    position="right"
+    [header]="tx.compacta.titulo"
+    styleClass="!w-full sm:!w-[26rem]"
+  >
+    <app-carrito-panel (cobrada)="catalogo.recargar()" class="flex h-full min-h-0 flex-col" />
+  </p-drawer>
+}
 
 <app-item-rapido-dialog
   [(visible)]="creandoItem"

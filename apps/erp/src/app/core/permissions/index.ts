@@ -1,7 +1,8 @@
 export { PermissionsService } from './permissions.service';
-export type { ActionPredicate, ModelGrants, PermissionAction } from './permission.types';
-export { MODELO, PERMISO_APPS, type ModeloId } from './modelo.catalog';
-export { ModelPermissionsService } from './model-permissions.service';
+// El núcleo (permisos por modelo y catálogo de modelos) vive en `@reddoc/core`
+// porque también lo usa el POS; se re-exporta para que el ERP lo siga pidiendo acá.
+export { MODELO, PERMISO_APPS, ModelPermissionsService } from '@reddoc/core';
+export type { ActionPredicate, ModelGrants, ModeloId, PermissionAction } from '@reddoc/core';
 export { PERMISSION_ROUTE_DATA_KEY, permissionGuard } from './permission.guard';
 export { withPermission } from './with-permission';
 export { withModuleAccess } from './with-module-access';

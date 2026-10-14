@@ -1,6 +1,8 @@
 import { Injectable, effect, inject, signal, untracked } from '@angular/core';
 import { Observable, catchError, map, of, shareReplay, tap } from 'rxjs';
-import { AUTH_SERVICE, BaseHttpService, TenantService } from '@reddoc/core';
+import { BaseHttpService } from '../services/base-http.service';
+import { TenantService } from '../tenant/tenant.service';
+import { AUTH_SERVICE } from '../tokens';
 import type { ModeloId } from './modelo.catalog';
 import type { ModelGrants, PermissionAction } from './permission.types';
 

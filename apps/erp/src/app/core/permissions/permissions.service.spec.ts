@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
-import { MODELO } from './modelo.catalog';
-import { ModelPermissionsService } from './model-permissions.service';
 import { PermissionsService } from './permissions.service';
+import { MODELO, ModelPermissionsService } from '@reddoc/core';
 
 /** El backend ya dijo que no a este modelo, como el `{"ver":false,…}` real. */
 class NiegaTodo {

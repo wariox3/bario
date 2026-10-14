@@ -4,13 +4,12 @@ import { provideHttpClient } from '@angular/common/http';
 import { Router, provideRouter } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { provideI18n } from '@reddoc/core';
+import { provideI18n, MODELO, type ModeloId } from '@reddoc/core';
 import { dictionaries } from '@erp/i18n';
 import { AccessDeniedPageComponent } from '../components/access-denied/access-denied.page';
 import { PermissionsService } from './permissions.service';
 import { ProtectedRouteError } from './access-denied-route';
 import { withPermission } from './with-permission';
-import { MODELO, type ModeloId } from './modelo.catalog';
 
 @Component({ standalone: true, template: 'lista de contactos' })
 class ContactosListStubComponent {}

@@ -275,3 +275,5 @@ export type {
   NumeroIdentificacionSnapshot,
   ValidarIdentificacion,
 } from './lib/contacto';
+export { MODELO, PERMISO_APPS, ModelPermissionsService } from './lib/permisos';
+export type { ActionPredicate, ModelGrants, ModeloId, PermissionAction } from './lib/permisos';

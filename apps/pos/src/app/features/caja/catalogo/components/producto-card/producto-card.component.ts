@@ -25,6 +25,8 @@ export class ProductoCardComponent {
   readonly producto = input.required<ProductoCatalogo>();
   /** Unidades de este producto en la venta activa. */
   readonly cantidad = input(0);
+  /** El usuario puede editar ítems: si no, no se ofrece la estrella. */
+  readonly puedeFavorito = input(true);
 
   readonly agregar = output<ProductoCatalogo>();
   readonly alternarFavorito = output<number>();

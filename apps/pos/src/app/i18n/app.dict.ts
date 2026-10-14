@@ -4,7 +4,7 @@ import type {
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
-} from '@reddoc/ui';
+} from '@reddoc/ui/i18n';
 import type { PosNavKey } from '../layouts/workspace-layout/workspace-menu';
 import type { FaseCobro } from '../features/caja/cobro/cobro.model';
 import type { MedioPagoId } from '../features/caja/cobro/medios-pago';
@@ -186,9 +186,11 @@ export interface AppDict
       codigoNoEncontrado: { title: string; desc: string };
       ventaBloqueada: { title: string; desc: string };
     };
+    compacta: { verVenta: string; titulo: string };
     tabs: {
       label: string;
       nueva: string;
+      atajoNueva: string;
       opciones: string;
       renombrar: string;
       nombre: string;
@@ -207,6 +209,7 @@ export interface AppDict
       vacioDesc: string;
       cancelar: string;
       cobrar: string;
+      atajoCobrar: string;
       retomarCobro: string;
       /** Aviso del panel; le sigue el número del documento. */
       cobroPendiente: string;
@@ -322,6 +325,9 @@ export interface AppDict
         imprimir: { title: string; desc: string };
       };
     };
+  };
+  acceso: {
+    sinVenta: { title: string; desc: string };
   };
   historial: {
     buscar: string;

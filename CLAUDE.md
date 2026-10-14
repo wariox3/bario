@@ -55,7 +55,7 @@ libs/
 
 Path aliases:
 
-- **Cross-app (libs)**: `@reddoc/core`, `@reddoc/ui`, `@reddoc/feature-base`, `@reddoc/styles`.
+- **Cross-app (libs)**: `@reddoc/core`, `@reddoc/ui`, `@reddoc/feature-base`, `@reddoc/styles`. Entry points aparte para lo que se carga eager: `@reddoc/ui/auth` (páginas de auth), `@reddoc/ui/i18n` (diccionarios) y `@reddoc/feature-contenedores/i18n`. Importarlos desde el barrel mete en el bundle inicial todo lo que el barrel re-exporta y alguna pantalla lazy usa (en el POS: 1.14 → 1.45 MB).
 - **Intra-app (solo erp)**: `@erp/*` → `apps/erp/src/app/*`. Permitido por excepción en `@nx/enforce-module-boundaries` para evitar paths relativos profundos (los masters viven anidados en `features/<modulo>/masters/<entity>/pages/<page>/`). Úsalo para imports cross-feature (`@erp/core/...`, `@erp/i18n`, `@erp/layouts/...`). Para hermanos del mismo bounded context, sigue con relativos cortos (`./contacto.service`). `@turnos/*` y `@pos/*` son el equivalente en sus apps; ESLint impide que una app importe el alias de otra.
 
 **Lo que ES cross-app va en libs/. Lo que es ERP-específico vive en `apps/erp/src/app/core/`.** El **núcleo compartido** del framework configuracional de documentos (tipos, gateway y `DocumentoDetalleService`) vive en `libs/core/documento` porque también lo consume `apps/turnos`; solo el registry, resolvers y `BaseDocumentListComponent` quedan en el ERP.
@@ -122,6 +122,8 @@ Cualquier app del monorepo puede usarlos para construir listas paginadas.
 - `lib/documento/comercial/` — modelos y mapper de la línea comercial (`tasasDelItem`, `toLineaCalculo`, `comercialDetalleToPayload`, `precioUnitarioCon/SinImpuestos`…) y `precioListaDeContacto`.
 - `lib/documento/pagos/` — `DocumentoPagoService` (`documento-pago/`, recurso aparte del documento) y `calcularPagos`.
 - `lib/documento/pos/` — cabecera de la familia POS (`PosDocumentoRead/Payload/Valores`, `posDocumentoToPayload`).
+- `lib/contacto/` — `TIPO_PERSONA`, `calcularDigitoVerificacion`, `construirNombreCorto` y `numeroIdentificacionUnicoValidator` (recibe la función `validar`).
+- `lib/permisos/` — `ModelPermissionsService` (`GET /general/modelo/<id>/permiso/`), el catálogo `MODELO` y sus tipos. El resto de la capa de permisos (guards, menú, módulos) sigue en el ERP, que re-exporta esto desde `@erp/core/permissions`.
 
 Los formularios (`FormGroup`) y las tablas editables de esas líneas siguen en el ERP: el POS tiene otra UX y solo comparte datos y cálculo.
 
@@ -290,3 +292,4 @@ Olvidar marcar un servicio global → el backend resuelve contra el schema del t
 - `docs/guides/permisos-erp.md` — cómo se decide qué ve y qué puede abrir un usuario dentro del tenant, explicado como recorrido en 6 pasos (de dónde salen los permisos → topbar → sidebar → ruta → botones → 403 del backend). Cubre los tres ejes (plan del tenant / permisos del usuario / rol de contenedor), el catálogo de modelos del backend (`MODELO`, espejo de `gen_modelo`), `withPermission` y el `ForbiddenPageStore`. Leerlo antes de tocar permisos o de sumar un master a un módulo ya migrado.
 - `docs/guides/importar-erp.md` — cómo funciona la **importación por Excel** de un listado: el `ImportDialogComponent` (tonto) + el `importar(file)` multipart del servicio + `parseImportErrors`. Distingue las tres cosas que el diálogo ofrece y que se confunden: el archivo del usuario, la **plantilla** (`…/importar-ejemplo/`, del backend) y los **maestros** (XLSX públicos de consulta, declarados por listado con `IMPORT_MASTER.*`). Leerlo antes de sumar importación a un master.
 - `docs/guides/agregar-accion-extra-erp.md` — guía paso a paso para agregar una **acción extra** a un documento (botón en el dropdown "Acciones" que abre su propio modal y endpoint): patrón `EntityActionStrategy` + registro en `ENTITY_ACTION_PROVIDERS` + `extraActionIds`. Ejemplo vivo: "Generar" en pedido-servicio.
+- `docs/guides/pos.md` — cómo funciona la caja del POS (configuración por dispositivo, carritos, cobro reanudable, atajos, modo tablet), el mapa del código y las reglas al tocarlo (entry points de `@reddoc/ui`, sin ids fijos del tenant). El análisis de la migración, el plan por sprints y las consultas pendientes con backend están en `docs/architecture/pos-*.md`.

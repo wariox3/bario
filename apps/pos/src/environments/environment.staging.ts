@@ -5,4 +5,7 @@ export const environment: ReddocEnvironment & { production: boolean } = {
   apiUrl: '/api',
   turnstileSiteKey: 'REEMPLAZAR_STAGING',
   landingUrl: 'https://reddoc.uk',
+  erpUrl: 'https://erp.reddoc.uk',
+  cuentaUrl: 'https://cuenta.reddoc.uk',
+  turnosUrl: 'https://turno.reddoc.uk',
 };
