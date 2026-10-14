@@ -127,10 +127,6 @@
         <dd class="nota-ajuste-detail__value">{{ formatFecha(c.fecha) }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="nota-ajuste-detail__label">{{ det.labels.fechaVence }}</dt>
-        <dd class="nota-ajuste-detail__value">{{ formatFecha(c.fechaVence) }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
         <dt class="nota-ajuste-detail__label">{{ det.labels.documentoReferencia }}</dt>
         <dd class="nota-ajuste-detail__value">{{ c.documentoReferencia }}</dd>
       </div>
@@ -150,10 +146,6 @@
         <dt class="nota-ajuste-detail__label">{{ det.labels.centroCosto }}</dt>
         <dd class="nota-ajuste-detail__value">{{ c.centroCosto }}</dd>
       </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="nota-ajuste-detail__label">{{ det.labels.ordenCompra }}</dt>
-        <dd class="nota-ajuste-detail__value">{{ c.ordenCompra }}</dd>
-      </div>
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="nota-ajuste-detail__label">{{ det.labels.cue }}</dt>
         <dd class="nota-ajuste-detail__value break-all">
@@ -168,6 +160,10 @@
             >
           }
         </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="nota-ajuste-detail__label">{{ det.labels.ordenCompra }}</dt>
+        <dd class="nota-ajuste-detail__value">{{ c.ordenCompra }}</dd>
       </div>
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="nota-ajuste-detail__label">{{ det.labels.comentario }}</dt>

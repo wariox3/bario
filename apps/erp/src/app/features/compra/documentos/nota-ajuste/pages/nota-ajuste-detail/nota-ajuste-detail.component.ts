@@ -46,7 +46,6 @@ interface CabeceraView {
   /** Identificación del contacto (`contacto_numero_identificacion` del read). */
   readonly identificacion: string | null;
   readonly fecha: Date | null;
-  readonly fechaVence: Date | null;
   readonly documentoReferencia: string | null;
   readonly plazoPago: string | null;
   readonly metodoPago: string | null;
@@ -222,7 +221,6 @@ export class NotaAjusteDetailComponent implements OnInit {
             proveedor: read.contacto_nombre_corto ?? null,
             identificacion: read.contacto_numero_identificacion ?? null,
             fecha: na.fecha ?? null,
-            fechaVence: na.fecha_vence ?? null,
             documentoReferencia: read.documento_referencia_numero ?? null,
             plazoPago: read.plazo_pago_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,

@@ -2701,7 +2701,6 @@ export interface AppDict
           proveedor: string;
           proveedorPlaceholder: string;
           fecha: string;
-          fechaVence: string;
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
@@ -2733,7 +2732,6 @@ export interface AppDict
           proveedor: string;
           identificacion: string;
           fecha: string;
-          fechaVence: string;
           documentoReferencia: string;
           plazoPago: string;
           metodoPago: string;
