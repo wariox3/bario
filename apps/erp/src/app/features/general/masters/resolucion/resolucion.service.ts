@@ -7,11 +7,12 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import type {
-  Resolucion,
-  ResolucionDianPage,
-  ResolucionPayload,
-  ResolucionTipo,
+import {
+  RESOLUCION_MODULO_DIAN,
+  type Resolucion,
+  type ResolucionDianPage,
+  type ResolucionPayload,
+  type ResolucionTipo,
 } from './resolucion.model';
 
 /**
@@ -58,13 +59,14 @@ export class ResolucionService extends BaseHttpService {
 
   /**
    * Las resoluciones que el servicio de facturación electrónica tiene del emisor
-   * de la empresa, paginadas de a 10 (`page` empieza en 1). Responde 404 si la
-   * empresa no tiene emisor. Sin el toast del interceptor: el modal lo avisa.
+   * de la empresa para el módulo (`facturacion` en venta, `compras` en compra),
+   * paginadas de a 10 (`page` empieza en 1). Responde 404 si la empresa no tiene
+   * emisor. Sin el toast del interceptor: el modal lo avisa.
    */
-  listaDian(page: number): Observable<ResolucionDianPage> {
+  listaDian(tipo: ResolucionTipo, page: number): Observable<ResolucionDianPage> {
     return this.get<ResolucionDianPage>(
       this.resourcePath + 'lista-dian/',
-      { page },
+      { modulo: RESOLUCION_MODULO_DIAN[tipo], page },
       { errorToast: false },
     );
   }
