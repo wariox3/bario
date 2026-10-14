@@ -134,6 +134,12 @@ export interface DocumentEntityConfig {
    */
   readonly almacenGeneral?: boolean;
   /**
+   * La cabecera lleva **concepto de corrección** (el motivo DIAN de la nota). Es la
+   * `documento_clase_id` con que se filtra el `seleccionar` de conceptos: cada clase
+   * de nota tiene los suyos. Se omite ⇒ sin campo.
+   */
+  readonly conceptoCorreccionClaseId?: number;
+  /**
    * Versión del schema. Se usa como sufijo en la clave de localStorage
    * para invalidar filtros guardados cuando el shape cambia.
    */

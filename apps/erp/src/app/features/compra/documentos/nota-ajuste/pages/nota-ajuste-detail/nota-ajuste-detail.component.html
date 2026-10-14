@@ -13,7 +13,7 @@
     size="small"
     (onClick)="onBack()"
   />
-  @if (cabecera()) {
+  @if (cabecera(); as cab) {
     <app-document-detail-actions
       [documentoId]="id()"
       [document]="document()"
@@ -46,7 +46,29 @@
         [disabled]="!isEditable()"
         (onClick)="onEdit()"
       />
+      @if (document().electronico) {
+        <p-button
+          actionsEnd
+          type="button"
+          [label]="t().documentActions.electronico.action"
+          icon="pi pi-chevron-down"
+          iconPos="right"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [loading]="electronico.isEmitiendo()"
+          (onClick)="electronico.toggle($event)"
+        />
+      }
     </app-document-detail-actions>
+    <!-- Dropdown Electrónico: emitir a la DIAN, corregir y ver la información electrónica. -->
+    <app-documento-electronico-menu
+      #electronico
+      [documentoId]="documentoIdNumero()"
+      [estados]="cab.estados"
+      [document]="document()"
+      (documentoChanged)="onDocumentoChanged()"
+    />
   }
 </header>
 
@@ -119,6 +141,10 @@
       <div class="flex flex-col gap-0.5">
         <dt class="nota-ajuste-detail__label">{{ det.labels.metodoPago }}</dt>
         <dd class="nota-ajuste-detail__value">{{ c.metodoPago }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="nota-ajuste-detail__label">{{ det.labels.conceptoCorreccion }}</dt>
+        <dd class="nota-ajuste-detail__value">{{ c.conceptoCorreccion }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="nota-ajuste-detail__label">{{ det.labels.centroCosto }}</dt>

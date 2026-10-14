@@ -17,6 +17,7 @@ export interface NotaVentaFormRawValue {
   readonly sede: ErpSelectOption | null;
   readonly almacen: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
+  readonly documento_concepto_correccion: ErpSelectOption | null;
   readonly comentario: string | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];
   readonly pagos: readonly PagoFormRawValue[];

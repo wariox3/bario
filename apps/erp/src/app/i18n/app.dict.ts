@@ -439,6 +439,7 @@ export interface AppDict
           resolucion: string;
           fecha: string;
           fechaVence: string;
+          conceptoCorreccion: string;
           seleccionar: string;
         };
         validation: { required: string };
@@ -2145,6 +2146,8 @@ export interface AppDict
           almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          conceptoCorreccion: string;
+          conceptoCorreccionPlaceholder: string;
           comentario: string;
           comentarioPlaceholder: string;
         };
@@ -2168,6 +2171,7 @@ export interface AppDict
           sede: string;
           almacen: string;
           metodoPago: string;
+          conceptoCorreccion: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2702,6 +2706,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          conceptoCorreccion: string;
+          conceptoCorreccionPlaceholder: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
           ordenCompra: string;
@@ -2727,6 +2733,7 @@ export interface AppDict
           documentoReferencia: string;
           plazoPago: string;
           metodoPago: string;
+          conceptoCorreccion: string;
           centroCosto: string;
           ordenCompra: string;
           comentario: string;
