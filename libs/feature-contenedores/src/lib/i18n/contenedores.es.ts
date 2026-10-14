@@ -51,6 +51,7 @@ export const contenedoresEs: ContenedoresDict = {
         desc: 'Algo falló al preparar {nombre}.',
       },
     },
+    lastConnection: 'Última conexión',
     roles: {
       propietario: 'Propietario',
       miembro: 'Miembro',

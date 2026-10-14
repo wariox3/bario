@@ -24,12 +24,11 @@
 
   <!-- Main: nombre + meta -->
   <span class="cl-row__main">
-    <span class="cl-row__nombre">{{ contenedor().cliente_nombre }}</span>
-    <span class="cl-row__meta">
-      <i class="pi pi-globe cl-row__meta-icon" aria-hidden="true"></i>
-      <span class="cl-row__domain">{{ contenedor().dominio }}</span>
+    <!-- El rol va con el nombre: describe la relación con la empresa, no su dirección. -->
+    <span class="flex min-w-0 items-center gap-2">
+      <span class="cl-row__nombre min-w-0">{{ contenedor().cliente_nombre }}</span>
       <span
-        class="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
+        class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
         [ngClass]="
           isOwner()
             ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
@@ -43,10 +42,26 @@
       </span>
       @if (!contenedor().activo) {
         <span
-          class="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
+          class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
         >
           <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
           Inactivo
+        </span>
+      }
+    </span>
+    <span class="cl-row__meta">
+      <i class="pi pi-globe cl-row__meta-icon" aria-hidden="true"></i>
+      <span class="cl-row__domain">{{ contenedor().dominio }}</span>
+      <!-- Junto al dominio: «dónde» y «cuándo» se leen en la misma pasada. En móvil
+           la fila no tiene sitio y la última conexión queda en la vista de tarjetas. -->
+      @if (ultimaConexion(); as conexion) {
+        <span
+          class="hidden shrink-0 items-center gap-1 whitespace-nowrap md:inline-flex"
+          [title]="lastConnectionLabel() + ': ' + conexion.exacta"
+        >
+          <span class="opacity-50" aria-hidden="true">·</span>
+          <i class="pi pi-clock cl-row__meta-icon" aria-hidden="true"></i>
+          {{ lastConnectionLabel() }} {{ conexion.recencia }}
         </span>
       }
     </span>

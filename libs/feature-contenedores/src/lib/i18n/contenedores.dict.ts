@@ -48,6 +48,8 @@ export interface ContenedoresDict {
       failed: { title: string; desc: string };
     };
     /** Pill de la tarjeta/fila: el backend solo distingue propietario o no. */
+    /** Antecede a la recencia: «Última conexión hace 3 horas». */
+    lastConnection: string;
     roles: {
       propietario: string;
       miembro: string;

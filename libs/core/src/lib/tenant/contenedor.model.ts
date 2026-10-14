@@ -185,6 +185,11 @@ export interface Contenedor extends ContenedorAccesoFlags {
   /** Solo se puede ingresar a un contenedor `listo`. */
   estado: ContenedorEstado;
   dominio: string;
+  /**
+   * Último ingreso a la empresa (ISO con hora y zona). El schema lo declara
+   * requerido, pero se tolera vacío: sin dato, el listado no pinta la línea.
+   */
+  cliente_fecha_ultima_conexion?: string | null;
   /** Imagen que identifica a la empresa (WEBP, 1024px). Sin imagen, se pinta la inicial. */
   cliente_imagen?: string | null;
   /** Miniatura cuadrada (320×320) de `cliente_imagen`: la que va en tarjetas y filas. */

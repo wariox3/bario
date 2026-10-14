@@ -3,6 +3,7 @@ import { NgClass } from '@angular/common';
 import { Contenedor, getInitials } from '@reddoc/core';
 import {
   getSuscripcionExpiryLabel,
+  getUltimaConexion,
   isSuscripcionExpired,
 } from '../../utils/contenedor-suscripcion.utils';
 
@@ -25,6 +26,7 @@ export class ContenedorRowItemComponent {
   readonly memberLabel = input<string>('Miembro');
   readonly creatingLabel = input<string>('Creando…');
   readonly errorLabel = input<string>('No se pudo crear');
+  readonly lastConnectionLabel = input<string>('Última conexión');
   /** Muestra el botón de acciones de fila. La app lo apaga si no habilita ninguna. */
   readonly showMenu = input<boolean>(true);
   /** Muestra el CTA de renovación al propietario con la suscripción vencida. */
@@ -43,6 +45,10 @@ export class ContenedorRowItemComponent {
 
   readonly expiryLabel = computed(() =>
     getSuscripcionExpiryLabel(this.contenedor().suscripcion_fecha_fin),
+  );
+
+  readonly ultimaConexion = computed(() =>
+    getUltimaConexion(this.contenedor().cliente_fecha_ultima_conexion),
   );
 
   readonly isOwner = computed(() => this.contenedor().propietario);

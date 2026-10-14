@@ -131,6 +131,7 @@
                       creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
                     "
                     [errorLabel]="t().contenedores.list.estado.error"
+                    [lastConnectionLabel]="t().contenedores.list.lastConnection"
                     (enter)="enterContenedor(item)"
                     (renew)="renewContenedor()"
                     (menuOpen)="openRowMenu($event, item)"
@@ -157,6 +158,7 @@
                     creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
                   "
                   [errorLabel]="t().contenedores.list.estado.error"
+                  [lastConnectionLabel]="t().contenedores.list.lastConnection"
                   (enter)="enterContenedor(item)"
                   (renew)="renewContenedor()"
                   (menuOpen)="openRowMenu($event, item)"

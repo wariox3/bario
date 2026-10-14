@@ -51,6 +51,7 @@ export const contenedoresEn: ContenedoresDict = {
         desc: 'Something went wrong while setting up {nombre}.',
       },
     },
+    lastConnection: 'Last connection',
     roles: {
       propietario: 'Owner',
       miembro: 'Member',
