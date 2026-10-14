@@ -40,6 +40,14 @@ export class ComercialDocumentoLineasTableComponent {
   readonly almacenEnabled = input<boolean>(false);
 
   /**
+   * Muestra la columna **REF** (`documento_detalle_afectado`, la línea origen de
+   * la que se importó). Default `true`; la apaga el documento cuyo form no
+   * importa líneas desde otro documento (p. ej. las recurrentes), donde quedaría
+   * siempre vacía.
+   */
+  readonly refEnabled = input<boolean>(true);
+
+  /**
    * Id del **detalle base** a consultar en el modal de afectación: la propia línea
    * (clic en #) o su `documento_detalle_afectado` (clic en REF).
    */
@@ -47,8 +55,10 @@ export class ComercialDocumentoLineasTableComponent {
 
   protected readonly formatMoney = formatCop;
 
-  /** Columnas de la tabla, para el `colspan` del estado vacío: 10 fijas más la opcional. */
-  protected readonly columnCount = computed(() => 10 + (this.almacenEnabled() ? 1 : 0));
+  /** Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las opcionales. */
+  protected readonly columnCount = computed(
+    () => 9 + (this.refEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
+  );
 
   /** Subtotal bruto de una línea por índice. */
   protected subtotalOf(index: number): number {

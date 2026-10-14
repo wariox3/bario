@@ -5,7 +5,9 @@
     <thead>
       <tr>
         <th class="comercial-detalle-table__th w-10 text-center">{{ c.columns.linea }}</th>
-        <th class="comercial-detalle-table__th w-12 text-center">{{ c.columns.ref }}</th>
+        @if (refEnabled()) {
+          <th class="comercial-detalle-table__th w-12 text-center">{{ c.columns.ref }}</th>
+        }
         <th class="comercial-detalle-table__th min-w-[16rem] text-left">{{ c.columns.item }}</th>
         @if (almacenEnabled()) {
           <th class="comercial-detalle-table__th w-36 text-left">{{ c.columns.almacen }}</th>
@@ -35,19 +37,21 @@
               {{ line.id ?? '—' }}
             }
           </td>
-          <td class="comercial-detalle-table__td text-center text-brand-muted tabular-nums">
-            @if (linkable() && line.documento_detalle_afectado !== null) {
-              <button
-                type="button"
-                class="cursor-pointer border-0 bg-transparent p-0 font-medium text-sky-700 underline-offset-2 hover:underline tabular-nums"
-                (click)="verAfectacion.emit(line.documento_detalle_afectado)"
-              >
-                {{ line.documento_detalle_afectado }}
-              </button>
-            } @else {
-              {{ line.documento_detalle_afectado ?? '—' }}
-            }
-          </td>
+          @if (refEnabled()) {
+            <td class="comercial-detalle-table__td text-center text-brand-muted tabular-nums">
+              @if (linkable() && line.documento_detalle_afectado !== null) {
+                <button
+                  type="button"
+                  class="cursor-pointer border-0 bg-transparent p-0 font-medium text-sky-700 underline-offset-2 hover:underline tabular-nums"
+                  (click)="verAfectacion.emit(line.documento_detalle_afectado)"
+                >
+                  {{ line.documento_detalle_afectado }}
+                </button>
+              } @else {
+                {{ line.documento_detalle_afectado ?? '—' }}
+              }
+            </td>
+          }
           <td class="comercial-detalle-table__td font-medium text-brand-text">
             {{ line.item?.nombre || '—' }}
           </td>
