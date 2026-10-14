@@ -16,7 +16,7 @@ import { DocumentoPagoService, startOfToday } from '@reddoc/core';
 import { CatalogosCobroService } from './catalogos-cobro.service';
 import { pagosToPayload, solicitudToPayload } from './cobro.mapper';
 import { CobroError, type EventoCobro, type FaseCobro, type SolicitudCobro } from './cobro.model';
-import { VentaPosService } from './venta-pos.service';
+import { VentaPosService } from '../../../core/documento/venta-pos.service';
 
 /**
  * Cobra una venta: crea el documento, registra sus pagos y lo aprueba.

@@ -264,3 +264,14 @@ export type { NormalizedError, ApiErrorKind } from './lib/utils/error-normalizer
 export { applyServerErrors, clearServerError } from './lib/utils/form-errors';
 export type { ServerFieldMap, ApplyServerErrorsResult } from './lib/utils/form-errors';
 export { FormErrorService } from './lib/services/form-error.service';
+export {
+  TIPO_PERSONA,
+  calcularDigitoVerificacion,
+  construirNombreCorto,
+  numeroIdentificacionUnicoValidator,
+} from './lib/contacto';
+export type {
+  NombresInput,
+  NumeroIdentificacionSnapshot,
+  ValidarIdentificacion,
+} from './lib/contacto';

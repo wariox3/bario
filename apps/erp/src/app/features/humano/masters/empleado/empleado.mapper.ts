@@ -1,7 +1,9 @@
-import { normalizarCelular } from '@reddoc/core';
-import { TIPO_PERSONA } from '@erp/features/general/masters/contacto/contacto.constants';
-import { construirNombreCorto } from '@erp/features/general/masters/contacto/utils/nombre-corto.util';
-import { calcularDigitoVerificacion } from '@erp/features/general/masters/contacto/utils/digito-verificacion.util';
+import {
+  normalizarCelular,
+  TIPO_PERSONA,
+  construirNombreCorto,
+  calcularDigitoVerificacion,
+} from '@reddoc/core';
 import type { Empleado, EmpleadoPayload } from './empleado.model';
 import type { EmpleadoFormRawValue } from './pages/empleado-form/empleado-form.types';
 

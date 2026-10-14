@@ -49,7 +49,7 @@ import {
 } from '../../cobro.model';
 import { cambio, sugerenciasEfectivo } from '../../efectivo';
 import { MEDIOS_PAGO_POS, type MedioPagoPos } from '../../medios-pago';
-import { VentaPosService } from '../../venta-pos.service';
+import { VentaPosService } from '../../../../../core/documento/venta-pos.service';
 
 type Vista = 'medios' | 'efectivo' | 'exito' | 'pendiente';
 

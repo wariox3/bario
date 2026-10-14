@@ -1,6 +1,11 @@
 import { type AbstractControl, type AsyncValidatorFn, type ValidationErrors } from '@angular/forms';
 import { type Observable, catchError, map, of, switchMap, timer } from 'rxjs';
-import type { ContactoService } from '../contacto.service';
+
+/** Consulta al backend si ya existe un contacto con esa identificación (`contacto/validar/`). */
+export type ValidarIdentificacion = (data: {
+  readonly identificacion_id: number;
+  readonly numero_identificacion: string;
+}) => Observable<{ readonly existe: boolean }>;
 
 /** Combinación que identifica únicamente a un contacto en el backend. */
 export interface NumeroIdentificacionSnapshot {
@@ -24,7 +29,7 @@ export interface NumeroIdentificacionSnapshot {
  * Angular y reusable si en el futuro se necesita en otro form.
  */
 export function numeroIdentificacionUnicoValidator(
-  contactoService: ContactoService,
+  validar: ValidarIdentificacion,
   getIdentificacionId: () => number | null,
   getOriginal: () => NumeroIdentificacionSnapshot | null,
   debounceMs = 300,
@@ -46,7 +51,7 @@ export function numeroIdentificacionUnicoValidator(
 
     return timer(debounceMs).pipe(
       switchMap(() =>
-        contactoService.validar({
+        validar({
           identificacion_id: identificacionId,
           numero_identificacion: numero,
         }),

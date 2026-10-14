@@ -29,6 +29,10 @@ import {
   SELECT_ENDPOINTS,
   TenantService,
   ToastService,
+  TIPO_PERSONA,
+  calcularDigitoVerificacion,
+  type NumeroIdentificacionSnapshot,
+  numeroIdentificacionUnicoValidator,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpApiSelectComponent, ErpAsesorSelectComponent } from '@reddoc/ui';
@@ -37,13 +41,8 @@ import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
-import { CONTACTO_LIST_PATH, TIPO_PERSONA } from '../../contacto.constants';
+import { CONTACTO_LIST_PATH } from '../../contacto.constants';
 import { contactoToFormValue, formValueToPayload } from '../../contacto.mapper';
-import { calcularDigitoVerificacion } from '../../utils/digito-verificacion.util';
-import {
-  type NumeroIdentificacionSnapshot,
-  numeroIdentificacionUnicoValidator,
-} from '../../validators/numero-identificacion-unico.validator';
 
 /**
  * Formulario de alta/edición de contacto.
@@ -337,7 +336,7 @@ export class ContactoFormComponent implements OnInit {
 
     controls.numero_identificacion.addAsyncValidators(
       numeroIdentificacionUnicoValidator(
-        this.contactoService,
+        (datos) => this.contactoService.validar(datos),
         () => controls.identificacion.value?.id ?? null,
         () => this.originalIdentificacion(),
       ),

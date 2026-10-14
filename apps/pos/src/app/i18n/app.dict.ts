@@ -20,6 +20,120 @@ export interface AppDict
     PhoneInputTranslationsHost,
     ContenedoresTranslationsHost,
     AccesosContenedorTranslationsHost {
+  common: {
+    comingSoon: string;
+    actions: {
+      new: string;
+      actions: string;
+      view: string;
+      edit: string;
+      delete: string;
+      deleteSelected: string;
+      cancel: string;
+      back: string;
+      save: string;
+      menuLabel: string;
+      filters: string;
+      clearFilters: string;
+      clearSearch: string;
+      refresh: string;
+      exportExcel: string;
+      import: string;
+      export: string;
+    };
+    search: {
+      placeholder: string;
+    };
+    list: {
+      records: string;
+      of: string;
+      empty: { title: string; sub: string };
+    };
+    confirms: {
+      deleteHeader: string;
+      deleteMessage: string;
+    };
+    toasts: {
+      loadError: { title: string; desc: string };
+      deleteSuccess: { title: string; desc: string };
+      deleteError: { title: string; desc: string };
+      exportError: { title: string; desc: string };
+    };
+    boolean: { true: string; false: string };
+    imageUpload: {
+      change: string;
+      remove: string;
+      removeConfirm: string;
+      tooLarge: string;
+      hint: string;
+      dialogTitle: string;
+      empty: string;
+    };
+    filters: {
+      title: string;
+      subtitle: string;
+      addCondition: string;
+      removeCondition: string;
+      where: string;
+      and: string;
+      apply: string;
+      clear: string;
+      cancel: string;
+      noValue: string;
+      valuePlaceholder: string;
+      empty: { title: string; sub: string };
+      operators: {
+        contiene: string;
+        es: string;
+        noEs: string;
+        comienzaCon: string;
+        terminaCon: string;
+        vacio: string;
+        noVacio: string;
+        mayor: string;
+        mayorIgual: string;
+        menor: string;
+        menorIgual: string;
+        esVerdadero: string;
+        esFalso: string;
+      };
+    };
+    import: {
+      dropzone: {
+        primary: string;
+        secondary: string;
+        /** Soporta los placeholders `{types}` y `{max}`. */
+        hint: string;
+        invalidType: string;
+        tooLarge: string;
+      };
+      fileMeta: {
+        /** Soporta los placeholders `{size}` y `{time}`. */
+        uploadedAt: string;
+      };
+      removeFile: string;
+      tabs: { errors: string; masters: string };
+      emptyStates: { errors: string; masters: string };
+      errors: {
+        rowHeader: string;
+        messageHeader: string;
+        /** Soporta los placeholders `{shown}` y `{total}`. */
+        truncated: string;
+      };
+      example: {
+        download: string;
+        downloading: string;
+        error: { title: string; desc: string };
+      };
+      submit: string;
+      submitting: string;
+      cancel: string;
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+      };
+    };
+  };
   layout: {
     menuLabel: string;
     drawerHeader: string;
@@ -36,10 +150,6 @@ export interface AppDict
       logout: string;
     };
   };
-  /** Pantalla de las secciones que todavía no están construidas. */
-  proximamente: {
-    desc: string;
-  };
   caja: {
     title: string;
     configuracion: { title: string; desc: string; accion: string };
@@ -50,6 +160,7 @@ export interface AppDict
       placeholderNombre: string;
       placeholderCodigo: string;
       limpiar: string;
+      nuevoItem: string;
     };
     producto: {
       agregar: string;
@@ -91,6 +202,7 @@ export interface AppDict
       prefijoVenta: string;
       cliente: string;
       clientePlaceholder: string;
+      nuevoCliente: string;
       vacio: string;
       vacioDesc: string;
       cancelar: string;
@@ -123,6 +235,45 @@ export interface AppDict
         cancelar: string;
         guardar: string;
       };
+    };
+    cliente: {
+      titulo: string;
+      nota: string;
+      guardar: string;
+      campos: {
+        tipoPersona: string;
+        identificacion: string;
+        numero: string;
+        dv: string;
+        nombre1: string;
+        nombre2: string;
+        apellido1: string;
+        apellido2: string;
+        razonSocial: string;
+        correo: string;
+        telefono: string;
+        direccion: string;
+        ciudad: string;
+      };
+      errores: { existente: string };
+      toasts: { creado: { title: string; desc: string }; error: string };
+    };
+    item: {
+      titulo: string;
+      guardar: string;
+      avisoInventario: string;
+      tipos: { producto: string; servicio: string };
+      campos: {
+        codigo: string;
+        nombre: string;
+        precio: string;
+        tipo: string;
+        inventario: string;
+        favorito: string;
+        impuestos: string;
+        impuestosPlaceholder: string;
+      };
+      toasts: { creado: { title: string; desc: string }; error: string };
     };
     cobro: {
       titulo: string;
@@ -171,6 +322,25 @@ export interface AppDict
         imprimir: { title: string; desc: string };
       };
     };
+  };
+  historial: {
+    buscar: string;
+    columns: {
+      numero: string;
+      fecha: string;
+      tipo: string;
+      identificacion: string;
+      contacto: string;
+      subtotal: string;
+      impuesto: string;
+      total: string;
+      aprobado: string;
+      anulado: string;
+      electronico: string;
+    };
+    filtros: { aprobado: string; anulado: string; electronico: string };
+    acciones: { imprimir: string };
+    toasts: { imprimirError: { title: string; desc: string } };
   };
   configuracion: {
     title: string;

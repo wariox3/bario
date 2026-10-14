@@ -6,7 +6,7 @@ import { CatalogosCobroService } from './catalogos-cobro.service';
 import { CobroError, type EventoCobro, type SolicitudCobro } from './cobro.model';
 import { CobroService } from './cobro.service';
 import { MEDIOS_PAGO_POS } from './medios-pago';
-import { VentaPosService } from './venta-pos.service';
+import { VentaPosService } from '../../../core/documento/venta-pos.service';
 
 const venta: Carrito = {
   uuid: 'u1',

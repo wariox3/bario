@@ -42,6 +42,8 @@ export class BuscadorProductosComponent {
   protected readonly t = this.i18n.t;
 
   readonly buscar = output<CriterioBusqueda>();
+  /** Crear un ítem; lleva el código escrito si se estaba buscando por código. */
+  readonly nuevoItem = output<string>();
 
   /** Clases del botón del modo activo. */
   protected readonly activo = 'bg-[rgba(20,48,73,0.08)] text-brand-text';
@@ -78,6 +80,10 @@ export class BuscadorProductosComponent {
   protected onEnter(): void {
     this.emitir(this.texto());
     if (this.modo() === 'codigo') this.campo().nativeElement.select();
+  }
+
+  protected onNuevoItem(): void {
+    this.nuevoItem.emit(this.modo() === 'codigo' ? this.texto().trim() : '');
   }
 
   protected limpiar(): void {

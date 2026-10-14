@@ -52,4 +52,13 @@
       </button>
     }
   </div>
+  <button
+    type="button"
+    class="flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-[rgba(20,48,73,0.14)] bg-brand-surface px-3 text-[0.8rem] font-medium text-brand-muted hover:border-[rgba(20,48,73,0.24)] hover:text-brand-text"
+    [attr.aria-label]="tx.nuevoItem"
+    (click)="onNuevoItem()"
+  >
+    <i class="pi pi-plus text-[0.75rem]" aria-hidden="true"></i>
+    <span class="max-[576px]:sr-only">{{ tx.nuevoItem }}</span>
+  </button>
 </div>

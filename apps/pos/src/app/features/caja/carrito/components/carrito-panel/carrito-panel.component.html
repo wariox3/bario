@@ -8,14 +8,26 @@
     <label for="carrito-cliente" class="text-[0.78rem] font-semibold text-brand-text">
       {{ tx.cliente }}
     </label>
-    <lib-contacto-select
-      inputId="carrito-cliente"
-      [extraParams]="contactoParams"
-      [placeholder]="tx.clientePlaceholder"
-      [ngModel]="venta.contacto"
-      [disabled]="bloqueada()"
-      (ngModelChange)="onContacto($event)"
-    />
+    <div class="flex items-center gap-2">
+      <lib-contacto-select
+        class="min-w-0 flex-1"
+        inputId="carrito-cliente"
+        [extraParams]="contactoParams"
+        [placeholder]="tx.clientePlaceholder"
+        [ngModel]="venta.contacto"
+        [disabled]="bloqueada()"
+        (ngModelChange)="onContacto($event)"
+      />
+      <p-button
+        type="button"
+        icon="pi pi-user-plus"
+        severity="secondary"
+        [outlined]="true"
+        [ariaLabel]="tx.nuevoCliente"
+        [disabled]="bloqueada()"
+        (onClick)="creandoCliente.set(true)"
+      />
+    </div>
   </div>
 
   @if (store.cobroPendiente(); as pendiente) {
@@ -107,6 +119,8 @@
     </div>
   </div>
 </section>
+
+<app-cliente-rapido-dialog [(visible)]="creandoCliente" (creado)="onContacto($event)" />
 
 <app-cobro-dialog [(visible)]="cobrando" (cobrada)="cobrada.emit()" />
 

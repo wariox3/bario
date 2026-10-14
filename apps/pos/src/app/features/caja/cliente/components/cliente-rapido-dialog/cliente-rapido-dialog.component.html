@@ -1,0 +1,176 @@
+@let tx = t().caja.cliente;
+@let f = form.controls;
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event && cerrar()"
+  [modal]="true"
+  [header]="tx.titulo"
+  [style]="{ width: '36rem' }"
+  [breakpoints]="{ '640px': '94vw' }"
+  [draggable]="false"
+>
+  <form [formGroup]="form" libFocusInvalid (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+      <div class="flex flex-col gap-1.5">
+        <label for="cliente-tipo-persona" class="text-[0.78rem] font-semibold text-brand-text">
+          {{ tx.campos.tipoPersona }}
+        </label>
+        <lib-api-select
+          inputId="cliente-tipo-persona"
+          formControlName="tipo_persona"
+          [endpoint]="tipoPersonaEndpoint"
+          [invalid]="f.tipo_persona.invalid && f.tipo_persona.touched"
+        />
+        <lib-field-error [control]="f.tipo_persona" />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="cliente-identificacion" class="text-[0.78rem] font-semibold text-brand-text">
+          {{ tx.campos.identificacion }}
+        </label>
+        <lib-api-select
+          inputId="cliente-identificacion"
+          formControlName="identificacion"
+          [endpoint]="identificacionEndpoint"
+          [params]="identificacionParams()"
+          [invalid]="f.identificacion.invalid && f.identificacion.touched"
+        />
+        <lib-field-error [control]="f.identificacion" />
+      </div>
+
+      <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <label for="cliente-numero" class="text-[0.78rem] font-semibold text-brand-text">
+          {{ tx.campos.numero }}
+        </label>
+        <div class="flex items-center gap-2">
+          <input
+            pInputText
+            libSoloDigitos
+            id="cliente-numero"
+            formControlName="numero_identificacion"
+            autocomplete="off"
+            class="min-w-0 flex-1 font-mono"
+            [class.ng-invalid]="f.numero_identificacion.invalid && f.numero_identificacion.touched"
+          />
+          <span
+            class="flex h-10 min-w-12 items-center justify-center rounded-lg bg-[rgba(20,48,73,0.05)] px-2 font-mono text-sm tabular-nums text-brand-muted"
+            [attr.aria-label]="tx.campos.dv"
+            [title]="tx.campos.dv"
+          >
+            {{ digitoVerificacion() }}
+          </span>
+        </div>
+        <lib-field-error
+          [control]="f.numero_identificacion"
+          [messages]="{ numeroIdentificacionExistente: tx.errores.existente }"
+        />
+      </div>
+
+      @if (esNatural()) {
+        <div class="flex flex-col gap-1.5">
+          <label for="cliente-nombre1" class="text-[0.78rem] font-semibold text-brand-text">
+            {{ tx.campos.nombre1 }}
+          </label>
+          <input pInputText id="cliente-nombre1" formControlName="nombre1" autocomplete="off" />
+          <lib-field-error [control]="f.nombre1" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="cliente-nombre2" class="text-[0.78rem] font-semibold text-brand-text">
+            {{ tx.campos.nombre2 }}
+          </label>
+          <input pInputText id="cliente-nombre2" formControlName="nombre2" autocomplete="off" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="cliente-apellido1" class="text-[0.78rem] font-semibold text-brand-text">
+            {{ tx.campos.apellido1 }}
+          </label>
+          <input pInputText id="cliente-apellido1" formControlName="apellido1" autocomplete="off" />
+          <lib-field-error [control]="f.apellido1" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="cliente-apellido2" class="text-[0.78rem] font-semibold text-brand-text">
+            {{ tx.campos.apellido2 }}
+          </label>
+          <input pInputText id="cliente-apellido2" formControlName="apellido2" autocomplete="off" />
+        </div>
+      } @else {
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="cliente-razon" class="text-[0.78rem] font-semibold text-brand-text">
+            {{ tx.campos.razonSocial }}
+          </label>
+          <input pInputText id="cliente-razon" formControlName="nombre_corto" autocomplete="off" />
+          <lib-field-error [control]="f.nombre_corto" />
+        </div>
+      }
+
+      <div class="flex flex-col gap-1.5">
+        <label for="cliente-correo" class="text-[0.78rem] font-semibold text-brand-text">
+          {{ tx.campos.correo }}
+        </label>
+        <input
+          pInputText
+          id="cliente-correo"
+          type="email"
+          formControlName="correo"
+          autocomplete="off"
+        />
+        <lib-field-error [control]="f.correo" />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="cliente-telefono" class="text-[0.78rem] font-semibold text-brand-text">
+          {{ tx.campos.telefono }}
+        </label>
+        <input
+          pInputText
+          id="cliente-telefono"
+          type="tel"
+          formControlName="telefono"
+          autocomplete="off"
+        />
+        <lib-field-error [control]="f.telefono" />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="cliente-direccion" class="text-[0.78rem] font-semibold text-brand-text">
+          {{ tx.campos.direccion }}
+        </label>
+        <input pInputText id="cliente-direccion" formControlName="direccion" autocomplete="off" />
+        <lib-field-error [control]="f.direccion" />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="cliente-ciudad" class="text-[0.78rem] font-semibold text-brand-text">
+          {{ tx.campos.ciudad }}
+        </label>
+        <lib-ciudad-autocomplete
+          inputId="cliente-ciudad"
+          formControlName="ciudad"
+          [fuente]="ciudadFuente"
+          [invalid]="f.ciudad.invalid && f.ciudad.touched"
+        />
+        <lib-field-error [control]="f.ciudad" />
+      </div>
+    </div>
+
+    <p class="m-0 text-[0.75rem] text-brand-muted">{{ tx.nota }}</p>
+
+    <div class="flex justify-end gap-2">
+      <p-button
+        type="button"
+        [label]="t().caja.carrito.cancelar"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="guardando()"
+        (onClick)="cerrar()"
+      />
+      <p-button
+        type="submit"
+        [label]="tx.guardar"
+        icon="pi pi-check"
+        [loading]="guardando()"
+        [disabled]="guardando()"
+      />
+    </div>
+  </form>
+</p-dialog>

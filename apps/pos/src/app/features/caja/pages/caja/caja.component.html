@@ -29,7 +29,7 @@
         </div>
       }
 
-      <app-buscador-productos (buscar)="onBuscar($event)" />
+      <app-buscador-productos (buscar)="onBuscar($event)" (nuevoItem)="onNuevoItem($event)" />
 
       @switch (catalogo.estado()) {
         @case ('cargando') {
@@ -107,5 +107,11 @@
     />
   </div>
 </div>
+
+<app-item-rapido-dialog
+  [(visible)]="creandoItem"
+  [codigoInicial]="codigoNuevoItem()"
+  (creado)="onItemCreado($event)"
+/>
 
 <p-confirmdialog [style]="{ width: '24rem' }" [breakpoints]="{ '576px': '92vw' }" />

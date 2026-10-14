@@ -11,13 +11,15 @@ import { RouterLink } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { I18nService, TenantService, ToastService, type Item } from '@reddoc/core';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../configuracion/configuracion-caja.store';
 import { CatalogoStore, type CriterioBusqueda } from '../../catalogo/catalogo.store';
 import type { ProductoCatalogo } from '../../catalogo/producto-catalogo.model';
 import { BuscadorProductosComponent } from '../../catalogo/components/buscador-productos/buscador-productos.component';
 import { ProductoCardComponent } from '../../catalogo/components/producto-card/producto-card.component';
+import { itemToProductoCatalogo } from '../../catalogo/producto-catalogo.mapper';
+import { ItemRapidoDialogComponent } from '../../item-rapido/components/item-rapido-dialog/item-rapido-dialog.component';
 import { CarritosStore, type ResultadoAgregar } from '../../carrito/carritos.store';
 import { ConsumidorFinalService } from '../../carrito/consumidor-final.service';
 import { CarritoPanelComponent } from '../../carrito/components/carrito-panel/carrito-panel.component';
@@ -44,6 +46,7 @@ import { CarritoTabsComponent } from '../../carrito/components/carrito-tabs/carr
     ProductoCardComponent,
     CarritoPanelComponent,
     CarritoTabsComponent,
+    ItemRapidoDialogComponent,
   ],
   providers: [CatalogoStore, ConfirmationService],
   templateUrl: './caja.component.html',
@@ -92,6 +95,24 @@ export class CajaComponent {
       return;
     }
     this.catalogo.buscar(criterio);
+  }
+
+  /** Alta rápida de ítem; con código, viene de una búsqueda por código sin resultado. */
+  protected readonly creandoItem = signal(false);
+  protected readonly codigoNuevoItem = signal('');
+
+  protected onNuevoItem(codigo: string): void {
+    this.codigoNuevoItem.set(codigo);
+    this.creandoItem.set(true);
+  }
+
+  /**
+   * Ítem recién creado: el catálogo se refresca y, si se creó a partir de un
+   * código que no existía, entra a la venta como si se hubiera leído.
+   */
+  protected onItemCreado(item: Item): void {
+    this.catalogo.recargar();
+    if (this.codigoNuevoItem()) this.onAgregar(itemToProductoCatalogo(item));
   }
 
   protected onAgregar(producto: ProductoCatalogo): void {

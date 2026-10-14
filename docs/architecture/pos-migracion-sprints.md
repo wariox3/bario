@@ -315,6 +315,33 @@ el ERP.
 **Terminado cuando:** se crea un cliente y un ítem desde la caja y ambos se
 usan en una venta; el historial muestra la venta e imprime.
 
+**Estado (2026-10-15).** Hecho. Ajustes respecto del plan:
+
+- El historial usa `lib-list-shell` + `lib-data-toolbar` + `lib-data-table`
+  (mismo patrón que los listados de turnos), con búsqueda por cliente, filtros
+  recordados en el dispositivo, refrescar e imprimir por fila. Para eso el
+  diccionario del POS sumó el bloque `common` que esos componentes leen.
+- `VentaPosService` pasó a `core/documento/` del POS: lo usan la caja y el
+  historial.
+- Cliente rápido: tipo de persona, tipo y número de identificación (con dígito
+  de verificación y validación de que no exista), nombres y apellidos o razón
+  social, correo, teléfono, dirección y ciudad: lo que el backend exige. Queda
+  elegido en la venta.
+- Para eso se movieron a `libs/core/contacto` `TIPO_PERSONA`,
+  `calcularDigitoVerificacion`, `construirNombreCorto` y el validador de
+  identificación única, que ahora recibe una función `validar` en vez del
+  servicio del ERP.
+- Ítem rápido: código, nombre, precio, producto o servicio, inventario,
+  favorito e impuestos de venta. Arranca **sin inventario**: con inventario
+  nace sin existencias y la caja no lo vendería. Si se abrió desde una búsqueda
+  por código, el ítem creado entra a la venta.
+
+Bundle inicial: 1.32 MB → 1.45 MB (error a 1.5 MB). No es el código nuevo: las
+páginas de auth importan `@reddoc/ui` eager, así que todo componente de ese lib
+que también use una pantalla lazy (selects, autocompletes, el datepicker que
+trae el modal de filtros del historial) cae en el chunk inicial. Turnos tiene lo
+mismo (1.48 MB). Va al sprint 5.
+
 ---
 
 ## Sprint 5 · Cierre
@@ -330,6 +357,9 @@ usan en una venta; el historial muestra la venta e imprime.
 - **Tablet:** el layout de dos columnas colapsa a catálogo + carrito en drawer.
 - **Observabilidad y budgets:** Sentry en `environment.prod.ts`, budget del
   bundle inicial, `npx nx affected -t lint build`.
+- **Bundle inicial:** cargar las páginas de auth sin arrastrar el resto de
+  `@reddoc/ui` (entry point propio para auth o import profundo), que hoy mete
+  selects, autocompletes y el datepicker en el chunk inicial.
 - **Documentación:** guía `docs/guides/pos.md` (configurar una caja, flujo de
   cobro, qué hacer con una venta no aprobada) y actualización de `CLAUDE.md`
   (`apps/pos` deja de ser esqueleto; nuevos módulos de `libs/core`).

@@ -15,6 +15,7 @@ import { I18nService, ToastService, formatCop, type ErpSelectOption } from '@red
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../../configuracion/configuracion-caja.store';
+import { ClienteRapidoDialogComponent } from '../../../cliente/components/cliente-rapido-dialog/cliente-rapido-dialog.component';
 import { CobroDialogComponent } from '../../../cobro/components/cobro-dialog/cobro-dialog.component';
 import { CarritosStore } from '../../carritos.store';
 import type { LineaCarrito } from '../../carrito.model';
@@ -38,6 +39,7 @@ import {
   imports: [
     FormsModule,
     ButtonModule,
+    ClienteRapidoDialogComponent,
     CobroDialogComponent,
     ErpContactoSelectComponent,
     CarritoLineaComponent,
@@ -60,6 +62,7 @@ export class CarritoPanelComponent {
   readonly cobrada = output<void>();
 
   protected readonly cobrando = signal(false);
+  protected readonly creandoCliente = signal(false);
   protected readonly bloqueada = computed(() => this.store.cobroPendiente() !== null);
 
   protected readonly contactoParams = { cliente: 'True' } as const;
