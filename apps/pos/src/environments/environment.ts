@@ -5,4 +5,7 @@ export const environment: ReddocEnvironment & { production: boolean } = {
   apiUrl: '/api',
   turnstileSiteKey: '1x00000000000000000000AA',
   landingUrl: 'http://localhost:4200',
+  erpUrl: 'http://localhost:4201',
+  cuentaUrl: 'http://localhost:4203',
+  turnosUrl: 'http://localhost:4206',
 };

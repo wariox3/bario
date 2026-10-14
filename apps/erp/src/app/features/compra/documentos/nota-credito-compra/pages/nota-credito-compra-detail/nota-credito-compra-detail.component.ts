@@ -12,6 +12,10 @@ import {
   calcularResumen,
   type ResumenDocumento,
   type DocumentoEstados,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
@@ -28,12 +32,6 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { notaCreditoCompraToFormValue } from '../../nota-credito-compra.mapper';
 import type { NotaCreditoCompraRead } from '../../nota-credito-compra.model';
 

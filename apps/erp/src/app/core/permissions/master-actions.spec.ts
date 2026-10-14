@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { MODELO } from './modelo.catalog';
-import { ModelPermissionsService } from './model-permissions.service';
 import { masterActions } from './master-actions';
+import { MODELO, ModelPermissionsService } from '@reddoc/core';
 
 const ROW = [{ id: 'edit' }, { id: 'view' }, { id: 'delete' }] as never;
 const PRIMARY = { id: 'new' } as never;

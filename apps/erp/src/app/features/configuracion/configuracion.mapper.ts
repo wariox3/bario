@@ -1,6 +1,5 @@
-import { toFiniteNumber } from '@reddoc/core';
+import { toFiniteNumber, type ItemOption } from '@reddoc/core';
 import type { Ciudad, ErpSelectOption } from '@reddoc/core';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import type { ConfiguracionPayload, ConfiguracionRead } from './configuracion.model';
 
 /** Opción mínima para precargar un select por id (el label lo resuelve el `dataKey`). */

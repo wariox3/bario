@@ -1,0 +1,152 @@
+@let tx = t().caja;
+<h1 class="sr-only">{{ tx.title }}</h1>
+
+<div class="flex min-h-0 flex-1 flex-col gap-3">
+  <app-carrito-tabs />
+
+  <div class="flex min-h-0 flex-1 gap-4">
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
+      @if (!configuracionCompleta()) {
+        <div
+          class="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+          role="status"
+        >
+          <i class="pi pi-exclamation-circle text-amber-600" aria-hidden="true"></i>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <p class="m-0 text-[0.85rem] font-semibold text-amber-900">
+              {{ tx.configuracion.title }}
+            </p>
+            <p class="m-0 text-[0.78rem] text-amber-800">{{ tx.configuracion.desc }}</p>
+          </div>
+          <a
+            [routerLink]="rutaConfiguracion()"
+            class="text-[0.8rem] font-semibold text-amber-900 underline underline-offset-2"
+          >
+            {{ tx.configuracion.accion }}
+          </a>
+        </div>
+      }
+
+      <app-buscador-productos
+        [puedeCrearItem]="puedeCrearItem()"
+        (buscar)="onBuscar($event)"
+        (nuevoItem)="onNuevoItem($event)"
+      />
+
+      @switch (catalogo.estado()) {
+        @case ('cargando') {
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+              <div class="aspect-[3/4] animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+            }
+          </div>
+        }
+        @case ('error') {
+          <div
+            class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
+          >
+            <i class="pi pi-exclamation-triangle text-xl text-brand-muted" aria-hidden="true"></i>
+            <p class="m-0 text-sm text-brand-muted">{{ tx.estados.error }}</p>
+            <p-button
+              type="button"
+              [label]="tx.estados.reintentar"
+              icon="pi pi-refresh"
+              [outlined]="true"
+              severity="secondary"
+              (onClick)="catalogo.recargar()"
+            />
+          </div>
+        }
+        @default {
+          @if (catalogo.productos().length === 0) {
+            <div
+              class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(20,48,73,0.16)] py-16 text-center"
+            >
+              <i class="pi pi-box text-xl text-brand-muted" aria-hidden="true"></i>
+              <p class="m-0 text-sm font-semibold text-brand-text">
+                {{ vacioPorBusqueda() ? tx.estados.sinResultados : tx.estados.sinProductos }}
+              </p>
+              <p class="m-0 text-[0.8rem] text-brand-muted">
+                {{
+                  vacioPorBusqueda() ? tx.estados.sinResultadosDesc : tx.estados.sinProductosDesc
+                }}
+              </p>
+            </div>
+          } @else {
+            <div
+              class="grid grid-cols-2 gap-3 pt-1.5 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+            >
+              @for (producto of catalogo.productos(); track producto.id) {
+                <app-producto-card
+                  [producto]="producto"
+                  [cantidad]="cantidades().get(producto.id) ?? 0"
+                  [puedeFavorito]="puedeFavorito()"
+                  (agregar)="onAgregar($event)"
+                  (alternarFavorito)="onAlternarFavorito($event)"
+                />
+              }
+            </div>
+            @if (catalogo.hayMas()) {
+              <div class="flex justify-center pb-1">
+                <p-button
+                  type="button"
+                  [label]="tx.estados.cargarMas"
+                  icon="pi pi-angle-down"
+                  [outlined]="true"
+                  severity="secondary"
+                  [loading]="catalogo.cargandoMas()"
+                  (onClick)="catalogo.cargarMas()"
+                />
+              </div>
+            }
+          }
+        }
+      }
+    </div>
+
+    @if (!compacta()) {
+      <app-carrito-panel
+        (cobrada)="catalogo.recargar()"
+        class="flex min-h-0 w-[380px] shrink-0 flex-col"
+      />
+    }
+  </div>
+
+  @if (compacta()) {
+    <!-- Tablet/móvil: la venta vive en un drawer; esta barra la resume y la abre. -->
+    <button
+      type="button"
+      class="flex shrink-0 items-center justify-between gap-3 rounded-xl bg-[var(--brand-navy)] px-4 py-3 text-white"
+      (click)="ventaVisible.set(true)"
+    >
+      <span class="flex items-center gap-2 text-[0.85rem] font-semibold">
+        <i class="pi pi-shopping-cart" aria-hidden="true"></i>
+        {{ tx.compacta.verVenta }}
+        <span class="rounded-full bg-white/20 px-2 font-mono text-[0.75rem] tabular-nums">
+          {{ cantidadVenta() }}
+        </span>
+      </span>
+      <span class="font-mono text-base font-bold tabular-nums">{{ totalVenta() }}</span>
+    </button>
+  }
+</div>
+
+@if (compacta()) {
+  <p-drawer
+    [visible]="ventaVisible()"
+    (visibleChange)="ventaVisible.set($event)"
+    position="right"
+    [header]="tx.compacta.titulo"
+    styleClass="!w-full sm:!w-[26rem]"
+  >
+    <app-carrito-panel (cobrada)="catalogo.recargar()" class="flex h-full min-h-0 flex-col" />
+  </p-drawer>
+}
+
+<app-item-rapido-dialog
+  [(visible)]="creandoItem"
+  [codigoInicial]="codigoNuevoItem()"
+  (creado)="onItemCreado($event)"
+/>
+
+<p-confirmdialog [style]="{ width: '24rem' }" [breakpoints]="{ '576px': '92vw' }" />

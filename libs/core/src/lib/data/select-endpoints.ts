@@ -29,5 +29,6 @@ export const SELECT_ENDPOINTS = {
    */
   centroCosto: '/contabilidad/centro-costo/seleccionar/',
   almacen: '/inventario/almacen/seleccionar/',
+  sede: '/general/sede/seleccionar/',
   novedadTipo: '/humano/novedad-tipo/seleccionar/',
 } as const;

@@ -7,4 +7,5 @@ export const environment: ReddocEnvironment & { production: boolean } = {
   landingUrl: 'http://localhost:4200',
   erpUrl: 'http://localhost:4201',
   cuentaUrl: 'http://localhost:4203',
+  posUrl: 'http://localhost:4205',
 };

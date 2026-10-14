@@ -7,5 +7,6 @@ export const environment: ReddocEnvironment & { production: boolean } = {
   landingUrl: 'https://reddoc2.co',
   erpUrl: 'https://erp.reddoc2.co',
   cuentaUrl: 'https://cuenta.reddoc2.co',
+  posUrl: 'https://pos.reddoc2.co',
   sentry: SENTRY_PRODUCCION,
 };

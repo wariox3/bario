@@ -1,5 +1,5 @@
 import { visibleActions, visiblePrimaryAction } from './action-visibility';
-import type { PermissionAction } from './permission.types';
+import type { PermissionAction } from '@reddoc/core';
 
 /** Concede solo las acciones listadas. */
 const only =

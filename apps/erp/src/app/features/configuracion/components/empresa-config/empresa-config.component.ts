@@ -12,10 +12,10 @@ import {
   I18nService,
   SELECT_ENDPOINTS,
   ToastService,
+  calcularDigitoVerificacion,
 } from '@reddoc/core';
 import { CiudadAutocompleteComponent, ErpApiSelectComponent } from '@reddoc/ui';
 import type { Ciudad, ErpSelectOption } from '@reddoc/core';
-import { calcularDigitoVerificacion } from '@erp/features/general/masters/contacto/utils/digito-verificacion.util';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionService } from '../../configuracion.service';
 import { EMPRESA_CAMPOS } from '../../configuracion.constants';

@@ -1,0 +1,133 @@
+@let c = t().configuracion;
+<form
+  [formGroup]="form"
+  libFocusInvalid
+  (ngSubmit)="onSubmit()"
+  class="flex max-w-3xl flex-col gap-5"
+>
+  <header class="flex flex-col gap-0.5">
+    <h1 class="m-0 text-xl font-bold tracking-tight text-brand-text">{{ c.title }}</h1>
+    <p class="m-0 text-sm text-brand-muted">{{ c.subtitle }}</p>
+  </header>
+
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-file text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ c.documento.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ c.documento.hint }}</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+      <div
+        class="flex flex-wrap gap-x-6 gap-y-3"
+        role="radiogroup"
+        [attr.aria-label]="c.documento.title"
+      >
+        @for (tipo of tipos; track tipo) {
+          <div class="flex items-center gap-2">
+            <p-radiobutton
+              formControlName="documentoTipoId"
+              [value]="tipo"
+              [inputId]="'tipo-' + tipo"
+            />
+            <label [for]="'tipo-' + tipo" class="cursor-pointer text-sm text-brand-text">
+              {{ tipoLabel(tipo) }}
+            </label>
+          </div>
+        }
+      </div>
+      <lib-field-error [control]="form.controls.documentoTipoId" />
+    </div>
+  </section>
+
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-shop text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+          {{ c.operacion.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ c.operacion.hint }}</p>
+      </div>
+    </div>
+
+    <div
+      class="grid grid-cols-1 gap-x-5 gap-y-4 px-5 py-5 md:grid-cols-2 max-[576px]:px-4 max-[576px]:py-4"
+    >
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="almacen"
+          class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+        >
+          {{ c.campos.almacen }}
+        </label>
+        <lib-api-select
+          inputId="almacen"
+          formControlName="almacen"
+          [endpoint]="almacenEndpoint"
+          [suggestedIndex]="almacenSugerido"
+          [invalid]="form.controls.almacen.invalid && form.controls.almacen.touched"
+        />
+        <lib-field-error [control]="form.controls.almacen" />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="cuentaEfectivo"
+          class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+        >
+          {{ c.campos.cuentaEfectivo }}
+        </label>
+        <lib-api-select
+          inputId="cuentaEfectivo"
+          formControlName="cuentaEfectivo"
+          [endpoint]="cuentaEndpoint"
+          [invalid]="form.controls.cuentaEfectivo.invalid && form.controls.cuentaEfectivo.touched"
+        />
+        <lib-field-error [control]="form.controls.cuentaEfectivo" />
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ c.campos.cuentaEfectivoHint }}</p>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="sede" class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text">
+          {{ c.campos.sede }}
+        </label>
+        <lib-api-select
+          inputId="sede"
+          formControlName="sede"
+          [endpoint]="sedeEndpoint"
+          [showClear]="true"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="asesor" class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text">
+          {{ c.campos.asesor }}
+        </label>
+        <lib-asesor-select inputId="asesor" formControlName="asesor" />
+      </div>
+    </div>
+  </section>
+
+  <div class="flex items-center justify-end gap-3 pb-1">
+    @if (form.dirty) {
+      <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
+        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        {{ c.sinGuardar }}
+      </span>
+    }
+    <p-button type="submit" [label]="c.guardar" icon="pi pi-check" />
+  </div>
+</form>

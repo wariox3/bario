@@ -1,10 +1,13 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
-import { TenantService, readModuleAccessFlags } from '@reddoc/core';
+import {
+  TenantService,
+  readModuleAccessFlags,
+  type ModeloId,
+  ModelPermissionsService,
+  type PermissionAction,
+} from '@reddoc/core';
 import { ERP_MODULES } from '@erp/core/erp-modules';
-import type { ModeloId } from './modelo.catalog';
-import { ModelPermissionsService } from './model-permissions.service';
-import type { PermissionAction } from './permission.types';
 
 /**
  * ¿Conocemos los permisos de **todos** los modelos antes de pintar?

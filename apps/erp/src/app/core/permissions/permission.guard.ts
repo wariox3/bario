@@ -1,8 +1,8 @@
 import { inject } from '@angular/core';
 import type { CanMatchFn, Route } from '@angular/router';
 import type { Observable } from 'rxjs';
-import type { ModeloId } from './modelo.catalog';
 import { PermissionsService } from './permissions.service';
+import type { ModeloId } from '@reddoc/core';
 
 /** Clave bajo la que `withPermission` deja el modelo en el `data` de la ruta. */
 export const PERMISSION_ROUTE_DATA_KEY = 'modelo';

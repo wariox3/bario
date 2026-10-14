@@ -18,12 +18,15 @@
     "noImplicitReturns": true,
     "paths": {
       "@erp/*": ["./apps/erp/src/app/*"],
+      "@pos/*": ["./apps/pos/src/app/*"],
       "@reddoc/core": ["./libs/core/src/index.ts"],
       "@reddoc/feature-base": ["./libs/feature-base/src/index.ts"],
       "@reddoc/feature-contenedores": ["./libs/feature-contenedores/src/index.ts"],
       "@reddoc/feature-contenedores/i18n": ["./libs/feature-contenedores/src/i18n.ts"],
       "@reddoc/styles": ["./libs/styles/src/index.ts"],
       "@reddoc/ui": ["./libs/ui/src/index.ts"],
+      "@reddoc/ui/auth": ["./libs/ui/src/auth.ts"],
+      "@reddoc/ui/i18n": ["./libs/ui/src/i18n.ts"],
       "@turnos/*": ["./apps/turnos/src/app/*"]
     }
   },

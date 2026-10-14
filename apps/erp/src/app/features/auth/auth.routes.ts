@@ -7,7 +7,7 @@ import {
   ResendVerificationComponent,
   ResetPasswordComponent,
   VerifyEmailComponent,
-} from '@reddoc/ui';
+} from '@reddoc/ui/auth';
 
 export const AUTH_ROUTES: Routes = [
   { path: 'login', canActivate: [publicGuard], component: LoginComponent },

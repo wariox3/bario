@@ -1,7 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { I18nService, formatCop, type ResumenDocumento } from '@reddoc/core';
+import { I18nService, formatCop, type ResumenDocumento, type ResumenPagos } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import type { ResumenPagos } from '@erp/features/documentos/pagos/pago.calculo';
 
 const CANTIDAD_FORMAT = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
 

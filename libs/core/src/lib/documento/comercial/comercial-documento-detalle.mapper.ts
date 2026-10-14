@@ -1,0 +1,225 @@
+import {
+  calcularImpuestosLinea,
+  redondearMoneda,
+  type ImpuestoLinea,
+  type LineaCalculo,
+  type TasaImpuesto,
+} from '../../calculo';
+import { toFiniteNumber } from '../../utils/currency.utils';
+import type { Item } from '../../item/item.model';
+import type {
+  ComercialDetalleRead,
+  ComercialDetallePayload,
+} from './comercial-documento-detalle.model';
+import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
+
+/**
+ * Subtotal bruto de la línea: `cantidad × precio`, redondeado a centavos. Con
+ * cantidad y precio decimales el producto puede tener más de dos decimales
+ * (`1.5 × 33.33 = 49.995`); sin redondear, el resumen sumaría un valor distinto
+ * al que pinta la fila.
+ */
+export function lineBruto(line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio'>): number {
+  return redondearMoneda((line.cantidad ?? 0) * (line.precio ?? 0));
+}
+
+/** Monto del descuento: `bruto × desc%/100`, redondeado. */
+export function lineDescuento(
+  line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio' | 'descuento'>,
+): number {
+  return redondearMoneda(lineBruto(line) * ((line.descuento ?? 0) / 100));
+}
+
+/** Base gravable: `bruto − descuento`. */
+export function lineBase(
+  line: Pick<ComercialDetalleFormRawValue, 'cantidad' | 'precio' | 'descuento'>,
+): number {
+  return redondearMoneda(lineBruto(line) - lineDescuento(line));
+}
+
+/** Suma de los montos de impuesto ya calculados de la línea. */
+export function lineImpuesto(
+  line: Pick<ComercialDetalleFormRawValue, 'impuestos_totales'>,
+): number {
+  return redondearMoneda(line.impuestos_totales.reduce((s, i) => s + i.total, 0));
+}
+
+/** Neto de la línea: `base + impuesto`. */
+export function lineNeto(
+  line: Pick<
+    ComercialDetalleFormRawValue,
+    'cantidad' | 'precio' | 'descuento' | 'impuestos_totales'
+  >,
+): number {
+  return redondearMoneda(lineBase(line) + lineImpuesto(line));
+}
+
+/**
+ * Recalcula los montos de impuesto de la línea: `calcularImpuestosLinea(base,
+ * tasas)` sobre las tasas disponibles del ítem intersectadas con las elegidas.
+ */
+export function recomputeImpuestosLinea(
+  line: Pick<
+    ComercialDetalleFormRawValue,
+    'cantidad' | 'precio' | 'descuento' | 'impuestos_ids' | 'impuestos_disponibles'
+  >,
+): ImpuestoLinea[] {
+  const ids = new Set(line.impuestos_ids);
+  const tasas = line.impuestos_disponibles.filter((t) => ids.has(t.id));
+  return calcularImpuestosLinea(lineBase(line), tasas);
+}
+
+/** Redondeo a 2 decimales para precios unitarios (el precio admite centavos). */
+function redondearPrecio(valor: number): number {
+  return Math.round((valor + Number.EPSILON) * 100) / 100;
+}
+
+/**
+ * Fracción total de los impuestos de la línea que **suman** (`operacion > 0`),
+ * p. ej. IVA 19% sobre base 100 → `0.19`. Las retenciones no participan: no
+ * hacen parte de un precio final al público — se descuentan al pagar.
+ */
+function fraccionImpuestosPositivos(
+  line: Pick<ComercialDetalleFormRawValue, 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  const ids = new Set(line.impuestos_ids);
+  return line.impuestos_disponibles
+    .filter((t) => ids.has(t.id) && (t.operacion ?? 1) > 0)
+    .reduce((s, t) => s + (t.porcentaje / 100) * (t.porcentajeBase / 100), 0);
+}
+
+/**
+ * Precio unitario **final** (con los impuestos que suman) que produce el precio
+ * actual de la línea: `precio × (1 + Σ fracciones)`. Siembra el campo del
+ * popover "precio con impuestos incluidos".
+ */
+export function precioUnitarioConImpuestos(
+  line: Pick<ComercialDetalleFormRawValue, 'precio' | 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  return redondearPrecio((line.precio ?? 0) * (1 + fraccionImpuestosPositivos(line)));
+}
+
+/**
+ * Deshace los impuestos de la línea de un precio unitario final: la inversa
+ * exacta del kernel. Los impuestos son **aditivos sobre la misma base** (así los
+ * calcula `calcularImpuestosLinea`), por eso se divide por `1 + Σ fracciones` —
+ * no en cadena tasa por tasa como hacía el legacy, que con varias tasas era
+ * inconsistente con su propio cálculo hacia adelante.
+ */
+export function precioUnitarioSinImpuestos(
+  precioFinal: number,
+  line: Pick<ComercialDetalleFormRawValue, 'impuestos_ids' | 'impuestos_disponibles'>,
+): number {
+  return redondearPrecio(precioFinal / (1 + fraccionImpuestosPositivos(line)));
+}
+
+/** Adapta una línea comercial al contrato mínimo del kernel de resumen. */
+export function toLineaCalculo(line: ComercialDetalleFormRawValue): LineaCalculo {
+  return {
+    base: lineBruto(line),
+    descuento: lineDescuento(line),
+    impuestos: line.impuestos_totales,
+  };
+}
+
+/**
+ * Tasas de **venta o compra** del ítem (opcionalmente acotadas a `ids`) como
+ * `TasaImpuesto[]`. El `modo` selecciona el flag del ítem a filtrar
+ * (`impuesto_venta` vs `impuesto_compra`): un documento comercial de venta usa
+ * los de venta; uno de compra, los de compra.
+ */
+export function tasasDelItem(
+  item: Item,
+  modo: 'venta' | 'compra',
+  ids?: readonly number[],
+): TasaImpuesto[] {
+  const idSet = ids ? new Set(ids) : null;
+  return (item.impuestos ?? [])
+    .filter(
+      (imp) =>
+        (modo === 'venta' ? imp.impuesto_venta : imp.impuesto_compra) &&
+        (!idSet || idSet.has(imp.impuesto)),
+    )
+    .map((imp) => ({
+      id: imp.impuesto,
+      nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
+      porcentaje: parseFloat(imp.impuesto_porcentaje ?? '0'),
+      porcentajeBase: parseFloat(imp.impuesto_porcentaje_base ?? '100'),
+      operacion: imp.impuesto_operacion ?? 1,
+    }));
+}
+
+/** Read-model (GET) → valores de formulario de una línea comercial. */
+export function comercialDetalleToFormValue(
+  read: ComercialDetalleRead,
+): ComercialDetalleFormRawValue {
+  const precio = toFiniteNumber(read.precio) ?? 0;
+  return {
+    id: read.id ?? null,
+    item: read.item != null ? { id: read.item, nombre: read.item_nombre ?? '', precio } : null,
+    cantidad: toFiniteNumber(read.cantidad),
+    precio,
+    descuento: toFiniteNumber(read.porcentaje_descuento) ?? 0,
+    impuestos_ids: (read.impuestos ?? []).map((imp) => imp.impuesto),
+    impuestos_totales: (read.impuestos ?? []).map((imp) => {
+      // El backend guarda el monto sin signo y manda la operación aparte, así
+      // que el signo sale de ahí. Si faltara, el monto queda como llegó y la
+      // tabla de edición lo corrige contra el catálogo (`normalizarImpuestosLeidos`).
+      const parsed = toFiniteNumber(imp.total) ?? 0;
+      const total =
+        imp.impuesto_operacion == null
+          ? parsed
+          : Math.abs(parsed) * (imp.impuesto_operacion < 0 ? -1 : 1);
+      return {
+        id: imp.impuesto,
+        nombre: imp.impuesto_nombre_extendido ?? imp.impuesto_nombre ?? '',
+        total,
+      };
+    }),
+    // Se rellenan al re-seleccionar el ítem; vacías preservan los montos cargados.
+    impuestos_disponibles: [],
+    detalle: read.detalle ?? null,
+    almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
+    documento_detalle_afectado: read.documento_detalle_afectado ?? null,
+  };
+}
+
+/**
+ * Copia una línea del **documento referencia** (la factura de una nota) como línea
+ * **nueva** de la nota: `id = null` para que se cree (POST), y con el pool de
+ * tasas vacío para que la tabla lo siembre del catálogo y recalcule los montos.
+ *
+ * `documento_detalle_afectado` queda en `null`: el legacy tampoco enlazaba la
+ * línea origen y falta confirmar con el backend si en las notas ese vínculo
+ * descuenta lo pendiente de la factura.
+ */
+export function lineaReferenciaToFormValue(
+  read: ComercialDetalleRead,
+): ComercialDetalleFormRawValue {
+  return {
+    ...comercialDetalleToFormValue(read),
+    id: null,
+    documento_detalle_afectado: null,
+  };
+}
+
+/** Valores del formulario → payload de una línea comercial (POST/PATCH). */
+export function comercialDetalleToPayload(
+  raw: ComercialDetalleFormRawValue,
+): ComercialDetallePayload {
+  return {
+    item: raw.item?.id ?? null,
+    cantidad: raw.cantidad ?? null,
+    precio: (raw.precio ?? 0).toFixed(2),
+    porcentaje_descuento: (raw.descuento ?? 0).toFixed(2),
+    detalle: raw.detalle?.trim() || null,
+    almacen: raw.almacen?.id ?? null,
+    impuestos_ids: raw.impuestos_ids,
+    documento_detalle_afectado: raw.documento_detalle_afectado,
+  };
+}
+
+/** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
+export function totalCantidad(lines: readonly ComercialDetalleFormRawValue[]): number {
+  return lines.reduce((acc, line) => acc + (line.cantidad ?? 0), 0);
+}

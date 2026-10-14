@@ -3,7 +3,7 @@ import type {
   SidebarGroup,
   SidebarSection,
 } from '../erp-modules/sidebar-menu.types';
-import type { ModeloId } from './modelo.catalog';
+import type { ModeloId } from '@reddoc/core';
 
 /** Predicado de permiso. Se inyecta para que estas funciones queden puras. */
 export type PermissionPredicate = (modelo: ModeloId | undefined) => boolean;

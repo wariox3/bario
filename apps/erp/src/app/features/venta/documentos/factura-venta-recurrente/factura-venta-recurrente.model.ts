@@ -13,8 +13,11 @@
  * el payload lo manda siempre nulo. Los demás nombres se confirman contra la
  * API real.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de venta recurrente. */
 export interface FacturaVentaRecurrenteRead extends DocumentoReadBase {

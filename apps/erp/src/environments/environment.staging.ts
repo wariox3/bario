@@ -7,4 +7,5 @@ export const environment: ReddocEnvironment & { production: boolean } = {
   landingUrl: 'https://reddoc.uk',
   cuentaUrl: 'https://cuenta.reddoc.uk',
   turnosUrl: 'https://turno.reddoc.uk',
+  posUrl: 'https://pos.reddoc.uk',
 };

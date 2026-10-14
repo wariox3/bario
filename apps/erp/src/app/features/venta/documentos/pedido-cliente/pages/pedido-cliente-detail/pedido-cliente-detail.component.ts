@@ -13,6 +13,10 @@ import {
   fromIsoDate,
   type DocumentoEstados,
   type ResumenDocumento,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -29,12 +33,6 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import type { PedidoClienteRead } from '../../pedido-cliente.model';
 
 /** Cabecera legible del pedido para la ficha (solo lo que trae `getById`). */

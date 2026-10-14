@@ -11,8 +11,11 @@
  * Nota: `fecha_vence` es el nombre real del campo en el backend (ver
  * `DocumentoListRowBase`). Los demás nombres se confirman contra la API real.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de venta. */
 export interface FacturaVentaRead extends DocumentoReadBase {

@@ -1,5 +1,4 @@
-import type { ErpSelectOption } from '@reddoc/core';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import type { ErpSelectOption, ItemOption } from '@reddoc/core';
 
 /**
  * Sentido del movimiento de una línea sobre su bodega: `1` suma existencias,

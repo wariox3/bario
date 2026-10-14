@@ -12,10 +12,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize, map, of, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { DocumentoDetalleService, I18nService, ToastService } from '@reddoc/core';
+import {
+  DocumentoDetalleService,
+  I18nService,
+  ToastService,
+  lineaReferenciaToFormValue,
+  type ComercialDetalleRead,
+} from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import { lineaReferenciaToFormValue } from '../../comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '../../comercial-documento-detalle.model';
 import type { ComercialDocumentoDetallesComponent } from '../comercial-documento-detalles/comercial-documento-detalles.component';
 
 /**

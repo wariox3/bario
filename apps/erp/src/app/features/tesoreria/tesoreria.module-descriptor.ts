@@ -1,5 +1,5 @@
 import type { ErpModuleDescriptor } from '@erp/core/erp-modules';
-import { MODELO } from '@erp/core/permissions/modelo.catalog';
+import { MODELO } from '@reddoc/core';
 
 /**
  * Descriptor del módulo Tesorería para la capa de navegación.

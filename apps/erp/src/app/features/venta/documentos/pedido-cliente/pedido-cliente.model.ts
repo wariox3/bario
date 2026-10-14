@@ -10,8 +10,11 @@
  * (cliente + fecha, fiel al legacy): no lleva plazo de pago, vencimiento, método
  * de pago ni sede. Toda la sustancia está en las líneas comerciales.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un pedido de cliente. */
 export interface PedidoClienteRead extends DocumentoReadBase {

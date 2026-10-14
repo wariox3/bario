@@ -4,11 +4,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { provideI18n } from '@reddoc/core';
+import { provideI18n, MODELO, ModelPermissionsService } from '@reddoc/core';
 import { dictionaries } from '@erp/i18n';
 import { AccessDeniedPageComponent } from '../components/access-denied/access-denied.page';
-import { MODELO } from './modelo.catalog';
-import { ModelPermissionsService } from './model-permissions.service';
 import { withPermission } from './with-permission';
 
 /** Reproduce el árbol real: módulo con índice, un master protegido y hermanos. */

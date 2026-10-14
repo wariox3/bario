@@ -1,0 +1,242 @@
+@let tx = t().caja.cobro;
+@let faseActual = fase();
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event && cerrar()"
+  [modal]="true"
+  [closable]="!procesando()"
+  [closeOnEscape]="!procesando()"
+  [header]="vista() === 'exito' ? tx.exito.titulo : tx.titulo"
+  [style]="{ width: '30rem' }"
+  [breakpoints]="{ '576px': '94vw' }"
+  [draggable]="false"
+>
+  @switch (vista()) {
+    @case ('medios') {
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col items-center gap-0.5 py-1">
+          <span class="text-[0.78rem] text-brand-muted">{{ tx.total }}</span>
+          <span class="font-mono text-3xl font-bold tabular-nums text-brand-text">
+            {{ formatear(total()) }}
+          </span>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          @for (medio of medios; track medio.id) {
+            <button
+              type="button"
+              class="relative flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-center transition-colors disabled:cursor-not-allowed"
+              [class]="
+                medio.habilitado
+                  ? 'border-[rgba(20,48,73,0.14)] bg-brand-surface hover:border-[var(--brand-blue)]'
+                  : 'border-dashed border-[rgba(20,48,73,0.14)] bg-[rgba(20,48,73,0.02)] text-brand-muted'
+              "
+              [disabled]="!medio.habilitado"
+              (click)="elegirMedio(medio)"
+            >
+              <i class="{{ medio.icono }} text-xl" aria-hidden="true"></i>
+              <span class="text-[0.85rem] font-semibold">{{ tx.medios[medio.id] }}</span>
+              @if (!medio.habilitado) {
+                <span class="text-[0.68rem]">{{ tx.medios.proximamente }}</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @case ('efectivo') {
+      @let ef = tx.efectivo;
+      <form [formGroup]="form" libFocusInvalid (ngSubmit)="onCobrar()" class="flex flex-col gap-4">
+        <div class="flex items-baseline justify-between">
+          <span class="text-[0.8rem] text-brand-muted">{{ tx.total }}</span>
+          <span class="font-mono text-2xl font-bold tabular-nums text-brand-text">
+            {{ formatear(total()) }}
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="cobro-recibido" class="text-[0.78rem] font-semibold text-brand-text">
+            {{ ef.recibido }}
+          </label>
+          <p-inputnumber
+            inputId="cobro-recibido"
+            formControlName="recibido"
+            mode="currency"
+            currency="COP"
+            locale="es-CO"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            [fluid]="true"
+            [autofocus]="true"
+            [invalid]="form.controls.recibido.invalid && form.controls.recibido.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.recibido"
+            [messages]="{ insuficiente: ef.recibidoMinimo }"
+          />
+          <div class="flex flex-wrap gap-1.5">
+            @for (monto of sugerencias(); track monto; let primero = $first) {
+              <button
+                type="button"
+                class="rounded-md border border-[rgba(20,48,73,0.14)] px-2 py-1 font-mono text-[0.75rem] tabular-nums text-brand-text hover:border-[var(--brand-blue)]"
+                (click)="usarMonto(monto)"
+              >
+                {{ primero ? ef.exacto : formatear(monto) }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div
+          class="flex items-baseline justify-between rounded-lg bg-emerald-50 px-3 py-2 text-emerald-900"
+        >
+          <span class="text-[0.82rem] font-semibold">{{ ef.cambio }}</span>
+          <span class="font-mono text-xl font-bold tabular-nums">{{
+            formatear(cambioEfectivo())
+          }}</span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="cobro-cuenta" class="text-[0.78rem] font-semibold text-brand-text">
+              {{ ef.cuenta }}
+            </label>
+            <lib-api-select
+              inputId="cobro-cuenta"
+              formControlName="cuenta"
+              [endpoint]="cuentaEndpoint"
+              [invalid]="form.controls.cuenta.invalid && form.controls.cuenta.touched"
+            />
+            <lib-field-error [control]="form.controls.cuenta" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="cobro-asesor" class="text-[0.78rem] font-semibold text-brand-text">
+              {{ ef.asesor }}
+            </label>
+            <lib-asesor-select inputId="cobro-asesor" formControlName="asesor" />
+          </div>
+        </div>
+
+        @if (error(); as mensaje) {
+          <p class="m-0 rounded-lg bg-red-50 px-3 py-2 text-[0.8rem] text-red-700" role="alert">
+            {{ mensaje }}
+          </p>
+        }
+
+        <div class="flex justify-between gap-2 pt-1">
+          <p-button
+            type="button"
+            [label]="ef.volver"
+            icon="pi pi-arrow-left"
+            severity="secondary"
+            [text]="true"
+            [disabled]="procesando()"
+            (onClick)="vista.set('medios')"
+          />
+          <p-button
+            type="submit"
+            [label]="faseActual ? tx.fases[faseActual] : ef.cobrar"
+            icon="pi pi-check"
+            [loading]="procesando()"
+            [disabled]="procesando()"
+          />
+        </div>
+      </form>
+    }
+
+    @case ('exito') {
+      @let ex = tx.exito;
+      @if (ventaCobrada(); as venta) {
+        <div class="flex flex-col items-center gap-4 py-2 text-center">
+          <span
+            class="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"
+          >
+            <i class="pi pi-check text-2xl" aria-hidden="true"></i>
+          </span>
+          <div class="flex flex-col gap-0.5">
+            <p class="m-0 text-[0.95rem] font-semibold text-brand-text">{{ ex.desc }}</p>
+            <p class="m-0 font-mono text-[0.8rem] tabular-nums text-brand-muted">
+              {{ ex.documento }} {{ venta.documentoId }} · {{ formatear(venta.total) }}
+            </p>
+          </div>
+          @if (venta.cambio > 0) {
+            <div
+              class="flex flex-col items-center rounded-lg bg-emerald-50 px-6 py-2 text-emerald-900"
+            >
+              <span class="text-[0.78rem] font-semibold">{{ ex.cambio }}</span>
+              <span class="font-mono text-2xl font-bold tabular-nums">
+                {{ formatear(venta.cambio) }}
+              </span>
+            </div>
+          }
+          <div class="flex w-full gap-2 pt-1">
+            <p-button
+              type="button"
+              [label]="ex.imprimir"
+              icon="pi pi-print"
+              severity="secondary"
+              [outlined]="true"
+              styleClass="w-full"
+              class="flex-1"
+              [loading]="imprimiendo()"
+              (onClick)="onImprimir()"
+            />
+            <p-button
+              type="button"
+              [label]="ex.nuevaVenta"
+              icon="pi pi-plus"
+              styleClass="w-full"
+              class="flex-1"
+              (onClick)="cerrar()"
+            />
+          </div>
+        </div>
+      }
+    }
+
+    @case ('pendiente') {
+      @let pe = tx.pendiente;
+      <div class="flex flex-col gap-4">
+        <div class="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3">
+          <i class="pi pi-exclamation-circle mt-0.5 text-amber-600" aria-hidden="true"></i>
+          <div class="flex flex-col gap-1">
+            <p class="m-0 text-[0.85rem] font-semibold text-amber-900">{{ pe.titulo }}</p>
+            <p class="m-0 text-[0.78rem] text-amber-800">
+              {{ pe.desc }}
+              <span class="font-mono tabular-nums">{{ cobroPendiente()?.documentoId }}</span
+              >.
+              {{ cobroPendiente()?.pagado ? pe.faltaAprobar : pe.faltaPago }}
+            </p>
+          </div>
+        </div>
+
+        @if (error(); as mensaje) {
+          <p class="m-0 rounded-lg bg-red-50 px-3 py-2 text-[0.8rem] text-red-700" role="alert">
+            {{ mensaje }}
+          </p>
+        }
+
+        <div class="flex flex-wrap justify-end gap-2">
+          <p-button
+            type="button"
+            [label]="pe.descartar"
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [loading]="descartando()"
+            [disabled]="procesando()"
+            (onClick)="onDescartar()"
+          />
+          <p-button
+            type="button"
+            [label]="faseActual ? tx.fases[faseActual] : pe.reintentar"
+            icon="pi pi-refresh"
+            [loading]="fase() !== null"
+            [disabled]="procesando()"
+            (onClick)="onReintentar()"
+          />
+        </div>
+      </div>
+    }
+  }
+</p-dialog>

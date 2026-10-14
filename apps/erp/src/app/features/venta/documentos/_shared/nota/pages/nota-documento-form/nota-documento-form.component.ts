@@ -33,6 +33,15 @@ import {
   startOfToday,
   TenantService,
   ToastService,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  totalCantidad,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
+  precioListaDeContacto,
+  calcularPagos,
+  type PagoRead,
+  DocumentoPagoService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -52,15 +61,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-  totalCantidad,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import {
   guardarTablasEnSerie,
@@ -73,10 +74,7 @@ import {
   type PagoFormRawValue,
   type PagoGroup,
 } from '@erp/features/documentos/pagos/pago.form';
-import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
-import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
-import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
 import type { NotaVentaRead } from '../../nota-documento.model';
 import {

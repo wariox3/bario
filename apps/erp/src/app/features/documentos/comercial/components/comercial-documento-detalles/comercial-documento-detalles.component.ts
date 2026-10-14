@@ -1,3 +1,4 @@
+import { pendienteLineaToFormValue } from '@erp/features/documentos/comercial/pendiente-linea.mapper';
 import {
   Component,
   DestroyRef,
@@ -48,6 +49,24 @@ import {
   type ParamValue,
   type ResumenDocumento,
   type TasaImpuesto,
+  ITEM_SELECCIONAR_ENDPOINT,
+  toItemOption,
+  type ItemApiRow,
+  type ItemOption,
+  ItemService,
+  PrecioDetalleService,
+  type Item,
+  comercialDetalleToFormValue,
+  comercialDetalleToPayload,
+  precioUnitarioConImpuestos,
+  precioUnitarioSinImpuestos,
+  lineBase,
+  lineBruto,
+  lineNeto,
+  tasasDelItem,
+  toLineaCalculo,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
 import {
   DocumentoDetalleService,
@@ -56,12 +75,6 @@ import {
 } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import {
-  ITEM_SELECCIONAR_ENDPOINT,
-  toItemOption,
-  type ItemApiRow,
-  type ItemOption,
-} from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import {
   IMPUESTO_SELECCIONAR_ENDPOINT,
@@ -70,29 +83,12 @@ import {
 } from '@erp/core/components/impuesto-select/impuesto-seleccionar.types';
 import { ErpSelectDataService, SELECT_ENDPOINTS, type ErpSelectOption } from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
-import { ItemService } from '@erp/features/general/masters/item/item.service';
-import { PrecioDetalleService } from '@erp/features/general/masters/precio/precio-detalle.service';
-import type { Item } from '@erp/features/general/masters/item/item.model';
 import type { AppDict } from '@erp/i18n';
 import { LineasEnCursoError } from '../../comercial-documento-detalle.errors';
 import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '../../comercial-documento-detalle.form';
-import {
-  comercialDetalleToFormValue,
-  comercialDetalleToPayload,
-  pendienteLineaToFormValue,
-  precioUnitarioConImpuestos,
-  precioUnitarioSinImpuestos,
-  lineBase,
-  lineBruto,
-  lineNeto,
-  tasasDelItem,
-  toLineaCalculo,
-} from '../../comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '../../comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '../../comercial-documento-detalle.types';
 import { aiuLineaToFormValue, type AiuLinea } from '../../aiu';
 
 /** Toasts con que cierra un agregado de líneas (importar desde documento, AIU). */

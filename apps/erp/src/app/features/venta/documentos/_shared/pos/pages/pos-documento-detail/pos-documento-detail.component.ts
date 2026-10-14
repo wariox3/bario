@@ -12,6 +12,15 @@ import {
   calcularResumen,
   type DocumentoEstados,
   type ResumenDocumento,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  totalCantidad,
+  calcularPagos,
+  DocumentoPagoService,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
+  posDocumentoToFormValue,
+  type PosDocumentoRead,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -30,20 +39,9 @@ import { DocumentEstadosComponent } from '@erp/core/module-config/components/doc
 import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
 import { DocumentoElectronicoMenuComponent } from '@erp/features/documentos/electronico/components/documento-electronico-menu/documento-electronico-menu.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-  totalCantidad,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import { DocumentoPagosTableComponent } from '@erp/features/documentos/pagos/components/documento-pagos-table/documento-pagos-table.component';
-import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
-import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { posDocumentoToFormValue } from '../../pos-documento.mapper';
-import type { PosDocumentoRead } from '../../pos-documento.model';
 
 /** Cabecera legible de la factura POS para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {

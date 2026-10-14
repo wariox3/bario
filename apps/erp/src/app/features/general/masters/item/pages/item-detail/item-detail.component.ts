@@ -15,7 +15,14 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import {
+  I18nService,
+  TenantService,
+  ToastService,
+  ItemService,
+  type Item,
+  type ItemImpuesto,
+} from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
 import { ImagenesDialogComponent } from '@erp/core/components/imagenes-dialog/imagenes-dialog.component';
@@ -26,9 +33,7 @@ import type { ArchivoOwner } from '@erp/core/components/archivos-dialog/archivo.
 import { dataUrlToFile } from '@erp/core/utils/data-url.util';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
-import { ItemService } from '../../item.service';
 import { ITEM_LIST_PATH } from '../../item.constants';
-import type { Item, ItemImpuesto } from '../../item.model';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 
 /**
