@@ -3,18 +3,17 @@
 
   <div class="container-edit hero-grid">
     <div class="hero-headline">
-      <span class="hero-eyebrow rise" style="animation-delay: 0.05s">
-        <span class="eyebrow-marker">●</span>
-        {{ t().hero.eyebrow }}
-      </span>
-
       <h1 class="title rise" style="animation-delay: 0.12s">
         <span class="line">{{ t().hero.headline_1 }}</span>
         <span class="line">
-          <span class="title-accent">{{ t().hero.headline_italic }}</span>
-          <span class="title-tail">{{ t().hero.headline_2 }}</span>
+          <span class="title-accent">{{ t().hero.headline_italic }}</span
+          >&ngsp;{{ t().hero.headline_2 }}
         </span>
       </h1>
+
+      <p class="subtitle rise" style="animation-delay: 0.18s">
+        {{ t().hero.subtitle }}
+      </p>
 
       <p class="lede rise" style="animation-delay: 0.22s">
         {{ t().hero.lede }}
@@ -46,27 +45,12 @@
           </svg>
         </a>
       </div>
-
-      <ul class="hero-stats rise" style="animation-delay: 0.4s">
-        <li>
-          <span class="stat-value tabular">{{ t().hero.stat_1_value }}</span>
-          <span class="stat-label">{{ t().hero.stat_1_label }}</span>
-        </li>
-        <li>
-          <span class="stat-value tabular">{{ t().hero.stat_2_value }}</span>
-          <span class="stat-label">{{ t().hero.stat_2_label }}</span>
-        </li>
-        <li>
-          <span class="stat-value tabular">{{ t().hero.stat_3_value }}</span>
-          <span class="stat-label">{{ t().hero.stat_3_label }}</span>
-        </li>
-      </ul>
     </div>
 
     <aside class="hero-stage" [attr.aria-label]="t().hero.invoice.title">
       <figure class="invoice fade" style="animation-delay: 0.35s">
         <header class="inv-head">
-          <img src="/logos/reddoc.svg" alt="Reddoc" class="inv-logo" width="80" height="16" />
+          <img src="/logos/reddoc.svg" alt="RedDoc" class="inv-logo" width="80" height="16" />
           <span class="inv-meta">
             <span class="inv-title">{{ t().hero.invoice.title }}</span>
             <span class="inv-num tabular">{{ t().hero.invoice.number }}</span>
@@ -144,27 +128,5 @@
         </footer>
       </figure>
     </aside>
-  </div>
-
-  <div class="hero-band container-edit">
-    <div class="hairline"></div>
-    <div class="band-row">
-      <span class="band-cell">
-        <span class="band-label">PESOS TRANSACCIONADOS</span>
-        <span class="band-value tabular">$1.2 B / mes</span>
-      </span>
-      <span class="band-cell">
-        <span class="band-label">CIERRE CONTABLE</span>
-        <span class="band-value tabular">−68% en tiempo</span>
-      </span>
-      <span class="band-cell">
-        <span class="band-label">TIEMPO IMPLEMENTACIÓN</span>
-        <span class="band-value tabular">≈ 1 semana</span>
-      </span>
-      <span class="band-cell">
-        <span class="band-label">SOPORTE</span>
-        <span class="band-value">humano · LUN–SAB</span>
-      </span>
-    </div>
   </div>
 </section>

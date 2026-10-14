@@ -54,10 +54,13 @@
   gap: 20px;
 }
 
+// Cada card toma las 4 filas de la grilla (cabecera, título, texto, mock) vía subgrid:
+// así los mocks arrancan a la misma altura y miden lo mismo aunque los textos difieran.
 .step {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 12px;
   background: var(--reddoc-surface-card);
   border: 1px solid var(--reddoc-rule);
   border-radius: 12px;
@@ -130,6 +133,8 @@
 
 // Mini console mockups inside each step
 .step-mock {
+  display: flex;
+  flex-direction: column;
   margin-top: 12px;
   border-radius: 8px;
 
@@ -148,6 +153,10 @@
     letter-spacing: 0.04em;
   }
   .console-frame-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 14px;
     background: var(--reddoc-surface-sunken);
     min-height: 120px;
