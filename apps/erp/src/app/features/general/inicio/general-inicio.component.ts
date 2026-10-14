@@ -8,8 +8,8 @@ import { ParametroService } from '@erp/core/services/parametro.service';
 import type { AppDict } from '@erp/i18n';
 import { PlantillaCargadaDialogComponent } from './components/plantilla-cargada-dialog/plantilla-cargada-dialog.component';
 import { CarteraResumenComponent } from '@erp/features/documentos/cartera-resumen/cartera-resumen.component';
-import { VentaResumenComponent } from '@erp/features/documentos/venta-resumen/venta-resumen.component';
 import { PlantillaService, type PlantillaCargarResponse } from './plantilla.service';
+import { ResultadoResumenComponent } from './resultado-resumen/resultado-resumen.component';
 
 /** Qué botón está en vuelo — para bloquear el otro sin apagar toda la tira. */
 type AccionEnVuelo = 'cargar' | 'descartar' | null;
@@ -19,7 +19,8 @@ type AccionEnVuelo = 'cargar' | 'descartar' | null;
  *
  * Arriba, cuando corresponde, la tira del asistente de datos iniciales —la
  * misma de `venta-inicio`—; debajo, la grilla de fichas: las de cartera
- * (cobrar y pagar, compartidas con sus inicios) y la gráfica de ventas.
+ * (cobrar y pagar, compartidas con sus inicios) y la gráfica de ingresos
+ * contra egresos.
  *
  * El acuse de lo que se cargó **no** vive acá sino en un modal: pasa una sola
  * vez en la vida del contenedor y merece que se lo mire una vez, no que se lo
@@ -33,7 +34,7 @@ type AccionEnVuelo = 'cargar' | 'descartar' | null;
     CarteraResumenComponent,
     InicioInvitacionComponent,
     PlantillaCargadaDialogComponent,
-    VentaResumenComponent,
+    ResultadoResumenComponent,
   ],
   templateUrl: './general-inicio.component.html',
   // Mismo ancho acotado que los demás inicios.

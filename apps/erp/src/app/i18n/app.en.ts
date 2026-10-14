@@ -6723,17 +6723,37 @@ export const en: AppDict = {
     },
   },
   inicio: {
-    ventaResumen: {
-      periodo: { aria: 'Sales period', mes: 'This month', anio: 'This year' },
-      titulo: 'Total sales',
-      desc: 'Taxes included; credit notes subtract.',
-      sinVentas: { mes: 'No sales this month yet', anio: 'No sales this year yet' },
-      documento: 'document',
-      documentos: 'documents',
+    periodo: { aria: 'Period', mes: 'This month', anio: 'This year' },
+    resultadoResumen: {
+      titulo: 'Income and expenses',
+      desc: 'Net subtotals of sales and purchases, before taxes.',
+      resultado: 'Result',
+      ingreso: 'Income',
+      egreso: 'Expenses',
+      sinMovimiento: { mes: 'No activity this month yet', anio: 'No activity this year yet' },
       error: {
-        title: "Sales couldn't be loaded",
+        title: "The result couldn't be loaded",
         desc: 'Try again in a moment.',
       },
+    },
+    comercialResumen: {
+      porTipo: {
+        venta: {
+          titulo: 'Total sales',
+          desc: 'Taxes included; credit notes subtract.',
+          sinMovimiento: { mes: 'No sales this month yet', anio: 'No sales this year yet' },
+          error: "Sales couldn't be loaded",
+        },
+        compra: {
+          titulo: 'Total purchases',
+          desc: 'Taxes included; credit notes subtract.',
+          sinMovimiento: { mes: 'No purchases this month yet', anio: 'No purchases this year yet' },
+          error: "Purchases couldn't be loaded",
+        },
+      },
+      documento: 'document',
+      documentos: 'documents',
+      errorDesc: 'Try again in a moment.',
     },
     carteraResumen: {
       porTipo: {

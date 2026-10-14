@@ -6810,17 +6810,43 @@ export const es: AppDict = {
     },
   },
   inicio: {
-    ventaResumen: {
-      periodo: { aria: 'Período de las ventas', mes: 'Mes actual', anio: 'Año actual' },
-      titulo: 'Total de ventas',
-      desc: 'Con impuestos incluidos; las notas crédito restan.',
-      sinVentas: { mes: 'Aún no hay ventas este mes', anio: 'Aún no hay ventas este año' },
-      documento: 'documento',
-      documentos: 'documentos',
+    periodo: { aria: 'Período', mes: 'Mes actual', anio: 'Año actual' },
+    resultadoResumen: {
+      titulo: 'Ingresos y egresos',
+      desc: 'Subtotales netos de ventas y compras, antes de impuestos.',
+      resultado: 'Resultado',
+      ingreso: 'Ingresos',
+      egreso: 'Egresos',
+      sinMovimiento: {
+        mes: 'Aún no hay movimiento este mes',
+        anio: 'Aún no hay movimiento este año',
+      },
       error: {
-        title: 'No se pudieron cargar las ventas',
+        title: 'No se pudo cargar el resultado',
         desc: 'Intenta de nuevo en un momento.',
       },
+    },
+    comercialResumen: {
+      porTipo: {
+        venta: {
+          titulo: 'Total de ventas',
+          desc: 'Con impuestos incluidos; las notas crédito restan.',
+          sinMovimiento: { mes: 'Aún no hay ventas este mes', anio: 'Aún no hay ventas este año' },
+          error: 'No se pudieron cargar las ventas',
+        },
+        compra: {
+          titulo: 'Total de compras',
+          desc: 'Con impuestos incluidos; las notas crédito restan.',
+          sinMovimiento: {
+            mes: 'Aún no hay compras este mes',
+            anio: 'Aún no hay compras este año',
+          },
+          error: 'No se pudieron cargar las compras',
+        },
+      },
+      documento: 'documento',
+      documentos: 'documentos',
+      errorDesc: 'Intenta de nuevo en un momento.',
     },
     carteraResumen: {
       porTipo: {
