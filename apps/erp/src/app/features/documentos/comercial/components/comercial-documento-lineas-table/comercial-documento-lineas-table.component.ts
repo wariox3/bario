@@ -1,8 +1,13 @@
 import { Component, computed, inject, input, output } from '@angular/core';
-import { I18nService, formatCop, type ImpuestoLinea } from '@reddoc/core';
+import {
+  I18nService,
+  formatCop,
+  type ImpuestoLinea,
+  lineBruto,
+  lineNeto,
+  type ComercialDetalleFormRawValue,
+} from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import { lineBruto, lineNeto } from '../../comercial-documento-detalle.mapper';
-import type { ComercialDetalleFormRawValue } from '../../comercial-documento-detalle.types';
 
 /**
  * Tabla **tonta** (solo lectura) de las líneas de un documento comercial.

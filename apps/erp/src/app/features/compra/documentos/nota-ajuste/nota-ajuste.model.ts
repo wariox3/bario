@@ -9,8 +9,11 @@
  * de compra) y suma a la cabecera el documento soporte que ajusta, el centro de
  * costo, la orden de compra y el comentario. El "grupo" del legacy es el centro de costo (`centro_costo`).
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una nota ajuste. */
 export interface NotaAjusteRead extends DocumentoReadBase {

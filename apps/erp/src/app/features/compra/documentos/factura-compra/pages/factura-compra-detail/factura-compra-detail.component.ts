@@ -23,6 +23,10 @@ import {
   calcularResumen,
   type ResumenDocumento,
   type DocumentoEstados,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -42,12 +46,6 @@ import { ImportDialogComponent } from '@erp/core/components/import-dialog/import
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { facturaCompraToFormValue } from '../../factura-compra.mapper';
 import type { FacturaCompraRead } from '../../factura-compra.model';
 

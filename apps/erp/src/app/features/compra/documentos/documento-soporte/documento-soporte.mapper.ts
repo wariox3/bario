@@ -3,8 +3,8 @@ import {
   fromIsoDate,
   resolucionDesdeRead,
   toIsoDate,
+  comercialDetalleToPayload,
 } from '@reddoc/core';
-import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { DocumentoSoporteRead, DocumentoSoportePayload } from './documento-soporte.model';
 import type { DocumentoSoporteFormRawValue } from './documento-soporte-form.types';
 

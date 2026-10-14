@@ -3,8 +3,8 @@ import {
   fromIsoDate,
   resolucionDesdeRead,
   toIsoDate,
+  comercialDetalleToPayload,
 } from '@reddoc/core';
-import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import type { FacturaVentaRead, FacturaVentaPayload } from './factura-venta.model';
 import type { FacturaVentaFormRawValue } from './factura-venta-form.types';
 

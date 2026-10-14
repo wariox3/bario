@@ -1,6 +1,6 @@
 import { PagoSinCuentaBancoError } from './pago.errors';
 import type { PagoFormRawValue } from './pago.form';
-import type { PagoPayload, PagoRead } from './pago.model';
+import type { PagoPayload, PagoRead } from '@reddoc/core';
 
 /** Read-model de un pago → fila del formulario (edición) o de la ficha. */
 export function pagoReadToFormValue(read: PagoRead): PagoFormRawValue {

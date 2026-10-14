@@ -12,13 +12,10 @@ import { map } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { I18nService, formatCop, redondearMoneda } from '@reddoc/core';
+import { I18nService, formatCop, redondearMoneda, type ItemOption } from '@reddoc/core';
 import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
-import {
-  ErpItemAutocompleteComponent,
-  type ItemOption,
-} from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ConfiguracionService } from '@erp/features/configuracion/configuracion.service';
 import { VENTA_AIU_CAMPOS } from '@erp/features/configuracion/configuracion.constants';
 import { configuracionToVentaAiuForm } from '@erp/features/configuracion/configuracion.mapper';

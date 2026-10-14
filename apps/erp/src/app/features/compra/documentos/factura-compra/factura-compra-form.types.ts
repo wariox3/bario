@@ -1,5 +1,4 @@
-import type { ErpSelectOption } from '@reddoc/core';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
+import type { ErpSelectOption, ComercialDetalleFormRawValue } from '@reddoc/core';
 import type { CuentaDetalleFormRawValue } from '@erp/features/documentos/contable/contable-documento-detalle.types';
 
 /**

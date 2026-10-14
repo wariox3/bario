@@ -16,6 +16,8 @@ import {
   type FilterCondition,
   type ListQuery,
   type SortSpec,
+  ItemService,
+  type Item,
 } from '@reddoc/core';
 import {
   DataFilterModalComponent,
@@ -31,8 +33,6 @@ import { importState } from '@erp/core/components/import-dialog/import-state';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
-import { ItemService } from '../../item.service';
-import type { Item } from '../../item.model';
 import {
   ITEMS_COLUMNS,
   ITEMS_FILTER_FIELDS,

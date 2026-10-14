@@ -1,4 +1,4 @@
-import type { ErpSelectOption } from '@reddoc/core';
+import type { ErpSelectOption } from '../../data';
 
 /**
  * Lee del contacto seleccionado su **lista de precios** (`precio_id`). Es la

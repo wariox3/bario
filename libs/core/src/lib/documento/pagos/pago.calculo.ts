@@ -1,4 +1,12 @@
-import type { PagoFormRawValue } from './pago.form';
+/**
+ * Lo mínimo de un pago para sumarlo: su monto y si está anulado. Lo cumplen el
+ * pago del formulario del ERP y el cobro del POS, sin que el cálculo dependa de
+ * ninguno de los dos.
+ */
+export interface PagoCalculable {
+  readonly pago: number | null;
+  readonly estado_anulado: boolean;
+}
 
 /** Estado de los pagos de un documento frente a su total. */
 export interface ResumenPagos {
@@ -16,7 +24,7 @@ export interface ResumenPagos {
  * con el saldo), para que todos lean la misma cifra. Un pago anulado no cuenta,
  * igual que en `documento.pago` del backend.
  */
-export function calcularPagos(pagos: readonly PagoFormRawValue[], total: number): ResumenPagos {
+export function calcularPagos(pagos: readonly PagoCalculable[], total: number): ResumenPagos {
   const recibido = pagos
     .filter((p) => !p.estado_anulado)
     .reduce((acc, p) => acc + (p.pago ?? 0), 0);

@@ -14,8 +14,10 @@
  * compra y comentario. Los pagos no viajan en el documento: son un recurso propio
  * (`documento-pago`) que se registra contra el documento ya creado.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type { ErpSelectOption } from '../../data';
+import type { DocumentoPayloadBase, DocumentoReadBase } from '../documento.types';
+import type { ComercialDetallePayload } from '../comercial/comercial-documento-detalle.model';
+import type { ComercialDetalleFormRawValue } from '../comercial/comercial-documento-detalle.types';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un documento POS. */
 export interface PosDocumentoRead extends DocumentoReadBase {
@@ -55,4 +57,24 @@ export interface PosDocumentoPayload extends DocumentoPayloadBase {
   readonly comentario: string | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
+}
+
+/**
+ * Valores de cabecera y líneas de un documento POS, ya elegidos por quien vende
+ * (`fecha` y `fecha_vence` como `Date`, los selects como opción completa). Es lo
+ * que necesita {@link posDocumentoToPayload}: el formulario del ERP lo extiende
+ * con sus pagos y la caja del POS lo arma desde el carrito.
+ */
+export interface PosDocumentoValores {
+  readonly contacto: ErpSelectOption | null;
+  readonly fecha: Date | null;
+  readonly fecha_vence: Date | null;
+  readonly plazo_pago: ErpSelectOption | null;
+  readonly sede: ErpSelectOption | null;
+  readonly almacen: ErpSelectOption | null;
+  readonly metodo_pago: ErpSelectOption | null;
+  readonly asesor: ErpSelectOption | null;
+  readonly orden_compra: string | null;
+  readonly comentario: string | null;
+  readonly detalles: readonly ComercialDetalleFormRawValue[];
 }

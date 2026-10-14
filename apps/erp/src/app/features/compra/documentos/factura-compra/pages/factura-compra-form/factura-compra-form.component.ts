@@ -29,6 +29,8 @@ import {
   startOfToday,
   TenantService,
   ToastService,
+  comercialDetalleToFormValue,
+  type ComercialDetalleRead,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -57,8 +59,6 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
 import {
   createCuentaDetalleGroup,

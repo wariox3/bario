@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, forkJoin, map } from 'rxjs';
-import {
-  BaseHttpService,
-  buildListBody,
-  buildListParams,
-  type ListQuery,
-  type PaginatedResponse,
-} from '@reddoc/core';
+import { BaseHttpService } from '../services/base-http.service';
+import { buildListBody, buildListParams } from '../data-list/data/build-list-body';
+import type { ListQuery } from '../data-list/data/list-query.types';
+import type { PaginatedResponse } from '../models/pagination.model';
 import type { Item, ItemPayload } from './item.model';
 
 /**

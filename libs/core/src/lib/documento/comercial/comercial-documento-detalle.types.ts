@@ -1,5 +1,6 @@
-import type { ErpSelectOption, ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import type { ImpuestoLinea, TasaImpuesto } from '../../calculo';
+import type { ErpSelectOption } from '../../data';
+import type { ItemOption } from '../../item/item-option';
 
 /**
  * Valores crudos de una línea de detalle **comercial** (`form.getRawValue()` de

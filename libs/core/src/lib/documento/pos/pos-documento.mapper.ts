@@ -1,7 +1,11 @@
-import { documentoContactoToOption, fromIsoDate, toIsoDate } from '@reddoc/core';
-import { comercialDetalleToPayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { PosDocumentoPayload, PosDocumentoRead } from './pos-documento.model';
-import type { PosDocumentoFormRawValue } from './pos-documento-form.types';
+import { fromIsoDate, toIsoDate } from '../../utils/date.utils';
+import { documentoContactoToOption } from '../documento-contacto';
+import { comercialDetalleToPayload } from '../comercial/comercial-documento-detalle.mapper';
+import type {
+  PosDocumentoPayload,
+  PosDocumentoRead,
+  PosDocumentoValores,
+} from './pos-documento.model';
 
 /**
  * Read-model (GET) → valores **escalares** de cabecera del formulario (edición).
@@ -10,7 +14,7 @@ import type { PosDocumentoFormRawValue } from './pos-documento-form.types';
  */
 export function posDocumentoToFormValue(
   read: PosDocumentoRead,
-): Partial<Omit<PosDocumentoFormRawValue, 'detalles' | 'pagos'>> {
+): Partial<Omit<PosDocumentoValores, 'detalles'>> {
   return {
     contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
@@ -39,8 +43,8 @@ export function posDocumentoToFormValue(
  * en vivo contra `documento-detalle`. En **alta** viajan embebidos. Los pagos nunca
  * viajan en el documento: se registran aparte en `documento-pago`.
  */
-export function formValueToPayload(
-  raw: PosDocumentoFormRawValue,
+export function posDocumentoToPayload(
+  raw: PosDocumentoValores,
   documentTypeId: number,
   includeDetalles = true,
 ): PosDocumentoPayload {

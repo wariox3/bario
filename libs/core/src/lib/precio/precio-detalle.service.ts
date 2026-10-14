@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { type Observable, concatMap, map, of } from 'rxjs';
-import { BaseHttpService, toFiniteNumber, type PaginatedResponse } from '@reddoc/core';
+import { BaseHttpService } from '../services/base-http.service';
+import { toFiniteNumber } from '../utils/currency.utils';
+import type { PaginatedResponse } from '../models/pagination.model';
 import type { PrecioDetalle, PrecioDetalleApi, PrecioDetallePayload } from './precio-detalle.model';
 import { toPrecioDetalle } from './precio-detalle.mapper';
 

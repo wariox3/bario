@@ -1,4 +1,4 @@
-import { calcularImpuestosLinea, type TasaImpuesto } from '@reddoc/core';
+import { calcularImpuestosLinea, type TasaImpuesto } from '../../calculo';
 import {
   comercialDetalleToFormValue,
   comercialDetalleToPayload,

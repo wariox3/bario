@@ -9,8 +9,11 @@
  * precio que la factura de compra) y comparte su cabecera, sumando los campos
  * propios del soporte: forma de pago, resolución, orden de compra y comentario.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un documento soporte. */
 export interface DocumentoSoporteRead extends DocumentoReadBase {

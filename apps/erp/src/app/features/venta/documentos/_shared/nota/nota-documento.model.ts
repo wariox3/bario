@@ -13,8 +13,11 @@
  * como el POS, además **se cobra en el acto**, pero sus pagos no viajan en el
  * documento: se registran aparte en `documento-pago` (la nota débito no tiene).
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una nota de venta. */
 export interface NotaVentaRead extends DocumentoReadBase {

@@ -31,6 +31,8 @@ import {
   startOfToday,
   TenantService,
   ToastService,
+  comercialDetalleToFormValue,
+  type ComercialDetalleRead,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
@@ -64,8 +66,6 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import { documentoSoporteToFormValue, formValueToPayload } from '../../documento-soporte.mapper';
 import type { DocumentoSoporteRead } from '../../documento-soporte.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';

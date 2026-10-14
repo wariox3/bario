@@ -33,6 +33,15 @@ import {
   startOfToday,
   TenantService,
   ToastService,
+  precioListaDeContacto,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  totalCantidad,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
+  type PagoRead,
+  DocumentoPagoService,
+  calcularPagos,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -60,7 +69,6 @@ import {
   RESOLUCION_ENDPOINT,
   SEDE_ENDPOINT,
 } from '../../factura-venta.constants';
-import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
   setupVencimientoAutocompute,
@@ -72,14 +80,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-  totalCantidad,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import {
   guardarTablasEnSerie,
@@ -89,9 +90,6 @@ import {
 } from '@erp/features/documentos/tablas-en-vivo';
 import { createPagoGroup, type PagoGroup } from '@erp/features/documentos/pagos/pago.form';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
-import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
-import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
-import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form';
 import { facturaVentaToFormValue, formValueToPayload } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';

@@ -1,5 +1,5 @@
-import { toFiniteNumber } from '@reddoc/core';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import { toFiniteNumber } from '../utils/currency.utils';
+import type { ItemOption } from '../item/item-option';
 import type { PrecioDetalle, PrecioDetalleApi, PrecioDetallePayload } from './precio-detalle.model';
 
 /**

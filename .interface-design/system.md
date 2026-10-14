@@ -799,7 +799,7 @@ max-[576px]:[&_.p-tablist-tab-list]:px-4">`: los tabs alinean con el gutter de l
   hint primero con `mr-auto`.
 - **Resumen fuera de los tabs:** el mismo en todas las vistas, como en el ERP anterior. Lo calcula
   la página (dueña de los `FormArray`), no la tabla: `calcularResumen` + `totalCantidad` para las
-  líneas y `calcularPagos` (`pagos/pago.calculo.ts`) para recibido/saldo/exceso. Si además tiene pagos, la página lo calcula ella misma.
+  líneas y `calcularPagos` (`@reddoc/core`) para recibido/saldo/exceso. Si además tiene pagos, la página lo calcula ella misma.
 - **Chip de conteo en el tab** que esconde algo que importa (Pagos): `font-mono tabular-nums` sobre
   `bg-[rgba(20,48,73,0.06)]`; en `bg-red-50 text-red-600` cuando lo que esconde necesita atención (pagos que superan el total —no se podrá aprobar— o filas inválidas ya tocadas). El error se ve desde otra pestaña.
 - **Guardar nunca queda muerto:** el botón solo espera a `isSaving` y a las tablas

@@ -10,8 +10,11 @@
  * `contacto` es el proveedor). `fecha_vence` es el nombre real del campo en el
  * backend (ver `DocumentoListRowBase`).
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 import type { CuentaDetallePayload } from '@erp/features/documentos/contable/contable-documento-detalle.model';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de compra. */

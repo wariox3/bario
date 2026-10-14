@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import { BaseHttpService } from '../../services/base-http.service';
+import type { PaginatedResponse } from '../../models/pagination.model';
 import { DOCUMENTO_PAGO_ENDPOINT } from './pago.constants';
 import type { PagoPayload, PagoRead } from './pago.model';
 

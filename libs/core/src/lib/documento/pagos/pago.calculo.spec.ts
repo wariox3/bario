@@ -1,9 +1,6 @@
-import { calcularPagos } from './pago.calculo';
-import type { PagoFormRawValue } from './pago.form';
+import { calcularPagos, type PagoCalculable } from './pago.calculo';
 
-const pago = (monto: number, estado_anulado = false): PagoFormRawValue => ({
-  id: null,
-  cuenta_banco: { id: 1, nombre: 'Bancolombia' },
+const pago = (monto: number, estado_anulado = false): PagoCalculable => ({
   pago: monto,
   estado_anulado,
 });

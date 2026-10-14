@@ -1,4 +1,4 @@
-import type { DocumentoDetallePayloadBase, DocumentoDetalleReadBase } from '@reddoc/core';
+import type { DocumentoDetallePayloadBase, DocumentoDetalleReadBase } from '../documento.types';
 
 /**
  * Modelos de lectura/escritura de una línea de detalle **comercial**, comunes a

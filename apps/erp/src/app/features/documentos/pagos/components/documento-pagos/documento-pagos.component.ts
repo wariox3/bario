@@ -8,15 +8,20 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TooltipModule } from 'primeng/tooltip';
-import { I18nService, ToastService, extractErrorMessage, formatCop } from '@reddoc/core';
+import {
+  I18nService,
+  ToastService,
+  extractErrorMessage,
+  formatCop,
+  CUENTA_BANCO_ENDPOINT,
+  calcularPagos,
+  type PagoRead,
+  DocumentoPagoService,
+} from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { createPagoGroup, type PagoFormRawValue, type PagoGroup } from '../../pago.form';
-import { CUENTA_BANCO_ENDPOINT } from '../../pago.constants';
-import { calcularPagos } from '../../pago.calculo';
 import { pagoReadToFormValue, pagoToPayload } from '../../pago.mapper';
-import type { PagoRead } from '../../pago.model';
-import { DocumentoPagoService } from '../../pago.service';
 import { PagosEnCursoError } from '../../pago.errors';
 
 /**

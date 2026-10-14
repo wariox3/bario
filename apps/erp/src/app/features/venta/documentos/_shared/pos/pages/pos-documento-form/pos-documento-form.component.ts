@@ -32,6 +32,18 @@ import {
   startOfToday,
   TenantService,
   ToastService,
+  calcularPagos,
+  DocumentoPagoService,
+  precioListaDeContacto,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  totalCantidad,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
+  posDocumentoToFormValue,
+  posDocumentoToPayload,
+  type PosDocumentoRead,
+  type PagoRead,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -64,10 +76,7 @@ import {
   type PagoFormRawValue,
   type PagoGroup,
 } from '@erp/features/documentos/pagos/pago.form';
-import { calcularPagos } from '@erp/features/documentos/pagos/pago.calculo';
 import { pagoReadToFormValue } from '@erp/features/documentos/pagos/pago.mapper';
-import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
-import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
   setupVencimientoAutocompute,
@@ -79,17 +88,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-  totalCantidad,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
-import { posDocumentoToFormValue, formValueToPayload } from '../../pos-documento.mapper';
-import type { PosDocumentoRead } from '../../pos-documento.model';
-import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 
 /**
@@ -395,7 +394,7 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   private persistCabecera(id: string | undefined): void {
     const toasts = this.t().entities.posDocumento.form.toasts;
     // En edición se omiten los detalles del payload: ya transaccionaron en vivo.
-    const payload = formValueToPayload(
+    const payload = posDocumentoToPayload(
       this.form.getRawValue(),
       this.document().documentTypeId,
       !id,

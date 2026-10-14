@@ -2,11 +2,10 @@ import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
-import { ENVIRONMENT, I18nService, ToastService } from '@reddoc/core';
+import { ENVIRONMENT, I18nService, ToastService, type PagoRead } from '@reddoc/core';
 import { dictionaries } from '@erp/i18n';
 import { PagosEnCursoError } from '../../pago.errors';
 import { createPagoGroup, type PagoGroup } from '../../pago.form';
-import type { PagoRead } from '../../pago.model';
 import { DocumentoPagosComponent } from './documento-pagos.component';
 
 const URL = '/api/general/documento-pago/';
