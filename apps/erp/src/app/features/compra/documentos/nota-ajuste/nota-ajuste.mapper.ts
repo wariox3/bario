@@ -26,6 +26,13 @@ export function notaAjusteToFormValue(
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
         : null,
+    documento_concepto_correccion:
+      read.documento_concepto_correccion != null
+        ? {
+            id: read.documento_concepto_correccion,
+            nombre: read.documento_concepto_correccion_nombre ?? '',
+          }
+        : null,
     centro_costo:
       read.centro_costo != null
         ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
@@ -55,6 +62,7 @@ export function formValueToPayload(
     documento_referencia: raw.documento_referencia?.id ?? null,
     plazo_pago: raw.plazo_pago?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
+    documento_concepto_correccion: raw.documento_concepto_correccion?.id ?? null,
     centro_costo: raw.centro_costo?.id ?? null,
     orden_compra: raw.orden_compra?.trim() || null,
     comentario: raw.comentario?.trim() || null,

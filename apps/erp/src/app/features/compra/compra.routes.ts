@@ -36,12 +36,10 @@ export const COMPRA_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(COMPRA_MODULE),
       {
-        // Inicio del módulo (vacío por ahora — sin endpoints de estadísticas).
+        // Inicio del módulo: la gráfica de compras del período.
         path: 'inicio',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
-          ),
+          import('./inicio/compra-inicio.component').then((m) => m.CompraInicioComponent),
       },
       {
         path: 'factura-compra',

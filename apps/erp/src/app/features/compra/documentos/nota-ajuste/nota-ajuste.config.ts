@@ -1,3 +1,4 @@
+import { DOCUMENTO_CLASE_ID } from '@reddoc/core';
 import { DOCUMENT_TYPE_ID, type DocumentEntityConfig } from '@erp/core/module-config';
 import { NOTA_AJUSTE_COLUMNS, NOTA_AJUSTE_FILTERS } from './nota-ajuste.constants';
 
@@ -20,6 +21,8 @@ export const NOTA_AJUSTE_CONFIG: DocumentEntityConfig = {
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_AJUSTE,
   inventoryEffect: 'inflow',
+  // Motivo DIAN de la nota: solo los conceptos de la clase nota de ajuste.
+  conceptoCorreccionClaseId: DOCUMENTO_CLASE_ID.NOTA_AJUSTE,
   schemaVersion: 1,
   columns: NOTA_AJUSTE_COLUMNS,
   filters: NOTA_AJUSTE_FILTERS,
@@ -45,4 +48,7 @@ export const NOTA_AJUSTE_CONFIG: DocumentEntityConfig = {
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
   extraActionIds: ['export-excel'],
+  // Se emite a la DIAN: el dropdown Electrónico corrige su cabecera con las
+  // resoluciones de compra.
+  electronico: { resolucionParams: { compra: 'True' } },
 };

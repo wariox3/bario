@@ -135,6 +135,11 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly metodoPagoEndpoint = SELECT_ENDPOINTS.metodoPago;
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
+  protected readonly conceptoCorreccionEndpoint = SELECT_ENDPOINTS.conceptoCorreccion;
+  /** Solo los conceptos de corrección de la nota de ajuste. */
+  protected readonly conceptoCorreccionParams = {
+    documento_clase_id: String(DOCUMENTO_CLASE_ID.NOTA_AJUSTE),
+  } as const;
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
@@ -184,6 +189,10 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
     documento_referencia: this.fb.control<ErpSelectOption | null>({ value: null, disabled: true }),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    documento_concepto_correccion: this.fb.control<ErpSelectOption | null>(
+      null,
+      Validators.required,
+    ),
     centro_costo: this.fb.control<ErpSelectOption | null>(null),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),

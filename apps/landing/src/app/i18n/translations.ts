@@ -1,4 +1,4 @@
-// Reddoc landing — i18n dictionaries (es / en)
+// RedDoc landing — i18n dictionaries (es / en)
 // Operations Console voice: technical, precise, ERP-flavored.
 
 import { getPlanDescription, getPlanFeatures } from '@reddoc/core';
@@ -41,11 +41,6 @@ export interface Quote {
 }
 
 export interface Dict {
-  meta: {
-    edition: string;
-    location: string;
-    issue: string;
-  };
   nav: {
     how: string;
     product: string;
@@ -56,19 +51,13 @@ export interface Dict {
     langLabel: string;
   };
   hero: {
-    eyebrow: string;
     headline_1: string;
     headline_italic: string;
     headline_2: string;
+    subtitle: string;
     lede: string;
     primary: string;
     secondary: string;
-    stat_1_value: string;
-    stat_1_label: string;
-    stat_2_value: string;
-    stat_2_label: string;
-    stat_3_value: string;
-    stat_3_label: string;
     invoice: {
       title: string;
       number: string;
@@ -167,11 +156,6 @@ export interface Dict {
 }
 
 const es: Dict = {
-  meta: {
-    edition: 'v.2026 · ERP',
-    location: 'MEDELLÍN · CO',
-    issue: 'MOD-06 · CLOUD',
-  },
   nav: {
     how: 'Cómo funciona',
     product: 'Módulos',
@@ -182,19 +166,13 @@ const es: Dict = {
     langLabel: 'Idioma',
   },
   hero: {
-    eyebrow: 'MOD-06 · ERP COLOMBIA · 2026',
-    headline_1: 'El sistema que opera',
-    headline_italic: 'tu empresa',
-    headline_2: 'todos los días.',
-    lede: 'Reddoc unifica compras, ventas, tesorería, inventario, POS, nómina y contabilidad — más facturación electrónica DIAN — en una sola plataforma operativa. Datos en vivo, una sola fuente de verdad, cero hojas de cálculo perdidas.',
+    headline_1: 'Tu empresa cambia,',
+    headline_italic: 'nosotros evolucionamos',
+    headline_2: 'contigo.',
+    subtitle: 'Un ERP flexible, moderno y fácil de usar.',
+    lede: 'RedDoc unifica compras, ventas, tesorería, inventario, POS, nómina y contabilidad — más facturación electrónica DIAN — en una sola plataforma operativa. Datos en vivo, una sola fuente de verdad, cero hojas de cálculo perdidas.',
     primary: 'Empezar ahora',
     secondary: 'Ver módulos',
-    stat_1_value: '6',
-    stat_1_label: 'módulos integrados',
-    stat_2_value: '24/7',
-    stat_2_label: 'cloud · sin instalación',
-    stat_3_value: '+1.200',
-    stat_3_label: 'empresas operando',
     invoice: {
       title: 'Factura electrónica',
       number: 'FE-2841',
@@ -263,7 +241,7 @@ const es: Dict = {
         eyebrow: 'MOD/01',
         title: 'Compras y ventas',
         italic: '',
-        body: 'Mantener en orden las compras y ventas es esencial para que tu negocio funcione sin problemas. Con Reddoc, este proceso se vuelve mucho más sencillo: podrás llevar un control eficiente de lo que adquieres, lo que vendes y cómo manejas tu inventario, evitando pérdidas y mejorando la rentabilidad.',
+        body: 'Mantener en orden las compras y ventas es esencial para que tu negocio funcione sin problemas. Con RedDoc, este proceso se vuelve mucho más sencillo: podrás llevar un control eficiente de lo que adquieres, lo que vendes y cómo manejas tu inventario, evitando pérdidas y mejorando la rentabilidad.',
         bullets: [
           'Registra tus compras y ventas de manera rápida y sencilla.',
           'Automatiza tu proceso con las facturas recurrentes.',
@@ -279,7 +257,7 @@ const es: Dict = {
         eyebrow: 'MOD/02',
         title: 'Tesorería y cartera',
         italic: '',
-        body: 'Llevar el control de la cartera y la tesorería es clave para que tu negocio esté siempre en orden. La cartera se encarga de los cobros y pagos, asegurando un flujo de efectivo constante, mientras que la tesorería te ayuda a organizar recursos, optimizar fondos y mantener liquidez. Con Reddoc, puedes automatizar estos procesos, simplificando la gestión financiera y asegurando un control total y sin complicaciones.',
+        body: 'Llevar el control de la cartera y la tesorería es clave para que tu negocio esté siempre en orden. La cartera se encarga de los cobros y pagos, asegurando un flujo de efectivo constante, mientras que la tesorería te ayuda a organizar recursos, optimizar fondos y mantener liquidez. Con RedDoc, puedes automatizar estos procesos, simplificando la gestión financiera y asegurando un control total y sin complicaciones.',
         bullets: [
           'Gestiona tus pagos y tus cobros.',
           'Controla los vencimientos.',
@@ -292,7 +270,7 @@ const es: Dict = {
         eyebrow: 'MOD/03',
         title: 'Inventario',
         italic: '',
-        body: 'Con Reddoc, llevar el control de tu inventario es más fácil. Podrás registrar entradas y salidas en tiempo real, asegurarte de que tu stock esté siempre actualizado y generar informes para entender mejor el movimiento de tus productos y tomar decisiones estratégicas. Todo se integra con tu negocio, desde compras y ventas hasta contabilidad y POS, para que tomes decisiones más inteligentes y tu empresa sea más eficiente.',
+        body: 'Con RedDoc, llevar el control de tu inventario es más fácil. Podrás registrar entradas y salidas en tiempo real, asegurarte de que tu stock esté siempre actualizado y generar informes para entender mejor el movimiento de tus productos y tomar decisiones estratégicas. Todo se integra con tu negocio, desde compras y ventas hasta contabilidad y POS, para que tomes decisiones más inteligentes y tu empresa sea más eficiente.',
         bullets: [
           'Control de existencias.',
           'Actualización del inventario en tiempo real.',
@@ -307,7 +285,7 @@ const es: Dict = {
         eyebrow: 'MOD/04',
         title: 'POS+',
         italic: '',
-        body: 'Vender nunca había sido tan fácil. Con el módulo POS de Reddoc, puedes procesar transacciones de manera rápida y sin complicaciones, manteniendo todo sincronizado con tu inventario y contabilidad.',
+        body: 'Vender nunca había sido tan fácil. Con el módulo POS de RedDoc, puedes procesar transacciones de manera rápida y sin complicaciones, manteniendo todo sincronizado con tu inventario y contabilidad.',
         bullets: [
           'Registra ventas en segundos.',
           'Acepta múltiples métodos de pago.',
@@ -316,7 +294,7 @@ const es: Dict = {
           'Accede a reportes de ventas en tiempo real.',
         ],
         closing:
-          'Ya sea en tu tienda física o en línea, Reddoc POS te ayuda a mejorar la experiencia de tus clientes y a optimizar la gestión de tu negocio.',
+          'Ya sea en tu tienda física o en línea, RedDoc POS te ayuda a mejorar la experiencia de tus clientes y a optimizar la gestión de tu negocio.',
         image: '/landing/pos.png',
       },
       {
@@ -324,7 +302,7 @@ const es: Dict = {
         eyebrow: 'MOD/05',
         title: 'Nómina',
         italic: '',
-        body: 'Manejar la nómina puede parecer complicado, pero con Reddoc es fácil y sin estrés. Podrás administrar pagos, generar nóminas electrónicas automáticamente y asegurarte de cumplir con las normativas vigentes. Todo está organizado para que ahorres tiempo y te enfoques en lo realmente importante: tu equipo y tu negocio.',
+        body: 'Manejar la nómina puede parecer complicado, pero con RedDoc es fácil y sin estrés. Podrás administrar pagos, generar nóminas electrónicas automáticamente y asegurarte de cumplir con las normativas vigentes. Todo está organizado para que ahorres tiempo y te enfoques en lo realmente importante: tu equipo y tu negocio.',
         bullets: [
           'Genera la nómina fácilmente.',
           'Liquida seguridad social sin errores.',
@@ -338,7 +316,7 @@ const es: Dict = {
         eyebrow: 'MOD/06',
         title: 'Contabilidad',
         italic: '',
-        body: 'Sabemos que lidiar con números, facturas e impuestos puede ser todo un desafío, pero es fundamental para mantener la estabilidad de tu negocio. Con Reddoc, llevar tu contabilidad será pan comido. Tendrás una visión clara de tus compras, ventas e inventario para tomar decisiones con confianza, además de un registro detallado de tus transacciones para una auditoría sin complicaciones.',
+        body: 'Sabemos que lidiar con números, facturas e impuestos puede ser todo un desafío, pero es fundamental para mantener la estabilidad de tu negocio. Con RedDoc, llevar tu contabilidad será pan comido. Tendrás una visión clara de tus compras, ventas e inventario para tomar decisiones con confianza, además de un registro detallado de tus transacciones para una auditoría sin complicaciones.',
         bullets: [
           'Accesibilidad remota.',
           'Intuitivo y fácil de usar.',
@@ -431,10 +409,10 @@ const es: Dict = {
   testimonials: {
     section: '04 / CLIENTES',
     title: 'Lo que dicen las',
-    italic: 'empresas que ya operan con Reddoc.',
+    italic: 'empresas que ya operan con RedDoc.',
     quotes: [
       {
-        body: 'Reddoc nos devolvió las tardes. Antes cerrábamos mes a las nueve de la noche; ahora a las cinco ya está liquidada la nómina y conciliada la cartera.',
+        body: 'RedDoc nos devolvió las tardes. Antes cerrábamos mes a las nueve de la noche; ahora a las cinco ya está liquidada la nómina y conciliada la cartera.',
         author: 'María Camila Restrepo',
         role: 'CEO · Distribuidora Andina',
       },
@@ -470,7 +448,7 @@ const es: Dict = {
     form_required: 'Campo obligatorio',
   },
   cta: {
-    eyebrow: 'EMPIEZA HOY · DEMO 30 MIN',
+    eyebrow: 'EMPIEZA HOY · DEMO 5 MINUTOS',
     title: 'Operación más ordenada,',
     italic: 'desde el primer día.',
     lede: 'Treinta minutos para configurarlo. Una vida operativa más tranquila después.',
@@ -486,17 +464,12 @@ const es: Dict = {
     company_links: ['Nosotros', 'Clientes', 'Blog', 'Trabaja con nosotros'],
     legal: 'Legal',
     legal_links: ['Términos', 'Privacidad', 'Cookies', 'Cumplimiento'],
-    rights: '© 2026 Reddoc S.A.S · Todos los derechos reservados.',
+    rights: '© 2026 Semantica Digital S.A.S · Todos los derechos reservados.',
     masthead: 'Hecho en Medellín · Colombia · operando en LATAM.',
   },
 };
 
 const en: Dict = {
-  meta: {
-    edition: 'v.2026 · ERP',
-    location: 'MEDELLÍN · CO',
-    issue: 'MOD-06 · CLOUD',
-  },
   nav: {
     how: 'How it works',
     product: 'Modules',
@@ -507,19 +480,13 @@ const en: Dict = {
     langLabel: 'Language',
   },
   hero: {
-    eyebrow: 'MOD-06 · ERP COLOMBIA · 2026',
-    headline_1: 'The system that',
-    headline_italic: 'runs your company',
-    headline_2: 'every day.',
-    lede: 'Reddoc unifies purchases, sales, treasury, inventory, POS, payroll, and accounting — plus DIAN e-invoicing — in a single operating platform. Live data, one source of truth, zero lost spreadsheets.',
+    headline_1: 'Your business changes,',
+    headline_italic: 'we evolve',
+    headline_2: 'with you.',
+    subtitle: 'A flexible, modern, easy-to-use ERP.',
+    lede: 'RedDoc unifies purchases, sales, treasury, inventory, POS, payroll, and accounting — plus DIAN e-invoicing — in a single operating platform. Live data, one source of truth, zero lost spreadsheets.',
     primary: 'Get started',
     secondary: 'See modules',
-    stat_1_value: '6',
-    stat_1_label: 'integrated modules',
-    stat_2_value: '24/7',
-    stat_2_label: 'cloud · no install',
-    stat_3_value: '+1,200',
-    stat_3_label: 'companies running',
     invoice: {
       title: 'Electronic invoice',
       number: 'FE-2841',
@@ -588,7 +555,7 @@ const en: Dict = {
         eyebrow: 'MOD/01',
         title: 'Purchases & sales',
         italic: '',
-        body: 'Keeping your purchases and sales in order is essential for a smooth-running business. With Reddoc, the process becomes much simpler: you can efficiently track what you buy, what you sell, and how you manage your inventory — avoiding losses and improving profitability.',
+        body: 'Keeping your purchases and sales in order is essential for a smooth-running business. With RedDoc, the process becomes much simpler: you can efficiently track what you buy, what you sell, and how you manage your inventory — avoiding losses and improving profitability.',
         bullets: [
           'Record purchases and sales quickly and easily.',
           'Automate your process with recurring invoices.',
@@ -604,7 +571,7 @@ const en: Dict = {
         eyebrow: 'MOD/02',
         title: 'Treasury & receivables',
         italic: '',
-        body: 'Keeping control of your receivables and treasury is key to running a healthy business. Receivables handle collections and payments to ensure a steady cash flow, while treasury helps you organize resources, optimize funds, and maintain liquidity. With Reddoc, you can automate these processes, simplifying financial management and ensuring complete, hassle-free control.',
+        body: 'Keeping control of your receivables and treasury is key to running a healthy business. Receivables handle collections and payments to ensure a steady cash flow, while treasury helps you organize resources, optimize funds, and maintain liquidity. With RedDoc, you can automate these processes, simplifying financial management and ensuring complete, hassle-free control.',
         bullets: [
           'Manage your payments and collections.',
           'Track due dates.',
@@ -617,7 +584,7 @@ const en: Dict = {
         eyebrow: 'MOD/03',
         title: 'Inventory',
         italic: '',
-        body: 'With Reddoc, keeping control of your inventory is easier. You can log inflows and outflows in real time, make sure your stock is always up to date, and generate reports to better understand product movement and make strategic decisions. Everything integrates with your business — from purchases and sales to accounting and POS — so you make smarter decisions and run a more efficient operation.',
+        body: 'With RedDoc, keeping control of your inventory is easier. You can log inflows and outflows in real time, make sure your stock is always up to date, and generate reports to better understand product movement and make strategic decisions. Everything integrates with your business — from purchases and sales to accounting and POS — so you make smarter decisions and run a more efficient operation.',
         bullets: [
           'Stock control.',
           'Real-time inventory updates.',
@@ -632,7 +599,7 @@ const en: Dict = {
         eyebrow: 'MOD/04',
         title: 'POS+',
         italic: '',
-        body: 'Selling has never been easier. With Reddoc POS, you can process transactions quickly and without friction, keeping everything in sync with your inventory and accounting.',
+        body: 'Selling has never been easier. With RedDoc POS, you can process transactions quickly and without friction, keeping everything in sync with your inventory and accounting.',
         bullets: [
           'Ring up sales in seconds.',
           'Accept multiple payment methods.',
@@ -641,7 +608,7 @@ const en: Dict = {
           'Access real-time sales reports.',
         ],
         closing:
-          'Whether in your physical store or online, Reddoc POS helps you improve customer experience and optimize business management.',
+          'Whether in your physical store or online, RedDoc POS helps you improve customer experience and optimize business management.',
         image: '/landing/pos.png',
       },
       {
@@ -649,7 +616,7 @@ const en: Dict = {
         eyebrow: 'MOD/05',
         title: 'Payroll',
         italic: '',
-        body: 'Handling payroll can seem complicated, but with Reddoc it is easy and stress-free. You can manage payments, generate electronic payroll automatically, and ensure compliance with current regulations — all organized so you save time and focus on what really matters: your team and your business.',
+        body: 'Handling payroll can seem complicated, but with RedDoc it is easy and stress-free. You can manage payments, generate electronic payroll automatically, and ensure compliance with current regulations — all organized so you save time and focus on what really matters: your team and your business.',
         bullets: [
           'Generate payroll with ease.',
           'Settle social security without errors.',
@@ -663,7 +630,7 @@ const en: Dict = {
         eyebrow: 'MOD/06',
         title: 'Accounting',
         italic: '',
-        body: 'We know that dealing with numbers, invoices, and taxes can be a real challenge, but it is essential for the stability of your business. With Reddoc, keeping your books will be a breeze. You will have a clear view of your purchases, sales, and inventory to make confident decisions, plus a detailed record of your transactions for a hassle-free audit.',
+        body: 'We know that dealing with numbers, invoices, and taxes can be a real challenge, but it is essential for the stability of your business. With RedDoc, keeping your books will be a breeze. You will have a clear view of your purchases, sales, and inventory to make confident decisions, plus a detailed record of your transactions for a hassle-free audit.',
         bullets: [
           'Remote accessibility.',
           'Intuitive and easy to use.',
@@ -756,10 +723,10 @@ const en: Dict = {
   testimonials: {
     section: '04 / CUSTOMERS',
     title: 'What companies',
-    italic: 'already running on Reddoc say.',
+    italic: 'already running on RedDoc say.',
     quotes: [
       {
-        body: 'Reddoc gave us back our afternoons. We used to close month-end at nine in the evening; now by five payroll is settled and A/R is reconciled.',
+        body: 'RedDoc gave us back our afternoons. We used to close month-end at nine in the evening; now by five payroll is settled and A/R is reconciled.',
         author: 'María Camila Restrepo',
         role: 'CEO · Distribuidora Andina',
       },
@@ -795,7 +762,7 @@ const en: Dict = {
     form_required: 'Required field',
   },
   cta: {
-    eyebrow: 'GET STARTED · 30 MIN DEMO',
+    eyebrow: 'GET STARTED · 5 MINUTE DEMO',
     title: 'A more orderly operation,',
     italic: 'from day one.',
     lede: 'Thirty minutes to set it up. A calmer operating life ever after.',
@@ -811,7 +778,7 @@ const en: Dict = {
     company_links: ['About', 'Customers', 'Blog', 'Careers'],
     legal: 'Legal',
     legal_links: ['Terms', 'Privacy', 'Cookies', 'Compliance'],
-    rights: '© 2026 Reddoc S.A.S · All rights reserved.',
+    rights: '© 2026 Semantica Digital S.A.S · All rights reserved.',
     masthead: 'Made in Medellín · Colombia · operating across LATAM.',
   },
 };

@@ -1,3 +1,4 @@
+import { DOCUMENTO_CLASE_ID } from '@reddoc/core';
 import { DOCUMENT_TYPE_ID, type DocumentEntityConfig } from '@erp/core/module-config';
 import { NOTA_CREDITO_COLUMNS, NOTA_CREDITO_FILTERS } from './nota-credito.constants';
 
@@ -27,6 +28,8 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   cargaLineasReferencia: true,
   // Lleva almacén general en la cabecera, como el ERP anterior (la débito no).
   almacenGeneral: true,
+  // Motivo DIAN de la nota: solo los conceptos de la clase nota crédito de venta.
+  conceptoCorreccionClaseId: DOCUMENTO_CLASE_ID.NOTA_CREDITO_VENTA,
   schemaVersion: 1,
   columns: NOTA_CREDITO_COLUMNS,
   filters: NOTA_CREDITO_FILTERS,
@@ -52,4 +55,7 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
   extraActionIds: ['export-excel'],
+  // Se emite a la DIAN: el dropdown Electrónico corrige su cabecera con las
+  // resoluciones de venta.
+  electronico: { resolucionParams: { venta: 'True' } },
 };

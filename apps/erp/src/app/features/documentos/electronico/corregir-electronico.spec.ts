@@ -7,15 +7,18 @@ const ORIGINAL = aCabeceraElectronica({
   resolucion: 7,
   resolucion_prefijo: 'FE',
   resolucion_numero: '1876',
+  documento_concepto_correccion: 3,
+  documento_concepto_correccion_nombre: 'Rebaja total aplicada',
 });
 
 describe('aCabeceraElectronica', () => {
-  it('normaliza número, fechas y la resolución con prefijo y número', () => {
+  it('normaliza número, fechas, la resolución con prefijo y número y el concepto', () => {
     expect(ORIGINAL).toEqual({
       numero: 125,
       resolucion: { id: 7, nombre: '', prefijo: 'FE', numero: '1876' },
       fecha: new Date(2026, 7, 5),
       fechaVence: new Date(2026, 8, 4),
+      conceptoCorreccion: { id: 3, nombre: 'Rebaja total aplicada' },
     });
   });
 
@@ -25,6 +28,7 @@ describe('aCabeceraElectronica', () => {
       resolucion: null,
       fecha: null,
       fechaVence: null,
+      conceptoCorreccion: null,
     });
   });
 });
@@ -50,5 +54,14 @@ describe('cambiosCabeceraElectronica', () => {
     expect(
       cambiosCabeceraElectronica(ORIGINAL, { ...ORIGINAL, resolucion: { id: 8, nombre: '' } }),
     ).toEqual({ resolucion: 8 });
+  });
+
+  it('manda el concepto de corrección nuevo por id', () => {
+    expect(
+      cambiosCabeceraElectronica(ORIGINAL, {
+        ...ORIGINAL,
+        conceptoCorreccion: { id: 5, nombre: 'Otros' },
+      }),
+    ).toEqual({ documento_concepto_correccion: 5 });
   });
 });

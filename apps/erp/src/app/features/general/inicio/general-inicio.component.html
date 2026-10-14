@@ -32,5 +32,16 @@
   </app-inicio-invitacion>
 }
 
+<h1 class="m-0 text-[1.1rem] font-bold tracking-tight text-brand-text">
+  {{ t().inicio.general.titulo }}
+</h1>
+
+<!-- En lg la fila de fichas deja dos huecos a propósito: ahí va lo que se sume. -->
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <app-cartera-resumen tipo="cobrar" />
+  <app-cartera-resumen tipo="pagar" />
+  <app-resultado-resumen />
+</div>
+
 <!-- El acuse de la siembra: se abre solo cuando hay resultado. -->
 <app-plantilla-cargada-dialog [resultado]="resultado()" (cerrar)="onCerrarResultado()" />

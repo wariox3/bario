@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.4](https://github.com/wariox3/bario/compare/v0.1.3...v0.1.4) (2026-10-14)
+
+### Features
+
+- **inicio:** compras en Compra e ingresos contra egresos en General ([0fa99d2](https://github.com/wariox3/bario/commit/0fa99d22194f877ef0f0607fd5aa8f5a018e056f))
+- **inicio:** gráfica de total de ventas en los inicios de General y Venta ([19ba510](https://github.com/wariox3/bario/commit/19ba5109d9539a941fd0214b644260f5660dbd1b))
+- **landing:** nuevo mensaje del hero y limpieza de indicadores de relleno ([d2d073d](https://github.com/wariox3/bario/commit/d2d073d45b972ef7fcc36ca5489f7730698dc3bb))
+- **notas:** concepto de corrección y dropdown Electrónico en las notas ([80f1d7b](https://github.com/wariox3/bario/commit/80f1d7b7d9ddaf5a861f23bb327fde2f114d5c8b))
+
+### Bug Fixes
+
+- **resolucion:** la lista de la DIAN se pide con el módulo ([3c5ff50](https://github.com/wariox3/bario/commit/3c5ff5008ef6d973e7c5e32e3919b34e2dac1bdd))
+
 ## [0.1.3](https://github.com/wariox3/bario/compare/v0.1.2...v0.1.3) (2026-10-13)
 
 ### Features

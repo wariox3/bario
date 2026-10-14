@@ -15,6 +15,7 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
+import { DocumentoElectronicoMenuComponent } from '@erp/features/documentos/electronico/components/documento-electronico-menu/documento-electronico-menu.component';
 import {
   CAPACIDADES_DOCUMENTO_VACIAS,
   DocumentoDetalleService,
@@ -54,6 +55,7 @@ interface CabeceraView {
   readonly sede: string | null;
   readonly almacen: string | null;
   readonly metodoPago: string | null;
+  readonly conceptoCorreccion: string | null;
   readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -83,6 +85,7 @@ interface CabeceraView {
   standalone: true,
   imports: [
     ButtonModule,
+    DocumentoElectronicoMenuComponent,
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
@@ -114,6 +117,12 @@ export class NotaDocumentoDetailComponent implements OnInit {
   /** Id del documento (route param `:id`, vía `withComponentInputBinding`). */
   readonly id = input<string>();
 
+  /** Id como número para el dropdown Electrónico (`null` si la ruta no lo trae). */
+  protected readonly documentoIdNumero = computed(() => {
+    const id = this.id();
+    return id ? Number(id) : null;
+  });
+
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
@@ -124,6 +133,10 @@ export class NotaDocumentoDetailComponent implements OnInit {
 
   /** La cabecera lleva almacén general (la nota crédito); lo declara la config. */
   protected readonly conAlmacenGeneral = computed(() => this.document().almacenGeneral === true);
+  /** La nota lleva concepto de corrección (lo declara su config). */
+  protected readonly conConceptoCorreccion = computed(
+    () => this.document().conceptoCorreccionClaseId != null,
+  );
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -242,6 +255,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
             sede: read.sede_nombre ?? null,
             almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
+            conceptoCorreccion: read.documento_concepto_correccion_nombre ?? null,
             comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,

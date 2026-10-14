@@ -121,6 +121,52 @@
           </div>
         </div>
 
+        <!-- Método de pago -->
+        <div class="flex flex-col gap-1.5">
+          <label for="metodo_pago" class="nota-documento-form__label">
+            {{ f.fields.metodoPago }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="metodo_pago"
+            formControlName="metodo_pago"
+            [endpoint]="metodoPagoEndpoint"
+            [suggestedMatch]="metodoPagoSugerido()"
+            [placeholder]="f.fields.metodoPagoPlaceholder"
+            [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
+          />
+          <lib-field-error
+            [control]="form.controls.metodo_pago"
+            [messages]="{ required: f.validation.required }"
+          />
+        </div>
+
+        @if (conceptoCorreccionClaseId()) {
+          <!-- Concepto de corrección: el motivo DIAN de la nota, filtrado por su clase. -->
+          <div class="flex flex-col gap-1.5">
+            <label for="documento_concepto_correccion" class="nota-documento-form__label">
+              {{ f.fields.conceptoCorreccion }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <lib-api-select
+              inputId="documento_concepto_correccion"
+              formControlName="documento_concepto_correccion"
+              [endpoint]="conceptoCorreccionEndpoint"
+              [params]="conceptoCorreccionParams()"
+              filterBy="nombre,codigo"
+              [placeholder]="f.fields.conceptoCorreccionPlaceholder"
+              [invalid]="
+                form.controls.documento_concepto_correccion.invalid &&
+                form.controls.documento_concepto_correccion.touched
+              "
+            />
+            <lib-field-error
+              [control]="form.controls.documento_concepto_correccion"
+              [messages]="{ required: f.validation.required }"
+            />
+          </div>
+        }
+
         <!-- Sede -->
         <div class="flex flex-col gap-1.5">
           <label for="sede" class="nota-documento-form__label">{{ f.fields.sede }}</label>
@@ -128,6 +174,7 @@
             inputId="sede"
             formControlName="sede"
             [endpoint]="sedeEndpoint"
+            [suggestedIndex]="sedeSuggestedIndex()"
             [placeholder]="f.fields.sedePlaceholder"
           />
         </div>
@@ -145,25 +192,6 @@
             />
           </div>
         }
-
-        <!-- Método de pago -->
-        <div class="flex flex-col gap-1.5">
-          <label for="metodo_pago" class="nota-documento-form__label">
-            {{ f.fields.metodoPago }}
-            <span class="ml-px text-red-500">*</span>
-          </label>
-          <lib-api-select
-            inputId="metodo_pago"
-            formControlName="metodo_pago"
-            [endpoint]="metodoPagoEndpoint"
-            [placeholder]="f.fields.metodoPagoPlaceholder"
-            [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
-          />
-          <lib-field-error
-            [control]="form.controls.metodo_pago"
-            [messages]="{ required: f.validation.required }"
-          />
-        </div>
       </div>
     </div>
 

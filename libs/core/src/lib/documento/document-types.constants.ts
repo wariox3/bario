@@ -69,6 +69,9 @@ export type DocumentTypeId = (typeof DOCUMENT_TYPE_ID)[DocumentTypeKey];
  */
 export const DOCUMENTO_CLASE_ID = {
   FACTURA_VENTA: 100,
+  NOTA_CREDITO_VENTA: 101,
+  NOTA_DEBITO_VENTA: 102,
   FACTURA_COMPRA: 300,
   DOCUMENTO_SOPORTE: 303,
+  NOTA_AJUSTE: 304,
 } as const;

@@ -31,6 +31,9 @@ export interface NotaVentaRead extends DocumentoReadBase {
   readonly almacen_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
+  /** Concepto de corrección (se muestra si el config declara `conceptoCorreccionClaseId`). */
+  readonly documento_concepto_correccion?: number | null;
+  readonly documento_concepto_correccion_nombre?: string | null;
   readonly comentario: string | null;
   /** Suma de los pagos no anulados (`documento-pago`). La mantiene el backend. */
   readonly pago?: string | null;
@@ -44,6 +47,7 @@ export interface NotaVentaPayload extends DocumentoPayloadBase {
   readonly sede: number | null;
   readonly almacen: number | null;
   readonly metodo_pago: number | null;
+  readonly documento_concepto_correccion: number | null;
   readonly comentario: string | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];

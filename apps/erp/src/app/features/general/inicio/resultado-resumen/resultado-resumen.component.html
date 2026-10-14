@@ -1,0 +1,96 @@
+<!--
+  Ingresos contra egresos del período, a todo el ancho de la grilla del inicio
+  (el host es `contents`). El resultado es la cifra principal; ingresos y
+  egresos, con su punto de color, hacen de leyenda de las dos barras.
+-->
+@let tx = t().inicio.resultadoResumen;
+
+<section
+  class="animate-fade-up flex h-full flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface sm:col-span-2 lg:col-span-4"
+  [attr.aria-busy]="estado() === 'cargando'"
+>
+  <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 px-5 pt-4">
+    <div class="flex flex-col gap-0.5">
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">{{ tx.titulo }}</h2>
+      <p class="m-0 text-[0.75rem] text-brand-muted">{{ tx.desc }}</p>
+    </div>
+    <app-periodo-selector [(periodo)]="periodo" />
+  </header>
+
+  @if (resumen(); as res) {
+    <div
+      class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 px-5 pt-3 transition-opacity"
+      [class.opacity-50]="recargando()"
+    >
+      <!-- El resultado: rojo solo si es pérdida. -->
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.72rem] text-brand-muted">
+          {{ tx.resultado }}
+          <span class="inline-block first-letter:uppercase">· {{ rotuloPeriodo() }}</span>
+        </span>
+        <span
+          class="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] tabular-nums"
+          [class.text-brand-navy]="!perdida()"
+          [class.text-red-600]="perdida()"
+        >
+          {{ formatMoney(res.totales.diferencia) }}
+        </span>
+      </div>
+
+      <!-- Leyenda con cifra: cada barra dice cuánto suma. -->
+      <dl class="m-0 flex flex-wrap gap-x-6 gap-y-1">
+        <div class="flex flex-col gap-0.5">
+          <dt class="flex items-center gap-1.5 text-[0.72rem] text-brand-muted">
+            <span class="h-2 w-2 rounded-[3px] bg-[rgba(20,48,73,0.72)]"></span>
+            {{ tx.ingreso }}
+          </dt>
+          <dd class="m-0 text-[0.9rem] font-semibold tabular-nums text-brand-text">
+            {{ formatMoney(res.totales.ingreso) }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="flex items-center gap-1.5 text-[0.72rem] text-brand-muted">
+            <span class="h-2 w-2 rounded-[3px] bg-[#77aad7]"></span>
+            {{ tx.egreso }}
+          </dt>
+          <dd class="m-0 text-[0.9rem] font-semibold tabular-nums text-brand-text">
+            {{ formatMoney(res.totales.egreso) }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="relative px-3 pt-3 pb-3 transition-opacity" [class.opacity-50]="recargando()">
+      <div class="h-64">
+        <p-chart
+          type="bar"
+          [data]="datosGrafica()"
+          [options]="opcionesGrafica()"
+          [style]="{ height: '100%' }"
+        />
+      </div>
+      @if (sinMovimiento()) {
+        <!-- Sin movimiento el eje queda: el período se ve, solo que vacío. -->
+        <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <span
+            class="rounded-md border border-[rgba(20,48,73,0.1)] bg-brand-surface px-3 py-1.5 text-[0.78rem] text-brand-muted"
+          >
+            {{ tx.sinMovimiento[res.periodo] }}
+          </span>
+        </div>
+      }
+    </div>
+  } @else if (estado() === 'cargando') {
+    <div class="px-5 pt-3 pb-5" aria-hidden="true">
+      <div class="h-64 animate-pulse rounded-md bg-brand-surface-2"></div>
+    </div>
+  } @else {
+    <div class="flex items-start gap-2 px-5 pt-3 pb-5">
+      <i class="pi pi-exclamation-circle mt-0.5 text-[0.85rem] text-brand-muted"></i>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.8rem] font-semibold text-brand-text">{{ tx.error.title }}</span>
+        <span class="text-[0.72rem] text-brand-muted">{{ tx.error.desc }}</span>
+      </div>
+    </div>
+  }
+</section>
