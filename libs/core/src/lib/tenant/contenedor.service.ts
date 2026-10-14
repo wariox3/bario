@@ -31,6 +31,11 @@ export interface UpdateContenedorRequest {
 /** Lo que devuelve el `PATCH`: el eco de los tres campos editables, nada más. */
 export type UpdateContenedorResponse = Required<UpdateContenedorRequest>;
 
+/** Lo que devuelve `ingresar/`: el instante que quedó como última conexión. */
+export interface IngresarContenedorResponse {
+  readonly fecha_ultima_conexion: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ContenedorService extends BaseHttpService {
   // Endpoints en el schema público (/contenedor/, /seguridad/usuario…): sin X-Tenant.
@@ -65,6 +70,23 @@ export class ContenedorService extends BaseHttpService {
     payload: UpdateContenedorRequest,
   ): Observable<UpdateContenedorResponse> {
     return this.patch<UpdateContenedorResponse>(`/contenedor/cliente/${id}/`, payload);
+  }
+
+  /**
+   * Marca la última conexión de la empresa con la hora actual. Se llama una vez
+   * al entrar, no en cada petición; cualquier miembro puede, y una empresa que
+   * no está `listo` responde 409.
+   *
+   * Sin toast de error: es contabilidad, no algo que la persona pidió. Que
+   * falle no debe interrumpir ni ensuciar el ingreso.
+   */
+  ingresar(id: number): Observable<IngresarContenedorResponse> {
+    return this.post<IngresarContenedorResponse>(
+      `/contenedor/cliente/${id}/ingresar/`,
+      {},
+      undefined,
+      { errorToast: false },
+    );
   }
 
   /**

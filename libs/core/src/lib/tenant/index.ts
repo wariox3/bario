@@ -17,7 +17,11 @@ export {
   buildAccesoFlags,
 } from './contenedor-acceso';
 export type { AccesoFlagName, ContenedorAcceso, ContenedorAccesoId } from './contenedor-acceso';
-export type { UpdateContenedorRequest, UpdateContenedorResponse } from './contenedor.service';
+export type {
+  IngresarContenedorResponse,
+  UpdateContenedorRequest,
+  UpdateContenedorResponse,
+} from './contenedor.service';
 export type {
   Contenedor,
   ContenedorDetalle,

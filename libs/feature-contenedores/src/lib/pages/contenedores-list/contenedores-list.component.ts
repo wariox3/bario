@@ -273,6 +273,11 @@ export class ContenedoresListComponent {
       if (item.propietario) this.renewContenedor(item.suscripcion_id);
       return;
     }
+    // Registra la última conexión sin esperarla: entrar no depende de ese dato.
+    // Sin `takeUntilDestroyed` a propósito: navegar destruye la lista, y la
+    // petición tiene que llegar igual. Un fallo se descarta (el servicio ya
+    // apaga el toast).
+    this.contenedorService.ingresar(item.cliente_id).subscribe({ error: () => undefined });
     this.tenant.setCurrent(item);
     this.router.navigateByUrl(this.tenantRoutes.tenantHome(item.schema_name));
   }

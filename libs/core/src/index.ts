@@ -182,6 +182,7 @@ export type {
   TenantSlug,
   ContenedorAccess,
   TenantRoutes,
+  IngresarContenedorResponse,
   UpdateContenedorRequest,
   UpdateContenedorResponse,
   Contenedor,
