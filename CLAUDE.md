@@ -55,7 +55,7 @@ libs/
 
 Path aliases:
 
-- **Cross-app (libs)**: `@reddoc/core`, `@reddoc/ui`, `@reddoc/feature-base`, `@reddoc/styles`. Entry points aparte para lo que se carga eager: `@reddoc/ui/auth` (páginas de auth), `@reddoc/ui/i18n` (diccionarios) y `@reddoc/feature-contenedores/i18n`. Importarlos desde el barrel mete en el bundle inicial todo lo que el barrel re-exporta y alguna pantalla lazy usa (en el POS: 1.14 → 1.45 MB).
+- **Cross-app (libs)**: `@reddoc/core`, `@reddoc/ui`, `@reddoc/feature-base`, `@reddoc/styles`. Entry points aparte para lo que se carga eager: `@reddoc/ui/auth` (páginas de auth), `@reddoc/ui/i18n` (diccionarios) y `@reddoc/feature-contenedores/i18n`. Importarlos desde el barrel mete en el bundle inicial todo lo que el barrel re-exporta y alguna pantalla lazy usa (el POS bajó de 1.45 a 1.14 MB y el ERP de 1.89 a 1.55 MB al dejar de hacerlo).
 - **Intra-app (solo erp)**: `@erp/*` → `apps/erp/src/app/*`. Permitido por excepción en `@nx/enforce-module-boundaries` para evitar paths relativos profundos (los masters viven anidados en `features/<modulo>/masters/<entity>/pages/<page>/`). Úsalo para imports cross-feature (`@erp/core/...`, `@erp/i18n`, `@erp/layouts/...`). Para hermanos del mismo bounded context, sigue con relativos cortos (`./contacto.service`). `@turnos/*` y `@pos/*` son el equivalente en sus apps; ESLint impide que una app importe el alias de otra.
 
 **Lo que ES cross-app va en libs/. Lo que es ERP-específico vive en `apps/erp/src/app/core/`.** El **núcleo compartido** del framework configuracional de documentos (tipos, gateway y `DocumentoDetalleService`) vive en `libs/core/documento` porque también lo consume `apps/turnos`; solo el registry, resolvers y `BaseDocumentListComponent` quedan en el ERP.

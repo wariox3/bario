@@ -4,7 +4,7 @@ import type {
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
-} from '@reddoc/ui';
+} from '@reddoc/ui/i18n';
 
 /**
  * Los 42 campos de la línea liquidada del aporte a seguridad social.
