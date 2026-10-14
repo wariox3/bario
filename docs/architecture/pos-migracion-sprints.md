@@ -251,6 +251,32 @@ impreso.
 pago y su PDF; un fallo simulado en aprobar deja el documento visible y el
 carrito intacto.
 
+**Estado (2026-10-14).** Hecho y en verde (build, lint, 29 tests en el POS,
+con el pipeline del cobro cubierto). Ajustes respecto del plan:
+
+- **Cobro reanudable en vez de "carrito intacto".** Si el cobro falla después de
+  crear el documento, la venta guarda su id y queda bloqueada (no se edita ni se
+  cierra). Cobrar retoma desde donde falló: no crea otra factura, no repite un
+  pago que ya quedó y no aprueba un documento ya aprobado. También se puede
+  descartar, que borra el documento sin aprobar y desbloquea la venta. Reintentar
+  creando de nuevo habría duplicado la factura.
+- Sin `ENTITY_DATA_GATEWAY`: armar un `DocumentEntityConfig` completo solo para
+  crear, aprobar e imprimir no se justificaba. `VentaPosService` (en el POS) hace
+  esas tres cosas y descartar.
+- `metodo_pago` sale del código DIAN del medio (`10` efectivo) y `plazo_pago` del
+  plazo de 0 días, recorriendo las páginas de los `seleccionar/`.
+- En efectivo se registra como pago el **total**, no lo recibido: el cambio se
+  devuelve. Hay montos sugeridos (exacto y redondeos a billetes).
+- Cobrar no se apaga: si falta configuración, cliente o productos, avisa qué.
+
+Riesgo que queda: si `POST documento/` se crea en el backend pero su respuesta
+se pierde, el POS no conoce el id y un reintento duplicaría la factura. Lo
+cerraría una clave de idempotencia en el backend.
+
+Pendiente de decidir: la factura POS electrónica (24) se aprueba pero el POS no
+la emite a la DIAN; eso depende de `gen_emitir_automaticamente` o se hace desde
+el ERP.
+
 ---
 
 ## Sprint 4 · Historial y altas rápidas

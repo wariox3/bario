@@ -19,6 +19,8 @@ export class CarritoLineaComponent {
   protected readonly t = this.i18n.t;
 
   readonly linea = input.required<LineaCarrito>();
+  /** La venta tiene un cobro pendiente: la línea se ve pero no se toca. */
+  readonly bloqueada = input(false);
 
   readonly cantidad = output<number>();
   readonly editar = output<LineaCarrito>();

@@ -13,9 +13,24 @@
       [extraParams]="contactoParams"
       [placeholder]="tx.clientePlaceholder"
       [ngModel]="venta.contacto"
+      [disabled]="bloqueada()"
       (ngModelChange)="onContacto($event)"
     />
   </div>
+
+  @if (store.cobroPendiente(); as pendiente) {
+    <div
+      class="flex gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-amber-900"
+      role="status"
+    >
+      <i class="pi pi-lock mt-0.5 text-[0.8rem]" aria-hidden="true"></i>
+      <p class="m-0 text-[0.75rem]">
+        {{ tx.cobroPendiente }}
+        <span class="font-mono tabular-nums">{{ pendiente.documentoId }}</span
+        >.
+      </p>
+    </div>
+  }
 
   <div class="min-h-0 flex-1 overflow-y-auto px-4">
     @if (venta.lineas.length === 0) {
@@ -30,6 +45,7 @@
           <li>
             <app-carrito-linea
               [linea]="linea"
+              [bloqueada]="bloqueada()"
               (cantidad)="onCantidad(linea.item.id, $event)"
               (editar)="editando.set($event)"
               (retirar)="store.retirarLinea($event)"
@@ -77,22 +93,22 @@
         icon="pi pi-trash"
         severity="secondary"
         [outlined]="true"
-        [disabled]="venta.lineas.length === 0"
+        [disabled]="venta.lineas.length === 0 || bloqueada()"
         (onClick)="onVaciar()"
       />
-      <span class="flex-1" [pTooltip]="tx.cobrarProximamente" tooltipPosition="top">
-        <p-button
-          type="button"
-          [label]="tx.cobrar"
-          icon="pi pi-wallet"
-          styleClass="w-full"
-          [fluid]="true"
-          [disabled]="true"
-        />
-      </span>
+      <p-button
+        type="button"
+        class="flex-1"
+        [label]="bloqueada() ? tx.retomarCobro : tx.cobrar"
+        icon="pi pi-wallet"
+        [fluid]="true"
+        (onClick)="onCobrar()"
+      />
     </div>
   </div>
 </section>
+
+<app-cobro-dialog [(visible)]="cobrando" (cobrada)="cobrada.emit()" />
 
 <app-editar-linea-dialog
   [linea]="editando()"

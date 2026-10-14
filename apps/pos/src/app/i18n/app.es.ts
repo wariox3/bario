@@ -79,6 +79,10 @@ export const es: AppDict = {
         title: 'Código no encontrado',
         desc: 'Ningún producto de venta tiene ese código.',
       },
+      ventaBloqueada: {
+        title: 'Venta con cobro pendiente',
+        desc: 'Termina o descarta el cobro antes de cambiar la venta.',
+      },
     },
     tabs: {
       label: 'Ventas abiertas',
@@ -93,6 +97,10 @@ export const es: AppDict = {
         message: 'La venta tiene productos. Si la cierras se pierden.',
         aceptar: 'Cerrar venta',
       },
+      cobroPendiente: {
+        title: 'Venta con cobro pendiente',
+        desc: 'Termina o descarta el cobro antes de cerrar la venta.',
+      },
     },
     carrito: {
       prefijoVenta: 'Venta',
@@ -102,7 +110,8 @@ export const es: AppDict = {
       vacioDesc: 'Toca un producto o escanea su código para agregarlo.',
       cancelar: 'Cancelar',
       cobrar: 'Cobrar',
-      cobrarProximamente: 'El cobro llega en la próxima fase.',
+      retomarCobro: 'Retomar cobro',
+      cobroPendiente: 'Cobro sin terminar. La venta no se puede cambiar; quedó en el documento',
       resumen: {
         productos: 'Productos',
         cantidad: 'Cantidad',
@@ -132,6 +141,79 @@ export const es: AppDict = {
         cantidadMax: 'Supera el stock disponible',
         cancelar: 'Cancelar',
         guardar: 'Guardar',
+      },
+    },
+    cobro: {
+      titulo: 'Cobrar',
+      total: 'Total a pagar',
+      medios: {
+        efectivo: 'Efectivo',
+        tarjetaCredito: 'Tarjeta de crédito',
+        tarjetaDebito: 'Tarjeta débito',
+        transferencia: 'Transferencia',
+        proximamente: 'Próximamente',
+      },
+      efectivo: {
+        recibido: 'Recibido',
+        recibidoMinimo: 'Lo recibido no cubre el total.',
+        exacto: 'Exacto',
+        cambio: 'Cambio',
+        cuenta: 'Cuenta',
+        asesor: 'Asesor',
+        volver: 'Medios de pago',
+        cobrar: 'Cobrar',
+      },
+      fases: {
+        preparando: 'Preparando…',
+        guardando: 'Guardando…',
+        pagando: 'Registrando pago…',
+        aprobando: 'Aprobando…',
+      },
+      exito: {
+        titulo: 'Venta cobrada',
+        desc: 'La venta quedó registrada y aprobada.',
+        documento: 'Documento',
+        cambio: 'Cambio a entregar',
+        imprimir: 'Imprimir',
+        nuevaVenta: 'Nueva venta',
+      },
+      pendiente: {
+        titulo: 'Cobro sin terminar',
+        desc: 'La venta ya se guardó como el documento',
+        faltaPago: 'Falta registrar el pago y aprobarlo.',
+        faltaAprobar: 'El pago quedó registrado; falta aprobarlo.',
+        reintentar: 'Reintentar',
+        descartar: 'Descartar cobro',
+        descartarConfirm: {
+          header: 'Descartar cobro',
+          message: 'Se borra el documento sin aprobar y la venta vuelve a editarse.',
+          aceptar: 'Descartar',
+        },
+      },
+      requisitos: {
+        configuracion: {
+          title: 'Falta configurar la caja',
+          desc: 'Elige el tipo de documento, el almacén y la cuenta de efectivo en configuración.',
+        },
+        productos: {
+          title: 'La venta está vacía',
+          desc: 'Agrega al menos un producto para cobrar.',
+        },
+        cliente: {
+          title: 'Falta el cliente',
+          desc: 'Elige el cliente de la venta para cobrar.',
+        },
+      },
+      errores: {
+        generico: 'No se pudo completar el cobro. Intenta de nuevo.',
+        configuracion: 'Falta configurar la caja: tipo de documento, almacén o cuenta de efectivo.',
+        metodoPago: 'La empresa no tiene el método de pago efectivo (código DIAN 10).',
+        plazoContado: 'La empresa no tiene un plazo de pago de contado (0 días).',
+        descartar: 'No se pudo descartar el documento.',
+        imprimir: {
+          title: 'No se pudo imprimir',
+          desc: 'Puedes imprimir la venta desde el historial.',
+        },
       },
     },
   },

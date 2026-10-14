@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { type Menu, MenuModule } from 'primeng/menu';
-import { I18nService } from '@reddoc/core';
+import { I18nService, ToastService } from '@reddoc/core';
 import type { AppDict } from '@pos/i18n';
 import { CarritosStore } from '../../carritos.store';
 import type { Carrito } from '../../carrito.model';
@@ -24,6 +24,7 @@ import type { Carrito } from '../../carrito.model';
 export class CarritoTabsComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   private readonly confirmation = inject(ConfirmationService);
+  private readonly toast = inject(ToastService);
 
   protected readonly t = this.i18n.t;
   protected readonly store = inject(CarritosStore);
@@ -57,6 +58,11 @@ export class CarritoTabsComponent {
   }
 
   private cerrar(carrito: Carrito): void {
+    if (carrito.cobro) {
+      const tx = this.t().caja.tabs.cobroPendiente;
+      this.toast.warn(tx.title, tx.desc);
+      return;
+    }
     if (carrito.lineas.length === 0) {
       this.store.eliminar(carrito.uuid);
       return;

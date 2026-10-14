@@ -13,7 +13,7 @@ import type { AppDict } from '@pos/i18n';
 import { PosStorageService } from '../../../core/storage/pos-storage.service';
 import { ConfiguracionCajaStore } from '../../configuracion/configuracion-caja.store';
 import type { ProductoCatalogo } from '../catalogo/producto-catalogo.model';
-import type { Carrito, EstadoCarritos } from './carrito.model';
+import type { Carrito, CobroPendiente, EstadoCarritos } from './carrito.model';
 import {
   agregarLinea,
   buscarLinea,
@@ -32,8 +32,11 @@ import {
   siguienteNumero,
 } from './carrito.ops';
 
-/** Cómo terminó un intento de sumar unidades a la venta. */
-export type ResultadoAgregar = 'agregado' | 'sinStock' | 'error';
+/**
+ * Cómo terminó un intento de cambiar la venta. `bloqueada`: la venta tiene un
+ * cobro pendiente y no se edita hasta terminarlo o descartarlo.
+ */
+export type ResultadoAgregar = 'agregado' | 'sinStock' | 'error' | 'bloqueada';
 
 /**
  * Las ventas abiertas de la caja (una por pestaña), persistidas en el
@@ -82,6 +85,8 @@ export class CarritosStore {
   );
   readonly resumen = computed(() => resumenCarrito(this.activo()));
   readonly cantidadTotal = computed(() => cantidadTotal(this.activo()));
+  /** Cobro empezado y sin terminar de la venta activa, o `null`. */
+  readonly cobroPendiente = computed(() => this.activo().cobro ?? null);
   /** Unidades de cada ítem en la venta activa: el badge de las tarjetas del catálogo. */
   readonly cantidades = computed(
     () => new Map(this.activo().lineas.map((l) => [l.item.id, l.cantidad])),
@@ -110,8 +115,22 @@ export class CarritosStore {
   /**
    * Cierra una venta. Siempre queda al menos una: cerrar la última abre una
    * nueva vacía. La activa pasa a la vecina de la que se cerró.
+   *
+   * Una venta con cobro pendiente no se cierra (devuelve `false`): su documento
+   * quedaría huérfano en el backend. Primero se termina o se descarta el cobro.
    */
-  eliminar(uuid: string): void {
+  eliminar(uuid: string): boolean {
+    if (this.carritos().find((c) => c.uuid === uuid)?.cobro) return false;
+    this.cerrar(uuid);
+    return true;
+  }
+
+  /** Cierra la venta que se acaba de cobrar, sin la guarda del cobro pendiente. */
+  cerrarCobrada(uuid: string): void {
+    this.cerrar(uuid);
+  }
+
+  private cerrar(uuid: string): void {
     this.actualizar((e) => {
       const indice = e.carritos.findIndex((c) => c.uuid === uuid);
       if (indice < 0) return e;
@@ -127,7 +146,24 @@ export class CarritosStore {
   }
 
   vaciar(uuid: string): void {
-    this.mutarCarrito(uuid, (c) => ({ ...c, lineas: [] }));
+    this.mutarCarrito(uuid, (c) => (c.cobro ? c : { ...c, lineas: [] }));
+  }
+
+  // ── Cobro ──────────────────────────────────────────────────────────────────
+
+  /** Anota que el cobro de la venta quedó a medias (ver `CobroPendiente`). */
+  registrarCobro(uuid: string, cobro: CobroPendiente): void {
+    this.mutarCarrito(uuid, (c) => ({ ...c, cobro }));
+  }
+
+  /** Quita el cobro pendiente (se descartó su documento): la venta vuelve a editarse. */
+  limpiarCobro(uuid: string): void {
+    this.mutarCarrito(uuid, (c) => ({
+      uuid: c.uuid,
+      nombre: c.nombre,
+      contacto: c.contacto,
+      lineas: c.lineas,
+    }));
   }
 
   // ── Cliente ────────────────────────────────────────────────────────────────
@@ -152,6 +188,7 @@ export class CarritosStore {
    * de precios del nuevo (las editadas a mano se respetan).
    */
   cambiarContacto(contacto: ErpSelectOption | null): Observable<void> {
+    if (this.activo().cobro) return of(undefined);
     const uuid = this.activo().uuid;
     const guardado = contactoParaGuardar(contacto);
     this.mutarCarrito(uuid, (c) => ({ ...c, contacto: guardado }));
@@ -176,6 +213,7 @@ export class CarritosStore {
    */
   agregarProducto(producto: ProductoCatalogo): Observable<ResultadoAgregar> {
     const carrito = this.activo();
+    if (carrito.cobro) return of('bloqueada');
     const existente = buscarLinea(carrito, producto.id);
     if (existente) return of(this.fijarCantidad(producto.id, existente.cantidad + 1));
     if (producto.disponible !== null && producto.disponible < 1) return of('sinStock');
@@ -218,6 +256,7 @@ export class CarritosStore {
 
   /** Fija la cantidad de una línea de la venta activa; en 0, la retira. */
   fijarCantidad(itemId: number, cantidad: number): ResultadoAgregar {
+    if (this.activo().cobro) return 'bloqueada';
     const linea = buscarLinea(this.activo(), itemId);
     if (!linea) return 'error';
     if (cantidad > 0 && !cabeEnStock(linea, cantidad)) return 'sinStock';
@@ -230,11 +269,11 @@ export class CarritosStore {
     itemId: number,
     cambios: { readonly precio: number; readonly cantidad: number },
   ): void {
-    this.mutarCarrito(this.activo().uuid, (c) => editarLinea(c, itemId, cambios));
+    this.mutarCarrito(this.activo().uuid, (c) => (c.cobro ? c : editarLinea(c, itemId, cambios)));
   }
 
   retirarLinea(itemId: number): void {
-    this.mutarCarrito(this.activo().uuid, (c) => retirarLinea(c, itemId));
+    this.mutarCarrito(this.activo().uuid, (c) => (c.cobro ? c : retirarLinea(c, itemId)));
   }
 
   // ── Internos ───────────────────────────────────────────────────────────────

@@ -177,9 +177,19 @@ function esLinea(valor: unknown): boolean {
   );
 }
 
+function esCobroPendiente(valor: unknown): boolean {
+  return (
+    valor === undefined ||
+    (esObjeto(valor) &&
+      typeof valor['documentoId'] === 'number' &&
+      typeof valor['pagado'] === 'boolean')
+  );
+}
+
 function esCarrito(valor: unknown): boolean {
   return (
     esObjeto(valor) &&
+    esCobroPendiente(valor['cobro']) &&
     typeof valor['uuid'] === 'string' &&
     typeof valor['nombre'] === 'string' &&
     (valor['contacto'] === null || esOpcion(valor['contacto'])) &&

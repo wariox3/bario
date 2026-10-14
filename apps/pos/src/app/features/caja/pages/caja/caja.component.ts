@@ -110,6 +110,7 @@ export class CajaComponent {
 
   private informar(resultado: ResultadoAgregar): void {
     if (resultado === 'sinStock') this.avisar('sinStock', 'warn');
+    else if (resultado === 'bloqueada') this.avisar('ventaBloqueada', 'warn');
     else if (resultado === 'error') this.avisar('agregarError', 'error');
   }
 

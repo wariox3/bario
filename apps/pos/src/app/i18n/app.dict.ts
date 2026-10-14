@@ -6,6 +6,8 @@ import type {
   PhoneInputTranslationsHost,
 } from '@reddoc/ui';
 import type { PosNavKey } from '../layouts/workspace-layout/workspace-menu';
+import type { FaseCobro } from '../features/caja/cobro/cobro.model';
+import type { MedioPagoId } from '../features/caja/cobro/medios-pago';
 
 /**
  * Diccionario del POS. Hereda los bloques que traen los libs compartidos (auth,
@@ -71,6 +73,7 @@ export interface AppDict
       sinStock: { title: string; desc: string };
       agregarError: { title: string; desc: string };
       codigoNoEncontrado: { title: string; desc: string };
+      ventaBloqueada: { title: string; desc: string };
     };
     tabs: {
       label: string;
@@ -81,6 +84,7 @@ export interface AppDict
       guardar: string;
       cerrar: string;
       confirmarCierre: { header: string; message: string; aceptar: string };
+      cobroPendiente: { title: string; desc: string };
     };
     carrito: {
       /** Prefijo del nombre de las ventas nuevas: "Venta 1", "Venta 2"… */
@@ -91,7 +95,9 @@ export interface AppDict
       vacioDesc: string;
       cancelar: string;
       cobrar: string;
-      cobrarProximamente: string;
+      retomarCobro: string;
+      /** Aviso del panel; le sigue el número del documento. */
+      cobroPendiente: string;
       resumen: {
         productos: string;
         cantidad: string;
@@ -116,6 +122,53 @@ export interface AppDict
         cantidadMax: string;
         cancelar: string;
         guardar: string;
+      };
+    };
+    cobro: {
+      titulo: string;
+      total: string;
+      medios: Record<MedioPagoId, string> & { proximamente: string };
+      efectivo: {
+        recibido: string;
+        recibidoMinimo: string;
+        exacto: string;
+        cambio: string;
+        cuenta: string;
+        asesor: string;
+        volver: string;
+        cobrar: string;
+      };
+      fases: Record<FaseCobro, string>;
+      exito: {
+        titulo: string;
+        desc: string;
+        documento: string;
+        cambio: string;
+        imprimir: string;
+        nuevaVenta: string;
+      };
+      pendiente: {
+        titulo: string;
+        /** Le sigue el número del documento. */
+        desc: string;
+        faltaPago: string;
+        faltaAprobar: string;
+        reintentar: string;
+        descartar: string;
+        descartarConfirm: { header: string; message: string; aceptar: string };
+      };
+      requisitos: {
+        configuracion: { title: string; desc: string };
+        productos: { title: string; desc: string };
+        cliente: { title: string; desc: string };
+      };
+      errores: {
+        generico: string;
+        configuracion: string;
+        metodoPago: string;
+        plazoContado: string;
+        descartar: string;
+        imprimir: { title: string; desc: string };
       };
     };
   };
