@@ -14,7 +14,13 @@
   (keydown.space)="$event.preventDefault(); onActivate()"
 >
   <!-- Monogram -->
-  <span class="cl-row__monogram" aria-hidden="true">{{ avatarLabel() }}</span>
+  <span class="cl-row__monogram" aria-hidden="true">
+    @if (contenedor().cliente_imagen_thumbnail; as src) {
+      <img [src]="src" alt="" class="size-full object-cover" />
+    } @else {
+      {{ avatarLabel() }}
+    }
+  </span>
 
   <!-- Main: nombre + meta -->
   <span class="cl-row__main">

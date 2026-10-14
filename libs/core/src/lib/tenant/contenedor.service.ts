@@ -67,6 +67,25 @@ export class ContenedorService extends BaseHttpService {
     return this.patch<UpdateContenedorResponse>(`/contenedor/cliente/${id}/`, payload);
   }
 
+  /**
+   * Carga o reemplaza la imagen de la empresa (multipart, campo `imagen`). El
+   * backend acepta JPEG, PNG o WEBP de hasta 5 MB, genera el original y la
+   * miniatura en WEBP y responde la ficha con las dos URLs. Solo el propietario.
+   */
+  subirImagen(id: number, imagen: File): Observable<ContenedorDetalle> {
+    return this.postFile<ContenedorDetalle>(
+      `/contenedor/cliente/${id}/imagen/`,
+      imagen,
+      undefined,
+      'imagen',
+    );
+  }
+
+  /** Quita la imagen de la empresa. Quitarla a una que no tiene no es error. */
+  quitarImagen(id: number): Observable<ContenedorDetalle> {
+    return this.delete<ContenedorDetalle>(`/contenedor/cliente/${id}/imagen/`);
+  }
+
   deleteContenedor(id: number): Observable<unknown> {
     return this.delete(`/contenedor/cliente/${id}/`);
   }

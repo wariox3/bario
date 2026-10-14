@@ -348,6 +348,14 @@ export class ContenedoresListComponent {
       });
   }
 
+  /**
+   * La imagen se guarda al elegirla, con el modal todavía abierto: el listado
+   * se recarga ya, y no al cerrar, para que «Cancelar» no parezca deshacerla.
+   */
+  onContenedorImagenChanged(): void {
+    this.reload$.next();
+  }
+
   deleteContenedor(item: Contenedor): void {
     this.contenedorToDelete.set(item);
     this.showDelete.set(true);

@@ -15,7 +15,13 @@
 >
   <!-- Top: monogram + (pill + acción) -->
   <div class="cl-card__top">
-    <span class="cl-card__monogram" aria-hidden="true">{{ avatarLabel() }}</span>
+    <span class="cl-card__monogram" aria-hidden="true">
+      @if (contenedor().cliente_imagen_thumbnail; as src) {
+        <img [src]="src" alt="" class="size-full object-cover" />
+      } @else {
+        {{ avatarLabel() }}
+      }
+    </span>
     <div class="flex flex-col items-end gap-1.5">
       @if (contenedor().suscripcion_suscripcion_tipo_nombre) {
         @if (isExpired()) {

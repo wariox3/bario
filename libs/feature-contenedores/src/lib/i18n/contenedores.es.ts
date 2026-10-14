@@ -101,6 +101,22 @@ export const contenedoresEs: ContenedoresDict = {
         desc: 'No se pudo actualizar la empresa. Intenta de nuevo.',
       },
     },
+    image: {
+      title: 'Imagen de la empresa',
+      description: 'Reemplaza la inicial en el listado de empresas.',
+      upload: 'Subir imagen',
+      change: 'Cambiar imagen',
+      remove: 'Quitar',
+      hint: 'JPG, PNG o WEBP, hasta 5 MB. Se guarda al elegirla.',
+      tileLabel: 'Elegir imagen para {nombre}',
+      uploading: 'Subiendo imagen…',
+      errors: {
+        type: 'El archivo no es una imagen JPG, PNG o WEBP.',
+        size: 'La imagen pesa más de 5 MB.',
+        upload: 'No se pudo subir la imagen. Intenta de nuevo.',
+        remove: 'No se pudo quitar la imagen. Intenta de nuevo.',
+      },
+    },
   },
   delete: {
     title: 'Eliminar contenedor',

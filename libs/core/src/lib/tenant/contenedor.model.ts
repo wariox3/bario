@@ -185,6 +185,10 @@ export interface Contenedor extends ContenedorAccesoFlags {
   /** Solo se puede ingresar a un contenedor `listo`. */
   estado: ContenedorEstado;
   dominio: string;
+  /** Imagen que identifica a la empresa (WEBP, 1024px). Sin imagen, se pinta la inicial. */
+  cliente_imagen?: string | null;
+  /** Miniatura cuadrada (320×320) de `cliente_imagen`: la que va en tarjetas y filas. */
+  cliente_imagen_thumbnail?: string | null;
   suscripcion_id?: number;
   suscripcion_fecha_fin?: string;
   suscripcion_frecuencia?: 'P' | 'M' | 'A';
@@ -222,6 +226,14 @@ export interface ContenedorDetalle {
   readonly estado: ContenedorEstado;
   /** Alta de la empresa, `yyyy-MM-ddTHH:mm:ss`. */
   readonly fecha_creacion: string | null;
+  /**
+   * Imagen que identifica a la empresa en la interfaz (WEBP, 1024px), no el
+   * logotipo de los formatos impresos. Se carga y se quita aparte del `PATCH`,
+   * con `/contenedor/cliente/{id}/imagen/`.
+   */
+  readonly imagen: string | null;
+  /** Miniatura cuadrada (320×320) de `imagen`. */
+  readonly imagen_thumbnail: string | null;
 }
 
 export interface CreateContenedorRequest {

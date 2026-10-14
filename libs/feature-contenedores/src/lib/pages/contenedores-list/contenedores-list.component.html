@@ -205,6 +205,7 @@
       [contenedor]="contenedorToEdit()"
       (visibleChange)="showEdit.set($event)"
       (updated)="onContenedorUpdated()"
+      (imagenChanged)="onContenedorImagenChanged()"
     />
   }
 }

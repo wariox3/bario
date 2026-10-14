@@ -89,6 +89,24 @@ export interface ContenedoresDict {
       success: { title: string; desc: string };
       error: { title: string; desc: string };
     };
+    /** Imagen que identifica a la empresa: se guarda sola, aparte del formulario. */
+    image: {
+      title: string;
+      description: string;
+      upload: string;
+      change: string;
+      remove: string;
+      hint: string;
+      /** Rótulo del recuadro para lectores de pantalla (`{nombre}`). */
+      tileLabel: string;
+      uploading: string;
+      errors: {
+        type: string;
+        size: string;
+        upload: string;
+        remove: string;
+      };
+    };
   };
   delete: {
     title: string;
