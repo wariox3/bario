@@ -31,7 +31,7 @@ import { CorregirElectronicoDialogComponent } from '../corregir-electronico-dial
 /**
  * Dropdown **Electrónico** de la ficha de un documento electrónico (factura de
  * venta, documento soporte…): *Emitir* lo envía a la DIAN cuando está aprobado
- * y aún no se notificó, *Corregir* arregla la cabecera que viaja a la DIAN
+ * y aún no es electrónico, *Corregir* arregla la cabecera que viaja a la DIAN
  * (número, resolución y fechas) mientras no haya salido, e *Información* abre
  * el rastro de envíos y las validaciones DIAN.
  *
@@ -86,19 +86,17 @@ export class DocumentoElectronicoMenuComponent {
   /** Control del diálogo "Corregir". */
   protected readonly corregirVisible = signal(false);
 
-  /** Misma regla pura que la botonera: aprobado, sin contabilizar y sin salir a la DIAN. */
-  private readonly puedeCorregir = computed(
-    () => capacidadesDocumento(this.estados()).puedeCorregirElectronico,
-  );
+  /** Reglas puras de la botonera (`capacidadesDocumento`): ver su tabla. */
+  private readonly capacidades = computed(() => capacidadesDocumento(this.estados()));
+
+  /** Aprobado, sin contabilizar y sin salir a la DIAN. */
+  private readonly puedeCorregir = computed(() => this.capacidades().puedeCorregirElectronico);
 
   /**
-   * Se emite un documento aprobado que todavía no se notificó. Antes de aprobar
-   * el backend lo rechaza, y uno ya notificado no tiene nada más que enviar.
+   * Aprobado, no anulado y que la DIAN todavía no aceptó. Uno que ya es
+   * electrónico tiene su CUE: no hay nada más que enviar.
    */
-  private readonly puedeEmitir = computed(() => {
-    const estados = this.estados();
-    return !!estados.estado_aprobado && !estados.estado_electronico_notificado;
-  });
+  private readonly puedeEmitir = computed(() => this.capacidades().puedeEmitirElectronico);
 
   /**
    * Entradas del menú. `computed` porque recrear el array en cada detección de
