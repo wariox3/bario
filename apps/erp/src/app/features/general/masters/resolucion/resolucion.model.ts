@@ -70,3 +70,9 @@ export interface ResolucionPayload {
  * Determina el flag `venta`/`compra` del payload y el filtro fijo del listado.
  */
 export type ResolucionTipo = 'venta' | 'compra';
+
+/** El `modulo` que `lista-dian/` pide para cada contexto. */
+export const RESOLUCION_MODULO_DIAN = {
+  venta: 'facturacion',
+  compra: 'compras',
+} as const satisfies Record<ResolucionTipo, string>;

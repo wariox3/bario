@@ -23,7 +23,7 @@ import {
 } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { ResolucionService } from '../../resolucion.service';
-import type { ResolucionDian, ResolucionDianRow } from '../../resolucion.model';
+import type { ResolucionDian, ResolucionDianRow, ResolucionTipo } from '../../resolucion.model';
 import { marcarImportadas, prefijosYNumerosDe } from '../../utils/resolucion-dian.utils';
 import {
   RESOLUCIONES_DIAN_COLUMNS,
@@ -62,6 +62,8 @@ export class ResolucionDianDialogComponent {
   protected readonly t = this.i18n.t;
 
   readonly visible = model<boolean>(false);
+  /** Módulo desde el que se abre: `lista-dian/` solo trae las suyas. */
+  readonly tipo = input.required<ResolucionTipo>();
   /** Importar crea una resolución: el host lo pasa con el permiso de crear. */
   readonly puedeImportar = input<boolean>(false);
   readonly imported = output<void>();
@@ -138,7 +140,7 @@ export class ResolucionDianDialogComponent {
     this.isLoading.set(true);
     this.service
       // El paginador cuenta desde 0; `page` del backend, desde 1.
-      .listaDian(this.currentPage() + 1)
+      .listaDian(this.tipo(), this.currentPage() + 1)
       .pipe(
         switchMap((response) => {
           if (response.results.length === 0) return of({ response, existentes: [] });

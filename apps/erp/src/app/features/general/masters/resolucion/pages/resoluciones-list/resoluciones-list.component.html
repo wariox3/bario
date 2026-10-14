@@ -45,6 +45,7 @@
 
 <app-resolucion-dian-dialog
   [(visible)]="listaDianVisible"
+  [tipo]="tipo()"
   [puedeImportar]="acciones.puedeCrear()"
   (imported)="onRefresh()"
 />
