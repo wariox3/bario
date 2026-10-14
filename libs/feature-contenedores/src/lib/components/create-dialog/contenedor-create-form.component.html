@@ -5,6 +5,15 @@
   class="flex flex-col gap-[1.1rem]"
   autocomplete="off"
 >
+  <!-- Imagen: solo al editar — el endpoint pide el id de una empresa que ya existe. -->
+  @if (contenedor(); as c) {
+    <lib-contenedor-imagen
+      [contenedor]="c"
+      [nombre]="nombre() ?? ''"
+      (changed)="imagenChanged.emit($event)"
+    />
+  }
+
   <!-- Nombre -->
   <div class="flex flex-col">
     <label

@@ -1,0 +1,104 @@
+<!--
+  Banda de identidad: el recuadro tiene la forma y el radio del monograma de la
+  tarjeta del listado, así que lo que se ve acá es lo que se va a ver allá. Sin
+  imagen muestra la misma inicial, que sigue en vivo al nombre del form.
+
+  El recuadro es en sí un botón (clic o arrastrar y soltar); los botones de al
+  lado dicen lo mismo con palabras para quien no lo descubra.
+-->
+<div
+  class="flex items-center gap-4 rounded-xl border border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] p-4"
+>
+  <button
+    type="button"
+    class="group relative flex size-[72px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[14px] border p-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[rgba(19,38,60,0.12)] disabled:cursor-progress"
+    [ngClass]="
+      dragging()
+        ? 'border-dashed border-brand-blue bg-[rgba(119,170,215,0.12)]'
+        : 'border-transparent bg-[rgba(19,38,60,0.06)]'
+    "
+    [disabled]="busy() !== null"
+    [attr.aria-label]="tileLabel()"
+    (click)="openPicker()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+  >
+    @if (imagen(); as src) {
+      <img [src]="src" alt="" class="size-full object-cover" />
+    } @else {
+      <span class="text-[1.35rem] font-bold tracking-[-0.03em] text-brand-navy" aria-hidden="true">
+        {{ inicial() }}
+      </span>
+    }
+
+    <!-- Al pasar por encima, el recuadro anuncia que se puede cambiar. -->
+    @if (busy() === null) {
+      <span
+        class="absolute inset-0 flex items-center justify-center bg-[rgba(19,38,60,0.45)] opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+        aria-hidden="true"
+      >
+        <i class="pi pi-camera text-[0.95rem] text-white"></i>
+      </span>
+    } @else {
+      <span
+        class="absolute inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.7)]"
+        aria-hidden="true"
+      >
+        <i class="pi pi-spin pi-spinner text-[1rem] text-brand-navy"></i>
+      </span>
+    }
+  </button>
+
+  <div class="flex min-w-0 flex-1 flex-col gap-2">
+    <div class="flex flex-col gap-0.5">
+      <span class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-navy">
+        {{ t().contenedores.edit.image.title }}
+      </span>
+      <span class="text-[0.72rem] leading-snug text-brand-muted">
+        {{ t().contenedores.edit.image.description }}
+      </span>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <p-button
+        type="button"
+        [label]="imagen() ? t().contenedores.edit.image.change : t().contenedores.edit.image.upload"
+        icon="pi pi-upload"
+        [outlined]="true"
+        severity="secondary"
+        [loading]="busy() === 'subiendo'"
+        [disabled]="busy() !== null"
+        (onClick)="openPicker()"
+      />
+      @if (imagen()) {
+        <p-button
+          type="button"
+          [label]="t().contenedores.edit.image.remove"
+          severity="danger"
+          [text]="true"
+          [loading]="busy() === 'quitando'"
+          [disabled]="busy() !== null"
+          (onClick)="quitar()"
+        />
+      }
+    </div>
+
+    @if (error(); as mensaje) {
+      <p role="alert" class="m-0 flex items-start gap-1.5 text-[0.72rem] font-medium text-rose-600">
+        <i class="pi pi-exclamation-circle mt-px text-[0.7rem]" aria-hidden="true"></i>
+        {{ mensaje }}
+      </p>
+    } @else {
+      <p class="m-0 text-[0.68rem] leading-snug text-brand-muted" aria-live="polite">
+        {{
+          busy() === 'subiendo'
+            ? t().contenedores.edit.image.uploading
+            : t().contenedores.edit.image.hint
+        }}
+      </p>
+    }
+  </div>
+</div>
+
+<input #fileInput type="file" [accept]="accept" class="hidden" (change)="onFileSelected($event)" />

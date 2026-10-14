@@ -12,6 +12,11 @@ export interface DocumentoPorEmitir {
   readonly resolucion_prefijo?: string | null;
   readonly resolucion_numero?: string | null;
   readonly estado_electronico_enviado: boolean;
+  /**
+   * Ya salió hacia la DIAN y espera su respuesta: no se puede volver a emitir.
+   * Opcional hasta que el backend lo serialice en `lista/`.
+   */
+  readonly estado_electronico_enviando?: boolean;
   /** El último intento de emitir falló; los motivos están en `documento-electronico-error/`. */
   readonly estado_electronico_error?: boolean;
   readonly [campo: string]: unknown;
@@ -21,7 +26,7 @@ export interface DocumentoPorEmitir {
  * Estado electrónico visible. No hay "descartado": el filtro fijo de las tres
  * pantallas ya excluye los descartados, así que nunca llegaría a verse.
  */
-export type EstadoElectronico = 'error' | 'enviado' | 'pendiente';
+export type EstadoElectronico = 'error' | 'pendienteRespuesta' | 'pendienteEnvio';
 
 /** La fila con lo que se deriva al mapear la respuesta. */
 export interface DocumentoPorEmitirFila extends DocumentoPorEmitir {

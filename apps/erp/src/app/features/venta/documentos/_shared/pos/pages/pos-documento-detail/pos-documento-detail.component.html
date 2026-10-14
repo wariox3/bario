@@ -13,7 +13,7 @@
     size="small"
     (onClick)="onBack()"
   />
-  @if (cabecera()) {
+  @if (cabecera(); as cab) {
     <app-document-detail-actions
       [documentoId]="id()"
       [document]="document()"
@@ -45,7 +45,30 @@
         [disabled]="!isEditable()"
         (onClick)="onEdit()"
       />
+      @if (esElectronico()) {
+        <p-button
+          actionsEnd
+          type="button"
+          [label]="t().documentActions.electronico.action"
+          icon="pi pi-chevron-down"
+          iconPos="right"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [loading]="electronico.isEmitiendo()"
+          (onClick)="electronico.toggle($event)"
+        />
+      }
     </app-document-detail-actions>
+    <!-- Dropdown Electrónico: emitir a la DIAN y ver la información electrónica. Solo
+         lo abre el botón, que aparece en la POS electrónica. -->
+    <app-documento-electronico-menu
+      #electronico
+      [documentoId]="documentoIdNumero()"
+      [estados]="cab.estados"
+      [document]="document()"
+      (documentoChanged)="onDocumentoChanged()"
+    />
   }
 </header>
 
@@ -131,6 +154,23 @@
         <dt class="pos-documento-detail__label">{{ det.labels.ordenCompra }}</dt>
         <dd class="pos-documento-detail__value">{{ c.ordenCompra }}</dd>
       </div>
+      @if (esElectronico()) {
+        <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+          <dt class="pos-documento-detail__label">{{ det.labels.cue }}</dt>
+          <dd class="pos-documento-detail__value break-all">
+            {{ c.cue }}
+            @if (dianUrl(); as url) {
+              <a
+                class="ml-2 font-semibold text-sky-700 hover:underline"
+                [href]="url"
+                target="_blank"
+                rel="noopener noreferrer"
+                >{{ det.labels.verDian }}</a
+              >
+            }
+          </dd>
+        </div>
+      }
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="pos-documento-detail__label">{{ det.labels.comentario }}</dt>
         <dd class="pos-documento-detail__value">{{ c.comentario }}</dd>

@@ -593,6 +593,10 @@ cuál comprometía algo.
   `rejectButtonStyleClass`: ya hereda el estándar.
 - En un `<p-dialog>` propio, la secundaria va como `severity="secondary"` `[text]="true"` a la
   izquierda de la primaria (ver el chrome de `descontabilizar-modal`).
+- **Ícono:** `pi pi-exclamation-triangle` en toda confirmación con consecuencias (eliminar, quitar,
+  salir de una empresa). El ícono de la acción (`pi-trash`, `pi-sign-out`…) vive en el menú o el
+  botón que la nombra, no en el modal: a ese tamaño, junto al mensaje, no advierte nada y parece
+  suelto. `pi-info-circle` solo para avisos sin riesgo.
 
 ## Regla: `<p-datepicker>` va siempre con `[fluid]="true"`
 

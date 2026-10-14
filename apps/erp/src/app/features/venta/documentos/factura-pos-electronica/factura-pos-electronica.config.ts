@@ -14,8 +14,8 @@ import {
  * Es el mismo documento que la factura POS salvo por el tipo: la cabecera, los
  * pagos y las líneas son idénticos, y de hecho comparten las páginas de la
  * familia POS (`documentos/_shared/pos/`). Lo electrónico lo resuelve el backend
- * a partir del `documento_tipo` — el front no cambia nada más allá de exponer el
- * filtro `estado_electronico` en el listado.
+ * a partir del `documento_tipo`; el front expone el filtro `estado_electronico`
+ * en el listado y, por `electronico`, el dropdown Electrónico y el CUE en la ficha.
  *
  * - `endpoint` no incluye el sufijo de operación (`/lista/`, `/eliminar/`):
  *   el `HttpEntityDataGateway` lo añade según corresponda.
@@ -61,4 +61,6 @@ export const FACTURA_POS_ELECTRONICA_CONFIG: DocumentEntityConfig = {
   // registrado en ENTITY_ACTION_PROVIDERS):
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
   extraActionIds: ['export-excel'],
+  // Se emite a la DIAN: la ficha suma el dropdown Electrónico y el CUE.
+  electronico: { resolucionParams: { venta: 'True' } },
 };

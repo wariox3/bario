@@ -15,7 +15,13 @@
 >
   <!-- Top: monogram + (pill + acción) -->
   <div class="cl-card__top">
-    <span class="cl-card__monogram" aria-hidden="true">{{ avatarLabel() }}</span>
+    <span class="cl-card__monogram" aria-hidden="true">
+      @if (contenedor().cliente_imagen_thumbnail; as src) {
+        <img [src]="src" alt="" class="size-full object-cover" />
+      } @else {
+        {{ avatarLabel() }}
+      }
+    </span>
     <div class="flex flex-col items-end gap-1.5">
       @if (contenedor().suscripcion_suscripcion_tipo_nombre) {
         @if (isExpired()) {
@@ -67,16 +73,12 @@
     </div>
   </div>
 
-  <!-- Body: nombre + dominio + rol + inactivo -->
+  <!-- Body: nombre con su rol + dominio + última conexión -->
   <div class="cl-card__body">
-    <span class="cl-card__nombre">{{ contenedor().cliente_nombre }}</span>
-    <span class="cl-card__meta">
-      <i class="pi pi-globe cl-card__meta-icon" aria-hidden="true"></i>
-      <span class="cl-card__domain">{{ contenedor().dominio }}</span>
-    </span>
-    <div class="flex items-center gap-1.5 mt-1">
+    <span class="flex min-w-0 items-center gap-2">
+      <span class="cl-card__nombre min-w-0">{{ contenedor().cliente_nombre }}</span>
       <span
-        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
+        class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
         [ngClass]="
           isOwner()
             ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
@@ -90,13 +92,23 @@
       </span>
       @if (!contenedor().activo) {
         <span
-          class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
+          class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
         >
           <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
           Inactivo
         </span>
       }
-    </div>
+    </span>
+    <span class="cl-card__meta">
+      <i class="pi pi-globe cl-card__meta-icon" aria-hidden="true"></i>
+      <span class="cl-card__domain">{{ contenedor().dominio }}</span>
+    </span>
+    @if (ultimaConexion(); as conexion) {
+      <span class="cl-card__meta" [title]="lastConnectionLabel() + ': ' + conexion.exacta">
+        <i class="pi pi-clock cl-card__meta-icon" aria-hidden="true"></i>
+        <span class="truncate">{{ lastConnectionLabel() }} {{ conexion.recencia }}</span>
+      </span>
+    }
   </div>
 
   <!-- Footer: fecha de vencimiento + CTA (o el estado, si no está listo) -->

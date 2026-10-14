@@ -50,6 +50,12 @@ export interface CapacidadesDocumento {
    * la cabecera. Solo la ofrecen los documentos con config `electronico`.
    */
   readonly puedeCorregirElectronico: boolean;
+  /**
+   * Emitir a la DIAN (dropdown Electrónico). Solo un documento aprobado que la
+   * DIAN todavía no aceptó: uno que ya es electrónico tiene su CUE y volver a
+   * enviarlo no es idempotente.
+   */
+  readonly puedeEmitirElectronico: boolean;
 }
 
 /**
@@ -62,6 +68,7 @@ export interface CapacidadesDocumento {
  * | Anular     | no          | sí       | sí            | no             | no      |
  * | Corregir   | no          | sí       | no            | sí             | no      |
  * | Corr. DIAN | no          | sí       | no            | no             | no      |
+ * | Emitir     | no          | sí       | sí            | ver abajo      | no      |
  *
  * Cuatro cosas que la tabla deja ver mejor que un template:
  *
@@ -83,6 +90,11 @@ export interface CapacidadesDocumento {
  *   resolución y fechas sí: una vez en camino o aceptado, cambiarlos lo
  *   dejaría distinto de lo que recibió la DIAN. Antes de eso se corrige haya
  *   fallado o no la emisión.
+ * - **Emitir se apaga en cuanto el documento es electrónico.** Con
+ *   `estado_electronico` (o ya notificado) la DIAN lo aceptó: no hay nada más
+ *   que enviar. `enviado` a secas **no** lo apaga, para poder reintentar un
+ *   envío que la DIAN rechazó. Es el mismo criterio de la utilidad de envío
+ *   masivo, que filtra `estado_electronico = false`.
  * - **Todo pasa por aprobar.** Sin aprobación no hay nada que revertir ni anular.
  *
  * Recibe el `DocumentoEstados` de `@reddoc/core` tal cual, con sus banderas
@@ -98,6 +110,7 @@ export function capacidadesDocumento(estados: DocumentoEstados): CapacidadesDocu
       puedeAnular: false,
       puedeCorregir: false,
       puedeCorregirElectronico: false,
+      puedeEmitirElectronico: false,
     };
   }
 
@@ -110,6 +123,8 @@ export function capacidadesDocumento(estados: DocumentoEstados): CapacidadesDocu
     puedeAnular: aprobado && !estados.estado_electronico_enviado,
     puedeCorregir: corregible,
     puedeCorregirElectronico: corregible && !enviadoDian(estados),
+    puedeEmitirElectronico:
+      aprobado && !estados.estado_electronico && !estados.estado_electronico_notificado,
   };
 }
 

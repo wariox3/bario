@@ -21,6 +21,18 @@ export interface ContenedoresDict {
       edit: string;
       updateSubscription: string;
       delete: string;
+      leave: string;
+    };
+    /** Confirmación de un miembro que sale de la empresa (`{nombre}`). */
+    leave: {
+      title: string;
+      message: string;
+      accept: string;
+      cancel: string;
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+      };
     };
     view: {
       list: string;
@@ -48,6 +60,8 @@ export interface ContenedoresDict {
       failed: { title: string; desc: string };
     };
     /** Pill de la tarjeta/fila: el backend solo distingue propietario o no. */
+    /** Antecede a la recencia: «Última conexión hace 3 horas». */
+    lastConnection: string;
     roles: {
       propietario: string;
       miembro: string;
@@ -88,6 +102,24 @@ export interface ContenedoresDict {
     toasts: {
       success: { title: string; desc: string };
       error: { title: string; desc: string };
+    };
+    /** Imagen que identifica a la empresa: se guarda sola, aparte del formulario. */
+    image: {
+      title: string;
+      description: string;
+      upload: string;
+      change: string;
+      remove: string;
+      hint: string;
+      /** Rótulo del recuadro para lectores de pantalla (`{nombre}`). */
+      tileLabel: string;
+      uploading: string;
+      errors: {
+        type: string;
+        size: string;
+        upload: string;
+        remove: string;
+      };
     };
   };
   delete: {

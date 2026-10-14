@@ -322,7 +322,7 @@ export interface AppDict
     emisionElectronica: {
       actions: { emitir: string; descartar: string };
       columns: { estado: string };
-      estado: { error: string; enviado: string; pendiente: string };
+      estado: { error: string; pendienteRespuesta: string; pendienteEnvio: string };
     };
     errorElectronico: {
       ver: string;
@@ -2172,6 +2172,8 @@ export interface AppDict
           almacen: string;
           metodoPago: string;
           conceptoCorreccion: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2263,6 +2265,8 @@ export interface AppDict
           metodoPago: string;
           asesor: string;
           ordenCompra: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2697,7 +2701,6 @@ export interface AppDict
           proveedor: string;
           proveedorPlaceholder: string;
           fecha: string;
-          fechaVence: string;
           documentoReferencia: string;
           documentoReferenciaPlaceholder: string;
           documentoReferenciaDisabled: string;
@@ -2729,13 +2732,14 @@ export interface AppDict
           proveedor: string;
           identificacion: string;
           fecha: string;
-          fechaVence: string;
           documentoReferencia: string;
           plazoPago: string;
           metodoPago: string;
           conceptoCorreccion: string;
           centroCosto: string;
           ordenCompra: string;
+          cue: string;
+          verDian: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };

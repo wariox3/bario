@@ -116,7 +116,7 @@ export abstract class BaseHttpService {
     return this.http.patch<T>(`${this.baseUrl}${path}`, body, { context: this.context(opts) });
   }
 
-  protected delete<T = void>(path: string): Observable<T> {
-    return this.http.delete<T>(`${this.baseUrl}${path}`, { context: this.context() });
+  protected delete<T = void>(path: string, opts?: RequestOptions): Observable<T> {
+    return this.http.delete<T>(`${this.baseUrl}${path}`, { context: this.context(opts) });
   }
 }

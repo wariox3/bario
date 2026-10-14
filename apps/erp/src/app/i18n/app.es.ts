@@ -312,7 +312,11 @@ export const es: AppDict = {
     emisionElectronica: {
       actions: { emitir: 'Emitir', descartar: 'Descartar' },
       columns: { estado: 'Estado' },
-      estado: { error: 'Error', enviado: 'Esperando respuesta', pendiente: 'Pendiente' },
+      estado: {
+        error: 'Error',
+        pendienteRespuesta: 'Pendiente respuesta',
+        pendienteEnvio: 'Pendiente envío',
+      },
     },
     errorElectronico: {
       ver: 'Ver el detalle del error',
@@ -2864,6 +2868,8 @@ export const es: AppDict = {
           almacen: 'Almacén',
           metodoPago: 'Método de pago',
           conceptoCorreccion: 'Concepto corrección',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {
@@ -2988,6 +2994,8 @@ export const es: AppDict = {
           metodoPago: 'Método de pago',
           asesor: 'Asesor',
           ordenCompra: 'Orden de compra',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {
@@ -3552,7 +3560,6 @@ export const es: AppDict = {
           proveedor: 'Proveedor',
           proveedorPlaceholder: 'Buscar proveedor…',
           fecha: 'Fecha',
-          fechaVence: 'Fecha de vencimiento',
           documentoReferencia: 'Documento referencia',
           documentoReferenciaPlaceholder: 'Selecciona el documento soporte…',
           documentoReferenciaDisabled: 'Selecciona primero un proveedor',
@@ -3602,13 +3609,14 @@ export const es: AppDict = {
           proveedor: 'Proveedor',
           identificacion: 'Identificación',
           fecha: 'Fecha',
-          fechaVence: 'Fecha de vencimiento',
           documentoReferencia: 'Documento referencia',
           plazoPago: 'Plazo de pago',
           metodoPago: 'Método de pago',
           conceptoCorreccion: 'Concepto corrección',
           centroCosto: 'Centro de costo',
           ordenCompra: 'Orden de compra',
+          cue: 'CUE',
+          verDian: 'Ver documento DIAN',
           comentario: 'Comentario',
         },
         notFound: {

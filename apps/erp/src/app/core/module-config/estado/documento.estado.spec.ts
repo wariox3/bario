@@ -20,6 +20,7 @@ describe('capacidadesDocumento — sin aprobar', () => {
       puedeAnular: false,
       puedeCorregir: false,
       puedeCorregirElectronico: false,
+      puedeEmitirElectronico: false,
     });
   });
 });
@@ -32,6 +33,7 @@ describe('capacidadesDocumento — aprobado', () => {
       puedeAnular: true,
       puedeCorregir: true,
       puedeCorregirElectronico: true,
+      puedeEmitirElectronico: true,
     });
   });
 });
@@ -64,6 +66,7 @@ describe('capacidadesDocumento — anulado', () => {
       puedeAnular: false,
       puedeCorregir: false,
       puedeCorregirElectronico: false,
+      puedeEmitirElectronico: false,
     });
   });
 
@@ -82,6 +85,7 @@ describe('capacidadesDocumento — banderas ausentes', () => {
       puedeAnular: true,
       puedeCorregir: true,
       puedeCorregirElectronico: true,
+      puedeEmitirElectronico: true,
     });
   });
 });
@@ -94,6 +98,7 @@ describe('CAPACIDADES_DOCUMENTO_VACIAS', () => {
       puedeAnular: false,
       puedeCorregir: false,
       puedeCorregirElectronico: false,
+      puedeEmitirElectronico: false,
     });
   });
 });
@@ -142,5 +147,34 @@ describe('capacidadesDocumento — corregir (DIAN)', () => {
   it('no aplica sin aprobar ni anulado', () => {
     expect(capacidadesDocumento(SIN_APROBAR).puedeCorregirElectronico).toBe(false);
     expect(capacidadesDocumento(ANULADO).puedeCorregirElectronico).toBe(false);
+  });
+});
+
+describe('capacidadesDocumento — emitir (DIAN)', () => {
+  it('se abre aprobado y sin emitir', () => {
+    expect(capacidadesDocumento(APROBADO).puedeEmitirElectronico).toBe(true);
+  });
+
+  it('contabilizar no impide emitir: son ejes distintos', () => {
+    expect(capacidadesDocumento(CONTABILIZADO).puedeEmitirElectronico).toBe(true);
+  });
+
+  it('sigue abierta enviado sin aceptar: se reintenta un envío rechazado', () => {
+    expect(capacidadesDocumento(ENVIADO).puedeEmitirElectronico).toBe(true);
+  });
+
+  it('se cierra en cuanto el documento ya es electrónico', () => {
+    expect(
+      capacidadesDocumento({ ...ENVIADO, estado_electronico: true }).puedeEmitirElectronico,
+    ).toBe(false);
+    expect(
+      capacidadesDocumento({ ...APROBADO, estado_electronico_notificado: true })
+        .puedeEmitirElectronico,
+    ).toBe(false);
+  });
+
+  it('no aplica sin aprobar ni anulado', () => {
+    expect(capacidadesDocumento(SIN_APROBAR).puedeEmitirElectronico).toBe(false);
+    expect(capacidadesDocumento(ANULADO).puedeEmitirElectronico).toBe(false);
   });
 });

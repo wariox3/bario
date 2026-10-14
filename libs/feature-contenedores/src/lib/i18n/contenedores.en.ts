@@ -18,6 +18,18 @@ export const contenedoresEn: ContenedoresDict = {
       edit: 'Edit container',
       updateSubscription: 'Update subscription',
       delete: 'Delete container',
+      leave: 'Leave company',
+    },
+    leave: {
+      title: 'Leave {nombre}',
+      message:
+        'You will no longer see this company or its data. To come back, the owner will have to invite you again.',
+      accept: 'Leave',
+      cancel: 'Cancel',
+      toasts: {
+        success: { title: 'You left the company', desc: 'You no longer have access to {nombre}.' },
+        error: { title: 'Could not leave', desc: 'Try again in a moment.' },
+      },
     },
     view: {
       list: 'List view',
@@ -51,6 +63,7 @@ export const contenedoresEn: ContenedoresDict = {
         desc: 'Something went wrong while setting up {nombre}.',
       },
     },
+    lastConnection: 'Last connection',
     roles: {
       propietario: 'Owner',
       miembro: 'Member',
@@ -94,6 +107,22 @@ export const contenedoresEn: ContenedoresDict = {
     toasts: {
       success: { title: 'Company updated', desc: 'Changes were saved successfully.' },
       error: { title: 'Update error', desc: 'Could not update the company. Try again.' },
+    },
+    image: {
+      title: 'Company image',
+      description: 'Replaces the initial in the company list.',
+      upload: 'Upload image',
+      change: 'Change image',
+      remove: 'Remove',
+      hint: 'JPG, PNG or WEBP, up to 5 MB. Saved as soon as you pick it.',
+      tileLabel: 'Choose an image for {nombre}',
+      uploading: 'Uploading image…',
+      errors: {
+        type: 'The file is not a JPG, PNG or WEBP image.',
+        size: 'The image is larger than 5 MB.',
+        upload: 'Could not upload the image. Try again.',
+        remove: 'Could not remove the image. Try again.',
+      },
     },
   },
   delete: {

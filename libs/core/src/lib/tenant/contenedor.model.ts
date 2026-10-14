@@ -178,6 +178,11 @@ export interface ContenedorEstadoResponse {
  * —`celular`, `correo`— **no viajan acá**: solo en la ficha.
  */
 export interface Contenedor extends ContenedorAccesoFlags {
+  /**
+   * Id de la **membresía** (la fila usuario-cliente), no de la empresa: es el
+   * que pide `DELETE /seguridad/usuario-cliente/{id}/` para salir de ella.
+   */
+  id: number;
   cliente_id: number;
   schema_name: string;
   cliente_nombre: string;
@@ -185,6 +190,15 @@ export interface Contenedor extends ContenedorAccesoFlags {
   /** Solo se puede ingresar a un contenedor `listo`. */
   estado: ContenedorEstado;
   dominio: string;
+  /**
+   * Último ingreso a la empresa (ISO con hora y zona). El schema lo declara
+   * requerido, pero se tolera vacío: sin dato, el listado no pinta la línea.
+   */
+  cliente_fecha_ultima_conexion?: string | null;
+  /** Imagen que identifica a la empresa (WEBP, 1024px). Sin imagen, se pinta la inicial. */
+  cliente_imagen?: string | null;
+  /** Miniatura cuadrada (320×320) de `cliente_imagen`: la que va en tarjetas y filas. */
+  cliente_imagen_thumbnail?: string | null;
   suscripcion_id?: number;
   suscripcion_fecha_fin?: string;
   suscripcion_frecuencia?: 'P' | 'M' | 'A';
@@ -222,6 +236,14 @@ export interface ContenedorDetalle {
   readonly estado: ContenedorEstado;
   /** Alta de la empresa, `yyyy-MM-ddTHH:mm:ss`. */
   readonly fecha_creacion: string | null;
+  /**
+   * Imagen que identifica a la empresa en la interfaz (WEBP, 1024px), no el
+   * logotipo de los formatos impresos. Se carga y se quita aparte del `PATCH`,
+   * con `/contenedor/cliente/{id}/imagen/`.
+   */
+  readonly imagen: string | null;
+  /** Miniatura cuadrada (320×320) de `imagen`. */
+  readonly imagen_thumbnail: string | null;
 }
 
 export interface CreateContenedorRequest {

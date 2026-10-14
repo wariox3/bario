@@ -67,6 +67,7 @@
           [style.text-align]="col.align ?? 'left'"
           [class.lib-data-table__cell--positive]="col.toneFor?.(row) === 'positive'"
           [class.lib-data-table__cell--critical]="col.toneFor?.(row) === 'critical'"
+          [class.lib-data-table__cell--pending]="col.toneFor?.(row) === 'pending'"
         >
           @if (isCellActionable(col, row)) {
             <button

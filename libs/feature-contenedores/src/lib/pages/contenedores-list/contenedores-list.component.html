@@ -119,6 +119,7 @@
                     [contenedor]="item"
                     [index]="i"
                     [showMenu]="hasRowActions()"
+                    [hasActions]="hasActionsFor(item)"
                     [canRenew]="capabilities().subscription"
                     [menuLabel]="t().contenedores.list.actions.menuLabel"
                     [enterLabel]="t().contenedores.list.enter"
@@ -131,6 +132,7 @@
                       creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
                     "
                     [errorLabel]="t().contenedores.list.estado.error"
+                    [lastConnectionLabel]="t().contenedores.list.lastConnection"
                     (enter)="enterContenedor(item)"
                     (renew)="renewContenedor()"
                     (menuOpen)="openRowMenu($event, item)"
@@ -145,6 +147,7 @@
                   [contenedor]="item"
                   [index]="i"
                   [showMenu]="hasRowActions()"
+                  [hasActions]="hasActionsFor(item)"
                   [canRenew]="capabilities().subscription"
                   [menuLabel]="t().contenedores.list.actions.menuLabel"
                   [enterLabel]="t().contenedores.list.enter"
@@ -157,6 +160,7 @@
                     creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
                   "
                   [errorLabel]="t().contenedores.list.estado.error"
+                  [lastConnectionLabel]="t().contenedores.list.lastConnection"
                   (enter)="enterContenedor(item)"
                   (renew)="renewContenedor()"
                   (menuOpen)="openRowMenu($event, item)"
@@ -188,6 +192,8 @@
 
 <p-menu #rowMenu [model]="rowMenuItems" [popup]="true" appendTo="body" styleClass="cl-row-menu" />
 
+<p-confirmDialog />
+
 @defer (when showCreate()) {
   @if (showCreate()) {
     <lib-contenedores-create-dialog
@@ -205,6 +211,7 @@
       [contenedor]="contenedorToEdit()"
       (visibleChange)="showEdit.set($event)"
       (updated)="onContenedorUpdated()"
+      (imagenChanged)="onContenedorImagenChanged()"
     />
   }
 }

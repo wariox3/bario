@@ -35,6 +35,8 @@ export interface PosDocumentoRead extends DocumentoReadBase {
   readonly asesor_nombre?: string | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
+  /** CUE con el que la DIAN validó la factura (solo la POS electrónica); vacío hasta que se emite. */
+  readonly cue?: string | null;
   /** Suma de los pagos no anulados (`documento-pago`). La mantiene el backend. */
   readonly pago?: string | null;
   /** Lo que queda por cobrar. El backend lo fija al aprobar (`total − pago`). */

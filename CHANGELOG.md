@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.5](https://github.com/wariox3/bario/compare/v0.1.4...v0.1.5) (2026-10-14)
+
+### Features
+
+- **compra:** nota de ajuste sin fecha de vencimiento y orden de compra al final ([1800859](https://github.com/wariox3/bario/commit/18008595f526c57b23f0a549c1600ed1baf14888))
+- **contenedores:** aviso de renovación bajo el badge de vencida ([c753588](https://github.com/wariox3/bario/commit/c75358899a001051c390eaab2b136a5da3dc9b46))
+- **contenedores:** imagen de la empresa al editar el contenedor ([4651ead](https://github.com/wariox3/bario/commit/4651eada902e371d6f96e7b9b1ea98afc40b09c3))
+- **contenedores:** registrar la última conexión al ingresar ([335081d](https://github.com/wariox3/bario/commit/335081d0c68e5584bb768665e84787ca1afd86b4))
+- **contenedores:** última conexión debajo del dominio en la fila ([ff48a22](https://github.com/wariox3/bario/commit/ff48a22fe88a8b61f599e10f762dc5650d710f5b))
+- **contenedores:** última conexión y rol junto al nombre en el listado ([e9b7400](https://github.com/wariox3/bario/commit/e9b740099c02e81781d5822e8fd57cb434a11f1f))
+- **contenedores:** un miembro puede salir de la empresa ([98412df](https://github.com/wariox3/bario/commit/98412dfb94f9e39149468605ad93e0f939ae6f4b))
+- **documentos:** estados pendiente respuesta y pendiente envío al emitir ([ccd5eec](https://github.com/wariox3/bario/commit/ccd5eec02d299a9d073b48c2e95ef933acbbf1d5))
+- **documentos:** mostrar el CUE en las fichas de documentos electrónicos ([cacf988](https://github.com/wariox3/bario/commit/cacf988403d611ead6148838e39b76ae593c0a39))
+
+### Bug Fixes
+
+- **documentos:** no habilitar emitir en un documento que ya es electrónico ([b8bbc2f](https://github.com/wariox3/bario/commit/b8bbc2f86dcbcbedcc231ede26a51e8228d90d52))
+
 ## [0.1.4](https://github.com/wariox3/bario/compare/v0.1.3...v0.1.4) (2026-10-14)
 
 ### Features

@@ -91,7 +91,7 @@
       <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
         <dt class="nomina-detail__label">{{ det.labels.cue }}</dt>
         <dd class="nomina-detail__value break-all">
-          {{ c.cue || '—' }}
+          {{ c.cue }}
           @if (dianUrl(); as url) {
             <a
               class="ml-2 font-semibold text-sky-700 hover:underline"

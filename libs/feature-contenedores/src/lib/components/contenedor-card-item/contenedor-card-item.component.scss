@@ -140,6 +140,8 @@
 }
 
 .cl-card__monogram {
+  // La imagen de la empresa ocupa el mismo hueco que la inicial, con su radio.
+  overflow: hidden;
   width: 52px;
   height: 52px;
   border-radius: 11px;

@@ -8,7 +8,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,6 +23,7 @@ import {
   normalizarCelular,
 } from '@reddoc/core';
 import type { ContenedoresTranslationsHost } from '../../i18n';
+import { ContenedorImagenComponent } from './contenedor-imagen.component';
 
 @Component({
   selector: 'lib-contenedor-create-form',
@@ -34,6 +35,7 @@ import type { ContenedoresTranslationsHost } from '../../i18n';
     FieldErrorComponent,
     FocusInvalidDirective,
     PhoneInputComponent,
+    ContenedorImagenComponent,
   ],
   templateUrl: './contenedor-create-form.component.html',
   styleUrl: './contenedor-create-form.component.scss',
@@ -53,6 +55,8 @@ export class ContenedorCreateFormComponent {
   readonly created = output<void>();
   readonly updated = output<void>();
   readonly cancelled = output<void>();
+  /** La imagen se guarda sola, sin esperar al submit: el listado la refleja ya. */
+  readonly imagenChanged = output<ContenedorDetalle>();
 
   readonly isSaving = signal(false);
 
@@ -66,6 +70,11 @@ export class ContenedorCreateFormComponent {
     // `celularE164` / `celularLongitud`); acá solo queda la obligatoriedad.
     celular: ['', [Validators.required]],
     correo: ['', [Validators.required, Validators.email]],
+  });
+
+  /** El nombre según se escribe: la inicial de la banda de imagen lo sigue. */
+  protected readonly nombre = toSignal(this.form.controls.nombre.valueChanges, {
+    initialValue: '',
   });
 
   constructor() {

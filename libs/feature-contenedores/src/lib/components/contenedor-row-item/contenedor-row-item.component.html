@@ -14,16 +14,21 @@
   (keydown.space)="$event.preventDefault(); onActivate()"
 >
   <!-- Monogram -->
-  <span class="cl-row__monogram" aria-hidden="true">{{ avatarLabel() }}</span>
+  <span class="cl-row__monogram" aria-hidden="true">
+    @if (contenedor().cliente_imagen_thumbnail; as src) {
+      <img [src]="src" alt="" class="size-full object-cover" />
+    } @else {
+      {{ avatarLabel() }}
+    }
+  </span>
 
   <!-- Main: nombre + meta -->
   <span class="cl-row__main">
-    <span class="cl-row__nombre">{{ contenedor().cliente_nombre }}</span>
-    <span class="cl-row__meta">
-      <i class="pi pi-globe cl-row__meta-icon" aria-hidden="true"></i>
-      <span class="cl-row__domain">{{ contenedor().dominio }}</span>
+    <!-- El rol va con el nombre: describe la relación con la empresa, no su dirección. -->
+    <span class="flex min-w-0 items-center gap-2">
+      <span class="cl-row__nombre min-w-0">{{ contenedor().cliente_nombre }}</span>
       <span
-        class="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
+        class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
         [ngClass]="
           isOwner()
             ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
@@ -37,13 +42,24 @@
       </span>
       @if (!contenedor().activo) {
         <span
-          class="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
+          class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
         >
           <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
           Inactivo
         </span>
       }
     </span>
+    <span class="cl-row__meta">
+      <i class="pi pi-globe cl-row__meta-icon" aria-hidden="true"></i>
+      <span class="cl-row__domain">{{ contenedor().dominio }}</span>
+    </span>
+    <!-- Debajo del dominio, como en la tarjeta: «dónde» y luego «cuándo». -->
+    @if (ultimaConexion(); as conexion) {
+      <span class="cl-row__meta" [title]="lastConnectionLabel() + ': ' + conexion.exacta">
+        <i class="pi pi-clock cl-row__meta-icon" aria-hidden="true"></i>
+        <span class="truncate">{{ lastConnectionLabel() }} {{ conexion.recencia }}</span>
+      </span>
+    }
   </span>
 
   <!-- Suscripción: plan pill + fecha de vencimiento -->
@@ -57,6 +73,15 @@
           {{ expiredBadgeLabel() }}
           <span class="opacity-60">· {{ contenedor().suscripcion_suscripcion_tipo_nombre }}</span>
         </span>
+        <!-- Debajo del badge, donde la vigente pone su vencimiento. -->
+        @if (!(isOwner() && canRenew())) {
+          <span
+            class="inline-flex mt-2 items-center gap-1 text-[0.65rem] leading-none text-brand-muted"
+          >
+            <i class="pi pi-lock text-[0.9em]" aria-hidden="true"></i>
+            {{ memberLockedLabel() }}
+          </span>
+        }
       } @else {
         <span
           class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[0.68rem] font-semibold leading-none border"
@@ -113,9 +138,11 @@
         <i class="pi pi-external-link" aria-hidden="true"></i>
       </span>
     } @else {
-      <span class="cl-row__locked-msg">
-        <i class="pi pi-lock text-[0.7rem]" aria-hidden="true"></i>
-        {{ memberLockedLabel() }}
+      <!-- El aviso vive bajo el badge de la suscripción. Acá queda la ranura del botón,
+           invisible, para que la columna no se corra respecto de las demás filas. -->
+      <span class="cl-row__cta invisible" aria-hidden="true">
+        {{ enterLabel() }}
+        <i class="pi pi-arrow-right"></i>
       </span>
     }
   } @else {

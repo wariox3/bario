@@ -166,6 +166,12 @@
     font-weight: 600;
   }
 
+  &__cell--pending {
+    background: #fffbeb;
+    color: #b45309;
+    font-weight: 600;
+  }
+
   &__paginator-count {
     font-size: 0.8rem;
     color: var(--brand-muted);

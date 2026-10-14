@@ -15,6 +15,7 @@ import {
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
+import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
 import { DocumentoElectronicoMenuComponent } from '@erp/features/documentos/electronico/components/documento-electronico-menu/documento-electronico-menu.component';
 import {
   CAPACIDADES_DOCUMENTO_VACIAS,
@@ -56,6 +57,8 @@ interface CabeceraView {
   readonly almacen: string | null;
   readonly metodoPago: string | null;
   readonly conceptoCorreccion: string | null;
+  /** CUE de la DIAN; vacío mientras la nota no se haya emitido. */
+  readonly cue: string | null;
   readonly comentario: string | null;
   /**
    * Banderas de estado (ciclo de vida) del documento. Alimentan los badges de la
@@ -137,6 +140,11 @@ export class NotaDocumentoDetailComponent implements OnInit {
   protected readonly conConceptoCorreccion = computed(
     () => this.document().conceptoCorreccionClaseId != null,
   );
+  /** Enlace a la consulta pública de la DIAN; `null` mientras no haya CUE. */
+  protected readonly dianUrl = computed(() => {
+    const cue = this.cabecera()?.cue;
+    return cue ? `${DIAN_DOCUMENT_URL}${cue}` : null;
+  });
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -256,6 +264,7 @@ export class NotaDocumentoDetailComponent implements OnInit {
             almacen: read.almacen_nombre ?? null,
             metodoPago: read.metodo_pago_nombre ?? null,
             conceptoCorreccion: read.documento_concepto_correccion_nombre ?? null,
+            cue: read.cue ?? null,
             comentario: read.comentario ?? null,
             estados: {
               estado_aprobado: read.estado_aprobado,

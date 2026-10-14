@@ -48,9 +48,10 @@ export type BooleanTone = 'positive' | 'negative';
 
 /**
  * Tono con el que se resalta una celda según su fila (`ColumnDef.toneFor`):
- * `positive` marca un hecho a notar (verde), `critical` un problema (rojo).
+ * `positive` marca un hecho a notar (verde), `critical` un problema (rojo) y
+ * `pending` algo en espera que no depende de la persona (ámbar).
  */
-export type CellTone = 'positive' | 'critical';
+export type CellTone = 'positive' | 'critical' | 'pending';
 
 export interface ColumnDef {
   /** Nombre del campo en el row (acceso por `row[field]`). */

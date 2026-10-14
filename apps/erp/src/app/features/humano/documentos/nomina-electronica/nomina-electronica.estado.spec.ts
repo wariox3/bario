@@ -48,6 +48,7 @@ describe('capacidadesDe — hereda el eje de aprobación', () => {
       puedeAnular: true,
       puedeCorregir: true,
       puedeCorregirElectronico: true,
+      puedeEmitirElectronico: true,
       puedeEmitir: true,
     });
   });
@@ -61,6 +62,7 @@ describe('CAPACIDADES_VACIAS', () => {
       puedeAnular: false,
       puedeCorregir: false,
       puedeCorregirElectronico: false,
+      puedeEmitirElectronico: false,
       puedeEmitir: false,
     });
   });

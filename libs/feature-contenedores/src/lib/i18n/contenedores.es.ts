@@ -18,6 +18,18 @@ export const contenedoresEs: ContenedoresDict = {
       edit: 'Editar contenedor',
       updateSubscription: 'Actualizar suscripción',
       delete: 'Eliminar contenedor',
+      leave: 'Salir de la empresa',
+    },
+    leave: {
+      title: 'Salir de {nombre}',
+      message:
+        'Dejarás de ver esta empresa y sus datos. Para volver, el propietario tendrá que invitarte de nuevo.',
+      accept: 'Salir',
+      cancel: 'Cancelar',
+      toasts: {
+        success: { title: 'Saliste de la empresa', desc: 'Ya no tienes acceso a {nombre}.' },
+        error: { title: 'No se pudo salir', desc: 'Intenta de nuevo en un momento.' },
+      },
     },
     view: {
       list: 'Vista de lista',
@@ -51,6 +63,7 @@ export const contenedoresEs: ContenedoresDict = {
         desc: 'Algo falló al preparar {nombre}.',
       },
     },
+    lastConnection: 'Última conexión',
     roles: {
       propietario: 'Propietario',
       miembro: 'Miembro',
@@ -99,6 +112,22 @@ export const contenedoresEs: ContenedoresDict = {
       error: {
         title: 'Error al actualizar',
         desc: 'No se pudo actualizar la empresa. Intenta de nuevo.',
+      },
+    },
+    image: {
+      title: 'Imagen de la empresa',
+      description: 'Reemplaza la inicial en el listado de empresas.',
+      upload: 'Subir imagen',
+      change: 'Cambiar imagen',
+      remove: 'Quitar',
+      hint: 'JPG, PNG o WEBP, hasta 5 MB. Se guarda al elegirla.',
+      tileLabel: 'Elegir imagen para {nombre}',
+      uploading: 'Subiendo imagen…',
+      errors: {
+        type: 'El archivo no es una imagen JPG, PNG o WEBP.',
+        size: 'La imagen pesa más de 5 MB.',
+        upload: 'No se pudo subir la imagen. Intenta de nuevo.',
+        remove: 'No se pudo quitar la imagen. Intenta de nuevo.',
       },
     },
   },

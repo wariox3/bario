@@ -15,6 +15,8 @@ export interface ContenedoresCapabilities {
   readonly invite: boolean;
   /** Eliminar la empresa. */
   readonly delete: boolean;
+  /** Salir de una empresa de la que se es miembro (no propietario). */
+  readonly leave: boolean;
   /** Saltar a la app de cuenta para renovar o cambiar el plan. */
   readonly subscription: boolean;
   /** Alternar entre vista de lista y grilla. */
@@ -27,6 +29,7 @@ export const CONTENEDORES_CAPABILITIES_FULL: ContenedoresCapabilities = {
   edit: true,
   invite: true,
   delete: true,
+  leave: true,
   subscription: true,
   viewToggle: true,
 };

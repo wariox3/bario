@@ -17,7 +17,8 @@ import {
 } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import {
   AUTH_SERVICE,
   Contenedor,
@@ -62,7 +63,9 @@ interface EstadoConsultado {
     ContenedorCardItemComponent,
     MenuModule,
     ButtonModule,
+    ConfirmDialogModule,
   ],
+  providers: [ConfirmationService],
   templateUrl: './contenedores-list.component.html',
   styleUrl: './contenedores-list.component.scss',
 })
@@ -75,6 +78,7 @@ export class ContenedoresListComponent {
   private readonly tenantRoutes = inject(TENANT_ROUTES);
   private readonly env = inject(ENVIRONMENT);
   private readonly toastService = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
   private readonly i18n = inject<I18nService<ContenedoresTranslationsHost>>(I18nService);
 
   protected readonly t = this.i18n.t;
@@ -85,11 +89,17 @@ export class ContenedoresListComponent {
    */
   readonly capabilities = input<ContenedoresCapabilities>(CONTENEDORES_CAPABILITIES_FULL);
 
-  /** El menú de fila solo se dibuja si hay al menos una acción adentro. */
-  readonly hasRowActions = computed(() => {
+  /** Lo que el propietario puede hacer desde el menú: administrar la empresa. */
+  private readonly hasOwnerActions = computed(() => {
     const caps = this.capabilities();
     return caps.invite || caps.edit || caps.subscription || caps.delete;
   });
+
+  /**
+   * El menú de fila solo se dibuja si alguna empresa puede tener acciones.
+   * Reserva la columna del engranaje en todas las filas aunque una no tenga nada.
+   */
+  readonly hasRowActions = computed(() => this.hasOwnerActions() || this.capabilities().leave);
 
   readonly showCreate = signal(false);
   readonly showEdit = signal(false);
@@ -273,6 +283,11 @@ export class ContenedoresListComponent {
       if (item.propietario) this.renewContenedor(item.suscripcion_id);
       return;
     }
+    // Registra la última conexión sin esperarla: entrar no depende de ese dato.
+    // Sin `takeUntilDestroyed` a propósito: navegar destruye la lista, y la
+    // petición tiene que llegar igual. Un fallo se descarta (el servicio ya
+    // apaga el toast).
+    this.contenedorService.ingresar(item.cliente_id).subscribe({ error: () => undefined });
     this.tenant.setCurrent(item);
     this.router.navigateByUrl(this.tenantRoutes.tenantHome(item.schema_name));
   }
@@ -285,8 +300,30 @@ export class ContenedoresListComponent {
     window.open(`${base}${path}`, '_blank', 'noopener');
   }
 
+  /** Mismo menú para los dos roles; cambia el contenido: el propietario administra, el miembro sale. */
+  hasActionsFor(item: Contenedor): boolean {
+    return item.propietario ? this.hasOwnerActions() : this.capabilities().leave;
+  }
+
   openRowMenu(event: Event, item: Contenedor): void {
     event.stopPropagation();
+    this.rowMenuItems = item.propietario ? this.ownerMenuItems(item) : this.memberMenuItems(item);
+    this.rowMenu.toggle(event);
+  }
+
+  private memberMenuItems(item: Contenedor): MenuItem[] {
+    if (!this.capabilities().leave) return [];
+    return [
+      {
+        label: this.t().contenedores.list.actions.leave,
+        icon: 'pi pi-sign-out',
+        styleClass: 'cl-row-menu__danger',
+        command: () => this.confirmLeave(item),
+      },
+    ];
+  }
+
+  private ownerMenuItems(item: Contenedor): MenuItem[] {
     const caps = this.capabilities();
     const labels = this.t().contenedores.list.actions;
     const items: MenuItem[] = [];
@@ -323,9 +360,44 @@ export class ContenedoresListComponent {
         command: () => this.deleteContenedor(item),
       });
     }
+    return items;
+  }
 
-    this.rowMenuItems = items;
-    this.rowMenu.toggle(event);
+  /**
+   * Salir es reversible solo con una invitación nueva del propietario: se
+   * confirma, pero sin pedir que se escriba el nombre como al eliminar — no se
+   * pierde ningún dato de la empresa.
+   */
+  private confirmLeave(item: Contenedor): void {
+    const textos = this.t().contenedores.list.leave;
+    const conNombre = (texto: string) => texto.replace('{nombre}', item.cliente_nombre);
+    this.confirmation.confirm({
+      header: conNombre(textos.title),
+      message: textos.message,
+      // El ícono del modal advierte (estándar de las confirmaciones); el de la
+      // acción —`pi-sign-out`— se queda en el menú, que es donde nombra algo.
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: textos.accept,
+      rejectLabel: textos.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.contenedorService
+          // Sin toast del interceptor: el fallo se avisa abajo con su propio texto.
+          .removeMember(item.id, { errorToast: false })
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.toastService.success(
+                textos.toasts.success.title,
+                conNombre(textos.toasts.success.desc),
+              );
+              this.reload$.next();
+            },
+            error: () =>
+              this.toastService.error(textos.toasts.error.title, textos.toasts.error.desc),
+          });
+      },
+    });
   }
 
   inviteContenedor(item: Contenedor): void {
@@ -346,6 +418,14 @@ export class ContenedoresListComponent {
         this.contenedorToEdit.set(contenedor);
         this.showEdit.set(true);
       });
+  }
+
+  /**
+   * La imagen se guarda al elegirla, con el modal todavía abierto: el listado
+   * se recarga ya, y no al cerrar, para que «Cancelar» no parezca deshacerla.
+   */
+  onContenedorImagenChanged(): void {
+    this.reload$.next();
   }
 
   deleteContenedor(item: Contenedor): void {

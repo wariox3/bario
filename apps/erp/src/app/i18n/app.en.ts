@@ -305,7 +305,11 @@ export const en: AppDict = {
     emisionElectronica: {
       actions: { emitir: 'Emit', descartar: 'Discard' },
       columns: { estado: 'Status' },
-      estado: { error: 'Error', enviado: 'Awaiting response', pendiente: 'Pending' },
+      estado: {
+        error: 'Error',
+        pendienteRespuesta: 'Awaiting response',
+        pendienteEnvio: 'Pending submission',
+      },
     },
     errorElectronico: {
       ver: 'See the error detail',
@@ -2803,6 +2807,8 @@ export const en: AppDict = {
           almacen: 'Warehouse',
           metodoPago: 'Payment method',
           conceptoCorreccion: 'Correction concept',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {
@@ -2927,6 +2933,8 @@ export const en: AppDict = {
           metodoPago: 'Payment method',
           asesor: 'Sales rep',
           ordenCompra: 'Purchase order',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {
@@ -3491,7 +3499,6 @@ export const en: AppDict = {
           proveedor: 'Supplier',
           proveedorPlaceholder: 'Search supplier…',
           fecha: 'Date',
-          fechaVence: 'Due date',
           documentoReferencia: 'Reference document',
           documentoReferenciaPlaceholder: 'Select the support document…',
           documentoReferenciaDisabled: 'Select a supplier first',
@@ -3541,13 +3548,14 @@ export const en: AppDict = {
           proveedor: 'Supplier',
           identificacion: 'ID number',
           fecha: 'Date',
-          fechaVence: 'Due date',
           documentoReferencia: 'Reference document',
           plazoPago: 'Payment terms',
           metodoPago: 'Payment method',
           conceptoCorreccion: 'Correction concept',
           centroCosto: 'Cost center',
           ordenCompra: 'Purchase order',
+          cue: 'CUE',
+          verDian: 'View DIAN document',
           comentario: 'Comment',
         },
         notFound: {

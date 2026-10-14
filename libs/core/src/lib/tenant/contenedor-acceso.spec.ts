@@ -2,6 +2,7 @@ import { accesosDisponibles, buildAccesoFlags, readModuleAccessFlags } from './c
 
 /** Contenedor tal como llega de `/contenedor/cliente/lista-usuario/`. */
 const CONTENEDOR = {
+  id: 21,
   cliente_id: 13,
   schema_name: 'seguridad',
   cliente_nombre: 'Seguridad',

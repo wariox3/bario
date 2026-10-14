@@ -31,6 +31,11 @@ export interface UpdateContenedorRequest {
 /** Lo que devuelve el `PATCH`: el eco de los tres campos editables, nada más. */
 export type UpdateContenedorResponse = Required<UpdateContenedorRequest>;
 
+/** Lo que devuelve `ingresar/`: el instante que quedó como última conexión. */
+export interface IngresarContenedorResponse {
+  readonly fecha_ultima_conexion: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ContenedorService extends BaseHttpService {
   // Endpoints en el schema público (/contenedor/, /seguridad/usuario…): sin X-Tenant.
@@ -65,6 +70,42 @@ export class ContenedorService extends BaseHttpService {
     payload: UpdateContenedorRequest,
   ): Observable<UpdateContenedorResponse> {
     return this.patch<UpdateContenedorResponse>(`/contenedor/cliente/${id}/`, payload);
+  }
+
+  /**
+   * Marca la última conexión de la empresa con la hora actual. Se llama una vez
+   * al entrar, no en cada petición; cualquier miembro puede, y una empresa que
+   * no está `listo` responde 409.
+   *
+   * Sin toast de error: es contabilidad, no algo que la persona pidió. Que
+   * falle no debe interrumpir ni ensuciar el ingreso.
+   */
+  ingresar(id: number): Observable<IngresarContenedorResponse> {
+    return this.post<IngresarContenedorResponse>(
+      `/contenedor/cliente/${id}/ingresar/`,
+      {},
+      undefined,
+      { errorToast: false },
+    );
+  }
+
+  /**
+   * Carga o reemplaza la imagen de la empresa (multipart, campo `imagen`). El
+   * backend acepta JPEG, PNG o WEBP de hasta 5 MB, genera el original y la
+   * miniatura en WEBP y responde la ficha con las dos URLs. Solo el propietario.
+   */
+  subirImagen(id: number, imagen: File): Observable<ContenedorDetalle> {
+    return this.postFile<ContenedorDetalle>(
+      `/contenedor/cliente/${id}/imagen/`,
+      imagen,
+      undefined,
+      'imagen',
+    );
+  }
+
+  /** Quita la imagen de la empresa. Quitarla a una que no tiene no es error. */
+  quitarImagen(id: number): Observable<ContenedorDetalle> {
+    return this.delete<ContenedorDetalle>(`/contenedor/cliente/${id}/imagen/`);
   }
 
   deleteContenedor(id: number): Observable<unknown> {
@@ -200,8 +241,13 @@ export class ContenedorService extends BaseHttpService {
     );
   }
 
-  removeMember(membershipId: number): Observable<unknown> {
-    return this.delete(`/seguridad/usuario-cliente/${membershipId}/`);
+  /**
+   * Borra una membresía: el propietario saca a un miembro, o un miembro sale
+   * de la empresa con la suya (el `id` de `lista-usuario`). `opts` deja que la
+   * pantalla apague el toast del interceptor cuando avisa el fallo por su cuenta.
+   */
+  removeMember(membershipId: number, opts?: RequestOptions): Observable<unknown> {
+    return this.delete(`/seguridad/usuario-cliente/${membershipId}/`, opts);
   }
 
   /**

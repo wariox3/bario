@@ -21,6 +21,7 @@ export class ContenedoresCreateDialogComponent {
   readonly visibleChange = output<boolean>();
   readonly created = output<void>();
   readonly updated = output<void>();
+  readonly imagenChanged = output<ContenedorDetalle>();
 
   readonly isEditMode = computed(() => this.contenedor() !== null);
 

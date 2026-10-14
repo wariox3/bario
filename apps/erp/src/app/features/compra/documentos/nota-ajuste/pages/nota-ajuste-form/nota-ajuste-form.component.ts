@@ -38,7 +38,7 @@ import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-br
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService, SELECT_ENDPOINTS } from '@reddoc/core';
+import { SELECT_ENDPOINTS } from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -49,11 +49,6 @@ import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.gu
 import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
 import type { AppDict } from '@erp/i18n';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
-import {
-  setupVencimientoAutocompute,
-  type VencimientoAutocompute,
-} from '@erp/features/documentos/comercial/vencimiento-autocompute';
-import { VencimientoHintComponent } from '@erp/features/documentos/comercial/components/vencimiento-hint/vencimiento-hint.component';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
   createComercialDetalleGroup,
@@ -106,7 +101,6 @@ import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comerc
     ErpDocumentoReferenciaSelectComponent,
     CargarLineasReferenciaComponent,
     ComercialDocumentoDetallesComponent,
-    VencimientoHintComponent,
     TabsModule,
   ],
   providers: [ConfirmationService],
@@ -117,7 +111,6 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
   private readonly fb = inject(FormBuilder);
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
   private readonly detalleService = inject(DocumentoDetalleService);
-  private readonly selectData = inject(ErpSelectDataService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
@@ -185,7 +178,6 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
   protected readonly form = this.fb.group({
     contacto: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     fecha: this.fb.control<Date | null>(startOfToday(), Validators.required),
-    fecha_vence: this.fb.control<Date | null>(null, Validators.required),
     documento_referencia: this.fb.control<ErpSelectOption | null>({ value: null, disabled: true }),
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
@@ -199,26 +191,9 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
     detalles: new FormArray<ComercialDetalleGroup>([]),
   });
 
-  /**
-   * Estado del vencimiento (días del plazo, fecha que dicta y desvío), para que
-   * `<app-vencimiento-hint>` explique bajo el campo de dónde salió la fecha.
-   */
-  protected readonly vencimiento: VencimientoAutocompute;
-
   constructor() {
-    // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
-    this.vencimiento = setupVencimientoAutocompute({
-      fecha: this.form.controls.fecha,
-      plazoPago: this.form.controls.plazo_pago,
-      fechaVence: this.form.controls.fecha_vence,
-      selectData: this.selectData,
-      destroyRef: this.destroyRef,
-      endpoint: this.plazoPagoEndpoint,
-    });
-
-    // Al elegir proveedor, adopta su plazo de pago pactado. Cambiar el plazo
-    // dispara el autocálculo de arriba, que reajusta la fecha de vencimiento. En
-    // edición no aplica: `applyCabecera` puebla con `emitEvent: false`.
+    // Al elegir proveedor, adopta su plazo de pago pactado. En edición no aplica:
+    // `applyCabecera` puebla con `emitEvent: false`.
     setupPlazoPagoDesdeContacto({
       contacto: this.form.controls.contacto,
       plazoPago: this.form.controls.plazo_pago,
@@ -378,8 +353,8 @@ export class NotaAjusteFormComponent implements OnInit, CanComponentDeactivate {
   }
 
   /**
-   * Pobla la cabecera en el form. `emitEvent: false`: no disparar el autocálculo
-   * y respetar el vencimiento que viene del backend.
+   * Pobla la cabecera en el form. `emitEvent: false`: no adoptar el plazo del
+   * proveedor ni limpiar la referencia que viene del backend.
    */
   private applyCabecera(read: NotaAjusteRead): void {
     this.form.patchValue(notaAjusteToFormValue(read), { emitEvent: false });
