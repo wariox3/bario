@@ -1,5 +1,5 @@
 import { Injectable, type OnDestroy, computed, inject, signal } from '@angular/core';
-import { type Observable, type Subscription, map, tap } from 'rxjs';
+import { EMPTY, type Observable, type Subscription, catchError, map, tap } from 'rxjs';
 import { ItemService, type FilterCondition, type ListQuery } from '@reddoc/core';
 import type { ProductoCatalogo } from './producto-catalogo.model';
 import { esVendible, itemToProductoCatalogo } from './producto-catalogo.mapper';
@@ -60,6 +60,8 @@ export class CatalogoStore implements OnDestroy {
   private criterio: CriterioBusqueda = { modo: 'nombre', texto: '' };
   private pagina = 0;
   private peticion?: Subscription;
+  /** Sube con cada búsqueda: una respuesta de una búsqueda vieja se descarta. */
+  private turno = 0;
 
   readonly productos = this._productos.asReadonly();
   readonly estado = this._estado.asReadonly();
@@ -68,10 +70,24 @@ export class CatalogoStore implements OnDestroy {
 
   /** Arranca una búsqueda nueva desde la primera página. */
   buscar(criterio: CriterioBusqueda): void {
-    this.criterio = criterio;
-    this.pagina = 0;
-    this._estado.set('cargando');
-    this.pedir();
+    this.peticion?.unsubscribe();
+    this.peticion = this.iniciar(criterio).subscribe();
+  }
+
+  /**
+   * Busca un código exacto (lector de barras) y devuelve el producto si hay uno
+   * solo con ese código; el catálogo queda mostrando el resultado igual que una
+   * búsqueda normal. Quien llama se suscribe y decide qué hacer con el producto.
+   */
+  buscarCodigo(codigo: string): Observable<ProductoCatalogo | null> {
+    this.peticion?.unsubscribe();
+    const texto = codigo.trim();
+    return this.iniciar({ modo: 'codigo', texto }).pipe(
+      map((productos) => {
+        const exactos = productos.filter((p) => p.codigo === texto);
+        return exactos.length === 1 ? exactos[0] : null;
+      }),
+    );
   }
 
   /** Vuelve a pedir la búsqueda actual (reintentar, o refrescar el stock tras vender). */
@@ -83,7 +99,7 @@ export class CatalogoStore implements OnDestroy {
     if (!this.hayMas() || this._cargandoMas()) return;
     this.pagina += 1;
     this._cargandoMas.set(true);
-    this.pedir();
+    this.peticion = this.pedir().subscribe();
   }
 
   /**
@@ -108,8 +124,17 @@ export class CatalogoStore implements OnDestroy {
     this._productos.update((lista) => lista.map((p) => (p.id === id ? { ...p, favorito } : p)));
   }
 
-  private pedir(): void {
-    this.peticion?.unsubscribe();
+  private iniciar(criterio: CriterioBusqueda): Observable<readonly ProductoCatalogo[]> {
+    this.criterio = criterio;
+    this.pagina = 0;
+    this._estado.set('cargando');
+    this._cargandoMas.set(false);
+    return this.pedir();
+  }
+
+  /** Pide la página actual y la vuelca en el estado; emite los productos recibidos. */
+  private pedir(): Observable<readonly ProductoCatalogo[]> {
+    const turno = ++this.turno;
     const agregar = this.pagina > 0;
     const query: ListQuery = {
       filters: [...filtrosDeBusqueda(this.criterio), ...FILTROS_BASE],
@@ -120,25 +145,33 @@ export class CatalogoStore implements OnDestroy {
       page: this.pagina,
       pageSize: TAMANO_PAGINA,
     };
-    this.peticion = this.itemService.list(query).subscribe({
-      next: (respuesta) => {
-        const nuevos = respuesta.results.filter(esVendible).map(itemToProductoCatalogo);
+    return this.itemService.list(query).pipe(
+      map((respuesta) => ({
+        respuesta,
+        nuevos: respuesta.results.filter(esVendible).map(itemToProductoCatalogo),
+      })),
+      tap(({ respuesta, nuevos }) => {
+        if (turno !== this.turno) return;
         this._productos.update((lista) => (agregar ? [...lista, ...nuevos] : nuevos));
         this.recibidos.update((n) => (agregar ? n : 0) + respuesta.results.length);
         this.total.set(respuesta.count);
         this._estado.set('listo');
         this._cargandoMas.set(false);
-      },
-      error: () => {
-        this._cargandoMas.set(false);
-        if (agregar) {
-          // Falló una página adicional: lo ya cargado sigue valiendo.
-          this.pagina -= 1;
-          return;
+      }),
+      map(({ nuevos }) => nuevos),
+      catchError(() => {
+        if (turno === this.turno) {
+          this._cargandoMas.set(false);
+          if (agregar) {
+            // Falló una página adicional: lo ya cargado sigue valiendo.
+            this.pagina -= 1;
+          } else {
+            this._productos.set([]);
+            this._estado.set('error');
+          }
         }
-        this._productos.set([]);
-        this._estado.set('error');
-      },
-    });
+        return EMPTY;
+      }),
+    );
   }
 }

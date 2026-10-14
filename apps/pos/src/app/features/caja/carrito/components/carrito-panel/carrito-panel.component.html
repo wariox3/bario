@@ -1,0 +1,101 @@
+@let tx = t().caja.carrito;
+@let venta = store.activo();
+<section
+  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+  [attr.aria-label]="venta.nombre"
+>
+  <div class="flex flex-col gap-1.5 border-b border-[rgba(20,48,73,0.08)] px-4 py-3">
+    <label for="carrito-cliente" class="text-[0.78rem] font-semibold text-brand-text">
+      {{ tx.cliente }}
+    </label>
+    <lib-contacto-select
+      inputId="carrito-cliente"
+      [extraParams]="contactoParams"
+      [placeholder]="tx.clientePlaceholder"
+      [ngModel]="venta.contacto"
+      (ngModelChange)="onContacto($event)"
+    />
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto px-4">
+    @if (venta.lineas.length === 0) {
+      <div class="flex h-full flex-col items-center justify-center gap-2 py-10 text-center">
+        <i class="pi pi-shopping-cart text-xl text-brand-muted" aria-hidden="true"></i>
+        <p class="m-0 text-[0.85rem] font-semibold text-brand-text">{{ tx.vacio }}</p>
+        <p class="m-0 text-[0.78rem] text-brand-muted">{{ tx.vacioDesc }}</p>
+      </div>
+    } @else {
+      <ul class="m-0 list-none divide-y divide-[rgba(20,48,73,0.08)] p-0">
+        @for (linea of venta.lineas; track linea.item.id) {
+          <li>
+            <app-carrito-linea
+              [linea]="linea"
+              (cantidad)="onCantidad(linea.item.id, $event)"
+              (editar)="editando.set($event)"
+              (retirar)="store.retirarLinea($event)"
+            />
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <div
+    class="flex flex-col gap-3 border-t border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.02)] px-4 py-3"
+  >
+    <dl class="m-0 flex flex-col gap-1 text-[0.8rem]">
+      <div class="flex justify-between text-brand-muted">
+        <dt>{{ tx.resumen.productos }}</dt>
+        <dd class="m-0 font-mono tabular-nums">{{ venta.lineas.length }}</dd>
+      </div>
+      <div class="flex justify-between text-brand-muted">
+        <dt>{{ tx.resumen.cantidad }}</dt>
+        <dd class="m-0 font-mono tabular-nums">{{ store.cantidadTotal() }}</dd>
+      </div>
+      <div class="flex justify-between text-brand-text">
+        <dt>{{ tx.resumen.subtotal }}</dt>
+        <dd class="m-0 font-mono tabular-nums">{{ subtotal() }}</dd>
+      </div>
+      @for (impuesto of impuestos(); track impuesto.id) {
+        <div class="flex justify-between text-brand-text">
+          <dt>{{ impuesto.nombre }}</dt>
+          <dd class="m-0 font-mono tabular-nums">{{ impuesto.monto }}</dd>
+        </div>
+      }
+      <div
+        class="mt-1 flex items-baseline justify-between border-t border-[rgba(20,48,73,0.08)] pt-2 text-brand-text"
+      >
+        <dt class="text-[0.85rem] font-bold">{{ tx.resumen.total }}</dt>
+        <dd class="m-0 font-mono text-lg font-bold tabular-nums">{{ total() }}</dd>
+      </div>
+    </dl>
+
+    <div class="flex gap-2">
+      <p-button
+        type="button"
+        [label]="tx.vaciar.boton"
+        icon="pi pi-trash"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="venta.lineas.length === 0"
+        (onClick)="onVaciar()"
+      />
+      <span class="flex-1" [pTooltip]="tx.cobrarProximamente" tooltipPosition="top">
+        <p-button
+          type="button"
+          [label]="tx.cobrar"
+          icon="pi pi-wallet"
+          styleClass="w-full"
+          [fluid]="true"
+          [disabled]="true"
+        />
+      </span>
+    </div>
+  </div>
+</section>
+
+<app-editar-linea-dialog
+  [linea]="editando()"
+  (guardar)="onGuardarEdicion($event)"
+  (cerrar)="editando.set(null)"
+/>

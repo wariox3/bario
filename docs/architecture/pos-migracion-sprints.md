@@ -192,6 +192,24 @@ sobreviven a recargas.
 **Terminado cuando:** se puede abrir tres ventas, cambiar de cliente en una,
 recargar la página y encontrar todo igual; un ítem con stock 0 no se agrega.
 
+**Estado (2026-10-14).** Hecho y en verde (build, lint, tests; 11 tests nuevos
+de las operaciones del carrito). Ajustes respecto del plan:
+
+- Cualquier pestaña se puede cerrar (con confirmación si tiene productos);
+  cerrar la última abre una venta nueva vacía. Así siempre hay una venta activa
+  sin tener una pestaña especial.
+- Cambiar de cliente **recotiza** las líneas contra su lista de precios; las que
+  se editaron a mano conservan su precio. El POS anterior solo cotizaba al
+  agregar.
+- El tope de stock es por venta: dos ventas abiertas pueden sumar entre ambas
+  más que el disponible. El backend tendría la última palabra al aprobar.
+- "Consumidor final" se busca por identificación (todo doses) en vez de asumir
+  `id = 1`; si el tenant no lo tiene, la venta arranca sin cliente.
+- Los identificadores de pestaña no usan solo `crypto.randomUUID`: no existe si
+  la caja se abre por HTTP sin TLS (una tablet en la red local).
+- El lector de barras agrega directo cuando el código corresponde a un solo
+  producto; si no, avisa "código no encontrado".
+
 ---
 
 ## Sprint 3 · Cobro

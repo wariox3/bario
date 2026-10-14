@@ -1,0 +1,64 @@
+@let l = linea();
+@let tx = t().caja.carrito.linea;
+<div class="flex flex-col gap-2 py-2.5">
+  <div class="flex items-start gap-2">
+    <button
+      type="button"
+      class="min-w-0 flex-1 rounded-md text-left focus-visible:outline-2 focus-visible:outline-[var(--brand-blue)]"
+      [attr.aria-label]="tx.editar + ': ' + l.item.nombre"
+      (click)="editar.emit(l)"
+    >
+      <span class="line-clamp-2 text-[0.82rem] font-semibold leading-tight text-brand-text">
+        {{ l.item.nombre }}
+      </span>
+      <span class="mt-0.5 flex items-center gap-1.5 text-[0.75rem] text-brand-muted">
+        <span class="font-mono tabular-nums">{{ precio() }}</span>
+        @if (l.precioEditado) {
+          <span class="rounded bg-amber-50 px-1 text-[0.65rem] font-medium text-amber-800">
+            {{ tx.precioEditado }}
+          </span>
+        }
+      </span>
+    </button>
+    <button
+      type="button"
+      class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-brand-muted hover:bg-red-50 hover:text-red-600"
+      [attr.aria-label]="tx.retirar + ': ' + l.item.nombre"
+      (click)="retirar.emit(l.item.id)"
+    >
+      <i class="pi pi-trash text-[0.8rem]"></i>
+    </button>
+  </div>
+
+  <div class="flex items-center justify-between gap-2">
+    <div
+      class="flex items-center overflow-hidden rounded-lg border border-[rgba(20,48,73,0.14)]"
+      role="group"
+      [attr.aria-label]="tx.cantidad"
+    >
+      <button
+        type="button"
+        class="flex h-8 w-8 items-center justify-center text-brand-muted hover:bg-[rgba(20,48,73,0.06)] hover:text-brand-text"
+        [attr.aria-label]="tx.restar"
+        (click)="cantidad.emit(l.cantidad - 1)"
+      >
+        <i class="pi pi-minus text-[0.7rem]"></i>
+      </button>
+      <span
+        class="min-w-9 text-center font-mono text-[0.85rem] font-semibold tabular-nums text-brand-text"
+      >
+        {{ l.cantidad }}
+      </span>
+      <button
+        type="button"
+        class="flex h-8 w-8 items-center justify-center text-brand-muted hover:bg-[rgba(20,48,73,0.06)] hover:text-brand-text disabled:cursor-not-allowed disabled:opacity-40"
+        [attr.aria-label]="tx.sumar"
+        [disabled]="enTope()"
+        (click)="cantidad.emit(l.cantidad + 1)"
+      >
+        <i class="pi pi-plus text-[0.7rem]"></i>
+      </button>
+    </div>
+    <span class="font-mono text-[0.9rem] font-bold tabular-nums text-brand-text">{{ neto() }}</span>
+  </div>
+</div>

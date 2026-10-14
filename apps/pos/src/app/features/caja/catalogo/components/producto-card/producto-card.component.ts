@@ -5,10 +5,11 @@ import { estaAgotado, type ProductoCatalogo } from '../../producto-catalogo.mode
 
 /**
  * Tarjeta de un producto en el catálogo de la caja: imagen, código, nombre,
- * precio, stock y estrella de favorito.
+ * precio, stock, estrella de favorito y las unidades que ya lleva la venta.
  *
- * Es tonta: no sabe de carrito ni de HTTP. Emite la intención y la página
- * decide.
+ * Es tonta: no sabe de carrito ni de HTTP. Emite la intención (agregar, marcar
+ * favorito) y la página decide. Toda la tarjeta es el botón de agregar; la
+ * estrella es un botón aparte, encima, para no anidar botones.
  */
 @Component({
   selector: 'app-producto-card',
@@ -22,14 +23,16 @@ export class ProductoCardComponent {
   protected readonly t = this.i18n.t;
 
   readonly producto = input.required<ProductoCatalogo>();
+  /** Unidades de este producto en la venta activa. */
+  readonly cantidad = input(0);
 
+  readonly agregar = output<ProductoCatalogo>();
   readonly alternarFavorito = output<number>();
 
   protected readonly agotado = computed(() => estaAgotado(this.producto()));
   protected readonly precio = computed(() => formatCop(this.producto().precio));
 
-  protected onFavorito(event: Event): void {
-    event.stopPropagation();
+  protected onFavorito(): void {
     this.alternarFavorito.emit(this.producto().id);
   }
 }

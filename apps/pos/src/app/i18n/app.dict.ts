@@ -50,6 +50,8 @@ export interface AppDict
       limpiar: string;
     };
     producto: {
+      agregar: string;
+      enVenta: string;
       disponibles: string;
       agotado: string;
       marcarFavorito: string;
@@ -66,6 +68,55 @@ export interface AppDict
     };
     toasts: {
       favoritoError: { title: string; desc: string };
+      sinStock: { title: string; desc: string };
+      agregarError: { title: string; desc: string };
+      codigoNoEncontrado: { title: string; desc: string };
+    };
+    tabs: {
+      label: string;
+      nueva: string;
+      opciones: string;
+      renombrar: string;
+      nombre: string;
+      guardar: string;
+      cerrar: string;
+      confirmarCierre: { header: string; message: string; aceptar: string };
+    };
+    carrito: {
+      /** Prefijo del nombre de las ventas nuevas: "Venta 1", "Venta 2"… */
+      prefijoVenta: string;
+      cliente: string;
+      clientePlaceholder: string;
+      vacio: string;
+      vacioDesc: string;
+      cancelar: string;
+      cobrar: string;
+      cobrarProximamente: string;
+      resumen: {
+        productos: string;
+        cantidad: string;
+        subtotal: string;
+        total: string;
+      };
+      vaciar: { boton: string; header: string; message: string; aceptar: string };
+      linea: {
+        editar: string;
+        retirar: string;
+        cantidad: string;
+        sumar: string;
+        restar: string;
+        precioEditado: string;
+      };
+      editar: {
+        title: string;
+        precio: string;
+        precioMin: string;
+        cantidad: string;
+        cantidadMin: string;
+        cantidadMax: string;
+        cancelar: string;
+        guardar: string;
+      };
     };
   };
   configuracion: {
