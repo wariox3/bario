@@ -15,6 +15,8 @@ export {
   ESTADO_ELECTRONICO_COLUMN,
   VER_ERROR_ACTION_ID,
   aFilaPorEmitir,
+  esSeleccionable,
+  esperaRespuesta,
   resolverEstadoElectronico,
   resolverResolucionEtiqueta,
 } from './estado-electronico';

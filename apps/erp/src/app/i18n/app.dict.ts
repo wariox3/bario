@@ -322,7 +322,7 @@ export interface AppDict
     emisionElectronica: {
       actions: { emitir: string; descartar: string };
       columns: { estado: string };
-      estado: { error: string; enviado: string; pendiente: string };
+      estado: { error: string; pendienteRespuesta: string; pendienteEnvio: string };
     };
     errorElectronico: {
       ver: string;

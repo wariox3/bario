@@ -305,7 +305,11 @@ export const en: AppDict = {
     emisionElectronica: {
       actions: { emitir: 'Emit', descartar: 'Discard' },
       columns: { estado: 'Status' },
-      estado: { error: 'Error', enviado: 'Awaiting response', pendiente: 'Pending' },
+      estado: {
+        error: 'Error',
+        pendienteRespuesta: 'Awaiting response',
+        pendienteEnvio: 'Pending submission',
+      },
     },
     errorElectronico: {
       ver: 'See the error detail',

@@ -35,6 +35,8 @@ import {
   ESTADO_ELECTRONICO_COLUMN,
   VER_ERROR_ACTION_ID,
   aFilaPorEmitir,
+  esSeleccionable,
+  esperaRespuesta,
 } from '../../estado-electronico';
 import { ErrorElectronicoDialogComponent } from '../error-electronico-dialog/error-electronico-dialog.component';
 
@@ -123,9 +125,12 @@ export class EmitirDocumentoElectronicoComponent implements OnInit {
     ];
   });
 
-  /** Seleccionadas que aún se pueden emitir (las "esperando respuesta" se excluyen). */
+  /** Las filas que esperan respuesta de la DIAN no pintan check. */
+  protected readonly esSeleccionable = esSeleccionable;
+
+  /** Seleccionadas que aún se pueden emitir; resguardo si una cambió de estado. */
   private readonly emitibles = computed(() =>
-    this.selectedRows().filter((row) => !row.estado_electronico_enviado),
+    this.selectedRows().filter((row) => !esperaRespuesta(row)),
   );
 
   protected readonly canEmitir = computed(
