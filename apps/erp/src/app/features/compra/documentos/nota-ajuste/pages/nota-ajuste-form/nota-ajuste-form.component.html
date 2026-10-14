@@ -216,6 +216,30 @@
             />
           </div>
         </div>
+
+        <!-- Concepto de corrección: el motivo DIAN de la nota. -->
+        <div class="flex flex-col gap-1.5">
+          <label for="documento_concepto_correccion" class="nota-ajuste-form__label">
+            {{ t().entities.notaAjuste.form.fields.conceptoCorreccion }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            inputId="documento_concepto_correccion"
+            formControlName="documento_concepto_correccion"
+            [endpoint]="conceptoCorreccionEndpoint"
+            [params]="conceptoCorreccionParams"
+            filterBy="nombre,codigo"
+            [placeholder]="t().entities.notaAjuste.form.fields.conceptoCorreccionPlaceholder"
+            [invalid]="
+              form.controls.documento_concepto_correccion.invalid &&
+              form.controls.documento_concepto_correccion.touched
+            "
+          />
+          <lib-field-error
+            [control]="form.controls.documento_concepto_correccion"
+            [messages]="{ required: t().entities.notaAjuste.form.validation.required }"
+          />
+        </div>
       </div>
     </div>
 

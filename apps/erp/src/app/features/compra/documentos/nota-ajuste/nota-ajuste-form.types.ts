@@ -17,6 +17,8 @@ export interface NotaAjusteFormRawValue {
   readonly documento_referencia: ErpSelectOption | null;
   readonly plazo_pago: ErpSelectOption | null;
   readonly metodo_pago: ErpSelectOption | null;
+  /** Motivo DIAN de la nota. */
+  readonly documento_concepto_correccion: ErpSelectOption | null;
   readonly centro_costo: ErpSelectOption | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;

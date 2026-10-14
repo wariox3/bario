@@ -79,7 +79,11 @@ import type { PagoRead } from '@erp/features/documentos/pagos/pago.model';
 import { DocumentoPagoService } from '@erp/features/documentos/pagos/pago.service';
 import { notaVentaToFormValue, formValueToPayload } from '../../nota-documento.mapper';
 import type { NotaVentaRead } from '../../nota-documento.model';
-import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../nota-documento.constants';
+import {
+  METODO_PAGO_ENDPOINT,
+  METODO_PAGO_NO_DEFINIDO,
+  SEDE_ENDPOINT,
+} from '../../nota-documento.constants';
 import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comercial/components/cargar-lineas-referencia/cargar-lineas-referencia.component';
 import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
@@ -186,6 +190,18 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
    */
   protected readonly conAlmacenGeneral = computed(() => this.document().almacenGeneral === true);
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly conceptoCorreccionEndpoint = SELECT_ENDPOINTS.conceptoCorreccion;
+
+  /**
+   * Clase de nota con que se filtran los conceptos de corrección (cada nota tiene
+   * los suyos); `null` ⇒ el documento no lleva el campo.
+   */
+  protected readonly conceptoCorreccionClaseId = computed(
+    () => this.document().conceptoCorreccionClaseId ?? null,
+  );
+  protected readonly conceptoCorreccionParams = computed(() => ({
+    documento_clase_id: String(this.conceptoCorreccionClaseId()),
+  }));
   protected readonly referenciaDocumentoClaseId = DOCUMENTO_CLASE_ID.FACTURA_VENTA;
 
   /** El documento ofrece cargar las líneas de su factura referencia (la nota crédito). */
@@ -218,6 +234,16 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
    * legacy): lo habitual es tener una sola. En edición manda la del documento.
    */
   protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
+
+  /** En alta la sede arranca en la primera, como el almacén. */
+  protected readonly sedeSuggestedIndex = this.almacenSuggestedIndex;
+
+  /** En alta el método de pago arranca en "Instrumento no definido" (como la factura de venta). */
+  protected readonly metodoPagoSugerido = computed(() =>
+    this.isEditMode()
+      ? null
+      : (option: ErpSelectOption) => option['codigo'] === METODO_PAGO_NO_DEFINIDO,
+  );
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
@@ -278,6 +304,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     sede: this.fb.control<ErpSelectOption | null>(null),
     almacen: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    documento_concepto_correccion: this.fb.control<ErpSelectOption | null>(null),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
     pagos: new FormArray<PagoGroup>([]),
@@ -313,6 +340,13 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   ngOnInit(): void {
+    // El concepto de corrección es obligatorio donde el documento lo lleva; la config llega por input, así que la regla se fija aquí y no al crear el form.
+    if (this.conceptoCorreccionClaseId() != null) {
+      const concepto = this.form.controls.documento_concepto_correccion;
+      concepto.addValidators(Validators.required);
+      concepto.updateValueAndValidity({ emitEvent: false });
+    }
+
     const id = this.id();
     if (!id) return;
     // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo

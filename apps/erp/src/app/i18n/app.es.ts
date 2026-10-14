@@ -516,6 +516,7 @@ export const es: AppDict = {
           resolucion: 'Resolución',
           fecha: 'Fecha',
           fechaVence: 'Fecha de vencimiento',
+          conceptoCorreccion: 'Concepto corrección',
           seleccionar: 'Selecciona…',
         },
         validation: { required: 'Este campo es obligatorio' },
@@ -2831,6 +2832,8 @@ export const es: AppDict = {
           almacenPlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
+          conceptoCorreccion: 'Concepto corrección',
+          conceptoCorreccionPlaceholder: 'Selecciona…',
           comentario: 'Comentario',
           comentarioPlaceholder: 'Observaciones del documento',
         },
@@ -2860,6 +2863,7 @@ export const es: AppDict = {
           sede: 'Sede',
           almacen: 'Almacén',
           metodoPago: 'Método de pago',
+          conceptoCorreccion: 'Concepto corrección',
           comentario: 'Comentario',
         },
         notFound: {
@@ -3557,6 +3561,8 @@ export const es: AppDict = {
           plazoPagoPlaceholder: 'Selecciona…',
           metodoPago: 'Método de pago',
           metodoPagoPlaceholder: 'Selecciona…',
+          conceptoCorreccion: 'Concepto corrección',
+          conceptoCorreccionPlaceholder: 'Selecciona…',
           centroCosto: 'Centro de costo',
           centroCostoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
@@ -3600,6 +3606,7 @@ export const es: AppDict = {
           documentoReferencia: 'Documento referencia',
           plazoPago: 'Plazo de pago',
           metodoPago: 'Método de pago',
+          conceptoCorreccion: 'Concepto corrección',
           centroCosto: 'Centro de costo',
           ordenCompra: 'Orden de compra',
           comentario: 'Comentario',
@@ -6803,6 +6810,44 @@ export const es: AppDict = {
     },
   },
   inicio: {
+    periodo: { aria: 'Período', mes: 'Mes actual', anio: 'Año actual' },
+    resultadoResumen: {
+      titulo: 'Ingresos y egresos',
+      desc: 'Subtotales netos de ventas y compras, antes de impuestos.',
+      resultado: 'Resultado',
+      ingreso: 'Ingresos',
+      egreso: 'Egresos',
+      sinMovimiento: {
+        mes: 'Aún no hay movimiento este mes',
+        anio: 'Aún no hay movimiento este año',
+      },
+      error: {
+        title: 'No se pudo cargar el resultado',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
+    comercialResumen: {
+      porTipo: {
+        venta: {
+          titulo: 'Total de ventas',
+          desc: 'Con impuestos incluidos; las notas crédito restan.',
+          sinMovimiento: { mes: 'Aún no hay ventas este mes', anio: 'Aún no hay ventas este año' },
+          error: 'No se pudieron cargar las ventas',
+        },
+        compra: {
+          titulo: 'Total de compras',
+          desc: 'Con impuestos incluidos; las notas crédito restan.',
+          sinMovimiento: {
+            mes: 'Aún no hay compras este mes',
+            anio: 'Aún no hay compras este año',
+          },
+          error: 'No se pudieron cargar las compras',
+        },
+      },
+      documento: 'documento',
+      documentos: 'documentos',
+      errorDesc: 'Intenta de nuevo en un momento.',
+    },
     carteraResumen: {
       porTipo: {
         cobrar: {
@@ -6843,6 +6888,7 @@ export const es: AppDict = {
       },
     },
     general: {
+      titulo: 'Resumen del negocio',
       datosIniciales: {
         title: 'Configuración rápida',
         desc: 'Establece los valores predeterminados y haz que el sistema funcione al instante.',

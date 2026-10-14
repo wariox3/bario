@@ -24,6 +24,13 @@ export function notaVentaToFormValue(
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
         : null,
+    documento_concepto_correccion:
+      read.documento_concepto_correccion != null
+        ? {
+            id: read.documento_concepto_correccion,
+            nombre: read.documento_concepto_correccion_nombre ?? '',
+          }
+        : null,
     comentario: read.comentario ?? null,
   };
 }
@@ -51,6 +58,7 @@ export function formValueToPayload(
     sede: raw.sede?.id ?? null,
     almacen: raw.almacen?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
+    documento_concepto_correccion: raw.documento_concepto_correccion?.id ?? null,
     comentario: comentario ? comentario : null,
     ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
   };

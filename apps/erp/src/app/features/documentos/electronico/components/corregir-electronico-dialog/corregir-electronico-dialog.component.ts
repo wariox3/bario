@@ -22,6 +22,7 @@ import {
   ENTITY_DATA_GATEWAY,
   I18nService,
   RESOLUCION_ACTIVA_PARAMS,
+  SELECT_ENDPOINTS,
   ToastService,
   extractErrorMessage,
   resolucionLabel,
@@ -48,7 +49,8 @@ const RESOLUCION_ENDPOINT = '/general/resolucion/seleccionar/';
 
 /**
  * Diálogo **Corregir** del dropdown "Electrónico" —la corrección **DIAN**—:
- * número, resolución, fecha y vencimiento de un documento aprobado que todavía
+ * número, resolución, fecha, vencimiento y —en las notas— concepto de corrección
+ * de un documento aprobado que todavía
  * no salió hacia la DIAN, típicamente para reintentar una emisión rechazada.
  * Sin líneas: lo contable (sede y líneas) lo corrige el "Corregir" de Opciones
  * (`CorregirDocumentoDialogComponent`).
@@ -100,6 +102,18 @@ export class CorregirElectronicoDialogComponent {
     ...this.document().electronico?.resolucionParams,
   }));
 
+  protected readonly conceptoCorreccionEndpoint = SELECT_ENDPOINTS.conceptoCorreccion;
+  /**
+   * Clase de nota con que se filtran los conceptos de corrección (la declara el
+   * config); `null` ⇒ el documento no es nota y el diálogo no muestra el campo.
+   */
+  protected readonly conceptoCorreccionClaseId = computed(
+    () => this.document().conceptoCorreccionClaseId ?? null,
+  );
+  protected readonly conceptoCorreccionParams = computed(() => ({
+    documento_clase_id: String(this.conceptoCorreccionClaseId()),
+  }));
+
   protected readonly isLoading = signal(false);
   protected readonly isSaving = signal(false);
   protected readonly loadFailed = signal(false);
@@ -110,6 +124,7 @@ export class CorregirElectronicoDialogComponent {
     resolucion: this.fb.control<ErpSelectOption | null>(null),
     fecha: this.fb.control<Date | null>(null, Validators.required),
     fechaVence: this.fb.control<Date | null>(null),
+    conceptoCorreccion: this.fb.control<ErpSelectOption | null>(null),
   });
 
   constructor() {
@@ -173,6 +188,11 @@ export class CorregirElectronicoDialogComponent {
   }
 
   private load(id: number): void {
+    // En las notas el concepto es obligatorio (en la crédito lo exige también el backend).
+    const concepto = this.form.controls.conceptoCorreccion;
+    if (this.conceptoCorreccionClaseId() != null) concepto.setValidators(Validators.required);
+    else concepto.clearValidators();
+
     this.isLoading.set(true);
     this.loadFailed.set(false);
     this.gateway

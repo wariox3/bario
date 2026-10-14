@@ -7,18 +7,20 @@ import { InicioInvitacionComponent } from '@erp/core/components/inicio-invitacio
 import { ParametroService } from '@erp/core/services/parametro.service';
 import type { AppDict } from '@erp/i18n';
 import { PlantillaCargadaDialogComponent } from './components/plantilla-cargada-dialog/plantilla-cargada-dialog.component';
+import { CarteraResumenComponent } from '@erp/features/documentos/cartera-resumen/cartera-resumen.component';
 import { PlantillaService, type PlantillaCargarResponse } from './plantilla.service';
+import { ResultadoResumenComponent } from './resultado-resumen/resultado-resumen.component';
 
 /** Qué botón está en vuelo — para bloquear el otro sin apagar toda la tira. */
 type AccionEnVuelo = 'cargar' | 'descartar' | null;
 
 /**
- * Inicio del módulo General.
+ * Inicio del módulo General: el resumen del negocio.
  *
- * Hoy solo hospeda el asistente de datos iniciales, y en la mayoría de las
- * entradas no muestra nada: es el landing del módulo y va a crecer
- * (indicadores, accesos rápidos), así que el asistente se compone como una tira
- * arriba —la misma de `venta-inicio`— y lo que venga después se apila debajo.
+ * Arriba, cuando corresponde, la tira del asistente de datos iniciales —la
+ * misma de `venta-inicio`—; debajo, la grilla de fichas: las de cartera
+ * (cobrar y pagar, compartidas con sus inicios) y la gráfica de ingresos
+ * contra egresos.
  *
  * El acuse de lo que se cargó **no** vive acá sino en un modal: pasa una sola
  * vez en la vida del contenedor y merece que se lo mire una vez, no que se lo
@@ -27,11 +29,16 @@ type AccionEnVuelo = 'cargar' | 'descartar' | null;
 @Component({
   selector: 'app-general-inicio',
   standalone: true,
-  imports: [ButtonModule, InicioInvitacionComponent, PlantillaCargadaDialogComponent],
+  imports: [
+    ButtonModule,
+    CarteraResumenComponent,
+    InicioInvitacionComponent,
+    PlantillaCargadaDialogComponent,
+    ResultadoResumenComponent,
+  ],
   templateUrl: './general-inicio.component.html',
-  // Mismo ancho acotado que el inicio de Venta: no es una tabla, se lee mejor
-  // en una columna.
-  host: { class: 'mx-auto flex w-full max-w-[1200px] flex-col' },
+  // Mismo ancho acotado que los demás inicios.
+  host: { class: 'mx-auto flex w-full max-w-[1200px] flex-col gap-4' },
 })
 export class GeneralInicioComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);

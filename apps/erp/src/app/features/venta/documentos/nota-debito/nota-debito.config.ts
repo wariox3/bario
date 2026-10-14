@@ -1,3 +1,4 @@
+import { DOCUMENTO_CLASE_ID } from '@reddoc/core';
 import { DOCUMENT_TYPE_ID, type DocumentEntityConfig } from '@erp/core/module-config';
 import { NOTA_DEBITO_COLUMNS, NOTA_DEBITO_FILTERS } from './nota-debito.constants';
 
@@ -22,6 +23,8 @@ export const NOTA_DEBITO_CONFIG: DocumentEntityConfig = {
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_DEBITO_VENTA,
   inventoryEffect: 'inflow',
+  // Motivo DIAN de la nota: solo los conceptos de la clase nota débito de venta.
+  conceptoCorreccionClaseId: DOCUMENTO_CLASE_ID.NOTA_DEBITO_VENTA,
   schemaVersion: 1,
   columns: NOTA_DEBITO_COLUMNS,
   filters: NOTA_DEBITO_FILTERS,
@@ -47,4 +50,7 @@ export const NOTA_DEBITO_CONFIG: DocumentEntityConfig = {
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
   extraActionIds: ['export-excel'],
+  // Se emite a la DIAN: el dropdown Electrónico corrige su cabecera con las
+  // resoluciones de venta.
+  electronico: { resolucionParams: { venta: 'True' } },
 };

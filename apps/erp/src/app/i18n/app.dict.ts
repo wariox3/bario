@@ -439,6 +439,7 @@ export interface AppDict
           resolucion: string;
           fecha: string;
           fechaVence: string;
+          conceptoCorreccion: string;
           seleccionar: string;
         };
         validation: { required: string };
@@ -2145,6 +2146,8 @@ export interface AppDict
           almacenPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          conceptoCorreccion: string;
+          conceptoCorreccionPlaceholder: string;
           comentario: string;
           comentarioPlaceholder: string;
         };
@@ -2168,6 +2171,7 @@ export interface AppDict
           sede: string;
           almacen: string;
           metodoPago: string;
+          conceptoCorreccion: string;
           comentario: string;
         };
         notFound: { title: string; desc: string };
@@ -2702,6 +2706,8 @@ export interface AppDict
           plazoPagoPlaceholder: string;
           metodoPago: string;
           metodoPagoPlaceholder: string;
+          conceptoCorreccion: string;
+          conceptoCorreccionPlaceholder: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
           ordenCompra: string;
@@ -2727,6 +2733,7 @@ export interface AppDict
           documentoReferencia: string;
           plazoPago: string;
           metodoPago: string;
+          conceptoCorreccion: string;
           centroCosto: string;
           ordenCompra: string;
           comentario: string;
@@ -5138,6 +5145,33 @@ export interface AppDict
   };
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
+    /** Selector del período de las gráficas (mes o año en curso). */
+    periodo: { aria: string; mes: string; anio: string };
+    /** Ingresos contra egresos del resumen del negocio (`resultado-resumen/`). */
+    resultadoResumen: {
+      titulo: string;
+      desc: string;
+      resultado: string;
+      ingreso: string;
+      egreso: string;
+      sinMovimiento: { mes: string; anio: string };
+      error: { title: string; desc: string };
+    };
+    /** Gráfica de ventas o compras (`comercial-resumen/`), por `tipo`. */
+    comercialResumen: {
+      porTipo: Record<
+        'venta' | 'compra',
+        {
+          titulo: string;
+          desc: string;
+          sinMovimiento: { mes: string; anio: string };
+          error: string;
+        }
+      >;
+      documento: string;
+      documentos: string;
+      errorDesc: string;
+    };
     carteraResumen: {
       porTipo: Record<
         'cobrar' | 'pagar',
@@ -5162,6 +5196,8 @@ export interface AppDict
       error: { title: string; desc: string };
     };
     general: {
+      /** Encabezado del inicio: el resumen del negocio. */
+      titulo: string;
       /** Asistente de datos iniciales: solo en contenedores recién creados. */
       datosIniciales: {
         title: string;

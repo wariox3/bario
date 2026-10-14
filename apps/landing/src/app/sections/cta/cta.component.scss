@@ -97,44 +97,8 @@
   }
 }
 
-.cta-statusline {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 22px;
-  padding: 10px 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  font-family: var(--reddoc-font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-  flex-wrap: wrap;
-  justify-content: center;
-
-  .dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--reddoc-emerald);
-    margin-right: 6px;
-    box-shadow: 0 0 0 3px rgba(32, 170, 62, 0.22);
-    animation: reddoc-pulse 2.4s ease-in-out infinite;
-  }
-  .cta-sep {
-    color: rgba(255, 255, 255, 0.32);
-  }
-}
-
 @media (max-width: 720px) {
   .cta-frame {
     padding: 40px 22px;
-  }
-  .cta-statusline {
-    font-size: 0.6rem;
-    gap: 8px;
   }
 }

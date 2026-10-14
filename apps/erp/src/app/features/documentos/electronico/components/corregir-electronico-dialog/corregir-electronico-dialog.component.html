@@ -130,6 +130,35 @@
               [messages]="{ vencimientoAnterior: t().entities.vencimiento.anteriorAFecha }"
             />
           </div>
+
+          @if (conceptoCorreccionClaseId()) {
+            <!-- Concepto de corrección: el motivo DIAN de la nota, filtrado por su clase. -->
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label
+                for="corregir-electronico-concepto"
+                class="cp-corregir-electronico-dialog__label"
+              >
+                {{ dict.fields.conceptoCorreccion }}
+                <span class="ml-px text-red-500">*</span>
+              </label>
+              <lib-api-select
+                inputId="corregir-electronico-concepto"
+                formControlName="conceptoCorreccion"
+                [endpoint]="conceptoCorreccionEndpoint"
+                [params]="conceptoCorreccionParams()"
+                filterBy="nombre,codigo"
+                [placeholder]="dict.fields.seleccionar"
+                [invalid]="
+                  form.controls.conceptoCorreccion.invalid &&
+                  form.controls.conceptoCorreccion.touched
+                "
+              />
+              <lib-field-error
+                [control]="form.controls.conceptoCorreccion"
+                [messages]="{ required: dict.validation.required }"
+              />
+            </div>
+          }
         </div>
 
         <div class="flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-4">

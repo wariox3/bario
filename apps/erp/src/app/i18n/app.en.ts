@@ -509,6 +509,7 @@ export const en: AppDict = {
           resolucion: 'Resolution',
           fecha: 'Date',
           fechaVence: 'Due date',
+          conceptoCorreccion: 'Correction concept',
           seleccionar: 'Select…',
         },
         validation: { required: 'This field is required' },
@@ -2773,6 +2774,8 @@ export const en: AppDict = {
           almacenPlaceholder: 'Select…',
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
+          conceptoCorreccion: 'Correction concept',
+          conceptoCorreccionPlaceholder: 'Select…',
           comentario: 'Comment',
           comentarioPlaceholder: 'Document notes',
         },
@@ -2799,6 +2802,7 @@ export const en: AppDict = {
           sede: 'Branch',
           almacen: 'Warehouse',
           metodoPago: 'Payment method',
+          conceptoCorreccion: 'Correction concept',
           comentario: 'Comment',
         },
         notFound: {
@@ -3496,6 +3500,8 @@ export const en: AppDict = {
           plazoPagoPlaceholder: 'Select…',
           metodoPago: 'Payment method',
           metodoPagoPlaceholder: 'Select…',
+          conceptoCorreccion: 'Correction concept',
+          conceptoCorreccionPlaceholder: 'Select…',
           centroCosto: 'Cost center',
           centroCostoPlaceholder: 'Select…',
           ordenCompra: 'Purchase order',
@@ -3539,6 +3545,7 @@ export const en: AppDict = {
           documentoReferencia: 'Reference document',
           plazoPago: 'Payment terms',
           metodoPago: 'Payment method',
+          conceptoCorreccion: 'Correction concept',
           centroCosto: 'Cost center',
           ordenCompra: 'Purchase order',
           comentario: 'Comment',
@@ -6716,6 +6723,38 @@ export const en: AppDict = {
     },
   },
   inicio: {
+    periodo: { aria: 'Period', mes: 'This month', anio: 'This year' },
+    resultadoResumen: {
+      titulo: 'Income and expenses',
+      desc: 'Net subtotals of sales and purchases, before taxes.',
+      resultado: 'Result',
+      ingreso: 'Income',
+      egreso: 'Expenses',
+      sinMovimiento: { mes: 'No activity this month yet', anio: 'No activity this year yet' },
+      error: {
+        title: "The result couldn't be loaded",
+        desc: 'Try again in a moment.',
+      },
+    },
+    comercialResumen: {
+      porTipo: {
+        venta: {
+          titulo: 'Total sales',
+          desc: 'Taxes included; credit notes subtract.',
+          sinMovimiento: { mes: 'No sales this month yet', anio: 'No sales this year yet' },
+          error: "Sales couldn't be loaded",
+        },
+        compra: {
+          titulo: 'Total purchases',
+          desc: 'Taxes included; credit notes subtract.',
+          sinMovimiento: { mes: 'No purchases this month yet', anio: 'No purchases this year yet' },
+          error: "Purchases couldn't be loaded",
+        },
+      },
+      documento: 'document',
+      documentos: 'documents',
+      errorDesc: 'Try again in a moment.',
+    },
     carteraResumen: {
       porTipo: {
         cobrar: {
@@ -6756,6 +6795,7 @@ export const en: AppDict = {
       },
     },
     general: {
+      titulo: 'Business summary',
       datosIniciales: {
         title: 'Quick setup',
         desc: 'Set the default values and get the system running right away.',

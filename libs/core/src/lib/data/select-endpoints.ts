@@ -17,6 +17,8 @@ export const SELECT_ENDPOINTS = {
   responsabilidad: '/general/responsabilidad/seleccionar/',
   plazoPago: '/general/plazo-pago/seleccionar/',
   metodoPago: '/general/metodo-pago/seleccionar/',
+  /** Conceptos de corrección (motivo DIAN de las notas): se filtran por `documento_clase_id`. */
+  conceptoCorreccion: '/general/documento-concepto-correccion/seleccionar/',
   precio: '/general/precio/seleccionar/',
   asesor: '/general/asesor/seleccionar/',
   banco: '/general/banco/seleccionar/',

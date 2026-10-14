@@ -25,6 +25,8 @@ export interface NotaAjusteRead extends DocumentoReadBase {
   readonly plazo_pago_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
+  readonly documento_concepto_correccion?: number | null;
+  readonly documento_concepto_correccion_nombre?: string | null;
   readonly centro_costo: number | null;
   readonly centro_costo_nombre?: string | null;
   readonly orden_compra: string | null;
@@ -37,6 +39,7 @@ export interface NotaAjustePayload extends DocumentoPayloadBase {
   readonly fecha_vence: string | null;
   readonly plazo_pago: number | null;
   readonly metodo_pago: number | null;
+  readonly documento_concepto_correccion: number | null;
   readonly centro_costo: number | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
