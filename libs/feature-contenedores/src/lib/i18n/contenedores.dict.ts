@@ -21,6 +21,18 @@ export interface ContenedoresDict {
       edit: string;
       updateSubscription: string;
       delete: string;
+      leave: string;
+    };
+    /** Confirmación de un miembro que sale de la empresa (`{nombre}`). */
+    leave: {
+      title: string;
+      message: string;
+      accept: string;
+      cancel: string;
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+      };
     };
     view: {
       list: string;

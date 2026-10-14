@@ -178,6 +178,11 @@ export interface ContenedorEstadoResponse {
  * —`celular`, `correo`— **no viajan acá**: solo en la ficha.
  */
 export interface Contenedor extends ContenedorAccesoFlags {
+  /**
+   * Id de la **membresía** (la fila usuario-cliente), no de la empresa: es el
+   * que pide `DELETE /seguridad/usuario-cliente/{id}/` para salir de ella.
+   */
+  id: number;
   cliente_id: number;
   schema_name: string;
   cliente_nombre: string;

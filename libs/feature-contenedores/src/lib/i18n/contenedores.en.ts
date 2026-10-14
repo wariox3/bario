@@ -18,6 +18,18 @@ export const contenedoresEn: ContenedoresDict = {
       edit: 'Edit container',
       updateSubscription: 'Update subscription',
       delete: 'Delete container',
+      leave: 'Leave company',
+    },
+    leave: {
+      title: 'Leave {nombre}',
+      message:
+        'You will no longer see this company or its data. To come back, the owner will have to invite you again.',
+      accept: 'Leave',
+      cancel: 'Cancel',
+      toasts: {
+        success: { title: 'You left the company', desc: 'You no longer have access to {nombre}.' },
+        error: { title: 'Could not leave', desc: 'Try again in a moment.' },
+      },
     },
     view: {
       list: 'List view',

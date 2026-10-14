@@ -18,6 +18,18 @@ export const contenedoresEs: ContenedoresDict = {
       edit: 'Editar contenedor',
       updateSubscription: 'Actualizar suscripción',
       delete: 'Eliminar contenedor',
+      leave: 'Salir de la empresa',
+    },
+    leave: {
+      title: 'Salir de {nombre}',
+      message:
+        'Dejarás de ver esta empresa y sus datos. Para volver, el propietario tendrá que invitarte de nuevo.',
+      accept: 'Salir',
+      cancel: 'Cancelar',
+      toasts: {
+        success: { title: 'Saliste de la empresa', desc: 'Ya no tienes acceso a {nombre}.' },
+        error: { title: 'No se pudo salir', desc: 'Intenta de nuevo en un momento.' },
+      },
     },
     view: {
       list: 'Vista de lista',

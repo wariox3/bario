@@ -241,8 +241,13 @@ export class ContenedorService extends BaseHttpService {
     );
   }
 
-  removeMember(membershipId: number): Observable<unknown> {
-    return this.delete(`/seguridad/usuario-cliente/${membershipId}/`);
+  /**
+   * Borra una membresía: el propietario saca a un miembro, o un miembro sale
+   * de la empresa con la suya (el `id` de `lista-usuario`). `opts` deja que la
+   * pantalla apague el toast del interceptor cuando avisa el fallo por su cuenta.
+   */
+  removeMember(membershipId: number, opts?: RequestOptions): Observable<unknown> {
+    return this.delete(`/seguridad/usuario-cliente/${membershipId}/`, opts);
   }
 
   /**

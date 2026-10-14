@@ -29,6 +29,12 @@ export class ContenedorRowItemComponent {
   readonly lastConnectionLabel = input<string>('Última conexión');
   /** Muestra el botón de acciones de fila. La app lo apaga si no habilita ninguna. */
   readonly showMenu = input<boolean>(true);
+  /**
+   * ¿El menú de esta empresa tiene algo que ofrecer? Lo decide el listado según
+   * el rol (el propietario administra, el miembro puede salir) y las
+   * capabilities de la app. Sin acciones, el engranaje guarda su ranura invisible.
+   */
+  readonly hasActions = input<boolean>(true);
   /** Muestra el CTA de renovación al propietario con la suscripción vencida. */
   readonly canRenew = input<boolean>(true);
 
@@ -62,7 +68,7 @@ export class ContenedorRowItemComponent {
   readonly isError = computed(() => this.contenedor().estado === 'error');
 
   /** Mientras se crea no hay acciones: el menú vuelve cuando termina (o falla). */
-  readonly menuDisabled = computed(() => !this.isOwner() || this.isCreando());
+  readonly menuDisabled = computed(() => !this.hasActions() || this.isCreando());
 
   protected onActivate(): void {
     // Hasta estar `listo`, el backend responde 409 a cualquier petición del tenant.

@@ -40,6 +40,7 @@ const APP_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   edit: true,
   invite: false, // esta app no gestiona miembros
   delete: false,
+  leave: true, // un miembro puede salir de la empresa
   subscription: true,
   viewToggle: true,
 };

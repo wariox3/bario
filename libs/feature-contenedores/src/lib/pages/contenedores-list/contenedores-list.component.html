@@ -119,6 +119,7 @@
                     [contenedor]="item"
                     [index]="i"
                     [showMenu]="hasRowActions()"
+                    [hasActions]="hasActionsFor(item)"
                     [canRenew]="capabilities().subscription"
                     [menuLabel]="t().contenedores.list.actions.menuLabel"
                     [enterLabel]="t().contenedores.list.enter"
@@ -146,6 +147,7 @@
                   [contenedor]="item"
                   [index]="i"
                   [showMenu]="hasRowActions()"
+                  [hasActions]="hasActionsFor(item)"
                   [canRenew]="capabilities().subscription"
                   [menuLabel]="t().contenedores.list.actions.menuLabel"
                   [enterLabel]="t().contenedores.list.enter"
@@ -189,6 +191,8 @@
 </div>
 
 <p-menu #rowMenu [model]="rowMenuItems" [popup]="true" appendTo="body" styleClass="cl-row-menu" />
+
+<p-confirmDialog />
 
 @defer (when showCreate()) {
   @if (showCreate()) {
