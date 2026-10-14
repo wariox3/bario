@@ -27,6 +27,14 @@ export interface Item {
   readonly venta: boolean;
   readonly favorito: boolean;
   readonly inactivo: boolean;
+  /**
+   * Saldos consolidados de todos los almacenes. El backend los manda como
+   * string decimal (`"12.000000"`); quien los use los pasa por `toFiniteNumber`.
+   * `disponible` es lo que se puede vender: la existencia menos lo comprometido
+   * en remisiones. Solo significan algo si el ítem maneja `inventario`.
+   */
+  readonly existencia?: string | number | null;
+  readonly disponible?: string | number | null;
   readonly cuenta_venta: number | null;
   readonly cuenta_venta_nombre?: string | null;
   readonly cuenta_venta_codigo?: string | null;

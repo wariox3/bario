@@ -41,6 +41,15 @@ export class ItemService extends BaseHttpService {
   }
 
   /**
+   * Marca o desmarca el ítem como favorito (`PATCH item/{id}/ { favorito }`).
+   * Va aparte de `update` porque solo toca ese campo: el `PUT` exige el ítem
+   * completo y la caja del POS no lo tiene.
+   */
+  actualizarFavorito(id: number, favorito: boolean): Observable<Item> {
+    return this.patch<Item>(`${this.resourcePath}${id}/`, { favorito });
+  }
+
+  /**
    * ¿El ítem ya se movió en documentos?
    *
    * Lo consulta el formulario en edición para bloquear lo que ya no se puede

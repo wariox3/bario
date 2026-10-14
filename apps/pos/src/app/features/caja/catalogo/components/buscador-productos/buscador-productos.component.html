@@ -1,0 +1,55 @@
+@let tx = t().caja.buscador;
+<div class="flex items-stretch gap-2">
+  <div
+    class="flex shrink-0 overflow-hidden rounded-lg border border-[rgba(20,48,73,0.14)] bg-brand-surface"
+    role="group"
+    [attr.aria-label]="tx.modo"
+  >
+    <button
+      type="button"
+      class="flex items-center gap-1.5 px-3 text-[0.8rem] font-medium transition-colors"
+      [class]="modo() === 'nombre' ? activo : inactivo"
+      [attr.aria-pressed]="modo() === 'nombre'"
+      (click)="cambiarModo('nombre')"
+    >
+      <i class="pi pi-search text-[0.8rem]" aria-hidden="true"></i>
+      <span class="max-[576px]:sr-only">{{ tx.porNombre }}</span>
+    </button>
+    <button
+      type="button"
+      class="flex items-center gap-1.5 border-l border-[rgba(20,48,73,0.14)] px-3 text-[0.8rem] font-medium transition-colors"
+      [class]="modo() === 'codigo' ? activo : inactivo"
+      [attr.aria-pressed]="modo() === 'codigo'"
+      (click)="cambiarModo('codigo')"
+    >
+      <i class="pi pi-barcode text-[0.8rem]" aria-hidden="true"></i>
+      <span class="max-[576px]:sr-only">{{ tx.porCodigo }}</span>
+    </button>
+  </div>
+
+  <div class="relative min-w-0 flex-1">
+    <input
+      #campo
+      type="text"
+      enterkeyhint="search"
+      autocomplete="off"
+      class="h-10 w-full rounded-lg border border-[rgba(20,48,73,0.14)] bg-brand-surface px-3 pr-9 text-sm text-brand-text outline-none transition-colors placeholder:text-brand-muted focus:border-[var(--brand-blue)]"
+      [class.font-mono]="modo() === 'codigo'"
+      [placeholder]="modo() === 'nombre' ? tx.placeholderNombre : tx.placeholderCodigo"
+      [attr.aria-label]="modo() === 'nombre' ? tx.placeholderNombre : tx.placeholderCodigo"
+      [value]="texto()"
+      (input)="onInput(campo.value)"
+      (keydown.enter)="onEnter()"
+    />
+    @if (texto()) {
+      <button
+        type="button"
+        class="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-brand-muted hover:bg-[rgba(20,48,73,0.06)] hover:text-brand-text"
+        [attr.aria-label]="tx.limpiar"
+        (click)="limpiar()"
+      >
+        <i class="pi pi-times text-[0.75rem]"></i>
+      </button>
+    }
+  </div>
+</div>

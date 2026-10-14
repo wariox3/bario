@@ -136,6 +136,23 @@ la caja configurada.
 por nombre filtra, el lector de códigos (o teclear un código + Enter) selecciona
 el ítem, y el favorito persiste tras recargar.
 
+**Estado (2026-10-14).** Hecho y en verde (build, lint, tests). Ajustes:
+
+- Obligatorios para vender: tipo de documento, **almacén** y cuenta de
+  efectivo. El almacén pasó a obligatorio porque es lo que mueve el inventario
+  de cada línea. Sede y asesor quedan opcionales.
+- El lector de barras busca por código exacto y deja el texto seleccionado para
+  la siguiente lectura; **agregar directo al carrito** entra con el carrito en
+  el sprint 2.
+- `item/lista/` recibe `venta = true` e `inactivo = false`, pero no está
+  confirmado que el backend los tenga en su lista blanca: el catálogo además
+  descarta en el cliente lo que no sea vendible. Si no están declarados, la
+  paginación puede traer páginas con menos tarjetas de las pedidas.
+- Marcar favorito no reordena en el momento (la tarjeta saltaría bajo el
+  cursor); el orden nuevo entra en la siguiente búsqueda.
+- `ItemService` sumó `actualizarFavorito` (PATCH solo de `favorito`) y el modelo
+  `Item` sumó `existencia` y `disponible`; `SELECT_ENDPOINTS` sumó `sede`.
+
 ---
 
 ## Sprint 2 · Carritos

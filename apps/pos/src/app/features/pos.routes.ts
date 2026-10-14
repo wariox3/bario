@@ -14,12 +14,19 @@ function proximamente(seccion: PosNavKey): Route {
 /**
  * Rutas del workspace del POS, relativas a `/t/:tenantSlug`.
  *
- * Por ahora las tres secciones son marcadores: la caja y la configuración llegan
- * en el sprint 1, el historial en el 4 (ver `docs/architecture/pos-migracion-sprints.md`).
+ * El historial sigue como marcador hasta el sprint 4 (ver
+ * `docs/architecture/pos-migracion-sprints.md`).
  */
 export const POS_ROUTES: Route[] = [
   { path: '', pathMatch: 'full', redirectTo: 'caja' },
-  proximamente('caja'),
+  {
+    path: 'caja',
+    loadChildren: () => import('./caja/caja.routes').then((m) => m.CAJA_ROUTES),
+  },
   proximamente('historial'),
-  proximamente('configuracion'),
+  {
+    path: 'configuracion',
+    loadChildren: () =>
+      import('./configuracion/configuracion.routes').then((m) => m.CONFIGURACION_ROUTES),
+  },
 ];

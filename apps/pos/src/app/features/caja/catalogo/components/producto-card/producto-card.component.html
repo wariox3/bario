@@ -1,0 +1,55 @@
+@let p = producto();
+@let tx = t().caja.producto;
+<article
+  class="flex h-full flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface transition-colors hover:border-[rgba(20,48,73,0.22)]"
+  [class.opacity-60]="agotado()"
+>
+  <div class="relative aspect-[4/3] bg-[rgba(20,48,73,0.04)]">
+    @if (p.imagenUrl) {
+      <img [src]="p.imagenUrl" [alt]="p.nombre" loading="lazy" class="h-full w-full object-cover" />
+    } @else {
+      <div class="flex h-full w-full items-center justify-center text-brand-muted-2">
+        <i class="pi pi-box text-2xl" aria-hidden="true"></i>
+      </div>
+    }
+
+    <button
+      type="button"
+      class="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-brand-muted transition-colors hover:text-amber-500"
+      [class.text-amber-500]="p.favorito"
+      [attr.aria-pressed]="p.favorito"
+      [attr.aria-label]="p.favorito ? tx.quitarFavorito : tx.marcarFavorito"
+      (click)="onFavorito($event)"
+    >
+      <i class="pi text-sm" [class.pi-star-fill]="p.favorito" [class.pi-star]="!p.favorito"></i>
+    </button>
+
+    @if (p.disponible !== null) {
+      <span
+        class="absolute bottom-2 left-2 rounded-full px-2 py-0.5 text-[0.7rem] font-medium"
+        [class.bg-emerald-50]="!agotado()"
+        [class.text-emerald-800]="!agotado()"
+        [class.bg-red-50]="agotado()"
+        [class.text-red-700]="agotado()"
+      >
+        @if (agotado()) {
+          {{ tx.agotado }}
+        } @else {
+          <span class="font-mono tabular-nums">{{ p.disponible }}</span> {{ tx.disponibles }}
+        }
+      </span>
+    }
+  </div>
+
+  <div class="flex flex-1 flex-col gap-1 px-3 py-2.5">
+    @if (p.codigo) {
+      <span class="truncate font-mono text-[0.7rem] text-brand-muted">{{ p.codigo }}</span>
+    }
+    <h3 class="m-0 line-clamp-2 text-[0.85rem] font-semibold leading-tight text-brand-text">
+      {{ p.nombre }}
+    </h3>
+    <p class="m-0 mt-auto pt-1 font-mono text-[0.95rem] font-bold tabular-nums text-brand-text">
+      {{ precio() }}
+    </p>
+  </div>
+</article>
