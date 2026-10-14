@@ -56,7 +56,7 @@ libs/
 Path aliases:
 
 - **Cross-app (libs)**: `@reddoc/core`, `@reddoc/ui`, `@reddoc/feature-base`, `@reddoc/styles`.
-- **Intra-app (solo erp)**: `@erp/*` → `apps/erp/src/app/*`. Permitido por excepción en `@nx/enforce-module-boundaries` para evitar paths relativos profundos (los masters viven anidados en `features/<modulo>/masters/<entity>/pages/<page>/`). Úsalo para imports cross-feature (`@erp/core/...`, `@erp/i18n`, `@erp/layouts/...`). Para hermanos del mismo bounded context, sigue con relativos cortos (`./contacto.service`).
+- **Intra-app (solo erp)**: `@erp/*` → `apps/erp/src/app/*`. Permitido por excepción en `@nx/enforce-module-boundaries` para evitar paths relativos profundos (los masters viven anidados en `features/<modulo>/masters/<entity>/pages/<page>/`). Úsalo para imports cross-feature (`@erp/core/...`, `@erp/i18n`, `@erp/layouts/...`). Para hermanos del mismo bounded context, sigue con relativos cortos (`./contacto.service`). `@turnos/*` y `@pos/*` son el equivalente en sus apps; ESLint impide que una app importe el alias de otra.
 
 **Lo que ES cross-app va en libs/. Lo que es ERP-específico vive en `apps/erp/src/app/core/`.** El **núcleo compartido** del framework configuracional de documentos (tipos, gateway y `DocumentoDetalleService`) vive en `libs/core/documento` porque también lo consume `apps/turnos`; solo el registry, resolvers y `BaseDocumentListComponent` quedan en el ERP.
 
@@ -96,12 +96,12 @@ BaseAuthService<TUser extends BaseUsuario>   (libs/core)
 
 | Token               | Purpose                                                                                                              |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `ENVIRONMENT`       | `{ apiUrl, turnstileSiteKey, cuentaUrl?, erpUrl?, turnosUrl? }` — las `<app>Url` alimentan el app-switcher           |
+| `ENVIRONMENT`       | `{ apiUrl, turnstileSiteKey, cuentaUrl?, erpUrl?, turnosUrl?, posUrl? }` — las `<app>Url` alimentan el app-switcher  |
 | `ROUTE_PATHS_TOKEN` | `{ auth: { login, register, forgotPassword, resetPassword, resendVerification, verifyEmail }, dashboard: { root } }` |
 | `AUTH_SERVICE`      | `useExisting: AuthService` — exposes `AuthServiceContract` to interceptors, guards, and shared auth pages            |
 | `AUTH_SKIP_URLS`    | String array of API paths that bypass the 401-refresh logic                                                          |
 | `APP_BRANDING`      | `{ appName, tagline? }` — consumed by the shared auth pages in `@reddoc/ui` to render per-app brand panel            |
-| `CURRENT_APP`       | `ReddocAppId` (`'erp' \| 'turnos'`) — quién soy; el app-switcher lo usa para excluirse de su propia lista            |
+| `CURRENT_APP`       | `ReddocAppId` (`'erp' \| 'turnos' \| 'pos'`) — quién soy; el app-switcher lo usa para excluirse de su propia lista   |
 
 **Guards** (`authGuard`, `publicGuard`) inject `AUTH_SERVICE` and `ROUTE_PATHS_TOKEN`.
 
@@ -115,12 +115,22 @@ BaseAuthService<TUser extends BaseUsuario>   (libs/core)
 
 Cualquier app del monorepo puede usarlos para construir listas paginadas.
 
+**Bloques comerciales cross-app** (los comparten el ERP y el POS; nada de PrimeNG):
+
+- `lib/item/` — `Item`, `ItemService` (`item/lista/`, `item/{id}/`, `validar-uso/`), `ItemOption` + `toItemOption`.
+- `lib/precio/` — `PrecioDetalleService` (`consultarPrecioItem` cotiza un ítem en la lista del cliente).
+- `lib/documento/comercial/` — modelos y mapper de la línea comercial (`tasasDelItem`, `toLineaCalculo`, `comercialDetalleToPayload`, `precioUnitarioCon/SinImpuestos`…) y `precioListaDeContacto`.
+- `lib/documento/pagos/` — `DocumentoPagoService` (`documento-pago/`, recurso aparte del documento) y `calcularPagos`.
+- `lib/documento/pos/` — cabecera de la familia POS (`PosDocumentoRead/Payload/Valores`, `posDocumentoToPayload`).
+
+Los formularios (`FormGroup`) y las tablas editables de esas líneas siguen en el ERP: el POS tiene otra UX y solo comparte datos y cálculo.
+
 ### libs/ui — shared standalone components
 
 - `TurnstileComponent` (`lib-turnstile`) — Cloudflare Turnstile widget. Reads `turnstileSiteKey` from `ENVIRONMENT`. Dev key `1x00000000000000000000AA` always passes.
 - Auth pages (`LoginComponent`, `RegisterComponent`, `ForgotPasswordComponent`, `ResetPasswordComponent`, `ResendVerificationComponent`, `VerifyEmailComponent`) — fully implemented; each app routes to them via eager `component:` (Nx prohibits mixing lazy + static imports of the same lib).
-- `AppSwitcherComponent` (`lib-app-switcher`) — waffle en el header (`app-header__actions`) que salta entre apps hermanas. Requiere que la app provea `CURRENT_APP` y declare las `<app>Url` de sus hermanas en `ENVIRONMENT`. Trae su propio dict (`AppSwitcherTranslationsHost` + `appSwitcherEs/En`), igual que las auth pages. Lo usan erp y turnos.
-- `PageActionsComponent` (`lib-page-actions`) — la fila de botones de una página (volver / guardar). Se pega bajo el header al hacer scroll y solo entonces se viste de fondo + filete. Se usa envolviendo los botones, sin inputs. El sangrado lateral sale de `--page-gutter`, que **cada layout declara sobre su scrollport** con el valor de su padding (ya lo hacen los `workspace-layout` de erp y turnos); un layout que no la declare cae al default de `1.75rem`. El scrollport **no debe llevar `padding-top`** (los navegadores no acuerdan desde dónde ancla un sticky con padding superior): el gutter de arriba va como espaciador `::before` en el flujo. Ver el patrón completo en `.interface-design/system.md`.
+- `AppSwitcherComponent` (`lib-app-switcher`) — waffle en el header (`app-header__actions`) que salta entre apps hermanas. Requiere que la app provea `CURRENT_APP` y declare las `<app>Url` de sus hermanas en `ENVIRONMENT`. Trae su propio dict (`AppSwitcherTranslationsHost` + `appSwitcherEs/En`), igual que las auth pages. Lo usan erp, turnos y pos.
+- `PageActionsComponent` (`lib-page-actions`) — la fila de botones de una página (volver / guardar). Se pega bajo el header al hacer scroll y solo entonces se viste de fondo + filete. Se usa envolviendo los botones, sin inputs. El sangrado lateral sale de `--page-gutter`, que **cada layout declara sobre su scrollport** con el valor de su padding (ya lo hacen los `workspace-layout` de erp, turnos y pos); un layout que no la declare cae al default de `1.75rem`. El scrollport **no debe llevar `padding-top`** (los navegadores no acuerdan desde dónde ancla un sticky con padding superior): el gutter de arriba va como espaciador `::before` en el flujo. Ver el patrón completo en `.interface-design/system.md`.
 - Assets: `src/assets/logos/reddoc.svg` and `reddoc-on-dark.svg` — copied into each app's build via `project.json` assets glob.
 
 ### libs/feature-base — building blocks de listados

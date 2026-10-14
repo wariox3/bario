@@ -22,4 +22,5 @@ export interface SwitcherApp {
 export const SWITCHER_APPS: readonly SwitcherApp[] = [
   { id: 'erp', icon: 'pi pi-building', url: (env) => env.erpUrl },
   { id: 'turnos', icon: 'pi pi-clock', url: (env) => env.turnosUrl },
+  { id: 'pos', icon: 'pi pi-shopping-cart', url: (env) => env.posUrl },
 ];

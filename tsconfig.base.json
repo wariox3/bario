@@ -18,6 +18,7 @@
     "noImplicitReturns": true,
     "paths": {
       "@erp/*": ["./apps/erp/src/app/*"],
+      "@pos/*": ["./apps/pos/src/app/*"],
       "@reddoc/core": ["./libs/core/src/index.ts"],
       "@reddoc/feature-base": ["./libs/feature-base/src/index.ts"],
       "@reddoc/feature-contenedores": ["./libs/feature-contenedores/src/index.ts"],

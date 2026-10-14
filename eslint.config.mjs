@@ -14,7 +14,7 @@ export default [
         'error',
         {
           enforceBuildableLibDependency: true,
-          // `@erp/*` (apps/erp) y `@turnos/*` (apps/turnos) son alias intra-app
+          // `@erp/*` (apps/erp), `@turnos/*` (apps/turnos) y `@pos/*` (apps/pos) son alias intra-app
           // para evitar imports relativos profundos (`../../../../../i18n`) ahora
           // que los masters viven en `features/<modulo>/masters/<entity>/pages/<page>/`.
           // Ambos alias están en `tsconfig.base.json`, así que resuelven desde
@@ -34,6 +34,7 @@ export default [
             '^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$',
             '^@erp/',
             '^@turnos/',
+            '^@pos/',
             '^@reddoc/feature-contenedores/i18n$',
           ],
           depConstraints: [
@@ -55,9 +56,9 @@ export default [
         {
           patterns: [
             {
-              group: ['@erp/*'],
+              group: ['@erp/*', '@pos/*'],
               message:
-                'apps/turnos no puede importar el alias @erp/* (app ajena). Usá @reddoc/* para lo compartido o rutas propias @turnos/*.',
+                'apps/turnos no puede importar los alias @erp/* ni @pos/* (apps ajenas). Usá @reddoc/* para lo compartido o rutas propias @turnos/*.',
             },
           ],
         },
@@ -73,9 +74,28 @@ export default [
         {
           patterns: [
             {
-              group: ['@turnos/*'],
+              group: ['@turnos/*', '@pos/*'],
               message:
-                'apps/erp no puede importar el alias @turnos/* (app ajena). Usá @reddoc/* para lo compartido o rutas propias @erp/*.',
+                'apps/erp no puede importar los alias @turnos/* ni @pos/* (apps ajenas). Usá @reddoc/* para lo compartido o rutas propias @erp/*.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Guard cross-app: `apps/pos` no puede usar los alias intra-app del ERP ni de turnos.
+    // Lo que el POS comparte con el ERP (ítems, líneas comerciales, pagos) vive en `@reddoc/core`.
+    files: ['apps/pos/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@erp/*', '@turnos/*'],
+              message:
+                'apps/pos no puede importar los alias @erp/* ni @turnos/* (apps ajenas). Usá @reddoc/* para lo compartido o rutas propias @pos/*.',
             },
           ],
         },
