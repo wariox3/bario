@@ -52,19 +52,14 @@
     <span class="cl-row__meta">
       <i class="pi pi-globe cl-row__meta-icon" aria-hidden="true"></i>
       <span class="cl-row__domain">{{ contenedor().dominio }}</span>
-      <!-- Junto al dominio: «dónde» y «cuándo» se leen en la misma pasada. En móvil
-           la fila no tiene sitio y la última conexión queda en la vista de tarjetas. -->
-      @if (ultimaConexion(); as conexion) {
-        <span
-          class="hidden shrink-0 items-center gap-1 whitespace-nowrap md:inline-flex"
-          [title]="lastConnectionLabel() + ': ' + conexion.exacta"
-        >
-          <span class="opacity-50" aria-hidden="true">·</span>
-          <i class="pi pi-clock cl-row__meta-icon" aria-hidden="true"></i>
-          {{ lastConnectionLabel() }} {{ conexion.recencia }}
-        </span>
-      }
     </span>
+    <!-- Debajo del dominio, como en la tarjeta: «dónde» y luego «cuándo». -->
+    @if (ultimaConexion(); as conexion) {
+      <span class="cl-row__meta" [title]="lastConnectionLabel() + ': ' + conexion.exacta">
+        <i class="pi pi-clock cl-row__meta-icon" aria-hidden="true"></i>
+        <span class="truncate">{{ lastConnectionLabel() }} {{ conexion.recencia }}</span>
+      </span>
+    }
   </span>
 
   <!-- Suscripción: plan pill + fecha de vencimiento -->
