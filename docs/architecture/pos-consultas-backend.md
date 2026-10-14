@@ -82,5 +82,27 @@
   desde el ERP, harían falta campos `pos_*` en `GenConfiguracion`.
 - **Filtro `pos` en `documento-tipo/seleccionar/`.** No existe; el POS usa los
   tipos 24 y 27 fijos.
-- **Cuadre de caja.** No hay modelo ni endpoint (apertura, base, arqueo por medio
-  de pago, cierre). Quedó fuera de esta migración.
+
+## Fuera de esta migración
+
+Decidido no hacerlo en la migración del POS (2026-10-14). Queda registrado para
+retomarlo; los que necesitan backend lo dicen.
+
+- **Cuadre de caja.** No hay nada que portar: en el POS anterior la pantalla
+  estaba vacía. Necesita modelo y endpoints en el backend (apertura con base,
+  arqueo por medio de pago, cierre) antes de cualquier pantalla.
+- **Medios de pago distintos de efectivo y pago combinado** (tarjeta crédito y
+  débito, transferencia). El front ya está preparado: cada medio declara su
+  código DIAN en `cobro/medios-pago.ts` y el backend acepta varios pagos por
+  documento. Falta habilitarlos, darles su formulario y su cuenta bancaria en la
+  configuración de la caja.
+- **Ficha del documento dentro del POS** (ver una venta con sus líneas y pagos,
+  anularla, emitirla a la DIAN). Hoy el historial solo lista e imprime; el resto
+  se hace en el ERP.
+- **Edición de ítems y clientes** más allá del alta rápida. El CRUD completo
+  queda en el ERP.
+- **Funcionamiento sin conexión (PWA).** El POS anterior registraba un service
+  worker sin lógica offline real. Vender sin red exigiría guardar los documentos
+  localmente y sincronizarlos, con la idempotencia del punto 1 resuelta.
+- **Impresión directa a impresora térmica** (ESC/POS) sin pasar por el PDF.
+  Depende de la respuesta del punto 7.

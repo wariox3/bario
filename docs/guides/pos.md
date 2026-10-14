@@ -94,9 +94,9 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
 
 ## Despliegue
 
-El workflow `deploy.yml` despliega cualquier app afectada. Para el POS hacen falta:
+El workflow `deploy.yml` despliega cualquier app afectada.
 
-- Secrets `POS_DEV_DEPLOY_PATH` y `POS_PROD_DEPLOY_PATH` (y el sitio en el servidor).
-- La clave de Turnstile de staging en `environment.staging.ts` (hoy `REEMPLAZAR_STAGING`).
-- Cuando haya dominio, `posUrl` en los environments de staging y producción del ERP y
-  turnos, para que el app-switcher lo ofrezca.
+- **Staging:** `https://pos.reddoc.uk`, con secrets de deploy y clave de Turnstile
+  configurados. El ERP y turnos lo ofrecen en el app-switcher (`posUrl`).
+- **Producción:** `https://pos.reddoc2.co`, también ofrecido por el ERP y turnos
+  (`posUrl` en sus `environment.prod.ts`).

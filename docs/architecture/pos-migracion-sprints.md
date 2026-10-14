@@ -389,10 +389,11 @@ lector de códigos y una impresora, y el `CHANGELOG` lo refleja.
 - **Documentación:** `docs/guides/pos.md` y `CLAUDE.md`.
 - **Environments:** staging y producción con las URLs de las apps hermanas.
 
-Pendiente fuera del front: secrets `POS_DEV_DEPLOY_PATH` / `POS_PROD_DEPLOY_PATH`
-y el sitio en el servidor, la clave de Turnstile de staging, el dominio del POS
-(para `posUrl` en ERP y turnos), la prueba en staging con lector e impresora, y
-el `CHANGELOG`, que lo genera `npm run release`.
+Deploy (2026-10-15): secrets, sitio y clave de Turnstile de staging listos;
+staging en `https://pos.reddoc.uk`, ya ofrecido por el ERP y turnos (`posUrl`).
+Producción en `https://pos.reddoc2.co`, también en el app-switcher.
+Pendiente: la prueba en staging con lector e impresora,
+y el `CHANGELOG`, que lo genera `npm run release`.
 
 Propuesta abierta: aplicar los entry points de `@reddoc/ui` al ERP (1.89 MB con
 límite 1.9) y a turnos (1.48 MB).
@@ -401,8 +402,5 @@ límite 1.9) y a turnos (1.48 MB).
 
 ## Fuera de alcance (registrado para después)
 
-- Cuadre de caja (requiere backend: apertura, base, arqueo, cierre).
-- Medios de pago distintos de efectivo y pago combinado (la estructura queda lista).
-- Ficha de documento dentro del POS; edición de ítems y clientes más allá del alta rápida.
-- PWA/offline.
-- Impresión directa a térmica (ESC/POS) sin pasar por el PDF.
+La lista vive en `pos-consultas-backend.md`, sección «Fuera de esta migración»,
+junto con las consultas a backend.
