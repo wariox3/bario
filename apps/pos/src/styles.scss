@@ -35,6 +35,27 @@ body {
   --p-font-family: 'DM Sans', system-ui, sans-serif;
 }
 
+// ─── Modal de cobro ──────────────────────────────────────────────────────────
+// Radio 16px, sombra con filete de 1px, sin la cabecera de PrimeNG y sin padding:
+// el diálogo dibuja su propia cabecera y su pie a sangre. Va global porque el
+// dialog se teletransporta al body.
+.pos-cobro-dialog.p-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 60px -12px rgba(19 38 60 / 0.22),
+    0 0 0 1px rgba(19 38 60 / 0.05);
+
+  .p-dialog-header {
+    display: none;
+  }
+
+  .p-dialog-content {
+    padding: 0;
+    border-radius: 16px;
+  }
+}
+
 .form-panel__logo-img {
   height: 25px;
   width: auto;

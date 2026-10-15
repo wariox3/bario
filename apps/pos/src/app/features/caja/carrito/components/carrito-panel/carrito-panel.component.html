@@ -8,7 +8,8 @@
     <label for="carrito-cliente" class="text-[0.78rem] font-semibold text-brand-text">
       {{ tx.cliente }}
     </label>
-    <div class="flex items-center gap-2">
+    <!-- items-stretch: el botón toma la altura del campo, no la del botón compacto. -->
+    <div class="flex items-stretch gap-2">
       <lib-contacto-select
         class="min-w-0 flex-1"
         inputId="carrito-cliente"
@@ -21,10 +22,13 @@
       @if (puedeCrearCliente()) {
         <p-button
           type="button"
+          class="flex shrink-0"
+          styleClass="!h-auto !w-[2.75rem] [&_.p-button-icon]:!text-base"
           icon="pi pi-user-plus"
           severity="secondary"
           [outlined]="true"
           [ariaLabel]="tx.nuevoCliente"
+          [title]="tx.nuevoCliente"
           [disabled]="bloqueada()"
           (onClick)="creandoCliente.set(true)"
         />
@@ -100,9 +104,12 @@
       </div>
     </dl>
 
-    <div class="flex gap-2">
+    <!-- Vaciar se estira a la altura de Cobrar (fluid, 43px) en vez del compacto de 32px. -->
+    <div class="flex items-stretch gap-2">
       <p-button
         type="button"
+        class="flex"
+        styleClass="!h-auto !px-4 !text-[0.85rem]"
         [label]="tx.vaciar.boton"
         icon="pi pi-trash"
         severity="secondary"

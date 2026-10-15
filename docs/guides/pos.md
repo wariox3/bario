@@ -17,7 +17,9 @@
    abiertas en pestañas, que sobreviven a recargas. Cliente por defecto "Consumidor
    final"; al cambiarlo, las líneas se recotizan con su lista de precios (las editadas a
    mano se respetan). La caja no deja pasar del stock disponible.
-4. **Cobrar.** Efectivo: lo recibido, el cambio, la cuenta y el asesor. El cobro crea el
+4. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio; la cuenta y el
+   asesor salen de la caja y se cambian desde el pie. Crédito, débito y transferencia se
+   ven con su formulario, pero aún no cobran. El cobro crea el
    documento con sus líneas, registra el pago y lo aprueba. Al terminar se puede imprimir
    el PDF del backend.
 5. **Consultar.** `/t/<slug>/historial`: facturas POS de los dos tipos, con filtros e
@@ -31,6 +33,8 @@
 | `F3` o `/` | Ir al buscador                    |
 | `F4`       | Nueva venta                       |
 | `Enter`    | En modo código, buscar y agregar  |
+| `F1`–`F4`  | En el cobro, elegir medio de pago |
+| `Enter`    | En el cobro, cobrar               |
 
 Si se teclea sin ningún campo con foco (lo que hace el lector de barras), el foco salta al
 buscador antes de que llegue la tecla. Con un modal abierto no se intercepta nada.
@@ -87,6 +91,10 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
   (`10` efectivo) y el plazo, del de 0 días.
 - **Un medio de pago nuevo** se habilita en `cobro/medios-pago.ts`, con su formulario en
   el diálogo y su cuenta en la configuración. El pipeline no cambia.
+- **Una sola pestaña por empresa.** Las ventas se guardan como un solo bloque en
+  `localStorage`; dos pestañas se las pisarían. `core/pestana/pestana-unica.service.ts` reserva
+  la caja con Web Locks y el workspace muestra un aviso en la segunda pestaña, que toma la caja
+  sola cuando la otra se cierra. Nada que escriba ventas debe montarse fuera del workspace.
 - **Lo que guarda el navegador lleva versión o validación** (`esEstadoCarritos`,
   `esConfiguracionCaja`): un cambio de forma descarta lo viejo en vez de romper la caja.
 - **Permisos:** `ModelPermissionsService` decide si se ofrecen el ítem rápido, la estrella

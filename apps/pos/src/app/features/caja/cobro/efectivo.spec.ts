@@ -1,12 +1,12 @@
 import { cambio, sugerenciasEfectivo } from './efectivo';
 
 describe('sugerenciasEfectivo', () => {
-  it('propone el exacto y los redondeos a billetes', () => {
-    expect(sugerenciasEfectivo(23_400)).toEqual([23_400, 24_000, 25_000, 30_000]);
+  it('redondea a billetes por encima del total, sin el exacto', () => {
+    expect(sugerenciasEfectivo(47_600)).toEqual([50_000, 60_000, 100_000]);
   });
 
-  it('no repite cuando el total ya es redondo', () => {
-    expect(sugerenciasEfectivo(50_000)).toEqual([50_000, 60_000, 100_000]);
+  it('un total ya redondo no se repite como sugerencia', () => {
+    expect(sugerenciasEfectivo(50_000)).toEqual([60_000, 100_000]);
   });
 
   it('sin total no sugiere nada', () => {
@@ -16,7 +16,7 @@ describe('sugerenciasEfectivo', () => {
 
 describe('cambio', () => {
   it('devuelve la diferencia y nunca negativo', () => {
-    expect(cambio(30_000, 23_400)).toBe(6_600);
-    expect(cambio(20_000, 23_400)).toBe(0);
+    expect(cambio(60_000, 47_600)).toBe(12_400);
+    expect(cambio(20_000, 47_600)).toBe(0);
   });
 });

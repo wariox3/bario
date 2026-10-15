@@ -142,6 +142,9 @@ export interface AppDict
     };
     /** Etiqueta de cada sección del sidebar; las claves salen de `WORKSPACE_MENU`. */
     nav: Record<PosNavKey, string>;
+    sidebar: { colapsar: string; expandir: string };
+    /** Otra pestaña del navegador tiene la caja de esta empresa. */
+    pestanaOcupada: { titulo: string; desc: string; esperando: string; cambiarEmpresa: string };
     userMenu: {
       label: string;
       myContainers: string;
@@ -280,33 +283,51 @@ export interface AppDict
     };
     cobro: {
       titulo: string;
+      cerrar: string;
       total: string;
+      medio: string;
       medios: Record<MedioPagoId, string> & { proximamente: string };
       efectivo: {
         recibido: string;
         recibidoMinimo: string;
         exacto: string;
-        cambio: string;
+        cambioEntregar: string;
+        faltaRecibir: string;
+        cobrar: string;
+      };
+      tarjeta: { datafono: string; datafonoPlaceholder: string; aprobacion: string };
+      transferencia: {
+        cuentaDestino: string;
+        cuentaDestinoPlaceholder: string;
+        referencia: string;
+        referenciaPlaceholder: string;
+      };
+      noDisponible: string;
+      ingreso: {
+        ingresaA: string;
+        cambiar: string;
+        ocultar: string;
         cuenta: string;
         asesor: string;
-        volver: string;
-        cobrar: string;
       };
       fases: Record<FaseCobro, string>;
       exito: {
         titulo: string;
         desc: string;
         documento: string;
-        cambio: string;
+        total: string;
+        recibido: string;
         imprimir: string;
         nuevaVenta: string;
       };
       pendiente: {
         titulo: string;
-        /** Le sigue el número del documento. */
         desc: string;
-        faltaPago: string;
-        faltaAprobar: string;
+        documento: string;
+        pago: string;
+        aprobacion: string;
+        hecho: string;
+        falta: string;
         reintentar: string;
         descartar: string;
         descartarConfirm: { header: string; message: string; aceptar: string };

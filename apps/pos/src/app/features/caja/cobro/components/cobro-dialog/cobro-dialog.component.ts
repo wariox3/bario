@@ -19,7 +19,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { AutoFocus } from 'primeng/autofocus';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import {
@@ -28,7 +28,6 @@ import {
   ToastService,
   asesorLabel,
   extractErrorMessage,
-  formatCop,
   type ErpSelectOption,
 } from '@reddoc/core';
 import {
@@ -51,27 +50,53 @@ import { cambio, sugerenciasEfectivo } from '../../efectivo';
 import { MEDIOS_PAGO_POS, type MedioPagoPos } from '../../medios-pago';
 import { VentaPosService } from '../../../../../core/documento/venta-pos.service';
 
-type Vista = 'medios' | 'efectivo' | 'exito' | 'pendiente';
+const FORMATO_PESOS = new Intl.NumberFormat('es-CO', {
+  style: 'currency',
+  currency: 'COP',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+type Vista = 'cobro' | 'exito' | 'pendiente';
 
 /** Venta ya cobrada: lo que la pantalla de éxito necesita aunque el carrito ya no exista. */
 interface VentaCobrada {
   readonly documentoId: number;
   readonly total: number;
+  readonly recibido: number;
   readonly cambio: number;
 }
 
+/** De qué venta y de quién: va en la cabecera para no cobrar la pestaña equivocada. */
+interface Encabezado {
+  readonly venta: string;
+  readonly cliente: string;
+  readonly identificacion: string;
+}
+
 /**
- * Cobro de la venta activa, en pasos:
+ * La opción del contacto trae la etiqueta `identificación - nombre` (así la arma
+ * el selector); la cabecera las muestra en dos líneas.
+ */
+function partirContacto(etiqueta: string): { nombre: string; identificacion: string } {
+  const corte = etiqueta.indexOf(' - ');
+  if (corte < 0) return { nombre: etiqueta, identificacion: '' };
+  return { identificacion: etiqueta.slice(0, corte), nombre: etiqueta.slice(corte + 3) };
+}
+
+/**
+ * Cobro de la venta activa (diseño «A · Base refinada»).
  *
- * 1. **Medio de pago.** Solo efectivo está habilitado; los demás se ven como
- *    "próximamente" (ver `MEDIOS_PAGO_POS`).
- * 2. **Efectivo.** Lo recibido (con montos sugeridos), el cambio, la cuenta y el
- *    asesor. Lo recibido no puede ser menor al total: en caja se paga completo.
- * 3. **Éxito.** El documento quedó aprobado; se puede imprimir o seguir vendiendo.
- *
- * Si el cobro falla después de crear el documento, la venta queda marcada con
- * él y el diálogo abre en **pendiente**: reintentar retoma donde quedó, y
- * descartar borra ese documento sin aprobar.
+ * - **Cobro.** Total, medio de pago (cuatro tarjetas con atajo F1–F4), lo
+ *   recibido con billetes sugeridos y el cambio a entregar o lo que falta.
+ *   Cuenta y asesor vienen de la configuración: el pie dice a qué cuenta
+ *   ingresa y permite cambiarlo. Enter cobra.
+ * - **Crédito, débito y transferencia** se pueden elegir para ver su formulario
+ *   (datáfono y aprobación, o cuenta destino y referencia), pero todavía no
+ *   cobran: sus campos van deshabilitados y Cobrar no se activa.
+ * - **Éxito.** El cambio a entregar y el documento; Enter abre una venta nueva.
+ * - **Pendiente.** Si el cobro falla después de crear el documento, la venta
+ *   queda marcada con él: reintentar retoma donde quedó, descartar lo borra.
  */
 @Component({
   selector: 'app-cobro-dialog',
@@ -79,7 +104,7 @@ interface VentaCobrada {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
-    ButtonModule,
+    AutoFocus,
     DialogModule,
     InputNumberModule,
     ErpApiSelectComponent,
@@ -87,7 +112,47 @@ interface VentaCobrada {
     FieldErrorComponent,
     FocusInvalidDirective,
   ],
+  // La cabecera de PrimeNG va oculta (frame del modal recibo), y con ella su
+  // cierre por Escape: se cablea aquí, salvo mientras el cobro está en curso.
+  host: {
+    '(document:keydown.escape)': 'onEscape()',
+    '(document:keydown)': 'onTecla($event)',
+  },
   templateUrl: './cobro-dialog.component.html',
+  styles: [
+    `
+      /*
+        El dialog se teletransporta al body, pero la encapsulacion emulada viaja
+        en el atributo del propio elemento: estos estilos lo alcanzan. El frame
+        (.pos-cobro-dialog) vive en styles.scss.
+      */
+      :host {
+        display: contents;
+      }
+
+      @keyframes lineaIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* El recibo se escribe solo, como en el acuse del ERP: menos de medio segundo. */
+      .linea {
+        animation: lineaIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .linea {
+          animation: none;
+        }
+      }
+    `,
+  ],
 })
 export class CobroDialogComponent {
   private readonly fb = inject(FormBuilder);
@@ -109,7 +174,10 @@ export class CobroDialogComponent {
   protected readonly medios = MEDIOS_PAGO_POS;
   protected readonly cuentaEndpoint = CUENTA_BANCO_ENDPOINT;
 
-  protected readonly vista = signal<Vista>('medios');
+  protected readonly vista = signal<Vista>('cobro');
+  protected readonly encabezado = signal<Encabezado | null>(null);
+  /** Cuenta y asesor desplegados; plegados mientras traigan los valores de la caja. */
+  protected readonly mostrarDetalles = signal(false);
   protected readonly fase = signal<FaseCobro | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly ventaCobrada = signal<VentaCobrada | null>(null);
@@ -125,7 +193,7 @@ export class CobroDialogComponent {
   private destruido = false;
 
   /** Medio elegido; hoy siempre efectivo, pero la solicitud ya lo lleva. */
-  private medio: MedioPagoPos = MEDIOS_PAGO_POS[0];
+  protected readonly medio = signal<MedioPagoPos>(MEDIOS_PAGO_POS[0]);
 
   protected readonly form = this.fb.group({
     recibido: this.fb.control<number | null>(null, [
@@ -139,6 +207,9 @@ export class CobroDialogComponent {
 
   private readonly recibido = signal(0);
   protected readonly cambioEfectivo = computed(() => cambio(this.recibido(), this.total()));
+  /** Lo que falta para cubrir el total; 0 cuando lo recibido alcanza. */
+  protected readonly faltante = computed(() => Math.max(this.total() - this.recibido(), 0));
+  protected readonly recibidoActual = this.recibido.asReadonly();
 
   constructor() {
     this.form.controls.recibido.valueChanges
@@ -154,14 +225,27 @@ export class CobroDialogComponent {
     });
   }
 
+  /** Pesos sin centavos cuando no los hay: en la caja `$ 47.600` se lee mejor que `,00`. */
   protected formatear(valor: number): string {
-    return formatCop(valor);
+    return FORMATO_PESOS.format(valor);
   }
 
+  protected readonly chipActivo = 'border-brand-blue bg-[#e8f6ff] text-brand-blue';
+  protected readonly chipReposo =
+    'border-[#e9edf2] bg-white text-brand-text hover:border-brand-blue hover:text-brand-blue';
+
+  /** Cualquier medio se elige para ver su formulario; solo los habilitados cobran. */
   protected elegirMedio(medio: MedioPagoPos): void {
-    if (!medio.habilitado) return;
-    this.medio = medio;
-    this.vista.set('efectivo');
+    if (!this.procesando()) this.medio.set(medio);
+  }
+
+  /** F1–F4 eligen el medio de pago mientras se está cobrando. */
+  protected onTecla(event: KeyboardEvent): void {
+    if (!this.visible() || this.vista() !== 'cobro') return;
+    const indice = ['F1', 'F2', 'F3', 'F4'].indexOf(event.key);
+    if (indice < 0 || indice >= this.medios.length) return;
+    event.preventDefault();
+    this.elegirMedio(this.medios[indice]);
   }
 
   protected usarMonto(monto: number): void {
@@ -169,7 +253,7 @@ export class CobroDialogComponent {
   }
 
   protected onCobrar(): void {
-    if (this.procesando() || this.form.invalid) return;
+    if (this.procesando() || !this.medio().habilitado || this.form.invalid) return;
     this.ejecutar();
   }
 
@@ -201,7 +285,7 @@ export class CobroDialogComponent {
             next: () => {
               this.descartando.set(false);
               this.carritos.limpiarCobro(uuid);
-              this.vista.set('medios');
+              this.vista.set('cobro');
             },
             error: (err: unknown) => {
               this.descartando.set(false);
@@ -229,6 +313,12 @@ export class CobroDialogComponent {
       });
   }
 
+  protected onEscape(): void {
+    // Con la confirmación de descartar encima, Escape es de ella: cierra solo esa.
+    if (!this.visible() || document.querySelector('.p-confirmdialog')) return;
+    this.cerrar();
+  }
+
   protected cerrar(): void {
     if (this.procesando()) return;
     this.visible.set(false);
@@ -239,13 +329,22 @@ export class CobroDialogComponent {
     this.fase.set(null);
     this.error.set(null);
     this.ventaCobrada.set(null);
-    this.medio = MEDIOS_PAGO_POS[0];
+    this.medio.set(MEDIOS_PAGO_POS[0]);
+    const venta = this.carritos.activo();
+    const contacto = partirContacto(venta.contacto?.nombre ?? '');
+    this.encabezado.set({
+      venta: venta.nombre,
+      cliente: contacto.nombre,
+      identificacion: contacto.identificacion,
+    });
+    // Sin cuenta de efectivo configurada no hay qué plegar: se muestra para elegirla.
+    this.mostrarDetalles.set(config.cuentaEfectivo === null);
     this.form.reset({
       recibido: this.total(),
       cuenta: config.cuentaEfectivo,
       asesor: config.asesor,
     });
-    this.vista.set(this.cobroPendiente() ? 'pendiente' : 'medios');
+    this.vista.set(this.cobroPendiente() ? 'pendiente' : 'cobro');
   }
 
   private ejecutar(): void {
@@ -253,6 +352,7 @@ export class CobroDialogComponent {
     if (!solicitud) return;
     const uuid = solicitud.venta.uuid;
     const total = this.total();
+    const recibido = this.recibido();
     const vuelto = this.cambioEfectivo();
     this.error.set(null);
 
@@ -270,7 +370,12 @@ export class CobroDialogComponent {
             return;
           }
           this.fase.set(null);
-          this.ventaCobrada.set({ documentoId: evento.documentoId, total, cambio: vuelto });
+          this.ventaCobrada.set({
+            documentoId: evento.documentoId,
+            total,
+            recibido,
+            cambio: vuelto,
+          });
           this.carritos.cerrarCobrada(uuid);
           this.vista.set('exito');
           if (!this.destruido) this.cobrada.emit();
@@ -309,7 +414,7 @@ export class CobroDialogComponent {
     return {
       venta: this.carritos.activo(),
       documentoTipoId: config.documentoTipoId,
-      medio: this.medio,
+      medio: this.medio(),
       // En efectivo se registra el total: el cambio se devuelve, no entra a la cuenta.
       pagos: [{ cuentaBanco, monto: this.total() }],
       almacen: config.almacen,
