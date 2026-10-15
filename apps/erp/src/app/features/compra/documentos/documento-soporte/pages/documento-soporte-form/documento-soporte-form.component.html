@@ -153,6 +153,7 @@
             inputId="metodo_pago"
             formControlName="metodo_pago"
             [endpoint]="metodoPagoEndpoint"
+            [suggestedMatch]="metodoPagoSugerido()"
             [placeholder]="t().entities.documentoSoporte.form.fields.metodoPagoPlaceholder"
             [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
           />
