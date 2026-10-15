@@ -158,6 +158,7 @@ export const es: AppDict = {
       historial: 'Historial',
       configuracion: 'Configuración',
     },
+    sidebar: { colapsar: 'Colapsar menú', expandir: 'Expandir menú' },
     userMenu: {
       label: 'Menú de usuario',
       myContainers: 'Mis contenedores',

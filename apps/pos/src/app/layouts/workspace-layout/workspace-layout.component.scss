@@ -95,13 +95,63 @@
 .workspace-sidebar {
   width: 240px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border-right: 1px solid rgba(19 38 60 / 0.08);
-  padding: 1.25rem 0.75rem;
+  padding: 1.25rem 0.75rem 0.75rem;
+  overflow-x: hidden;
   overflow-y: auto;
+  transition: width 0.18s ease;
 
   @media (max-width: 768px) {
     display: none;
+  }
+
+  // Botón de colapsar, al pie: mismo trazo que los ítems, sin competir con ellos.
+  &__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: auto;
+    padding: 0.55rem 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--brand-muted);
+    cursor: pointer;
+    transition:
+      background 0.12s ease,
+      color 0.12s ease;
+
+    i {
+      font-size: 0.85rem;
+    }
+
+    &:hover {
+      background: rgba(19 38 60 / 0.04);
+      color: var(--brand-text);
+    }
+  }
+
+  // Rail: solo íconos, centrados; los nombres quedan en el tooltip.
+  &--colapsado {
+    width: 64px;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+
+    .workspace-nav__item,
+    .workspace-sidebar__toggle {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .workspace-nav__label {
+      display: none;
+    }
   }
 }
 

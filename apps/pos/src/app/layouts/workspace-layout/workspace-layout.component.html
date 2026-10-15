@@ -18,10 +18,27 @@
 </header>
 
 <div class="workspace-body">
-  <aside class="workspace-sidebar">
+  <aside class="workspace-sidebar" [class.workspace-sidebar--colapsado]="colapsado()">
     <nav class="workspace-nav">
-      <ng-container *ngTemplateOutlet="navTpl" />
+      <ng-container *ngTemplateOutlet="navTpl; context: { $implicit: false, rail: colapsado() }" />
     </nav>
+    <button
+      type="button"
+      class="workspace-sidebar__toggle"
+      [attr.aria-expanded]="!colapsado()"
+      [attr.aria-label]="colapsado() ? t().layout.sidebar.expandir : t().layout.sidebar.colapsar"
+      [pTooltip]="colapsado() ? t().layout.sidebar.expandir : ''"
+      tooltipPosition="right"
+      (click)="alternarSidebar()"
+    >
+      <i
+        class="pi"
+        [class.pi-angle-double-right]="colapsado()"
+        [class.pi-angle-double-left]="!colapsado()"
+        aria-hidden="true"
+      ></i>
+      <span class="workspace-nav__label">{{ t().layout.sidebar.colapsar }}</span>
+    </button>
   </aside>
 
   <main class="workspace-main">
@@ -42,12 +59,15 @@
 </p-drawer>
 
 <!-- Navegación compartida entre sidebar y drawer -->
-<ng-template #navTpl let-inDrawer>
+<ng-template #navTpl let-inDrawer let-rail="rail">
   @for (item of items; track item.path) {
     <a
       class="workspace-nav__item"
       [routerLink]="itemPath(item)"
       routerLinkActive="workspace-nav__item--active"
+      [attr.aria-label]="rail ? t().layout.nav[item.labelKey] : null"
+      [pTooltip]="rail ? t().layout.nav[item.labelKey] : ''"
+      tooltipPosition="right"
       (click)="inDrawer && drawerVisible.set(false)"
     >
       <i class="workspace-nav__icon {{ item.iconClass }}"></i>

@@ -142,6 +142,7 @@ export interface AppDict
     };
     /** Etiqueta de cada sección del sidebar; las claves salen de `WORKSPACE_MENU`. */
     nav: Record<PosNavKey, string>;
+    sidebar: { colapsar: string; expandir: string };
     userMenu: {
       label: string;
       myContainers: string;
