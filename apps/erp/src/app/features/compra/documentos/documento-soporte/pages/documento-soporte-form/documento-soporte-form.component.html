@@ -231,6 +231,9 @@
             formControlName="resolucion"
             [endpoint]="resolucionEndpoint"
             [params]="resolucionParams"
+            [displayWith]="resolucionLabel"
+            filterBy="prefijo,numero"
+            [showClear]="true"
             [placeholder]="t().entities.documentoSoporte.form.fields.resolucionPlaceholder"
           />
         </div>
