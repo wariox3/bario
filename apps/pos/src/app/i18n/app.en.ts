@@ -383,15 +383,14 @@ export const en: AppDict = {
       },
       transferencia: {
         cuentaDestino: 'Destination account',
-        cuentaDestinoPlaceholder: 'No bank account',
-        referencia: 'Reference / receipt',
+        referencia: 'Reference / receipt (optional)',
         referenciaPlaceholder: 'E.g. M123456',
+        aRecibir: 'Amount to receive',
+        comentario: 'Transfer, ref.',
       },
-      noDisponible: 'This payment method will be available soon. For now, charge in cash.',
+      noDisponible:
+        'This payment method will be available soon. For now, charge in cash or by transfer.',
       ingreso: {
-        ingresaA: 'Goes to',
-        cambiar: 'Change',
-        ocultar: 'Hide',
         cuenta: 'Account',
         asesor: 'Advisor',
       },
@@ -409,6 +408,12 @@ export const en: AppDict = {
         recibido: 'Received',
         imprimir: 'Print',
         nuevaVenta: 'New sale',
+        pagado: {
+          efectivo: 'Paid in cash',
+          transferencia: 'Paid by transfer',
+          tarjetaCredito: 'Paid by credit card',
+          tarjetaDebito: 'Paid by debit card',
+        },
       },
       pendiente: {
         titulo: 'Unfinished charge',
@@ -418,6 +423,8 @@ export const en: AppDict = {
         aprobacion: 'Approval',
         hecho: 'Recorded',
         falta: 'Pending',
+        sinValor:
+          'The sale adds up to $0 and the payment cannot be recorded. Discard the charge, fix the prices and charge again.',
         reintentar: 'Retry',
         descartar: 'Discard charge',
         descartarConfirm: {
@@ -439,17 +446,23 @@ export const en: AppDict = {
           title: 'Customer missing',
           desc: 'Choose the customer of the sale to charge.',
         },
+        sinValor: {
+          title: 'The sale is at $0',
+          desc: 'The total must be greater than zero: check the product prices.',
+        },
       },
       errores: {
         generico: 'The charge could not be completed. Try again.',
         configuracion: 'The register is not set up: document type, warehouse or cash account.',
         metodoPago: 'The company has no cash payment method (DIAN code 10).',
         plazoContado: 'The company has no cash payment term (0 days).',
+        sinValor: 'The sale is at $0: the total must be greater than zero to charge.',
         descartar: 'The document could not be discarded.',
         imprimir: {
           title: 'Could not print',
           desc: 'You can print the sale from the history.',
         },
+        cuentaTransferencia: 'Choose the account the transfer goes to.',
       },
     },
   },
@@ -504,6 +517,9 @@ export const en: AppDict = {
       almacen: 'Warehouse',
       cuentaEfectivo: 'Cash account',
       cuentaEfectivoHint: 'Account where cash payments are recorded.',
+      cuentaTransferencia: 'Transfer account',
+      cuentaTransferenciaHint:
+        "Bank account where transfer payments come in. Without it, the register can't charge by transfer.",
       sede: 'Branch',
       asesor: 'Default advisor',
     },

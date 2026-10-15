@@ -81,11 +81,14 @@
                   [class]="
                     activo
                       ? 'border-brand-blue bg-[#e8f6ff] text-brand-blue'
-                      : 'border-[#e9edf2] bg-white text-[#526680] hover:border-[#c9d6e2]'
+                      : m.habilitado
+                        ? 'border-[#e9edf2] bg-white text-[#526680] hover:border-[#c9d6e2]'
+                        : 'cursor-not-allowed border-[#f2f4f7] bg-[#fbfcfd] text-[#c9d6e2]'
                   "
                   [attr.aria-checked]="activo"
                   [attr.aria-keyshortcuts]="'F' + (i + 1)"
-                  [disabled]="procesando()"
+                  [title]="m.habilitado ? '' : tx.medios.proximamente"
+                  [disabled]="procesando() || !m.habilitado"
                   (click)="elegirMedio(m)"
                 >
                   @switch (m.id) {
@@ -226,19 +229,9 @@
               </span>
             </div>
           } @else {
-            <!-- Tarjeta y transferencia: el formulario ya está, pero todavía no cobran. -->
             @if (medio().id === 'transferencia') {
+              <!-- Transferencia: el total entra completo a la cuenta destino. -->
               <div class="grid gap-2.5">
-                <div>
-                  <p class="m-0 mb-2 text-xs font-semibold text-[#526680]">
-                    {{ tx.transferencia.cuentaDestino }}
-                  </p>
-                  <div
-                    class="flex h-11 items-center rounded-xl border-[1.5px] border-[#e9edf2] bg-[#fbfcfd] px-3.5 text-[#c9d6e2]"
-                  >
-                    {{ tx.transferencia.cuentaDestinoPlaceholder }}
-                  </div>
-                </div>
                 <div>
                   <label
                     for="cobro-referencia"
@@ -249,13 +242,25 @@
                   <input
                     id="cobro-referencia"
                     type="text"
-                    disabled
-                    class="h-11 w-full rounded-xl border-[1.5px] border-[#e9edf2] bg-[#fbfcfd] px-3.5 text-[#8fa4b8] placeholder:text-[#c9d6e2]"
+                    formControlName="referencia"
+                    autocomplete="off"
+                    maxlength="60"
+                    class="h-11 w-full rounded-xl border-[1.5px] border-[#e9edf2] bg-white px-3.5 text-brand-text outline-none placeholder:text-[#c9d6e2] focus:border-brand-blue focus:shadow-[0_0_0_4px_#e8f6ff]"
                     [placeholder]="tx.transferencia.referenciaPlaceholder"
                   />
                 </div>
               </div>
+              <div
+                class="flex items-center justify-between rounded-xl bg-[#e8f6ff] px-4 py-3.5 text-[#0369a1]"
+              >
+                <span class="font-semibold">{{ tx.transferencia.aRecibir }}</span>
+                <span class="text-[26px] font-bold tabular-nums">{{ formatear(total()) }}</span>
+              </div>
             } @else {
+              <!--
+                Tarjetas: hoy no se pueden elegir (botón deshabilitado). El formulario
+                queda listo para cuando se habiliten en medios-pago.ts.
+              -->
               <div class="grid grid-cols-2 gap-2.5">
                 <div>
                   <p class="m-0 mb-2 text-xs font-semibold text-[#526680]">
@@ -283,55 +288,39 @@
                   />
                 </div>
               </div>
+              <p
+                class="m-0 flex items-center gap-2 rounded-xl bg-[#f2f4f7] px-3.5 py-2.5 text-xs text-[#526680]"
+              >
+                <i class="pi pi-info-circle text-[0.8rem]" aria-hidden="true"></i>
+                {{ tx.noDisponible }}
+              </p>
             }
-            <p
-              class="m-0 flex items-center gap-2 rounded-xl bg-[#f2f4f7] px-3.5 py-2.5 text-xs text-[#526680]"
-            >
-              <i class="pi pi-info-circle text-[0.8rem]" aria-hidden="true"></i>
-              {{ tx.noDisponible }}
-            </p>
           }
 
-          <!-- A qué cuenta ingresa, pegado al cambio: se cambia solo para esta venta. -->
-          <p class="m-0 -mt-2.5 truncate px-1 text-xs text-[#526680]">
-            @if (form.controls.cuenta.value; as cuenta) {
-              {{ tx.ingreso.ingresaA }}
-              <b class="font-semibold text-brand-text">{{ cuenta.nombre }}</b>
-              ·
-            }
-            <button
-              type="button"
-              class="font-medium text-brand-blue hover:underline disabled:opacity-50"
-              [disabled]="procesando()"
-              (click)="mostrarDetalles.set(!mostrarDetalles())"
-            >
-              {{ mostrarDetalles() ? tx.ingreso.ocultar : tx.ingreso.cambiar }}
-            </button>
-          </p>
-
-          <!-- Cuenta y asesor de esta venta; por defecto, los de la caja. -->
-          @if (mostrarDetalles()) {
-            <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-              <div>
-                <label for="cobro-cuenta" class="mb-2 block text-xs font-semibold text-[#526680]">
-                  {{ tx.ingreso.cuenta }}
-                </label>
-                <lib-api-select
-                  inputId="cobro-cuenta"
-                  formControlName="cuenta"
-                  [endpoint]="cuentaEndpoint"
-                  [invalid]="form.controls.cuenta.invalid && form.controls.cuenta.touched"
-                />
-                <lib-field-error [control]="form.controls.cuenta" />
-              </div>
-              <div>
-                <label for="cobro-asesor" class="mb-2 block text-xs font-semibold text-[#526680]">
-                  {{ tx.ingreso.asesor }}
-                </label>
-                <lib-asesor-select inputId="cobro-asesor" formControlName="asesor" />
-              </div>
+          <!--
+            Cuenta y asesor de esta venta, siempre a la vista: vienen de la caja y se
+            cambian aquí mismo si hace falta. La cuenta es la del medio elegido.
+          -->
+          <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <div>
+              <label for="cobro-cuenta" class="mb-2 block text-xs font-semibold text-[#526680]">
+                {{ tx.ingreso.cuenta }}
+              </label>
+              <lib-api-select
+                inputId="cobro-cuenta"
+                formControlName="cuenta"
+                [endpoint]="cuentaEndpoint"
+                [invalid]="form.controls.cuenta.invalid && form.controls.cuenta.touched"
+              />
+              <lib-field-error [control]="form.controls.cuenta" />
             </div>
-          }
+            <div>
+              <label for="cobro-asesor" class="mb-2 block text-xs font-semibold text-[#526680]">
+                {{ tx.ingreso.asesor }}
+              </label>
+              <lib-asesor-select inputId="cobro-asesor" formControlName="asesor" />
+            </div>
+          </div>
 
           @if (error(); as mensaje) {
             <p
@@ -414,16 +403,28 @@
               <p class="m-0 text-[15px] font-bold text-brand-text">{{ ex.titulo }}</p>
               <p class="m-0 text-xs tabular-nums text-[#526680]">
                 {{ ex.documento }} {{ venta.documentoId }} · {{ ex.total }}
-                {{ formatear(venta.total) }} · {{ ex.recibido }} {{ formatear(venta.recibido) }}
+                {{ formatear(venta.total) }}
+                @if (venta.medio === 'efectivo') {
+                  · {{ ex.recibido }} {{ formatear(venta.recibido) }}
+                }
               </p>
             </div>
           </div>
-          <div
-            class="linea flex items-center justify-between rounded-xl bg-[#e7f6ec] px-4 py-3.5 text-[#15803d]"
-          >
-            <span class="font-semibold">{{ tx.efectivo.cambioEntregar }}</span>
-            <span class="text-[26px] font-bold tabular-nums">{{ formatear(venta.cambio) }}</span>
-          </div>
+          @if (venta.medio === 'efectivo') {
+            <div
+              class="linea flex items-center justify-between rounded-xl bg-[#e7f6ec] px-4 py-3.5 text-[#15803d]"
+            >
+              <span class="font-semibold">{{ tx.efectivo.cambioEntregar }}</span>
+              <span class="text-[26px] font-bold tabular-nums">{{ formatear(venta.cambio) }}</span>
+            </div>
+          } @else {
+            <div
+              class="linea flex items-center justify-between rounded-xl bg-[#e7f6ec] px-4 py-3.5 text-[#15803d]"
+            >
+              <span class="font-semibold">{{ ex.pagado[venta.medio] }}</span>
+              <span class="text-[26px] font-bold tabular-nums">{{ formatear(venta.total) }}</span>
+            </div>
+          }
         </div>
         <div
           class="flex items-center justify-end gap-1.5 border-t border-[#f2f4f7] bg-[#fbfcfd] px-6 py-3.5"
@@ -495,7 +496,15 @@
               <span class="font-semibold text-[#b45309]">{{ pe.falta }}</span>
             </div>
           </div>
-          @if (error(); as mensaje) {
+          @if (sinValor()) {
+            <!-- Reintentar no puede funcionar: el backend no acepta un pago de $0. -->
+            <p
+              class="m-0 rounded-xl bg-[#fdf3e1] px-3.5 py-2.5 text-xs leading-relaxed text-[#b45309]"
+              role="alert"
+            >
+              {{ pe.sinValor }}
+            </p>
+          } @else if (error(); as mensaje) {
             <p
               class="m-0 rounded-xl bg-[#fdecee] px-3.5 py-2.5 text-xs text-[#d92d3a]"
               role="alert"
@@ -521,7 +530,7 @@
           <button
             type="button"
             class="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-brand-blue px-[18px] text-sm font-semibold text-white transition-colors hover:bg-[#0086d1] disabled:cursor-not-allowed disabled:bg-[#c9d6e2]"
-            [disabled]="procesando()"
+            [disabled]="procesando() || sinValor()"
             (click)="onReintentar()"
           >
             <i

@@ -47,7 +47,7 @@ import {
   type SolicitudCobro,
 } from '../../cobro.model';
 import { cambio, sugerenciasEfectivo } from '../../efectivo';
-import { MEDIOS_PAGO_POS, type MedioPagoPos } from '../../medios-pago';
+import { MEDIOS_PAGO_POS, type MedioPagoId, type MedioPagoPos } from '../../medios-pago';
 import { VentaPosService } from '../../../../../core/documento/venta-pos.service';
 
 const FORMATO_PESOS = new Intl.NumberFormat('es-CO', {
@@ -62,6 +62,7 @@ type Vista = 'cobro' | 'exito' | 'pendiente';
 /** Venta ya cobrada: lo que la pantalla de éxito necesita aunque el carrito ya no exista. */
 interface VentaCobrada {
   readonly documentoId: number;
+  readonly medio: MedioPagoId;
   readonly total: number;
   readonly recibido: number;
   readonly cambio: number;
@@ -91,9 +92,12 @@ function partirContacto(etiqueta: string): { nombre: string; identificacion: str
  *   recibido con billetes sugeridos y el cambio a entregar o lo que falta.
  *   Cuenta y asesor vienen de la configuración: el pie dice a qué cuenta
  *   ingresa y permite cambiarlo. Enter cobra.
- * - **Crédito, débito y transferencia** se pueden elegir para ver su formulario
- *   (datáfono y aprobación, o cuenta destino y referencia), pero todavía no
- *   cobran: sus campos van deshabilitados y Cobrar no se activa.
+ * - **Transferencia** cobra el total contra la cuenta de transferencia de la
+ *   caja; la referencia del comprobante (opcional) va al comentario del
+ *   documento, porque el pago no tiene dónde guardarla.
+ * - **Crédito y débito** se ven apagados y no se pueden elegir (tampoco con
+ *   F3/F4). Su formulario (datáfono y aprobación) ya está para cuando se
+ *   habiliten.
  * - **Éxito.** El cambio a entregar y el documento; Enter abre una venta nueva.
  * - **Pendiente.** Si el cobro falla después de crear el documento, la venta
  *   queda marcada con él: reintentar retoma donde quedó, descartar lo borra.
@@ -176,8 +180,6 @@ export class CobroDialogComponent {
 
   protected readonly vista = signal<Vista>('cobro');
   protected readonly encabezado = signal<Encabezado | null>(null);
-  /** Cuenta y asesor desplegados; plegados mientras traigan los valores de la caja. */
-  protected readonly mostrarDetalles = signal(false);
   protected readonly fase = signal<FaseCobro | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly ventaCobrada = signal<VentaCobrada | null>(null);
@@ -186,6 +188,11 @@ export class CobroDialogComponent {
 
   protected readonly procesando = computed(() => this.fase() !== null || this.descartando());
   protected readonly total = computed(() => this.carritos.resumen().total);
+  /**
+   * La venta suma $0 (precios en cero): el backend rechaza un pago de $0, así
+   * que no se cobra; y si ya quedó un documento, reintentar no puede terminar.
+   */
+  protected readonly sinValor = computed(() => this.total() <= 0);
   protected readonly cobroPendiente = this.carritos.cobroPendiente;
   protected readonly sugerencias = computed(() => sugerenciasEfectivo(this.total()));
 
@@ -196,11 +203,16 @@ export class CobroDialogComponent {
   protected readonly medio = signal<MedioPagoPos>(MEDIOS_PAGO_POS[0]);
 
   protected readonly form = this.fb.group({
+    // Lo recibido solo cuenta en efectivo: las demás formas pagan el total exacto.
     recibido: this.fb.control<number | null>(null, [
-      Validators.required,
       (control: AbstractControl): ValidationErrors | null =>
-        (control.value ?? 0) < this.total() ? { insuficiente: true } : null,
+        this.medio().id === 'efectivo' && control.value === null ? { required: true } : null,
+      (control: AbstractControl): ValidationErrors | null =>
+        this.medio().id === 'efectivo' && (control.value ?? 0) < this.total()
+          ? { insuficiente: true }
+          : null,
     ]),
+    referencia: this.fb.nonNullable.control('', Validators.maxLength(60)),
     cuenta: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     asesor: this.fb.control<ErpSelectOption | null>(null),
   });
@@ -234,9 +246,26 @@ export class CobroDialogComponent {
   protected readonly chipReposo =
     'border-[#e9edf2] bg-white text-brand-text hover:border-brand-blue hover:text-brand-blue';
 
-  /** Cualquier medio se elige para ver su formulario; solo los habilitados cobran. */
+  /**
+   * Solo se eligen los medios habilitados: los demás se ven apagados.
+   * Cada uno trae la cuenta que la caja tiene configurada para él (vacía si no
+   * tiene: el selector de cuenta está siempre a la vista para elegirla).
+   */
   protected elegirMedio(medio: MedioPagoPos): void {
-    if (!this.procesando()) this.medio.set(medio);
+    if (this.procesando() || !medio.habilitado || medio.id === this.medio().id) return;
+    this.medio.set(medio);
+    const cuenta = this.cuentaPorMedio(medio.id);
+    this.form.controls.cuenta.setValue(cuenta);
+    this.form.controls.cuenta.markAsUntouched();
+    this.form.controls.recibido.updateValueAndValidity();
+    this.error.set(null);
+  }
+
+  private cuentaPorMedio(medio: MedioPagoId): ErpSelectOption | null {
+    const config = this.configuracion.configuracion();
+    if (medio === 'efectivo') return config.cuentaEfectivo;
+    if (medio === 'transferencia') return config.cuentaTransferencia;
+    return null;
   }
 
   /** F1–F4 eligen el medio de pago mientras se está cobrando. */
@@ -254,11 +283,15 @@ export class CobroDialogComponent {
 
   protected onCobrar(): void {
     if (this.procesando() || !this.medio().habilitado || this.form.invalid) return;
+    if (this.sinValor()) {
+      this.error.set(this.t().caja.cobro.errores.sinValor);
+      return;
+    }
     this.ejecutar();
   }
 
   protected onReintentar(): void {
-    if (this.procesando()) return;
+    if (this.procesando() || this.sinValor()) return;
     this.ejecutar();
   }
 
@@ -337,12 +370,11 @@ export class CobroDialogComponent {
       cliente: contacto.nombre,
       identificacion: contacto.identificacion,
     });
-    // Sin cuenta de efectivo configurada no hay qué plegar: se muestra para elegirla.
-    this.mostrarDetalles.set(config.cuentaEfectivo === null);
     this.form.reset({
       recibido: this.total(),
       cuenta: config.cuentaEfectivo,
       asesor: config.asesor,
+      referencia: '',
     });
     this.vista.set(this.cobroPendiente() ? 'pendiente' : 'cobro');
   }
@@ -352,8 +384,11 @@ export class CobroDialogComponent {
     if (!solicitud) return;
     const uuid = solicitud.venta.uuid;
     const total = this.total();
-    const recibido = this.recibido();
-    const vuelto = this.cambioEfectivo();
+    const efectivo = solicitud.medio.id === 'efectivo';
+    // Fuera del efectivo se paga el total exacto: no hay recibido de más ni cambio.
+    const recibido = efectivo ? this.recibido() : total;
+    const vuelto = efectivo ? this.cambioEfectivo() : 0;
+    const medio = solicitud.medio.id;
     this.error.set(null);
 
     this.cobroService
@@ -372,6 +407,7 @@ export class CobroDialogComponent {
           this.fase.set(null);
           this.ventaCobrada.set({
             documentoId: evento.documentoId,
+            medio,
             total,
             recibido,
             cambio: vuelto,
@@ -405,21 +441,30 @@ export class CobroDialogComponent {
 
   private armarSolicitud(): SolicitudCobro | null {
     const config = this.configuracion.configuracion();
-    const { cuenta, asesor } = this.form.getRawValue();
-    const cuentaBanco = cuenta ?? config.cuentaEfectivo;
+    const { cuenta, asesor, referencia } = this.form.getRawValue();
+    const medio = this.medio();
+    const tx = this.t().caja.cobro;
+    const cuentaBanco = cuenta ?? this.cuentaPorMedio(medio.id);
     if (config.documentoTipoId === null || config.almacen === null || cuentaBanco === null) {
-      this.error.set(this.t().caja.cobro.errores.configuracion);
+      this.error.set(
+        medio.id === 'transferencia' && cuentaBanco === null
+          ? tx.errores.cuentaTransferencia
+          : tx.errores.configuracion,
+      );
       return null;
     }
+    const ref = referencia.trim();
     return {
       venta: this.carritos.activo(),
       documentoTipoId: config.documentoTipoId,
-      medio: this.medio(),
+      medio,
       // En efectivo se registra el total: el cambio se devuelve, no entra a la cuenta.
       pagos: [{ cuentaBanco, monto: this.total() }],
       almacen: config.almacen,
       sede: config.sede,
       asesor: asesor ? { id: asesor.id, nombre: asesorLabel(asesor) } : null,
+      comentario:
+        medio.id === 'transferencia' && ref ? `${tx.transferencia.comentario} ${ref}` : null,
     };
   }
 }

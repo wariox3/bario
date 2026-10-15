@@ -31,7 +31,7 @@ export function solicitudToPayload(
       metodo_pago: metodoPago,
       asesor: solicitud.asesor,
       orden_compra: null,
-      comentario: null,
+      comentario: solicitud.comentario,
       detalles: venta.lineas.map((linea) => ({ ...linea, almacen })),
     },
     solicitud.documentoTipoId,

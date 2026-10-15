@@ -25,7 +25,8 @@ import { POS_DOCUMENTO_TIPOS, type PosDocumentoTipoId } from '../../configuracio
 
 /**
  * Configuración de la caja: con qué tipo de documento factura, de qué almacén
- * sale la mercancía, a qué cuenta entra el efectivo, y sede y asesor por defecto.
+ * sale la mercancía, a qué cuentas entran el efectivo y las transferencias, y
+ * sede y asesor por defecto.
  *
  * El tipo de documento es de la empresa y se guarda en el backend: cambiarlo
  * aquí lo cambia para todas sus cajas. El resto se guarda en este dispositivo.
@@ -64,6 +65,7 @@ export class ConfiguracionCajaComponent {
     documentoTipoId: this.fb.control<PosDocumentoTipoId | null>(null, Validators.required),
     almacen: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     cuentaEfectivo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    cuentaTransferencia: this.fb.control<ErpSelectOption | null>(null),
     sede: this.fb.control<ErpSelectOption | null>(null),
     asesor: this.fb.control<ErpSelectOption | null>(null),
   });
