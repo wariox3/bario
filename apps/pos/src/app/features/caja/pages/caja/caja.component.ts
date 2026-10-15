@@ -74,7 +74,10 @@ export class CajaComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly catalogo = inject(CatalogoStore);
-  protected readonly configuracionCompleta = inject(ConfiguracionCajaStore).completa;
+  private readonly configuracionCaja = inject(ConfiguracionCajaStore);
+  protected readonly configuracionCompleta = this.configuracionCaja.completa;
+  /** Lectura del tipo de documento de la empresa: mientras carga no se avisa nada. */
+  protected readonly estadoTipo = this.configuracionCaja.estadoTipo;
   protected readonly cantidades = this.carritos.cantidades;
 
   /** Hubo búsqueda: el vacío se explica distinto que un catálogo sin productos. */
@@ -165,6 +168,10 @@ export class CajaComponent {
     if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
       this.buscador()?.enfocar();
     }
+  }
+
+  protected recargarTipo(): void {
+    this.configuracionCaja.recargarTipo();
   }
 
   protected onBuscar(criterio: CriterioBusqueda): void {

@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
@@ -9,6 +10,7 @@ import {
   SELECT_ENDPOINTS,
   ToastService,
   asesorLabel,
+  extractErrorMessage,
   type ErpSelectOption,
 } from '@reddoc/core';
 import {
@@ -22,10 +24,11 @@ import { ConfiguracionCajaStore } from '../../configuracion-caja.store';
 import { POS_DOCUMENTO_TIPOS, type PosDocumentoTipoId } from '../../configuracion-caja.model';
 
 /**
- * Configuración de esta caja: con qué tipo de documento factura, de qué almacén
+ * Configuración de la caja: con qué tipo de documento factura, de qué almacén
  * sale la mercancía, a qué cuenta entra el efectivo, y sede y asesor por defecto.
  *
- * Se guarda en el dispositivo (`ConfiguracionCajaStore`), no en el backend.
+ * El tipo de documento es de la empresa y se guarda en el backend: cambiarlo
+ * aquí lo cambia para todas sus cajas. El resto se guarda en este dispositivo.
  */
 @Component({
   selector: 'app-configuracion-caja',
@@ -46,8 +49,11 @@ export class ConfiguracionCajaComponent {
   private readonly store = inject(ConfiguracionCajaStore);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
+  protected readonly estadoTipo = this.store.estadoTipo;
+  protected readonly guardando = signal(false);
 
   protected readonly tipos = POS_DOCUMENTO_TIPOS;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
@@ -70,6 +76,26 @@ export class ConfiguracionCajaComponent {
 
   constructor() {
     this.form.setValue(this.store.configuracion());
+
+    // El tipo llega del backend después de pintar la página. Mientras carga (o si
+    // falló) el control va deshabilitado: no se valida ni se guarda.
+    const tipo = this.form.controls.documentoTipoId;
+    effect(() => {
+      const estado = this.estadoTipo();
+      const valor = this.store.configuracion().documentoTipoId;
+      untracked(() => {
+        if (estado !== 'listo') {
+          tipo.disable();
+          return;
+        }
+        if (tipo.pristine) tipo.setValue(valor);
+        tipo.enable();
+      });
+    });
+  }
+
+  protected recargarTipo(): void {
+    this.store.recargarTipo();
   }
 
   protected tipoLabel(tipo: PosDocumentoTipoId): string {
@@ -78,15 +104,44 @@ export class ConfiguracionCajaComponent {
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid) return;
-    const valores = this.form.getRawValue();
-    const asesor = valores.asesor;
-    this.store.guardar({
-      ...valores,
+    if (this.guardando() || this.form.invalid) return;
+    const { documentoTipoId, asesor, ...local } = this.form.getRawValue();
+    this.store.guardarLocal({
+      ...local,
       // El selector de asesor trae `nombre_corto`, no `nombre`: se normaliza para
       // que la opción guardada tenga la forma `{ id, nombre }` de las demás.
       asesor: asesor ? { id: asesor.id, nombre: asesorLabel(asesor) } : null,
     });
+
+    const tipoControl = this.form.controls.documentoTipoId;
+    const cambioTipo =
+      tipoControl.enabled &&
+      documentoTipoId !== null &&
+      documentoTipoId !== this.store.configuracion().documentoTipoId;
+    if (!cambioTipo) {
+      this.alGuardar();
+      return;
+    }
+
+    this.guardando.set(true);
+    this.store
+      .guardarTipo(documentoTipoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.guardando.set(false);
+          this.alGuardar();
+        },
+        error: (err: unknown) => {
+          this.guardando.set(false);
+          // Lo de la caja ya quedó; el tipo sigue sin guardar y el form, sucio.
+          const tx = this.t().configuracion.toasts.tipoError;
+          this.toast.error(tx.title, extractErrorMessage(err, tx.desc));
+        },
+      });
+  }
+
+  private alGuardar(): void {
     this.form.markAsPristine();
     const ok = this.t().configuracion.toasts.guardada;
     this.toast.success(ok.title, ok.desc);

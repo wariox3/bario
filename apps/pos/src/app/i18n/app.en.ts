@@ -177,8 +177,13 @@ export const en: AppDict = {
     title: 'Register',
     configuracion: {
       title: 'Setup required',
-      desc: 'Before selling, choose the document type, warehouse and cash account for this register.',
+      desc: "Before selling, choose the company's document type and this register's warehouse and cash account.",
       accion: 'Go to settings',
+    },
+    configuracionError: {
+      title: "Couldn't read the company settings",
+      desc: "Without the document type the register can't charge.",
+      accion: 'Retry',
     },
     buscador: {
       modo: 'Search by',
@@ -469,10 +474,12 @@ export const en: AppDict = {
   },
   configuracion: {
     title: 'Register settings',
-    subtitle: 'Stored on this device: each register has its own.',
+    subtitle: 'The document type belongs to the company; the rest is stored on this device.',
     documento: {
       title: 'Document type',
-      hint: 'Which document this register invoices with.',
+      hint: 'Shared by every register of the company.',
+      error: "Couldn't read the company's document type.",
+      reintentar: 'Retry',
     },
     tipos: {
       pos: 'POS invoice',
@@ -495,6 +502,10 @@ export const en: AppDict = {
       guardada: {
         title: 'Settings saved',
         desc: 'The register now uses the new settings.',
+      },
+      tipoError: {
+        title: "Couldn't save the document type",
+        desc: 'Everything else was saved. Try again.',
       },
     },
   },

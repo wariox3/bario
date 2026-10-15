@@ -156,6 +156,8 @@ export interface AppDict
   caja: {
     title: string;
     configuracion: { title: string; desc: string; accion: string };
+    /** No se pudo leer el tipo de documento de la empresa. */
+    configuracionError: { title: string; desc: string; accion: string };
     buscador: {
       modo: string;
       porNombre: string;
@@ -375,7 +377,7 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    documento: { title: string; hint: string };
+    documento: { title: string; hint: string; error: string; reintentar: string };
     tipos: { pos: string; posElectronica: string };
     operacion: { title: string; hint: string };
     campos: {
@@ -389,6 +391,7 @@ export interface AppDict
     guardar: string;
     toasts: {
       guardada: { title: string; desc: string };
+      tipoError: { title: string; desc: string };
     };
   };
 }

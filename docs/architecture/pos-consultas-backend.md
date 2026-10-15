@@ -74,12 +74,19 @@
 - **Pregunta:** confirmar que responde 201 con `id` para ambos tipos y que
   calcula los totales a partir de las líneas.
 
+## Resuelto
+
+- **Tipo de documento POS de la empresa** (2026-10-15). Backend agregó
+  `ven_pos_documento_tipo` (+ `_nombre`, solo lectura) a `GenConfiguracion`; el
+  POS lo lee por `configuracion/campos/` y lo guarda por `actualizar/`. El
+  schema no dice si valida que sea un tipo POS: el front acepta solo 24 y 27 y
+  trata cualquier otro como no configurado.
+
 ## Pedidos a futuro (no bloquean)
 
-- **Configuración del POS en el backend.** Hoy cada caja guarda su
-  configuración en el navegador (tipo de documento, almacén, cuenta de
-  efectivo, sede, asesor). Si se quiere compartir entre cajas o administrarla
-  desde el ERP, harían falta campos `pos_*` en `GenConfiguracion`.
+- **Valores por defecto de la caja en el backend** (almacén, cuenta de
+  efectivo). Hoy son de cada navegador. Solo si se quiere administrarlos desde el
+  ERP.
 - **Filtro `pos` en `documento-tipo/seleccionar/`.** No existe; el POS usa los
   tipos 24 y 27 fijos.
 

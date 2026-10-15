@@ -177,8 +177,13 @@ export const es: AppDict = {
     title: 'Caja',
     configuracion: {
       title: 'Configuración requerida',
-      desc: 'Antes de vender, elige el tipo de documento, el almacén y la cuenta de efectivo de esta caja.',
+      desc: 'Antes de vender, elige el tipo de documento de la empresa y el almacén y la cuenta de efectivo de esta caja.',
       accion: 'Ir a configuración',
+    },
+    configuracionError: {
+      title: 'No se pudo leer la configuración de la empresa',
+      desc: 'Sin el tipo de documento la caja no puede cobrar.',
+      accion: 'Reintentar',
     },
     buscador: {
       modo: 'Buscar por',
@@ -469,10 +474,12 @@ export const es: AppDict = {
   },
   configuracion: {
     title: 'Configuración de la caja',
-    subtitle: 'Se guarda en este dispositivo: cada caja tiene la suya.',
+    subtitle: 'El tipo de documento es de la empresa; lo demás se guarda en este dispositivo.',
     documento: {
       title: 'Tipo de documento',
-      hint: 'Con qué documento factura esta caja.',
+      hint: 'Lo comparten todas las cajas de la empresa.',
+      error: 'No se pudo leer el tipo de documento de la empresa.',
+      reintentar: 'Reintentar',
     },
     tipos: {
       pos: 'Factura POS',
@@ -495,6 +502,10 @@ export const es: AppDict = {
       guardada: {
         title: 'Configuración guardada',
         desc: 'La caja ya usa la nueva configuración.',
+      },
+      tipoError: {
+        title: 'No se pudo guardar el tipo de documento',
+        desc: 'Lo demás quedó guardado. Intenta de nuevo.',
       },
     },
   },
