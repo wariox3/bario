@@ -235,6 +235,7 @@ export const en: AppDict = {
       atajoNueva: 'New sale (F4)',
       opciones: 'Sale options',
       renombrar: 'Rename',
+      renombrarSubtitulo: 'Only changes the tab name.',
       nombre: 'Sale name',
       guardar: 'Save',
       cerrar: 'Close sale',
@@ -293,6 +294,7 @@ export const en: AppDict = {
     },
     cliente: {
       titulo: 'New customer',
+      subtitulo: 'Becomes the customer of this sale.',
       nota: 'Price list, terms and tax details are completed in the ERP.',
       guardar: 'Create customer',
       campos: {
@@ -318,6 +320,7 @@ export const en: AppDict = {
     },
     item: {
       titulo: 'New item',
+      subtitulo: 'Created in the company catalog.',
       guardar: 'Create item',
       avisoInventario:
         'With inventory the item starts with no stock: the register will not sell it until goods come in.',

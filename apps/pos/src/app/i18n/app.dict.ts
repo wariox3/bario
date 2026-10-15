@@ -196,6 +196,7 @@ export interface AppDict
       atajoNueva: string;
       opciones: string;
       renombrar: string;
+      renombrarSubtitulo: string;
       nombre: string;
       guardar: string;
       cerrar: string;
@@ -244,6 +245,7 @@ export interface AppDict
     };
     cliente: {
       titulo: string;
+      subtitulo: string;
       nota: string;
       guardar: string;
       campos: {
@@ -266,6 +268,7 @@ export interface AppDict
     };
     item: {
       titulo: string;
+      subtitulo: string;
       guardar: string;
       avisoInventario: string;
       tipos: { producto: string; servicio: string };

@@ -235,6 +235,7 @@ export const es: AppDict = {
       atajoNueva: 'Nueva venta (F4)',
       opciones: 'Opciones de la venta',
       renombrar: 'Renombrar',
+      renombrarSubtitulo: 'Solo cambia el nombre de la pestaña.',
       nombre: 'Nombre de la venta',
       guardar: 'Guardar',
       cerrar: 'Cerrar venta',
@@ -293,6 +294,7 @@ export const es: AppDict = {
     },
     cliente: {
       titulo: 'Nuevo cliente',
+      subtitulo: 'Queda como cliente de esta venta.',
       nota: 'Lista de precios, plazos y datos fiscales se completan en el ERP.',
       guardar: 'Crear cliente',
       campos: {
@@ -318,6 +320,7 @@ export const es: AppDict = {
     },
     item: {
       titulo: 'Nuevo ítem',
+      subtitulo: 'Se crea en el catálogo de la empresa.',
       guardar: 'Crear ítem',
       avisoInventario:
         'Con inventario el ítem nace sin existencias: la caja no lo venderá hasta que entre mercancía.',
