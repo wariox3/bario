@@ -18,6 +18,8 @@ export interface SolicitudCobro {
   readonly almacen: ErpSelectOption;
   readonly sede: ErpSelectOption | null;
   readonly asesor: ErpSelectOption | null;
+  /** Va al comentario del documento: p. ej. la referencia de una transferencia. */
+  readonly comentario: string | null;
 }
 
 /** Paso del cobro en curso, para el estado del botón y los mensajes. */

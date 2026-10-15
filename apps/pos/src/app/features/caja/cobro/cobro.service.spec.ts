@@ -23,6 +23,7 @@ const solicitud = (cambios: Partial<Carrito> = {}): SolicitudCobro => ({
   almacen: { id: 2, nombre: 'Principal' },
   sede: null,
   asesor: null,
+  comentario: null,
 });
 
 function preparar() {

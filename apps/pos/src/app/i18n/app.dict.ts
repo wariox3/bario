@@ -287,6 +287,7 @@ export interface AppDict
         precio: string;
         tipo: string;
         inventario: string;
+        opciones: string;
         favorito: string;
         inactivo: string;
         impuestos: string;
@@ -317,15 +318,14 @@ export interface AppDict
       tarjeta: { datafono: string; datafonoPlaceholder: string; aprobacion: string };
       transferencia: {
         cuentaDestino: string;
-        cuentaDestinoPlaceholder: string;
         referencia: string;
         referenciaPlaceholder: string;
+        aRecibir: string;
+        /** Prefijo de la referencia en el comentario del documento. */
+        comentario: string;
       };
       noDisponible: string;
       ingreso: {
-        ingresaA: string;
-        cambiar: string;
-        ocultar: string;
         cuenta: string;
         asesor: string;
       };
@@ -338,6 +338,8 @@ export interface AppDict
         recibido: string;
         imprimir: string;
         nuevaVenta: string;
+        /** Cómo se pagó, en la pantalla de éxito fuera del efectivo. */
+        pagado: Record<MedioPagoId, string>;
       };
       pendiente: {
         titulo: string;
@@ -347,6 +349,8 @@ export interface AppDict
         aprobacion: string;
         hecho: string;
         falta: string;
+        /** La venta suma $0: reintentar no puede registrar el pago. */
+        sinValor: string;
         reintentar: string;
         descartar: string;
         descartarConfirm: { header: string; message: string; aceptar: string };
@@ -355,6 +359,7 @@ export interface AppDict
         configuracion: { title: string; desc: string };
         productos: { title: string; desc: string };
         cliente: { title: string; desc: string };
+        sinValor: { title: string; desc: string };
       };
       errores: {
         generico: string;
@@ -363,6 +368,8 @@ export interface AppDict
         plazoContado: string;
         descartar: string;
         imprimir: { title: string; desc: string };
+        cuentaTransferencia: string;
+        sinValor: string;
       };
     };
   };
@@ -398,6 +405,8 @@ export interface AppDict
       almacen: string;
       cuentaEfectivo: string;
       cuentaEfectivoHint: string;
+      cuentaTransferencia: string;
+      cuentaTransferenciaHint: string;
       sede: string;
       asesor: string;
     };

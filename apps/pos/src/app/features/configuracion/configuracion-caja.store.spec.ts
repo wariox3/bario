@@ -44,6 +44,7 @@ describe('ConfiguracionCajaStore', () => {
       documentoTipoId: POS,
       almacen,
       cuentaEfectivo: cuenta,
+      cuentaTransferencia: null,
       sede: null,
       asesor: null,
     });
@@ -68,7 +69,13 @@ describe('ConfiguracionCajaStore', () => {
 
   it('sin tipo en la empresa la caja no está completa', () => {
     const { store } = preparar(null);
-    store.guardarLocal({ almacen, cuentaEfectivo: cuenta, sede: null, asesor: null });
+    store.guardarLocal({
+      almacen,
+      cuentaEfectivo: cuenta,
+      cuentaTransferencia: null,
+      sede: null,
+      asesor: null,
+    });
     expect(store.completa()).toBe(false);
   });
 
@@ -111,10 +118,18 @@ describe('ConfiguracionCajaStore', () => {
 
   it('lo de la caja se guarda en el navegador, sin el tipo', () => {
     const { store } = preparar();
-    store.guardarLocal({ almacen, cuentaEfectivo: cuenta, sede: null, asesor: null });
+    const banco = { id: 11, nombre: 'Bancolombia' };
+    store.guardarLocal({
+      almacen,
+      cuentaEfectivo: cuenta,
+      cuentaTransferencia: banco,
+      sede: null,
+      asesor: null,
+    });
     expect(JSON.parse(localStorage.getItem('pos:config:acme') ?? 'null')).toEqual({
       almacen,
       cuentaEfectivo: cuenta,
+      cuentaTransferencia: banco,
       sede: null,
       asesor: null,
     });

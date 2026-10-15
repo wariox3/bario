@@ -1,4 +1,4 @@
-import { type Signal, type WritableSignal, computed, signal } from '@angular/core';
+import { type Signal, computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import type { FormGroup } from '@angular/forms';
 import { Subject, of, throwError } from 'rxjs';
@@ -24,12 +24,12 @@ import { CobroDialogComponent } from './cobro-dialog.component';
 interface Interno {
   readonly vista: Signal<'cobro' | 'exito' | 'pendiente'>;
   readonly encabezado: Signal<{ venta: string; cliente: string; identificacion: string } | null>;
-  readonly mostrarDetalles: WritableSignal<boolean>;
   readonly medio: Signal<MedioPagoPos>;
   readonly error: Signal<string | null>;
   readonly faltante: Signal<number>;
   readonly ventaCobrada: Signal<{
     documentoId: number;
+    medio: string;
     total: number;
     recibido: number;
     cambio: number;
@@ -49,6 +49,7 @@ const configuracionCompleta: ConfiguracionCaja = {
   documentoTipoId: 27,
   almacen: { id: 2, nombre: 'Principal' },
   cuentaEfectivo: cuenta,
+  cuentaTransferencia: { id: 11, nombre: 'Bancolombia' },
   sede: null,
   asesor: null,
 };
@@ -56,7 +57,11 @@ const configuracionCompleta: ConfiguracionCaja = {
 const errores = es.caja.cobro.errores;
 
 function preparar(
-  cambios: { config?: Partial<ConfiguracionCaja>; pendiente?: CobroPendiente } = {},
+  cambios: {
+    config?: Partial<ConfiguracionCaja>;
+    pendiente?: CobroPendiente;
+    total?: number;
+  } = {},
 ) {
   const activo = signal<Carrito>({
     uuid: 'u1',
@@ -64,7 +69,7 @@ function preparar(
     contacto: { id: 1, nombre: '222222222222 - Consumidor final' },
     lineas: [],
   });
-  const total = signal(47_600);
+  const total = signal(cambios.total ?? 47_600);
   const pendiente = signal<CobroPendiente | null>(cambios.pendiente ?? null);
   const carritos = {
     activo,
@@ -128,11 +133,15 @@ const tecla = (key: string) => new KeyboardEvent('keydown', { key, cancelable: t
 
 describe('CobroDialogComponent', () => {
   describe('al abrir', () => {
-    it('propone el total como recibido y la cuenta de la caja, con los detalles plegados', () => {
+    it('propone el total como recibido y la cuenta y el asesor de la caja', () => {
       const { interno } = preparar();
       expect(interno.vista()).toBe('cobro');
-      expect(interno.form.getRawValue()).toEqual({ recibido: 47_600, cuenta, asesor: null });
-      expect(interno.mostrarDetalles()).toBe(false);
+      expect(interno.form.getRawValue()).toEqual({
+        recibido: 47_600,
+        cuenta,
+        asesor: null,
+        referencia: '',
+      });
       expect(interno.medio().id).toBe('efectivo');
     });
 
@@ -145,9 +154,11 @@ describe('CobroDialogComponent', () => {
       });
     });
 
-    it('sin cuenta de efectivo configurada, muestra cuenta y asesor para elegirla', () => {
-      const { interno } = preparar({ config: { cuentaEfectivo: null } });
-      expect(interno.mostrarDetalles()).toBe(true);
+    it('sin cuenta de efectivo configurada, la cuenta queda vacía y no cobra', () => {
+      const { interno, cobro } = preparar({ config: { cuentaEfectivo: null } });
+      expect(interno.form.controls['cuenta'].value).toBeNull();
+      interno.onCobrar();
+      expect(cobro.cobrar).not.toHaveBeenCalled();
     });
 
     it('con un cobro pendiente abre directo en pendiente', () => {
@@ -159,7 +170,7 @@ describe('CobroDialogComponent', () => {
   describe('medios de pago', () => {
     it('F1–F4 eligen el medio', () => {
       const { interno } = preparar();
-      const evento = tecla('F4');
+      const evento = tecla('F2');
       interno.onTecla(evento);
       expect(interno.medio().id).toBe('transferencia');
       expect(evento.defaultPrevented).toBe(true);
@@ -167,12 +178,15 @@ describe('CobroDialogComponent', () => {
       expect(interno.medio().id).toBe('efectivo');
     });
 
-    it('un medio deshabilitado se ve pero no cobra', () => {
-      const { interno, cobro } = preparar();
-      interno.onTecla(tecla('F2'));
-      expect(interno.medio().id).toBe('tarjetaCredito');
-      interno.onCobrar();
-      expect(cobro.cobrar).not.toHaveBeenCalled();
+    it('un medio deshabilitado no se puede elegir, ni con su atajo', () => {
+      const { interno } = preparar();
+      const evento = tecla('F3');
+      interno.onTecla(evento);
+      expect(interno.medio().id).toBe('efectivo');
+      // El atajo no se le deja al navegador (F3 es "buscar en la página").
+      expect(evento.defaultPrevented).toBe(true);
+      interno.onTecla(tecla('F4'));
+      expect(interno.medio().id).toBe('efectivo');
     });
 
     it('fuera de la pantalla de cobro las teclas F no hacen nada', () => {
@@ -209,6 +223,7 @@ describe('CobroDialogComponent', () => {
       expect(interno.vista()).toBe('exito');
       expect(interno.ventaCobrada()).toEqual({
         documentoId: 55,
+        medio: 'efectivo',
         total: 47_600,
         recibido: 50_000,
         cambio: 2_400,
@@ -222,6 +237,61 @@ describe('CobroDialogComponent', () => {
       interno.onCobrar();
       expect(cobro.cobrar).not.toHaveBeenCalled();
       expect(interno.error()).toBe(errores.configuracion);
+    });
+  });
+
+  describe('cobrar por transferencia', () => {
+    const banco = { id: 11, nombre: 'Bancolombia' };
+
+    it('toma la cuenta de transferencia de la caja y cobra el total', () => {
+      const { interno, cobro } = preparar();
+      interno.onTecla(tecla('F2'));
+      expect(interno.form.controls['cuenta'].value).toEqual(banco);
+      // Lo recibido no aplica: ni un monto menor al total bloquea.
+      interno.usarMonto(10);
+      interno.onCobrar();
+      const solicitud = cobro.cobrar.mock.calls[0][0];
+      expect(solicitud.medio.codigoDian).toBe('47');
+      expect(solicitud.pagos).toEqual([{ cuentaBanco: banco, monto: 47_600 }]);
+      expect(solicitud.comentario).toBeNull();
+    });
+
+    it('la referencia del comprobante va al comentario del documento', () => {
+      const { interno, cobro } = preparar();
+      interno.onTecla(tecla('F2'));
+      interno.form.controls['referencia'].setValue(' M123456 ');
+      interno.onCobrar();
+      expect(cobro.cobrar.mock.calls[0][0].comentario).toBe(
+        `${es.caja.cobro.transferencia.comentario} M123456`,
+      );
+    });
+
+    it('el éxito no habla de cambio: se pagó el total', () => {
+      const { interno } = preparar();
+      interno.onTecla(tecla('F2'));
+      interno.onCobrar();
+      expect(interno.ventaCobrada()).toEqual({
+        documentoId: 55,
+        medio: 'transferencia',
+        total: 47_600,
+        recibido: 47_600,
+        cambio: 0,
+      });
+    });
+
+    it('sin cuenta de transferencia configurada la cuenta queda vacía y no cobra', () => {
+      const { interno, cobro } = preparar({ config: { cuentaTransferencia: null } });
+      interno.onTecla(tecla('F2'));
+      expect(interno.form.controls['cuenta'].value).toBeNull();
+      interno.onCobrar();
+      expect(cobro.cobrar).not.toHaveBeenCalled();
+    });
+
+    it('volver a efectivo recupera la cuenta de efectivo', () => {
+      const { interno } = preparar();
+      interno.onTecla(tecla('F2'));
+      interno.onTecla(tecla('F1'));
+      expect(interno.form.controls['cuenta'].value).toEqual(cuenta);
     });
   });
 
@@ -274,6 +344,27 @@ describe('CobroDialogComponent', () => {
         pagado: false,
       });
       expect(cobradas).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('venta en $0', () => {
+    it('no crea el documento: el backend no aceptaría un pago de $0', () => {
+      const { interno, cobro } = preparar({ total: 0 });
+      interno.onCobrar();
+      expect(cobro.cobrar).not.toHaveBeenCalled();
+      expect(interno.error()).toBe(errores.sinValor);
+    });
+
+    it('con el documento ya creado, reintentar no hace nada y descartar sí', () => {
+      const { interno, cobro, ventas, carritos } = preparar({
+        total: 0,
+        pendiente: { documentoId: 1, pagado: false },
+      });
+      interno.onReintentar();
+      expect(cobro.cobrar).not.toHaveBeenCalled();
+      interno.onDescartar();
+      expect(ventas.eliminar).toHaveBeenCalledWith(1);
+      expect(carritos.limpiarCobro).toHaveBeenCalledWith('u1');
     });
   });
 

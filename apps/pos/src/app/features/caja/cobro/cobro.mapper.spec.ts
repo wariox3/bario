@@ -38,6 +38,7 @@ const solicitud: SolicitudCobro = {
   almacen: { id: 2, nombre: 'Principal' },
   sede: null,
   asesor: { id: 4, nombre: 'Ana' },
+  comentario: null,
 };
 
 describe('solicitudToPayload', () => {
@@ -72,6 +73,16 @@ describe('solicitudToPayload', () => {
         impuestos_ids: [10],
       }),
     ]);
+  });
+
+  it('el comentario de la solicitud llega al documento', () => {
+    const conReferencia = solicitudToPayload(
+      { ...solicitud, comentario: 'Transferencia, ref. M123' },
+      { id: 22, nombre: 'Transferencia' },
+      { id: 1, nombre: 'Contado' },
+      new Date(2026, 9, 14),
+    );
+    expect(conReferencia.comentario).toBe('Transferencia, ref. M123');
   });
 });
 

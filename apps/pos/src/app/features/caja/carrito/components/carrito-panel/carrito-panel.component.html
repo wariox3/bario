@@ -130,6 +130,11 @@
   </div>
 </section>
 
+<!--
+  En tablet este panel vive dentro de un p-drawer, que usa transform: todo lo
+  position:fixed de adentro quedaría encerrado en el drawer (máscara y centrado
+  incluidos). Por eso estos diálogos llevan appendTo="body"; uno nuevo aquí también.
+-->
 <app-cliente-rapido-dialog [(visible)]="creandoCliente" (creado)="onContacto($event)" />
 
 <app-cobro-dialog [(visible)]="cobrando" (cobrada)="cobrada.emit()" />

@@ -116,6 +116,11 @@ export class CarritoPanelComponent {
         this.toast.warn(tx.cliente.title, tx.cliente.desc);
         return;
       }
+      // El backend no acepta un pago de $0: el documento quedaría creado y sin cobrar.
+      if (this.store.resumen().total <= 0) {
+        this.toast.warn(tx.sinValor.title, tx.sinValor.desc);
+        return;
+      }
     }
     this.cobrando.set(true);
   }

@@ -20,7 +20,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { SelectButtonModule } from 'primeng/selectbutton';
+import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormErrorService, I18nService, ItemService, ToastService, type Item } from '@reddoc/core';
 import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
@@ -54,7 +54,7 @@ import { ItemRapidoService } from '../../item-rapido.service';
     InputNumberModule,
     InputTextModule,
     MultiSelectModule,
-    SelectButtonModule,
+    RadioButtonModule,
     FieldErrorComponent,
     FocusInvalidDirective,
   ],
@@ -91,10 +91,6 @@ export class ItemRapidoDialogComponent {
       .pipe(catchError(() => of([]))),
     { initialValue: [] },
   );
-  protected readonly tipos = computed(() => [
-    { value: 'producto', label: this.t().caja.item.tipos.producto },
-    { value: 'servicio', label: this.t().caja.item.tipos.servicio },
-  ]);
 
   protected readonly form = this.fb.nonNullable.group({
     codigo: ['', [Validators.required, Validators.maxLength(100)]],

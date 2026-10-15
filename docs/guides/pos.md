@@ -24,23 +24,24 @@
    final"; al cambiarlo, las líneas se recotizan con su lista de precios (las editadas a
    mano se respetan). La caja no deja pasar del stock disponible.
 4. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio; la cuenta y el
-   asesor salen de la caja y se cambian desde el pie. Crédito, débito y transferencia se
-   ven con su formulario, pero aún no cobran. El cobro crea el
-   documento con sus líneas, registra el pago y lo aprueba. Al terminar se puede imprimir
-   el PDF del backend.
+   asesor salen de la caja y están a la vista para cambiarlos. Transferencia: el total entra
+   a la cuenta de transferencia de la caja y la referencia del comprobante (opcional) va al
+   comentario del documento, porque el pago no tiene dónde guardarla. Crédito y débito se
+   ven deshabilitados y no se pueden elegir. El cobro crea el documento con sus líneas,
+   registra el pago y lo aprueba. Al terminar se puede imprimir el PDF del backend.
 5. **Consultar.** `/t/<slug>/historial`: facturas POS de los dos tipos, con filtros e
    imprimir.
 
 ### Atajos
 
-| Tecla      | Acción                            |
-| ---------- | --------------------------------- |
-| `F2`       | Cobrar (en tablet, abre la venta) |
-| `F3` o `/` | Ir al buscador                    |
-| `F4`       | Nueva venta                       |
-| `Enter`    | En modo código, buscar y agregar  |
-| `F1`–`F4`  | En el cobro, elegir medio de pago |
-| `Enter`    | En el cobro, cobrar               |
+| Tecla      | Acción                                                |
+| ---------- | ----------------------------------------------------- |
+| `F2`       | Cobrar (en tablet, abre la venta)                     |
+| `F3` o `/` | Ir al buscador                                        |
+| `F4`       | Nueva venta                                           |
+| `Enter`    | En modo código, buscar y agregar                      |
+| `F1`–`F4`  | En el cobro: efectivo, transferencia, crédito, débito |
+| `Enter`    | En el cobro, cobrar                                   |
 
 Si se teclea sin ningún campo con foco (lo que hace el lector de barras), el foco salta al
 buscador antes de que llegue la tecla. Con un modal abierto no se intercepta nada.
@@ -101,6 +102,9 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
   `localStorage`; dos pestañas se las pisarían. `core/pestana/pestana-unica.service.ts` reserva
   la caja con Web Locks y el workspace muestra un aviso en la segunda pestaña, que toma la caja
   sola cuando la otra se cierra. Nada que escriba ventas debe montarse fuera del workspace.
+- **Un diálogo dentro del panel de la venta va con `appendTo="body"`.** En tablet el panel vive
+  en un `p-drawer` con `transform`, que encierra todo lo `position: fixed`: sin eso el modal se
+  centra en el drawer y su máscara no cubre la pantalla.
 - **Lo que guarda el navegador lleva versión o validación** (`esEstadoCarritos`,
   `esConfiguracionCaja`): un cambio de forma descarta lo viejo en vez de romper la caja.
 - **Editar un ítem desde la caja** usa `PATCH item/{id}/` con solo los campos del modal

@@ -98,11 +98,12 @@ retomarlo; los que necesitan backend lo dicen.
 - **Cuadre de caja.** No hay nada que portar: en el POS anterior la pantalla
   estaba vacía. Necesita modelo y endpoints en el backend (apertura con base,
   arqueo por medio de pago, cierre) antes de cualquier pantalla.
-- **Medios de pago distintos de efectivo y pago combinado** (tarjeta crédito y
-  débito, transferencia). El front ya está preparado: cada medio declara su
-  código DIAN en `cobro/medios-pago.ts` y el backend acepta varios pagos por
-  documento. Falta habilitarlos, darles su formulario y su cuenta bancaria en la
-  configuración de la caja.
+- **Tarjeta crédito y débito, y pago combinado.** Transferencia ya cobra
+  (2026-10-15, cuenta propia en la configuración de la caja). Las tarjetas se
+  ven en el cobro pero no cobran: falta su cuenta y decidir qué se guarda del
+  datáfono. El backend acepta varios pagos por documento. `documento-pago/` no
+  tiene campo de referencia: la de la transferencia va al comentario del
+  documento.
 - **Ficha del documento dentro del POS** (ver una venta con sus líneas y pagos,
   anularla, emitirla a la DIAN). Hoy el historial solo lista e imprime; el resto
   se hace en el ERP.

@@ -342,6 +342,7 @@ export const es: AppDict = {
         precio: 'Precio de venta',
         tipo: 'Tipo',
         inventario: 'Maneja inventario',
+        opciones: 'Opciones',
         favorito: 'Favorito',
         inactivo: 'Inactivo (deja de aparecer en la caja)',
         impuestos: 'Impuestos de venta',
@@ -385,15 +386,14 @@ export const es: AppDict = {
       },
       transferencia: {
         cuentaDestino: 'Cuenta destino',
-        cuentaDestinoPlaceholder: 'Sin cuenta bancaria',
-        referencia: 'Referencia / comprobante',
+        referencia: 'Referencia / comprobante (opcional)',
         referenciaPlaceholder: 'Ej. M123456',
+        aRecibir: 'Total a recibir',
+        comentario: 'Transferencia, ref.',
       },
-      noDisponible: 'Este medio de pago estará disponible pronto. Por ahora cobra en efectivo.',
+      noDisponible:
+        'Este medio de pago estará disponible pronto. Por ahora cobra en efectivo o por transferencia.',
       ingreso: {
-        ingresaA: 'Ingresa a',
-        cambiar: 'Cambiar',
-        ocultar: 'Ocultar',
         cuenta: 'Cuenta',
         asesor: 'Asesor',
       },
@@ -411,6 +411,12 @@ export const es: AppDict = {
         recibido: 'Recibido',
         imprimir: 'Imprimir',
         nuevaVenta: 'Nueva venta',
+        pagado: {
+          efectivo: 'Pagado en efectivo',
+          transferencia: 'Pagado por transferencia',
+          tarjetaCredito: 'Pagado con tarjeta de crédito',
+          tarjetaDebito: 'Pagado con tarjeta de débito',
+        },
       },
       pendiente: {
         titulo: 'Cobro sin terminar',
@@ -420,6 +426,8 @@ export const es: AppDict = {
         aprobacion: 'Aprobación',
         hecho: 'Registrado',
         falta: 'Pendiente',
+        sinValor:
+          'La venta suma $0 y el pago no se puede registrar. Descarta el cobro, corrige los precios y vuelve a cobrar.',
         reintentar: 'Reintentar',
         descartar: 'Descartar cobro',
         descartarConfirm: {
@@ -441,12 +449,18 @@ export const es: AppDict = {
           title: 'Falta el cliente',
           desc: 'Elige el cliente de la venta para cobrar.',
         },
+        sinValor: {
+          title: 'La venta está en $0',
+          desc: 'El total debe ser mayor que cero: revisa los precios de los productos.',
+        },
       },
       errores: {
         generico: 'No se pudo completar el cobro. Intenta de nuevo.',
         configuracion: 'Falta configurar la caja: tipo de documento, almacén o cuenta de efectivo.',
+        cuentaTransferencia: 'Elige la cuenta donde entra la transferencia.',
         metodoPago: 'La empresa no tiene el método de pago efectivo (código DIAN 10).',
         plazoContado: 'La empresa no tiene un plazo de pago de contado (0 días).',
+        sinValor: 'La venta está en $0: el total debe ser mayor que cero para cobrar.',
         descartar: 'No se pudo descartar el documento.',
         imprimir: {
           title: 'No se pudo imprimir',
@@ -506,6 +520,9 @@ export const es: AppDict = {
       almacen: 'Almacén',
       cuentaEfectivo: 'Cuenta de efectivo',
       cuentaEfectivoHint: 'Cuenta donde se registran los cobros en efectivo.',
+      cuentaTransferencia: 'Cuenta de transferencia',
+      cuentaTransferenciaHint:
+        'Cuenta bancaria donde entran los cobros por transferencia. Sin ella, la caja no cobra por transferencia.',
       sede: 'Sede',
       asesor: 'Asesor por defecto',
     },

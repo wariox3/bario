@@ -96,6 +96,18 @@
       </div>
 
       <div class="flex flex-col gap-1.5">
+        <label for="sede" class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text">
+          {{ c.campos.sede }}
+        </label>
+        <lib-api-select
+          inputId="sede"
+          formControlName="sede"
+          [endpoint]="sedeEndpoint"
+          [showClear]="true"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
         <label
           for="cuentaEfectivo"
           class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
@@ -113,15 +125,19 @@
       </div>
 
       <div class="flex flex-col gap-1.5">
-        <label for="sede" class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text">
-          {{ c.campos.sede }}
+        <label
+          for="cuentaTransferencia"
+          class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+        >
+          {{ c.campos.cuentaTransferencia }}
         </label>
         <lib-api-select
-          inputId="sede"
-          formControlName="sede"
-          [endpoint]="sedeEndpoint"
+          inputId="cuentaTransferencia"
+          formControlName="cuentaTransferencia"
+          [endpoint]="cuentaEndpoint"
           [showClear]="true"
         />
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ c.campos.cuentaTransferenciaHint }}</p>
       </div>
 
       <div class="flex flex-col gap-1.5">

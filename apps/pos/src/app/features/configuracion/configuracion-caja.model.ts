@@ -30,6 +30,8 @@ export interface ConfiguracionLocal {
   readonly almacen: ErpSelectOption | null;
   /** Cuenta bancaria donde entra el efectivo de los cobros. */
   readonly cuentaEfectivo: ErpSelectOption | null;
+  /** Cuenta donde entran los cobros por transferencia; sin ella no se cobra así. */
+  readonly cuentaTransferencia: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
   /** Asesor que se propone en cada venta; se puede cambiar al cobrar. */
   readonly asesor: ErpSelectOption | null;
@@ -38,6 +40,7 @@ export interface ConfiguracionLocal {
 export const CONFIGURACION_LOCAL_VACIA: ConfiguracionLocal = {
   almacen: null,
   cuentaEfectivo: null,
+  cuentaTransferencia: null,
   sede: null,
   asesor: null,
 };
@@ -71,6 +74,8 @@ export function esConfiguracionLocal(valor: unknown): valor is ConfiguracionLoca
   return (
     esOpcionONulo(config['almacen']) &&
     esOpcionONulo(config['cuentaEfectivo']) &&
+    // Llegó después: lo guardado antes no la trae.
+    (config['cuentaTransferencia'] === undefined || esOpcionONulo(config['cuentaTransferencia'])) &&
     esOpcionONulo(config['sede']) &&
     esOpcionONulo(config['asesor'])
   );
@@ -81,6 +86,7 @@ export function soloLocal(config: ConfiguracionLocal): ConfiguracionLocal {
   return {
     almacen: config.almacen,
     cuentaEfectivo: config.cuentaEfectivo,
+    cuentaTransferencia: config.cuentaTransferencia ?? null,
     sede: config.sede,
     asesor: config.asesor,
   };
