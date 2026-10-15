@@ -1,19 +1,19 @@
 /** Billetes contra los que se redondea el efectivo recibido (pesos colombianos). */
-const REDONDEOS = [1_000, 5_000, 10_000, 20_000, 50_000, 100_000] as const;
+const BILLETES = [10_000, 20_000, 50_000, 100_000] as const;
 
 /**
- * Montos de efectivo que se suelen recibir para un total: el exacto y el total
- * redondeado hacia arriba a cada billete, sin repetidos y hasta `maximo`
- * opciones. Para $23.400 → 23.400, 24.000, 25.000, 30.000.
+ * Montos que se suelen recibir por encima del total: el total redondeado hacia
+ * arriba a cada billete, sin repetidos, de menor a mayor y hasta `maximo`. El
+ * exacto va aparte (es su propio chip). Para $47.600 → 50.000, 60.000, 100.000.
  */
-export function sugerenciasEfectivo(total: number, maximo = 4): number[] {
+export function sugerenciasEfectivo(total: number, maximo = 3): number[] {
   if (total <= 0) return [];
-  const montos = new Set<number>([total]);
-  for (const billete of REDONDEOS) {
-    if (montos.size >= maximo) break;
-    montos.add(Math.ceil(total / billete) * billete);
+  const montos = new Set<number>();
+  for (const billete of BILLETES) {
+    const monto = Math.ceil(total / billete) * billete;
+    if (monto > total) montos.add(monto);
   }
-  return [...montos].sort((a, b) => a - b);
+  return [...montos].sort((a, b) => a - b).slice(0, maximo);
 }
 
 /** Lo que se devuelve al cliente; nunca negativo. */
