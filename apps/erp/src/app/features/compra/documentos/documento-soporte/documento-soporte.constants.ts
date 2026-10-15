@@ -4,6 +4,8 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /** Endpoint `seleccionar` de métodos de pago. */
 export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
+/** Código DIAN del método de pago "Instrumento no definido": el que se sugiere en alta. */
+export const METODO_PAGO_NO_DEFINIDO = '1';
 /** Endpoint `seleccionar` de formas de pago. */
 export const FORMA_PAGO_ENDPOINT = '/general/forma-pago/seleccionar/';
 /** Endpoint `seleccionar` de resoluciones (se filtra a las de compra vía `params`). */

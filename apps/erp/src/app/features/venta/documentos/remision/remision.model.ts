@@ -11,8 +11,11 @@
  * Sin plazo/vencimiento/método de pago. El almacén de la cabecera es el general
  * del documento: precarga el de cada línea nueva, que puede diferir.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una remisión. */
 export interface RemisionRead extends DocumentoReadBase {

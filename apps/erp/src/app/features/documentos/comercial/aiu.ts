@@ -1,11 +1,12 @@
-import { calcularImpuestosLinea, redondearMoneda } from '@reddoc/core';
 import {
+  calcularImpuestosLinea,
+  redondearMoneda,
   toItemOption,
   type ItemOption,
-} from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import type { Item } from '@erp/features/general/masters/item/item.model';
-import { tasasDelItem } from './comercial-documento-detalle.mapper';
-import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
+  type Item,
+  tasasDelItem,
+  type ComercialDetalleFormRawValue,
+} from '@reddoc/core';
 
 /**
  * **AIU** (Administración, Imprevistos y Utilidad): esquema de los contratos de

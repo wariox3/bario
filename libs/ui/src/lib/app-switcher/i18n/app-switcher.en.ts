@@ -7,5 +7,6 @@ export const appSwitcherEn: AppSwitcherDict = {
   apps: {
     erp: { name: 'ERP', description: 'Manage your company' },
     turnos: { name: 'Turnos', description: 'Shift management' },
+    pos: { name: 'POS', description: 'Point of sale' },
   },
 };

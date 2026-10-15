@@ -1,5 +1,4 @@
-import type { ErpSelectOption } from '@reddoc/core';
-import type { Item, ItemImpuesto, ItemPayload } from './item.model';
+import type { ErpSelectOption, Item, ItemImpuesto, ItemPayload } from '@reddoc/core';
 import type { ItemFormRawValue } from './pages/item-form/item-form.types';
 
 /** Reagrupa el id del FK de cuenta + su `*_nombre`/`*_codigo` en un `ErpSelectOption`. */

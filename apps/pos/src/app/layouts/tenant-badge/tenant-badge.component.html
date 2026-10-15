@@ -1,0 +1,10 @@
+@if (nombre()) {
+  <div
+    class="tenant-badge"
+    role="img"
+    [attr.aria-label]="t().layout.tenantBadge.ariaLabel + ': ' + nombre()"
+  >
+    <span class="tenant-badge__mono" aria-hidden="true">{{ inicial() }}</span>
+    <span class="tenant-badge__name" [title]="nombre()">{{ nombre() }}</span>
+  </div>
+}

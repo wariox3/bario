@@ -1,5 +1,5 @@
 import type { Contacto } from './contacto.model';
-import { TIPO_PERSONA } from './contacto.constants';
+import { TIPO_PERSONA } from '@reddoc/core';
 
 /**
  * Formato de lectura de un contacto, compartido por las fichas que lo muestran.

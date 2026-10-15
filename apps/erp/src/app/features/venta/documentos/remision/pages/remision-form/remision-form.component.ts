@@ -30,6 +30,9 @@ import {
   startOfToday,
   TenantService,
   ToastService,
+  comercialDetalleToFormValue,
+  type ComercialDetalleRead,
+  precioListaDeContacto,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -53,9 +56,6 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import { precioListaDeContacto } from '@erp/features/documentos/comercial/precio-lista-contacto';
 import { SEDE_ENDPOINT } from '../../remision.constants';
 import { remisionToFormValue, formValueToPayload } from '../../remision.mapper';
 import type { RemisionRead } from '../../remision.model';

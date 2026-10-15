@@ -16,7 +16,7 @@ import type { SentryConfig } from './observabilidad';
  * app: se usa como clave de i18n, para excluir la app actual de su propia lista
  * (`CURRENT_APP`) y para resolver su URL en `ReddocEnvironment`.
  */
-export type ReddocAppId = 'erp' | 'turnos';
+export type ReddocAppId = 'erp' | 'turnos' | 'pos';
 
 export interface ReddocEnvironment {
   apiUrl: string;
@@ -26,6 +26,7 @@ export interface ReddocEnvironment {
   /** URLs de las apps hermanas. Ausente = esa app no se muestra en el switcher. */
   erpUrl?: string;
   turnosUrl?: string;
+  posUrl?: string;
   wompiPublicKey?: string;
   /**
    * Origen al que Wompi va a devolver al usuario tras el checkout (`redirect-url`).

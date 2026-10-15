@@ -16,9 +16,9 @@ import { TESORERIA_MODULE } from '@erp/features/tesoreria/tesoreria.module-descr
 import { TESORERIA_ROUTES } from '@erp/features/tesoreria/tesoreria.routes';
 import { VENTA_MODULE } from '@erp/features/venta/venta.module-descriptor';
 import { VENTA_ROUTES } from '@erp/features/venta/venta.routes';
-import type { ModeloId } from './modelo.catalog';
 import { PERMISSION_ROUTE_DATA_KEY } from './permission.guard';
 import type { SidebarSection } from '../erp-modules/sidebar-menu.types';
+import type { ModeloId } from '@reddoc/core';
 
 /**
  * El invariante que ningún tipo puede sostener: **menú y ruta tienen que

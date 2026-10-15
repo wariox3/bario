@@ -2,12 +2,9 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
+import { FormErrorService, I18nService, ToastService, type ItemOption } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import {
-  ErpItemAutocompleteComponent,
-  type ItemOption,
-} from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ConfiguracionService } from '../../configuracion.service';
 import { VENTA_AIU_CAMPOS } from '../../configuracion.constants';
 import { configuracionToVentaAiuForm, ventaAiuFormToPayload } from '../../configuracion.mapper';

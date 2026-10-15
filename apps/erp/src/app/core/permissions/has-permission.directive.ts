@@ -1,7 +1,6 @@
 import { Directive, TemplateRef, ViewContainerRef, effect, inject, input } from '@angular/core';
 import { PermissionsService } from './permissions.service';
-import type { ModeloId } from './modelo.catalog';
-import type { PermissionAction } from './permission.types';
+import type { ModeloId, PermissionAction } from '@reddoc/core';
 
 /**
  * Renderiza su contenido solo si el usuario tiene el permiso.

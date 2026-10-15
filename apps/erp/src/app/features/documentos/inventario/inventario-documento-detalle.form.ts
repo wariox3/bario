@@ -1,6 +1,5 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import type { ErpSelectOption } from '@reddoc/core';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+import type { ErpSelectOption, ItemOption } from '@reddoc/core';
 import type {
   InventarioDetalleFormRawValue,
   OperacionInventario,

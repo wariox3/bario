@@ -27,14 +27,19 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { I18nService, calcularImpuestosLinea, toHora, type TasaImpuesto } from '@reddoc/core';
+import {
+  I18nService,
+  calcularImpuestosLinea,
+  toHora,
+  type TasaImpuesto,
+  ItemService,
+  type Item,
+} from '@reddoc/core';
 import { FieldErrorComponent, MascaraFechaDirective } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import type { AppDict } from '@erp/i18n';
-import { ItemService } from '@erp/features/general/masters/item/item.service';
-import type { Item } from '@erp/features/general/masters/item/item.model';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { MODALIDAD_ENDPOINT, PUESTO_ENDPOINT } from '../../servicio-documento.constants';
 import { createDetalleGroup, type DetalleGroup } from '../../servicio-documento-detalle.form';

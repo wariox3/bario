@@ -1,0 +1,547 @@
+@let tx = t().caja.cobro;
+@let faseActual = fase();
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event && cerrar()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [closeOnEscape]="false"
+  [dismissableMask]="false"
+  [style]="{ width: '460px', maxWidth: '94vw' }"
+  styleClass="pos-cobro-dialog"
+  appendTo="body"
+>
+  <!-- ── Cabecera: de qué venta y de quién, y la cifra ─────────────────────── -->
+  <div class="px-6 pt-5">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        @if (encabezado(); as enc) {
+          <p
+            class="m-0 truncate text-[11px] font-semibold uppercase tracking-[0.06em] text-[#8fa4b8]"
+          >
+            {{ enc.venta }}
+            @if (enc.cliente) {
+              · {{ enc.cliente }}
+            }
+          </p>
+          @if (enc.identificacion && vista() === 'cobro') {
+            <p class="m-0 mt-0.5 text-xs tabular-nums text-[#8fa4b8]">{{ enc.identificacion }}</p>
+          }
+        }
+      </div>
+      <button
+        type="button"
+        class="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#8fa4b8] transition-colors hover:bg-[#f2f4f7] hover:text-brand-text disabled:opacity-40"
+        [attr.aria-label]="tx.cerrar"
+        [disabled]="procesando()"
+        (click)="cerrar()"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+
+    @if (vista() === 'cobro') {
+      <p class="m-0 mt-3.5 text-[13px] text-[#526680]">{{ tx.total }}</p>
+      <p
+        class="m-0 mt-0.5 text-[40px] font-bold leading-[1.1] tracking-[-0.01em] tabular-nums text-brand-text"
+      >
+        {{ formatear(total()) }}
+      </p>
+    }
+  </div>
+
+  @switch (vista()) {
+    <!-- ── Cobro ─────────────────────────────────────────────────────────── -->
+    @case ('cobro') {
+      @let ef = tx.efectivo;
+      <form [formGroup]="form" libFocusInvalid (ngSubmit)="onCobrar()">
+        <div class="grid gap-[18px] px-6 py-5">
+          <!-- Medio de pago: cuatro tarjetas con su atajo F1–F4. -->
+          <div>
+            <p class="m-0 mb-2 text-xs font-semibold text-[#526680]">{{ tx.medio }}</p>
+            <div class="grid grid-cols-4 gap-2" role="radiogroup" [attr.aria-label]="tx.medio">
+              @for (m of medios; track m.id; let i = $index) {
+                @let activo = m.id === medio().id;
+                <button
+                  type="button"
+                  role="radio"
+                  class="relative grid h-[68px] place-items-center content-center gap-1 rounded-xl border-[1.5px] text-xs font-semibold transition-colors"
+                  [class]="
+                    activo
+                      ? 'border-brand-blue bg-[#e8f6ff] text-brand-blue'
+                      : m.habilitado
+                        ? 'border-[#e9edf2] bg-white text-[#526680] hover:border-[#c9d6e2]'
+                        : 'cursor-not-allowed border-[#f2f4f7] bg-[#fbfcfd] text-[#c9d6e2]'
+                  "
+                  [attr.aria-checked]="activo"
+                  [attr.aria-keyshortcuts]="'F' + (i + 1)"
+                  [title]="m.habilitado ? '' : tx.medios.proximamente"
+                  [disabled]="procesando() || !m.habilitado"
+                  (click)="elegirMedio(m)"
+                >
+                  @switch (m.id) {
+                    @case ('efectivo') {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        aria-hidden="true"
+                      >
+                        <rect x="2" y="6" width="20" height="12" rx="2" />
+                        <circle cx="12" cy="12" r="2.5" />
+                        <path d="M6 10v4M18 10v4" />
+                      </svg>
+                    }
+                    @case ('tarjetaCredito') {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        aria-hidden="true"
+                      >
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20M6 15h4" />
+                      </svg>
+                    }
+                    @case ('tarjetaDebito') {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        aria-hidden="true"
+                      >
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <rect x="5" y="9" width="5" height="4" rx="1" />
+                        <path d="M14 15h4" />
+                      </svg>
+                    }
+                    @case ('transferencia') {
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18" />
+                      </svg>
+                    }
+                  }
+                  <span>{{ tx.medios[m.id] }}</span>
+                  <span
+                    class="absolute right-[5px] top-[5px] text-[10px] font-semibold leading-4 text-[#8fa4b8]"
+                    aria-hidden="true"
+                    >F{{ i + 1 }}</span
+                  >
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (medio().id === 'efectivo') {
+            <!-- Lo recibido: el único dato que se escribe. -->
+            <div>
+              <label for="cobro-recibido" class="mb-2 block text-xs font-semibold text-[#526680]">
+                {{ ef.recibido }}
+              </label>
+              <div class="relative">
+                <span
+                  class="pointer-events-none absolute left-4 top-1/2 z-[1] -translate-y-1/2 text-[22px] font-semibold text-[#8fa4b8]"
+                  aria-hidden="true"
+                  >$</span
+                >
+                <p-inputnumber
+                  inputId="cobro-recibido"
+                  formControlName="recibido"
+                  mode="decimal"
+                  locale="es-CO"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="0"
+                  [fluid]="true"
+                  [autofocus]="true"
+                  inputStyleClass="!h-14 !rounded-xl !border-[1.5px] !border-[#e9edf2] !pl-9 !pr-4 !text-right !text-2xl !font-bold !tabular-nums !shadow-none focus:!border-brand-blue focus:!shadow-[0_0_0_4px_#e8f6ff]"
+                />
+              </div>
+              <lib-field-error
+                [control]="form.controls.recibido"
+                [messages]="{ insuficiente: ef.recibidoMinimo }"
+              />
+              <div class="mt-2 flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  class="h-[34px] rounded-lg border px-3 text-[13px] font-semibold transition-colors"
+                  [class]="recibidoActual() === total() ? chipActivo : chipReposo"
+                  [disabled]="procesando()"
+                  (click)="usarMonto(total())"
+                >
+                  {{ ef.exacto }}
+                </button>
+                @for (monto of sugerencias(); track monto) {
+                  <button
+                    type="button"
+                    class="h-[34px] rounded-lg border px-3 text-[13px] font-semibold tabular-nums transition-colors"
+                    [class]="recibidoActual() === monto ? chipActivo : chipReposo"
+                    [disabled]="procesando()"
+                    (click)="usarMonto(monto)"
+                  >
+                    {{ formatear(monto) }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Cambio a entregar o lo que falta: el color dice cuál de los dos. -->
+            <div
+              class="flex items-center justify-between rounded-xl px-4 py-3.5"
+              [class]="
+                faltante() > 0 ? 'bg-[#fdf3e1] text-[#b45309]' : 'bg-[#e7f6ec] text-[#15803d]'
+              "
+              aria-live="polite"
+            >
+              <span class="font-semibold">{{
+                faltante() > 0 ? ef.faltaRecibir : ef.cambioEntregar
+              }}</span>
+              <span class="text-[26px] font-bold tabular-nums">
+                {{ formatear(faltante() > 0 ? faltante() : cambioEfectivo()) }}
+              </span>
+            </div>
+          } @else {
+            @if (medio().id === 'transferencia') {
+              <!-- Transferencia: el total entra completo a la cuenta destino. -->
+              <div class="grid gap-2.5">
+                <div>
+                  <label
+                    for="cobro-referencia"
+                    class="mb-2 block text-xs font-semibold text-[#526680]"
+                  >
+                    {{ tx.transferencia.referencia }}
+                  </label>
+                  <input
+                    id="cobro-referencia"
+                    type="text"
+                    formControlName="referencia"
+                    autocomplete="off"
+                    maxlength="60"
+                    class="h-11 w-full rounded-xl border-[1.5px] border-[#e9edf2] bg-white px-3.5 text-brand-text outline-none placeholder:text-[#c9d6e2] focus:border-brand-blue focus:shadow-[0_0_0_4px_#e8f6ff]"
+                    [placeholder]="tx.transferencia.referenciaPlaceholder"
+                  />
+                </div>
+              </div>
+              <div
+                class="flex items-center justify-between rounded-xl bg-[#e8f6ff] px-4 py-3.5 text-[#0369a1]"
+              >
+                <span class="font-semibold">{{ tx.transferencia.aRecibir }}</span>
+                <span class="text-[26px] font-bold tabular-nums">{{ formatear(total()) }}</span>
+              </div>
+            } @else {
+              <!--
+                Tarjetas: hoy no se pueden elegir (botón deshabilitado). El formulario
+                queda listo para cuando se habiliten en medios-pago.ts.
+              -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <p class="m-0 mb-2 text-xs font-semibold text-[#526680]">
+                    {{ tx.tarjeta.datafono }}
+                  </p>
+                  <div
+                    class="flex h-11 items-center rounded-xl border-[1.5px] border-[#e9edf2] bg-[#fbfcfd] px-3.5 text-[#c9d6e2]"
+                  >
+                    {{ tx.tarjeta.datafonoPlaceholder }}
+                  </div>
+                </div>
+                <div>
+                  <label
+                    for="cobro-aprobacion"
+                    class="mb-2 block text-xs font-semibold text-[#526680]"
+                  >
+                    {{ tx.tarjeta.aprobacion }}
+                  </label>
+                  <input
+                    id="cobro-aprobacion"
+                    type="text"
+                    disabled
+                    class="h-11 w-full rounded-xl border-[1.5px] border-[#e9edf2] bg-[#fbfcfd] px-3.5 tabular-nums text-[#8fa4b8] placeholder:text-[#c9d6e2]"
+                    placeholder="000000"
+                  />
+                </div>
+              </div>
+              <p
+                class="m-0 flex items-center gap-2 rounded-xl bg-[#f2f4f7] px-3.5 py-2.5 text-xs text-[#526680]"
+              >
+                <i class="pi pi-info-circle text-[0.8rem]" aria-hidden="true"></i>
+                {{ tx.noDisponible }}
+              </p>
+            }
+          }
+
+          <!--
+            Cuenta y asesor de esta venta, siempre a la vista: vienen de la caja y se
+            cambian aquí mismo si hace falta. La cuenta es la del medio elegido.
+          -->
+          <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <div>
+              <label for="cobro-cuenta" class="mb-2 block text-xs font-semibold text-[#526680]">
+                {{ tx.ingreso.cuenta }}
+              </label>
+              <lib-api-select
+                inputId="cobro-cuenta"
+                formControlName="cuenta"
+                [endpoint]="cuentaEndpoint"
+                [invalid]="form.controls.cuenta.invalid && form.controls.cuenta.touched"
+              />
+              <lib-field-error [control]="form.controls.cuenta" />
+            </div>
+            <div>
+              <label for="cobro-asesor" class="mb-2 block text-xs font-semibold text-[#526680]">
+                {{ tx.ingreso.asesor }}
+              </label>
+              <lib-asesor-select inputId="cobro-asesor" formControlName="asesor" />
+            </div>
+          </div>
+
+          @if (error(); as mensaje) {
+            <p
+              class="m-0 rounded-xl bg-[#fdecee] px-3.5 py-2.5 text-xs text-[#d92d3a]"
+              role="alert"
+            >
+              {{ mensaje }}
+            </p>
+          }
+        </div>
+
+        <!-- Pie: las acciones. -->
+        <div
+          class="flex items-center justify-end gap-3 border-t border-[#f2f4f7] bg-[#fbfcfd] px-6 py-3.5"
+        >
+          <div class="flex shrink-0 gap-1.5">
+            <button
+              type="button"
+              class="inline-flex h-11 items-center justify-center rounded-[10px] px-[18px] text-sm font-semibold text-[#526680] transition-colors hover:bg-[#f2f4f7] hover:text-brand-text disabled:opacity-50"
+              [disabled]="procesando()"
+              (click)="cerrar()"
+            >
+              {{ t().caja.carrito.cancelar }}
+            </button>
+            <button
+              type="submit"
+              class="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-brand-blue px-[18px] text-sm font-semibold text-white transition-colors hover:bg-[#0086d1] disabled:cursor-not-allowed disabled:bg-[#c9d6e2]"
+              [disabled]="procesando() || !medio().habilitado"
+            >
+              @if (faseActual) {
+                <i class="pi pi-spin pi-spinner text-[0.85rem]" aria-hidden="true"></i>
+                {{ tx.fases[faseActual] }}
+              } @else {
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12l5 5 9-10" />
+                </svg>
+                {{ ef.cobrar }}
+                <span
+                  class="rounded border border-white/40 px-1 text-[10px] font-semibold leading-4"
+                  aria-hidden="true"
+                  >Enter</span
+                >
+              }
+            </button>
+          </div>
+        </div>
+      </form>
+    }
+
+    <!-- ── Éxito ─────────────────────────────────────────────────────────── -->
+    @case ('exito') {
+      @let ex = tx.exito;
+      @if (ventaCobrada(); as venta) {
+        <div class="grid gap-[18px] px-6 py-5">
+          <div class="flex items-center gap-3">
+            <span
+              class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#e7f6ec] text-[#15803d]"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                aria-hidden="true"
+              >
+                <path d="M5 12l5 5 9-10" />
+              </svg>
+            </span>
+            <div class="min-w-0">
+              <p class="m-0 text-[15px] font-bold text-brand-text">{{ ex.titulo }}</p>
+              <p class="m-0 text-xs tabular-nums text-[#526680]">
+                {{ ex.documento }} {{ venta.documentoId }} · {{ ex.total }}
+                {{ formatear(venta.total) }}
+                @if (venta.medio === 'efectivo') {
+                  · {{ ex.recibido }} {{ formatear(venta.recibido) }}
+                }
+              </p>
+            </div>
+          </div>
+          @if (venta.medio === 'efectivo') {
+            <div
+              class="linea flex items-center justify-between rounded-xl bg-[#e7f6ec] px-4 py-3.5 text-[#15803d]"
+            >
+              <span class="font-semibold">{{ tx.efectivo.cambioEntregar }}</span>
+              <span class="text-[26px] font-bold tabular-nums">{{ formatear(venta.cambio) }}</span>
+            </div>
+          } @else {
+            <div
+              class="linea flex items-center justify-between rounded-xl bg-[#e7f6ec] px-4 py-3.5 text-[#15803d]"
+            >
+              <span class="font-semibold">{{ ex.pagado[venta.medio] }}</span>
+              <span class="text-[26px] font-bold tabular-nums">{{ formatear(venta.total) }}</span>
+            </div>
+          }
+        </div>
+        <div
+          class="flex items-center justify-end gap-1.5 border-t border-[#f2f4f7] bg-[#fbfcfd] px-6 py-3.5"
+        >
+          <button
+            type="button"
+            class="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] px-[18px] text-sm font-semibold text-[#526680] transition-colors hover:bg-[#f2f4f7] hover:text-brand-text disabled:opacity-50"
+            [disabled]="imprimiendo()"
+            (click)="onImprimir()"
+          >
+            <i
+              class="pi text-[0.85rem]"
+              [class]="imprimiendo() ? 'pi-spin pi-spinner' : 'pi-print'"
+              aria-hidden="true"
+            ></i>
+            {{ ex.imprimir }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-brand-blue px-[18px] text-sm font-semibold text-white transition-colors hover:bg-[#0086d1]"
+            [pAutoFocus]="true"
+            (click)="cerrar()"
+          >
+            {{ ex.nuevaVenta }}
+            <span
+              class="rounded border border-white/40 px-1 text-[10px] font-semibold leading-4"
+              aria-hidden="true"
+              >Enter</span
+            >
+          </button>
+        </div>
+      }
+    }
+
+    <!-- ── Pendiente ─────────────────────────────────────────────────────── -->
+    @case ('pendiente') {
+      @let pe = tx.pendiente;
+      @if (cobroPendiente(); as pendiente) {
+        <div class="grid gap-[18px] px-6 py-5">
+          <div class="flex items-center gap-3">
+            <span
+              class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#fdf3e1] text-[#b45309]"
+            >
+              <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+            </span>
+            <div class="min-w-0">
+              <p class="m-0 text-[15px] font-bold text-brand-text">{{ pe.titulo }}</p>
+              <p class="m-0 text-xs text-[#526680]">{{ pe.desc }}</p>
+            </div>
+          </div>
+          <div class="grid rounded-xl border border-[#e9edf2] text-[13px]">
+            <div class="flex items-center justify-between px-3.5 py-2.5">
+              <span class="text-[#526680]">{{ pe.documento }}</span>
+              <span class="font-semibold tabular-nums text-brand-text">{{
+                pendiente.documentoId
+              }}</span>
+            </div>
+            <div class="flex items-center justify-between border-t border-[#f2f4f7] px-3.5 py-2.5">
+              <span class="text-[#526680]">{{ pe.pago }}</span>
+              <span
+                class="font-semibold"
+                [class]="pendiente.pagado ? 'text-[#15803d]' : 'text-[#b45309]'"
+              >
+                {{ pendiente.pagado ? pe.hecho : pe.falta }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between border-t border-[#f2f4f7] px-3.5 py-2.5">
+              <span class="text-[#526680]">{{ pe.aprobacion }}</span>
+              <span class="font-semibold text-[#b45309]">{{ pe.falta }}</span>
+            </div>
+          </div>
+          @if (sinValor()) {
+            <!-- Reintentar no puede funcionar: el backend no acepta un pago de $0. -->
+            <p
+              class="m-0 rounded-xl bg-[#fdf3e1] px-3.5 py-2.5 text-xs leading-relaxed text-[#b45309]"
+              role="alert"
+            >
+              {{ pe.sinValor }}
+            </p>
+          } @else if (error(); as mensaje) {
+            <p
+              class="m-0 rounded-xl bg-[#fdecee] px-3.5 py-2.5 text-xs text-[#d92d3a]"
+              role="alert"
+            >
+              {{ mensaje }}
+            </p>
+          }
+        </div>
+        <div
+          class="flex items-center justify-between gap-1.5 border-t border-[#f2f4f7] bg-[#fbfcfd] px-6 py-3.5"
+        >
+          <button
+            type="button"
+            class="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] px-[18px] text-sm font-semibold text-[#d92d3a] transition-colors hover:bg-[#fdecee] disabled:opacity-50"
+            [disabled]="procesando()"
+            (click)="onDescartar()"
+          >
+            @if (descartando()) {
+              <i class="pi pi-spin pi-spinner text-[0.85rem]" aria-hidden="true"></i>
+            }
+            {{ pe.descartar }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-brand-blue px-[18px] text-sm font-semibold text-white transition-colors hover:bg-[#0086d1] disabled:cursor-not-allowed disabled:bg-[#c9d6e2]"
+            [disabled]="procesando() || sinValor()"
+            (click)="onReintentar()"
+          >
+            <i
+              class="pi text-[0.85rem]"
+              [class]="faseActual ? 'pi-spin pi-spinner' : 'pi-refresh'"
+              aria-hidden="true"
+            ></i>
+            {{ faseActual ? tx.fases[faseActual] : pe.reintentar }}
+          </button>
+        </div>
+      }
+    }
+  }
+</p-dialog>

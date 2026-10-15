@@ -1,0 +1,38 @@
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().layout.nav.historial">
+  <lib-data-toolbar
+    toolbar
+    [searchEnabled]="true"
+    [searchPlaceholderKey]="'historial.buscar'"
+    [searchValue]="searchValue()"
+    [filtersEnabled]="true"
+    [activeFiltersCount]="activeFilters().length"
+    [refreshEnabled]="true"
+    (searched)="onSearch($event)"
+    (filtersToggle)="filtersVisible.set(true)"
+    (filtersClear)="clearFilters()"
+    (refresh)="cargar()"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    [rowActions]="rowActions"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>

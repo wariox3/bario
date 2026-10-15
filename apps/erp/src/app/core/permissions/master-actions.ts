@@ -1,9 +1,8 @@
 import { type Signal, computed, inject } from '@angular/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
-import type { ModeloId } from './modelo.catalog';
 import { PermissionsService } from './permissions.service';
 import { visibleActions, visiblePrimaryAction } from './action-visibility';
-import type { PermissionAction } from './permission.types';
+import type { ModeloId, PermissionAction } from '@reddoc/core';
 
 /** Las acciones declarativas de una página de lista, tal como las define su master. */
 export interface MasterActionsConfig {

@@ -11,8 +11,11 @@
  * Suma a la cabecera el plazo/forma de pago, el centro de costo, la sede, la
  * orden de compra y el comentario.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de compra recurrente. */
 export interface FacturaCompraRecurrenteRead extends DocumentoReadBase {

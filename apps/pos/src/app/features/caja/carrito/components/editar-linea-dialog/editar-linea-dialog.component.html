@@ -1,0 +1,92 @@
+@let tx = t().caja.carrito.editar;
+<p-dialog
+  [visible]="linea() !== null"
+  (visibleChange)="!$event && cerrar.emit()"
+  [modal]="true"
+  [style]="{ width: '24rem' }"
+  [breakpoints]="{ '576px': '92vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-pencil text-[1.05rem]" aria-hidden="true"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ tx.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] text-brand-muted">{{ linea()?.item?.nombre }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form
+    #formulario
+    [formGroup]="form"
+    libFocusInvalid
+    (ngSubmit)="onSubmit()"
+    class="flex flex-col gap-4"
+  >
+    <div class="flex flex-col gap-1.5">
+      <label for="editar-precio" class="text-[0.8rem] font-medium text-brand-text">
+        {{ tx.precio }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-inputnumber
+        inputId="editar-precio"
+        formControlName="precio"
+        mode="currency"
+        currency="COP"
+        locale="es-CO"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="2"
+        [fluid]="true"
+        [invalid]="form.controls.precio.invalid && form.controls.precio.touched"
+      />
+      <lib-field-error [control]="form.controls.precio" [messages]="{ min: tx.precioMin }" />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="editar-cantidad" class="text-[0.8rem] font-medium text-brand-text">
+        {{ tx.cantidad }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <p-inputnumber
+        inputId="editar-cantidad"
+        formControlName="cantidad"
+        [min]="1"
+        [useGrouping]="false"
+        [fluid]="true"
+        [invalid]="form.controls.cantidad.invalid && form.controls.cantidad.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.cantidad"
+        [messages]="{
+          min: tx.cantidadMin,
+          max: tx.cantidadMax + ' (' + (linea()?.disponible ?? '') + ')',
+        }"
+      />
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      type="button"
+      [label]="tx.cancelar"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cerrar.emit()"
+    />
+    <p-button
+      type="button"
+      [label]="tx.guardar"
+      icon="pi pi-check"
+      (onClick)="formulario.requestSubmit()"
+    />
+  </ng-template>
+</p-dialog>

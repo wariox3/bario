@@ -18,12 +18,12 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  ItemService,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
-import { ItemService } from '../../item.service';
 import { ITEM_LIST_PATH } from '../../item.constants';
 import { formValueToPayload, itemToFormValue } from '../../item.mapper';
 

@@ -1,8 +1,10 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import type { ErpSelectOption, ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import type { ComercialDetalleFormRawValue } from './comercial-documento-detalle.types';
-import { recomputeImpuestosLinea } from './comercial-documento-detalle.mapper';
+import {
+  type ItemOption,
+  type ComercialDetalleFormRawValue,
+  recomputeImpuestosLinea,
+} from '@reddoc/core';
 
 /** `FormGroup` tipado de una línea de detalle comercial. */
 export type ComercialDetalleGroup = FormGroup<{

@@ -10,8 +10,11 @@
  * de compra) y suma a la cabecera el **documento de referencia** (la factura de
  * compra que la nota ajusta), el centro de costo y el comentario.
  */
-import type { DocumentoPayloadBase, DocumentoReadBase } from '@reddoc/core';
-import type { ComercialDetallePayload } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  ComercialDetallePayload,
+} from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una nota crédito de compra. */
 export interface NotaCreditoCompraRead extends DocumentoReadBase {

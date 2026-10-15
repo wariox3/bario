@@ -6,18 +6,21 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService, extractErrorMessage } from '@reddoc/core';
 import {
-  ErpItemAutocompleteComponent,
+  I18nService,
+  ToastService,
+  extractErrorMessage,
   type ItemOption,
-} from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
+  PrecioDetalleService,
+  type PrecioDetalle,
+  precioDetalleToItemOption,
+  toPrecioDetallePayload,
+} from '@reddoc/core';
+import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
-import { PrecioDetalleService } from '../../precio-detalle.service';
-import type { PrecioDetalle } from '../../precio-detalle.model';
-import { precioDetalleToItemOption, toPrecioDetallePayload } from '../../precio-detalle.mapper';
 import { VR_PRECIO_MAX } from '../../precio.constants';
 
 /**

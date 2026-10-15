@@ -1,4 +1,4 @@
-import type { ActionPredicate, PermissionAction } from './permission.types';
+import type { ActionPredicate, PermissionAction } from '@reddoc/core';
 
 /**
  * Acción de UI → acción de permiso.

@@ -124,6 +124,27 @@ export {
   HttpEntityDataGateway,
   DocumentoDetalleService,
   documentoContactoToOption,
+  lineBruto,
+  lineDescuento,
+  lineBase,
+  lineImpuesto,
+  lineNeto,
+  recomputeImpuestosLinea,
+  precioUnitarioConImpuestos,
+  precioUnitarioSinImpuestos,
+  toLineaCalculo,
+  tasasDelItem,
+  comercialDetalleToFormValue,
+  lineaReferenciaToFormValue,
+  comercialDetalleToPayload,
+  totalCantidad,
+  precioListaDeContacto,
+  calcularPagos,
+  CUENTA_BANCO_ENDPOINT,
+  DOCUMENTO_PAGO_ENDPOINT,
+  DocumentoPagoService,
+  posDocumentoToFormValue,
+  posDocumentoToPayload,
 } from './lib/documento';
 export type {
   EntityKind,
@@ -139,7 +160,26 @@ export type {
   DocumentTypeKey,
   EntityDataGateway,
   DocumentoContactoRead,
+  ComercialDetalleRead,
+  ComercialDetallePayload,
+  ComercialDetalleFormRawValue,
+  PagoRead,
+  PagoPayload,
+  PagoCalculable,
+  ResumenPagos,
+  PosDocumentoRead,
+  PosDocumentoPayload,
+  PosDocumentoValores,
 } from './lib/documento';
+export type { Item, ItemImpuesto, ItemPayload, ItemOption, ItemApiRow } from './lib/item';
+export { ITEM_SELECCIONAR_ENDPOINT, toItemOption, ItemService } from './lib/item';
+export type { PrecioDetalle, PrecioDetalleApi, PrecioDetallePayload } from './lib/precio';
+export {
+  toPrecioDetalle,
+  precioDetalleToItemOption,
+  toPrecioDetallePayload,
+  PrecioDetalleService,
+} from './lib/precio';
 export {
   toProgramacionFecha,
   esColumnaFestiva,
@@ -224,3 +264,16 @@ export type { NormalizedError, ApiErrorKind } from './lib/utils/error-normalizer
 export { applyServerErrors, clearServerError } from './lib/utils/form-errors';
 export type { ServerFieldMap, ApplyServerErrorsResult } from './lib/utils/form-errors';
 export { FormErrorService } from './lib/services/form-error.service';
+export {
+  TIPO_PERSONA,
+  calcularDigitoVerificacion,
+  construirNombreCorto,
+  numeroIdentificacionUnicoValidator,
+} from './lib/contacto';
+export type {
+  NombresInput,
+  NumeroIdentificacionSnapshot,
+  ValidarIdentificacion,
+} from './lib/contacto';
+export { MODELO, PERMISO_APPS, ModelPermissionsService } from './lib/permisos';
+export type { ActionPredicate, ModelGrants, ModeloId, PermissionAction } from './lib/permisos';

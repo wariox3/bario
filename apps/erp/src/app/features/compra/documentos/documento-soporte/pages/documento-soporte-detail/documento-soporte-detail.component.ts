@@ -13,6 +13,10 @@ import {
   resolucionTexto,
   type ResumenDocumento,
   type DocumentoEstados,
+  comercialDetalleToFormValue,
+  toLineaCalculo,
+  type ComercialDetalleRead,
+  type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
 import { DIAN_DOCUMENT_URL } from '@erp/features/documentos/dian-document-url';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -31,12 +35,6 @@ import { DocumentDetailActionsComponent } from '@erp/core/module-config/componen
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
 import { DocumentoElectronicoMenuComponent } from '@erp/features/documentos/electronico/components/documento-electronico-menu/documento-electronico-menu.component';
-import {
-  comercialDetalleToFormValue,
-  toLineaCalculo,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
-import type { ComercialDetalleFormRawValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.types';
 import { documentoSoporteToFormValue } from '../../documento-soporte.mapper';
 import type { DocumentoSoporteRead } from '../../documento-soporte.model';
 

@@ -1,0 +1,115 @@
+@let tx = t().caja.tabs;
+<div
+  class="flex items-center gap-1 overflow-x-auto pb-0.5"
+  role="tablist"
+  [attr.aria-label]="tx.label"
+>
+  @for (carrito of store.carritos(); track carrito.uuid) {
+    @let activa = carrito.uuid === store.activo().uuid;
+    <div
+      class="flex shrink-0 items-center rounded-lg border transition-colors"
+      [class]="
+        activa
+          ? 'border-[rgba(20,48,73,0.18)] bg-brand-surface'
+          : 'border-transparent hover:bg-[rgba(20,48,73,0.04)]'
+      "
+    >
+      <button
+        type="button"
+        role="tab"
+        class="flex items-center gap-2 py-1.5 pl-3 pr-1 text-[0.8rem]"
+        [class]="activa ? 'font-semibold text-brand-text' : 'font-medium text-brand-muted'"
+        [attr.aria-selected]="activa"
+        (click)="store.seleccionar(carrito.uuid)"
+      >
+        <span class="max-w-40 truncate">{{ carrito.nombre }}</span>
+        @if (carrito.lineas.length > 0) {
+          <span
+            class="rounded-full bg-[rgba(20,48,73,0.08)] px-1.5 font-mono text-[0.68rem] tabular-nums"
+          >
+            {{ carrito.lineas.length }}
+          </span>
+        }
+      </button>
+      <button
+        type="button"
+        class="mr-1 flex h-6 w-6 items-center justify-center rounded-md text-brand-muted hover:bg-[rgba(20,48,73,0.08)] hover:text-brand-text"
+        [attr.aria-label]="tx.opciones + ': ' + carrito.nombre"
+        (click)="abrirOpciones($event, carrito)"
+      >
+        <i class="pi pi-ellipsis-v text-[0.7rem]"></i>
+      </button>
+    </div>
+  }
+  <button
+    type="button"
+    class="flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[0.8rem] font-medium text-brand-muted hover:bg-[rgba(20,48,73,0.06)] hover:text-brand-text"
+    aria-keyshortcuts="F4"
+    [title]="tx.atajoNueva"
+    (click)="store.nueva()"
+  >
+    <i class="pi pi-plus text-[0.75rem]"></i>
+    {{ tx.nueva }}
+  </button>
+</div>
+
+<p-menu #menu [popup]="true" [model]="opciones()" appendTo="body" />
+
+<p-dialog
+  [visible]="renombrando() !== null"
+  (visibleChange)="!$event && renombrando.set(null)"
+  [modal]="true"
+  [style]="{ width: '22rem' }"
+  [breakpoints]="{ '576px': '92vw' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-pencil text-[1.05rem]" aria-hidden="true"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ tx.renombrar }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] text-brand-muted">{{ tx.renombrarSubtitulo }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form #formulario (ngSubmit)="guardarNombre()" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <label for="nombre-venta" class="text-[0.8rem] font-medium text-brand-text">
+        {{ tx.nombre }}
+      </label>
+      <input
+        pInputText
+        id="nombre-venta"
+        name="nombre"
+        maxlength="40"
+        autocomplete="off"
+        [(ngModel)]="nombre"
+        class="w-full"
+      />
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      type="button"
+      [label]="t().caja.carrito.cancelar"
+      severity="secondary"
+      [text]="true"
+      (onClick)="renombrando.set(null)"
+    />
+    <p-button
+      type="button"
+      [label]="tx.guardar"
+      icon="pi pi-check"
+      (onClick)="formulario.requestSubmit()"
+    />
+  </ng-template>
+</p-dialog>

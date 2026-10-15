@@ -18,6 +18,9 @@ import {
   SELECT_ENDPOINTS,
   TenantService,
   ToastService,
+  TIPO_PERSONA,
+  type NumeroIdentificacionSnapshot,
+  numeroIdentificacionUnicoValidator,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpApiSelectComponent } from '@reddoc/ui';
@@ -25,11 +28,6 @@ import type { ErpSelectOption } from '@reddoc/core';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '@erp/features/general/masters/contacto/contacto.service';
-import { TIPO_PERSONA } from '@erp/features/general/masters/contacto/contacto.constants';
-import {
-  type NumeroIdentificacionSnapshot,
-  numeroIdentificacionUnicoValidator,
-} from '@erp/features/general/masters/contacto/validators/numero-identificacion-unico.validator';
 import { EMPLEADO_LIST_PATH } from '../../empleado.constants';
 import { empleadoToFormValue, formValueToPayload } from '../../empleado.mapper';
 
@@ -180,7 +178,7 @@ export class EmpleadoFormComponent implements OnInit {
 
     controls.numero_identificacion.addAsyncValidators(
       numeroIdentificacionUnicoValidator(
-        this.contactoService,
+        (datos) => this.contactoService.validar(datos),
         () => controls.identificacion.value?.id ?? null,
         () => this.originalIdentificacion(),
       ),

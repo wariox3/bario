@@ -1,0 +1,189 @@
+@let tx = t().caja.item;
+@let f = form.controls;
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event && cerrar()"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '576px': '94vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!guardando()"
+  [closeOnEscape]="!guardando()"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i
+          class="pi text-[1.05rem]"
+          [class]="editando() ? 'pi-pencil' : 'pi-box'"
+          aria-hidden="true"
+        ></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ editando() ? tx.tituloEditar : tx.titulo }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] text-brand-muted">
+          {{ editando() ? tx.subtituloEditar : tx.subtitulo }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form
+    #formulario
+    [formGroup]="form"
+    libFocusInvalid
+    (ngSubmit)="onSubmit()"
+    class="flex flex-col gap-4"
+  >
+    <div class="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+      <div class="flex flex-col gap-1.5">
+        <label for="item-codigo" class="text-[0.8rem] font-medium text-brand-text">
+          {{ tx.campos.codigo }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <input
+          pInputText
+          id="item-codigo"
+          formControlName="codigo"
+          autocomplete="off"
+          class="font-mono"
+        />
+        <lib-field-error [control]="f.codigo" />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="item-precio" class="text-[0.8rem] font-medium text-brand-text">
+          {{ tx.campos.precio }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <p-inputnumber
+          inputId="item-precio"
+          formControlName="precio"
+          mode="currency"
+          currency="COP"
+          locale="es-CO"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+          [fluid]="true"
+          [invalid]="f.precio.invalid && f.precio.touched"
+        />
+        <lib-field-error [control]="f.precio" />
+      </div>
+
+      <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <label for="item-nombre" class="text-[0.8rem] font-medium text-brand-text">
+          {{ tx.campos.nombre }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <input pInputText id="item-nombre" formControlName="nombre" autocomplete="off" />
+        <lib-field-error [control]="f.nombre" />
+      </div>
+
+      <!-- Tipo: producto / servicio. Mismo control que el formulario de ítem del ERP. -->
+      <div class="flex flex-col gap-1.5">
+        <span class="text-[0.8rem] font-medium text-brand-text">{{ tx.campos.tipo }}</span>
+        <div
+          class="mt-1 flex flex-wrap gap-x-6 gap-y-2.5"
+          role="radiogroup"
+          [attr.aria-label]="tx.campos.tipo"
+        >
+          <label for="item-tipo-producto" class="flex cursor-pointer items-center gap-2">
+            <p-radiobutton inputId="item-tipo-producto" formControlName="tipo" value="producto" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.tipos.producto }}</span>
+          </label>
+          <label for="item-tipo-servicio" class="flex cursor-pointer items-center gap-2">
+            <p-radiobutton inputId="item-tipo-servicio" formControlName="tipo" value="servicio" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.tipos.servicio }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Opciones: banderas del ítem, junto al tipo como en el ERP. -->
+      <div class="flex flex-col gap-1.5">
+        <span class="text-[0.8rem] font-medium text-brand-text">{{ tx.campos.opciones }}</span>
+        <div class="mt-1 flex flex-wrap gap-x-6 gap-y-2.5">
+          <label for="item-inventario" class="flex cursor-pointer items-center gap-2">
+            <p-checkbox inputId="item-inventario" formControlName="inventario" [binary]="true" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.campos.inventario }}</span>
+          </label>
+          <label for="item-favorito" class="flex cursor-pointer items-center gap-2">
+            <p-checkbox inputId="item-favorito" formControlName="favorito" [binary]="true" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.campos.favorito }}</span>
+          </label>
+          @if (editando()) {
+            <label for="item-inactivo" class="flex cursor-pointer items-center gap-2">
+              <p-checkbox inputId="item-inactivo" formControlName="inactivo" [binary]="true" />
+              <span class="text-[0.85rem] text-brand-text">{{ tx.campos.inactivo }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5 sm:col-span-2">
+        <label for="item-impuestos" class="text-[0.8rem] font-medium text-brand-text">
+          {{ tx.campos.impuestos }}
+        </label>
+        <!--
+          Lo normal es un solo impuesto (el IVA): se cierra al elegir. Para sumar
+          otro se vuelve a abrir; los chips se quitan sin abrirlo.
+        -->
+        <p-multiselect
+          #impuestosSelect
+          inputId="item-impuestos"
+          formControlName="impuestos_ids"
+          [options]="impuestos()"
+          optionLabel="nombre"
+          optionValue="id"
+          display="chip"
+          appendTo="body"
+          [placeholder]="tx.campos.impuestosPlaceholder"
+          [fluid]="true"
+          (onChange)="impuestosSelect.hide()"
+        />
+      </div>
+    </div>
+
+    @if (cargando()) {
+      <p class="m-0 flex items-center gap-2 text-[0.78rem] text-brand-muted" role="status">
+        <i class="pi pi-spin pi-spinner text-[0.75rem]" aria-hidden="true"></i>
+        {{ tx.cargando }}
+      </p>
+    }
+
+    @if (enUso()) {
+      <p class="m-0 rounded-lg bg-[rgba(20,48,73,0.04)] px-3 py-2 text-[0.75rem] text-brand-muted">
+        {{ tx.enUso }}
+      </p>
+    }
+
+    @if (!editando() && f.inventario.value) {
+      <p class="m-0 rounded-lg bg-amber-50 px-3 py-2 text-[0.75rem] text-amber-900">
+        {{ tx.avisoInventario }}
+      </p>
+    }
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      type="button"
+      [label]="t().caja.carrito.cancelar"
+      severity="secondary"
+      [text]="true"
+      [disabled]="guardando()"
+      (onClick)="cerrar()"
+    />
+    <p-button
+      type="button"
+      [label]="editando() ? tx.guardarEditar : tx.guardar"
+      icon="pi pi-check"
+      [loading]="guardando()"
+      [disabled]="guardando() || cargando()"
+      (onClick)="formulario.requestSubmit()"
+    />
+  </ng-template>
+</p-dialog>

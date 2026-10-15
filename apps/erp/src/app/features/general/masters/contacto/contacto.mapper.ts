@@ -1,8 +1,6 @@
-import { normalizarCelular } from '@reddoc/core';
+import { normalizarCelular, TIPO_PERSONA, construirNombreCorto } from '@reddoc/core';
 import type { Contacto, ContactoPayload } from './contacto.model';
 import type { ContactoFormRawValue } from './pages/contacto-form/contacto-form.types';
-import { TIPO_PERSONA } from './contacto.constants';
-import { construirNombreCorto } from './utils/nombre-corto.util';
 
 /**
  * Adapta el read-model (`Contacto`) a los valores que espera el reactive form.

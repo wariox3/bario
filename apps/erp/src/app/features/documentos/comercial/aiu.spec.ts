@@ -1,5 +1,5 @@
-import type { Item } from '@erp/features/general/masters/item/item.model';
 import { AIU_PORCENTAJES_INICIALES, aiuLineaToFormValue, calcularAiu } from './aiu';
+import type { Item } from '@reddoc/core';
 
 describe('aiu · calcularAiu', () => {
   it('cobra cada concepto como porcentaje del valor base', () => {

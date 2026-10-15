@@ -1,6 +1,6 @@
 import type { SidebarSection } from '../erp-modules/sidebar-menu.types';
 import { collectPermissions, hasVisibleMenu, visibleSections } from './menu-visibility';
-import { MODELO, type ModeloId } from './modelo.catalog';
+import { MODELO, type ModeloId } from '@reddoc/core';
 
 /** Menú de prueba: un item libre, un acordeón con dos grupos permisados. */
 const MENU: readonly SidebarSection[] = [

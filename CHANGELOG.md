@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.6](https://github.com/wariox3/bario/compare/v0.1.5...v0.1.6) (2026-10-15)
+
+### Features
+
+- **erp:** documento soporte sugiere el método de pago en alta ([ba701c7](https://github.com/wariox3/bario/commit/ba701c76d0fec993c3d17c45aa37293d4d3e2794))
+- **pos:** acceso por módulo de venta, atajos, modo tablet y bundle liviano ([be21ae7](https://github.com/wariox3/bario/commit/be21ae7c08e0640e925383132d05f7ce9004763a))
+- **pos:** cobro en efectivo reanudable con impresión del documento ([a04d7a9](https://github.com/wariox3/bario/commit/a04d7a9ae895d8f83b2792b5551bf845d8c99568))
+- **pos:** cobro por transferencia y bloqueo de ventas en $0 ([3617402](https://github.com/wariox3/bario/commit/3617402962135ab9c95016591e9a7ee733ec5646))
+- **pos:** configuración de la caja y catálogo con búsqueda ([d824714](https://github.com/wariox3/bario/commit/d8247140c32398bde524cff3d2ff5875b4287555))
+- **pos:** editar un ítem desde la tarjeta del catálogo ([2cd48a6](https://github.com/wariox3/bario/commit/2cd48a6f7c1e5a788f49e7333889050dfc488368))
+- **pos:** esqueleto con contenedores y workspace bajo el tenant ([30df431](https://github.com/wariox3/bario/commit/30df43137f10faa40d0999437767d7063bc5e730))
+- **pos:** historial de ventas y altas rápidas de cliente e ítem ([3be4f22](https://github.com/wariox3/bario/commit/3be4f22be1a3e70334314be58158884ac2734a8d))
+- **pos:** lápiz de editar siempre visible en la tarjeta y en la línea de la venta ([1bc1471](https://github.com/wariox3/bario/commit/1bc1471427c369142bfb94a3a678410cb958710e))
+- **pos:** rediseño del modal de cobro con los cuatro medios de pago ([ec7ea40](https://github.com/wariox3/bario/commit/ec7ea40e4687423cd1300adcb18adf1b1fbf0090))
+- **pos:** sidebar colapsable a rail de íconos, colapsado al entrar a la caja ([33fb1b0](https://github.com/wariox3/bario/commit/33fb1b075571fbc22789fe95c4410eced9f9b268))
+- **pos:** tipo de documento de la empresa en el backend ([725f2b9](https://github.com/wariox3/bario/commit/725f2b9978604a8a8d2c68a9d78ac84637db56d0))
+- **pos:** una sola pestaña por empresa con aviso en la segunda ([c8925ec](https://github.com/wariox3/bario/commit/c8925ecac21100c2609fcee3d229ef58b9a326b4))
+- **pos:** ventas en pestañas con carrito, cliente y resumen ([e74a457](https://github.com/wariox3/bario/commit/e74a457e7ca23ec53ca3bf6ebb74ad7930f22768))
+
+### Bug Fixes
+
+- **documentos:** ocultar la columna REF donde ninguna línea la llena ([b34dbd1](https://github.com/wariox3/bario/commit/b34dbd11a5b7b739195a9183ed773d2ad2f3d2ce))
+- **erp:** etiqueta de la resolución en el selector de documento soporte ([7d54a27](https://github.com/wariox3/bario/commit/7d54a275291ee65f55a8feb1bc70692ed8621870))
+- **pos:** badge de cantidad dentro de la tarjeta del catálogo ([5ece32a](https://github.com/wariox3/bario/commit/5ece32a22405d20f8c54f2035e21683f1b85a53e))
+- **pos:** botones de nuevo cliente y vaciar a la altura de sus vecinos ([505fa2c](https://github.com/wariox3/bario/commit/505fa2c83f232df542e64e1afafdf9ad7d20735f))
+- **pos:** cursor de mano en los botones propios y pista de edición en la línea ([78d346d](https://github.com/wariox3/bario/commit/78d346d82cd54e232224145295e7877762a44883))
+- **pos:** modales del panel de venta centrados sobre toda la pantalla en tablet ([6b56472](https://github.com/wariox3/bario/commit/6b564726080ebc3c07d3ff0b867803eee1ed2de0))
+
+### Performance
+
+- **erp:** bundle inicial de 1.89 a 1.55 MB con los entry points de @reddoc/ui ([610809c](https://github.com/wariox3/bario/commit/610809c1ce9359a3b641a7d5fcee0f407cf9e52a))
+
+### Refactoring
+
+- **core:** mover ítem, precio, línea comercial, pagos y cabecera POS a libs/core ([3786bf0](https://github.com/wariox3/bario/commit/3786bf0577206effd72662f4033ab7cf531c15a7))
+
 ## [0.1.5](https://github.com/wariox3/bario/compare/v0.1.4...v0.1.5) (2026-10-14)
 
 ### Features

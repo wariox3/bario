@@ -31,13 +31,20 @@ import {
   startOfToday,
   TenantService,
   ToastService,
+  comercialDetalleToFormValue,
+  type ComercialDetalleRead,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ErpSelectDataService, RESOLUCION_ACTIVA_PARAMS, SELECT_ENDPOINTS } from '@reddoc/core';
+import {
+  ErpSelectDataService,
+  RESOLUCION_ACTIVA_PARAMS,
+  SELECT_ENDPOINTS,
+  resolucionLabel,
+} from '@reddoc/core';
 import {
   DocumentoDetalleService,
   ENTITY_DATA_GATEWAY,
@@ -50,6 +57,7 @@ import type { AppDict } from '@erp/i18n';
 import {
   FORMA_PAGO_ENDPOINT,
   METODO_PAGO_ENDPOINT,
+  METODO_PAGO_NO_DEFINIDO,
   RESOLUCION_ENDPOINT,
   SEDE_ENDPOINT,
 } from '../../documento-soporte.constants';
@@ -64,8 +72,6 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { comercialDetalleToFormValue } from '@erp/features/documentos/comercial/comercial-documento-detalle.mapper';
-import type { ComercialDetalleRead } from '@erp/features/documentos/comercial/comercial-documento-detalle.model';
 import { documentoSoporteToFormValue, formValueToPayload } from '../../documento-soporte.mapper';
 import type { DocumentoSoporteRead } from '../../documento-soporte.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
@@ -142,6 +148,8 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
   protected readonly contactoParams = { proveedor: 'True' } as const;
   /** Filtra el select de resolución a las de compra activas. */
   protected readonly resolucionParams = { ...RESOLUCION_ACTIVA_PARAMS, compra: 'True' } as const;
+  /** El `seleccionar` de resoluciones no trae `nombre`: la etiqueta sale de prefijo y número. */
+  protected readonly resolucionLabel = resolucionLabel;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -163,6 +171,16 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
    * legacy): lo habitual es tener una sola. En edición manda la del documento.
    */
   protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
+
+  /**
+   * En alta, el método de pago sugiere "Instrumento no definido". Se busca por
+   * su código DIAN (`1`), no por posición: el catálogo no llega en ese orden.
+   */
+  protected readonly metodoPagoSugerido = computed(() =>
+    this.isEditMode()
+      ? null
+      : (option: ErpSelectOption) => option['codigo'] === METODO_PAGO_NO_DEFINIDO,
+  );
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {

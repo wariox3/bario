@@ -15,12 +15,12 @@ import {
   formatCop,
   toFiniteNumber,
   type ErpSelectOption,
+  type ItemOption,
+  ItemService,
 } from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import { DocumentoDetalleService } from '@erp/core/module-config';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import type { ItemOption } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
-import { ItemService } from '@erp/features/general/masters/item/item.service';
 import type { AppDict } from '@erp/i18n';
 import {
   createInventarioDetalleGroup,
