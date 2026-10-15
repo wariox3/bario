@@ -9,10 +9,16 @@
 1. **Entrar a la empresa.** Login → `/contenedores` → `/t/<slug>/caja`. Solo entran
    empresas con el módulo de venta (`acceso_venta`); sin él, se vuelve a contenedores
    con un aviso (`core/acceso/venta-access.guard.ts`).
-2. **Configurar la caja una vez.** `/t/<slug>/configuracion`: tipo de documento (factura
-   POS o POS electrónica), almacén, cuenta de efectivo, sede y asesor por defecto. Se
-   guarda **en el navegador**, por empresa: cada caja física tiene la suya. Sin tipo,
-   almacén y cuenta, la caja avisa y no deja cobrar.
+2. **Configurar la caja una vez.** `/t/<slug>/configuracion`, con dos dueños:
+   - **Tipo de documento** (factura POS o POS electrónica): es **de la empresa** y vive en el
+     backend (`GenConfiguracion.ven_pos_documento_tipo`, por `configuracion/campos/` y
+     `actualizar/`). Cambiarlo lo cambia para todas sus cajas.
+   - **Almacén, cuenta de efectivo, sede y asesor:** son **de la caja física** y se guardan en
+     el navegador, por empresa.
+
+   Sin tipo, almacén y cuenta, la caja avisa y no deja cobrar. Si no se puede leer el tipo,
+   avisa con un reintento.
+
 3. **Armar la venta.** Tocar una tarjeta o leer un código suma una unidad. Varias ventas
    abiertas en pestañas, que sobreviven a recargas. Cliente por defecto "Consumidor
    final"; al cambiarlo, las líneas se recotizan con su lista de precios (las editadas a
@@ -97,8 +103,12 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
   sola cuando la otra se cierra. Nada que escriba ventas debe montarse fuera del workspace.
 - **Lo que guarda el navegador lleva versión o validación** (`esEstadoCarritos`,
   `esConfiguracionCaja`): un cambio de forma descarta lo viejo en vez de romper la caja.
+- **Editar un ítem desde la caja** usa `PATCH item/{id}/` con solo los campos del modal
+  (`itemRapidoToPatch`). `impuestos_ids` reemplaza la lista entera: el mapper suma los
+  impuestos de compra que el ítem ya tenía. Con movimientos (`validar-uso`), tipo e
+  inventario quedan bloqueados, como en el ERP.
 - **Permisos:** `ModelPermissionsService` decide si se ofrecen el ítem rápido, la estrella
-  de favorito y el cliente rápido. Es UX: el backend responde 403 igual.
+  de favorito, el lápiz de editar y el cliente rápido. Es UX: el backend responde 403 igual.
 
 ## Despliegue
 

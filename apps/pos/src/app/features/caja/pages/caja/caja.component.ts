@@ -74,7 +74,10 @@ export class CajaComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly catalogo = inject(CatalogoStore);
-  protected readonly configuracionCompleta = inject(ConfiguracionCajaStore).completa;
+  private readonly configuracionCaja = inject(ConfiguracionCajaStore);
+  protected readonly configuracionCompleta = this.configuracionCaja.completa;
+  /** Lectura del tipo de documento de la empresa: mientras carga no se avisa nada. */
+  protected readonly estadoTipo = this.configuracionCaja.estadoTipo;
   protected readonly cantidades = this.carritos.cantidades;
 
   /** Hubo búsqueda: el vacío se explica distinto que un catálogo sin productos. */
@@ -96,7 +99,7 @@ export class CajaComponent {
   protected readonly puedeCrearItem = computed(() =>
     this.permisos.allows(MODELO.general.item, 'crear'),
   );
-  protected readonly puedeFavorito = computed(() =>
+  protected readonly puedeEditarItem = computed(() =>
     this.permisos.allows(MODELO.general.item, 'editar'),
   );
 
@@ -167,6 +170,10 @@ export class CajaComponent {
     }
   }
 
+  protected recargarTipo(): void {
+    this.configuracionCaja.recargarTipo();
+  }
+
   protected onBuscar(criterio: CriterioBusqueda): void {
     const texto = criterio.texto.trim();
     this.busquedaActiva.set(texto !== '');
@@ -183,13 +190,34 @@ export class CajaComponent {
     this.catalogo.buscar(criterio);
   }
 
-  /** Alta rápida de ítem; con código, viene de una búsqueda por código sin resultado. */
-  protected readonly creandoItem = signal(false);
+  /**
+   * Diálogo de ítem: alta rápida (con código, viene de una búsqueda por código
+   * sin resultado) o edición desde la tarjeta (`itemEditado`).
+   */
+  protected readonly dialogoItem = signal(false);
   protected readonly codigoNuevoItem = signal('');
+  protected readonly itemEditado = signal<number | null>(null);
 
   protected onNuevoItem(codigo: string): void {
+    this.itemEditado.set(null);
     this.codigoNuevoItem.set(codigo);
-    this.creandoItem.set(true);
+    this.dialogoItem.set(true);
+  }
+
+  protected onEditarItem(id: number): void {
+    this.codigoNuevoItem.set('');
+    this.itemEditado.set(id);
+    this.dialogoItem.set(true);
+  }
+
+  /**
+   * Ítem editado: el catálogo se refresca y la caja olvida el detalle que tenía
+   * guardado, para que lo próximo que se agregue tome los impuestos nuevos. Las
+   * líneas ya en la venta conservan el precio con que entraron.
+   */
+  protected onItemEditado(item: Item): void {
+    this.carritos.olvidarItem(item.id);
+    this.catalogo.recargar();
   }
 
   /**

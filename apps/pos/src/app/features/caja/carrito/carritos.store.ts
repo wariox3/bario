@@ -276,6 +276,11 @@ export class CarritosStore {
     this.mutarCarrito(this.activo().uuid, (c) => (c.cobro ? c : retirarLinea(c, itemId)));
   }
 
+  /** Descarta el detalle guardado del ítem (se editó): la próxima vez se vuelve a pedir. */
+  olvidarItem(id: number): void {
+    this.items.delete(`${this.slug() ?? ''}:${id}`);
+  }
+
   // ── Internos ───────────────────────────────────────────────────────────────
 
   private detalleItem(id: number): Observable<Item> {

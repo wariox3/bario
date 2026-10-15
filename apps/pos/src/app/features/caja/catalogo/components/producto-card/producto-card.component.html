@@ -1,6 +1,6 @@
 @let p = producto();
 @let tx = t().caja.producto;
-<article class="relative h-full">
+<article class="group relative h-full">
   <button
     type="button"
     class="flex h-full w-full flex-col overflow-hidden rounded-xl border bg-brand-surface text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-blue)] disabled:cursor-not-allowed"
@@ -50,7 +50,20 @@
     </div>
   </button>
 
-  @if (puedeFavorito()) {
+  @if (puedeEditar()) {
+    <!--
+      Con mouse aparece al pasar por la tarjeta; en pantallas táctiles, donde no
+      hay hover, queda siempre visible.
+    -->
+    <button
+      type="button"
+      class="absolute right-11 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-brand-muted opacity-0 transition-opacity hover:text-brand-text focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+      [attr.aria-label]="tx.editar + ': ' + p.nombre"
+      [title]="tx.editar"
+      (click)="editar.emit(p.id)"
+    >
+      <i class="pi pi-pencil text-[0.8rem]" aria-hidden="true"></i>
+    </button>
     <button
       type="button"
       class="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 transition-colors hover:text-amber-500"

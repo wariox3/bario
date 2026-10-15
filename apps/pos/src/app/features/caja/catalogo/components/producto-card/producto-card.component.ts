@@ -8,8 +8,8 @@ import { estaAgotado, type ProductoCatalogo } from '../../producto-catalogo.mode
  * precio, stock, estrella de favorito y las unidades que ya lleva la venta.
  *
  * Es tonta: no sabe de carrito ni de HTTP. Emite la intención (agregar, marcar
- * favorito) y la página decide. Toda la tarjeta es el botón de agregar; la
- * estrella es un botón aparte, encima, para no anidar botones.
+ * favorito, editar) y la página decide. Toda la tarjeta es el botón de agregar;
+ * la estrella y el lápiz son botones aparte, encima, para no anidar botones.
  */
 @Component({
   selector: 'app-producto-card',
@@ -25,11 +25,12 @@ export class ProductoCardComponent {
   readonly producto = input.required<ProductoCatalogo>();
   /** Unidades de este producto en la venta activa. */
   readonly cantidad = input(0);
-  /** El usuario puede editar ítems: si no, no se ofrece la estrella. */
-  readonly puedeFavorito = input(true);
+  /** El usuario puede editar ítems: si no, no se ofrecen la estrella ni el lápiz. */
+  readonly puedeEditar = input(true);
 
   readonly agregar = output<ProductoCatalogo>();
   readonly alternarFavorito = output<number>();
+  readonly editar = output<number>();
 
   protected readonly agotado = computed(() => estaAgotado(this.producto()));
   protected readonly precio = computed(() => formatCop(this.producto().precio));

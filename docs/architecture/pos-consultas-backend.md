@@ -74,12 +74,19 @@
 - **Pregunta:** confirmar que responde 201 con `id` para ambos tipos y que
   calcula los totales a partir de las líneas.
 
+## Resuelto
+
+- **Tipo de documento POS de la empresa** (2026-10-15). Backend agregó
+  `ven_pos_documento_tipo` (+ `_nombre`, solo lectura) a `GenConfiguracion`; el
+  POS lo lee por `configuracion/campos/` y lo guarda por `actualizar/`. El
+  schema no dice si valida que sea un tipo POS: el front acepta solo 24 y 27 y
+  trata cualquier otro como no configurado.
+
 ## Pedidos a futuro (no bloquean)
 
-- **Configuración del POS en el backend.** Hoy cada caja guarda su
-  configuración en el navegador (tipo de documento, almacén, cuenta de
-  efectivo, sede, asesor). Si se quiere compartir entre cajas o administrarla
-  desde el ERP, harían falta campos `pos_*` en `GenConfiguracion`.
+- **Valores por defecto de la caja en el backend** (almacén, cuenta de
+  efectivo). Hoy son de cada navegador. Solo si se quiere administrarlos desde el
+  ERP.
 - **Filtro `pos` en `documento-tipo/seleccionar/`.** No existe; el POS usa los
   tipos 24 y 27 fijos.
 
@@ -99,8 +106,10 @@ retomarlo; los que necesitan backend lo dicen.
 - **Ficha del documento dentro del POS** (ver una venta con sus líneas y pagos,
   anularla, emitirla a la DIAN). Hoy el historial solo lista e imprime; el resto
   se hace en el ERP.
-- **Edición de ítems y clientes** más allá del alta rápida. El CRUD completo
-  queda en el ERP.
+- **Edición completa de ítems y clientes.** Desde la caja se crea un ítem o un
+  cliente y se edita un ítem desde su tarjeta (código, nombre, precio, tipo,
+  inventario, impuestos de venta, favorito, inactivo). Imagen, costo, cuentas,
+  importación y la edición de clientes quedan en el ERP.
 - **Funcionamiento sin conexión (PWA).** El POS anterior registraba un service
   worker sin lógica offline real. Vender sin red exigiría guardar los documentos
   localmente y sincronizarlos, con la idempotencia del punto 1 resuelta.

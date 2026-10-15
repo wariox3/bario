@@ -177,8 +177,13 @@ export const es: AppDict = {
     title: 'Caja',
     configuracion: {
       title: 'Configuración requerida',
-      desc: 'Antes de vender, elige el tipo de documento, el almacén y la cuenta de efectivo de esta caja.',
+      desc: 'Antes de vender, elige el tipo de documento de la empresa y el almacén y la cuenta de efectivo de esta caja.',
       accion: 'Ir a configuración',
+    },
+    configuracionError: {
+      title: 'No se pudo leer la configuración de la empresa',
+      desc: 'Sin el tipo de documento la caja no puede cobrar.',
+      accion: 'Reintentar',
     },
     buscador: {
       modo: 'Buscar por',
@@ -196,6 +201,7 @@ export const es: AppDict = {
       agotado: 'Agotado',
       marcarFavorito: 'Marcar como favorito',
       quitarFavorito: 'Quitar de favoritos',
+      editar: 'Editar ítem',
     },
     estados: {
       error: 'No se pudieron cargar los productos.',
@@ -235,6 +241,7 @@ export const es: AppDict = {
       atajoNueva: 'Nueva venta (F4)',
       opciones: 'Opciones de la venta',
       renombrar: 'Renombrar',
+      renombrarSubtitulo: 'Solo cambia el nombre de la pestaña.',
       nombre: 'Nombre de la venta',
       guardar: 'Guardar',
       cerrar: 'Cerrar venta',
@@ -293,6 +300,7 @@ export const es: AppDict = {
     },
     cliente: {
       titulo: 'Nuevo cliente',
+      subtitulo: 'Queda como cliente de esta venta.',
       nota: 'Lista de precios, plazos y datos fiscales se completan en el ERP.',
       guardar: 'Crear cliente',
       campos: {
@@ -318,7 +326,13 @@ export const es: AppDict = {
     },
     item: {
       titulo: 'Nuevo ítem',
+      subtitulo: 'Se crea en el catálogo de la empresa.',
       guardar: 'Crear ítem',
+      tituloEditar: 'Editar ítem',
+      subtituloEditar: 'Los cambios se ven en el ERP y en todas las cajas.',
+      guardarEditar: 'Guardar cambios',
+      cargando: 'Cargando el ítem…',
+      enUso: 'El ítem ya tiene movimientos: el tipo y el inventario no se pueden cambiar.',
       avisoInventario:
         'Con inventario el ítem nace sin existencias: la caja no lo venderá hasta que entre mercancía.',
       tipos: { producto: 'Producto', servicio: 'Servicio' },
@@ -329,12 +343,19 @@ export const es: AppDict = {
         tipo: 'Tipo',
         inventario: 'Maneja inventario',
         favorito: 'Favorito',
+        inactivo: 'Inactivo (deja de aparecer en la caja)',
         impuestos: 'Impuestos de venta',
         impuestosPlaceholder: 'Sin impuestos',
       },
       toasts: {
         creado: { title: 'Ítem creado', desc: 'Ya aparece en el catálogo.' },
         error: 'No se pudo crear el ítem',
+        editado: { title: 'Ítem actualizado', desc: 'El catálogo ya muestra los cambios.' },
+        errorEditar: 'No se pudo guardar el ítem',
+        cargarError: {
+          title: 'No se pudo abrir el ítem',
+          desc: 'Intenta de nuevo en unos segundos.',
+        },
       },
     },
     cobro: {
@@ -466,10 +487,12 @@ export const es: AppDict = {
   },
   configuracion: {
     title: 'Configuración de la caja',
-    subtitle: 'Se guarda en este dispositivo: cada caja tiene la suya.',
+    subtitle: 'El tipo de documento es de la empresa; lo demás se guarda en este dispositivo.',
     documento: {
       title: 'Tipo de documento',
-      hint: 'Con qué documento factura esta caja.',
+      hint: 'Lo comparten todas las cajas de la empresa.',
+      error: 'No se pudo leer el tipo de documento de la empresa.',
+      reintentar: 'Reintentar',
     },
     tipos: {
       pos: 'Factura POS',
@@ -492,6 +515,10 @@ export const es: AppDict = {
       guardada: {
         title: 'Configuración guardada',
         desc: 'La caja ya usa la nueva configuración.',
+      },
+      tipoError: {
+        title: 'No se pudo guardar el tipo de documento',
+        desc: 'Lo demás quedó guardado. Intenta de nuevo.',
       },
     },
   },

@@ -41,6 +41,15 @@ export class ItemService extends BaseHttpService {
   }
 
   /**
+   * Cambia solo los campos que se mandan (`PATCH item/{id}/`). Lo usa el POS, que
+   * edita unos pocos campos y no tiene el ítem completo que exige el `PUT`.
+   * Ojo: `impuestos_ids` **reemplaza** la lista entera, también la de compra.
+   */
+  actualizarCampos(id: number, cambios: Partial<ItemPayload>): Observable<Item> {
+    return this.patch<Item>(`${this.resourcePath}${id}/`, cambios);
+  }
+
+  /**
    * Marca o desmarca el ítem como favorito (`PATCH item/{id}/ { favorito }`).
    * Va aparte de `update` porque solo toca ese campo: el `PUT` exige el ítem
    * completo y la caja del POS no lo tiene.

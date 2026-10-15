@@ -156,6 +156,8 @@ export interface AppDict
   caja: {
     title: string;
     configuracion: { title: string; desc: string; accion: string };
+    /** No se pudo leer el tipo de documento de la empresa. */
+    configuracionError: { title: string; desc: string; accion: string };
     buscador: {
       modo: string;
       porNombre: string;
@@ -172,6 +174,7 @@ export interface AppDict
       agotado: string;
       marcarFavorito: string;
       quitarFavorito: string;
+      editar: string;
     };
     estados: {
       error: string;
@@ -196,6 +199,7 @@ export interface AppDict
       atajoNueva: string;
       opciones: string;
       renombrar: string;
+      renombrarSubtitulo: string;
       nombre: string;
       guardar: string;
       cerrar: string;
@@ -244,6 +248,7 @@ export interface AppDict
     };
     cliente: {
       titulo: string;
+      subtitulo: string;
       nota: string;
       guardar: string;
       campos: {
@@ -266,7 +271,14 @@ export interface AppDict
     };
     item: {
       titulo: string;
+      subtitulo: string;
       guardar: string;
+      tituloEditar: string;
+      subtituloEditar: string;
+      guardarEditar: string;
+      cargando: string;
+      /** El ítem ya tiene movimientos: tipo e inventario bloqueados. */
+      enUso: string;
       avisoInventario: string;
       tipos: { producto: string; servicio: string };
       campos: {
@@ -276,10 +288,17 @@ export interface AppDict
         tipo: string;
         inventario: string;
         favorito: string;
+        inactivo: string;
         impuestos: string;
         impuestosPlaceholder: string;
       };
-      toasts: { creado: { title: string; desc: string }; error: string };
+      toasts: {
+        creado: { title: string; desc: string };
+        error: string;
+        editado: { title: string; desc: string };
+        errorEditar: string;
+        cargarError: { title: string; desc: string };
+      };
     };
     cobro: {
       titulo: string;
@@ -372,7 +391,7 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    documento: { title: string; hint: string };
+    documento: { title: string; hint: string; error: string; reintentar: string };
     tipos: { pos: string; posElectronica: string };
     operacion: { title: string; hint: string };
     campos: {
@@ -386,6 +405,7 @@ export interface AppDict
     guardar: string;
     toasts: {
       guardada: { title: string; desc: string };
+      tipoError: { title: string; desc: string };
     };
   };
 }

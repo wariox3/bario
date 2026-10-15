@@ -177,8 +177,13 @@ export const en: AppDict = {
     title: 'Register',
     configuracion: {
       title: 'Setup required',
-      desc: 'Before selling, choose the document type, warehouse and cash account for this register.',
+      desc: "Before selling, choose the company's document type and this register's warehouse and cash account.",
       accion: 'Go to settings',
+    },
+    configuracionError: {
+      title: "Couldn't read the company settings",
+      desc: "Without the document type the register can't charge.",
+      accion: 'Retry',
     },
     buscador: {
       modo: 'Search by',
@@ -196,6 +201,7 @@ export const en: AppDict = {
       agotado: 'Out of stock',
       marcarFavorito: 'Mark as favorite',
       quitarFavorito: 'Remove from favorites',
+      editar: 'Edit item',
     },
     estados: {
       error: 'Products could not be loaded.',
@@ -235,6 +241,7 @@ export const en: AppDict = {
       atajoNueva: 'New sale (F4)',
       opciones: 'Sale options',
       renombrar: 'Rename',
+      renombrarSubtitulo: 'Only changes the tab name.',
       nombre: 'Sale name',
       guardar: 'Save',
       cerrar: 'Close sale',
@@ -293,6 +300,7 @@ export const en: AppDict = {
     },
     cliente: {
       titulo: 'New customer',
+      subtitulo: 'Becomes the customer of this sale.',
       nota: 'Price list, terms and tax details are completed in the ERP.',
       guardar: 'Create customer',
       campos: {
@@ -318,7 +326,13 @@ export const en: AppDict = {
     },
     item: {
       titulo: 'New item',
+      subtitulo: 'Created in the company catalog.',
       guardar: 'Create item',
+      tituloEditar: 'Edit item',
+      subtituloEditar: 'Changes show up in the ERP and in every register.',
+      guardarEditar: 'Save changes',
+      cargando: 'Loading the item…',
+      enUso: 'The item already has movements: its type and inventory can no longer change.',
       avisoInventario:
         'With inventory the item starts with no stock: the register will not sell it until goods come in.',
       tipos: { producto: 'Product', servicio: 'Service' },
@@ -329,12 +343,16 @@ export const en: AppDict = {
         tipo: 'Type',
         inventario: 'Tracks inventory',
         favorito: 'Favorite',
+        inactivo: 'Inactive (no longer shown in the register)',
         impuestos: 'Sale taxes',
         impuestosPlaceholder: 'No taxes',
       },
       toasts: {
         creado: { title: 'Item created', desc: 'It now shows in the catalog.' },
         error: 'The item could not be created',
+        editado: { title: 'Item updated', desc: 'The catalog already shows the changes.' },
+        errorEditar: 'The item could not be saved',
+        cargarError: { title: "Couldn't open the item", desc: 'Try again in a few seconds.' },
       },
     },
     cobro: {
@@ -466,10 +484,12 @@ export const en: AppDict = {
   },
   configuracion: {
     title: 'Register settings',
-    subtitle: 'Stored on this device: each register has its own.',
+    subtitle: 'The document type belongs to the company; the rest is stored on this device.',
     documento: {
       title: 'Document type',
-      hint: 'Which document this register invoices with.',
+      hint: 'Shared by every register of the company.',
+      error: "Couldn't read the company's document type.",
+      reintentar: 'Retry',
     },
     tipos: {
       pos: 'POS invoice',
@@ -492,6 +512,10 @@ export const en: AppDict = {
       guardada: {
         title: 'Settings saved',
         desc: 'The register now uses the new settings.',
+      },
+      tipoError: {
+        title: "Couldn't save the document type",
+        desc: 'Everything else was saved. Try again.',
       },
     },
   },

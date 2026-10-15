@@ -6,7 +6,27 @@
 
   <div class="flex min-h-0 flex-1 gap-4">
     <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
-      @if (!configuracionCompleta()) {
+      @if (estadoTipo() === 'error') {
+        <div
+          class="flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+          role="alert"
+        >
+          <i class="pi pi-exclamation-circle text-red-600" aria-hidden="true"></i>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <p class="m-0 text-[0.85rem] font-semibold text-red-900">
+              {{ tx.configuracionError.title }}
+            </p>
+            <p class="m-0 text-[0.78rem] text-red-800">{{ tx.configuracionError.desc }}</p>
+          </div>
+          <button
+            type="button"
+            class="text-[0.8rem] font-semibold text-red-900 underline underline-offset-2"
+            (click)="recargarTipo()"
+          >
+            {{ tx.configuracionError.accion }}
+          </button>
+        </div>
+      } @else if (estadoTipo() === 'listo' && !configuracionCompleta()) {
         <div
           class="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
           role="status"
@@ -78,9 +98,10 @@
                 <app-producto-card
                   [producto]="producto"
                   [cantidad]="cantidades().get(producto.id) ?? 0"
-                  [puedeFavorito]="puedeFavorito()"
+                  [puedeEditar]="puedeEditarItem()"
                   (agregar)="onAgregar($event)"
                   (alternarFavorito)="onAlternarFavorito($event)"
+                  (editar)="onEditarItem($event)"
                 />
               }
             </div>
@@ -142,9 +163,11 @@
 }
 
 <app-item-rapido-dialog
-  [(visible)]="creandoItem"
+  [(visible)]="dialogoItem"
   [codigoInicial]="codigoNuevoItem()"
+  [itemId]="itemEditado()"
   (creado)="onItemCreado($event)"
+  (editado)="onItemEditado($event)"
 />
 
 <p-confirmdialog [style]="{ width: '24rem' }" [breakpoints]="{ '576px': '92vw' }" />

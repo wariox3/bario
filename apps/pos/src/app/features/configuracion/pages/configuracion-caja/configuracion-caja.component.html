@@ -15,7 +15,7 @@
       <span
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
       >
-        <i class="pi pi-file text-[1.05rem]"></i>
+        <i class="pi pi-building text-[1.05rem]"></i>
       </span>
       <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
         <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
@@ -45,6 +45,18 @@
         }
       </div>
       <lib-field-error [control]="form.controls.documentoTipoId" />
+      @if (estadoTipo() === 'error') {
+        <p class="m-0 flex flex-wrap items-center gap-2 text-[0.78rem] text-red-700" role="alert">
+          {{ c.documento.error }}
+          <button
+            type="button"
+            class="font-semibold underline underline-offset-2"
+            (click)="recargarTipo()"
+          >
+            {{ c.documento.reintentar }}
+          </button>
+        </p>
+      }
     </div>
   </section>
 
@@ -128,6 +140,12 @@
         {{ c.sinGuardar }}
       </span>
     }
-    <p-button type="submit" [label]="c.guardar" icon="pi pi-check" />
+    <p-button
+      type="submit"
+      [label]="c.guardar"
+      icon="pi pi-check"
+      [loading]="guardando()"
+      [disabled]="guardando()"
+    />
   </div>
 </form>
