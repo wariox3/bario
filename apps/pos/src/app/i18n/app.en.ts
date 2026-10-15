@@ -342,6 +342,7 @@ export const en: AppDict = {
         precio: 'Sale price',
         tipo: 'Type',
         inventario: 'Tracks inventory',
+        opciones: 'Options',
         favorito: 'Favorite',
         inactivo: 'Inactive (no longer shown in the register)',
         impuestos: 'Sale taxes',

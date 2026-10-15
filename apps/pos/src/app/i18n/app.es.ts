@@ -342,6 +342,7 @@ export const es: AppDict = {
         precio: 'Precio de venta',
         tipo: 'Tipo',
         inventario: 'Maneja inventario',
+        opciones: 'Opciones',
         favorito: 'Favorito',
         inactivo: 'Inactivo (deja de aparecer en la caja)',
         impuestos: 'Impuestos de venta',

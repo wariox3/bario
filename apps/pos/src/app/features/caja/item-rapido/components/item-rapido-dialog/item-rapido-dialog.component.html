@@ -84,46 +84,56 @@
         <lib-field-error [control]="f.nombre" />
       </div>
 
+      <!-- Tipo: producto / servicio. Mismo control que el formulario de ítem del ERP. -->
       <div class="flex flex-col gap-1.5">
         <span class="text-[0.8rem] font-medium text-brand-text">{{ tx.campos.tipo }}</span>
-        <p-selectbutton
-          formControlName="tipo"
-          [options]="tipos()"
-          optionLabel="label"
-          optionValue="value"
-          [allowEmpty]="false"
-          [ariaLabel]="tx.campos.tipo"
-        />
+        <div
+          class="mt-1 flex flex-wrap gap-x-6 gap-y-2.5"
+          role="radiogroup"
+          [attr.aria-label]="tx.campos.tipo"
+        >
+          <label for="item-tipo-producto" class="flex cursor-pointer items-center gap-2">
+            <p-radiobutton inputId="item-tipo-producto" formControlName="tipo" value="producto" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.tipos.producto }}</span>
+          </label>
+          <label for="item-tipo-servicio" class="flex cursor-pointer items-center gap-2">
+            <p-radiobutton inputId="item-tipo-servicio" formControlName="tipo" value="servicio" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.tipos.servicio }}</span>
+          </label>
+        </div>
       </div>
 
-      <div class="flex flex-col justify-end gap-2 pb-1">
-        <div class="flex items-center gap-2">
-          <p-checkbox inputId="item-inventario" formControlName="inventario" [binary]="true" />
-          <label for="item-inventario" class="text-[0.82rem] text-brand-text">
-            {{ tx.campos.inventario }}
+      <!-- Opciones: banderas del ítem, junto al tipo como en el ERP. -->
+      <div class="flex flex-col gap-1.5">
+        <span class="text-[0.8rem] font-medium text-brand-text">{{ tx.campos.opciones }}</span>
+        <div class="mt-1 flex flex-wrap gap-x-6 gap-y-2.5">
+          <label for="item-inventario" class="flex cursor-pointer items-center gap-2">
+            <p-checkbox inputId="item-inventario" formControlName="inventario" [binary]="true" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.campos.inventario }}</span>
           </label>
-        </div>
-        <div class="flex items-center gap-2">
-          <p-checkbox inputId="item-favorito" formControlName="favorito" [binary]="true" />
-          <label for="item-favorito" class="text-[0.82rem] text-brand-text">
-            {{ tx.campos.favorito }}
+          <label for="item-favorito" class="flex cursor-pointer items-center gap-2">
+            <p-checkbox inputId="item-favorito" formControlName="favorito" [binary]="true" />
+            <span class="text-[0.85rem] text-brand-text">{{ tx.campos.favorito }}</span>
           </label>
-        </div>
-        @if (editando()) {
-          <div class="flex items-center gap-2">
-            <p-checkbox inputId="item-inactivo" formControlName="inactivo" [binary]="true" />
-            <label for="item-inactivo" class="text-[0.82rem] text-brand-text">
-              {{ tx.campos.inactivo }}
+          @if (editando()) {
+            <label for="item-inactivo" class="flex cursor-pointer items-center gap-2">
+              <p-checkbox inputId="item-inactivo" formControlName="inactivo" [binary]="true" />
+              <span class="text-[0.85rem] text-brand-text">{{ tx.campos.inactivo }}</span>
             </label>
-          </div>
-        }
+          }
+        </div>
       </div>
 
       <div class="flex flex-col gap-1.5 sm:col-span-2">
         <label for="item-impuestos" class="text-[0.8rem] font-medium text-brand-text">
           {{ tx.campos.impuestos }}
         </label>
+        <!--
+          Lo normal es un solo impuesto (el IVA): se cierra al elegir. Para sumar
+          otro se vuelve a abrir; los chips se quitan sin abrirlo.
+        -->
         <p-multiselect
+          #impuestosSelect
           inputId="item-impuestos"
           formControlName="impuestos_ids"
           [options]="impuestos()"
@@ -133,6 +143,7 @@
           appendTo="body"
           [placeholder]="tx.campos.impuestosPlaceholder"
           [fluid]="true"
+          (onChange)="impuestosSelect.hide()"
         />
       </div>
     </div>

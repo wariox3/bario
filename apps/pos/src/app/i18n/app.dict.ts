@@ -287,6 +287,7 @@ export interface AppDict
         precio: string;
         tipo: string;
         inventario: string;
+        opciones: string;
         favorito: string;
         inactivo: string;
         impuestos: string;
