@@ -201,6 +201,7 @@ export const es: AppDict = {
       agotado: 'Agotado',
       marcarFavorito: 'Marcar como favorito',
       quitarFavorito: 'Quitar de favoritos',
+      editar: 'Editar ítem',
     },
     estados: {
       error: 'No se pudieron cargar los productos.',
@@ -327,6 +328,11 @@ export const es: AppDict = {
       titulo: 'Nuevo ítem',
       subtitulo: 'Se crea en el catálogo de la empresa.',
       guardar: 'Crear ítem',
+      tituloEditar: 'Editar ítem',
+      subtituloEditar: 'Los cambios se ven en el ERP y en todas las cajas.',
+      guardarEditar: 'Guardar cambios',
+      cargando: 'Cargando el ítem…',
+      enUso: 'El ítem ya tiene movimientos: el tipo y el inventario no se pueden cambiar.',
       avisoInventario:
         'Con inventario el ítem nace sin existencias: la caja no lo venderá hasta que entre mercancía.',
       tipos: { producto: 'Producto', servicio: 'Servicio' },
@@ -337,12 +343,19 @@ export const es: AppDict = {
         tipo: 'Tipo',
         inventario: 'Maneja inventario',
         favorito: 'Favorito',
+        inactivo: 'Inactivo (deja de aparecer en la caja)',
         impuestos: 'Impuestos de venta',
         impuestosPlaceholder: 'Sin impuestos',
       },
       toasts: {
         creado: { title: 'Ítem creado', desc: 'Ya aparece en el catálogo.' },
         error: 'No se pudo crear el ítem',
+        editado: { title: 'Ítem actualizado', desc: 'El catálogo ya muestra los cambios.' },
+        errorEditar: 'No se pudo guardar el ítem',
+        cargarError: {
+          title: 'No se pudo abrir el ítem',
+          desc: 'Intenta de nuevo en unos segundos.',
+        },
       },
     },
     cobro: {

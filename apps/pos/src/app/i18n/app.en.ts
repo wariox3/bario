@@ -201,6 +201,7 @@ export const en: AppDict = {
       agotado: 'Out of stock',
       marcarFavorito: 'Mark as favorite',
       quitarFavorito: 'Remove from favorites',
+      editar: 'Edit item',
     },
     estados: {
       error: 'Products could not be loaded.',
@@ -327,6 +328,11 @@ export const en: AppDict = {
       titulo: 'New item',
       subtitulo: 'Created in the company catalog.',
       guardar: 'Create item',
+      tituloEditar: 'Edit item',
+      subtituloEditar: 'Changes show up in the ERP and in every register.',
+      guardarEditar: 'Save changes',
+      cargando: 'Loading the item…',
+      enUso: 'The item already has movements: its type and inventory can no longer change.',
       avisoInventario:
         'With inventory the item starts with no stock: the register will not sell it until goods come in.',
       tipos: { producto: 'Product', servicio: 'Service' },
@@ -337,12 +343,16 @@ export const en: AppDict = {
         tipo: 'Type',
         inventario: 'Tracks inventory',
         favorito: 'Favorite',
+        inactivo: 'Inactive (no longer shown in the register)',
         impuestos: 'Sale taxes',
         impuestosPlaceholder: 'No taxes',
       },
       toasts: {
         creado: { title: 'Item created', desc: 'It now shows in the catalog.' },
         error: 'The item could not be created',
+        editado: { title: 'Item updated', desc: 'The catalog already shows the changes.' },
+        errorEditar: 'The item could not be saved',
+        cargarError: { title: "Couldn't open the item", desc: 'Try again in a few seconds.' },
       },
     },
     cobro: {

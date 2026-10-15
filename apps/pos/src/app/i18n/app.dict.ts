@@ -174,6 +174,7 @@ export interface AppDict
       agotado: string;
       marcarFavorito: string;
       quitarFavorito: string;
+      editar: string;
     };
     estados: {
       error: string;
@@ -272,6 +273,12 @@ export interface AppDict
       titulo: string;
       subtitulo: string;
       guardar: string;
+      tituloEditar: string;
+      subtituloEditar: string;
+      guardarEditar: string;
+      cargando: string;
+      /** El ítem ya tiene movimientos: tipo e inventario bloqueados. */
+      enUso: string;
       avisoInventario: string;
       tipos: { producto: string; servicio: string };
       campos: {
@@ -281,10 +288,17 @@ export interface AppDict
         tipo: string;
         inventario: string;
         favorito: string;
+        inactivo: string;
         impuestos: string;
         impuestosPlaceholder: string;
       };
-      toasts: { creado: { title: string; desc: string }; error: string };
+      toasts: {
+        creado: { title: string; desc: string };
+        error: string;
+        editado: { title: string; desc: string };
+        errorEditar: string;
+        cargarError: { title: string; desc: string };
+      };
     };
     cobro: {
       titulo: string;

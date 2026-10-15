@@ -98,9 +98,10 @@
                 <app-producto-card
                   [producto]="producto"
                   [cantidad]="cantidades().get(producto.id) ?? 0"
-                  [puedeFavorito]="puedeFavorito()"
+                  [puedeEditar]="puedeEditarItem()"
                   (agregar)="onAgregar($event)"
                   (alternarFavorito)="onAlternarFavorito($event)"
+                  (editar)="onEditarItem($event)"
                 />
               }
             </div>
@@ -162,9 +163,11 @@
 }
 
 <app-item-rapido-dialog
-  [(visible)]="creandoItem"
+  [(visible)]="dialogoItem"
   [codigoInicial]="codigoNuevoItem()"
+  [itemId]="itemEditado()"
   (creado)="onItemCreado($event)"
+  (editado)="onItemEditado($event)"
 />
 
 <p-confirmdialog [style]="{ width: '24rem' }" [breakpoints]="{ '576px': '92vw' }" />

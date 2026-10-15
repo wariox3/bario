@@ -103,8 +103,12 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
   sola cuando la otra se cierra. Nada que escriba ventas debe montarse fuera del workspace.
 - **Lo que guarda el navegador lleva versión o validación** (`esEstadoCarritos`,
   `esConfiguracionCaja`): un cambio de forma descarta lo viejo en vez de romper la caja.
+- **Editar un ítem desde la caja** usa `PATCH item/{id}/` con solo los campos del modal
+  (`itemRapidoToPatch`). `impuestos_ids` reemplaza la lista entera: el mapper suma los
+  impuestos de compra que el ítem ya tenía. Con movimientos (`validar-uso`), tipo e
+  inventario quedan bloqueados, como en el ERP.
 - **Permisos:** `ModelPermissionsService` decide si se ofrecen el ítem rápido, la estrella
-  de favorito y el cliente rápido. Es UX: el backend responde 403 igual.
+  de favorito, el lápiz de editar y el cliente rápido. Es UX: el backend responde 403 igual.
 
 ## Despliegue
 

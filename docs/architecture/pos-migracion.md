@@ -369,7 +369,7 @@ localStorage bajo `pos:carritos:<tenantSlug>` (misma idea que
 
 ## 8. Decisiones tomadas (2026-10-14)
 
-1. **Tipo de documento y configuración de la caja: por tenant + dispositivo, en localStorage.** Cada caja elige su tipo de documento (factura POS 27 o factura POS electrónica 24, fijos desde `DOCUMENT_TYPE_ID`, sin depender de un filtro `pos` del backend), su sede, su almacén, su cuenta de efectivo y, opcionalmente, su asesor. No se piden campos `pos_*` al backend. Si más adelante se quiere compartir entre cajas, el store es el único punto que cambia.
+1. **Tipo de documento y configuración de la caja: por tenant + dispositivo, en localStorage.** Cada caja elige su tipo de documento (factura POS 27 o factura POS electrónica 24, fijos desde `DOCUMENT_TYPE_ID`, sin depender de un filtro `pos` del backend), su sede, su almacén, su cuenta de efectivo y, opcionalmente, su asesor. No se piden campos `pos_*` al backend. Si más adelante se quiere compartir entre cajas, el store es el único punto que cambia. **Revisado 2026-10-15:** el tipo de documento pasó al backend (`GenConfiguracion.ven_pos_documento_tipo`) porque es una decisión fiscal de la empresa; el resto sigue por dispositivo.
 2. **Medios de pago: solo efectivo**, pero con la estructura preparada para sumar otros (cada medio es una cuenta bancaria registrada vía `documento-pago/`; el modal de cobro se arma sobre una lista de medios con uno solo habilitado).
 3. **Existencias: se bloquea desde el front.** Un ítem con `inventario` y sin `negativo` no se puede agregar por encima de `disponible`; el catálogo se refresca tras cada venta. No se asume validación del backend.
 4. **Impresión: el PDF del backend** (`gateway.imprimir`). No se porta el jsPDF local.

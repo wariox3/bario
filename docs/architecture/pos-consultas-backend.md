@@ -106,8 +106,10 @@ retomarlo; los que necesitan backend lo dicen.
 - **Ficha del documento dentro del POS** (ver una venta con sus líneas y pagos,
   anularla, emitirla a la DIAN). Hoy el historial solo lista e imprime; el resto
   se hace en el ERP.
-- **Edición de ítems y clientes** más allá del alta rápida. El CRUD completo
-  queda en el ERP.
+- **Edición completa de ítems y clientes.** Desde la caja se crea un ítem o un
+  cliente y se edita un ítem desde su tarjeta (código, nombre, precio, tipo,
+  inventario, impuestos de venta, favorito, inactivo). Imagen, costo, cuentas,
+  importación y la edición de clientes quedan en el ERP.
 - **Funcionamiento sin conexión (PWA).** El POS anterior registraba un service
   worker sin lógica offline real. Vender sin red exigiría guardar los documentos
   localmente y sincronizarlos, con la idempotencia del punto 1 resuelta.

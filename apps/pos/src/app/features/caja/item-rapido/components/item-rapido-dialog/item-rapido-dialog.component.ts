@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, of } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
@@ -24,16 +24,23 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { FormErrorService, I18nService, ItemService, ToastService, type Item } from '@reddoc/core';
 import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
-import { itemRapidoToPayload } from '../../item-rapido.mapper';
+import {
+  itemRapidoDesdeItem,
+  itemRapidoToPatch,
+  itemRapidoToPayload,
+} from '../../item-rapido.mapper';
 import { ItemRapidoService } from '../../item-rapido.service';
 
 /**
- * Alta de un ítem sin salir de la caja: código, nombre, precio, producto o
- * servicio, inventario e impuestos de venta. Cuentas contables, costo y demás
- * se completan en el ERP.
+ * Alta y edición de un ítem sin salir de la caja: código, nombre, precio,
+ * producto o servicio, inventario, impuestos de venta, favorito y (al editar)
+ * inactivo. Cuentas contables, costo, imagen y demás se manejan en el ERP.
  *
- * Arranca **sin inventario**: un producto nuevo con inventario tiene stock cero
- * y la caja no lo dejaría vender hasta que entre mercancía.
+ * - **Alta** (`itemId` nulo): arranca **sin inventario**; un producto nuevo con
+ *   inventario tiene stock cero y la caja no lo dejaría vender.
+ * - **Edición** (`itemId`): trae el ítem y guarda con `PATCH` solo esos campos,
+ *   conservando los impuestos de compra. Si el ítem ya tiene movimientos
+ *   (`validar-uso`), el tipo y el inventario quedan bloqueados, como en el ERP.
  */
 @Component({
   selector: 'app-item-rapido-dialog',
@@ -66,9 +73,18 @@ export class ItemRapidoDialogComponent {
   readonly visible = model(false);
   /** Código con el que se abre (lo que se buscó y no apareció). */
   readonly codigoInicial = input('');
+  /** Ítem a editar; nulo para crear uno nuevo. */
+  readonly itemId = input<number | null>(null);
   readonly creado = output<Item>();
+  readonly editado = output<Item>();
 
+  protected readonly editando = computed(() => this.itemId() !== null);
   protected readonly guardando = signal(false);
+  protected readonly cargando = signal(false);
+  /** El ítem ya se movió en documentos: tipo e inventario no se cambian. */
+  protected readonly enUso = signal(false);
+  /** El ítem tal como llegó, para conservar lo que la caja no edita. */
+  private original: Item | null = null;
   protected readonly impuestos = toSignal(
     inject(ItemRapidoService)
       .impuestosVenta()
@@ -88,6 +104,7 @@ export class ItemRapidoDialogComponent {
     inventario: [false],
     impuestos_ids: this.fb.nonNullable.control<number[]>([]),
     favorito: [false],
+    inactivo: [false],
   });
 
   protected readonly esProducto = signal(true);
@@ -99,40 +116,83 @@ export class ItemRapidoDialogComponent {
       if (tipo === 'servicio') {
         inventario.setValue(false);
         inventario.disable({ emitEvent: false });
-      } else {
+      } else if (!this.enUso()) {
         inventario.enable({ emitEvent: false });
       }
     });
     effect(() => {
       if (!this.visible()) return;
       const codigo = this.codigoInicial();
-      untracked(() => {
-        this.form.reset({ codigo });
-        this.form.controls.inventario.enable({ emitEvent: false });
-        this.esProducto.set(true);
-      });
+      const id = this.itemId();
+      untracked(() => (id === null ? this.prepararAlta(codigo) : this.cargar(id)));
     });
   }
 
-  protected onSubmit(): void {
-    if (this.guardando() || this.form.invalid) return;
-    this.guardando.set(true);
-    this.items
-      .create(itemRapidoToPayload(this.form.getRawValue()))
+  private prepararAlta(codigo: string): void {
+    this.original = null;
+    this.enUso.set(false);
+    this.form.enable({ emitEvent: false });
+    this.form.reset({ codigo });
+    this.esProducto.set(true);
+  }
+
+  private cargar(id: number): void {
+    this.original = null;
+    this.enUso.set(false);
+    this.cargando.set(true);
+    this.form.reset();
+    this.form.disable({ emitEvent: false });
+    forkJoin({
+      item: this.items.getById(id),
+      // Sin respuesta se asume que sí tiene uso: bloquear de más no rompe kardex.
+      uso: this.items.validarUso(id).pipe(catchError(() => of(true))),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (item) => {
-          this.guardando.set(false);
-          const tx = this.t().caja.item.toasts.creado;
-          this.toast.success(tx.title, tx.desc);
-          this.creado.emit(item);
+        next: ({ item, uso }) => {
+          this.original = item;
+          this.enUso.set(uso);
+          this.cargando.set(false);
+          this.form.enable({ emitEvent: false });
+          const valores = itemRapidoDesdeItem(item);
+          this.form.reset({ ...valores, impuestos_ids: [...valores.impuestos_ids] });
+          if (uso) {
+            this.form.controls.tipo.disable({ emitEvent: false });
+            this.form.controls.inventario.disable({ emitEvent: false });
+          }
+        },
+        error: () => {
+          this.cargando.set(false);
+          const tx = this.t().caja.item.toasts.cargarError;
+          this.toast.error(tx.title, tx.desc);
           this.visible.set(false);
         },
-        error: (err: unknown) => {
-          this.guardando.set(false);
-          this.formErrors.handle(this.form, err, this.t().caja.item.toasts.error);
-        },
       });
+  }
+
+  protected onSubmit(): void {
+    if (this.guardando() || this.cargando() || this.form.invalid) return;
+    const valores = this.form.getRawValue();
+    const original = this.original;
+    const tx = this.t().caja.item;
+    this.guardando.set(true);
+    const peticion = original
+      ? this.items.actualizarCampos(original.id, itemRapidoToPatch(valores, original))
+      : this.items.create(itemRapidoToPayload(valores));
+    peticion.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (item) => {
+        this.guardando.set(false);
+        const ok = original ? tx.toasts.editado : tx.toasts.creado;
+        this.toast.success(ok.title, ok.desc);
+        if (original) this.editado.emit(item);
+        else this.creado.emit(item);
+        this.visible.set(false);
+      },
+      error: (err: unknown) => {
+        this.guardando.set(false);
+        this.formErrors.handle(this.form, err, original ? tx.toasts.errorEditar : tx.toasts.error);
+      },
+    });
   }
 
   protected cerrar(): void {
