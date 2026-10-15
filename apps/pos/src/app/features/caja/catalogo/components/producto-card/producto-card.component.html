@@ -51,13 +51,10 @@
   </button>
 
   @if (puedeEditar()) {
-    <!--
-      Con mouse aparece al pasar por la tarjeta; en pantallas táctiles, donde no
-      hay hover, queda siempre visible.
-    -->
+    <!-- Siempre visible: quien recién usa la caja tiene que poder encontrarlo. -->
     <button
       type="button"
-      class="absolute right-11 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-brand-muted opacity-0 transition-opacity hover:text-brand-text focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+      class="absolute right-11 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-brand-muted transition-colors hover:text-brand-text"
       [attr.aria-label]="tx.editar + ': ' + p.nombre"
       [title]="tx.editar"
       (click)="editar.emit(p.id)"

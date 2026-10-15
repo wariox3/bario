@@ -4,7 +4,7 @@
   <div class="flex items-start gap-2">
     <button
       type="button"
-      class="min-w-0 flex-1 rounded-md text-left focus-visible:outline-2 focus-visible:outline-[var(--brand-blue)]"
+      class="-mx-1.5 -my-1 min-w-0 flex-1 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-[rgba(20,48,73,0.04)] focus-visible:outline-2 focus-visible:outline-[var(--brand-blue)] disabled:hover:bg-transparent"
       [attr.aria-label]="tx.editar + ': ' + l.item.nombre"
       [disabled]="bloqueada()"
       (click)="editar.emit(l)"
@@ -20,6 +20,17 @@
           </span>
         }
       </span>
+    </button>
+    <!-- Editar a la vista (también se edita tocando el nombre): sin hover que descubrir. -->
+    <button
+      type="button"
+      class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-brand-muted hover:bg-[rgba(20,48,73,0.06)] hover:text-brand-text disabled:pointer-events-none disabled:opacity-40"
+      [attr.aria-label]="tx.editar + ': ' + l.item.nombre"
+      [title]="tx.editar"
+      [disabled]="bloqueada()"
+      (click)="editar.emit(l)"
+    >
+      <i class="pi pi-pencil text-[0.8rem]" aria-hidden="true"></i>
     </button>
     <button
       type="button"
