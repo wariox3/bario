@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -8,6 +8,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { I18nService, TenantService } from '@reddoc/core';
 import { AppSwitcherComponent } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
+import { PestanaUnicaService } from '../../core/pestana/pestana-unica.service';
 import { PosStorageService } from '../../core/storage/pos-storage.service';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
@@ -25,6 +26,10 @@ import { WORKSPACE_MENU, type PosNavItem } from './workspace-menu';
  *    solo mientras se está en la caja.
  *  - En las demás secciones manda la preferencia de la persona, recordada en
  *    el dispositivo.
+ *
+ * Además reserva la caja de la empresa para esta pestaña (`PestanaUnicaService`):
+ * si otra pestaña ya la tiene, en lugar de las secciones muestra un aviso, y la
+ * toma sola cuando la otra se cierra.
  */
 @Component({
   selector: 'app-workspace-layout',
@@ -48,10 +53,12 @@ export class WorkspaceLayoutComponent {
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
   private readonly storage = inject(PosStorageService);
+  private readonly pestana = inject(PestanaUnicaService);
 
   protected readonly t = this.i18n.t;
   protected readonly items = WORKSPACE_MENU;
   protected readonly drawerVisible = signal(false);
+  protected readonly estadoPestana = this.pestana.estado;
 
   /** La ruta actual es la caja. */
   private readonly enCaja = toSignal(
@@ -75,6 +82,12 @@ export class WorkspaceLayoutComponent {
   );
 
   constructor() {
+    effect(() => {
+      const slug = this.tenant.currentSlug();
+      if (slug) this.pestana.reclamar(slug);
+    });
+    inject(DestroyRef).onDestroy(() => this.pestana.soltar());
+
     // Entrar a la caja siempre la abre con el sidebar colapsado.
     this.router.events
       .pipe(

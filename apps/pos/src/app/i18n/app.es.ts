@@ -159,6 +159,12 @@ export const es: AppDict = {
       configuracion: 'Configuración',
     },
     sidebar: { colapsar: 'Colapsar menú', expandir: 'Expandir menú' },
+    pestanaOcupada: {
+      titulo: 'La caja ya está abierta en otra pestaña',
+      desc: 'Para no mezclar las ventas, el POS trabaja en una sola pestaña por empresa. Sigue en la otra o ciérrala para usar esta.',
+      esperando: 'Esta pestaña tomará la caja en cuanto cierres la otra.',
+      cambiarEmpresa: 'Cambiar de empresa',
+    },
     userMenu: {
       label: 'Menú de usuario',
       myContainers: 'Mis contenedores',

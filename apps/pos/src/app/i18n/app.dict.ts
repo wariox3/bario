@@ -143,6 +143,8 @@ export interface AppDict
     /** Etiqueta de cada sección del sidebar; las claves salen de `WORKSPACE_MENU`. */
     nav: Record<PosNavKey, string>;
     sidebar: { colapsar: string; expandir: string };
+    /** Otra pestaña del navegador tiene la caja de esta empresa. */
+    pestanaOcupada: { titulo: string; desc: string; esperando: string; cambiarEmpresa: string };
     userMenu: {
       label: string;
       myContainers: string;

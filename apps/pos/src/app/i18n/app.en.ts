@@ -159,6 +159,12 @@ export const en: AppDict = {
       configuracion: 'Settings',
     },
     sidebar: { colapsar: 'Collapse menu', expandir: 'Expand menu' },
+    pestanaOcupada: {
+      titulo: 'The register is already open in another tab',
+      desc: 'To keep sales from mixing, the POS works in a single tab per company. Keep using the other one or close it to use this one.',
+      esperando: 'This tab will take over the register as soon as you close the other one.',
+      cambiarEmpresa: 'Switch company',
+    },
     userMenu: {
       label: 'User menu',
       myContainers: 'My containers',

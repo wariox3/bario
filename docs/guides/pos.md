@@ -91,6 +91,10 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
   (`10` efectivo) y el plazo, del de 0 días.
 - **Un medio de pago nuevo** se habilita en `cobro/medios-pago.ts`, con su formulario en
   el diálogo y su cuenta en la configuración. El pipeline no cambia.
+- **Una sola pestaña por empresa.** Las ventas se guardan como un solo bloque en
+  `localStorage`; dos pestañas se las pisarían. `core/pestana/pestana-unica.service.ts` reserva
+  la caja con Web Locks y el workspace muestra un aviso en la segunda pestaña, que toma la caja
+  sola cuando la otra se cierra. Nada que escriba ventas debe montarse fuera del workspace.
 - **Lo que guarda el navegador lleva versión o validación** (`esEstadoCarritos`,
   `esConfiguracionCaja`): un cambio de forma descarta lo viejo en vez de romper la caja.
 - **Permisos:** `ModelPermissionsService` decide si se ofrecen el ítem rápido, la estrella
