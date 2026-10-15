@@ -101,6 +101,9 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
   `localStorage`; dos pestañas se las pisarían. `core/pestana/pestana-unica.service.ts` reserva
   la caja con Web Locks y el workspace muestra un aviso en la segunda pestaña, que toma la caja
   sola cuando la otra se cierra. Nada que escriba ventas debe montarse fuera del workspace.
+- **Un diálogo dentro del panel de la venta va con `appendTo="body"`.** En tablet el panel vive
+  en un `p-drawer` con `transform`, que encierra todo lo `position: fixed`: sin eso el modal se
+  centra en el drawer y su máscara no cubre la pantalla.
 - **Lo que guarda el navegador lleva versión o validación** (`esEstadoCarritos`,
   `esConfiguracionCaja`): un cambio de forma descarta lo viejo en vez de romper la caja.
 - **Editar un ítem desde la caja** usa `PATCH item/{id}/` con solo los campos del modal
