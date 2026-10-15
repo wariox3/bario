@@ -4,13 +4,18 @@
   <div class="flex items-start gap-2">
     <button
       type="button"
-      class="min-w-0 flex-1 rounded-md text-left focus-visible:outline-2 focus-visible:outline-[var(--brand-blue)]"
+      class="group -mx-1.5 -my-1 min-w-0 flex-1 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-[rgba(20,48,73,0.04)] focus-visible:outline-2 focus-visible:outline-[var(--brand-blue)] disabled:hover:bg-transparent"
       [attr.aria-label]="tx.editar + ': ' + l.item.nombre"
       [disabled]="bloqueada()"
       (click)="editar.emit(l)"
     >
       <span class="line-clamp-2 text-[0.82rem] font-semibold leading-tight text-brand-text">
         {{ l.item.nombre }}
+        <!-- Pista de que la línea se edita: aparece al pasar o enfocar. -->
+        <i
+          class="pi pi-pencil ml-1 align-middle text-[0.65rem] text-brand-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 group-disabled:hidden"
+          aria-hidden="true"
+        ></i>
       </span>
       <span class="mt-0.5 flex items-center gap-1.5 text-[0.75rem] text-brand-muted">
         <span class="font-mono tabular-nums">{{ precio() }}</span>
