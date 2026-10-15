@@ -153,6 +153,7 @@
             inputId="metodo_pago"
             formControlName="metodo_pago"
             [endpoint]="metodoPagoEndpoint"
+            [suggestedMatch]="metodoPagoSugerido()"
             [placeholder]="t().entities.documentoSoporte.form.fields.metodoPagoPlaceholder"
             [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
           />
@@ -231,6 +232,9 @@
             formControlName="resolucion"
             [endpoint]="resolucionEndpoint"
             [params]="resolucionParams"
+            [displayWith]="resolucionLabel"
+            filterBy="prefijo,numero"
+            [showClear]="true"
             [placeholder]="t().entities.documentoSoporte.form.fields.resolucionPlaceholder"
           />
         </div>
