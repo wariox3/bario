@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.7](///compare/v0.1.6...v0.1.7) (2026-10-16)
+
+
+### Features
+
+* **contenedores:** acceso de soporte para el staff ce0e593
+* **erp,pos:** imprimir desde todos los documentos y el historial del POS 421620b
+* **erp:** documentos que referencian en el modal de afectación 7eb4fbb
+* **erp:** ficha de documento recibido y forma de pago en la bandeja 8d11d1f
+* **erp:** imprimir e imprimir zip desde el listado de documentos 8cb8f6b
+* **erp:** los pagos del documento se guardan con el "Guardar" general c2d4a46
+* **erp:** selección de filas en nómina, nómina electrónica y seguridad social e30d294
+* **erp:** un solo "Guardar" confirma las líneas de los documentos comerciales 4ae3c5f
+* **erp:** vencimiento bloqueado en contado en factura de venta y POS 43d0ee0
+
+
+### Bug Fixes
+
+* **contenedores:** adicionar soporte deshabilitado sin contenedor elegido d9de7f9
+
 ## [0.1.6](https://github.com/wariox3/bario/compare/v0.1.5...v0.1.6) (2026-10-15)
 
 ### Features
