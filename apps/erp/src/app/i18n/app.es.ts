@@ -353,6 +353,32 @@ export const es: AppDict = {
         desc: 'No se pudo generar el documento. Intentá de nuevo.',
       },
     },
+    imprimirLista: {
+      label: 'Imprimir',
+      zipLabel: 'Imprimir zip',
+      confirmar: {
+        header: 'Imprimir documentos',
+        message: 'Se imprimirán {n} documentos. Puede tardar unos minutos.',
+        accept: 'Imprimir',
+        reject: 'Cancelar',
+      },
+      generando: {
+        title: 'Generando impresión',
+        desc: 'La descarga empieza en cuanto el archivo esté listo.',
+      },
+      sinCriterio: {
+        title: 'Elige qué imprimir',
+        desc: 'Selecciona documentos o aplica un filtro para imprimir.',
+      },
+      vacio: {
+        title: 'Nada para imprimir',
+        desc: 'No hay documentos con los filtros actuales.',
+      },
+      error: {
+        title: 'No se pudo imprimir',
+        desc: 'Ocurrió un error al generar la impresión. Intenta de nuevo.',
+      },
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generar seleccionados',
       modalHeader: 'Generar facturas',
