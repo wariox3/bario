@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import { type BackendFilter, BaseHttpService, type PaginatedResponse } from '@reddoc/core';
 
 /** Endpoint de cabeceras de documento (compartido por todos los documentos). */
 const DOCUMENTO_ENDPOINT = '/general/documento/';
+
+/** Tope de cabeceras por consulta filtrada: alcanza para trazar un documento. */
+const DOCUMENTO_PAGE_SIZE = 1000;
 
 /**
  * Lectura de **cabeceras de documento** (`/api/general/documento/`).
@@ -34,6 +37,18 @@ export class DocumentoService extends BaseHttpService {
       `${DOCUMENTO_ENDPOINT}lista/`,
       { filtros: [{ propiedad: 'id', operador: 'in', valor: ids.join(',') }] },
       { limit: ids.length },
+    ).pipe(map((res) => [...res.results]));
+  }
+
+  /** Cabeceras que cumplen `filtros` (`POST …documento/lista/`), hasta `limit` filas. */
+  listarPorFiltros<TRead = unknown>(
+    filtros: readonly BackendFilter[],
+    limit: number = DOCUMENTO_PAGE_SIZE,
+  ): Observable<TRead[]> {
+    return this.post<PaginatedResponse<TRead>>(
+      `${DOCUMENTO_ENDPOINT}lista/`,
+      { filtros },
+      { limit },
     ).pipe(map((res) => [...res.results]));
   }
 }

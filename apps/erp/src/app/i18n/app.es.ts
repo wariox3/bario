@@ -668,7 +668,12 @@ export const es: AppDict = {
       porDocumento: {
         subtitle: 'El documento, su referencia y lo que lo afecta',
         empty: 'Ningún documento afecta a este.',
-        cols: { concepto: 'Concepto', valor: 'Valor' },
+        cols: { concepto: 'Concepto', valor: 'Valor', numero: 'Número' },
+        lineas: { title: 'Líneas que lo afectan' },
+        referencias: {
+          title: 'Documentos que lo referencian',
+          empty: 'Ningún documento lo toma como referencia.',
+        },
       },
       ver: 'Ver afectación',
       cols: {

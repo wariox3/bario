@@ -535,7 +535,9 @@ export interface AppDict
       porDocumento: {
         subtitle: string;
         empty: string;
-        cols: { concepto: string; valor: string };
+        cols: { concepto: string; valor: string; numero: string };
+        lineas: { title: string };
+        referencias: { title: string; empty: string };
       };
       ver: string;
       cols: {

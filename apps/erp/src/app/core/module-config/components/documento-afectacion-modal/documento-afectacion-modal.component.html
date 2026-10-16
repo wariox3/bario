@@ -2,6 +2,7 @@
 @let th =
   'sticky top-0 z-[1] whitespace-nowrap bg-[#f8f9fa] px-[0.6rem] py-2 text-[0.66rem] font-bold uppercase tracking-[0.04em] text-brand-muted shadow-[inset_0_-1px_0_rgba(20,48,73,0.1)]';
 @let td = 'px-[0.6rem] py-[0.45rem] align-middle';
+@let sectionTitle = 'm-0 text-[0.72rem] font-bold uppercase tracking-[0.04em] text-brand-muted';
 
 <p-dialog
   [visible]="visible()"
@@ -55,7 +56,8 @@
       }
 
       <!-- ── Lo que afecta al documento: una fila por línea de otro documento ──── -->
-      <div class="max-h-96 overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+      <h3 [class]="sectionTitle">{{ a.porDocumento.lineas.title }}</h3>
+      <div class="-mt-2 max-h-96 overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
         <table class="w-full border-collapse text-[0.82rem]">
           <thead>
             <tr>
@@ -94,6 +96,53 @@
               <tr>
                 <td colspan="6" class="px-5 py-10 text-center text-sm text-brand-muted">
                   <i class="pi pi-inbox mr-2"></i>{{ a.porDocumento.empty }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Documentos que lo toman como referencia: una fila por cabecera ──── -->
+      <h3 [class]="sectionTitle">{{ a.porDocumento.referencias.title }}</h3>
+      <div class="-mt-2 max-h-96 overflow-auto rounded-xl border border-[rgba(20,48,73,0.12)]">
+        <table class="w-full border-collapse text-[0.82rem]">
+          <thead>
+            <tr>
+              <th [class]="th + ' text-center'">{{ a.cols.id }}</th>
+              <th [class]="th + ' text-left'">{{ a.cols.documento }}</th>
+              <th [class]="th + ' text-center'">{{ a.porDocumento.cols.numero }}</th>
+              <th [class]="th + ' text-center'">{{ a.campos.fecha }}</th>
+              <th [class]="th + ' text-left'">{{ a.campos.contacto }}</th>
+              <th [class]="th + ' text-right'">{{ a.cols.total }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[rgba(20,48,73,0.07)]">
+            @for (ref of referenciados(); track ref.id ?? $index) {
+              <tr class="hover:bg-[rgba(20,48,73,0.015)]">
+                <td [class]="td + ' text-center tabular-nums text-brand-muted'">
+                  {{ ref.id }}
+                </td>
+                <td [class]="td + ' text-left font-medium text-brand-text'">
+                  {{ ref.documento_tipo_nombre }}
+                </td>
+                <td [class]="td + ' text-center tabular-nums text-brand-text'">
+                  {{ ref.numero }}
+                </td>
+                <td [class]="td + ' whitespace-nowrap text-center tabular-nums text-brand-text'">
+                  {{ formatFecha(ref.fecha) }}
+                </td>
+                <td [class]="td + ' font-medium text-brand-text'">
+                  {{ ref.contacto_nombre_corto }}
+                </td>
+                <td [class]="td + ' text-right font-semibold tabular-nums text-brand-text'">
+                  {{ formatMoney(ref.total ?? 0) }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="px-5 py-10 text-center text-sm text-brand-muted">
+                  <i class="pi pi-inbox mr-2"></i>{{ a.porDocumento.referencias.empty }}
                 </td>
               </tr>
             }
