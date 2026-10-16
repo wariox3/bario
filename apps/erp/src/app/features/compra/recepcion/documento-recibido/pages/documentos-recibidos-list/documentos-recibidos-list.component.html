@@ -92,6 +92,7 @@
   <lib-data-table
     table
     [columns]="columns"
+    [rowActions]="rowActions"
     [items]="items()"
     [totalCount]="totalCount()"
     [loading]="isLoading()"
@@ -102,6 +103,7 @@
     emptySubKey="entities.documentoRecibido.empty.sub"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
   />
 </lib-list-shell>
 

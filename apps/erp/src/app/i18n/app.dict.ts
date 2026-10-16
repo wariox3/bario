@@ -4689,6 +4689,7 @@ export interface AppDict
     documentoRecibido: {
       name: string;
       cargar: string;
+      verDetalle: string;
       columns: {
         fecha: string;
         numero: string;
@@ -4697,6 +4698,7 @@ export interface AppDict
         tipo: string;
         impuestos: string;
         total: string;
+        formaPago: string;
       };
       tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
       filtros: {
@@ -4706,6 +4708,19 @@ export interface AppDict
         hasta: string;
         delCorreo: string;
         quitarCorreo: string;
+      };
+      detalle: {
+        title: string;
+        general: string;
+        emision: string;
+        moneda: string;
+        validado: string;
+        fechaValidacion: string;
+        recibido: string;
+        cue: string;
+        verDian: string;
+        valorBruto: string;
+        notFound: { title: string; desc: string };
       };
       empty: { title: string; sub: string };
       carga: {

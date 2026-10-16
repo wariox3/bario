@@ -60,6 +60,8 @@ export interface DocumentoRecibido {
   readonly proveedor_razon_social: string;
   /** NIT de la empresa que recibe (el emisor), sin DV. */
   readonly receptor_numero_identificacion: string;
+  /** Nombre de la forma de pago (contado, crédito…); `null` si el XML no la trae. */
+  readonly forma_pago_nombre: string | null;
   readonly moneda: string;
   readonly valor_bruto: string;
   readonly total_impuestos: string;

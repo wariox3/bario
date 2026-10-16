@@ -6097,6 +6097,7 @@ export const es: AppDict = {
     documentoRecibido: {
       name: 'Documentos',
       cargar: 'Cargar archivo',
+      verDetalle: 'Ver detalle',
       columns: {
         fecha: 'Fecha',
         numero: 'Número',
@@ -6105,6 +6106,7 @@ export const es: AppDict = {
         tipo: 'Tipo',
         impuestos: 'Impuestos',
         total: 'Total',
+        formaPago: 'Forma de pago',
       },
       tipos: {
         factura_venta: 'Factura',
@@ -6118,6 +6120,22 @@ export const es: AppDict = {
         hasta: 'Hasta',
         delCorreo: 'Del correo',
         quitarCorreo: 'Quitar el filtro por correo',
+      },
+      detalle: {
+        title: 'Detalle',
+        general: 'Información general',
+        emision: 'Emisión',
+        moneda: 'Moneda',
+        validado: 'Validado DIAN',
+        fechaValidacion: 'Fecha de validación',
+        recibido: 'Recibido en RedEDoc',
+        cue: 'CUE',
+        verDian: 'Ver en la DIAN',
+        valorBruto: 'Valor bruto',
+        notFound: {
+          title: 'Documento no encontrado',
+          desc: 'Vuelve a la bandeja y ábrelo desde allí.',
+        },
       },
       empty: {
         title: 'No hay documentos recibidos',
