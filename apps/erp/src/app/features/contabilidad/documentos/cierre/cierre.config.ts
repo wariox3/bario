@@ -50,5 +50,5 @@ export const CIERRE_CONFIG: DocumentEntityConfig = {
   },
   // Un cierre aprobado ya movió los saldos del ejercicio: no se edita.
   canEditRow: (row) => !row.estado_aprobado,
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
 };

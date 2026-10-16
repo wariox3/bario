@@ -1,0 +1,143 @@
+@let d = t().entities.documentoRecibido;
+
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<!-- ── Encabezado de página ──────────────────────────────────────────────────── -->
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+</header>
+
+@if (isLoading()) {
+  <!-- ── Estado de carga ─────────────────────────────────────────────────────── -->
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <!-- ── No encontrado ───────────────────────────────────────────────────────── -->
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ d.detalle.notFound.title }}</p>
+    <p class="m-0 mt-1 max-w-[280px] text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ d.detalle.notFound.desc }}
+    </p>
+  </div>
+} @else if (vista(); as v) {
+  <!-- ── Información general ──────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+    >
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-inbox text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.detalle.general }}
+      </h2>
+      @if (v.validado) {
+        <span
+          class="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[0.72rem] font-semibold text-emerald-700"
+        >
+          <i class="pi pi-check-circle text-[0.7rem]"></i>
+          {{ d.detalle.validado }}
+        </span>
+      }
+    </div>
+    <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.columns.numero }}</dt>
+        <dd class="documento-recibido-detail__value">{{ v.doc.numero }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.columns.tipo }}</dt>
+        <dd class="documento-recibido-detail__value">{{ v.tipo }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.detalle.emision }}</dt>
+        <dd class="documento-recibido-detail__value">{{ v.emision }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.columns.proveedor }}</dt>
+        <dd class="documento-recibido-detail__value">{{ v.doc.proveedor_razon_social }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.columns.nit }}</dt>
+        <dd class="documento-recibido-detail__value tabular-nums">
+          {{ v.doc.proveedor_nit }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.columns.formaPago }}</dt>
+        <dd class="documento-recibido-detail__value">{{ v.doc.forma_pago_nombre }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.detalle.moneda }}</dt>
+        <dd class="documento-recibido-detail__value">{{ v.doc.moneda }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.detalle.fechaValidacion }}</dt>
+        <dd class="documento-recibido-detail__value">{{ v.fechaValidacion }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.detalle.recibido }}</dt>
+        <dd class="documento-recibido-detail__value tabular-nums">{{ v.recibido }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+        <dt class="documento-recibido-detail__label">{{ d.detalle.cue }}</dt>
+        <dd class="documento-recibido-detail__value break-all">
+          {{ v.doc.cufe_cude }}
+          @if (v.dianUrl; as url) {
+            <a
+              class="ml-2 font-semibold text-sky-700 hover:underline"
+              [href]="url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ d.detalle.verDian }}</a
+            >
+          }
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
+  <div class="flex justify-end">
+    <div
+      class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
+    >
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+          <span class="text-brand-muted">{{ d.detalle.valorBruto }}</span>
+          <span class="tabular-nums text-brand-text">{{ v.valorBruto }}</span>
+        </div>
+        <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+          <span class="text-brand-muted">{{ d.columns.impuestos }}</span>
+          <span class="tabular-nums text-brand-text">{{ v.impuestos }}</span>
+        </div>
+        <div
+          class="mt-1 flex items-baseline justify-between gap-2 border-t border-[rgba(20,48,73,0.1)] pt-2.5"
+        >
+          <span class="text-[0.78rem] font-semibold text-brand-text">{{ d.columns.total }}</span>
+          <span
+            class="text-[1.35rem] font-bold leading-none tracking-[-0.02em] tabular-nums text-[#143049]"
+          >
+            {{ v.total }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

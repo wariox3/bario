@@ -26,6 +26,9 @@
       [loading]="isSaving()"
       [disabled]="isSaving() || tablasOcupadas()"
     />
+    @if (hayCambios()) {
+      <app-cambios-sin-guardar />
+    }
   </lib-page-actions>
 
   <!-- ── Sección: Información general ──────────────────────────────────────── -->
@@ -121,6 +124,9 @@
               [silenciar]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
               (restablecer)="vencimiento.restablecer()"
             />
+            @if (vencimiento.bloqueado()) {
+              <p class="text-[0.72rem] text-slate-500">{{ t().entities.vencimiento.contado }}</p>
+            }
           </div>
         </div>
 
@@ -333,7 +339,6 @@
             [scannerEnabled]="true"
             [almacenEnabled]="true"
             [almacenPorDefecto]="form.controls.almacen.value"
-            (imported)="onImported()"
           />
         </p-tabpanel>
 

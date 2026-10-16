@@ -491,8 +491,26 @@ export const es: AppDict = {
       electronico: 'Ele',
     },
     filtros: { aprobado: 'Aprobado', anulado: 'Anulado', electronico: 'Electrónico' },
-    acciones: { imprimir: 'Imprimir' },
+    acciones: { imprimir: 'Imprimir', imprimirLista: 'Imprimir', imprimirZip: 'Imprimir zip' },
+    confirmarImpresion: {
+      header: 'Imprimir ventas',
+      message: 'Se imprimirán {n} ventas. Puede tardar unos minutos.',
+      accept: 'Imprimir',
+      reject: 'Cancelar',
+    },
     toasts: {
+      generando: {
+        title: 'Generando impresión',
+        desc: 'La descarga empieza en cuanto el archivo esté listo.',
+      },
+      sinCriterio: {
+        title: 'Elige qué imprimir',
+        desc: 'Selecciona ventas o aplica un filtro para imprimir.',
+      },
+      vacio: {
+        title: 'Nada para imprimir',
+        desc: 'No hay ventas con los filtros actuales.',
+      },
       imprimirError: {
         title: 'No se pudo imprimir',
         desc: 'Intenta de nuevo en un momento.',

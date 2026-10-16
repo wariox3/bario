@@ -353,6 +353,32 @@ export const es: AppDict = {
         desc: 'No se pudo generar el documento. Intentá de nuevo.',
       },
     },
+    imprimirLista: {
+      label: 'Imprimir',
+      zipLabel: 'Imprimir zip',
+      confirmar: {
+        header: 'Imprimir documentos',
+        message: 'Se imprimirán {n} documentos. Puede tardar unos minutos.',
+        accept: 'Imprimir',
+        reject: 'Cancelar',
+      },
+      generando: {
+        title: 'Generando impresión',
+        desc: 'La descarga empieza en cuanto el archivo esté listo.',
+      },
+      sinCriterio: {
+        title: 'Elige qué imprimir',
+        desc: 'Selecciona documentos o aplica un filtro para imprimir.',
+      },
+      vacio: {
+        title: 'Nada para imprimir',
+        desc: 'No hay documentos con los filtros actuales.',
+      },
+      error: {
+        title: 'No se pudo imprimir',
+        desc: 'Ocurrió un error al generar la impresión. Intenta de nuevo.',
+      },
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generar seleccionados',
       modalHeader: 'Generar facturas',
@@ -642,7 +668,12 @@ export const es: AppDict = {
       porDocumento: {
         subtitle: 'El documento, su referencia y lo que lo afecta',
         empty: 'Ningún documento afecta a este.',
-        cols: { concepto: 'Concepto', valor: 'Valor' },
+        cols: { concepto: 'Concepto', valor: 'Valor', numero: 'Número' },
+        lineas: { title: 'Líneas que lo afectan' },
+        referencias: {
+          title: 'Documentos que lo referencian',
+          empty: 'Ningún documento lo toma como referencia.',
+        },
       },
       ver: 'Ver afectación',
       cols: {
@@ -2883,8 +2914,6 @@ export const es: AppDict = {
       add: 'Agregar pago',
       empty: 'No hay pagos registrados',
       removePago: 'Eliminar pago',
-      savePago: 'Guardar pago',
-      saveAll: 'Guardar pagos',
       pendingSuffix: 'sin guardar',
       anulado: 'Anulado',
       confirmDelete: '¿Eliminar este pago?',
@@ -2908,14 +2937,7 @@ export const es: AppDict = {
           title: 'Sin saldo por cobrar',
           desc: 'Los pagos ya cubren el total del documento',
         },
-        saveSuccess: { title: 'Pago guardado', desc: 'El pago se registró correctamente' },
         saveError: { title: 'Error al guardar', desc: 'No se pudo guardar el pago' },
-        allSaved: { title: 'Pagos guardados', desc: 'Se guardaron los pagos pendientes' },
-        incompletos: {
-          title: 'Pagos incompletos',
-          desc: 'Elige la cuenta de banco y un monto mayor a cero en cada pago',
-        },
-        deleteError: { title: 'Error al eliminar', desc: 'No se pudo eliminar el pago' },
         noRegistrados: {
           title: 'Pagos sin registrar',
           desc: 'El documento se guardó, pero algunos pagos no se registraron. Edítalo para agregarlos',
@@ -4052,6 +4074,7 @@ export const es: AppDict = {
       usar: 'Usar {fecha}',
       usarTitle: 'Volver al vencimiento que dicta el plazo de pago',
       anteriorAFecha: 'El vencimiento no puede ser anterior a la fecha.',
+      contado: 'De contado: vence el mismo día de la fecha.',
     },
     comercialDetalle: {
       cargarReferencia: {
@@ -4077,8 +4100,6 @@ export const es: AppDict = {
       empty: 'Aún no hay líneas. Agrega la primera para empezar',
       addLine: 'Agregar línea',
       removeLine: 'Eliminar línea',
-      saveLine: 'Guardar línea',
-      saveAll: 'Guardar líneas',
       pendingSuffix: 'sin guardar',
       leaveHeader: 'Cambios sin guardar',
       leaveMessage: 'Hay cambios sin guardar que se perderán. ¿Salir de todos modos?',
@@ -4163,17 +4184,9 @@ export const es: AppDict = {
         total: 'Total',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Línea guardada',
-          desc: 'La línea se guardó correctamente',
-        },
         lineSaveError: {
           title: 'Error al guardar',
-          desc: 'No se pudo guardar la línea',
-        },
-        allSaved: {
-          title: 'Líneas guardadas',
-          desc: 'Se guardaron las líneas pendientes',
+          desc: 'No se pudieron guardar las líneas',
         },
         incompleteLines: {
           title: 'Líneas incompletas',
@@ -6096,6 +6109,7 @@ export const es: AppDict = {
     documentoRecibido: {
       name: 'Documentos',
       cargar: 'Cargar archivo',
+      verDetalle: 'Ver detalle',
       columns: {
         fecha: 'Fecha',
         numero: 'Número',
@@ -6104,6 +6118,7 @@ export const es: AppDict = {
         tipo: 'Tipo',
         impuestos: 'Impuestos',
         total: 'Total',
+        formaPago: 'Forma de pago',
       },
       tipos: {
         factura_venta: 'Factura',
@@ -6117,6 +6132,22 @@ export const es: AppDict = {
         hasta: 'Hasta',
         delCorreo: 'Del correo',
         quitarCorreo: 'Quitar el filtro por correo',
+      },
+      detalle: {
+        title: 'Detalle',
+        general: 'Información general',
+        emision: 'Emisión',
+        moneda: 'Moneda',
+        validado: 'Validado DIAN',
+        fechaValidacion: 'Fecha de validación',
+        recibido: 'Recibido en RedEDoc',
+        cue: 'CUE',
+        verDian: 'Ver en la DIAN',
+        valorBruto: 'Valor bruto',
+        notFound: {
+          title: 'Documento no encontrado',
+          desc: 'Vuelve a la bandeja y ábrelo desde allí.',
+        },
       },
       empty: {
         title: 'No hay documentos recibidos',

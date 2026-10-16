@@ -367,6 +367,7 @@ export class BaseDocumentListComponent {
         document: this.document(),
         query: this.currentQuery(),
         selectedIds: this.currentSelectedIds(),
+        totalCount: this.totalCount(),
         reload: () => this.loadList(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))

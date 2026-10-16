@@ -46,5 +46,5 @@ export const SALIDA_CONFIG: DocumentEntityConfig = {
   // Una salida aprobada ya movió stock: no se edita. Regla única consumida por
   // la lista, el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
 };

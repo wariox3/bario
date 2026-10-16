@@ -11,7 +11,7 @@ interface ToastTexto {
 }
 
 /**
- * Contrato mínimo de una tabla que transacciona en vivo contra el backend (líneas de
+ * Contrato mínimo de una tabla que se guarda aparte del documento (líneas de
  * `documento-detalle`, pagos de `documento-pago`): el form padre le pide que guarde
  * sus pendientes antes de guardar la cabecera.
  */

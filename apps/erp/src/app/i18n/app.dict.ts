@@ -347,6 +347,16 @@ export interface AppDict
       success: { title: string; desc: string };
       error: { title: string; desc: string };
     };
+    imprimirLista: {
+      label: string;
+      zipLabel: string;
+      /** `message` lleva `{n}`, la cantidad de documentos. */
+      confirmar: { header: string; message: string; accept: string; reject: string };
+      generando: { title: string; desc: string };
+      sinCriterio: { title: string; desc: string };
+      vacio: { title: string; desc: string };
+      error: { title: string; desc: string };
+    };
     generarRecurrente: {
       seleccionadosLabel: string;
       modalHeader: string;
@@ -525,7 +535,9 @@ export interface AppDict
       porDocumento: {
         subtitle: string;
         empty: string;
-        cols: { concepto: string; valor: string };
+        cols: { concepto: string; valor: string; numero: string };
+        lineas: { title: string };
+        referencias: { title: string; empty: string };
       };
       ver: string;
       cols: {
@@ -2188,8 +2200,6 @@ export interface AppDict
       add: string;
       empty: string;
       removePago: string;
-      savePago: string;
-      saveAll: string;
       pendingSuffix: string;
       anulado: string;
       confirmDelete: string;
@@ -2207,11 +2217,7 @@ export interface AppDict
       toasts: {
         sinDetalles: { title: string; desc: string };
         sinSaldo: { title: string; desc: string };
-        saveSuccess: { title: string; desc: string };
         saveError: { title: string; desc: string };
-        allSaved: { title: string; desc: string };
-        incompletos: { title: string; desc: string };
-        deleteError: { title: string; desc: string };
         noRegistrados: { title: string; desc: string };
       };
     };
@@ -3075,6 +3081,7 @@ export interface AppDict
       usar: string;
       usarTitle: string;
       anteriorAFecha: string;
+      contado: string;
     };
     comercialDetalle: {
       cargarReferencia: {
@@ -3093,8 +3100,6 @@ export interface AppDict
       empty: string;
       addLine: string;
       removeLine: string;
-      saveLine: string;
-      saveAll: string;
       pendingSuffix: string;
       leaveHeader: string;
       leaveMessage: string;
@@ -3157,9 +3162,7 @@ export interface AppDict
         total: string;
       };
       toasts: {
-        lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };
-        allSaved: { title: string; desc: string };
         incompleteLines: { title: string; desc: string };
       };
     };
@@ -4688,6 +4691,7 @@ export interface AppDict
     documentoRecibido: {
       name: string;
       cargar: string;
+      verDetalle: string;
       columns: {
         fecha: string;
         numero: string;
@@ -4696,6 +4700,7 @@ export interface AppDict
         tipo: string;
         impuestos: string;
         total: string;
+        formaPago: string;
       };
       tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
       filtros: {
@@ -4705,6 +4710,19 @@ export interface AppDict
         hasta: string;
         delCorreo: string;
         quitarCorreo: string;
+      };
+      detalle: {
+        title: string;
+        general: string;
+        emision: string;
+        moneda: string;
+        validado: string;
+        fechaValidacion: string;
+        recibido: string;
+        cue: string;
+        verDian: string;
+        valorBruto: string;
+        notFound: { title: string; desc: string };
       };
       empty: { title: string; sub: string };
       carga: {

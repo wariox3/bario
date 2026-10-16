@@ -392,8 +392,15 @@ export interface AppDict
       electronico: string;
     };
     filtros: { aprobado: string; anulado: string; electronico: string };
-    acciones: { imprimir: string };
-    toasts: { imprimirError: { title: string; desc: string } };
+    acciones: { imprimir: string; imprimirLista: string; imprimirZip: string };
+    /** `message` lleva `{n}`, la cantidad de ventas. */
+    confirmarImpresion: { header: string; message: string; accept: string; reject: string };
+    toasts: {
+      imprimirError: { title: string; desc: string };
+      generando: { title: string; desc: string };
+      sinCriterio: { title: string; desc: string };
+      vacio: { title: string; desc: string };
+    };
   };
   configuracion: {
     title: string;

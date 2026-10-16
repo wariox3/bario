@@ -13,15 +13,6 @@
         <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
         {{ pendingCount() }} {{ p.pendingSuffix }}
       </span>
-      <p-button
-        type="button"
-        size="small"
-        icon="pi pi-save"
-        [label]="p.saveAll + ' (' + pendingCount() + ')'"
-        [loading]="savingAll()"
-        [disabled]="ocupado()"
-        (onClick)="onSaveAllClick()"
-      />
     }
     <p-button
       type="button"
@@ -29,6 +20,7 @@
       icon="pi pi-plus"
       [label]="p.add"
       [outlined]="true"
+      [disabled]="ocupado()"
       (onClick)="addPago()"
     />
   </div>
@@ -62,14 +54,12 @@
                 ></span>
               }
               <!-- Id real del pago; una fila aún sin guardar no tiene id. -->
-              {{ pago.controls.id.value ?? '—' }}
+              {{ pago.controls.id.value }}
             </td>
 
             <td class="documento-pagos-table__td">
               @if (anulado) {
-                <span class="text-brand-muted">{{
-                  pago.controls.cuenta_banco.value?.nombre || '—'
-                }}</span>
+                <span class="text-brand-muted">{{ pago.controls.cuenta_banco.value?.nombre }}</span>
               } @else {
                 <lib-api-select
                   formControlName="cuenta_banco"
@@ -111,22 +101,6 @@
                     {{ p.anulado }}
                   </span>
                 } @else {
-                  @if (canSaveRow(pago)) {
-                    <button
-                      type="button"
-                      (click)="savePago(pago)"
-                      [disabled]="ocupado()"
-                      [pTooltip]="p.savePago"
-                      [attr.aria-label]="p.savePago"
-                      class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
-                    >
-                      @if (isSavingRow(pago)) {
-                        <i class="pi pi-spin pi-spinner text-[0.72rem]"></i>
-                      } @else {
-                        <i class="pi pi-check text-[0.72rem]"></i>
-                      }
-                    </button>
-                  }
                   <button
                     type="button"
                     (click)="removePago(pago)"

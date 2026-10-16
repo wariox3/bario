@@ -36,6 +36,7 @@ import { isSuscripcionExpired } from '../../utils/contenedor-suscripcion.utils';
 import { ContenedoresCreateDialogComponent } from '../../components/create-dialog/contenedores-create-dialog.component';
 import { ContenedoresDeleteDialogComponent } from '../../components/delete-dialog/contenedores-delete-dialog.component';
 import { ContenedoresInviteDialogComponent } from '../../components/invite-dialog/contenedores-invite-dialog.component';
+import { ContenedoresSupportDialogComponent } from '../../components/support-dialog/contenedores-support-dialog.component';
 import { ContenedorRowItemComponent } from '../../components/contenedor-row-item/contenedor-row-item.component';
 import { ContenedorCardItemComponent } from '../../components/contenedor-card-item/contenedor-card-item.component';
 import { CONTENEDORES_CAPABILITIES_FULL } from '../../contenedores.capabilities';
@@ -59,6 +60,7 @@ interface EstadoConsultado {
     ContenedoresCreateDialogComponent,
     ContenedoresDeleteDialogComponent,
     ContenedoresInviteDialogComponent,
+    ContenedoresSupportDialogComponent,
     ContenedorRowItemComponent,
     ContenedorCardItemComponent,
     MenuModule,
@@ -105,6 +107,7 @@ export class ContenedoresListComponent {
   readonly showEdit = signal(false);
   readonly showDelete = signal(false);
   readonly showInvite = signal(false);
+  readonly showSupport = signal(false);
   readonly contenedorToEdit = signal<ContenedorDetalle | null>(null);
   readonly contenedorToDelete = signal<Contenedor | null>(null);
   readonly contenedorToInvite = signal<Contenedor | null>(null);
@@ -114,6 +117,11 @@ export class ContenedoresListComponent {
   private readonly reload$ = new Subject<void>();
 
   readonly currentUser = this.authService.currentUser;
+
+  /** Entrar como soporte: lo habilita la app y solo lo ve el staff de la plataforma. */
+  readonly canSupport = computed(
+    () => this.capabilities().support && this.currentUser()?.is_staff === true,
+  );
 
   /**
    * Estados que `/estado/` reportó después de la última carga de la lista. Pisan
@@ -279,7 +287,8 @@ export class ContenedoresListComponent {
 
   enterContenedor(item: Contenedor): void {
     if (item.estado !== 'listo') return;
-    if (isSuscripcionExpired(item.suscripcion_fecha_fin)) {
+    // Soporte entra aunque la suscripción esté vencida: el backend se lo permite.
+    if (isSuscripcionExpired(item.suscripcion_fecha_fin) && !item.soporte) {
       if (item.propietario) this.renewContenedor(item.suscripcion_id);
       return;
     }
@@ -313,9 +322,10 @@ export class ContenedoresListComponent {
 
   private memberMenuItems(item: Contenedor): MenuItem[] {
     if (!this.capabilities().leave) return [];
+    const labels = this.t().contenedores.list.actions;
     return [
       {
-        label: this.t().contenedores.list.actions.leave,
+        label: item.soporte ? labels.closeSupport : labels.leave,
         icon: 'pi pi-sign-out',
         styleClass: 'cl-row-menu__danger',
         command: () => this.confirmLeave(item),
@@ -369,7 +379,10 @@ export class ContenedoresListComponent {
    * pierde ningún dato de la empresa.
    */
   private confirmLeave(item: Contenedor): void {
-    const textos = this.t().contenedores.list.leave;
+    // Soporte sale igual, pero puede volver solo: no aplica «te tendrán que invitar».
+    const textos = item.soporte
+      ? this.t().contenedores.list.closeSupport
+      : this.t().contenedores.list.leave;
     const conNombre = (texto: string) => texto.replace('{nombre}', item.cliente_nombre);
     this.confirmation.confirm({
       header: conNombre(textos.title),
@@ -442,6 +455,11 @@ export class ContenedoresListComponent {
   onContenedorDeleted(): void {
     this.showDelete.set(false);
     this.contenedorToDelete.set(null);
+    this.reload$.next();
+  }
+
+  onSupportAdded(): void {
+    this.showSupport.set(false);
     this.reload$.next();
   }
 

@@ -22,6 +22,7 @@ const POS_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   leave: true,
   subscription: false,
   viewToggle: true,
+  support: true,
 };
 
 export const CONTENEDORES_ROUTES: Route[] = [

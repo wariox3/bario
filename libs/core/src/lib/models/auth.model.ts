@@ -6,6 +6,14 @@ export interface BaseUsuario {
   celular?: string | null;
   imagen?: string | null;
   imagen_thumbnail?: string | null;
+  /**
+   * Personal de soporte de la plataforma. Habilita lo que solo hace el staff,
+   * como entrar a un contenedor sin invitación. Opcional en la base porque no
+   * todo backend lo manda: ausente se lee como `false`.
+   */
+  is_staff?: boolean;
+  /** ¿Tiene activa la autenticación en varias fases? Abrir soporte la exige. */
+  mfa_activo?: boolean;
 }
 
 export interface Usuario extends BaseUsuario {
@@ -16,6 +24,7 @@ export interface Usuario extends BaseUsuario {
   imagen: string | null;
   imagen_thumbnail: string | null;
   is_verified: boolean;
+  is_staff: boolean;
   /** ¿El usuario tiene activa la autenticación en varias fases? */
   mfa_activo: boolean;
   /** `codigo` del método activo (`totp`, `sms`, `correo`). `null` si `mfa_activo` es `false`. */

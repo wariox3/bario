@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@reddoc/core';
+import type { RowAction } from '@reddoc/feature-base';
 import type { DocumentoRecibidoTipo } from './documento-recibido.model';
 
 const I18N = 'entities.documentoRecibido';
@@ -8,6 +9,13 @@ export const TIPOS: readonly DocumentoRecibidoTipo[] = [
   'factura_venta',
   'nota_credito',
   'nota_debito',
+];
+
+/** Abre la ficha del documento. */
+export const ROW_ACTION_DETALLE = 'ver-detalle';
+
+export const ROW_ACTIONS: readonly RowAction[] = [
+  { id: ROW_ACTION_DETALLE, labelKey: `${I18N}.verDetalle`, iconClass: 'pi pi-eye', inline: true },
 ];
 
 /** Lo que acepta la carga a mano: el ZIP que manda el proveedor o su XML. */
@@ -26,6 +34,13 @@ export const COLUMNS: readonly ColumnDef[] = [
     width: '110px',
   },
   {
+    field: 'documento_tipo',
+    headerKey: `${I18N}.columns.tipo`,
+    type: 'enum',
+    enumKeyPrefix: `${I18N}.tipos`,
+    width: '130px',
+  },
+  {
     field: 'numero',
     headerKey: `${I18N}.columns.numero`,
     type: 'text',
@@ -34,11 +49,10 @@ export const COLUMNS: readonly ColumnDef[] = [
   { field: 'proveedor_razon_social', headerKey: `${I18N}.columns.proveedor`, type: 'text' },
   { field: 'proveedor_nit', headerKey: `${I18N}.columns.nit`, type: 'text', width: '140px' },
   {
-    field: 'documento_tipo',
-    headerKey: `${I18N}.columns.tipo`,
-    type: 'enum',
-    enumKeyPrefix: `${I18N}.tipos`,
-    width: '130px',
+    field: 'forma_pago_nombre',
+    headerKey: `${I18N}.columns.formaPago`,
+    type: 'text',
+    width: '140px',
   },
   {
     field: 'total_impuestos',

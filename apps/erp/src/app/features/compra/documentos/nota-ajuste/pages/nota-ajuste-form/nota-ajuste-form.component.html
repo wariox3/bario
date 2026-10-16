@@ -24,8 +24,11 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="isSaving()"
+      [disabled]="isSaving() || tablasOcupadas()"
     />
+    @if (hayCambios()) {
+      <app-cambios-sin-guardar />
+    }
   </lib-page-actions>
 
   <!-- ── Sección: Información general ──────────────────────────────────────── -->
@@ -165,7 +168,6 @@
               [referenciaId]="form.controls.documento_referencia.value?.id ?? null"
               [tabla]="detallesTable()"
               [disabled]="isSaving()"
-              (recargar)="recargarLineas()"
             />
           </div>
         </div>
@@ -250,7 +252,6 @@
             [documentId]="documentId()"
             [contactoId]="form.controls.contacto.value?.id ?? null"
             [almacenEnabled]="true"
-            (imported)="onImported()"
           />
         </p-tabpanel>
       </p-tabpanels>

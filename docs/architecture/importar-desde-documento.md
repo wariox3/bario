@@ -125,6 +125,13 @@ en el legacy). Reutilizamos sí el `DialogService` y el chrome `ENTITY_ACTION_DI
 
 ### 4.3 Persistencia según modo (decidido)
 
+> **Actualización (2026-10):** en edición la tabla de líneas ya no persiste nada por su cuenta. Las
+> líneas importadas (como las del AIU, las agregadas, editadas o quitadas) quedan pendientes en el
+> `FormArray` igual que en alta, y se escriben fila por fila contra `/documento-detalle` cuando la
+> persona pulsa el **"Guardar"** del documento (`saveAll()` de la tabla, antes de la cabecera). Ya
+> no se usa `masivo/` ni se recarga el documento: la recarga pisaba los cambios sin guardar de la
+> cabecera y de otras líneas. Lo que sigue describe la decisión original.
+
 La inserción de las líneas resueltas difiere según el modo del formulario — espeja el patrón que ya
 usa `comercial-documento-detalles` (alta = virtual en el `FormArray`; edición = transacciona al
 instante), pero en **lote**:
@@ -335,12 +342,13 @@ Puntos a confirmar con backend:
    `contactoId`, output `imported` (edición → el padre recarga), signal `importing`. `openImport()`
    abre el modal lazy (`DialogService` + `ENTITY_ACTION_DIALOG_DEFAULTS`); `resolveAndAdd()` hace el
    `forkJoin` de `consultar(id)` + `comercialDetalleImportToFormValue`; alta=`addImportedLocal`,
-   edición=`persistImported` (`crearMasivo` + `imported.emit()`). Botón en toolbar (gated por
-   `importEnabled`). tsc ok + build ok (template del modal validado como lazy chunk).
+   edición=`persistImported` (`crearMasivo` + `imported.emit()`) — **reemplazado en 2026-10**: ahora
+   también se empujan al `FormArray` y se guardan con el documento (ver la nota de 4.3). Botón en
+   toolbar (gated por `importEnabled`). tsc ok + build ok (template del modal validado como lazy chunk).
 6. **Activación en factura de venta** — declarar la capability/config de importación. ✅ **HECHO** —
    `factura-venta-form` pasa `[importEnabled]="true"`, `[contactoId]="contacto?.id ?? null"` y
-   `(imported)="onImported()"` (recarga el documento en edición vía `loadDocumento`). tsc + build +
-   lint ok.
+   `(imported)="onImported()"` (recargaba el documento en edición vía `loadDocumento`; el output se
+   quitó en 2026-10, ver la nota de 4.3). tsc + build + lint ok.
 7. **i18n** — ✅ **HECHO en Fase 3** (namespace `documentImport.*`, es + en).
 8. **Persistencia del vínculo afectado** — ✅ cubierto: el payload de línea
    (`comercialDetalleToPayload`) incluye `documento_detalle_afectado` en alta (embebido) y en

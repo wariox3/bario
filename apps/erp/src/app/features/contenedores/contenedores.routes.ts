@@ -11,6 +11,7 @@ const ERP_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   leave: true,
   subscription: true,
   viewToggle: true,
+  support: true,
 };
 
 export const CONTENEDORES_ROUTES: Routes = [

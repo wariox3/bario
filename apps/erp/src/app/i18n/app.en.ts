@@ -346,6 +346,32 @@ export const en: AppDict = {
         desc: 'Could not generate the document. Please try again.',
       },
     },
+    imprimirLista: {
+      label: 'Print',
+      zipLabel: 'Print zip',
+      confirmar: {
+        header: 'Print documents',
+        message: '{n} documents will be printed. It may take a few minutes.',
+        accept: 'Print',
+        reject: 'Cancel',
+      },
+      generando: {
+        title: 'Generating print',
+        desc: 'The download starts as soon as the file is ready.',
+      },
+      sinCriterio: {
+        title: 'Choose what to print',
+        desc: 'Select documents or apply a filter to print.',
+      },
+      vacio: {
+        title: 'Nothing to print',
+        desc: 'There are no documents with the current filters.',
+      },
+      error: {
+        title: 'Could not print',
+        desc: 'Something went wrong while generating the print. Try again.',
+      },
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generate selected',
       modalHeader: 'Generate invoices',
@@ -635,7 +661,12 @@ export const en: AppDict = {
       porDocumento: {
         subtitle: 'The document, its reference and what affects it',
         empty: 'No documents affect this one.',
-        cols: { concepto: 'Concept', valor: 'Amount' },
+        cols: { concepto: 'Concept', valor: 'Amount', numero: 'Number' },
+        lineas: { title: 'Lines that affect it' },
+        referencias: {
+          title: 'Documents that reference it',
+          empty: 'No documents reference this one.',
+        },
       },
       ver: 'View traceability',
       cols: {
@@ -2822,8 +2853,6 @@ export const en: AppDict = {
       add: 'Add payment',
       empty: 'No payments registered',
       removePago: 'Remove payment',
-      savePago: 'Save payment',
-      saveAll: 'Save payments',
       pendingSuffix: 'unsaved',
       anulado: 'Voided',
       confirmDelete: 'Remove this payment?',
@@ -2847,14 +2876,7 @@ export const en: AppDict = {
           title: 'Nothing left to collect',
           desc: 'Payments already cover the document total',
         },
-        saveSuccess: { title: 'Payment saved', desc: 'The payment was registered' },
         saveError: { title: 'Save failed', desc: 'The payment could not be saved' },
-        allSaved: { title: 'Payments saved', desc: 'Pending payments were saved' },
-        incompletos: {
-          title: 'Incomplete payments',
-          desc: 'Choose the bank account and an amount above zero for each payment',
-        },
-        deleteError: { title: 'Remove failed', desc: 'The payment could not be removed' },
         noRegistrados: {
           title: 'Payments not registered',
           desc: 'The document was saved, but some payments were not registered. Edit it to add them',
@@ -3985,6 +4007,7 @@ export const en: AppDict = {
       usar: 'Use {fecha}',
       usarTitle: 'Go back to the due date set by the payment term',
       anteriorAFecha: 'The due date cannot be earlier than the date.',
+      contado: 'Cash payment: due on the same date.',
     },
     comercialDetalle: {
       cargarReferencia: {
@@ -4007,8 +4030,6 @@ export const en: AppDict = {
       empty: 'No lines yet. Add the first one to start',
       addLine: 'Add line',
       removeLine: 'Remove line',
-      saveLine: 'Save line',
-      saveAll: 'Save lines',
       pendingSuffix: 'unsaved',
       leaveHeader: 'Unsaved changes',
       leaveMessage: 'There are unsaved changes that will be lost. Leave anyway?',
@@ -4090,17 +4111,9 @@ export const en: AppDict = {
         total: 'Total',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Line saved',
-          desc: 'The line was saved successfully',
-        },
         lineSaveError: {
           title: 'Save failed',
-          desc: 'The line could not be saved',
-        },
-        allSaved: {
-          title: 'Lines saved',
-          desc: 'Pending lines were saved',
+          desc: 'The lines could not be saved',
         },
         incompleteLines: {
           title: 'Incomplete lines',
@@ -6015,6 +6028,7 @@ export const en: AppDict = {
     documentoRecibido: {
       name: 'Documents',
       cargar: 'Upload file',
+      verDetalle: 'View details',
       columns: {
         fecha: 'Date',
         numero: 'Number',
@@ -6023,6 +6037,7 @@ export const en: AppDict = {
         tipo: 'Type',
         impuestos: 'Taxes',
         total: 'Total',
+        formaPago: 'Payment method',
       },
       tipos: {
         factura_venta: 'Invoice',
@@ -6036,6 +6051,22 @@ export const en: AppDict = {
         hasta: 'To',
         delCorreo: 'From email',
         quitarCorreo: 'Remove the email filter',
+      },
+      detalle: {
+        title: 'Details',
+        general: 'General information',
+        emision: 'Issued',
+        moneda: 'Currency',
+        validado: 'DIAN validated',
+        fechaValidacion: 'Validation date',
+        recibido: 'Received in RedEDoc',
+        cue: 'CUE',
+        verDian: 'View at DIAN',
+        valorBruto: 'Gross value',
+        notFound: {
+          title: 'Document not found',
+          desc: 'Go back to the inbox and open it from there.',
+        },
       },
       empty: {
         title: 'No received documents',

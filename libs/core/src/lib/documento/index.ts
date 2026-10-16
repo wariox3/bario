@@ -65,3 +65,7 @@ export type {
   PosDocumentoValores,
 } from './pos/pos-documento.model';
 export { posDocumentoToFormValue, posDocumentoToPayload } from './pos/pos-documento.mapper';
+
+// Qué se imprime desde un listado (selección / filtros / umbral), ERP y POS.
+export { alcanceImpresion, UMBRAL_CONFIRMACION_IMPRESION } from './impresion/alcance-impresion';
+export type { AlcanceImpresion } from './impresion/alcance-impresion';

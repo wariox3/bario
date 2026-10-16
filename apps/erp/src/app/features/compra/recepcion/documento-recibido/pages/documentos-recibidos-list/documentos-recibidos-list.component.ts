@@ -22,12 +22,18 @@ import {
   ListShellComponent,
   type BreadcrumbItem,
   type PageChangeEvent,
+  type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import { MascaraFechaDirective } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
-import { COLUMNS, TIPOS } from '../../documento-recibido.constants';
+import {
+  COLUMNS,
+  ROW_ACTIONS,
+  ROW_ACTION_DETALLE,
+  TIPOS,
+} from '../../documento-recibido.constants';
 import {
   toDocumentoRecibidoRow,
   type DocumentoRecibidoOrden,
@@ -93,6 +99,7 @@ export class DocumentosRecibidosListComponent {
   protected readonly t = inject<I18nService<AppDict>>(I18nService).t;
 
   protected readonly columns = COLUMNS;
+  protected readonly rowActions = ROW_ACTIONS;
 
   // ── Filtros ───────────────────────────────────────────────────────────────
   /** Lo que se escribe; la búsqueda que viaja es `busqueda`, ya con debounce. */
@@ -222,6 +229,16 @@ export class DocumentosRecibidosListComponent {
   protected onSortChange(sort: readonly SortSpec[]): void {
     this.sort.set(sort.length > 0 ? sort.slice(0, 1) : DEFAULT_SORT);
     this.currentPage.set(0);
+  }
+
+  /** La ficha se abre con el CUE y la fecha: el backend no tiene `GET` por id. */
+  protected onRowAction(event: RowActionInvokedEvent): void {
+    if (event.actionId !== ROW_ACTION_DETALLE) return;
+    const doc = event.row as DocumentoRecibidoRow;
+    void this.router.navigate(['detalle', doc.id], {
+      relativeTo: this.route,
+      queryParams: { cue: doc.cufe_cude, fecha: doc.fecha_emision },
+    });
   }
 
   protected onCargado(): void {

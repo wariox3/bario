@@ -24,6 +24,11 @@ export interface EntityActionContext {
    * seleccionados); las que operan sobre el query completo pueden ignorarlo.
    */
   readonly selectedIds: readonly (string | number)[];
+  /**
+   * Total de registros que cumplen el query activo (no solo la página). Lo usan
+   * las acciones que operan sobre el query completo para avisar cuánto abarcan.
+   */
+  readonly totalCount: number;
   /** Recarga la lista. El strategy lo llama tras una operación exitosa. */
   readonly reload: () => void;
 }
