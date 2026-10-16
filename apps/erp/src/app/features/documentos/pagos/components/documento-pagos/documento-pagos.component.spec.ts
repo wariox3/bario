@@ -7,6 +7,7 @@ import { dictionaries } from '@erp/i18n';
 import { PagosEnCursoError } from '../../pago.errors';
 import { createPagoGroup, type PagoGroup } from '../../pago.form';
 import { DocumentoPagosComponent } from './documento-pagos.component';
+import { ConfirmationService } from 'primeng/api';
 
 const URL = '/api/general/documento-pago/';
 const BANCO = { id: 7, nombre: 'Bancolombia' };
@@ -82,24 +83,6 @@ describe('DocumentoPagosComponent', () => {
     expect(component.pendingCount()).toBe(0);
   });
 
-  it('la fila que guarda su ✓ no se reenvía y un lote a la vez se rechaza', () => {
-    const fila = nueva(100);
-    montar(10, [fila]);
-
-    component['savePago'](fila);
-    const enVuelo = http.expectOne(URL);
-    expect(component.ocupado()).toBe(true);
-    expect(component.pendingCount()).toBe(0);
-
-    let error: unknown;
-    component.saveAll().subscribe({ error: (e: unknown) => (error = e) });
-    expect(error).toBeInstanceOf(PagosEnCursoError);
-    http.expectNone(URL);
-
-    enVuelo.flush(leido(1, 100));
-    expect(component.ocupado()).toBe(false);
-  });
-
   it('si falla un pago corta, libera la tabla y deja pendientes los que faltan', () => {
     montar(10, [nueva(100), nueva(200), nueva(300)]);
     let error: unknown;
@@ -147,19 +130,6 @@ describe('DocumentoPagosComponent', () => {
     req.flush(leido(1, 100));
   });
 
-  it('"Guardar pagos" con solo filas incompletas avisa y no anuncia que guardó', () => {
-    const incompleta = createPagoGroup({ id: 4, cuenta_banco: BANCO, pago: 100 });
-    incompleta.controls.pago.setValue(0);
-    incompleta.markAsDirty();
-    montar(10, [incompleta]);
-
-    component['onSaveAllClick']();
-
-    expect(toast.warn).toHaveBeenCalled();
-    expect(toast.success).not.toHaveBeenCalled();
-    http.expectNone(URL);
-  });
-
   it('"Agregar pago" con el saldo cubierto avisa en vez de crear una fila en cero', () => {
     montar(10, [createPagoGroup({ id: 1, cuenta_banco: BANCO, pago: 1_000_000 })]);
 
@@ -170,5 +140,93 @@ describe('DocumentoPagosComponent', () => {
       dictionaries.es.entities.documentoPago.toasts.sinSaldo.desc,
     );
     expect(component.pagos().length).toBe(1);
+  });
+
+  /** Quita un pago como lo hace la papelera, aceptando la confirmación. */
+  function quitar(fila: PagoGroup): void {
+    const confirmation = fixture.debugElement.injector.get(ConfirmationService);
+    jest.spyOn(confirmation, 'confirm').mockImplementation((c) => {
+      c.accept?.();
+      return confirmation;
+    });
+    component['removePago'](fila);
+  }
+
+  it('quitar un pago guardado no llama a la API hasta guardar el documento', () => {
+    const fila = createPagoGroup({ id: 3, cuenta_banco: BANCO, pago: 100 });
+    montar(10, [fila]);
+
+    quitar(fila);
+
+    http.expectNone(`${URL}3/`);
+    expect(component.pagos().length).toBe(0);
+    expect(component.pendingCount()).toBe(1);
+
+    component.saveAll().subscribe();
+    http.expectOne({ method: 'DELETE', url: `${URL}3/` }).flush(null);
+    expect(component.pendingCount()).toBe(0);
+  });
+
+  it('las bajas van antes que las altas y un 404 al borrar cuenta como hecho', () => {
+    const vieja = createPagoGroup({ id: 3, cuenta_banco: BANCO, pago: 100 });
+    montar(10, [vieja, nueva(200)]);
+    quitar(vieja);
+
+    component.saveAll().subscribe();
+    http
+      .expectOne({ method: 'DELETE', url: `${URL}3/` })
+      .flush(null, { status: 404, statusText: 'Not Found' });
+    http.expectOne({ method: 'POST', url: URL }).flush(leido(4, 200));
+
+    expect(component.pendingCount()).toBe(0);
+  });
+
+  it('con un guardado en curso rechaza otro lote y bloquea agregar pagos', () => {
+    montar(10, [nueva(100)]);
+
+    component.saveAll().subscribe();
+    const enVuelo = http.expectOne(URL);
+    expect(component.ocupado()).toBe(true);
+
+    let error: unknown;
+    component.saveAll().subscribe({ error: (e: unknown) => (error = e) });
+    expect(error).toBeInstanceOf(PagosEnCursoError);
+    component['addPago']();
+    expect(component.pagos().length).toBe(1);
+
+    enVuelo.flush(leido(1, 100));
+    expect(component.ocupado()).toBe(false);
+  });
+
+  it('si el monto cambia mientras viaja, no se pisa: toma el id y sigue pendiente', () => {
+    const fila = nueva(100);
+    montar(10, [fila]);
+
+    component.saveAll().subscribe();
+    const req = http.expectOne(URL);
+    fila.controls.pago.markAsDirty();
+    fila.controls.pago.setValue(150);
+    req.flush(leido(8, 100));
+
+    expect(component.pagos().at(0)).toBe(fila);
+    expect(fila.controls.id.value).toBe(8);
+    expect(fila.controls.pago.value).toBe(150);
+    expect(component.pendingCount()).toBe(1);
+
+    component.saveAll().subscribe();
+    const patch = http.expectOne({ method: 'PATCH', url: `${URL}8/` });
+    expect(patch.request.body.pago).toBe('150.00');
+    patch.flush(leido(8, 150));
+  });
+
+  it('en alta quitar un pago es solo local', () => {
+    const fila = nueva(100);
+    montar(null, [fila]);
+
+    component['removePago'](fila);
+
+    expect(component.pagos().length).toBe(0);
+    expect(component.pendingCount()).toBe(0);
+    http.expectNone(URL);
   });
 });

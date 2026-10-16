@@ -111,8 +111,9 @@ export class DocumentoDetalleService extends BaseHttpService {
 
   /**
    * Alta **masiva** de líneas en un documento existente
-   * (`POST /general/documento-detalle/masivo/`). Una sola request para N líneas;
-   * la usa "importar desde documento" en modo edición.
+   * (`POST /general/documento-detalle/masivo/`). Una sola request para N líneas.
+   * La tabla de líneas comerciales ya no la usa (sus altas esperan al guardado del
+   * documento); hoy la consume la tabla de cuentas contables.
    *
    * La forma de la respuesta del backend está pendiente de confirmar (¿devuelve
    * las líneas creadas o solo un OK?); por eso el tipo de lectura se parametriza

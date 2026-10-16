@@ -24,8 +24,11 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="isSaving()"
+      [disabled]="isSaving() || tablasOcupadas()"
     />
+    @if (hayCambios()) {
+      <app-cambios-sin-guardar />
+    }
   </lib-page-actions>
 
   <!-- ── Sección: Información general ──────────────────────────────────────── -->
@@ -179,7 +182,6 @@
             [almacenPorDefecto]="form.controls.almacen.value"
             [contactoId]="form.controls.contacto.value?.id ?? null"
             [precioListaId]="precioListaId()"
-            (imported)="onImported()"
           />
         </p-tabpanel>
       </p-tabpanels>

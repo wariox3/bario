@@ -2848,8 +2848,6 @@ export const en: AppDict = {
       add: 'Add payment',
       empty: 'No payments registered',
       removePago: 'Remove payment',
-      savePago: 'Save payment',
-      saveAll: 'Save payments',
       pendingSuffix: 'unsaved',
       anulado: 'Voided',
       confirmDelete: 'Remove this payment?',
@@ -2873,14 +2871,7 @@ export const en: AppDict = {
           title: 'Nothing left to collect',
           desc: 'Payments already cover the document total',
         },
-        saveSuccess: { title: 'Payment saved', desc: 'The payment was registered' },
         saveError: { title: 'Save failed', desc: 'The payment could not be saved' },
-        allSaved: { title: 'Payments saved', desc: 'Pending payments were saved' },
-        incompletos: {
-          title: 'Incomplete payments',
-          desc: 'Choose the bank account and an amount above zero for each payment',
-        },
-        deleteError: { title: 'Remove failed', desc: 'The payment could not be removed' },
         noRegistrados: {
           title: 'Payments not registered',
           desc: 'The document was saved, but some payments were not registered. Edit it to add them',
@@ -4034,8 +4025,6 @@ export const en: AppDict = {
       empty: 'No lines yet. Add the first one to start',
       addLine: 'Add line',
       removeLine: 'Remove line',
-      saveLine: 'Save line',
-      saveAll: 'Save lines',
       pendingSuffix: 'unsaved',
       leaveHeader: 'Unsaved changes',
       leaveMessage: 'There are unsaved changes that will be lost. Leave anyway?',
@@ -4117,17 +4106,9 @@ export const en: AppDict = {
         total: 'Total',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Line saved',
-          desc: 'The line was saved successfully',
-        },
         lineSaveError: {
           title: 'Save failed',
-          desc: 'The line could not be saved',
-        },
-        allSaved: {
-          title: 'Lines saved',
-          desc: 'Pending lines were saved',
+          desc: 'The lines could not be saved',
         },
         incompleteLines: {
           title: 'Incomplete lines',

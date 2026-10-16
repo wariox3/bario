@@ -238,9 +238,18 @@ export class ContableDocumentoDetallesComponent {
   /** Guardado en lote ("Guardar líneas" / flush del padre) en curso. */
   protected readonly savingAll = signal(false);
 
+  /**
+   * `true` desde que el effect de sincronización corrió, es decir, con los inputs ya
+   * asignados. El form padre pide `pendingCount()` desde su barra de acciones, que se
+   * evalúa antes que esta tabla (va más abajo en la plantilla): leer el input
+   * obligatorio en ese momento lanza NG0950. Al montar no hay nada pendiente.
+   */
+  private readonly montada = signal(false);
+
   constructor() {
     effect((onCleanup) => {
       const array = this.detalles();
+      this.montada.set(true);
       const sync = (): void => this.lines.set(array.getRawValue());
       sync();
       const sub = array.valueChanges.subscribe(sync);
@@ -357,6 +366,7 @@ export class ContableDocumentoDetallesComponent {
 
   /** Nº de líneas sin guardar; alimenta el botón, el toolbar y el guard de salida. */
   pendingCount(): number {
+    if (!this.montada()) return 0;
     return this.pendingRows().length;
   }
 

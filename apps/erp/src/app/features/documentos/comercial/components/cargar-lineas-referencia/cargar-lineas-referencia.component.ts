@@ -5,11 +5,10 @@ import {
   computed,
   inject,
   input,
-  output,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, map, of, switchMap } from 'rxjs';
+import { finalize, map } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import {
@@ -29,10 +28,9 @@ import type { ComercialDocumentoDetallesComponent } from '../comercial-documento
  *
  * - Si la nota ya tiene líneas con ítem pide confirmación; una fila vacía no
  *   cuenta, no hay nada que perder.
- * - El reemplazo lo hace la tabla (`reemplazarLineas`): en alta en memoria, en
- *   edición contra la API.
- * - En edición emite `recargar` al terminar, salga bien o mal: el reemplazo no
- *   es atómico y el padre debe volver a leer las líneas persistidas.
+ * - El reemplazo lo hace la tabla (`reemplazarLineas`), siempre en memoria: en
+ *   edición las líneas viejas se borran y las nuevas se crean recién al guardar
+ *   la nota, así que salir sin guardar la deja como estaba.
  * - No copia los pagos del documento referenciado (el legacy sí, y la nota
  *   quedaba con dinero que pertenece a la factura).
  *
@@ -75,9 +73,6 @@ export class CargarLineasReferenciaComponent {
   /** Deshabilita el botón mientras el formulario guarda (la tabla ocupada ya lo bloquea). */
   readonly disabled = input<boolean>(false);
 
-  /** En edición, tras intentar el reemplazo: el padre recarga las líneas persistidas. */
-  readonly recargar = output<void>();
-
   protected readonly cargando = signal(false);
 
   /** Sin referencia, con el form guardando o con la tabla persistiendo líneas no se carga. */
@@ -111,17 +106,15 @@ export class CargarLineasReferenciaComponent {
 
   private cargar(referenciaId: number, tabla: ComercialDocumentoDetallesComponent): void {
     const toasts = this.t().entities.comercialDetalle.cargarReferencia.toasts;
-    const enEdicion = tabla.documentId() != null;
     this.cargando.set(true);
     this.detalleService
       .listarPorDocumento<ComercialDetalleRead>(referenciaId)
       .pipe(
-        map((lineas) => lineas.map(lineaReferenciaToFormValue)),
-        switchMap((values) =>
-          values.length === 0
-            ? of(0)
-            : tabla.reemplazarLineas(values).pipe(map(() => values.length)),
-        ),
+        map((lineas) => {
+          const values = lineas.map(lineaReferenciaToFormValue);
+          if (values.length > 0) tabla.reemplazarLineas(values);
+          return values.length;
+        }),
         finalize(() => this.cargando.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -133,12 +126,8 @@ export class CargarLineasReferenciaComponent {
           }
           tabla.detalles().markAsDirty();
           this.toast.success(toasts.success.title, toasts.success.desc);
-          if (enEdicion) this.recargar.emit();
         },
-        error: () => {
-          this.toast.error(toasts.error.title, toasts.error.desc);
-          if (enEdicion) this.recargar.emit();
-        },
+        error: () => this.toast.error(toasts.error.title, toasts.error.desc),
       });
   }
 }

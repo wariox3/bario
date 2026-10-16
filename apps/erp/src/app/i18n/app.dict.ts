@@ -2198,8 +2198,6 @@ export interface AppDict
       add: string;
       empty: string;
       removePago: string;
-      savePago: string;
-      saveAll: string;
       pendingSuffix: string;
       anulado: string;
       confirmDelete: string;
@@ -2217,11 +2215,7 @@ export interface AppDict
       toasts: {
         sinDetalles: { title: string; desc: string };
         sinSaldo: { title: string; desc: string };
-        saveSuccess: { title: string; desc: string };
         saveError: { title: string; desc: string };
-        allSaved: { title: string; desc: string };
-        incompletos: { title: string; desc: string };
-        deleteError: { title: string; desc: string };
         noRegistrados: { title: string; desc: string };
       };
     };
@@ -3104,8 +3098,6 @@ export interface AppDict
       empty: string;
       addLine: string;
       removeLine: string;
-      saveLine: string;
-      saveAll: string;
       pendingSuffix: string;
       leaveHeader: string;
       leaveMessage: string;
@@ -3168,9 +3160,7 @@ export interface AppDict
         total: string;
       };
       toasts: {
-        lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };
-        allSaved: { title: string; desc: string };
         incompleteLines: { title: string; desc: string };
       };
     };

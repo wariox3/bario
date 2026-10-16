@@ -61,7 +61,12 @@ import {
 } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
-import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
+import {
+  canLeaveDocumentForm,
+  hayCambiosSinGuardar,
+  type CambiosDocumento,
+} from '@erp/core/guards/leave-document-form';
+import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
 import type { AppDict } from '@erp/i18n';
 import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../pos-documento.constants';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
@@ -117,6 +122,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
   selector: 'app-pos-documento-form',
   standalone: true,
   imports: [
+    CambiosSinGuardarComponent,
     MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
@@ -162,7 +168,7 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
-  /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
+  /** Tabla de pagos: en edición se guarda con el documento; en alta registra los pagos al crear. */
   private readonly pagosTable = viewChild(DocumentoPagosComponent);
 
   /** Guardado en curso en la tabla de líneas o la de pagos: el botón Guardar espera a que termine. */
@@ -380,7 +386,7 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
       });
   }
 
-  /** Tablas que transaccionan en vivo, en el orden en que se guardan. */
+  /** Tablas que se guardan aparte del documento, en el orden en que se guardan. */
   private tablasEnVivo(): readonly TablaEnVivoDocumento[] {
     const { comercialDetalle, documentoPago } = this.t().entities;
     return [
@@ -395,7 +401,8 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
   private persistCabecera(id: string | undefined): void {
     const toasts = this.t().entities.posDocumento.form.toasts;
-    // En edición se omiten los detalles del payload: ya transaccionaron en vivo.
+    // En edición se omiten los detalles del payload: van por `documento-detalle` y ya
+    // los guardó `saveAll()` de la tabla.
     const payload = posDocumentoToPayload(
       this.form.getRawValue(),
       this.document().documentTypeId,
@@ -450,13 +457,9 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
     this.navigateToList();
   }
 
-  /**
-   * Guard de salida: si hay líneas o pagos sin guardar, confirma antes de abandonar
-   * para no perderlos (el guardado del documento los flushea, así que tras guardar no
-   * hay pendientes y no molesta). Solo aplica en edición.
-   */
-  canDeactivate(): boolean | Observable<boolean> {
-    return canLeaveDocumentForm({
+  /** Lo que se perdería al salir; lo leen el guard de salida y el aviso junto a "Guardar". */
+  private cambios(): CambiosDocumento {
+    return {
       form: this.form,
       pendingLines:
         (this.detallesTable()?.pendingCount() ?? 0) + (this.pagosTable()?.pendingCount() ?? 0),
@@ -464,6 +467,22 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
       lineControls: ['detalles', 'pagos'],
       // En alta nada persiste aparte: tocar una línea o un pago y salir también pierde trabajo.
       enAlta: !this.id(),
+    };
+  }
+
+  /** Aviso "Cambios sin guardar" junto al botón. En alta todo está por guardar: no se muestra. */
+  protected hayCambios(): boolean {
+    return this.isEditMode() && hayCambiosSinGuardar(this.cambios());
+  }
+
+  /**
+   * Guard de salida: si hay cambios sin guardar (cabecera o líneas), confirma antes
+   * de abandonar. Guardar el documento persiste todo y deja el form limpio, así que
+   * el camino feliz no pregunta.
+   */
+  canDeactivate(): boolean | Observable<boolean> {
+    return canLeaveDocumentForm({
+      ...this.cambios(),
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,
       cancelLabel: this.t().common.actions.cancel,
@@ -471,19 +490,10 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   }
 
   /**
-   * Tras importar líneas en **edición** (ya persistidas vía `masivo/`), recarga el
-   * documento para reflejar las nuevas líneas con sus ids y montos autoritativos.
-   */
-  protected onImported(): void {
-    const id = this.documentId();
-    if (id != null) this.loadDocumento(id);
-  }
-
-  /**
    * Carga completa (cabecera + líneas + pagos). La cabecera (`documento/:id/`) no
    * embebe detalles ni pagos: se traen aparte de `documento-detalle/?documento_id=`
    * y `documento-pago/?documento_id=`. Se usa como fallback de la carga inicial
-   * (si el resolver no pre-cargó la cabecera) y para recargar tras importar.
+   * (si el resolver no pre-cargó la cabecera).
    */
   private loadDocumento(id: number): void {
     forkJoin({

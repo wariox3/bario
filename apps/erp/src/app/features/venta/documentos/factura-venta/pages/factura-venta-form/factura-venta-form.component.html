@@ -26,6 +26,9 @@
       [loading]="isSaving()"
       [disabled]="isSaving() || tablasOcupadas()"
     />
+    @if (hayCambios()) {
+      <app-cambios-sin-guardar />
+    }
   </lib-page-actions>
 
   <!-- ── Sección: Información general ──────────────────────────────────────── -->
@@ -336,7 +339,6 @@
             [scannerEnabled]="true"
             [almacenEnabled]="true"
             [almacenPorDefecto]="form.controls.almacen.value"
-            (imported)="onImported()"
           />
         </p-tabpanel>
 

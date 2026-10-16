@@ -2909,8 +2909,6 @@ export const es: AppDict = {
       add: 'Agregar pago',
       empty: 'No hay pagos registrados',
       removePago: 'Eliminar pago',
-      savePago: 'Guardar pago',
-      saveAll: 'Guardar pagos',
       pendingSuffix: 'sin guardar',
       anulado: 'Anulado',
       confirmDelete: '¿Eliminar este pago?',
@@ -2934,14 +2932,7 @@ export const es: AppDict = {
           title: 'Sin saldo por cobrar',
           desc: 'Los pagos ya cubren el total del documento',
         },
-        saveSuccess: { title: 'Pago guardado', desc: 'El pago se registró correctamente' },
         saveError: { title: 'Error al guardar', desc: 'No se pudo guardar el pago' },
-        allSaved: { title: 'Pagos guardados', desc: 'Se guardaron los pagos pendientes' },
-        incompletos: {
-          title: 'Pagos incompletos',
-          desc: 'Elige la cuenta de banco y un monto mayor a cero en cada pago',
-        },
-        deleteError: { title: 'Error al eliminar', desc: 'No se pudo eliminar el pago' },
         noRegistrados: {
           title: 'Pagos sin registrar',
           desc: 'El documento se guardó, pero algunos pagos no se registraron. Edítalo para agregarlos',
@@ -4104,8 +4095,6 @@ export const es: AppDict = {
       empty: 'Aún no hay líneas. Agrega la primera para empezar',
       addLine: 'Agregar línea',
       removeLine: 'Eliminar línea',
-      saveLine: 'Guardar línea',
-      saveAll: 'Guardar líneas',
       pendingSuffix: 'sin guardar',
       leaveHeader: 'Cambios sin guardar',
       leaveMessage: 'Hay cambios sin guardar que se perderán. ¿Salir de todos modos?',
@@ -4190,17 +4179,9 @@ export const es: AppDict = {
         total: 'Total',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Línea guardada',
-          desc: 'La línea se guardó correctamente',
-        },
         lineSaveError: {
           title: 'Error al guardar',
-          desc: 'No se pudo guardar la línea',
-        },
-        allSaved: {
-          title: 'Líneas guardadas',
-          desc: 'Se guardaron las líneas pendientes',
+          desc: 'No se pudieron guardar las líneas',
         },
         incompleteLines: {
           title: 'Líneas incompletas',

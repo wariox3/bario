@@ -1,7 +1,7 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { firstValueFrom, isObservable } from 'rxjs';
 import type { Confirmation, ConfirmationService } from 'primeng/api';
-import { canLeaveDocumentForm, isHeaderDirty } from './leave-document-form';
+import { canLeaveDocumentForm, hayCambiosSinGuardar, isHeaderDirty } from './leave-document-form';
 
 /** Form típico de documento: cabecera + `FormArray` de líneas. */
 function documentoForm(): FormGroup {
@@ -155,5 +155,30 @@ describe('isHeaderDirty — pagos', () => {
     form.controls['pagos'].markAsDirty();
     expect(isHeaderDirty(form, ['detalles', 'pagos'])).toBe(false);
     expect(isHeaderDirty(form)).toBe(true);
+  });
+});
+
+describe('hayCambiosSinGuardar', () => {
+  it('es falso con el form recién hidratado y sin pendientes', () => {
+    const form = documentoForm();
+    form.patchValue({ contacto: 'ACME' });
+    expect(hayCambiosSinGuardar({ form, pendingLines: 0 })).toBe(false);
+  });
+
+  it('cuenta las líneas pendientes, que incluyen las quitadas sin guardar', () => {
+    expect(hayCambiosSinGuardar({ form: documentoForm(), pendingLines: 1 })).toBe(true);
+  });
+
+  it('cuenta el encabezado sucio aunque no haya líneas pendientes', () => {
+    const form = documentoForm();
+    form.controls['fecha'].markAsDirty();
+    expect(hayCambiosSinGuardar({ form, pendingLines: 0 })).toBe(true);
+  });
+
+  it('en alta cuenta una línea tocada: nada se guardó aparte', () => {
+    const form = documentoForm();
+    form.controls['detalles'].markAsDirty();
+    expect(hayCambiosSinGuardar({ form, pendingLines: 0, enAlta: true })).toBe(true);
+    expect(hayCambiosSinGuardar({ form, pendingLines: 0 })).toBe(false);
   });
 });
