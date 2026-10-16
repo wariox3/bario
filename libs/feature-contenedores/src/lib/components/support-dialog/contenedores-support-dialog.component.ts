@@ -1,5 +1,6 @@
 import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -72,6 +73,15 @@ export class ContenedoresSupportDialogComponent {
   protected readonly form = new FormGroup({
     contenedor: new FormControl<ErpSelectOption | null>(null, Validators.required),
   });
+
+  /**
+   * Excepción a la regla de no deshabilitar por formulario inválido: el modal
+   * tiene un único campo a la vista, así que el botón apagado no esconde qué falta.
+   */
+  protected readonly sinContenedor = toSignal(
+    this.form.controls.contenedor.valueChanges.pipe(map((value) => value === null)),
+    { initialValue: true },
+  );
 
   onSubmit(): void {
     const contenedor = this.form.controls.contenedor.value;

@@ -86,7 +86,7 @@
           icon="pi pi-plus"
           [label]="s.submit"
           [loading]="isSaving()"
-          [disabled]="isSaving() || sinMfa()"
+          [disabled]="isSaving() || sinMfa() || sinContenedor()"
         />
       </div>
     </form>
