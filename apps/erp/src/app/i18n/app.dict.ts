@@ -3075,6 +3075,7 @@ export interface AppDict
       usar: string;
       usarTitle: string;
       anteriorAFecha: string;
+      contado: string;
     };
     comercialDetalle: {
       cargarReferencia: {

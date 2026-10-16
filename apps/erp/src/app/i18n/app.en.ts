@@ -3985,6 +3985,7 @@ export const en: AppDict = {
       usar: 'Use {fecha}',
       usarTitle: 'Go back to the due date set by the payment term',
       anteriorAFecha: 'The due date cannot be earlier than the date.',
+      contado: 'Cash payment: due on the same date.',
     },
     comercialDetalle: {
       cargarReferencia: {

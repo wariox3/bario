@@ -4052,6 +4052,7 @@ export const es: AppDict = {
       usar: 'Usar {fecha}',
       usarTitle: 'Volver al vencimiento que dicta el plazo de pago',
       anteriorAFecha: 'El vencimiento no puede ser anterior a la fecha.',
+      contado: 'De contado: vence el mismo día de la fecha.',
     },
     comercialDetalle: {
       cargarReferencia: {
