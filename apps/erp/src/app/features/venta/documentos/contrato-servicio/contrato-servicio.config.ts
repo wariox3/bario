@@ -55,5 +55,5 @@ export const CONTRATO_SERVICIO_CONFIG: DocumentEntityConfig = {
   //  - 'generar': modal de fecha → genera pedidos servicio desde los contratos
   //    servicio de esa fecha.
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
-  extraActionIds: ['generar', 'export-excel'],
+  extraActionIds: ['generar', 'imprimir', 'imprimir-zip', 'export-excel'],
 };

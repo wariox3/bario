@@ -54,5 +54,11 @@ export const FACTURA_COMPRA_RECURRENTE_CONFIG: DocumentEntityConfig = {
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
   // Ver el docblock de FACTURA_VENTA_RECURRENTE_CONFIG para qué aporta cada id.
-  extraActionIds: ['generar-recurrente-todos', 'generar-recurrente-seleccionados', 'export-excel'],
+  extraActionIds: [
+    'generar-recurrente-todos',
+    'generar-recurrente-seleccionados',
+    'imprimir',
+    'imprimir-zip',
+    'export-excel',
+  ],
 };

@@ -45,5 +45,5 @@ export const NOMINA_ELECTRONICA_CONFIG: DocumentEntityConfig = {
     canExportZip: false,
     canGenerate: false,
   },
-  extraActionIds: ['generar-nomina-electronica', 'export-excel'],
+  extraActionIds: ['generar-nomina-electronica', 'imprimir', 'imprimir-zip', 'export-excel'],
 };

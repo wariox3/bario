@@ -6,6 +6,7 @@ import {
   ENTITY_DATA_GATEWAY,
   I18nService,
   ToastService,
+  alcanceImpresion,
   extractBlobErrorMessage,
   type DocumentEntityConfig,
   type ListQuery,
@@ -17,24 +18,11 @@ import type { EntityActionContext, EntityActionStrategy } from '../entity-action
 import type { ImprimirConfirmData } from './imprimir-confirm-modal.component';
 
 /**
- * Por encima de este número de documentos se pide confirmación: un PDF de
- * cientos de documentos tarda y conviene que sea a propósito.
- */
-const UMBRAL_CONFIRMACION = 50;
-
-/**
  * Base de "Imprimir" e "Imprimir zip" en el listado de documentos. Las dos
  * mandan el mismo body que el listado y solo cambian el endpoint (`descargar`).
  *
- * Qué se imprime:
- *  - Con filas marcadas, solo esas (se suma `id in [...]` a los filtros).
- *  - Sin selección, todo lo que cumple los filtros activos, no solo la página.
- *  - Sin selección ni filtros, nada: avisa en vez de pedir al backend todos los
- *    documentos del tipo. Cuentan solo los filtros de la persona; los implícitos
- *    del documento (`documento_tipo_id`, `defaultFilters`) los suma el gateway.
- *
- * Sin nada que imprimir avisa sin pedir nada; por encima de
- * `UMBRAL_CONFIRMACION` documentos pregunta antes, con el total.
+ * Qué se imprime lo decide `alcanceImpresion` (`@reddoc/core`), la misma regla
+ * que usa el historial del POS: la selección, o lo filtrado, o nada.
  */
 export abstract class ImprimirListaBaseStrategy implements EntityActionStrategy {
   abstract readonly id: string;
@@ -53,33 +41,22 @@ export abstract class ImprimirListaBaseStrategy implements EntityActionStrategy 
   execute(ctx: EntityActionContext): Observable<void> {
     if (this.imprimiendo) return EMPTY;
     const dict = this.i18n.t().documentActions.imprimirLista;
-    const seleccion = ctx.selectedIds;
-    if (seleccion.length === 0 && ctx.query.filters.length === 0) {
+    const alcance = alcanceImpresion(ctx.query, ctx.selectedIds, ctx.totalCount);
+    if (alcance.tipo === 'sin-criterio') {
       this.toast.warn(dict.sinCriterio.title, dict.sinCriterio.desc);
       return EMPTY;
     }
-
-    const cantidad = seleccion.length > 0 ? seleccion.length : ctx.totalCount;
-
-    if (cantidad === 0) {
+    if (alcance.tipo === 'vacio') {
       this.toast.warn(dict.vacio.title, dict.vacio.desc);
       return EMPTY;
     }
 
-    const query: ListQuery =
-      seleccion.length > 0
-        ? {
-            ...ctx.query,
-            filters: [...ctx.query.filters, { field: 'id', operator: 'in', value: seleccion }],
-          }
-        : ctx.query;
-
-    return this.confirmar(cantidad).pipe(
+    return this.confirmar(alcance.cantidad, alcance.confirmar).pipe(
       filter((confirmado) => confirmado),
       switchMap(() => {
         this.imprimiendo = true;
         this.toast.info(dict.generando.title, dict.generando.desc);
-        return this.descargar(ctx.document, query).pipe(
+        return this.descargar(ctx.document, alcance.query).pipe(
           catchError((err: unknown) => {
             void extractBlobErrorMessage(err, dict.error.desc).then((mensaje) =>
               this.toast.error(dict.error.title, mensaje),
@@ -98,8 +75,8 @@ export abstract class ImprimirListaBaseStrategy implements EntityActionStrategy 
    * Modal propio y no `p-confirmDialog`: el strategy vive en root y el
    * `ConfirmationService` del listado es de componente. Se carga lazy.
    */
-  private confirmar(cantidad: number): Observable<boolean> {
-    if (cantidad <= UMBRAL_CONFIRMACION) return of(true);
+  private confirmar(cantidad: number, preguntar: boolean): Observable<boolean> {
+    if (!preguntar) return of(true);
     const data: ImprimirConfirmData = { cantidad };
     return from(import('./imprimir-confirm-modal.component')).pipe(
       switchMap(({ ImprimirConfirmModalComponent }) => {

@@ -48,5 +48,5 @@ export const NOTA_DEBITO_COMPRA_CONFIG: DocumentEntityConfig = {
   // Un documento aprobado ya no se edita. Regla única consumida por la lista,
   // el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
 };

@@ -488,8 +488,26 @@ export const en: AppDict = {
       electronico: 'Ele',
     },
     filtros: { aprobado: 'Approved', anulado: 'Voided', electronico: 'Electronic' },
-    acciones: { imprimir: 'Print' },
+    acciones: { imprimir: 'Print', imprimirLista: 'Print', imprimirZip: 'Print zip' },
+    confirmarImpresion: {
+      header: 'Print sales',
+      message: '{n} sales will be printed. It may take a few minutes.',
+      accept: 'Print',
+      reject: 'Cancel',
+    },
     toasts: {
+      generando: {
+        title: 'Generating print',
+        desc: 'The download starts as soon as the file is ready.',
+      },
+      sinCriterio: {
+        title: 'Choose what to print',
+        desc: 'Select sales or apply a filter to print.',
+      },
+      vacio: {
+        title: 'Nothing to print',
+        desc: 'There are no sales with the current filters.',
+      },
       imprimirError: {
         title: 'Could not print',
         desc: 'Try again in a moment.',

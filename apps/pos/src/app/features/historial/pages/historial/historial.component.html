@@ -7,6 +7,8 @@
     [filtersEnabled]="true"
     [activeFiltersCount]="activeFilters().length"
     [refreshEnabled]="true"
+    [trailingActions]="toolbarActions"
+    (actionInvoked)="onToolbarAction($event)"
     (searched)="onSearch($event)"
     (filtersToggle)="filtersVisible.set(true)"
     (filtersClear)="clearFilters()"
@@ -22,7 +24,10 @@
     [pageSize]="pageSize()"
     [currentPage]="currentPage()"
     [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
     [rowActions]="rowActions"
+    (selectionChange)="onSelectionChange($event)"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
     (rowActionInvoked)="onRowAction($event)"
@@ -36,3 +41,5 @@
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />
+
+<p-confirmdialog [style]="{ width: '24rem' }" [breakpoints]="{ '576px': '92vw' }" />

@@ -60,7 +60,7 @@ export const FACTURA_POS_ELECTRONICA_CONFIG: DocumentEntityConfig = {
   // Acciones extra del dropdown "Acciones" (cada id ↔ un EntityActionStrategy
   // registrado en ENTITY_ACTION_PROVIDERS):
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
   // Se emite a la DIAN: la ficha suma el dropdown Electrónico y el CUE.
   electronico: { resolucionParams: { venta: 'True' } },
 };
