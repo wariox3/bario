@@ -3985,6 +3985,7 @@ export const en: AppDict = {
       usar: 'Use {fecha}',
       usarTitle: 'Go back to the due date set by the payment term',
       anteriorAFecha: 'The due date cannot be earlier than the date.',
+      contado: 'Cash payment: due on the same date.',
     },
     comercialDetalle: {
       cargarReferencia: {
@@ -6015,6 +6016,7 @@ export const en: AppDict = {
     documentoRecibido: {
       name: 'Documents',
       cargar: 'Upload file',
+      verDetalle: 'View details',
       columns: {
         fecha: 'Date',
         numero: 'Number',
@@ -6023,6 +6025,7 @@ export const en: AppDict = {
         tipo: 'Type',
         impuestos: 'Taxes',
         total: 'Total',
+        formaPago: 'Payment method',
       },
       tipos: {
         factura_venta: 'Invoice',
@@ -6036,6 +6039,22 @@ export const en: AppDict = {
         hasta: 'To',
         delCorreo: 'From email',
         quitarCorreo: 'Remove the email filter',
+      },
+      detalle: {
+        title: 'Details',
+        general: 'General information',
+        emision: 'Issued',
+        moneda: 'Currency',
+        validado: 'DIAN validated',
+        fechaValidacion: 'Validation date',
+        recibido: 'Received in RedEDoc',
+        cue: 'CUE',
+        verDian: 'View at DIAN',
+        valorBruto: 'Gross value',
+        notFound: {
+          title: 'Document not found',
+          desc: 'Go back to the inbox and open it from there.',
+        },
       },
       empty: {
         title: 'No received documents',

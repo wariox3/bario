@@ -296,7 +296,8 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected readonly vencimiento: VencimientoAutocompute;
 
   constructor() {
-    // Autocálculo del vencimiento (fecha + días del plazo); el campo sigue editable.
+    // Autocálculo del vencimiento (fecha + días del plazo). Editable salvo en
+    // contado, donde vence el mismo día de la emisión y el campo se bloquea.
     this.vencimiento = setupVencimientoAutocompute({
       fecha: this.form.controls.fecha,
       plazoPago: this.form.controls.plazo_pago,
@@ -304,6 +305,7 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
       selectData: this.selectData,
       destroyRef: this.destroyRef,
       endpoint: this.plazoPagoEndpoint,
+      bloquearEnContado: true,
     });
 
     // Al elegir cliente, adopta su plazo de pago pactado. Cambiar el plazo
@@ -529,6 +531,8 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
    */
   private applyCabecera(read: FacturaVentaRead): void {
     this.form.patchValue(facturaVentaToFormValue(read), { emitEvent: false });
+    // El patch silencioso no avisa al autocálculo: el contado se reevalúa a mano.
+    this.vencimiento.sincronizar();
   }
 
   /** Reemplaza el `FormArray` de pagos con los del backend (anulados incluidos, de solo lectura). */

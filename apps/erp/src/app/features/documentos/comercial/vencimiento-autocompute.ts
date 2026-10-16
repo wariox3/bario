@@ -23,15 +23,23 @@ export interface VencimientoAutocomputeConfig {
   readonly destroyRef: DestroyRef;
   /** Endpoint del plazo de pago; por default `SELECT_ENDPOINTS.plazoPago`. */
   readonly endpoint?: string;
+  /**
+   * Con plazo de contado (dias 0) el vencimiento **es** la fecha de emisión y el
+   * campo se deshabilita. Lo activan los documentos de venta: la factura la
+   * emitimos nosotros, no hay un papel ajeno con otra fecha que respetar. En
+   * compra queda apagado (ver `VencimientoAutocompute`).
+   */
+  readonly bloquearEnContado?: boolean;
 }
 
 /**
  * Estado del vencimiento, para que el formulario pueda **explicar** de dónde
  * salió la fecha y señalar cuándo se apartó del plazo pactado.
  *
- * El campo nunca se bloquea: la factura del proveedor manda sobre la condición
- * pactada (llega con su propio vencimiento impreso y puede no coincidir). Lo que
- * el form hace con esto es contarlo —ver `<app-vencimiento-hint>`—, no impedirlo.
+ * En compra el campo nunca se bloquea: la factura del proveedor manda sobre la
+ * condición pactada (llega con su propio vencimiento impreso y puede no
+ * coincidir). Lo que el form hace con esto es contarlo —ver
+ * `<app-vencimiento-hint>`—, no impedirlo. La excepción es `bloquearEnContado`.
  */
 export interface VencimientoAutocompute {
   /** Días del plazo elegido (0 = contado); `null` mientras no se conozcan. */
@@ -46,6 +54,14 @@ export interface VencimientoAutocompute {
   readonly desvio: Signal<number | null>;
   /** Devuelve el campo al vencimiento que dicta el plazo. No hace nada sin sugerido. */
   readonly restablecer: () => void;
+  /** `true` mientras el campo está deshabilitado por plazo de contado. */
+  readonly bloqueado: Signal<boolean>;
+  /**
+   * Reevalúa el vencimiento tras poblar la cabecera con `emitEvent: false`. Sin
+   * esto, si el catálogo de plazos llegó antes que la cabecera (carga sin
+   * resolver), nada recalcularía el sugerido ni el bloqueo del contado.
+   */
+  readonly sincronizar: () => void;
 }
 
 /**
@@ -82,6 +98,13 @@ export function vencimientoAnteriorAFecha(
  * llegaran los días); con valor, el catálogo únicamente alimenta `sugerido`, que
  * es lo que permite señalar el desvío de un documento viejo.
  *
+ * **Contado con `bloquearEnContado`:** el vencimiento se iguala a la fecha y el
+ * control se deshabilita; vuelve a habilitarse al pasar a un plazo con días. Acá
+ * la hidratación **sí** pisa el valor guardado: un documento viejo de contado con
+ * otro vencimiento se corrige al abrirlo, en vez de mostrar bloqueado un dato que
+ * la regla no admite. El guardado no se entera del bloqueo porque los forms arman
+ * el payload con `getRawValue()`, que incluye los controles deshabilitados.
+ *
  * Además instala la regla dura `vencimientoAnteriorAFecha` sobre el control, para
  * que ningún formulario tenga que acordarse de sumarla.
  *
@@ -97,13 +120,31 @@ export function setupVencimientoAutocompute(
   const diasPlazo = signal<number | null>(null);
   const sugerido = signal<Date | null>(null);
   const vence = signal<Date | null>(cfg.fechaVence.value);
+  const bloqueado = signal(false);
 
   cfg.fechaVence.addValidators(vencimientoAnteriorAFecha(cfg.fecha));
 
   /**
+   * Deshabilita o rehabilita el campo por contado. Solo rehabilita lo que este
+   * helper deshabilitó: si el form entero se deshabilitó por otra razón, no se
+   * lo abre por debajo.
+   */
+  const aplicarBloqueo = (contado: boolean): void => {
+    if (contado === bloqueado()) return;
+    bloqueado.set(contado);
+    if (contado) cfg.fechaVence.disable({ emitEvent: false });
+    else cfg.fechaVence.enable({ emitEvent: false });
+  };
+
+  const escribir = (valor: Date | null): void => {
+    cfg.fechaVence.setValue(valor, { emitEvent: false });
+    vence.set(valor);
+  };
+
+  /**
    * Recalcula el vencimiento del plazo. `hidratando` = el disparo vino del
    * catálogo recién llegado, no de una interacción: ahí el campo con valor se
-   * respeta (ver el bloque de arriba).
+   * respeta (ver el bloque de arriba), salvo en contado bloqueado.
    */
   const recompute = (hidratando = false): void => {
     const fecha = cfg.fecha.value;
@@ -111,12 +152,18 @@ export function setupVencimientoAutocompute(
     const dias = plazoId == null ? undefined : plazoDias.get(plazoId);
     diasPlazo.set(dias ?? null);
 
-    if (!fecha || dias == null) {
-      sugerido.set(null);
+    const calculado = fecha && dias != null ? addDays(fecha, dias) : null;
+    sugerido.set(calculado);
+
+    const contado = cfg.bloquearEnContado === true && dias === 0;
+    aplicarBloqueo(contado);
+    if (contado) {
+      // El campo bloqueado sigue a la fecha, incluso vacía: no puede quedar
+      // mostrando un vencimiento que nadie puede corregir.
+      escribir(calculado);
       return;
     }
-    const calculado = addDays(fecha, dias);
-    sugerido.set(calculado);
+    if (!calculado) return;
 
     if (hidratando && cfg.fechaVence.value) {
       // Documento en edición: el valor guardado manda, pero hay que engancharlo
@@ -124,8 +171,7 @@ export function setupVencimientoAutocompute(
       vence.set(cfg.fechaVence.value);
       return;
     }
-    cfg.fechaVence.setValue(calculado, { emitEvent: false });
-    vence.set(calculado);
+    escribir(calculado);
   };
 
   cfg.fecha.valueChanges.pipe(takeUntilDestroyed(cfg.destroyRef)).subscribe(() => {
@@ -173,5 +219,7 @@ export function setupVencimientoAutocompute(
       cfg.fechaVence.setValue(esperado);
       cfg.fechaVence.markAsDirty();
     },
+    bloqueado: bloqueado.asReadonly(),
+    sincronizar: () => recompute(true),
   };
 }

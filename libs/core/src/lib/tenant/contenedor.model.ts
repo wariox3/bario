@@ -213,6 +213,13 @@ export interface Contenedor extends ContenedorAccesoFlags {
    * `ContenedorMember.rol_id`, que es otro endpoint.
    */
   propietario: boolean;
+  /**
+   * ¿La membresía es de soporte? La abre el staff con
+   * `POST /contenedor/cliente/{id}/soporte/`, sin invitación: entra con todos
+   * los accesos aunque la suscripción esté vencida y la cierra él mismo saliendo
+   * de la empresa. Opcional: un despliegue que no lo mande se lee como `false`.
+   */
+  soporte?: boolean;
 }
 
 export type ContenedoresResponse = PaginatedResponse<Contenedor>;

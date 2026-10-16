@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
+import { map, type Observable } from 'rxjs';
 import { BaseHttpService } from '@reddoc/core';
-import type { DocumentoRecibidoPagina, DocumentoRecibidoQuery } from './documento-recibido.model';
+import type {
+  DocumentoRecibido,
+  DocumentoRecibidoPagina,
+  DocumentoRecibidoQuery,
+} from './documento-recibido.model';
 
 const BASE = '/general/electronico/';
 
@@ -13,6 +17,17 @@ const BASE = '/general/electronico/';
 export class DocumentoRecibidoService extends BaseHttpService {
   listar(query: DocumentoRecibidoQuery = {}): Observable<DocumentoRecibidoPagina> {
     return this.get<DocumentoRecibidoPagina>(`${BASE}recepcion-documento/`, { ...query });
+  }
+
+  /**
+   * Un documento de la bandeja. El backend no tiene `GET` por id: se busca por
+   * su CUE el día de emisión (el filtro de fechas es obligatorio en la práctica,
+   * sin él consulta el mes en curso) y se toma el que coincide en id.
+   */
+  obtener(id: string, cue: string, fecha: string): Observable<DocumentoRecibido | null> {
+    return this.listar({ search: cue, desde: fecha, hasta: fecha, page_size: 100 }).pipe(
+      map((res) => res.results.find((doc) => doc.id === id) ?? null),
+    );
   }
 
   /**

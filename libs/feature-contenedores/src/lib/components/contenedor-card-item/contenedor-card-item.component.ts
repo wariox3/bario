@@ -24,6 +24,7 @@ export class ContenedorCardItemComponent {
   readonly expiredBadgeLabel = input<string>('Vencida');
   readonly ownerLabel = input<string>('Propietario');
   readonly memberLabel = input<string>('Miembro');
+  readonly supportLabel = input<string>('Soporte');
   readonly creatingLabel = input<string>('Creando…');
   readonly errorLabel = input<string>('No se pudo crear');
   readonly lastConnectionLabel = input<string>('Última conexión');
@@ -59,6 +60,9 @@ export class ContenedorCardItemComponent {
 
   readonly isOwner = computed(() => this.contenedor().propietario);
 
+  /** Membresía de soporte: entra aunque la suscripción esté vencida. */
+  readonly isSoporte = computed(() => this.contenedor().soporte === true);
+
   readonly isExpired = computed(() =>
     isSuscripcionExpired(this.contenedor().suscripcion_fecha_fin),
   );
@@ -67,13 +71,16 @@ export class ContenedorCardItemComponent {
 
   readonly isError = computed(() => this.contenedor().estado === 'error');
 
+  /** Vencida y sin cómo entrar: ni la renueva (propietario) ni la salta (soporte). */
+  readonly isLocked = computed(() => this.isExpired() && !this.isOwner() && !this.isSoporte());
+
   /** Mientras se crea no hay acciones: el menú vuelve cuando termina (o falla). */
   readonly menuDisabled = computed(() => !this.hasActions() || this.isCreando());
 
   protected onActivate(): void {
     // Hasta estar `listo`, el backend responde 409 a cualquier petición del tenant.
     if (this.contenedor().estado !== 'listo') return;
-    if (this.isExpired()) {
+    if (this.isExpired() && !this.isSoporte()) {
       if (this.isOwner() && this.canRenew()) this.renew.emit();
       return;
     }

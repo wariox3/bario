@@ -21,6 +21,11 @@ export interface ContenedoresCapabilities {
   readonly subscription: boolean;
   /** Alternar entre vista de lista y grilla. */
   readonly viewToggle: boolean;
+  /**
+   * Entrar como soporte a cualquier contenedor, sin invitación. Además de la
+   * capability, el botón exige que el usuario sea staff (`is_staff` de `/me/`).
+   */
+  readonly support: boolean;
 }
 
 /** Todas las acciones habilitadas. Es el default del componente. */
@@ -32,4 +37,5 @@ export const CONTENEDORES_CAPABILITIES_FULL: ContenedoresCapabilities = {
   leave: true,
   subscription: true,
   viewToggle: true,
+  support: true,
 };

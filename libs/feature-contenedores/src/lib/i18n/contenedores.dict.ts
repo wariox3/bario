@@ -8,6 +8,8 @@ export interface ContenedoresDict {
     title: string;
     subtitle: string;
     newButton: string;
+    /** Botón del staff para entrar a un contenedor como soporte. */
+    supportButton: string;
     searchPlaceholder: string;
     enter: string;
     status: { active: string; inactive: string };
@@ -22,9 +24,22 @@ export interface ContenedoresDict {
       updateSubscription: string;
       delete: string;
       leave: string;
+      /** «Salir» de una membresía de soporte. */
+      closeSupport: string;
     };
     /** Confirmación de un miembro que sale de la empresa (`{nombre}`). */
     leave: {
+      title: string;
+      message: string;
+      accept: string;
+      cancel: string;
+      toasts: {
+        success: { title: string; desc: string };
+        error: { title: string; desc: string };
+      };
+    };
+    /** Lo mismo que `leave`, para una membresía de soporte (`{nombre}`). */
+    closeSupport: {
       title: string;
       message: string;
       accept: string;
@@ -65,6 +80,7 @@ export interface ContenedoresDict {
     roles: {
       propietario: string;
       miembro: string;
+      soporte: string;
     };
   };
   create: {
@@ -182,6 +198,24 @@ export interface ContenedoresDict {
       removed: { title: string; desc: string };
       removeError: { title: string; desc: string };
       loadError: { title: string; desc: string };
+    };
+  };
+  /** Modal del staff: entrar a cualquier contenedor como soporte, sin invitación. */
+  support: {
+    title: string;
+    subtitle: string;
+    field: string;
+    placeholder: string;
+    required: string;
+    /** Sin MFA el backend responde 403: se avisa antes de intentarlo. */
+    mfaRequired: string;
+    /** Qué implica: miembro con todos los accesos, sin vencimiento. */
+    note: string;
+    submit: string;
+    cancel: string;
+    toasts: {
+      success: { title: string; desc: string };
+      error: { title: string; desc: string };
     };
   };
 }

@@ -122,6 +122,9 @@
               [silenciar]="form.controls.fecha_vence.invalid && form.controls.fecha_vence.touched"
               (restablecer)="vencimiento.restablecer()"
             />
+            @if (vencimiento.bloqueado()) {
+              <p class="text-[0.72rem] text-slate-500">{{ t().entities.vencimiento.contado }}</p>
+            }
           </div>
         </div>
 
