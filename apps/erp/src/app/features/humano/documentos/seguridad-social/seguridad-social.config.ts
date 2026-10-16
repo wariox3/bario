@@ -37,7 +37,7 @@ export const SEGURIDAD_SOCIAL_CONFIG: DocumentEntityConfig = {
     canEdit: false,
     canView: true,
     canDelete: false,
-    canSelectRows: false,
+    canSelectRows: true,
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
