@@ -10,13 +10,24 @@
           <p class="cl-panel__sub">{{ t().contenedores.list.subtitle }}</p>
         }
       </div>
-      @if (capabilities().create) {
-        <p-button
-          icon="pi pi-plus"
-          [label]="t().contenedores.list.newButton"
-          (onClick)="showCreate.set(true)"
-        />
-      }
+      <div class="flex shrink-0 items-center gap-2">
+        @if (canSupport()) {
+          <p-button
+            icon="pi pi-headphones"
+            severity="secondary"
+            [outlined]="true"
+            [label]="t().contenedores.list.supportButton"
+            (onClick)="showSupport.set(true)"
+          />
+        }
+        @if (capabilities().create) {
+          <p-button
+            icon="pi pi-plus"
+            [label]="t().contenedores.list.newButton"
+            (onClick)="showCreate.set(true)"
+          />
+        }
+      </div>
     </div>
 
     <!-- Controls (search + view toggle) -->
@@ -128,6 +139,7 @@
                     [expiredBadgeLabel]="t().contenedores.list.expired.badge"
                     [ownerLabel]="t().contenedores.list.roles.propietario"
                     [memberLabel]="t().contenedores.list.roles.miembro"
+                    [supportLabel]="t().contenedores.list.roles.soporte"
                     [creatingLabel]="
                       creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
                     "
@@ -156,6 +168,7 @@
                   [expiredBadgeLabel]="t().contenedores.list.expired.badge"
                   [ownerLabel]="t().contenedores.list.roles.propietario"
                   [memberLabel]="t().contenedores.list.roles.miembro"
+                  [supportLabel]="t().contenedores.list.roles.soporte"
                   [creatingLabel]="
                     creatingLabels().get(item.cliente_id) ?? t().contenedores.list.estado.creando
                   "
@@ -223,6 +236,16 @@
       (visibleChange)="showDelete.set($event)"
       [contenedor]="contenedorToDelete()"
       (deleted)="onContenedorDeleted()"
+    />
+  }
+}
+
+@defer (when showSupport()) {
+  @if (showSupport()) {
+    <lib-contenedores-support-dialog
+      [visible]="showSupport()"
+      (visibleChange)="showSupport.set($event)"
+      (added)="onSupportAdded()"
     />
   }
 }

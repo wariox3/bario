@@ -43,6 +43,7 @@ const APP_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   leave: true, // un miembro puede salir de la empresa
   subscription: true,
   viewToggle: true,
+  support: true, // además exige `is_staff` en el usuario
 };
 
 export const CONTENEDORES_ROUTES: Route[] = [
@@ -58,7 +59,7 @@ export const CONTENEDORES_ROUTES: Route[] = [
 `withComponentInputBinding()` ata `data.capabilities` al input del componente. Si no se pasa nada, el
 default es `CONTENEDORES_CAPABILITIES_FULL`.
 
-Escribí las seis banderas a mano aunque las quieras todas en `true`. `CONTENEDORES_CAPABILITIES_FULL`
+Escribí todas las banderas a mano aunque las quieras todas en `true`. `CONTENEDORES_CAPABILITIES_FULL`
 es un **valor** del barrel principal, así que importarlo desde las rutas de la app sería un import
 estático del lib — exactamente lo que colapsa el chunk lazy. Hoy erp y turnos habilitan las seis.
 

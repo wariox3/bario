@@ -5,6 +5,7 @@ export const contenedoresEn: ContenedoresDict = {
     title: 'Your companies',
     subtitle: 'Pick a workspace to continue',
     newButton: 'New company',
+    supportButton: 'Support access',
     searchPlaceholder: 'Search...',
     enter: 'Enter',
     status: { active: 'Active', inactive: 'Inactive' },
@@ -19,6 +20,7 @@ export const contenedoresEn: ContenedoresDict = {
       updateSubscription: 'Update subscription',
       delete: 'Delete container',
       leave: 'Leave company',
+      closeSupport: 'Close support',
     },
     leave: {
       title: 'Leave {nombre}',
@@ -29,6 +31,17 @@ export const contenedoresEn: ContenedoresDict = {
       toasts: {
         success: { title: 'You left the company', desc: 'You no longer have access to {nombre}.' },
         error: { title: 'Could not leave', desc: 'Try again in a moment.' },
+      },
+    },
+    closeSupport: {
+      title: 'Close support on {nombre}',
+      message:
+        'You will stop seeing this company. You can reopen support access whenever you need it.',
+      accept: 'Close support',
+      cancel: 'Cancel',
+      toasts: {
+        success: { title: 'Support closed', desc: 'You no longer have access to {nombre}.' },
+        error: { title: 'Could not close', desc: 'Try again in a moment.' },
       },
     },
     view: {
@@ -67,6 +80,7 @@ export const contenedoresEn: ContenedoresDict = {
     roles: {
       propietario: 'Owner',
       miembro: 'Member',
+      soporte: 'Support',
     },
   },
   create: {
@@ -211,6 +225,22 @@ export const contenedoresEn: ContenedoresDict = {
         title: 'Failed to load members',
         desc: 'We could not fetch the member list.',
       },
+    },
+  },
+  support: {
+    title: 'Support access',
+    subtitle: 'Add a company to your list without an invitation.',
+    field: 'Company',
+    placeholder: 'Search by name or schema',
+    required: 'Select a company.',
+    mfaRequired:
+      'To enter as support you need multi-factor authentication enabled on your account.',
+    note: 'You will join as a member with full access. Access does not expire: it ends when you leave the company.',
+    submit: 'Add',
+    cancel: 'Cancel',
+    toasts: {
+      success: { title: 'Company added', desc: '{nombre} is now in your list.' },
+      error: { title: 'Could not add', desc: 'Try again in a moment.' },
     },
   },
 };

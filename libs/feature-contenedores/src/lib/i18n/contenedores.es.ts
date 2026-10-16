@@ -5,6 +5,7 @@ export const contenedoresEs: ContenedoresDict = {
     title: 'Tus contenedores de empresa',
     subtitle: 'Selecciona un espacio de trabajo para continuar',
     newButton: 'Nuevo contenedor',
+    supportButton: 'Acceso de soporte',
     searchPlaceholder: 'Buscar...',
     enter: 'Ingresar',
     status: { active: 'Activo', inactive: 'Inactivo' },
@@ -19,6 +20,7 @@ export const contenedoresEs: ContenedoresDict = {
       updateSubscription: 'Actualizar suscripción',
       delete: 'Eliminar contenedor',
       leave: 'Salir de la empresa',
+      closeSupport: 'Cerrar soporte',
     },
     leave: {
       title: 'Salir de {nombre}',
@@ -29,6 +31,17 @@ export const contenedoresEs: ContenedoresDict = {
       toasts: {
         success: { title: 'Saliste de la empresa', desc: 'Ya no tienes acceso a {nombre}.' },
         error: { title: 'No se pudo salir', desc: 'Intenta de nuevo en un momento.' },
+      },
+    },
+    closeSupport: {
+      title: 'Cerrar soporte en {nombre}',
+      message:
+        'Dejarás de ver esta empresa. Puedes volver a abrir el acceso de soporte cuando lo necesites.',
+      accept: 'Cerrar soporte',
+      cancel: 'Cancelar',
+      toasts: {
+        success: { title: 'Soporte cerrado', desc: 'Ya no tienes acceso a {nombre}.' },
+        error: { title: 'No se pudo cerrar', desc: 'Intenta de nuevo en un momento.' },
       },
     },
     view: {
@@ -67,6 +80,7 @@ export const contenedoresEs: ContenedoresDict = {
     roles: {
       propietario: 'Propietario',
       miembro: 'Miembro',
+      soporte: 'Soporte',
     },
   },
   create: {
@@ -223,6 +237,22 @@ export const contenedoresEs: ContenedoresDict = {
         title: 'Error al cargar miembros',
         desc: 'No pudimos traer la lista de miembros.',
       },
+    },
+  },
+  support: {
+    title: 'Acceso de soporte',
+    subtitle: 'Agrega un contenedor a tu lista sin necesitar una invitación.',
+    field: 'Contenedor',
+    placeholder: 'Busca por nombre o schema',
+    required: 'Selecciona un contenedor.',
+    mfaRequired:
+      'Para entrar como soporte necesitas la autenticación en varias fases activa en tu cuenta.',
+    note: 'Entrarás como miembro con todos los accesos. El acceso no vence: se cierra saliendo de la empresa.',
+    submit: 'Adicionar',
+    cancel: 'Cancelar',
+    toasts: {
+      success: { title: 'Contenedor agregado', desc: '{nombre} ya está en tu lista.' },
+      error: { title: 'No se pudo agregar', desc: 'Intenta de nuevo en un momento.' },
     },
   },
 };

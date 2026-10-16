@@ -578,6 +578,24 @@ tabular-nums`. La **suma al pie**, tras `border-t-2 border-[rgba(20,48,73,0.12)]
 - **El parámetro recalculado sale de la propia respuesta** (`gen_asistente_datos_iniciales`), no de
   releer el endpoint de parámetros.
 
+## Regla: relación con la empresa = una sola pill (soporte punteada)
+
+En el listado de contenedores (`contenedor-row-item` / `contenedor-card-item`) la pill junto al
+nombre dice **qué relación tiene la persona con la empresa**, y es una sola: propietario (índigo +
+`pi-crown`), miembro (slate) o soporte. Nunca se apilan («Miembro · Soporte» es redundante y
+miente: a soporte no lo invitaron).
+
+- **Soporte va punteada, no con un color nuevo:** `border-dashed border-slate-400 text-slate-600`,
+  sin fondo, + `pi pi-headphones` (el mismo ícono del botón «Acceso de soporte» y su modal). En
+  esa fila los colores ya significan algo —ámbar prueba, sky mensual, emerald anual, índigo
+  propietario, rosa vencida—; un sexto sería ruido. El punteado se lee como credencial de
+  visitante: está dentro, pero no es su casa. Jerarquía por estructura, no por color.
+- **Misma geometría que las otras pills** (`px-1.5 py-0.5 rounded-md text-[0.65rem]`): cambiar de
+  relación no mueve la fila.
+- **Comportamiento:** soporte entra aunque la suscripción esté vencida (`isLocked` excluye
+  soporte), y en el menú «Salir de la empresa» pasa a «Cerrar soporte», con una confirmación que
+  no promete «el propietario tendrá que invitarte»: el staff puede volver a abrirlo solo.
+
 ## Regla: confirmación con una sola acción con color
 
 En un `confirm({...})` (y en cualquier modal de decisión) **solo la acción lleva color**; cancelar

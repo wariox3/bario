@@ -8,6 +8,7 @@ import {
 } from '../services/base-http.service';
 import type { PaginatedResponse } from '../models/pagination.model';
 import {
+  Contenedor,
   ContenedorDetalle,
   ContenedorEstadoResponse,
   ContenedorInvitacionesPendientesResponse,
@@ -106,6 +107,18 @@ export class ContenedorService extends BaseHttpService {
   /** Quita la imagen de la empresa. Quitarla a una que no tiene no es error. */
   quitarImagen(id: number): Observable<ContenedorDetalle> {
     return this.delete<ContenedorDetalle>(`/contenedor/cliente/${id}/imagen/`);
+  }
+
+  /**
+   * Hace al staff miembro del contenedor como soporte (`is_superuser` y todos los
+   * accesos), sin invitación. Solo staff con MFA activo (403 si no); 409 si el
+   * contenedor no está `listo` o ya es miembro. Responde la membresía con la
+   * forma de `lista-usuario`. No vence: se cierra saliendo de la empresa.
+   *
+   * `id` es el del cliente (`/contenedor/cliente/administrar/`), no una membresía.
+   */
+  abrirSoporte(id: number, opts?: RequestOptions): Observable<Contenedor> {
+    return this.post<Contenedor>(`/contenedor/cliente/${id}/soporte/`, {}, undefined, opts);
   }
 
   deleteContenedor(id: number): Observable<unknown> {

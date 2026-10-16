@@ -1,13 +1,13 @@
 <div
   role="button"
-  [attr.tabindex]="isCreando() || isError() || (isExpired() && !isOwner()) ? -1 : 0"
+  [attr.tabindex]="isCreando() || isError() || isLocked() ? -1 : 0"
   [attr.aria-busy]="isCreando() || null"
   [attr.aria-disabled]="isCreando() || isError() || null"
   class="cl-card"
   [class.cl-card--creando]="isCreando()"
   [class.cl-card--error]="isError()"
   [class.cl-card--expired]="isExpired()"
-  [class.cl-card--locked]="isExpired() && !isOwner()"
+  [class.cl-card--locked]="isLocked()"
   [style.--i]="index()"
   (click)="onActivate()"
   (keydown.enter)="onActivate()"
@@ -77,19 +77,29 @@
   <div class="cl-card__body">
     <span class="flex min-w-0 items-center gap-2">
       <span class="cl-card__nombre min-w-0">{{ contenedor().cliente_nombre }}</span>
-      <span
-        class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border"
-        [ngClass]="
-          isOwner()
-            ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-            : 'bg-slate-50 text-slate-600 border-slate-200'
-        "
-      >
-        @if (isOwner()) {
+      <!-- Una sola pill de relación. Soporte va punteada: presencia de visitante,
+           no un rol de la casa; el color lo dejan los planes y el propietario. -->
+      @if (isOwner()) {
+        <span
+          class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border bg-indigo-50 text-indigo-700 border-indigo-200"
+        >
           <i class="pi pi-crown text-[0.6rem]" aria-hidden="true"></i>
-        }
-        {{ isOwner() ? ownerLabel() : memberLabel() }}
-      </span>
+          {{ ownerLabel() }}
+        </span>
+      } @else if (isSoporte()) {
+        <span
+          class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border border-dashed border-slate-400 text-slate-600"
+        >
+          <i class="pi pi-headphones text-[0.6rem]" aria-hidden="true"></i>
+          {{ supportLabel() }}
+        </span>
+      } @else {
+        <span
+          class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold leading-none border bg-slate-50 text-slate-600 border-slate-200"
+        >
+          {{ memberLabel() }}
+        </span>
+      }
       @if (!contenedor().activo) {
         <span
           class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 rounded-md text-[0.65rem] font-semibold bg-red-50 text-red-600 border border-red-200 leading-none"
@@ -138,7 +148,7 @@
         <i class="pi pi-exclamation-circle text-[0.7rem]" aria-hidden="true"></i>
         {{ errorLabel() }}
       </span>
-    } @else if (isExpired()) {
+    } @else if (isExpired() && !isSoporte()) {
       @if (isOwner() && canRenew()) {
         <span class="cl-card__cta cl-card__cta--renew">
           {{ renewLabel() }}

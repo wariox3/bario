@@ -1,0 +1,94 @@
+@let s = t().contenedores.support;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  [dismissableMask]="!isSaving()"
+  [style]="{ width: '480px' }"
+  [breakpoints]="{ '640px': '92vw' }"
+  styleClass="cp-support-dialog"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50">
+        <i class="pi pi-headphones text-[1.05rem] text-sky-700"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+        >
+          {{ s.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ s.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Body -->
+  @if (visible()) {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      libFocusInvalid
+      class="flex flex-col gap-4"
+      autocomplete="off"
+    >
+      @if (sinMfa()) {
+        <p class="m-0 rounded-lg bg-amber-50 px-3 py-2 text-[0.78rem] text-amber-800">
+          <i class="pi pi-exclamation-triangle mr-1.5"></i>{{ s.mfaRequired }}
+        </p>
+      }
+
+      <div class="flex flex-col gap-1.5">
+        <label for="cs-contenedor" class="text-[0.8rem] font-medium text-brand-text">
+          {{ s.field }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <lib-api-autocomplete
+          inputId="cs-contenedor"
+          formControlName="contenedor"
+          [endpoint]="endpoint"
+          [params]="params"
+          searchParam="nombre"
+          [minLength]="1"
+          [placeholder]="s.placeholder"
+          [invalid]="form.controls.contenedor.invalid && form.controls.contenedor.touched"
+        />
+        <lib-field-error
+          [control]="form.controls.contenedor"
+          [messages]="{ required: s.required }"
+        />
+      </div>
+
+      <p class="m-0 flex gap-2 text-[0.75rem] leading-snug text-brand-muted">
+        <i class="pi pi-info-circle mt-[0.15rem] text-[0.75rem]"></i>
+        <span>{{ s.note }}</span>
+      </p>
+
+      <!-- Footer -->
+      <div
+        class="mt-1 flex items-center justify-end gap-2 border-t border-[rgba(20,48,73,0.08)] pt-5"
+      >
+        <p-button
+          severity="secondary"
+          [text]="true"
+          [label]="s.cancel"
+          [disabled]="isSaving()"
+          (onClick)="onCancel()"
+        />
+        <p-button
+          type="submit"
+          icon="pi pi-plus"
+          [label]="s.submit"
+          [loading]="isSaving()"
+          [disabled]="isSaving() || sinMfa()"
+        />
+      </div>
+    </form>
+  }
+</p-dialog>
