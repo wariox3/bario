@@ -4104,8 +4104,6 @@ export const es: AppDict = {
       empty: 'Aún no hay líneas. Agrega la primera para empezar',
       addLine: 'Agregar línea',
       removeLine: 'Eliminar línea',
-      saveLine: 'Guardar línea',
-      saveAll: 'Guardar líneas',
       pendingSuffix: 'sin guardar',
       leaveHeader: 'Cambios sin guardar',
       leaveMessage: 'Hay cambios sin guardar que se perderán. ¿Salir de todos modos?',
@@ -4190,17 +4188,9 @@ export const es: AppDict = {
         total: 'Total',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Línea guardada',
-          desc: 'La línea se guardó correctamente',
-        },
         lineSaveError: {
           title: 'Error al guardar',
-          desc: 'No se pudo guardar la línea',
-        },
-        allSaved: {
-          title: 'Líneas guardadas',
-          desc: 'Se guardaron las líneas pendientes',
+          desc: 'No se pudieron guardar las líneas',
         },
         incompleteLines: {
           title: 'Líneas incompletas',

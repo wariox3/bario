@@ -102,10 +102,19 @@ export class DocumentoPagosComponent {
    */
   readonly ocupado = computed(() => this.savingAll() || this.savingGroup() !== null);
 
+  /**
+   * `true` desde que el effect de sincronización corrió, es decir, con los inputs ya
+   * asignados. El form padre pide `pendingCount()` desde su barra de acciones, que se
+   * evalúa antes que esta tabla (va más abajo en la plantilla): leer el input
+   * obligatorio en ese momento lanza NG0950. Al montar no hay nada pendiente.
+   */
+  private readonly montada = signal(false);
+
   constructor() {
     // Espejo reactivo del FormArray inyectado (se re-suscribe si cambia la instancia).
     effect((onCleanup) => {
       const array = this.pagos();
+      this.montada.set(true);
       this.mirror.set(array.getRawValue());
       const sub = array.valueChanges.subscribe(() => this.mirror.set(array.getRawValue()));
       onCleanup(() => sub.unsubscribe());
@@ -156,6 +165,7 @@ export class DocumentoPagosComponent {
 
   /** Nº de pagos sin guardar en edición; alimenta el toolbar y el guard de salida. */
   pendingCount(): number {
+    if (!this.montada()) return 0;
     return this.documentId() == null ? 0 : this.rowsToPersist().length;
   }
 

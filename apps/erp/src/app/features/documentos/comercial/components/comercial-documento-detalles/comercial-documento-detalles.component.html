@@ -31,15 +31,6 @@
         <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
         {{ pendingCount() }} {{ t().entities.comercialDetalle.pendingSuffix }}
       </span>
-      <p-button
-        type="button"
-        size="small"
-        icon="pi pi-save"
-        [label]="t().entities.comercialDetalle.saveAll + ' (' + pendingCount() + ')'"
-        [loading]="savingAll()"
-        [disabled]="ocupado()"
-        (onClick)="onSaveAllClick()"
-      />
     }
     @if (addLineMenu().length > 0) {
       <p-splitbutton
@@ -49,6 +40,7 @@
         size="small"
         [model]="addLineMenu()"
         menuStyleClass="comercial-detalle-add-menu"
+        [disabled]="ocupado()"
         (onClick)="addLinea()"
       />
     } @else {
@@ -58,6 +50,7 @@
         icon="pi pi-plus"
         [label]="t().entities.comercialDetalle.addLine"
         [outlined]="true"
+        [disabled]="ocupado()"
         (onClick)="addLinea()"
       />
     }
@@ -262,22 +255,6 @@
 
             <td class="comercial-detalle-table__td">
               <div class="flex items-center justify-center gap-0.5">
-                @if (canSaveRow(row)) {
-                  <button
-                    type="button"
-                    (click)="saveLinea(row)"
-                    [disabled]="ocupado()"
-                    [pTooltip]="t().entities.comercialDetalle.saveLine"
-                    [attr.aria-label]="t().entities.comercialDetalle.saveLine"
-                    class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
-                  >
-                    @if (isSavingRow(row)) {
-                      <i class="pi pi-spin pi-spinner text-[0.72rem]"></i>
-                    } @else {
-                      <i class="pi pi-check text-[0.72rem]"></i>
-                    }
-                  </button>
-                }
                 <button
                   type="button"
                   (click)="removeLinea(row)"

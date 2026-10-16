@@ -4034,8 +4034,6 @@ export const en: AppDict = {
       empty: 'No lines yet. Add the first one to start',
       addLine: 'Add line',
       removeLine: 'Remove line',
-      saveLine: 'Save line',
-      saveAll: 'Save lines',
       pendingSuffix: 'unsaved',
       leaveHeader: 'Unsaved changes',
       leaveMessage: 'There are unsaved changes that will be lost. Leave anyway?',
@@ -4117,17 +4115,9 @@ export const en: AppDict = {
         total: 'Total',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Line saved',
-          desc: 'The line was saved successfully',
-        },
         lineSaveError: {
           title: 'Save failed',
-          desc: 'The line could not be saved',
-        },
-        allSaved: {
-          title: 'Lines saved',
-          desc: 'Pending lines were saved',
+          desc: 'The lines could not be saved',
         },
         incompleteLines: {
           title: 'Incomplete lines',

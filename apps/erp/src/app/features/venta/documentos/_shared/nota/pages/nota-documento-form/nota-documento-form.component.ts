@@ -54,7 +54,12 @@ import {
 } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
-import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
+import {
+  canLeaveDocumentForm,
+  hayCambiosSinGuardar,
+  type CambiosDocumento,
+} from '@erp/core/guards/leave-document-form';
+import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import {
@@ -110,6 +115,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
   selector: 'app-nota-documento-form',
   standalone: true,
   imports: [
+    CambiosSinGuardarComponent,
     MasInformacionComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
@@ -391,7 +397,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
       });
   }
 
-  /** Tablas que transaccionan en vivo, en el orden en que se guardan. */
+  /** Tablas que se guardan aparte del documento, en el orden en que se guardan. */
   private tablasEnVivo(): readonly TablaEnVivoDocumento[] {
     const { comercialDetalle, documentoPago } = this.t().entities;
     return [
@@ -406,7 +412,8 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
   private persistCabecera(id: string | undefined): void {
     const toasts = this.t().entities.notaVenta.form.toasts;
-    // En edición se omiten los detalles del payload: ya transaccionaron en vivo.
+    // En edición se omiten los detalles del payload: van por `documento-detalle` y ya
+    // los guardó `saveAll()` de la tabla.
     const payload = formValueToPayload(
       this.form.getRawValue(),
       this.document().documentTypeId,
@@ -461,19 +468,32 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
     this.navigateToList();
   }
 
-  /**
-   * Guard de salida: si hay líneas o pagos sin guardar, confirma antes de abandonar
-   * para no perderlos. Solo aplica en edición.
-   */
-  canDeactivate(): boolean | Observable<boolean> {
+  /** Lo que se perdería al salir; lo leen el guard de salida y el aviso junto a "Guardar". */
+  private cambios(): CambiosDocumento {
     const pagosPendientes = this.conPagos() ? (this.pagosTable()?.pendingCount() ?? 0) : 0;
-    return canLeaveDocumentForm({
+    return {
       form: this.form,
       pendingLines: (this.detallesTable()?.pendingCount() ?? 0) + pagosPendientes,
       // En edición los pagos transaccionan aparte, como las líneas: los cuenta `pendingLines`.
       lineControls: ['detalles', 'pagos'],
       // En alta nada persiste aparte: tocar una línea o un pago y salir también pierde trabajo.
       enAlta: !this.id(),
+    };
+  }
+
+  /** Aviso "Cambios sin guardar" junto al botón. En alta todo está por guardar: no se muestra. */
+  protected hayCambios(): boolean {
+    return this.isEditMode() && hayCambiosSinGuardar(this.cambios());
+  }
+
+  /**
+   * Guard de salida: si hay cambios sin guardar (cabecera o líneas), confirma antes
+   * de abandonar. Guardar el documento persiste todo y deja el form limpio, así que
+   * el camino feliz no pregunta.
+   */
+  canDeactivate(): boolean | Observable<boolean> {
+    return canLeaveDocumentForm({
+      ...this.cambios(),
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,
       cancelLabel: this.t().common.actions.cancel,
@@ -481,18 +501,9 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /**
-   * Tras importar líneas en **edición** (ya persistidas vía `masivo/`), recarga el
-   * documento para reflejar las nuevas líneas con sus ids y montos autoritativos.
-   */
-  protected onImported(): void {
-    const id = this.documentId();
-    if (id != null) this.loadDocumento(id);
-  }
-
-  /**
    * Carga completa (cabecera + líneas + pagos). La cabecera no embebe líneas ni
    * pagos: se traen aparte de `documento-detalle` y `documento-pago`. Se usa como
-   * fallback de la carga inicial y para recargar tras importar.
+   * fallback de la carga inicial.
    */
   private loadDocumento(id: number): void {
     forkJoin({
@@ -574,22 +585,6 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
-  /**
-   * En edición trae las líneas persistidas (ids y montos del backend) sin tocar la
-   * cabecera, que puede tener cambios sin guardar —como la referencia recién elegida—.
-   */
-  protected recargarLineas(): void {
-    const id = this.documentId();
-    if (id == null) return;
-    this.detalleService
-      .listarPorDocumento<ComercialDetalleRead>(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (lineas) => this.populateLineas(lineas),
-        error: () => this.notifyLoadError(),
-      });
-  }
-
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
     detalles.clear();

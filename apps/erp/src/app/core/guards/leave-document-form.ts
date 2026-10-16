@@ -43,26 +43,11 @@ export function isHeaderDirty(
   );
 }
 
-/**
- * Decide si un formulario de documento puede abandonarse, y si no, lo pregunta.
- *
- * Hay cambios pendientes cuando quedan **líneas sin persistir** o cuando el
- * **encabezado** está sucio: ambos se pierden al salir, así que ambos avisan.
- * Antes solo se miraban las líneas y editar la cabecera y volver perdía el
- * trabajo en silencio.
- *
- * El form que guarda con éxito debe marcarse `markAsPristine()` antes de
- * navegar: guardar también pasa por el guard, y sin eso el camino feliz
- * preguntaría por cambios que ya están almacenados.
- */
-export function canLeaveDocumentForm(options: {
+/** Estado de un formulario de documento del que depende si hay algo sin guardar. */
+export interface CambiosDocumento {
   readonly form: FormGroup;
-  /** Líneas editadas o nuevas que todavía no viajaron al backend. */
+  /** Cambios de las tablas en vivo que todavía no viajaron al backend (altas, ediciones y bajas). */
   readonly pendingLines: number;
-  readonly confirmation: ConfirmationService;
-  readonly labels: LeaveConfirmLabels;
-  /** Etiqueta del botón que cancela la salida (`common.actions.cancel`). */
-  readonly cancelLabel: string;
   /**
    * Controles cuyas líneas ya cuenta `pendingLines`. Default `['detalles']`; un
    * documento con otra tabla en vivo (la factura de compra) declara las suyas.
@@ -74,9 +59,39 @@ export function canLeaveDocumentForm(options: {
    * pierde trabajo. En edición esas tablas las cubre `pendingLines`.
    */
   readonly enAlta?: boolean;
-}): boolean | Observable<boolean> {
-  const { form, pendingLines, confirmation, labels, cancelLabel, lineControls, enAlta } = options;
-  if (pendingLines === 0 && !isHeaderDirty(form, enAlta ? [] : lineControls)) return true;
+}
+
+/**
+ * ¿Hay algo que se pierde al salir? **Líneas sin persistir** o el **encabezado**
+ * sucio. Lo usan el guard de salida y el aviso "Cambios sin guardar" junto al botón
+ * de guardar, para que digan lo mismo.
+ */
+export function hayCambiosSinGuardar(cambios: CambiosDocumento): boolean {
+  const { form, pendingLines, lineControls, enAlta } = cambios;
+  return pendingLines > 0 || isHeaderDirty(form, enAlta ? [] : lineControls);
+}
+
+/**
+ * Decide si un formulario de documento puede abandonarse, y si no, lo pregunta.
+ *
+ * Hay cambios pendientes cuando quedan **líneas sin persistir** o cuando el
+ * **encabezado** está sucio: ambos se pierden al salir, así que ambos avisan
+ * (ver `hayCambiosSinGuardar`).
+ *
+ * El form que guarda con éxito debe marcarse `markAsPristine()` antes de
+ * navegar: guardar también pasa por el guard, y sin eso el camino feliz
+ * preguntaría por cambios que ya están almacenados.
+ */
+export function canLeaveDocumentForm(
+  options: CambiosDocumento & {
+    readonly confirmation: ConfirmationService;
+    readonly labels: LeaveConfirmLabels;
+    /** Etiqueta del botón que cancela la salida (`common.actions.cancel`). */
+    readonly cancelLabel: string;
+  },
+): boolean | Observable<boolean> {
+  const { confirmation, labels, cancelLabel } = options;
+  if (!hayCambiosSinGuardar(options)) return true;
 
   return new Observable<boolean>((subscriber) => {
     confirmation.confirm({

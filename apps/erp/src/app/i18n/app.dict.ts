@@ -3104,8 +3104,6 @@ export interface AppDict
       empty: string;
       addLine: string;
       removeLine: string;
-      saveLine: string;
-      saveAll: string;
       pendingSuffix: string;
       leaveHeader: string;
       leaveMessage: string;
@@ -3168,9 +3166,7 @@ export interface AppDict
         total: string;
       };
       toasts: {
-        lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };
-        allSaved: { title: string; desc: string };
         incompleteLines: { title: string; desc: string };
       };
     };
