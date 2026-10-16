@@ -2848,8 +2848,6 @@ export const en: AppDict = {
       add: 'Add payment',
       empty: 'No payments registered',
       removePago: 'Remove payment',
-      savePago: 'Save payment',
-      saveAll: 'Save payments',
       pendingSuffix: 'unsaved',
       anulado: 'Voided',
       confirmDelete: 'Remove this payment?',
@@ -2873,14 +2871,7 @@ export const en: AppDict = {
           title: 'Nothing left to collect',
           desc: 'Payments already cover the document total',
         },
-        saveSuccess: { title: 'Payment saved', desc: 'The payment was registered' },
         saveError: { title: 'Save failed', desc: 'The payment could not be saved' },
-        allSaved: { title: 'Payments saved', desc: 'Pending payments were saved' },
-        incompletos: {
-          title: 'Incomplete payments',
-          desc: 'Choose the bank account and an amount above zero for each payment',
-        },
-        deleteError: { title: 'Remove failed', desc: 'The payment could not be removed' },
         noRegistrados: {
           title: 'Payments not registered',
           desc: 'The document was saved, but some payments were not registered. Edit it to add them',

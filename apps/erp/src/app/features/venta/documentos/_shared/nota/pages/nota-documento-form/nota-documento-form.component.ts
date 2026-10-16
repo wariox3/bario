@@ -159,7 +159,7 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   protected readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
-  /** Tabla de pagos: en edición persiste en vivo; en alta registra los pagos al crear. */
+  /** Tabla de pagos: en edición se guarda con el documento; en alta registra los pagos al crear. */
   private readonly pagosTable = viewChild(DocumentoPagosComponent);
 
   /** Guardado en curso en la tabla de líneas o la de pagos: el botón Guardar espera a que termine. */

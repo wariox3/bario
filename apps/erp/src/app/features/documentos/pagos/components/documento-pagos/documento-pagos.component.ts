@@ -1,8 +1,9 @@
 import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, concat, defer, of, throwError } from 'rxjs';
-import { finalize, ignoreElements, tap } from 'rxjs/operators';
+import { catchError, finalize, ignoreElements, tap } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -29,10 +30,10 @@ import { PagosEnCursoError } from '../../pago.errors';
  * venta, POS, nota crédito…). Building block transversal: recibe el `FormArray` de
  * pagos del form padre y lo edita inline (cuenta de banco + monto).
  *
- * Transacciona igual que la tabla de detalles, contra `/general/documento-pago/`:
- * - **Edición** (`documentId` presente): cada fila se guarda (✓) o elimina en vivo;
- *   las pendientes se marcan y el padre las persiste con `saveAll()` antes de
- *   guardar el documento.
+ * Se guarda igual que la tabla de detalles, contra `/general/documento-pago/`:
+ * - **Edición** (`documentId` presente): la tabla no escribe nada por su cuenta. Altas,
+ *   ediciones y bajas quedan pendientes y las persiste `saveAll()` cuando el form
+ *   padre guarda el documento; "Volver" las descarta.
  * - **Alta** (sin `documentId`): las filas viven en memoria y el padre las registra
  *   con `saveAll(idCreado)` apenas el backend devuelve el documento.
  *
@@ -90,17 +91,21 @@ export class DocumentoPagosComponent {
   /** Saldo pendiente por cubrir con pagos (nunca negativo). */
   protected readonly saldoPendiente = computed(() => this.calculo().saldo);
 
-  /** Fila que se está guardando con su ✓. */
-  private readonly savingGroup = signal<PagoGroup | null>(null);
-
-  /** Guardado en lote en curso (botón del toolbar o flush del padre). */
+  /** Guardado de los pagos (flush del form padre al guardar el documento) en curso. */
   protected readonly savingAll = signal(false);
 
   /**
-   * Hay un guardado en curso (una fila con su ✓ o un lote). El padre deshabilita su
-   * "Guardar" mientras tanto: guardar a la vez reenviaría filas que aún no tienen `id`.
+   * Hay un guardado en curso. El padre deshabilita su "Guardar" mientras tanto:
+   * guardar a la vez reenviaría filas que aún no tienen `id`.
    */
-  readonly ocupado = computed(() => this.savingAll() || this.savingGroup() !== null);
+  readonly ocupado = computed(() => this.savingAll());
+
+  /**
+   * Ids de pagos persistidos que la persona quitó en edición. La fila sale de la tabla
+   * (y del saldo) al instante, pero el `DELETE` espera al guardado del documento:
+   * salir sin guardar los conserva.
+   */
+  private readonly eliminados = signal<readonly number[]>([]);
 
   /**
    * `true` desde que el effect de sincronización corrió, es decir, con los inputs ya
@@ -128,6 +133,8 @@ export class DocumentoPagosComponent {
    * una fila en cero.
    */
   protected addPago(): void {
+    // Mientras se guarda no se agregan filas: quedarían fuera del lote en vuelo.
+    if (this.ocupado()) return;
     if (this.documentTotal() <= 0) {
       const toast = this.t().entities.documentoPago.toasts.sinDetalles;
       this.toast.warn(toast.title, toast.desc);
@@ -152,8 +159,8 @@ export class DocumentoPagosComponent {
    */
   private rowsToPersist(): readonly PagoGroup[] {
     return this.pagos().controls.filter((row) => {
-      // Anulado: solo lectura. En vuelo por su ✓: ya se está guardando, no se reenvía.
-      if (this.isAnulado(row) || row === this.savingGroup()) return false;
+      // Anulado: solo lectura.
+      if (this.isAnulado(row)) return false;
       return row.controls.id.value == null ? row.controls.cuenta_banco.value != null : row.dirty;
     });
   }
@@ -163,10 +170,14 @@ export class DocumentoPagosComponent {
     return this.documentId() != null && this.rowsToPersist().includes(group);
   }
 
-  /** Nº de pagos sin guardar en edición; alimenta el toolbar y el guard de salida. */
+  /**
+   * Nº de cambios sin guardar en edición (filas nuevas o editadas más las quitadas);
+   * alimenta el toolbar, el aviso del form padre y el guard de salida.
+   */
   pendingCount(): number {
     if (!this.montada()) return 0;
-    return this.documentId() == null ? 0 : this.rowsToPersist().length;
+    if (this.documentId() == null) return 0;
+    return this.rowsToPersist().length + this.eliminados().length;
   }
 
   /** Nº de pagos por registrar (no anulados); el padre lo mira en alta tras crear. */
@@ -179,91 +190,86 @@ export class DocumentoPagosComponent {
     return this.rowsToPersist().some((row) => row.invalid);
   }
 
-  /** Pendientes y válidos: los que `saveAll` y el ✓ pueden persistir ya. */
+  /** Pendientes y válidos: los que `saveAll` puede persistir ya. */
   private pendingSavable(): readonly PagoGroup[] {
     return this.rowsToPersist().filter((row) => row.valid);
   }
 
-  protected canSaveRow(group: PagoGroup): boolean {
-    return group.valid && this.isPending(group);
-  }
-
-  protected isSavingRow(group: PagoGroup): boolean {
-    return this.savingGroup() === group;
-  }
-
   /**
    * Persiste una fila (PATCH con `id`, POST si es nueva) y la reconstruye desde la
-   * respuesta del backend. No muestra toasts: los pone cada caller.
+   * respuesta del backend; reconstruida, deja de estar pendiente.
+   *
+   * Si la fila cambió mientras la petición viajaba (la persona corrigió el monto), no
+   * se reconstruye: pisaría lo nuevo. Solo toma el `id` —para que el próximo guardado
+   * sea un PATCH y no otra alta— y queda pendiente con lo que muestra la pantalla.
    */
   private persistRow(group: PagoGroup, documentoId: number): Observable<PagoRead> {
     const payload = pagoToPayload(group.getRawValue(), documentoId);
+    const enviado = JSON.stringify(payload);
     const id = group.controls.id.value;
     const op =
       id != null ? this.pagoService.actualizar(id, payload) : this.pagoService.crear(payload);
     return op.pipe(
       tap((saved) => {
+        const leido = pagoReadToFormValue(saved);
+        if (JSON.stringify(pagoToPayload(group.getRawValue(), documentoId)) !== enviado) {
+          group.controls.id.setValue(leido.id);
+          group.markAsDirty();
+          return;
+        }
         const index = this.pagos().controls.indexOf(group);
-        if (index >= 0) this.pagos().setControl(index, createPagoGroup(pagoReadToFormValue(saved)));
+        if (index >= 0) this.pagos().setControl(index, createPagoGroup(leido));
       }),
     );
   }
 
-  /** Guarda un solo pago (✓ por fila, en edición). */
-  protected savePago(group: PagoGroup): void {
-    const docId = this.documentId();
-    if (docId == null || group.invalid || this.ocupado()) return;
-    this.savingGroup.set(group);
-    this.persistRow(group, docId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.savingGroup.set(null);
-          const toast = this.t().entities.documentoPago.toasts.saveSuccess;
-          this.toast.success(toast.title, toast.desc);
-        },
-        error: (err: unknown) => {
-          this.savingGroup.set(null);
-          const toast = this.t().entities.documentoPago.toasts.saveError;
-          this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
-        },
-      });
-  }
-
-  /** Botón "Guardar pagos" del toolbar: avisa de incompletos y guarda los válidos. */
-  protected onSaveAllClick(): void {
-    const toasts = this.t().entities.documentoPago.toasts;
-    if (this.hasInvalidPending())
-      this.toast.warn(toasts.incompletos.title, toasts.incompletos.desc);
-    // Solo incompletos: ya se avisó, y un "Pagos guardados" sin haber guardado nada mentiría.
-    if (this.pendingSavable().length === 0) return;
-    this.saveAll().subscribe({
-      complete: () => this.toast.success(toasts.allSaved.title, toasts.allSaved.desc),
-      error: (err: unknown) =>
-        this.toast.error(toasts.saveError.title, extractErrorMessage(err, toasts.saveError.desc)),
-    });
+  /**
+   * Borra un pago quitado y lo saca de `eliminados`. Un 404 cuenta como hecho: el pago
+   * ya no existe (p. ej. lo borró un intento anterior cuya respuesta se perdió).
+   */
+  private persistBaja(id: number): Observable<void> {
+    const hecho = (): void => this.eliminados.update((ids) => ids.filter((x) => x !== id));
+    return this.pagoService.eliminar(id).pipe(
+      tap(hecho),
+      catchError((err: unknown) => {
+        if (err instanceof HttpErrorResponse && err.status === 404) {
+          hecho();
+          return of(undefined);
+        }
+        return throwError(() => err);
+      }),
+    );
   }
 
   /**
-   * Guarda todos los pagos pendientes y válidos contra `documentoId` (por defecto el
-   * del documento en edición; en alta, el recién creado). Completa al terminar y
-   * emite error si alguno falla.
+   * Guarda los cambios pendientes contra `documentoId` (por defecto el del documento
+   * en edición; en alta, el recién creado): primero las bajas, después las altas y
+   * ediciones válidas. Completa al terminar y emite error si alguna falla.
    *
    * - Va **en serie**, no en paralelo: cada escritura hace que el backend recalcule
    *   `documento.pago`, y dos a la vez sobre el mismo documento se pisarían la suma.
    * - Cada payload se arma **cuando le toca** (`defer`), no al empezar el lote: si la
    *   persona corrige un monto mientras se guardan las filas anteriores, viaja el nuevo.
    * - Con otro guardado en curso emite `PagosEnCursoError` en vez de reenviar filas.
+   * - Si una escritura falla, corta ahí (en serie no hay nada en vuelo que cancelar). Lo
+   *   ya guardado deja de estar pendiente, así que reintentar solo manda lo que faltó.
+   *   Límite: si un POST llega al backend pero se pierde su respuesta, el reintento lo
+   *   crea otra vez; evitarlo pide una clave de idempotencia del backend.
    *
    * Operación pura: no muestra toasts.
    */
   saveAll(documentoId: number | null = this.documentId()): Observable<void> {
     return defer(() => {
       if (this.ocupado()) return throwError(() => new PagosEnCursoError());
+      if (documentoId == null) return of(undefined);
+      const bajas = [...this.eliminados()];
       const rows = this.pendingSavable();
-      if (documentoId == null || rows.length === 0) return of(undefined);
+      if (bajas.length === 0 && rows.length === 0) return of(undefined);
       this.savingAll.set(true);
-      return concat(...rows.map((row) => defer(() => this.persistRow(row, documentoId)))).pipe(
+      return concat(
+        ...bajas.map((id) => defer(() => this.persistBaja(id))),
+        ...rows.map((row) => defer(() => this.persistRow(row, documentoId))),
+      ).pipe(
         ignoreElements(),
         finalize(() => this.savingAll.set(false)),
       );
@@ -271,8 +277,9 @@ export class DocumentoPagosComponent {
   }
 
   /**
-   * Quita un pago. Si ya existe en el backend (edición), pide confirmación y lo
-   * elimina allí; si es una fila local, solo sale del array.
+   * Quita un pago. Si ya existe en el backend (edición), pide confirmación y su id pasa
+   * a `eliminados`: el `DELETE` se hace al guardar el documento. Una fila local solo
+   * sale del array.
    */
   protected removePago(group: PagoGroup): void {
     const id = group.controls.id.value;
@@ -287,17 +294,10 @@ export class DocumentoPagosComponent {
       acceptLabel: this.t().common.actions.delete,
       rejectLabel: this.t().common.actions.cancel,
       acceptButtonStyleClass: 'p-button-danger',
-      accept: () =>
-        this.pagoService
-          .eliminar(id)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => this.removeRow(group),
-            error: (err: unknown) => {
-              const toast = this.t().entities.documentoPago.toasts.deleteError;
-              this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
-            },
-          }),
+      accept: () => {
+        this.eliminados.update((ids) => [...ids, id]);
+        this.removeRow(group);
+      },
     });
   }
 

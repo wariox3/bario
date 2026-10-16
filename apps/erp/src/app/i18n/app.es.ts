@@ -2909,8 +2909,6 @@ export const es: AppDict = {
       add: 'Agregar pago',
       empty: 'No hay pagos registrados',
       removePago: 'Eliminar pago',
-      savePago: 'Guardar pago',
-      saveAll: 'Guardar pagos',
       pendingSuffix: 'sin guardar',
       anulado: 'Anulado',
       confirmDelete: '¿Eliminar este pago?',
@@ -2934,14 +2932,7 @@ export const es: AppDict = {
           title: 'Sin saldo por cobrar',
           desc: 'Los pagos ya cubren el total del documento',
         },
-        saveSuccess: { title: 'Pago guardado', desc: 'El pago se registró correctamente' },
         saveError: { title: 'Error al guardar', desc: 'No se pudo guardar el pago' },
-        allSaved: { title: 'Pagos guardados', desc: 'Se guardaron los pagos pendientes' },
-        incompletos: {
-          title: 'Pagos incompletos',
-          desc: 'Elige la cuenta de banco y un monto mayor a cero en cada pago',
-        },
-        deleteError: { title: 'Error al eliminar', desc: 'No se pudo eliminar el pago' },
         noRegistrados: {
           title: 'Pagos sin registrar',
           desc: 'El documento se guardó, pero algunos pagos no se registraron. Edítalo para agregarlos',
