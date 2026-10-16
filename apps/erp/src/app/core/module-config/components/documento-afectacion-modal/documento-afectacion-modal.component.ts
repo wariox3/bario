@@ -62,9 +62,9 @@ interface LineaAfectaRead {
  * pregunta: aquel parte de una **línea** («¿quién consume este detalle?», con
  * sus programaciones); este, del **documento**. Comparten la card del documento.
  *
- * Hoy cubre lo que enlaza por cabecera (`documento_afectado`), que es como lo
- * hacen los pagos de cartera. Las notas crédito/débito enlazan la factura por su
- * `documento_referencia`; se sumarán cuando el backend las deje listas.
+ * Cubre los dos enlaces que llegan al documento: las líneas que lo afectan por
+ * cabecera (`documento_afectado`), como los pagos de cartera, y los documentos que
+ * lo toman como `documento_referencia`, como las notas crédito/débito.
  */
 @Component({
   selector: 'app-documento-afectacion-modal',
@@ -91,6 +91,8 @@ export class DocumentoAfectacionModalComponent {
   protected readonly documento = signal<AfectacionDocumentoRead | null>(null);
   protected readonly documentoReferencia = signal<AfectacionDocumentoRead | null>(null);
   protected readonly filas = signal<readonly LineaAfectaRead[]>([]);
+  /** Documentos cuyo `documento_referencia` es este. */
+  protected readonly referenciados = signal<readonly AfectacionDocumentoRead[]>([]);
 
   protected readonly formatMoney = formatCop;
 
@@ -129,22 +131,25 @@ export class DocumentoAfectacionModalComponent {
     this.documento.set(null);
     this.documentoReferencia.set(null);
     this.filas.set([]);
+    this.referenciados.set([]);
 
     forkJoin({
       doc: this.documentoService.obtenerPorId<AfectacionDocumentoRead>(documentoId),
       filas: this.lineasQueAfectan(documentoId),
+      referenciados: this.documentosQueReferencian(documentoId),
     })
       .pipe(
-        switchMap(({ doc, filas }) =>
-          this.referenciaDe(doc).pipe(map((ref) => ({ doc, ref, filas }))),
+        switchMap(({ doc, ...resto }) =>
+          this.referenciaDe(doc).pipe(map((ref) => ({ doc, ref, ...resto }))),
         ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: ({ doc, ref, filas }) => {
+        next: ({ doc, ref, filas, referenciados }) => {
           this.documento.set(doc);
           this.documentoReferencia.set(ref);
           this.filas.set(filas);
+          this.referenciados.set(referenciados);
           this.loading.set(false);
         },
         error: () => {
@@ -171,6 +176,30 @@ export class DocumentoAfectacionModalComponent {
       .pipe(
         map((filas) =>
           filas.filter((f) => f.documento_afectado === documentoId && f.documento !== documentoId),
+        ),
+      );
+  }
+
+  /**
+   * Cabeceras de otros documentos con `documento_referencia = documentoId`. Se
+   * re-acota aquí por la misma razón que las líneas: un filtro no declarado se
+   * ignora y llegaría la lista entera.
+   */
+  private documentosQueReferencian(
+    documentoId: number,
+  ): Observable<readonly AfectacionDocumentoRead[]> {
+    const filtros: BackendFilter[] = [
+      { propiedad: 'documento_referencia_id', operador: '=', valor: documentoId },
+    ];
+    return this.documentoService
+      .listarPorFiltros<AfectacionDocumentoRead>(filtros)
+      .pipe(
+        map((docs) =>
+          docs.filter(
+            (d) =>
+              (d.documento_referencia ?? d.documento_referencia_id) === documentoId &&
+              d.id !== documentoId,
+          ),
         ),
       );
   }
