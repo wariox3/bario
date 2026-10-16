@@ -44,6 +44,17 @@ export interface EntityDataGateway {
   exportExcel(entity: EntityConfig, query: ListQuery): Observable<void>;
 
   /**
+   * Imprime en un solo PDF los registros que cumplen `query` (mismos filtros y
+   * orden que la lista, sin paginar) y dispara la descarga en el navegador.
+   */
+  imprimirLista(entity: EntityConfig, query: ListQuery): Observable<void>;
+
+  /**
+   * Como `imprimirLista`, pero descarga un ZIP con un PDF por registro.
+   */
+  imprimirZip(entity: EntityConfig, query: ListQuery): Observable<void>;
+
+  /**
    * Aprueba un documento vía `POST <endpoint>/aprobar/` con body `{ id }`.
    * Devuelve el documento actualizado por el backend.
    */

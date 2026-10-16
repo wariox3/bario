@@ -24,7 +24,8 @@ import type { EntityDataGateway } from './entity-data-gateway';
 interface BackendDocumentFilter {
   readonly propiedad: string;
   readonly operador: string;
-  readonly valor: string | number | boolean;
+  /** El operador `in` lleva la lista como array: `[1, 2, 3]`. */
+  readonly valor: string | number | boolean | readonly (string | number)[];
 }
 
 /**
@@ -123,22 +124,33 @@ export class HttpEntityDataGateway implements EntityDataGateway {
    * blob se consume disparando la descarga del navegador.
    */
   exportExcel(entity: EntityConfig, query: ListQuery): Observable<void> {
-    const body = this.buildListBody(entity, query);
-    return this.http
-      .post(`${entity.endpoint}/excel/`, body, { observe: 'response', responseType: 'blob' })
-      .pipe(
-        map((response) => {
-          const blob = response.body;
-          if (!blob || blob.size === 0) {
-            throw new Error('Respuesta vacía del servidor');
-          }
-          const filename = parseFilename(
-            response.headers.get('content-disposition'),
-            `${entity.id}.xlsx`,
-          );
-          triggerBrowserDownload(blob, filename);
-        }),
-      );
+    return this.descargar(entity, 'excel', this.buildListBody(entity, query), `${entity.id}.xlsx`);
+  }
+
+  /**
+   * Imprime en un solo PDF los documentos del listado vía
+   * `POST <endpoint>/imprimir/`, con el mismo body que `exportExcel`.
+   */
+  imprimirLista(entity: EntityConfig, query: ListQuery): Observable<void> {
+    return this.descargar(
+      entity,
+      'imprimir',
+      this.buildListBody(entity, query),
+      `${entity.id}.pdf`,
+    );
+  }
+
+  /**
+   * Imprime los documentos del listado como un ZIP con un PDF por documento vía
+   * `POST <endpoint>/imprimir-zip/`, con el mismo body que `exportExcel`.
+   */
+  imprimirZip(entity: EntityConfig, query: ListQuery): Observable<void> {
+    return this.descargar(
+      entity,
+      'imprimir-zip',
+      this.buildListBody(entity, query),
+      `${entity.id}.zip`,
+    );
   }
 
   /** Aprueba el documento: `POST <endpoint>/<id>/aprobar/` sin body. */
@@ -184,11 +196,22 @@ export class HttpEntityDataGateway implements EntityDataGateway {
     const body: Pick<DocumentListBody, 'filtros'> = {
       filtros: [{ propiedad: 'id', operador: '=', valor: id }],
     };
+    return this.descargar(entity, 'imprimir', body, `${entity.id}-${id}.pdf`);
+  }
+
+  /**
+   * `POST <endpoint>/<accion>/` que responde un archivo: valida que no venga
+   * vacío, resuelve el nombre del `content-disposition` (o `fallbackFilename`)
+   * y dispara la descarga del navegador.
+   */
+  private descargar(
+    entity: EntityConfig,
+    accion: string,
+    body: Partial<DocumentListBody>,
+    fallbackFilename: string,
+  ): Observable<void> {
     return this.http
-      .post(`${entity.endpoint}/imprimir/`, body, {
-        observe: 'response',
-        responseType: 'blob',
-      })
+      .post(`${entity.endpoint}/${accion}/`, body, { observe: 'response', responseType: 'blob' })
       .pipe(
         map((response) => {
           const blob = response.body;
@@ -197,7 +220,7 @@ export class HttpEntityDataGateway implements EntityDataGateway {
           }
           const filename = parseFilename(
             response.headers.get('content-disposition'),
-            `${entity.id}-${id}.pdf`,
+            fallbackFilename,
           );
           triggerBrowserDownload(blob, filename);
         }),
@@ -231,18 +254,8 @@ function toBackendFilter(condition: FilterCondition): BackendDocumentFilter {
   return {
     propiedad: condition.field,
     operador: BACKEND_OPERATOR[condition.operator],
-    valor: normalizeFilterValue(condition.value),
+    valor: condition.value,
   };
-}
-
-function normalizeFilterValue(value: FilterCondition['value']): string | number | boolean {
-  // `Array.isArray` no estrecha sobre `readonly`; el chequeo explícito por
-  // ausencia de `join` también devolvería una unión, por lo que serializamos
-  // explícitamente listas a CSV.
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-    return value;
-  }
-  return value.join(',');
 }
 
 function encodeSort(spec: SortSpec): string {

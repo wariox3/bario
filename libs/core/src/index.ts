@@ -145,7 +145,10 @@ export {
   DocumentoPagoService,
   posDocumentoToFormValue,
   posDocumentoToPayload,
+  alcanceImpresion,
+  UMBRAL_CONFIRMACION_IMPRESION,
 } from './lib/documento';
+export type { AlcanceImpresion } from './lib/documento';
 export type {
   EntityKind,
   InventoryEffect,

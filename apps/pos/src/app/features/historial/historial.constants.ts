@@ -4,7 +4,7 @@ import {
   type FilterCondition,
   type FilterField,
 } from '@reddoc/core';
-import type { RowAction } from '@reddoc/feature-base';
+import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
 /** Filtros del usuario en el historial, recordados en el dispositivo. */
 export const HISTORIAL_FILTROS_STORAGE_KEY = 'pos:historial:filtros:v1';
@@ -102,5 +102,23 @@ export const HISTORIAL_ACCIONES_FILA: readonly RowAction[] = [
     labelKey: 'historial.acciones.imprimir',
     iconClass: 'pi pi-print',
     inline: true,
+  },
+];
+
+/** Dropdown "Acciones" del toolbar: imprimir lo que se ve y exportarlo. */
+export const HISTORIAL_ACCIONES_TOOLBAR: readonly ToolbarAction[] = [
+  {
+    id: 'actions',
+    labelKey: 'common.actions.actions',
+    iconClass: '',
+    children: [
+      {
+        id: 'imprimir-lista',
+        labelKey: 'historial.acciones.imprimirLista',
+        iconClass: 'pi pi-print',
+      },
+      { id: 'imprimir-zip', labelKey: 'historial.acciones.imprimirZip', iconClass: 'pi pi-box' },
+      { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
+    ],
   },
 ];

@@ -347,6 +347,16 @@ export interface AppDict
       success: { title: string; desc: string };
       error: { title: string; desc: string };
     };
+    imprimirLista: {
+      label: string;
+      zipLabel: string;
+      /** `message` lleva `{n}`, la cantidad de documentos. */
+      confirmar: { header: string; message: string; accept: string; reject: string };
+      generando: { title: string; desc: string };
+      sinCriterio: { title: string; desc: string };
+      vacio: { title: string; desc: string };
+      error: { title: string; desc: string };
+    };
     generarRecurrente: {
       seleccionadosLabel: string;
       modalHeader: string;

@@ -44,5 +44,5 @@ export const NOMINA_CONFIG: DocumentEntityConfig = {
     canExportZip: false,
     canGenerate: false,
   },
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
 };

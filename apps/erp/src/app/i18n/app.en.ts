@@ -346,6 +346,32 @@ export const en: AppDict = {
         desc: 'Could not generate the document. Please try again.',
       },
     },
+    imprimirLista: {
+      label: 'Print',
+      zipLabel: 'Print zip',
+      confirmar: {
+        header: 'Print documents',
+        message: '{n} documents will be printed. It may take a few minutes.',
+        accept: 'Print',
+        reject: 'Cancel',
+      },
+      generando: {
+        title: 'Generating print',
+        desc: 'The download starts as soon as the file is ready.',
+      },
+      sinCriterio: {
+        title: 'Choose what to print',
+        desc: 'Select documents or apply a filter to print.',
+      },
+      vacio: {
+        title: 'Nothing to print',
+        desc: 'There are no documents with the current filters.',
+      },
+      error: {
+        title: 'Could not print',
+        desc: 'Something went wrong while generating the print. Try again.',
+      },
+    },
     generarRecurrente: {
       seleccionadosLabel: 'Generate selected',
       modalHeader: 'Generate invoices',

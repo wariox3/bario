@@ -4,6 +4,8 @@ import { ExportarExcelActionStrategy } from './exportar-excel/exportar-excel-act
 import { GenerarDocumentoActionStrategy } from './generar/generar-documento-action.strategy';
 import { GenerarRecurrenteSeleccionadosActionStrategy } from './generar-recurrente/generar-recurrente-seleccionados-action.strategy';
 import { GenerarRecurrenteTodosActionStrategy } from './generar-recurrente/generar-recurrente-todos-action.strategy';
+import { ImprimirListaActionStrategy } from './imprimir-lista/imprimir-lista-action.strategy';
+import { ImprimirZipActionStrategy } from './imprimir-lista/imprimir-zip-action.strategy';
 import { GenerarNominaElectronicaActionStrategy } from './generar-nomina-electronica/generar-nomina-electronica-action.strategy';
 
 /**
@@ -26,5 +28,7 @@ export const ENTITY_ACTION_PROVIDERS: readonly Provider[] = [
     useClass: GenerarNominaElectronicaActionStrategy,
     multi: true,
   },
+  { provide: ENTITY_ACTION_STRATEGY, useClass: ImprimirListaActionStrategy, multi: true },
+  { provide: ENTITY_ACTION_STRATEGY, useClass: ImprimirZipActionStrategy, multi: true },
   { provide: ENTITY_ACTION_STRATEGY, useClass: ExportarExcelActionStrategy, multi: true },
 ];

@@ -46,5 +46,5 @@ export const PEDIDO_CLIENTE_CONFIG: DocumentEntityConfig = {
   canEditRow: (row) => !row.estado_aprobado,
   // Acciones extra del dropdown "Acciones":
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
 };

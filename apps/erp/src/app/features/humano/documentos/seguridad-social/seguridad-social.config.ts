@@ -42,5 +42,5 @@ export const SEGURIDAD_SOCIAL_CONFIG: DocumentEntityConfig = {
     canExportZip: false,
     canGenerate: false,
   },
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
 };

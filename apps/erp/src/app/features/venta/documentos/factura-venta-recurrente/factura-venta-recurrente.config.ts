@@ -60,5 +60,11 @@ export const FACTURA_VENTA_RECURRENTE_CONFIG: DocumentEntityConfig = {
   //  - 'generar-recurrente-seleccionados': genera facturas reales desde las
   //    plantillas marcadas.
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
-  extraActionIds: ['generar-recurrente-todos', 'generar-recurrente-seleccionados', 'export-excel'],
+  extraActionIds: [
+    'generar-recurrente-todos',
+    'generar-recurrente-seleccionados',
+    'imprimir',
+    'imprimir-zip',
+    'export-excel',
+  ],
 };

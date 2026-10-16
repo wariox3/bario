@@ -49,5 +49,5 @@ export const DEPRECIACION_CONFIG: DocumentEntityConfig = {
   // Una depreciación aprobada ya movió los saldos: no se edita. Regla única
   // consumida por la lista, el detalle y el resolver de la ruta de edición.
   canEditRow: (row) => !row.estado_aprobado,
-  extraActionIds: ['export-excel'],
+  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
 };
