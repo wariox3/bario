@@ -2,25 +2,54 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
-## [0.1.7](///compare/v0.1.6...v0.1.7) (2026-10-16)
-
+## [0.1.8](https://github.com/wariox3/bario/compare/v0.1.7...v0.1.8) (2026-10-19)
 
 ### Features
 
-* **contenedores:** acceso de soporte para el staff ce0e593
-* **erp,pos:** imprimir desde todos los documentos y el historial del POS 421620b
-* **erp:** documentos que referencian en el modal de afectación 7eb4fbb
-* **erp:** ficha de documento recibido y forma de pago en la bandeja 8d11d1f
-* **erp:** imprimir e imprimir zip desde el listado de documentos 8cb8f6b
-* **erp:** los pagos del documento se guardan con el "Guardar" general c2d4a46
-* **erp:** selección de filas en nómina, nómina electrónica y seguridad social e30d294
-* **erp:** un solo "Guardar" confirma las líneas de los documentos comerciales 4ae3c5f
-* **erp:** vencimiento bloqueado en contado en factura de venta y POS 43d0ee0
-
+- **erp:** adjuntos y eventos RADIAN en la ficha del documento recibido ([e0e0a6b](https://github.com/wariox3/bario/commit/e0e0a6b9e4d4ccb34df645b9a1572dcf8c603033))
+- **erp:** configurar la cuenta contable de los impuestos en Configuración ([5746e5b](https://github.com/wariox3/bario/commit/5746e5b62be3c2b04f0c4d3492b62a28e95574c1))
+- **erp:** crear la factura de compra desde una plantilla recurrente ([5f6474a](https://github.com/wariox3/bario/commit/5f6474a9f0757ed93b8c648fcdb2aa9854962f98))
+- **erp:** descartar y eliminar documentos recibidos sin eventos ([8a7657c](https://github.com/wariox3/bario/commit/8a7657c2c28ae2a9789209772d99f5d3513f07d5))
+- **erp:** filtro de recepción y columnas ajustadas en documentos recibidos ([d9c2b62](https://github.com/wariox3/bario/commit/d9c2b62e510b9f74a08dbcdf94df96aeb27b41dd))
+- **erp:** guardar la persona que recibe desde el evento RADIAN ([e62badb](https://github.com/wariox3/bario/commit/e62badbea2eecaf62b3fd0273bd351e92b3e3521))
+- **erp:** la bandeja de recibidos arranca sin recepción y sin fechas ([cd579d2](https://github.com/wariox3/bario/commit/cd579d2ccb1a43df88f468a7ad9cec9631e0b201))
+- **erp:** listar la familia de nómina con su tipo ([dc262a1](https://github.com/wariox3/bario/commit/dc262a10f70a0ee9aa636d2d4a9af3a7d7d75652))
+- **erp:** mostrar primero el último ítem creado en el listado ([6e4ce8b](https://github.com/wariox3/bario/commit/6e4ce8b79b376bafa3066d3afb26f9dd705d5a68))
+- **erp:** registrar eventos RADIAN y persona que recibe en Configuración ([bf0dffd](https://github.com/wariox3/bario/commit/bf0dffd43e1a31d6adab520369dd9f4cafb7f8b3))
+- **erp:** renombrar la opción Lista de la DIAN a Importar ([03f9659](https://github.com/wariox3/bario/commit/03f965935ff01d3db6c79f4108b3a0ee82a08724))
+- **erp:** restaurar documentos recibidos descartados ([431b605](https://github.com/wariox3/bario/commit/431b6051ba09a95ae711c99779766d6e83475167))
+- **erp:** rutas nuevas de recepción y adjuntos con descarga en la ficha ([145a121](https://github.com/wariox3/bario/commit/145a121d058b24722e4c924bd8ead4c3bb750042))
+- **erp:** verificación DIAN, estado RADIAN y eventos con su forma real ([fe17c04](https://github.com/wariox3/bario/commit/fe17c040392fa1a186d15e02d5bdd3a44f554fec))
+- **ui:** tamaño opcional en lib-api-select ([69cc12a](https://github.com/wariox3/bario/commit/69cc12a89378f826f8ed7bafa18630d7954fd304))
 
 ### Bug Fixes
 
-* **contenedores:** adicionar soporte deshabilitado sin contenedor elegido d9de7f9
+- **erp:** dejar de mandar el modulo a lista-dian de resoluciones ([36d5a16](https://github.com/wariox3/bario/commit/36d5a162223464ab5055aa313a11207623570ae6))
+- **erp:** separar el almacén del par centro de costo y sede ([92ec4b2](https://github.com/wariox3/bario/commit/92ec4b25e0c3540003540d8980a8921d1e5c03ed))
+- **feature-base:** una celda enum sin valor queda vacía ([2f14bd9](https://github.com/wariox3/bario/commit/2f14bd9e8d382f3a655c7c3d2bb0576b20bf0791))
+- **styles:** las acciones destructivas del menú de la tabla salen en rojo ([77b8922](https://github.com/wariox3/bario/commit/77b892205ff142e8d8246a22d06e3fc66266d79d))
+
+### Refactoring
+
+- **erp:** usar DOCUMENTO_CLASE_ID.NOMINA en vez del 701 suelto ([0c46766](https://github.com/wariox3/bario/commit/0c46766db74946ce29f746a2cd17ef4123bf8133))
+
+## [0.1.7](///compare/v0.1.6...v0.1.7) (2026-10-16)
+
+### Features
+
+- **contenedores:** acceso de soporte para el staff ce0e593
+- **erp,pos:** imprimir desde todos los documentos y el historial del POS 421620b
+- **erp:** documentos que referencian en el modal de afectación 7eb4fbb
+- **erp:** ficha de documento recibido y forma de pago en la bandeja 8d11d1f
+- **erp:** imprimir e imprimir zip desde el listado de documentos 8cb8f6b
+- **erp:** los pagos del documento se guardan con el "Guardar" general c2d4a46
+- **erp:** selección de filas en nómina, nómina electrónica y seguridad social e30d294
+- **erp:** un solo "Guardar" confirma las líneas de los documentos comerciales 4ae3c5f
+- **erp:** vencimiento bloqueado en contado en factura de venta y POS 43d0ee0
+
+### Bug Fixes
+
+- **contenedores:** adicionar soporte deshabilitado sin contenedor elegido d9de7f9
 
 ## [0.1.6](https://github.com/wariox3/bario/compare/v0.1.5...v0.1.6) (2026-10-15)
 
