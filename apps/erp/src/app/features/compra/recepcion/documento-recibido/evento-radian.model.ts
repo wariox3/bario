@@ -1,13 +1,12 @@
+import { formatFechaCorta, toHora } from '@reddoc/core';
+
 /**
  * Eventos RADIAN de un documento recibido: acuse (030), reclamo (031), recibo
  * del bien o servicio (032) y aceptación expresa (033) que la empresa le manda a
  * la DIAN sobre la factura del proveedor. Salen de
  * `GET /general/electronico/recepcion/evento/`; el emisor lo pone el backend.
- *
- * El OpenAPI declara filtros y página, pero no la forma de cada evento
- * (`additionalProperties`): esos campos son provisionales hasta ver una
- * respuesta real. Sí está declarado que el motivo de un rechazo viene en
- * `respuesta_descripcion`.
+ * El OpenAPI no declara la forma de cada evento: la de `EventoRadian` sale de
+ * una respuesta real.
  */
 
 export type EventoRadianCodigo = '030' | '031' | '032' | '033';
@@ -26,21 +25,49 @@ export interface EventoRadianQuery {
   readonly page_size?: number;
 }
 
+/**
+ * Concepto de un reclamo (031), según la DIAN: `01` documento con
+ * inconsistencias, `02` mercancía no entregada totalmente, `03` mercancía no
+ * entregada parcialmente, `04` servicio no prestado.
+ */
+export type EventoRadianConcepto = '01' | '02' | '03' | '04';
+
 export interface EventoRadian {
   readonly id: string;
-  readonly numero: string;
+  readonly documento: string;
+  readonly emisor: number;
   readonly codigo: EventoRadianCodigo;
+  /** Nombre DIAN del evento (`Reclamo de la Factura Electrónica de Venta`). */
+  readonly descripcion: string;
+  readonly numero: string;
+  /** Si la DIAN lo registró, lo rechazó o no se pudo enviar. */
   readonly estado: EventoRadianEstado;
-  readonly firmado: boolean;
-  readonly persona_recibe: string | null;
-  readonly concepto: string | null;
-  readonly reclamo: string | null;
+  /** `1` producción, `2` pruebas. */
+  readonly ambiente: number;
+  readonly cude: string;
+  /** AAAA-MM-DD. */
+  readonly fecha: string;
+  /** `HH:mm:ss`. */
+  readonly hora: string;
+  /** Quien recibe el bien o servicio (032); vacíos en los demás eventos. */
+  readonly persona_tipo_identificacion: string | null;
+  readonly persona_numero_identificacion: string;
+  readonly persona_nombres: string;
+  readonly persona_apellidos: string;
+  readonly persona_cargo: string;
+  readonly persona_area: string;
+  /** Solo en un reclamo (031). */
+  readonly concepto_reclamo: EventoRadianConcepto | null;
+  readonly respuesta_codigo: string | null;
   /** Lo que respondió la DIAN; en un rechazo, el motivo. */
   readonly respuesta_descripcion: string | null;
+  /** ISO con zona; `null` si todavía no se envió. */
+  readonly enviado_en: string | null;
   readonly intentos: number;
-  readonly enviado: boolean;
-  readonly usuario: string | null;
-  readonly cude: string | null;
+  readonly tiene_xml: boolean;
+  readonly tiene_respuesta: boolean;
+  /** ISO con zona. */
+  readonly creado_en: string;
 }
 
 /** Respuesta del listado; `desde` y `hasta` llegan siempre en nulo. */
@@ -49,4 +76,23 @@ export interface EventoRadianPagina {
   readonly page: number;
   readonly page_size: number;
   readonly results: readonly EventoRadian[];
+}
+
+/** Fila de la tabla: el evento con la persona y el envío ya legibles. */
+export interface EventoRadianRow extends EventoRadian {
+  /** Nombres y apellidos de quien recibe. */
+  readonly persona_nombre: string;
+  readonly enviado_texto: string;
+}
+
+export function toEventoRadianRow(evento: EventoRadian): EventoRadianRow {
+  const enviado = evento.enviado_en ? new Date(evento.enviado_en) : null;
+  return {
+    ...evento,
+    persona_nombre: [evento.persona_nombres, evento.persona_apellidos]
+      .map((parte) => parte?.trim())
+      .filter(Boolean)
+      .join(' '),
+    enviado_texto: enviado ? `${formatFechaCorta(evento.enviado_en, '')} ${toHora(enviado)}` : '',
+  };
 }

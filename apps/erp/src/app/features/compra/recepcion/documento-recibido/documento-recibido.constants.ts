@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@reddoc/core';
 import type { RowAction } from '@reddoc/feature-base';
 import type { DocumentoRecibidoTipo, EstadoRecepcionFiltro } from './documento-recibido.model';
+import type { EventoRadian } from './evento-radian.model';
 
 const I18N = 'entities.documentoRecibido';
 
@@ -60,17 +61,24 @@ const I18N_EVENTO = `${I18N}.eventos`;
 export const EVENTO_ACTION_XML = 'xml';
 export const EVENTO_ACTION_RESPUESTA = 'respuesta';
 
+/** XML y respuesta, solo en los eventos que los tienen. */
 export const EVENTO_ROW_ACTIONS: readonly RowAction[] = [
-  { id: EVENTO_ACTION_XML, labelKey: `${I18N_EVENTO}.acciones.xml`, iconClass: 'pi pi-code' },
+  {
+    id: EVENTO_ACTION_XML,
+    labelKey: `${I18N_EVENTO}.acciones.xml`,
+    iconClass: 'pi pi-code',
+    visibleFor: (row) => (row as EventoRadian).tiene_xml,
+  },
   {
     id: EVENTO_ACTION_RESPUESTA,
     labelKey: `${I18N_EVENTO}.acciones.respuesta`,
     iconClass: 'pi pi-file',
+    visibleFor: (row) => (row as EventoRadian).tiene_respuesta,
   },
 ];
 
 export const EVENTO_COLUMNS: readonly ColumnDef[] = [
-  { field: 'numero', headerKey: `${I18N_EVENTO}.columns.numero`, type: 'text', width: '110px' },
+  { field: 'numero', headerKey: `${I18N_EVENTO}.columns.numero`, type: 'text', width: '100px' },
   {
     field: 'codigo',
     headerKey: `${I18N_EVENTO}.columns.evento`,
@@ -85,10 +93,13 @@ export const EVENTO_COLUMNS: readonly ColumnDef[] = [
     enumKeyPrefix: `${I18N_EVENTO}.estados`,
     width: '120px',
   },
-  { field: 'firmado', headerKey: `${I18N_EVENTO}.columns.firmado`, type: 'boolean', width: '90px' },
-  { field: 'persona_recibe', headerKey: `${I18N_EVENTO}.columns.personaRecibe`, type: 'text' },
-  { field: 'concepto', headerKey: `${I18N_EVENTO}.columns.concepto`, type: 'text' },
-  { field: 'reclamo', headerKey: `${I18N_EVENTO}.columns.reclamo`, type: 'text' },
+  { field: 'persona_nombre', headerKey: `${I18N_EVENTO}.columns.personaRecibe`, type: 'text' },
+  {
+    field: 'concepto_reclamo',
+    headerKey: `${I18N_EVENTO}.columns.conceptoReclamo`,
+    type: 'enum',
+    enumKeyPrefix: `${I18N_EVENTO}.conceptos`,
+  },
   {
     field: 'respuesta_descripcion',
     headerKey: `${I18N_EVENTO}.columns.respuestaDian`,
@@ -101,8 +112,12 @@ export const EVENTO_COLUMNS: readonly ColumnDef[] = [
     width: '90px',
     align: 'right',
   },
-  { field: 'enviado', headerKey: `${I18N_EVENTO}.columns.enviado`, type: 'boolean', width: '90px' },
-  { field: 'usuario', headerKey: `${I18N_EVENTO}.columns.usuario`, type: 'text' },
+  {
+    field: 'enviado_texto',
+    headerKey: `${I18N_EVENTO}.columns.enviado`,
+    type: 'text',
+    width: '150px',
+  },
   { field: 'cude', headerKey: `${I18N_EVENTO}.columns.cude`, type: 'text' },
 ];
 
@@ -148,5 +163,12 @@ export const COLUMNS: readonly ColumnDef[] = [
     type: 'currency',
     width: '140px',
     align: 'right',
+  },
+  {
+    field: 'radian_estado',
+    headerKey: `${I18N}.columns.radian`,
+    type: 'enum',
+    enumKeyPrefix: `${I18N}.radianEstados`,
+    width: '190px',
   },
 ];

@@ -47,14 +47,15 @@
       <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
         {{ d.detalle.general }}
       </h2>
-      @if (v.validado) {
-        <span
-          class="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[0.72rem] font-semibold text-emerald-700"
-        >
-          <i class="pi pi-check-circle text-[0.7rem]"></i>
-          {{ d.detalle.validado }}
-        </span>
-      }
+      <!-- Verificación DIAN por CUFE; al pasar el mouse, lo que respondió la DIAN -->
+      <span
+        class="ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[0.72rem] font-semibold"
+        [class]="v.verificacion.clase"
+        [attr.title]="v.verificacion.descripcion || null"
+      >
+        <i class="text-[0.7rem]" [class]="v.verificacion.icono"></i>
+        {{ v.verificacion.label }}
+      </span>
     </div>
     <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
       <div class="flex flex-col gap-0.5">

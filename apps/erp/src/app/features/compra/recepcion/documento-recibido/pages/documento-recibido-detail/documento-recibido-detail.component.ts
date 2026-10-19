@@ -29,9 +29,13 @@ import {
   EVENTO_COLUMNS,
   EVENTO_ROW_ACTIONS,
 } from '../../documento-recibido.constants';
-import { toDocumentoRecibidoRow, type DocumentoRecibidoRow } from '../../documento-recibido.model';
+import {
+  toDocumentoRecibidoRow,
+  type DocumentoRecibidoRow,
+  type VerificacionEstado,
+} from '../../documento-recibido.model';
 import { DocumentoRecibidoService } from '../../documento-recibido.service';
-import type { EventoRadian } from '../../evento-radian.model';
+import { toEventoRadianRow, type EventoRadianRow } from '../../evento-radian.model';
 import { EventoRadianService } from '../../evento-radian.service';
 import {
   ADJUNTO_PAGE_SIZE,
@@ -40,8 +44,20 @@ import {
 } from '../../recepcion-adjunto.model';
 import { RecepcionAdjuntoService } from '../../recepcion-adjunto.service';
 
-/** Código DIAN de un documento validado. */
-const VALIDACION_OK = '02';
+/** Pill de la verificación DIAN en la barra de título: color e ícono por estado. */
+const VERIFICACION_PILL: Record<
+  VerificacionEstado,
+  { readonly clase: string; readonly icono: string }
+> = {
+  valido: { clase: 'bg-emerald-50 text-emerald-700', icono: 'pi pi-check-circle' },
+  invalido: { clase: 'bg-red-50 text-red-600', icono: 'pi pi-times-circle' },
+  error: { clase: 'bg-amber-50 text-amber-700', icono: 'pi pi-exclamation-triangle' },
+  no_verificable: {
+    clase: 'bg-[rgba(20,48,73,0.06)] text-brand-muted',
+    icono: 'pi pi-minus-circle',
+  },
+  pendiente: { clase: 'bg-[rgba(20,48,73,0.06)] text-brand-muted', icono: 'pi pi-clock' },
+};
 
 /** Lo mínimo que se lee de una página del backend. */
 interface Pagina<T> {
@@ -147,7 +163,10 @@ export class DocumentoRecibidoDetailComponent {
     toObservable(this.id).pipe(
       switchMap((documento) =>
         this.eventoService.listar({ documento, ordering: 'creado_en', page_size: 100 }).pipe(
-          map((res): Pagina<EventoRadian> | undefined => res),
+          map((res): Pagina<EventoRadianRow> | undefined => ({
+            count: res.count,
+            results: res.results.map(toEventoRadianRow),
+          })),
           catchError(() => of(SIN_FILAS)),
           startWith(undefined),
         ),
@@ -172,7 +191,11 @@ export class DocumentoRecibidoDetailComponent {
       emision: [formatFechaLarga(doc.fecha_emision, ''), doc.hora_emision.slice(0, 5)]
         .filter(Boolean)
         .join(' · '),
-      validado: doc.validacion_codigo === VALIDACION_OK,
+      verificacion: {
+        ...VERIFICACION_PILL[doc.verificacion_estado],
+        label: d.detalle.verificacion[doc.verificacion_estado] ?? doc.verificacion_estado,
+        descripcion: doc.verificacion_descripcion ?? '',
+      },
       fechaValidacion: formatFechaCorta(doc.fecha_validacion, ''),
       recibido: doc.creado_en
         ? `${formatFechaCorta(doc.creado_en, '')} ${toHora(new Date(doc.creado_en))}`

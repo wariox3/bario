@@ -4701,8 +4701,10 @@ export interface AppDict
         impuestos: string;
         total: string;
         formaPago: string;
+        radian: string;
       };
       tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
+      radianEstados: Record<'sin_eventos' | 'acuse' | 'recibo' | 'aceptada' | 'reclamada', string>;
       filtros: {
         buscar: string;
         tipo: string;
@@ -4718,7 +4720,10 @@ export interface AppDict
         general: string;
         emision: string;
         moneda: string;
-        validado: string;
+        verificacion: Record<
+          'pendiente' | 'valido' | 'invalido' | 'no_verificable' | 'error',
+          string
+        >;
         fechaValidacion: string;
         recibido: string;
         cue: string;
@@ -4737,16 +4742,14 @@ export interface AppDict
           numero: string;
           evento: string;
           estado: string;
-          firmado: string;
           personaRecibe: string;
-          concepto: string;
-          reclamo: string;
+          conceptoReclamo: string;
           respuestaDian: string;
           intentos: string;
           enviado: string;
-          usuario: string;
           cude: string;
         };
+        conceptos: Record<'01' | '02' | '03' | '04', string>;
         codigos: Record<'030' | '031' | '032' | '033', string>;
         estados: Record<'pendiente' | 'registrado' | 'rechazado' | 'error', string>;
         acciones: { xml: string; respuesta: string };
