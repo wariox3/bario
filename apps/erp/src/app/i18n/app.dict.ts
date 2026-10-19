@@ -4707,14 +4707,42 @@ export interface AppDict
       radianEstados: Record<'sin_eventos' | 'acuse' | 'recibo' | 'aceptada' | 'reclamada', string>;
       /** Acciones de `documento-recibido.acciones.ts`; `{numero}` = número del documento. */
       acciones: Record<
-        'descartar' | 'restaurar' | 'eliminar',
+        'acuse' | 'recibo' | 'aceptar' | 'reclamar' | 'descartar' | 'restaurar' | 'eliminar',
         {
           label: string;
-          /** Solo las acciones que piden confirmar. */
+          /** Solo las acciones directas que piden confirmar. */
           confirmar?: { header: string; message: string };
-          exito: { title: string; desc: string };
+          /** Solo las acciones directas; los eventos avisan desde `registrarEvento.exito`. */
+          exito?: { title: string; desc: string };
         }
       >;
+      /** Diálogo de registrar evento RADIAN. */
+      registrarEvento: {
+        /** `{numero}` y `{proveedor}`. */
+        subtitulo: string;
+        descripciones: Record<'030' | '031' | '032' | '033', string>;
+        persona: {
+          titulo: string;
+          cargando: string;
+          sugerida: string;
+          sinConfigurar: string;
+          irConfiguracion: string;
+          documento: string;
+          tipo: string;
+          numero: string;
+          nombres: string;
+          apellidos: string;
+          cargo: string;
+          area: string;
+        };
+        concepto: string;
+        conceptoPlaceholder: string;
+        cierreAviso: string;
+        validacion: { requerido: string; maximo: string };
+        enviar: string;
+        errorGenerico: string;
+        exito: { title: string; desc: string };
+      };
       filtros: {
         buscar: string;
         tipo: string;
@@ -5357,7 +5385,21 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    tabs: { general: string; humano: string; venta: string };
+    tabs: { general: string; humano: string; venta: string; compra: string };
+    /** Área Compra: la persona que recibe en la recepción de documentos. */
+    compra: {
+      recibe: { title: string; hint: string };
+      fields: {
+        documento: string;
+        identificacion: string;
+        numeroIdentificacion: string;
+        nombres: string;
+        apellidos: string;
+        cargo: string;
+        area: string;
+      };
+      validation: { required: string; maxLength: string };
+    };
     unsavedChanges: string;
     actions: { save: string };
     general: {

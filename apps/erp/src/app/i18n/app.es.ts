@@ -6133,7 +6133,47 @@ export const es: AppDict = {
         aceptada: 'Aceptación expresa',
         reclamada: 'Reclamo',
       },
+      registrarEvento: {
+        subtitulo: 'Documento {numero} · {proveedor}',
+        descripciones: {
+          '030':
+            'Le informa a la DIAN que la factura llegó. Es el primer evento y no depende de ninguno anterior.',
+          '032': 'Le informa a la DIAN que recibiste el bien o el servicio facturado.',
+          '033': 'Le informa a la DIAN que aceptas la factura.',
+          '031': 'Le informa a la DIAN que no estás de acuerdo con la factura y por qué.',
+        },
+        persona: {
+          titulo: 'Quién recibe',
+          cargando: 'Buscando la persona configurada…',
+          sugerida:
+            'Sugerida desde Configuración › Compra. Si la cambias, solo aplica a este evento.',
+          sinConfigurar: 'No hay una persona configurada.',
+          irConfiguracion: 'Configurarla para no escribirla cada vez',
+          documento: 'Documento',
+          tipo: 'Tipo de documento',
+          numero: 'Número de documento',
+          nombres: 'Nombres',
+          apellidos: 'Apellidos',
+          cargo: 'Cargo',
+          area: 'Área',
+        },
+        concepto: 'Concepto del reclamo',
+        conceptoPlaceholder: 'Elige el concepto',
+        cierreAviso:
+          'Aceptar y reclamar se excluyen: después de este evento la factura ya no admite el otro.',
+        validacion: { requerido: 'Este campo es obligatorio', maximo: 'Es demasiado largo' },
+        enviar: 'Enviar a la DIAN',
+        errorGenerico: 'No se pudo registrar el evento. Intenta de nuevo.',
+        exito: {
+          title: 'Evento enviado',
+          desc: 'La DIAN lo procesa en unos segundos; su estado se ve en la ficha del documento.',
+        },
+      },
       acciones: {
+        acuse: { label: 'Acuse de recibo' },
+        recibo: { label: 'Recibo del bien o servicio' },
+        aceptar: { label: 'Aceptar factura' },
+        reclamar: { label: 'Reclamar' },
         descartar: {
           label: 'Descartar',
           confirmar: {
@@ -7176,7 +7216,23 @@ export const es: AppDict = {
   configuracion: {
     title: 'Configuración',
     subtitle: 'Parámetros de la empresa',
-    tabs: { general: 'General', humano: 'Humano', venta: 'Venta' },
+    tabs: { general: 'General', humano: 'Humano', venta: 'Venta', compra: 'Compra' },
+    compra: {
+      recibe: {
+        title: 'Persona que recibe',
+        hint: 'Se sugiere al registrar el acuse de recibo y el recibo del bien o servicio de un documento recibido.',
+      },
+      fields: {
+        documento: 'Documento',
+        identificacion: 'Tipo de documento',
+        numeroIdentificacion: 'Número de documento',
+        nombres: 'Nombres',
+        apellidos: 'Apellidos',
+        cargo: 'Cargo',
+        area: 'Área',
+      },
+      validation: { required: 'Este campo es obligatorio', maxLength: 'Es demasiado largo' },
+    },
     unsavedChanges: 'Cambios sin guardar',
     actions: { save: 'Guardar' },
     general: {

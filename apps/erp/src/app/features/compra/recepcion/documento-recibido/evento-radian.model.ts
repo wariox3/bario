@@ -70,6 +70,38 @@ export interface EventoRadian {
   readonly creado_en: string;
 }
 
+/**
+ * Quien recibe la factura o la mercancía en el acuse (030) y el recibo (032)
+ * (`RecepcionPersonaRequest`). La configuración la guarda como sugerencia en
+ * `com_recepcion_recibe`.
+ *
+ * `identificacion` es el id de `GenIdentificacion` (el mismo selector que usa el
+ * resto del ERP), no el código DIAN: el backend lo convierte al enviar.
+ */
+export interface RecepcionPersona {
+  readonly identificacion: number;
+  readonly numero_identificacion: string;
+  readonly nombres: string;
+  readonly apellidos: string;
+  readonly cargo?: string;
+  readonly area?: string;
+}
+
+/**
+ * Cuerpo de `POST recepcion/documento-evento/`. `persona` obligatoria en 030 y
+ * 032; `concepto_reclamo` solo en 031, y obligatorio ahí.
+ */
+export interface RegistrarEventoPayload {
+  /** UUID del documento recibido. */
+  readonly id: string;
+  readonly codigo: EventoRadianCodigo;
+  readonly persona?: RecepcionPersona;
+  readonly concepto_reclamo?: EventoRadianConcepto;
+}
+
+/** Conceptos del reclamo, en el orden en que se ofrecen. */
+export const CONCEPTOS_RECLAMO: readonly EventoRadianConcepto[] = ['01', '02', '03', '04'];
+
 /** Respuesta del listado; `desde` y `hasta` llegan siempre en nulo. */
 export interface EventoRadianPagina {
   readonly count: number;

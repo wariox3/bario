@@ -6,6 +6,7 @@ import type { AppDict } from '@erp/i18n';
 import { GeneralConfigComponent } from '../../components/general-config/general-config.component';
 import { HumanoConfigComponent } from '../../components/humano-config/humano-config.component';
 import { VentaConfigComponent } from '../../components/venta-config/venta-config.component';
+import { CompraConfigComponent } from '../../components/compra-config/compra-config.component';
 import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/components/asistente-acceso/asistente-acceso.component';
 
 /**
@@ -13,7 +14,7 @@ import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/co
  *
  * Aloja las áreas en pestañas horizontales; la activa viaja en `?seccion=` para
  * deep-link. Cada área es auto-contenida (lee y guarda solo sus campos), así que
- * el shell no carga datos. Pestañas: General (UVT), Humano y Venta.
+ * el shell no carga datos. Pestañas: General (UVT), Humano, Venta y Compra.
  */
 @Component({
   selector: 'app-configuracion',
@@ -23,6 +24,7 @@ import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/co
     GeneralConfigComponent,
     HumanoConfigComponent,
     VentaConfigComponent,
+    CompraConfigComponent,
     AsistenteAccesoComponent,
   ],
   templateUrl: './configuracion.component.html',

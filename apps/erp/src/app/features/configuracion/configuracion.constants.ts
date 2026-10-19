@@ -44,6 +44,13 @@ export const VENTA_AIU_CAMPOS = [
   'ven_item_utilidad_nombre',
 ] as const satisfies readonly ConfiguracionCampo[];
 
+// ── Área Compra ───────────────────────────────────────────────────────────────
+
+/** Campos del área Compra: la persona que recibe en la recepción de documentos. */
+export const COMPRA_CAMPOS = [
+  'com_recepcion_recibe',
+] as const satisfies readonly ConfiguracionCampo[];
+
 // ── Área Empresa (datos de la empresa) ────────────────────────────────────────
 
 /**

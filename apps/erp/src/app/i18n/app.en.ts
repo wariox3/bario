@@ -6052,7 +6052,46 @@ export const en: AppDict = {
         aceptada: 'Express acceptance',
         reclamada: 'Claim',
       },
+      registrarEvento: {
+        subtitulo: 'Document {numero} · {proveedor}',
+        descripciones: {
+          '030':
+            'Tells DIAN the invoice arrived. It is the first event and does not depend on any other.',
+          '032': 'Tells DIAN you received the invoiced goods or service.',
+          '033': 'Tells DIAN you accept the invoice.',
+          '031': 'Tells DIAN you disagree with the invoice and why.',
+        },
+        persona: {
+          titulo: 'Received by',
+          cargando: 'Looking up the configured person…',
+          sugerida: 'Suggested from Settings › Purchasing. Changing it only applies to this event.',
+          sinConfigurar: 'No person is configured.',
+          irConfiguracion: 'Configure one so you do not type it every time',
+          documento: 'ID',
+          tipo: 'ID type',
+          numero: 'ID number',
+          nombres: 'First names',
+          apellidos: 'Last names',
+          cargo: 'Position',
+          area: 'Department',
+        },
+        concepto: 'Claim reason',
+        conceptoPlaceholder: 'Choose the reason',
+        cierreAviso:
+          'Accepting and claiming exclude each other: after this event the invoice no longer admits the other.',
+        validacion: { requerido: 'This field is required', maximo: 'It is too long' },
+        enviar: 'Send to DIAN',
+        errorGenerico: 'The event could not be registered. Try again.',
+        exito: {
+          title: 'Event sent',
+          desc: 'DIAN processes it in a few seconds; its status shows in the document details.',
+        },
+      },
       acciones: {
+        acuse: { label: 'Acknowledge receipt' },
+        recibo: { label: 'Goods or service receipt' },
+        aceptar: { label: 'Accept invoice' },
+        reclamar: { label: 'Claim' },
         descartar: {
           label: 'Discard',
           confirmar: {
@@ -7082,7 +7121,23 @@ export const en: AppDict = {
   configuracion: {
     title: 'Settings',
     subtitle: 'Company parameters',
-    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales' },
+    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales', compra: 'Purchasing' },
+    compra: {
+      recibe: {
+        title: 'Receiving person',
+        hint: 'Suggested when registering the receipt acknowledgment and the goods or service receipt of a received document.',
+      },
+      fields: {
+        documento: 'ID',
+        identificacion: 'ID type',
+        numeroIdentificacion: 'ID number',
+        nombres: 'First names',
+        apellidos: 'Last names',
+        cargo: 'Position',
+        area: 'Department',
+      },
+      validation: { required: 'This field is required', maxLength: 'It is too long' },
+    },
     unsavedChanges: 'Unsaved changes',
     actions: { save: 'Save' },
     general: {

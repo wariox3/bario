@@ -1,5 +1,6 @@
 import { toFiniteNumber, type ItemOption } from '@reddoc/core';
 import type { Ciudad, ErpSelectOption } from '@reddoc/core';
+import type { RecepcionPersona } from '@erp/features/compra/recepcion/documento-recibido/evento-radian.model';
 import type { ConfiguracionPayload, ConfiguracionRead } from './configuracion.model';
 
 /** Opción mínima para precargar un select por id (el label lo resuelve el `dataKey`). */
@@ -115,6 +116,54 @@ export function ventaAiuFormToPayload(form: VentaAiuConfigFormValue): Configurac
     ven_item_imprevisto: form.item_imprevisto?.id ?? null,
     ven_item_utilidad: form.item_utilidad?.id ?? null,
   };
+}
+
+// ── Área Compra (persona que recibe) ──────────────────────────────────────────
+
+export interface CompraConfigFormValue {
+  readonly identificacion: ErpSelectOption | null;
+  readonly numero_identificacion: string;
+  readonly nombres: string;
+  readonly apellidos: string;
+  readonly cargo: string;
+  readonly area: string;
+}
+
+export function configuracionToCompraForm(
+  config: Partial<ConfiguracionRead>,
+): CompraConfigFormValue {
+  const recibe = config.com_recepcion_recibe;
+  return {
+    identificacion: optionFromId(recibe?.identificacion),
+    numero_identificacion: recibe?.numero_identificacion ?? '',
+    nombres: recibe?.nombres ?? '',
+    apellidos: recibe?.apellidos ?? '',
+    cargo: recibe?.cargo ?? '',
+    area: recibe?.area ?? '',
+  };
+}
+
+/**
+ * La persona que recibe tal como la piden la configuración y `documento-evento`
+ * (`RecepcionPersona`). Cargo y área son opcionales: vacíos no viajan. Sin tipo
+ * de documento no hay persona.
+ */
+export function compraFormToRecepcionPersona(form: CompraConfigFormValue): RecepcionPersona | null {
+  if (!form.identificacion) return null;
+  const cargo = form.cargo.trim();
+  const area = form.area.trim();
+  return {
+    identificacion: form.identificacion.id,
+    numero_identificacion: form.numero_identificacion.trim(),
+    nombres: form.nombres.trim(),
+    apellidos: form.apellidos.trim(),
+    ...(cargo && { cargo }),
+    ...(area && { area }),
+  };
+}
+
+export function compraFormToPayload(form: CompraConfigFormValue): ConfiguracionPayload {
+  return { com_recepcion_recibe: compraFormToRecepcionPersona(form) };
 }
 
 // ── Área Empresa (datos de la empresa) ────────────────────────────────────────

@@ -6,6 +6,7 @@ import type {
   DocumentoRecibidoPagina,
   DocumentoRecibidoQuery,
 } from './documento-recibido.model';
+import type { EventoRadian, RegistrarEventoPayload } from './evento-radian.model';
 
 const BASE = '/general/electronico/recepcion/';
 
@@ -45,6 +46,17 @@ export class DocumentoRecibidoService extends BaseHttpService {
    */
   restaurar(id: string): Observable<DocumentoRecibido> {
     return this.post<DocumentoRecibido>(`${BASE}documento-restaurar/`, { id });
+  }
+
+  /**
+   * Registra un evento RADIAN. Responde el evento `pendiente`: RedEDoc lo envía
+   * a la DIAN en segundo plano. Sin toast: el diálogo muestra el 400 (orden,
+   * plazos, persona sin configurar…) junto al formulario.
+   */
+  registrarEvento(payload: RegistrarEventoPayload): Observable<EventoRadian> {
+    return this.post<EventoRadian>(`${BASE}documento-evento/`, payload, undefined, {
+      errorToast: false,
+    });
   }
 
   /** Elimina el documento y sus archivos; solo si no tiene eventos RADIAN. */

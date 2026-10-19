@@ -39,8 +39,10 @@ import type { AppDict } from '@erp/i18n';
 import {
   ACCIONES_RECEPCION_ROW,
   buscarAccionRecepcion,
-  type AccionRecepcion,
+  type AccionDirecta,
 } from '../../documento-recibido.acciones';
+import { RegistrarEventoDialogComponent } from '../../components/registrar-evento-dialog/registrar-evento-dialog.component';
+import type { EventoRadianCodigo } from '../../evento-radian.model';
 import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
 import {
   COLUMNS,
@@ -93,6 +95,7 @@ const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 
     ListShellComponent,
     DataTableComponent,
     CargarDocumentoDialogComponent,
+    RegistrarEventoDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './documentos-recibidos-list.component.html',
@@ -135,6 +138,11 @@ export class DocumentosRecibidosListComponent {
   private readonly recargas = signal(0);
 
   protected readonly cargaVisible = signal(false);
+
+  // ── Registrar evento RADIAN ───────────────────────────────────────────────
+  protected readonly eventoVisible = signal(false);
+  protected readonly eventoDocumento = signal<DocumentoRecibido | null>(null);
+  protected readonly eventoCodigo = signal<EventoRadianCodigo | null>(null);
 
   protected readonly tipoOptions = computed(() => {
     const tipos = this.t().entities.documentoRecibido.tipos;
@@ -267,11 +275,25 @@ export class DocumentosRecibidosListComponent {
       return;
     }
     const accion = buscarAccionRecepcion(event.actionId);
-    if (accion?.habilitada(doc)) this.solicitarAccion(accion, doc);
+    if (!accion?.habilitada(doc)) return;
+    if (accion.tipo === 'evento') {
+      this.eventoDocumento.set(doc);
+      this.eventoCodigo.set(accion.codigo);
+      this.eventoVisible.set(true);
+      return;
+    }
+    this.solicitarAccion(accion, doc);
+  }
+
+  /** El evento nace pendiente: la DIAN lo procesa en segundo plano. */
+  protected onEventoRegistrado(): void {
+    const exito = this.t().entities.documentoRecibido.registrarEvento.exito;
+    this.toast.success(exito.title, exito.desc);
+    this.recargas.update((n) => n + 1);
   }
 
   /** Confirma (si la acción lo pide) y ejecuta. */
-  private solicitarAccion(accion: AccionRecepcion, doc: DocumentoRecibido): void {
+  private solicitarAccion(accion: AccionDirecta, doc: DocumentoRecibido): void {
     const textos = this.t().entities.documentoRecibido.acciones[accion.id];
     if (!accion.confirmar || !textos.confirmar) {
       this.ejecutarAccion(accion, doc);
@@ -290,13 +312,13 @@ export class DocumentosRecibidosListComponent {
   }
 
   /** Un 400 lo avisa el interceptor con el mensaje del backend. */
-  private ejecutarAccion(accion: AccionRecepcion, doc: DocumentoRecibido): void {
+  private ejecutarAccion(accion: AccionDirecta, doc: DocumentoRecibido): void {
     accion
       .ejecutar(this.service, doc)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const exito = this.t().entities.documentoRecibido.acciones[accion.id].exito;
-        this.toast.success(exito.title, exito.desc.replace('{numero}', doc.numero));
+        if (exito) this.toast.success(exito.title, exito.desc.replace('{numero}', doc.numero));
         this.recargas.update((n) => n + 1);
       });
   }

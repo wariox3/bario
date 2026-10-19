@@ -1,3 +1,5 @@
+import type { RecepcionPersona } from '@erp/features/compra/recepcion/documento-recibido/evento-radian.model';
+
 /**
  * Configuración de la empresa — un único registro por tenant.
  *
@@ -59,6 +61,13 @@ export interface ConfiguracionRead {
   readonly ven_item_imprevisto_nombre?: string | null;
   readonly ven_item_utilidad: number | null;
   readonly ven_item_utilidad_nombre?: string | null;
+
+  // Recepción de documentos (área Compra)
+  /**
+   * Persona que recibe, sugerida al registrar el acuse (030) y el recibo (032).
+   * JSON con la forma de `RecepcionPersona`; `null` mientras no se configure.
+   */
+  readonly com_recepcion_recibe: RecepcionPersona | null;
 }
 
 /** Nombre de columna pedible/persistible (todo menos el `id`). */

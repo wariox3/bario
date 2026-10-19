@@ -121,4 +121,11 @@
 
 <p-confirmDialog />
 
+<app-registrar-evento-dialog
+  [(visible)]="eventoVisible"
+  [documento]="eventoDocumento()"
+  [codigo]="eventoCodigo()"
+  (registrado)="onEventoRegistrado()"
+/>
+
 <app-cargar-documento-dialog [(visible)]="cargaVisible" (cargado)="onCargado()" />

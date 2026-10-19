@@ -1,0 +1,220 @@
+@let r = t().entities.documentoRecibido.registrarEvento;
+@let p = r.persona;
+@let personaForm = form.controls.persona.controls;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="$event ? visible.set(true) : cerrar()"
+  [modal]="true"
+  [draggable]="false"
+  [closable]="!enviando()"
+  [style]="{ width: '34rem' }"
+  [breakpoints]="{ '640px': '95vw' }"
+>
+  <ng-template #header>
+    <div class="flex flex-col gap-0.5">
+      <h2 class="m-0 text-[1rem] font-bold tracking-tight text-brand-text">{{ titulo() }}</h2>
+      <p class="m-0 text-[0.75rem] text-brand-muted">{{ subtitulo() }}</p>
+    </div>
+  </ng-template>
+
+  @if (visible() && codigo(); as cod) {
+    <form
+      id="registrar-evento-form"
+      [formGroup]="form"
+      (ngSubmit)="enviar()"
+      libFocusInvalid
+      autocomplete="off"
+      class="flex flex-col gap-4"
+    >
+      <p class="m-0 text-[0.8rem] leading-relaxed text-brand-muted">
+        {{ r.descripciones[cod] }}
+      </p>
+
+      @if (conPersona()) {
+        <!-- Quién recibe: la de Configuración › Compra como sugerencia, editable aquí -->
+        <div formGroupName="persona" class="flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <span class="text-[0.8rem] font-semibold text-brand-text">{{ p.titulo }}</span>
+            @switch (sugerencia()) {
+              @case ('cargando') {
+                <span class="text-[0.72rem] text-brand-muted">
+                  <i class="pi pi-spin pi-spinner mr-1 text-[0.65rem]"></i>{{ p.cargando }}
+                </span>
+              }
+              @case ('configurada') {
+                <span class="text-[0.72rem] text-brand-muted">{{ p.sugerida }}</span>
+              }
+              @default {
+                <span class="text-[0.72rem] text-brand-muted">
+                  {{ p.sinConfigurar }}
+                  @if (configuracionLink(); as link) {
+                    <a
+                      class="font-semibold text-sky-700 hover:underline"
+                      [routerLink]="link"
+                      [queryParams]="{ seccion: 'compra' }"
+                      (click)="cerrar()"
+                      >{{ p.irConfiguracion }}</a
+                    >
+                  }
+                </span>
+              }
+            }
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label for="evento-numero" class="text-[0.8rem] font-medium text-brand-text">
+                {{ p.documento }} <span class="ml-px text-red-500">*</span>
+              </label>
+              <div class="flex gap-2">
+                <div class="w-52 shrink-0">
+                  <lib-api-select
+                    inputId="evento-identificacion"
+                    formControlName="identificacion"
+                    [endpoint]="endpoints.identificacion"
+                    [ariaLabel]="p.tipo"
+                    [invalid]="
+                      personaForm.identificacion.invalid && personaForm.identificacion.touched
+                    "
+                  />
+                </div>
+                <input
+                  id="evento-numero"
+                  pInputText
+                  pSize="small"
+                  formControlName="numero_identificacion"
+                  inputmode="numeric"
+                  class="min-w-0 flex-1"
+                  fluid
+                  [attr.aria-label]="p.numero"
+                />
+              </div>
+              <lib-field-error
+                [control]="personaForm.identificacion"
+                [messages]="{ required: r.validacion.requerido }"
+              />
+              <lib-field-error
+                [control]="personaForm.numero_identificacion"
+                [messages]="{ required: r.validacion.requerido, maxlength: r.validacion.maximo }"
+              />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label for="evento-nombres" class="text-[0.8rem] font-medium text-brand-text">
+                {{ p.nombres }} <span class="ml-px text-red-500">*</span>
+              </label>
+              <input id="evento-nombres" pInputText pSize="small" formControlName="nombres" fluid />
+              <lib-field-error
+                [control]="personaForm.nombres"
+                [messages]="{ required: r.validacion.requerido, maxlength: r.validacion.maximo }"
+              />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label for="evento-apellidos" class="text-[0.8rem] font-medium text-brand-text">
+                {{ p.apellidos }} <span class="ml-px text-red-500">*</span>
+              </label>
+              <input
+                id="evento-apellidos"
+                pInputText
+                pSize="small"
+                formControlName="apellidos"
+                fluid
+              />
+              <lib-field-error
+                [control]="personaForm.apellidos"
+                [messages]="{ required: r.validacion.requerido, maxlength: r.validacion.maximo }"
+              />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label for="evento-cargo" class="text-[0.8rem] font-medium text-brand-text">
+                {{ p.cargo }}
+              </label>
+              <input id="evento-cargo" pInputText pSize="small" formControlName="cargo" fluid />
+              <lib-field-error
+                [control]="personaForm.cargo"
+                [messages]="{ maxlength: r.validacion.maximo }"
+              />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label for="evento-area" class="text-[0.8rem] font-medium text-brand-text">
+                {{ p.area }}
+              </label>
+              <input id="evento-area" pInputText pSize="small" formControlName="area" fluid />
+              <lib-field-error
+                [control]="personaForm.area"
+                [messages]="{ maxlength: r.validacion.maximo }"
+              />
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (esReclamo()) {
+        <div class="flex flex-col gap-1.5">
+          <label for="evento-concepto" class="text-[0.8rem] font-medium text-brand-text">
+            {{ r.concepto }} <span class="ml-px text-red-500">*</span>
+          </label>
+          <p-select
+            inputId="evento-concepto"
+            formControlName="concepto_reclamo"
+            [options]="conceptoOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [placeholder]="r.conceptoPlaceholder"
+            size="small"
+            appendTo="body"
+            fluid
+          />
+          <lib-field-error
+            [control]="form.controls.concepto_reclamo"
+            [messages]="{ required: r.validacion.requerido }"
+          />
+        </div>
+      }
+
+      @if (cierra()) {
+        <!-- Aceptar o reclamar cierra el proceso: se avisa antes de enviar -->
+        <div
+          class="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5"
+        >
+          <i class="pi pi-info-circle mt-0.5 text-[0.85rem] text-amber-700"></i>
+          <p class="m-0 text-[0.78rem] leading-relaxed text-amber-800">{{ r.cierreAviso }}</p>
+        </div>
+      }
+
+      @if (errores().length > 0) {
+        <div
+          class="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5"
+          role="alert"
+        >
+          <i class="pi pi-exclamation-circle mt-0.5 text-[0.85rem] text-red-600"></i>
+          <ul class="m-0 flex list-none flex-col gap-0.5 p-0 text-[0.78rem] text-red-700">
+            @for (msg of errores(); track $index) {
+              <li>{{ msg }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </form>
+  }
+
+  <ng-template #footer>
+    <p-button
+      [label]="t().common.actions.cancel"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [disabled]="enviando()"
+      (onClick)="cerrar()"
+    />
+    <p-button
+      type="submit"
+      form="registrar-evento-form"
+      [label]="r.enviar"
+      icon="pi pi-send"
+      size="small"
+      [loading]="enviando()"
+      [disabled]="enviando()"
+    />
+  </ng-template>
+</p-dialog>
