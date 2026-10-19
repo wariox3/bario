@@ -140,7 +140,7 @@ export class ResolucionDianDialogComponent {
     this.isLoading.set(true);
     this.service
       // El paginador cuenta desde 0; `page` del backend, desde 1.
-      .listaDian(this.tipo(), this.currentPage() + 1)
+      .listaDian(this.currentPage() + 1)
       .pipe(
         switchMap((response) => {
           if (response.results.length === 0) return of({ response, existentes: [] });
