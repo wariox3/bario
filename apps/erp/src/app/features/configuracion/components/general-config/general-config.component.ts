@@ -1,9 +1,11 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { TabsModule } from 'primeng/tabs';
 import { FieldErrorComponent, FocusInvalidDirective } from '@reddoc/ui';
 import { FormErrorService, I18nService, ToastService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
@@ -11,12 +13,21 @@ import { ConfiguracionService } from '../../configuracion.service';
 import { GENERAL_CAMPOS } from '../../configuracion.constants';
 import { configuracionToGeneralForm, generalFormToPayload } from '../../configuracion.mapper';
 import { DocumentoTipoTableComponent } from './documento-tipo-table/documento-tipo-table.component';
+import { ImpuestoTableComponent } from './impuesto-table/impuesto-table.component';
 
 /** Campos del backend (prefijados) → controles del form (sin prefijo). */
 const GENERAL_FIELD_MAP = {
   gen_uvt: 'uvt',
   gen_emitir_automaticamente: 'emitir_automaticamente',
 };
+
+/** Pestañas de la tarjeta de catálogos (`?tab=`). La primera es la de por defecto. */
+const CATALOGO_TABS = ['documentos', 'impuestos'] as const;
+type CatalogoTab = (typeof CATALOGO_TABS)[number];
+
+function esCatalogoTab(value: string | null): value is CatalogoTab {
+  return (CATALOGO_TABS as readonly (string | null)[]).includes(value);
+}
 
 /**
  * Área "General" de la configuración: la UVT (`gen_uvt`) y la emisión
@@ -26,6 +37,9 @@ const GENERAL_FIELD_MAP = {
  * base de los cálculos fiscales, por eso vive en su propia sección destacada;
  * la emisión automática va en la suya porque no es un parámetro de cálculo sino
  * una decisión sobre cómo salen los documentos hacia la DIAN.
+ *
+ * Debajo, en su propia tarjeta con pestañas, los catálogos normativos que cada
+ * empresa ajusta: tipos de documento e impuestos.
  */
 @Component({
   selector: 'app-general-config',
@@ -35,9 +49,11 @@ const GENERAL_FIELD_MAP = {
     ButtonModule,
     CheckboxModule,
     InputNumberModule,
+    TabsModule,
     FieldErrorComponent,
     FocusInvalidDirective,
     DocumentoTipoTableComponent,
+    ImpuestoTableComponent,
   ],
   templateUrl: './general-config.component.html',
 })
@@ -48,8 +64,18 @@ export class GeneralConfigComponent {
   private readonly formErrors = inject(FormErrorService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly t = this.i18n.t;
+
+  private readonly queryParams = toSignal(this.route.queryParamMap);
+
+  /** Pestaña activa de los catálogos; un `?tab=` desconocido cae a la primera. */
+  protected readonly catalogoTab = computed((): CatalogoTab => {
+    const tab = this.queryParams()?.get('tab') ?? null;
+    return esCatalogoTab(tab) ? tab : CATALOGO_TABS[0];
+  });
 
   protected readonly loading = signal(true);
   protected readonly loadFailed = signal(false);
@@ -62,6 +88,14 @@ export class GeneralConfigComponent {
 
   constructor() {
     this.cargar();
+  }
+
+  protected onCatalogoTabChange(tab: CatalogoTab): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+    });
   }
 
   protected cargar(): void {

@@ -107,6 +107,13 @@ export interface DocumentEntityConfig {
   /** Discriminador para el backend genérico. Único across todo el ERP. */
   readonly documentTypeId: number;
   /**
+   * Clase de documento (`documento_clase_id`) que agrupa varios tipos. Si se
+   * declara, el listado filtra por la clase en vez de por `documentTypeId`, así
+   * una misma vista muestra toda la familia (la nómina junto a primas, cesantías
+   * y liquidaciones). El resto del framework sigue usando `documentTypeId`.
+   */
+  readonly documentClassId?: number;
+  /**
    * Efecto sobre el inventario. Metadata para forms/inventario — la lista no la
    * usa. Se omite en los documentos que no mueven stock (p. ej. el pago, que es
    * un recaudo: sus líneas son movimientos contables, no ítems).

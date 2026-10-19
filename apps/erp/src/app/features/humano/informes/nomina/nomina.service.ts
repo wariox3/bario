@@ -7,6 +7,7 @@ import {
   type FilterCondition,
   type ListQuery,
   type PaginatedResponse,
+  DOCUMENTO_CLASE_ID,
 } from '@reddoc/core';
 import type { NominaInforme } from './nomina.model';
 
@@ -41,7 +42,7 @@ export const NOMINA_INFORME_EXPORT_SERIALIZADOR = 'informe_nomina';
  * Va **antes** de los filtros del usuario, así que este no lo puede pisar.
  */
 const NOMINA_INFORME_BASE_FILTERS: readonly FilterCondition[] = [
-  { field: 'documento_tipo__documento_clase_id', operator: 'eq', value: 701 },
+  { field: 'documento_tipo__documento_clase_id', operator: 'eq', value: DOCUMENTO_CLASE_ID.NOMINA },
 ];
 
 /**

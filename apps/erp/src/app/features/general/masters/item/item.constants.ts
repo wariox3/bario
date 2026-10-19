@@ -1,4 +1,4 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import type { ColumnDef, FilterField, SortSpec } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
 import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
@@ -14,6 +14,13 @@ export const ITEMS_QUICK_SEARCH_FIELD = 'nombre';
 
 /** Segmento de ruta del listado, relativo al módulo activo (se antepone en runtime). */
 export const ITEM_LIST_PATH = ['items'] as const;
+
+/**
+ * Orden inicial del listado: el último ítem creado primero, para que se vea de
+ * un vistazo el código más reciente y cuál sigue al registrar uno nuevo. El
+ * usuario puede reordenar por cualquier columna; esto es solo el punto de partida.
+ */
+export const ITEMS_DEFAULT_SORT: readonly SortSpec[] = [{ field: 'id', direction: 'desc' }];
 
 export const ITEMS_COLUMNS: readonly ColumnDef[] = [
   {

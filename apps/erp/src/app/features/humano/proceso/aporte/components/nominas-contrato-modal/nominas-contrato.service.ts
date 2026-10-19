@@ -6,6 +6,7 @@ import {
   buildFiltros,
   type FilterCondition,
   type PaginatedResponse,
+  DOCUMENTO_CLASE_ID,
 } from '@reddoc/core';
 import type { LineaNominaDelContrato, NominaDelContrato } from './nominas-contrato.model';
 
@@ -17,7 +18,7 @@ import type { LineaNominaDelContrato, NominaDelContrato } from './nominas-contra
  * cruce alcanza también a las nóminas de ajuste si el tenant las usa — que es lo
  * correcto: todas alimentan el IBC del periodo.
  */
-const NOMINA_CLASE_ID = 701;
+const NOMINA_CLASE_ID = DOCUMENTO_CLASE_ID.NOMINA;
 
 const DOCUMENTO_ENDPOINT = '/general/documento/';
 const DOCUMENTO_DETALLE_ENDPOINT = '/general/documento-detalle/';

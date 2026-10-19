@@ -410,6 +410,40 @@ export const es: AppDict = {
         desc: 'No se pudieron generar las facturas. Intenta de nuevo.',
       },
     },
+    elegirRecurrente: {
+      buttonLabel: 'Recurrente',
+      modalHeader: 'Factura desde recurrente',
+      modalSubtitle: 'Elige la factura recurrente desde la que se crea la nueva factura',
+      searchPlaceholder: 'Buscar por proveedor o identificación',
+      seleccionar: 'Seleccionar',
+      cancel: 'Cancelar',
+      sinOrigen: 'Este documento no tiene definida la factura recurrente de la que sale.',
+      columns: {
+        id: 'ID',
+        identificacion: 'Identificación',
+        contacto: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+      },
+      empty: {
+        title: 'Sin facturas recurrentes',
+        sub: 'No hay facturas recurrentes que coincidan con la búsqueda.',
+        desc: 'Esa factura recurrente ya se generó este mes o tiene una fecha posterior.',
+      },
+      success: {
+        title: 'Factura generada',
+        desc: 'La factura se creó a partir de la factura recurrente.',
+      },
+      loadError: {
+        title: 'Error al cargar',
+        desc: 'No pudimos traer las facturas recurrentes.',
+      },
+      error: {
+        title: 'Error al generar',
+        desc: 'No se pudo generar la factura. Intenta de nuevo.',
+      },
+    },
     detail: {
       aprobar: 'Aprobar',
       desaprobar: 'Desaprobar',
@@ -1042,7 +1076,7 @@ export const es: AppDict = {
       actions: {
         dian: 'DIAN',
         validar: 'Validar',
-        lista: 'Lista',
+        importar: 'Importar',
       },
       toasts: {
         validarSuccess: {
@@ -5347,6 +5381,7 @@ export const es: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Número',
+        tipo: 'Tipo',
         desde: 'Desde',
         hasta: 'Hasta',
         identificacion: 'Identificación',
@@ -6119,11 +6154,95 @@ export const es: AppDict = {
         impuestos: 'Impuestos',
         total: 'Total',
         formaPago: 'Forma de pago',
+        radian: 'Estado RADIAN',
       },
       tipos: {
         factura_venta: 'Factura',
         nota_credito: 'Nota crédito',
         nota_debito: 'Nota débito',
+      },
+      radianEstados: {
+        sin_eventos: 'Sin eventos',
+        acuse: 'Acuse de recibo',
+        recibo: 'Recibo del bien o servicio',
+        aceptada: 'Aceptación expresa',
+        reclamada: 'Reclamo',
+      },
+      registrarEvento: {
+        subtitulo: 'Documento {numero} · {proveedor}',
+        descripciones: {
+          '030':
+            'Le informa a la DIAN que la factura llegó. Es el primer evento y no depende de ninguno anterior.',
+          '032': 'Le informa a la DIAN que recibiste el bien o el servicio facturado.',
+          '033': 'Le informa a la DIAN que aceptas la factura.',
+          '031': 'Le informa a la DIAN que no estás de acuerdo con la factura y por qué.',
+        },
+        persona: {
+          titulo: 'Quién recibe',
+          cargando: 'Buscando la persona configurada…',
+          sugerida:
+            'Sugerida desde Configuración › Compra. Si la cambias, solo aplica a este evento.',
+          sinConfigurar: 'No hay una persona configurada.',
+          irConfiguracion: 'Configurarla para no escribirla cada vez',
+          actualizarConfigurada: 'Actualizar también la persona configurada',
+          guardarConfigurada: 'Guardarla como persona configurada',
+          guardarHint: 'Se guarda en Configuración › Compra después de enviar el evento.',
+          documento: 'Documento',
+          tipo: 'Tipo de documento',
+          numero: 'Número de documento',
+          nombres: 'Nombres',
+          apellidos: 'Apellidos',
+          cargo: 'Cargo',
+          area: 'Área',
+        },
+        concepto: 'Concepto del reclamo',
+        conceptoPlaceholder: 'Elige el concepto',
+        cierreAviso:
+          'Aceptar y reclamar se excluyen: después de este evento la factura ya no admite el otro.',
+        validacion: { requerido: 'Este campo es obligatorio', maximo: 'Es demasiado largo' },
+        enviar: 'Enviar a la DIAN',
+        errorGenerico: 'No se pudo registrar el evento. Intenta de nuevo.',
+        exito: {
+          title: 'Evento enviado',
+          desc: 'La DIAN lo procesa en unos segundos; su estado se ve en la ficha del documento.',
+          descConPersona:
+            'La DIAN lo procesa en unos segundos y la persona configurada quedó actualizada.',
+        },
+        personaNoGuardada: {
+          title: 'No se actualizó la persona configurada',
+          desc: 'El evento se envió, pero la persona no se guardó. Puedes hacerlo en Configuración › Compra.',
+        },
+      },
+      acciones: {
+        acuse: { label: 'Acuse de recibo' },
+        recibo: { label: 'Recibo del bien o servicio' },
+        aceptar: { label: 'Aceptar factura' },
+        reclamar: { label: 'Reclamar' },
+        descartar: {
+          label: 'Descartar',
+          confirmar: {
+            header: 'Descartar documento',
+            message:
+              'El documento {numero} queda guardado, pero ya no admitirá eventos RADIAN ni el acuse automático.',
+          },
+          exito: { title: 'Documento descartado', desc: 'El documento {numero} quedó descartado.' },
+        },
+        restaurar: {
+          label: 'Restaurar',
+          exito: {
+            title: 'Documento restaurado',
+            desc: 'El documento {numero} ya no está descartado.',
+          },
+        },
+        eliminar: {
+          label: 'Eliminar',
+          confirmar: {
+            header: 'Eliminar documento',
+            message:
+              'Se eliminarán el documento {numero} y sus archivos. Esta acción no se puede deshacer.',
+          },
+          exito: { title: 'Documento eliminado', desc: 'El documento {numero} se eliminó.' },
+        },
       },
       filtros: {
         buscar: 'Buscar por proveedor, NIT, número o CUE',
@@ -6132,13 +6251,21 @@ export const es: AppDict = {
         hasta: 'Hasta',
         delCorreo: 'Del correo',
         quitarCorreo: 'Quitar el filtro por correo',
+        estadoRecepcion: 'Recepción',
+        estadosRecepcion: { todos: 'Todos', si: 'Sí', no: 'No' },
       },
       detalle: {
         title: 'Detalle',
         general: 'Información general',
         emision: 'Emisión',
         moneda: 'Moneda',
-        validado: 'Validado DIAN',
+        verificacion: {
+          pendiente: 'Verificación DIAN pendiente',
+          valido: 'Válido en la DIAN',
+          invalido: 'No válido en la DIAN',
+          no_verificable: 'No verificable',
+          error: 'Error al consultar la DIAN',
+        },
         fechaValidacion: 'Fecha de validación',
         recibido: 'Recibido en RedEDoc',
         cue: 'CUE',
@@ -6147,6 +6274,51 @@ export const es: AppDict = {
         notFound: {
           title: 'Documento no encontrado',
           desc: 'Vuelve a la bandeja y ábrelo desde allí.',
+        },
+        tabs: { adjuntos: 'Adjuntos', eventos: 'Eventos RADIAN' },
+      },
+      adjuntos: {
+        columns: { nombre: 'Nombre', tamano: 'Tamaño', creado: 'Creado' },
+        descargar: 'Descargar',
+        empty: {
+          title: 'Sin adjuntos',
+          sub: 'Este documento no trajo archivos adjuntos.',
+        },
+      },
+      eventos: {
+        columns: {
+          numero: 'Número',
+          evento: 'Evento',
+          estado: 'Estado',
+          personaRecibe: 'Persona que recibe',
+          conceptoReclamo: 'Concepto del reclamo',
+          respuestaDian: 'Respuesta DIAN',
+          intentos: 'Intentos',
+          enviado: 'Enviado',
+          cude: 'CUDE',
+        },
+        conceptos: {
+          '01': 'Documento con inconsistencias',
+          '02': 'Mercancía no entregada totalmente',
+          '03': 'Mercancía no entregada parcialmente',
+          '04': 'Servicio no prestado',
+        },
+        codigos: {
+          '030': 'Acuse de recibo',
+          '031': 'Reclamo',
+          '032': 'Recibo del bien o servicio',
+          '033': 'Aceptación expresa',
+        },
+        estados: {
+          pendiente: 'Pendiente',
+          registrado: 'Registrado',
+          rechazado: 'Rechazado',
+          error: 'Error',
+        },
+        acciones: { xml: 'XML', respuesta: 'Respuesta' },
+        empty: {
+          title: 'Sin eventos RADIAN',
+          sub: 'Todavía no se registró ningún evento sobre este documento.',
         },
       },
       empty: {
@@ -7088,7 +7260,23 @@ export const es: AppDict = {
   configuracion: {
     title: 'Configuración',
     subtitle: 'Parámetros de la empresa',
-    tabs: { general: 'General', humano: 'Humano', venta: 'Venta' },
+    tabs: { general: 'General', humano: 'Humano', venta: 'Venta', compra: 'Compra' },
+    compra: {
+      recibe: {
+        title: 'Persona que recibe',
+        hint: 'Se sugiere al registrar el acuse de recibo y el recibo del bien o servicio de un documento recibido.',
+      },
+      fields: {
+        documento: 'Documento',
+        identificacion: 'Tipo de documento',
+        numeroIdentificacion: 'Número de documento',
+        nombres: 'Nombres',
+        apellidos: 'Apellidos',
+        cargo: 'Cargo',
+        area: 'Área',
+      },
+      validation: { required: 'Este campo es obligatorio', maxLength: 'Es demasiado largo' },
+    },
     unsavedChanges: 'Cambios sin guardar',
     actions: { save: 'Guardar' },
     general: {
@@ -7151,6 +7339,44 @@ export const es: AppDict = {
           loadError: {
             title: 'Error al cargar',
             desc: 'No pudimos traer los tipos de documento.',
+          },
+        },
+      },
+      tabs: { documentos: 'Documentos', impuestos: 'Impuestos' },
+      impuesto: {
+        hint: 'Cuenta contable donde se registra cada impuesto. El catálogo es fijo: no se crean ni se eliminan impuestos.',
+        columns: {
+          id: 'ID',
+          nombre: 'Nombre',
+          nombreExtendido: 'Nombre extendido',
+          tipo: 'Tipo',
+          porcentaje: 'Porcentaje',
+          porcentajeBase: 'Base',
+          venta: 'Venta',
+          compra: 'Compra',
+          cuenta: 'Cuenta',
+        },
+        fields: {
+          cuenta: 'Cuenta contable',
+          cuentaHint: 'Déjala vacía si el impuesto no se contabiliza.',
+        },
+        dialog: { title: 'Editar impuesto' },
+        empty: {
+          title: 'Sin impuestos',
+          sub: 'Todavía no hay impuestos configurados para esta empresa.',
+        },
+        toasts: {
+          saveSuccess: {
+            title: 'Impuesto guardado',
+            desc: 'Los cambios se guardaron correctamente.',
+          },
+          saveError: {
+            title: 'Error al guardar',
+            desc: 'No pudimos guardar el impuesto.',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No pudimos traer los impuestos.',
           },
         },
       },

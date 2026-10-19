@@ -74,4 +74,6 @@ export const DOCUMENTO_CLASE_ID = {
   FACTURA_COMPRA: 300,
   DOCUMENTO_SOPORTE: 303,
   NOTA_AJUSTE: 304,
+  /** Nómina, prima, cesantía, intereses de cesantía y liquidación. */
+  NOMINA: 701,
 } as const;

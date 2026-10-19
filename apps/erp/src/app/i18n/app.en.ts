@@ -403,6 +403,40 @@ export const en: AppDict = {
         desc: 'Could not generate the invoices. Please try again.',
       },
     },
+    elegirRecurrente: {
+      buttonLabel: 'Recurring',
+      modalHeader: 'Invoice from recurring',
+      modalSubtitle: 'Pick the recurring invoice the new invoice is created from',
+      searchPlaceholder: 'Search by supplier or ID number',
+      seleccionar: 'Select',
+      cancel: 'Cancel',
+      sinOrigen: 'This document has no recurring invoice defined to come from.',
+      columns: {
+        id: 'ID',
+        identificacion: 'ID number',
+        contacto: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+      },
+      empty: {
+        title: 'No recurring invoices',
+        sub: 'There are no recurring invoices matching the search.',
+        desc: 'That recurring invoice was already generated this month or has a later date.',
+      },
+      success: {
+        title: 'Invoice generated',
+        desc: 'The invoice was created from the recurring invoice.',
+      },
+      loadError: {
+        title: 'Could not load',
+        desc: 'We could not load the recurring invoices.',
+      },
+      error: {
+        title: 'Generation failed',
+        desc: 'Could not generate the invoice. Please try again.',
+      },
+    },
     detail: {
       aprobar: 'Approve',
       desaprobar: 'Unapprove',
@@ -1028,7 +1062,7 @@ export const en: AppDict = {
       actions: {
         dian: 'DIAN',
         validar: 'Validate',
-        lista: 'List',
+        importar: 'Import',
       },
       toasts: {
         validarSuccess: {
@@ -5267,6 +5301,7 @@ export const en: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Number',
+        tipo: 'Type',
         desde: 'From',
         hasta: 'To',
         identificacion: 'ID number',
@@ -6038,11 +6073,93 @@ export const en: AppDict = {
         impuestos: 'Taxes',
         total: 'Total',
         formaPago: 'Payment method',
+        radian: 'RADIAN status',
       },
       tipos: {
         factura_venta: 'Invoice',
         nota_credito: 'Credit note',
         nota_debito: 'Debit note',
+      },
+      radianEstados: {
+        sin_eventos: 'No events',
+        acuse: 'Receipt acknowledgment',
+        recibo: 'Goods or service receipt',
+        aceptada: 'Express acceptance',
+        reclamada: 'Claim',
+      },
+      registrarEvento: {
+        subtitulo: 'Document {numero} · {proveedor}',
+        descripciones: {
+          '030':
+            'Tells DIAN the invoice arrived. It is the first event and does not depend on any other.',
+          '032': 'Tells DIAN you received the invoiced goods or service.',
+          '033': 'Tells DIAN you accept the invoice.',
+          '031': 'Tells DIAN you disagree with the invoice and why.',
+        },
+        persona: {
+          titulo: 'Received by',
+          cargando: 'Looking up the configured person…',
+          sugerida: 'Suggested from Settings › Purchasing. Changing it only applies to this event.',
+          sinConfigurar: 'No person is configured.',
+          irConfiguracion: 'Configure one so you do not type it every time',
+          actualizarConfigurada: 'Also update the configured person',
+          guardarConfigurada: 'Save as the configured person',
+          guardarHint: 'Saved in Settings › Purchasing after the event is sent.',
+          documento: 'ID',
+          tipo: 'ID type',
+          numero: 'ID number',
+          nombres: 'First names',
+          apellidos: 'Last names',
+          cargo: 'Position',
+          area: 'Department',
+        },
+        concepto: 'Claim reason',
+        conceptoPlaceholder: 'Choose the reason',
+        cierreAviso:
+          'Accepting and claiming exclude each other: after this event the invoice no longer admits the other.',
+        validacion: { requerido: 'This field is required', maximo: 'It is too long' },
+        enviar: 'Send to DIAN',
+        errorGenerico: 'The event could not be registered. Try again.',
+        exito: {
+          title: 'Event sent',
+          desc: 'DIAN processes it in a few seconds; its status shows in the document details.',
+          descConPersona:
+            'DIAN processes it in a few seconds and the configured person was updated.',
+        },
+        personaNoGuardada: {
+          title: 'The configured person was not updated',
+          desc: 'The event was sent, but the person was not saved. You can do it in Settings › Purchasing.',
+        },
+      },
+      acciones: {
+        acuse: { label: 'Acknowledge receipt' },
+        recibo: { label: 'Goods or service receipt' },
+        aceptar: { label: 'Accept invoice' },
+        reclamar: { label: 'Claim' },
+        descartar: {
+          label: 'Discard',
+          confirmar: {
+            header: 'Discard document',
+            message:
+              'Document {numero} stays stored, but it will no longer accept RADIAN events or the automatic acknowledgment.',
+          },
+          exito: { title: 'Document discarded', desc: 'Document {numero} was discarded.' },
+        },
+        restaurar: {
+          label: 'Restore',
+          exito: {
+            title: 'Document restored',
+            desc: 'Document {numero} is no longer discarded.',
+          },
+        },
+        eliminar: {
+          label: 'Delete',
+          confirmar: {
+            header: 'Delete document',
+            message: 'Document {numero} and its files will be deleted. This cannot be undone.',
+          },
+          exito: { title: 'Document deleted', desc: 'Document {numero} was deleted.' },
+        },
       },
       filtros: {
         buscar: 'Search by supplier, tax ID, number or CUE',
@@ -6051,13 +6168,21 @@ export const en: AppDict = {
         hasta: 'To',
         delCorreo: 'From email',
         quitarCorreo: 'Remove the email filter',
+        estadoRecepcion: 'Receipt',
+        estadosRecepcion: { todos: 'All', si: 'Yes', no: 'No' },
       },
       detalle: {
         title: 'Details',
         general: 'General information',
         emision: 'Issued',
         moneda: 'Currency',
-        validado: 'DIAN validated',
+        verificacion: {
+          pendiente: 'DIAN check pending',
+          valido: 'Valid at DIAN',
+          invalido: 'Not valid at DIAN',
+          no_verificable: 'Cannot be checked',
+          error: 'DIAN check failed',
+        },
         fechaValidacion: 'Validation date',
         recibido: 'Received in RedEDoc',
         cue: 'CUE',
@@ -6066,6 +6191,51 @@ export const en: AppDict = {
         notFound: {
           title: 'Document not found',
           desc: 'Go back to the inbox and open it from there.',
+        },
+        tabs: { adjuntos: 'Attachments', eventos: 'RADIAN events' },
+      },
+      adjuntos: {
+        columns: { nombre: 'Name', tamano: 'Size', creado: 'Created' },
+        descargar: 'Download',
+        empty: {
+          title: 'No attachments',
+          sub: 'This document came without attachments.',
+        },
+      },
+      eventos: {
+        columns: {
+          numero: 'Number',
+          evento: 'Event',
+          estado: 'Status',
+          personaRecibe: 'Received by',
+          conceptoReclamo: 'Claim reason',
+          respuestaDian: 'DIAN response',
+          intentos: 'Attempts',
+          enviado: 'Sent',
+          cude: 'CUDE',
+        },
+        conceptos: {
+          '01': 'Document with inconsistencies',
+          '02': 'Goods not fully delivered',
+          '03': 'Goods partially delivered',
+          '04': 'Service not provided',
+        },
+        codigos: {
+          '030': 'Receipt acknowledgment',
+          '031': 'Claim',
+          '032': 'Goods or service receipt',
+          '033': 'Express acceptance',
+        },
+        estados: {
+          pendiente: 'Pending',
+          registrado: 'Registered',
+          rechazado: 'Rejected',
+          error: 'Error',
+        },
+        acciones: { xml: 'XML', respuesta: 'Response' },
+        empty: {
+          title: 'No RADIAN events',
+          sub: 'No event has been registered for this document yet.',
         },
       },
       empty: {
@@ -6995,7 +7165,23 @@ export const en: AppDict = {
   configuracion: {
     title: 'Settings',
     subtitle: 'Company parameters',
-    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales' },
+    tabs: { general: 'General', humano: 'Payroll', venta: 'Sales', compra: 'Purchasing' },
+    compra: {
+      recibe: {
+        title: 'Receiving person',
+        hint: 'Suggested when registering the receipt acknowledgment and the goods or service receipt of a received document.',
+      },
+      fields: {
+        documento: 'ID',
+        identificacion: 'ID type',
+        numeroIdentificacion: 'ID number',
+        nombres: 'First names',
+        apellidos: 'Last names',
+        cargo: 'Position',
+        area: 'Department',
+      },
+      validation: { required: 'This field is required', maxLength: 'It is too long' },
+    },
     unsavedChanges: 'Unsaved changes',
     actions: { save: 'Save' },
     general: {
@@ -7058,6 +7244,44 @@ export const en: AppDict = {
           loadError: {
             title: 'Could not load',
             desc: 'We could not load the document types.',
+          },
+        },
+      },
+      tabs: { documentos: 'Documents', impuestos: 'Taxes' },
+      impuesto: {
+        hint: 'Ledger account where each tax is recorded. The catalog is fixed: taxes cannot be created or deleted.',
+        columns: {
+          id: 'ID',
+          nombre: 'Name',
+          nombreExtendido: 'Full name',
+          tipo: 'Type',
+          porcentaje: 'Rate',
+          porcentajeBase: 'Base',
+          venta: 'Sales',
+          compra: 'Purchases',
+          cuenta: 'Account',
+        },
+        fields: {
+          cuenta: 'Ledger account',
+          cuentaHint: 'Leave it empty if the tax is not posted.',
+        },
+        dialog: { title: 'Edit tax' },
+        empty: {
+          title: 'No taxes',
+          sub: 'There are no taxes configured for this company yet.',
+        },
+        toasts: {
+          saveSuccess: {
+            title: 'Tax saved',
+            desc: 'Your changes were saved successfully.',
+          },
+          saveError: {
+            title: 'Could not save',
+            desc: 'We could not save the tax.',
+          },
+          loadError: {
+            title: 'Could not load',
+            desc: 'We could not load the taxes.',
           },
         },
       },

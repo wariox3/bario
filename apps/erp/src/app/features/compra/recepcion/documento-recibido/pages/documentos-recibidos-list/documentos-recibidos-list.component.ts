@@ -1,8 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -27,19 +36,32 @@ import {
 import { MascaraFechaDirective } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
+import {
+  ACCIONES_RECEPCION_ROW,
+  buscarAccionRecepcion,
+  type AccionDirecta,
+} from '../../documento-recibido.acciones';
+import {
+  RegistrarEventoDialogComponent,
+  type EventoRegistrado,
+} from '../../components/registrar-evento-dialog/registrar-evento-dialog.component';
+import type { EventoRadianCodigo } from '../../evento-radian.model';
 import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
 import {
   COLUMNS,
+  ESTADOS_RECEPCION,
   ROW_ACTIONS,
   ROW_ACTION_DETALLE,
   TIPOS,
 } from '../../documento-recibido.constants';
 import {
   toDocumentoRecibidoRow,
+  type DocumentoRecibido,
   type DocumentoRecibidoOrden,
   type DocumentoRecibidoQuery,
   type DocumentoRecibidoRow,
   type DocumentoRecibidoTipo,
+  type EstadoRecepcionFiltro,
 } from '../../documento-recibido.model';
 import { DocumentoRecibidoService } from '../../documento-recibido.service';
 
@@ -47,25 +69,15 @@ const PAGE_SIZE = 25;
 /** Orden del backend cuando no se pide otro: los más recientes primero. */
 const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 'desc' }];
 
-function inicioDeMes(): Date {
-  const hoy = new Date();
-  return new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-}
-
-function finDeMes(): Date {
-  const hoy = new Date();
-  return new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
-}
-
 /**
  * Documentos recibidos (Compra › Recepción): la bandeja de lo que los
  * proveedores mandan al buzón del emisor en RedEDoc.
  *
  * Los filtros van a la vista en la barra —búsqueda, tipo y rango de emisión—
- * porque el endpoint no habla `campo__operador` sino parámetros propios. El
- * rango arranca en el mes en curso, que es lo que el backend aplica sin fechas:
- * así la pantalla dice qué está mostrando. A la derecha, **Cargar archivo**
- * para lo que no llegó por correo.
+ * porque el endpoint no habla `campo__operador` sino parámetros propios. Arranca
+ * en los documentos sin recepción y sin fechas: vacías no viajan y el backend
+ * decide el rango. A la derecha, **Cargar archivo** para lo que no llegó por
+ * correo.
  *
  * Desde Correos se llega con `?correo=&desde=&hasta=`: los documentos que salieron
  * de ese correo, con un chip para quitar el filtro y volver a la bandeja.
@@ -76,6 +88,7 @@ function finDeMes(): Date {
   imports: [
     FormsModule,
     ButtonModule,
+    ConfirmDialogModule,
     DatePickerModule,
     IconFieldModule,
     InputIconModule,
@@ -85,7 +98,9 @@ function finDeMes(): Date {
     ListShellComponent,
     DataTableComponent,
     CargarDocumentoDialogComponent,
+    RegistrarEventoDialogComponent,
   ],
+  providers: [ConfirmationService],
   templateUrl: './documentos-recibidos-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -93,21 +108,25 @@ export class DocumentosRecibidosListComponent {
   private readonly service = inject(DocumentoRecibidoService);
   private readonly tenant = inject(TenantService);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected readonly t = inject<I18nService<AppDict>>(I18nService).t;
 
   protected readonly columns = COLUMNS;
-  protected readonly rowActions = ROW_ACTIONS;
+  /** Ver detalle (en línea) y, en el menú, las acciones que el estado de cada fila habilite. */
+  protected readonly rowActions = [...ROW_ACTIONS, ...ACCIONES_RECEPCION_ROW];
 
   // ── Filtros ───────────────────────────────────────────────────────────────
   /** Lo que se escribe; la búsqueda que viaja es `busqueda`, ya con debounce. */
   protected readonly busquedaInput = signal('');
   private readonly busqueda = signal('');
   protected readonly tipo = signal<DocumentoRecibidoTipo | null>(null);
-  protected readonly desde = signal<Date | null>(inicioDeMes());
-  protected readonly hasta = signal<Date | null>(finDeMes());
+  protected readonly estadoRecepcion = signal<EstadoRecepcionFiltro>('no');
+  protected readonly desde = signal<Date | null>(null);
+  protected readonly hasta = signal<Date | null>(null);
   /** Correo del que salieron los documentos, si se llegó desde Correos. */
   protected readonly correo = signal<number | null>(null);
 
@@ -123,9 +142,19 @@ export class DocumentosRecibidosListComponent {
 
   protected readonly cargaVisible = signal(false);
 
+  // ── Registrar evento RADIAN ───────────────────────────────────────────────
+  protected readonly eventoVisible = signal(false);
+  protected readonly eventoDocumento = signal<DocumentoRecibido | null>(null);
+  protected readonly eventoCodigo = signal<EventoRadianCodigo | null>(null);
+
   protected readonly tipoOptions = computed(() => {
     const tipos = this.t().entities.documentoRecibido.tipos;
     return TIPOS.map((value) => ({ value, label: tipos[value] }));
+  });
+
+  protected readonly estadoRecepcionOptions = computed(() => {
+    const estados = this.t().entities.documentoRecibido.filtros.estadosRecepcion;
+    return ESTADOS_RECEPCION.map((value) => ({ value, label: estados[value] }));
   });
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -147,6 +176,8 @@ export class DocumentosRecibidosListComponent {
       page_size: this.pageSize(),
       search: this.busqueda().trim() || undefined,
       documento_tipo: this.tipo() ?? undefined,
+      estado_recepcion:
+        this.estadoRecepcion() === 'todos' ? undefined : this.estadoRecepcion() === 'si',
       correo: this.correo() ?? undefined,
       desde: toIsoDate(this.desde()) ?? undefined,
       hasta: toIsoDate(this.hasta()) ?? undefined,
@@ -211,6 +242,11 @@ export class DocumentosRecibidosListComponent {
     this.currentPage.set(0);
   }
 
+  protected onEstadoRecepcion(estado: EstadoRecepcionFiltro): void {
+    this.estadoRecepcion.set(estado);
+    this.currentPage.set(0);
+  }
+
   protected onDesde(fecha: Date | null): void {
     this.desde.set(fecha);
     this.currentPage.set(0);
@@ -233,12 +269,69 @@ export class DocumentosRecibidosListComponent {
 
   /** La ficha se abre con el CUE y la fecha: el backend no tiene `GET` por id. */
   protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId !== ROW_ACTION_DETALLE) return;
     const doc = event.row as DocumentoRecibidoRow;
-    void this.router.navigate(['detalle', doc.id], {
-      relativeTo: this.route,
-      queryParams: { cue: doc.cufe_cude, fecha: doc.fecha_emision },
+    if (event.actionId === ROW_ACTION_DETALLE) {
+      void this.router.navigate(['detalle', doc.id], {
+        relativeTo: this.route,
+        queryParams: { cue: doc.cufe_cude, fecha: doc.fecha_emision },
+      });
+      return;
+    }
+    const accion = buscarAccionRecepcion(event.actionId);
+    if (!accion?.habilitada(doc)) return;
+    if (accion.tipo === 'evento') {
+      this.eventoDocumento.set(doc);
+      this.eventoCodigo.set(accion.codigo);
+      this.eventoVisible.set(true);
+      return;
+    }
+    this.solicitarAccion(accion, doc);
+  }
+
+  /**
+   * El evento nace pendiente: la DIAN lo procesa en segundo plano. Si además se
+   * pidió guardar la persona en la configuración, el aviso dice cómo terminó.
+   */
+  protected onEventoRegistrado({ personaGuardada }: EventoRegistrado): void {
+    const r = this.t().entities.documentoRecibido.registrarEvento;
+    this.toast.success(
+      r.exito.title,
+      personaGuardada === 'si' ? r.exito.descConPersona : r.exito.desc,
+    );
+    if (personaGuardada === 'fallo')
+      this.toast.warn(r.personaNoGuardada.title, r.personaNoGuardada.desc);
+    this.recargas.update((n) => n + 1);
+  }
+
+  /** Confirma (si la acción lo pide) y ejecuta. */
+  private solicitarAccion(accion: AccionDirecta, doc: DocumentoRecibido): void {
+    const textos = this.t().entities.documentoRecibido.acciones[accion.id];
+    if (!accion.confirmar || !textos.confirmar) {
+      this.ejecutarAccion(accion, doc);
+      return;
+    }
+    const confirmar = textos.confirmar;
+    this.confirmation.confirm({
+      header: confirmar.header,
+      message: confirmar.message.replace('{numero}', doc.numero),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: textos.label,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: accion.severity === 'danger' ? 'p-button-danger' : undefined,
+      accept: () => this.ejecutarAccion(accion, doc),
     });
+  }
+
+  /** Un 400 lo avisa el interceptor con el mensaje del backend. */
+  private ejecutarAccion(accion: AccionDirecta, doc: DocumentoRecibido): void {
+    accion
+      .ejecutar(this.service, doc)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const exito = this.t().entities.documentoRecibido.acciones[accion.id].exito;
+        if (exito) this.toast.success(exito.title, exito.desc.replace('{numero}', doc.numero));
+        this.recargas.update((n) => n + 1);
+      });
   }
 
   protected onCargado(): void {

@@ -11,6 +11,9 @@
 /** Tipos de documento que acepta el filtro `documento_tipo`. */
 export type DocumentoRecibidoTipo = 'factura_venta' | 'nota_credito' | 'nota_debito';
 
+/** Opciones del filtro de recepción; `todos` no manda `estado_recepcion`. */
+export type EstadoRecepcionFiltro = 'todos' | 'si' | 'no';
+
 /** Campos por los que ordena el backend; con `-` delante, descendente. */
 export type DocumentoRecibidoOrden =
   | 'fecha_emision'
@@ -38,14 +41,28 @@ export interface DocumentoRecibidoQuery {
   readonly proveedor?: string;
   /** Id del correo de recepción del que salió el documento. */
   readonly correo?: number;
+  /** Si ya se dio la recepción del documento; sin él, todos. */
+  readonly estado_recepcion?: boolean;
   readonly ordering?: DocumentoRecibidoOrden;
 }
+
+/** Qué dijo la DIAN del documento al consultarlo por su CUFE. */
+export type VerificacionEstado = 'pendiente' | 'valido' | 'invalido' | 'no_verificable' | 'error';
+
+/**
+ * El último evento RADIAN que el emisor registró sobre la factura. Es un
+ * resumen de los eventos que el backend reescribe cada vez que la DIAN registra
+ * uno.
+ */
+export type RadianEstado = 'sin_eventos' | 'acuse' | 'recibo' | 'aceptada' | 'reclamada';
 
 /** Un documento de la bandeja, tal como lo registró RedEDoc. */
 export interface DocumentoRecibido {
   /** UUID en RedEDoc. */
   readonly id: string;
   readonly emisor: number;
+  /** Correo del que salió; `null` si se cargó a mano. */
+  readonly correo: number | null;
   readonly documento_tipo: DocumentoRecibidoTipo;
   /** Código DIAN del tipo (`01` factura, `91` nota crédito, `92` nota débito). */
   readonly tipo_codigo_dian: string;
@@ -53,29 +70,47 @@ export interface DocumentoRecibido {
   readonly cufe_cude: string;
   /** AAAA-MM-DD. */
   readonly fecha_emision: string;
-  /** `HH:mm:ss` con zona (`10:15:00-05:00`). */
+  /** `HH:mm:ss`, a veces con zona (`10:15:00-05:00`). */
   readonly hora_emision: string;
   readonly proveedor_numero_identificacion: string;
   readonly proveedor_digito_verificacion: string;
   readonly proveedor_razon_social: string;
+  /** Código DIAN del tipo de identificación (`31` = NIT). */
+  readonly proveedor_tipo_identificacion: string;
+  /** Código DIAN del tipo de organización (`1` jurídica, `2` natural). */
+  readonly proveedor_tipo_organizacion: string;
   /** NIT de la empresa que recibe (el emisor), sin DV. */
   readonly receptor_numero_identificacion: string;
+  /** Código DIAN de la forma de pago (`1` contado, `2` crédito). */
+  readonly forma_pago: number | null;
   /** Nombre de la forma de pago (contado, crédito…); `null` si el XML no la trae. */
   readonly forma_pago_nombre: string | null;
   readonly moneda: string;
   readonly valor_bruto: string;
   readonly total_impuestos: string;
   readonly total_a_pagar: string;
-  /** Código de la validación DIAN (`02` = validado). */
+  /** Código de validación que trae el XML (`002`). Para saber si vale, `verificacion_estado`. */
   readonly validacion_codigo: string;
+  /** ISO con zona. */
   readonly fecha_validacion: string | null;
+  /** `1` producción, `2` pruebas. */
+  readonly ambiente: number;
+  readonly verificacion_estado: VerificacionEstado;
+  readonly verificacion_codigo: string | null;
+  /** Lo que respondió la DIAN al consultar el CUFE. */
+  readonly verificacion_descripcion: string | null;
+  /** ISO con zona; `null` mientras está pendiente. */
+  readonly verificado_en: string | null;
+  readonly radian_estado: RadianEstado;
+  readonly estado_recepcion: boolean;
+  readonly estado_descartado: boolean;
   readonly tiene_xml_factura: boolean;
   readonly tiene_pdf: boolean;
   /** Cuándo llegó a RedEDoc (ISO con zona). */
   readonly creado_en: string;
 }
 
-/** Respuesta de `GET recepcion-documento/`: página más el rango aplicado. */
+/** Respuesta de `GET recepcion/documento/`: página más el rango aplicado. */
 export interface DocumentoRecibidoPagina {
   readonly count: number;
   readonly page: number;

@@ -6,8 +6,9 @@ import type {
   DocumentoRecibidoPagina,
   DocumentoRecibidoQuery,
 } from './documento-recibido.model';
+import type { EventoRadian, RegistrarEventoPayload } from './evento-radian.model';
 
-const BASE = '/general/electronico/';
+const BASE = '/general/electronico/recepcion/';
 
 /**
  * Recepción de documentos de proveedores en RedEDoc: la bandeja y la carga a
@@ -16,7 +17,7 @@ const BASE = '/general/electronico/';
 @Injectable({ providedIn: 'root' })
 export class DocumentoRecibidoService extends BaseHttpService {
   listar(query: DocumentoRecibidoQuery = {}): Observable<DocumentoRecibidoPagina> {
-    return this.get<DocumentoRecibidoPagina>(`${BASE}recepcion-documento/`, { ...query });
+    return this.get<DocumentoRecibidoPagina>(`${BASE}documento/`, { ...query });
   }
 
   /**
@@ -31,16 +32,45 @@ export class DocumentoRecibidoService extends BaseHttpService {
   }
 
   /**
+   * Marca el documento como descartado: queda intacto, pero ya no admite
+   * eventos RADIAN (tampoco el acuse automático). Responde el documento.
+   */
+  descartar(id: string): Observable<DocumentoRecibido> {
+    return this.post<DocumentoRecibido>(`${BASE}documento-descartar/`, { id });
+  }
+
+  /**
+   * Quita el descarte: el documento vuelve a admitir eventos RADIAN, salvo una
+   * factura de contado verificada como válida, que queda terminada. El acuse
+   * automático omitido no se pide solo. Responde el documento.
+   */
+  restaurar(id: string): Observable<DocumentoRecibido> {
+    return this.post<DocumentoRecibido>(`${BASE}documento-restaurar/`, { id });
+  }
+
+  /**
+   * Registra un evento RADIAN. Responde el evento `pendiente`: RedEDoc lo envía
+   * a la DIAN en segundo plano. Sin toast: el diálogo muestra el 400 (orden,
+   * plazos, persona sin configurar…) junto al formulario.
+   */
+  registrarEvento(payload: RegistrarEventoPayload): Observable<EventoRadian> {
+    return this.post<EventoRadian>(`${BASE}documento-evento/`, payload, undefined, {
+      errorToast: false,
+    });
+  }
+
+  /** Elimina el documento y sus archivos; solo si no tiene eventos RADIAN. */
+  eliminar(id: string): Observable<void> {
+    return this.post<void>(`${BASE}documento-eliminar/`, { id });
+  }
+
+  /**
    * Sube un archivo del proveedor (multipart, campo `archivo`). Sin toast: la
    * ventana de carga muestra el error junto al archivo.
    */
   cargar(archivo: File): Observable<unknown> {
-    return this.postFile<unknown>(
-      `${BASE}recepcion-documento-cargar/`,
-      archivo,
-      undefined,
-      'archivo',
-      { errorToast: false },
-    );
+    return this.postFile<unknown>(`${BASE}documento-cargar/`, archivo, undefined, 'archivo', {
+      errorToast: false,
+    });
   }
 }

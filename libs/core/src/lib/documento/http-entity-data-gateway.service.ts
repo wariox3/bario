@@ -229,15 +229,19 @@ export class HttpEntityDataGateway implements EntityDataGateway {
 
   /**
    * Arma el body de `POST <endpoint>/lista/` a partir del `ListQuery` genérico.
-   * El filtro por `documento_tipo_id` se inyecta como primer elemento —
-   * es responsabilidad del framework, no del consumidor.
+   * El filtro por `documento_tipo_id` (o por la clase, si el documento declara
+   * `documentClassId`) se inyecta como primer elemento — es responsabilidad del
+   * framework, no del consumidor.
    */
   private buildListBody(entity: EntityConfig, query: ListQuery): DocumentListBody {
-    const baseFilter: BackendDocumentFilter = {
-      propiedad: 'documento_tipo_id',
-      operador: '=',
-      valor: entity.documentTypeId,
-    };
+    const baseFilter: BackendDocumentFilter =
+      entity.documentClassId !== undefined
+        ? {
+            propiedad: 'documento_tipo__documento_clase_id',
+            operador: '=',
+            valor: entity.documentClassId,
+          }
+        : { propiedad: 'documento_tipo_id', operador: '=', valor: entity.documentTypeId };
     const userFilters = query.filters.map(toBackendFilter);
     // Filtros implícitos del documento: siempre activos, junto al baseFilter.
     const implicitFilters = (entity.defaultFilters ?? []).map(toBackendFilter);

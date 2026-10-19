@@ -82,3 +82,14 @@ p-menu {
     outline-offset: 2px;
   }
 }
+
+// Acción destructiva en el menú ⋮ de `<lib-data-table>` (`severity: 'danger'`).
+//
+// Vive acá y no en el SCSS de la tabla: el menú es popup con `appendTo="body"`,
+// así que sus ítems quedan fuera del componente y el encapsulado de Angular no
+// los alcanza — la regla nunca pintaba. Las clases son las de PrimeNG 20
+// (`p-menu-item-*`); las `p-menuitem-*` de versiones viejas ya no existen.
+.lib-data-table__menu-item--danger
+  :where(.p-menu-item-link, .p-menu-item-label, .p-menu-item-icon) {
+  color: #b91c1c;
+}

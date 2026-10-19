@@ -39,6 +39,7 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
       dataKey="id"
       appendTo="body"
       [fluid]="true"
+      [size]="size()"
     >
       @if (displayWith(); as format) {
         <ng-template #selectedItem let-option>{{ format(option) }}</ng-template>
@@ -69,6 +70,12 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   readonly ariaLabel = input<string | undefined>(undefined);
   readonly placeholder = input<string>('Selecciona…');
   readonly invalid = input<boolean>(false);
+  /**
+   * Tamaño del select, como el `size` de PrimeNG. Sin él, el normal. Se usa para
+   * que case con los `pSize="small"` vecinos: en una fila flex el más alto estira
+   * al resto, así que un select normal agranda también el input de al lado.
+   */
+  readonly size = input<'small' | 'large' | undefined>(undefined);
   /**
    * Muestra la equis para vaciar el campo. Default `false`: en un campo
    * obligatorio la equis ofrece un estado que el formulario va a rechazar, y en

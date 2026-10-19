@@ -47,16 +47,17 @@
       <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
         {{ d.detalle.general }}
       </h2>
-      @if (v.validado) {
-        <span
-          class="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[0.72rem] font-semibold text-emerald-700"
-        >
-          <i class="pi pi-check-circle text-[0.7rem]"></i>
-          {{ d.detalle.validado }}
-        </span>
-      }
+      <!-- Verificación DIAN por CUFE; al pasar el mouse, lo que respondió la DIAN -->
+      <span
+        class="ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[0.72rem] font-semibold"
+        [class]="v.verificacion.clase"
+        [attr.title]="v.verificacion.descripcion || null"
+      >
+        <i class="text-[0.7rem]" [class]="v.verificacion.icono"></i>
+        {{ v.verificacion.label }}
+      </span>
     </div>
-    <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
+    <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
       <div class="flex flex-col gap-0.5">
         <dt class="documento-recibido-detail__label">{{ d.columns.numero }}</dt>
         <dd class="documento-recibido-detail__value">{{ v.doc.numero }}</dd>
@@ -68,6 +69,10 @@
       <div class="flex flex-col gap-0.5">
         <dt class="documento-recibido-detail__label">{{ d.detalle.emision }}</dt>
         <dd class="documento-recibido-detail__value">{{ v.emision }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.detalle.valorBruto }}</dt>
+        <dd class="documento-recibido-detail__value tabular-nums">{{ v.valorBruto }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="documento-recibido-detail__label">{{ d.columns.proveedor }}</dt>
@@ -84,6 +89,10 @@
         <dd class="documento-recibido-detail__value">{{ v.doc.forma_pago_nombre }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.columns.impuestos }}</dt>
+        <dd class="documento-recibido-detail__value tabular-nums">{{ v.impuestos }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
         <dt class="documento-recibido-detail__label">{{ d.detalle.moneda }}</dt>
         <dd class="documento-recibido-detail__value">{{ v.doc.moneda }}</dd>
       </div>
@@ -95,7 +104,11 @@
         <dt class="documento-recibido-detail__label">{{ d.detalle.recibido }}</dt>
         <dd class="documento-recibido-detail__value tabular-nums">{{ v.recibido }}</dd>
       </div>
-      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
+      <div class="flex flex-col gap-0.5">
+        <dt class="documento-recibido-detail__label">{{ d.columns.total }}</dt>
+        <dd class="documento-recibido-detail__value tabular-nums">{{ v.total }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-4">
         <dt class="documento-recibido-detail__label">{{ d.detalle.cue }}</dt>
         <dd class="documento-recibido-detail__value break-all">
           {{ v.doc.cufe_cude }}
@@ -113,31 +126,68 @@
     </dl>
   </section>
 
-  <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
-  <div class="flex justify-end">
-    <div
-      class="w-72 rounded-lg border border-[rgba(20,48,73,0.1)] bg-brand-surface px-4 py-3 shadow-sm"
+  <!-- Eventos RADIAN y adjuntos: card propia; las tabs son su cabecera -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <p-tabs
+      class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
+      value="eventos"
     >
-      <div class="flex flex-col gap-1.5">
-        <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-          <span class="text-brand-muted">{{ d.detalle.valorBruto }}</span>
-          <span class="tabular-nums text-brand-text">{{ v.valorBruto }}</span>
-        </div>
-        <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-          <span class="text-brand-muted">{{ d.columns.impuestos }}</span>
-          <span class="tabular-nums text-brand-text">{{ v.impuestos }}</span>
-        </div>
-        <div
-          class="mt-1 flex items-baseline justify-between gap-2 border-t border-[rgba(20,48,73,0.1)] pt-2.5"
-        >
-          <span class="text-[0.78rem] font-semibold text-brand-text">{{ d.columns.total }}</span>
-          <span
-            class="text-[1.35rem] font-bold leading-none tracking-[-0.02em] tabular-nums text-[#143049]"
-          >
-            {{ v.total }}
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
+      <p-tablist>
+        <p-tab value="eventos">
+          {{ d.detalle.tabs.eventos }}
+          @if (eventosTotal() > 0) {
+            <span
+              class="ml-2 inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums text-brand-text"
+            >
+              {{ eventosTotal() }}
+            </span>
+          }
+        </p-tab>
+        <p-tab value="adjuntos">
+          {{ d.detalle.tabs.adjuntos }}
+          @if (adjuntosTotal() > 0) {
+            <span
+              class="ml-2 inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums text-brand-text"
+            >
+              {{ adjuntosTotal() }}
+            </span>
+          }
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="eventos">
+          <lib-data-table
+            [columns]="eventoColumns"
+            [items]="eventos()"
+            [loading]="eventosLoading()"
+            [totalCount]="eventos().length"
+            [pageSize]="eventos().length || 1"
+            [currentPage]="0"
+            [rowActions]="eventoRowActions"
+            emptyTitleKey="entities.documentoRecibido.eventos.empty.title"
+            emptySubKey="entities.documentoRecibido.eventos.empty.sub"
+            (rowActionInvoked)="onEventoAction($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="adjuntos">
+          <lib-data-table
+            [columns]="adjuntoColumns"
+            [items]="adjuntos()"
+            [loading]="adjuntosLoading()"
+            [totalCount]="adjuntosTotal()"
+            [pageSize]="adjuntosPageSize"
+            [rowsPerPageOptions]="[adjuntosPageSize]"
+            [currentPage]="adjuntosPage()"
+            [rowActions]="adjuntoRowActions"
+            emptyTitleKey="entities.documentoRecibido.adjuntos.empty.title"
+            emptySubKey="entities.documentoRecibido.adjuntos.empty.sub"
+            (pageChange)="onAdjuntosPage($event)"
+            (rowActionInvoked)="onAdjuntoAction($event)"
+          />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </section>
 }

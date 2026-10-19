@@ -1,0 +1,57 @@
+@let d = t().documentActions.elegirRecurrente;
+
+<div class="flex flex-col gap-5">
+  <!-- Header: badge + título + subtítulo (estándar de modales del ERP) -->
+  <div class="flex items-center gap-3.5">
+    <span
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-blue/15"
+    >
+      <i class="pi pi-replay text-[1.1rem] text-brand-blue"></i>
+    </span>
+    <div class="flex flex-col gap-[0.1rem]">
+      <h2
+        class="m-0 text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+      >
+        {{ d.modalHeader }}
+      </h2>
+      <p class="m-0 text-[0.75rem] tracking-[0.01em] text-brand-muted">{{ d.modalSubtitle }}</p>
+    </div>
+  </div>
+
+  <p-iconfield class="w-full sm:max-w-sm">
+    <p-inputicon class="pi pi-search" />
+    <input
+      pInputText
+      type="search"
+      class="w-full"
+      [placeholder]="d.searchPlaceholder"
+      [attr.aria-label]="d.searchPlaceholder"
+      (input)="onSearch($any($event.target).value)"
+    />
+  </p-iconfield>
+
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="loading()"
+    [pageSize]="pageSize()"
+    [currentPage]="page()"
+    [rowActions]="rowActions"
+    [scrollHeight]="'50vh'"
+    emptyTitleKey="documentActions.elegirRecurrente.empty.title"
+    emptySubKey="documentActions.elegirRecurrente.empty.sub"
+    (pageChange)="onPageChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+
+  <div class="mt-1 flex items-center justify-end border-t border-[rgba(20,48,73,0.08)] pt-5">
+    <p-button
+      type="button"
+      [label]="d.cancel"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="cancel()"
+    />
+  </div>
+</div>
