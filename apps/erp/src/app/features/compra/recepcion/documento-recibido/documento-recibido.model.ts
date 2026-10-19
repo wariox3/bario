@@ -11,6 +11,9 @@
 /** Tipos de documento que acepta el filtro `documento_tipo`. */
 export type DocumentoRecibidoTipo = 'factura_venta' | 'nota_credito' | 'nota_debito';
 
+/** Opciones del filtro de recepción; `todos` no manda `estado_recepcion`. */
+export type EstadoRecepcionFiltro = 'todos' | 'si' | 'no';
+
 /** Campos por los que ordena el backend; con `-` delante, descendente. */
 export type DocumentoRecibidoOrden =
   | 'fecha_emision'
@@ -38,6 +41,8 @@ export interface DocumentoRecibidoQuery {
   readonly proveedor?: string;
   /** Id del correo de recepción del que salió el documento. */
   readonly correo?: number;
+  /** Si ya se dio la recepción del documento; sin él, todos. */
+  readonly estado_recepcion?: boolean;
   readonly ordering?: DocumentoRecibidoOrden;
 }
 

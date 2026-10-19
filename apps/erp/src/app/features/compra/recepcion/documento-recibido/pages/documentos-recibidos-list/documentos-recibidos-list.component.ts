@@ -30,6 +30,7 @@ import type { AppDict } from '@erp/i18n';
 import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
 import {
   COLUMNS,
+  ESTADOS_RECEPCION,
   ROW_ACTIONS,
   ROW_ACTION_DETALLE,
   TIPOS,
@@ -40,6 +41,7 @@ import {
   type DocumentoRecibidoQuery,
   type DocumentoRecibidoRow,
   type DocumentoRecibidoTipo,
+  type EstadoRecepcionFiltro,
 } from '../../documento-recibido.model';
 import { DocumentoRecibidoService } from '../../documento-recibido.service';
 
@@ -106,6 +108,7 @@ export class DocumentosRecibidosListComponent {
   protected readonly busquedaInput = signal('');
   private readonly busqueda = signal('');
   protected readonly tipo = signal<DocumentoRecibidoTipo | null>(null);
+  protected readonly estadoRecepcion = signal<EstadoRecepcionFiltro>('todos');
   protected readonly desde = signal<Date | null>(inicioDeMes());
   protected readonly hasta = signal<Date | null>(finDeMes());
   /** Correo del que salieron los documentos, si se llegó desde Correos. */
@@ -128,6 +131,11 @@ export class DocumentosRecibidosListComponent {
     return TIPOS.map((value) => ({ value, label: tipos[value] }));
   });
 
+  protected readonly estadoRecepcionOptions = computed(() => {
+    const estados = this.t().entities.documentoRecibido.filtros.estadosRecepcion;
+    return ESTADOS_RECEPCION.map((value) => ({ value, label: estados[value] }));
+  });
+
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     return [
@@ -147,6 +155,8 @@ export class DocumentosRecibidosListComponent {
       page_size: this.pageSize(),
       search: this.busqueda().trim() || undefined,
       documento_tipo: this.tipo() ?? undefined,
+      estado_recepcion:
+        this.estadoRecepcion() === 'todos' ? undefined : this.estadoRecepcion() === 'si',
       correo: this.correo() ?? undefined,
       desde: toIsoDate(this.desde()) ?? undefined,
       hasta: toIsoDate(this.hasta()) ?? undefined,
@@ -208,6 +218,11 @@ export class DocumentosRecibidosListComponent {
 
   protected onTipo(tipo: DocumentoRecibidoTipo | null): void {
     this.tipo.set(tipo);
+    this.currentPage.set(0);
+  }
+
+  protected onEstadoRecepcion(estado: EstadoRecepcionFiltro): void {
+    this.estadoRecepcion.set(estado);
     this.currentPage.set(0);
   }
 

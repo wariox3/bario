@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@reddoc/core';
 import type { RowAction } from '@reddoc/feature-base';
-import type { DocumentoRecibidoTipo } from './documento-recibido.model';
+import type { DocumentoRecibidoTipo, EstadoRecepcionFiltro } from './documento-recibido.model';
 
 const I18N = 'entities.documentoRecibido';
 
@@ -10,6 +10,9 @@ export const TIPOS: readonly DocumentoRecibidoTipo[] = [
   'nota_credito',
   'nota_debito',
 ];
+
+/** Opciones del filtro de recepción, en el orden en que se ofrecen. */
+export const ESTADOS_RECEPCION: readonly EstadoRecepcionFiltro[] = ['todos', 'si', 'no'];
 
 /** Abre la ficha del documento. */
 export const ROW_ACTION_DETALLE = 'ver-detalle';
@@ -46,21 +49,14 @@ export const COLUMNS: readonly ColumnDef[] = [
     type: 'text',
     width: '130px',
   },
-  { field: 'proveedor_razon_social', headerKey: `${I18N}.columns.proveedor`, type: 'text' },
-  { field: 'proveedor_nit', headerKey: `${I18N}.columns.nit`, type: 'text', width: '140px' },
   {
     field: 'forma_pago_nombre',
     headerKey: `${I18N}.columns.formaPago`,
     type: 'text',
     width: '140px',
   },
-  {
-    field: 'total_impuestos',
-    headerKey: `${I18N}.columns.impuestos`,
-    type: 'currency',
-    width: '130px',
-    align: 'right',
-  },
+  { field: 'proveedor_razon_social', headerKey: `${I18N}.columns.proveedor`, type: 'text' },
+  { field: 'proveedor_nit', headerKey: `${I18N}.columns.nit`, type: 'text', width: '140px' },
   {
     field: 'total_a_pagar',
     headerKey: `${I18N}.columns.total`,

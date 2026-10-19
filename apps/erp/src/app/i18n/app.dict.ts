@@ -4710,6 +4710,8 @@ export interface AppDict
         hasta: string;
         delCorreo: string;
         quitarCorreo: string;
+        estadoRecepcion: string;
+        estadosRecepcion: { todos: string; si: string; no: string };
       };
       detalle: {
         title: string;
