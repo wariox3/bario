@@ -498,7 +498,8 @@ export class ComercialDocumentoDetallesComponent {
         switchMap(({ ImportarDocumentoModalComponent }) => {
           const ref = this.dialog.open(ImportarDocumentoModalComponent, {
             ...ENTITY_ACTION_DIALOG_DEFAULTS,
-            width: '62rem',
+            width: '80rem',
+            breakpoints: { '1360px': '95vw', '640px': '92vw' },
             data,
           });
           return ref ? ref.onClose : EMPTY;

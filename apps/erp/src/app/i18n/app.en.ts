@@ -750,6 +750,7 @@ export const en: AppDict = {
     submit: 'Add',
     cancel: 'Cancel',
     columns: {
+      tipo: 'Type',
       documento: 'Document',
       fecha: 'Date',
       contacto: 'Contact',

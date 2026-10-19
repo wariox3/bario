@@ -25,6 +25,12 @@ import type { ImportarDocumentoModalData, LineaPendienteApi } from '../../import
 /** Columnas de la tabla de líneas pendientes (solo lectura, selección múltiple). */
 const IMPORTAR_DOCUMENTO_COLUMNS: readonly ColumnDef[] = [
   {
+    field: 'documento_documento_tipo_nombre',
+    headerKey: 'documentImport.columns.tipo',
+    type: 'text',
+    width: '10rem',
+  },
+  {
     field: 'documento_numero',
     headerKey: 'documentImport.columns.documento',
     type: 'number',

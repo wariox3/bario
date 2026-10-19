@@ -600,6 +600,7 @@ export interface AppDict
     submit: string;
     cancel: string;
     columns: {
+      tipo: string;
       documento: string;
       fecha: string;
       contacto: string;
