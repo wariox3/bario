@@ -7212,6 +7212,44 @@ export const en: AppDict = {
           },
         },
       },
+      tabs: { documentos: 'Documents', impuestos: 'Taxes' },
+      impuesto: {
+        hint: 'Ledger account where each tax is recorded. The catalog is fixed: taxes cannot be created or deleted.',
+        columns: {
+          id: 'ID',
+          nombre: 'Name',
+          nombreExtendido: 'Full name',
+          tipo: 'Type',
+          porcentaje: 'Rate',
+          porcentajeBase: 'Base',
+          venta: 'Sales',
+          compra: 'Purchases',
+          cuenta: 'Account',
+        },
+        fields: {
+          cuenta: 'Ledger account',
+          cuentaHint: 'Leave it empty if the tax is not posted.',
+        },
+        dialog: { title: 'Edit tax' },
+        empty: {
+          title: 'No taxes',
+          sub: 'There are no taxes configured for this company yet.',
+        },
+        toasts: {
+          saveSuccess: {
+            title: 'Tax saved',
+            desc: 'Your changes were saved successfully.',
+          },
+          saveError: {
+            title: 'Could not save',
+            desc: 'We could not save the tax.',
+          },
+          loadError: {
+            title: 'Could not load',
+            desc: 'We could not load the taxes.',
+          },
+        },
+      },
       validation: { required: 'This field is required' },
     },
     humano: {

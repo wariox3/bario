@@ -7307,6 +7307,44 @@ export const es: AppDict = {
           },
         },
       },
+      tabs: { documentos: 'Documentos', impuestos: 'Impuestos' },
+      impuesto: {
+        hint: 'Cuenta contable donde se registra cada impuesto. El catálogo es fijo: no se crean ni se eliminan impuestos.',
+        columns: {
+          id: 'ID',
+          nombre: 'Nombre',
+          nombreExtendido: 'Nombre extendido',
+          tipo: 'Tipo',
+          porcentaje: 'Porcentaje',
+          porcentajeBase: 'Base',
+          venta: 'Venta',
+          compra: 'Compra',
+          cuenta: 'Cuenta',
+        },
+        fields: {
+          cuenta: 'Cuenta contable',
+          cuentaHint: 'Déjala vacía si el impuesto no se contabiliza.',
+        },
+        dialog: { title: 'Editar impuesto' },
+        empty: {
+          title: 'Sin impuestos',
+          sub: 'Todavía no hay impuestos configurados para esta empresa.',
+        },
+        toasts: {
+          saveSuccess: {
+            title: 'Impuesto guardado',
+            desc: 'Los cambios se guardaron correctamente.',
+          },
+          saveError: {
+            title: 'Error al guardar',
+            desc: 'No pudimos guardar el impuesto.',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No pudimos traer los impuestos.',
+          },
+        },
+      },
       validation: { required: 'Este campo es obligatorio' },
     },
     humano: {

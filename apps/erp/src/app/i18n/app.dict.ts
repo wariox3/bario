@@ -5441,6 +5441,29 @@ export interface AppDict
           loadError: { title: string; desc: string };
         };
       };
+      tabs: { documentos: string; impuestos: string };
+      impuesto: {
+        hint: string;
+        columns: {
+          id: string;
+          nombre: string;
+          nombreExtendido: string;
+          tipo: string;
+          porcentaje: string;
+          porcentajeBase: string;
+          venta: string;
+          compra: string;
+          cuenta: string;
+        };
+        fields: { cuenta: string; cuentaHint: string };
+        dialog: { title: string };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
       validation: { required: string };
     };
     humano: {

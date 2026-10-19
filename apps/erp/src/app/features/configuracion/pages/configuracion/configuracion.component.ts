@@ -47,7 +47,9 @@ export class ConfiguracionComponent {
   protected onTabChange(value: string): void {
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { seccion: value },
+      // `tab` es la pestaña interna de un área (p. ej. impuestos en General):
+      // al cambiar de área deja de significar algo y se limpia.
+      queryParams: { seccion: value, tab: null },
       queryParamsHandling: 'merge',
     });
   }
