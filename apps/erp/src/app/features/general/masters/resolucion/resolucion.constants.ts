@@ -138,8 +138,8 @@ export const RESOLUCIONES_TRAILING_ACTIONS: readonly ToolbarAction[] = [
       },
       {
         id: RESOLUCIONES_LISTA_DIAN_ACTION_ID,
-        labelKey: 'entities.resolucion.actions.lista',
-        iconClass: 'pi pi-list',
+        labelKey: 'entities.resolucion.actions.importar',
+        iconClass: 'pi pi-download',
       },
     ],
   },

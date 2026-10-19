@@ -1062,7 +1062,7 @@ export const en: AppDict = {
       actions: {
         dian: 'DIAN',
         validar: 'Validate',
-        lista: 'List',
+        importar: 'Import',
       },
       toasts: {
         validarSuccess: {

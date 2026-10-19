@@ -824,7 +824,7 @@ export interface AppDict
       actions: {
         dian: string;
         validar: string;
-        lista: string;
+        importar: string;
       };
       toasts: {
         validarSuccess: { title: string; desc: string };
