@@ -6133,6 +6133,26 @@ export const es: AppDict = {
         aceptada: 'Aceptación expresa',
         reclamada: 'Reclamo',
       },
+      acciones: {
+        descartar: {
+          label: 'Descartar',
+          confirmar: {
+            header: 'Descartar documento',
+            message:
+              'El documento {numero} queda guardado, pero ya no admitirá eventos RADIAN ni el acuse automático.',
+          },
+          exito: { title: 'Documento descartado', desc: 'El documento {numero} quedó descartado.' },
+        },
+        eliminar: {
+          label: 'Eliminar',
+          confirmar: {
+            header: 'Eliminar documento',
+            message:
+              'Se eliminarán el documento {numero} y sus archivos. Esta acción no se puede deshacer.',
+          },
+          exito: { title: 'Documento eliminado', desc: 'El documento {numero} se eliminó.' },
+        },
+      },
       filtros: {
         buscar: 'Buscar por proveedor, NIT, número o CUE',
         tipo: 'Tipo',

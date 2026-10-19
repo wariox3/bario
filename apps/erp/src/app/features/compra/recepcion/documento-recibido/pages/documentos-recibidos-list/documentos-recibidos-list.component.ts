@@ -1,8 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -27,6 +36,11 @@ import {
 import { MascaraFechaDirective } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
+import {
+  ACCIONES_RECEPCION_ROW,
+  buscarAccionRecepcion,
+  type AccionRecepcion,
+} from '../../documento-recibido.acciones';
 import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
 import {
   COLUMNS,
@@ -37,6 +51,7 @@ import {
 } from '../../documento-recibido.constants';
 import {
   toDocumentoRecibidoRow,
+  type DocumentoRecibido,
   type DocumentoRecibidoOrden,
   type DocumentoRecibidoQuery,
   type DocumentoRecibidoRow,
@@ -68,6 +83,7 @@ const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 
   imports: [
     FormsModule,
     ButtonModule,
+    ConfirmDialogModule,
     DatePickerModule,
     IconFieldModule,
     InputIconModule,
@@ -78,6 +94,7 @@ const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 
     DataTableComponent,
     CargarDocumentoDialogComponent,
   ],
+  providers: [ConfirmationService],
   templateUrl: './documentos-recibidos-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -85,13 +102,16 @@ export class DocumentosRecibidosListComponent {
   private readonly service = inject(DocumentoRecibidoService);
   private readonly tenant = inject(TenantService);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected readonly t = inject<I18nService<AppDict>>(I18nService).t;
 
   protected readonly columns = COLUMNS;
-  protected readonly rowActions = ROW_ACTIONS;
+  /** Ver detalle (en línea) y, en el menú, las acciones que el estado de cada fila habilite. */
+  protected readonly rowActions = [...ROW_ACTIONS, ...ACCIONES_RECEPCION_ROW];
 
   // ── Filtros ───────────────────────────────────────────────────────────────
   /** Lo que se escribe; la búsqueda que viaja es `busqueda`, ya con debounce. */
@@ -238,12 +258,46 @@ export class DocumentosRecibidosListComponent {
 
   /** La ficha se abre con el CUE y la fecha: el backend no tiene `GET` por id. */
   protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId !== ROW_ACTION_DETALLE) return;
     const doc = event.row as DocumentoRecibidoRow;
-    void this.router.navigate(['detalle', doc.id], {
-      relativeTo: this.route,
-      queryParams: { cue: doc.cufe_cude, fecha: doc.fecha_emision },
+    if (event.actionId === ROW_ACTION_DETALLE) {
+      void this.router.navigate(['detalle', doc.id], {
+        relativeTo: this.route,
+        queryParams: { cue: doc.cufe_cude, fecha: doc.fecha_emision },
+      });
+      return;
+    }
+    const accion = buscarAccionRecepcion(event.actionId);
+    if (accion?.habilitada(doc)) this.solicitarAccion(accion, doc);
+  }
+
+  /** Confirma (si la acción lo pide) y ejecuta. */
+  private solicitarAccion(accion: AccionRecepcion, doc: DocumentoRecibido): void {
+    if (!accion.confirmar) {
+      this.ejecutarAccion(accion, doc);
+      return;
+    }
+    const textos = this.t().entities.documentoRecibido.acciones[accion.id];
+    this.confirmation.confirm({
+      header: textos.confirmar.header,
+      message: textos.confirmar.message.replace('{numero}', doc.numero),
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: textos.label,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: accion.severity === 'danger' ? 'p-button-danger' : undefined,
+      accept: () => this.ejecutarAccion(accion, doc),
     });
+  }
+
+  /** Un 400 lo avisa el interceptor con el mensaje del backend. */
+  private ejecutarAccion(accion: AccionRecepcion, doc: DocumentoRecibido): void {
+    accion
+      .ejecutar(this.service, doc)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const exito = this.t().entities.documentoRecibido.acciones[accion.id].exito;
+        this.toast.success(exito.title, exito.desc.replace('{numero}', doc.numero));
+        this.recargas.update((n) => n + 1);
+      });
   }
 
   protected onCargado(): void {

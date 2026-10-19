@@ -31,6 +31,19 @@ export class DocumentoRecibidoService extends BaseHttpService {
   }
 
   /**
+   * Marca el documento como descartado: queda intacto, pero ya no admite
+   * eventos RADIAN (tampoco el acuse automático). Responde el documento.
+   */
+  descartar(id: string): Observable<DocumentoRecibido> {
+    return this.post<DocumentoRecibido>(`${BASE}documento-descartar/`, { id });
+  }
+
+  /** Elimina el documento y sus archivos; solo si no tiene eventos RADIAN. */
+  eliminar(id: string): Observable<void> {
+    return this.post<void>(`${BASE}documento-eliminar/`, { id });
+  }
+
+  /**
    * Sube un archivo del proveedor (multipart, campo `archivo`). Sin toast: la
    * ventana de carga muestra el error junto al archivo.
    */

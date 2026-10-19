@@ -6052,6 +6052,25 @@ export const en: AppDict = {
         aceptada: 'Express acceptance',
         reclamada: 'Claim',
       },
+      acciones: {
+        descartar: {
+          label: 'Discard',
+          confirmar: {
+            header: 'Discard document',
+            message:
+              'Document {numero} stays stored, but it will no longer accept RADIAN events or the automatic acknowledgment.',
+          },
+          exito: { title: 'Document discarded', desc: 'Document {numero} was discarded.' },
+        },
+        eliminar: {
+          label: 'Delete',
+          confirmar: {
+            header: 'Delete document',
+            message: 'Document {numero} and its files will be deleted. This cannot be undone.',
+          },
+          exito: { title: 'Document deleted', desc: 'Document {numero} was deleted.' },
+        },
+      },
       filtros: {
         buscar: 'Search by supplier, tax ID, number or CUE',
         tipo: 'Type',

@@ -4705,6 +4705,15 @@ export interface AppDict
       };
       tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
       radianEstados: Record<'sin_eventos' | 'acuse' | 'recibo' | 'aceptada' | 'reclamada', string>;
+      /** Acciones de `documento-recibido.acciones.ts`; `{numero}` = número del documento. */
+      acciones: Record<
+        'descartar' | 'eliminar',
+        {
+          label: string;
+          confirmar: { header: string; message: string };
+          exito: { title: string; desc: string };
+        }
+      >;
       filtros: {
         buscar: string;
         tipo: string;
