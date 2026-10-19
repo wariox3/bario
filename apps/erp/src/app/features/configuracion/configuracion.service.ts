@@ -34,8 +34,14 @@ export class ConfiguracionService extends BaseHttpService {
     );
   }
 
-  /** Persiste solo los campos enviados (actualización parcial). */
-  actualizar(payload: ConfiguracionPayload): Observable<Partial<ConfiguracionRead>> {
-    return this.patch<Partial<ConfiguracionRead>>(`${this.resourcePath}actualizar/`, payload);
+  /**
+   * Persiste solo los campos enviados (actualización parcial). `opts` permite
+   * apagar el toast cuando quien llama avisa por su cuenta.
+   */
+  actualizar(
+    payload: ConfiguracionPayload,
+    opts?: RequestOptions,
+  ): Observable<Partial<ConfiguracionRead>> {
+    return this.patch<Partial<ConfiguracionRead>>(`${this.resourcePath}actualizar/`, payload, opts);
   }
 }

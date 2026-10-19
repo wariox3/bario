@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
-import { BaseHttpService } from '@reddoc/core';
+import {
+  BaseHttpService,
+  buildListBody,
+  buildListParams,
+  type ListQuery,
+  type PaginatedResponse,
+} from '@reddoc/core';
 
 /**
  * Endpoint de generación desde **plantillas recurrentes**.
@@ -13,6 +19,9 @@ import { BaseHttpService } from '@reddoc/core';
  * (`/api/contenedor/schema/`).
  */
 const GENERAR_RECURRENTE_ENDPOINT = '/general/documento/generar-recurrente/';
+
+/** Listado genérico de cabeceras, de donde salen las plantillas a elegir. */
+const DOCUMENTO_LISTA_ENDPOINT = '/general/documento/lista/';
 
 /**
  * Payload de `POST /general/documento/generar-recurrente/`.
@@ -50,6 +59,17 @@ export interface GenerarRecurrenteResponse {
   readonly generados: number;
 }
 
+/** Fila de `general/documento/lista/` que pinta el modal de elegir plantilla. */
+export interface PlantillaRecurrenteRow {
+  readonly id: number;
+  readonly fecha: string;
+  readonly contacto_numero_identificacion: string | null;
+  readonly contacto_nombre_corto: string | null;
+  readonly subtotal: string;
+  readonly impuesto: string;
+  readonly total: string;
+}
+
 /**
  * Servicio HTTP de la acción "generar recurrente".
  *
@@ -61,5 +81,18 @@ export interface GenerarRecurrenteResponse {
 export class GenerarRecurrenteService extends BaseHttpService {
   generar(payload: GenerarRecurrentePayload): Observable<GenerarRecurrenteResponse> {
     return this.post<GenerarRecurrenteResponse>(GENERAR_RECURRENTE_ENDPOINT, payload);
+  }
+
+  /**
+   * Plantillas recurrentes de un tipo, paginadas. `query.filters` ya debe traer
+   * el filtro del tipo en el orden correcto: el backend encadena los filtros en
+   * secuencia, así que quien arma un `OR` decide dónde va el `documento_tipo_id`.
+   */
+  listarPlantillas(query: ListQuery): Observable<PaginatedResponse<PlantillaRecurrenteRow>> {
+    return this.post<PaginatedResponse<PlantillaRecurrenteRow>>(
+      DOCUMENTO_LISTA_ENDPOINT,
+      buildListBody(query),
+      buildListParams(query),
+    );
   }
 }

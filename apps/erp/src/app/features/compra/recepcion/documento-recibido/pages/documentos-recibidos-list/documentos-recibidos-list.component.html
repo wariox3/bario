@@ -36,6 +36,18 @@
         appendTo="body"
       />
 
+      <p-select
+        size="small"
+        class="w-32"
+        [options]="estadoRecepcionOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [ariaLabel]="d.filtros.estadoRecepcion"
+        [ngModel]="estadoRecepcion()"
+        (ngModelChange)="onEstadoRecepcion($event)"
+        appendTo="body"
+      />
+
       <div class="w-36">
         <p-datepicker
           size="small"
@@ -106,5 +118,14 @@
     (rowActionInvoked)="onRowAction($event)"
   />
 </lib-list-shell>
+
+<p-confirmDialog />
+
+<app-registrar-evento-dialog
+  [(visible)]="eventoVisible"
+  [documento]="eventoDocumento()"
+  [codigo]="eventoCodigo()"
+  (registrado)="onEventoRegistrado($event)"
+/>
 
 <app-cargar-documento-dialog [(visible)]="cargaVisible" (cargado)="onCargado()" />

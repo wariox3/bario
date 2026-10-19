@@ -35,6 +35,7 @@ import { MODELO, masterActions } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import {
   ITEMS_COLUMNS,
+  ITEMS_DEFAULT_SORT,
   ITEMS_FILTER_FIELDS,
   ITEMS_FILTERS_STORAGE_KEY,
   ITEMS_IMPORT_MASTERS,
@@ -89,7 +90,7 @@ export class ItemsListComponent {
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(25);
-  protected readonly sort = signal<readonly SortSpec[]>([]);
+  protected readonly sort = signal<readonly SortSpec[]>(ITEMS_DEFAULT_SORT);
   protected readonly selectedRows = signal<readonly Item[]>([]);
   protected readonly searchValue = signal('');
   protected readonly activeFilters = signal<readonly FilterCondition[]>(

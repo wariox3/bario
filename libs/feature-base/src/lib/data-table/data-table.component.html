@@ -176,11 +176,14 @@
       </span>
     }
     @case ('enum') {
-      {{
-        col.enumKeyPrefix
-          ? translate(col.enumKeyPrefix + '.' + readValue(row, col.field))
-          : readValue(row, col.field)
-      }}
+      <!-- Sin valor no hay clave que traducir: la celda queda vacía, no `prefijo.null` -->
+      @if (hasValue(row, col.field)) {
+        {{
+          col.enumKeyPrefix
+            ? translate(col.enumKeyPrefix + '.' + readValue(row, col.field))
+            : readValue(row, col.field)
+        }}
+      }
     }
     @case ('currency') {
       {{ currencyCell(readValue(row, col.field)) }}

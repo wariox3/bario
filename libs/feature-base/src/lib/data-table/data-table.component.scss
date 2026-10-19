@@ -119,10 +119,6 @@
     line-height: 1.5;
   }
 
-  &__menu-item--danger :where(.p-menuitem-link, .p-menuitem-text, .p-menuitem-icon) {
-    color: #b91c1c;
-  }
-
   &__bool-badge {
     display: inline-flex;
     align-items: center;

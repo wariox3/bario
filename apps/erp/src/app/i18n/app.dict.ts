@@ -375,6 +375,27 @@ export interface AppDict
       empty: { title: string; desc: string; descTodos: string };
       error: { title: string; desc: string };
     };
+    elegirRecurrente: {
+      buttonLabel: string;
+      modalHeader: string;
+      modalSubtitle: string;
+      searchPlaceholder: string;
+      seleccionar: string;
+      cancel: string;
+      sinOrigen: string;
+      columns: {
+        id: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+      };
+      empty: { title: string; sub: string; desc: string };
+      success: { title: string; desc: string };
+      loadError: { title: string; desc: string };
+      error: { title: string; desc: string };
+    };
     detail: {
       aprobar: string;
       desaprobar: string;
@@ -803,7 +824,7 @@ export interface AppDict
       actions: {
         dian: string;
         validar: string;
-        lista: string;
+        importar: string;
       };
       toasts: {
         validarSuccess: { title: string; desc: string };
@@ -4047,6 +4068,7 @@ export interface AppDict
       columns: {
         id: string;
         numero: string;
+        tipo: string;
         desde: string;
         hasta: string;
         identificacion: string;
@@ -4701,8 +4723,52 @@ export interface AppDict
         impuestos: string;
         total: string;
         formaPago: string;
+        radian: string;
       };
       tipos: Record<'factura_venta' | 'nota_credito' | 'nota_debito', string>;
+      radianEstados: Record<'sin_eventos' | 'acuse' | 'recibo' | 'aceptada' | 'reclamada', string>;
+      /** Acciones de `documento-recibido.acciones.ts`; `{numero}` = número del documento. */
+      acciones: Record<
+        'acuse' | 'recibo' | 'aceptar' | 'reclamar' | 'descartar' | 'restaurar' | 'eliminar',
+        {
+          label: string;
+          /** Solo las acciones directas que piden confirmar. */
+          confirmar?: { header: string; message: string };
+          /** Solo las acciones directas; los eventos avisan desde `registrarEvento.exito`. */
+          exito?: { title: string; desc: string };
+        }
+      >;
+      /** Diálogo de registrar evento RADIAN. */
+      registrarEvento: {
+        /** `{numero}` y `{proveedor}`. */
+        subtitulo: string;
+        descripciones: Record<'030' | '031' | '032' | '033', string>;
+        persona: {
+          titulo: string;
+          cargando: string;
+          sugerida: string;
+          sinConfigurar: string;
+          irConfiguracion: string;
+          actualizarConfigurada: string;
+          guardarConfigurada: string;
+          guardarHint: string;
+          documento: string;
+          tipo: string;
+          numero: string;
+          nombres: string;
+          apellidos: string;
+          cargo: string;
+          area: string;
+        };
+        concepto: string;
+        conceptoPlaceholder: string;
+        cierreAviso: string;
+        validacion: { requerido: string; maximo: string };
+        enviar: string;
+        errorGenerico: string;
+        exito: { title: string; desc: string; descConPersona: string };
+        personaNoGuardada: { title: string; desc: string };
+      };
       filtros: {
         buscar: string;
         tipo: string;
@@ -4710,19 +4776,48 @@ export interface AppDict
         hasta: string;
         delCorreo: string;
         quitarCorreo: string;
+        estadoRecepcion: string;
+        estadosRecepcion: { todos: string; si: string; no: string };
       };
       detalle: {
         title: string;
         general: string;
         emision: string;
         moneda: string;
-        validado: string;
+        verificacion: Record<
+          'pendiente' | 'valido' | 'invalido' | 'no_verificable' | 'error',
+          string
+        >;
         fechaValidacion: string;
         recibido: string;
         cue: string;
         verDian: string;
         valorBruto: string;
         notFound: { title: string; desc: string };
+        tabs: { adjuntos: string; eventos: string };
+      };
+      adjuntos: {
+        columns: { nombre: string; tamano: string; creado: string };
+        descargar: string;
+        empty: { title: string; sub: string };
+      };
+      eventos: {
+        columns: {
+          numero: string;
+          evento: string;
+          estado: string;
+          personaRecibe: string;
+          conceptoReclamo: string;
+          respuestaDian: string;
+          intentos: string;
+          enviado: string;
+          cude: string;
+        };
+        conceptos: Record<'01' | '02' | '03' | '04', string>;
+        codigos: Record<'030' | '031' | '032' | '033', string>;
+        estados: Record<'pendiente' | 'registrado' | 'rechazado' | 'error', string>;
+        acciones: { xml: string; respuesta: string };
+        empty: { title: string; sub: string };
       };
       empty: { title: string; sub: string };
       carga: {
@@ -5316,7 +5411,21 @@ export interface AppDict
   configuracion: {
     title: string;
     subtitle: string;
-    tabs: { general: string; humano: string; venta: string };
+    tabs: { general: string; humano: string; venta: string; compra: string };
+    /** Área Compra: la persona que recibe en la recepción de documentos. */
+    compra: {
+      recibe: { title: string; hint: string };
+      fields: {
+        documento: string;
+        identificacion: string;
+        numeroIdentificacion: string;
+        nombres: string;
+        apellidos: string;
+        cargo: string;
+        area: string;
+      };
+      validation: { required: string; maxLength: string };
+    };
     unsavedChanges: string;
     actions: { save: string };
     general: {
@@ -5347,6 +5456,29 @@ export interface AppDict
         };
         dialog: { title: string; groups: { numeracion: string; cuentas: string } };
         validation: { required: string; consecutivoMin: string };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      tabs: { documentos: string; impuestos: string };
+      impuesto: {
+        hint: string;
+        columns: {
+          id: string;
+          nombre: string;
+          nombreExtendido: string;
+          tipo: string;
+          porcentaje: string;
+          porcentajeBase: string;
+          venta: string;
+          compra: string;
+          cuenta: string;
+        };
+        fields: { cuenta: string; cuentaHint: string };
+        dialog: { title: string };
         empty: { title: string; sub: string };
         toasts: {
           saveSuccess: { title: string; desc: string };
