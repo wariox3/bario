@@ -22,6 +22,12 @@ export const NOMINA_COLUMNS: readonly ColumnDef[] = [
     width: '110px',
   },
   {
+    field: 'documento_tipo_nombre',
+    headerKey: 'entities.nomina.columns.tipo',
+    type: 'text',
+    width: '140px',
+  },
+  {
     field: 'fecha_desde',
     headerKey: 'entities.nomina.columns.desde',
     type: 'date',

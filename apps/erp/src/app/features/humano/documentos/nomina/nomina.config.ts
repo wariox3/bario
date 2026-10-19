@@ -1,3 +1,4 @@
+import { DOCUMENTO_CLASE_ID } from '@reddoc/core';
 import { DOCUMENT_TYPE_ID, type DocumentEntityConfig } from '@erp/core/module-config';
 import { NOMINA_COLUMNS, NOMINA_FILTERS } from './nomina.constants';
 
@@ -14,6 +15,10 @@ import { NOMINA_COLUMNS, NOMINA_FILTERS } from './nomina.constants';
  * que la UI solo ofrece lista y ficha (igual que el legacy, que para este
  * documento tampoco expone formulario propio).
  *
+ * El listado filtra por la **clase** 701 y no por el tipo 14, igual que el
+ * legacy: junto a la nómina aparecen las primas, cesantías y liquidaciones, y
+ * la columna Tipo las distingue.
+ *
  * `routes` son relativas al módulo; el `BaseDocumentListComponent` les prepende
  * `/t/<slug>/humano/` al navegar. `new` y `edit` se declaran porque el tipo los
  * exige, pero ninguna capa los usa con `canCreate`/`canEdit` en false.
@@ -24,6 +29,7 @@ export const NOMINA_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.nomina.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOMINA,
+  documentClassId: DOCUMENTO_CLASE_ID.NOMINA,
   schemaVersion: 1,
   columns: NOMINA_COLUMNS,
   filters: NOMINA_FILTERS,

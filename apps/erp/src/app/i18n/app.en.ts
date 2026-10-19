@@ -5301,6 +5301,7 @@ export const en: AppDict = {
       columns: {
         id: 'ID',
         numero: 'Number',
+        tipo: 'Type',
         desde: 'From',
         hasta: 'To',
         identificacion: 'ID number',

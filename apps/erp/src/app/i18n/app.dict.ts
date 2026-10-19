@@ -4068,6 +4068,7 @@ export interface AppDict
       columns: {
         id: string;
         numero: string;
+        tipo: string;
         desde: string;
         hasta: string;
         identificacion: string;
