@@ -4725,6 +4725,28 @@ export interface AppDict
         verDian: string;
         valorBruto: string;
         notFound: { title: string; desc: string };
+        tabs: { adjuntos: string; eventos: string };
+        adjuntosVacio: { title: string; sub: string };
+      };
+      eventos: {
+        columns: {
+          numero: string;
+          evento: string;
+          estado: string;
+          firmado: string;
+          personaRecibe: string;
+          concepto: string;
+          reclamo: string;
+          respuestaDian: string;
+          intentos: string;
+          enviado: string;
+          usuario: string;
+          cude: string;
+        };
+        codigos: Record<'030' | '031' | '032' | '033', string>;
+        estados: Record<'pendiente' | 'registrado' | 'rechazado' | 'error', string>;
+        acciones: { xml: string; respuesta: string };
+        empty: { title: string; sub: string };
       };
       empty: { title: string; sub: string };
       carga: {
