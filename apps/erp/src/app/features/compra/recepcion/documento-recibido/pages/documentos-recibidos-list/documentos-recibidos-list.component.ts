@@ -49,25 +49,15 @@ const PAGE_SIZE = 25;
 /** Orden del backend cuando no se pide otro: los más recientes primero. */
 const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 'desc' }];
 
-function inicioDeMes(): Date {
-  const hoy = new Date();
-  return new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-}
-
-function finDeMes(): Date {
-  const hoy = new Date();
-  return new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
-}
-
 /**
  * Documentos recibidos (Compra › Recepción): la bandeja de lo que los
  * proveedores mandan al buzón del emisor en RedEDoc.
  *
  * Los filtros van a la vista en la barra —búsqueda, tipo y rango de emisión—
- * porque el endpoint no habla `campo__operador` sino parámetros propios. El
- * rango arranca en el mes en curso, que es lo que el backend aplica sin fechas:
- * así la pantalla dice qué está mostrando. A la derecha, **Cargar archivo**
- * para lo que no llegó por correo.
+ * porque el endpoint no habla `campo__operador` sino parámetros propios. Arranca
+ * en los documentos sin recepción y sin fechas: vacías no viajan y el backend
+ * decide el rango. A la derecha, **Cargar archivo** para lo que no llegó por
+ * correo.
  *
  * Desde Correos se llega con `?correo=&desde=&hasta=`: los documentos que salieron
  * de ese correo, con un chip para quitar el filtro y volver a la bandeja.
@@ -108,9 +98,9 @@ export class DocumentosRecibidosListComponent {
   protected readonly busquedaInput = signal('');
   private readonly busqueda = signal('');
   protected readonly tipo = signal<DocumentoRecibidoTipo | null>(null);
-  protected readonly estadoRecepcion = signal<EstadoRecepcionFiltro>('todos');
-  protected readonly desde = signal<Date | null>(inicioDeMes());
-  protected readonly hasta = signal<Date | null>(finDeMes());
+  protected readonly estadoRecepcion = signal<EstadoRecepcionFiltro>('no');
+  protected readonly desde = signal<Date | null>(null);
+  protected readonly hasta = signal<Date | null>(null);
   /** Correo del que salieron los documentos, si se llegó desde Correos. */
   protected readonly correo = signal<number | null>(null);
 
