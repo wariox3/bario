@@ -6143,6 +6143,13 @@ export const es: AppDict = {
           },
           exito: { title: 'Documento descartado', desc: 'El documento {numero} quedó descartado.' },
         },
+        restaurar: {
+          label: 'Restaurar',
+          exito: {
+            title: 'Documento restaurado',
+            desc: 'El documento {numero} ya no está descartado.',
+          },
+        },
         eliminar: {
           label: 'Eliminar',
           confirmar: {

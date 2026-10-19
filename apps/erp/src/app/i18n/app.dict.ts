@@ -4707,10 +4707,11 @@ export interface AppDict
       radianEstados: Record<'sin_eventos' | 'acuse' | 'recibo' | 'aceptada' | 'reclamada', string>;
       /** Acciones de `documento-recibido.acciones.ts`; `{numero}` = número del documento. */
       acciones: Record<
-        'descartar' | 'eliminar',
+        'descartar' | 'restaurar' | 'eliminar',
         {
           label: string;
-          confirmar: { header: string; message: string };
+          /** Solo las acciones que piden confirmar. */
+          confirmar?: { header: string; message: string };
           exito: { title: string; desc: string };
         }
       >;

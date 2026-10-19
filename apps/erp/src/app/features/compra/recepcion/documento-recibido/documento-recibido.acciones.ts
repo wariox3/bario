@@ -6,7 +6,7 @@ import type { DocumentoRecibidoService } from './documento-recibido.service';
 const I18N = 'entities.documentoRecibido.acciones';
 
 /** Acciones de negocio sobre un documento recibido. */
-export type AccionRecepcionId = 'descartar' | 'eliminar';
+export type AccionRecepcionId = 'descartar' | 'restaurar' | 'eliminar';
 
 /**
  * Una acción sobre un documento recibido, declarada una sola vez: cuándo se
@@ -50,6 +50,14 @@ export const ACCIONES_RECEPCION: readonly AccionRecepcion[] = [
     // El backend lo rechaza si ya está descartado, si su recepción terminó o si tiene eventos.
     habilitada: (doc) => !doc.estado_descartado && !doc.estado_recepcion && sinEventos(doc),
     ejecutar: (service, doc) => service.descartar(doc.id),
+  },
+  {
+    id: 'restaurar',
+    iconClass: 'pi pi-replay',
+    // Deshace un descarte: no destruye nada, así que no pide confirmar.
+    confirmar: false,
+    habilitada: (doc) => doc.estado_descartado,
+    ejecutar: (service, doc) => service.restaurar(doc.id),
   },
   {
     id: 'eliminar',

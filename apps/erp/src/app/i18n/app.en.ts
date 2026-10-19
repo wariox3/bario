@@ -6062,6 +6062,13 @@ export const en: AppDict = {
           },
           exito: { title: 'Document discarded', desc: 'Document {numero} was discarded.' },
         },
+        restaurar: {
+          label: 'Restore',
+          exito: {
+            title: 'Document restored',
+            desc: 'Document {numero} is no longer discarded.',
+          },
+        },
         eliminar: {
           label: 'Delete',
           confirmar: {

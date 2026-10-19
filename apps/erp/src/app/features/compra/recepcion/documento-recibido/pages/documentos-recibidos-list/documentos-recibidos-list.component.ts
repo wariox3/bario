@@ -272,14 +272,15 @@ export class DocumentosRecibidosListComponent {
 
   /** Confirma (si la acción lo pide) y ejecuta. */
   private solicitarAccion(accion: AccionRecepcion, doc: DocumentoRecibido): void {
-    if (!accion.confirmar) {
+    const textos = this.t().entities.documentoRecibido.acciones[accion.id];
+    if (!accion.confirmar || !textos.confirmar) {
       this.ejecutarAccion(accion, doc);
       return;
     }
-    const textos = this.t().entities.documentoRecibido.acciones[accion.id];
+    const confirmar = textos.confirmar;
     this.confirmation.confirm({
-      header: textos.confirmar.header,
-      message: textos.confirmar.message.replace('{numero}', doc.numero),
+      header: confirmar.header,
+      message: confirmar.message.replace('{numero}', doc.numero),
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: textos.label,
       rejectLabel: this.t().common.actions.cancel,

@@ -38,6 +38,15 @@ export class DocumentoRecibidoService extends BaseHttpService {
     return this.post<DocumentoRecibido>(`${BASE}documento-descartar/`, { id });
   }
 
+  /**
+   * Quita el descarte: el documento vuelve a admitir eventos RADIAN, salvo una
+   * factura de contado verificada como válida, que queda terminada. El acuse
+   * automático omitido no se pide solo. Responde el documento.
+   */
+  restaurar(id: string): Observable<DocumentoRecibido> {
+    return this.post<DocumentoRecibido>(`${BASE}documento-restaurar/`, { id });
+  }
+
   /** Elimina el documento y sus archivos; solo si no tiene eventos RADIAN. */
   eliminar(id: string): Observable<void> {
     return this.post<void>(`${BASE}documento-eliminar/`, { id });
