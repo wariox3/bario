@@ -125,39 +125,36 @@
     </dl>
   </section>
 
-  <!-- Adjuntos y eventos RADIAN: card propia; las tabs son su cabecera -->
+  <!-- Eventos RADIAN y adjuntos: card propia; las tabs son su cabecera -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <p-tabs
       class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
-      value="adjuntos"
+      value="eventos"
     >
       <p-tablist>
-        <p-tab value="adjuntos">{{ d.detalle.tabs.adjuntos }}</p-tab>
         <p-tab value="eventos">
           {{ d.detalle.tabs.eventos }}
-          @if (eventos().length > 0) {
+          @if (eventosTotal() > 0) {
             <span
               class="ml-2 inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums text-brand-text"
             >
-              {{ eventos().length }}
+              {{ eventosTotal() }}
+            </span>
+          }
+        </p-tab>
+        <p-tab value="adjuntos">
+          {{ d.detalle.tabs.adjuntos }}
+          @if (adjuntosTotal() > 0) {
+            <span
+              class="ml-2 inline-block rounded-md bg-[rgba(20,48,73,0.06)] px-2 py-0.5 font-mono text-[0.75rem] font-semibold tabular-nums text-brand-text"
+            >
+              {{ adjuntosTotal() }}
             </span>
           }
         </p-tab>
       </p-tablist>
 
       <p-tabpanels>
-        <p-tabpanel value="adjuntos">
-          <div class="flex flex-col items-center px-6 py-12 text-center">
-            <i class="pi pi-paperclip mb-3 text-2xl text-brand-muted opacity-50"></i>
-            <p class="m-0 text-[0.9rem] font-bold text-brand-text">
-              {{ d.detalle.adjuntosVacio.title }}
-            </p>
-            <p class="m-0 mt-1 max-w-[280px] text-[0.8rem] leading-relaxed text-brand-muted">
-              {{ d.detalle.adjuntosVacio.sub }}
-            </p>
-          </div>
-        </p-tabpanel>
-
         <p-tabpanel value="eventos">
           <lib-data-table
             [columns]="eventoColumns"
@@ -170,6 +167,23 @@
             emptyTitleKey="entities.documentoRecibido.eventos.empty.title"
             emptySubKey="entities.documentoRecibido.eventos.empty.sub"
             (rowActionInvoked)="onEventoAction($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="adjuntos">
+          <lib-data-table
+            [columns]="adjuntoColumns"
+            [items]="adjuntos()"
+            [loading]="adjuntosLoading()"
+            [totalCount]="adjuntosTotal()"
+            [pageSize]="adjuntosPageSize"
+            [rowsPerPageOptions]="[adjuntosPageSize]"
+            [currentPage]="adjuntosPage()"
+            [rowActions]="adjuntoRowActions"
+            emptyTitleKey="entities.documentoRecibido.adjuntos.empty.title"
+            emptySubKey="entities.documentoRecibido.adjuntos.empty.sub"
+            (pageChange)="onAdjuntosPage($event)"
+            (rowActionInvoked)="onAdjuntoAction($event)"
           />
         </p-tabpanel>
       </p-tabpanels>

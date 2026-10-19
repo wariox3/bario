@@ -6151,9 +6151,13 @@ export const es: AppDict = {
           desc: 'Vuelve a la bandeja y ábrelo desde allí.',
         },
         tabs: { adjuntos: 'Adjuntos', eventos: 'Eventos RADIAN' },
-        adjuntosVacio: {
+      },
+      adjuntos: {
+        columns: { nombre: 'Nombre', tamano: 'Tamaño', creado: 'Creado' },
+        descargar: 'Descargar',
+        empty: {
           title: 'Sin adjuntos',
-          sub: 'Los archivos del documento aparecerán aquí.',
+          sub: 'Este documento no trajo archivos adjuntos.',
         },
       },
       eventos: {

@@ -1,13 +1,15 @@
 /**
- * Eventos RADIAN de un documento recibido: acuse, reclamo, recibo del bien y
- * aceptación expresa que la empresa le manda a la DIAN sobre la factura del
- * proveedor. Salen de `GET /recepcion/evento/`.
+ * Eventos RADIAN de un documento recibido: acuse (030), reclamo (031), recibo
+ * del bien o servicio (032) y aceptación expresa (033) que la empresa le manda a
+ * la DIAN sobre la factura del proveedor. Salen de
+ * `GET /general/electronico/recepcion/evento/`; el emisor lo pone el backend.
  *
- * El OpenAPI todavía no declara el endpoint: los nombres de los campos son
- * provisionales hasta ver una respuesta real.
+ * El OpenAPI declara filtros y página, pero no la forma de cada evento
+ * (`additionalProperties`): esos campos son provisionales hasta ver una
+ * respuesta real. Sí está declarado que el motivo de un rechazo viene en
+ * `respuesta_descripcion`.
  */
 
-/** Códigos DIAN de los eventos de recepción. */
 export type EventoRadianCodigo = '030' | '031' | '032' | '033';
 
 export type EventoRadianEstado = 'pendiente' | 'registrado' | 'rechazado' | 'error';
@@ -15,10 +17,13 @@ export type EventoRadianEstado = 'pendiente' | 'registrado' | 'rechazado' | 'err
 export interface EventoRadianQuery {
   /** UUID del documento recibido. */
   readonly documento?: string;
-  readonly emisor?: number;
   readonly estado?: EventoRadianEstado;
   readonly codigo?: EventoRadianCodigo;
+  /** Por defecto, los más recientes primero. */
   readonly ordering?: 'creado_en' | 'numero' | '-creado_en' | '-numero';
+  readonly page?: number;
+  /** 1 a 100; el backend usa 25 por defecto. */
+  readonly page_size?: number;
 }
 
 export interface EventoRadian {
@@ -30,18 +35,18 @@ export interface EventoRadian {
   readonly persona_recibe: string | null;
   readonly concepto: string | null;
   readonly reclamo: string | null;
-  readonly respuesta_dian: string | null;
+  /** Lo que respondió la DIAN; en un rechazo, el motivo. */
+  readonly respuesta_descripcion: string | null;
   readonly intentos: number;
   readonly enviado: boolean;
   readonly usuario: string | null;
   readonly cude: string | null;
 }
 
-/** Acepta la página de DRF (`results`) o la lista suelta, hasta confirmar cuál llega. */
-export function toEventosRadian(res: unknown): readonly EventoRadian[] {
-  if (Array.isArray(res)) return res as EventoRadian[];
-  if (res && typeof res === 'object' && 'results' in res && Array.isArray(res.results)) {
-    return res.results as EventoRadian[];
-  }
-  return [];
+/** Respuesta del listado; `desde` y `hasta` llegan siempre en nulo. */
+export interface EventoRadianPagina {
+  readonly count: number;
+  readonly page: number;
+  readonly page_size: number;
+  readonly results: readonly EventoRadian[];
 }

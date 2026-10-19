@@ -7,6 +7,6 @@ import type { CorreoRecibidoPagina, CorreoRecibidoQuery } from './correo-recibid
 @Injectable({ providedIn: 'root' })
 export class CorreoRecibidoService extends BaseHttpService {
   listar(query: CorreoRecibidoQuery = {}): Observable<CorreoRecibidoPagina> {
-    return this.get<CorreoRecibidoPagina>('/general/electronico/recepcion-correo/', { ...query });
+    return this.get<CorreoRecibidoPagina>('/general/electronico/recepcion/correo/', { ...query });
   }
 }

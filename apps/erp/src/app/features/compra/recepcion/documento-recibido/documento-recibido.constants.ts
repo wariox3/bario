@@ -21,6 +21,38 @@ export const ROW_ACTIONS: readonly RowAction[] = [
   { id: ROW_ACTION_DETALLE, labelKey: `${I18N}.verDetalle`, iconClass: 'pi pi-eye', inline: true },
 ];
 
+// ── Adjuntos (tab de la ficha) ──────────────────────────────────────────────
+
+const I18N_ADJUNTO = `${I18N}.adjuntos`;
+
+export const ADJUNTO_ACTION_DESCARGAR = 'descargar';
+
+export const ADJUNTO_ROW_ACTIONS: readonly RowAction[] = [
+  {
+    id: ADJUNTO_ACTION_DESCARGAR,
+    labelKey: `${I18N_ADJUNTO}.descargar`,
+    iconClass: 'pi pi-download',
+    inline: true,
+  },
+];
+
+export const ADJUNTO_COLUMNS: readonly ColumnDef[] = [
+  { field: 'nombre', headerKey: `${I18N_ADJUNTO}.columns.nombre`, type: 'text' },
+  {
+    field: 'tamano_texto',
+    headerKey: `${I18N_ADJUNTO}.columns.tamano`,
+    type: 'text',
+    width: '100px',
+    align: 'right',
+  },
+  {
+    field: 'creado_texto',
+    headerKey: `${I18N_ADJUNTO}.columns.creado`,
+    type: 'text',
+    width: '150px',
+  },
+];
+
 // ── Eventos RADIAN (tab de la ficha) ────────────────────────────────────────
 
 const I18N_EVENTO = `${I18N}.eventos`;
@@ -57,7 +89,11 @@ export const EVENTO_COLUMNS: readonly ColumnDef[] = [
   { field: 'persona_recibe', headerKey: `${I18N_EVENTO}.columns.personaRecibe`, type: 'text' },
   { field: 'concepto', headerKey: `${I18N_EVENTO}.columns.concepto`, type: 'text' },
   { field: 'reclamo', headerKey: `${I18N_EVENTO}.columns.reclamo`, type: 'text' },
-  { field: 'respuesta_dian', headerKey: `${I18N_EVENTO}.columns.respuestaDian`, type: 'text' },
+  {
+    field: 'respuesta_descripcion',
+    headerKey: `${I18N_EVENTO}.columns.respuestaDian`,
+    type: 'text',
+  },
   {
     field: 'intentos',
     headerKey: `${I18N_EVENTO}.columns.intentos`,

@@ -4726,7 +4726,11 @@ export interface AppDict
         valorBruto: string;
         notFound: { title: string; desc: string };
         tabs: { adjuntos: string; eventos: string };
-        adjuntosVacio: { title: string; sub: string };
+      };
+      adjuntos: {
+        columns: { nombre: string; tamano: string; creado: string };
+        descargar: string;
+        empty: { title: string; sub: string };
       };
       eventos: {
         columns: {

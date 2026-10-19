@@ -6070,9 +6070,13 @@ export const en: AppDict = {
           desc: 'Go back to the inbox and open it from there.',
         },
         tabs: { adjuntos: 'Attachments', eventos: 'RADIAN events' },
-        adjuntosVacio: {
+      },
+      adjuntos: {
+        columns: { nombre: 'Name', tamano: 'Size', creado: 'Created' },
+        descargar: 'Download',
+        empty: {
           title: 'No attachments',
-          sub: 'The document files will show up here.',
+          sub: 'This document came without attachments.',
         },
       },
       eventos: {

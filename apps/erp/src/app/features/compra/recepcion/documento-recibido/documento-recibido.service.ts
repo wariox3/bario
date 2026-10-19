@@ -7,7 +7,7 @@ import type {
   DocumentoRecibidoQuery,
 } from './documento-recibido.model';
 
-const BASE = '/general/electronico/';
+const BASE = '/general/electronico/recepcion/';
 
 /**
  * Recepción de documentos de proveedores en RedEDoc: la bandeja y la carga a
@@ -16,7 +16,7 @@ const BASE = '/general/electronico/';
 @Injectable({ providedIn: 'root' })
 export class DocumentoRecibidoService extends BaseHttpService {
   listar(query: DocumentoRecibidoQuery = {}): Observable<DocumentoRecibidoPagina> {
-    return this.get<DocumentoRecibidoPagina>(`${BASE}recepcion-documento/`, { ...query });
+    return this.get<DocumentoRecibidoPagina>(`${BASE}documento/`, { ...query });
   }
 
   /**
@@ -35,12 +35,8 @@ export class DocumentoRecibidoService extends BaseHttpService {
    * ventana de carga muestra el error junto al archivo.
    */
   cargar(archivo: File): Observable<unknown> {
-    return this.postFile<unknown>(
-      `${BASE}recepcion-documento-cargar/`,
-      archivo,
-      undefined,
-      'archivo',
-      { errorToast: false },
-    );
+    return this.postFile<unknown>(`${BASE}documento-cargar/`, archivo, undefined, 'archivo', {
+      errorToast: false,
+    });
   }
 }

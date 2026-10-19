@@ -80,7 +80,7 @@ export interface DocumentoRecibido {
   readonly creado_en: string;
 }
 
-/** Respuesta de `GET recepcion-documento/`: página más el rango aplicado. */
+/** Respuesta de `GET recepcion/documento/`: página más el rango aplicado. */
 export interface DocumentoRecibidoPagina {
   readonly count: number;
   readonly page: number;
