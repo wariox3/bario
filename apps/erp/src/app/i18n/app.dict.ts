@@ -4727,6 +4727,9 @@ export interface AppDict
           sugerida: string;
           sinConfigurar: string;
           irConfiguracion: string;
+          actualizarConfigurada: string;
+          guardarConfigurada: string;
+          guardarHint: string;
           documento: string;
           tipo: string;
           numero: string;
@@ -4741,7 +4744,8 @@ export interface AppDict
         validacion: { requerido: string; maximo: string };
         enviar: string;
         errorGenerico: string;
-        exito: { title: string; desc: string };
+        exito: { title: string; desc: string; descConPersona: string };
+        personaNoGuardada: { title: string; desc: string };
       };
       filtros: {
         buscar: string;

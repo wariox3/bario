@@ -6149,6 +6149,9 @@ export const es: AppDict = {
             'Sugerida desde Configuración › Compra. Si la cambias, solo aplica a este evento.',
           sinConfigurar: 'No hay una persona configurada.',
           irConfiguracion: 'Configurarla para no escribirla cada vez',
+          actualizarConfigurada: 'Actualizar también la persona configurada',
+          guardarConfigurada: 'Guardarla como persona configurada',
+          guardarHint: 'Se guarda en Configuración › Compra después de enviar el evento.',
           documento: 'Documento',
           tipo: 'Tipo de documento',
           numero: 'Número de documento',
@@ -6167,6 +6170,12 @@ export const es: AppDict = {
         exito: {
           title: 'Evento enviado',
           desc: 'La DIAN lo procesa en unos segundos; su estado se ve en la ficha del documento.',
+          descConPersona:
+            'La DIAN lo procesa en unos segundos y la persona configurada quedó actualizada.',
+        },
+        personaNoGuardada: {
+          title: 'No se actualizó la persona configurada',
+          desc: 'El evento se envió, pero la persona no se guardó. Puedes hacerlo en Configuración › Compra.',
         },
       },
       acciones: {

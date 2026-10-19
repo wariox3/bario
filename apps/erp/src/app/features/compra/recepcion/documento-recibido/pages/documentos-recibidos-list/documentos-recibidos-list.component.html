@@ -125,7 +125,7 @@
   [(visible)]="eventoVisible"
   [documento]="eventoDocumento()"
   [codigo]="eventoCodigo()"
-  (registrado)="onEventoRegistrado()"
+  (registrado)="onEventoRegistrado($event)"
 />
 
 <app-cargar-documento-dialog [(visible)]="cargaVisible" (cargado)="onCargado()" />

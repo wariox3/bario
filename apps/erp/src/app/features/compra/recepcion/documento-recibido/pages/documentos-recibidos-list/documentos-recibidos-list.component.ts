@@ -41,7 +41,10 @@ import {
   buscarAccionRecepcion,
   type AccionDirecta,
 } from '../../documento-recibido.acciones';
-import { RegistrarEventoDialogComponent } from '../../components/registrar-evento-dialog/registrar-evento-dialog.component';
+import {
+  RegistrarEventoDialogComponent,
+  type EventoRegistrado,
+} from '../../components/registrar-evento-dialog/registrar-evento-dialog.component';
 import type { EventoRadianCodigo } from '../../evento-radian.model';
 import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
 import {
@@ -285,10 +288,18 @@ export class DocumentosRecibidosListComponent {
     this.solicitarAccion(accion, doc);
   }
 
-  /** El evento nace pendiente: la DIAN lo procesa en segundo plano. */
-  protected onEventoRegistrado(): void {
-    const exito = this.t().entities.documentoRecibido.registrarEvento.exito;
-    this.toast.success(exito.title, exito.desc);
+  /**
+   * El evento nace pendiente: la DIAN lo procesa en segundo plano. Si además se
+   * pidió guardar la persona en la configuración, el aviso dice cómo terminó.
+   */
+  protected onEventoRegistrado({ personaGuardada }: EventoRegistrado): void {
+    const r = this.t().entities.documentoRecibido.registrarEvento;
+    this.toast.success(
+      r.exito.title,
+      personaGuardada === 'si' ? r.exito.descConPersona : r.exito.desc,
+    );
+    if (personaGuardada === 'fallo')
+      this.toast.warn(r.personaNoGuardada.title, r.personaNoGuardada.desc);
     this.recargas.update((n) => n + 1);
   }
 

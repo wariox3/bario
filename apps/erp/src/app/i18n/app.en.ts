@@ -6067,6 +6067,9 @@ export const en: AppDict = {
           sugerida: 'Suggested from Settings › Purchasing. Changing it only applies to this event.',
           sinConfigurar: 'No person is configured.',
           irConfiguracion: 'Configure one so you do not type it every time',
+          actualizarConfigurada: 'Also update the configured person',
+          guardarConfigurada: 'Save as the configured person',
+          guardarHint: 'Saved in Settings › Purchasing after the event is sent.',
           documento: 'ID',
           tipo: 'ID type',
           numero: 'ID number',
@@ -6085,6 +6088,12 @@ export const en: AppDict = {
         exito: {
           title: 'Event sent',
           desc: 'DIAN processes it in a few seconds; its status shows in the document details.',
+          descConPersona:
+            'DIAN processes it in a few seconds and the configured person was updated.',
+        },
+        personaNoGuardada: {
+          title: 'The configured person was not updated',
+          desc: 'The event was sent, but the person was not saved. You can do it in Settings › Purchasing.',
         },
       },
       acciones: {

@@ -20,7 +20,6 @@
 
   @if (visible() && codigo(); as cod) {
     <form
-      id="registrar-evento-form"
       [formGroup]="form"
       (ngSubmit)="enviar()"
       libFocusInvalid
@@ -74,6 +73,7 @@
                     formControlName="identificacion"
                     [endpoint]="endpoints.identificacion"
                     [ariaLabel]="p.tipo"
+                    size="small"
                     [invalid]="
                       personaForm.identificacion.invalid && personaForm.identificacion.touched
                     "
@@ -147,6 +147,28 @@
             </div>
           </div>
         </div>
+
+        <!-- Solo si hay algo que guardar: no hay persona configurada o esta difiere -->
+        @if (ofrecerGuardar()) {
+          <label
+            for="evento-guardar-persona"
+            class="flex cursor-pointer items-start gap-2.5 rounded-lg border border-[rgba(20,48,73,0.1)] px-3 py-2.5"
+          >
+            <p-checkbox
+              inputId="evento-guardar-persona"
+              formControlName="guardarPersona"
+              [binary]="true"
+            />
+            <span class="flex flex-col gap-0.5">
+              <span class="text-[0.8rem] font-medium text-brand-text">
+                {{
+                  sugerencia() === 'configurada' ? p.actualizarConfigurada : p.guardarConfigurada
+                }}
+              </span>
+              <span class="text-[0.72rem] text-brand-muted">{{ p.guardarHint }}</span>
+            </span>
+          </label>
+        }
       }
 
       @if (esReclamo()) {
@@ -195,26 +217,27 @@
           </ul>
         </div>
       }
+
+      <!-- Dentro del form: un submit fuera de él (en el footer del diálogo) no envía nada -->
+      <div class="flex justify-end gap-2 pt-1">
+        <p-button
+          type="button"
+          [label]="t().common.actions.cancel"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [disabled]="enviando()"
+          (onClick)="cerrar()"
+        />
+        <p-button
+          type="submit"
+          [label]="r.enviar"
+          icon="pi pi-send"
+          size="small"
+          [loading]="enviando()"
+          [disabled]="enviando()"
+        />
+      </div>
     </form>
   }
-
-  <ng-template #footer>
-    <p-button
-      [label]="t().common.actions.cancel"
-      severity="secondary"
-      [outlined]="true"
-      size="small"
-      [disabled]="enviando()"
-      (onClick)="cerrar()"
-    />
-    <p-button
-      type="submit"
-      form="registrar-evento-form"
-      [label]="r.enviar"
-      icon="pi pi-send"
-      size="small"
-      [loading]="enviando()"
-      [disabled]="enviando()"
-    />
-  </ng-template>
 </p-dialog>
