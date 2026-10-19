@@ -410,6 +410,40 @@ export const es: AppDict = {
         desc: 'No se pudieron generar las facturas. Intenta de nuevo.',
       },
     },
+    elegirRecurrente: {
+      buttonLabel: 'Recurrente',
+      modalHeader: 'Factura desde recurrente',
+      modalSubtitle: 'Elige la factura recurrente desde la que se crea la nueva factura',
+      searchPlaceholder: 'Buscar por proveedor o identificación',
+      seleccionar: 'Seleccionar',
+      cancel: 'Cancelar',
+      sinOrigen: 'Este documento no tiene definida la factura recurrente de la que sale.',
+      columns: {
+        id: 'ID',
+        identificacion: 'Identificación',
+        contacto: 'Proveedor',
+        subtotal: 'Subtotal',
+        impuesto: 'Impuesto',
+        total: 'Total',
+      },
+      empty: {
+        title: 'Sin facturas recurrentes',
+        sub: 'No hay facturas recurrentes que coincidan con la búsqueda.',
+        desc: 'Esa factura recurrente ya se generó este mes o tiene una fecha posterior.',
+      },
+      success: {
+        title: 'Factura generada',
+        desc: 'La factura se creó a partir de la factura recurrente.',
+      },
+      loadError: {
+        title: 'Error al cargar',
+        desc: 'No pudimos traer las facturas recurrentes.',
+      },
+      error: {
+        title: 'Error al generar',
+        desc: 'No se pudo generar la factura. Intenta de nuevo.',
+      },
+    },
     detail: {
       aprobar: 'Aprobar',
       desaprobar: 'Desaprobar',

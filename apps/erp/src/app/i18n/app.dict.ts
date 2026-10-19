@@ -375,6 +375,27 @@ export interface AppDict
       empty: { title: string; desc: string; descTodos: string };
       error: { title: string; desc: string };
     };
+    elegirRecurrente: {
+      buttonLabel: string;
+      modalHeader: string;
+      modalSubtitle: string;
+      searchPlaceholder: string;
+      seleccionar: string;
+      cancel: string;
+      sinOrigen: string;
+      columns: {
+        id: string;
+        identificacion: string;
+        contacto: string;
+        subtotal: string;
+        impuesto: string;
+        total: string;
+      };
+      empty: { title: string; sub: string; desc: string };
+      success: { title: string; desc: string };
+      loadError: { title: string; desc: string };
+      error: { title: string; desc: string };
+    };
     detail: {
       aprobar: string;
       desaprobar: string;

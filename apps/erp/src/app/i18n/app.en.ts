@@ -403,6 +403,40 @@ export const en: AppDict = {
         desc: 'Could not generate the invoices. Please try again.',
       },
     },
+    elegirRecurrente: {
+      buttonLabel: 'Recurring',
+      modalHeader: 'Invoice from recurring',
+      modalSubtitle: 'Pick the recurring invoice the new invoice is created from',
+      searchPlaceholder: 'Search by supplier or ID number',
+      seleccionar: 'Select',
+      cancel: 'Cancel',
+      sinOrigen: 'This document has no recurring invoice defined to come from.',
+      columns: {
+        id: 'ID',
+        identificacion: 'ID number',
+        contacto: 'Supplier',
+        subtotal: 'Subtotal',
+        impuesto: 'Tax',
+        total: 'Total',
+      },
+      empty: {
+        title: 'No recurring invoices',
+        sub: 'There are no recurring invoices matching the search.',
+        desc: 'That recurring invoice was already generated this month or has a later date.',
+      },
+      success: {
+        title: 'Invoice generated',
+        desc: 'The invoice was created from the recurring invoice.',
+      },
+      loadError: {
+        title: 'Could not load',
+        desc: 'We could not load the recurring invoices.',
+      },
+      error: {
+        title: 'Generation failed',
+        desc: 'Could not generate the invoice. Please try again.',
+      },
+    },
     detail: {
       aprobar: 'Approve',
       desaprobar: 'Unapprove',
