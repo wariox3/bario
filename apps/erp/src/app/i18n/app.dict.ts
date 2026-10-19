@@ -1352,6 +1352,12 @@ export interface AppDict
         centroCosto: string;
         valorCompra: string;
         fechaCompra: string;
+        fechaActivacion: string;
+        fechaBaja: string;
+        duracion: string;
+        depreciacionInicial: string;
+        depreciacionPeriodo: string;
+        depreciacionSaldo: string;
       };
       form: {
         createTitle: string;

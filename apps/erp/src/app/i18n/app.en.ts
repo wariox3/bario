@@ -1827,6 +1827,12 @@ export const en: AppDict = {
         centroCosto: 'Cost center',
         valorCompra: 'Purchase value',
         fechaCompra: 'Purchase date',
+        fechaActivacion: 'Activation date',
+        fechaBaja: 'Disposal date',
+        duracion: 'Duration',
+        depreciacionInicial: 'Initial dep.',
+        depreciacionPeriodo: 'Period dep.',
+        depreciacionSaldo: 'Dep. balance',
       },
       form: {
         createTitle: 'New asset',

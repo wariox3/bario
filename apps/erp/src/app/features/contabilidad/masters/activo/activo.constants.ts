@@ -33,14 +33,35 @@ export const ACTIVOS_COLUMNS: readonly ColumnDef[] = [
     type: 'text',
   },
   {
-    field: 'activo_grupo_nombre',
-    headerKey: 'entities.activo.columns.activoGrupo',
-    type: 'text',
+    field: 'fecha_compra',
+    headerKey: 'entities.activo.columns.fechaCompra',
+    type: 'date',
+  },
+  {
+    field: 'fecha_activacion',
+    headerKey: 'entities.activo.columns.fechaActivacion',
+    type: 'date',
+  },
+  {
+    field: 'fecha_baja',
+    headerKey: 'entities.activo.columns.fechaBaja',
+    type: 'date',
   },
   {
     field: 'centro_costo_nombre',
     headerKey: 'entities.activo.columns.centroCosto',
     type: 'text',
+  },
+  {
+    field: 'activo_grupo_nombre',
+    headerKey: 'entities.activo.columns.activoGrupo',
+    type: 'text',
+  },
+  {
+    field: 'duracion',
+    headerKey: 'entities.activo.columns.duracion',
+    type: 'number',
+    align: 'right',
   },
   {
     field: 'valor_compra',
@@ -49,9 +70,22 @@ export const ACTIVOS_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'fecha_compra',
-    headerKey: 'entities.activo.columns.fechaCompra',
-    type: 'date',
+    field: 'depreciacion_inicial',
+    headerKey: 'entities.activo.columns.depreciacionInicial',
+    type: 'currency',
+    align: 'right',
+  },
+  {
+    field: 'depreciacion_periodo',
+    headerKey: 'entities.activo.columns.depreciacionPeriodo',
+    type: 'currency',
+    align: 'right',
+  },
+  {
+    field: 'depreciacion_saldo',
+    headerKey: 'entities.activo.columns.depreciacionSaldo',
+    type: 'currency',
+    align: 'right',
   },
 ];
 

@@ -1876,6 +1876,12 @@ export const es: AppDict = {
         centroCosto: 'Centro de costo',
         valorCompra: 'Valor de compra',
         fechaCompra: 'Fecha de compra',
+        fechaActivacion: 'Fecha de activación',
+        fechaBaja: 'Fecha de baja',
+        duracion: 'Duración',
+        depreciacionInicial: 'Dep. inicial',
+        depreciacionPeriodo: 'Dep. periodo',
+        depreciacionSaldo: 'Dep. saldo',
       },
       form: {
         createTitle: 'Nuevo activo',
