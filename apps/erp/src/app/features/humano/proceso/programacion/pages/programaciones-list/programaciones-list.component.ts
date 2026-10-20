@@ -1,6 +1,8 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { finalize } from 'rxjs';
 import {
   FileDownloadService,
@@ -39,17 +41,22 @@ import {
 /**
  * Listado de **programaciones de nómina**.
  *
- * Solo consulta y navegación: filtros, paginación, Excel y abrir una programación.
- * **Sin borrado múltiple ni acción de eliminar por fila** — a diferencia del resto
- * de listados del ERP: borrar una programación depende de su estado
- * (`capacidadesDe(...).puedeEliminar`, solo en borrador) y la tabla compartida no
- * sabe condicionar acciones fila por fila. Esa acción vive en el workspace, donde
- * la capacidad se evalúa contra la programación abierta.
+ * Filtros, paginación, Excel y abrir una programación. Editar y eliminar van por
+ * fila y solo en las que siguen en borrador (sin generar ni aprobar); cada acción
+ * decide su visibilidad con `capacidadesDe`. **Sin borrado múltiple**: la
+ * selección mezclaría programaciones que no se pueden borrar.
  */
 @Component({
   selector: 'app-programaciones-list',
   standalone: true,
-  imports: [ListShellComponent, DataTableComponent, DataToolbarComponent, DataFilterModalComponent],
+  imports: [
+    ListShellComponent,
+    DataTableComponent,
+    DataToolbarComponent,
+    DataFilterModalComponent,
+    ConfirmDialogModule,
+  ],
+  providers: [ConfirmationService],
   templateUrl: './programaciones-list.component.html',
   styleUrl: './programaciones-list.component.scss',
 })
@@ -60,6 +67,7 @@ export class ProgramacionesListComponent {
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
@@ -131,7 +139,18 @@ export class ProgramacionesListComponent {
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId === 'view') this.navigateTo('detalle', (event.row as Programacion).id);
+    const programacion = event.row as Programacion;
+    switch (event.actionId) {
+      case 'view':
+        this.navigateTo('detalle', programacion.id);
+        break;
+      case 'edit':
+        this.navigateTo('editar', programacion.id);
+        break;
+      case 'delete':
+        this.confirmRemove(programacion.id);
+        break;
+    }
   }
 
   protected onToolbarAction(actionId: string): void {
@@ -146,6 +165,38 @@ export class ProgramacionesListComponent {
   }
 
   // ── Internos ──────────────────────────────────────────────────────────────
+
+  private confirmRemove(id: number): void {
+    this.confirmation.confirm({
+      header: this.t().common.confirms.deleteHeader,
+      message: this.t().common.confirms.deleteMessage,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.t().common.actions.delete,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.executeRemove(id),
+    });
+  }
+
+  private executeRemove(id: number): void {
+    this.service
+      .remove([id])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toast.success(
+            this.t().common.toasts.deleteSuccess.title,
+            this.t().common.toasts.deleteSuccess.desc,
+          );
+          this.loadList();
+        },
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.deleteError.title,
+            this.t().common.toasts.deleteError.desc,
+          ),
+      });
+  }
 
   private exportExcel(): void {
     if (this.isExportingExcel()) return;

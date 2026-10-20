@@ -1,6 +1,7 @@
 import type { CellTone, ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
-import type { ProgramacionDetalle } from './programacion.model';
+import { capacidadesDe } from './programacion.estado';
+import type { Programacion, ProgramacionDetalle } from './programacion.model';
 
 export const PROGRAMACIONES_FILTERS_STORAGE_KEY = 'programaciones:filters:v1';
 
@@ -159,13 +160,26 @@ export const PROGRAMACIONES_FILTER_FIELDS: readonly FilterField[] = [
 ];
 
 /**
- * Acciones de fila. **No incluye eliminar**: borrar una programación depende de
- * su estado (`capacidadesDe(...).puedeEliminar`), y la tabla compartida no
- * condiciona acciones por fila. El borrado vive en el workspace, donde la
- * capacidad se evalúa contra la programación abierta.
+ * Acciones de fila. Editar y eliminar solo aparecen mientras la programación no
+ * está generada ni aprobada: la regla es la de `capacidadesDe`, no una
+ * combinación de banderas aparte.
  */
 export const PROGRAMACIONES_ROW_ACTIONS: readonly RowAction[] = [
+  {
+    id: 'edit',
+    labelKey: 'common.actions.edit',
+    iconClass: 'pi pi-pencil',
+    inline: true,
+    visibleFor: (row) => capacidadesDe(row as Programacion).puedeEditarCabecera,
+  },
   { id: 'view', labelKey: 'common.actions.view', iconClass: 'pi pi-eye', inline: true },
+  {
+    id: 'delete',
+    labelKey: 'common.actions.delete',
+    iconClass: 'pi pi-trash',
+    severity: 'danger',
+    visibleFor: (row) => capacidadesDe(row as Programacion).puedeEliminar,
+  },
 ];
 
 export const PROGRAMACIONES_PRIMARY_ACTION: ToolbarAction = {
