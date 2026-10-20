@@ -21,9 +21,10 @@ const ENVIAR_PATH = ['humano', 'utilidades', 'enviar-nomina-electronica'];
  * flujo viene del ERP anterior y se conserva: consolidar sin emitir deja el
  * trabajo a medias, y el usuario que acaba de generar es el que va a emitir.
  *
- * Distinta de `GenerarDocumentoActionStrategy` (venta), que genera un tipo de
- * documento a partir de otro vía el endpoint genérico `documento/generar/`. Esta
- * tiene endpoint propio y no recibe tipos: el backend sabe qué consolidar.
+ * Comparte endpoint con `GenerarDocumentoActionStrategy` (venta) —el genérico
+ * `documento/generar/`— pero no el contrato: aquella genera un tipo a partir de
+ * otro (`documento_tipo_id` + destino); esta manda solo `documento_tipo` y el
+ * periodo, y el backend sabe qué consolidar.
  */
 @Injectable()
 export class GenerarNominaElectronicaActionStrategy implements EntityActionStrategy {

@@ -626,14 +626,14 @@ a fichas cuyo backend no los atiende.
 
 ### 7.3 Endpoints y supuestos
 
-| Qué                 | Petición                                                     | Estado  |
-| ------------------- | ------------------------------------------------------------ | ------- |
-| Listado             | `POST /general/documento/lista/` (tipo 15, vía el framework) | Asumido |
-| Cabecera            | `GET /general/documento/:id/`                                | Asumido |
-| Nóminas origen      | `GET /general/documento/?documento_referencia_id=:id&limit=` | Asumido |
-| Líneas              | `GET /general/documento-detalle/?documento_id=:id&limit=`    | Asumido |
-| Generar             | `POST /general/documento/generar-nomina-electronica/`        | Asumido |
-| Las cuatro acciones | ver la tabla de §7.2                                         | Asumido |
+| Qué                 | Petición                                                     | Estado                  |
+| ------------------- | ------------------------------------------------------------ | ----------------------- |
+| Listado             | `POST /general/documento/lista/` (tipo 15, vía el framework) | Asumido                 |
+| Cabecera            | `GET /general/documento/:id/`                                | Asumido                 |
+| Nóminas origen      | `GET /general/documento/?documento_referencia_id=:id&limit=` | Asumido                 |
+| Líneas              | `GET /general/documento-detalle/?documento_id=:id&limit=`    | Asumido                 |
+| Generar             | `POST /general/documento/generar/` (`documento_tipo: 15`)    | Confirmado (2026-10-20) |
+| Las cuatro acciones | ver la tabla de §7.2                                         | Asumido                 |
 
 Cuatro preguntas abiertas:
 
@@ -661,7 +661,7 @@ Cuatro preguntas abiertas:
 | 7   | El modal de "Generar" usa un datepicker de mes                            | El legacy usa dos `<input type="number">` que aceptan mes 13 y año 20024. Mismo dato, cero validaciones que escribir                                                                                   |
 | 8   | El "¿emitir ahora?" es un modal propio, no un `p-confirmDialog`           | El strategy se provee en root y el único `ConfirmationService` del listado vive a nivel de componente. Habría compilado y fallado en silencio                                                          |
 | 9   | El `activeMatch` de la nómina pasó de `nomina` a `nomina/`                | `nomina` a secas también casa con `nomina-electronica`: las dos entradas del sidebar quedaban marcadas a la vez                                                                                        |
-| 10  | La acción no reusa `GenerarDocumentoActionStrategy` (venta)               | Aquella genera un tipo a partir de otro por el endpoint genérico; esta tiene endpoint propio y no recibe tipos. Comparten forma, no contrato                                                           |
+| 10  | La acción no reusa `GenerarDocumentoActionStrategy` (venta)               | Mismo endpoint genérico, otro contrato: aquella manda `documento_tipo_id` + destino; esta solo `documento_tipo` y el periodo. Comparten forma, no payload                                              |
 
 ### 7.5 Lo que no se portó
 
