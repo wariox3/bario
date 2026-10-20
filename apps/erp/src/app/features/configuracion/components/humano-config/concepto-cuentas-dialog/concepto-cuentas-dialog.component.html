@@ -6,8 +6,8 @@
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
-  [closable]="!isAdding()"
-  [dismissableMask]="!isAdding()"
+  [closable]="!ocupado()"
+  [dismissableMask]="!ocupado()"
   [style]="{ width: '46rem' }"
   [breakpoints]="{ '768px': '95vw' }"
 >
@@ -94,7 +94,7 @@
             icon="pi pi-refresh"
             [outlined]="true"
             severity="secondary"
-            (onClick)="recargar()"
+            (onClick)="reintentar()"
           />
         </div>
       } @else if (rows().length === 0) {
@@ -127,6 +127,7 @@
                         [ngModel]="row.cuenta_option"
                         [disabled]="busyId() === row.id"
                         (ngModelChange)="onCambioCuenta(row, $event)"
+                        (focusout)="onSalirCuenta(row)"
                       />
                     } @else {
                       {{ row.cuenta_label }}
@@ -160,7 +161,7 @@
       severity="secondary"
       [text]="true"
       [label]="t().common.actions.close"
-      [disabled]="isAdding()"
+      [disabled]="ocupado()"
       (onClick)="visible.set(false)"
     />
   </ng-template>

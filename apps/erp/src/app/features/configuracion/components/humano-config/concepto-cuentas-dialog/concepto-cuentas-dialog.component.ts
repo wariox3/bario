@@ -5,7 +5,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
-import { finalize } from 'rxjs';
+import { finalize, type Subscription } from 'rxjs';
 import {
   FormErrorService,
   I18nService,
@@ -23,6 +23,7 @@ import {
   type ConceptoCuentaRow,
 } from '../../../concepto-cuenta/concepto-cuenta.mapper';
 import { TIPO_COSTO_ENDPOINT } from '../../../concepto-cuenta/concepto-cuenta.constants';
+import { copiaCuentaOption } from '../../../cuenta.mapper';
 
 /**
  * Modal con las cuentas contables de un concepto por tipo de costo.
@@ -76,6 +77,10 @@ export class ConceptoCuentasDialogComponent {
   protected readonly isAdding = signal(false);
   /** Fila con una petición en vuelo (guardar o eliminar). */
   protected readonly busyId = signal<number | null>(null);
+  /** Filas cuyo selector la persona vació y todavía no eligió otra cuenta. */
+  private readonly vaciadas = new Set<number>();
+  /** Lectura en vuelo: una nueva la cancela, así nunca pisa filas una respuesta vieja. */
+  private carga?: Subscription;
 
   protected readonly addForm = this.fb.group({
     tipo_costo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
@@ -88,34 +93,61 @@ export class ConceptoCuentasDialogComponent {
       const concepto = this.concepto();
       if (!this.visible() || !concepto) return;
       this.addForm.reset();
-      this.cargar(concepto.id);
+      this.cargar(concepto.id, true);
     });
   }
 
-  protected recargar(): void {
+  /** Reintento tras un error de carga: vuelve a mostrar el esqueleto. */
+  protected reintentar(): void {
     const concepto = this.concepto();
-    if (concepto) this.cargar(concepto.id);
+    if (concepto) this.cargar(concepto.id, true);
   }
 
-  private cargar(conceptoId: number): void {
-    this.isLoading.set(true);
-    this.loadFailed.set(false);
-    this.rows.set([]);
+  /**
+   * Refresca las filas tras agregar, cambiar o eliminar sin pasar por el
+   * esqueleto: la tabla no parpadea ni pierde el foco del selector recién usado.
+   */
+  private refrescar(): void {
+    const concepto = this.concepto();
+    if (concepto) this.cargar(concepto.id, false);
+  }
 
-    this.service
+  /**
+   * Trae las cuentas del concepto. Cancela la lectura anterior y descarta la
+   * respuesta si entretanto se abrió otro concepto, para que nunca se mezclen.
+   */
+  private cargar(conceptoId: number, conEsqueleto: boolean): void {
+    this.carga?.unsubscribe();
+    this.loadFailed.set(false);
+    if (conEsqueleto) {
+      this.isLoading.set(true);
+      this.rows.set([]);
+      this.vaciadas.clear();
+    }
+
+    this.carga = this.service
       .listar(conceptoId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: (respuesta) => this.rows.set(respuesta.map(toConceptoCuentaRow)),
+        next: (respuesta) => {
+          if (this.concepto()?.id !== conceptoId) return;
+          this.rows.set(respuesta.map(toConceptoCuentaRow));
+        },
         error: () => {
+          if (this.concepto()?.id !== conceptoId) return;
           this.loadFailed.set(true);
           const toasts = this.t().configuracion.humano.conceptoCuenta.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
         },
       });
+  }
+
+  /** Mientras algo se guarda o se elimina, el modal no se puede cerrar. */
+  protected ocupado(): boolean {
+    return this.isAdding() || this.busyId() !== null;
   }
 
   protected onAgregar(): void {
@@ -146,7 +178,7 @@ export class ConceptoCuentasDialogComponent {
         next: () => {
           this.toast.success(toasts.addSuccess.title, toasts.addSuccess.desc);
           this.addForm.reset();
-          this.cargar(concepto.id);
+          this.refrescar();
         },
         error: (err: unknown) => {
           this.formErrors.handle(this.addForm, err, toasts.saveError.title);
@@ -156,11 +188,18 @@ export class ConceptoCuentasDialogComponent {
 
   /**
    * Guarda al instante la cuenta elegida en la fila. El selector solo emite al
-   * elegir una opción o al vaciarlo: vaciarlo no guarda nada (la cuenta es
-   * obligatoria) y la fila vuelve a la guardada en la próxima carga.
+   * elegir una opción o al vaciarlo. Vaciarlo no guarda nada (la cuenta es
+   * obligatoria y vaciar es el primer paso para buscar otra): solo se anota y,
+   * si la persona sale del campo sin elegir, `onSalirCuenta` le devuelve la
+   * guardada.
    */
   protected onCambioCuenta(row: ConceptoCuentaRow, cuenta: ErpSelectOption | null): void {
-    if (!cuenta || cuenta.id === row.cuenta) return;
+    if (!cuenta) {
+      this.vaciadas.add(row.id);
+      return;
+    }
+    this.vaciadas.delete(row.id);
+    if (cuenta.id === row.cuenta) return;
 
     const toasts = this.t().configuracion.humano.conceptoCuenta.toasts;
     this.busyId.set(row.id);
@@ -174,14 +213,24 @@ export class ConceptoCuentasDialogComponent {
       .subscribe({
         next: () => {
           this.toast.success(toasts.saveSuccess.title, toasts.saveSuccess.desc);
-          this.recargar();
+          this.refrescar();
         },
         error: () => {
           this.toast.error(toasts.saveError.title, toasts.saveError.desc);
           // Devuelve la fila a la cuenta que sigue guardada.
-          this.recargar();
+          this.refrescar();
         },
       });
+  }
+
+  /** Al salir de un selector vaciado sin elegir otra cuenta, vuelve a mostrar la guardada. */
+  protected onSalirCuenta(row: ConceptoCuentaRow): void {
+    if (!this.vaciadas.delete(row.id)) return;
+    this.rows.update((rows) =>
+      rows.map((r) =>
+        r.id === row.id ? { ...r, cuenta_option: copiaCuentaOption(r.cuenta_option) } : r,
+      ),
+    );
   }
 
   protected onEliminar(row: ConceptoCuentaRow): void {
@@ -212,7 +261,7 @@ export class ConceptoCuentasDialogComponent {
       .subscribe({
         next: () => {
           this.toast.success(toasts.deleteSuccess.title, toasts.deleteSuccess.desc);
-          this.recargar();
+          this.refrescar();
         },
         error: () => this.toast.error(toasts.deleteError.title, toasts.deleteError.desc),
       });

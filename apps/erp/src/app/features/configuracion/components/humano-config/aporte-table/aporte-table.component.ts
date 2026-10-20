@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { finalize } from 'rxjs';
+import { finalize, type Subscription } from 'rxjs';
 import { I18nService, ToastService, type ErpSelectOption } from '@reddoc/core';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import { MODELO, ModelPermissionsService } from '@erp/core/permissions';
@@ -14,6 +14,7 @@ import type {
   ConfiguracionAporteRow,
 } from '../../../configuracion-aporte/configuracion-aporte.model';
 import { toConfiguracionAporteRow } from '../../../configuracion-aporte/configuracion-aporte.mapper';
+import { copiaCuentaOption } from '../../../cuenta.mapper';
 
 /**
  * Tabla de aportes dentro del área Humano de la configuración: una cuenta
@@ -47,6 +48,10 @@ export class AporteTableComponent {
   protected readonly loadFailed = signal(false);
   /** Fila con un guardado en vuelo; `null` si ninguna. */
   protected readonly busyId = signal<number | null>(null);
+  /** Filas cuyo selector la persona vació y todavía no eligió otra cuenta. */
+  private readonly vaciadas = new Set<number>();
+  /** Refresco en vuelo tras un guardado; uno nuevo lo cancela. */
+  private refresco?: Subscription;
 
   constructor() {
     // Los grants se piden antes de listar: sin permiso de ver, la petición
@@ -87,11 +92,17 @@ export class AporteTableComponent {
 
   /**
    * Guarda al instante la cuenta elegida. El selector solo emite al elegir una
-   * opción o al vaciarlo: vaciarlo no guarda nada y la celda vuelve a la cuenta
-   * guardada en la próxima carga.
+   * opción o al vaciarlo. Vaciarlo no guarda nada: es el primer paso para
+   * buscar otra cuenta, así que solo se anota y, si la persona sale del campo sin
+   * elegir, `onSalirCuenta` le devuelve la guardada.
    */
   protected onCambioCuenta(row: ConfiguracionAporteRow, cuenta: ErpSelectOption | null): void {
-    if (!cuenta || cuenta.id === row.cuenta) return;
+    if (!cuenta) {
+      this.vaciadas.add(row.id);
+      return;
+    }
+    this.vaciadas.delete(row.id);
+    if (cuenta.id === row.cuenta) return;
 
     const toasts = this.t().configuracion.humano.aporte.toasts;
     this.busyId.set(row.id);
@@ -115,9 +126,24 @@ export class AporteTableComponent {
       });
   }
 
-  /** Refresca las filas tras guardar sin pasar por el esqueleto: la tabla no parpadea. */
+  /** Al salir de un selector vaciado sin elegir otra cuenta, vuelve a mostrar la guardada. */
+  protected onSalirCuenta(row: ConfiguracionAporteRow): void {
+    if (!this.vaciadas.delete(row.id)) return;
+    this.rows.update((rows) =>
+      rows.map((r) =>
+        r.id === row.id ? { ...r, cuenta_option: copiaCuentaOption(r.cuenta_option) } : r,
+      ),
+    );
+  }
+
+  /**
+   * Refresca las filas tras guardar sin pasar por el esqueleto: la tabla no
+   * parpadea. Cancela el refresco anterior: con dos cambios seguidos, la lectura
+   * del primero podría llegar después y mostrar un valor viejo.
+   */
   private recargarSinEsqueleto(): void {
-    this.service
+    this.refresco?.unsubscribe();
+    this.refresco = this.service
       .listar()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (respuesta) => this.setRows(respuesta) });

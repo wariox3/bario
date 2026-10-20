@@ -46,6 +46,7 @@
                   [ngModel]="row.cuenta_option"
                   [disabled]="busyId() === row.id"
                   (ngModelChange)="onCambioCuenta(row, $event)"
+                  (focusout)="onSalirCuenta(row)"
                 />
               } @else {
                 {{ row.cuenta_label }}

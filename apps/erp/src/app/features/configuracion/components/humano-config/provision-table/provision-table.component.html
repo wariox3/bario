@@ -49,6 +49,7 @@
                   [ngModel]="row.cuenta_debito_option"
                   [disabled]="busy(row, 'cuenta_debito')"
                   (ngModelChange)="onCambioCuenta(row, 'cuenta_debito', $event)"
+                  (focusout)="onSalirCuenta(row, 'cuenta_debito')"
                 />
               } @else {
                 {{ row.cuenta_debito_label }}
@@ -62,6 +63,7 @@
                     [ngModel]="row.cuenta_credito_option"
                     [disabled]="busy(row, 'cuenta_credito')"
                     (ngModelChange)="onCambioCuenta(row, 'cuenta_credito', $event)"
+                    (focusout)="onSalirCuenta(row, 'cuenta_credito')"
                   />
                 } @else {
                   {{ row.cuenta_credito_label }}
