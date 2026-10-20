@@ -44,7 +44,7 @@ export interface NominaElectronicaRead extends DocumentoReadBase {
 /**
  * Una de las **nóminas origen** que componen la nómina electrónica.
  *
- * Se leen de `/general/documento/` filtrando por `documento_referencia_id`: son
+ * Se leen de `POST /general/documento/lista/` filtrando por `documento_referencia_id`: son
  * documentos de nómina (14) que apuntan a esta. La ficha las lista para que se
  * vea de qué está hecho el consolidado, y desde ahí se navega a cada una.
  *
@@ -71,19 +71,29 @@ export interface NominaElectronicaOrigen {
 }
 
 /**
- * Línea de la nómina electrónica: un **concepto consolidado** del periodo.
+ * Línea de uno de los **documentos origen**: un concepto liquidado en él.
  *
- * Vive en `/general/documento-detalle/` como toda línea del framework. El legacy
- * pintaba además el empleado y el rango de fechas en cada fila, pero todas las
- * líneas son del mismo documento: esos valores son constantes y ya están en la
- * cabecera, así que acá quedan fuera.
+ * Vive en `/general/documento-detalle/` como toda línea del framework, y llega
+ * por `POST …/lista/` filtrando por el `documento_referencia_id` de su
+ * documento. Los documentos origen no son solo nóminas: también entran
+ * liquidaciones, y `documento_documento_tipo_nombre` dice cuál.
  *
- * **Supuestos pendientes de confirmar con backend**: todos los campos.
+ * El contacto es **el de la línea**: en Salud es la EPS y en Pensión el fondo,
+ * no el empleado.
+ *
+ * Campos confirmados con la respuesta real (2026-10-20). Solo se declaran los
+ * que pinta la ficha; el serializador trae muchos más.
  */
 export interface NominaElectronicaDetalleRead {
   readonly id: number;
+  /** Documento origen (FK cruda, sin `_id`). */
+  readonly documento: number;
+  readonly documento_documento_tipo_nombre?: string | null;
+  readonly documento_fecha?: string | null;
   readonly concepto_id?: number | null;
   readonly concepto_nombre?: string | null;
+  readonly contacto_numero_identificacion?: string | null;
+  readonly contacto_nombre_corto?: string | null;
   readonly base_cotizacion?: string | number | null;
   readonly base_prestacion?: string | number | null;
   readonly devengado?: string | number | null;

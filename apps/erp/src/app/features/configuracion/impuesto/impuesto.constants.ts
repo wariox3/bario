@@ -1,4 +1,4 @@
-import type { ColumnDef, SortSpec } from '@reddoc/core';
+import type { ColumnDef } from '@reddoc/core';
 import type { RowAction } from '@reddoc/feature-base';
 
 /**
@@ -70,12 +70,6 @@ export const IMPUESTO_COLUMNS: readonly ColumnDef[] = [
     width: '16rem',
   },
 ];
-
-/**
- * Orden **fijo** del listado: el del catálogo. Viaja en cada consulta para que
- * la paginación no repita ni saltee filas (ver `DOCUMENTO_TIPO_SORT`).
- */
-export const IMPUESTO_SORT: readonly SortSpec[] = [{ field: 'id', direction: 'asc' }];
 
 /** Única acción de fila, `inline` por ser la razón de ser de la tabla. */
 export const IMPUESTO_ROW_ACTIONS: readonly RowAction[] = [

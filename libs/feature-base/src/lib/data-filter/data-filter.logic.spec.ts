@@ -3,6 +3,7 @@ import {
   conditionsToDraft,
   draftToConditions,
   fieldTypeOf,
+  initialDraft,
   newRowForField,
   type DraftRow,
 } from './data-filter.logic';
@@ -90,5 +91,26 @@ describe('conditionsToDraft', () => {
   it('ignora condiciones sobre campos desconocidos', () => {
     const conditions: FilterCondition[] = [{ field: 'fantasma', operator: 'eq', value: 1 }];
     expect(conditionsToDraft(conditions, FIELDS)).toEqual([]);
+  });
+});
+
+describe('initialDraft', () => {
+  it('abre con los filtros activos cuando los hay', () => {
+    const conditions: FilterCondition[] = [{ field: 'id', operator: 'gt', value: 10 }];
+    expect(initialDraft(conditions, FIELDS)).toEqual([{ field: 'id', opId: 'mayor', value: '10' }]);
+  });
+
+  it('sin filtros activos abre con una condición sobre el primer campo', () => {
+    expect(initialDraft([], FIELDS)).toEqual([
+      { field: 'nombre_corto', opId: 'contiene', value: '' },
+    ]);
+  });
+
+  it('no agrega la condición si el primer campo no pide valor', () => {
+    expect(initialDraft([], [FIELDS[2], FIELDS[0]])).toEqual([]);
+  });
+
+  it('no agrega nada si no hay campos', () => {
+    expect(initialDraft([], [])).toEqual([]);
   });
 });

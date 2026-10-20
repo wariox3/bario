@@ -4,58 +4,17 @@ import { Observable, forkJoin, map, of } from 'rxjs';
 import { buildHttpParams } from '../services/base-http.service';
 import { parseFilename, triggerBrowserDownload } from '../http/file-download.utils';
 import {
+  buildFiltros,
   buildListParams,
-  type FilterCondition,
-  type FilterOperator,
+  buildOrdenamientos,
+  type AdvancedListBody,
+  type BackendFilter,
   type ListQuery,
   type ListResponse,
-  type SortSpec,
 } from '../data-list';
 import type { PaginatedResponse } from '../models/pagination.model';
 import type { EntityConfig } from './entity-config.types';
 import type { EntityDataGateway } from './entity-data-gateway';
-
-/**
- * Filtro tal como lo espera el backend de documentos en `POST /lista/`.
- * Operadores en español (`=`, `!=`, `>=`, …) y array de objetos en vez de
- * query params Django-style. El gateway traduce desde el contrato genérico
- * (`FilterCondition`) a este shape concreto.
- */
-interface BackendDocumentFilter {
-  readonly propiedad: string;
-  readonly operador: string;
-  /** El operador `in` lleva la lista como array: `[1, 2, 3]`. */
-  readonly valor: string | number | boolean | readonly (string | number)[];
-}
-
-/**
- * Body del endpoint `POST <endpoint>/lista/`. La paginación viaja como query
- * params (`buildListParams`), no en el body.
- */
-interface DocumentListBody {
-  readonly filtros: readonly BackendDocumentFilter[];
-  readonly ordenamientos: readonly string[];
-}
-
-/**
- * Mapeo de operadores genéricos (`FilterOperator`) a string que el backend
- * de documentos espera en `operador`. `=` para igualdad fue confirmado;
- * el resto sigue convención del legacy y se ajusta aquí si algún filtro
- * real lo contradice.
- */
-const BACKEND_OPERATOR: Readonly<Record<FilterOperator, string>> = {
-  eq: '=',
-  neq: '!=',
-  gt: '>',
-  gte: '>=',
-  lt: '<',
-  lte: '<=',
-  contains: 'icontains',
-  startsWith: 'istartswith',
-  endsWith: 'iendswith',
-  in: 'in',
-  isNull: 'isnull',
-};
 
 /**
  * Implementación HTTP default del `EntityDataGateway` para documentos
@@ -193,7 +152,7 @@ export class HttpEntityDataGateway implements EntityDataGateway {
    * descarga del navegador.
    */
   imprimir(entity: EntityConfig, id: string | number): Observable<void> {
-    const body: Pick<DocumentListBody, 'filtros'> = {
+    const body: Pick<AdvancedListBody, 'filtros'> = {
       filtros: [{ propiedad: 'id', operador: '=', valor: id }],
     };
     return this.descargar(entity, 'imprimir', body, `${entity.id}-${id}.pdf`);
@@ -207,7 +166,7 @@ export class HttpEntityDataGateway implements EntityDataGateway {
   private descargar(
     entity: EntityConfig,
     accion: string,
-    body: Partial<DocumentListBody>,
+    body: Partial<AdvancedListBody>,
     fallbackFilename: string,
   ): Observable<void> {
     return this.http
@@ -233,8 +192,8 @@ export class HttpEntityDataGateway implements EntityDataGateway {
    * `documentClassId`) se inyecta como primer elemento — es responsabilidad del
    * framework, no del consumidor.
    */
-  private buildListBody(entity: EntityConfig, query: ListQuery): DocumentListBody {
-    const baseFilter: BackendDocumentFilter =
+  private buildListBody(entity: EntityConfig, query: ListQuery): AdvancedListBody {
+    const baseFilter: BackendFilter =
       entity.documentClassId !== undefined
         ? {
             propiedad: 'documento_tipo__documento_clase_id',
@@ -242,26 +201,14 @@ export class HttpEntityDataGateway implements EntityDataGateway {
             valor: entity.documentClassId,
           }
         : { propiedad: 'documento_tipo_id', operador: '=', valor: entity.documentTypeId };
-    const userFilters = query.filters.map(toBackendFilter);
+    const userFilters = buildFiltros(query.filters);
     // Filtros implícitos del documento: siempre activos, junto al baseFilter.
-    const implicitFilters = (entity.defaultFilters ?? []).map(toBackendFilter);
+    const implicitFilters = buildFiltros(entity.defaultFilters ?? []);
     // Sin orden del usuario, cae al orden por defecto del documento (si lo declara).
     const sort = query.sort.length > 0 ? query.sort : (entity.defaultSort ?? []);
     return {
       filtros: [baseFilter, ...implicitFilters, ...userFilters],
-      ordenamientos: sort.map(encodeSort),
+      ordenamientos: buildOrdenamientos(sort),
     };
   }
-}
-
-function toBackendFilter(condition: FilterCondition): BackendDocumentFilter {
-  return {
-    propiedad: condition.field,
-    operador: BACKEND_OPERATOR[condition.operator],
-    valor: condition.value,
-  };
-}
-
-function encodeSort(spec: SortSpec): string {
-  return spec.direction === 'desc' ? `-${spec.field}` : spec.field;
 }

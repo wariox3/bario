@@ -136,6 +136,15 @@ export class RemisionDetailComponent implements OnInit {
     return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
   });
 
+  /**
+   * ¿Alguna línea vino importada de otro documento? Solo entonces se muestra la
+   * columna REF: la remisión casi siempre se arma a mano, y la columna quedaba
+   * vacía en todas las filas.
+   */
+  protected readonly tieneReferencias = computed(() =>
+    this.lines().some((line) => line.documento_detalle_afectado !== null),
+  );
+
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
   protected readonly resumen = computed<ResumenDocumento>(() =>
     calcularResumen(this.lines().map(toLineaCalculo)),

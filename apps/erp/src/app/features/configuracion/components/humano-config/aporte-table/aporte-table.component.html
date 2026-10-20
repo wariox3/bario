@@ -1,0 +1,60 @@
+@let m = t().configuracion.humano.aporte;
+
+@if (!puedeVer()) {
+  <app-access-denied [message]="t().common.accessDenied.subPermission" />
+} @else if (isLoading()) {
+  <div class="h-40 animate-pulse rounded-lg bg-[rgba(20,48,73,0.06)]"></div>
+} @else if (loadFailed()) {
+  <div class="flex flex-col items-center justify-center gap-3 py-12 text-center">
+    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+    <p class="m-0 text-sm text-brand-muted">{{ m.toasts.loadError.desc }}</p>
+    <p-button
+      type="button"
+      [label]="t().common.actions.refresh"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="cargar()"
+    />
+  </div>
+} @else if (rows().length === 0) {
+  <div
+    class="flex flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-[rgba(20,48,73,0.15)] py-10 text-center"
+  >
+    <p class="m-0 text-sm font-medium text-brand-text">{{ m.empty.title }}</p>
+    <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.empty.sub }}</p>
+  </div>
+} @else {
+  <div class="overflow-x-auto rounded-lg border border-[rgba(20,48,73,0.1)]">
+    <table class="w-full min-w-[36rem] border-collapse text-[0.82rem]">
+      <thead>
+        <tr class="bg-[#f6f8fa] text-left text-[0.75rem] text-brand-muted">
+          <th class="w-[70px] px-3 py-2 text-right font-semibold">{{ m.columns.id }}</th>
+          <th class="w-[14rem] px-3 py-2 font-semibold">{{ m.columns.tipo }}</th>
+          <th class="px-3 py-2 font-semibold">{{ m.columns.cuenta }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.id) {
+          <tr class="border-t border-[rgba(20,48,73,0.08)]">
+            <td class="px-3 py-2 text-right tabular-nums text-brand-muted">{{ row.id }}</td>
+            <td class="px-3 py-2 text-brand-text">{{ row.tipo_label }}</td>
+            <td class="px-3 py-2 text-brand-text">
+              @if (puedeEditar()) {
+                <app-cuenta-select
+                  [inputId]="'aporte_cuenta_' + row.id"
+                  [ngModel]="row.cuenta_option"
+                  [disabled]="busyId() === row.id"
+                  (ngModelChange)="onCambioCuenta(row, $event)"
+                  (focusout)="onSalirCuenta(row)"
+                />
+              } @else {
+                {{ row.cuenta_label }}
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

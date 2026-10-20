@@ -189,48 +189,72 @@ export const NOMINA_ELECTRONICA_ORIGEN_COLUMNS: readonly ColumnDef[] = [
 ];
 
 /**
- * Columnas de la pestaña **"Detalle"**: los conceptos consolidados.
+ * Columnas de la pestaña **"Detalle"**: las líneas de los documentos origen.
  *
- * El legacy repetía en cada fila el empleado y el rango del periodo; todas las
- * líneas son del mismo documento, así que esos valores son constantes y ya
- * están arriba. Quedan solo las columnas que varían fila a fila.
+ * Frente al legacy (`Id · Desde · Hasta · Cod · Identificación · Empleado · bases
+ * · Devengado · Deducción · Total`):
+ *
+ *  - **Desde/Hasta** salen: la línea no trae el periodo de su documento. En su
+ *    lugar va de qué documento sale (id, tipo y fecha), porque no todos son
+ *    nóminas —también entran liquidaciones—.
+ *  - **Concepto** entra: es lo que distingue una fila de otra y el legacy no
+ *    lo pintaba.
+ *  - El contacto es **el de la línea**, no siempre el empleado: Salud apunta a
+ *    la EPS y Pensión al fondo. Por eso el encabezado dice "Tercero".
+ *  - **Cod** (FK cruda del contacto) y **Total** salen: el primero es
+ *    redundante con la identificación, y el segundo llega en 0 en toda línea
+ *    de nómina —el neto de la línea es devengado o deducción—.
  */
 export const NOMINA_ELECTRONICA_DETALLE_COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.detalle.id`, type: 'number', width: '80px', align: 'right' },
+  {
+    field: 'documento',
+    headerKey: `${I18N}.detalle.documento`,
+    type: 'number',
+    width: '100px',
+    align: 'right',
+  },
+  {
+    field: 'documento_documento_tipo_nombre',
+    headerKey: `${I18N}.detalle.tipo`,
+    type: 'text',
+    width: '120px',
+  },
+  { field: 'documento_fecha', headerKey: `${I18N}.detalle.fecha`, type: 'date', width: '110px' },
   { field: 'concepto_nombre', headerKey: `${I18N}.detalle.concepto`, type: 'text' },
+  {
+    field: 'contacto_numero_identificacion',
+    headerKey: `${I18N}.detalle.identificacion`,
+    type: 'text',
+    width: '130px',
+  },
+  { field: 'contacto_nombre_corto', headerKey: `${I18N}.detalle.tercero`, type: 'text' },
   {
     field: 'base_cotizacion',
     headerKey: `${I18N}.detalle.baseCotizacion`,
     type: 'currency',
-    width: '140px',
+    width: '130px',
     align: 'right',
   },
   {
     field: 'base_prestacion',
     headerKey: `${I18N}.detalle.basePrestacion`,
     type: 'currency',
-    width: '140px',
+    width: '130px',
     align: 'right',
   },
   {
     field: 'devengado',
     headerKey: `${I18N}.detalle.devengado`,
     type: 'currency',
-    width: '130px',
+    width: '120px',
     align: 'right',
   },
   {
     field: 'deduccion',
     headerKey: `${I18N}.detalle.deduccion`,
     type: 'currency',
-    width: '130px',
-    align: 'right',
-  },
-  {
-    field: 'total',
-    headerKey: `${I18N}.detalle.total`,
-    type: 'currency',
-    width: '140px',
+    width: '120px',
     align: 'right',
   },
 ];

@@ -37,6 +37,24 @@ export function newRowForField(field: FilterField): DraftRow {
 }
 
 /**
+ * Borrador con el que abre el modal: los filtros activos o, si no hay ninguno,
+ * una condición ya puesta sobre el primer campo para ahorrar el clic en
+ * "Añadir condición". Solo se agrega si su operador inicial pide un valor: una
+ * fila sin valor (booleano, "está vacío") se aplicaría tal cual al confirmar,
+ * filtrando algo que la persona no eligió.
+ */
+export function initialDraft(
+  conditions: readonly FilterCondition[],
+  fields: readonly FilterField[],
+): DraftRow[] {
+  const rows = conditionsToDraft(conditions, fields);
+  if (rows.length > 0) return rows;
+  const first = fields[0];
+  if (!first || getOperatorsForType(first.type)[0]?.valueKind === 'none') return [];
+  return [newRowForField(first)];
+}
+
+/**
  * Traduce el borrador a `FilterCondition[]`:
  *  - descarta filas con operador inexistente o con valor requerido vacío;
  *  - aplica `fixedValue` para operadores sin valor (booleanos / is_null);

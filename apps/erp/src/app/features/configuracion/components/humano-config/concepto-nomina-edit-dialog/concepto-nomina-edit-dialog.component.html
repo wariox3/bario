@@ -1,0 +1,67 @@
+@let m = t().configuracion.humano.conceptoNomina;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  [dismissableMask]="!isSaving()"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-pencil text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.dialog.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] text-brand-muted">{{ conceptoNomina()?.nombre }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <form [formGroup]="form" class="flex flex-col gap-1.5 pt-1" (ngSubmit)="onSubmit()">
+      <label for="concepto" class="text-[0.8rem] font-medium text-brand-text">
+        {{ m.fields.concepto }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <lib-api-autocomplete
+        inputId="concepto"
+        formControlName="concepto"
+        [endpoint]="conceptoEndpoint"
+        searchParam="nombre__icontains"
+        [placeholder]="m.fields.conceptoPlaceholder"
+        [invalid]="form.controls.concepto.invalid && form.controls.concepto.touched"
+      />
+      <lib-field-error
+        [control]="form.controls.concepto"
+        [messages]="{ required: m.validation.required }"
+      />
+    </form>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      severity="secondary"
+      [text]="true"
+      [label]="t().common.actions.cancel"
+      [disabled]="isSaving()"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      [label]="t().configuracion.actions.save"
+      icon="pi pi-check"
+      [loading]="isSaving()"
+      [disabled]="isSaving()"
+      (onClick)="onSubmit()"
+    />
+  </ng-template>
+</p-dialog>

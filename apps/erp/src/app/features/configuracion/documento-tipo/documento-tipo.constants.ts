@@ -1,4 +1,4 @@
-import type { ColumnDef, SortSpec } from '@reddoc/core';
+import type { ColumnDef } from '@reddoc/core';
 import type { RowAction } from '@reddoc/feature-base';
 
 /**
@@ -94,18 +94,6 @@ export const DOCUMENTO_TIPO_COLUMNS: readonly ColumnDef[] = [
 
 /** Catálogo de resoluciones que alimenta el selector del modal de edición. */
 export const RESOLUCION_SELECCIONAR_ENDPOINT = '/general/resolucion/seleccionar/';
-
-/**
- * Orden **fijo** del listado: el del catálogo.
- *
- * Ninguna columna es ordenable y esto no se cambia desde la UI. Los tipos vienen
- * sembrados por fixture en un orden que la gente ya conoce de memoria.
- *
- * Igual viaja en cada consulta, y no es decorativo: sin un `ORDER BY` explícito
- * la base puede devolver las filas en cualquier orden entre consultas, y una
- * lista paginada así repite filas en una página y se saltea otras.
- */
-export const DOCUMENTO_TIPO_SORT: readonly SortSpec[] = [{ field: 'id', direction: 'asc' }];
 
 /**
  * Única acción de fila. Va `inline` porque es la razón de ser de la tabla:

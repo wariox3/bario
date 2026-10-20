@@ -757,6 +757,7 @@ export const es: AppDict = {
     submit: 'Agregar',
     cancel: 'Cancelar',
     columns: {
+      tipo: 'Tipo',
       documento: 'Documento',
       fecha: 'Fecha',
       contacto: 'Contacto',
@@ -1876,6 +1877,12 @@ export const es: AppDict = {
         centroCosto: 'Centro de costo',
         valorCompra: 'Valor de compra',
         fechaCompra: 'Fecha de compra',
+        fechaActivacion: 'Fecha de activación',
+        fechaBaja: 'Fecha de baja',
+        duracion: 'Duración',
+        depreciacionInicial: 'Dep. inicial',
+        depreciacionPeriodo: 'Dep. periodo',
+        depreciacionSaldo: 'Dep. saldo',
       },
       form: {
         createTitle: 'Nuevo activo',
@@ -2286,6 +2293,7 @@ export const es: AppDict = {
           fechaHastaPeriodo: 'Fecha hasta periodo',
           diasDinero: 'Días dinero',
           diasDisfrutados: 'Días disfrutados',
+          diasDisfrutadosReales: 'Días disfrutados reales',
         },
         hints: {
           dias: 'La novedad dura {dias} días, contando desde y hasta.',
@@ -3064,19 +3072,12 @@ export const es: AppDict = {
       name: 'Factura recurrente',
       columns: {
         id: 'ID',
-        numero: 'Número',
         fecha: 'Fecha',
         identificacion: 'Identificación',
         contacto: 'Contacto',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
-        anulado: 'Anu',
-        contabilizado: 'Con',
-      },
-      filters: {
-        anulado: 'Anulado',
-        contabilizado: 'Contabilizado',
       },
       form: {
         createTitle: 'Nueva factura recurrente',
@@ -3507,19 +3508,12 @@ export const es: AppDict = {
       name: 'Compra recurrente',
       columns: {
         id: 'ID',
-        numero: 'Número',
         fecha: 'Fecha',
         identificacion: 'Identificación',
         proveedor: 'Proveedor',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
-        anulado: 'Anu',
-        contabilizado: 'Con',
-      },
-      filters: {
-        anulado: 'Anulado',
-        contabilizado: 'Contabilizado',
       },
       form: {
         createTitle: 'Nueva factura recurrente',
@@ -5856,9 +5850,11 @@ export const es: AppDict = {
       columns: {
         id: 'ID',
         documento: 'Documento',
+        documentoTipo: 'Tipo',
         numero: 'Número',
         identificacion: 'Identificación',
         empleado: 'Empleado',
+        concepto: 'Concepto',
         fecha: 'Fecha',
         fechaDesde: 'Desde',
         fechaHasta: 'Hasta',
@@ -5866,8 +5862,8 @@ export const es: AppDict = {
         porcentaje: '%',
         dias: 'Días',
         valorHora: 'Valor hora',
-        operacion: 'Operación',
-        pago: 'Pago',
+        devengado: 'Devengado',
+        deduccion: 'Deducción',
         basePrestacion: 'IBP',
         baseCotizacion: 'IBC',
       },
@@ -5875,7 +5871,6 @@ export const es: AppDict = {
         empleadoIdentificacion: 'Identificación del empleado',
         empleadoNombre: 'Nombre del empleado',
       },
-      operaciones: { '1': 'Suma', '0': 'Neutro', '-1': 'Resta' },
     },
     nominaElectronica: {
       name: 'Nómina electrónica',
@@ -5917,7 +5912,12 @@ export const es: AppDict = {
       },
       detalle: {
         id: 'ID',
+        documento: 'Documento',
+        tipo: 'Tipo',
+        fecha: 'Fecha',
         concepto: 'Concepto',
+        identificacion: 'Identificación',
+        tercero: 'Tercero',
         baseCotizacion: 'Base cotización',
         basePrestacion: 'Base prestación',
         devengado: 'Devengado',
@@ -5927,7 +5927,6 @@ export const es: AppDict = {
       detail: {
         sections: {
           general: 'Información general',
-          montos: 'Consolidado del periodo',
           composicion: 'Composición',
         },
         tabs: { origen: 'Nóminas', detalle: 'Detalle' },
@@ -7392,7 +7391,120 @@ export const es: AppDict = {
         factor: 'Factor prestacional',
         auxilioTransporte: 'Auxilio de transporte',
       },
+      licenciaNoRemuneradaAfectaPension: {
+        label: 'Licencia no remunerada afecta pensión',
+        hint: 'Durante una licencia no remunerada se sigue cotizando a pensión.',
+      },
       validation: { required: 'Este campo es obligatorio' },
+      tabs: {
+        conceptosNomina: 'Conceptos de nómina',
+        conceptos: 'Cuentas por concepto',
+        provision: 'Provisión',
+        aporte: 'Aporte',
+      },
+      hints: {
+        conceptosNomina: 'Qué concepto usa la nómina para cada rubro fijo, como el salario.',
+        conceptos: 'Cuenta contable de cada concepto según el tipo de costo del contrato.',
+        provision: 'Cuentas débito y crédito con que se contabiliza cada provisión.',
+        aporte: 'Cuenta contable de cada aporte a seguridad social y parafiscales.',
+      },
+      tipos: {
+        CESANTIA: 'Cesantías',
+        INTERES: 'Intereses de cesantías',
+        PRIMA: 'Prima de servicios',
+        VACACION: 'Vacaciones',
+        PENSION: 'Pensión',
+        SALUD: 'Salud',
+        CAJA: 'Caja de compensación',
+        RIESGO: 'Riesgos laborales',
+        SENA: 'SENA',
+        ICBF: 'ICBF',
+      },
+      aporte: {
+        columns: { id: 'ID', tipo: 'Aporte', cuenta: 'Cuenta' },
+        empty: { title: 'Sin aportes', sub: 'No hay aportes para configurar.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Aporte actualizado',
+            desc: 'La cuenta del aporte quedó guardada.',
+          },
+          saveError: { title: 'Error al guardar', desc: 'No pudimos guardar el aporte.' },
+          loadError: { title: 'Error al cargar', desc: 'No pudimos traer los aportes.' },
+        },
+      },
+      provision: {
+        columns: {
+          id: 'ID',
+          tipoCosto: 'Tipo de costo',
+          tipo: 'Provisión',
+          cuentaDebito: 'Cuenta débito',
+          cuentaCredito: 'Cuenta crédito',
+        },
+        empty: { title: 'Sin provisiones', sub: 'No hay provisiones para configurar.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Provisión actualizada',
+            desc: 'Las cuentas de la provisión quedaron guardadas.',
+          },
+          saveError: { title: 'Error al guardar', desc: 'No pudimos guardar la provisión.' },
+          loadError: { title: 'Error al cargar', desc: 'No pudimos traer las provisiones.' },
+        },
+      },
+      concepto: {
+        columns: { id: 'ID', nombre: 'Nombre', tipo: 'Tipo', porcentaje: 'Porcentaje' },
+        actions: { cuentas: 'Cuentas' },
+        empty: { title: 'Sin conceptos', sub: 'No hay conceptos en el catálogo.' },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No pudimos traer los conceptos.' },
+        },
+      },
+      conceptoCuenta: {
+        dialog: {
+          title: 'Cuentas del concepto',
+          hint: 'Al contabilizar la nómina, cada línea va a la cuenta que corresponde al tipo de costo del contrato.',
+        },
+        columns: { id: 'ID', tipoCosto: 'Tipo de costo', cuenta: 'Cuenta' },
+        fields: { tipoCosto: 'Tipo de costo', cuenta: 'Cuenta contable' },
+        actions: { agregar: 'Agregar' },
+        validation: {
+          required: 'Este campo es obligatorio',
+          duplicado: 'Este tipo de costo ya tiene cuenta',
+        },
+        empty: { title: 'Sin cuentas', sub: 'Este concepto todavía no tiene cuentas.' },
+        confirmDelete: '¿Quieres eliminar la cuenta de este tipo de costo?',
+        toasts: {
+          addSuccess: { title: 'Cuenta agregada', desc: 'La cuenta quedó asignada al concepto.' },
+          saveSuccess: { title: 'Cuenta actualizada', desc: 'El cambio quedó guardado.' },
+          saveError: { title: 'Error al guardar', desc: 'No pudimos guardar la cuenta.' },
+          deleteSuccess: { title: 'Cuenta eliminada', desc: 'La cuenta se quitó del concepto.' },
+          deleteError: { title: 'Error al eliminar', desc: 'No pudimos eliminar la cuenta.' },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No pudimos traer las cuentas del concepto.',
+          },
+        },
+      },
+      conceptoNomina: {
+        columns: { id: 'ID', nombre: 'Rubro', concepto: 'Concepto' },
+        dialog: { title: 'Editar concepto de nómina' },
+        fields: { concepto: 'Concepto', conceptoPlaceholder: 'Buscar concepto' },
+        validation: { required: 'Este campo es obligatorio' },
+        empty: { title: 'Sin conceptos de nómina', sub: 'No hay rubros para configurar.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Concepto actualizado',
+            desc: 'El concepto de nómina quedó guardado.',
+          },
+          saveError: {
+            title: 'Error al guardar',
+            desc: 'No pudimos guardar el concepto de nómina.',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No pudimos traer los conceptos de nómina.',
+          },
+        },
+      },
     },
     venta: {
       tabs: { formato: 'Formato', aiu: 'AIU' },

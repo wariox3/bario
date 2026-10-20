@@ -1,45 +1,44 @@
 /**
  * Fila del informe **Nómina detallada**
- * (`POST /general/documento-detalle/lista/`, `serializador: 'nomina'`).
+ * (`POST /general/documento-detalle/lista/`; el Excel sale de
+ * `documento-detalle-informe/excel/` con `informe: 'nomina_detalle'`).
  *
- * Es un **concepto liquidado** —una línea de nómina— aplanado con los datos de
- * su documento padre: el empleado, el periodo y la fecha. Mientras la ficha de
- * nómina muestra los conceptos de *un* documento, este informe los recorre
- * todos, así que sirve para cruzar un concepto a través de varias nóminas.
+ * Es un **concepto liquidado** —una línea de nómina— con los datos de su
+ * documento padre aplanados (`documento_fecha`, `documento_documento_tipo_nombre`).
+ * Mientras la ficha de nómina muestra los conceptos de *un* documento, este
+ * informe los recorre todos, así que sirve para cruzar un concepto a través de
+ * varias nóminas.
  *
- * `operacion` dice cómo entra el concepto al total: `1` suma (devengado),
- * `-1` resta (deducción), `0` es neutro (informativo).
+ * El empleado viaja en la propia línea (`contacto_*`). El valor del concepto
+ * llega partido en `devengado` y `deduccion`, no con signo.
  *
- * **Supuestos pendientes de confirmar con backend**: los nombres siguen el
- * lookup de Django del ERP legacy (`documento__contacto__nombre_corto`), porque
- * su tabla pintaba las llaves crudas de la respuesta. Si el API nuevo los
- * devuelve aplanados (`documento_contacto_nombre_corto`), el fix es local: este
- * archivo y `nomina-detalle.constants.ts`.
+ * Convención del backend: montos como `string` con cola de decimales
+ * (`"250000.000000"`); fechas como `yyyy-MM-dd`. Verificado contra la respuesta
+ * real el 2026-10-20. La respuesta trae además los campos comerciales y de
+ * programación de la línea, que no se modelan porque el informe no los usa.
  */
 export interface NominaDetalleInforme {
   readonly id: number;
   /** Documento (nómina) al que pertenece la línea. */
   readonly documento: number | null;
-  readonly documento__numero: number | string | null;
+  readonly documento_documento_tipo_nombre: string | null;
   /** Fecha de la nómina (`yyyy-MM-dd`). */
-  readonly documento__fecha: string | null;
-  /** Periodo liquidado. La nómina usa el rango, no `fecha`. */
-  readonly documento__fecha_desde: string | null;
-  readonly documento__fecha_hasta: string | null;
-  readonly documento__contacto__numero_identificacion: string | null;
-  readonly documento__contacto__nombre_corto: string | null;
+  readonly documento_fecha: string | null;
+  readonly contacto: number | null;
+  readonly contacto_numero_identificacion: string | null;
+  readonly contacto_nombre_corto: string | null;
+  readonly concepto_id: number | null;
+  readonly concepto_nombre: string | null;
   /** Texto que el proceso de liquidación escribe en la línea. */
   readonly detalle: string | null;
-  readonly porcentaje: number | string | null;
-  readonly dias: number | string | null;
+  readonly porcentaje: string | null;
+  readonly dias: number | null;
   /** Valor de la hora aplicado. */
-  readonly hora: number | string | null;
-  /** Sentido del concepto: 1 suma, -1 resta, 0 neutro. */
-  readonly operacion: number | null;
-  /** Valor de la línea **con el signo de `operacion` aplicado**. */
-  readonly pago_operado: number | string | null;
+  readonly hora: string | null;
+  readonly devengado: string | null;
+  readonly deduccion: string | null;
   /** Ingreso base de prestaciones (IBP). */
-  readonly base_prestacion: number | string | null;
+  readonly base_prestacion: string | null;
   /** Ingreso base de cotización (IBC). */
-  readonly base_cotizacion: number | string | null;
+  readonly base_cotizacion: string | null;
 }

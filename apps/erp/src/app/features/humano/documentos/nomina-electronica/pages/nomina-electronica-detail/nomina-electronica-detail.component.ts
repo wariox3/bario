@@ -125,14 +125,6 @@ export class NominaElectronicaDetailComponent implements OnInit {
     this.cabecera() ? capacidadesDe(this.estados()) : CAPACIDADES_VACIAS,
   );
 
-  /** Empleado en una sola línea: `<identificación> - <nombre>`. */
-  protected readonly empleado = computed(() => {
-    const c = this.cabecera();
-    if (!c) return '—';
-    const partes = [c.contacto_numero_identificacion, c.contacto_nombre_corto].filter(Boolean);
-    return partes.length ? partes.join(' - ') : '—';
-  });
-
   /** Enlace al documento en el portal de la DIAN, si ya se emitió. */
   protected readonly dianUrl = computed(() => {
     const cue = this.cabecera()?.cue;
@@ -161,7 +153,7 @@ export class NominaElectronicaDetailComponent implements OnInit {
   }
 
   protected formatFecha(iso: string | null | undefined): string {
-    return formatFechaCorta(iso, '—');
+    return formatFechaCorta(iso, '');
   }
 
   protected onBack(): void {

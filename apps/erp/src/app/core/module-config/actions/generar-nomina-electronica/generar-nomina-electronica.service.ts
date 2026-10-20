@@ -1,20 +1,24 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
-import { BaseHttpService } from '@reddoc/core';
+import { BaseHttpService, DOCUMENT_TYPE_ID } from '@reddoc/core';
 
 /**
- * Endpoint de generación de nóminas electrónicas.
- *
- * Va con **guion**, que es la convención de endpoints de este ERP; el ERP
- * anterior lo escribe igual (`generar-nomina-electronica/`), así que acá no hay
- * traducción de por medio.
+ * Endpoint genérico de generación de documentos. Es el mismo que usa la acción
+ * "generar" de venta, pero con otro contrato: acá el tipo va en `documento_tipo`
+ * (sin `_id` ni destino) y el backend consolida las nóminas del periodo en
+ * documentos de ese tipo.
  */
-const GENERAR_NOMINA_ELECTRONICA_ENDPOINT = '/general/documento/generar-nomina-electronica/';
+const GENERAR_ENDPOINT = '/general/documento/generar/';
 
-/** Payload: el periodo a consolidar. `mes` es 1-12. */
-export interface GenerarNominaElectronicaPayload {
+/** El periodo a consolidar. `mes` es 1-12. */
+export interface GenerarNominaElectronicaPeriodo {
   readonly anio: number;
   readonly mes: number;
+}
+
+/** Body de `POST /general/documento/generar/` para nómina electrónica. */
+interface GenerarNominaElectronicaPayload extends GenerarNominaElectronicaPeriodo {
+  readonly documento_tipo: number;
 }
 
 /**
@@ -37,10 +41,11 @@ export interface GenerarNominaElectronicaRespuesta {
  */
 @Injectable({ providedIn: 'root' })
 export class GenerarNominaElectronicaService extends BaseHttpService {
-  generar(payload: GenerarNominaElectronicaPayload): Observable<GenerarNominaElectronicaRespuesta> {
-    return this.post<GenerarNominaElectronicaRespuesta>(
-      GENERAR_NOMINA_ELECTRONICA_ENDPOINT,
-      payload,
-    );
+  generar(periodo: GenerarNominaElectronicaPeriodo): Observable<GenerarNominaElectronicaRespuesta> {
+    const payload: GenerarNominaElectronicaPayload = {
+      documento_tipo: DOCUMENT_TYPE_ID.NOMINA_ELECTRONICA,
+      ...periodo,
+    };
+    return this.post<GenerarNominaElectronicaRespuesta>(GENERAR_ENDPOINT, payload);
   }
 }

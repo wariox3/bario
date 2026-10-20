@@ -1,60 +1,46 @@
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   BaseHttpService,
+  buildListBody,
   buildListParams,
-  buildOrdenamientos,
   type ListQuery,
   type PaginatedResponse,
-  type ParamValue,
 } from '@reddoc/core';
-import {
-  toPaginatedResponse,
-  type CuentaCobrarCorte,
-  type CuentaCobrarCorteRawResponse,
-} from './cuenta-cobrar-corte.model';
+import type { CuentaCobrarCorte } from './cuenta-cobrar-corte.model';
 
-/** Endpoint del informe de corte (`GET` para consultar, `?excel=True` para Excel). */
-export const CUENTA_COBRAR_CORTE_ENDPOINT = '/cartera/informe/pendiente-corte/';
+/**
+ * Identificador del informe que el backend lee del body: cuentas por cobrar con
+ * saldo pendiente **a la `fecha` de corte**. Gemelo de `pagar_corte`.
+ */
+export const CUENTA_COBRAR_CORTE_INFORME = 'cobrar_corte';
 
-/** Serializador que el backend usa para acotar el informe a las columnas de corte. */
-export const CUENTA_COBRAR_CORTE_SERIALIZADOR = 'Informe';
+/** Endpoint del informe (acciones: `lista/`, `excel/`). */
+export const CUENTA_COBRAR_CORTE_ENDPOINT = '/general/documento-informe/';
 
 /**
  * Servicio HTTP del informe **Cuentas por cobrar corte**.
  *
- * A diferencia del resto de informes del ERP (POST `documento-informe/lista/`
- * con `{ filtros, ordenamientos }`), el corte es un **GET** parametrizado por la
- * **fecha de corte** — el input protagonista del reporte. Adapta la respuesta
- * cruda `{ registros, cantidad_registros }` al envelope estándar
- * `{ results, count }`. La paginación va como query params.
+ * Mismo endpoint que el resto de informes de documentos (`documento-informe`):
+ * POST con `{ informe, fecha, filtros, ordenamientos }`. La **fecha de corte**
+ * viaja en el body junto al identificador del informe. La paginación va como
+ * query params.
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
- *
- * **Supuesto pendiente de confirmar con backend**: el path, el param `fecha`
- * (`yyyy-MM-dd`), `serializador: 'Informe'`, que respete `page`/`limit` y que la
- * descarga se pida con `excel=True`.
  */
 @Injectable({ providedIn: 'root' })
 export class CuentaCobrarCorteService extends BaseHttpService {
-  /** URL de la acción de exportar (la usa `FileDownloadService`). */
-  readonly exportUrl = CUENTA_COBRAR_CORTE_ENDPOINT;
+  private readonly resourcePath = CUENTA_COBRAR_CORTE_ENDPOINT;
 
-  /**
-   * Consulta la cartera por cobrar a la `fecha` de corte, paginada.
-   * `query.filters` se ignora (el informe solo se parametriza por fecha).
-   */
+  /** URL absoluta de la acción de exportar (la usa `FileDownloadService`). */
+  readonly exportUrl = `${CUENTA_COBRAR_CORTE_ENDPOINT}excel/`;
+
+  /** Consulta la cartera por cobrar a la `fecha` de corte (`yyyy-MM-dd`), paginada. */
   list(fecha: string, query: ListQuery): Observable<PaginatedResponse<CuentaCobrarCorte>> {
-    const params: Record<string, ParamValue> = {
-      fecha,
-      serializador: CUENTA_COBRAR_CORTE_SERIALIZADOR,
-      ...buildListParams(query),
-    };
-    const ordering = buildOrdenamientos(query.sort);
-    if (ordering.length > 0) params['ordering'] = ordering.join(',');
-
-    return this.get<CuentaCobrarCorteRawResponse>(CUENTA_COBRAR_CORTE_ENDPOINT, params).pipe(
-      map(toPaginatedResponse),
+    return this.post<PaginatedResponse<CuentaCobrarCorte>>(
+      this.resourcePath + 'lista/',
+      { ...buildListBody(query), informe: CUENTA_COBRAR_CORTE_INFORME, fecha },
+      buildListParams(query),
     );
   }
 }

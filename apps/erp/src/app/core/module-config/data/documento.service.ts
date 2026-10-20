@@ -35,7 +35,7 @@ export class DocumentoService extends BaseHttpService {
   listarPorIds<TRead = unknown>(ids: readonly number[]): Observable<TRead[]> {
     return this.post<PaginatedResponse<TRead>>(
       `${DOCUMENTO_ENDPOINT}lista/`,
-      { filtros: [{ propiedad: 'id', operador: 'in', valor: ids.join(',') }] },
+      { filtros: [{ propiedad: 'id', operador: 'in', valor: ids }] },
       { limit: ids.length },
     ).pipe(map((res) => [...res.results]));
   }

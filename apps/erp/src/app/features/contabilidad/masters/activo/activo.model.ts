@@ -19,6 +19,9 @@ export interface Activo {
   readonly duracion: number | null;
   readonly valor_compra: string | number | null;
   readonly depreciacion_inicial: string | number | null;
+  // Calculados por el backend (solo lectura)
+  readonly depreciacion_periodo?: string | number | null;
+  readonly depreciacion_saldo?: string | number | null;
   // Foreign keys (id pelado) + companion `*_nombre` / `*_codigo`
   readonly activo_grupo: number | null;
   readonly activo_grupo_nombre?: string | null;

@@ -53,6 +53,13 @@ export class ComercialDocumentoLineasTableComponent {
   readonly refEnabled = input<boolean>(true);
 
   /**
+   * Muestra la columna **Detalle** (la nota libre por línea). Default `true`; la
+   * apaga el documento que también la apaga en su tabla editable (la remisión),
+   * para que la ficha no muestre una columna que el form no deja llenar.
+   */
+  readonly detalleEnabled = input<boolean>(true);
+
+  /**
    * Id del **detalle base** a consultar en el modal de afectación: la propia línea
    * (clic en #) o su `documento_detalle_afectado` (clic en REF).
    */
@@ -60,9 +67,13 @@ export class ComercialDocumentoLineasTableComponent {
 
   protected readonly formatMoney = formatCop;
 
-  /** Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las opcionales. */
+  /** Columnas de la tabla, para el `colspan` del estado vacío: 8 fijas más las opcionales. */
   protected readonly columnCount = computed(
-    () => 9 + (this.refEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
+    () =>
+      8 +
+      (this.refEnabled() ? 1 : 0) +
+      (this.almacenEnabled() ? 1 : 0) +
+      (this.detalleEnabled() ? 1 : 0),
   );
 
   /** Subtotal bruto de una línea por índice. */

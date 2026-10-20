@@ -7,13 +7,13 @@ export const CUENTA_COBRAR_CORTE_FECHA_STORAGE_KEY = 'cuenta-cobrar-corte:fecha:
 
 /**
  * Columnas del informe de corte. Igual que el informe normal en la
- * identificación del documento/contacto, pero cierra con **saldo** (el
- * pendiente por cobrar al día del corte) en vez de afectado/pendiente.
+ * identificación del documento/contacto, pero cierra con el **saldo** (el
+ * `pendiente_corte` al día del corte) en vez de afectado/pendiente.
  */
 export const CUENTA_COBRAR_CORTE_COLUMNS: readonly ColumnDef[] = [
   { field: 'id', headerKey: `${I18N}.columns.id`, type: 'number', width: '70px', align: 'right' },
   {
-    field: 'documento_tipo__nombre',
+    field: 'documento_tipo_nombre',
     headerKey: `${I18N}.columns.documentoTipo`,
     type: 'text',
     width: '140px',
@@ -22,12 +22,12 @@ export const CUENTA_COBRAR_CORTE_COLUMNS: readonly ColumnDef[] = [
   { field: 'fecha', headerKey: `${I18N}.columns.fecha`, type: 'date', width: '110px' },
   { field: 'fecha_vence', headerKey: `${I18N}.columns.fechaVence`, type: 'date', width: '110px' },
   {
-    field: 'contacto__numero_identificacion',
+    field: 'contacto_numero_identificacion',
     headerKey: `${I18N}.columns.identificacion`,
     type: 'text',
     width: '130px',
   },
-  { field: 'contacto__nombre_corto', headerKey: `${I18N}.columns.contacto`, type: 'text' },
+  { field: 'contacto_nombre_corto', headerKey: `${I18N}.columns.contacto`, type: 'text' },
   {
     field: 'subtotal',
     headerKey: `${I18N}.columns.subtotal`,
@@ -50,14 +50,14 @@ export const CUENTA_COBRAR_CORTE_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'pago',
+    field: 'pago_corte',
     headerKey: `${I18N}.columns.pago`,
     type: 'currency',
     width: '130px',
     align: 'right',
   },
   {
-    field: 'saldo',
+    field: 'pendiente_corte',
     headerKey: `${I18N}.columns.saldo`,
     type: 'currency',
     width: '130px',

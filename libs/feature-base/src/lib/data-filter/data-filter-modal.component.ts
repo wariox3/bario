@@ -27,9 +27,9 @@ import {
   type FilterValueKind,
 } from '@reddoc/core';
 import {
-  conditionsToDraft,
   draftToConditions,
   fieldTypeOf,
+  initialDraft,
   newRowForField,
   type DraftRow,
 } from './data-filter.logic';
@@ -99,10 +99,17 @@ export class DataFilterModalComponent {
   private readonly focusRowIndex = signal<number | null>(null);
 
   constructor() {
-    // Al abrir, hidrata el borrador desde los filtros activos. Se hace en un
-    // effect (no en input setter) porque `value`/`fields` son signals.
+    // Al abrir, hidrata el borrador desde los filtros activos (o con una
+    // condición lista si no hay ninguno). Se hace en un effect (no en input
+    // setter) porque `value`/`fields` son signals.
     effect(() => {
-      if (this.visible()) this.draft.set(conditionsToDraft(this.value(), this.fields()));
+      if (!this.visible()) return;
+      const rows = initialDraft(this.value(), this.fields());
+      this.draft.set(rows);
+      // El foco va al valor de la última fila, que es la que se suele editar.
+      // El diálogo no lo pone (`focusOnShow` apagado): le daría el foco al
+      // select de propiedad después de la animación, pisando este.
+      untracked(() => this.focusRowIndex.set(rows.length > 0 ? rows.length - 1 : null));
     });
 
     // UX: al añadir una condición, mover el foco a su input de valor cuando

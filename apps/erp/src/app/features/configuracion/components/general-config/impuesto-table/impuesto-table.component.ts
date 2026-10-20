@@ -1,8 +1,8 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService, type ListQuery } from '@reddoc/core';
+import { I18nService, ToastService } from '@reddoc/core';
 import {
   DataTableComponent,
   type PageChangeEvent,
@@ -17,12 +17,11 @@ import { toImpuestoRow } from '../../../impuesto/impuesto.mapper';
 import {
   IMPUESTO_COLUMNS,
   IMPUESTO_ROW_ACTIONS,
-  IMPUESTO_SORT,
   IMPUESTO_TABLE_HEIGHT,
 } from '../../../impuesto/impuesto.constants';
 import { ImpuestoEditDialogComponent } from '../impuesto-edit-dialog/impuesto-edit-dialog.component';
 
-/** Tamaño de página inicial. El `lista/` lo acepta como `limit`, así que manda el front. */
+/** Tamaño de página inicial. El backend devuelve todo; se pagina en el cliente. */
 const PAGE_SIZE_INICIAL = 25;
 
 /**
@@ -47,14 +46,19 @@ export class ImpuestoTableComponent {
 
   protected readonly t = this.i18n.t;
 
-  protected readonly items = signal<readonly ImpuestoRow[]>([]);
-  protected readonly totalCount = signal(0);
   /** Arranca en `true`: hasta saber si puede ver, la tabla muestra su esqueleto. */
   protected readonly isLoading = signal(true);
   protected readonly puedeVer = signal(true);
   protected readonly loadFailed = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(PAGE_SIZE_INICIAL);
+
+  private readonly rows = signal<readonly ImpuestoRow[]>([]);
+  protected readonly totalCount = computed(() => this.rows().length);
+  protected readonly items = computed(() => {
+    const inicio = this.currentPage() * this.pageSize();
+    return this.rows().slice(inicio, inicio + this.pageSize());
+  });
 
   protected readonly selectedImpuesto = signal<Impuesto | null>(null);
   protected readonly dialogVisible = signal(false);
@@ -83,29 +87,19 @@ export class ImpuestoTableComponent {
       });
   }
 
-  private query(): ListQuery {
-    return {
-      filters: [],
-      sort: IMPUESTO_SORT,
-      page: this.currentPage(),
-      pageSize: this.pageSize(),
-    };
-  }
-
   protected cargar(): void {
     this.isLoading.set(true);
     this.loadFailed.set(false);
 
     this.service
-      .list(this.query())
+      .listar()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
         next: (respuesta) => {
-          this.items.set(respuesta.results.map(toImpuestoRow));
-          this.totalCount.set(respuesta.count);
+          this.rows.set(respuesta.map(toImpuestoRow));
         },
         error: () => {
           this.loadFailed.set(true);
@@ -118,7 +112,6 @@ export class ImpuestoTableComponent {
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
     this.pageSize.set(event.pageSize);
-    this.cargar();
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
