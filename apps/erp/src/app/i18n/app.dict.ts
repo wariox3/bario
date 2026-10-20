@@ -5489,7 +5489,6 @@ export interface AppDict
       validation: { required: string };
       tabs: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };
       hints: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };
-      pendiente: string;
       /** Nombres legibles de los códigos `tipo` de provisión y aporte (`CESANTIA`, `PENSION`…). */
       tipos: Record<string, string>;
       aporte: {
@@ -5523,6 +5522,29 @@ export interface AppDict
         toasts: {
           saveSuccess: { title: string; desc: string };
           saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      concepto: {
+        columns: { id: string; nombre: string; tipo: string; porcentaje: string };
+        actions: { cuentas: string };
+        empty: { title: string; sub: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+      conceptoCuenta: {
+        dialog: { title: string; hint: string };
+        columns: { id: string; tipoCosto: string; cuenta: string };
+        fields: { tipoCosto: string; cuenta: string };
+        actions: { agregar: string };
+        validation: { required: string; duplicado: string };
+        empty: { title: string; sub: string };
+        confirmDelete: string;
+        toasts: {
+          addSuccess: { title: string; desc: string };
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          deleteSuccess: { title: string; desc: string };
+          deleteError: { title: string; desc: string };
           loadError: { title: string; desc: string };
         };
       };

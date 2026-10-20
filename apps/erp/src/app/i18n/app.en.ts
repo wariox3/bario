@@ -7309,7 +7309,6 @@ export const en: AppDict = {
         provision: 'Debit and credit accounts used to post each provision.',
         aporte: 'Ledger account for each social security and payroll tax contribution.',
       },
-      pendiente: 'This section is not available yet.',
       tipos: {
         CESANTIA: 'Severance',
         INTERES: 'Severance interest',
@@ -7362,6 +7361,40 @@ export const en: AppDict = {
           saveSuccess: { title: 'Provision updated', desc: 'The provision accounts were saved.' },
           saveError: { title: 'Save failed', desc: 'We could not save the provision.' },
           loadError: { title: 'Load failed', desc: 'We could not load the provisions.' },
+        },
+      },
+      concepto: {
+        columns: { id: 'ID', nombre: 'Name', tipo: 'Type', porcentaje: 'Percentage' },
+        actions: { cuentas: 'Accounts' },
+        empty: { title: 'No concepts', sub: 'There are no concepts in the catalog.' },
+        toasts: {
+          loadError: { title: 'Load failed', desc: 'We could not load the concepts.' },
+        },
+      },
+      conceptoCuenta: {
+        dialog: {
+          title: 'Concept accounts',
+          hint: "When posting payroll, each line goes to the account for the contract's cost type.",
+        },
+        columns: { id: 'ID', tipoCosto: 'Cost type', cuenta: 'Account' },
+        fields: { tipoCosto: 'Cost type', cuenta: 'Ledger account' },
+        actions: { agregar: 'Add' },
+        validation: {
+          required: 'This field is required',
+          duplicado: 'This cost type already has an account',
+        },
+        empty: { title: 'No accounts', sub: 'This concept has no accounts yet.' },
+        confirmDelete: 'Do you want to delete the account for this cost type?',
+        toasts: {
+          addSuccess: { title: 'Account added', desc: 'The account was assigned to the concept.' },
+          saveSuccess: { title: 'Account updated', desc: 'The change was saved.' },
+          saveError: { title: 'Save failed', desc: 'We could not save the account.' },
+          deleteSuccess: {
+            title: 'Account deleted',
+            desc: 'The account was removed from the concept.',
+          },
+          deleteError: { title: 'Delete failed', desc: 'We could not delete the account.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the concept accounts.' },
         },
       },
       conceptoNomina: {

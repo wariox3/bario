@@ -7404,7 +7404,6 @@ export const es: AppDict = {
         provision: 'Cuentas débito y crédito con que se contabiliza cada provisión.',
         aporte: 'Cuenta contable de cada aporte a seguridad social y parafiscales.',
       },
-      pendiente: 'Esta sección todavía no está disponible.',
       tipos: {
         CESANTIA: 'Cesantías',
         INTERES: 'Intereses de cesantías',
@@ -7459,6 +7458,40 @@ export const es: AppDict = {
           },
           saveError: { title: 'Error al guardar', desc: 'No pudimos guardar la provisión.' },
           loadError: { title: 'Error al cargar', desc: 'No pudimos traer las provisiones.' },
+        },
+      },
+      concepto: {
+        columns: { id: 'ID', nombre: 'Nombre', tipo: 'Tipo', porcentaje: 'Porcentaje' },
+        actions: { cuentas: 'Cuentas' },
+        empty: { title: 'Sin conceptos', sub: 'No hay conceptos en el catálogo.' },
+        toasts: {
+          loadError: { title: 'Error al cargar', desc: 'No pudimos traer los conceptos.' },
+        },
+      },
+      conceptoCuenta: {
+        dialog: {
+          title: 'Cuentas del concepto',
+          hint: 'Al contabilizar la nómina, cada línea va a la cuenta que corresponde al tipo de costo del contrato.',
+        },
+        columns: { id: 'ID', tipoCosto: 'Tipo de costo', cuenta: 'Cuenta' },
+        fields: { tipoCosto: 'Tipo de costo', cuenta: 'Cuenta contable' },
+        actions: { agregar: 'Agregar' },
+        validation: {
+          required: 'Este campo es obligatorio',
+          duplicado: 'Este tipo de costo ya tiene cuenta',
+        },
+        empty: { title: 'Sin cuentas', sub: 'Este concepto todavía no tiene cuentas.' },
+        confirmDelete: '¿Quieres eliminar la cuenta de este tipo de costo?',
+        toasts: {
+          addSuccess: { title: 'Cuenta agregada', desc: 'La cuenta quedó asignada al concepto.' },
+          saveSuccess: { title: 'Cuenta actualizada', desc: 'El cambio quedó guardado.' },
+          saveError: { title: 'Error al guardar', desc: 'No pudimos guardar la cuenta.' },
+          deleteSuccess: { title: 'Cuenta eliminada', desc: 'La cuenta se quitó del concepto.' },
+          deleteError: { title: 'Error al eliminar', desc: 'No pudimos eliminar la cuenta.' },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No pudimos traer las cuentas del concepto.',
+          },
         },
       },
       conceptoNomina: {

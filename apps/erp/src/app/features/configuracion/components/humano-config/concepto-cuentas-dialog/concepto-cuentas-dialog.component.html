@@ -1,0 +1,169 @@
+@let m = t().configuracion.humano.conceptoCuenta;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isAdding()"
+  [dismissableMask]="!isAdding()"
+  [style]="{ width: '46rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-book text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.dialog.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] text-brand-muted">{{ concepto()?.nombre }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <div class="flex flex-col gap-5 pt-1">
+      <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.dialog.hint }}</p>
+
+      @if (grants().crear) {
+        <form
+          [formGroup]="addForm"
+          class="grid grid-cols-1 items-start gap-3 rounded-lg border border-[rgba(20,48,73,0.1)] p-4 sm:grid-cols-[1fr_1.4fr_auto]"
+          (ngSubmit)="onAgregar()"
+        >
+          <div class="flex flex-col gap-1.5">
+            <label for="cc_tipo_costo" class="text-[0.8rem] font-medium text-brand-text">
+              {{ m.fields.tipoCosto }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <lib-api-select
+              inputId="cc_tipo_costo"
+              formControlName="tipo_costo"
+              [endpoint]="tipoCostoEndpoint"
+              [params]="{ limit: '100' }"
+              [invalid]="addForm.controls.tipo_costo.invalid && addForm.controls.tipo_costo.touched"
+            />
+            <lib-field-error
+              [control]="addForm.controls.tipo_costo"
+              [messages]="{ required: m.validation.required, duplicado: m.validation.duplicado }"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="cc_cuenta" class="text-[0.8rem] font-medium text-brand-text">
+              {{ m.fields.cuenta }}
+              <span class="ml-px text-red-500">*</span>
+            </label>
+            <app-cuenta-select
+              inputId="cc_cuenta"
+              formControlName="cuenta"
+              [invalid]="addForm.controls.cuenta.invalid && addForm.controls.cuenta.touched"
+            />
+            <lib-field-error
+              [control]="addForm.controls.cuenta"
+              [messages]="{ required: m.validation.required }"
+            />
+          </div>
+
+          <p-button
+            type="submit"
+            class="sm:mt-[1.6rem]"
+            [label]="m.actions.agregar"
+            icon="pi pi-plus"
+            [loading]="isAdding()"
+            [disabled]="isAdding()"
+          />
+        </form>
+      }
+
+      @if (isLoading()) {
+        <div class="h-28 animate-pulse rounded-lg bg-[rgba(20,48,73,0.06)]"></div>
+      } @else if (loadFailed()) {
+        <div class="flex flex-col items-center justify-center gap-3 py-8 text-center">
+          <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+          <p class="m-0 text-sm text-brand-muted">{{ m.toasts.loadError.desc }}</p>
+          <p-button
+            type="button"
+            [label]="t().common.actions.refresh"
+            icon="pi pi-refresh"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="recargar()"
+          />
+        </div>
+      } @else if (rows().length === 0) {
+        <div
+          class="flex flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-[rgba(20,48,73,0.15)] py-8 text-center"
+        >
+          <p class="m-0 text-sm font-medium text-brand-text">{{ m.empty.title }}</p>
+          <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.empty.sub }}</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto rounded-lg border border-[rgba(20,48,73,0.1)]">
+          <table class="w-full border-collapse text-[0.82rem]">
+            <thead>
+              <tr class="bg-[rgba(20,48,73,0.03)] text-left text-[0.75rem] text-brand-muted">
+                <th class="w-[70px] px-3 py-2 text-right font-semibold">{{ m.columns.id }}</th>
+                <th class="w-[12rem] px-3 py-2 font-semibold">{{ m.columns.tipoCosto }}</th>
+                <th class="px-3 py-2 font-semibold">{{ m.columns.cuenta }}</th>
+                <th class="w-[3.5rem] px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows(); track row.id) {
+                <tr class="border-t border-[rgba(20,48,73,0.08)]">
+                  <td class="px-3 py-2 text-right tabular-nums text-brand-muted">{{ row.id }}</td>
+                  <td class="px-3 py-2 text-brand-text">{{ row.tipo_costo_nombre }}</td>
+                  <td class="px-3 py-2 text-brand-text">
+                    @if (grants().editar) {
+                      <app-cuenta-select
+                        [inputId]="'cc_cuenta_' + row.id"
+                        [ngModel]="row.cuenta_option"
+                        [disabled]="busyId() === row.id"
+                        (ngModelChange)="onCambioCuenta(row, $event)"
+                      />
+                    } @else {
+                      {{ row.cuenta_label }}
+                    }
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    @if (grants().eliminar) {
+                      <p-button
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [text]="true"
+                        [rounded]="true"
+                        [ariaLabel]="t().common.actions.delete"
+                        [loading]="busyId() === row.id"
+                        [disabled]="busyId() !== null"
+                        (onClick)="onEliminar(row)"
+                      />
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      severity="secondary"
+      [text]="true"
+      [label]="t().common.actions.close"
+      [disabled]="isAdding()"
+      (onClick)="visible.set(false)"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog key="concepto-cuenta" />

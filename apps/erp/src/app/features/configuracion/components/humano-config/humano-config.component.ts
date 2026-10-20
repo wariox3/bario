@@ -13,6 +13,7 @@ import { ConfiguracionService } from '../../configuracion.service';
 import { HUMANO_CAMPOS } from '../../configuracion.constants';
 import { configuracionToHumanoForm, humanoFormToPayload } from '../../configuracion.mapper';
 import { AporteTableComponent } from './aporte-table/aporte-table.component';
+import { ConceptoTableComponent } from './concepto-table/concepto-table.component';
 import { ConceptoNominaTableComponent } from './concepto-nomina-table/concepto-nomina-table.component';
 import { ProvisionTableComponent } from './provision-table/provision-table.component';
 
@@ -56,6 +57,7 @@ function esCuentasTab(value: string | null): value is CuentasTab {
     FieldErrorComponent,
     FocusInvalidDirective,
     ConceptoNominaTableComponent,
+    ConceptoTableComponent,
     ProvisionTableComponent,
     AporteTableComponent,
   ],

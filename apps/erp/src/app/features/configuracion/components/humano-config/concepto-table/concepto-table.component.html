@@ -1,0 +1,39 @@
+@let m = t().configuracion.humano.concepto;
+
+@if (!puedeVer()) {
+  <app-access-denied [message]="t().common.accessDenied.subPermission" />
+} @else if (loadFailed()) {
+  <div class="flex flex-col items-center justify-center gap-3 py-12 text-center">
+    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+    <p class="m-0 text-sm text-brand-muted">{{ m.toasts.loadError.desc }}</p>
+    <p-button
+      type="button"
+      [label]="t().common.actions.refresh"
+      icon="pi pi-refresh"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="cargar()"
+    />
+  </div>
+} @else {
+  <lib-data-table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [rowActions]="rowActions()"
+    [scrollHeight]="tableHeight"
+    emptyTitleKey="configuracion.humano.concepto.empty.title"
+    emptySubKey="configuracion.humano.concepto.empty.sub"
+    (pageChange)="onPageChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+}
+
+<app-concepto-cuentas-dialog
+  [(visible)]="dialogVisible"
+  [concepto]="selected()"
+  [grants]="cuentasGrants()"
+/>
