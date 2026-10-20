@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.9](https://github.com/tamerlantian/reddoc-nx/compare/v0.1.8...v0.1.9) (2026-10-20)
+
+### Features
+
+- **configuracion:** cuentas por concepto en la pestaña humano ([cce059d](https://github.com/tamerlantian/reddoc-nx/commit/cce059d3cc1631e7895c866191ecadfa04a99029))
+- **configuracion:** cuentas y conceptos de nomina en la pestaña humano ([4e1e139](https://github.com/tamerlantian/reddoc-nx/commit/4e1e139c0f25f9c8e1abfa3d3896793a18d1d9c9))
+- **configuracion:** provision y aporte se editan en la tabla ([e596d6a](https://github.com/tamerlantian/reddoc-nx/commit/e596d6adbd3ff9c557e53ba29a1ee752d7bea23a))
+- **erp:** editar y eliminar programaciones en borrador desde el listado ([0065680](https://github.com/tamerlantian/reddoc-nx/commit/00656803c3c71787640287c4d9f456d47c3e407d))
+- **erp:** mostrar el tipo de documento al importar desde documento ([4279e77](https://github.com/tamerlantian/reddoc-nx/commit/4279e775c5936a0191b2bee331ebf04698d9cf86))
+- **erp:** sumar las columnas de Reddoc 1 al listado de activos ([d861d21](https://github.com/tamerlantian/reddoc-nx/commit/d861d215f7fd3b22a0c3669c91f831e2acedeaea))
+- **feature-base:** abrir el filtro con una condicion lista ([8067ca0](https://github.com/tamerlantian/reddoc-nx/commit/8067ca01afbdd14f174903b8a6c5e4e59a413ef6))
+- **humano:** ficha de nomina electronica en una card y tabs por POST ([ca3f445](https://github.com/tamerlantian/reddoc-nx/commit/ca3f445f973ad77f394b3bef60acdea90b1c5a3a))
+
+### Bug Fixes
+
+- **configuracion:** estados de los selectores de cuenta en humano ([736ed90](https://github.com/tamerlantian/reddoc-nx/commit/736ed9079f6c73968e100643a5b5c6e2185b0f12))
+- **core:** usar el vocabulario de operadores del backend en documentos ([2902a0a](https://github.com/tamerlantian/reddoc-nx/commit/2902a0af671b82b5bb0bd8dc17ffa45b22c65761))
+- **erp:** consumir documento-informe en cuentas por cobrar corte ([1310415](https://github.com/tamerlantian/reddoc-nx/commit/13104154616540356c15aa597e77bea8c76e1925))
+- **erp:** mapear nomina detallada contra la respuesta real ([e228eeb](https://github.com/tamerlantian/reddoc-nx/commit/e228eeb9e37a0e3af54e1b58570e2e0b634284ec))
+- **erp:** ocultar detalle y la REF vacia en la ficha de remision ([a83025a](https://github.com/tamerlantian/reddoc-nx/commit/a83025afd5b442a078922322936ac6f289a00647))
+- **erp:** quitar numero, anulado y contabilizado de las recurrentes ([906b963](https://github.com/tamerlantian/reddoc-nx/commit/906b96379ec31de3680d5fe14098e2b02beca4dc))
+- **humano:** generar nomina electronica por el endpoint generico ([37e9236](https://github.com/tamerlantian/reddoc-nx/commit/37e9236c3aed026d3eab1682e7bc99dc3529e870))
+- **humano:** la novedad de vacaciones envía los días disfrutados reales ([741aade](https://github.com/tamerlantian/reddoc-nx/commit/741aade6753825b01809d9b819e2fe6be8809963))
+- **tesoreria:** la ficha del egreso y la del pago muestran la base ([c13c2bf](https://github.com/tamerlantian/reddoc-nx/commit/c13c2bf5e088736998419c3c621bdc360b83a109))
+
+### Performance
+
+- **configuracion:** montar solo el area de la pestaña activa ([a1a0b1e](https://github.com/tamerlantian/reddoc-nx/commit/a1a0b1e3fa018a2bc9c3e1eab650d9f9e25872a3))
+
+### Refactoring
+
+- **configuracion:** tipos de documento e impuestos sin paginar ([8df8dd4](https://github.com/tamerlantian/reddoc-nx/commit/8df8dd4236283d75212f9b1a94af2d8fc1eb70e7))
+
 ## [0.1.8](https://github.com/wariox3/bario/compare/v0.1.7...v0.1.8) (2026-10-19)
 
 ### Features
