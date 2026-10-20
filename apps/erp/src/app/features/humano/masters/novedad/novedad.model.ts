@@ -93,9 +93,11 @@ export interface NovedadPayload {
   dias: number | null;
   dias_dinero: number;
   dias_disfrutados: number;
-  // `dias_disfrutados_reales` no viaja: el OpenAPI lo marca `readOnly` (DRF lo
-  // descartaría) aunque hoy el backend tampoco lo calcula —vuelve `0.000`—.
-  // Pendiente de definir con el backend: o lo calcula o lo vuelve escribible.
+  /**
+   * Días calendario que la persona está fuera. Lo escribe el usuario, como en el
+   * ERP anterior: el backend rechaza vacaciones con este valor en cero.
+   */
+  dias_disfrutados_reales: number;
   // Referencia
   novedad_referencia: number | null;
 }

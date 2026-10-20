@@ -1665,6 +1665,7 @@ export interface AppDict
           fechaHastaPeriodo: string;
           diasDinero: string;
           diasDisfrutados: string;
+          diasDisfrutadosReales: string;
         };
         hints: { dias: string; diasUno: string };
         validation: { required: string; min: string; maxLength: string; rangoFechas: string };

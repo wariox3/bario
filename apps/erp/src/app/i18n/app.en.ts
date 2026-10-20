@@ -2235,6 +2235,7 @@ export const en: AppDict = {
           fechaHastaPeriodo: 'Period end date',
           diasDinero: 'Paid days',
           diasDisfrutados: 'Enjoyed days',
+          diasDisfrutadosReales: 'Actual enjoyed days',
         },
         hints: {
           dias: 'The event lasts {dias} days, start and end included.',

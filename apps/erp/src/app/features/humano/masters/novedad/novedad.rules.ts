@@ -39,4 +39,5 @@ export function diasDeNovedad(desde: Date | null, hasta: Date | null): number | 
 // No hay regla que ate `dias_disfrutados + dias_dinero` a los días de la novedad:
 // los días en dinero se pagan sin tomarse (no viven en el rango de fechas) y los
 // disfrutados suelen contarse en hábiles, mientras el rango es calendario. El
-// backend cuadra el calendario por su cuenta en `dias_disfrutados_reales`.
+// usuario cuadra el calendario en `dias_disfrutados_reales`, que el backend exige
+// mayor que cero en vacaciones.

@@ -2293,6 +2293,7 @@ export const es: AppDict = {
           fechaHastaPeriodo: 'Fecha hasta periodo',
           diasDinero: 'Días dinero',
           diasDisfrutados: 'Días disfrutados',
+          diasDisfrutadosReales: 'Días disfrutados reales',
         },
         hints: {
           dias: 'La novedad dura {dias} días, contando desde y hasta.',
