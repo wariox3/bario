@@ -5485,7 +5485,59 @@ export interface AppDict
     humano: {
       section: { title: string; hint: string };
       fields: { salarioMinimo: string; factor: string; auxilioTransporte: string };
+      licenciaNoRemuneradaAfectaPension: { label: string; hint: string };
       validation: { required: string };
+      tabs: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };
+      hints: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };
+      pendiente: string;
+      /** Nombres legibles de los códigos `tipo` de provisión y aporte (`CESANTIA`, `PENSION`…). */
+      tipos: Record<string, string>;
+      aporte: {
+        columns: { id: string; tipo: string; cuenta: string };
+        dialog: { title: string };
+        fields: { cuenta: string; cuentaHint: string };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      provision: {
+        columns: {
+          id: string;
+          tipoCosto: string;
+          tipo: string;
+          cuentaDebito: string;
+          cuentaCredito: string;
+        };
+        dialog: { title: string };
+        fields: {
+          cuentaDebito: string;
+          cuentaDebitoHint: string;
+          cuentaCredito: string;
+          cuentaCreditoHint: string;
+          sinCredito: string;
+        };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      conceptoNomina: {
+        columns: { id: string; nombre: string; concepto: string };
+        dialog: { title: string };
+        fields: { concepto: string; conceptoPlaceholder: string };
+        validation: { required: string };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
     };
     venta: {
       tabs: { formato: string; aiu: string };

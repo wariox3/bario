@@ -7387,7 +7387,101 @@ export const es: AppDict = {
         factor: 'Factor prestacional',
         auxilioTransporte: 'Auxilio de transporte',
       },
+      licenciaNoRemuneradaAfectaPension: {
+        label: 'Licencia no remunerada afecta pensión',
+        hint: 'Durante una licencia no remunerada se sigue cotizando a pensión.',
+      },
       validation: { required: 'Este campo es obligatorio' },
+      tabs: {
+        conceptosNomina: 'Conceptos de nómina',
+        conceptos: 'Cuentas por concepto',
+        provision: 'Provisión',
+        aporte: 'Aporte',
+      },
+      hints: {
+        conceptosNomina: 'Qué concepto usa la nómina para cada rubro fijo, como el salario.',
+        conceptos: 'Cuenta contable de cada concepto según el tipo de costo del contrato.',
+        provision: 'Cuentas débito y crédito con que se contabiliza cada provisión.',
+        aporte: 'Cuenta contable de cada aporte a seguridad social y parafiscales.',
+      },
+      pendiente: 'Esta sección todavía no está disponible.',
+      tipos: {
+        CESANTIA: 'Cesantías',
+        INTERES: 'Intereses de cesantías',
+        PRIMA: 'Prima de servicios',
+        VACACION: 'Vacaciones',
+        PENSION: 'Pensión',
+        SALUD: 'Salud',
+        CAJA: 'Caja de compensación',
+        RIESGO: 'Riesgos laborales',
+        SENA: 'SENA',
+        ICBF: 'ICBF',
+      },
+      aporte: {
+        columns: { id: 'ID', tipo: 'Aporte', cuenta: 'Cuenta' },
+        dialog: { title: 'Editar aporte' },
+        fields: {
+          cuenta: 'Cuenta contable',
+          cuentaHint: 'Cuenta por pagar donde se registra el aporte. Déjala vacía para quitarla.',
+        },
+        empty: { title: 'Sin aportes', sub: 'No hay aportes para configurar.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Aporte actualizado',
+            desc: 'La cuenta del aporte quedó guardada.',
+          },
+          saveError: { title: 'Error al guardar', desc: 'No pudimos guardar el aporte.' },
+          loadError: { title: 'Error al cargar', desc: 'No pudimos traer los aportes.' },
+        },
+      },
+      provision: {
+        columns: {
+          id: 'ID',
+          tipoCosto: 'Tipo de costo',
+          tipo: 'Provisión',
+          cuentaDebito: 'Cuenta débito',
+          cuentaCredito: 'Cuenta crédito',
+        },
+        dialog: { title: 'Editar provisión' },
+        fields: {
+          cuentaDebito: 'Cuenta débito',
+          cuentaDebitoHint: 'Cuenta de gasto de la provisión.',
+          cuentaCredito: 'Cuenta crédito',
+          cuentaCreditoHint: 'Cuenta de pasivo donde se acumula la provisión.',
+          sinCredito:
+            'Esta provisión no lleva cuenta crédito: su contrapartida es la cuenta del aporte.',
+        },
+        empty: { title: 'Sin provisiones', sub: 'No hay provisiones para configurar.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Provisión actualizada',
+            desc: 'Las cuentas de la provisión quedaron guardadas.',
+          },
+          saveError: { title: 'Error al guardar', desc: 'No pudimos guardar la provisión.' },
+          loadError: { title: 'Error al cargar', desc: 'No pudimos traer las provisiones.' },
+        },
+      },
+      conceptoNomina: {
+        columns: { id: 'ID', nombre: 'Rubro', concepto: 'Concepto' },
+        dialog: { title: 'Editar concepto de nómina' },
+        fields: { concepto: 'Concepto', conceptoPlaceholder: 'Buscar concepto' },
+        validation: { required: 'Este campo es obligatorio' },
+        empty: { title: 'Sin conceptos de nómina', sub: 'No hay rubros para configurar.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Concepto actualizado',
+            desc: 'El concepto de nómina quedó guardado.',
+          },
+          saveError: {
+            title: 'Error al guardar',
+            desc: 'No pudimos guardar el concepto de nómina.',
+          },
+          loadError: {
+            title: 'Error al cargar',
+            desc: 'No pudimos traer los conceptos de nómina.',
+          },
+        },
+      },
     },
     venta: {
       tabs: { formato: 'Formato', aiu: 'AIU' },

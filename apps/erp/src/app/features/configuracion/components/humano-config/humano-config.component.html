@@ -1,132 +1,230 @@
-@if (loading()) {
-  <div class="h-52 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
-} @else if (loadFailed()) {
-  <div
-    class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
-  >
-    <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
-    <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.toasts.loadError.desc }}</p>
-    <p-button
-      type="button"
-      [label]="t().common.actions.refresh"
-      icon="pi pi-refresh"
-      [outlined]="true"
-      severity="secondary"
-      (onClick)="cargar()"
-    />
-  </div>
-} @else {
-  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-5">
-    <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-      <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
-        <span
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-        >
-          <i class="pi pi-users text-[1.05rem]"></i>
-        </span>
-        <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
-          <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
-            {{ t().configuracion.humano.section.title }}
-          </h2>
-          <p class="m-0 text-[0.75rem] text-brand-muted">
-            {{ t().configuracion.humano.section.hint }}
-          </p>
-        </div>
-      </div>
-
-      <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
-        <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-          <div class="flex flex-col gap-1.5">
-            <label
-              for="salario_minimo"
-              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
-            >
-              {{ t().configuracion.humano.fields.salarioMinimo }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-inputnumber
-              inputId="salario_minimo"
-              formControlName="salario_minimo"
-              mode="currency"
-              currency="COP"
-              locale="es-CO"
-              [fluid]="true"
-              [invalid]="
-                form.controls.salario_minimo.invalid && form.controls.salario_minimo.touched
-              "
-            />
-            <lib-field-error
-              [control]="form.controls.salario_minimo"
-              [messages]="{ required: t().configuracion.humano.validation.required }"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label
-              for="auxilio_transporte"
-              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
-            >
-              {{ t().configuracion.humano.fields.auxilioTransporte }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-inputnumber
-              inputId="auxilio_transporte"
-              formControlName="auxilio_transporte"
-              mode="currency"
-              currency="COP"
-              locale="es-CO"
-              [fluid]="true"
-              [invalid]="
-                form.controls.auxilio_transporte.invalid && form.controls.auxilio_transporte.touched
-              "
-            />
-            <lib-field-error
-              [control]="form.controls.auxilio_transporte"
-              [messages]="{ required: t().configuracion.humano.validation.required }"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label
-              for="factor"
-              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
-            >
-              {{ t().configuracion.humano.fields.factor }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <p-inputnumber
-              inputId="factor"
-              formControlName="factor"
-              mode="decimal"
-              locale="es-CO"
-              [minFractionDigits]="2"
-              [maxFractionDigits]="4"
-              [fluid]="true"
-              [invalid]="form.controls.factor.invalid && form.controls.factor.touched"
-            />
-            <lib-field-error
-              [control]="form.controls.factor"
-              [messages]="{ required: t().configuracion.humano.validation.required }"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="flex items-center justify-end gap-3 pb-1">
-      @if (form.dirty) {
-        <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
-          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-          {{ t().configuracion.unsavedChanges }}
-        </span>
-      }
+<div class="flex flex-col gap-5">
+  @if (loading()) {
+    <div class="h-52 animate-pulse rounded-xl bg-[rgba(20,48,73,0.06)]"></div>
+  } @else if (loadFailed()) {
+    <div
+      class="flex flex-col items-center justify-center gap-3 rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-16 text-center"
+    >
+      <i class="pi pi-exclamation-triangle text-xl text-brand-muted"></i>
+      <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.toasts.loadError.desc }}</p>
       <p-button
-        type="submit"
-        [label]="t().configuracion.actions.save"
-        icon="pi pi-check"
-        [loading]="isSaving()"
-        [disabled]="form.invalid || isSaving()"
+        type="button"
+        [label]="t().common.actions.refresh"
+        icon="pi pi-refresh"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="cargar()"
       />
     </div>
-  </form>
-}
+  } @else {
+    <form [formGroup]="form" libFocusInvalid (ngSubmit)="onSave()" class="flex flex-col gap-5">
+      <section
+        class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+      >
+        <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
+          <span
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+          >
+            <i class="pi pi-users text-[1.05rem]"></i>
+          </span>
+          <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+            <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
+              {{ t().configuracion.humano.section.title }}
+            </h2>
+            <p class="m-0 text-[0.75rem] text-brand-muted">
+              {{ t().configuracion.humano.section.hint }}
+            </p>
+          </div>
+        </div>
+
+        <div class="px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+          <div class="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="salario_minimo"
+                class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+              >
+                {{ t().configuracion.humano.fields.salarioMinimo }}
+                <span class="ml-px text-red-500">*</span>
+              </label>
+              <p-inputnumber
+                inputId="salario_minimo"
+                formControlName="salario_minimo"
+                mode="currency"
+                currency="COP"
+                locale="es-CO"
+                [fluid]="true"
+                [invalid]="
+                  form.controls.salario_minimo.invalid && form.controls.salario_minimo.touched
+                "
+              />
+              <lib-field-error
+                [control]="form.controls.salario_minimo"
+                [messages]="{ required: t().configuracion.humano.validation.required }"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="auxilio_transporte"
+                class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+              >
+                {{ t().configuracion.humano.fields.auxilioTransporte }}
+                <span class="ml-px text-red-500">*</span>
+              </label>
+              <p-inputnumber
+                inputId="auxilio_transporte"
+                formControlName="auxilio_transporte"
+                mode="currency"
+                currency="COP"
+                locale="es-CO"
+                [fluid]="true"
+                [invalid]="
+                  form.controls.auxilio_transporte.invalid &&
+                  form.controls.auxilio_transporte.touched
+                "
+              />
+              <lib-field-error
+                [control]="form.controls.auxilio_transporte"
+                [messages]="{ required: t().configuracion.humano.validation.required }"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label
+                for="factor"
+                class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+              >
+                {{ t().configuracion.humano.fields.factor }}
+                <span class="ml-px text-red-500">*</span>
+              </label>
+              <p-inputnumber
+                inputId="factor"
+                formControlName="factor"
+                mode="decimal"
+                locale="es-CO"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="4"
+                [fluid]="true"
+                [invalid]="form.controls.factor.invalid && form.controls.factor.touched"
+              />
+              <lib-field-error
+                [control]="form.controls.factor"
+                [messages]="{ required: t().configuracion.humano.validation.required }"
+              />
+            </div>
+          </div>
+
+          <label
+            for="licencia_no_remunerada_afecta_pension"
+            class="mt-5 flex cursor-pointer items-start gap-2.5"
+          >
+            <p-checkbox
+              inputId="licencia_no_remunerada_afecta_pension"
+              formControlName="licencia_no_remunerada_afecta_pension"
+              [binary]="true"
+            />
+            <span class="flex flex-col gap-[0.15rem]">
+              <span class="text-[0.85rem] font-medium text-brand-text">
+                {{ t().configuracion.humano.licenciaNoRemuneradaAfectaPension.label }}
+              </span>
+              <span class="text-[0.75rem] text-brand-muted">
+                {{ t().configuracion.humano.licenciaNoRemuneradaAfectaPension.hint }}
+              </span>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <div class="flex items-center justify-end gap-3 pb-1">
+        @if (form.dirty) {
+          <span class="inline-flex items-center gap-1.5 text-[0.78rem] text-brand-muted">
+            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+            {{ t().configuracion.unsavedChanges }}
+          </span>
+        }
+        <p-button
+          type="submit"
+          [label]="t().configuracion.actions.save"
+          icon="pi pi-check"
+          [loading]="isSaving()"
+          [disabled]="isSaving()"
+        />
+      </div>
+    </form>
+  }
+
+  <!--
+  Cuentas y conceptos: fuera del formulario a propósito. Cada pestaña guarda
+  contra su propio endpoint, así que no comparte el botón Guardar de los
+  parámetros ni depende de que esa carga haya salido bien. La activa viaja en
+  `?tab=`.
+-->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <p-tabs
+      class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
+      [value]="cuentasTab()"
+      (valueChange)="onCuentasTabChange($any($event))"
+    >
+      <p-tablist>
+        <p-tab value="conceptos-nomina">{{ t().configuracion.humano.tabs.conceptosNomina }}</p-tab>
+        <p-tab value="conceptos">{{ t().configuracion.humano.tabs.conceptos }}</p-tab>
+        <p-tab value="provision">{{ t().configuracion.humano.tabs.provision }}</p-tab>
+        <p-tab value="aporte">{{ t().configuracion.humano.tabs.aporte }}</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <!--
+          Cada tabla se monta solo con su pestaña activa: así no pide permisos ni
+          datos a quien nunca la abre. Cuentas por concepto sigue pendiente: falta
+          el endpoint de sus cuentas por tipo de costo.
+        -->
+        <p-tabpanel value="conceptos-nomina">
+          @if (cuentasTab() === 'conceptos-nomina') {
+            <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+              <p class="m-0 text-[0.75rem] text-brand-muted">
+                {{ t().configuracion.humano.hints.conceptosNomina }}
+              </p>
+              <app-concepto-nomina-table />
+            </div>
+          }
+        </p-tabpanel>
+        <p-tabpanel value="conceptos">
+          @if (cuentasTab() === 'conceptos') {
+            <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+              <p class="m-0 text-[0.75rem] text-brand-muted">
+                {{ t().configuracion.humano.hints.conceptos }}
+              </p>
+              <div
+                class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[rgba(20,48,73,0.15)] py-10 text-center"
+              >
+                <i class="pi pi-clock text-lg text-brand-muted"></i>
+                <p class="m-0 text-sm text-brand-muted">{{ t().configuracion.humano.pendiente }}</p>
+              </div>
+            </div>
+          }
+        </p-tabpanel>
+        <p-tabpanel value="provision">
+          @if (cuentasTab() === 'provision') {
+            <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+              <p class="m-0 text-[0.75rem] text-brand-muted">
+                {{ t().configuracion.humano.hints.provision }}
+              </p>
+              <app-provision-table />
+            </div>
+          }
+        </p-tabpanel>
+        <p-tabpanel value="aporte">
+          @if (cuentasTab() === 'aporte') {
+            <div class="flex flex-col gap-4 px-5 py-5 max-[576px]:px-4 max-[576px]:py-4">
+              <p class="m-0 text-[0.75rem] text-brand-muted">
+                {{ t().configuracion.humano.hints.aporte }}
+              </p>
+              <app-aporte-table />
+            </div>
+          }
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </section>
+</div>

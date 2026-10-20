@@ -24,6 +24,8 @@ export interface ConfiguracionRead {
   readonly hum_salario_minimo: number | string | null;
   readonly hum_auxilio_transporte: number | string | null;
   readonly hum_entidad_riesgo: number | null;
+  /** Si una licencia no remunerada sigue cotizando a pensión. */
+  readonly hum_licencia_no_remunerada_afecta_pension: boolean;
 
   // Facturación electrónica (área General)
   /**

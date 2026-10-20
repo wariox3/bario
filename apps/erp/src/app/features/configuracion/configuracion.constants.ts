@@ -21,6 +21,7 @@ export const HUMANO_CAMPOS = [
   'hum_salario_minimo',
   'hum_factor',
   'hum_auxilio_transporte',
+  'hum_licencia_no_remunerada_afecta_pension',
 ] as const satisfies readonly ConfiguracionCampo[];
 
 // ── Área Venta ────────────────────────────────────────────────────────────────

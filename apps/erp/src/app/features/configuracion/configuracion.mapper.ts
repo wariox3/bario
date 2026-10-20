@@ -37,6 +37,7 @@ export interface HumanoConfigFormValue {
   readonly salario_minimo: number | null;
   readonly factor: number | null;
   readonly auxilio_transporte: number | null;
+  readonly licencia_no_remunerada_afecta_pension: boolean;
 }
 
 export function configuracionToHumanoForm(
@@ -46,6 +47,8 @@ export function configuracionToHumanoForm(
     salario_minimo: toFiniteNumber(config.hum_salario_minimo),
     factor: toFiniteNumber(config.hum_factor),
     auxilio_transporte: toFiniteNumber(config.hum_auxilio_transporte),
+    licencia_no_remunerada_afecta_pension:
+      config.hum_licencia_no_remunerada_afecta_pension ?? false,
   };
 }
 
@@ -54,6 +57,7 @@ export function humanoFormToPayload(form: HumanoConfigFormValue): ConfiguracionP
     hum_salario_minimo: form.salario_minimo,
     hum_factor: form.factor,
     hum_auxilio_transporte: form.auxilio_transporte,
+    hum_licencia_no_remunerada_afecta_pension: form.licencia_no_remunerada_afecta_pension,
   };
 }
 

@@ -7292,7 +7292,90 @@ export const en: AppDict = {
         factor: 'Benefits factor',
         auxilioTransporte: 'Transport allowance',
       },
+      licenciaNoRemuneradaAfectaPension: {
+        label: 'Unpaid leave affects pension',
+        hint: 'Pension contributions continue during unpaid leave.',
+      },
       validation: { required: 'This field is required' },
+      tabs: {
+        conceptosNomina: 'Payroll concepts',
+        conceptos: 'Accounts by concept',
+        provision: 'Provision',
+        aporte: 'Contribution',
+      },
+      hints: {
+        conceptosNomina: 'Which concept payroll uses for each fixed item, such as salary.',
+        conceptos: "Ledger account for each concept by the contract's cost type.",
+        provision: 'Debit and credit accounts used to post each provision.',
+        aporte: 'Ledger account for each social security and payroll tax contribution.',
+      },
+      pendiente: 'This section is not available yet.',
+      tipos: {
+        CESANTIA: 'Severance',
+        INTERES: 'Severance interest',
+        PRIMA: 'Service bonus',
+        VACACION: 'Vacation',
+        PENSION: 'Pension',
+        SALUD: 'Health',
+        CAJA: 'Family compensation fund',
+        RIESGO: 'Occupational risk',
+        SENA: 'SENA',
+        ICBF: 'ICBF',
+      },
+      aporte: {
+        columns: { id: 'ID', tipo: 'Contribution', cuenta: 'Account' },
+        dialog: { title: 'Edit contribution' },
+        fields: {
+          cuenta: 'Ledger account',
+          cuentaHint:
+            'Payable account where the contribution is recorded. Leave it empty to remove it.',
+        },
+        empty: { title: 'No contributions', sub: 'There are no contributions to configure.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Contribution updated',
+            desc: 'The contribution account was saved.',
+          },
+          saveError: { title: 'Save failed', desc: 'We could not save the contribution.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the contributions.' },
+        },
+      },
+      provision: {
+        columns: {
+          id: 'ID',
+          tipoCosto: 'Cost type',
+          tipo: 'Provision',
+          cuentaDebito: 'Debit account',
+          cuentaCredito: 'Credit account',
+        },
+        dialog: { title: 'Edit provision' },
+        fields: {
+          cuentaDebito: 'Debit account',
+          cuentaDebitoHint: 'Expense account of the provision.',
+          cuentaCredito: 'Credit account',
+          cuentaCreditoHint: 'Liability account where the provision accrues.',
+          sinCredito:
+            'This provision has no credit account: its counterpart is the contribution account.',
+        },
+        empty: { title: 'No provisions', sub: 'There are no provisions to configure.' },
+        toasts: {
+          saveSuccess: { title: 'Provision updated', desc: 'The provision accounts were saved.' },
+          saveError: { title: 'Save failed', desc: 'We could not save the provision.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the provisions.' },
+        },
+      },
+      conceptoNomina: {
+        columns: { id: 'ID', nombre: 'Item', concepto: 'Concept' },
+        dialog: { title: 'Edit payroll concept' },
+        fields: { concepto: 'Concept', conceptoPlaceholder: 'Search concept' },
+        validation: { required: 'This field is required' },
+        empty: { title: 'No payroll concepts', sub: 'There are no items to configure.' },
+        toasts: {
+          saveSuccess: { title: 'Concept updated', desc: 'The payroll concept was saved.' },
+          saveError: { title: 'Save failed', desc: 'We could not save the payroll concept.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the payroll concepts.' },
+        },
+      },
     },
     venta: {
       tabs: { formato: 'Format', aiu: 'AIU' },
