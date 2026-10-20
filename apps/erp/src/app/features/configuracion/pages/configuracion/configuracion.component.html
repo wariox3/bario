@@ -29,28 +29,42 @@
       </p-tablist>
 
       <p-tabpanels>
+        <!--
+          Cada área se monta solo con su pestaña activa: PrimeNG crea todos los
+          paneles y solo oculta los inactivos, así que sin el @if entrar a
+          Configuración pedía los datos de todas las áreas a la vez. Al cambiar de
+          área se descarta la que se deja, con sus cambios sin guardar.
+        -->
         <p-tabpanel value="general">
-          <!-- El aire bajo la tira vive aquí (pt-7): el padding de .p-tabpanels no es confiable. -->
-          <div class="pt-7">
-            <app-general-config />
-          </div>
+          @if (activeSeccion() === 'general') {
+            <!-- El aire bajo la tira vive aquí (pt-7): el padding de .p-tabpanels no es confiable. -->
+            <div class="pt-7">
+              <app-general-config />
+            </div>
+          }
         </p-tabpanel>
         <p-tabpanel value="humano">
-          <div class="flex flex-col gap-5 pt-7">
-            <app-asistente-acceso variante="nomina" />
-            <app-humano-config />
-          </div>
+          @if (activeSeccion() === 'humano') {
+            <div class="flex flex-col gap-5 pt-7">
+              <app-asistente-acceso variante="nomina" />
+              <app-humano-config />
+            </div>
+          }
         </p-tabpanel>
         <p-tabpanel value="venta">
-          <div class="flex flex-col gap-5 pt-7">
-            <app-asistente-acceso variante="venta" />
-            <app-venta-config />
-          </div>
+          @if (activeSeccion() === 'venta') {
+            <div class="flex flex-col gap-5 pt-7">
+              <app-asistente-acceso variante="venta" />
+              <app-venta-config />
+            </div>
+          }
         </p-tabpanel>
         <p-tabpanel value="compra">
-          <div class="pt-7">
-            <app-compra-config />
-          </div>
+          @if (activeSeccion() === 'compra') {
+            <div class="pt-7">
+              <app-compra-config />
+            </div>
+          }
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
