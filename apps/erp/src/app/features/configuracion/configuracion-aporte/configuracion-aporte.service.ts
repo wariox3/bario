@@ -17,7 +17,7 @@ export class ConfiguracionAporteService extends BaseHttpService {
     return this.get<ConfiguracionAporte[]>(`${this.resourcePath}configuracion/`);
   }
 
-  /** Asigna (o quita, con `null`) la cuenta contable del aporte. */
+  /** Guarda la cuenta contable del aporte. */
   update(id: number, payload: ConfiguracionAportePayload): Observable<unknown> {
     return this.patch<unknown>(`${this.resourcePath}${id}/`, payload);
   }

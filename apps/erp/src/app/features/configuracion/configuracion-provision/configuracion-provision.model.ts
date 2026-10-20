@@ -1,3 +1,5 @@
+import type { ErpSelectOption } from '@reddoc/core';
+
 /**
  * Configuración de provisión (`HumConfiguracionProvision`).
  *
@@ -20,14 +22,19 @@ export interface ConfiguracionProvision {
   readonly cuenta_credito_nombre: string | null;
 }
 
-/** Fila tal como la pinta la tabla: el tipo traducido y las cuentas aplanadas. */
+/** Fila tal como la pinta la tabla: el tipo traducido y cada cuenta lista para su selector. */
 export interface ConfiguracionProvisionRow extends ConfiguracionProvision {
   readonly tipo_label: string;
+  /** Las de seguridad social y parafiscales solo llevan débito. */
+  readonly lleva_credito: boolean;
   readonly cuenta_debito_label: string;
+  readonly cuenta_debito_option: ErpSelectOption | null;
   readonly cuenta_credito_label: string;
+  readonly cuenta_credito_option: ErpSelectOption | null;
 }
 
-export interface ConfiguracionProvisionPayload {
-  readonly cuenta_debito: number | null;
-  readonly cuenta_credito?: number | null;
-}
+/** Campo de cuenta que se guarda al elegirla en la tabla. */
+export type ProvisionCuentaCampo = 'cuenta_debito' | 'cuenta_credito';
+
+/** El PATCH lleva solo la cuenta que cambió. */
+export type ConfiguracionProvisionPayload = Partial<Record<ProvisionCuentaCampo, number>>;

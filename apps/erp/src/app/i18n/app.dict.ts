@@ -5493,8 +5493,6 @@ export interface AppDict
       tipos: Record<string, string>;
       aporte: {
         columns: { id: string; tipo: string; cuenta: string };
-        dialog: { title: string };
-        fields: { cuenta: string; cuentaHint: string };
         empty: { title: string; sub: string };
         toasts: {
           saveSuccess: { title: string; desc: string };
@@ -5509,14 +5507,6 @@ export interface AppDict
           tipo: string;
           cuentaDebito: string;
           cuentaCredito: string;
-        };
-        dialog: { title: string };
-        fields: {
-          cuentaDebito: string;
-          cuentaDebitoHint: string;
-          cuentaCredito: string;
-          cuentaCreditoHint: string;
-          sinCredito: string;
         };
         empty: { title: string; sub: string };
         toasts: {

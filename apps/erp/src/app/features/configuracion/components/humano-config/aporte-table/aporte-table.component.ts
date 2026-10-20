@@ -1,35 +1,33 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService } from '@reddoc/core';
-import {
-  DataTableComponent,
-  type PageChangeEvent,
-  type RowActionInvokedEvent,
-} from '@reddoc/feature-base';
-import { MODELO, ModelPermissionsService, masterActions } from '@erp/core/permissions';
+import { I18nService, ToastService, type ErpSelectOption } from '@reddoc/core';
+import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
+import { MODELO, ModelPermissionsService } from '@erp/core/permissions';
 import { AccessDeniedComponent } from '@erp/core/components/access-denied/access-denied.component';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionAporteService } from '../../../configuracion-aporte/configuracion-aporte.service';
-import type { ConfiguracionAporteRow } from '../../../configuracion-aporte/configuracion-aporte.model';
+import type {
+  ConfiguracionAporte,
+  ConfiguracionAporteRow,
+} from '../../../configuracion-aporte/configuracion-aporte.model';
 import { toConfiguracionAporteRow } from '../../../configuracion-aporte/configuracion-aporte.mapper';
-import { CONFIGURACION_APORTE_COLUMNS } from '../../../configuracion-aporte/configuracion-aporte.constants';
-import { EDITAR_ROW_ACTIONS, HUMANO_TABLE_HEIGHT } from '../humano-config.constants';
-import { AporteEditDialogComponent } from '../aporte-edit-dialog/aporte-edit-dialog.component';
-
-/** Tamaño de página inicial. El backend devuelve todo; se pagina en el cliente. */
-const PAGE_SIZE_INICIAL = 25;
 
 /**
  * Tabla de aportes dentro del área Humano de la configuración: una cuenta
  * contable por aporte a seguridad social y parafiscales. Las filas las siembra
  * el backend; solo se edita la cuenta.
+ *
+ * Se edita en la propia tabla, como en el legacy y en Provisión: la cuenta es
+ * un selector siempre visible y elegir otra la guarda al instante (PATCH). Son
+ * seis filas fijas, así que no se pagina.
  */
 @Component({
   selector: 'app-aporte-table',
   standalone: true,
-  imports: [DataTableComponent, ButtonModule, AccessDeniedComponent, AporteEditDialogComponent],
+  imports: [FormsModule, ButtonModule, AccessDeniedComponent, ErpCuentaSelectComponent],
   templateUrl: './aporte-table.component.html',
 })
 export class AporteTableComponent {
@@ -41,30 +39,14 @@ export class AporteTableComponent {
 
   protected readonly t = this.i18n.t;
 
-  private readonly rows = signal<readonly ConfiguracionAporteRow[]>([]);
+  protected readonly rows = signal<readonly ConfiguracionAporteRow[]>([]);
   /** Arranca en `true`: hasta saber si puede ver, la tabla muestra su esqueleto. */
   protected readonly isLoading = signal(true);
   protected readonly puedeVer = signal(true);
+  protected readonly puedeEditar = signal(false);
   protected readonly loadFailed = signal(false);
-  protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(PAGE_SIZE_INICIAL);
-
-  protected readonly totalCount = computed(() => this.rows().length);
-  protected readonly items = computed(() => {
-    const inicio = this.currentPage() * this.pageSize();
-    return this.rows().slice(inicio, inicio + this.pageSize());
-  });
-
-  protected readonly selected = signal<ConfiguracionAporteRow | null>(null);
-  protected readonly dialogVisible = signal(false);
-
-  protected readonly columns = CONFIGURACION_APORTE_COLUMNS;
-  protected readonly tableHeight = HUMANO_TABLE_HEIGHT;
-
-  /** El lápiz solo aparece si la persona puede editar. */
-  protected readonly acciones = masterActions(MODELO.humano.configuracionAporte, {
-    row: EDITAR_ROW_ACTIONS,
-  });
+  /** Fila con un guardado en vuelo; `null` si ninguna. */
+  protected readonly busyId = signal<number | null>(null);
 
   constructor() {
     // Los grants se piden antes de listar: sin permiso de ver, la petición
@@ -74,6 +56,7 @@ export class AporteTableComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((grants) => {
         this.puedeVer.set(grants.ver);
+        this.puedeEditar.set(grants.editar);
         if (grants.ver) {
           this.cargar();
         } else {
@@ -93,10 +76,7 @@ export class AporteTableComponent {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: (respuesta) => {
-          const tipos = this.t().configuracion.humano.tipos;
-          this.rows.set(respuesta.map((aporte) => toConfiguracionAporteRow(aporte, tipos)));
-        },
+        next: (respuesta) => this.setRows(respuesta),
         error: () => {
           this.loadFailed.set(true);
           const toasts = this.t().configuracion.humano.aporte.toasts;
@@ -105,18 +85,46 @@ export class AporteTableComponent {
       });
   }
 
-  protected onPageChange(event: PageChangeEvent): void {
-    this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
+  /**
+   * Guarda al instante la cuenta elegida. El selector solo emite al elegir una
+   * opción o al vaciarlo: vaciarlo no guarda nada y la celda vuelve a la cuenta
+   * guardada en la próxima carga.
+   */
+  protected onCambioCuenta(row: ConfiguracionAporteRow, cuenta: ErpSelectOption | null): void {
+    if (!cuenta || cuenta.id === row.cuenta) return;
+
+    const toasts = this.t().configuracion.humano.aporte.toasts;
+    this.busyId.set(row.id);
+
+    this.service
+      .update(row.id, { cuenta: cuenta.id })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busyId.set(null)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success(toasts.saveSuccess.title, toasts.saveSuccess.desc);
+          this.recargarSinEsqueleto();
+        },
+        error: () => {
+          this.toast.error(toasts.saveError.title, toasts.saveError.desc);
+          // Devuelve la celda a la cuenta que sigue guardada.
+          this.recargarSinEsqueleto();
+        },
+      });
   }
 
-  protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId !== 'edit') return;
-    this.selected.set(event.row as ConfiguracionAporteRow);
-    this.dialogVisible.set(true);
+  /** Refresca las filas tras guardar sin pasar por el esqueleto: la tabla no parpadea. */
+  private recargarSinEsqueleto(): void {
+    this.service
+      .listar()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (respuesta) => this.setRows(respuesta) });
   }
 
-  protected onSaved(): void {
-    this.cargar();
+  private setRows(respuesta: readonly ConfiguracionAporte[]): void {
+    const tipos = this.t().configuracion.humano.tipos;
+    this.rows.set(respuesta.map((aporte) => toConfiguracionAporteRow(aporte, tipos)));
   }
 }

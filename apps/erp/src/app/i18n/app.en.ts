@@ -7323,12 +7323,6 @@ export const en: AppDict = {
       },
       aporte: {
         columns: { id: 'ID', tipo: 'Contribution', cuenta: 'Account' },
-        dialog: { title: 'Edit contribution' },
-        fields: {
-          cuenta: 'Ledger account',
-          cuentaHint:
-            'Payable account where the contribution is recorded. Leave it empty to remove it.',
-        },
         empty: { title: 'No contributions', sub: 'There are no contributions to configure.' },
         toasts: {
           saveSuccess: {
@@ -7346,15 +7340,6 @@ export const en: AppDict = {
           tipo: 'Provision',
           cuentaDebito: 'Debit account',
           cuentaCredito: 'Credit account',
-        },
-        dialog: { title: 'Edit provision' },
-        fields: {
-          cuentaDebito: 'Debit account',
-          cuentaDebitoHint: 'Expense account of the provision.',
-          cuentaCredito: 'Credit account',
-          cuentaCreditoHint: 'Liability account where the provision accrues.',
-          sinCredito:
-            'This provision has no credit account: its counterpart is the contribution account.',
         },
         empty: { title: 'No provisions', sub: 'There are no provisions to configure.' },
         toasts: {

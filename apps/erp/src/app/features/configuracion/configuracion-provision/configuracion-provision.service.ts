@@ -19,7 +19,7 @@ export class ConfiguracionProvisionService extends BaseHttpService {
     return this.get<ConfiguracionProvision[]>(`${this.resourcePath}configuracion/`);
   }
 
-  /** Asigna (o quita, con `null`) las cuentas de la provisión. */
+  /** Guarda la cuenta que cambió (débito o crédito). */
   update(id: number, payload: ConfiguracionProvisionPayload): Observable<unknown> {
     return this.patch<unknown>(`${this.resourcePath}${id}/`, payload);
   }

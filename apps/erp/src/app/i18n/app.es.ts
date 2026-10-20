@@ -7418,11 +7418,6 @@ export const es: AppDict = {
       },
       aporte: {
         columns: { id: 'ID', tipo: 'Aporte', cuenta: 'Cuenta' },
-        dialog: { title: 'Editar aporte' },
-        fields: {
-          cuenta: 'Cuenta contable',
-          cuentaHint: 'Cuenta por pagar donde se registra el aporte. Déjala vacía para quitarla.',
-        },
         empty: { title: 'Sin aportes', sub: 'No hay aportes para configurar.' },
         toasts: {
           saveSuccess: {
@@ -7440,15 +7435,6 @@ export const es: AppDict = {
           tipo: 'Provisión',
           cuentaDebito: 'Cuenta débito',
           cuentaCredito: 'Cuenta crédito',
-        },
-        dialog: { title: 'Editar provisión' },
-        fields: {
-          cuentaDebito: 'Cuenta débito',
-          cuentaDebitoHint: 'Cuenta de gasto de la provisión.',
-          cuentaCredito: 'Cuenta crédito',
-          cuentaCreditoHint: 'Cuenta de pasivo donde se acumula la provisión.',
-          sinCredito:
-            'Esta provisión no lleva cuenta crédito: su contrapartida es la cuenta del aporte.',
         },
         empty: { title: 'Sin provisiones', sub: 'No hay provisiones para configurar.' },
         toasts: {

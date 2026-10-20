@@ -1,35 +1,34 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService } from '@reddoc/core';
-import {
-  DataTableComponent,
-  type PageChangeEvent,
-  type RowActionInvokedEvent,
-} from '@reddoc/feature-base';
-import { MODELO, ModelPermissionsService, masterActions } from '@erp/core/permissions';
+import { I18nService, ToastService, type ErpSelectOption } from '@reddoc/core';
+import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
+import { MODELO, ModelPermissionsService } from '@erp/core/permissions';
 import { AccessDeniedComponent } from '@erp/core/components/access-denied/access-denied.component';
 import type { AppDict } from '@erp/i18n';
 import { ConfiguracionProvisionService } from '../../../configuracion-provision/configuracion-provision.service';
-import type { ConfiguracionProvisionRow } from '../../../configuracion-provision/configuracion-provision.model';
+import type {
+  ConfiguracionProvisionRow,
+  ProvisionCuentaCampo,
+} from '../../../configuracion-provision/configuracion-provision.model';
 import { toConfiguracionProvisionRow } from '../../../configuracion-provision/configuracion-provision.mapper';
-import { CONFIGURACION_PROVISION_COLUMNS } from '../../../configuracion-provision/configuracion-provision.constants';
-import { EDITAR_ROW_ACTIONS, HUMANO_TABLE_HEIGHT } from '../humano-config.constants';
-import { ProvisionEditDialogComponent } from '../provision-edit-dialog/provision-edit-dialog.component';
-
-/** Tamaño de página inicial. El backend devuelve todo; se pagina en el cliente. */
-const PAGE_SIZE_INICIAL = 25;
 
 /**
  * Tabla de provisiones dentro del área Humano de la configuración: cuentas
  * débito y crédito por tipo de provisión y tipo de costo. Las filas las siembra
  * el backend; solo se editan las cuentas.
+ *
+ * Se edita en la propia tabla, como en el legacy: cada cuenta es un selector
+ * siempre visible y elegir otra la guarda al instante (PATCH solo de ese campo).
+ * Las provisiones de seguridad social y parafiscales no llevan crédito: esa
+ * celda queda vacía. Son pocas filas fijas, así que no se pagina.
  */
 @Component({
   selector: 'app-provision-table',
   standalone: true,
-  imports: [DataTableComponent, ButtonModule, AccessDeniedComponent, ProvisionEditDialogComponent],
+  imports: [FormsModule, ButtonModule, AccessDeniedComponent, ErpCuentaSelectComponent],
   templateUrl: './provision-table.component.html',
 })
 export class ProvisionTableComponent {
@@ -41,30 +40,14 @@ export class ProvisionTableComponent {
 
   protected readonly t = this.i18n.t;
 
-  private readonly rows = signal<readonly ConfiguracionProvisionRow[]>([]);
+  protected readonly rows = signal<readonly ConfiguracionProvisionRow[]>([]);
   /** Arranca en `true`: hasta saber si puede ver, la tabla muestra su esqueleto. */
   protected readonly isLoading = signal(true);
   protected readonly puedeVer = signal(true);
+  protected readonly puedeEditar = signal(false);
   protected readonly loadFailed = signal(false);
-  protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(PAGE_SIZE_INICIAL);
-
-  protected readonly totalCount = computed(() => this.rows().length);
-  protected readonly items = computed(() => {
-    const inicio = this.currentPage() * this.pageSize();
-    return this.rows().slice(inicio, inicio + this.pageSize());
-  });
-
-  protected readonly selected = signal<ConfiguracionProvisionRow | null>(null);
-  protected readonly dialogVisible = signal(false);
-
-  protected readonly columns = CONFIGURACION_PROVISION_COLUMNS;
-  protected readonly tableHeight = HUMANO_TABLE_HEIGHT;
-
-  /** El lápiz solo aparece si la persona puede editar. */
-  protected readonly acciones = masterActions(MODELO.humano.configuracionProvision, {
-    row: EDITAR_ROW_ACTIONS,
-  });
+  /** Celda con un guardado en vuelo (`<id>:<campo>`); `null` si ninguna. */
+  protected readonly busyKey = signal<string | null>(null);
 
   constructor() {
     // Los grants se piden antes de listar: sin permiso de ver, la petición
@@ -74,6 +57,7 @@ export class ProvisionTableComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((grants) => {
         this.puedeVer.set(grants.ver);
+        this.puedeEditar.set(grants.editar);
         if (grants.ver) {
           this.cargar();
         } else {
@@ -107,18 +91,58 @@ export class ProvisionTableComponent {
       });
   }
 
-  protected onPageChange(event: PageChangeEvent): void {
-    this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
+  protected busy(row: ConfiguracionProvisionRow, campo: ProvisionCuentaCampo): boolean {
+    return this.busyKey() === `${row.id}:${campo}`;
   }
 
-  protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId !== 'edit') return;
-    this.selected.set(event.row as ConfiguracionProvisionRow);
-    this.dialogVisible.set(true);
+  /**
+   * Guarda al instante la cuenta elegida. El selector solo emite al elegir una
+   * opción o al vaciarlo: vaciarlo no guarda nada y la celda vuelve a la cuenta
+   * guardada en la próxima carga.
+   */
+  protected onCambioCuenta(
+    row: ConfiguracionProvisionRow,
+    campo: ProvisionCuentaCampo,
+    cuenta: ErpSelectOption | null,
+  ): void {
+    if (!cuenta || cuenta.id === row[campo]) return;
+
+    const toasts = this.t().configuracion.humano.provision.toasts;
+    this.busyKey.set(`${row.id}:${campo}`);
+
+    this.service
+      .update(row.id, { [campo]: cuenta.id })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busyKey.set(null)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success(toasts.saveSuccess.title, toasts.saveSuccess.desc);
+          this.recargarSinEsqueleto();
+        },
+        error: () => {
+          this.toast.error(toasts.saveError.title, toasts.saveError.desc);
+          // Devuelve la celda a la cuenta que sigue guardada.
+          this.recargarSinEsqueleto();
+        },
+      });
   }
 
-  protected onSaved(): void {
-    this.cargar();
+  /**
+   * Refresca las filas tras guardar sin pasar por el esqueleto: la tabla no
+   * parpadea ni pierde el scroll mientras la persona sigue editando.
+   */
+  private recargarSinEsqueleto(): void {
+    const tipos = this.t().configuracion.humano.tipos;
+    this.service
+      .listar()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (respuesta) =>
+          this.rows.set(
+            respuesta.map((provision) => toConfiguracionProvisionRow(provision, tipos)),
+          ),
+      });
   }
 }

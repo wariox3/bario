@@ -1,3 +1,5 @@
+import type { ErpSelectOption } from '@reddoc/core';
+
 /**
  * Configuración de aporte (`HumConfiguracionAporte`).
  *
@@ -16,12 +18,13 @@ export interface ConfiguracionAporte {
   readonly cuenta_nombre: string | null;
 }
 
-/** Fila tal como la pinta la tabla: el tipo traducido y la cuenta aplanada. */
+/** Fila tal como la pinta la tabla: el tipo traducido y la cuenta lista para su selector. */
 export interface ConfiguracionAporteRow extends ConfiguracionAporte {
   readonly tipo_label: string;
   readonly cuenta_label: string;
+  readonly cuenta_option: ErpSelectOption | null;
 }
 
 export interface ConfiguracionAportePayload {
-  readonly cuenta: number | null;
+  readonly cuenta: number;
 }
