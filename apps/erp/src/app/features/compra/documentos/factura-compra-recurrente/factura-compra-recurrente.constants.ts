@@ -10,9 +10,10 @@ export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /**
  * Columnas visibles del listado de Factura de compra recurrente.
  *
- * Mismo set canónico de `DocumentoListRowBase` que la factura de compra (id,
- * número, fecha, identificación del proveedor, desglose de montos y flags de
- * estado). Los `field` mapean el shape del endpoint `general/documento/lista/`.
+ * Id, fecha, proveedor y montos. Sin número ni banderas de anulado/contabilizado:
+ * la recurrente es una plantilla que no se aprueba, así que nunca recibe
+ * consecutivo ni se anula o contabiliza —esas columnas saldrían siempre vacías—.
+ * Los `field` mapean el shape de `general/documento/lista/` (`DocumentoListRowBase`).
  */
 export const FACTURA_COMPRA_RECURRENTE_COLUMNS: readonly ColumnDef[] = [
   {
@@ -21,12 +22,6 @@ export const FACTURA_COMPRA_RECURRENTE_COLUMNS: readonly ColumnDef[] = [
     type: 'number',
     width: '80px',
     align: 'right',
-  },
-  {
-    field: 'numero',
-    headerKey: 'entities.facturaCompraRecurrente.columns.numero',
-    type: 'text',
-    width: '130px',
   },
   {
     field: 'fecha',
@@ -66,20 +61,6 @@ export const FACTURA_COMPRA_RECURRENTE_COLUMNS: readonly ColumnDef[] = [
     width: '140px',
     align: 'right',
   },
-  {
-    field: 'estado_anulado',
-    headerKey: 'entities.facturaCompraRecurrente.columns.anulado',
-    type: 'boolean',
-    width: '70px',
-    align: 'center',
-  },
-  {
-    field: 'estado_contabilizado',
-    headerKey: 'entities.facturaCompraRecurrente.columns.contabilizado',
-    type: 'boolean',
-    width: '70px',
-    align: 'center',
-  },
 ];
 
 /**
@@ -87,11 +68,6 @@ export const FACTURA_COMPRA_RECURRENTE_COLUMNS: readonly ColumnDef[] = [
  * inyecta el gateway desde el config; aquí solo van los del usuario.
  */
 export const FACTURA_COMPRA_RECURRENTE_FILTERS: readonly FilterField[] = [
-  {
-    name: 'numero',
-    displayNameKey: 'entities.facturaCompraRecurrente.columns.numero',
-    type: 'string',
-  },
   { name: 'fecha', displayNameKey: 'entities.facturaCompraRecurrente.columns.fecha', type: 'date' },
   {
     name: 'contacto__numero_identificacion',
@@ -102,15 +78,5 @@ export const FACTURA_COMPRA_RECURRENTE_FILTERS: readonly FilterField[] = [
     name: 'contacto__nombre_corto',
     displayNameKey: 'entities.facturaCompraRecurrente.columns.proveedor',
     type: 'string',
-  },
-  {
-    name: 'estado_anulado',
-    displayNameKey: 'entities.facturaCompraRecurrente.filters.anulado',
-    type: 'boolean',
-  },
-  {
-    name: 'estado_contabilizado',
-    displayNameKey: 'entities.facturaCompraRecurrente.filters.contabilizado',
-    type: 'boolean',
   },
 ];

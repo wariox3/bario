@@ -3071,19 +3071,12 @@ export const es: AppDict = {
       name: 'Factura recurrente',
       columns: {
         id: 'ID',
-        numero: 'Número',
         fecha: 'Fecha',
         identificacion: 'Identificación',
         contacto: 'Contacto',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
-        anulado: 'Anu',
-        contabilizado: 'Con',
-      },
-      filters: {
-        anulado: 'Anulado',
-        contabilizado: 'Contabilizado',
       },
       form: {
         createTitle: 'Nueva factura recurrente',
@@ -3514,19 +3507,12 @@ export const es: AppDict = {
       name: 'Compra recurrente',
       columns: {
         id: 'ID',
-        numero: 'Número',
         fecha: 'Fecha',
         identificacion: 'Identificación',
         proveedor: 'Proveedor',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
-        anulado: 'Anu',
-        contabilizado: 'Con',
-      },
-      filters: {
-        anulado: 'Anulado',
-        contabilizado: 'Contabilizado',
       },
       form: {
         createTitle: 'Nueva factura recurrente',

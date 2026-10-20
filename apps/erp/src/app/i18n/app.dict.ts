@@ -2310,19 +2310,12 @@ export interface AppDict
       name: string;
       columns: {
         id: string;
-        numero: string;
         fecha: string;
         identificacion: string;
         contacto: string;
         subtotal: string;
         impuesto: string;
         total: string;
-        anulado: string;
-        contabilizado: string;
-      };
-      filters: {
-        anulado: string;
-        contabilizado: string;
       };
       form: {
         createTitle: string;
@@ -2647,19 +2640,12 @@ export interface AppDict
       name: string;
       columns: {
         id: string;
-        numero: string;
         fecha: string;
         identificacion: string;
         proveedor: string;
         subtotal: string;
         impuesto: string;
         total: string;
-        anulado: string;
-        contabilizado: string;
-      };
-      filters: {
-        anulado: string;
-        contabilizado: string;
       };
       form: {
         createTitle: string;

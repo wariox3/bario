@@ -3010,19 +3010,12 @@ export const en: AppDict = {
       name: 'Recurring invoice',
       columns: {
         id: 'ID',
-        numero: 'Number',
         fecha: 'Date',
         identificacion: 'ID number',
         contacto: 'Contact',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
-        anulado: 'Voi',
-        contabilizado: 'Pos',
-      },
-      filters: {
-        anulado: 'Voided',
-        contabilizado: 'Posted',
       },
       form: {
         createTitle: 'New recurring invoice',
@@ -3453,19 +3446,12 @@ export const en: AppDict = {
       name: 'Recurring purchase',
       columns: {
         id: 'ID',
-        numero: 'Number',
         fecha: 'Date',
         identificacion: 'ID number',
         proveedor: 'Supplier',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
-        anulado: 'Void',
-        contabilizado: 'Post',
-      },
-      filters: {
-        anulado: 'Voided',
-        contabilizado: 'Posted',
       },
       form: {
         createTitle: 'New recurring invoice',
