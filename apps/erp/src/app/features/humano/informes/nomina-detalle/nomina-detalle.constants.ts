@@ -7,7 +7,9 @@ export const NOMINA_DETALLE_INFORME_FILTERS_STORAGE_KEY = 'nomina-detalle-inform
 
 /**
  * Columnas del informe: identificación de la nómina que originó la línea
- * (documento, empleado, periodo) seguida del concepto liquidado y sus montos.
+ * (documento, tipo, fecha, empleado) seguida del concepto liquidado y sus
+ * montos. El valor va partido en devengado y deducción, como lo manda el
+ * backend.
  *
  * Solo `id` es ordenable: el resto son campos de relación o calculados que el
  * informe original tampoco dejaba ordenar.
@@ -28,39 +30,32 @@ export const NOMINA_DETALLE_INFORME_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'documento__numero',
-    headerKey: `${I18N}.columns.numero`,
-    type: 'text',
-    width: '100px',
-  },
-  {
-    field: 'documento__contacto__numero_identificacion',
-    headerKey: `${I18N}.columns.identificacion`,
+    field: 'documento_documento_tipo_nombre',
+    headerKey: `${I18N}.columns.documentoTipo`,
     type: 'text',
     width: '130px',
   },
   {
-    field: 'documento__contacto__nombre_corto',
-    headerKey: `${I18N}.columns.empleado`,
-    type: 'text',
-  },
-  {
-    field: 'documento__fecha',
+    field: 'documento_fecha',
     headerKey: `${I18N}.columns.fecha`,
     type: 'date',
     width: '110px',
   },
   {
-    field: 'documento__fecha_desde',
-    headerKey: `${I18N}.columns.fechaDesde`,
-    type: 'date',
-    width: '110px',
+    field: 'contacto_numero_identificacion',
+    headerKey: `${I18N}.columns.identificacion`,
+    type: 'text',
+    width: '130px',
   },
   {
-    field: 'documento__fecha_hasta',
-    headerKey: `${I18N}.columns.fechaHasta`,
-    type: 'date',
-    width: '110px',
+    field: 'contacto_nombre_corto',
+    headerKey: `${I18N}.columns.empleado`,
+    type: 'text',
+  },
+  {
+    field: 'concepto_nombre',
+    headerKey: `${I18N}.columns.concepto`,
+    type: 'text',
   },
   {
     field: 'detalle',
@@ -89,16 +84,15 @@ export const NOMINA_DETALLE_INFORME_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'operacion',
-    headerKey: `${I18N}.columns.operacion`,
-    type: 'enum',
-    width: '110px',
-    align: 'center',
-    enumKeyPrefix: `${I18N}.operaciones`,
+    field: 'devengado',
+    headerKey: `${I18N}.columns.devengado`,
+    type: 'currency',
+    width: '130px',
+    align: 'right',
   },
   {
-    field: 'pago_operado',
-    headerKey: `${I18N}.columns.pago`,
+    field: 'deduccion',
+    headerKey: `${I18N}.columns.deduccion`,
     type: 'currency',
     width: '130px',
     align: 'right',

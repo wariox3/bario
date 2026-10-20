@@ -4451,9 +4451,11 @@ export interface AppDict
       columns: {
         id: string;
         documento: string;
+        documentoTipo: string;
         numero: string;
         identificacion: string;
         empleado: string;
+        concepto: string;
         fecha: string;
         fechaDesde: string;
         fechaHasta: string;
@@ -4461,14 +4463,12 @@ export interface AppDict
         porcentaje: string;
         dias: string;
         valorHora: string;
-        operacion: string;
-        pago: string;
+        devengado: string;
+        deduccion: string;
         basePrestacion: string;
         baseCotizacion: string;
       };
       filters: { empleadoIdentificacion: string; empleadoNombre: string };
-      /** Claves = valor crudo de `operacion` (1 suma, -1 resta, 0 neutro). */
-      operaciones: { '1': string; '0': string; '-1': string };
     };
     nominaElectronica: {
       name: string;

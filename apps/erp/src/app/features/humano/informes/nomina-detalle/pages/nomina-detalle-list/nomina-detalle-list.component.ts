@@ -25,7 +25,7 @@ import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core
 import type { AppDict } from '@erp/i18n';
 import {
   NominaDetalleInformeService,
-  NOMINA_DETALLE_INFORME_EXPORT_SERIALIZADOR,
+  NOMINA_DETALLE_INFORME_EXPORT_INFORME,
 } from '../../nomina-detalle.service';
 import type { NominaDetalleInforme } from '../../nomina-detalle.model';
 import {
@@ -146,11 +146,10 @@ export class NominaDetalleListComponent {
       .download(this.service.exportUrl, {
         method: 'POST',
         body: {
-          // El filtro de clase va también en la descarga: si no, el Excel
-          // traería líneas de documentos que no son nómina.
-          filtros: buildFiltros([...this.service.baseFilters, ...this.activeFilters()]),
+          // El `informe` ya acota a líneas de nómina: no hace falta el filtro de clase.
+          filtros: buildFiltros(this.activeFilters()),
           ordenamientos: buildOrdenamientos(this.sort()),
-          serializador: NOMINA_DETALLE_INFORME_EXPORT_SERIALIZADOR,
+          informe: NOMINA_DETALLE_INFORME_EXPORT_INFORME,
         },
         fallbackFilename: 'nomina-detalle.xlsx',
       })
