@@ -4499,7 +4499,12 @@ export interface AppDict
       /** Columnas de la pestaña con los conceptos consolidados. */
       detalle: {
         id: string;
+        documento: string;
+        tipo: string;
+        fecha: string;
         concepto: string;
+        identificacion: string;
+        tercero: string;
         baseCotizacion: string;
         basePrestacion: string;
         devengado: string;
@@ -4507,7 +4512,7 @@ export interface AppDict
         total: string;
       };
       detail: {
-        sections: { general: string; montos: string; composicion: string };
+        sections: { general: string; composicion: string };
         tabs: { origen: string; detalle: string };
         fields: {
           numero: string;

@@ -5831,7 +5831,12 @@ export const en: AppDict = {
       },
       detalle: {
         id: 'ID',
+        documento: 'Document',
+        tipo: 'Type',
+        fecha: 'Date',
         concepto: 'Concept',
+        identificacion: 'ID number',
+        tercero: 'Third party',
         baseCotizacion: 'Contribution base',
         basePrestacion: 'Benefit base',
         devengado: 'Earnings',
@@ -5841,7 +5846,6 @@ export const en: AppDict = {
       detail: {
         sections: {
           general: 'General information',
-          montos: 'Period consolidation',
           composicion: 'Composition',
         },
         tabs: { origen: 'Payrolls', detalle: 'Detail' },

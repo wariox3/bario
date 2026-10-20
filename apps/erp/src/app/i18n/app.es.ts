@@ -5912,7 +5912,12 @@ export const es: AppDict = {
       },
       detalle: {
         id: 'ID',
+        documento: 'Documento',
+        tipo: 'Tipo',
+        fecha: 'Fecha',
         concepto: 'Concepto',
+        identificacion: 'Identificación',
+        tercero: 'Tercero',
         baseCotizacion: 'Base cotización',
         basePrestacion: 'Base prestación',
         devengado: 'Devengado',
@@ -5922,7 +5927,6 @@ export const es: AppDict = {
       detail: {
         sections: {
           general: 'Información general',
-          montos: 'Consolidado del periodo',
           composicion: 'Composición',
         },
         tabs: { origen: 'Nóminas', detalle: 'Detalle' },

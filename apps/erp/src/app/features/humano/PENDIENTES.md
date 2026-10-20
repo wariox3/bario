@@ -626,14 +626,14 @@ a fichas cuyo backend no los atiende.
 
 ### 7.3 Endpoints y supuestos
 
-| Qué                 | Petición                                                     | Estado                  |
-| ------------------- | ------------------------------------------------------------ | ----------------------- |
-| Listado             | `POST /general/documento/lista/` (tipo 15, vía el framework) | Asumido                 |
-| Cabecera            | `GET /general/documento/:id/`                                | Asumido                 |
-| Nóminas origen      | `GET /general/documento/?documento_referencia_id=:id&limit=` | Asumido                 |
-| Líneas              | `GET /general/documento-detalle/?documento_id=:id&limit=`    | Asumido                 |
-| Generar             | `POST /general/documento/generar/` (`documento_tipo: 15`)    | Confirmado (2026-10-20) |
-| Las cuatro acciones | ver la tabla de §7.2                                         | Asumido                 |
+| Qué                 | Petición                                                                        | Estado                  |
+| ------------------- | ------------------------------------------------------------------------------- | ----------------------- |
+| Listado             | `POST /general/documento/lista/` (tipo 15, vía el framework)                    | Asumido                 |
+| Cabecera            | `GET /general/documento/:id/`                                                   | Asumido                 |
+| Nóminas origen      | `POST /general/documento/lista/` (`documento_referencia_id`)                    | Confirmado (2026-10-20) |
+| Líneas              | `POST /general/documento-detalle/lista/` (`documento__documento_referencia_id`) | Confirmado (2026-10-20) |
+| Generar             | `POST /general/documento/generar/` (`documento_tipo: 15`)                       | Confirmado (2026-10-20) |
+| Las cuatro acciones | ver la tabla de §7.2                                                            | Asumido                 |
 
 Cuatro preguntas abiertas:
 
@@ -642,26 +642,27 @@ Cuatro preguntas abiertas:
    en la nómina (14) — que funciona así. Si el backend los necesita, la ficha carga con campos
    vacíos y hay que sumarlos; `NominaElectronicaService` es el único lugar a tocar para dos de los
    tres, y el tercero exigiría ensanchar `getById` del gateway con un parámetro de serializador.
-2. **`documento_referencia_id` como query param del `GET` de listado.** Es la única consulta "hacia
-   atrás" del ERP; si el backend solo la acepta como filtro del `POST …/lista/`, cambia la forma.
+2. ~~**`documento_referencia_id` como query param del `GET` de listado.**~~ Resuelto (2026-10-20):
+   las dos pestañas van por `POST …/lista/` con `filtros`. Falta confirmar que `documento_referencia_id`
+   esté en los `campos_filtrables`: si no, el backend devuelve la lista sin filtrar y sin error.
 3. **Qué es el `resumen`** que devuelve generar. El legacy lo recibe y lo ignora. Si es "cuántas se
    generaron", vale la pena decirlo en el toast; si es un id, no. Hasta saberlo se trata como opaco.
 4. **Si la clase 702 agrupa más tipos que el 15** (ver §7.1).
 
 ### 7.4 Decisiones tomadas (divergencias del legacy)
 
-| #   | Decisión                                                                  | Por qué                                                                                                                                                                                                |
-| --- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | Las capacidades salen de una tabla pura y probada, no de los `[disabled]` | Cuatro acciones por tres banderas. En el legacy la condición de anulado está escrita a mano en cada botón y **en "Aprobar" falta**: un documento anulado y sin aprobar deja darle aprobar              |
-| 2   | "Anular" va dentro del dropdown "Acciones", no como botón suelto          | Es irreversible; tenerlo a un click de "Aprobar" es pedir un accidente                                                                                                                                 |
-| 3   | El listado omite `fecha_desde`, `fecha_hasta`, `salario` y `contrato_id`  | El mapeo del legacy para 702 está copiado del de la nómina. Su propia ficha no los muestra y usa `fecha` a secas: un consolidado no tiene _un_ salario ni _un_ contrato                                |
-| 4   | La pestaña "Detalle" pasa de 11 a 7 columnas y suma `concepto_nombre`     | Las cuatro que salen (`documento__*`) son constantes en toda la tabla —es un solo documento— y ya están en la cabecera. El concepto, que es lo que distingue una fila de otra, el legacy no lo pintaba |
-| 5   | Las filas de la pestaña "Nóminas" navegan a su ficha                      | En el legacy son inertes. Es la pregunta natural al mirar de qué se compone el consolidado                                                                                                             |
-| 6   | El CUNE se muestra siempre, con "Aún no emitida" cuando falta             | El legacy pone el `@if` sobre el `<td>` pero no sobre el `<th>`: sin CUNE queda la etiqueta suelta y la celda vacía al lado                                                                            |
-| 7   | El modal de "Generar" usa un datepicker de mes                            | El legacy usa dos `<input type="number">` que aceptan mes 13 y año 20024. Mismo dato, cero validaciones que escribir                                                                                   |
-| 8   | El "¿emitir ahora?" es un modal propio, no un `p-confirmDialog`           | El strategy se provee en root y el único `ConfirmationService` del listado vive a nivel de componente. Habría compilado y fallado en silencio                                                          |
-| 9   | El `activeMatch` de la nómina pasó de `nomina` a `nomina/`                | `nomina` a secas también casa con `nomina-electronica`: las dos entradas del sidebar quedaban marcadas a la vez                                                                                        |
-| 10  | La acción no reusa `GenerarDocumentoActionStrategy` (venta)               | Mismo endpoint genérico, otro contrato: aquella manda `documento_tipo_id` + destino; esta solo `documento_tipo` y el periodo. Comparten forma, no payload                                              |
+| #   | Decisión                                                                                                 | Por qué                                                                                                                                                                                   |
+| --- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Las capacidades salen de una tabla pura y probada, no de los `[disabled]`                                | Cuatro acciones por tres banderas. En el legacy la condición de anulado está escrita a mano en cada botón y **en "Aprobar" falta**: un documento anulado y sin aprobar deja darle aprobar |
+| 2   | "Anular" va dentro del dropdown "Acciones", no como botón suelto                                         | Es irreversible; tenerlo a un click de "Aprobar" es pedir un accidente                                                                                                                    |
+| 3   | El listado omite `fecha_desde`, `fecha_hasta`, `salario` y `contrato_id`                                 | El mapeo del legacy para 702 está copiado del de la nómina. Su propia ficha no los muestra y usa `fecha` a secas: un consolidado no tiene _un_ salario ni _un_ contrato                   |
+| 4   | La pestaña "Detalle" cambia Desde/Hasta por documento, tipo y fecha; suma el concepto; quita Cod y Total | La línea no trae el periodo, y no todo origen es nómina (entran liquidaciones). El concepto es lo que distingue una fila; Cod es redundante y Total llega en 0 en toda línea de nómina    |
+| 5   | Las filas de la pestaña "Nóminas" navegan a su ficha                                                     | En el legacy son inertes. Es la pregunta natural al mirar de qué se compone el consolidado                                                                                                |
+| 6   | El CUNE se muestra siempre, con "Aún no emitida" cuando falta                                            | El legacy pone el `@if` sobre el `<td>` pero no sobre el `<th>`: sin CUNE queda la etiqueta suelta y la celda vacía al lado                                                               |
+| 7   | El modal de "Generar" usa un datepicker de mes                                                           | El legacy usa dos `<input type="number">` que aceptan mes 13 y año 20024. Mismo dato, cero validaciones que escribir                                                                      |
+| 8   | El "¿emitir ahora?" es un modal propio, no un `p-confirmDialog`                                          | El strategy se provee en root y el único `ConfirmationService` del listado vive a nivel de componente. Habría compilado y fallado en silencio                                             |
+| 9   | El `activeMatch` de la nómina pasó de `nomina` a `nomina/`                                               | `nomina` a secas también casa con `nomina-electronica`: las dos entradas del sidebar quedaban marcadas a la vez                                                                           |
+| 10  | La acción no reusa `GenerarDocumentoActionStrategy` (venta)                                              | Mismo endpoint genérico, otro contrato: aquella manda `documento_tipo_id` + destino; esta solo `documento_tipo` y el periodo. Comparten forma, no payload                                 |
 
 ### 7.5 Lo que no se portó
 

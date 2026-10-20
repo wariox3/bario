@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import { BaseHttpService, type BackendFilter, type PaginatedResponse } from '@reddoc/core';
 import type {
   NominaElectronicaDetalleRead,
   NominaElectronicaOrigen,
 } from './nomina-electronica.model';
 
-/** Endpoint de cabeceras de documento (compartido por toda la familia). */
-const DOCUMENTO_ENDPOINT = '/general/documento/';
+/** Listado filtrado de cabeceras de documento (compartido por toda la familia). */
+const DOCUMENTO_LISTA_ENDPOINT = '/general/documento/lista/';
 
-/** Endpoint de líneas de documento. Va con **guion**, no con guion bajo. */
-const DOCUMENTO_DETALLE_ENDPOINT = '/general/documento-detalle/';
+/** Listado filtrado de líneas de documento. Va con **guion**, no con guion bajo. */
+const DOCUMENTO_DETALLE_LISTA_ENDPOINT = '/general/documento-detalle/lista/';
 
 /**
  * Tope de nóminas origen por consolidado. Son las del periodo de **un
@@ -30,34 +30,45 @@ const PAGE_SIZE = 200;
  *  - `listarOrigen`: las nóminas que componen el consolidado. Es una consulta
  *    **hacia atrás** (`documento_referencia_id`) que no existe en el gateway
  *    porque ningún otro documento del ERP la necesita todavía.
- *  - `listarDetalle`: sus líneas. `DocumentoDetalleService.listarPorDocumento`
- *    haría casi lo mismo, pero el legacy manda además un `serializador` acá; se
- *    deja el punto de extensión abierto en un solo lugar.
+ *  - `listarDetalle`: las líneas **de esas nóminas**, no las de la nómina
+ *    electrónica. Salta un nivel: filtra las líneas cuyo documento apunta a
+ *    este consolidado. El legacy manda además un `serializador` acá; se deja el
+ *    punto de extensión abierto en un solo lugar.
+ *
+ * Las dos van por `POST …/lista/` con `filtros`, como los listados.
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
 @Injectable({ providedIn: 'root' })
 export class NominaElectronicaService extends BaseHttpService {
   /**
-   * Trae las nóminas que apuntan a este consolidado.
-   *
-   * **Supuesto pendiente de confirmar con backend**: que `documento_referencia_id`
-   * sirve como query param del `GET` de listado. El legacy lo manda así junto a
-   * `serializador=lista_nomina`; el serializador se omite acá, igual que en la
-   * cabecera. Ver `PENDIENTES §7`.
+   * Trae las nóminas que apuntan a este consolidado: `POST documento/lista/`
+   * filtrando por `documento_referencia_id`. El legacy pedía además
+   * `serializador=lista_nomina`; acá se omite, igual que en la cabecera. Ver
+   * `PENDIENTES §7`.
    */
   listarOrigen(documentoId: number): Observable<NominaElectronicaOrigen[]> {
-    return this.get<PaginatedResponse<NominaElectronicaOrigen>>(DOCUMENTO_ENDPOINT, {
-      documento_referencia_id: documentoId,
-      limit: PAGE_SIZE,
-    }).pipe(map((res) => [...res.results]));
+    return this.listar<NominaElectronicaOrigen>(DOCUMENTO_LISTA_ENDPOINT, [
+      { propiedad: 'documento_referencia_id', operador: '=', valor: documentoId },
+    ]);
   }
 
-  /** Trae los conceptos consolidados del documento. */
+  /**
+   * Trae las líneas de las nóminas origen: `POST documento-detalle/lista/`
+   * filtrando por el `documento_referencia_id` **del documento de la línea**.
+   *
+   * Confirmado con una respuesta real (2026-10-20): trae solo las líneas de
+   * los documentos que apuntan a este consolidado.
+   */
   listarDetalle(documentoId: number): Observable<NominaElectronicaDetalleRead[]> {
-    return this.get<PaginatedResponse<NominaElectronicaDetalleRead>>(DOCUMENTO_DETALLE_ENDPOINT, {
-      documento_id: documentoId,
-      limit: PAGE_SIZE,
-    }).pipe(map((res) => [...res.results]));
+    return this.listar<NominaElectronicaDetalleRead>(DOCUMENTO_DETALLE_LISTA_ENDPOINT, [
+      { propiedad: 'documento__documento_referencia_id', operador: '=', valor: documentoId },
+    ]);
+  }
+
+  private listar<TRead>(endpoint: string, filtros: readonly BackendFilter[]): Observable<TRead[]> {
+    return this.post<PaginatedResponse<TRead>>(endpoint, { filtros }, { limit: PAGE_SIZE }).pipe(
+      map((res) => [...res.results]),
+    );
   }
 }
