@@ -10,6 +10,7 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  buildOrdenamientos,
   startOfToday,
   toIsoDate,
   type ListQuery,
@@ -23,7 +24,10 @@ import {
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
-import { CuentaCobrarCorteService } from '../../cuenta-cobrar-corte.service';
+import {
+  CUENTA_COBRAR_CORTE_INFORME,
+  CuentaCobrarCorteService,
+} from '../../cuenta-cobrar-corte.service';
 import type { CuentaCobrarCorte } from '../../cuenta-cobrar-corte.model';
 import { CUENTA_COBRAR_CORTE_COLUMNS } from '../../cuenta-cobrar-corte.constants';
 
@@ -127,8 +131,13 @@ export class CuentaCobrarCorteListComponent {
     this.isExportingExcel.set(true);
     this.fileDownload
       .download(this.service.exportUrl, {
-        method: 'GET',
-        params: { fecha, excel: 'True' },
+        method: 'POST',
+        body: {
+          filtros: [],
+          ordenamientos: buildOrdenamientos(this.sort()),
+          informe: CUENTA_COBRAR_CORTE_INFORME,
+          fecha,
+        },
         fallbackFilename: 'cuentas-por-cobrar-corte.xlsx',
       })
       .pipe(
