@@ -1,12 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import {
-  BaseHttpService,
-  buildListBody,
-  buildListParams,
-  type ListQuery,
-  type PaginatedResponse,
-} from '@reddoc/core';
+import { BaseHttpService } from '@reddoc/core';
 import type {
   DocumentoTipo,
   DocumentoTipoActualizado,
@@ -16,21 +10,17 @@ import type {
 /**
  * Servicio HTTP del catálogo de tipos de documento.
  *
- * Tenant-scoped (cada empresa configura los suyos). El listado usa el `lista/`
- * estándar del ERP: POST con `filtros` y `ordenamientos` en el cuerpo, y la
- * paginación (`page` / `limit`) en los query-params. Por eso el front decide el
- * tamaño de página y el orden, cosa que el `GET` plano del recurso no permitía.
+ * Tenant-scoped (cada empresa configura los suyos). El listado es el
+ * `configuracion/` del recurso: devuelve el catálogo entero, sin paginar y ya
+ * ordenado, porque son pocas filas fijas.
  */
 @Injectable({ providedIn: 'root' })
 export class DocumentoTipoService extends BaseHttpService {
   private readonly resourcePath = '/general/documento-tipo/';
 
-  list(query: ListQuery): Observable<PaginatedResponse<DocumentoTipo>> {
-    return this.post<PaginatedResponse<DocumentoTipo>>(
-      `${this.resourcePath}lista/`,
-      buildListBody(query),
-      buildListParams(query),
-    );
+  /** Todo el catálogo en un arreglo, sin paginar y en el orden del backend. */
+  listar(): Observable<DocumentoTipo[]> {
+    return this.get<DocumentoTipo[]>(`${this.resourcePath}configuracion/`);
   }
 
   /**

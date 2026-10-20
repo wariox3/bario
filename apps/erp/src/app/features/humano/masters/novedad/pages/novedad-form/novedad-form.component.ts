@@ -154,6 +154,7 @@ export class NovedadFormComponent implements OnInit {
       fecha_hasta_periodo: this.fb.control<Date | null>(null),
       dias_dinero: this.fb.control<number | null>(0),
       dias_disfrutados: this.fb.control<number | null>(0),
+      dias_disfrutados_reales: this.fb.control<number | null>(0),
       // Referencia
       novedad_referencia: this.fb.control<ErpSelectOption | null>(null),
     },
@@ -261,15 +262,28 @@ export class NovedadFormComponent implements OnInit {
    * se mutan validadores → fácil de auditar y mantener.
    */
   private aplicarValidadoresVacaciones(activo: boolean): void {
-    const { fecha_desde_periodo, fecha_hasta_periodo, dias_dinero, dias_disfrutados } =
-      this.form.controls;
-    const controles = [fecha_desde_periodo, fecha_hasta_periodo, dias_dinero, dias_disfrutados];
+    const {
+      fecha_desde_periodo,
+      fecha_hasta_periodo,
+      dias_dinero,
+      dias_disfrutados,
+      dias_disfrutados_reales,
+    } = this.form.controls;
+    const controles = [
+      fecha_desde_periodo,
+      fecha_hasta_periodo,
+      dias_dinero,
+      dias_disfrutados,
+      dias_disfrutados_reales,
+    ];
 
     if (activo) {
       fecha_desde_periodo.setValidators(Validators.required);
       fecha_hasta_periodo.setValidators(Validators.required);
       dias_dinero.setValidators([Validators.required, Validators.min(0)]);
       dias_disfrutados.setValidators([Validators.required, Validators.min(0)]);
+      // El backend rechaza vacaciones sin días disfrutados reales.
+      dias_disfrutados_reales.setValidators([Validators.required, Validators.min(1)]);
     } else {
       for (const control of controles) control.clearValidators();
     }
@@ -280,14 +294,18 @@ export class NovedadFormComponent implements OnInit {
   /**
    * Defaults de vacaciones — solo ante cambio del usuario.
    *
-   * Al activar se propone lo corriente: tantos días disfrutados como dura la
-   * novedad y ninguno en dinero. Es una sugerencia editable, no una regla: los
+   * Al activar se propone lo corriente: tantos días disfrutados (y reales) como
+   * dura la novedad y ninguno en dinero. Es una sugerencia editable, no una regla: los
    * disfrutados pueden contarse en hábiles y los de dinero no se toman.
    */
   private aplicarValoresVacaciones(activo: boolean): void {
     if (activo) {
       this.form.patchValue(
-        { dias_dinero: 0, dias_disfrutados: this.dias() ?? 0 },
+        {
+          dias_dinero: 0,
+          dias_disfrutados: this.dias() ?? 0,
+          dias_disfrutados_reales: this.dias() ?? 0,
+        },
         { emitEvent: false },
       );
     } else {
@@ -295,6 +313,7 @@ export class NovedadFormComponent implements OnInit {
         {
           dias_dinero: 0,
           dias_disfrutados: 0,
+          dias_disfrutados_reales: 0,
           fecha_desde_periodo: null,
           fecha_hasta_periodo: null,
         },

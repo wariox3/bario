@@ -9,6 +9,14 @@ import { VentaConfigComponent } from '../../components/venta-config/venta-config
 import { CompraConfigComponent } from '../../components/compra-config/compra-config.component';
 import { AsistenteAccesoComponent } from '@erp/features/asistente-electronico/components/asistente-acceso/asistente-acceso.component';
 
+/** Áreas de la configuración (`?seccion=`). La primera es la de por defecto. */
+const SECCIONES = ['general', 'humano', 'venta', 'compra'] as const;
+type Seccion = (typeof SECCIONES)[number];
+
+function esSeccion(value: string | undefined): value is Seccion {
+  return (SECCIONES as readonly (string | undefined)[]).includes(value);
+}
+
 /**
  * Shell de Configuración de la empresa.
  *
@@ -40,9 +48,12 @@ export class ConfiguracionComponent {
 
   protected readonly t = this.i18n.t;
 
-  /** Pestaña activa (query-param `?seccion=`); por defecto "general". */
+  /** Pestaña activa (query-param `?seccion=`); una desconocida cae a "general". */
   readonly seccion = input<string>();
-  protected readonly activeSeccion = computed(() => this.seccion() || 'general');
+  protected readonly activeSeccion = computed((): Seccion => {
+    const seccion = this.seccion();
+    return esSeccion(seccion) ? seccion : SECCIONES[0];
+  });
 
   protected onTabChange(value: string): void {
     void this.router.navigate([], {

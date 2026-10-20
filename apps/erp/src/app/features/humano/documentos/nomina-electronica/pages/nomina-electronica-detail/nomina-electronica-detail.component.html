@@ -54,7 +54,7 @@
     </p>
   </div>
 } @else if (cabecera(); as c) {
-  <!-- ── Información general ──────────────────────────────────────────────────── -->
+  <!-- ── Información general: datos a la izquierda, consolidado a la derecha ──── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
       <span
@@ -66,82 +66,81 @@
         {{ det.sections.general }}
       </h2>
     </div>
-    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.numero }}</dt>
-        <dd class="nomina-electronica-detail__value">{{ c.numero || '—' }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.fecha }}</dt>
-        <dd class="nomina-electronica-detail__value">{{ formatFecha(c.fecha) }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.empleado }}</dt>
-        <dd class="nomina-electronica-detail__value">{{ empleado() }}</dd>
-      </div>
-      <div class="flex flex-col gap-0.5 sm:col-span-2 lg:col-span-3">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.cune }}</dt>
-        <dd class="nomina-electronica-detail__value break-all">
-          @if (dianUrl(); as url) {
-            {{ c.cue }}
-            <a
-              class="ml-2 font-semibold text-sky-700 hover:underline"
-              [href]="url"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ det.verEnDian }}</a
-            >
-          } @else {
-            <span class="text-brand-muted">{{ det.sinCune }}</span>
-          }
-        </dd>
-      </div>
-    </dl>
-  </section>
 
-  <!-- ── Consolidado del periodo ─────────────────────────────────────────────── -->
-  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
-    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
-      <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
-      >
-        <i class="pi pi-calculator text-[1rem]"></i>
-      </span>
-      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
-        {{ det.sections.montos }}
-      </h2>
+    <div
+      class="grid grid-cols-1 divide-y divide-[rgba(20,48,73,0.08)] lg:grid-cols-2 lg:divide-x lg:divide-y-0"
+    >
+      <dl class="m-0 grid grid-cols-1 content-start gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+        <div class="flex flex-col gap-0.5">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.numero }}</dt>
+          <dd class="nomina-electronica-detail__value">{{ c.numero }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.fecha }}</dt>
+          <dd class="nomina-electronica-detail__value">{{ formatFecha(c.fecha) }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.empleado }}</dt>
+          <dd class="nomina-electronica-detail__value">{{ c.contacto_nombre_corto }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.identificacion }}</dt>
+          <dd class="nomina-electronica-detail__value">{{ c.contacto_numero_identificacion }}</dd>
+        </div>
+      </dl>
+
+      <dl class="m-0 flex flex-col gap-2 px-5 py-4">
+        <div class="flex items-baseline justify-between gap-4">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.baseCotizacion }}</dt>
+          <dd class="nomina-electronica-detail__value tabular-nums">
+            {{ formatAmount(c.base_cotizacion) }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.basePrestacion }}</dt>
+          <dd class="nomina-electronica-detail__value tabular-nums">
+            {{ formatAmount(c.base_prestacion) }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.devengado }}</dt>
+          <dd class="nomina-electronica-detail__value tabular-nums">
+            {{ formatAmount(c.devengado) }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4">
+          <dt class="nomina-electronica-detail__label">{{ det.fields.deduccion }}</dt>
+          <dd class="nomina-electronica-detail__value tabular-nums">
+            {{ formatAmount(c.deduccion) }}
+          </dd>
+        </div>
+        <div
+          class="mt-1 flex items-baseline justify-between gap-4 border-t border-[rgba(20,48,73,0.08)] pt-2"
+        >
+          <dt class="nomina-electronica-detail__label">{{ det.fields.total }}</dt>
+          <dd class="nomina-electronica-detail__value text-[0.95rem] font-bold tabular-nums">
+            {{ formatAmount(c.total) }}
+          </dd>
+        </div>
+      </dl>
     </div>
-    <dl class="grid grid-cols-2 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-3 lg:grid-cols-5">
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.baseCotizacion }}</dt>
-        <dd class="nomina-electronica-detail__value tabular-nums">
-          {{ formatAmount(c.base_cotizacion) }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.basePrestacion }}</dt>
-        <dd class="nomina-electronica-detail__value tabular-nums">
-          {{ formatAmount(c.base_prestacion) }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.devengado }}</dt>
-        <dd class="nomina-electronica-detail__value tabular-nums">
-          {{ formatAmount(c.devengado) }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.deduccion }}</dt>
-        <dd class="nomina-electronica-detail__value tabular-nums">
-          {{ formatAmount(c.deduccion) }}
-        </dd>
-      </div>
-      <div class="flex flex-col gap-0.5">
-        <dt class="nomina-electronica-detail__label">{{ det.fields.total }}</dt>
-        <dd class="nomina-electronica-detail__value text-[0.95rem] font-bold tabular-nums">
-          {{ formatAmount(c.total) }}
-        </dd>
-      </div>
+
+    <dl class="m-0 flex flex-col gap-0.5 border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+      <dt class="nomina-electronica-detail__label">{{ det.fields.cune }}</dt>
+      <dd class="nomina-electronica-detail__value break-all">
+        @if (dianUrl(); as url) {
+          {{ c.cue }}
+          <a
+            class="ml-2 font-semibold text-sky-700 hover:underline"
+            [href]="url"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ det.verEnDian }}</a
+          >
+        } @else {
+          <span class="text-brand-muted">{{ det.sinCune }}</span>
+        }
+      </dd>
     </dl>
   </section>
 

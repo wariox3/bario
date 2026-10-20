@@ -2235,6 +2235,7 @@ export const en: AppDict = {
           fechaHastaPeriodo: 'Period end date',
           diasDinero: 'Paid days',
           diasDisfrutados: 'Enjoyed days',
+          diasDisfrutadosReales: 'Actual enjoyed days',
         },
         hints: {
           dias: 'The event lasts {dias} days, start and end included.',
@@ -5830,7 +5831,12 @@ export const en: AppDict = {
       },
       detalle: {
         id: 'ID',
+        documento: 'Document',
+        tipo: 'Type',
+        fecha: 'Date',
         concepto: 'Concept',
+        identificacion: 'ID number',
+        tercero: 'Third party',
         baseCotizacion: 'Contribution base',
         basePrestacion: 'Benefit base',
         devengado: 'Earnings',
@@ -5840,7 +5846,6 @@ export const en: AppDict = {
       detail: {
         sections: {
           general: 'General information',
-          montos: 'Period consolidation',
           composicion: 'Composition',
         },
         tabs: { origen: 'Payrolls', detalle: 'Detail' },
@@ -7291,7 +7296,108 @@ export const en: AppDict = {
         factor: 'Benefits factor',
         auxilioTransporte: 'Transport allowance',
       },
+      licenciaNoRemuneradaAfectaPension: {
+        label: 'Unpaid leave affects pension',
+        hint: 'Pension contributions continue during unpaid leave.',
+      },
       validation: { required: 'This field is required' },
+      tabs: {
+        conceptosNomina: 'Payroll concepts',
+        conceptos: 'Accounts by concept',
+        provision: 'Provision',
+        aporte: 'Contribution',
+      },
+      hints: {
+        conceptosNomina: 'Which concept payroll uses for each fixed item, such as salary.',
+        conceptos: "Ledger account for each concept by the contract's cost type.",
+        provision: 'Debit and credit accounts used to post each provision.',
+        aporte: 'Ledger account for each social security and payroll tax contribution.',
+      },
+      tipos: {
+        CESANTIA: 'Severance',
+        INTERES: 'Severance interest',
+        PRIMA: 'Service bonus',
+        VACACION: 'Vacation',
+        PENSION: 'Pension',
+        SALUD: 'Health',
+        CAJA: 'Family compensation fund',
+        RIESGO: 'Occupational risk',
+        SENA: 'SENA',
+        ICBF: 'ICBF',
+      },
+      aporte: {
+        columns: { id: 'ID', tipo: 'Contribution', cuenta: 'Account' },
+        empty: { title: 'No contributions', sub: 'There are no contributions to configure.' },
+        toasts: {
+          saveSuccess: {
+            title: 'Contribution updated',
+            desc: 'The contribution account was saved.',
+          },
+          saveError: { title: 'Save failed', desc: 'We could not save the contribution.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the contributions.' },
+        },
+      },
+      provision: {
+        columns: {
+          id: 'ID',
+          tipoCosto: 'Cost type',
+          tipo: 'Provision',
+          cuentaDebito: 'Debit account',
+          cuentaCredito: 'Credit account',
+        },
+        empty: { title: 'No provisions', sub: 'There are no provisions to configure.' },
+        toasts: {
+          saveSuccess: { title: 'Provision updated', desc: 'The provision accounts were saved.' },
+          saveError: { title: 'Save failed', desc: 'We could not save the provision.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the provisions.' },
+        },
+      },
+      concepto: {
+        columns: { id: 'ID', nombre: 'Name', tipo: 'Type', porcentaje: 'Percentage' },
+        actions: { cuentas: 'Accounts' },
+        empty: { title: 'No concepts', sub: 'There are no concepts in the catalog.' },
+        toasts: {
+          loadError: { title: 'Load failed', desc: 'We could not load the concepts.' },
+        },
+      },
+      conceptoCuenta: {
+        dialog: {
+          title: 'Concept accounts',
+          hint: "When posting payroll, each line goes to the account for the contract's cost type.",
+        },
+        columns: { id: 'ID', tipoCosto: 'Cost type', cuenta: 'Account' },
+        fields: { tipoCosto: 'Cost type', cuenta: 'Ledger account' },
+        actions: { agregar: 'Add' },
+        validation: {
+          required: 'This field is required',
+          duplicado: 'This cost type already has an account',
+        },
+        empty: { title: 'No accounts', sub: 'This concept has no accounts yet.' },
+        confirmDelete: 'Do you want to delete the account for this cost type?',
+        toasts: {
+          addSuccess: { title: 'Account added', desc: 'The account was assigned to the concept.' },
+          saveSuccess: { title: 'Account updated', desc: 'The change was saved.' },
+          saveError: { title: 'Save failed', desc: 'We could not save the account.' },
+          deleteSuccess: {
+            title: 'Account deleted',
+            desc: 'The account was removed from the concept.',
+          },
+          deleteError: { title: 'Delete failed', desc: 'We could not delete the account.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the concept accounts.' },
+        },
+      },
+      conceptoNomina: {
+        columns: { id: 'ID', nombre: 'Item', concepto: 'Concept' },
+        dialog: { title: 'Edit payroll concept' },
+        fields: { concepto: 'Concept', conceptoPlaceholder: 'Search concept' },
+        validation: { required: 'This field is required' },
+        empty: { title: 'No payroll concepts', sub: 'There are no items to configure.' },
+        toasts: {
+          saveSuccess: { title: 'Concept updated', desc: 'The payroll concept was saved.' },
+          saveError: { title: 'Save failed', desc: 'We could not save the payroll concept.' },
+          loadError: { title: 'Load failed', desc: 'We could not load the payroll concepts.' },
+        },
+      },
     },
     venta: {
       tabs: { formato: 'Format', aiu: 'AIU' },

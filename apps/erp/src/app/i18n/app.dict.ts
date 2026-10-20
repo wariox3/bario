@@ -1665,6 +1665,7 @@ export interface AppDict
           fechaHastaPeriodo: string;
           diasDinero: string;
           diasDisfrutados: string;
+          diasDisfrutadosReales: string;
         };
         hints: { dias: string; diasUno: string };
         validation: { required: string; min: string; maxLength: string; rangoFechas: string };
@@ -4498,7 +4499,12 @@ export interface AppDict
       /** Columnas de la pestaña con los conceptos consolidados. */
       detalle: {
         id: string;
+        documento: string;
+        tipo: string;
+        fecha: string;
         concepto: string;
+        identificacion: string;
+        tercero: string;
         baseCotizacion: string;
         basePrestacion: string;
         devengado: string;
@@ -4506,7 +4512,7 @@ export interface AppDict
         total: string;
       };
       detail: {
-        sections: { general: string; montos: string; composicion: string };
+        sections: { general: string; composicion: string };
         tabs: { origen: string; detalle: string };
         fields: {
           numero: string;
@@ -5484,7 +5490,71 @@ export interface AppDict
     humano: {
       section: { title: string; hint: string };
       fields: { salarioMinimo: string; factor: string; auxilioTransporte: string };
+      licenciaNoRemuneradaAfectaPension: { label: string; hint: string };
       validation: { required: string };
+      tabs: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };
+      hints: { conceptosNomina: string; conceptos: string; provision: string; aporte: string };
+      /** Nombres legibles de los códigos `tipo` de provisión y aporte (`CESANTIA`, `PENSION`…). */
+      tipos: Record<string, string>;
+      aporte: {
+        columns: { id: string; tipo: string; cuenta: string };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      provision: {
+        columns: {
+          id: string;
+          tipoCosto: string;
+          tipo: string;
+          cuentaDebito: string;
+          cuentaCredito: string;
+        };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      concepto: {
+        columns: { id: string; nombre: string; tipo: string; porcentaje: string };
+        actions: { cuentas: string };
+        empty: { title: string; sub: string };
+        toasts: { loadError: { title: string; desc: string } };
+      };
+      conceptoCuenta: {
+        dialog: { title: string; hint: string };
+        columns: { id: string; tipoCosto: string; cuenta: string };
+        fields: { tipoCosto: string; cuenta: string };
+        actions: { agregar: string };
+        validation: { required: string; duplicado: string };
+        empty: { title: string; sub: string };
+        confirmDelete: string;
+        toasts: {
+          addSuccess: { title: string; desc: string };
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          deleteSuccess: { title: string; desc: string };
+          deleteError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
+      conceptoNomina: {
+        columns: { id: string; nombre: string; concepto: string };
+        dialog: { title: string };
+        fields: { concepto: string; conceptoPlaceholder: string };
+        validation: { required: string };
+        empty: { title: string; sub: string };
+        toasts: {
+          saveSuccess: { title: string; desc: string };
+          saveError: { title: string; desc: string };
+          loadError: { title: string; desc: string };
+        };
+      };
     };
     venta: {
       tabs: { formato: string; aiu: string };

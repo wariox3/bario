@@ -36,6 +36,7 @@ export function novedadToFormValue(n: Novedad): Partial<NovedadFormRawValue> {
     fecha_hasta_periodo: fromIsoDate(n.fecha_hasta_periodo),
     dias_dinero: aDias(n.dias_dinero),
     dias_disfrutados: aDias(n.dias_disfrutados),
+    dias_disfrutados_reales: aDias(n.dias_disfrutados_reales),
     novedad_referencia:
       n.novedad_referencia != null
         ? { id: n.novedad_referencia, nombre: n.novedad_referencia_nombre ?? '' }
@@ -66,6 +67,7 @@ export function formValueToPayload(v: NovedadFormRawValue): NovedadPayload {
     dias: diasDeNovedad(v.fecha_desde, v.fecha_hasta),
     dias_dinero: v.dias_dinero ?? 0,
     dias_disfrutados: v.dias_disfrutados ?? 0,
+    dias_disfrutados_reales: v.dias_disfrutados_reales ?? 0,
     novedad_referencia: v.novedad_referencia?.id ?? null,
   };
 }
