@@ -140,6 +140,8 @@
             [lines]="lines()"
             [linkable]="true"
             [almacenEnabled]="true"
+            [refEnabled]="tieneReferencias()"
+            [detalleEnabled]="false"
             (verAfectacion)="onVerAfectacion($event)"
           />
         </p-tabpanel>
