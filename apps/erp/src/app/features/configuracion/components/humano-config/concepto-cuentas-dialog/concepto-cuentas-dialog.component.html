@@ -32,52 +32,64 @@
       <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.dialog.hint }}</p>
 
       @if (grants().crear) {
+        <!--
+          Rejilla de tres filas (etiquetas / controles / errores) para que el botón
+          comparta la fila de los controles y tome su misma altura, sin adivinar
+          píxeles: el botón compacto global mide 32px y los selectores más.
+          En pantallas angostas todo apila en una columna, en su orden natural.
+        -->
         <form
           [formGroup]="addForm"
-          class="grid grid-cols-1 items-start gap-3 rounded-lg border border-[rgba(20,48,73,0.1)] p-4 sm:grid-cols-[1fr_1.4fr_auto]"
+          class="grid grid-cols-1 gap-x-3 gap-y-1.5 rounded-lg border border-[rgba(20,48,73,0.1)] p-4 sm:grid-cols-[1fr_1.4fr_auto] sm:grid-rows-[auto_auto_auto]"
           (ngSubmit)="onAgregar()"
         >
-          <div class="flex flex-col gap-1.5">
-            <label for="cc_tipo_costo" class="text-[0.8rem] font-medium text-brand-text">
-              {{ m.fields.tipoCosto }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <lib-api-select
-              inputId="cc_tipo_costo"
-              formControlName="tipo_costo"
-              [endpoint]="tipoCostoEndpoint"
-              [params]="{ limit: '100' }"
-              [invalid]="addForm.controls.tipo_costo.invalid && addForm.controls.tipo_costo.touched"
-            />
-            <lib-field-error
-              [control]="addForm.controls.tipo_costo"
-              [messages]="{ required: m.validation.required, duplicado: m.validation.duplicado }"
-            />
-          </div>
+          <label
+            for="cc_tipo_costo"
+            class="text-[0.8rem] font-medium text-brand-text sm:col-start-1 sm:row-start-1"
+          >
+            {{ m.fields.tipoCosto }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <lib-api-select
+            class="sm:col-start-1 sm:row-start-2"
+            inputId="cc_tipo_costo"
+            formControlName="tipo_costo"
+            [endpoint]="tipoCostoEndpoint"
+            [params]="{ limit: '100' }"
+            [invalid]="addForm.controls.tipo_costo.invalid && addForm.controls.tipo_costo.touched"
+          />
+          <lib-field-error
+            class="sm:col-start-1 sm:row-start-3"
+            [control]="addForm.controls.tipo_costo"
+            [messages]="{ required: m.validation.required, duplicado: m.validation.duplicado }"
+          />
 
-          <div class="flex flex-col gap-1.5">
-            <label for="cc_cuenta" class="text-[0.8rem] font-medium text-brand-text">
-              {{ m.fields.cuenta }}
-              <span class="ml-px text-red-500">*</span>
-            </label>
-            <app-cuenta-select
-              inputId="cc_cuenta"
-              formControlName="cuenta"
-              [invalid]="addForm.controls.cuenta.invalid && addForm.controls.cuenta.touched"
-            />
-            <lib-field-error
-              [control]="addForm.controls.cuenta"
-              [messages]="{ required: m.validation.required }"
-            />
-          </div>
+          <label
+            for="cc_cuenta"
+            class="mt-2 text-[0.8rem] font-medium text-brand-text sm:col-start-2 sm:row-start-1 sm:mt-0"
+          >
+            {{ m.fields.cuenta }}
+            <span class="ml-px text-red-500">*</span>
+          </label>
+          <app-cuenta-select
+            class="sm:col-start-2 sm:row-start-2"
+            inputId="cc_cuenta"
+            formControlName="cuenta"
+            [invalid]="addForm.controls.cuenta.invalid && addForm.controls.cuenta.touched"
+          />
+          <lib-field-error
+            class="sm:col-start-2 sm:row-start-3"
+            [control]="addForm.controls.cuenta"
+            [messages]="{ required: m.validation.required }"
+          />
 
           <p-button
             type="submit"
-            class="sm:mt-[1.6rem]"
+            class="mt-2 flex sm:col-start-3 sm:row-start-2 sm:mt-0"
+            styleClass="!h-full w-full"
             [label]="m.actions.agregar"
             icon="pi pi-plus"
             [loading]="isAdding()"
-            [disabled]="isAdding()"
           />
         </form>
       }
@@ -156,14 +168,18 @@
     </div>
   }
 
+  <!-- Modal de gestión (cada acción guarda sola): solo Cerrar, como archivos o imágenes. -->
   <ng-template pTemplate="footer">
-    <p-button
-      severity="secondary"
-      [text]="true"
-      [label]="t().common.actions.close"
-      [disabled]="ocupado()"
-      (onClick)="visible.set(false)"
-    />
+    <div class="flex justify-end border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.close"
+        [outlined]="true"
+        severity="secondary"
+        [disabled]="ocupado()"
+        (onClick)="visible.set(false)"
+      />
+    </div>
   </ng-template>
 </p-dialog>
 
