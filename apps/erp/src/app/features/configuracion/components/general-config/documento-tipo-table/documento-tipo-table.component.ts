@@ -1,8 +1,8 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService, type ListQuery } from '@reddoc/core';
+import { I18nService, ToastService } from '@reddoc/core';
 import {
   DataTableComponent,
   type PageChangeEvent,
@@ -16,13 +16,12 @@ import type { DocumentoTipo, DocumentoTipoRow } from '../../../documento-tipo/do
 import { toDocumentoTipoRow } from '../../../documento-tipo/documento-tipo.mapper';
 import {
   DOCUMENTO_TIPO_COLUMNS,
-  DOCUMENTO_TIPO_SORT,
   DOCUMENTO_TIPO_ROW_ACTIONS,
   DOCUMENTO_TIPO_TABLE_HEIGHT,
 } from '../../../documento-tipo/documento-tipo.constants';
 import { DocumentoTipoEditDialogComponent } from '../documento-tipo-edit-dialog/documento-tipo-edit-dialog.component';
 
-/** Tamaño de página inicial. El `lista/` lo acepta como `limit`, así que manda el front. */
+/** Tamaño de página inicial. El backend devuelve todo; se pagina en el cliente. */
 const PAGE_SIZE_INICIAL = 25;
 
 /**
@@ -31,7 +30,7 @@ const PAGE_SIZE_INICIAL = 25;
  * El catálogo es normativo: no se crea ni se borra, solo se edita el consecutivo
  * y las cuentas de cartera de cada tipo. Por eso no hay toolbar, ni filtros, ni
  * selección múltiple ni ordenamiento por columna; solo la tabla y su lápiz. El
- * orden es fijo (`DOCUMENTO_TIPO_SORT`), el del catálogo.
+ * orden es fijo, el del catálogo, y lo pone el backend.
  */
 @Component({
   selector: 'app-documento-tipo-table',
@@ -53,14 +52,19 @@ export class DocumentoTipoTableComponent {
 
   protected readonly t = this.i18n.t;
 
-  protected readonly items = signal<readonly DocumentoTipoRow[]>([]);
-  protected readonly totalCount = signal(0);
   /** Arranca en `true`: hasta saber si puede ver, la tabla muestra su esqueleto. */
   protected readonly isLoading = signal(true);
   protected readonly puedeVer = signal(true);
   protected readonly loadFailed = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly pageSize = signal(PAGE_SIZE_INICIAL);
+
+  private readonly rows = signal<readonly DocumentoTipoRow[]>([]);
+  protected readonly totalCount = computed(() => this.rows().length);
+  protected readonly items = computed(() => {
+    const inicio = this.currentPage() * this.pageSize();
+    return this.rows().slice(inicio, inicio + this.pageSize());
+  });
 
   protected readonly selectedTipo = signal<DocumentoTipo | null>(null);
   protected readonly dialogVisible = signal(false);
@@ -93,29 +97,19 @@ export class DocumentoTipoTableComponent {
       });
   }
 
-  private query(): ListQuery {
-    return {
-      filters: [],
-      sort: DOCUMENTO_TIPO_SORT,
-      page: this.currentPage(),
-      pageSize: this.pageSize(),
-    };
-  }
-
   protected cargar(): void {
     this.isLoading.set(true);
     this.loadFailed.set(false);
 
     this.service
-      .list(this.query())
+      .listar()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
         next: (respuesta) => {
-          this.items.set(respuesta.results.map(toDocumentoTipoRow));
-          this.totalCount.set(respuesta.count);
+          this.rows.set(respuesta.map(toDocumentoTipoRow));
         },
         error: () => {
           this.loadFailed.set(true);
@@ -128,7 +122,6 @@ export class DocumentoTipoTableComponent {
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
     this.pageSize.set(event.pageSize);
-    this.cargar();
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
