@@ -4140,6 +4140,10 @@ export const es: AppDict = {
       detallePlaceholder: 'Nota…',
       almacenPlaceholder: 'Almacén…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
+      confirmDeleteLines: '¿Eliminar {count} líneas del documento?',
+      removeSelected: 'Eliminar seleccionadas',
+      selectLine: 'Seleccionar línea',
+      selectAllLines: 'Seleccionar todas las líneas',
       createItem: 'Crear ítem',
       extraerIva: {
         title: 'Precio con impuestos incluidos',

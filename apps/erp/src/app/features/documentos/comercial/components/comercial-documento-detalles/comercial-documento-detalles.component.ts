@@ -25,6 +25,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -123,6 +124,7 @@ interface ToastTexto {
     FormsModule,
     ReactiveFormsModule,
     ButtonModule,
+    CheckboxModule,
     SplitButtonModule,
     InputNumberModule,
     InputTextModule,
@@ -238,11 +240,11 @@ export class ComercialDocumentoDetallesComponent {
   readonly detalleEnabled = input<boolean>(true);
 
   /**
-   * Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las
+   * Columnas de la tabla, para el `colspan` del estado vacío: 10 fijas más las
    * opcionales que el documento haya encendido.
    */
   protected readonly columnCount = computed(
-    () => 9 + (this.detalleEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
+    () => 10 + (this.detalleEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
   );
 
   /** Importación en curso; bloquea el botón mientras resuelve los ítems. */
@@ -277,6 +279,33 @@ export class ComercialDocumentoDetallesComponent {
 
   /** Espejo reactivo del valor del array para la tabla, los totales y el resumen. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+
+  /**
+   * Filas marcadas para quitar en bloque. La clave es el `FormGroup` y no el `id`:
+   * las líneas nuevas aún no lo tienen.
+   */
+  private readonly marcadas = signal<ReadonlySet<ComercialDetalleGroup>>(new Set());
+
+  /**
+   * Filas marcadas que siguen en la tabla. Se cruza con los controles actuales
+   * porque el array cambia por debajo: guardar reconstruye la fila (`setControl`)
+   * y reemplazar o quitar líneas saca grupos; una marca huérfana no cuenta.
+   */
+  protected readonly seleccionadas = computed(() => {
+    this.lines(); // dependencia: se recalcula con cada cambio del array
+    const marcadas = this.marcadas();
+    return this.montada() ? this.detalles().controls.filter((row) => marcadas.has(row)) : [];
+  });
+
+  /** Todas las filas están marcadas (checkbox de la cabecera lleno). */
+  protected readonly todasSeleccionadas = computed(
+    () => this.lines().length > 0 && this.seleccionadas().length === this.lines().length,
+  );
+
+  /** Hay filas marcadas, pero no todas (checkbox de la cabecera a medias). */
+  protected readonly seleccionParcial = computed(
+    () => this.seleccionadas().length > 0 && !this.todasSeleccionadas(),
+  );
 
   /** Hay al menos una línea: la página pinta el resumen solo entonces. */
   readonly hayLineas = computed(() => this.lines().length > 0);
@@ -604,7 +633,48 @@ export class ComercialDocumentoDetallesComponent {
       this.eliminadas.update((actuales) => [...actuales, ...ids]);
     }
     this.detalles().clear();
+    this.marcadas.set(new Set());
     for (const value of values) this.detalles().push(createComercialDetalleGroup(value));
+  }
+
+  protected estaSeleccionada(group: ComercialDetalleGroup): boolean {
+    return this.marcadas().has(group);
+  }
+
+  protected toggleSeleccion(group: ComercialDetalleGroup): void {
+    this.marcadas.update((actuales) => {
+      const siguiente = new Set(actuales);
+      if (!siguiente.delete(group)) siguiente.add(group);
+      return siguiente;
+    });
+  }
+
+  /** Marca todas las filas, o ninguna si ya estaban todas. */
+  protected toggleTodas(): void {
+    this.marcadas.set(this.todasSeleccionadas() ? new Set() : new Set(this.detalles().controls));
+  }
+
+  /**
+   * Pide una sola confirmación y quita todas las filas marcadas. Cada una sigue el
+   * camino de la papelera (`deleteLinea`): en edición las persistidas pasan a
+   * `eliminadas` y el `DELETE` espera al guardado del documento.
+   */
+  protected removeSeleccionadas(): void {
+    const filas = this.seleccionadas();
+    if (filas.length === 0) return;
+    const dict = this.t().entities.comercialDetalle;
+    this.confirmation.confirm({
+      message:
+        filas.length === 1
+          ? dict.confirmDeleteLine
+          : dict.confirmDeleteLines.replace('{count}', String(filas.length)),
+      header: this.t().common.confirms.deleteHeader,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.t().common.actions.delete,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deleteLineas(filas),
+    });
   }
 
   /** Pide confirmación y, al aceptar, elimina la línea (persiste en edición). */
@@ -978,6 +1048,12 @@ export class ComercialDocumentoDetallesComponent {
       this.eliminadas.update((ids) => [...ids, id]);
     }
     this.removeGroup(group);
+  }
+
+  /** Quita varias filas a la vez y vacía la selección. */
+  private deleteLineas(filas: readonly ComercialDetalleGroup[]): void {
+    for (const fila of filas) this.deleteLinea(fila, fila.controls.id.value);
+    this.marcadas.set(new Set());
   }
 
   /** Quita un grupo del `FormArray` por su referencia (robusto ante reordenamientos). */

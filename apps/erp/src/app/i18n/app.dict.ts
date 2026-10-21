@@ -3127,6 +3127,10 @@ export interface AppDict
       detallePlaceholder: string;
       almacenPlaceholder: string;
       confirmDeleteLine: string;
+      confirmDeleteLines: string;
+      removeSelected: string;
+      selectLine: string;
+      selectAllLines: string;
       createItem: string;
       extraerIva: { title: string; baseLabel: string; apply: string };
       aiu: {

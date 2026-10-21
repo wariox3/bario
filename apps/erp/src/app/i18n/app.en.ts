@@ -4070,6 +4070,10 @@ export const en: AppDict = {
       detallePlaceholder: 'Note…',
       almacenPlaceholder: 'Warehouse…',
       confirmDeleteLine: 'Remove this line from the document?',
+      confirmDeleteLines: 'Remove {count} lines from the document?',
+      removeSelected: 'Remove selected',
+      selectLine: 'Select line',
+      selectAllLines: 'Select all lines',
       createItem: 'Create item',
       extraerIva: {
         title: 'Tax-inclusive price',
