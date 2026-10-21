@@ -72,6 +72,10 @@ export const es: AppDict = {
       deleteMessage: '¿Estás seguro de que querés eliminar los registros seleccionados?',
     },
     toasts: {
+      formModalError: {
+        title: 'No se pudo abrir el formulario',
+        desc: 'Recarga la página e inténtalo de nuevo.',
+      },
       loadError: {
         title: 'Error al cargar',
         desc: 'No se pudieron obtener los registros. Intentá de nuevo.',
@@ -1274,10 +1278,6 @@ export const es: AppDict = {
           loadError: {
             title: 'Error al cargar',
             desc: 'No se pudo cargar el contacto.',
-          },
-          createTerceroError: {
-            title: 'No se pudo abrir el formulario',
-            desc: 'Recarga la página e inténtalo de nuevo.',
           },
         },
         dian: {

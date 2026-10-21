@@ -48,6 +48,7 @@ import { ContactoService } from '../../contacto.service';
 import { CONTACTO_LIST_PATH } from '../../contacto.constants';
 import { contactoToFormValue, formValueToPayload } from '../../contacto.mapper';
 import type { ContactoFormDialogData } from './contacto-form.types';
+import { prepararFormModal } from '@erp/core/components/form-modal/form-modal';
 
 /** Id del título del modal: el `role="dialog"` lo usa como nombre accesible. */
 const MODAL_TITLE_ID = 'contacto-form-modal-title';
@@ -204,7 +205,12 @@ export class ContactoFormComponent implements OnInit {
   constructor() {
     this.setupFormReactions();
     this.applyRolInicial();
-    if (this.isModal) afterNextRender(() => this.prepararModal());
+    // Nombre accesible del modal y foco en el primer campo (ver `prepararFormModal`).
+    if (this.isModal) {
+      afterNextRender(() =>
+        prepararFormModal(this.host.nativeElement, MODAL_TITLE_ID, '#tipo_persona'),
+      );
+    }
   }
 
   ngOnInit(): void {
@@ -332,18 +338,6 @@ export class ContactoFormComponent implements OnInit {
   }
 
   // ── Internos ────────────────────────────────────────────────────────────────
-
-  /**
-   * Accesibilidad del modal. Con `showHeader: false` PrimeNG deja el
-   * `role="dialog"` sin nombre y su autofoco caería en la ✕ (el primer
-   * focusable): el título propio se enlaza como nombre y el foco va al primer
-   * campo. Quien abre el modal apaga `focusOnShow` para que no lo pise.
-   */
-  private prepararModal(): void {
-    const host = this.host.nativeElement;
-    host.closest('[role="dialog"]')?.setAttribute('aria-labelledby', MODAL_TITLE_ID);
-    host.querySelector<HTMLElement>('#tipo_persona')?.focus();
-  }
 
   /**
    * Premarca el rol que pidió el documento (modal). Va como hidratación: la card

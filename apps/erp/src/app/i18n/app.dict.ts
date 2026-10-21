@@ -115,6 +115,8 @@ export interface AppDict
     };
     toasts: {
       loadError: { title: string; desc: string };
+      /** Un formulario en modal (alta inline) no pudo cargar su chunk. */
+      formModalError: { title: string; desc: string };
       deleteSuccess: { title: string; desc: string };
       deleteError: { title: string; desc: string };
       exportError: { title: string; desc: string };
@@ -969,7 +971,6 @@ export interface AppDict
           editSuccess: { title: string; desc: string };
           editError: { title: string; desc: string };
           loadError: { title: string; desc: string };
-          createTerceroError: { title: string; desc: string };
         };
         dian: {
           button: string;

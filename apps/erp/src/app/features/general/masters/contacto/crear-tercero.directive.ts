@@ -1,13 +1,13 @@
 import { DestroyRef, Directive, effect, inject, input } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DialogService, type DynamicDialogRef } from 'primeng/dynamicdialog';
-import { EMPTY, catchError, exhaustMap, filter, finalize, from, map, switchMap, take } from 'rxjs';
-import { I18nService, ToastService } from '@reddoc/core';
+import { exhaustMap, map } from 'rxjs';
+import { I18nService } from '@reddoc/core';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { MODELO, PermissionsService } from '@erp/core/permissions';
-import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
+import { formModal } from '@erp/core/components/form-modal/form-modal';
 import type { AppDict } from '@erp/i18n';
 import type { Contacto } from './contacto.model';
+import { contactoToSeleccionarOption } from './contacto.mapper';
 import type {
   ContactoFormDialogData,
   ContactoRolInicial,
@@ -65,15 +65,9 @@ export function rolInicial(
  *   autocompletan igual que al elegirlo de la lista — ningún form se entera.
  *
  * El formulario se carga lazy: el documento no paga el master hasta que alguien
- * pide crear. Mismo patrón que "Crear ítem" en la línea de un documento.
- *
- * - **Modal:** ni el clic afuera ni `Escape` lo cierran, para no descartar un
- *   form a medias; se sale con Cancelar o la ✕. Si el documento se destruye con
- *   el modal abierto (p. ej. la sesión vence y se navega al login), se cierra con
- *   él: quedaría huérfano sobre otra pantalla y un guardado ahí crearía un
- *   contacto que nadie selecciona.
- * - **Chunk caído:** si el form no carga, se avisa y el flujo sigue vivo para el
- *   próximo intento.
+ * pide crear. El modal (sin descartes accidentales, sin quedar huérfano, chunk
+ * caído) lo resuelve `formModal`, igual que "Crear ítem" en la línea de un
+ * documento.
  */
 @Directive({
   selector: 'lib-contacto-select[appCrearTercero]',
@@ -81,21 +75,15 @@ export function rolInicial(
 })
 export class CrearTerceroDirective {
   private readonly select = inject(ErpContactoSelectComponent, { self: true });
-  private readonly dialog = inject(DialogService);
   private readonly permissions = inject(PermissionsService);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
-  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly formModal = formModal();
 
   /** Rol explícito; vacío (atributo sin valor) = deducirlo del filtro. */
   readonly appCrearTercero = input<ContactoRolInicial | ''>('');
 
-  /** Modal abierto por esta directiva, para cerrarlo si el documento se destruye. */
-  private abierto: DynamicDialogRef | null = null;
-
   constructor() {
-    this.destroyRef.onDestroy(() => this.abierto?.close(null));
-
     effect(() => {
       this.select.createLabel.set(this.i18n.t().entities.contacto.form.createTercero);
     });
@@ -118,42 +106,14 @@ export class CrearTerceroDirective {
     const data: ContactoFormDialogData = {
       rol: rolInicial(this.appCrearTercero(), this.select.extraParams()),
     };
-    return from(
-      Promise.all([
-        import('./pages/contacto-form/contacto-form.component'),
-        import('./contacto.mapper'),
-      ]),
-    ).pipe(
-      switchMap(([{ ContactoFormComponent }, { contactoToSeleccionarOption }]) => {
-        const ref = this.dialog.open(ContactoFormComponent, {
-          ...ENTITY_ACTION_DIALOG_DEFAULTS,
-          dismissableMask: false,
-          closeOnEscape: false,
-          // El form lleva el foco a su primer campo; el autofoco de PrimeNG lo
-          // pisaría con la ✕, que es el primer focusable del modal.
-          focusOnShow: false,
-          width: 'min(80rem, 95vw)',
-          contentStyle: { 'max-height': '86vh', overflow: 'auto' },
-          data,
-        });
-        if (!ref) return EMPTY;
-        this.abierto = ref;
-        // `take(1)`: PrimeNG completa `onClose` un segundo después de cerrar, y
-        // mientras tanto el `exhaustMap` de afuera ignoraría un nuevo pedido.
-        return ref.onClose.pipe(
-          take(1),
-          finalize(() => (this.abierto = null)),
-          filter((created: unknown): created is Contacto => created != null),
-          map(contactoToSeleccionarOption),
-        );
-      }),
-      // Sin esto, un `import()` rechazado errorea la suscripción a
-      // `createRequested` y "Crear tercero" deja de responder hasta recargar.
-      catchError(() => {
-        const { title, desc } = this.i18n.t().entities.contacto.form.toasts.createTerceroError;
-        this.toast.error(title, desc);
-        return EMPTY;
-      }),
-    );
+    return this.formModal
+      .abrir<Contacto>(
+        () =>
+          import('./pages/contacto-form/contacto-form.component').then(
+            (m) => m.ContactoFormComponent,
+          ),
+        { data, width: 'min(80rem, 95vw)' },
+      )
+      .pipe(map(contactoToSeleccionarOption));
   }
 }

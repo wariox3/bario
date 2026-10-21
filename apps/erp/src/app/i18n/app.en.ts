@@ -72,6 +72,10 @@ export const en: AppDict = {
       deleteMessage: 'Are you sure you want to delete the selected records?',
     },
     toasts: {
+      formModalError: {
+        title: 'Could not open the form',
+        desc: 'Reload the page and try again.',
+      },
       loadError: {
         title: 'Failed to load',
         desc: 'Could not fetch the records. Please try again.',
@@ -1260,10 +1264,6 @@ export const en: AppDict = {
           loadError: {
             title: 'Could not load',
             desc: 'The contact could not be loaded.',
-          },
-          createTerceroError: {
-            title: 'Could not open the form',
-            desc: 'Reload the page and try again.',
           },
         },
         dian: {

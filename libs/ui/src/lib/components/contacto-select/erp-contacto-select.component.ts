@@ -12,6 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AutoComplete, AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
+import { CreateOptionFooterComponent } from '../create-option-footer/create-option-footer.component';
 import { Subject, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import {
@@ -70,7 +71,7 @@ function toOption(row: ContactoApiRow): ErpSelectOption {
 @Component({
   selector: 'lib-contacto-select',
   standalone: true,
-  imports: [AutoCompleteModule, FormsModule],
+  imports: [AutoCompleteModule, FormsModule, CreateOptionFooterComponent],
   template: `
     <p-autocomplete
       [inputId]="inputId()"
@@ -96,18 +97,9 @@ function toOption(row: ContactoApiRow): ErpSelectOption {
       autocomplete="off"
     >
       @if (allowCreate()) {
-        <!-- Pie del panel: alta inline. El preventDefault del mousedown evita que
-             el blur del input dispare la reconciliación antes de que llegue el click. -->
+        <!-- Pie del panel: alta inline. -->
         <ng-template #footer>
-          <button
-            type="button"
-            class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-3 py-2 text-[0.8rem] font-medium text-sky-700 transition-colors hover:bg-sky-50"
-            (mousedown)="$event.preventDefault()"
-            (click)="onCreateClick()"
-          >
-            <i class="pi pi-plus text-[0.7rem]"></i>
-            {{ createLabel() }}
-          </button>
+          <lib-create-option-footer [label]="createLabel()" (create)="onCreateClick()" />
         </ng-template>
       }
     </p-autocomplete>
