@@ -52,6 +52,7 @@ import type {
   CuentaDetalleFormRawValue,
   NaturalezaCuenta,
 } from '../../contable-documento-detalle.types';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /** Columnas fijas: nº, cuenta, naturaleza, valor y acciones. */
 const BASE_COLUMN_COUNT = 5;
@@ -96,6 +97,7 @@ const BASE_COLUMN_COUNT = 5;
     ConfirmDialogModule,
     ErpCuentaSelectComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
   ],
   providers: [ConfirmationService],

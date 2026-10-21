@@ -67,6 +67,7 @@ import { asientoToFormValue, formValueToPayload } from '../../asiento.mapper';
 import type { AsientoRead } from '../../asiento.model';
 import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Asiento contable.
@@ -105,6 +106,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ContableDocumentoDetallesComponent,
     TabsModule,

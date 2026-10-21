@@ -66,6 +66,7 @@ import { pagoToFormValue, formValueToPayload } from '../../pago.mapper';
 import type { PagoRead } from '../../pago.model';
 import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Pago (recaudo de cartera).
@@ -100,6 +101,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ContableDocumentoDetallesComponent,
     TabsModule,
