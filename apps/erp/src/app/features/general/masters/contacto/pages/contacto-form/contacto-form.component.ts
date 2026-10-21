@@ -12,6 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -45,12 +46,20 @@ import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
 import { CONTACTO_LIST_PATH } from '../../contacto.constants';
 import { contactoToFormValue, formValueToPayload } from '../../contacto.mapper';
+import type { ContactoFormDialogData } from './contacto-form.types';
 
 /**
  * Formulario de alta/edición de contacto.
  *
  * Master del módulo General (camino B). La misma página cubre crear y editar:
  * sin `:id` → alta; con `:id` → edición (el id llega por `withComponentInputBinding`).
+ *
+ * También sirve como **modal** (alta de tercero desde un documento de venta o
+ * compra, vía `appCrearTercero`): si hay un `DynamicDialogRef` inyectable es que
+ * lo abrió un `DialogService`, y en ese modo esconde el chrome de página
+ * (breadcrumb, barra pegajosa), pinta su propio encabezado/pie, premarca el rol
+ * que pidió el documento y al guardar **cierra devolviendo el contacto creado**
+ * en vez de navegar a su ficha. Mismo patrón que `ItemFormComponent`.
  */
 @Component({
   selector: 'app-contacto-form',
@@ -84,6 +93,14 @@ export class ContactoFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
+  /** Presente solo cuando el form vive en un modal (alta de tercero); `null` como página. */
+  private readonly dialogRef = inject(DynamicDialogRef, { optional: true });
+  private readonly dialogData = inject(DynamicDialogConfig, { optional: true })?.data as
+    | ContactoFormDialogData
+    | undefined;
+
+  /** `true` cuando el form se abrió como modal desde un documento. */
+  protected readonly isModal = this.dialogRef !== null;
 
   protected readonly t = this.i18n.t;
 
@@ -180,6 +197,7 @@ export class ContactoFormComponent implements OnInit {
 
   constructor() {
     this.setupFormReactions();
+    this.applyRolInicial();
   }
 
   ngOnInit(): void {
@@ -203,8 +221,14 @@ export class ContactoFormComponent implements OnInit {
         this.isSaving.set(false);
         const ok = id ? toasts.editSuccess : toasts.createSuccess;
         this.toast.success(ok.title, ok.desc);
-        // Guardar termina en la ficha, para revisar lo que quedó almacenado. En alta
-        // el id sale de la respuesta del backend; si no viniera, se cae a la lista.
+        // Como modal, el contacto creado vuelve a quien lo pidió (el selector del
+        // documento lo deja elegido). Como página, guardar termina en la ficha
+        // para revisar lo que quedó almacenado. En alta el id sale de la
+        // respuesta del backend; si no viniera, se cae a la lista.
+        if (this.dialogRef) {
+          this.dialogRef.close(saved);
+          return;
+        }
         const savedId = id ? Number(id) : saved?.id;
         if (savedId == null) {
           this.navigateToList();
@@ -221,6 +245,10 @@ export class ContactoFormComponent implements OnInit {
   }
 
   protected onCancel(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close(null);
+      return;
+    }
     this.navigateToList();
   }
 
@@ -297,6 +325,18 @@ export class ContactoFormComponent implements OnInit {
   }
 
   // ── Internos ────────────────────────────────────────────────────────────────
+
+  /**
+   * Premarca el rol que pidió el documento (modal). Va como hidratación: la card
+   * de proveedor se revela sin el scroll que acompaña a marcarla a mano.
+   */
+  private applyRolInicial(): void {
+    const rol = this.dialogData?.rol;
+    if (!rol) return;
+    this.isHydrating = true;
+    this.form.patchValue({ cliente: rol === 'cliente', proveedor: rol === 'proveedor' });
+    this.isHydrating = false;
+  }
 
   /**
    * Hace scroll suave hacia la card recién revelada. La sección se renderiza vía

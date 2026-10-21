@@ -910,6 +910,8 @@ export interface AppDict
       };
       form: {
         createTitle: string;
+        createTerceroTitle: string;
+        createTercero: string;
         createSubtitle: string;
         editTitle: string;
         editSubtitle: string;
@@ -967,6 +969,7 @@ export interface AppDict
           editSuccess: { title: string; desc: string };
           editError: { title: string; desc: string };
           loadError: { title: string; desc: string };
+          createTerceroError: { title: string; desc: string };
         };
         dian: {
           button: string;

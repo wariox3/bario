@@ -71,6 +71,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/documento-referencia-select/erp-documento-referencia-select.component';
 import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comercial/components/cargar-lineas-referencia/cargar-lineas-referencia.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Nota ajuste.
@@ -107,6 +108,7 @@ import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comerc
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ErpDocumentoReferenciaSelectComponent,
     CargarLineasReferenciaComponent,

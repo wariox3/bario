@@ -1190,6 +1190,8 @@ export const es: AppDict = {
       },
       form: {
         createTitle: 'Nuevo contacto',
+        createTerceroTitle: 'Nuevo tercero',
+        createTercero: 'Crear tercero',
         createSubtitle: 'Registrá un nuevo contacto',
         editTitle: 'Editar contacto',
         editSubtitle: 'Actualizá los datos del contacto',
@@ -1272,6 +1274,10 @@ export const es: AppDict = {
           loadError: {
             title: 'Error al cargar',
             desc: 'No se pudo cargar el contacto.',
+          },
+          createTerceroError: {
+            title: 'No se pudo abrir el formulario',
+            desc: 'Recarga la página e inténtalo de nuevo.',
           },
         },
         dian: {

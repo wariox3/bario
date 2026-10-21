@@ -87,6 +87,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
 import { pestanaConPrimerError } from '@erp/features/documentos/tablas-en-vivo';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Línea de documento leída al cargar en edición: la tabla `documento-detalle`
@@ -139,6 +140,7 @@ interface FlushableLineTable {
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
     VencimientoHintComponent,

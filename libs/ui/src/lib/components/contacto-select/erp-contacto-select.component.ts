@@ -6,6 +6,7 @@ import {
   forwardRef,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -93,7 +94,23 @@ function toOption(row: ContactoApiRow): ErpSelectOption {
       [showClear]="true"
       appendTo="body"
       autocomplete="off"
-    />
+    >
+      @if (allowCreate()) {
+        <!-- Pie del panel: alta inline. El preventDefault del mousedown evita que
+             el blur del input dispare la reconciliación antes de que llegue el click. -->
+        <ng-template #footer>
+          <button
+            type="button"
+            class="flex w-full items-center gap-2 border-t border-[rgba(20,48,73,0.08)] px-3 py-2 text-[0.8rem] font-medium text-sky-700 transition-colors hover:bg-sky-50"
+            (mousedown)="$event.preventDefault()"
+            (click)="onCreateClick()"
+          >
+            <i class="pi pi-plus text-[0.7rem]"></i>
+            {{ createLabel() }}
+          </button>
+        </ng-template>
+      }
+    </p-autocomplete>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -119,6 +136,19 @@ export class ErpContactoSelectComponent implements ControlValueAccessor {
 
   /** Filtros adicionales fijos para este campo (p. ej. `{ cliente: 'True' }`). */
   readonly extraParams = input<Record<string, ParamValue>>({});
+
+  /**
+   * Muestra "crear tercero" al pie del panel de sugerencias. Es una **señal
+   * escribible** y no un input (igual que `createLabel`): en el ERP la enciende la directiva
+   * `appCrearTercero` cuando el usuario puede crear contactos, sin que cada form
+   * lo enlace. El selector solo **emite** `createRequested`: el alta (modal,
+   * permisos, selección del creado) es de quien escucha — así `libs/ui` no
+   * conoce el master. Mismo contrato que `app-item-autocomplete`.
+   */
+  readonly allowCreate = signal(false);
+  /** Texto del pie; quien enciende `allowCreate` lo traduce. */
+  readonly createLabel = signal('Crear tercero');
+  readonly createRequested = output<void>();
 
   readonly value = signal<ErpSelectOption | null>(null);
   readonly disabled = signal(false);
@@ -216,6 +246,25 @@ export class ErpContactoSelectComponent implements ControlValueAccessor {
     this.focused = false;
     clearTimeout(this.reopenTimer);
     this.reconcileForceSelection();
+    this.onTouchedFn();
+  }
+
+  /** Cierra el panel y delega el alta en quien escucha `createRequested`. */
+  onCreateClick(): void {
+    this.ac?.hide();
+    this.createRequested.emit();
+  }
+
+  /**
+   * Fija un contacto recién creado como si se hubiera elegido de la lista:
+   * actualiza el input y **propaga** al formulario, así corre la misma tubería
+   * de una selección (plazo, lista de precios…).
+   */
+  selectCreated(option: ErpSelectOption): void {
+    // Sin `onValueChange`: su `skipNextFocus` es para el foco que PrimeNG
+    // devuelve tras elegir una opción, y aquí ese foco puede no volver nunca.
+    this.value.set(option);
+    this.onChangeFn(option);
     this.onTouchedFn();
   }
 

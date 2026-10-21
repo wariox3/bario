@@ -35,3 +35,16 @@ export interface ContactoFormRawValue {
   readonly cuenta_banco_clase: ErpSelectOption | null;
   readonly plazo_pago_proveedor: ErpSelectOption | null;
 }
+
+/** Rol con el que un documento abre el alta de un tercero. */
+export type ContactoRolInicial = 'cliente' | 'proveedor';
+
+/**
+ * `data` del `DynamicDialogConfig` cuando el form se abre como modal (alta de
+ * tercero desde un documento). El rol llega **premarcado pero editable**: sin él,
+ * el tercero creado no pasaría el filtro (`cliente`/`proveedor`) del selector
+ * que lo pidió.
+ */
+export interface ContactoFormDialogData {
+  readonly rol?: ContactoRolInicial;
+}

@@ -1176,6 +1176,8 @@ export const en: AppDict = {
       },
       form: {
         createTitle: 'new contact',
+        createTerceroTitle: 'New third party',
+        createTercero: 'Create third party',
         createSubtitle: 'Register a new contact',
         editTitle: 'Edit contact',
         editSubtitle: 'Update the contact details',
@@ -1258,6 +1260,10 @@ export const en: AppDict = {
           loadError: {
             title: 'Could not load',
             desc: 'The contact could not be loaded.',
+          },
+          createTerceroError: {
+            title: 'Could not open the form',
+            desc: 'Reload the page and try again.',
           },
         },
         dian: {
