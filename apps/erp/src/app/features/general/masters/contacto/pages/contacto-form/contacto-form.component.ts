@@ -1,8 +1,9 @@
 import {
   Component,
   DestroyRef,
-  type ElementRef,
+  ElementRef,
   type OnInit,
+  afterNextRender,
   computed,
   inject,
   input,
@@ -47,6 +48,9 @@ import { ContactoService } from '../../contacto.service';
 import { CONTACTO_LIST_PATH } from '../../contacto.constants';
 import { contactoToFormValue, formValueToPayload } from '../../contacto.mapper';
 import type { ContactoFormDialogData } from './contacto-form.types';
+
+/** Id del título del modal: el `role="dialog"` lo usa como nombre accesible. */
+const MODAL_TITLE_ID = 'contacto-form-modal-title';
 
 /**
  * Formulario de alta/edición de contacto.
@@ -101,6 +105,8 @@ export class ContactoFormComponent implements OnInit {
 
   /** `true` cuando el form se abrió como modal desde un documento. */
   protected readonly isModal = this.dialogRef !== null;
+  protected readonly modalTitleId = MODAL_TITLE_ID;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly t = this.i18n.t;
 
@@ -198,6 +204,7 @@ export class ContactoFormComponent implements OnInit {
   constructor() {
     this.setupFormReactions();
     this.applyRolInicial();
+    if (this.isModal) afterNextRender(() => this.prepararModal());
   }
 
   ngOnInit(): void {
@@ -327,6 +334,18 @@ export class ContactoFormComponent implements OnInit {
   // ── Internos ────────────────────────────────────────────────────────────────
 
   /**
+   * Accesibilidad del modal. Con `showHeader: false` PrimeNG deja el
+   * `role="dialog"` sin nombre y su autofoco caería en la ✕ (el primer
+   * focusable): el título propio se enlaza como nombre y el foco va al primer
+   * campo. Quien abre el modal apaga `focusOnShow` para que no lo pise.
+   */
+  private prepararModal(): void {
+    const host = this.host.nativeElement;
+    host.closest('[role="dialog"]')?.setAttribute('aria-labelledby', MODAL_TITLE_ID);
+    host.querySelector<HTMLElement>('#tipo_persona')?.focus();
+  }
+
+  /**
    * Premarca el rol que pidió el documento (modal). Va como hidratación: la card
    * de proveedor se revela sin el scroll que acompaña a marcarla a mano.
    */
@@ -334,7 +353,11 @@ export class ContactoFormComponent implements OnInit {
     const rol = this.dialogData?.rol;
     if (!rol) return;
     this.isHydrating = true;
-    this.form.patchValue({ cliente: rol === 'cliente', proveedor: rol === 'proveedor' });
+    this.form.patchValue({
+      cliente: rol === 'cliente',
+      proveedor: rol === 'proveedor',
+      empleado: rol === 'empleado',
+    });
     this.isHydrating = false;
   }
 

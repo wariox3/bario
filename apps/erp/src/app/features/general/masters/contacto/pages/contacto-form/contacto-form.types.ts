@@ -37,7 +37,7 @@ export interface ContactoFormRawValue {
 }
 
 /** Rol con el que un documento abre el alta de un tercero. */
-export type ContactoRolInicial = 'cliente' | 'proveedor';
+export type ContactoRolInicial = 'cliente' | 'proveedor' | 'empleado';
 
 /**
  * `data` del `DynamicDialogConfig` cuando el form se abre como modal (alta de

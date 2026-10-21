@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, effect, inject } from '@angular/core';
+import { DestroyRef, Directive, effect, inject, input } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DialogService, type DynamicDialogRef } from 'primeng/dynamicdialog';
 import { EMPTY, catchError, exhaustMap, filter, finalize, from, map, switchMap, take } from 'rxjs';
@@ -27,7 +27,21 @@ export function rolDesdeFiltro(
   const activo = (clave: string) => String(params[clave]).toLowerCase() === 'true';
   if (activo('proveedor')) return 'proveedor';
   if (activo('cliente')) return 'cliente';
+  if (activo('empleado')) return 'empleado';
   return undefined;
+}
+
+/**
+ * Rol con que abre el modal: el **explícito** del atributo
+ * (`appCrearTercero="empleado"`) manda; sin él se deduce del filtro. El
+ * explícito existe para los selectores cuyo filtro no dice el rol (un egreso, un
+ * asiento), donde lo deducido caería al default del form.
+ */
+export function rolInicial(
+  explicito: ContactoRolInicial | '',
+  params: Readonly<Record<string, unknown>>,
+): ContactoRolInicial | undefined {
+  return explicito || rolDesdeFiltro(params);
 }
 
 /**
@@ -37,13 +51,15 @@ export function rolDesdeFiltro(
  *
  * ```html
  * <lib-contacto-select formControlName="contacto" [extraParams]="contactoParams" appCrearTercero />
+ * <lib-contacto-select formControlName="contacto" appCrearTercero="empleado" />
  * ```
  *
  * - **Permiso:** la opción aparece solo si el usuario puede crear contactos. Los
  *   grants de contacto no están en cache dentro de un documento (se piden al
  *   entrar a `/contactos`), así que se preguntan aquí; la respuesta queda en
  *   cache para el resto de la sesión.
- * - **Rol:** llega premarcado, y editable, según el filtro del selector.
+ * - **Rol:** llega premarcado, y editable: el del atributo si se declara, si no
+ *   el que dice el filtro del selector (ver `rolInicial`).
  * - **Selección:** el creado se traduce al shape de `contacto/seleccionar/` y se
  *   fija como una selección más, así el plazo y la lista de precios se
  *   autocompletan igual que al elegirlo de la lista — ningún form se entera.
@@ -71,6 +87,9 @@ export class CrearTerceroDirective {
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
+  /** Rol explícito; vacío (atributo sin valor) = deducirlo del filtro. */
+  readonly appCrearTercero = input<ContactoRolInicial | ''>('');
+
   /** Modal abierto por esta directiva, para cerrarlo si el documento se destruye. */
   private abierto: DynamicDialogRef | null = null;
 
@@ -96,7 +115,9 @@ export class CrearTerceroDirective {
   }
 
   private abrirAlta() {
-    const data: ContactoFormDialogData = { rol: rolDesdeFiltro(this.select.extraParams()) };
+    const data: ContactoFormDialogData = {
+      rol: rolInicial(this.appCrearTercero(), this.select.extraParams()),
+    };
     return from(
       Promise.all([
         import('./pages/contacto-form/contacto-form.component'),
@@ -108,6 +129,9 @@ export class CrearTerceroDirective {
           ...ENTITY_ACTION_DIALOG_DEFAULTS,
           dismissableMask: false,
           closeOnEscape: false,
+          // El form lleva el foco a su primer campo; el autofoco de PrimeNG lo
+          // pisaría con la ✕, que es el primer focusable del modal.
+          focusOnShow: false,
           width: 'min(80rem, 95vw)',
           contentStyle: { 'max-height': '86vh', overflow: 'auto' },
           data,

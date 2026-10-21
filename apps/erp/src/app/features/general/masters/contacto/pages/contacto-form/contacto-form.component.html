@@ -13,7 +13,7 @@
   @if (isModal) {
     <!-- El frame `erp-action-dialog` no trae header propio: se pinta aquí. -->
     <div class="flex items-center justify-between gap-3">
-      <h2 class="m-0 text-[1rem] font-bold tracking-tight text-brand-text">
+      <h2 [id]="modalTitleId" class="m-0 text-[1rem] font-bold tracking-tight text-brand-text">
         {{ t().entities.contacto.form.createTerceroTitle }}
       </h2>
       <p-button
