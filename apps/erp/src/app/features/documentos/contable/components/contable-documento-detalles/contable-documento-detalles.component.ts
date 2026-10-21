@@ -1,4 +1,15 @@
-import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  Injector,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  viewChildren,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, type Observable, defer, filter, from, switchMap } from 'rxjs';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
@@ -98,8 +109,12 @@ export class ContableDocumentoDetallesComponent {
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(DialogService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   protected readonly t = this.i18n.t;
+
+  /** Selects de cuenta de la tabla, en el orden de las filas. */
+  private readonly cuentaSelects = viewChildren(ErpCuentaSelectComponent);
 
   /** FormArray de líneas de cuenta, propiedad del form padre. */
   readonly detalles = input.required<FormArray<CuentaDetalleGroup>>();
@@ -255,6 +270,11 @@ export class ContableDocumentoDetallesComponent {
     });
   }
 
+  /**
+   * Agrega una línea manual y enfoca su cuenta, que al enfocarse despliega la
+   * lista: lo siguiente que hace la persona es elegirla. La fila nueva es la
+   * última, así que su select es el último de la tabla una vez pintada.
+   */
   protected addLinea(): void {
     this.detalles().push(
       createCuentaDetalleGroup({
@@ -263,6 +283,7 @@ export class ContableDocumentoDetallesComponent {
         naturaleza: this.naturalezaPorDefecto(),
       }),
     );
+    afterNextRender(() => this.cuentaSelects().at(-1)?.focus(), { injector: this.injector });
   }
 
   /**
