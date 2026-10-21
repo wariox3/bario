@@ -16,7 +16,7 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { PageActionsComponent } from '@reddoc/ui';
+import { AceptarConEnterDirective, PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { LiquidacionAdicionalesTabComponent } from '../../components/liquidacion-adicionales-tab/liquidacion-adicionales-tab.component';
 import { LiquidacionResumenComponent } from '../../components/liquidacion-resumen/liquidacion-resumen.component';
@@ -58,6 +58,7 @@ type AccionCiclo = 'generar' | 'reliquidar' | 'desgenerar' | 'aprobar' | 'desapr
     ButtonModule,
     ButtonGroupModule,
     ConfirmDialogModule,
+    AceptarConEnterDirective,
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
@@ -216,6 +217,8 @@ export class LiquidacionWorkspaceComponent implements OnInit {
       // Las dos que destruyen lo calculado piden confirmación en rojo.
       acceptButtonStyleClass:
         accion === 'desgenerar' || accion === 'desaprobar' ? 'p-button-danger' : '',
+      // Enter aprueba; las demás piden el clic.
+      acceptButtonProps: accion === 'aprobar' ? { autofocus: true } : undefined,
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => this.ejecutar(accion),
     });
