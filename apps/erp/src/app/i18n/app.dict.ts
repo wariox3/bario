@@ -2405,8 +2405,8 @@ export interface AppDict
           sedePlaceholder: string;
           almacen: string;
           almacenPlaceholder: string;
-          metodoPago: string;
-          metodoPagoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2431,7 +2431,7 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           almacen: string;
-          metodoPago: string;
+          formaPago: string;
           ordenCompra: string;
           comentario: string;
         };

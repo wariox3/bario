@@ -147,22 +147,22 @@
           />
         </div>
 
-        <!-- Método de pago -->
+        <!-- Forma de pago -->
         <div class="flex flex-col gap-1.5">
-          <label for="metodo_pago" class="factura-compra-form__label">
-            {{ t().entities.facturaCompra.form.fields.metodoPago }}
+          <label for="forma_pago" class="factura-compra-form__label">
+            {{ t().entities.facturaCompra.form.fields.formaPago }}
             <span class="ml-px text-red-500">*</span>
           </label>
           <lib-api-select
-            inputId="metodo_pago"
-            formControlName="metodo_pago"
-            [endpoint]="metodoPagoEndpoint"
-            [suggestedMatch]="metodoPagoSugerido()"
-            [placeholder]="t().entities.facturaCompra.form.fields.metodoPagoPlaceholder"
-            [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
+            inputId="forma_pago"
+            formControlName="forma_pago"
+            [endpoint]="formaPagoEndpoint"
+            [suggestedIndex]="primeraSugerida()"
+            [placeholder]="t().entities.facturaCompra.form.fields.formaPagoPlaceholder"
+            [invalid]="form.controls.forma_pago.invalid && form.controls.forma_pago.touched"
           />
           <lib-field-error
-            [control]="form.controls.metodo_pago"
+            [control]="form.controls.forma_pago"
             [messages]="{ required: t().entities.facturaCompra.form.validation.required }"
           />
         </div>

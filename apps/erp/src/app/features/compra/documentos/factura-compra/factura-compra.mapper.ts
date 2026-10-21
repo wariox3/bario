@@ -25,9 +25,9 @@ export function facturaCompraToFormValue(
         : null,
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
     almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
-    metodo_pago:
-      read.metodo_pago != null
-        ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
+    forma_pago:
+      read.forma_pago != null
+        ? { id: read.forma_pago, nombre: read.forma_pago_nombre ?? '' }
         : null,
     orden_compra: read.orden_compra ?? null,
     comentario: read.comentario ?? null,
@@ -56,7 +56,7 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     almacen: raw.almacen?.id ?? null,
-    metodo_pago: raw.metodo_pago?.id ?? null,
+    forma_pago: raw.forma_pago?.id ?? null,
     orden_compra: raw.orden_compra?.trim() || null,
     comentario: raw.comentario?.trim() || null,
     ...(includeDetalles

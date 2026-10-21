@@ -56,11 +56,7 @@ import {
 } from '@erp/features/documentos/tablas-en-vivo';
 import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
 import type { AppDict } from '@erp/i18n';
-import {
-  METODO_PAGO_ENDPOINT,
-  METODO_PAGO_NO_DEFINIDO,
-  SEDE_ENDPOINT,
-} from '../../factura-compra.constants';
+import { FORMA_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../factura-compra.constants';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import {
   setupVencimientoAutocompute,
@@ -195,7 +191,7 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
-  protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
+  protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
 
   /** Filtra el autocomplete de contacto a proveedores. */
   protected readonly contactoParams = { proveedor: 'True' } as const;
@@ -216,20 +212,11 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   protected readonly isEditMode = computed(() => !!this.id());
 
   /**
-   * En alta, sede y almacén auto-seleccionan la primera opción (como el
-   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   * En alta, sede, almacén y forma de pago auto-seleccionan la primera opción
+   * (como el legacy): lo habitual es tener una sola. En edición manda la del
+   * documento.
    */
   protected readonly primeraSugerida = computed(() => (this.isEditMode() ? null : 0));
-
-  /**
-   * En alta, el método de pago sugiere "Instrumento no definido". Se busca por
-   * su código DIAN (`1`), no por posición: el catálogo no llega en ese orden.
-   */
-  protected readonly metodoPagoSugerido = computed(() =>
-    this.isEditMode()
-      ? null
-      : (option: ErpSelectOption) => option['codigo'] === METODO_PAGO_NO_DEFINIDO,
-  );
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {
@@ -256,7 +243,7 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
     almacen: this.fb.control<ErpSelectOption | null>(null),
-    metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
+    forma_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),

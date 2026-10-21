@@ -2,10 +2,8 @@ import type { ColumnDef, FilterField } from '@reddoc/core';
 
 /** Endpoint `seleccionar` de sedes. */
 export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
-/** Endpoint `seleccionar` de métodos de pago. */
-export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
-/** Código DIAN del método de pago "Instrumento no definido", el sugerido en alta. */
-export const METODO_PAGO_NO_DEFINIDO = '1';
+/** Endpoint `seleccionar` de formas de pago (las configuradas en el master). */
+export const FORMA_PAGO_ENDPOINT = '/general/forma-pago/seleccionar/';
 
 /**
  * Columnas visibles del listado de Factura de compra.

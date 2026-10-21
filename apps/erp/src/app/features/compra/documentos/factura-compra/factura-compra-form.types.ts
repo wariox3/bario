@@ -16,7 +16,7 @@ export interface FacturaCompraFormRawValue {
   readonly plazo_pago: ErpSelectOption | null;
   readonly sede: ErpSelectOption | null;
   readonly almacen: ErpSelectOption | null;
-  readonly metodo_pago: ErpSelectOption | null;
+  readonly forma_pago: ErpSelectOption | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
   readonly detalles: readonly ComercialDetalleFormRawValue[];

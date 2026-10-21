@@ -60,7 +60,7 @@ interface CabeceraView {
   readonly plazoPago: string | null;
   readonly sede: string | null;
   readonly almacen: string | null;
-  readonly metodoPago: string | null;
+  readonly formaPago: string | null;
   readonly ordenCompra: string | null;
   readonly comentario: string | null;
   /**
@@ -281,7 +281,7 @@ export class FacturaCompraDetailComponent implements OnInit {
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
             almacen: read.almacen_nombre ?? null,
-            metodoPago: read.metodo_pago_nombre ?? null,
+            formaPago: read.forma_pago_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             comentario: read.comentario ?? null,
             estados: {
