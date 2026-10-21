@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { map, type Observable } from 'rxjs';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import type { Observable } from 'rxjs';
+import { BaseHttpService, fetchAllPages, type PaginatedResponse } from '@reddoc/core';
 import type {
   ActualizarContabilidadPayload,
   CorregirCabeceraRead,
@@ -9,8 +9,6 @@ import type {
 
 const DOCUMENTO_ENDPOINT = '/general/documento/';
 const DETALLE_ENDPOINT = '/general/documento-detalle/';
-/** Mismo tope que `DocumentoDetalleService.listarPorDocumento`: todas las líneas de una. */
-const DETALLE_LIMIT = 1000;
 
 /**
  * HTTP de **Corregir documento** (la corrección contable): lee cabecera y
@@ -22,11 +20,14 @@ export class CorregirDocumentoService extends BaseHttpService {
     return this.get<CorregirCabeceraRead>(`${DOCUMENTO_ENDPOINT}${documentoId}/`);
   }
 
+  /** Todas las líneas del documento, recorriendo las páginas. */
   lineas(documentoId: number): Observable<CorregirLineaRead[]> {
-    return this.get<PaginatedResponse<CorregirLineaRead>>(DETALLE_ENDPOINT, {
-      documento_id: documentoId,
-      limit: DETALLE_LIMIT,
-    }).pipe(map((res) => [...res.results]));
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<CorregirLineaRead>>(DETALLE_ENDPOINT, {
+        documento_id: documentoId,
+        page,
+      }),
+    );
   }
 
   /**

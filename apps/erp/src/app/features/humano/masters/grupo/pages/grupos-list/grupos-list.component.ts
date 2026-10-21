@@ -72,7 +72,6 @@ export class GruposListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>(GRUPOS_DEFAULT_SORT);
   protected readonly selectedRows = signal<readonly Grupo[]>([]);
   protected readonly searchValue = signal('');
@@ -110,7 +109,6 @@ export class GruposListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -211,7 +209,6 @@ export class GruposListComponent {
       filters,
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

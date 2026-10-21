@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { type BackendFilter, BaseHttpService, type PaginatedResponse } from '@reddoc/core';
+import {
+  type BackendFilter,
+  BaseHttpService,
+  fetchAllPages,
+  type PaginatedResponse,
+} from '@reddoc/core';
 
 /** Endpoint de cabeceras de documento (compartido por todos los documentos). */
 const DOCUMENTO_ENDPOINT = '/general/documento/';
-
-/** Tope de cabeceras por consulta filtrada: alcanza para trazar un documento. */
-const DOCUMENTO_PAGE_SIZE = 1000;
 
 /**
  * Lectura de **cabeceras de documento** (`/api/general/documento/`).
@@ -30,25 +31,17 @@ export class DocumentoService extends BaseHttpService {
    * filtro `id in`). La usa quien parte de un puñado de líneas y necesita a qué
    * documento pertenece cada una: el número y la fecha no viajan en la línea.
    *
-   * Pide tantas filas como ids se pasen; el llamador ya deduplica.
+   * Recorre las páginas: con más de 25 ids una sola página dejaría cabeceras
+   * afuera. El llamador ya deduplica.
    */
   listarPorIds<TRead = unknown>(ids: readonly number[]): Observable<TRead[]> {
-    return this.post<PaginatedResponse<TRead>>(
-      `${DOCUMENTO_ENDPOINT}lista/`,
-      { filtros: [{ propiedad: 'id', operador: 'in', valor: ids }] },
-      { limit: ids.length },
-    ).pipe(map((res) => [...res.results]));
+    return this.listarPorFiltros<TRead>([{ propiedad: 'id', operador: 'in', valor: ids }]);
   }
 
-  /** Cabeceras que cumplen `filtros` (`POST …documento/lista/`), hasta `limit` filas. */
-  listarPorFiltros<TRead = unknown>(
-    filtros: readonly BackendFilter[],
-    limit: number = DOCUMENTO_PAGE_SIZE,
-  ): Observable<TRead[]> {
-    return this.post<PaginatedResponse<TRead>>(
-      `${DOCUMENTO_ENDPOINT}lista/`,
-      { filtros },
-      { limit },
-    ).pipe(map((res) => [...res.results]));
+  /** **Todas** las cabeceras que cumplen `filtros` (`POST …documento/lista/`). */
+  listarPorFiltros<TRead = unknown>(filtros: readonly BackendFilter[]): Observable<TRead[]> {
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<TRead>>(`${DOCUMENTO_ENDPOINT}lista/`, { filtros }, { page }),
+    );
   }
 }

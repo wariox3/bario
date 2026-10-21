@@ -19,9 +19,6 @@ import {
   buildMovimientoInformeParams,
 } from './movimiento-informe.utils';
 
-/** Filas por página. Mismo default que el resto de los listados del ERP. */
-const PAGE_SIZE_DEFAULT = 25;
-
 /**
  * Base de las páginas de los informes contables, los nueve que pegan a
  * `/contabilidad/movimiento-informe/`.
@@ -123,7 +120,6 @@ export abstract class MovimientoInformePageBase<TRow> {
   protected readonly totales = signal<InformeTotales | null>(null);
   protected readonly totalCount = signal(0);
   protected readonly page = signal(0);
-  protected readonly pageSize = signal(PAGE_SIZE_DEFAULT);
   protected readonly isLoading = signal(false);
   protected readonly isExportingExcel = signal(false);
   protected readonly isExportingPdf = signal(false);
@@ -203,7 +199,7 @@ export abstract class MovimientoInformePageBase<TRow> {
   }
 
   /**
-   * Cambio de página o de tamaño. No revalida ni vuelve a pedir los totales
+   * Cambio de página. No revalida ni vuelve a pedir los totales
    * como acción aparte: `consultar()` los refresca con el mismo body, que no
    * cambió.
    */
@@ -211,13 +207,11 @@ export abstract class MovimientoInformePageBase<TRow> {
     if (!this.generated() || this.isBusy()) return;
 
     const page = event.page ?? 0;
-    const pageSize = event.rows ?? this.pageSize();
     // PrimeNG reemite `onPageChange` cuando se le reprograma `first`/`rows`;
     // sin este guard cada respuesta dispararía otra consulta idéntica.
-    if (page === this.page() && pageSize === this.pageSize()) return;
+    if (page === this.page()) return;
 
     this.page.set(page);
-    this.pageSize.set(pageSize);
     this.consultar();
   }
 
@@ -273,7 +267,7 @@ export abstract class MovimientoInformePageBase<TRow> {
 
     this.isLoading.set(true);
     forkJoin({
-      pagina: this.service.list(params, this.page(), this.pageSize()),
+      pagina: this.service.list(params, this.page()),
       totales: this.service.totales(params),
     })
       .pipe(

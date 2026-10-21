@@ -231,7 +231,7 @@ export class LiquidacionAdicionalesTabComponent {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: (response) => this.items.set(response.results),
+        next: (adicionales) => this.items.set(adicionales),
         error: () => {
           this.items.set([]);
           this.toast.error(

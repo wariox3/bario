@@ -28,7 +28,6 @@ import type { AppDict } from '@erp/i18n';
 import type { CapacidadesProgramacion } from '../../programacion.estado';
 import type { ProgramacionDetalle } from '../../programacion.model';
 import {
-  PROGRAMACION_RENGLONES_PAGE_SIZE,
   RENGLONES_FILTER_FIELDS,
   tonoFechaDesde,
   tonoFechaHasta,
@@ -99,8 +98,6 @@ export class ProgramacionRenglonesTabComponent {
   protected readonly currentPage = signal(0);
   protected readonly selectedRows = signal<readonly ProgramacionDetalle[]>([]);
   protected readonly isBusy = signal(false);
-
-  protected readonly pageSize = PROGRAMACION_RENGLONES_PAGE_SIZE;
 
   /** Columnas según el tipo de pago. */
   protected readonly columns = computed(() => columnasDeRenglones(this.pagoTipoId()));
@@ -403,7 +400,7 @@ export class ProgramacionRenglonesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarRenglones(id, page, this.pageSize, this.activeFilters())
+      .listarRenglones(id, page, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

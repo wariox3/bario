@@ -49,7 +49,7 @@ export function usuariosQueryParams(
  * clave que ignore un filtro se traga consultas en silencio).
  */
 export function permisoCatalogoKey(filtros: PermisoCatalogoFiltros): string {
-  return [filtros.app, filtros.modelo, filtros.accion, filtros.search, filtros.page, filtros.limit]
+  return [filtros.app, filtros.modelo, filtros.accion, filtros.search, filtros.page]
     .map((valor) => valor ?? '')
     .join('|');
 }

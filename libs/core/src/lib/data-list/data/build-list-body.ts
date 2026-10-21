@@ -20,8 +20,8 @@ import type {
  * ```
  *
  * La **paginación NO viaja en el body**: el backend (Django REST Framework) la
- * lee de los query params de la URL (`?page=…&limit=…`). Por eso `buildListBody`
- * solo arma `filtros`/`ordenamientos` y la paginación se construye aparte con
+ * lee del query param `?page=…` de la URL. Por eso `buildListBody` solo arma
+ * `filtros`/`ordenamientos` y la página se construye aparte con
  * `buildListParams` (que el servicio pasa como query params del POST).
  *
  * El front trabaja con operadores semánticos (`FilterOperator`); aquí se
@@ -30,28 +30,30 @@ import type {
  */
 
 /**
- * Nombres de los query params de paginación que espera el backend. **Única
- * fuente de verdad**: si el backend confirma otra convención (`page_size`,
- * `offset`, …) solo se cambia aquí.
+ * Tamaño de página **fijo** del backend: todas sus listas paginan de a 25 e
+ * ignoran cualquier `limit`/`page_size` que se mande. Toda tabla paginada
+ * contra el backend usa este valor; pedir otro tamaño solo desalinea el
+ * paginador con lo que llega (se ven filas de menos y la última página
+ * responde 404 «Página inválida»).
  *
- * `page` está confirmado por el `next` de las respuestas (`.../lista/?page=2`);
- * `limit` es el nombre del tamaño de página (pendiente de confirmación final).
+ * Para traer **todo** un recurso, recorrer las páginas con `fetchAllPages`.
  */
+export const LIST_PAGE_SIZE = 25;
+
+/** Nombre del query param de paginación que espera el backend (1-based). */
 export const LIST_PAGINATION_PARAMS = {
   page: 'page',
-  size: 'limit',
 } as const;
 
 /**
  * Construye los query params de paginación a partir del `ListQuery`.
  *
- * El `ListQuery` maneja la página 0-based; en el wire va 1-based (igual que la
- * convención previa del body). El servicio los pasa como `params` del POST.
+ * El `ListQuery` maneja la página 0-based; en el wire va 1-based. El servicio
+ * los pasa como `params` del POST.
  */
 export function buildListParams(query: ListQuery): Record<string, ParamValue> {
   return {
     [LIST_PAGINATION_PARAMS.page]: query.page + 1,
-    [LIST_PAGINATION_PARAMS.size]: query.pageSize,
   };
 }
 

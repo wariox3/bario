@@ -16,12 +16,6 @@ import {
   type Movimiento,
 } from '@erp/core/contabilidad';
 
-/** Página del libro de un documento: qué página y de qué tamaño. */
-export interface MovimientosPage {
-  readonly page: number;
-  readonly pageSize: number;
-}
-
 /**
  * Lee el **libro contable de un documento**: los movimientos que generó su
  * contabilización, filtrados por `documento`.
@@ -36,12 +30,12 @@ export interface MovimientosPage {
 export class DocumentoMovimientosService extends BaseHttpService {
   private readonly fileDownload = inject(FileDownloadService);
 
-  listar(documentoId: number, page: MovimientosPage): Observable<PaginatedResponse<Movimiento>> {
+  /** Una página (0-based) del libro del documento. */
+  listar(documentoId: number, page: number): Observable<PaginatedResponse<Movimiento>> {
     const query: ListQuery = {
       filters: filtroDocumento(documentoId),
       sort: [],
-      page: page.page,
-      pageSize: page.pageSize,
+      page,
     };
     return this.post<PaginatedResponse<Movimiento>>(
       `${MOVIMIENTO_ENDPOINT}lista/`,

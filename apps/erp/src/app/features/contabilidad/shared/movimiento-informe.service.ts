@@ -54,19 +54,12 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
     return { informe: this.informe, ...params };
   }
 
-  /** Una página del informe. */
-  list(
-    params: MovimientoInformeParams,
-    page: number,
-    pageSize: number,
-  ): Observable<PaginatedResponse<TRow>> {
+  /** Una página (0-based) del informe. */
+  list(params: MovimientoInformeParams, page: number): Observable<PaginatedResponse<TRow>> {
     return this.post<PaginatedResponse<TRow>>(
       `${MOVIMIENTO_INFORME_ENDPOINT}lista/`,
       this.buildBody(params),
-      {
-        [LIST_PAGINATION_PARAMS.page]: page + 1,
-        [LIST_PAGINATION_PARAMS.size]: pageSize,
-      },
+      { [LIST_PAGINATION_PARAMS.page]: page + 1 },
     );
   }
 

@@ -215,9 +215,8 @@ nombre, su archivo y qué bloques de columnas enciende (`showContacto`, `showMov
       está en la whitelist, el informe sale **sin filtrar** y no da error, igual que pasó con
       `contacto__numero_identificacion`. El fix es `INFORME_FILTER_FIELD.centroCostoId`, y el caso
       está fijado en `movimiento-informe.utils.spec.ts`.
-- [ ] **Si `limit` se respeta.** Backend habló de "25 por página, `?page=N`" y solo mencionó `page`;
-      el front manda además `limit` y la tabla ofrece el dropdown 10/25/50/100. Si el endpoint lo
-      ignora, el dropdown no hace nada.
+- [x] **Si `limit` se respeta.** No: el backend pagina siempre de a 25 y lo ignora. El front ya
+      no lo manda y la tabla no ofrece el dropdown de tamaño (`LIST_PAGE_SIZE`).
 - [ ] **Paginar un árbol.** Con 25 filas por página, la página 2 puede empezar a mitad de una cuenta,
       sin las filas de subtotal que le dan contexto. Falta decidir si se resuelve en el front
       (repetir la cabecera del auxiliar en curso) o si backend puede paginar por auxiliar.

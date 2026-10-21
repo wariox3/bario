@@ -73,7 +73,6 @@ export class CuentasBancoListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
   protected readonly selectedRows = signal<readonly CuentaBanco[]>([]);
   protected readonly searchValue = signal('');
@@ -111,7 +110,6 @@ export class CuentasBancoListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -212,7 +210,6 @@ export class CuentasBancoListComponent {
       filters,
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

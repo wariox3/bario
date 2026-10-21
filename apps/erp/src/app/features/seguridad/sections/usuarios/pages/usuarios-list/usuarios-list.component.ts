@@ -185,7 +185,6 @@ export class UsuariosListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
   }
 
   protected onSelectionChange(rows: unknown[]): void {

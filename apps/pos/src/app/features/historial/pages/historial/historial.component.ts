@@ -76,7 +76,6 @@ export class HistorialComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>(HISTORIAL_ORDEN_DEFAULT);
   protected readonly searchValue = signal('');
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
@@ -108,7 +107,6 @@ export class HistorialComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.cargar();
   }
 
@@ -175,7 +173,6 @@ export class HistorialComponent {
       filters: busqueda ? [...this.activeFilters(), busqueda] : this.activeFilters(),
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
   }
 

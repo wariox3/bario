@@ -84,8 +84,6 @@ export class NovedadFormComponent implements OnInit {
   protected readonly novedadTipoEndpoint = SELECT_ENDPOINTS.novedadTipo;
   protected readonly detalleMaxLength = NOVEDAD_DETALLE_MAX_LENGTH;
   protected readonly novedadReferenciaEndpoint = NOVEDAD_REFERENCIA_ENDPOINT;
-  /** Referencia estable para no re-disparar el fetch del selector en cada ciclo de CD. */
-  protected readonly tipoParams: Record<string, string> = { limit: '100' };
 
   /** Id de la novedad a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -112,7 +110,6 @@ export class NovedadFormComponent implements OnInit {
     return {
       [NOVEDAD_REFERENCIA_CONTRATO_PARAM]: contrato != null ? String(contrato) : '',
       [NOVEDAD_REFERENCIA_TIPO_PARAM]: tipo != null ? String(tipo) : '',
-      limit: '100',
     };
   });
 

@@ -137,7 +137,7 @@
             inputId="cuenta_clase"
             formControlName="cuenta_clase"
             [endpoint]="claseEndpoint"
-            [params]="{ ordering: 'id', limit: '100' }"
+            [params]="{ ordering: 'id' }"
             [displayWith]="formatNivel"
             [placeholder]="t().entities.cuenta.form.fields.selectPlaceholder"
             [invalid]="form.controls.cuenta_clase.invalid && form.controls.cuenta_clase.touched"

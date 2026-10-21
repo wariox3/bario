@@ -91,13 +91,11 @@ export class ConciliacionService extends BaseHttpService {
   listarDetalles(
     conciliacionId: number,
     page: number,
-    limit: number,
     filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<ConciliacionDetalle>> {
     return this.get<PaginatedResponse<ConciliacionDetalle>>(CONCILIACION_DETALLE_ENDPOINT, {
       conciliacion_id: conciliacionId,
       page,
-      limit,
       ordering: 'id',
       ...toQueryFilters(filtros),
     });
@@ -119,17 +117,15 @@ export class ConciliacionService extends BaseHttpService {
 
   // ── El extracto (conciliacion_soporte) ────────────────────────────────────
 
-  /** Página de líneas del extracto bancario. */
+  /** Página de líneas del extracto bancario. `page` es 1-based. */
   listarSoportes(
     conciliacionId: number,
     page: number,
-    limit: number,
     filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<ConciliacionSoporte>> {
     return this.get<PaginatedResponse<ConciliacionSoporte>>(CONCILIACION_SOPORTE_ENDPOINT, {
       conciliacion_id: conciliacionId,
       page,
-      limit,
       ordering: 'id',
       ...toQueryFilters(filtros),
     });

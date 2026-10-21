@@ -111,7 +111,6 @@ export class ImportarDocumentoModalComponent {
   private readonly data = this.dialogConfig.data as ImportarDocumentoModalData | undefined;
 
   protected readonly page = signal(0);
-  protected readonly pageSize = signal(25);
   private readonly sort = signal<readonly SortSpec[]>([]);
 
   protected readonly items = signal<readonly LineaPendienteApi[]>([]);
@@ -127,7 +126,6 @@ export class ImportarDocumentoModalComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.page.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.load();
   }
 
@@ -174,7 +172,7 @@ export class ImportarDocumentoModalComponent {
     }
     // Sin orden del usuario, cae al orden por defecto (más recientes primero).
     const sort = this.sort().length > 0 ? [...this.sort()] : [...DEFAULT_SORT];
-    return { filters, sort, page: this.page(), pageSize: this.pageSize() };
+    return { filters, sort, page: this.page() };
   }
 
   private load(): void {

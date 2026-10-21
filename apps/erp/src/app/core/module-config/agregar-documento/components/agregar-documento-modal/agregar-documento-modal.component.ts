@@ -87,7 +87,6 @@ export class AgregarDocumentoModalComponent {
   private readonly data = this.dialogConfig.data as AgregarDocumentoModalData | undefined;
 
   protected readonly page = signal(0);
-  protected readonly pageSize = signal(25);
   private readonly sort = signal<readonly SortSpec[]>([]);
 
   /** Quita el filtro por contacto: lista pendientes de todos los terceros. */
@@ -115,7 +114,6 @@ export class AgregarDocumentoModalComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.page.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.load();
   }
 
@@ -174,7 +172,7 @@ export class AgregarDocumentoModalComponent {
     filters.push(...this.activeFilters());
     // Sin orden del usuario, cae al orden por defecto (más recientes primero).
     const sort = this.sort().length > 0 ? [...this.sort()] : [...AGREGAR_DOCUMENTO_DEFAULT_SORT];
-    return { filters, sort, page: this.page(), pageSize: this.pageSize() };
+    return { filters, sort, page: this.page() };
   }
 
   private load(): void {

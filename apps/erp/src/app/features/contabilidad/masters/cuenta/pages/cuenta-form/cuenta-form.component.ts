@@ -93,7 +93,6 @@ export class CuentaFormComponent implements OnInit {
       id__gte: String(idDesde),
       id__lte: String(idHasta),
       ordering: 'id',
-      limit: '100',
     };
     return params;
   });
@@ -111,7 +110,6 @@ export class CuentaFormComponent implements OnInit {
       id__gte: String(idDesde),
       id__lte: String(idHasta),
       ordering: 'id',
-      limit: '100',
     };
     return params;
   });

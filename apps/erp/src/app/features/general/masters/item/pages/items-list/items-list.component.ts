@@ -89,7 +89,6 @@ export class ItemsListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>(ITEMS_DEFAULT_SORT);
   protected readonly selectedRows = signal<readonly Item[]>([]);
   protected readonly searchValue = signal('');
@@ -147,7 +146,6 @@ export class ItemsListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -263,7 +261,6 @@ export class ItemsListComponent {
       filters,
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

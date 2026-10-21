@@ -22,7 +22,7 @@ import type { EntityDataGateway } from './entity-data-gateway';
  *
  * Convenciones del backend de documentos (`/api/general/documento`):
  *  - **Listado**: POST `<endpoint>/lista/` con body `{ filtros, ordenamientos }`
- *    y la paginación como query params (`?page=…&limit=…`). El filtro por
+ *    y la página como query param (`?page=…`). El filtro por
  *    `documento_tipo_id` se inyecta automáticamente desde
  *    `DocumentEntityConfig.documentTypeId` — el componente nunca lo declara.
  *  - **Batch delete**: POST `<endpoint>/eliminar/` con `{ ids: [...] }`.

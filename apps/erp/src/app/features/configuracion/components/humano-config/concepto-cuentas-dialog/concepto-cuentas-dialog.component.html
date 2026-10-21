@@ -55,7 +55,6 @@
             inputId="cc_tipo_costo"
             formControlName="tipo_costo"
             [endpoint]="tipoCostoEndpoint"
-            [params]="{ limit: '100' }"
             [invalid]="addForm.controls.tipo_costo.invalid && addForm.controls.tipo_costo.touched"
           />
           <lib-field-error
