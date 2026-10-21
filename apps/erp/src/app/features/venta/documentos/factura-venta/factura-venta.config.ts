@@ -27,6 +27,12 @@ export const FACTURA_VENTA_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: FACTURA_VENTA_COLUMNS,
   filters: FACTURA_VENTA_FILTERS,
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'factura-venta/list',
     new: 'factura-venta/nuevo',

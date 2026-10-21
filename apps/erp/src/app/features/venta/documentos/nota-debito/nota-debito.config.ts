@@ -28,7 +28,12 @@ export const NOTA_DEBITO_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: NOTA_DEBITO_COLUMNS,
   filters: NOTA_DEBITO_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'nota-debito/list',
     new: 'nota-debito/nuevo',

@@ -24,7 +24,12 @@ export const PEDIDO_SERVICIO_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: PEDIDO_SERVICIO_COLUMNS,
   filters: PEDIDO_SERVICIO_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'pedido-servicio/list',
     new: 'pedido-servicio/nuevo',

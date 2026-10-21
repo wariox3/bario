@@ -31,6 +31,12 @@ export const CUENTA_COBRO_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: CUENTA_COBRO_COLUMNS,
   filters: CUENTA_COBRO_FILTERS,
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'cuenta-cobro/list',
     new: 'cuenta-cobro/nuevo',

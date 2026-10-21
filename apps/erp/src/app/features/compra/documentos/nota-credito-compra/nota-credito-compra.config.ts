@@ -27,7 +27,12 @@ export const NOTA_CREDITO_COMPRA_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: NOTA_CREDITO_COMPRA_COLUMNS,
   filters: NOTA_CREDITO_COMPRA_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'nota-credito-compra/list',
     new: 'nota-credito-compra/nuevo',
