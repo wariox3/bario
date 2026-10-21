@@ -1,4 +1,10 @@
-import { normalizarCelular, TIPO_PERSONA, construirNombreCorto } from '@reddoc/core';
+import {
+  buildContactoLabel,
+  construirNombreCorto,
+  normalizarCelular,
+  TIPO_PERSONA,
+  type ErpSelectOption,
+} from '@reddoc/core';
 import type { Contacto, ContactoPayload } from './contacto.model';
 import type { ContactoFormRawValue } from './pages/contacto-form/contacto-form.types';
 
@@ -44,6 +50,7 @@ export function contactoToFormValue(c: Contacto): Partial<ContactoFormRawValue> 
     cliente: c.cliente,
     proveedor: c.proveedor,
     empleado: c.empleado,
+    estado_inactivo: c.estado_inactivo,
     plazo_pago: c.plazo_pago != null ? { id: c.plazo_pago, nombre: '' } : null,
     precio: c.precio != null ? { id: c.precio, nombre: '' } : null,
     asesor: c.asesor != null ? { id: c.asesor, nombre: c.asesor_nombre_corto ?? '' } : null,
@@ -98,6 +105,7 @@ export function formValueToPayload(v: ContactoFormRawValue): ContactoPayload {
     cliente: v.cliente ?? false,
     proveedor: v.proveedor ?? false,
     empleado: v.empleado ?? false,
+    estado_inactivo: v.estado_inactivo ?? false,
     plazo_pago: v.plazo_pago?.id ?? null,
     precio: v.precio?.id ?? null,
     asesor: v.asesor?.id ?? null,
@@ -106,5 +114,28 @@ export function formValueToPayload(v: ContactoFormRawValue): ContactoPayload {
     numero_cuenta: v.numero_cuenta || null,
     cuenta_banco_clase: v.cuenta_banco_clase?.id ?? null,
     plazo_pago_proveedor: v.plazo_pago_proveedor?.id ?? null,
+  };
+}
+
+/**
+ * Contacto recién creado (respuesta del `POST`) → la opción que entrega
+ * `lib-contacto-select` al elegir uno de `contacto/seleccionar/`.
+ *
+ * Los documentos leen de esa opción más que la etiqueta: el plazo pactado en
+ * cada sentido (`plazo_pago_id`, `plazo_pago_proveedor_id`, ver
+ * `plazo-pago-contacto.ts`) y la lista de precios (`precio_id`, ver
+ * `precioListaDeContacto`). El `POST` los devuelve con el nombre del FK
+ * pelado, así que se traducen a las claves del `seleccionar`: un tercero creado
+ * desde el documento autocompleta lo mismo que uno elegido de la lista.
+ */
+export function contactoToSeleccionarOption(c: Contacto): ErpSelectOption {
+  return {
+    id: c.id,
+    nombre: buildContactoLabel(c.numero_identificacion, c.nombre_corto),
+    numero_identificacion: c.numero_identificacion,
+    nombre_corto: c.nombre_corto,
+    plazo_pago_id: c.plazo_pago,
+    plazo_pago_proveedor_id: c.plazo_pago_proveedor,
+    precio_id: c.precio,
   };
 }

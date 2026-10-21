@@ -55,6 +55,8 @@ import type { AppDict } from '@erp/i18n';
 import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
 import {
   createCuentaDetalleGroup,
+  propagarCentroCostoALineas,
+  propagarContactoALineas,
   type CuentaDetalleGroup,
 } from '@erp/features/documentos/contable/contable-documento-detalle.form';
 import {
@@ -67,6 +69,7 @@ import { asientoToFormValue, formValueToPayload } from '../../asiento.mapper';
 import type { AsientoRead } from '../../asiento.model';
 import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Asiento contable.
@@ -105,6 +108,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ContableDocumentoDetallesComponent,
     TabsModule,
@@ -202,14 +206,14 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((contacto) => {
         this.contactoCabecera.set(contacto);
-        this.propagarALineas('contacto', contacto);
+        propagarContactoALineas(this.form.controls.detalles, contacto);
       });
 
     this.form.controls.centro_costo.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((centroCosto) => {
         this.centroCostoCabecera.set(centroCosto);
-        this.propagarALineas('centro_costo', centroCosto);
+        propagarCentroCostoALineas(this.form.controls.detalles, centroCosto);
       });
   }
 
@@ -333,20 +337,6 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
     if (detalles.length === 0) return false;
     const { debitos, creditos } = calcularResumenContable(detalles);
     return debitos === creditos;
-  }
-
-  /**
-   * Replica un campo de la cabecera en las líneas que aún no se guardaron.
-   *
-   * Una línea libre nace con el tercero y el centro de costo del documento, pero
-   * mientras sea suya: las ya persistidas conservan los que tengan (cambiarlas
-   * es decisión explícita del usuario, fila por fila).
-   */
-  private propagarALineas(campo: 'contacto' | 'centro_costo', valor: ErpSelectOption | null): void {
-    for (const group of this.form.controls.detalles.controls) {
-      if (group.controls.id.value !== null) continue;
-      group.controls[campo].setValue(valor);
-    }
   }
 
   /**

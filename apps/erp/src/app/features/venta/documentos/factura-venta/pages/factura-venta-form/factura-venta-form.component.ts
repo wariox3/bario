@@ -99,6 +99,7 @@ import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form'
 import { facturaVentaToFormValue, formValueToPayload } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de venta.
@@ -134,6 +135,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ErpAsesorSelectComponent,
     InputTextModule,

@@ -181,6 +181,14 @@ export class ErpCuentaSelectComponent implements ControlValueAccessor {
     this.disabled.set(isDisabled);
   }
 
+  /**
+   * Enfoca el input. El enfoque abre la lista de cuentas (`onFocusInput`): así la
+   * línea recién agregada queda lista para elegir sin un clic más.
+   */
+  focus(): void {
+    this.ac?.inputEL?.nativeElement.focus();
+  }
+
   onValueChange(next: ErpSelectOption | null): void {
     this.value.set(next);
     this.onChangeFn(next);

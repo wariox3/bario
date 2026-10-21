@@ -58,6 +58,7 @@ import { movimientoToFormValue, formValueToPayload } from '../../movimiento-docu
 import type { MovimientoRead } from '../../movimiento-documento.model';
 import { InventarioDocumentoResumenComponent } from '@erp/features/documentos/inventario/components/inventario-documento-resumen/inventario-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un movimiento de inventario.
@@ -98,6 +99,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     InventarioDocumentoDetallesComponent,
     TabsModule,

@@ -64,6 +64,7 @@ import {
   type LineaPendienteApi,
 } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
+import { formModal } from '@erp/core/components/form-modal/form-modal';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import {
@@ -134,6 +135,7 @@ export class ComercialDocumentoDetallesComponent {
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(DialogService);
+  private readonly formModal = formModal();
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
@@ -423,25 +425,18 @@ export class ComercialDocumentoDetallesComponent {
 
   /**
    * Alta de ítem inline desde una línea: abre el formulario del master como
-   * modal (lazy) y, con el ítem creado, lo selecciona en **esa** fila — de ahí
-   * corre la tubería normal de una selección (precio pactado + impuestos). Se
-   * apaga `dismissableMask`: un clic afuera no debe descartar un form a medias.
+   * modal (lazy, vía `formModal`) y, con el ítem creado, lo selecciona en
+   * **esa** fila — de ahí corre la tubería normal de una selección (precio
+   * pactado + impuestos).
    */
   protected onCreateItem(group: ComercialDetalleGroup): void {
-    from(import('@erp/features/general/masters/item/pages/item-form/item-form.component'))
-      .pipe(
-        switchMap(({ ItemFormComponent }) => {
-          const ref = this.dialog.open(ItemFormComponent, {
-            ...ENTITY_ACTION_DIALOG_DEFAULTS,
-            dismissableMask: false,
-            width: 'min(70rem, 95vw)',
-            contentStyle: { 'max-height': '86vh', overflow: 'auto' },
-          });
-          return ref ? ref.onClose : EMPTY;
-        }),
-        filter((created: unknown): created is Item => created != null),
-        takeUntilDestroyed(this.destroyRef),
+    this.formModal
+      .abrir<Item>(() =>
+        import('@erp/features/general/masters/item/pages/item-form/item-form.component').then(
+          (m) => m.ItemFormComponent,
+        ),
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((created) => {
         group.controls.item.setValue(
           toItemOption({

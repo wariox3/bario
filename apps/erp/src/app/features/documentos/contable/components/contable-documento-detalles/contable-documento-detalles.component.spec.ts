@@ -1,7 +1,9 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { FormArray } from '@angular/forms';
+import { FormArray, ReactiveFormsModule } from '@angular/forms';
+import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ENVIRONMENT, I18nService, ToastService } from '@reddoc/core';
 import type { DocumentoPendienteApi } from '@erp/core/module-config';
@@ -245,5 +247,52 @@ describe('ContableDocumentoDetallesComponent — guardado diferido', () => {
     expect(fila.controls.id.value).toBe(5);
     expect(fila.controls.valor.value).toBe(150);
     expect(component.pendingCount()).toBe(1);
+  });
+});
+
+describe('ContableDocumentoDetallesComponent — agregar cuenta', () => {
+  let http: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [ContableDocumentoDetallesComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: ENVIRONMENT, useValue: { apiUrl: '/api', turnstileSiteKey: '' } },
+        { provide: I18nService, useValue: { t: () => dictionaries.es } },
+        { provide: ToastService, useValue: { success: jest.fn() } },
+        { provide: DialogService, useValue: {} },
+      ],
+    });
+    // Solo los selects de cuenta: se prueba a cuál va el foco, no el resto de la fila.
+    TestBed.overrideComponent(ContableDocumentoDetallesComponent, {
+      set: {
+        template: `
+          @for (row of detalles().controls; track row) {
+            <app-cuenta-select [formControl]="row.controls.cuenta" />
+          }
+        `,
+        imports: [ReactiveFormsModule, ErpCuentaSelectComponent],
+      },
+    });
+    http = TestBed.inject(HttpTestingController);
+  });
+
+  it('enfoca la cuenta de la línea nueva y despliega la lista', () => {
+    const fixture = TestBed.createComponent(ContableDocumentoDetallesComponent);
+    fixture.componentRef.setInput('detalles', new FormArray<CuentaDetalleGroup>([nueva()]));
+    fixture.detectChanges();
+
+    fixture.componentInstance['addLinea']();
+    fixture.detectChanges();
+    // El foco va en `afterNextRender`: corre con el tick de la aplicación.
+    TestBed.inject(ApplicationRef).tick();
+
+    const inputs: HTMLInputElement[] = Array.from(fixture.nativeElement.querySelectorAll('input'));
+    expect(inputs).toHaveLength(2);
+    expect(document.activeElement).toBe(inputs[1]);
+    // El enfoque pide la lista inicial de cuentas, la que abre el desplegable.
+    http.expectOne((req) => req.url.endsWith('/contabilidad/cuenta/seleccionar/'));
   });
 });

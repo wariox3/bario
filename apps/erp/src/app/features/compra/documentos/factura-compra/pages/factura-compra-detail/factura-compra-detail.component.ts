@@ -25,7 +25,6 @@ import {
   type DocumentoEstados,
   comercialDetalleToFormValue,
   toLineaCalculo,
-  type ComercialDetalleRead,
   type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -40,6 +39,13 @@ import type { CapacidadesDocumento, DocumentEntityConfig } from '@erp/core/modul
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos/comercial/components/comercial-documento-lineas-table/comercial-documento-lineas-table.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { ContableDocumentoLineasTableComponent } from '@erp/features/documentos/contable/components/contable-documento-lineas-table/contable-documento-lineas-table.component';
+import {
+  calcularResumenContable,
+  cuentaDetalleToLineaView,
+  resumenConCuentas,
+} from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
+import type { CuentaDetalleLineaView } from '@erp/features/documentos/contable/contable-documento-detalle.types';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
@@ -47,7 +53,7 @@ import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
 import { facturaCompraToFormValue } from '../../factura-compra.mapper';
-import type { FacturaCompraRead } from '../../factura-compra.model';
+import type { FacturaCompraRead, FacturaLineaRead } from '../../factura-compra.model';
 
 /** Cabecera legible de la factura para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -60,7 +66,8 @@ interface CabeceraView {
   readonly plazoPago: string | null;
   readonly sede: string | null;
   readonly almacen: string | null;
-  readonly metodoPago: string | null;
+  readonly centroCosto: string | null;
+  readonly formaPago: string | null;
   readonly ordenCompra: string | null;
   readonly comentario: string | null;
   /**
@@ -93,6 +100,7 @@ interface CabeceraView {
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
+    ContableDocumentoLineasTableComponent,
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
@@ -124,6 +132,8 @@ export class FacturaCompraDetailComponent implements OnInit {
   protected readonly cabecera = signal<CabeceraView | null>(null);
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+  /** Líneas de cuenta contable (`tipo_registro = 'C'`): van en su propia pestaña. */
+  protected readonly cuentas = signal<readonly CuentaDetalleLineaView[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -155,9 +165,28 @@ export class FacturaCompraDetailComponent implements OnInit {
     return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
   });
 
-  /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
+  /**
+   * Débitos y créditos de las cuentas contables del documento. Suma el neto que
+   * calculó el backend (el legacy sumaba `total`), así cuadra con la columna
+   * Neto de la tabla; sin neto cae al valor de la línea.
+   */
+  protected readonly resumenCuentas = computed(() =>
+    calcularResumenContable(
+      this.cuentas().map((cuenta) => ({ ...cuenta, valor: cuenta.neto ?? cuenta.valor })),
+    ),
+  );
+
+  /**
+   * Resumen financiero del documento: subtotal, descuento e impuestos de los
+   * ítems, y un total al que las cuentas débito suman y las crédito restan.
+   */
   protected readonly resumen = computed<ResumenDocumento>(() =>
-    calcularResumen(this.lines().map(toLineaCalculo)),
+    resumenConCuentas(calcularResumen(this.lines().map(toLineaCalculo)), this.resumenCuentas()),
+  );
+
+  /** Hay líneas de algún tipo: la ficha pinta el resumen solo entonces. */
+  protected readonly hayLineas = computed(
+    () => this.lines().length > 0 || this.cuentas().length > 0,
   );
 
   private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
@@ -261,11 +290,11 @@ export class FacturaCompraDetailComponent implements OnInit {
 
   private loadDocumento(id: number): void {
     // Mismo patrón que el form: cabecera y líneas son independientes → en paralelo.
-    // Los nombres de los FK (plazo de pago, método de pago, sede) llegan en los
+    // Los nombres de los FK (plazo de pago, forma de pago, sede) llegan en los
     // `*_nombre` del read; no hace falta resolverlos con peticiones extra.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      lineas: this.detalleService.listarPorDocumento<FacturaLineaRead>(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -281,7 +310,8 @@ export class FacturaCompraDetailComponent implements OnInit {
             plazoPago: read.plazo_pago_nombre ?? null,
             sede: read.sede_nombre ?? null,
             almacen: read.almacen_nombre ?? null,
-            metodoPago: read.metodo_pago_nombre ?? null,
+            centroCosto: read.centro_costo_nombre ?? null,
+            formaPago: read.forma_pago_nombre ?? null,
             ordenCompra: read.orden_compra ?? null,
             comentario: read.comentario ?? null,
             estados: {
@@ -294,7 +324,15 @@ export class FacturaCompraDetailComponent implements OnInit {
               estado_generado: read.estado_generado,
             },
           });
-          this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
+          // Mismo reparto que el form: las cuentas a su pestaña, el resto (ítems) a Detalles.
+          this.lines.set(
+            lineas
+              .filter((line) => line.tipo_registro !== 'C')
+              .map((line) => comercialDetalleToFormValue(line)),
+          );
+          this.cuentas.set(
+            lineas.filter((line) => line.tipo_registro === 'C').map(cuentaDetalleToLineaView),
+          );
           this.isLoading.set(false);
         },
         error: () => {

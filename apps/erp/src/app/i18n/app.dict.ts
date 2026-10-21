@@ -115,6 +115,8 @@ export interface AppDict
     };
     toasts: {
       loadError: { title: string; desc: string };
+      /** Un formulario en modal (alta inline) no pudo cargar su chunk. */
+      formModalError: { title: string; desc: string };
       deleteSuccess: { title: string; desc: string };
       deleteError: { title: string; desc: string };
       exportError: { title: string; desc: string };
@@ -906,9 +908,12 @@ export interface AppDict
         cliente: string;
         proveedor: string;
         empleado: string;
+        inactivo: string;
       };
       form: {
         createTitle: string;
+        createTerceroTitle: string;
+        createTercero: string;
         createSubtitle: string;
         editTitle: string;
         editSubtitle: string;
@@ -937,6 +942,7 @@ export interface AppDict
           cliente: string;
           proveedor: string;
           empleado: string;
+          inactivo: string;
           plazoPago: string;
           precio: string;
           asesor: string;
@@ -2399,8 +2405,10 @@ export interface AppDict
           sedePlaceholder: string;
           almacen: string;
           almacenPlaceholder: string;
-          metodoPago: string;
-          metodoPagoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2415,7 +2423,7 @@ export interface AppDict
         };
       };
       detail: {
-        sections: { general: string; detalles: string };
+        sections: { general: string; detalles: string; cuentas: string };
         labels: {
           numero: string;
           proveedor: string;
@@ -2425,7 +2433,8 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           almacen: string;
-          metodoPago: string;
+          centroCosto: string;
+          formaPago: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -3356,7 +3365,6 @@ export interface AppDict
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {
-        linea: string;
         id: string;
         numero: string;
         documento: string;
@@ -3367,6 +3375,8 @@ export interface AppDict
         centroCosto: string;
         valor: string;
         base: string;
+        subtotal: string;
+        neto: string;
         detalle: string;
         acciones: string;
       };

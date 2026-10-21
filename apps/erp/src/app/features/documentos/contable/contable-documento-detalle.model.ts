@@ -30,6 +30,10 @@ export interface CuentaDetalleRead extends DocumentoDetalleReadBase {
   readonly centro_costo_nombre?: string | null;
   /** Base gravable de la línea; llega como string con decimales. */
   readonly base?: string | null;
+  /** Subtotal de la línea calculado por el backend; llega como string con decimales. */
+  readonly subtotal?: string | number | null;
+  /** Neto (total) de la línea calculado por el backend; llega como string con decimales. */
+  readonly total?: string | number | null;
   /** Número de referencia libre de la línea (solo lo imputa el asiento manual). */
   readonly numero?: number | string | null;
   /** Glosa libre de la línea. */

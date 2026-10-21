@@ -1,13 +1,16 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { I18nService, formatCop } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
+import type { CuentaDetalleLineaView } from '../../contable-documento-detalle.types';
 
-/** Columnas fijas: la primera (nº o id), cuenta, naturaleza y valor. */
+/** Columnas fijas: id, cuenta, naturaleza y valor. */
 const BASE_COLUMN_COUNT = 4;
 
 /** Las tres columnas que enciende `showDocumentoAfectado`. */
 const DOCUMENTO_AFECTADO_COLUMN_COUNT = 3;
+
+/** Las dos columnas que enciende `showTotales`: subtotal y neto. */
+const TOTALES_COLUMN_COUNT = 2;
 
 /**
  * Tabla **tonta** (solo lectura) de las líneas de cuenta contable de un documento.
@@ -18,11 +21,13 @@ const DOCUMENTO_AFECTADO_COLUMN_COUNT = 3;
  * persistencia. La usa la ficha de detalle de cualquier documento con asientos
  * manuales.
  *
- * Suma dos columnas que la editable no tiene, porque solo tienen sentido sobre
- * algo ya guardado: el **id** de la línea (`showId`) y el **documento cruzado**
- * abierto en sus tres campos (`showDocumentoAfectado`). Las prenden las fichas
- * de los documentos que cruzan cartera —el egreso, el pago—, que es donde el ERP
- * anterior las mostraba.
+ * La primera columna es el **id** de la línea: es lo que se cita para hablar de
+ * una línea con soporte o con el backend, y una posición no identifica nada.
+ *
+ * Suma una columna que la editable no tiene, porque solo tiene sentido sobre algo
+ * ya guardado: el **documento cruzado** abierto en sus tres campos
+ * (`showDocumentoAfectado`). La prenden las fichas de los documentos que cruzan
+ * cartera —el egreso, el pago—, que es donde el ERP anterior la mostraba.
  */
 @Component({
   selector: 'app-contable-documento-lineas-table',
@@ -35,14 +40,7 @@ export class ContableDocumentoLineasTableComponent {
   protected readonly t = this.i18n.t;
 
   /** Líneas a renderizar (read mapeado a la forma del front). */
-  readonly lines = input.required<readonly CuentaDetalleFormRawValue[]>();
-
-  /**
-   * La primera columna muestra el **id** de la línea en vez de su posición.
-   * Solo tiene sentido en una ficha: el id es lo que se cita para hablar de una
-   * línea con soporte o con el backend, y el ordinal no identifica nada.
-   */
-  readonly showId = input<boolean>(false);
+  readonly lines = input.required<readonly CuentaDetalleLineaView[]>();
 
   /**
    * Muestra las tres columnas del **documento cruzado**: su id, su tipo y su
@@ -71,13 +69,25 @@ export class ContableDocumentoLineasTableComponent {
   /** Muestra la columna de glosa libre de la línea. */
   readonly showDetalle = input<boolean>(false);
 
+  /**
+   * Muestra el subtotal y el neto que el backend calcula por línea. Los pide la
+   * ficha de la factura de compra, como el ERP anterior.
+   */
+  readonly showTotales = input<boolean>(false);
+
   protected readonly formatMoney = formatCop;
+
+  /** Monto que puede no venir del backend: sin valor, la celda queda vacía. */
+  protected formatMoneyOpcional(value: number | null | undefined): string {
+    return value === null || value === undefined ? '' : formatCop(value);
+  }
 
   /** Nº de columnas de la tabla; alimenta el `colspan` del estado vacío. */
   protected readonly columnCount = computed(
     () =>
       BASE_COLUMN_COUNT +
       (this.showDocumentoAfectado() ? DOCUMENTO_AFECTADO_COLUMN_COUNT : 0) +
+      (this.showTotales() ? TOTALES_COLUMN_COUNT : 0) +
       [
         this.showNumero(),
         this.showContacto(),
@@ -88,7 +98,7 @@ export class ContableDocumentoLineasTableComponent {
   );
 
   /** Etiqueta i18n de la naturaleza de una línea (`'D'`/`'C'`). */
-  protected naturalezaLabel(line: CuentaDetalleFormRawValue): string {
+  protected naturalezaLabel(line: CuentaDetalleLineaView): string {
     const n = this.t().entities.cuentaDetalle.naturaleza;
     return line.naturaleza === 'C' ? n.credito : n.debito;
   }

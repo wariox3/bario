@@ -53,6 +53,7 @@ import type { AppDict } from '@erp/i18n';
 import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
 import {
   createCuentaDetalleGroup,
+  propagarContactoALineas,
   type CuentaDetalleGroup,
 } from '@erp/features/documentos/contable/contable-documento-detalle.form';
 import {
@@ -65,6 +66,7 @@ import { egresoToFormValue, formValueToPayload } from '../../egreso.mapper';
 import type { EgresoRead } from '../../egreso.model';
 import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Egreso (desembolso de
@@ -101,6 +103,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ContableDocumentoDetallesComponent,
     TabsModule,
@@ -191,7 +194,7 @@ export class EgresoFormComponent implements OnInit, CanComponentDeactivate {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((contacto) => {
         this.contactoCabecera.set(contacto);
-        this.propagarContactoALineas(contacto);
+        propagarContactoALineas(this.form.controls.detalles, contacto);
       });
   }
 
@@ -312,20 +315,6 @@ export class EgresoFormComponent implements OnInit, CanComponentDeactivate {
   /** Neto del desembolso (`débitos − créditos`), la misma cuenta que viaja en `total`. */
   private totalNeto(): number {
     return calcularResumenContable(this.form.controls.detalles.getRawValue(), 'pagar').total;
-  }
-
-  /**
-   * Replica el contacto de la cabecera en las líneas que aún no se guardaron.
-   *
-   * Una línea libre nace con el tercero del documento, pero solo mientras sea
-   * suya: las ya persistidas conservan el que tengan (cambiarlas es decisión
-   * explícita del usuario, fila por fila).
-   */
-  private propagarContactoALineas(contacto: ErpSelectOption | null): void {
-    for (const group of this.form.controls.detalles.controls) {
-      if (group.controls.id.value !== null) continue;
-      group.controls.contacto.setValue(contacto);
-    }
   }
 
   /**

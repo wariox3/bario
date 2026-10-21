@@ -69,6 +69,7 @@ import { ErpDocumentoReferenciaSelectComponent } from '@erp/core/components/docu
 import { CargarLineasReferenciaComponent } from '@erp/features/documentos/comercial/components/cargar-lineas-referencia/cargar-lineas-referencia.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Nota crédito de compra.
@@ -103,6 +104,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ErpDocumentoReferenciaSelectComponent,
     CargarLineasReferenciaComponent,

@@ -170,7 +170,7 @@ export class AgregarDocumentoModalComponent {
       filters.push({ field: 'contacto_id', operator: 'eq', value: contactoId });
     }
     filters.push(...this.activeFilters());
-    // Sin orden del usuario, cae al orden por defecto (más recientes primero).
+    // Sin orden del usuario, cae al orden por defecto (más antiguos primero).
     const sort = this.sort().length > 0 ? [...this.sort()] : [...AGREGAR_DOCUMENTO_DEFAULT_SORT];
     return { filters, sort, page: this.page() };
   }

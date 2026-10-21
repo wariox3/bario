@@ -63,6 +63,7 @@ import {
 import { pedidoClienteToFormValue, formValueToPayload } from '../../pedido-cliente.mapper';
 import type { PedidoClienteRead } from '../../pedido-cliente.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de un Pedido de cliente.
@@ -98,6 +99,7 @@ import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/com
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ComercialDocumentoDetallesComponent,
   ],
   providers: [ConfirmationService],

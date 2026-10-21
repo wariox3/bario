@@ -14,8 +14,20 @@ import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
   ComercialDetallePayload,
+  ComercialDetalleRead,
 } from '@reddoc/core';
-import type { CuentaDetallePayload } from '@erp/features/documentos/contable/contable-documento-detalle.model';
+import type {
+  CuentaDetallePayload,
+  CuentaDetalleRead,
+} from '@erp/features/documentos/contable/contable-documento-detalle.model';
+
+/**
+ * Línea de la factura tal como la devuelve `documento-detalle`: la tabla mezcla
+ * líneas de ítem (comerciales) y de cuenta contable, discriminadas por
+ * `tipo_registro`. La intersección expone los campos de ambas familias (todos
+ * opcionales salvo el esqueleto común) para poder repartirlas.
+ */
+export type FacturaLineaRead = ComercialDetalleRead & CuentaDetalleRead;
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de compra. */
 export interface FacturaCompraRead extends DocumentoReadBase {
@@ -29,8 +41,14 @@ export interface FacturaCompraRead extends DocumentoReadBase {
   /** Almacén general: el que heredan las líneas nuevas. */
   readonly almacen?: number | null;
   readonly almacen_nombre?: string | null;
-  readonly metodo_pago: number | null;
-  readonly metodo_pago_nombre?: string | null;
+  /**
+   * Centro de costo de la cabecera: lo heredan las cuentas que se agregan (el
+   * «grupo» del ERP anterior).
+   */
+  readonly centro_costo?: number | null;
+  readonly centro_costo_nombre?: string | null;
+  readonly forma_pago: number | null;
+  readonly forma_pago_nombre?: string | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
 }
@@ -41,7 +59,8 @@ export interface FacturaCompraPayload extends DocumentoPayloadBase {
   readonly plazo_pago: number | null;
   readonly sede: number | null;
   readonly almacen: number | null;
-  readonly metodo_pago: number | null;
+  readonly centro_costo: number | null;
+  readonly forma_pago: number | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
   /**

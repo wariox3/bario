@@ -88,6 +88,14 @@ export {
 } from './lib/utils/date.utils';
 export type { DiaDelMes, AnioMes } from './lib/utils/date.utils';
 export { formatTelefono } from './lib/utils/telefono.utils';
+export {
+  SEPARADOR_CORREOS,
+  esCorreoValido,
+  partirCorreos,
+  unirCorreos,
+  incluyeCorreo,
+  agregarCorreo,
+} from './lib/utils/correos.utils';
 export type { PaisCelular, CelularPartido } from './lib/celular';
 export {
   PAISES_CELULAR,

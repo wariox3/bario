@@ -55,6 +55,16 @@ export interface CuentaDetalleFormRawValue {
   readonly documento_afectado_tipo: string | null;
 }
 
+/**
+ * Línea de cuenta para la ficha de solo lectura: los valores del formulario más
+ * el subtotal y el neto que calcula el backend. Solo existen sobre una línea ya
+ * guardada, por eso no viven en el `FormGroup`.
+ */
+export interface CuentaDetalleLineaView extends CuentaDetalleFormRawValue {
+  readonly subtotal?: number | null;
+  readonly neto?: number | null;
+}
+
 /** Acumulado de débitos y créditos de las líneas de cuenta del documento. */
 export interface ResumenContable {
   readonly debitos: number;

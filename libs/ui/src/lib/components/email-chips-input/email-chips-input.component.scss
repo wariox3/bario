@@ -1,0 +1,90 @@
+// El contenedor se viste como un `pInputText` (mismos tokens de PrimeNG) para
+// que, junto a los demás campos, se lea como un input más. El input real va
+// sin borde adentro: el foco y el error los pinta el contenedor.
+//
+// Alto: chip e input viven en una **fila de alto fijo** (`--email-chips-fila`),
+// igual al line-height con que preflight de Tailwind deja un `pInputText`
+// (1.5 × 1rem). Con el mismo padding que el input, el campo vacío mide lo mismo
+// que sus vecinos y no cambia de alto al entrar el primer chip; solo crece, de a
+// una fila, cuando los chips saltan de línea.
+.email-chips {
+  --email-chips-fila: 1.5rem;
+  --email-chips-gap: 0.375rem;
+
+  // El chip de PrimeNG trae 0.5rem de padding vertical (~40px de alto): sin
+  // esto empuja el campo al aparecer. Se aplana a la fila y se compacta.
+  --p-chip-padding-y: 0;
+  --p-chip-padding-x: 0.5rem;
+  --p-chip-gap: 0.25rem;
+  --p-chip-border-radius: calc(var(--p-inputtext-border-radius) - 2px);
+  --p-chip-background: var(--brand-surface-2, #eef2f6);
+  --p-chip-color: var(--p-inputtext-color);
+  --p-chip-remove-icon-size: 0.8125rem;
+  --p-chip-remove-icon-color: var(--p-inputtext-placeholder-color);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--email-chips-gap);
+  padding: var(--p-inputtext-padding-y) var(--p-inputtext-padding-x);
+  background: var(--p-inputtext-background);
+  border: 1px solid var(--p-inputtext-border-color);
+  border-radius: var(--p-inputtext-border-radius);
+  box-shadow: var(--p-inputtext-shadow);
+  cursor: text;
+  transition:
+    border-color var(--p-inputtext-transition-duration),
+    box-shadow var(--p-inputtext-transition-duration);
+
+  &:hover {
+    border-color: var(--p-inputtext-hover-border-color);
+  }
+
+  &:focus-within {
+    border-color: var(--p-inputtext-focus-border-color);
+  }
+
+  // Mismo look que `lib-phone-input` en error: PrimeNG no conoce este contenedor.
+  &--invalid,
+  &--invalid:hover,
+  &--invalid:focus-within {
+    border-color: #dc2626;
+  }
+
+  &--invalid:focus-within {
+    box-shadow: 0 0 0 2px rgba(220 38 38 / 0.15);
+  }
+
+  &--disabled {
+    background: var(--p-inputtext-disabled-background);
+    cursor: default;
+  }
+
+  &__chip {
+    height: var(--email-chips-fila);
+    font-size: 0.8125rem;
+    line-height: var(--email-chips-fila);
+  }
+
+  // Un correo guardado que no es válido: se ve para poder quitarlo.
+  &__chip--invalid {
+    --p-chip-background: #fee2e2;
+    --p-chip-color: #b91c1c;
+    --p-chip-remove-icon-color: #b91c1c;
+  }
+
+  &__input {
+    height: var(--email-chips-fila);
+    padding: 0;
+    font-size: 1rem;
+    line-height: var(--email-chips-fila);
+    color: var(--p-inputtext-color);
+    background: transparent;
+    border: none;
+    outline: none;
+
+    &::placeholder {
+      color: var(--p-inputtext-placeholder-color);
+    }
+  }
+}

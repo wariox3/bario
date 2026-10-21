@@ -62,6 +62,7 @@
             <span class="ml-px text-red-500">*</span>
           </label>
           <lib-contacto-select
+            appCrearTercero
             inputId="contacto"
             formControlName="contacto"
             [extraParams]="contactoParams"
@@ -146,21 +147,22 @@
           />
         </div>
 
-        <!-- Método de pago -->
+        <!-- Forma de pago -->
         <div class="flex flex-col gap-1.5">
-          <label for="metodo_pago" class="factura-compra-form__label">
-            {{ t().entities.facturaCompra.form.fields.metodoPago }}
+          <label for="forma_pago" class="factura-compra-form__label">
+            {{ t().entities.facturaCompra.form.fields.formaPago }}
             <span class="ml-px text-red-500">*</span>
           </label>
           <lib-api-select
-            inputId="metodo_pago"
-            formControlName="metodo_pago"
-            [endpoint]="metodoPagoEndpoint"
-            [placeholder]="t().entities.facturaCompra.form.fields.metodoPagoPlaceholder"
-            [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
+            inputId="forma_pago"
+            formControlName="forma_pago"
+            [endpoint]="formaPagoEndpoint"
+            [suggestedIndex]="primeraSugerida()"
+            [placeholder]="t().entities.facturaCompra.form.fields.formaPagoPlaceholder"
+            [invalid]="form.controls.forma_pago.invalid && form.controls.forma_pago.touched"
           />
           <lib-field-error
-            [control]="form.controls.metodo_pago"
+            [control]="form.controls.forma_pago"
             [messages]="{ required: t().entities.facturaCompra.form.validation.required }"
           />
         </div>
@@ -174,6 +176,7 @@
             inputId="sede"
             formControlName="sede"
             [endpoint]="sedeEndpoint"
+            [suggestedIndex]="primeraSugerida()"
             [placeholder]="t().entities.facturaCompra.form.fields.sedePlaceholder"
           />
         </div>
@@ -187,8 +190,21 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
-            [suggestedIndex]="almacenSuggestedIndex()"
+            [suggestedIndex]="primeraSugerida()"
             [placeholder]="t().entities.facturaCompra.form.fields.almacenPlaceholder"
+          />
+        </div>
+
+        <!-- Centro de costo: lo heredan las cuentas nuevas; cada una lo puede cambiar. -->
+        <div class="flex flex-col gap-1.5">
+          <label for="centro_costo" class="factura-compra-form__label">
+            {{ t().entities.facturaCompra.form.fields.centroCosto }}
+          </label>
+          <lib-api-select
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
+            [placeholder]="t().entities.facturaCompra.form.fields.centroCostoPlaceholder"
           />
         </div>
       </div>
@@ -244,7 +260,6 @@
       <p-tabpanels>
         <p-tabpanel value="detalles">
           <app-comercial-documento-detalles
-            #detallesTabla
             modo="compra"
             [detalles]="form.controls.detalles"
             [documentId]="documentId()"
@@ -256,9 +271,13 @@
 
         <p-tabpanel value="cuentas">
           <app-contable-documento-detalles
-            #cuentasTabla
             [detalles]="form.controls.cuentas"
             [documentId]="documentId()"
+            [contactoPorDefecto]="contactoCabecera()"
+            [centroCostoPorDefecto]="centroCostoCabecera()"
+            [showCentroCosto]="true"
+            [showContacto]="true"
+            [showBase]="true"
           />
         </p-tabpanel>
       </p-tabpanels>
@@ -266,12 +285,8 @@
   </section>
 
   <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
-  @if (activeTab() === 'cuentas') {
-    @if (cuentasTabla.hayLineas()) {
-      <app-contable-documento-resumen [resumen]="cuentasTabla.resumen()" />
-    }
-  } @else if (detallesTabla.hayLineas()) {
-    <app-comercial-documento-resumen [resumen]="detallesTabla.resumen()" />
+  @if (hayLineas()) {
+    <app-comercial-documento-resumen [resumen]="resumen()" [cuentas]="resumenCuentas()" />
   }
 </form>
 

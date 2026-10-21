@@ -46,8 +46,8 @@
     <table class="contable-detalle-table">
       <thead>
         <tr>
-          <th class="contable-detalle-table__th w-10 text-center">
-            {{ t().entities.cuentaDetalle.columns.linea }}
+          <th class="contable-detalle-table__th w-16 text-center">
+            {{ t().entities.cuentaDetalle.columns.id }}
           </th>
           @if (showNumero()) {
             <th class="contable-detalle-table__th w-28 text-left">
@@ -94,7 +94,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of detalles().controls; track row; let i = $index) {
+        @for (row of detalles().controls; track row) {
           <tr
             [formGroup]="row"
             class="contable-detalle-table__row"
@@ -107,7 +107,7 @@
                   [pTooltip]="t().entities.cuentaDetalle.pendingSuffix"
                 ></span>
               }
-              {{ i + 1 }}
+              {{ row.controls.id.value }}
             </td>
 
             @if (showNumero()) {
@@ -154,6 +154,7 @@
             @if (showContacto()) {
               <td class="contable-detalle-table__td">
                 <lib-contacto-select
+                  appCrearTercero
                   formControlName="contacto"
                   [placeholder]="t().entities.cuentaDetalle.contactoPlaceholder"
                 />

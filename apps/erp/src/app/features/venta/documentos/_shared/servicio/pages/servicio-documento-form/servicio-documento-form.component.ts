@@ -49,6 +49,7 @@ import type {
 import { createDetalleGroup, type DetalleGroup } from '../../servicio-documento-detalle.form';
 import { ServicioDocumentoDetallesComponent } from '../../components/servicio-documento-detalles/servicio-documento-detalles.component';
 import { ServicioDocumentoResumenComponent } from '@erp/features/venta/documentos/_shared/servicio/components/servicio-documento-resumen/servicio-documento-resumen.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de un **documento de servicio** (vigilancia):
@@ -83,6 +84,7 @@ import { ServicioDocumentoResumenComponent } from '@erp/features/venta/documento
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ServicioDocumentoDetallesComponent,
   ],

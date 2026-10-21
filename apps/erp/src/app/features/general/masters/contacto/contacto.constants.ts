@@ -65,6 +65,16 @@ export const CONTACTOS_COLUMNS: readonly ColumnDef[] = [
     width: '60px',
     align: 'center',
   },
+  {
+    field: 'estado_inactivo',
+    headerKey: 'entities.contacto.columns.inactivo',
+    type: 'boolean',
+    // Un contacto inactivo no se usa en documentos nuevos: el «sí» es una
+    // condición adversa, no un estado deseable.
+    booleanTone: 'negative',
+    width: '60px',
+    align: 'center',
+  },
 ];
 
 /**
@@ -86,6 +96,11 @@ export const CONTACTOS_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'cliente', displayNameKey: 'entities.contacto.columns.cliente', type: 'boolean' },
   { name: 'proveedor', displayNameKey: 'entities.contacto.columns.proveedor', type: 'boolean' },
   { name: 'empleado', displayNameKey: 'entities.contacto.columns.empleado', type: 'boolean' },
+  {
+    name: 'estado_inactivo',
+    displayNameKey: 'entities.contacto.columns.inactivo',
+    type: 'boolean',
+  },
 ];
 
 export const CONTACTOS_ROW_ACTIONS: readonly RowAction[] = [
