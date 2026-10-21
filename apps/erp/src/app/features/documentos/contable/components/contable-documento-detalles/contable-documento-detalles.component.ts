@@ -53,7 +53,10 @@ import {
   documentoPendienteToFormValue,
 } from '../../contable-documento-detalle.mapper';
 import type { CuentaDetalleRead } from '../../contable-documento-detalle.model';
-import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
+import type {
+  CuentaDetalleFormRawValue,
+  NaturalezaCuenta,
+} from '../../contable-documento-detalle.types';
 
 /** Columnas fijas: nº, cuenta, naturaleza, valor y acciones. */
 const BASE_COLUMN_COUNT = 5;
@@ -139,6 +142,12 @@ export class ContableDocumentoDetallesComponent {
    * `contactoPorDefecto`: el asiento siembra el de su cabecera.
    */
   readonly centroCostoPorDefecto = input<ErpSelectOption | null>(null);
+
+  /**
+   * Naturaleza con la que nace cada línea nueva. Débito salvo que el documento
+   * diga otra cosa: el egreso arranca en crédito.
+   */
+  readonly naturalezaPorDefecto = input<NaturalezaCuenta>('D');
 
   /** Muestra la columna de base gravable. */
   readonly showBase = input<boolean>(false);
@@ -262,6 +271,7 @@ export class ContableDocumentoDetallesComponent {
       createCuentaDetalleGroup({
         contacto: this.contactoPorDefecto(),
         centro_costo: this.centroCostoPorDefecto(),
+        naturaleza: this.naturalezaPorDefecto(),
       }),
     );
   }
