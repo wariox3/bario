@@ -27,6 +27,7 @@
       "@reddoc/ui": ["./libs/ui/src/index.ts"],
       "@reddoc/ui/auth": ["./libs/ui/src/auth.ts"],
       "@reddoc/ui/i18n": ["./libs/ui/src/i18n.ts"],
+      "@reddoc/ui/pegar-numero": ["./libs/ui/src/pegar-numero.ts"],
       "@turnos/*": ["./apps/turnos/src/app/*"]
     }
   },

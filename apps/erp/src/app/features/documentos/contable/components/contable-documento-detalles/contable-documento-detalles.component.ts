@@ -30,11 +30,8 @@ import {
 } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
-import {
-  ErpApiSelectComponent,
-  ErpContactoSelectComponent,
-  PegarNumeroDirective,
-} from '@reddoc/ui';
+import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
+import { PegarNumeroDirective } from '@reddoc/ui/pegar-numero';
 import type { AppDict } from '@erp/i18n';
 import { LineasDiferidas } from '../../../lineas-diferidas';
 import {
