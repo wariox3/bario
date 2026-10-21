@@ -34,6 +34,10 @@
             {{ c.columns.detalle }}
           </th>
         }
+        @if (showTotales()) {
+          <th class="contable-detalle-table__th w-36 text-right">{{ c.columns.subtotal }}</th>
+          <th class="contable-detalle-table__th w-36 text-right">{{ c.columns.neto }}</th>
+        }
       </tr>
     </thead>
     <tbody>
@@ -84,6 +88,16 @@
           }
           @if (showDetalle()) {
             <td class="contable-detalle-table__td text-brand-muted">{{ line.detalle || '—' }}</td>
+          }
+          @if (showTotales()) {
+            <td class="contable-detalle-table__td text-right tabular-nums text-brand-muted">
+              {{ formatMoneyOpcional(line.subtotal) }}
+            </td>
+            <td
+              class="contable-detalle-table__td text-right font-semibold tabular-nums text-brand-text"
+            >
+              {{ formatMoneyOpcional(line.neto) }}
+            </td>
           }
         </tr>
       } @empty {

@@ -4,12 +4,19 @@ import type { AppDict } from '@erp/i18n';
 
 const CANTIDAD_FORMAT = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
 
+/** Débitos y créditos de las cuentas contables que acompañan a los ítems. */
+export interface ResumenCuentasDocumento {
+  readonly debitos: number;
+  readonly creditos: number;
+}
+
 /**
  * Aside de **resumen** de un documento comercial: total cantidad (si se declara),
  * subtotal, descuento (si aplica), desglose por impuesto, total de impuestos y
- * total. Con `pagos` suma lo recibido y el saldo pendiente. Componente tonto
- * compartido por los formularios y las fichas de detalle, para que el bloque viva
- * en un solo lugar.
+ * total. Con `cuentas` suma los débitos y créditos de las líneas contables (el
+ * `total` que llega ya los incluye). Con `pagos` suma lo recibido y el saldo
+ * pendiente. Componente tonto compartido por los formularios y las fichas de
+ * detalle, para que el bloque viva en un solo lugar.
  */
 @Component({
   selector: 'app-comercial-documento-resumen',
@@ -24,6 +31,20 @@ export class ComercialDocumentoResumenComponent {
 
   /** Suma de cantidades de las líneas. `null` (default) oculta la fila. */
   readonly cantidad = input<number | null>(null);
+
+  /**
+   * Débitos y créditos de las cuentas contables del documento. `null` (default)
+   * oculta las filas; cada una se pinta solo si tiene valor, como el legacy.
+   */
+  readonly cuentas = input<ResumenCuentasDocumento | null>(null);
+
+  /**
+   * El subtotal se pinta siempre, salvo en un documento con cuentas sin ítems:
+   * ahí sería un «$0» que no dice nada (el legacy lo ocultaba en cero).
+   */
+  protected readonly mostrarSubtotal = computed(
+    () => this.cuentas() === null || this.resumen().subtotal !== 0,
+  );
 
   /** Recibido y saldo del documento. `null` (default) oculta el bloque de pagos. */
   readonly pagos = input<ResumenPagos | null>(null);

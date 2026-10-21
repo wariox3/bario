@@ -88,9 +88,29 @@ export function propagarContactoALineas(
   detalles: FormArray<CuentaDetalleGroup>,
   contacto: ErpSelectOption | null,
 ): void {
+  propagarALineasLibres(detalles, 'contacto', contacto);
+}
+
+/**
+ * Replica el centro de costo de la cabecera en las líneas manuales que aún no se
+ * guardaron. Misma regla que el contacto: las persistidas y las enlazadas a un
+ * documento conservan el suyo.
+ */
+export function propagarCentroCostoALineas(
+  detalles: FormArray<CuentaDetalleGroup>,
+  centroCosto: ErpSelectOption | null,
+): void {
+  propagarALineasLibres(detalles, 'centro_costo', centroCosto);
+}
+
+function propagarALineasLibres(
+  detalles: FormArray<CuentaDetalleGroup>,
+  campo: 'contacto' | 'centro_costo',
+  valor: ErpSelectOption | null,
+): void {
   for (const group of detalles.controls) {
     if (group.controls.id.value !== null) continue;
     if (group.controls.documento_afectado.value !== null) continue;
-    group.controls.contacto.setValue(contacto);
+    group.controls[campo].setValue(valor);
   }
 }

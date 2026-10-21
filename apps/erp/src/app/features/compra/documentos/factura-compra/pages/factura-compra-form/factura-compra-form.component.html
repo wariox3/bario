@@ -194,6 +194,19 @@
             [placeholder]="t().entities.facturaCompra.form.fields.almacenPlaceholder"
           />
         </div>
+
+        <!-- Centro de costo: lo heredan las cuentas nuevas; cada una lo puede cambiar. -->
+        <div class="flex flex-col gap-1.5">
+          <label for="centro_costo" class="factura-compra-form__label">
+            {{ t().entities.facturaCompra.form.fields.centroCosto }}
+          </label>
+          <lib-api-select
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
+            [placeholder]="t().entities.facturaCompra.form.fields.centroCostoPlaceholder"
+          />
+        </div>
       </div>
     </div>
 
@@ -247,7 +260,6 @@
       <p-tabpanels>
         <p-tabpanel value="detalles">
           <app-comercial-documento-detalles
-            #detallesTabla
             modo="compra"
             [detalles]="form.controls.detalles"
             [documentId]="documentId()"
@@ -259,9 +271,13 @@
 
         <p-tabpanel value="cuentas">
           <app-contable-documento-detalles
-            #cuentasTabla
             [detalles]="form.controls.cuentas"
             [documentId]="documentId()"
+            [contactoPorDefecto]="contactoCabecera()"
+            [centroCostoPorDefecto]="centroCostoCabecera()"
+            [showCentroCosto]="true"
+            [showContacto]="true"
+            [showBase]="true"
           />
         </p-tabpanel>
       </p-tabpanels>
@@ -269,12 +285,8 @@
   </section>
 
   <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
-  @if (activeTab() === 'cuentas') {
-    @if (cuentasTabla.hayLineas()) {
-      <app-contable-documento-resumen [resumen]="cuentasTabla.resumen()" />
-    }
-  } @else if (detallesTabla.hayLineas()) {
-    <app-comercial-documento-resumen [resumen]="detallesTabla.resumen()" />
+  @if (hayLineas()) {
+    <app-comercial-documento-resumen [resumen]="resumen()" [cuentas]="resumenCuentas()" />
   }
 </form>
 

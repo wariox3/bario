@@ -25,6 +25,10 @@ export function facturaCompraToFormValue(
         : null,
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
     almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
+    centro_costo:
+      read.centro_costo != null
+        ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
+        : null,
     forma_pago:
       read.forma_pago != null
         ? { id: read.forma_pago, nombre: read.forma_pago_nombre ?? '' }
@@ -56,6 +60,7 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     almacen: raw.almacen?.id ?? null,
+    centro_costo: raw.centro_costo?.id ?? null,
     forma_pago: raw.forma_pago?.id ?? null,
     orden_compra: raw.orden_compra?.trim() || null,
     comentario: raw.comentario?.trim() || null,

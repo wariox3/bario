@@ -3186,6 +3186,8 @@ export const es: AppDict = {
           sedePlaceholder: 'Selecciona…',
           almacen: 'Almacén',
           almacenPlaceholder: 'Selecciona…',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
           formaPago: 'Forma de pago',
           formaPagoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
@@ -3220,6 +3222,7 @@ export const es: AppDict = {
         sections: {
           general: 'Información general',
           detalles: 'Detalles',
+          cuentas: 'Cuentas',
         },
         labels: {
           numero: 'Número',
@@ -3230,6 +3233,7 @@ export const es: AppDict = {
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
           almacen: 'Almacén',
+          centroCosto: 'Centro de costo',
           formaPago: 'Forma de pago',
           ordenCompra: 'Orden de compra',
           comentario: 'Comentario',
@@ -4445,6 +4449,8 @@ export const es: AppDict = {
         centroCosto: 'Centro de costo',
         valor: 'Valor',
         base: 'Base',
+        subtotal: 'Subtotal',
+        neto: 'Neto',
         detalle: 'Detalle',
         acciones: 'Acciones',
       },

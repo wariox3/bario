@@ -2405,6 +2405,8 @@ export interface AppDict
           sedePlaceholder: string;
           almacen: string;
           almacenPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
           formaPago: string;
           formaPagoPlaceholder: string;
           ordenCompra: string;
@@ -2421,7 +2423,7 @@ export interface AppDict
         };
       };
       detail: {
-        sections: { general: string; detalles: string };
+        sections: { general: string; detalles: string; cuentas: string };
         labels: {
           numero: string;
           proveedor: string;
@@ -2431,6 +2433,7 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           almacen: string;
+          centroCosto: string;
           formaPago: string;
           ordenCompra: string;
           comentario: string;
@@ -3372,6 +3375,8 @@ export interface AppDict
         centroCosto: string;
         valor: string;
         base: string;
+        subtotal: string;
+        neto: string;
         detalle: string;
         acciones: string;
       };

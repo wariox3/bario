@@ -127,7 +127,7 @@ export class ContableDocumentoDetallesComponent {
    */
   readonly documentId = input<number | null>(null);
 
-  /** Muestra la columna de tercero por línea (la imputa el pago; la factura no). */
+  /** Muestra la columna de tercero por línea (la imputan el pago y la factura de compra). */
   readonly showContacto = input<boolean>(false);
 
   /**

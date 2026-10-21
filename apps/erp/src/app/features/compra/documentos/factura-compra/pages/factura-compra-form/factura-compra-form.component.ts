@@ -30,7 +30,6 @@ import {
   TenantService,
   ToastService,
   comercialDetalleToFormValue,
-  type ComercialDetalleRead,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -73,25 +72,22 @@ import {
   createCuentaDetalleGroup,
   type CuentaDetalleGroup,
 } from '@erp/features/documentos/contable/contable-documento-detalle.form';
-import { cuentaDetalleToFormValue } from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
-import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contable-documento-detalle.model';
+import {
+  cuentaDetalleToFormValue,
+  resumenConCuentas,
+} from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
+import {
+  propagarCentroCostoALineas,
+  propagarContactoALineas,
+} from '@erp/features/documentos/contable/contable-documento-detalle.form';
 import { facturaCompraToFormValue, formValueToPayload } from '../../factura-compra.mapper';
-import type { FacturaCompraRead } from '../../factura-compra.model';
+import type { FacturaCompraRead, FacturaLineaRead } from '../../factura-compra.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
-import { ContableDocumentoResumenComponent } from '@erp/features/documentos/contable/components/contable-documento-resumen/contable-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 import { pestanaConPrimerError } from '@erp/features/documentos/tablas-en-vivo';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
-
-/**
- * Línea de documento leída al cargar en edición: la tabla `documento-detalle`
- * mezcla líneas de ítem (comerciales) y de cuenta contable, discriminadas por
- * `tipo_registro`. La intersección expone los campos de ambas familias (todos
- * opcionales salvo el esqueleto común) para poder repartirlas al FormArray correcto.
- */
-type FacturaLineaRead = ComercialDetalleRead & CuentaDetalleRead;
 
 /** Lo que el guard de salida necesita de cada tabla de líneas. */
 interface FlushableLineTable {
@@ -123,7 +119,6 @@ interface FlushableLineTable {
     InputTextModule,
     TextareaModule,
     MasInformacionComponent,
-    ContableDocumentoResumenComponent,
     ComercialDocumentoResumenComponent,
     ReactiveFormsModule,
     BreadcrumbComponent,
@@ -176,6 +171,32 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   /** Tabla de líneas de cuenta contable; mismo contrato de flush que la de ítems. */
   private readonly cuentasTable = viewChild(ContableDocumentoDetallesComponent);
 
+  /** Hay líneas de ítem o de cuenta: la página pinta el resumen solo entonces. */
+  protected readonly hayLineas = computed(
+    () =>
+      (this.detallesTable()?.hayLineas() ?? false) || (this.cuentasTable()?.hayLineas() ?? false),
+  );
+
+  /** Débitos y créditos de las cuentas, para las filas del resumen. */
+  protected readonly resumenCuentas = computed(
+    () => this.cuentasTable()?.resumen() ?? { debitos: 0, creditos: 0, total: 0 },
+  );
+
+  /**
+   * Resumen de la factura: subtotal, descuento e impuestos de los ítems y un
+   * total al que las cuentas débito suman y las crédito restan. Es uno solo para
+   * las dos pestañas: el total del documento no cambia según lo que se mire.
+   */
+  protected readonly resumen = computed(() => {
+    const items = this.detallesTable()?.resumen() ?? {
+      subtotal: 0,
+      descuento: 0,
+      impuestos: [],
+      total: 0,
+    };
+    return resumenConCuentas(items, this.resumenCuentas());
+  });
+
   /** Tab activo del bloque de líneas (Detalles / Cuentas). */
   protected readonly activeTab = signal<'detalles' | 'cuentas'>('detalles');
 
@@ -191,6 +212,7 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
 
   /** Filtra el autocomplete de contacto a proveedores. */
@@ -243,12 +265,23 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
     almacen: this.fb.control<ErpSelectOption | null>(null),
+    centro_costo: this.fb.control<ErpSelectOption | null>(null),
     forma_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
     cuentas: new FormArray<CuentaDetalleGroup>([]),
   });
+
+  /**
+   * Espejo en signal del contacto y el centro de costo de la cabecera, para que
+   * siembre con ellos cada cuenta nueva (como el asiento). Se escriben en los dos
+   * únicos puntos donde cambian —la elección del usuario y la carga en edición—;
+   * esta última patchea con `emitEvent: false`, así que no basta con seguir
+   * `valueChanges`.
+   */
+  protected readonly contactoCabecera = signal<ErpSelectOption | null>(null);
+  protected readonly centroCostoCabecera = signal<ErpSelectOption | null>(null);
 
   /**
    * Estado del vencimiento (días del plazo, fecha que dicta y desvío), para que
@@ -276,6 +309,20 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
       origen: 'proveedor',
       destroyRef: this.destroyRef,
     });
+
+    this.form.controls.contacto.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((contacto) => {
+        this.contactoCabecera.set(contacto);
+        propagarContactoALineas(this.form.controls.cuentas, contacto);
+      });
+
+    this.form.controls.centro_costo.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((centroCosto) => {
+        this.centroCostoCabecera.set(centroCosto);
+        propagarCentroCostoALineas(this.form.controls.cuentas, centroCosto);
+      });
   }
 
   ngOnInit(): void {
@@ -448,7 +495,12 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
    * y respetar el vencimiento que viene del backend.
    */
   private applyCabecera(read: FacturaCompraRead): void {
-    this.form.patchValue(facturaCompraToFormValue(read), { emitEvent: false });
+    const value = facturaCompraToFormValue(read);
+    this.form.patchValue(value, { emitEvent: false });
+    // Las cuentas que agregue el usuario en edición nacen con el contacto y el
+    // centro de costo del documento, igual que en alta.
+    this.contactoCabecera.set(value.contacto ?? null);
+    this.centroCostoCabecera.set(value.centro_costo ?? null);
   }
 
   /**
