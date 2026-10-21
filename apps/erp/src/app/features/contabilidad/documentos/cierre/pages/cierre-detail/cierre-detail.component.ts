@@ -6,6 +6,7 @@ import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { TabsModule } from 'primeng/tabs';
 import {
   I18nService,
+  LIST_PAGE_SIZE,
   TenantService,
   ToastService,
   formatFechaLarga,
@@ -27,7 +28,6 @@ import { ContableDocumentoLineasTableComponent } from '@erp/features/documentos/
 import { cuentaDetalleToFormValue } from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
 import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contable-documento-detalle.model';
 import type { CuentaDetalleFormRawValue } from '@erp/features/documentos/contable/contable-documento-detalle.types';
-import { CIERRE_DETALLE_PAGE_SIZE } from '../../cierre.constants';
 import { cierreToFormValue } from '../../cierre.mapper';
 import type { CierreRead } from '../../cierre.model';
 
@@ -83,7 +83,7 @@ export class CierreDetailComponent implements OnInit {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
-  protected readonly pageSize = CIERRE_DETALLE_PAGE_SIZE;
+  protected readonly pageSize = LIST_PAGE_SIZE;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -213,7 +213,7 @@ export class CierreDetailComponent implements OnInit {
   private loadLineas(id: number): void {
     this.isLoadingLineas.set(true);
     this.detalleService
-      .listarPaginadoPorDocumento<CuentaDetalleRead>(id, this.page() + 1, this.pageSize)
+      .listarPaginadoPorDocumento<CuentaDetalleRead>(id, this.page() + 1)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {

@@ -25,6 +25,12 @@ export const PEDIDO_CLIENTE_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: PEDIDO_CLIENTE_COLUMNS,
   filters: PEDIDO_CLIENTE_FILTERS,
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'pedido-cliente/list',
     new: 'pedido-cliente/nuevo',

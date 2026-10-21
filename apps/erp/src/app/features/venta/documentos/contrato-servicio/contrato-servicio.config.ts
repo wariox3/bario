@@ -30,7 +30,12 @@ export const CONTRATO_SERVICIO_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: CONTRATO_SERVICIO_COLUMNS,
   filters: CONTRATO_SERVICIO_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'contrato-servicio/list',
     new: 'contrato-servicio/nuevo',

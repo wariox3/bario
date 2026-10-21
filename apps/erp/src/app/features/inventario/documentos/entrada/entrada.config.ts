@@ -23,7 +23,12 @@ export const ENTRADA_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: ENTRADA_COLUMNS,
   filters: ENTRADA_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'entrada/list',
     new: 'entrada/nuevo',

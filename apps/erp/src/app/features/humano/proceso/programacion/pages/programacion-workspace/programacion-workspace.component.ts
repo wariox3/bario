@@ -20,7 +20,7 @@ import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-ma
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { PageActionsComponent } from '@reddoc/ui';
+import { AceptarConEnterDirective, PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { ProgramacionResumenComponent } from '../../components/programacion-resumen/programacion-resumen.component';
 import { ProgramacionAdicionalesTabComponent } from '../../components/programacion-adicionales-tab/programacion-adicionales-tab.component';
@@ -64,6 +64,7 @@ type WorkspaceTab = 'renglones' | 'adicionales';
     ButtonModule,
     ButtonGroupModule,
     ConfirmDialogModule,
+    AceptarConEnterDirective,
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
@@ -368,6 +369,8 @@ export class ProgramacionWorkspaceComponent implements OnInit {
       // contabilización) piden confirmación en rojo.
       acceptButtonStyleClass:
         accion === 'desgenerar' || accion === 'desaprobar' ? 'p-button-danger' : '',
+      // Enter aprueba; las demás piden el clic.
+      acceptButtonProps: accion === 'aprobar' ? { autofocus: true } : undefined,
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => this.ejecutar(accion),
     });

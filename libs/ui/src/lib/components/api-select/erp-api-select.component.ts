@@ -165,7 +165,7 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
       const params = this.params();
       const endpoint = this.endpoint();
       this.loading.set(true);
-      const fetch = this.dataService.fetchOptions(endpoint, params).subscribe({
+      const fetch = this.dataService.fetchAllOptions(endpoint, params).subscribe({
         next: (options) => {
           this.options.set(options);
           this.loading.set(false);

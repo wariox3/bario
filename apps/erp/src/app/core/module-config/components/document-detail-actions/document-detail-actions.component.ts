@@ -15,6 +15,7 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Menu, MenuModule } from 'primeng/menu';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
+import { AceptarConEnterDirective } from '@reddoc/ui';
 import {
   ENTITY_DATA_GATEWAY,
   I18nService,
@@ -88,6 +89,7 @@ const CONFIRMACION: Readonly<
     ButtonModule,
     ButtonGroupModule,
     ConfirmDialogModule,
+    AceptarConEnterDirective,
     MenuModule,
     ArchivosDialogComponent,
     ContabilidadDialogComponent,
@@ -288,7 +290,9 @@ export class DocumentDetailActionsComponent {
       header: a[clave].header,
       icon,
       acceptLabel: a[accion],
-      acceptButtonProps: peligrosa ? { severity: 'danger' } : undefined,
+      // Enter confirma lo que se puede deshacer; anular no, que un Enter de más
+      // congelaría el documento.
+      acceptButtonProps: peligrosa ? { severity: 'danger' } : { autofocus: true },
       rejectLabel: this.t().common.actions.cancel,
       // Cancelar baja a secundario contorneado para dar jerarquía clara: sin
       // esto PrimeNG pinta los dos botones idénticos.

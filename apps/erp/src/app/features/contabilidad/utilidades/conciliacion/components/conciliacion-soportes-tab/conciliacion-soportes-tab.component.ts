@@ -20,7 +20,6 @@ import type { ConciliacionSoporte } from '../../conciliacion.model';
 import {
   CONCILIACION_ESTADO_FILTER_FIELDS,
   CONCILIACION_SOPORTE_COLUMNS,
-  CONCILIACION_TAB_PAGE_SIZE,
 } from '../../conciliacion.constants';
 
 /**
@@ -90,7 +89,6 @@ export class ConciliacionSoportesTabComponent {
     reason: this.t().entities.conciliacion.soporteTab.plantillaNoDisponible,
   }));
 
-  protected readonly pageSize = CONCILIACION_TAB_PAGE_SIZE;
   protected readonly columns = CONCILIACION_SOPORTE_COLUMNS;
   protected readonly filterFields = CONCILIACION_ESTADO_FILTER_FIELDS;
 
@@ -236,7 +234,7 @@ export class ConciliacionSoportesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarSoportes(id, page + 1, this.pageSize, this.activeFilters())
+      .listarSoportes(id, page + 1, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

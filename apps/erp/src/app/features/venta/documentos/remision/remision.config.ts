@@ -24,6 +24,12 @@ export const REMISION_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: REMISION_COLUMNS,
   filters: REMISION_FILTERS,
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'remision/list',
     new: 'remision/nuevo',

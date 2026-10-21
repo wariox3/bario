@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseHttpService, ParamValue } from '../services/base-http.service';
 import { PaginatedResponse } from '../models/pagination.model';
+import { fetchAllPages } from '../data-list/data/fetch-all-pages';
 
 /**
  * Opción genérica `{ id, nombre }` que devuelven los endpoints `seleccionar`.
@@ -37,5 +38,20 @@ export class ErpSelectDataService extends BaseHttpService {
     params?: Record<string, ParamValue>,
   ): Observable<T[]> {
     return this.get<PaginatedResponse<T>>(endpoint, params).pipe(map((res) => [...res.results]));
+  }
+
+  /**
+   * Trae **todas** las opciones de un `seleccionar`, recorriendo las páginas.
+   *
+   * El backend pagina de a 25 sin importar el `limit`. Un autocomplete busca en
+   * el servidor y le basta `fetchOptions`; un dropdown que carga una vez y
+   * filtra en el cliente necesita el catálogo completo, o lo que pase de 25 no
+   * aparece.
+   */
+  fetchAllOptions<T = ErpSelectOption>(
+    endpoint: string,
+    params?: Record<string, ParamValue>,
+  ): Observable<T[]> {
+    return fetchAllPages((page) => this.get<PaginatedResponse<T>>(endpoint, { ...params, page }));
   }
 }

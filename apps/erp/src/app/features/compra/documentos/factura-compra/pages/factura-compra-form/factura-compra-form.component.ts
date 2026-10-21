@@ -164,10 +164,12 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
   /**
-   * La tabla de líneas está guardando o resolviendo ítems (AIU). "Guardar" espera:
+   * Alguna tabla de líneas está guardando o resolviendo ítems (AIU). "Guardar" espera:
    * un segundo lote reenviaría líneas que todavía no tienen `id`.
    */
-  protected readonly tablasOcupadas = computed(() => this.detallesTable()?.ocupado() ?? false);
+  protected readonly tablasOcupadas = computed(
+    () => (this.detallesTable()?.ocupado() ?? false) || (this.cuentasTable()?.ocupado() ?? false),
+  );
 
   /** Tabla de líneas de cuenta contable; mismo contrato de flush que la de ítems. */
   private readonly cuentasTable = viewChild(ContableDocumentoDetallesComponent);

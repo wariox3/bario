@@ -127,10 +127,9 @@
 @if (totalCount() > 0) {
   <div class="mi-table__footer">
     <p-paginator
-      [rows]="pageSize()"
+      [rows]="pageSize"
       [totalRecords]="totalCount()"
-      [first]="page() * pageSize()"
-      [rowsPerPageOptions]="rowsPerPageOptions"
+      [first]="page() * pageSize"
       (onPageChange)="pageChange.emit($event)"
     />
     <span class="mi-table__count">

@@ -17,7 +17,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '../../comercial-documento-detalle.form';
-import { LineasEnCursoError } from '../../comercial-documento-detalle.errors';
+import { LineasEnCursoError } from '../../../lineas-diferidas';
 import { ComercialDocumentoDetallesComponent } from './comercial-documento-detalles.component';
 
 const URL = '/api/general/documento-detalle/';
@@ -60,7 +60,7 @@ describe('ComercialDocumentoDetallesComponent — guardado diferido', () => {
 
   /** Quita una fila como lo hace el botón de la papelera tras confirmar. */
   function quitar(fila: ComercialDetalleGroup): void {
-    component['deleteLinea'](fila, fila.controls.id.value);
+    component['lineas'].quitar(fila);
   }
 
   beforeEach(() => {
@@ -340,5 +340,90 @@ describe('ComercialDocumentoDetallesComponent — guardado diferido', () => {
     // El siguiente guardado actualiza la línea creada, no crea otra.
     component.saveAll().subscribe();
     http.expectOne({ method: 'PATCH', url: `${URL}7/` }).flush(leida(7));
+  });
+
+  describe('quitar varias líneas', () => {
+    /** Marca las filas y las quita como lo hace el botón de la barra tras confirmar. */
+    function quitarVarias(filas: ComercialDetalleGroup[]): void {
+      for (const fila of filas) component['toggleSeleccion'](fila);
+      component['deleteLineas'](component['seleccionadas']());
+    }
+
+    it('en edición deja las persistidas para el guardado y no llama a la API', () => {
+      const [a, b, c] = [persistida(1), persistida(2), persistida(3)];
+      montar(10, [a, b, c]);
+
+      quitarVarias([a, c]);
+
+      http.expectNone(URL);
+      expect(component.detalles().controls).toEqual([b]);
+      expect(component.pendingCount()).toBe(2);
+      expect(component['seleccionadas']()).toEqual([]);
+
+      component.saveAll().subscribe();
+      http.expectOne({ method: 'DELETE', url: `${URL}1/` }).flush(null);
+      http.expectOne({ method: 'DELETE', url: `${URL}3/` }).flush(null);
+      expect(component.pendingCount()).toBe(0);
+    });
+
+    it('una línea nueva marcada solo sale de la tabla: no tiene nada que borrar', () => {
+      const guardada = persistida(1);
+      montar(10, [guardada, nueva()]);
+
+      quitarVarias([...component.detalles().controls]);
+
+      expect(component.detalles().length).toBe(0);
+      // Solo la persistida queda como baja pendiente.
+      expect(component.pendingCount()).toBe(1);
+    });
+
+    it('en alta quitar varias es solo local', () => {
+      montar(null, [nueva(), nueva()]);
+
+      quitarVarias([...component.detalles().controls]);
+      component.saveAll().subscribe();
+
+      http.expectNone(URL);
+      expect(component.detalles().length).toBe(0);
+      expect(component.pendingCount()).toBe(0);
+    });
+
+    it('marcar todas llena la cabecera; marcar algunas la deja a medias', () => {
+      const [a, b] = [persistida(1), persistida(2)];
+      montar(10, [a, b]);
+
+      component['toggleSeleccion'](a);
+      expect(component['seleccionParcial']()).toBe(true);
+      expect(component['todasSeleccionadas']()).toBe(false);
+
+      component['toggleTodas']();
+      expect(component['todasSeleccionadas']()).toBe(true);
+      expect(component['seleccionParcial']()).toBe(false);
+
+      component['toggleTodas']();
+      expect(component['seleccionadas']()).toEqual([]);
+    });
+
+    it('reemplazar las líneas vacía la selección', () => {
+      const fila = persistida(1);
+      montar(10, [fila]);
+      component['toggleSeleccion'](fila);
+
+      component.reemplazarLineas([nueva().getRawValue()]);
+
+      expect(component['seleccionadas']()).toEqual([]);
+    });
+
+    it('una fila que el guardado reconstruye deja de contar como marcada', () => {
+      const fila = nueva();
+      montar(10, [fila]);
+      component['toggleSeleccion'](fila);
+
+      component.saveAll().subscribe();
+      http.expectOne({ method: 'POST', url: URL }).flush(leida(7));
+
+      expect(component.detalles().at(0)).not.toBe(fila);
+      expect(component['seleccionadas']()).toEqual([]);
+    });
   });
 });

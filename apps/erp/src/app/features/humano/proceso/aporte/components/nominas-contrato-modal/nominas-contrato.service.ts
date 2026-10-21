@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   BaseHttpService,
-  LIST_PAGINATION_PARAMS,
   buildFiltros,
+  fetchAllPages,
   type FilterCondition,
   type PaginatedResponse,
   DOCUMENTO_CLASE_ID,
@@ -24,18 +24,6 @@ const DOCUMENTO_ENDPOINT = '/general/documento/';
 const DOCUMENTO_DETALLE_ENDPOINT = '/general/documento-detalle/';
 
 /**
- * Tope de registros del cruce. Un contrato tiene una o dos nóminas por periodo y
- * unas decenas de conceptos: se traen todos para poder totalizar sin paginar.
- */
-const LIMITE = 500;
-
-/** Una sola página con todo: el cruce se totaliza completo, no por página. */
-const PAGINA_UNICA = {
-  [LIST_PAGINATION_PARAMS.page]: 1,
-  [LIST_PAGINATION_PARAMS.size]: LIMITE,
-};
-
-/**
  * Consulta las **nóminas de un contrato dentro de un periodo** y sus conceptos.
  *
  * Vive junto al modal y no en `AporteService` porque no toca ningún endpoint del
@@ -44,6 +32,9 @@ const PAGINA_UNICA = {
  *
  * El cuerpo es el de cualquier `lista/` (`filtros` y `ordenamientos`): el ERP
  * anterior le agregaba un `serializador` que este backend no declara.
+ *
+ * El cruce se totaliza completo, no por página: las dos consultas recorren
+ * todas las páginas (el backend pagina de a 25).
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
@@ -54,18 +45,19 @@ export class NominasContratoService extends BaseHttpService {
     contratoId: number,
     desde: string | null,
     hasta: string | null,
-  ): Observable<PaginatedResponse<NominaDelContrato>> {
-    return this.post<PaginatedResponse<NominaDelContrato>>(
-      `${DOCUMENTO_ENDPOINT}lista/`,
-      {
-        filtros: buildFiltros([
-          { field: 'documento_tipo__documento_clase_id', operator: 'eq', value: NOMINA_CLASE_ID },
-          { field: 'contrato_id', operator: 'eq', value: contratoId },
-          ...rangoDeFechas('fecha', desde, hasta),
-        ]),
-        ordenamientos: ['fecha', 'id'],
-      },
-      PAGINA_UNICA,
+  ): Observable<NominaDelContrato[]> {
+    const cuerpo = {
+      filtros: buildFiltros([
+        { field: 'documento_tipo__documento_clase_id', operator: 'eq', value: NOMINA_CLASE_ID },
+        { field: 'contrato_id', operator: 'eq', value: contratoId },
+        ...rangoDeFechas('fecha', desde, hasta),
+      ]),
+      ordenamientos: ['fecha', 'id'],
+    };
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<NominaDelContrato>>(`${DOCUMENTO_ENDPOINT}lista/`, cuerpo, {
+        page,
+      }),
     );
   }
 
@@ -74,22 +66,25 @@ export class NominasContratoService extends BaseHttpService {
     contratoId: number,
     desde: string | null,
     hasta: string | null,
-  ): Observable<PaginatedResponse<LineaNominaDelContrato>> {
-    return this.post<PaginatedResponse<LineaNominaDelContrato>>(
-      `${DOCUMENTO_DETALLE_ENDPOINT}lista/`,
-      {
-        filtros: buildFiltros([
-          {
-            field: 'documento__documento_tipo__documento_clase_id',
-            operator: 'eq',
-            value: NOMINA_CLASE_ID,
-          },
-          { field: 'documento__contrato_id', operator: 'eq', value: contratoId },
-          ...rangoDeFechas('documento__fecha', desde, hasta),
-        ]),
-        ordenamientos: ['documento__fecha', 'id'],
-      },
-      PAGINA_UNICA,
+  ): Observable<LineaNominaDelContrato[]> {
+    const cuerpo = {
+      filtros: buildFiltros([
+        {
+          field: 'documento__documento_tipo__documento_clase_id',
+          operator: 'eq',
+          value: NOMINA_CLASE_ID,
+        },
+        { field: 'documento__contrato_id', operator: 'eq', value: contratoId },
+        ...rangoDeFechas('documento__fecha', desde, hasta),
+      ]),
+      ordenamientos: ['documento__fecha', 'id'],
+    };
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<LineaNominaDelContrato>>(
+        `${DOCUMENTO_DETALLE_ENDPOINT}lista/`,
+        cuerpo,
+        { page },
+      ),
     );
   }
 }

@@ -20,6 +20,7 @@ import {
 import {
   FormErrorService,
   I18nService,
+  LIST_PAGE_SIZE,
   SELECT_ENDPOINTS,
   TenantService,
   ToastService,
@@ -41,7 +42,6 @@ import { cuentaDetalleToFormValue } from '@erp/features/documentos/contable/cont
 import type { CuentaDetalleRead } from '@erp/features/documentos/contable/contable-documento-detalle.model';
 import type { CuentaDetalleFormRawValue } from '@erp/features/documentos/contable/contable-documento-detalle.types';
 import type { CargarCierreSeleccion } from '../../components/cargar-cierre-modal/cargar-cierre-modal.component';
-import { CIERRE_DETALLE_PAGE_SIZE } from '../../cierre.constants';
 import { cierreToFormValue, formValueToPayload } from '../../cierre.mapper';
 import type { CierreRead } from '../../cierre.model';
 import { CierreService } from '../../cierre.service';
@@ -106,7 +106,7 @@ export class CierreFormComponent implements OnInit {
 
   /** Catálogo de centros de costo (el "grupo" del ERP anterior). */
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
-  protected readonly pageSize = CIERRE_DETALLE_PAGE_SIZE;
+  protected readonly pageSize = LIST_PAGE_SIZE;
 
   /** Documento activo inyectado por `activeDocumentResolver` vía router binding. */
   readonly document = input.required<DocumentEntityConfig>();
@@ -322,7 +322,7 @@ export class CierreFormComponent implements OnInit {
   private loadLineas(id: number): void {
     this.isLoadingLineas.set(true);
     this.detalleService
-      .listarPaginadoPorDocumento<CuentaDetalleRead>(id, this.page() + 1, this.pageSize)
+      .listarPaginadoPorDocumento<CuentaDetalleRead>(id, this.page() + 1)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {

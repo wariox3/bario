@@ -16,7 +16,7 @@ import {
   extractErrorMessage,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
-import { PageActionsComponent } from '@reddoc/ui';
+import { AceptarConEnterDirective, PageActionsComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { AporteContratosTabComponent } from '../../components/aporte-contratos-tab/aporte-contratos-tab.component';
 import { AporteDetallesTabComponent } from '../../components/aporte-detalles-tab/aporte-detalles-tab.component';
@@ -60,6 +60,7 @@ type Pestania = 'contratos' | 'detalles' | 'entidades';
     ButtonModule,
     ButtonGroupModule,
     ConfirmDialogModule,
+    AceptarConEnterDirective,
     MenuModule,
     TabsModule,
     BreadcrumbComponent,
@@ -264,6 +265,8 @@ export class AporteWorkspaceComponent implements OnInit {
       // revierte el cierre) piden confirmación en rojo.
       acceptButtonStyleClass:
         accion === 'desgenerar' || accion === 'desaprobar' ? 'p-button-danger' : '',
+      // Enter aprueba; las demás piden el clic.
+      acceptButtonProps: accion === 'aprobar' ? { autofocus: true } : undefined,
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => this.ejecutar(accion),
     });

@@ -103,8 +103,8 @@ export class NominasContratoModalComponent {
       )
       .subscribe({
         next: ({ documentos, lineas }) => {
-          this.documentos.set(documentos.results);
-          this.lineas.set(lineas.results);
+          this.documentos.set(documentos);
+          this.lineas.set(lineas);
         },
         error: () =>
           this.toast.error(

@@ -7,7 +7,6 @@ import type { FilterCondition, ListQuery, SortSpec } from './list-query.types';
  */
 const PARAM_NAMES = {
   page: 'page',
-  pageSize: 'page_size',
   ordering: 'ordering',
 } as const;
 
@@ -27,9 +26,7 @@ const PARAM_NAMES = {
  * duplicar la convención.
  */
 export function serializeListQuery(query: ListQuery): HttpParams {
-  let params = new HttpParams()
-    .set(PARAM_NAMES.page, String(query.page + 1))
-    .set(PARAM_NAMES.pageSize, String(query.pageSize));
+  let params = new HttpParams().set(PARAM_NAMES.page, String(query.page + 1));
 
   for (const condition of query.filters) {
     params = appendFilter(params, condition);

@@ -83,7 +83,7 @@ export class AporteEntidadesTabComponent {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: (response) => this.entidades.set(response.results),
+        next: (entidades) => this.entidades.set(entidades),
         error: () => {
           this.entidades.set([]);
           this.toast.error(

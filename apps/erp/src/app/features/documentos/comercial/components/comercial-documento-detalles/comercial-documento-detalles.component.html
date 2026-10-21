@@ -32,6 +32,18 @@
         {{ pendingCount() }} {{ t().entities.comercialDetalle.pendingSuffix }}
       </span>
     }
+    @if (seleccionadas().length > 0) {
+      <p-button
+        type="button"
+        size="small"
+        icon="pi pi-trash"
+        severity="danger"
+        [label]="t().entities.comercialDetalle.removeSelected + ' (' + seleccionadas().length + ')'"
+        [outlined]="true"
+        [disabled]="ocupado()"
+        (onClick)="removeSeleccionadas()"
+      />
+    }
     @if (addLineMenu().length > 0) {
       <p-splitbutton
         [label]="t().entities.comercialDetalle.addLine"
@@ -60,6 +72,16 @@
     <table class="comercial-detalle-table">
       <thead>
         <tr>
+          <th class="comercial-detalle-table__th w-9 text-center">
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="todasSeleccionadas()"
+              [indeterminate]="seleccionParcial()"
+              [disabled]="detalles().length === 0 || ocupado()"
+              [ariaLabel]="t().entities.comercialDetalle.selectAllLines"
+              (onChange)="toggleTodas()"
+            />
+          </th>
           <th class="comercial-detalle-table__th w-10 text-center">
             {{ t().entities.comercialDetalle.columns.linea }}
           </th>
@@ -105,7 +127,19 @@
             [formGroup]="row"
             class="comercial-detalle-table__row"
             [class.comercial-detalle-table__row--pending]="isPending(row)"
+            [class.comercial-detalle-table__row--selected]="estaSeleccionada(row)"
           >
+            <td class="comercial-detalle-table__td text-center">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="estaSeleccionada(row)"
+                [ngModelOptions]="{ standalone: true }"
+                [disabled]="ocupado()"
+                [ariaLabel]="t().entities.comercialDetalle.selectLine + ' ' + (i + 1)"
+                (onChange)="toggleSeleccion(row)"
+              />
+            </td>
+
             <td class="comercial-detalle-table__td text-center text-brand-muted tabular-nums">
               @if (isPending(row)) {
                 <span

@@ -4,6 +4,7 @@ import {
   BaseHttpService,
   buildListBody,
   buildListParams,
+  fetchAllPages,
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
@@ -24,12 +25,6 @@ export const LIQUIDACION_ENDPOINT = '/humano/liquidacion/';
  * **guion**, que es la convención de endpoints de este ERP.
  */
 export const LIQUIDACION_ADICIONAL_ENDPOINT = '/humano/liquidacion-adicional/';
-
-/**
- * Tope de adicionales por liquidación. Son unos pocos conceptos cargados a mano,
- * no un listado: se traen todos para poder totalizar sin paginar.
- */
-const ADICIONALES_LIMITE = 200;
 
 /**
  * Servicio de la **liquidación**: la consulta de la cabecera, sus adicionales y
@@ -89,23 +84,24 @@ export class LiquidacionService extends BaseHttpService {
   // ── Adicionales ───────────────────────────────────────────────────────────
 
   /**
-   * Todos los adicionales de la liquidación en una sola página, para poder
-   * totalizar sin paginar.
+   * Todos los adicionales de la liquidación, recorriendo las páginas, para
+   * poder totalizar sin paginar.
    *
    * Va por `POST …/lista/` con el filtro y el orden en el cuerpo: el recurso no
    * publica `GET` en la raíz.
    */
-  listarAdicionales(liquidacionId: number): Observable<PaginatedResponse<LiquidacionAdicional>> {
+  listarAdicionales(liquidacionId: number): Observable<LiquidacionAdicional[]> {
     const query: ListQuery = {
       filters: [{ field: 'liquidacion_id', operator: 'eq', value: liquidacionId }],
       sort: [{ field: 'id', direction: 'asc' }],
       page: 0,
-      pageSize: ADICIONALES_LIMITE,
     };
-    return this.post<PaginatedResponse<LiquidacionAdicional>>(
-      `${LIQUIDACION_ADICIONAL_ENDPOINT}lista/`,
-      buildListBody(query),
-      buildListParams(query),
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<LiquidacionAdicional>>(
+        `${LIQUIDACION_ADICIONAL_ENDPOINT}lista/`,
+        buildListBody(query),
+        { page },
+      ),
     );
   }
 

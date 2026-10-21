@@ -5,7 +5,6 @@ const FILTRADO: ListQuery = {
   filters: [{ field: 'contacto_id', operator: 'eq', value: 3 }],
   sort: [],
   page: 0,
-  pageSize: 25,
 };
 const SIN_FILTROS: ListQuery = { ...FILTRADO, filters: [] };
 

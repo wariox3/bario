@@ -5,7 +5,7 @@
  * testeada, y no repartida en un servicio con estado como en el ERP anterior
  * —donde además se agrupaba sobre **una página de 50 registros**, de modo que con
  * más entidades los subtotales y el total general quedaban mal—. Por eso el
- * servicio las trae todas de una (`listarEntidades`).
+ * servicio las trae todas, recorriendo las páginas (`listarEntidades`).
  */
 import { toFiniteNumber } from '@reddoc/core';
 import type { AporteEntidad } from './aporte.model';

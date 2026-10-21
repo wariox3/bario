@@ -26,7 +26,6 @@ import type { ConciliacionDetalle } from '../../conciliacion.model';
 import {
   CONCILIACION_DETALLE_COLUMNS,
   CONCILIACION_ESTADO_FILTER_FIELDS,
-  CONCILIACION_TAB_PAGE_SIZE,
 } from '../../conciliacion.constants';
 
 /**
@@ -87,7 +86,6 @@ export class ConciliacionDetallesTabComponent {
   /** Alguna operación en vuelo: bloquea toda la botonera para no encadenarlas. */
   protected readonly isBusy = signal(false);
 
-  protected readonly pageSize = CONCILIACION_TAB_PAGE_SIZE;
   protected readonly columns = CONCILIACION_DETALLE_COLUMNS;
   protected readonly filterFields = CONCILIACION_ESTADO_FILTER_FIELDS;
 
@@ -271,7 +269,7 @@ export class ConciliacionDetallesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarDetalles(id, page + 1, this.pageSize, this.activeFilters())
+      .listarDetalles(id, page + 1, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

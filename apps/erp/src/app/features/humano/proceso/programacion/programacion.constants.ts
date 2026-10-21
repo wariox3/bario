@@ -17,9 +17,6 @@ export const RENGLONES_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.programacion.renglones.columns.id', type: 'number' },
 ];
 
-/** Filas por página de la tabla de renglones del workspace. */
-export const PROGRAMACION_RENGLONES_PAGE_SIZE = 25;
-
 /**
  * Catálogos de la cabecera.
  *

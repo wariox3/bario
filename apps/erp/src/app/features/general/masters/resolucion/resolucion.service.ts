@@ -4,6 +4,7 @@ import {
   BaseHttpService,
   buildListBody,
   buildListParams,
+  fetchAllPages,
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
@@ -13,12 +14,6 @@ import {
   type ResolucionPayload,
   type ResolucionTipo,
 } from './resolucion.model';
-
-/**
- * Tope de la consulta de existentes: una página de la DIAN trae 10 resoluciones,
- * así que los dos `in` devuelven a lo sumo unas pocas.
- */
-const EXISTENTES_PAGE_SIZE = 100;
 
 @Injectable({ providedIn: 'root' })
 export class ResolucionService extends BaseHttpService {
@@ -87,14 +82,15 @@ export class ResolucionService extends BaseHttpService {
       ],
       sort: [],
       page: 0,
-      pageSize: EXISTENTES_PAGE_SIZE,
     };
-    return this.post<PaginatedResponse<Resolucion>>(
-      this.resourcePath + 'lista/',
-      buildListBody(query),
-      buildListParams(query),
-      { errorToast: false },
-    ).pipe(map((response) => response.results));
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<Resolucion>>(
+        this.resourcePath + 'lista/',
+        buildListBody(query),
+        { page },
+        { errorToast: false },
+      ),
+    );
   }
 
   /**

@@ -65,7 +65,6 @@ export class CuentaCobrarListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
     this.filterStorage.read(CUENTA_COBRAR_FILTERS_STORAGE_KEY),
@@ -102,7 +101,6 @@ export class CuentaCobrarListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -167,7 +165,6 @@ export class CuentaCobrarListComponent {
       filters: this.activeFilters(),
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

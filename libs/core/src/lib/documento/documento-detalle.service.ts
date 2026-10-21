@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { BaseHttpService } from '../services/base-http.service';
 import type { BackendFilter } from '../data-list/data/build-list-body';
+import { fetchAllPages } from '../data-list/data/fetch-all-pages';
 import type { PaginatedResponse } from '../models/pagination.model';
 
 /** Endpoint CRUD de líneas de documento (compartido por todos los documentos). */
 const DOCUMENTO_DETALLE_ENDPOINT = '/general/documento-detalle/';
-
-/**
- * Tamaño de página al traer las líneas de un documento. Un documento real no
- * llega a este volumen de líneas, así que pedimos todo en una sola página y
- * evitamos paginar la edición.
- */
-const DETALLE_PAGE_SIZE = 1000;
 
 /**
  * CRUD de **líneas de documento** (`/api/general/documento-detalle/`).
@@ -33,14 +26,17 @@ export class DocumentoDetalleService extends BaseHttpService {
    * Lista las líneas de un documento (`GET …documento-detalle/?documento_id=`).
    *
    * Desde que la cabecera (`GET documento/:id/`) dejó de embeber `detalles`, la
-   * edición trae las líneas en una segunda petición a este endpoint. Respuesta
-   * paginada estándar (`PaginatedResponse`); devolvemos solo los `results`.
+   * edición trae las líneas en una segunda petición a este endpoint. El
+   * backend pagina de a 25 sin importar el `limit`, así que se recorren todas
+   * las páginas: la edición necesita el documento completo.
    */
   listarPorDocumento<TRead = unknown>(documentoId: number): Observable<TRead[]> {
-    return this.get<PaginatedResponse<TRead>>(DOCUMENTO_DETALLE_ENDPOINT, {
-      documento_id: documentoId,
-      limit: DETALLE_PAGE_SIZE,
-    }).pipe(map((res) => [...res.results]));
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<TRead>>(DOCUMENTO_DETALLE_ENDPOINT, {
+        documento_id: documentoId,
+        page,
+      }),
+    );
   }
 
   /**
@@ -51,20 +47,19 @@ export class DocumentoDetalleService extends BaseHttpService {
    * Lo pide el cierre contable, el único documento que puede traer más líneas de
    * las que cabe mostrar de una: cierra todas las cuentas de resultado y, según
    * cómo se configure, las abre por tercero. El resto de los documentos siguen
-   * con `listarPorDocumento`, que trae todo en una sola página.
+   * con `listarPorDocumento`, que trae todas las páginas.
    *
    * `page` es **1-based**, como espera el backend (misma convención que
-   * `LIST_PAGINATION_PARAMS` en los listados).
+   * `LIST_PAGINATION_PARAMS` en los listados). El tamaño es el fijo del
+   * backend (`LIST_PAGE_SIZE`).
    */
   listarPaginadoPorDocumento<TRead = unknown>(
     documentoId: number,
     page: number,
-    limit: number,
   ): Observable<PaginatedResponse<TRead>> {
     return this.get<PaginatedResponse<TRead>>(DOCUMENTO_DETALLE_ENDPOINT, {
       documento_id: documentoId,
       page,
-      limit,
     });
   }
 
@@ -76,22 +71,21 @@ export class DocumentoDetalleService extends BaseHttpService {
   /**
    * Lista líneas por **filtros arbitrarios** vía `POST …documento-detalle/lista/`
    * (misma convención de filtros que el listado de documentos: `buildFiltros`
-   * arma el array desde condiciones del front). La paginación viaja como query
-   * param (`?limit=`); respuesta paginada estándar, devolvemos `results`.
+   * arma el array desde condiciones del front). Recorre todas las páginas y
+   * devuelve las filas juntas.
    *
    * ⚠️ El backend solo aplica los filtros cuya `propiedad` esté en la whitelist
    * `campos_filtrables` del endpoint. Una propiedad no declarada **no da error**:
    * devuelve la lista sin filtrar. Confirmar cada campo antes de usarlo.
    */
-  listarPorFiltros<TRead = unknown>(
-    filtros: readonly BackendFilter[],
-    limit: number = DETALLE_PAGE_SIZE,
-  ): Observable<TRead[]> {
-    return this.post<PaginatedResponse<TRead>>(
-      `${DOCUMENTO_DETALLE_ENDPOINT}lista/`,
-      { filtros },
-      { limit },
-    ).pipe(map((res) => [...res.results]));
+  listarPorFiltros<TRead = unknown>(filtros: readonly BackendFilter[]): Observable<TRead[]> {
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<TRead>>(
+        `${DOCUMENTO_DETALLE_ENDPOINT}lista/`,
+        { filtros },
+        { page },
+      ),
+    );
   }
 
   /**
@@ -112,8 +106,8 @@ export class DocumentoDetalleService extends BaseHttpService {
   /**
    * Alta **masiva** de líneas en un documento existente
    * (`POST /general/documento-detalle/masivo/`). Una sola request para N líneas.
-   * La tabla de líneas comerciales ya no la usa (sus altas esperan al guardado del
-   * documento); hoy la consume la tabla de cuentas contables.
+   * Hoy no la usa ninguna tabla: las líneas comerciales y las de cuenta contable
+   * esperan al guardado del documento y se escriben fila por fila (`LineasDiferidas`).
    *
    * La forma de la respuesta del backend está pendiente de confirmar (¿devuelve
    * las líneas creadas o solo un OK?); por eso el tipo de lectura se parametriza

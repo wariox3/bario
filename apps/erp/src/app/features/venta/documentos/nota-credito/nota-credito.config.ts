@@ -33,7 +33,12 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: NOTA_CREDITO_COLUMNS,
   filters: NOTA_CREDITO_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'nota-credito/list',
     new: 'nota-credito/nuevo',

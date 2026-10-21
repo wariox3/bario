@@ -26,7 +26,12 @@ export const NOTA_AJUSTE_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: NOTA_AJUSTE_COLUMNS,
   filters: NOTA_AJUSTE_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'nota-ajuste/list',
     new: 'nota-ajuste/nuevo',

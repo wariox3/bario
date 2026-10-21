@@ -58,10 +58,11 @@ export interface SortSpec {
 export interface ListQuery {
   readonly filters: readonly FilterCondition[];
   readonly sort: readonly SortSpec[];
-  /** Índice de página (0-based). */
+  /**
+   * Índice de página (0-based). El tamaño no se elige: el backend pagina
+   * siempre de a `LIST_PAGE_SIZE`.
+   */
   readonly page: number;
-  /** Tamaño de página. */
-  readonly pageSize: number;
 }
 
 /**

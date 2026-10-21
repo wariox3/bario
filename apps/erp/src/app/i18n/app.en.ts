@@ -809,10 +809,6 @@ export const en: AppDict = {
         title: 'Documents added',
         desc: 'The selected documents were added as lines.',
       },
-      addError: {
-        title: 'Add failed',
-        desc: 'Could not add the documents. Please try again.',
-      },
     },
   },
   modules: {
@@ -4070,6 +4066,10 @@ export const en: AppDict = {
       detallePlaceholder: 'Note…',
       almacenPlaceholder: 'Warehouse…',
       confirmDeleteLine: 'Remove this line from the document?',
+      confirmDeleteLines: 'Remove {count} lines from the document?',
+      removeSelected: 'Remove selected',
+      selectLine: 'Select line',
+      selectAllLines: 'Select all lines',
       createItem: 'Create item',
       extraerIva: {
         title: 'Tax-inclusive price',
@@ -4346,8 +4346,6 @@ export const en: AppDict = {
       empty: 'No accounts yet. Add the first one to get started',
       addLine: 'Add account',
       removeLine: 'Remove account',
-      saveLine: 'Save account',
-      saveAll: 'Save accounts',
       pendingSuffix: 'unsaved',
       cuentaPlaceholder: 'Search account…',
       contactoPlaceholder: 'Search contact…',
@@ -4377,21 +4375,9 @@ export const en: AppDict = {
         diferencia: 'Difference',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Account saved',
-          desc: 'The account was saved successfully',
-        },
         lineSaveError: {
           title: 'Save failed',
           desc: 'The account could not be saved',
-        },
-        allSaved: {
-          title: 'Accounts saved',
-          desc: 'Pending accounts were saved',
-        },
-        incompleteLines: {
-          title: 'Incomplete accounts',
-          desc: 'Complete or remove accounts without an account or amount before saving',
         },
       },
     },

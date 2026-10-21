@@ -70,7 +70,6 @@ export class ResolucionDianDialogComponent {
 
   protected readonly columns = RESOLUCIONES_DIAN_COLUMNS;
   protected readonly pageSize = RESOLUCIONES_DIAN_PAGE_SIZE;
-  protected readonly rowsPerPageOptions = [RESOLUCIONES_DIAN_PAGE_SIZE] as const;
 
   protected readonly items = signal<readonly ResolucionDianRow[]>([]);
   protected readonly totalCount = signal(0);

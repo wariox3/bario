@@ -185,7 +185,6 @@ export class CorreosRecibidosListComponent {
   }
 
   protected onPageChange(event: PageChangeEvent): void {
-    this.pageSize.set(event.pageSize);
     this.currentPage.set(event.page);
   }
 

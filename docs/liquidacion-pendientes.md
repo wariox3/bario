@@ -12,7 +12,7 @@ Convenciones que asume el frontend:
 - Las acciones sobre una liquidación la identifican con **`liquidacion_id`** en el cuerpo
   (no `id`) y responden la liquidación actualizada.
 - Los adicionales se listan por **`POST liquidacion-adicional/lista/`** con
-  `{ filtros, ordenamientos }` en el cuerpo y `?page=&limit=` en la URL.
+  `{ filtros, ordenamientos }` en el cuerpo y `?page=` en la URL (el backend pagina de a 25).
 - Las FK van **sin `_id`** al escribir y al leer, y **con `_id`** al filtrar en un
   `lista/` (estándar decidido; si un `lista/` rechaza `x_id`, se agrega en el backend).
 

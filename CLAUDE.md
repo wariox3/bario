@@ -112,6 +112,7 @@ BaseAuthService<TUser extends BaseUsuario>   (libs/core)
 - Tipos: `ColumnDef`, `FilterField`, `ListQuery`, `ListResponse`, `FilterCondition`, `SortSpec`.
 - `serializeListQuery(query)` — convención Django REST de query-params (filtros `field__operator=value`, ordering, paginación).
 - `FilterStorageService` — persistencia agnóstica de filtros en localStorage por `storageKey: string`.
+- **Paginación fija de 25** — el backend pagina siempre de a `LIST_PAGE_SIZE` (25) e ignora `limit`/`page_size`. No se manda tamaño (`ListQuery` no tiene `pageSize`; `buildListParams` solo arma `?page=`) y `<lib-data-table>` no ofrece selector. Pedir otro tamaño desalinea el paginador: con 10 se ven 10 de 25 y la página siguiente da 404 «Página inválida». Para traer **todo** un recurso (líneas, pagos, catálogos) se usa `fetchAllPages`, nunca un `limit: 1000`; `lib-api-select` ya carga su catálogo así. Excepciones con contrato propio: `lista-dian/` (10) y recepción electrónica (`page_size`).
 
 Cualquier app del monorepo puede usarlos para construir listas paginadas.
 

@@ -101,7 +101,6 @@ export class EmitirDocumentoElectronicoComponent implements OnInit {
   protected readonly isLoading = signal(false);
   protected readonly isProcessing = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
   protected readonly selectedRows = signal<readonly DocumentoPorEmitirFila[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
@@ -152,7 +151,6 @@ export class EmitirDocumentoElectronicoComponent implements OnInit {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -263,7 +261,6 @@ export class EmitirDocumentoElectronicoComponent implements OnInit {
       filters: this.activeFilters(),
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

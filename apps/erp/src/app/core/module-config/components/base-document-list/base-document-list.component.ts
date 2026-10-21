@@ -50,9 +50,6 @@ import { ModuleNavigationStore } from '../../module-navigation.store';
 import { buildEntityStorageKey } from '../../storage/build-entity-storage-key';
 import { DocumentoAfectacionModalComponent } from '../documento-afectacion-modal/documento-afectacion-modal.component';
 
-/** Tamaño de página default mientras `DocumentEntityConfig` no exponga `paginationDefaults`. */
-const DEFAULT_PAGE_SIZE = 25;
-
 /**
  * Acción de la celda `id` cuando el documento declara `canViewAfectacion`. Sale
  * por `rowActionInvoked`, como las acciones de fila.
@@ -129,7 +126,6 @@ export class BaseDocumentListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(DEFAULT_PAGE_SIZE);
   protected readonly sort = signal<readonly SortSpec[]>([]);
   protected readonly selectedRows = signal<readonly unknown[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
@@ -300,8 +296,8 @@ export class BaseDocumentListComponent {
     // restauramos los filtros guardados y recargamos la lista.
     //
     // El `effect` debe reaccionar SOLO al cambio de documento/módulo (`storageKey`).
-    // El cuerpo va en `untracked` porque `loadList()` lee `currentPage`/`pageSize`/
-    // `sort`/`activeFilters`: sin `untracked`, esas señales se volverían
+    // El cuerpo va en `untracked` porque `loadList()` lee `currentPage`/`sort`/
+    // `activeFilters`: sin `untracked`, esas señales se volverían
     // dependencias y cada cambio de página re-dispararía el effect, que resetea
     // `currentPage` a 0 → la paginación rebotaría siempre a la primera página.
     effect(() => {
@@ -319,7 +315,6 @@ export class BaseDocumentListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -441,7 +436,6 @@ export class BaseDocumentListComponent {
       filters: this.activeFilters(),
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
   }
 

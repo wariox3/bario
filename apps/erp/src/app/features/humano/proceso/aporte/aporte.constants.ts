@@ -8,10 +8,6 @@ export const APORTES_FILTERS_STORAGE_KEY = 'aportes:filters:v1';
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const APORTE_LIST_PATH = ['humano', 'proceso', 'aporte'] as const;
 
-/** Filas por página de las tablas de contratos y de líneas del workspace. */
-export const APORTE_CONTRATOS_PAGE_SIZE = 25;
-export const APORTE_DETALLES_PAGE_SIZE = 25;
-
 /**
  * Catálogos de la cabecera.
  *
