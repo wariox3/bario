@@ -101,13 +101,14 @@ export interface ContactoPayload {
 
 /**
  * Respuesta de la consulta a la DIAN (`consulta-dian/`).
- * `encontrado` indica si la identificación existe en el registro; cuando es
- * `false`, los demás campos vienen `null`. `nit` es un string (eco del número
- * consultado) que no usamos para autocompletar.
+ * `existe` indica si la identificación figura en el registro; cuando es `false`
+ * nombre y correo llegan vacíos y `mensaje` trae el motivo que da la DIAN.
+ * `codigo` es el estado que devuelve la DIAN (`"200"`, `"404"`); no lo usamos.
  */
 export interface ConsultaDianResponse {
-  readonly encontrado: boolean;
-  readonly nit: string | null;
-  readonly nombre: string | null;
-  readonly correo: string | null;
+  readonly existe: boolean;
+  readonly nombre: string;
+  readonly correo: string;
+  readonly codigo: string;
+  readonly mensaje: string;
 }

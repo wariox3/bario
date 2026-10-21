@@ -143,6 +143,8 @@
                 [label]="t().entities.contacto.form.dian.button"
                 icon="pi pi-search"
                 severity="secondary"
+                class="flex"
+                styleClass="!h-full"
                 [loading]="isConsultingDian()"
                 [disabled]="!canConsultarDian()"
                 (onClick)="consultarDian()"
