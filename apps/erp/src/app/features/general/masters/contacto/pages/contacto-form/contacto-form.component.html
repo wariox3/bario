@@ -330,6 +330,16 @@
               {{ t().entities.contacto.form.fields.empleado }}
             </span>
           </label>
+          <label for="estado_inactivo" class="flex cursor-pointer items-center gap-2">
+            <p-checkbox
+              inputId="estado_inactivo"
+              formControlName="estado_inactivo"
+              [binary]="true"
+            />
+            <span class="text-[0.85rem] text-brand-text">
+              {{ t().entities.contacto.form.fields.inactivo }}
+            </span>
+          </label>
         </div>
       </div>
     </div>

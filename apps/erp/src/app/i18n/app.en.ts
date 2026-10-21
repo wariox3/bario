@@ -1172,6 +1172,7 @@ export const en: AppDict = {
         cliente: 'CLI',
         proveedor: 'PRO',
         empleado: 'EMP',
+        inactivo: 'INA',
       },
       form: {
         createTitle: 'new contact',
@@ -1211,6 +1212,7 @@ export const en: AppDict = {
           cliente: 'Customer',
           proveedor: 'Supplier',
           empleado: 'Employee',
+          inactivo: 'Inactive',
           plazoPago: 'Payment term',
           precio: 'Price list',
           asesor: 'Advisor',

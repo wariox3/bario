@@ -162,6 +162,7 @@ export class ContactoFormComponent implements OnInit {
     cliente: [true],
     proveedor: [false],
     empleado: [false],
+    estado_inactivo: [false],
     plazo_pago: this.fb.control<ErpSelectOption | null>(null),
     precio: this.fb.control<ErpSelectOption | null>(null),
     asesor: this.fb.control<ErpSelectOption | null>(null),

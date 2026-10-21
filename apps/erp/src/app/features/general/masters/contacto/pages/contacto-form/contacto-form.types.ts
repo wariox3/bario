@@ -25,6 +25,7 @@ export interface ContactoFormRawValue {
   readonly cliente: boolean | null;
   readonly proveedor: boolean | null;
   readonly empleado: boolean | null;
+  readonly estado_inactivo: boolean | null;
   readonly plazo_pago: ErpSelectOption | null;
   readonly precio: ErpSelectOption | null;
   readonly asesor: ErpSelectOption | null;

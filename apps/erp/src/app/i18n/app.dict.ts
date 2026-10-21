@@ -906,6 +906,7 @@ export interface AppDict
         cliente: string;
         proveedor: string;
         empleado: string;
+        inactivo: string;
       };
       form: {
         createTitle: string;
@@ -937,6 +938,7 @@ export interface AppDict
           cliente: string;
           proveedor: string;
           empleado: string;
+          inactivo: string;
           plazoPago: string;
           precio: string;
           asesor: string;
