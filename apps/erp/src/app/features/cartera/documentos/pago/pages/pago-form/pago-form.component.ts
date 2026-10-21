@@ -53,6 +53,7 @@ import type { AppDict } from '@erp/i18n';
 import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
 import {
   createCuentaDetalleGroup,
+  propagarContactoALineas,
   type CuentaDetalleGroup,
 } from '@erp/features/documentos/contable/contable-documento-detalle.form';
 import {
@@ -189,7 +190,7 @@ export class PagoFormComponent implements OnInit, CanComponentDeactivate {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((contacto) => {
         this.contactoCabecera.set(contacto);
-        this.propagarContactoALineas(contacto);
+        propagarContactoALineas(this.form.controls.detalles, contacto);
       });
   }
 
@@ -310,20 +311,6 @@ export class PagoFormComponent implements OnInit, CanComponentDeactivate {
   /** Neto del recaudo (`créditos − débitos`), la misma cuenta que viaja en `total`. */
   private totalNeto(): number {
     return calcularResumenContable(this.form.controls.detalles.getRawValue()).total;
-  }
-
-  /**
-   * Replica el contacto de la cabecera en las líneas que aún no se guardaron.
-   *
-   * Una línea libre nace con el tercero del documento, pero solo mientras sea
-   * suya: las ya persistidas conservan el que tengan (cambiarlas es decisión
-   * explícita del usuario, fila por fila).
-   */
-  private propagarContactoALineas(contacto: ErpSelectOption | null): void {
-    for (const group of this.form.controls.detalles.controls) {
-      if (group.controls.id.value !== null) continue;
-      group.controls.contacto.setValue(contacto);
-    }
   }
 
   /**

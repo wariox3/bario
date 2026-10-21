@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import type { ErpSelectOption } from '@reddoc/core';
 import type {
   CuentaDetalleFormRawValue,
@@ -35,8 +35,9 @@ export type CuentaDetalleGroup = FormGroup<{
  * Ninguno es obligatorio —solo `cuenta` y `valor` lo son—, así que prender una
  * columna nunca puede dejar una línea inválida.
  *
- * Una línea **enlazada** (`documento_afectado != null`) nace con `cuenta` y
- * `naturaleza` deshabilitadas: su imputación la fija el cruce, no el usuario.
+ * Una línea **enlazada** (`documento_afectado != null`) nace con `cuenta`,
+ * `naturaleza` y `contacto` deshabilitados: su imputación y su tercero los fija el
+ * cruce, no el usuario.
  * El componente lee todo con `getRawValue()`, así que los disabled no se pierden.
  * Si el cruce llega **sin cuenta** (hueco del contrato), `cuenta` queda
  * habilitada: un disabled en null pasaría la validación en silencio; así el
@@ -59,7 +60,10 @@ export function createCuentaDetalleGroup(
     valor: new FormControl<number | null>(value?.valor ?? null, {
       validators: [Validators.required, Validators.min(0.01)],
     }),
-    contacto: new FormControl<ErpSelectOption | null>(value?.contacto ?? null),
+    contacto: new FormControl<ErpSelectOption | null>({
+      value: value?.contacto ?? null,
+      disabled: enlazada,
+    }),
     centro_costo: new FormControl<ErpSelectOption | null>(value?.centro_costo ?? null),
     base: new FormControl<number | null>(value?.base ?? 0),
     numero: new FormControl<number | null>(value?.numero ?? null),
@@ -70,4 +74,23 @@ export function createCuentaDetalleGroup(
     ),
     documento_afectado_tipo: new FormControl<string | null>(value?.documento_afectado_tipo ?? null),
   });
+}
+
+/**
+ * Replica el contacto de la cabecera en las líneas manuales que aún no se guardaron.
+ *
+ * Una línea libre nace con el tercero del documento, pero solo mientras sea
+ * suya: las ya persistidas conservan el que tengan (cambiarlas es decisión
+ * explícita del usuario, fila por fila) y las enlazadas a un documento conservan
+ * el del documento que cruzan.
+ */
+export function propagarContactoALineas(
+  detalles: FormArray<CuentaDetalleGroup>,
+  contacto: ErpSelectOption | null,
+): void {
+  for (const group of detalles.controls) {
+    if (group.controls.id.value !== null) continue;
+    if (group.controls.documento_afectado.value !== null) continue;
+    group.controls.contacto.setValue(contacto);
+  }
 }
