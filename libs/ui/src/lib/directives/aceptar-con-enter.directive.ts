@@ -1,7 +1,6 @@
-import { DOCUMENT, DestroyRef, Directive, type OnInit, inject } from '@angular/core';
+import { DOCUMENT, DestroyRef, Directive, type OnInit, inject, input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialog } from 'primeng/confirmdialog';
 import { fromEvent, merge } from 'rxjs';
 
 /** El `<button>` del aceptar: la clase va en el host `p-button` o en el propio botón. */
@@ -27,16 +26,23 @@ const SELECTOR_ACEPTAR =
  * persona toca algo —tecla o puntero—, todo foco que entre al diálogo se lleva al
  * aceptar. Tab, Escape o un clic devuelven el control de inmediato. Las acciones
  * irreversibles no lo piden, para que un Enter de más no las dispare.
+ *
+ * No inyecta `ConfirmDialog`: este archivo sale por el barrel de `@reddoc/ui`, que
+ * algunas apps cargan eager, y traer `primeng/confirmdialog` como valor lo metería
+ * en su bundle inicial. El `key` se lee como
+ * input propio, el mismo que recibe el diálogo.
  */
 @Directive({
   selector: 'p-confirmdialog[libAceptarConEnter], p-confirmDialog[libAceptarConEnter]',
   standalone: true,
 })
 export class AceptarConEnterDirective implements OnInit {
-  private readonly confirmDialog = inject(ConfirmDialog);
   private readonly confirmation = inject(ConfirmationService);
   private readonly document = inject(DOCUMENT);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** El `key` del `<p-confirmdialog>`: solo se atienden sus confirmaciones. */
+  readonly key = input<string>();
 
   /** Hay una confirmación con Enter abierta y la persona aún no tocó nada. */
   private armado = false;
@@ -46,12 +52,8 @@ export class AceptarConEnterDirective implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((c) => {
         const props: { readonly autofocus?: boolean } | undefined = c?.acceptButtonProps;
-        this.armado = c?.key === this.confirmDialog.key && props?.autofocus === true;
+        this.armado = c?.key === this.key() && props?.autofocus === true;
       });
-
-    this.confirmDialog.onHide
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => (this.armado = false));
 
     // En captura: el keydown que abrió el diálogo ya pasó por aquí antes de armarlo.
     merge(

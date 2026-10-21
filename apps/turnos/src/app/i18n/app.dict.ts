@@ -4,7 +4,7 @@ import type {
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
-} from '@reddoc/ui';
+} from '@reddoc/ui/i18n';
 
 export interface AppDict
   extends
