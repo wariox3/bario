@@ -46,6 +46,7 @@ export type {
 } from './lib/components/accesos-contenedor/i18n';
 export { accesosContenedorEs, accesosContenedorEn } from './lib/components/accesos-contenedor/i18n';
 export { PhoneInputComponent } from './lib/components/phone-input/phone-input.component';
+export { EmailChipsInputComponent } from './lib/components/email-chips-input/email-chips-input.component';
 export type { PhoneInputDict, PhoneInputTranslationsHost } from './lib/components/phone-input/i18n';
 export { phoneInputEs, phoneInputEn } from './lib/components/phone-input/i18n';
 export { AppSwitcherComponent } from './lib/app-switcher/app-switcher.component';

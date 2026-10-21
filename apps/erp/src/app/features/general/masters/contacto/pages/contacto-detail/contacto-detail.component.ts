@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { I18nService, TenantService, ToastService, partirCorreos } from '@reddoc/core';
 import { TelefonoPipe } from '@reddoc/ui';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
@@ -140,6 +140,11 @@ export class ContactoDetailComponent implements OnInit {
     const c = this.contacto();
     return c ? direccionLineasDe(c) : [];
   });
+
+  /** El campo guarda varios correos unidos por `;`: cada uno se pinta como su badge. */
+  protected readonly correosFacturacion = computed<readonly string[]>(() =>
+    partirCorreos(this.contacto()?.correo_facturacion_electronica),
+  );
 
   /** Pills de rol activas según los flags del contacto. */
   protected readonly roles = computed<readonly ContactoRol[]>(() => {

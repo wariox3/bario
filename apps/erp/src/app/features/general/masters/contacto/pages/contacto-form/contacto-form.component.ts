@@ -17,6 +17,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import {
   CiudadAutocompleteComponent,
+  EmailChipsInputComponent,
   FieldErrorComponent,
   FocusInvalidDirective,
   PageActionsComponent,
@@ -30,6 +31,7 @@ import {
   TenantService,
   ToastService,
   TIPO_PERSONA,
+  agregarCorreo,
   calcularDigitoVerificacion,
   type NumeroIdentificacionSnapshot,
   numeroIdentificacionUnicoValidator,
@@ -66,6 +68,7 @@ import { contactoToFormValue, formValueToPayload } from '../../contacto.mapper';
     ErpAsesorSelectComponent,
     ErpApiAutocompleteComponent,
     PhoneInputComponent,
+    EmailChipsInputComponent,
     CiudadAutocompleteComponent,
   ],
   templateUrl: './contacto-form.component.html',
@@ -166,7 +169,9 @@ export class ContactoFormComponent implements OnInit {
     plazo_pago: this.fb.control<ErpSelectOption | null>(null),
     precio: this.fb.control<ErpSelectOption | null>(null),
     asesor: this.fb.control<ErpSelectOption | null>(null),
-    correo_facturacion_electronica: ['', Validators.email],
+    // Varios correos unidos por `;`: la validación de cada uno la aporta
+    // `lib-email-chips-input`.
+    correo_facturacion_electronica: [''],
     banco: this.fb.control<ErpSelectOption | null>(null),
     numero_cuenta: [''],
     cuenta_banco_clase: this.fb.control<ErpSelectOption | null>(null),
@@ -269,7 +274,12 @@ export class ContactoFormComponent implements OnInit {
           }
           if (res.correo) {
             patch.correo = res.correo;
-            patch.correo_facturacion_electronica = res.correo;
+            // Facturación admite varios correos: el de la DIAN se suma a los que
+            // ya había (si es válido y no estaba), en vez de reemplazarlos.
+            patch.correo_facturacion_electronica = agregarCorreo(
+              this.form.controls.correo_facturacion_electronica.value,
+              res.correo,
+            );
           }
           this.form.patchValue(patch);
           // Si la DIAN trajo un correo malformado ("NO", etc.), el validador
@@ -277,7 +287,6 @@ export class ContactoFormComponent implements OnInit {
           // mensaje de error se muestre bajo el input.
           if (res.correo) {
             this.form.controls.correo.markAsTouched();
-            this.form.controls.correo_facturacion_electronica.markAsTouched();
           }
         },
         error: () => {

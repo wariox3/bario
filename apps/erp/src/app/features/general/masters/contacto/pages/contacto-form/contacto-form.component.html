@@ -414,12 +414,13 @@
             <label for="correo_facturacion_electronica" class="contacto-form__label">
               {{ t().entities.contacto.form.fields.correoFacturacion }}
             </label>
-            <input
-              id="correo_facturacion_electronica"
-              pInputText
-              type="email"
+            <lib-email-chips-input
+              inputId="correo_facturacion_electronica"
               formControlName="correo_facturacion_electronica"
-              fluid
+              [invalid]="
+                form.controls.correo_facturacion_electronica.invalid &&
+                form.controls.correo_facturacion_electronica.touched
+              "
             />
             <lib-field-error
               [control]="form.controls.correo_facturacion_electronica"
