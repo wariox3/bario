@@ -3,7 +3,7 @@ import { I18nService, formatCop } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
 
-/** Columnas fijas: la primera (nº o id), cuenta, naturaleza y valor. */
+/** Columnas fijas: id, cuenta, naturaleza y valor. */
 const BASE_COLUMN_COUNT = 4;
 
 /** Las tres columnas que enciende `showDocumentoAfectado`. */
@@ -18,11 +18,13 @@ const DOCUMENTO_AFECTADO_COLUMN_COUNT = 3;
  * persistencia. La usa la ficha de detalle de cualquier documento con asientos
  * manuales.
  *
- * Suma dos columnas que la editable no tiene, porque solo tienen sentido sobre
- * algo ya guardado: el **id** de la línea (`showId`) y el **documento cruzado**
- * abierto en sus tres campos (`showDocumentoAfectado`). Las prenden las fichas
- * de los documentos que cruzan cartera —el egreso, el pago—, que es donde el ERP
- * anterior las mostraba.
+ * La primera columna es el **id** de la línea: es lo que se cita para hablar de
+ * una línea con soporte o con el backend, y una posición no identifica nada.
+ *
+ * Suma una columna que la editable no tiene, porque solo tiene sentido sobre algo
+ * ya guardado: el **documento cruzado** abierto en sus tres campos
+ * (`showDocumentoAfectado`). La prenden las fichas de los documentos que cruzan
+ * cartera —el egreso, el pago—, que es donde el ERP anterior la mostraba.
  */
 @Component({
   selector: 'app-contable-documento-lineas-table',
@@ -36,13 +38,6 @@ export class ContableDocumentoLineasTableComponent {
 
   /** Líneas a renderizar (read mapeado a la forma del front). */
   readonly lines = input.required<readonly CuentaDetalleFormRawValue[]>();
-
-  /**
-   * La primera columna muestra el **id** de la línea en vez de su posición.
-   * Solo tiene sentido en una ficha: el id es lo que se cita para hablar de una
-   * línea con soporte o con el backend, y el ordinal no identifica nada.
-   */
-  readonly showId = input<boolean>(false);
 
   /**
    * Muestra las tres columnas del **documento cruzado**: su id, su tipo y su

@@ -3356,7 +3356,6 @@ export interface AppDict
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {
-        linea: string;
         id: string;
         numero: string;
         documento: string;

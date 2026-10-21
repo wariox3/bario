@@ -4,8 +4,8 @@
   <table class="contable-detalle-table">
     <thead>
       <tr>
-        <th class="contable-detalle-table__th w-10 text-center">
-          {{ showId() ? c.columns.id : c.columns.linea }}
+        <th class="contable-detalle-table__th w-16 text-center">
+          {{ c.columns.id }}
         </th>
         @if (showDocumentoAfectado()) {
           <th class="contable-detalle-table__th w-20 text-left">{{ c.columns.documento }}</th>
@@ -37,10 +37,10 @@
       </tr>
     </thead>
     <tbody>
-      @for (line of lines(); track line.id ?? $index; let i = $index) {
+      @for (line of lines(); track line.id ?? $index) {
         <tr class="contable-detalle-table__row">
           <td class="contable-detalle-table__td text-center text-brand-muted tabular-nums">
-            {{ showId() ? (line.id ?? '—') : i + 1 }}
+            {{ line.id }}
           </td>
           @if (showDocumentoAfectado()) {
             <td class="contable-detalle-table__td text-brand-text tabular-nums">

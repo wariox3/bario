@@ -126,13 +126,12 @@
       <p-tabpanels>
         <p-tabpanel value="detalles">
           <!--
-              Las líneas del egreso nacen de cruzar cartera, así que la ficha las
-              identifica como lo hacía el ERP anterior: el id de la línea y el
-              documento cruzado abierto en id, tipo y número.
+              Las líneas del egreso nacen de cruzar cartera, así que la ficha
+              muestra, como el ERP anterior, el documento cruzado abierto en id,
+              tipo y número.
             -->
           <app-contable-documento-lineas-table
             [lines]="lines()"
-            [showId]="true"
             [showDocumentoAfectado]="true"
             [showContacto]="true"
             [showCentroCosto]="true"

@@ -4354,7 +4354,6 @@ export const en: AppDict = {
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
-        linea: '#',
         id: 'ID',
         numero: 'Number',
         documento: 'Document',
