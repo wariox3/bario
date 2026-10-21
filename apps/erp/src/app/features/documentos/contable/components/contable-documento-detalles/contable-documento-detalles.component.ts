@@ -19,7 +19,11 @@ import {
 } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
-import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
+import {
+  ErpApiSelectComponent,
+  ErpContactoSelectComponent,
+  PegarNumeroDirective,
+} from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { LineasDiferidas } from '../../../lineas-diferidas';
 import {
@@ -74,6 +78,7 @@ const BASE_COLUMN_COUNT = 5;
     ReactiveFormsModule,
     ButtonModule,
     InputNumberModule,
+    PegarNumeroDirective,
     InputTextModule,
     SelectModule,
     TooltipModule,
