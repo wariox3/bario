@@ -248,8 +248,8 @@ export class ContactoFormComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.isConsultingDian.set(false);
-          if (!res.encontrado) {
-            this.toast.info(dian.notFound.title, dian.notFound.desc);
+          if (!res.existe) {
+            this.toast.info(dian.notFound.title, res.mensaje || dian.notFound.desc);
             return;
           }
           // Solo pisamos un campo si la DIAN devolvió valor: nunca borramos lo
