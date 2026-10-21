@@ -816,10 +816,6 @@ export const es: AppDict = {
         title: 'Documentos agregados',
         desc: 'Los documentos seleccionados se agregaron como líneas.',
       },
-      addError: {
-        title: 'Error al agregar',
-        desc: 'No se pudieron agregar los documentos. Intentá de nuevo.',
-      },
     },
   },
   modules: {
@@ -4423,8 +4419,6 @@ export const es: AppDict = {
       empty: 'Aún no hay cuentas. Agrega la primera para empezar',
       addLine: 'Agregar cuenta',
       removeLine: 'Eliminar cuenta',
-      saveLine: 'Guardar cuenta',
-      saveAll: 'Guardar cuentas',
       pendingSuffix: 'sin guardar',
       cuentaPlaceholder: 'Buscar cuenta…',
       contactoPlaceholder: 'Buscar contacto…',
@@ -4454,21 +4448,9 @@ export const es: AppDict = {
         diferencia: 'Diferencia',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Cuenta guardada',
-          desc: 'La cuenta se guardó correctamente',
-        },
         lineSaveError: {
           title: 'Error al guardar',
           desc: 'No se pudo guardar la cuenta',
-        },
-        allSaved: {
-          title: 'Cuentas guardadas',
-          desc: 'Se guardaron las cuentas pendientes',
-        },
-        incompleteLines: {
-          title: 'Cuentas incompletas',
-          desc: 'Completa o elimina las cuentas sin cuenta o valor antes de guardar',
         },
       },
     },

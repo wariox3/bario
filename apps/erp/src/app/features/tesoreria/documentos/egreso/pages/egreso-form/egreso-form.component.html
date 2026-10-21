@@ -24,8 +24,11 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="isSaving()"
+      [disabled]="isSaving() || tablasOcupadas()"
     />
+    @if (hayCambios()) {
+      <app-cambios-sin-guardar />
+    }
   </lib-page-actions>
 
   <!-- ── Sección: Información general ──────────────────────────────────────── -->
@@ -156,7 +159,6 @@
             [agregarDocumentoEnabled]="true"
             [carteraTipo]="'pagar'"
             [contactoId]="contactoCabecera()?.id ?? null"
-            (imported)="onDocumentosAgregados()"
           />
         </p-tabpanel>
       </p-tabpanels>

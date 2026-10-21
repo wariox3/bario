@@ -644,7 +644,6 @@ export interface AppDict
     toasts: {
       loadError: { title: string; desc: string };
       addSuccess: { title: string; desc: string };
-      addError: { title: string; desc: string };
     };
   };
   modules: {
@@ -3349,8 +3348,6 @@ export interface AppDict
       empty: string;
       addLine: string;
       removeLine: string;
-      saveLine: string;
-      saveAll: string;
       pendingSuffix: string;
       cuentaPlaceholder: string;
       contactoPlaceholder: string;
@@ -3375,10 +3372,7 @@ export interface AppDict
       };
       resumen: { debitos: string; creditos: string; total: string; diferencia: string };
       toasts: {
-        lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };
-        allSaved: { title: string; desc: string };
-        incompleteLines: { title: string; desc: string };
       };
     };
     contratoServicio: {

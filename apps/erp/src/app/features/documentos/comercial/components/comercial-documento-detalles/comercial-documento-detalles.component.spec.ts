@@ -17,7 +17,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '../../comercial-documento-detalle.form';
-import { LineasEnCursoError } from '../../comercial-documento-detalle.errors';
+import { LineasEnCursoError } from '../../../lineas-diferidas';
 import { ComercialDocumentoDetallesComponent } from './comercial-documento-detalles.component';
 
 const URL = '/api/general/documento-detalle/';
@@ -60,7 +60,7 @@ describe('ComercialDocumentoDetallesComponent — guardado diferido', () => {
 
   /** Quita una fila como lo hace el botón de la papelera tras confirmar. */
   function quitar(fila: ComercialDetalleGroup): void {
-    component['deleteLinea'](fila, fila.controls.id.value);
+    component['lineas'].quitar(fila);
   }
 
   beforeEach(() => {

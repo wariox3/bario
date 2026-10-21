@@ -44,7 +44,13 @@ import {
 } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
-import { canLeaveDocumentForm } from '@erp/core/guards/leave-document-form';
+import {
+  canLeaveDocumentForm,
+  hayCambiosSinGuardar,
+  type CambiosDocumento,
+} from '@erp/core/guards/leave-document-form';
+import { guardarTablasEnSerie } from '@erp/features/documentos/tablas-en-vivo';
+import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
 import type { AppDict } from '@erp/i18n';
 import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
 import {
@@ -102,6 +108,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     ErpApiSelectComponent,
     ContableDocumentoDetallesComponent,
     TabsModule,
+    CambiosSinGuardarComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './asiento-form.component.html',
@@ -124,6 +131,12 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
 
   /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ContableDocumentoDetallesComponent);
+
+  /**
+   * La tabla de líneas está guardando. "Guardar" espera: un segundo lote reenviaría
+   * líneas que todavía no tienen `id`.
+   */
+  protected readonly tablasOcupadas = computed(() => this.detallesTable()?.ocupado() ?? false);
 
   /** Catálogo de comprobantes que admiten asiento manual. */
   protected readonly comprobanteEndpoint = COMPROBANTE_ENDPOINT;
@@ -215,7 +228,7 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.form.pending || this.isSaving()) return;
+    if (this.form.invalid || this.form.pending || this.isSaving() || this.tablasOcupadas()) return;
 
     // Un asiento debería cuadrar. Si no lo hace se avisa —el resumen ya marca la
     // diferencia— pero se deja guardar: quien decide si es admisible es el
@@ -226,35 +239,23 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
     }
 
     const id = this.id();
-    const detalles = this.detallesTable();
-    // En edición las líneas transaccionan aparte (no viajan en el payload de la
-    // cabecera). Para que no se pierdan, antes de guardar el documento se
-    // flushean las pendientes; si hay líneas incompletas se avisa y se aborta.
-    if (id && detalles) {
-      if (detalles.hasInvalidPending()) {
-        const toast = this.t().entities.cuentaDetalle.toasts.incompleteLines;
-        this.toast.warn(toast.title, toast.desc);
-        return;
-      }
-      if (detalles.pendingCount() > 0) {
-        this.isSaving.set(true);
-        detalles
-          .saveAll()
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: () => this.persistCabecera(id),
-            error: () => {
-              this.isSaving.set(false);
-              const toast = this.t().entities.cuentaDetalle.toasts.lineSaveError;
-              this.toast.error(toast.title, toast.desc);
-            },
-          });
-        return;
-      }
+    this.isSaving.set(true);
+    if (!id) {
+      // Alta: las líneas viajan embebidas en el documento.
+      this.persistCabecera(id);
+      return;
     }
 
-    this.isSaving.set(true);
-    this.persistCabecera(id);
+    // Edición: las líneas van por `documento-detalle`. Se guardan sus cambios
+    // pendientes antes de la cabecera; si fallan, se avisa con el motivo del backend
+    // y no se sigue.
+    const errorAlGuardar = this.t().entities.cuentaDetalle.toasts.lineSaveError;
+    guardarTablasEnSerie([{ tabla: this.detallesTable(), errorAlGuardar }], this.toast)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        complete: () => this.persistCabecera(id),
+        error: () => this.isSaving.set(false),
+      });
   }
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
@@ -297,16 +298,29 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
     this.navigateToList();
   }
 
-  /**
-   * Guard de salida: si hay líneas sin guardar, confirma antes de abandonar para
-   * no perderlas. Solo aplica en edición.
-   */
-  canDeactivate(): boolean | Observable<boolean> {
-    return canLeaveDocumentForm({
+  /** Lo que se perdería al salir; lo leen el guard de salida y el aviso junto a "Guardar". */
+  private cambios(): CambiosDocumento {
+    return {
       form: this.form,
       // En alta nada persiste aparte: tocar una línea y salir también pierde trabajo.
       enAlta: !this.id(),
       pendingLines: this.detallesTable()?.pendingCount() ?? 0,
+    };
+  }
+
+  /** Aviso "Cambios sin guardar" junto al botón. En alta todo está por guardar: no se muestra. */
+  protected hayCambios(): boolean {
+    return this.isEditMode() && hayCambiosSinGuardar(this.cambios());
+  }
+
+  /**
+   * Guard de salida: si hay cambios sin guardar (cabecera o líneas), confirma antes
+   * de abandonar. Guardar el documento persiste todo y deja el form limpio, así que
+   * el camino feliz no pregunta.
+   */
+  canDeactivate(): boolean | Observable<boolean> {
+    return canLeaveDocumentForm({
+      ...this.cambios(),
       confirmation: this.confirmation,
       labels: this.t().entities.comercialDetalle,
       cancelLabel: this.t().common.actions.cancel,
