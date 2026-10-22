@@ -78,8 +78,20 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   private readonly filterService = inject(FilterService);
   protected readonly idPrefixMatchMode = ID_PREFIX_MATCH_MODE;
 
-  readonly endpoint = input.required<string>();
+  /** Endpoint `seleccionar` del que se trae el catálogo. Sobra si viene `catalogo`. */
+  readonly endpoint = input<string>('');
   readonly params = input<Record<string, string>>({});
+  /**
+   * Catálogo ya cargado por el padre. Si viene, el select **no consulta**: es
+   * para las celdas de una tabla de líneas, donde un fetch por fila multiplica
+   * la misma petición por cada línea del documento (y otra vez al guardar,
+   * cuando la fila se reconstruye). El padre lo carga una vez con
+   * `catalogoCompartido` y lo reparte. `null` (default) = el select trae el suyo.
+   *
+   * Mientras el padre lo carga llega vacío; el valor actual se pinta igual
+   * (ver el `effect`), así que la celda no se ve en blanco ni se deshabilita.
+   */
+  readonly catalogo = input<readonly ErpSelectOption[] | null>(null);
   readonly inputId = input<string>('');
   /**
    * Nombre accesible del select, para cuando no hay un `<label for>` que lo
@@ -163,10 +175,24 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   private onChangeFn: (value: ErpSelectOption | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
 
+  /** Último `catalogo` del padre ya sugerido y emitido, para no repetirlo en cada selección. */
+  private catalogoAplicado: readonly ErpSelectOption[] | null = null;
+
   constructor() {
     this.filterService.register(ID_PREFIX_MATCH_MODE, idPrefixOrContains);
 
     effect((onCleanup) => {
+      // Catálogo del padre: no hay nada que consultar. El valor se lee
+      // trackeado porque puede no estar en el catálogo —una línea cargada en
+      // edición antes de que el padre lo reciba, o un almacén ya inactivo—: se
+      // antepone para que el p-select tenga con qué pintarlo. Sin red de por
+      // medio, re-correr en cada selección no cuesta nada.
+      const catalogo = this.catalogo();
+      if (catalogo !== null) {
+        this.aplicarCatalogo(catalogo, this.value());
+        return;
+      }
+
       const disabled = this.disabled();
       // Habilitado, el valor cambia con cada selección del usuario: se lee sin
       // trackear para no volver a pedir el catálogo entero en cada clic.
@@ -192,14 +218,14 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
 
       const params = this.params();
       const endpoint = this.endpoint();
+      if (!endpoint) {
+        this.options.set([]);
+        return;
+      }
       this.loading.set(true);
       const fetch = this.dataService.fetchAllOptions(endpoint, params).subscribe({
         next: (fetched) => {
-          // El backend no garantiza el orden (descarta `ordering`): con códigos
-          // jerárquicos se ordena aquí para que el filtrado salga en secuencia.
-          const options = untracked(this.idPrefixSearch)
-            ? [...fetched].sort((a, b) => a.id - b.id)
-            : fetched;
+          const options = this.ordenar(fetched);
           this.options.set(options);
           this.loading.set(false);
           this.applySuggestion(options);
@@ -236,6 +262,35 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   onValueChange(next: ErpSelectOption | null): void {
     this.value.set(next);
     this.onChangeFn(next);
+  }
+
+  /**
+   * El backend no garantiza el orden (descarta `ordering`): con códigos
+   * jerárquicos se ordena aquí para que el filtrado salga en secuencia.
+   */
+  private ordenar(options: readonly ErpSelectOption[]): ErpSelectOption[] {
+    return untracked(this.idPrefixSearch) ? [...options].sort((a, b) => a.id - b.id) : [...options];
+  }
+
+  /**
+   * Pinta el catálogo que mandó el padre, con el valor actual antepuesto si no
+   * está en él. La sugerencia y `optionsLoaded` corren una vez por catálogo
+   * recibido —no en cada selección— y no con el vacío de mientras carga.
+   */
+  private aplicarCatalogo(
+    catalogo: readonly ErpSelectOption[],
+    current: ErpSelectOption | null,
+  ): void {
+    const options = this.ordenar(catalogo);
+    const faltaActual = current !== null && !options.some((o) => o.id === current.id);
+    this.options.set(faltaActual ? [current, ...options] : options);
+    this.loading.set(false);
+    if (catalogo.length === 0 || catalogo === this.catalogoAplicado) return;
+    this.catalogoAplicado = catalogo;
+    untracked(() => {
+      this.applySuggestion(options);
+      this.optionsLoaded.emit(options);
+    });
   }
 
   /**
