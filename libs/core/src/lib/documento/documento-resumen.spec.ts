@@ -1,4 +1,8 @@
-import { cuentasDesdeCabecera, resumenDesdeCabecera } from './documento-resumen';
+import {
+  cantidadDesdeCabecera,
+  cuentasDesdeCabecera,
+  resumenDesdeCabecera,
+} from './documento-resumen';
 import type { DocumentoImpuestoAgrupadoRead, DocumentoTotalesRead } from './documento.types';
 
 const iva19: DocumentoImpuestoAgrupadoRead = {
@@ -119,5 +123,15 @@ describe('cuentasDesdeCabecera', () => {
 
   it('sin los campos devuelve null para que se sumen las líneas', () => {
     expect(cuentasDesdeCabecera(factura131)).toBeNull();
+  });
+});
+
+describe('cantidadDesdeCabecera', () => {
+  it('lee la suma de cantidades, con decimales', () => {
+    expect(cantidadDesdeCabecera({ ...factura154, cantidad_detalles: '12.500000' })).toBe(12.5);
+  });
+
+  it('sin el campo devuelve null: no se puede paginar sin perder el total', () => {
+    expect(cantidadDesdeCabecera(factura154)).toBeNull();
   });
 });

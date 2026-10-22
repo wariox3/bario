@@ -16,11 +16,12 @@
 import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
+  DocumentoTotalesRead,
   ComercialDetallePayload,
 } from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una nota de venta. */
-export interface NotaVentaRead extends DocumentoReadBase {
+export interface NotaVentaRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   /** FK al documento (factura de venta) que la nota ajusta. */

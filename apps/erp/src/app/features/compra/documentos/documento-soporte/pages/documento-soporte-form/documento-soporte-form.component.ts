@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -31,8 +31,8 @@ import {
   startOfToday,
   TenantService,
   ToastService,
-  comercialDetalleToFormValue,
-  type ComercialDetalleRead,
+  resumenDesdeCabecera,
+  type ResumenDocumento,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-breadcrumb';
@@ -45,11 +45,7 @@ import {
   SELECT_ENDPOINTS,
   resolucionLabel,
 } from '@reddoc/core';
-import {
-  DocumentoDetalleService,
-  ENTITY_DATA_GATEWAY,
-  extractDocumentoId,
-} from '@erp/core/module-config';
+import { ENTITY_DATA_GATEWAY, extractDocumentoId } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import {
@@ -77,11 +73,7 @@ import {
 } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { VencimientoHintComponent } from '@erp/features/documentos/comercial/components/vencimiento-hint/vencimiento-hint.component';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
-import {
-  createComercialDetalleGroup,
-  type ComercialDetalleGroup,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
+import type { ComercialDetalleGroup } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import { documentoSoporteToFormValue, formValueToPayload } from '../../documento-soporte.mapper';
 import type { DocumentoSoporteRead } from '../../documento-soporte.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
@@ -135,7 +127,6 @@ import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/cr
 export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeactivate {
   private readonly fb = inject(FormBuilder);
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
-  private readonly detalleService = inject(DocumentoDetalleService);
   private readonly selectData = inject(ErpSelectDataService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
@@ -261,15 +252,20 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
     });
   }
 
+  /**
+   * Resumen que calculó el backend con todas las líneas guardadas, leído de la
+   * cabecera en edición. La tabla, paginada, parte de él; `null` en alta.
+   */
+  protected readonly resumenBase = signal<ResumenDocumento | null>(null);
+
   ngOnInit(): void {
     const id = this.id();
     if (!id) return;
-    // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
-    // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
+    // En edición la cabecera ya viene del resolver: la aplicamos sin red; las
+    // líneas las trae la tabla. Sin resolved (fail-open) se pide la cabecera.
     const prefetched = this.documentoEdit();
     if (prefetched) {
       this.applyCabecera(prefetched as DocumentoSoporteRead);
-      this.loadLineas(Number(id));
     } else {
       this.loadDocumento(Number(id));
     }
@@ -378,31 +374,15 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
   }
 
   /**
-   * Carga completa (cabecera + líneas). Se usa como fallback de la carga inicial
-   * (si el resolver no pre-cargó la cabecera).
+   * Carga la cabecera (fallback si el resolver no la pre-cargó). Las líneas las
+   * trae la tabla, de a una página (`paginada`).
    */
   private loadDocumento(id: number): void {
-    forkJoin({
-      cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
-    })
+    this.gateway
+      .getById(this.document(), id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
-          this.applyCabecera(cabecera as DocumentoSoporteRead);
-          this.populateLineas(lineas);
-        },
-        error: () => this.notifyLoadError(),
-      });
-  }
-
-  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
-  private loadLineas(id: number): void {
-    this.detalleService
-      .listarPorDocumento<ComercialDetalleRead>(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (lineas) => this.populateLineas(lineas),
+        next: (cabecera) => this.applyCabecera(cabecera as DocumentoSoporteRead),
         error: () => this.notifyLoadError(),
       });
   }
@@ -413,15 +393,7 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
    */
   private applyCabecera(read: DocumentoSoporteRead): void {
     this.form.patchValue(documentoSoporteToFormValue(read), { emitEvent: false });
-  }
-
-  /** Reemplaza el FormArray de detalles con las líneas recibidas. */
-  private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
-    const detalles = this.form.controls.detalles;
-    reemplazarFilas(
-      detalles,
-      lineas.map((line) => createComercialDetalleGroup(comercialDetalleToFormValue(line))),
-    );
+    this.resumenBase.set(resumenDesdeCabecera(read));
   }
 
   private notifyLoadError(): void {

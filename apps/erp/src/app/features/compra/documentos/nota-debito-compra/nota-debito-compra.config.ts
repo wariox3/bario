@@ -23,6 +23,8 @@ export const NOTA_DEBITO_COMPRA_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.notaDebitoCompra.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_DEBITO_COMPRA,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'inflow',
   schemaVersion: 1,
   columns: NOTA_DEBITO_COMPRA_COLUMNS,

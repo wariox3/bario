@@ -21,6 +21,8 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.notaCredito.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_CREDITO_VENTA,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'inflow',
   // Se cobra en el acto: el form y la ficha compartidos muestran la pestaña de pagos.
   hasPagos: true,

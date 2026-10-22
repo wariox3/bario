@@ -502,6 +502,50 @@ describe('ComercialDocumentoDetallesComponent — guardado diferido', () => {
       expect(component.resumen().total).toBe(3200);
     });
 
+    it('la cantidad total parte de la cabecera y se mueve con lo que cambia', () => {
+      montarPaginada();
+      fixture.componentRef.setInput('cantidadBase', 30);
+      responderPagina(1, pagina(1, 25));
+      expect(component.cantidadTotal()).toBe(30);
+
+      filas()[0].controls.cantidad.markAsDirty();
+      filas()[0].controls.cantidad.setValue(2.5);
+      quitar(filas()[1]);
+      component.detalles().push(nueva());
+      expect(component.cantidadTotal()).toBe(31.5);
+
+      // La editada sale de la vista y su cantidad sigue contando.
+      irA(1);
+      responderPagina(2, pagina(26, 30));
+      expect(component.cantidadTotal()).toBe(31.5);
+    });
+
+    it('un guardado a medias no desfasa la cantidad total', () => {
+      montarPaginada();
+      fixture.componentRef.setInput('cantidadBase', 30);
+      responderPagina(1, pagina(1, 25));
+      const [a, b] = filas();
+      for (const fila of [a, b]) {
+        fila.controls.cantidad.markAsDirty();
+        fila.controls.cantidad.setValue(4);
+      }
+      expect(component.cantidadTotal()).toBe(36);
+
+      component.saveAll().subscribe({ error: () => undefined });
+      http.expectOne({ method: 'PATCH', url: `${URL}1/` }).flush(leidaDe(1, { cantidad: 4 }));
+      http
+        .expectOne({ method: 'PATCH', url: `${URL}2/` })
+        .flush(null, { status: 500, statusText: 'Error' });
+
+      expect(component.cantidadTotal()).toBe(36);
+    });
+
+    it('sin cantidad de la cabecera suma las filas', () => {
+      montarPaginada();
+      responderPagina(1, pagina(1, 25));
+      expect(component.cantidadTotal()).toBe(25);
+    });
+
     it('reemplazar las líneas lee todas las páginas para darlas de baja', () => {
       montarPaginada();
       responderPagina(1, pagina(1, 25));

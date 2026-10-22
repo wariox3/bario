@@ -70,6 +70,7 @@ import {
   lineNeto,
   tasasDelItem,
   toLineaCalculo,
+  totalCantidad,
   type ComercialDetalleRead,
   type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
@@ -107,6 +108,22 @@ import {
   type ComercialDetalleGroup,
 } from '../../comercial-documento-detalle.form';
 import { aiuLineaToFormValue, type AiuLinea } from '../../aiu';
+
+/** Cómo estaba guardada una línea: lo que se le resta a lo guardado si cambia. */
+interface LineaOriginal {
+  readonly calculo: LineaCalculo;
+  readonly cantidad: number;
+}
+
+function lineaOriginal(leida: ComercialDetalleRead): LineaOriginal {
+  const value = comercialDetalleToFormValue(leida);
+  return { calculo: toLineaCalculo(value), cantidad: value.cantidad ?? 0 };
+}
+
+/** Las cantidades admiten decimales: sumar y restar en coma flotante deja colas. */
+function redondearCantidad(valor: number): number {
+  return Math.round(valor * 1e6) / 1e6;
+}
 
 /** Toast con que cierra un agregado de líneas (importar desde documento, AIU). */
 interface ToastTexto {
@@ -270,6 +287,12 @@ export class ComercialDocumentoDetallesComponent {
    */
   readonly resumenBase = input<ResumenDocumento | null>(null);
 
+  /**
+   * Suma de cantidades de las líneas guardadas, según la cabecera
+   * (`cantidadDesdeCabecera`). Como `resumenBase`, solo se usa con `paginada`.
+   */
+  readonly cantidadBase = input<number | null>(null);
+
   protected readonly pageSize = LIST_PAGE_SIZE;
 
   /** Página visible, 0-based como `p-paginator`. */
@@ -287,14 +310,17 @@ export class ComercialDocumentoDetallesComponent {
    */
   private readonly baseGuardada = linkedSignal(() => this.resumenBase());
 
+  /** Cantidad guardada vigente: igual que `baseGuardada`, para «Total cantidad». */
+  private readonly cantidadGuardada = linkedSignal(() => this.cantidadBase());
+
   /**
    * Cómo está guardada cada línea persistida que pasó por la tabla, por id: lo
-   * que hay que restarle a `baseGuardada` cuando la línea cambia o se quita. Se
-   * anota al leer cada página y se actualiza con lo que confirma el guardado. Va
-   * en un `Map` plano: cambia siempre junto con `lines` o `baseGuardada`, que son
-   * los que disparan el resumen.
+   * que hay que restarle a `baseGuardada` y `cantidadGuardada` cuando la línea
+   * cambia o se quita. Se anota al leer cada página y se actualiza con lo que
+   * confirma el guardado. Va en un `Map` plano: cambia siempre junto con `lines`
+   * o las bases, que son los que disparan el resumen.
    */
-  private readonly originales = new Map<number, LineaCalculo>();
+  private readonly originales = new Map<number, LineaOriginal>();
 
   /**
    * Muestra la columna **Detalle** (la nota libre por línea). Default `true`.
@@ -391,17 +417,44 @@ export class ComercialDocumentoDetallesComponent {
    * muestra exactamente lo del backend, con una sola página cargada.
    */
   readonly resumen = computed<ResumenDocumento>(() => {
+    const { actuales, originales } = this.comparables();
+    const base = this.baseGuardada();
+    const calculo = actuales.map(toLineaCalculo);
+    if (!this.paginada() || !base) return calcularResumen(calculo);
+    return aplicarDeltas(
+      base,
+      calculo,
+      originales.map((original) => original.calculo),
+    );
+  });
+
+  /**
+   * Suma de cantidades del documento (fila «Total cantidad» del resumen). Paginada
+   * y con `cantidadBase`, la guardada más lo que cambió, como `resumen`.
+   */
+  readonly cantidadTotal = computed(() => {
+    const { actuales, originales } = this.comparables();
+    const base = this.cantidadGuardada();
+    if (!this.paginada() || base == null) return totalCantidad(actuales);
+    const antes = originales.reduce((acc, original) => acc + original.cantidad, 0);
+    return redondearCantidad(base + totalCantidad(actuales) - antes);
+  });
+
+  /**
+   * Lo que se compara contra lo guardado: las filas visibles y las editadas de
+   * otras páginas, y los originales de esas filas y de las quitadas. Las nuevas no
+   * tienen original.
+   */
+  private readonly comparables = computed(() => {
     const visibles = this.lines();
     const fuera = this.lineas.fueraDePagina().map((fila) => fila.getRawValue());
-    const actuales = [...visibles, ...fuera].map(toLineaCalculo);
-    const base = this.baseGuardada();
-    if (!this.paginada() || !base) return calcularResumen(actuales);
-    const ids = [...visibles, ...fuera].map((linea) => linea.id).concat(this.lineas.bajas());
+    const actuales = [...visibles, ...fuera];
+    const ids = actuales.map((linea) => linea.id).concat(this.lineas.bajas());
     const originales = ids.flatMap((id) => {
       const original = id != null ? this.originales.get(id) : undefined;
       return original ? [original] : [];
     });
-    return aplicarDeltas(base, actuales, originales);
+    return { actuales, originales };
   });
 
   /**
@@ -606,7 +659,7 @@ export class ComercialDocumentoDetallesComponent {
   private registrarOriginales(leidas: readonly ComercialDetalleRead[]): void {
     for (const leida of leidas) {
       if (leida.id == null || this.originales.has(leida.id)) continue;
-      this.originales.set(leida.id, toLineaCalculo(comercialDetalleToFormValue(leida)));
+      this.originales.set(leida.id, lineaOriginal(leida));
     }
   }
 
@@ -615,17 +668,23 @@ export class ComercialDocumentoDetallesComponent {
    * desde ya. Así un guardado que falla a medias no deja el total desfasado.
    */
   private alGuardado(cambio: LineaGuardada<ComercialDetalleRead>): void {
-    const base = this.baseGuardada();
     const original = this.originales.get(cambio.id);
-    const antes = original ? [original] : [];
-    if (cambio.tipo === 'borrada') {
-      this.originales.delete(cambio.id);
-      if (base) this.baseGuardada.set(aplicarDeltas(base, [], antes));
-      return;
+    const guardada = cambio.tipo === 'escrita' ? lineaOriginal(cambio.leida) : undefined;
+    if (guardada) this.originales.set(cambio.id, guardada);
+    else this.originales.delete(cambio.id);
+
+    const base = this.baseGuardada();
+    if (base) {
+      this.baseGuardada.set(
+        aplicarDeltas(base, guardada ? [guardada.calculo] : [], original ? [original.calculo] : []),
+      );
     }
-    const guardada = toLineaCalculo(comercialDetalleToFormValue(cambio.leida));
-    this.originales.set(cambio.id, guardada);
-    if (base) this.baseGuardada.set(aplicarDeltas(base, [guardada], antes));
+    const cantidad = this.cantidadGuardada();
+    if (cantidad != null) {
+      this.cantidadGuardada.set(
+        redondearCantidad(cantidad + (guardada?.cantidad ?? 0) - (original?.cantidad ?? 0)),
+      );
+    }
   }
 
   /**

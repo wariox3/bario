@@ -42,6 +42,9 @@ import {
   calcularPagos,
   type PagoRead,
   DocumentoPagoService,
+  type ResumenDocumento,
+  cantidadDesdeCabecera,
+  resumenDesdeCabecera,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -263,13 +266,17 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
 
   /** Resumen del documento: lo pinta el aside bajo los tabs, igual en Detalles y Pagos. */
-  protected readonly resumen = computed(() => calcularResumen(this.lines().map(toLineaCalculo)));
+  protected readonly resumen = computed(
+    () => this.detallesTable()?.resumen() ?? calcularResumen(this.lines().map(toLineaCalculo)),
+  );
 
   /** Total del documento: contra él se validan y se prellenan los pagos. */
   protected readonly totalGeneral = computed(() => this.resumen().total);
 
   /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
-  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+  protected readonly cantidadTotal = computed(
+    () => this.detallesTable()?.cantidadTotal() ?? totalCantidad(this.lines()),
+  );
 
   /** Espejo reactivo de los pagos para el resumen y la validación del guardado. */
   protected readonly pagosLines = signal<readonly PagoFormRawValue[]>([]);
@@ -345,6 +352,22 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   protected precioListaId(): number | null {
     return precioListaDeContacto(this.form.controls.contacto.value);
   }
+
+  /**
+   * Resumen y suma de cantidades que calculó el backend con todas las líneas
+   * guardadas, leídos de la cabecera en edición; `null` en alta.
+   */
+  protected readonly resumenBase = signal<ResumenDocumento | null>(null);
+  protected readonly cantidadBase = signal<number | null>(null);
+
+  /**
+   * La tabla pagina sus líneas solo si la cabecera trae el resumen y la suma de
+   * cantidades (`cantidad_detalles`, para «Total cantidad»). Si faltara alguno
+   * se traen todas las líneas, como antes.
+   */
+  protected readonly paginada = computed(
+    () => this.resumenBase() !== null && this.cantidadBase() !== null,
+  );
 
   ngOnInit(): void {
     // El concepto de corrección es obligatorio donde el documento lo lleva; la config llega por input, así que la regla se fija aquí y no al crear el form.
@@ -511,32 +534,47 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
       pagos: this.listarPagos(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas, pagos }) => {
+        next: ({ cabecera, pagos }) => {
           this.applyCabecera(cabecera as NotaVentaRead);
-          this.populateLineas(lineas);
+          this.populatePagos(pagos);
+          if (!this.paginada()) this.loadTodasLasLineas(id);
+        },
+        error: () => this.notifyLoadError(),
+      });
+  }
+
+  /**
+   * Carga los pagos y, si la tabla no pagina, todas las líneas (la cabecera ya la
+   * aportó el resolver). Paginada, las líneas las trae la tabla.
+   */
+  private loadLineas(id: number): void {
+    forkJoin({
+      lineas: this.paginada()
+        ? of(null)
+        : this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.listarPagos(id),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ lineas, pagos }) => {
+          if (lineas) this.populateLineas(lineas);
           this.populatePagos(pagos);
         },
         error: () => this.notifyLoadError(),
       });
   }
 
-  /** Carga líneas y pagos (la cabecera ya la aportó el resolver). */
-  private loadLineas(id: number): void {
-    forkJoin({
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
-      pagos: this.listarPagos(id),
-    })
+  /** Todas las líneas, para cuando la tabla no pagina (ver `paginada`). */
+  private loadTodasLasLineas(id: number): void {
+    this.detalleService
+      .listarPorDocumento<ComercialDetalleRead>(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ lineas, pagos }) => {
-          this.populateLineas(lineas);
-          this.populatePagos(pagos);
-        },
+        next: (lineas) => this.populateLineas(lineas),
         error: () => this.notifyLoadError(),
       });
   }
@@ -554,6 +592,8 @@ export class NotaDocumentoFormComponent implements OnInit, CanComponentDeactivat
    */
   private applyCabecera(read: NotaVentaRead): void {
     this.form.patchValue(notaVentaToFormValue(read), { emitEvent: false });
+    this.resumenBase.set(resumenDesdeCabecera(read));
+    this.cantidadBase.set(cantidadDesdeCabecera(read));
     this.syncReferenciaState();
   }
 

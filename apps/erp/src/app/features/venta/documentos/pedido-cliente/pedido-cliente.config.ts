@@ -21,6 +21,8 @@ export const PEDIDO_CLIENTE_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.pedidoCliente.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.PEDIDO_CLIENTE,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'outflow',
   schemaVersion: 1,
   columns: PEDIDO_CLIENTE_COLUMNS,

@@ -23,6 +23,15 @@ export function cuentasDesdeCabecera(read: DocumentoTotalesRead): CuentasCabecer
 }
 
 /**
+ * Suma de cantidades de las líneas de ítem según la cabecera (`cantidad_detalles`). `null`
+ * si no la trae: entonces se suman las líneas, y quien la muestra no puede
+ * paginarlas.
+ */
+export function cantidadDesdeCabecera(read: DocumentoTotalesRead): number | null {
+  return read.cantidad_detalles == null ? null : (toFiniteNumber(read.cantidad_detalles) ?? null);
+}
+
+/**
  * Resumen de las líneas de **ítem** de un documento guardado, con los acumulados
  * del backend: no necesita tener las líneas cargadas. `null` si la cabecera no
  * trae el desglose por impuesto (solo lo trae `documento/<id>/detalle/`);

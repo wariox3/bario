@@ -41,6 +41,11 @@ export interface DocumentoTotalesRead {
    */
   readonly debito?: string | null;
   readonly credito?: string | null;
+  /**
+   * Suma de `cantidad` de las líneas de ítem. Llegó el 2026-10-22: sin ella, los
+   * documentos que muestran «Total cantidad» no paginan sus líneas.
+   */
+  readonly cantidad_detalles?: string | null;
   /** Solo en `documento/<id>/detalle/` (`cabeceraConImpuestos`). */
   readonly documento_impuestos?: readonly DocumentoImpuestoAgrupadoRead[];
 }

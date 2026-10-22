@@ -10,7 +10,11 @@ export type {
   DocumentoTotalesRead,
 } from './documento.types';
 export { impuestosAgrupadosToResumen } from './documento-impuestos';
-export { cuentasDesdeCabecera, resumenDesdeCabecera } from './documento-resumen';
+export {
+  cantidadDesdeCabecera,
+  cuentasDesdeCabecera,
+  resumenDesdeCabecera,
+} from './documento-resumen';
 export type { CuentasCabecera } from './documento-resumen';
 export type {
   EntityKind,

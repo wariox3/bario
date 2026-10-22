@@ -22,6 +22,8 @@ export const FACTURA_VENTA_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.facturaVenta.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.FACTURA_VENTA,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'outflow',
   hasPagos: true,
   schemaVersion: 1,

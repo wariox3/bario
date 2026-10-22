@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -30,9 +30,9 @@ import {
   startOfToday,
   TenantService,
   ToastService,
-  comercialDetalleToFormValue,
-  type ComercialDetalleRead,
   precioListaDeContacto,
+  resumenDesdeCabecera,
+  type ResumenDocumento,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -42,11 +42,7 @@ import {
   ErpAsesorSelectComponent,
 } from '@reddoc/ui';
 import { SELECT_ENDPOINTS, type ErpSelectOption } from '@reddoc/core';
-import {
-  DocumentoDetalleService,
-  ENTITY_DATA_GATEWAY,
-  extractDocumentoId,
-} from '@erp/core/module-config';
+import { ENTITY_DATA_GATEWAY, extractDocumentoId } from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import {
@@ -61,11 +57,7 @@ import {
 import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
-import {
-  createComercialDetalleGroup,
-  type ComercialDetalleGroup,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
-import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
+import type { ComercialDetalleGroup } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
 import { SEDE_ENDPOINT } from '../../remision.constants';
 import { remisionToFormValue, formValueToPayload } from '../../remision.mapper';
 import type { RemisionRead } from '../../remision.model';
@@ -123,7 +115,6 @@ import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/cr
 export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
   private readonly fb = inject(FormBuilder);
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
-  private readonly detalleService = inject(DocumentoDetalleService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
@@ -198,15 +189,20 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
     return precioListaDeContacto(this.form.controls.contacto.value);
   }
 
+  /**
+   * Resumen que calculó el backend con todas las líneas guardadas, leído de la
+   * cabecera en edición. La tabla, paginada, parte de él; `null` en alta.
+   */
+  protected readonly resumenBase = signal<ResumenDocumento | null>(null);
+
   ngOnInit(): void {
     const id = this.id();
     if (!id) return;
-    // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
-    // pedimos las líneas. Sin resolved (fail-open) cae a la carga completa.
+    // En edición la cabecera ya viene del resolver: la aplicamos sin red; las
+    // líneas las trae la tabla. Sin resolved (fail-open) se pide la cabecera.
     const prefetched = this.documentoEdit();
     if (prefetched) {
       this.applyCabecera(prefetched as RemisionRead);
-      this.loadLineas(Number(id));
     } else {
       this.loadDocumento(Number(id));
     }
@@ -315,33 +311,15 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
   }
 
   /**
-   * Carga completa (cabecera + líneas). La cabecera (`documento/:id/`) ya no
-   * embebe los detalles: las líneas se traen aparte de
-   * `documento-detalle/?documento_id=`. Se usa como fallback de la carga inicial
-   * (si el resolver no pre-cargó la cabecera).
+   * Carga la cabecera (fallback si el resolver no la pre-cargó). Las líneas las
+   * trae la tabla, de a una página (`paginada`).
    */
   private loadDocumento(id: number): void {
-    forkJoin({
-      cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
-    })
+    this.gateway
+      .getById(this.document(), id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
-          this.applyCabecera(cabecera as RemisionRead);
-          this.populateLineas(lineas);
-        },
-        error: () => this.notifyLoadError(),
-      });
-  }
-
-  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
-  private loadLineas(id: number): void {
-    this.detalleService
-      .listarPorDocumento<ComercialDetalleRead>(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (lineas) => this.populateLineas(lineas),
+        next: (cabecera) => this.applyCabecera(cabecera as RemisionRead),
         error: () => this.notifyLoadError(),
       });
   }
@@ -349,15 +327,7 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
   /** Pobla la cabecera en el form. `emitEvent: false`: no dispara efectos colaterales. */
   private applyCabecera(read: RemisionRead): void {
     this.form.patchValue(remisionToFormValue(read), { emitEvent: false });
-  }
-
-  /** Reemplaza el FormArray de detalles con las líneas recibidas. */
-  private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
-    const detalles = this.form.controls.detalles;
-    reemplazarFilas(
-      detalles,
-      lineas.map((line) => createComercialDetalleGroup(comercialDetalleToFormValue(line))),
-    );
+    this.resumenBase.set(resumenDesdeCabecera(read));
   }
 
   private notifyLoadError(): void {

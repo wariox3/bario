@@ -22,6 +22,8 @@ export const NOTA_DEBITO_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.notaDebito.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_DEBITO_VENTA,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'inflow',
   // Motivo DIAN de la nota: solo los conceptos de la clase nota débito de venta.
   conceptoCorreccionClaseId: DOCUMENTO_CLASE_ID.NOTA_DEBITO_VENTA,

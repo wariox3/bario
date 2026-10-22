@@ -144,6 +144,7 @@ export {
   impuestosAgrupadosToResumen,
   resumenDesdeCabecera,
   cuentasDesdeCabecera,
+  cantidadDesdeCabecera,
   lineBruto,
   lineDescuento,
   lineBase,
