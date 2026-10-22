@@ -1,4 +1,9 @@
-import type { ResumenDocumento } from '@reddoc/core';
+import {
+  cuentasDesdeCabecera,
+  resumenDesdeCabecera,
+  type DocumentoTotalesRead,
+  type ResumenDocumento,
+} from '@reddoc/core';
 import {
   calcularResumenContable,
   cuentaDetalleToLineaView,
@@ -50,6 +55,31 @@ describe('resumenConCuentas', () => {
     const vacio: ResumenDocumento = { subtotal: 0, descuento: 0, impuestos: [], total: 0 };
 
     expect(resumenConCuentas(vacio, { debitos: 300, creditos: 100 }).total).toBe(200);
+  });
+
+  it('con la cabecera del backend da su total: las cuentas no se suman dos veces', () => {
+    // Factura de compra 154: ítem de 10.000 y cuenta débito de 10.000.
+    const cabecera: DocumentoTotalesRead = {
+      subtotal: '20000.000000',
+      descuento: '0.000000',
+      total_bruto: '10000.000000',
+      base_impuesto: '10000.000000',
+      impuesto: '0.000000',
+      impuesto_retencion: '0.000000',
+      total: '20000.000000',
+      debito: '10000.000000',
+      credito: '0.000000',
+      documento_impuestos: [],
+    };
+    const items = resumenDesdeCabecera(cabecera) ?? ITEMS;
+    const cuentas = cuentasDesdeCabecera(cabecera);
+    expect(items.total).toBe(10000);
+
+    // La ficha suma las cuentas de la cabecera; el form, las de su tabla (las mismas).
+    expect(cuentas && resumenConCuentas(items, cuentas).total).toBe(20000);
+    expect(resumenConCuentas(items, calcularResumenContable([cuenta('D', 10000)])).total).toBe(
+      20000,
+    );
   });
 });
 

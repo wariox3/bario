@@ -185,6 +185,10 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
    * Resumen de la factura: subtotal, descuento e impuestos de los ítems y un
    * total al que las cuentas débito suman y las crédito restan. Es uno solo para
    * las dos pestañas: el total del documento no cambia según lo que se mire.
+   *
+   * Las cuentas se suman una sola vez, desde su tabla, que las tiene todas y las
+   * recalcula en vivo. La base de los ítems que viene del backend ya las deja
+   * afuera aunque su `total` las incluya (`resumenDesdeCabecera`).
    */
   protected readonly resumen = computed(() => {
     const items = this.detallesTable()?.resumen() ?? {

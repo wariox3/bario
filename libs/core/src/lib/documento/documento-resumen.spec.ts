@@ -1,4 +1,4 @@
-import { resumenDesdeCabecera } from './documento-resumen';
+import { cuentasDesdeCabecera, resumenDesdeCabecera } from './documento-resumen';
 import type { DocumentoImpuestoAgrupadoRead, DocumentoTotalesRead } from './documento.types';
 
 const iva19: DocumentoImpuestoAgrupadoRead = {
@@ -34,8 +34,25 @@ const factura131: DocumentoTotalesRead = {
   ],
 };
 
+/**
+ * Factura de compra 154: un ítem de 10.000 sin impuestos y una cuenta débito de
+ * 10.000. `subtotal` y `total` ya suman la cuenta; `total_bruto` no.
+ */
+const factura154: DocumentoTotalesRead = {
+  subtotal: '20000.000000',
+  descuento: '0.000000',
+  total_bruto: '10000.000000',
+  base_impuesto: '10000.000000',
+  impuesto: '0.000000',
+  impuesto_retencion: '0.000000',
+  total: '20000.000000',
+  debito: '10000.000000',
+  credito: '0.000000',
+  documento_impuestos: [],
+};
+
 describe('resumenDesdeCabecera', () => {
-  it('arma el resumen con los acumulados y cuadra con el total del backend', () => {
+  it('sin cuentas cuadra con el total del backend', () => {
     expect(resumenDesdeCabecera(factura131)).toEqual({
       subtotal: 1686500,
       descuento: 0,
@@ -47,11 +64,25 @@ describe('resumenDesdeCabecera', () => {
     });
   });
 
-  it('resta el descuento y las retenciones', () => {
+  it('deja afuera las cuentas aunque subtotal y total las sumen', () => {
+    expect(resumenDesdeCabecera(factura154)).toEqual({
+      subtotal: 10000,
+      descuento: 0,
+      impuestos: [],
+      total: 10000,
+    });
+  });
+
+  it('con descuento, retención y una cuenta crédito el desglose cuadra', () => {
+    // Ítems: 1000 − 100 de descuento + 171 de IVA − 22,5 de retención = 1048,5.
+    // Cuenta crédito de 48,5: el documento queda en 1000.
     const r = resumenDesdeCabecera({
       ...factura131,
-      subtotal: '1000.00',
+      subtotal: '951.50',
       descuento: '100.00',
+      total: '1000.00',
+      debito: '0.00',
+      credito: '48.50',
       documento_impuestos: [
         { ...iva19, total: '171.00' },
         {
@@ -65,11 +96,28 @@ describe('resumenDesdeCabecera', () => {
         },
       ],
     });
-    expect(r?.impuestos.map((imp) => imp.total)).toEqual([171, -22.5]);
-    expect(r?.total).toBe(1048.5);
+    expect(r).toEqual({
+      subtotal: 1000,
+      descuento: 100,
+      impuestos: [
+        { id: 3, nombre: 'IVA Compras 19%', total: 171 },
+        { id: 7, nombre: 'RTF', total: -22.5 },
+      ],
+      total: 1048.5,
+    });
   });
 
   it('sin desglose por impuesto devuelve null', () => {
     expect(resumenDesdeCabecera({ ...factura131, documento_impuestos: undefined })).toBeNull();
+  });
+});
+
+describe('cuentasDesdeCabecera', () => {
+  it('lee débitos y créditos de la cabecera', () => {
+    expect(cuentasDesdeCabecera(factura154)).toEqual({ debitos: 10000, creditos: 0 });
+  });
+
+  it('sin los campos devuelve null para que se sumen las líneas', () => {
+    expect(cuentasDesdeCabecera(factura131)).toBeNull();
   });
 });

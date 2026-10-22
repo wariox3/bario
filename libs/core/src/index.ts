@@ -132,6 +132,7 @@ export type {
   DocumentoDetalleImpuestoRead,
   DocumentoImpuestoAgrupadoRead,
   DocumentoTotalesRead,
+  CuentasCabecera,
 } from './lib/documento';
 export {
   DOCUMENT_TYPE_ID,
@@ -142,6 +143,7 @@ export {
   documentoContactoToOption,
   impuestosAgrupadosToResumen,
   resumenDesdeCabecera,
+  cuentasDesdeCabecera,
   lineBruto,
   lineDescuento,
   lineBase,

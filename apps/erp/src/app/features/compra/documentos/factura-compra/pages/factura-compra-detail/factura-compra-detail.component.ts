@@ -24,6 +24,8 @@ import {
   calcularResumen,
   LIST_PAGE_SIZE,
   resumenDesdeCabecera,
+  cuentasDesdeCabecera,
+  type CuentasCabecera,
   type ResumenDocumento,
   type DocumentoEstados,
   comercialDetalleToFormValue,
@@ -156,6 +158,8 @@ export class FacturaCompraDetailComponent implements OnInit {
    * `null` si la cabecera no trae el desglose por impuesto: se suman las líneas.
    */
   private readonly resumenCabecera = signal<ResumenDocumento | null>(null);
+  /** Débitos y créditos según la cabecera; `null` si no los trae: se suman las cuentas. */
+  private readonly cuentasCabecera = signal<CuentasCabecera | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -188,14 +192,17 @@ export class FacturaCompraDetailComponent implements OnInit {
   });
 
   /**
-   * Débitos y créditos de las cuentas contables del documento. Suma el neto que
-   * calculó el backend (el legacy sumaba `total`), así cuadra con la columna
-   * Neto de la tabla; sin neto cae al valor de la línea.
+   * Débitos y créditos de las cuentas contables del documento: los de la cabecera
+   * (`debito` / `credito`), que son los que entraron en su `total`. Si la cabecera
+   * no los trae, suma el neto de cada línea (el legacy sumaba `total`); sin neto
+   * cae al valor de la línea.
    */
-  protected readonly resumenCuentas = computed(() =>
-    calcularResumenContable(
-      this.cuentas().map((cuenta) => ({ ...cuenta, valor: cuenta.neto ?? cuenta.valor })),
-    ),
+  protected readonly resumenCuentas = computed<CuentasCabecera>(
+    () =>
+      this.cuentasCabecera() ??
+      calcularResumenContable(
+        this.cuentas().map((cuenta) => ({ ...cuenta, valor: cuenta.neto ?? cuenta.valor })),
+      ),
   );
 
   /**
@@ -325,6 +332,7 @@ export class FacturaCompraDetailComponent implements OnInit {
           const read = cabecera as FacturaCompraRead;
           const fc = facturaCompraToFormValue(read);
           this.resumenCabecera.set(resumenDesdeCabecera(read));
+          this.cuentasCabecera.set(cuentasDesdeCabecera(read));
           this.cabecera.set({
             numero: read.numero ?? null,
             proveedor: read.contacto_nombre_corto ?? null,

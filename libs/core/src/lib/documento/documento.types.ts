@@ -32,7 +32,15 @@ export interface DocumentoTotalesRead {
   readonly base_impuesto: string | null;
   readonly impuesto: string | null;
   readonly impuesto_retencion: string | null;
+  /** Total del documento: ítems con sus impuestos, más débitos y menos créditos de las cuentas. */
   readonly total: string | null;
+  /**
+   * Suma de las líneas de cuenta contable (`tipo_registro = 'C'`) por naturaleza.
+   * Opcionales: el backend las expone desde el 2026-10-22 y la fila del listado
+   * puede no traerlas.
+   */
+  readonly debito?: string | null;
+  readonly credito?: string | null;
   /** Solo en `documento/<id>/detalle/` (`cabeceraConImpuestos`). */
   readonly documento_impuestos?: readonly DocumentoImpuestoAgrupadoRead[];
 }

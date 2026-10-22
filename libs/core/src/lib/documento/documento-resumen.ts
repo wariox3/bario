@@ -4,27 +4,50 @@ import { toFiniteNumber } from '../utils/currency.utils';
 import { impuestosAgrupadosToResumen } from './documento-impuestos';
 import type { DocumentoTotalesRead } from './documento.types';
 
+/** Débitos y créditos de las cuentas contables de un documento. */
+export interface CuentasCabecera {
+  readonly debitos: number;
+  readonly creditos: number;
+}
+
 /**
- * Resumen de las líneas de ítem de un documento guardado, con los acumulados del
- * backend: no necesita tener las líneas cargadas. `null` si la cabecera no trae
- * el desglose por impuesto (solo lo trae `documento/<id>/detalle/`); entonces
- * el resumen se sigue calculando con las líneas.
+ * Débitos y créditos de las cuentas según el backend (`debito` / `credito` de la
+ * cabecera). `null` si la cabecera no los trae: entonces se suman las líneas.
+ */
+export function cuentasDesdeCabecera(read: DocumentoTotalesRead): CuentasCabecera | null {
+  if (read.debito == null && read.credito == null) return null;
+  return {
+    debitos: redondearMoneda(toFiniteNumber(read.debito) ?? 0),
+    creditos: redondearMoneda(toFiniteNumber(read.credito) ?? 0),
+  };
+}
+
+/**
+ * Resumen de las líneas de **ítem** de un documento guardado, con los acumulados
+ * del backend: no necesita tener las líneas cargadas. `null` si la cabecera no
+ * trae el desglose por impuesto (solo lo trae `documento/<id>/detalle/`);
+ * entonces el resumen se sigue calculando con las líneas.
  *
- * El total se arma con las piezas (`subtotal − descuento + Σ impuestos`) y no con
- * el `total` de la cabecera, para que cuadre con el desglose que se pinta y para
- * que sumarle las cuentas contables (`resumenConCuentas`) no las cuente dos veces
- * si el backend ya las incluyera.
+ * Deja afuera las cuentas contables: quien lo use les suma las suyas
+ * (`resumenConCuentas`), y así no cuentan dos veces. El `total` del backend sí
+ * las incluye, así que el de los ítems es `total − debito + credito`.
+ *
+ * El subtotal no se lee de `subtotal`, que también suma las cuentas, ni de
+ * `total_bruto`, cuyo trato del descuento no está confirmado: sale de despejar
+ * `total = subtotal − descuento + Σ impuestos`. Así el desglose que se pinta
+ * siempre cuadra con el total del backend.
  */
 export function resumenDesdeCabecera(read: DocumentoTotalesRead): ResumenDocumento | null {
   if (!read.documento_impuestos) return null;
   const impuestos = impuestosAgrupadosToResumen(read.documento_impuestos);
-  const subtotal = toFiniteNumber(read.subtotal) ?? 0;
+  const cuentas = cuentasDesdeCabecera(read) ?? { debitos: 0, creditos: 0 };
+  const total = (toFiniteNumber(read.total) ?? 0) - cuentas.debitos + cuentas.creditos;
   const descuento = toFiniteNumber(read.descuento) ?? 0;
   const totalImpuestos = impuestos.reduce((acc, imp) => acc + imp.total, 0);
   return {
-    subtotal: redondearMoneda(subtotal),
+    subtotal: redondearMoneda(total + descuento - totalImpuestos),
     descuento: redondearMoneda(descuento),
     impuestos,
-    total: redondearMoneda(subtotal - descuento + totalImpuestos),
+    total: redondearMoneda(total),
   };
 }

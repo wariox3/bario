@@ -10,7 +10,8 @@ export type {
   DocumentoTotalesRead,
 } from './documento.types';
 export { impuestosAgrupadosToResumen } from './documento-impuestos';
-export { resumenDesdeCabecera } from './documento-resumen';
+export { cuentasDesdeCabecera, resumenDesdeCabecera } from './documento-resumen';
+export type { CuentasCabecera } from './documento-resumen';
 export type {
   EntityKind,
   InventoryEffect,
