@@ -12,11 +12,12 @@
 import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
+  DocumentoTotalesRead,
   ComercialDetallePayload,
 } from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una nota ajuste. */
-export interface NotaAjusteRead extends DocumentoReadBase {
+export interface NotaAjusteRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   /** FK al documento soporte que la nota ajusta. */

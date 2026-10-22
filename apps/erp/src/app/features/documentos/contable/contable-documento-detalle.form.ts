@@ -1,4 +1,11 @@
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  type AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+  type ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import type { ErpSelectOption } from '@reddoc/core';
 import type {
   CuentaDetalleFormRawValue,
@@ -22,18 +29,34 @@ export type CuentaDetalleGroup = FormGroup<{
 }>;
 
 /**
+ * La cuenta de la línea exige base (`exige_base` del `seleccionar/`) y la base
+ * está en cero. Vive en el control `base` —no en el grupo— para que
+ * `libFocusInvalid` lleve a la persona a ese campo; por eso lee la cuenta del
+ * padre y el grupo lo re-evalúa cada vez que la cuenta cambia.
+ *
+ * Una cuenta cargada desde el backend (edición, cruce) no trae la bandera: no se
+ * valida hasta que se vuelva a elegir en el selector.
+ */
+function baseExigidaValidator(control: AbstractControl<number | null>): ValidationErrors | null {
+  const cuenta = control.parent?.get('cuenta')?.value as ErpSelectOption | null | undefined;
+  if (cuenta?.['exige_base'] !== true) return null;
+  return (control.value ?? 0) > 0 ? null : { baseExigida: true };
+}
+
+/**
  * Crea un `FormGroup` de línea de cuenta (vacío o precargado en edición).
  *
- * Sin suscripciones internas: una línea de cuenta no recalcula impuestos ni
- * deriva campos —su valor lo teclea el usuario directo—, así que el grupo es puro
- * estado de formulario. El acumulado de débitos/créditos se deriva fuera, en la
- * tabla, a partir del valor del array.
+ * Una línea de cuenta no recalcula impuestos ni deriva campos —su valor lo
+ * teclea el usuario directo—. La única suscripción interna re-evalúa la base
+ * cuando cambia la cuenta, porque su obligatoriedad depende de ella
+ * (`baseExigidaValidator`). El acumulado de débitos/créditos se deriva fuera, en
+ * la tabla, a partir del valor del array.
  *
  * `contacto`, `centro_costo`, `base`, `numero` y `detalle` existen siempre en el
  * grupo aunque la tabla los oculte: así el shape de la línea es uno solo y el
  * mapper no necesita ramas. Un documento que no los usa los deja en su default nulo.
- * Ninguno es obligatorio —solo `cuenta` y `valor` lo son—, así que prender una
- * columna nunca puede dejar una línea inválida.
+ * Ninguno es obligatorio —solo `cuenta` y `valor` lo son—, salvo la `base` cuando
+ * la cuenta elegida la exige.
  *
  * Una línea **enlazada** (`documento_afectado != null`) nace con `cuenta`,
  * `naturaleza` y `contacto` deshabilitados: su imputación y su tercero los fija el
@@ -47,7 +70,7 @@ export function createCuentaDetalleGroup(
   value?: Partial<CuentaDetalleFormRawValue>,
 ): CuentaDetalleGroup {
   const enlazada = value?.documento_afectado != null;
-  return new FormGroup({
+  const group: CuentaDetalleGroup = new FormGroup({
     id: new FormControl<number | null>(value?.id ?? null),
     cuenta: new FormControl<ErpSelectOption | null>(
       { value: value?.cuenta ?? null, disabled: enlazada && value?.cuenta != null },
@@ -65,7 +88,7 @@ export function createCuentaDetalleGroup(
       disabled: enlazada,
     }),
     centro_costo: new FormControl<ErpSelectOption | null>(value?.centro_costo ?? null),
-    base: new FormControl<number | null>(value?.base ?? 0),
+    base: new FormControl<number | null>(value?.base ?? 0, baseExigidaValidator),
     numero: new FormControl<number | null>(value?.numero ?? null),
     detalle: new FormControl<string | null>(value?.detalle ?? null, Validators.maxLength(200)),
     documento_afectado: new FormControl<number | null>(value?.documento_afectado ?? null),
@@ -74,6 +97,10 @@ export function createCuentaDetalleGroup(
     ),
     documento_afectado_tipo: new FormControl<string | null>(value?.documento_afectado_tipo ?? null),
   });
+  // El control y su suscriptor mueren con el grupo: no hace falta desuscribir.
+  group.controls.cuenta.valueChanges.subscribe(() => group.controls.base.updateValueAndValidity());
+  group.controls.base.updateValueAndValidity();
+  return group;
 }
 
 /**

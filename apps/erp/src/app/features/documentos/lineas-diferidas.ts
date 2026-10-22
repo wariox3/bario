@@ -1,12 +1,19 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { signal } from '@angular/core';
-import type { AbstractControl, FormArray, FormControl } from '@angular/forms';
+import { computed, signal } from '@angular/core';
+import {
+  type AbstractControl,
+  type FormArray,
+  type FormControl,
+  PristineChangeEvent,
+  TouchedChangeEvent,
+} from '@angular/forms';
 import {
   type Observable,
   catchError,
   concat,
   concatMap,
   defer,
+  filter,
   finalize,
   from,
   map,
@@ -18,6 +25,7 @@ import {
   toArray,
 } from 'rxjs';
 import type { DocumentoDetalleService } from '@erp/core/module-config';
+import { reemplazarFilas } from './form-array-filas';
 
 /**
  * Líneas que se escriben a la vez al guardar. Acota la ráfaga contra el backend en
@@ -34,6 +42,24 @@ export class LineasEnCursoError extends Error {
     super('Ya hay un guardado de líneas en curso');
     this.name = 'LineasEnCursoError';
   }
+}
+
+/**
+ * Cambios de las filas que **no** mueven su valor: tocado y sucio/limpio. Una tabla
+ * `OnPush` los necesita aparte de `valueChanges`, porque los dispara alguien de
+ * afuera sin pasar por un signal:
+ *
+ * - el form padre, al intentar guardar en blanco: `libFocusInvalid` hace
+ *   `markAllAsTouched()` y las filas incompletas tienen que pintarse en rojo;
+ * - el guardado, que marca sucia una fila que cambió mientras viajaba
+ *   (`persistirFila`), y el padre, que limpia todo al guardar.
+ *
+ * Los eventos de cada fila suben por `events` del `FormArray`.
+ */
+export function cambiosDeEstado(array: AbstractControl): Observable<unknown> {
+  return array.events.pipe(
+    filter((e) => e instanceof TouchedChangeEvent || e instanceof PristineChangeEvent),
+  );
 }
 
 /** Lo único que el guardado diferido lee de una fila además del estado del control. */
@@ -57,7 +83,18 @@ export interface LineasDiferidasConfig<G extends LineaGroup, TRead> {
   readonly payload: (fila: G) => object;
   /** Grupo nuevo armado con la línea que devolvió el backend. */
   readonly reconstruir: (leida: TRead) => G;
+  /**
+   * Avisa cada línea que el backend confirmó, aunque el resto del lote falle. La
+   * tabla paginada lo usa para mover el resumen guardado: lo escrito ya cuenta en
+   * el documento.
+   */
+  readonly alGuardar?: (cambio: LineaGuardada<TRead>) => void;
 }
+
+/** Una línea que quedó escrita (alta o edición) o borrada en el backend. */
+export type LineaGuardada<TRead> =
+  | { readonly tipo: 'escrita'; readonly id: number; readonly leida: TRead }
+  | { readonly tipo: 'borrada'; readonly id: number };
 
 /** Cómo terminó una operación del guardado: el lote junta todas antes de decidir. */
 type ResultadoGuardado = { readonly ok: true } | { readonly ok: false; readonly err: unknown };
@@ -79,10 +116,24 @@ export class LineasDiferidas<G extends LineaGroup, TRead> {
    */
   private readonly eliminadas = signal<readonly number[]>([]);
 
+  /**
+   * Filas persistidas con cambios sin guardar que no están en la página visible.
+   * Con la tabla paginada, cambiar de página reemplaza las filas del array; las
+   * editadas se guardan acá con su grupo vivo y vuelven a la tabla al regresar a
+   * su página (`mostrarPagina`). Sin paginar queda siempre vacío.
+   */
+  private readonly fuera = signal<ReadonlyMap<number, G>>(new Map());
+
   private readonly guardandoSignal = signal(false);
 
   /** Hay un guardado en curso. */
   readonly guardando = this.guardandoSignal.asReadonly();
+
+  /** Ids de las líneas persistidas quitadas, pendientes de borrar. */
+  readonly bajas = this.eliminadas.asReadonly();
+
+  /** Filas editadas que no están en la página visible (ver `fuera`). */
+  readonly fueraDePagina = computed(() => [...this.fuera().values()]);
 
   constructor(private readonly config: LineasDiferidasConfig<G, TRead>) {}
 
@@ -95,12 +146,57 @@ export class LineasDiferidas<G extends LineaGroup, TRead> {
 
   /** Nº de cambios sin guardar: filas nuevas o editadas más las quitadas. */
   pendingCount(): number {
-    return this.filasPendientes().length + this.eliminadas().length;
+    return this.pendientes().length + this.eliminadas().length;
   }
 
   /** `true` si alguna fila pendiente está incompleta; el guardado la salta. */
   hayIncompletas(): boolean {
-    return this.filasPendientes().some((fila) => fila.invalid);
+    return this.pendientes().some((fila) => fila.invalid);
+  }
+
+  /**
+   * Filas con cambios sin guardar, estén o no en la página visible (no incluye
+   * las quitadas).
+   */
+  pendientes(): readonly G[] {
+    return [...this.filas(), ...this.fuera().values()].filter((fila) => this.esPendiente(fila));
+  }
+
+  /**
+   * Muestra una página de líneas leídas del backend. El array queda con las de la
+   * página (menos las quitadas) y, al final, las nuevas sin guardar, que se ven en
+   * todas las páginas. Una fila editada que sale de la vista pasa a `fuera` y, si
+   * la página trae su id, vuelve con sus cambios en vez de reconstruirse.
+   */
+  mostrarPagina(leidas: readonly TRead[]): void {
+    const fuera = new Map(this.fuera());
+    const nuevas: G[] = [];
+    for (const fila of this.filas()) {
+      const id = fila.controls.id.value;
+      if (id == null) nuevas.push(fila);
+      else if (this.esPendiente(fila)) fuera.set(id, fila);
+    }
+    const bajas = new Set(this.eliminadas());
+    const pagina: G[] = [];
+    for (const leida of leidas) {
+      const fila = this.config.reconstruir(leida);
+      const id = fila.controls.id.value;
+      if (id != null && bajas.has(id)) continue;
+      const viva = id != null ? fuera.get(id) : undefined;
+      if (viva && id != null) fuera.delete(id);
+      pagina.push(viva ?? fila);
+    }
+    this.fuera.set(fuera);
+    reemplazarFilas(this.config.detalles(), [...pagina, ...nuevas]);
+  }
+
+  /**
+   * Marca como quitadas líneas persistidas que no están en la tabla (las de otras
+   * páginas), p. ej. para reemplazar todas las líneas del documento.
+   */
+  marcarBajas(ids: readonly number[]): void {
+    if (this.config.documentId() == null || ids.length === 0) return;
+    this.eliminadas.update((actuales) => [...new Set([...actuales, ...ids])]);
   }
 
   /**
@@ -115,7 +211,8 @@ export class LineasDiferidas<G extends LineaGroup, TRead> {
 
   /** Quita todas las filas (p. ej. para reemplazarlas por las de otro documento). */
   quitarTodas(): void {
-    for (const fila of this.filas()) this.marcarBaja(fila);
+    for (const fila of [...this.filas(), ...this.fuera().values()]) this.marcarBaja(fila);
+    this.fuera.set(new Map());
     this.config.detalles().clear();
   }
 
@@ -145,7 +242,7 @@ export class LineasDiferidas<G extends LineaGroup, TRead> {
       const documentoId = this.config.documentId();
       if (documentoId == null) return of(undefined);
       const bajas = [...this.eliminadas()];
-      const filas = this.filasPendientes().filter((fila) => fila.valid);
+      const filas = this.pendientes().filter((fila) => fila.valid);
       if (bajas.length === 0 && filas.length === 0) return of(undefined);
 
       // Cada operación entrega su resultado en vez de cortar el lote con su error.
@@ -184,10 +281,6 @@ export class LineasDiferidas<G extends LineaGroup, TRead> {
     return this.config.detalles().controls as readonly G[];
   }
 
-  private filasPendientes(): readonly G[] {
-    return this.filas().filter((fila) => this.esPendiente(fila));
-  }
-
   private marcarBaja(fila: G): void {
     const id = fila.controls.id.value;
     if (this.config.documentId() != null && id != null) {
@@ -216,15 +309,27 @@ export class LineasDiferidas<G extends LineaGroup, TRead> {
     return op.pipe(
       tap((guardada) => {
         const nueva = this.config.reconstruir(guardada);
+        const nuevoId = nueva.controls.id.value;
+        if (nuevoId != null)
+          this.config.alGuardar?.({ tipo: 'escrita', id: nuevoId, leida: guardada });
         if (JSON.stringify(this.config.payload(fila)) !== enviado) {
-          fila.controls.id.setValue(nueva.controls.id.value);
+          fila.controls.id.setValue(nuevoId);
           fila.markAsDirty();
           return;
         }
         const index = this.filas().indexOf(fila);
         if (index >= 0) this.config.detalles().setControl(index, nueva);
+        else if (id != null) this.sacarDeFuera(id);
       }),
     );
+  }
+
+  /** Una fila de otra página ya quedó guardada: al volver a ella se lee del backend. */
+  private sacarDeFuera(id: number): void {
+    if (!this.fuera().has(id)) return;
+    const fuera = new Map(this.fuera());
+    fuera.delete(id);
+    this.fuera.set(fuera);
   }
 
   /**
@@ -232,7 +337,10 @@ export class LineasDiferidas<G extends LineaGroup, TRead> {
    * línea ya no existe (p. ej. la borró un intento anterior cuya respuesta se perdió).
    */
   private persistirBaja(id: number): Observable<void> {
-    const hecho = (): void => this.eliminadas.update((ids) => ids.filter((x) => x !== id));
+    const hecho = (): void => {
+      this.eliminadas.update((ids) => ids.filter((x) => x !== id));
+      this.config.alGuardar?.({ tipo: 'borrada', id });
+    };
     return this.config.service.eliminar(id).pipe(
       tap(hecho),
       catchError((err: unknown) => {

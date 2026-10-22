@@ -1,14 +1,17 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { TabsModule } from 'primeng/tabs';
 import {
   I18nService,
   TenantService,
   ToastService,
   calcularResumen,
+  LIST_PAGE_SIZE,
+  resumenDesdeCabecera,
   type ResumenDocumento,
   type DocumentoEstados,
   comercialDetalleToFormValue,
@@ -59,6 +62,7 @@ interface CabeceraView {
   selector: 'app-factura-compra-recurrente-detail',
   standalone: true,
   imports: [
+    PaginatorModule,
     ButtonModule,
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
@@ -89,8 +93,20 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
   readonly id = input<string>();
 
   protected readonly cabecera = signal<CabeceraView | null>(null);
-  /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
+  /** Página visible de las líneas de ítem, ya mapeadas a la forma del front. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+  protected readonly pageSize = LIST_PAGE_SIZE;
+  /** Página visible de los ítems, 0-based como `p-paginator`. */
+  protected readonly pagina = signal(0);
+  /** Líneas de ítem del documento según el backend. */
+  protected readonly totalItems = signal(0);
+  protected readonly cargandoItems = signal(false);
+  /**
+   * Resumen con los acumulados del backend (`resumenDesdeCabecera`): con las
+   * líneas paginadas no se puede sumar en el front. `null` si la cabecera no trae
+   * el desglose por impuesto: se suman las líneas.
+   */
+  private readonly resumenCabecera = signal<ResumenDocumento | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -112,8 +128,8 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
   });
 
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
-  protected readonly resumen = computed<ResumenDocumento>(() =>
-    calcularResumen(this.lines().map(toLineaCalculo)),
+  protected readonly resumen = computed<ResumenDocumento>(
+    () => this.resumenCabecera() ?? calcularResumen(this.lines().map(toLineaCalculo)),
   );
 
   /** Migas: módulo Compra → listado del documento → identificador del documento abierto. */
@@ -161,7 +177,7 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      lineas: this.detalleService.paginaDeItems<ComercialDetalleRead>(id, 1),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -187,7 +203,10 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
               estado_generado: read.estado_generado,
             },
           });
-          this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
+          this.resumenCabecera.set(resumenDesdeCabecera(read));
+          this.pagina.set(0);
+          this.totalItems.set(lineas.count);
+          this.lines.set(lineas.results.map((line) => comercialDetalleToFormValue(line)));
           this.isLoading.set(false);
         },
         error: () => {
@@ -195,6 +214,30 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
           this.notFound.set(true);
           const toasts = this.t().entities.facturaCompraRecurrente.form.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
+        },
+      });
+  }
+
+  protected onItemsPageChange(event: PaginatorState): void {
+    const id = this.id();
+    const pagina = event.page ?? 0;
+    if (!id || pagina === this.pagina()) return;
+    this.cargandoItems.set(true);
+    this.detalleService
+      .paginaDeItems<ComercialDetalleRead>(Number(id), pagina + 1)
+      .pipe(
+        finalize(() => this.cargandoItems.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (items) => {
+          this.pagina.set(pagina);
+          this.totalItems.set(items.count);
+          this.lines.set(items.results.map((line) => comercialDetalleToFormValue(line)));
+        },
+        error: () => {
+          const toast = this.t().entities.comercialDetalle.toasts.loadError;
+          this.toast.error(toast.title, toast.desc);
         },
       });
   }

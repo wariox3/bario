@@ -171,6 +171,17 @@
             [almacenEnabled]="true"
             (verAfectacion)="onVerAfectacion($event)"
           />
+          @if (totalItems() > pageSize) {
+            <p-paginator
+              styleClass="border-t border-[rgba(20,48,73,0.08)]"
+              [class.pointer-events-none]="cargandoItems()"
+              [class.opacity-60]="cargandoItems()"
+              [rows]="pageSize"
+              [totalRecords]="totalItems()"
+              [first]="pagina() * pageSize"
+              (onPageChange)="onItemsPageChange($event)"
+            />
+          }
         </p-tabpanel>
 
         <p-tabpanel value="cuentas">

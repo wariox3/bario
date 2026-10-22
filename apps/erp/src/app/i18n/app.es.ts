@@ -4228,6 +4228,10 @@ export const es: AppDict = {
           title: 'Error al guardar',
           desc: 'No se pudieron guardar las líneas',
         },
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron cargar las líneas',
+        },
         incompleteLines: {
           title: 'Líneas incompletas',
           desc: 'Completa o elimina las líneas sin ítem antes de guardar',
@@ -4436,6 +4440,7 @@ export const es: AppDict = {
       contactoPlaceholder: 'Buscar contacto…',
       centroCostoPlaceholder: 'Seleccionar…',
       detallePlaceholder: 'Glosa de la línea',
+      baseExigida: 'Esta cuenta exige base: ingresa un valor mayor a cero',
       confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {

@@ -1,5 +1,5 @@
-import { calcularImpuestosLinea, calcularResumen, redondearMoneda } from './calculo';
-import type { LineaCalculo, TasaImpuesto } from './calculo.types';
+import { aplicarDeltas, calcularImpuestosLinea, calcularResumen, redondearMoneda } from './calculo';
+import type { LineaCalculo, ResumenDocumento, TasaImpuesto } from './calculo.types';
 
 const IVA_19: TasaImpuesto = { id: 1, nombre: 'IVA 19%', porcentaje: 19, porcentajeBase: 100 };
 const IVA_AIU: TasaImpuesto = { id: 2, nombre: 'IVA AIU', porcentaje: 19, porcentajeBase: 10 };
@@ -188,5 +188,72 @@ describe('calcularResumen', () => {
     expect(r.subtotal).toBe(1_250_000);
     expect(r.impuestos).toEqual([]);
     expect(r.total).toBe(1_250_000);
+  });
+});
+
+describe('aplicarDeltas', () => {
+  const iva = (total: number) => ({ id: 3, nombre: 'IVA 19%', total });
+  const linea = (base: number, ivaTotal: number): LineaCalculo => ({
+    base,
+    impuestos: [iva(ivaTotal)],
+  });
+  // Lo que devolvió el backend para un documento con más líneas que las cargadas.
+  const base: ResumenDocumento = {
+    subtotal: 1000,
+    descuento: 0,
+    impuestos: [{ id: 3, nombre: 'IVA Compras 19%', total: 190 }],
+    total: 1190,
+  };
+
+  it('sin cambios devuelve la base tal cual', () => {
+    const cargadas = [linea(100, 19), linea(200, 38)];
+    expect(aplicarDeltas(base, cargadas, cargadas)).toEqual(base);
+  });
+
+  it('una línea editada suma solo la diferencia', () => {
+    const r = aplicarDeltas(base, [linea(150, 28.5)], [linea(100, 19)]);
+    expect(r.subtotal).toBe(1050);
+    expect(r.impuestos).toEqual([{ id: 3, nombre: 'IVA Compras 19%', total: 199.5 }]);
+    expect(r.total).toBe(1249.5);
+  });
+
+  it('una nueva suma y una quitada resta', () => {
+    const nueva: LineaCalculo = {
+      base: 50,
+      descuento: 5,
+      impuestos: [{ id: 4, nombre: 'IVA 5%', total: 2.25 }],
+    };
+    const r = aplicarDeltas(base, [nueva], [linea(100, 19)]);
+    expect(r.subtotal).toBe(950);
+    expect(r.descuento).toBe(5);
+    expect(r.impuestos).toEqual([
+      { id: 3, nombre: 'IVA Compras 19%', total: 171 },
+      { id: 4, nombre: 'IVA 5%', total: 2.25 },
+    ]);
+    expect(r.total).toBe(1118.25);
+  });
+
+  it('omite el impuesto que quedó en cero al quitar sus líneas', () => {
+    const r = aplicarDeltas(base, [], [linea(1000, 190)]);
+    expect(r.impuestos).toEqual([]);
+    expect(r.total).toBe(0);
+  });
+
+  it('conserva un impuesto en cero que viene de la base sin tocar', () => {
+    const exento: ResumenDocumento = {
+      ...base,
+      impuestos: [...base.impuestos, { id: 9, nombre: 'IVA 0%', total: 0 }],
+    };
+    const r = aplicarDeltas(exento, [linea(100, 19)], [linea(100, 19)]);
+    expect(r.impuestos.map((imp) => imp.id)).toEqual([3, 9]);
+  });
+
+  it('no arrastra colas de coma flotante', () => {
+    const r = aplicarDeltas(
+      { subtotal: 0.3, descuento: 0, impuestos: [], total: 0.3 },
+      [{ base: 0.1, impuestos: [] }],
+      [{ base: 0.2, impuestos: [] }],
+    );
+    expect(r.subtotal).toBe(0.2);
   });
 });

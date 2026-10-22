@@ -18,6 +18,7 @@ export { authInterceptor } from './lib/interceptors/auth.interceptor';
 export { errorInterceptor } from './lib/interceptors/error.interceptor';
 export { ERROR_TOAST } from './lib/interceptors/error-http-context';
 export { tenantInterceptor } from './lib/interceptors/tenant.interceptor';
+export { catalogoCacheInterceptor } from './lib/interceptors/catalogo-cache.interceptor';
 export type { PaginatedResponse } from './lib/models/pagination.model';
 export type {
   BaseUsuario,
@@ -114,7 +115,12 @@ export {
   SENTRY_PRODUCCION,
 } from './lib/observabilidad';
 export type { ObservabilidadOptions, SentryConfig } from './lib/observabilidad';
-export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/calculo';
+export {
+  redondearMoneda,
+  calcularImpuestosLinea,
+  calcularResumen,
+  aplicarDeltas,
+} from './lib/calculo';
 export type { TasaImpuesto, ImpuestoLinea, LineaCalculo, ResumenDocumento } from './lib/calculo';
 export type {
   DocumentoListRowBase,
@@ -124,6 +130,9 @@ export type {
   DocumentoDetalleReadBase,
   DocumentoDetallePayloadBase,
   DocumentoDetalleImpuestoRead,
+  DocumentoImpuestoAgrupadoRead,
+  DocumentoTotalesRead,
+  CuentasCabecera,
 } from './lib/documento';
 export {
   DOCUMENT_TYPE_ID,
@@ -132,6 +141,10 @@ export {
   HttpEntityDataGateway,
   DocumentoDetalleService,
   documentoContactoToOption,
+  impuestosAgrupadosToResumen,
+  resumenDesdeCabecera,
+  cuentasDesdeCabecera,
+  cantidadDesdeCabecera,
   lineBruto,
   lineDescuento,
   lineBase,
@@ -260,6 +273,9 @@ export type {
 export {
   ErpSelectDataService,
   SELECT_ENDPOINTS,
+  catalogoCompartido,
+  CatalogoCacheService,
+  CATALOGO_TTL_MS,
   buildContactoLabel,
   asesorLabel,
   resolucionDesdeRead,
@@ -267,7 +283,7 @@ export {
   resolucionTexto,
   RESOLUCION_ACTIVA_PARAMS,
 } from './lib/data';
-export type { ErpSelectOption, ResolucionRead } from './lib/data';
+export type { CatalogoCompartidoOptions, ErpSelectOption, ResolucionRead } from './lib/data';
 export * from './lib/data-list';
 export * from './lib/plans';
 export { normalizeHttpError, classifyStatus, NON_FIELD_KEY } from './lib/utils/error-normalizer';

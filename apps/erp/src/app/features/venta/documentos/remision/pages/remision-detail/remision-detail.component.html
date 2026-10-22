@@ -144,13 +144,24 @@
             [detalleEnabled]="false"
             (verAfectacion)="onVerAfectacion($event)"
           />
+          @if (totalItems() > pageSize) {
+            <p-paginator
+              styleClass="border-t border-[rgba(20,48,73,0.08)]"
+              [class.pointer-events-none]="cargandoItems()"
+              [class.opacity-60]="cargandoItems()"
+              [rows]="pageSize"
+              [totalRecords]="totalItems()"
+              [first]="pagina() * pageSize"
+              (onPageChange)="onItemsPageChange($event)"
+            />
+          }
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
   </section>
 
   <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
-  @if (lines().length > 0) {
+  @if (totalItems() > 0) {
     <app-comercial-documento-resumen [resumen]="resumen()" />
   }
 }

@@ -13,11 +13,12 @@
 import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
+  DocumentoTotalesRead,
   ComercialDetallePayload,
 } from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un pedido de cliente. */
-export interface PedidoClienteRead extends DocumentoReadBase {
+export interface PedidoClienteRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
 }

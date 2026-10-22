@@ -3190,6 +3190,7 @@ export interface AppDict
       };
       toasts: {
         lineSaveError: { title: string; desc: string };
+        loadError: { title: string; desc: string };
         incompleteLines: { title: string; desc: string };
       };
     };
@@ -3362,6 +3363,7 @@ export interface AppDict
       contactoPlaceholder: string;
       centroCostoPlaceholder: string;
       detallePlaceholder: string;
+      baseExigida: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {

@@ -29,6 +29,8 @@ export const FACTURA_COMPRA_RECURRENTE_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.facturaCompraRecurrente.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.FACTURA_COMPRA_RECURRENTE,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'inflow',
   schemaVersion: 1,
   columns: FACTURA_COMPRA_RECURRENTE_COLUMNS,

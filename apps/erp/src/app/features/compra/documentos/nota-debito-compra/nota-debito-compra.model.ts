@@ -13,11 +13,12 @@
 import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
+  DocumentoTotalesRead,
   ComercialDetallePayload,
 } from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una nota débito de compra. */
-export interface NotaDebitoCompraRead extends DocumentoReadBase {
+export interface NotaDebitoCompraRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   /** FK al documento (factura de compra) que la nota débito referencia. */

@@ -4155,6 +4155,10 @@ export const en: AppDict = {
           title: 'Save failed',
           desc: 'The lines could not be saved',
         },
+        loadError: {
+          title: 'Load failed',
+          desc: 'The lines could not be loaded',
+        },
         incompleteLines: {
           title: 'Incomplete lines',
           desc: 'Complete or remove lines without an item before saving',
@@ -4363,6 +4367,7 @@ export const en: AppDict = {
       contactoPlaceholder: 'Search contact…',
       centroCostoPlaceholder: 'Select…',
       detallePlaceholder: 'Line description',
+      baseExigida: 'This account requires a base: enter a value greater than zero',
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {

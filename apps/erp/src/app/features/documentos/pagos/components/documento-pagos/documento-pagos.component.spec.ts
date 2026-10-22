@@ -41,6 +41,10 @@ describe('DocumentoPagosComponent', () => {
     fixture.componentRef.setInput('documentTotal', total);
     fixture.componentRef.setInput('documentId', documentId);
     fixture.detectChanges();
+    // La tabla carga una vez el catálogo de cuentas de banco que reparte a sus filas.
+    http
+      .expectOne((req) => req.url.endsWith('/general/cuenta-banco/seleccionar/'))
+      .flush({ count: 1, next: null, previous: null, results: [BANCO] });
   }
 
   beforeEach(() => {

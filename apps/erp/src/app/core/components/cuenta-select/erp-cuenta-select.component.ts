@@ -21,6 +21,9 @@ interface CuentaApiRow {
   readonly id: number;
   readonly codigo: string;
   readonly nombre: string;
+  readonly exige_base?: boolean;
+  readonly exige_contacto?: boolean;
+  readonly exige_centro_costo?: boolean;
 }
 
 /** Endpoint de selección de cuentas contables. */
@@ -41,10 +44,21 @@ const BASE_PARAMS: Record<string, ParamValue> = {
  * (p. ej. el rango de cuentas del cierre contable). `ErpSelectOption` admite
  * campos extra, así que exponerlo no rompe a nadie: quien no lo necesite sigue
  * leyendo `id` y `nombre`.
+ *
+ * Viajan también las **exigencias** de la cuenta (`exige_base`, `exige_contacto`,
+ * `exige_centro_costo`): la línea contable las lee para validar lo que la cuenta
+ * pide (ver `createCuentaDetalleGroup`).
  */
 function toOption(row: CuentaApiRow): ErpSelectOption {
   const label = [row.codigo, row.nombre].filter(Boolean).join(' - ');
-  return { id: row.id, nombre: label || row.nombre || '', codigo: row.codigo ?? '' };
+  return {
+    id: row.id,
+    nombre: label || row.nombre || '',
+    codigo: row.codigo ?? '',
+    exige_base: row.exige_base ?? false,
+    exige_contacto: row.exige_contacto ?? false,
+    exige_centro_costo: row.exige_centro_costo ?? false,
+  };
 }
 
 /**

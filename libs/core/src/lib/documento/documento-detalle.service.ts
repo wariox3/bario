@@ -1,12 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { BaseHttpService } from '../services/base-http.service';
 import type { BackendFilter } from '../data-list/data/build-list-body';
 import { fetchAllPages } from '../data-list/data/fetch-all-pages';
 import type { PaginatedResponse } from '../models/pagination.model';
+import type { DocumentoDetalleReadBase } from './documento.types';
 
 /** Endpoint CRUD de líneas de documento (compartido por todos los documentos). */
 const DOCUMENTO_DETALLE_ENDPOINT = '/general/documento-detalle/';
+
+/** `tipo_registro` de las líneas de cuenta contable; el resto son de ítem. */
+const TIPO_REGISTRO_CUENTA = 'C';
+
+/** Ítems (todo lo que no es cuenta) o cuentas de un documento. */
+function filtrosDeLineas(documentoId: number, cuentas: boolean): BackendFilter[] {
+  return [
+    { propiedad: 'documento_id', operador: '=', valor: documentoId },
+    { propiedad: 'tipo_registro', operador: cuentas ? '=' : '!=', valor: TIPO_REGISTRO_CUENTA },
+  ];
+}
+
+/**
+ * Re-acota lo que devolvió el backend: un filtro no declarado se ignora en
+ * silencio y una línea ajena no puede entrar a una tabla (ni a su guardado).
+ */
+function esLineaDe(documentoId: number, cuentas: boolean) {
+  return (linea: DocumentoDetalleReadBase): boolean =>
+    (linea.tipo_registro === TIPO_REGISTRO_CUENTA) === cuentas &&
+    (linea.documento == null || linea.documento === documentoId);
+}
 
 /**
  * CRUD de **líneas de documento** (`/api/general/documento-detalle/`).
@@ -85,6 +107,57 @@ export class DocumentoDetalleService extends BaseHttpService {
         { filtros },
         { page },
       ),
+    );
+  }
+
+  /**
+   * Una página de líneas filtradas (`POST …documento-detalle/lista/?page=`), con
+   * el `count` para el paginador. Ordena por `id` salvo que se pida otra cosa:
+   * sin un orden fijo, dos páginas pedidas en momentos distintos pueden repetir o
+   * saltarse líneas.
+   *
+   * Mismo aviso que `listarPorFiltros`: un filtro no declarado en el backend se
+   * ignora en silencio. Confirmados el 2026-10-22 en una factura de compra:
+   * `documento_id` y `ordenamientos: ['id']`.
+   */
+  listarPaginadoPorFiltros<TRead = unknown>(
+    filtros: readonly BackendFilter[],
+    page: number,
+    ordenamientos: readonly string[] = ['id'],
+  ): Observable<PaginatedResponse<TRead>> {
+    return this.post<PaginatedResponse<TRead>>(
+      `${DOCUMENTO_DETALLE_ENDPOINT}lista/`,
+      { filtros, ordenamientos },
+      { page },
+    );
+  }
+
+  /**
+   * Una página de las líneas de **ítem** de un documento (todo lo que no es
+   * cuenta contable), ordenadas por `id`. El `count` es el del backend.
+   */
+  paginaDeItems<TRead extends DocumentoDetalleReadBase>(
+    documentoId: number,
+    page: number,
+  ): Observable<PaginatedResponse<TRead>> {
+    return this.listarPaginadoPorFiltros<TRead>(filtrosDeLineas(documentoId, false), page).pipe(
+      map((res) => ({ ...res, results: res.results.filter(esLineaDe(documentoId, false)) })),
+    );
+  }
+
+  /** Todas las líneas de ítem de un documento (recorre las páginas). */
+  itemsDelDocumento<TRead extends DocumentoDetalleReadBase>(
+    documentoId: number,
+  ): Observable<TRead[]> {
+    return fetchAllPages((page) => this.paginaDeItems<TRead>(documentoId, page));
+  }
+
+  /** Todas las líneas de cuenta contable (`'C'`) de un documento; suelen ser pocas. */
+  cuentasDelDocumento<TRead extends DocumentoDetalleReadBase>(
+    documentoId: number,
+  ): Observable<TRead[]> {
+    return this.listarPorFiltros<TRead>(filtrosDeLineas(documentoId, true)).pipe(
+      map((lineas) => lineas.filter(esLineaDe(documentoId, true))),
     );
   }
 

@@ -50,8 +50,13 @@ export class HttpEntityDataGateway implements EntityDataGateway {
       );
   }
 
+  /**
+   * Con `cabeceraConImpuestos` pide `<endpoint>/<id>/detalle/`, que suma los
+   * impuestos agrupados (`documento_impuestos`) al mismo documento.
+   */
   getById(entity: EntityConfig, id: string | number): Observable<unknown> {
-    return this.http.get(`${entity.endpoint}/${id}/`);
+    const sufijo = entity.cabeceraConImpuestos ? 'detalle/' : '';
+    return this.http.get(`${entity.endpoint}/${id}/${sufijo}`);
   }
 
   create(entity: EntityConfig, payload: unknown): Observable<unknown> {

@@ -13,6 +13,7 @@
 import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
+  DocumentoTotalesRead,
   ComercialDetallePayload,
   ComercialDetalleRead,
 } from '@reddoc/core';
@@ -29,8 +30,13 @@ import type {
  */
 export type FacturaLineaRead = ComercialDetalleRead & CuentaDetalleRead;
 
-/** Read-model (GET `/documento/:id/`) de la cabecera de una factura de compra. */
-export interface FacturaCompraRead extends DocumentoReadBase {
+/**
+ * Read-model de la cabecera de una factura de compra. Se pide a
+ * `GET /documento/:id/detalle/` (`cabeceraConImpuestos`), que suma
+ * `documento_impuestos` al mismo documento de `/documento/:id/`: con eso el
+ * resumen sale de la cabecera (`resumenDesdeCabecera`).
+ */
+export interface FacturaCompraRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   readonly fecha_vence: string | null;

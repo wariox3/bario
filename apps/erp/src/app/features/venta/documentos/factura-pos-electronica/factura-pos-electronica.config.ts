@@ -33,6 +33,8 @@ export const FACTURA_POS_ELECTRONICA_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.facturaPosElectronica.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.FACTURA_POS_ELECTRONICO,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'outflow',
   hasPagos: true,
   schemaVersion: 1,

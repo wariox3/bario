@@ -12,11 +12,12 @@
 import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
+  DocumentoTotalesRead,
   ComercialDetallePayload,
 } from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un documento soporte. */
-export interface DocumentoSoporteRead extends DocumentoReadBase {
+export interface DocumentoSoporteRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   readonly fecha_vence: string | null;

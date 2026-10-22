@@ -20,6 +20,8 @@ export const NOTA_AJUSTE_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.notaAjuste.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_AJUSTE,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'inflow',
   // Motivo DIAN de la nota: solo los conceptos de la clase nota de ajuste.
   conceptoCorreccionClaseId: DOCUMENTO_CLASE_ID.NOTA_AJUSTE,
