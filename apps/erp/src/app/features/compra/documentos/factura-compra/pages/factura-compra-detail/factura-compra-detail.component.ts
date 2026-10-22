@@ -10,8 +10,9 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { TabsModule } from 'primeng/tabs';
 import type { MenuItem } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
@@ -21,6 +22,8 @@ import {
   TenantService,
   ToastService,
   calcularResumen,
+  LIST_PAGE_SIZE,
+  resumenDesdeCabecera,
   type ResumenDocumento,
   type DocumentoEstados,
   comercialDetalleToFormValue,
@@ -55,7 +58,10 @@ import { AfectacionModalComponent } from '@erp/core/module-config/components/afe
 import { facturaCompraToFormValue } from '../../factura-compra.mapper';
 import type { FacturaCompraRead, FacturaLineaRead } from '../../factura-compra.model';
 
-/** Cabecera legible de la factura para la ficha (solo lo que trae `getById`). */
+/**
+ * Cabecera legible de la factura para la ficha (solo lo que trae `getById`, que
+ * con `cabeceraConImpuestos` pega a `documento/<id>/detalle/`).
+ */
 interface CabeceraView {
   readonly numero: string | null;
   readonly proveedor: string | null;
@@ -84,8 +90,9 @@ interface CabeceraView {
  * documento (de ahí que viva en `factura-compra/` y no en un `_shared`), pero la
  * tabla de líneas y el resumen los aporta la familia comercial. Carga cabecera
  * (`ENTITY_DATA_GATEWAY.getById`) y líneas (`DocumentoDetalleService`) en paralelo
- * —igual que el form— y las muestra sin formularios. Desde aquí se vuelve a la
- * lista o se salta a editar.
+ * —igual que el form— y las muestra sin formularios. El resumen sale de los
+ * acumulados que el backend calcula en la cabecera, no de sumar las líneas. Desde
+ * aquí se vuelve a la lista o se salta a editar.
  *
  * Suma un dropdown **Utilidades** con la importación de líneas por Excel, igual
  * que la ficha del asiento. Vive acá y no en el formulario porque la
@@ -105,6 +112,7 @@ interface CabeceraView {
     DocumentEstadosComponent,
     AfectacionModalComponent,
     MenuModule,
+    PaginatorModule,
     ImportDialogComponent,
     TabsModule,
   ],
@@ -130,10 +138,24 @@ export class FacturaCompraDetailComponent implements OnInit {
   readonly id = input<string>();
 
   protected readonly cabecera = signal<CabeceraView | null>(null);
-  /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
+  /**
+   * Página visible de las líneas de ítem, ya mapeadas a la forma del front. Se
+   * traen de a 25: el resumen no las necesita todas, sale de la cabecera.
+   */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+  protected readonly pageSize = LIST_PAGE_SIZE;
+  /** Página visible de los ítems, 0-based como `p-paginator`. */
+  protected readonly pagina = signal(0);
+  /** Líneas de ítem del documento según el backend. */
+  protected readonly totalItems = signal(0);
+  protected readonly cargandoItems = signal(false);
   /** Líneas de cuenta contable (`tipo_registro = 'C'`): van en su propia pestaña. */
   protected readonly cuentas = signal<readonly CuentaDetalleLineaView[]>([]);
+  /**
+   * Resumen de los ítems con los acumulados del backend (`resumenDesdeCabecera`).
+   * `null` si la cabecera no trae el desglose por impuesto: se suman las líneas.
+   */
+  private readonly resumenCabecera = signal<ResumenDocumento | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -177,17 +199,17 @@ export class FacturaCompraDetailComponent implements OnInit {
   );
 
   /**
-   * Resumen financiero del documento: subtotal, descuento e impuestos de los
-   * ítems, y un total al que las cuentas débito suman y las crédito restan.
+   * Resumen financiero del documento: subtotal, descuento e impuestos de los ítems
+   * que calculó el backend, y un total al que las cuentas débito suman y las
+   * crédito restan.
    */
-  protected readonly resumen = computed<ResumenDocumento>(() =>
-    resumenConCuentas(calcularResumen(this.lines().map(toLineaCalculo)), this.resumenCuentas()),
-  );
+  protected readonly resumen = computed<ResumenDocumento>(() => {
+    const items = this.resumenCabecera() ?? calcularResumen(this.lines().map(toLineaCalculo));
+    return resumenConCuentas(items, this.resumenCuentas());
+  });
 
   /** Hay líneas de algún tipo: la ficha pinta el resumen solo entonces. */
-  protected readonly hayLineas = computed(
-    () => this.lines().length > 0 || this.cuentas().length > 0,
-  );
+  protected readonly hayLineas = computed(() => this.totalItems() > 0 || this.cuentas().length > 0);
 
   private readonly utilidadesMenu = viewChild<Menu>('utilidadesMenu');
 
@@ -294,13 +316,15 @@ export class FacturaCompraDetailComponent implements OnInit {
     // `*_nombre` del read; no hace falta resolverlos con peticiones extra.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<FacturaLineaRead>(id),
+      items: this.detalleService.paginaDeItems<FacturaLineaRead>(id, 1),
+      cuentas: this.detalleService.cuentasDelDocumento<FacturaLineaRead>(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, items, cuentas }) => {
           const read = cabecera as FacturaCompraRead;
           const fc = facturaCompraToFormValue(read);
+          this.resumenCabecera.set(resumenDesdeCabecera(read));
           this.cabecera.set({
             numero: read.numero ?? null,
             proveedor: read.contacto_nombre_corto ?? null,
@@ -324,15 +348,10 @@ export class FacturaCompraDetailComponent implements OnInit {
               estado_generado: read.estado_generado,
             },
           });
-          // Mismo reparto que el form: las cuentas a su pestaña, el resto (ítems) a Detalles.
-          this.lines.set(
-            lineas
-              .filter((line) => line.tipo_registro !== 'C')
-              .map((line) => comercialDetalleToFormValue(line)),
-          );
-          this.cuentas.set(
-            lineas.filter((line) => line.tipo_registro === 'C').map(cuentaDetalleToLineaView),
-          );
+          this.pagina.set(0);
+          this.totalItems.set(items.count);
+          this.lines.set(items.results.map((line) => comercialDetalleToFormValue(line)));
+          this.cuentas.set(cuentas.map(cuentaDetalleToLineaView));
           this.isLoading.set(false);
         },
         error: () => {
@@ -340,6 +359,30 @@ export class FacturaCompraDetailComponent implements OnInit {
           this.notFound.set(true);
           const toasts = this.t().entities.facturaCompra.form.toasts;
           this.toast.error(toasts.loadError.title, toasts.loadError.desc);
+        },
+      });
+  }
+
+  protected onItemsPageChange(event: PaginatorState): void {
+    const id = this.id();
+    const pagina = event.page ?? 0;
+    if (!id || pagina === this.pagina()) return;
+    this.cargandoItems.set(true);
+    this.detalleService
+      .paginaDeItems<FacturaLineaRead>(Number(id), pagina + 1)
+      .pipe(
+        finalize(() => this.cargandoItems.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (items) => {
+          this.pagina.set(pagina);
+          this.totalItems.set(items.count);
+          this.lines.set(items.results.map((line) => comercialDetalleToFormValue(line)));
+        },
+        error: () => {
+          const toast = this.t().entities.comercialDetalle.toasts.loadError;
+          this.toast.error(toast.title, toast.desc);
         },
       });
   }

@@ -6,7 +6,11 @@ export type {
   DocumentoDetalleReadBase,
   DocumentoDetallePayloadBase,
   DocumentoDetalleImpuestoRead,
+  DocumentoImpuestoAgrupadoRead,
+  DocumentoTotalesRead,
 } from './documento.types';
+export { impuestosAgrupadosToResumen } from './documento-impuestos';
+export { resumenDesdeCabecera } from './documento-resumen';
 export type {
   EntityKind,
   InventoryEffect,

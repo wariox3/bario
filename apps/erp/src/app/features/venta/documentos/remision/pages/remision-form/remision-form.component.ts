@@ -65,6 +65,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
+import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
 import { SEDE_ENDPOINT } from '../../remision.constants';
 import { remisionToFormValue, formValueToPayload } from '../../remision.mapper';
 import type { RemisionRead } from '../../remision.model';
@@ -353,9 +354,10 @@ export class RemisionFormComponent implements OnInit, CanComponentDeactivate {
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
-    detalles.clear();
-    for (const line of lineas)
-      detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+    reemplazarFilas(
+      detalles,
+      lineas.map((line) => createComercialDetalleGroup(comercialDetalleToFormValue(line))),
+    );
   }
 
   private notifyLoadError(): void {

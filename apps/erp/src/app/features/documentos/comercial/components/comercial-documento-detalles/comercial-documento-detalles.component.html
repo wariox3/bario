@@ -77,7 +77,7 @@
               [binary]="true"
               [ngModel]="todasSeleccionadas()"
               [indeterminate]="seleccionParcial()"
-              [disabled]="detalles().length === 0 || ocupado()"
+              [disabled]="filas().length === 0 || ocupado()"
               [ariaLabel]="t().entities.comercialDetalle.selectAllLines"
               (onChange)="toggleTodas()"
             />
@@ -122,7 +122,8 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of detalles().controls; track row; let i = $index) {
+        @for (row of filas(); track row; let i = $index) {
+          @let monto = montos()[i];
           <tr
             [formGroup]="row"
             class="comercial-detalle-table__row"
@@ -165,7 +166,7 @@
               <td class="comercial-detalle-table__td">
                 <lib-api-select
                   formControlName="almacen"
-                  [endpoint]="almacenEndpoint"
+                  [catalogo]="almacenCatalogo()"
                   [placeholder]="t().entities.comercialDetalle.almacenPlaceholder"
                 />
               </td>
@@ -206,39 +207,6 @@
                   <i class="pi pi-percentage text-[0.7rem]"></i>
                 </button>
               </div>
-              <p-popover #extraerIvaOp>
-                <div class="flex w-64 flex-col gap-2">
-                  <span class="text-[0.72rem] font-semibold text-brand-text">
-                    {{ t().entities.comercialDetalle.extraerIva.title }}
-                  </span>
-                  <p-inputnumber
-                    [ngModel]="extraerIvaValor()"
-                    (ngModelChange)="extraerIvaValor.set($event)"
-                    [ngModelOptions]="{ standalone: true }"
-                    mode="decimal"
-                    [min]="0"
-                    [maxFractionDigits]="2"
-                    prefix="$ "
-                    [fluid]="true"
-                    inputStyleClass="text-right"
-                  />
-                  <div class="flex items-center justify-between text-[0.75rem]">
-                    <span class="text-brand-muted">
-                      {{ t().entities.comercialDetalle.extraerIva.baseLabel }}
-                    </span>
-                    <span class="font-semibold tabular-nums text-brand-text">
-                      {{ formatMoney(extraerIvaBase()) }}
-                    </span>
-                  </div>
-                  <p-button
-                    type="button"
-                    size="small"
-                    icon="pi pi-check"
-                    [label]="t().entities.comercialDetalle.extraerIva.apply"
-                    (onClick)="applyExtraerIva(extraerIvaOp)"
-                  />
-                </div>
-              </p-popover>
             </td>
 
             <td class="comercial-detalle-table__td">
@@ -254,7 +222,7 @@
             </td>
 
             <td class="comercial-detalle-table__td text-right tabular-nums text-brand-text">
-              {{ formatMoney(subtotalOf(i)) }}
+              {{ formatMoney(monto?.subtotal ?? 0) }}
             </td>
 
             <td class="comercial-detalle-table__td">
@@ -262,7 +230,7 @@
                 variant="celda"
                 [formControl]="row.controls.impuestos_ids"
                 [catalogo]="impuestosCatalog()"
-                [baseLinea]="baseOf(i)"
+                [baseLinea]="monto?.base ?? 0"
                 [placeholder]="t().entities.comercialDetalle.impuestosAdd"
                 [tituloPanel]="t().entities.comercialDetalle.impuestosTitle"
                 [quitarLabel]="t().entities.comercialDetalle.impuestosRemove"
@@ -273,7 +241,7 @@
             <td
               class="comercial-detalle-table__td text-right font-semibold tabular-nums text-brand-text"
             >
-              {{ formatMoney(netoOf(i)) }}
+              {{ formatMoney(monto?.neto ?? 0) }}
             </td>
 
             @if (detalleEnabled()) {
@@ -315,4 +283,53 @@
       </tbody>
     </table>
   </div>
+
+  @if (paginada() && totalLineas() > pageSize) {
+    <!-- Las líneas nuevas sin guardar se ven al final de todas las páginas. -->
+    <p-paginator
+      styleClass="border-t border-[rgba(20,48,73,0.08)]"
+      [class.pointer-events-none]="ocupado()"
+      [class.opacity-60]="ocupado()"
+      [rows]="pageSize"
+      [totalRecords]="totalLineas()"
+      [first]="pagina() * pageSize"
+      (onPageChange)="onPageChange($event)"
+    />
+  }
 </div>
+
+<!-- Precio con impuestos incluidos → precio base. Uno solo para toda la tabla: la
+     fila que lo abrió la recuerda `openExtraerIva`, y el ancla es su botón. -->
+<p-popover #extraerIvaOp>
+  <div class="flex w-64 flex-col gap-2">
+    <span class="text-[0.72rem] font-semibold text-brand-text">
+      {{ t().entities.comercialDetalle.extraerIva.title }}
+    </span>
+    <p-inputnumber
+      [ngModel]="extraerIvaValor()"
+      (ngModelChange)="extraerIvaValor.set($event)"
+      [ngModelOptions]="{ standalone: true }"
+      mode="decimal"
+      [min]="0"
+      [maxFractionDigits]="2"
+      prefix="$ "
+      [fluid]="true"
+      inputStyleClass="text-right"
+    />
+    <div class="flex items-center justify-between text-[0.75rem]">
+      <span class="text-brand-muted">
+        {{ t().entities.comercialDetalle.extraerIva.baseLabel }}
+      </span>
+      <span class="font-semibold tabular-nums text-brand-text">
+        {{ formatMoney(extraerIvaBase()) }}
+      </span>
+    </div>
+    <p-button
+      type="button"
+      size="small"
+      icon="pi pi-check"
+      [label]="t().entities.comercialDetalle.extraerIva.apply"
+      (onClick)="applyExtraerIva(extraerIvaOp)"
+    />
+  </div>
+</p-popover>

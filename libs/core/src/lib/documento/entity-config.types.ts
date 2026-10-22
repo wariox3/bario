@@ -141,6 +141,14 @@ export interface DocumentEntityConfig {
    */
   readonly almacenGeneral?: boolean;
   /**
+   * La cabecera se pide a `GET <endpoint>/<id>/detalle/` en vez de
+   * `<endpoint>/<id>/`: mismo documento más `documento_impuestos`, los impuestos
+   * de todas las líneas agrupados por el backend. Lo aplica el gateway en
+   * `getById`, así que lo heredan la ficha, el form y el resolver de edición.
+   * Se omite ⇒ el GET de siempre.
+   */
+  readonly cabeceraConImpuestos?: boolean;
+  /**
    * La cabecera lleva **concepto de corrección** (el motivo DIAN de la nota). Es la
    * `documento_clase_id` con que se filtra el `seleccionar` de conceptos: cada clase
    * de nota tiene los suyos. Se omite ⇒ sin campo.

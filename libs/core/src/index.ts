@@ -115,7 +115,12 @@ export {
   SENTRY_PRODUCCION,
 } from './lib/observabilidad';
 export type { ObservabilidadOptions, SentryConfig } from './lib/observabilidad';
-export { redondearMoneda, calcularImpuestosLinea, calcularResumen } from './lib/calculo';
+export {
+  redondearMoneda,
+  calcularImpuestosLinea,
+  calcularResumen,
+  aplicarDeltas,
+} from './lib/calculo';
 export type { TasaImpuesto, ImpuestoLinea, LineaCalculo, ResumenDocumento } from './lib/calculo';
 export type {
   DocumentoListRowBase,
@@ -125,6 +130,8 @@ export type {
   DocumentoDetalleReadBase,
   DocumentoDetallePayloadBase,
   DocumentoDetalleImpuestoRead,
+  DocumentoImpuestoAgrupadoRead,
+  DocumentoTotalesRead,
 } from './lib/documento';
 export {
   DOCUMENT_TYPE_ID,
@@ -133,6 +140,8 @@ export {
   HttpEntityDataGateway,
   DocumentoDetalleService,
   documentoContactoToOption,
+  impuestosAgrupadosToResumen,
+  resumenDesdeCabecera,
   lineBruto,
   lineDescuento,
   lineBase,

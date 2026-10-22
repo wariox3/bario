@@ -4155,6 +4155,10 @@ export const en: AppDict = {
           title: 'Save failed',
           desc: 'The lines could not be saved',
         },
+        loadError: {
+          title: 'Load failed',
+          desc: 'The lines could not be loaded',
+        },
         incompleteLines: {
           title: 'Incomplete lines',
           desc: 'Complete or remove lines without an item before saving',

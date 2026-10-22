@@ -29,7 +29,8 @@ import {
   startOfToday,
   TenantService,
   ToastService,
-  comercialDetalleToFormValue,
+  resumenDesdeCabecera,
+  type ResumenDocumento,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -63,10 +64,8 @@ import {
 } from '@erp/features/documentos/comercial/vencimiento-autocompute';
 import { VencimientoHintComponent } from '@erp/features/documentos/comercial/components/vencimiento-hint/vencimiento-hint.component';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
-import {
-  createComercialDetalleGroup,
-  type ComercialDetalleGroup,
-} from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
+import type { ComercialDetalleGroup } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
+import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
 import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
 import {
   createCuentaDetalleGroup,
@@ -284,6 +283,12 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   protected readonly centroCostoCabecera = signal<ErpSelectOption | null>(null);
 
   /**
+   * Resumen de los ítems que calculó el backend, leído de la cabecera en edición.
+   * La tabla de ítems, paginada, parte de él; `null` en alta.
+   */
+  protected readonly resumenBase = signal<ResumenDocumento | null>(null);
+
+  /**
    * Estado del vencimiento (días del plazo, fecha que dicta y desvío), para que
    * `<app-vencimiento-hint>` explique bajo el campo de dónde salió la fecha.
    */
@@ -459,33 +464,32 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   }
 
   /**
-   * Carga completa (cabecera + líneas). La cabecera (`documento/:id/`) ya no
-   * embebe los detalles: las líneas se traen aparte de
-   * `documento-detalle/?documento_id=`. Se usa como fallback de la carga inicial
-   * (si el resolver no pre-cargó la cabecera).
+   * Carga completa (cabecera + cuentas). Se usa como fallback de la carga inicial
+   * (si el resolver no pre-cargó la cabecera). Los ítems los trae la tabla, de a
+   * una página (`paginada`).
    */
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<FacturaLineaRead>(id),
+      cuentas: this.detalleService.cuentasDelDocumento<FacturaLineaRead>(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, cuentas }) => {
           this.applyCabecera(cabecera as FacturaCompraRead);
-          this.populateLineas(lineas);
+          this.populateCuentas(cuentas);
         },
         error: () => this.notifyLoadError(),
       });
   }
 
-  /** Carga solo las líneas (la cabecera ya la aportó el resolver). */
+  /** Carga solo las cuentas (la cabecera ya la aportó el resolver). */
   private loadLineas(id: number): void {
     this.detalleService
-      .listarPorDocumento<FacturaLineaRead>(id)
+      .cuentasDelDocumento<FacturaLineaRead>(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (lineas) => this.populateLineas(lineas),
+        next: (cuentas) => this.populateCuentas(cuentas),
         error: () => this.notifyLoadError(),
       });
   }
@@ -497,26 +501,18 @@ export class FacturaCompraFormComponent implements OnInit, CanComponentDeactivat
   private applyCabecera(read: FacturaCompraRead): void {
     const value = facturaCompraToFormValue(read);
     this.form.patchValue(value, { emitEvent: false });
+    this.resumenBase.set(resumenDesdeCabecera(read));
     // Las cuentas que agregue el usuario en edición nacen con el contacto y el
     // centro de costo del documento, igual que en alta.
     this.contactoCabecera.set(value.contacto ?? null);
     this.centroCostoCabecera.set(value.centro_costo ?? null);
   }
 
-  /**
-   * Reparte las líneas recibidas entre sus dos FormArrays según `tipo_registro`:
-   * las `'C'` (cuentas contables) van a `cuentas`, el resto (ítems) a `detalles`.
-   */
-  private populateLineas(lineas: readonly FacturaLineaRead[]): void {
-    const detalles = this.form.controls.detalles;
-    const cuentas = this.form.controls.cuentas;
-    detalles.clear();
-    cuentas.clear();
-    for (const line of lineas) {
-      if (line.tipo_registro === 'C')
-        cuentas.push(createCuentaDetalleGroup(cuentaDetalleToFormValue(line)));
-      else detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
-    }
+  private populateCuentas(lineas: readonly FacturaLineaRead[]): void {
+    reemplazarFilas(
+      this.form.controls.cuentas,
+      lineas.map((line) => createCuentaDetalleGroup(cuentaDetalleToFormValue(line))),
+    );
   }
 
   private notifyLoadError(): void {

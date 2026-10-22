@@ -94,7 +94,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of detalles().controls; track row) {
+        @for (row of filas(); track row) {
           <tr
             [formGroup]="row"
             class="contable-detalle-table__row"
@@ -176,7 +176,7 @@
               <td class="contable-detalle-table__td">
                 <lib-api-select
                   formControlName="centro_costo"
-                  [endpoint]="centroCostoEndpoint"
+                  [catalogo]="centroCostoCatalogo()"
                   [placeholder]="t().entities.cuentaDetalle.centroCostoPlaceholder"
                 />
               </td>

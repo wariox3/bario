@@ -3190,6 +3190,7 @@ export interface AppDict
       };
       toasts: {
         lineSaveError: { title: string; desc: string };
+        loadError: { title: string; desc: string };
         incompleteLines: { title: string; desc: string };
       };
     };

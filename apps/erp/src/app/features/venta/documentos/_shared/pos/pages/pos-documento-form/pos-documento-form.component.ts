@@ -93,6 +93,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
+import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
@@ -552,9 +553,10 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
-    detalles.clear();
-    for (const line of lineas)
-      detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+    reemplazarFilas(
+      detalles,
+      lineas.map((line) => createComercialDetalleGroup(comercialDetalleToFormValue(line))),
+    );
     this.lines.set(detalles.getRawValue());
   }
 

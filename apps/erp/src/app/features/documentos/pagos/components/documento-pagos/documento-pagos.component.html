@@ -63,7 +63,7 @@
               } @else {
                 <lib-api-select
                   formControlName="cuenta_banco"
-                  [endpoint]="cuentaBancoEndpoint"
+                  [catalogo]="cuentaBancoCatalogo()"
                   [placeholder]="p.cuentaBancoPlaceholder"
                   [invalid]="
                     pago.controls.cuenta_banco.invalid && pago.controls.cuenta_banco.touched

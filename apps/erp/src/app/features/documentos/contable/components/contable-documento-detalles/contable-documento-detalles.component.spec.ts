@@ -269,7 +269,7 @@ describe('ContableDocumentoDetallesComponent — agregar cuenta', () => {
     TestBed.overrideComponent(ContableDocumentoDetallesComponent, {
       set: {
         template: `
-          @for (row of detalles().controls; track row) {
+          @for (row of filas(); track row) {
             <app-cuenta-select [formControl]="row.controls.cuenta" />
           }
         `,

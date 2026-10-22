@@ -60,6 +60,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
+import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
 import { pedidoClienteToFormValue, formValueToPayload } from '../../pedido-cliente.mapper';
 import type { PedidoClienteRead } from '../../pedido-cliente.model';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
@@ -333,9 +334,10 @@ export class PedidoClienteFormComponent implements OnInit, CanComponentDeactivat
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
-    detalles.clear();
-    for (const line of lineas)
-      detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+    reemplazarFilas(
+      detalles,
+      lineas.map((line) => createComercialDetalleGroup(comercialDetalleToFormValue(line))),
+    );
   }
 
   private notifyLoadError(): void {

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   Injector,
@@ -21,7 +22,13 @@ import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { type ErpSelectOption, I18nService, SELECT_ENDPOINTS, ToastService } from '@reddoc/core';
+import {
+  type ErpSelectOption,
+  I18nService,
+  SELECT_ENDPOINTS,
+  ToastService,
+  catalogoCompartido,
+} from '@reddoc/core';
 import {
   DocumentoDetalleService,
   type AgregarDocumentoModalData,
@@ -33,7 +40,7 @@ import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp
 import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
 import { PegarNumeroDirective } from '@reddoc/ui/pegar-numero';
 import type { AppDict } from '@erp/i18n';
-import { LineasDiferidas } from '../../../lineas-diferidas';
+import { LineasDiferidas, cambiosDeEstado } from '../../../lineas-diferidas';
 import {
   createCuentaDetalleGroup,
   type CuentaDetalleGroup,
@@ -79,9 +86,13 @@ const BASE_COLUMN_COUNT = 5;
  * (cruce de cartera): un modal de documentos con saldo pendiente cuya selección
  * entra como líneas enlazadas (`documento_afectado`, cuenta/naturaleza
  * bloqueadas, valor = pendiente). Espejo del "importar desde documento" comercial.
+ *
+ * `OnPush`, igual que la tabla comercial: la plantilla solo lee signals, y lo que
+ * cambia sin mover el valor (tocado, sucio) entra por `cambiosDeEstado`.
  */
 @Component({
   selector: 'app-contable-documento-detalles',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -195,8 +206,13 @@ export class ContableDocumentoDetallesComponent {
   /** Muestra la columna "Documento" (tipo + número del cruce) de las líneas enlazadas. */
   readonly showDocumento = input<boolean>(false);
 
-  /** Endpoint del catálogo de centros de costo (columna `centro_costo`). */
-  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
+  /**
+   * Catálogo de centros de costo (columna `centro_costo`), cargado una vez para
+   * todas las filas (ver `catalogoCompartido`). Solo se pide si la columna se ve.
+   */
+  protected readonly centroCostoCatalogo = catalogoCompartido(SELECT_ENDPOINTS.centroCosto, {
+    activo: () => this.showCentroCosto(),
+  });
 
   /** Nº de columnas de la tabla; alimenta el `colspan` del estado vacío. */
   protected readonly columnCount = computed(
@@ -258,6 +274,37 @@ export class ContableDocumentoDetallesComponent {
    */
   private readonly montada = signal(false);
 
+  /**
+   * Sube con cada cambio de tocado o sucio de las filas (`cambiosDeEstado`), que no
+   * mueve `lines`. Lo leen los derivados de abajo, y por ellos la plantilla.
+   */
+  private readonly revisionEstado = signal(0);
+
+  /** Filas con cambios sin guardar; la plantilla consulta cada fila contra este set. */
+  private readonly pendientes = computed<ReadonlySet<CuentaDetalleGroup>>(() => {
+    this.lines();
+    this.revisionEstado();
+    return this.montada() ? new Set(this.lineas.pendientes()) : new Set();
+  });
+
+  /** Nº de cambios sin guardar (filas pendientes más las quitadas). */
+  private readonly cambiosPendientes = computed(() => {
+    this.lines();
+    this.revisionEstado();
+    return this.montada() ? this.lineas.pendingCount() : 0;
+  });
+
+  /**
+   * Filas que recorre la plantilla. Con `OnPush` el `@for` no puede iterar
+   * `detalles().controls` directo: no es un signal, y una tabla vacía no lee
+   * ningún otro, así que la primera línea agregada no se pintaba. Es una copia
+   * porque `FormArray` muta `controls` en el lugar: el mismo array no avisaría.
+   */
+  protected readonly filas = computed(() => {
+    this.lines();
+    return this.montada() ? [...this.detalles().controls] : [];
+  });
+
   constructor() {
     effect((onCleanup) => {
       const array = this.detalles();
@@ -265,6 +312,7 @@ export class ContableDocumentoDetallesComponent {
       const sync = (): void => this.lines.set(array.getRawValue());
       sync();
       const sub = array.valueChanges.subscribe(sync);
+      sub.add(cambiosDeEstado(array).subscribe(() => this.revisionEstado.update((n) => n + 1)));
       onCleanup(() => sub.unsubscribe());
     });
   }
@@ -348,7 +396,7 @@ export class ContableDocumentoDetallesComponent {
 
   /** La fila tiene cambios sin guardar (nueva con cuenta, o persistida y editada). */
   protected isPending(group: CuentaDetalleGroup): boolean {
-    return this.lineas.esPendiente(group);
+    return this.pendientes().has(group);
   }
 
   /**
@@ -356,8 +404,7 @@ export class ContableDocumentoDetallesComponent {
    * aviso del toolbar, el del form padre y el guard de salida.
    */
   pendingCount(): number {
-    if (!this.montada()) return 0;
-    return this.lineas.pendingCount();
+    return this.cambiosPendientes();
   }
 
   /** `true` si alguna línea pendiente está incompleta (p. ej. sin cuenta o sin valor). */
