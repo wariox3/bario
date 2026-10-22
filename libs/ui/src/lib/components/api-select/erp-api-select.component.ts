@@ -11,8 +11,24 @@ import {
   untracked,
 } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
+import { FilterService } from 'primeng/api';
+import { Select, SelectModule } from 'primeng/select';
 import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
+
+/**
+ * Regla de filtro propia (registrada en el `FilterService` de PrimeNG): los
+ * campos numéricos —el `id`— casan por **prefijo** y el resto por «contiene».
+ * PrimeNG solo tipa sus reglas nativas, de ahí la conversión.
+ */
+const ID_PREFIX_MATCH_MODE = 'idPrefixOrContains' as unknown as Select['filterMatchMode'];
+
+function idPrefixOrContains(value: unknown, filter: unknown, locale?: string): boolean {
+  if (filter === undefined || filter === null || String(filter).trim() === '') return true;
+  if (value === undefined || value === null) return false;
+  const query = String(filter).toLocaleLowerCase(locale);
+  if (typeof value === 'number') return String(value).startsWith(query);
+  return String(value).toLocaleLowerCase(locale).includes(query);
+}
 
 @Component({
   selector: 'lib-api-select',
@@ -32,7 +48,8 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
       [loading]="loading()"
       [showClear]="showClear()"
       [filter]="showFilter()"
-      [filterBy]="filterBy()"
+      [filterBy]="idPrefixSearch() ? 'id,nombre' : filterBy()"
+      [filterMatchMode]="idPrefixSearch() ? idPrefixMatchMode : 'contains'"
       [filterPlaceholder]="filterPlaceholder()"
       [resetFilterOnHide]="true"
       optionLabel="nombre"
@@ -58,6 +75,8 @@ import { ErpSelectDataService, ErpSelectOption } from '@reddoc/core';
 })
 export class ErpApiSelectComponent implements ControlValueAccessor {
   private readonly dataService = inject(ErpSelectDataService);
+  private readonly filterService = inject(FilterService);
+  protected readonly idPrefixMatchMode = ID_PREFIX_MATCH_MODE;
 
   readonly endpoint = input.required<string>();
   readonly params = input<Record<string, string>>({});
@@ -114,6 +133,13 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
    */
   readonly filterBy = input<string>('nombre');
   readonly filterPlaceholder = input<string>('Buscar…');
+  /**
+   * Para catálogos cuyo id es un código jerárquico (el PUC: clase 5, grupo 51,
+   * cuenta 5105): el buscador casa el id **por prefijo** —`51` trae 51xx y no
+   * 1512 ni 2510— y el nombre por «contiene», y las opciones se ordenan por id.
+   * Ignora `filterBy`.
+   */
+  readonly idPrefixSearch = input<boolean>(false);
 
   /**
    * Emite el catálogo cada vez que llega del endpoint. Sirve a quien necesita
@@ -138,6 +164,8 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
   onTouchedFn: () => void = () => undefined;
 
   constructor() {
+    this.filterService.register(ID_PREFIX_MATCH_MODE, idPrefixOrContains);
+
     effect((onCleanup) => {
       const disabled = this.disabled();
       // Habilitado, el valor cambia con cada selección del usuario: se lee sin
@@ -166,7 +194,12 @@ export class ErpApiSelectComponent implements ControlValueAccessor {
       const endpoint = this.endpoint();
       this.loading.set(true);
       const fetch = this.dataService.fetchAllOptions(endpoint, params).subscribe({
-        next: (options) => {
+        next: (fetched) => {
+          // El backend no garantiza el orden (descarta `ordering`): con códigos
+          // jerárquicos se ordena aquí para que el filtrado salga en secuencia.
+          const options = untracked(this.idPrefixSearch)
+            ? [...fetched].sort((a, b) => a.id - b.id)
+            : fetched;
           this.options.set(options);
           this.loading.set(false);
           this.applySuggestion(options);

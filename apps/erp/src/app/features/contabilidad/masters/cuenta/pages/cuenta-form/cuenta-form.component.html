@@ -139,6 +139,7 @@
             [endpoint]="claseEndpoint"
             [params]="{ ordering: 'id' }"
             [displayWith]="formatNivel"
+            [idPrefixSearch]="true"
             [placeholder]="t().entities.cuenta.form.fields.selectPlaceholder"
             [invalid]="form.controls.cuenta_clase.invalid && form.controls.cuenta_clase.touched"
           />
@@ -156,6 +157,7 @@
             [endpoint]="grupoEndpoint"
             [params]="grupoParams()"
             [displayWith]="formatNivel"
+            [idPrefixSearch]="true"
             [placeholder]="t().entities.cuenta.form.fields.selectPlaceholder"
             [invalid]="form.controls.cuenta_grupo.invalid && form.controls.cuenta_grupo.touched"
           />
@@ -173,6 +175,7 @@
             [endpoint]="cuentaEndpoint"
             [params]="cuentaParams()"
             [displayWith]="formatNivel"
+            [idPrefixSearch]="true"
             [placeholder]="t().entities.cuenta.form.fields.selectPlaceholder"
             [invalid]="form.controls.cuenta_cuenta.invalid && form.controls.cuenta_cuenta.touched"
           />
