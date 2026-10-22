@@ -4436,6 +4436,7 @@ export const es: AppDict = {
       contactoPlaceholder: 'Buscar contacto…',
       centroCostoPlaceholder: 'Seleccionar…',
       detallePlaceholder: 'Glosa de la línea',
+      baseExigida: 'Esta cuenta exige base: ingresa un valor mayor a cero',
       confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {

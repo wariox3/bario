@@ -196,7 +196,16 @@
             </td>
 
             @if (showBase()) {
-              <td class="contable-detalle-table__td">
+              <!-- La cuenta exige base: el tooltip dice por qué el campo quedó en rojo. -->
+              <td
+                class="contable-detalle-table__td"
+                [pTooltip]="
+                  row.controls.base.hasError('baseExigida')
+                    ? t().entities.cuentaDetalle.baseExigida
+                    : ''
+                "
+                tooltipPosition="top"
+              >
                 <p-inputnumber
                   formControlName="base"
                   mode="decimal"
@@ -206,6 +215,10 @@
                   prefix="$ "
                   [fluid]="true"
                   inputStyleClass="text-right"
+                  [invalid]="
+                    row.controls.base.invalid &&
+                    (row.controls.base.touched || row.controls.cuenta.touched)
+                  "
                 />
               </td>
             }

@@ -38,6 +38,32 @@ describe('createCuentaDetalleGroup', () => {
   });
 });
 
+describe('base exigida por la cuenta', () => {
+  const RETENCION = { id: 30, nombre: '236540 - Compras', exige_base: true };
+
+  it('marca la base en cero cuando la cuenta elegida la exige', () => {
+    const group = manual();
+    group.controls.cuenta.setValue(RETENCION);
+
+    expect(group.controls.base.hasError('baseExigida')).toBe(true);
+    expect(group.invalid).toBe(true);
+  });
+
+  it('acepta la línea en cuanto la base es mayor a cero', () => {
+    const group = createCuentaDetalleGroup({ cuenta: RETENCION, valor: 25000, base: 1000000 });
+
+    expect(group.controls.base.valid).toBe(true);
+  });
+
+  it('suelta el error al cambiar a una cuenta que no exige base', () => {
+    const group = manual();
+    group.controls.cuenta.setValue(RETENCION);
+    group.controls.cuenta.setValue(CUENTA);
+
+    expect(group.controls.base.valid).toBe(true);
+  });
+});
+
 describe('propagarContactoALineas', () => {
   it('cambia solo las líneas manuales sin guardar', () => {
     const doc = enlazada();

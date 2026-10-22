@@ -4363,6 +4363,7 @@ export const en: AppDict = {
       contactoPlaceholder: 'Search contact…',
       centroCostoPlaceholder: 'Select…',
       detallePlaceholder: 'Line description',
+      baseExigida: 'This account requires a base: enter a value greater than zero',
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {

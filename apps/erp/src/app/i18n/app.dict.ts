@@ -3362,6 +3362,7 @@ export interface AppDict
       contactoPlaceholder: string;
       centroCostoPlaceholder: string;
       detallePlaceholder: string;
+      baseExigida: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {
