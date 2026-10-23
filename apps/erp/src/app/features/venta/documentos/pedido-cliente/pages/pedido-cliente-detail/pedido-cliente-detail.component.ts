@@ -142,6 +142,15 @@ export class PedidoClienteDetailComponent implements OnInit {
     return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
   });
 
+  /**
+   * ¿Alguna línea vino importada de otro documento? Solo entonces se muestra la
+   * columna REF (`documento_detalle_afectado`, no la referencia del ítem): el pedido
+   * que se arma a mano la dejaba vacía en todas las filas.
+   */
+  protected readonly tieneReferencias = computed(() =>
+    this.lines().some((line) => line.documento_detalle_afectado !== null),
+  );
+
   /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
   protected readonly resumen = computed<ResumenDocumento>(
     () => this.resumenCabecera() ?? calcularResumen(this.lines().map(toLineaCalculo)),
