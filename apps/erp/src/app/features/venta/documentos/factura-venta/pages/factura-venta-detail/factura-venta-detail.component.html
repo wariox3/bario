@@ -230,6 +230,7 @@
             [lines]="lines()"
             [linkable]="true"
             [almacenEnabled]="true"
+            [refEnabled]="tieneReferencias()"
             (verAfectacion)="onVerAfectacion($event)"
           />
           @if (paginada() && totalItems() > pageSize) {
