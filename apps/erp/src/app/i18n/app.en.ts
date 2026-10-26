@@ -72,6 +72,10 @@ export const en: AppDict = {
       deleteMessage: 'Are you sure you want to delete the selected records?',
     },
     toasts: {
+      formModalError: {
+        title: 'Could not open the form',
+        desc: 'Reload the page and try again.',
+      },
       loadError: {
         title: 'Failed to load',
         desc: 'Could not fetch the records. Please try again.',
@@ -809,10 +813,6 @@ export const en: AppDict = {
         title: 'Documents added',
         desc: 'The selected documents were added as lines.',
       },
-      addError: {
-        title: 'Add failed',
-        desc: 'Could not add the documents. Please try again.',
-      },
     },
   },
   modules: {
@@ -1176,9 +1176,12 @@ export const en: AppDict = {
         cliente: 'CLI',
         proveedor: 'PRO',
         empleado: 'EMP',
+        inactivo: 'INA',
       },
       form: {
         createTitle: 'new contact',
+        createTerceroTitle: 'New third party',
+        createTercero: 'Create third party',
         createSubtitle: 'Register a new contact',
         editTitle: 'Edit contact',
         editSubtitle: 'Update the contact details',
@@ -1215,6 +1218,7 @@ export const en: AppDict = {
           cliente: 'Customer',
           proveedor: 'Supplier',
           empleado: 'Employee',
+          inactivo: 'Inactive',
           plazoPago: 'Payment term',
           precio: 'Price list',
           asesor: 'Advisor',
@@ -3121,8 +3125,10 @@ export const en: AppDict = {
           sedePlaceholder: 'Select…',
           almacen: 'Warehouse',
           almacenPlaceholder: 'Select…',
-          metodoPago: 'Payment method',
-          metodoPagoPlaceholder: 'Select…',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Select…',
+          formaPago: 'Payment form',
+          formaPagoPlaceholder: 'Select…',
           ordenCompra: 'Purchase order',
           comentario: 'Comment',
         },
@@ -3155,6 +3161,7 @@ export const en: AppDict = {
         sections: {
           general: 'General information',
           detalles: 'Details',
+          cuentas: 'Accounts',
         },
         labels: {
           numero: 'Number',
@@ -3165,7 +3172,8 @@ export const en: AppDict = {
           plazoPago: 'Payment terms',
           sede: 'Branch',
           almacen: 'Warehouse',
-          metodoPago: 'Payment method',
+          centroCosto: 'Cost center',
+          formaPago: 'Payment form',
           ordenCompra: 'Purchase order',
           comentario: 'Comment',
         },
@@ -4070,6 +4078,10 @@ export const en: AppDict = {
       detallePlaceholder: 'Note…',
       almacenPlaceholder: 'Warehouse…',
       confirmDeleteLine: 'Remove this line from the document?',
+      confirmDeleteLines: 'Remove {count} lines from the document?',
+      removeSelected: 'Remove selected',
+      selectLine: 'Select line',
+      selectAllLines: 'Select all lines',
       createItem: 'Create item',
       extraerIva: {
         title: 'Tax-inclusive price',
@@ -4142,6 +4154,10 @@ export const en: AppDict = {
         lineSaveError: {
           title: 'Save failed',
           desc: 'The lines could not be saved',
+        },
+        loadError: {
+          title: 'Load failed',
+          desc: 'The lines could not be loaded',
         },
         incompleteLines: {
           title: 'Incomplete lines',
@@ -4346,17 +4362,15 @@ export const en: AppDict = {
       empty: 'No accounts yet. Add the first one to get started',
       addLine: 'Add account',
       removeLine: 'Remove account',
-      saveLine: 'Save account',
-      saveAll: 'Save accounts',
       pendingSuffix: 'unsaved',
       cuentaPlaceholder: 'Search account…',
       contactoPlaceholder: 'Search contact…',
       centroCostoPlaceholder: 'Select…',
       detallePlaceholder: 'Line description',
+      baseExigida: 'This account requires a base: enter a value greater than zero',
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
-        linea: '#',
         id: 'ID',
         numero: 'Number',
         documento: 'Document',
@@ -4367,6 +4381,8 @@ export const en: AppDict = {
         centroCosto: 'Cost center',
         valor: 'Amount',
         base: 'Base',
+        subtotal: 'Subtotal',
+        neto: 'Net',
         detalle: 'Description',
         acciones: 'Actions',
       },
@@ -4377,21 +4393,9 @@ export const en: AppDict = {
         diferencia: 'Difference',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Account saved',
-          desc: 'The account was saved successfully',
-        },
         lineSaveError: {
           title: 'Save failed',
           desc: 'The account could not be saved',
-        },
-        allSaved: {
-          title: 'Accounts saved',
-          desc: 'Pending accounts were saved',
-        },
-        incompleteLines: {
-          title: 'Incomplete accounts',
-          desc: 'Complete or remove accounts without an account or amount before saving',
         },
       },
     },
@@ -6010,6 +6014,7 @@ export const en: AppDict = {
         identificacion: 'Identification',
         contacto: 'Contact',
         contactoId: 'Contact ID',
+        documentoTipoId: 'Type ID',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
@@ -6052,6 +6057,7 @@ export const en: AppDict = {
         identificacion: 'Identification',
         contacto: 'Contact',
         contactoId: 'Contact ID',
+        documentoTipoId: 'Type ID',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',

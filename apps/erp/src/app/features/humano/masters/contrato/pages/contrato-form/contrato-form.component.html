@@ -77,7 +77,6 @@
             inputId="contrato_tipo"
             formControlName="contrato_tipo"
             endpoint="/humano/contrato-tipo/seleccionar/"
-            [params]="{ limit: '100' }"
             [invalid]="form.controls.contrato_tipo.invalid && form.controls.contrato_tipo.touched"
           />
         </div>
@@ -91,7 +90,6 @@
             inputId="cargo"
             formControlName="cargo"
             endpoint="/humano/cargo/seleccionar/"
-            [params]="{ limit: '100' }"
             [invalid]="form.controls.cargo.invalid && form.controls.cargo.touched"
           />
         </div>
@@ -105,7 +103,6 @@
             inputId="grupo"
             formControlName="grupo"
             endpoint="/humano/grupo/seleccionar/"
-            [params]="{ limit: '100' }"
             [invalid]="form.controls.grupo.invalid && form.controls.grupo.touched"
           />
         </div>
@@ -119,7 +116,6 @@
             inputId="sucursal"
             formControlName="sucursal"
             endpoint="/humano/sucursal/seleccionar/"
-            [params]="{ limit: '100' }"
             [invalid]="form.controls.sucursal.invalid && form.controls.sucursal.touched"
           />
         </div>
@@ -133,7 +129,6 @@
             inputId="tiempo"
             formControlName="tiempo"
             endpoint="/humano/tiempo/seleccionar/"
-            [params]="{ limit: '100' }"
             [suggestedIndex]="1"
             [invalid]="form.controls.tiempo.invalid && form.controls.tiempo.touched"
           />
@@ -272,7 +267,6 @@
             formControlName="tipo_costo"
             [suggestedIndex]="0"
             endpoint="/humano/tipo-costo/seleccionar/"
-            [params]="{ limit: '100' }"
           />
         </div>
 
@@ -284,7 +278,6 @@
             inputId="centro_costo"
             formControlName="centro_costo"
             [endpoint]="endpoints.centroCosto"
-            [params]="{ limit: '100' }"
           />
         </div>
 
@@ -344,7 +337,6 @@
             inputId="salud"
             formControlName="salud"
             endpoint="/humano/salud/seleccionar/"
-            [params]="{ limit: '100' }"
             [suggestedIndex]="0"
             [invalid]="form.controls.salud.invalid && form.controls.salud.touched"
           />
@@ -359,7 +351,7 @@
             inputId="entidad_salud"
             formControlName="entidad_salud"
             endpoint="/humano/entidad/seleccionar/"
-            [params]="{ salud: 'True', limit: '100' }"
+            [params]="{ salud: 'True' }"
             [invalid]="form.controls.entidad_salud.invalid && form.controls.entidad_salud.touched"
           />
         </div>
@@ -373,7 +365,6 @@
             inputId="pension"
             formControlName="pension"
             endpoint="/humano/pension/seleccionar/"
-            [params]="{ limit: '100' }"
             [suggestedIndex]="1"
             [invalid]="form.controls.pension.invalid && form.controls.pension.touched"
           />
@@ -388,7 +379,7 @@
             inputId="entidad_pension"
             formControlName="entidad_pension"
             endpoint="/humano/entidad/seleccionar/"
-            [params]="{ pension: 'True', limit: '100' }"
+            [params]="{ pension: 'True' }"
             [invalid]="
               form.controls.entidad_pension.invalid && form.controls.entidad_pension.touched
             "
@@ -404,7 +395,7 @@
             inputId="entidad_cesantias"
             formControlName="entidad_cesantias"
             endpoint="/humano/entidad/seleccionar/"
-            [params]="{ cesantias: 'True', limit: '100' }"
+            [params]="{ cesantias: 'True' }"
             [invalid]="
               form.controls.entidad_cesantias.invalid && form.controls.entidad_cesantias.touched
             "
@@ -420,7 +411,7 @@
             inputId="entidad_caja"
             formControlName="entidad_caja"
             endpoint="/humano/entidad/seleccionar/"
-            [params]="{ caja: 'True', limit: '100' }"
+            [params]="{ caja: 'True' }"
             [invalid]="form.controls.entidad_caja.invalid && form.controls.entidad_caja.touched"
           />
         </div>
@@ -434,7 +425,6 @@
             inputId="riesgo"
             formControlName="riesgo"
             endpoint="/humano/riesgo/seleccionar/"
-            [params]="{ limit: '100' }"
             [displayWith]="riesgoLabel"
             [invalid]="form.controls.riesgo.invalid && form.controls.riesgo.touched"
           />
@@ -449,7 +439,6 @@
             inputId="tipo_cotizante"
             formControlName="tipo_cotizante"
             endpoint="/humano/tipo-cotizante/seleccionar/"
-            [params]="{ limit: '100' }"
             [invalid]="form.controls.tipo_cotizante.invalid && form.controls.tipo_cotizante.touched"
           />
           <lib-field-error
@@ -473,7 +462,6 @@
             inputId="subtipo_cotizante"
             formControlName="subtipo_cotizante"
             endpoint="/humano/subtipo-cotizante/seleccionar/"
-            [params]="{ limit: '100' }"
             [suggestedIndex]="6"
             [invalid]="
               form.controls.subtipo_cotizante.invalid && form.controls.subtipo_cotizante.touched
@@ -543,7 +531,6 @@
               inputId="motivo_terminacion"
               formControlName="motivo_terminacion"
               endpoint="/humano/motivo-terminacion/seleccionar/"
-              [params]="{ limit: '100' }"
             />
           </div>
 

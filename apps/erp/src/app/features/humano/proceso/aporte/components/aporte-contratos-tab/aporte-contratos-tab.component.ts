@@ -28,7 +28,6 @@ import type { AppDict } from '@erp/i18n';
 import type { CapacidadesAporte } from '../../aporte.estado';
 import { conNovedad, type AporteContratoFila } from '../../aporte.contratos';
 import {
-  APORTE_CONTRATOS_PAGE_SIZE,
   APORTE_CONTRATO_COLUMNS,
   APORTE_CONTRATO_FILTER_FIELDS,
   EXCEL_ACTION_PREFIX,
@@ -103,8 +102,9 @@ export class AporteContratosTabComponent {
 
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
-  protected readonly pageSize = APORTE_CONTRATOS_PAGE_SIZE;
   protected readonly columns = APORTE_CONTRATO_COLUMNS;
   protected readonly filterFields = APORTE_CONTRATO_FILTER_FIELDS;
 
@@ -201,8 +201,14 @@ export class AporteContratosTabComponent {
       .subscribe();
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
@@ -330,7 +336,7 @@ export class AporteContratosTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarContratos(id, page, this.pageSize, this.activeFilters())
+      .listarContratos(id, page, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

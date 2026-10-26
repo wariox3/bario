@@ -1,16 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { fetchAllPages } from '../../data-list/data/fetch-all-pages';
 import { BaseHttpService } from '../../services/base-http.service';
 import type { PaginatedResponse } from '../../models/pagination.model';
 import { DOCUMENTO_PAGO_ENDPOINT } from './pago.constants';
 import type { PagoPayload, PagoRead } from './pago.model';
-
-/**
- * Tamaño de página al traer los pagos de un documento: un documento real no llega
- * a este volumen, así que se piden todos de una.
- */
-const PAGO_PAGE_SIZE = 1000;
 
 /**
  * Pagos de documento (`/api/general/documento-pago/`).
@@ -23,12 +17,17 @@ const PAGO_PAGE_SIZE = 1000;
  */
 @Injectable({ providedIn: 'root' })
 export class DocumentoPagoService extends BaseHttpService {
-  /** Pagos de un documento (`GET …?documento_id=`), anulados incluidos. */
+  /**
+   * Pagos de un documento (`GET …?documento_id=`), anulados incluidos. Recorre
+   * todas las páginas: el backend pagina de a 25 sin importar el `limit`.
+   */
   listarPorDocumento(documentoId: number): Observable<PagoRead[]> {
-    return this.get<PaginatedResponse<PagoRead>>(DOCUMENTO_PAGO_ENDPOINT, {
-      documento_id: documentoId,
-      limit: PAGO_PAGE_SIZE,
-    }).pipe(map((res) => [...res.results]));
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<PagoRead>>(DOCUMENTO_PAGO_ENDPOINT, {
+        documento_id: documentoId,
+        page,
+      }),
+    );
   }
 
   /** Registra un pago; el backend recalcula `documento.pago`. */

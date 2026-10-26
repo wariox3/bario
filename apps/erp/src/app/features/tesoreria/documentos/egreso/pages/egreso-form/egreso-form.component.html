@@ -24,8 +24,11 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="isSaving()"
+      [disabled]="isSaving() || tablasOcupadas()"
     />
+    @if (hayCambios()) {
+      <app-cambios-sin-guardar />
+    }
   </lib-page-actions>
 
   <!-- ── Sección: Información general ──────────────────────────────────────── -->
@@ -57,6 +60,7 @@
             <span class="ml-px text-red-500">*</span>
           </label>
           <lib-contacto-select
+            appCrearTercero="proveedor"
             inputId="contacto"
             formControlName="contacto"
             [placeholder]="t().entities.egreso.form.fields.proveedorPlaceholder"
@@ -147,6 +151,7 @@
             [detalles]="form.controls.detalles"
             [documentId]="documentId()"
             [contactoPorDefecto]="contactoCabecera()"
+            [naturalezaPorDefecto]="'C'"
             [showContacto]="true"
             [showCentroCosto]="true"
             [showBase]="true"
@@ -155,7 +160,6 @@
             [agregarDocumentoEnabled]="true"
             [carteraTipo]="'pagar'"
             [contactoId]="contactoCabecera()?.id ?? null"
-            (imported)="onDocumentosAgregados()"
           />
         </p-tabpanel>
       </p-tabpanels>

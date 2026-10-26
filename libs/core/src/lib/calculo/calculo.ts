@@ -89,3 +89,58 @@ export function calcularResumen(lineas: readonly LineaCalculo[]): ResumenDocumen
 
   return { subtotal, descuento, impuestos, total };
 }
+
+/**
+ * Resumen de un documento ya guardado más lo que cambió en pantalla:
+ * `base + resumen(actuales) − resumen(originales)`.
+ *
+ * `base` es el resumen que calculó el backend con todas las líneas guardadas;
+ * `originales` son esas líneas tal como se leyeron y `actuales`, las que muestra
+ * la tabla ahora. Con las mismas líneas de los dos lados el resultado es `base`
+ * tal cual: el resumen coincide con el del backend aunque redondee distinto.
+ *
+ * No hace falta tener todas las líneas: basta con que `actuales` y `originales`
+ * cubran las mismas líneas (las cargadas), más las nuevas de un lado y las
+ * quitadas del otro. Así puede paginarse la tabla sin perder el total.
+ *
+ * Un impuesto que queda en cero se omite, salvo que alguna línea actual lo lleve
+ * o que venga en `base` sin que ningún cambio lo toque (un IVA 0 %).
+ */
+export function aplicarDeltas(
+  base: ResumenDocumento,
+  actuales: readonly LineaCalculo[],
+  originales: readonly LineaCalculo[],
+): ResumenDocumento {
+  const ahora = calcularResumen(actuales);
+  const antes = calcularResumen(originales);
+  const enAhora = new Set(ahora.impuestos.map((imp) => imp.id));
+  const enAntes = new Set(antes.impuestos.map((imp) => imp.id));
+  const enBase = new Set(base.impuestos.map((imp) => imp.id));
+
+  const acc = new Map<number, ImpuestoLinea>();
+  const sumar = (imp: ImpuestoLinea, signo: 1 | -1): void => {
+    const prev = acc.get(imp.id);
+    acc.set(imp.id, {
+      id: imp.id,
+      nombre: prev?.nombre || imp.nombre,
+      total: (prev?.total ?? 0) + signo * imp.total,
+    });
+  };
+  for (const imp of base.impuestos) sumar(imp, 1);
+  for (const imp of ahora.impuestos) sumar(imp, 1);
+  for (const imp of antes.impuestos) sumar(imp, -1);
+
+  const impuestos = [...acc.values()]
+    .map((imp) => ({ ...imp, total: redondearMoneda(imp.total) }))
+    .filter(
+      (imp) =>
+        imp.total !== 0 || enAhora.has(imp.id) || (enBase.has(imp.id) && !enAntes.has(imp.id)),
+    );
+
+  return {
+    subtotal: redondearMoneda(base.subtotal + ahora.subtotal - antes.subtotal),
+    descuento: redondearMoneda(base.descuento + ahora.descuento - antes.descuento),
+    impuestos,
+    total: redondearMoneda(base.total + ahora.total - antes.total),
+  };
+}

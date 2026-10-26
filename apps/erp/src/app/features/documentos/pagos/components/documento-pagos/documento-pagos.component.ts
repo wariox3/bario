@@ -16,6 +16,7 @@ import {
   formatCop,
   CUENTA_BANCO_ENDPOINT,
   calcularPagos,
+  catalogoCompartido,
   type PagoRead,
   DocumentoPagoService,
 } from '@reddoc/core';
@@ -65,7 +66,8 @@ export class DocumentoPagosComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly formatMoney = formatCop;
-  protected readonly cuentaBancoEndpoint = CUENTA_BANCO_ENDPOINT;
+  /** Catálogo de cuentas de banco, cargado una vez para todos los pagos (ver `catalogoCompartido`). */
+  protected readonly cuentaBancoCatalogo = catalogoCompartido(CUENTA_BANCO_ENDPOINT);
 
   /** FormArray de pagos, propiedad del form padre. */
   readonly pagos = input.required<FormArray<PagoGroup>>();

@@ -29,6 +29,7 @@ export interface Contacto {
   readonly proveedor: boolean;
   readonly empleado: boolean;
   readonly conductor: boolean;
+  readonly estado_inactivo: boolean;
   readonly numero_cuenta: string | null;
   readonly numero_licencia: string | null;
   readonly fecha_vence_licencia: string | null;
@@ -89,6 +90,11 @@ export interface ContactoPayload {
   readonly cliente: boolean;
   readonly proveedor: boolean;
   readonly empleado: boolean;
+  /**
+   * Opcional porque el master de empleado (`EmpleadoPayload` = este payload) no
+   * lo edita: al omitirlo, el backend conserva el valor que el contacto ya tenía.
+   */
+  readonly estado_inactivo?: boolean;
   readonly plazo_pago: number | null;
   readonly precio: number | null;
   readonly asesor: number | null;

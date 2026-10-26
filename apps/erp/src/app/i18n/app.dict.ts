@@ -115,6 +115,8 @@ export interface AppDict
     };
     toasts: {
       loadError: { title: string; desc: string };
+      /** Un formulario en modal (alta inline) no pudo cargar su chunk. */
+      formModalError: { title: string; desc: string };
       deleteSuccess: { title: string; desc: string };
       deleteError: { title: string; desc: string };
       exportError: { title: string; desc: string };
@@ -644,7 +646,6 @@ export interface AppDict
     toasts: {
       loadError: { title: string; desc: string };
       addSuccess: { title: string; desc: string };
-      addError: { title: string; desc: string };
     };
   };
   modules: {
@@ -907,9 +908,12 @@ export interface AppDict
         cliente: string;
         proveedor: string;
         empleado: string;
+        inactivo: string;
       };
       form: {
         createTitle: string;
+        createTerceroTitle: string;
+        createTercero: string;
         createSubtitle: string;
         editTitle: string;
         editSubtitle: string;
@@ -938,6 +942,7 @@ export interface AppDict
           cliente: string;
           proveedor: string;
           empleado: string;
+          inactivo: string;
           plazoPago: string;
           precio: string;
           asesor: string;
@@ -2400,8 +2405,10 @@ export interface AppDict
           sedePlaceholder: string;
           almacen: string;
           almacenPlaceholder: string;
-          metodoPago: string;
-          metodoPagoPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
+          formaPago: string;
+          formaPagoPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2416,7 +2423,7 @@ export interface AppDict
         };
       };
       detail: {
-        sections: { general: string; detalles: string };
+        sections: { general: string; detalles: string; cuentas: string };
         labels: {
           numero: string;
           proveedor: string;
@@ -2426,7 +2433,8 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           almacen: string;
-          metodoPago: string;
+          centroCosto: string;
+          formaPago: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -3127,6 +3135,10 @@ export interface AppDict
       detallePlaceholder: string;
       almacenPlaceholder: string;
       confirmDeleteLine: string;
+      confirmDeleteLines: string;
+      removeSelected: string;
+      selectLine: string;
+      selectAllLines: string;
       createItem: string;
       extraerIva: { title: string; baseLabel: string; apply: string };
       aiu: {
@@ -3178,6 +3190,7 @@ export interface AppDict
       };
       toasts: {
         lineSaveError: { title: string; desc: string };
+        loadError: { title: string; desc: string };
         incompleteLines: { title: string; desc: string };
       };
     };
@@ -3345,17 +3358,15 @@ export interface AppDict
       empty: string;
       addLine: string;
       removeLine: string;
-      saveLine: string;
-      saveAll: string;
       pendingSuffix: string;
       cuentaPlaceholder: string;
       contactoPlaceholder: string;
       centroCostoPlaceholder: string;
       detallePlaceholder: string;
+      baseExigida: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {
-        linea: string;
         id: string;
         numero: string;
         documento: string;
@@ -3366,15 +3377,14 @@ export interface AppDict
         centroCosto: string;
         valor: string;
         base: string;
+        subtotal: string;
+        neto: string;
         detalle: string;
         acciones: string;
       };
       resumen: { debitos: string; creditos: string; total: string; diferencia: string };
       toasts: {
-        lineSaveSuccess: { title: string; desc: string };
         lineSaveError: { title: string; desc: string };
-        allSaved: { title: string; desc: string };
-        incompleteLines: { title: string; desc: string };
       };
     };
     contratoServicio: {
@@ -4662,6 +4672,7 @@ export interface AppDict
         identificacion: string;
         contacto: string;
         contactoId: string;
+        documentoTipoId: string;
         subtotal: string;
         impuesto: string;
         total: string;
@@ -4701,6 +4712,7 @@ export interface AppDict
         identificacion: string;
         contacto: string;
         contactoId: string;
+        documentoTipoId: string;
         subtotal: string;
         impuesto: string;
         total: string;

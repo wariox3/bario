@@ -25,6 +25,7 @@ import {
 } from 'rxjs';
 import {
   I18nService,
+  LIST_PAGE_SIZE,
   ToastService,
   type PaginatedResponse,
   type PermisoAsignado,
@@ -51,8 +52,6 @@ import {
  */
 const APPS_CATALOGO: readonly string[] = PERMISO_APPS;
 
-const LIMITE_DEFAULT = 25;
-
 const PAGINA_VACIA: PaginatedResponse<PermisoSeguridad> = {
   count: 0,
   next: null,
@@ -70,7 +69,7 @@ const PAGINA_VACIA: PaginatedResponse<PermisoSeguridad> = {
  * Agregar es acción explícita: el botón abre un dialog con el **picker** — la
  * matriz del catálogo de `/seguridad/permiso/` (app → modelo × acción) con
  * filtros y paginación resueltos en el backend (`?app=`, `?accion=`,
- * `?search=`, `?page=`, `?limit=`): pills por app (del espejo estático
+ * `?search=`, `?page=`): pills por app (del espejo estático
  * `MODELO`), buscador con debounce, lente por acción que colapsa la matriz a
  * esa columna y `p-paginator` al pie. El catálogo recién se consulta al abrir
  * el dialog, y cada consulta queda cacheada en el servicio.
@@ -112,8 +111,8 @@ export class UsuarioPermisosPanelComponent {
   protected readonly appActiva = signal<string | null>(null);
   /** Página 1-based del `p-paginator`. */
   protected readonly pagina = signal(1);
-  /** Tamaño de página fijo: el paginador no expone el selector. */
-  protected readonly limite = signal(LIMITE_DEFAULT);
+  /** Tamaño de página fijo del backend: el paginador no expone el selector. */
+  protected readonly porPagina = LIST_PAGE_SIZE;
 
   /** Página visible de la consulta activa (ya filtrada por el backend). */
   protected readonly resultado = signal<readonly PermisoSeguridad[]>([]);
@@ -139,7 +138,6 @@ export class UsuarioPermisosPanelComponent {
     app: this.appActiva() ?? undefined,
     search: this.busquedaDebounced() || undefined,
     page: this.pagina(),
-    limit: this.limite(),
   }));
 
   protected readonly tieneFlags = computed(() => {
@@ -232,7 +230,7 @@ export class UsuarioPermisosPanelComponent {
     if (this.pendientesCeldas().includes(clave)) return;
     this.pendientesCeldas.update((claves) => [...claves, clave]);
     this.service
-      .getCatalogoPermisos({ modelo, accion, limit: 1 })
+      .getCatalogoPermisos({ modelo, accion })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (pagina) => {

@@ -79,6 +79,12 @@ export class DataFilterModalComponent {
   readonly value = input<readonly FilterCondition[]>([]);
   /** Control de visibilidad (two-way: `[(visible)]`). */
   readonly visible = input<boolean>(false);
+  /**
+   * Fila a enfocar al abrir (la píldora que la persona tocó). Su valor queda
+   * seleccionado para reescribirlo y dar Enter; si la fila no toma valor, el
+   * foco va a su operador. `null` = la última fila, como al abrir con el botón.
+   */
+  readonly focusRow = input<number | null>(null);
   readonly visibleChange = output<boolean>();
   /** Emitido al confirmar; entrega el nuevo conjunto de condiciones. */
   readonly apply = output<readonly FilterCondition[]>();
@@ -95,8 +101,19 @@ export class DataFilterModalComponent {
 
   /** Inputs de valor en el DOM (uno por fila con valor editable). */
   private readonly valueInputs = viewChildren<ElementRef<HTMLInputElement>>('valueInput');
-  /** Índice de la fila cuyo input debe recibir foco al renderizarse; `null` = ninguno. */
+  /** Selects de operador; reciben el foco cuando la fila no toma valor. */
+  private readonly operatorSelects = viewChildren('operatorSelect', { read: ElementRef });
+  /** Índice de la fila que debe recibir foco al renderizarse; `null` = ninguno. */
   private readonly focusRowIndex = signal<number | null>(null);
+  /** Si el foco pendiente viene de una píldora: entonces se selecciona el valor. */
+  private readonly selectOnFocus = signal(false);
+  /**
+   * Fila cuyo campo u operador cambió con el panel del selector abierto. Al
+   * cerrarse ese panel el foco salta a su valor. No se salta en el cambio
+   * mismo: con el selector cerrado las flechas cambian la opción una a una, y
+   * saltar ahí le robaría el foco a quien recorre opciones con el teclado.
+   */
+  private changedRow: number | null = null;
 
   constructor() {
     // Al abrir, hidrata el borrador desde los filtros activos (o con una
@@ -106,26 +123,63 @@ export class DataFilterModalComponent {
       if (!this.visible()) return;
       const rows = initialDraft(this.value(), this.fields());
       this.draft.set(rows);
-      // El foco va al valor de la última fila, que es la que se suele editar.
-      // El diálogo no lo pone (`focusOnShow` apagado): le daría el foco al
-      // select de propiedad después de la animación, pisando este.
-      untracked(() => this.focusRowIndex.set(rows.length > 0 ? rows.length - 1 : null));
+      // El foco va al valor de la fila pedida (la píldora tocada) o, si no, al
+      // de la última, que es la que se suele editar. El diálogo no lo pone
+      // (`focusOnShow` apagado): le daría el foco al select de propiedad
+      // después de la animación, pisando este.
+      untracked(() => {
+        const asked = this.focusRow();
+        const target = asked !== null && asked < rows.length ? asked : rows.length - 1;
+        this.selectOnFocus.set(asked !== null && asked < rows.length);
+        this.focusRowIndex.set(target >= 0 ? target : null);
+      });
     });
 
     // UX: al añadir una condición, mover el foco a su input de valor cuando
     // aparezca en el DOM. Depende de `valueInputs()` (cambia al renderizarse la
     // fila nueva); `focusRowIndex` se lee en untracked para no crear ciclos.
     effect(() => {
-      const inputs = this.valueInputs();
-      untracked(() => {
-        const target = this.focusRowIndex();
-        if (target === null) return;
-        this.focusRowIndex.set(null);
-        inputs
-          .find((ref) => ref.nativeElement.dataset['row'] === String(target))
-          ?.nativeElement.focus();
-      });
+      this.valueInputs();
+      this.operatorSelects();
+      untracked(() => this.applyPendingFocus());
     });
+  }
+
+  /**
+   * Al terminar de abrirse el diálogo. Hace falta además del effect: el
+   * diálogo conserva sus campos entre aperturas, así que al reabrir
+   * `valueInputs()` no cambia y el effect no vuelve a correr. Sin esto, el foco
+   * solo caía bien la primera vez.
+   */
+  protected onDialogShow(): void {
+    this.applyPendingFocus();
+  }
+
+  /**
+   * Enfoca la fila pendiente (`focusRowIndex`) si ya está en el DOM: su valor,
+   * seleccionado cuando viene de una píldora, o su operador si no toma valor.
+   */
+  private applyPendingFocus(): void {
+    const target = this.focusRowIndex();
+    if (target === null) return;
+    const input = this.valueInputs().find(
+      (ref) => ref.nativeElement.dataset['row'] === String(target),
+    );
+    if (input) {
+      this.focusRowIndex.set(null);
+      input.nativeElement.focus();
+      if (this.selectOnFocus()) input.nativeElement.select();
+      return;
+    }
+    // Fila sin valor («está vacío», booleanos): lo único editable es el
+    // operador. El elemento enfocable del p-select es su combobox interno.
+    const row = this.draft()[target];
+    if (!row || this.valueKindFor(row) !== 'none') return;
+    const select = this.operatorSelects()[target]?.nativeElement as HTMLElement | undefined;
+    const combobox = select?.querySelector<HTMLElement>('[role="combobox"]');
+    if (!combobox) return;
+    this.focusRowIndex.set(null);
+    combobox.focus();
   }
 
   // ── Opciones de los selects ─────────────────────────────────────────────
@@ -174,6 +228,7 @@ export class DataFilterModalComponent {
     if (!first) return;
     this.draft.update((rows) => [...rows, newRowForField(first)]);
     // Enfocar el input de la fila recién agregada (la última).
+    this.selectOnFocus.set(false);
     this.focusRowIndex.set(this.draft().length - 1);
   }
 
@@ -185,15 +240,37 @@ export class DataFilterModalComponent {
     this.draft.set([]);
   }
 
+  /** Se abrió el panel de un selector de la fila: los cambios cuentan desde aquí. */
+  protected onSelectShow(): void {
+    this.changedRow = null;
+  }
+
+  /**
+   * Se cerró el panel de un selector. Si en esa apertura se eligió otra opción,
+   * el foco pasa al valor de la fila (o al operador si la fila no toma valor),
+   * que es lo siguiente que se edita. Cerrar con Escape o clic fuera no salta.
+   */
+  protected onSelectHide(index: number): void {
+    if (this.changedRow !== index) return;
+    this.changedRow = null;
+    this.selectOnFocus.set(true);
+    this.focusRowIndex.set(index);
+    // Si el input de valor no cambió de tipo, ya está en el DOM y el effect no
+    // va a correr; si cambió (texto → fecha), lo enfoca el effect al aparecer.
+    this.applyPendingFocus();
+  }
+
   protected onFieldChange(index: number, fieldName: string): void {
     const field = this.fields().find((f) => f.name === fieldName);
     if (!field) return;
+    this.changedRow = index;
     // Cambiar de propiedad resetea operador (al primero del nuevo tipo) y valor.
     const next = newRowForField(field);
     this.draft.update((rows) => rows.map((row, i) => (i === index ? next : row)));
   }
 
   protected onOperatorChange(index: number, opId: string): void {
+    this.changedRow = index;
     this.draft.update((rows) =>
       rows.map((row, i) => {
         if (i !== index) return row;

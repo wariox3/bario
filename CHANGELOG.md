@@ -2,6 +2,54 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.10](https://github.com/wariox3/bario/compare/v0.1.9...v0.1.10) (2026-10-26)
+
+### Features
+
+- **core:** compartir y cachear los catalogos de los selects ([5610282](https://github.com/wariox3/bario/commit/56102822cf79f8f33908d786f2553ae89e9297b6))
+- **erp:** aprobar con Enter en la confirmacion de los documentos ([d56d427](https://github.com/wariox3/bario/commit/d56d42771d04a8b32fe02f24fe3885525a0a8321))
+- **erp:** buscar clase, grupo y cuenta del PUC por prefijo de codigo ([a6badec](https://github.com/wariox3/bario/commit/a6badec3c21d0869f5b7044e3a657fe7ef18dfe4))
+- **erp:** consultar la DIAN por POST y mockearla fuera de produccion ([f2453d7](https://github.com/wariox3/bario/commit/f2453d758f0bbb608de2ae8f0c1d67de5db8ab03))
+- **erp:** crear tercero desde los documentos de venta y compra ([ef7542c](https://github.com/wariox3/bario/commit/ef7542ca640d08617f2eca005d9040edd3f3de8e))
+- **erp:** crear tercero en cartera, tesoreria, inventario y contabilidad ([538e208](https://github.com/wariox3/bario/commit/538e2089e49d356b3f448a171d88c544ca4ddeaa))
+- **erp:** cuentas separadas y en el total de la factura de compra ([471aeb7](https://github.com/wariox3/bario/commit/471aeb71c1c362f108eaa0e7d8d452ca13ed80b2))
+- **erp:** desplegar la lista de cuentas al agregar una cuenta ([348a1e6](https://github.com/wariox3/bario/commit/348a1e6b82e1ed294cae0bb19151a4de54d30857))
+- **erp:** eliminar varias lineas a la vez en los documentos comerciales ([58ca0a3](https://github.com/wariox3/bario/commit/58ca0a352a06fadb5b1f280812ddbbb927356fb7))
+- **erp:** exigir base en la linea cuando la cuenta la exige ([a3cd746](https://github.com/wariox3/bario/commit/a3cd74677153eb42c735bb9fe0919498ce8b2970))
+- **erp:** forma de pago en la factura de compra ([b4435e8](https://github.com/wariox3/bario/commit/b4435e86ee8e031b303c4c5a415dd186593b1d71))
+- **erp:** marcar un contacto como inactivo ([9aa4d2c](https://github.com/wariox3/bario/commit/9aa4d2c1ce3fc0df403b6db3fa4d93c1ff9892aa))
+- **erp:** mostrar el id de la linea en las tablas de detalle contable ([2eeade1](https://github.com/wariox3/bario/commit/2eeade1965d90e7a1eee4de3a90e8b55004d3260))
+- **erp:** ordenar del mas antiguo al mas reciente al agregar documento ([5100914](https://github.com/wariox3/bario/commit/5100914dcf5076a4d608120c48518d282fe8e40c))
+- **erp:** paginar las lineas de la factura de compra en edicion ([0a7b4ef](https://github.com/wariox3/bario/commit/0a7b4efa8777cd2bdf5348bbf59e09f17bcbc23a))
+- **erp:** paginar las lineas en los demas documentos comerciales ([9b457f4](https://github.com/wariox3/bario/commit/9b457f4d728b2a8bd782b6ad9057631874e0b8cb))
+- **erp:** rol explicito y accesibilidad del modal de crear tercero ([9663bdf](https://github.com/wariox3/bario/commit/9663bdf8841af52e15dc7cecb7a0afd8d8624368))
+- **erp:** sugerir metodo de pago y sede en alta de factura de compra ([f7fd1bb](https://github.com/wariox3/bario/commit/f7fd1bb0375a17da9d14073af3d6086b48a753a8))
+- **erp:** sumar los filtros del informe anterior a cuentas por cobrar y pagar ([11ddf9d](https://github.com/wariox3/bario/commit/11ddf9dcf6a997ba29e6b94609ca3132176f2219))
+- **erp:** un solo "Guardar" confirma las cuentas de los documentos ([f64faf3](https://github.com/wariox3/bario/commit/f64faf3ce1b6c3ceaebdc05c9c3f0e73547ed8d3))
+- **erp:** varios correos de facturacion electronica en el contacto ([fdca24a](https://github.com/wariox3/bario/commit/fdca24ad7cb6a26cee38554918d0ebbd035ad929))
+- **feature-base:** enfocar el valor de la condicion al tocar su pildora ([a61d93d](https://github.com/wariox3/bario/commit/a61d93d7621264783a63929ccd131bb1d9dd2a16))
+- **feature-base:** mostrar los filtros activos como pildoras bajo la botonera ([d067e14](https://github.com/wariox3/bario/commit/d067e14d157a8f92cce4882b5fb213765f8ec5da))
+- **feature-base:** pasar el foco al valor al elegir campo u operador ([7f0f3db](https://github.com/wariox3/bario/commit/7f0f3dbc43dc330e7d28764f9e2128e54b592a94))
+- mostrar los filtros activos como pildoras en todos los listados ([5abcb47](https://github.com/wariox3/bario/commit/5abcb47f63eb6f23350c63699c0e0919513770cf))
+
+### Bug Fixes
+
+- **erp:** conservar el contacto de las lineas de documento en pago y egreso ([15ffacc](https://github.com/wariox3/bario/commit/15ffacc5e46939029b2451a1252e5a9dc0cc2ad5))
+- **erp:** iniciar en credito las cuentas nuevas del egreso ([6b3f655](https://github.com/wariox3/bario/commit/6b3f655da82013fe54fd311e3526f2dd08e812b3))
+- **erp:** listar primero las facturas de compra pendientes de aprobar ([a07ac11](https://github.com/wariox3/bario/commit/a07ac115e41a1ced694e99f602d26bda2b516eab))
+- **erp:** listar primero los documentos pendientes de aprobar ([f0fb4ac](https://github.com/wariox3/bario/commit/f0fb4ac8a8ed6ada6888020b67ae13b942a95644))
+- **erp:** no sumar dos veces las cuentas al resumen de la cabecera ([15ded4b](https://github.com/wariox3/bario/commit/15ded4b172e2589f436b1df5949bd0607f398fe1))
+- **erp:** ocultar la columna ref de la factura de venta sin lineas importadas ([6a083eb](https://github.com/wariox3/bario/commit/6a083ebf9abecbe9f5073d3d69ceac9aed5ac262))
+- **erp:** ocultar la columna ref en las fichas donde queda vacia ([02a5dcb](https://github.com/wariox3/bario/commit/02a5dcbdde42eeb589b330aaa2e40e7fe1978c55))
+- paginar siempre de a 25 como el backend ([e6b214f](https://github.com/wariox3/bario/commit/e6b214f88fe04ebaba60ade74236f8c891d0414d))
+- **ui:** conservar los decimales al pegar un valor en un campo numerico ([90e9b84](https://github.com/wariox3/bario/commit/90e9b84ba430073e33a753a73b59535079f8c1da))
+- **ui:** sacar PegarNumeroDirective del barrel de @reddoc/ui ([f762fd6](https://github.com/wariox3/bario/commit/f762fd60d4a58929597ade7bfdaf3eb41f996ef3))
+- **ui:** sacar primeng/confirmdialog del bundle inicial de turnos ([ee0c476](https://github.com/wariox3/bario/commit/ee0c4765b39a899a995a125b2a686d509f2117c3))
+
+### Refactoring
+
+- **erp:** compartir el alta inline en modal entre tercero e item ([170808b](https://github.com/wariox3/bario/commit/170808b321d00cf6c98a61ba227e785d6ebf189e))
+
 ## [0.1.9](https://github.com/wariox3/bario/compare/v0.1.8...v0.1.9) (2026-10-20)
 
 ### Features

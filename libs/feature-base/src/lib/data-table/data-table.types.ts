@@ -38,8 +38,10 @@ export interface RowActionInvokedEvent {
   readonly row: unknown;
 }
 
-/** Evento emitido cuando cambia la paginación. */
+/**
+ * Evento emitido cuando cambia la página. Solo la página: el tamaño es fijo
+ * (`LIST_PAGE_SIZE`), el paginador no deja elegirlo.
+ */
 export interface PageChangeEvent {
   readonly page: number;
-  readonly pageSize: number;
 }

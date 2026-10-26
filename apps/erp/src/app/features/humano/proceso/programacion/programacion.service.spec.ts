@@ -24,14 +24,14 @@ describe('ProgramacionService · listarRenglones', () => {
   afterEach(() => http.verify());
 
   it('pide por POST a lista/: la raíz del recurso no acepta GET', () => {
-    service.listarRenglones(7, 0, 25).subscribe();
+    service.listarRenglones(7, 0).subscribe();
     const req = http.expectOne((r) => r.url === '/api/humano/programacion-detalle/lista/');
     expect(req.request.method).toBe('POST');
     req.flush({ count: 0, next: null, previous: null, results: [] });
   });
 
   it('filtra por la programación y ordena por contrato en el cuerpo', () => {
-    service.listarRenglones(7, 0, 25).subscribe();
+    service.listarRenglones(7, 0).subscribe();
     const req = http.expectOne((r) => r.url.endsWith('/programacion-detalle/lista/'));
     expect(req.request.body).toEqual({
       filtros: [{ propiedad: 'programacion_id', operador: '=', valor: 7 }],
@@ -41,7 +41,7 @@ describe('ProgramacionService · listarRenglones', () => {
   });
 
   it('suma los filtros de la tabla después del de la programación', () => {
-    service.listarRenglones(7, 0, 25, [{ field: 'id', operator: 'eq', value: 3 }]).subscribe();
+    service.listarRenglones(7, 0, [{ field: 'id', operator: 'eq', value: 3 }]).subscribe();
     const req = http.expectOne((r) => r.url.endsWith('/programacion-detalle/lista/'));
     expect(req.request.body.filtros).toEqual([
       { propiedad: 'programacion_id', operador: '=', valor: 7 },
@@ -51,10 +51,10 @@ describe('ProgramacionService · listarRenglones', () => {
   });
 
   it('recibe la página 0-based y la manda 1-based', () => {
-    service.listarRenglones(7, 2, 25).subscribe();
+    service.listarRenglones(7, 2).subscribe();
     const req = http.expectOne((r) => r.url.endsWith('/programacion-detalle/lista/'));
     expect(req.request.params.get('page')).toBe('3');
-    expect(req.request.params.get('limit')).toBe('25');
+    expect(req.request.params.has('limit')).toBe(false);
     req.flush({ count: 0, next: null, previous: null, results: [] });
   });
 });
@@ -160,7 +160,7 @@ describe('ProgramacionService · nominaDelRenglon', () => {
       filtros: [{ propiedad: 'programacion_detalle_id', operador: '=', valor: 42 }],
       ordenamientos: [],
     });
-    expect(req.request.params.get('limit')).toBe('1');
+    expect(req.request.params.has('limit')).toBe(false);
     req.flush({ count: 0, next: null, previous: null, results: [] });
   });
 });

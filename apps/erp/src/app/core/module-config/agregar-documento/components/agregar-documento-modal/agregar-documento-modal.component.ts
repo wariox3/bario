@@ -87,7 +87,6 @@ export class AgregarDocumentoModalComponent {
   private readonly data = this.dialogConfig.data as AgregarDocumentoModalData | undefined;
 
   protected readonly page = signal(0);
-  protected readonly pageSize = signal(25);
   private readonly sort = signal<readonly SortSpec[]>([]);
 
   /** Quita el filtro por contacto: lista pendientes de todos los terceros. */
@@ -96,6 +95,8 @@ export class AgregarDocumentoModalComponent {
   /** Filtros que arma el usuario; efímeros (no se guardan en localStorage). */
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
   protected readonly items = signal<readonly DocumentoPendienteApi[]>([]);
   protected readonly totalCount = signal(0);
@@ -115,7 +116,6 @@ export class AgregarDocumentoModalComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.page.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.load();
   }
 
@@ -129,8 +129,14 @@ export class AgregarDocumentoModalComponent {
     this.selected.set(rows as DocumentoPendienteApi[]);
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
@@ -172,9 +178,9 @@ export class AgregarDocumentoModalComponent {
       filters.push({ field: 'contacto_id', operator: 'eq', value: contactoId });
     }
     filters.push(...this.activeFilters());
-    // Sin orden del usuario, cae al orden por defecto (más recientes primero).
+    // Sin orden del usuario, cae al orden por defecto (más antiguos primero).
     const sort = this.sort().length > 0 ? [...this.sort()] : [...AGREGAR_DOCUMENTO_DEFAULT_SORT];
-    return { filters, sort, page: this.page(), pageSize: this.pageSize() };
+    return { filters, sort, page: this.page() };
   }
 
   private load(): void {

@@ -27,10 +27,7 @@ import { DataTableComponent, type PageChangeEvent } from '@reddoc/feature-base';
 import { DocumentoContabilizacionService, type Movimiento } from '@erp/core/contabilidad';
 import type { AppDict } from '@erp/i18n';
 import { DocumentoMovimientosService } from './documento-movimientos.service';
-import {
-  CONTABILIDAD_DIALOG_COLUMNS,
-  CONTABILIDAD_DIALOG_PAGE_SIZE,
-} from './contabilidad-dialog.constants';
+import { CONTABILIDAD_DIALOG_COLUMNS } from './contabilidad-dialog.constants';
 
 /** Suma de la página cargada del libro. */
 interface TotalesLibro {
@@ -122,7 +119,6 @@ export class ContabilidadDialogComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(CONTABILIDAD_DIALOG_PAGE_SIZE);
   /** Contabilizar o descontabilizar en curso. */
   protected readonly isProcessing = signal(false);
   protected readonly isExporting = signal(false);
@@ -192,7 +188,6 @@ export class ContabilidadDialogComponent {
     const documentoId = this.documentoId();
     if (documentoId === null) return;
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.cargar(documentoId);
   }
 
@@ -246,7 +241,7 @@ export class ContabilidadDialogComponent {
   private cargar(documentoId: number): void {
     this.isLoading.set(true);
     this.movimientos
-      .listar(documentoId, { page: this.currentPage(), pageSize: this.pageSize() })
+      .listar(documentoId, this.currentPage())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

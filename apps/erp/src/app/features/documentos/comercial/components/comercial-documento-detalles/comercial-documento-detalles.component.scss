@@ -75,3 +75,10 @@
 .comercial-detalle-table__row--pending:hover .comercial-detalle-table__td {
   background: rgba(245, 158, 11, 0.08);
 }
+
+// Línea marcada para quitar en bloque. Va después de la pendiente: si es las dos
+// cosas, manda la selección (es lo que la persona está mirando).
+.comercial-detalle-table__row--selected .comercial-detalle-table__td,
+.comercial-detalle-table__row--selected:hover .comercial-detalle-table__td {
+  background: rgba(119, 170, 215, 0.12);
+}

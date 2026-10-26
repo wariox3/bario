@@ -20,10 +20,18 @@ export const REMISION_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.remision.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.REMISION,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'outflow',
   schemaVersion: 1,
   columns: REMISION_COLUMNS,
   filters: REMISION_FILTERS,
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'remision/list',
     new: 'remision/nuevo',

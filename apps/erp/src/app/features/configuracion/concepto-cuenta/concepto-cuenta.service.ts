@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   BaseHttpService,
   buildListBody,
-  buildListParams,
+  fetchAllPages,
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
@@ -12,12 +12,6 @@ import type {
   ConceptoCuentaActualizarPayload,
   ConceptoCuentaCrearPayload,
 } from './concepto-cuenta.model';
-
-/**
- * Un concepto tiene a lo sumo una cuenta por tipo de costo, así que una página
- * de este tamaño las trae todas.
- */
-const CUENTAS_POR_CONCEPTO_MAX = 100;
 
 /**
  * Servicio HTTP de las cuentas por tipo de costo de cada concepto.
@@ -31,19 +25,20 @@ const CUENTAS_POR_CONCEPTO_MAX = 100;
 export class ConceptoCuentaService extends BaseHttpService {
   private readonly resourcePath = '/humano/concepto-cuenta/';
 
-  /** Las cuentas de un concepto, todas en un arreglo. */
+  /** Las cuentas de un concepto, todas en un arreglo (recorre las páginas). */
   listar(conceptoId: number): Observable<readonly ConceptoCuenta[]> {
     const query: ListQuery = {
       filters: [{ field: 'concepto_id', operator: 'eq', value: conceptoId }],
       sort: [{ field: 'id', direction: 'asc' }],
       page: 0,
-      pageSize: CUENTAS_POR_CONCEPTO_MAX,
     };
-    return this.post<PaginatedResponse<ConceptoCuenta>>(
-      `${this.resourcePath}lista/`,
-      buildListBody(query),
-      buildListParams(query),
-    ).pipe(map((respuesta) => respuesta.results));
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<ConceptoCuenta>>(
+        `${this.resourcePath}lista/`,
+        buildListBody(query),
+        { page },
+      ),
+    );
   }
 
   crear(payload: ConceptoCuentaCrearPayload): Observable<ConceptoCuenta> {

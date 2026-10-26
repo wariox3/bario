@@ -16,6 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import type { MenuItem, SortMeta } from 'primeng/api';
 import {
   I18nService,
+  LIST_PAGE_SIZE,
   formatCop,
   formatFechaCorta,
   toFiniteNumber,
@@ -57,9 +58,15 @@ export class DataTableComponent {
   // ── Inputs opcionales ─────────────────────────────────────────────────────
   readonly totalCount = input<number>(0);
   readonly loading = input<boolean>(false);
-  readonly pageSize = input<number>(25);
+  /**
+   * Filas por página. Una tabla paginada contra el backend **no lo pasa**: el
+   * backend pagina siempre de a `LIST_PAGE_SIZE` y el paginador no ofrece otro
+   * tamaño. Solo lo cambia una tabla local que muestra todo de una
+   * (`items().length || 1`) o un endpoint con su propio tamaño fijo
+   * (`lista-dian/`, adjuntos de recepción: de a 10).
+   */
+  readonly pageSize = input<number>(LIST_PAGE_SIZE);
   readonly currentPage = input<number>(0);
-  readonly rowsPerPageOptions = input<readonly number[]>([10, 25, 50, 100]);
   /**
    * Alto del cuerpo scrollable (modo `scrollable` de PrimeNG). Default `'flex'`:
    * la tabla llena el alto disponible de su contenedor flex (header sticky,
@@ -128,13 +135,12 @@ export class DataTableComponent {
   );
 
   /**
-   * PrimeNG requiere arrays mutables en sus inputs `[value]`, `[selection]`
-   * y `[rowsPerPageOptions]`. Los inputs del componente son `readonly` para
+   * PrimeNG requiere arrays mutables en sus inputs `[value]` y `[selection]`.
+   * Los inputs del componente son `readonly` para
    * proteger a los consumidores; los exponemos como copias mutables aquí.
    */
   protected readonly mutableItems = computed(() => [...this.items()]);
   protected readonly mutableSelection = computed(() => [...this.selectedRows()]);
-  protected readonly mutableRowsPerPage = computed(() => [...this.rowsPerPageOptions()]);
 
   /**
    * `sort` (contrato propio) traducido al formato `SortMeta[]` de PrimeNG.
@@ -283,8 +289,8 @@ export class DataTableComponent {
 
   protected onPageEvent(event: { first: number; rows: number }): void {
     const nextPage = Math.floor(event.first / event.rows);
-    if (nextPage === this.currentPage() && event.rows === this.pageSize()) return;
-    this.pageChange.emit({ page: nextPage, pageSize: event.rows });
+    if (nextPage === this.currentPage()) return;
+    this.pageChange.emit({ page: nextPage });
   }
 
   protected onSelectionEvent(rows: unknown[] | unknown): void {

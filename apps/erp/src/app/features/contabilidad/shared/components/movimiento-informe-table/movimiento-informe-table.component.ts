@@ -1,6 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
-import { I18nService, formatCop, formatFechaCorta, toFiniteNumber } from '@reddoc/core';
+import {
+  I18nService,
+  LIST_PAGE_SIZE,
+  formatCop,
+  formatFechaCorta,
+  toFiniteNumber,
+} from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type {
   InformeEmptyCopySet,
@@ -9,9 +15,6 @@ import type {
   InformeTableRow,
   InformeTotales,
 } from '../../movimiento-informe.types';
-
-/** Tamaños de página del ERP (mismos que `<lib-data-table>`). */
-const ROWS_PER_PAGE = [10, 25, 50, 100];
 
 /** Los cuatro niveles del plan que son **subtotal**, no cuenta de movimiento. */
 const SUBTOTALES: ReadonlySet<InformeFilaTipo> = new Set<InformeFilaTipo>([
@@ -138,12 +141,10 @@ export class MovimientoInformeTableComponent {
 
   readonly totalCount = input<number>(0);
   readonly page = input<number>(0);
-  readonly pageSize = input<number>(25);
+  /** Tamaño fijo del backend: el paginador no deja elegir otro. */
+  protected readonly pageSize = LIST_PAGE_SIZE;
 
   readonly pageChange = output<PaginatorState>();
-
-  /** PrimeNG muta el array del dropdown, así que no puede ser el `readonly` de arriba. */
-  protected readonly rowsPerPageOptions = [...ROWS_PER_PAGE];
 
   /**
    * Columnas que **no** son importes: cuenta, nombre y los bloques opcionales.
@@ -216,11 +217,11 @@ export class MovimientoInformeTableComponent {
 
   /** Primer registro de la página (1-based), para el contador del pie. */
   protected readonly rangeStart = computed(() =>
-    this.totalCount() === 0 ? 0 : this.page() * this.pageSize() + 1,
+    this.totalCount() === 0 ? 0 : this.page() * this.pageSize + 1,
   );
 
   protected readonly rangeEnd = computed(() =>
-    Math.min((this.page() + 1) * this.pageSize(), this.totalCount()),
+    Math.min((this.page() + 1) * this.pageSize, this.totalCount()),
   );
 
   protected formatMonto(value: string | null | undefined): string {

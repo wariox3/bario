@@ -62,12 +62,13 @@ export class PrototiposListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
     this.filterStorage.read(PROTOTIPOS_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
   // ── Migas: módulo Turno → entidad actual (Prototipos) ──────────────────────
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
@@ -93,7 +94,6 @@ export class PrototiposListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -103,8 +103,14 @@ export class PrototiposListComponent {
     this.loadList();
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
@@ -136,7 +142,6 @@ export class PrototiposListComponent {
       filters: this.activeFilters(),
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

@@ -21,6 +21,8 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.notaCredito.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_CREDITO_VENTA,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'inflow',
   // Se cobra en el acto: el form y la ficha compartidos muestran la pestaña de pagos.
   hasPagos: true,
@@ -33,7 +35,12 @@ export const NOTA_CREDITO_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: NOTA_CREDITO_COLUMNS,
   filters: NOTA_CREDITO_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'nota-credito/list',
     new: 'nota-credito/nuevo',

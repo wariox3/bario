@@ -84,8 +84,8 @@ export class ProgramacionService extends BaseHttpService {
    * acepta `GET` en la raíz (responde 405). `page` es 0-based, como en todo
    * `ListQuery`; `buildListParams` lo pasa a 1-based para el backend.
    *
-   * El legacy pedía `limit: 1000` para traerlos todos de una; acá se pagina de
-   * verdad: una programación de una empresa grande no cabe en una página.
+   * El legacy pedía `limit: 1000` para traerlos todos de una; el backend ya no
+   * acepta tamaño (pagina siempre de a 25), así que se pagina de verdad.
    *
    * `filtros` son los que elige la persona en la tabla; van **después** del de la
    * programación, que no se puede pisar.
@@ -93,14 +93,12 @@ export class ProgramacionService extends BaseHttpService {
   listarRenglones(
     programacionId: number,
     page: number,
-    pageSize: number,
     filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<ProgramacionDetalle>> {
     const query: ListQuery = {
       filters: [{ field: 'programacion_id', operator: 'eq', value: programacionId }, ...filtros],
       sort: [{ field: 'contrato_id', direction: 'asc' }],
       page,
-      pageSize,
     };
     return this.post<PaginatedResponse<ProgramacionDetalle>>(
       `${PROGRAMACION_DETALLE_ENDPOINT}lista/`,
@@ -222,7 +220,6 @@ export class ProgramacionService extends BaseHttpService {
       filters: [{ field: 'programacion_detalle_id', operator: 'eq', value: renglonId }],
       sort: [],
       page: 0,
-      pageSize: 1,
     };
     return this.post<PaginatedResponse<NominaRead>>(
       `${DOCUMENTO_ENDPOINT}lista/`,
@@ -311,7 +308,6 @@ export function cuerpoExportacion(
     filters: [{ field: config.filtro, operator: 'eq', value: programacionId }],
     sort: config.orden ?? [],
     page: 0,
-    pageSize: 0,
   };
   return { ...buildListBody(query), ...config.reporte };
 }

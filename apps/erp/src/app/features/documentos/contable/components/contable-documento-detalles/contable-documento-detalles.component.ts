@@ -1,27 +1,18 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  Injector,
+  afterNextRender,
   computed,
   effect,
   inject,
   input,
-  output,
   signal,
+  viewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  EMPTY,
-  type Observable,
-  defer,
-  filter,
-  finalize,
-  forkJoin,
-  from,
-  map,
-  of,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { EMPTY, type Observable, defer, filter, from, switchMap } from 'rxjs';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -31,7 +22,13 @@ import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { type ErpSelectOption, I18nService, SELECT_ENDPOINTS, ToastService } from '@reddoc/core';
+import {
+  type ErpSelectOption,
+  I18nService,
+  SELECT_ENDPOINTS,
+  ToastService,
+  catalogoCompartido,
+} from '@reddoc/core';
 import {
   DocumentoDetalleService,
   type AgregarDocumentoModalData,
@@ -41,7 +38,9 @@ import {
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import { ErpApiSelectComponent, ErpContactoSelectComponent } from '@reddoc/ui';
+import { PegarNumeroDirective } from '@reddoc/ui/pegar-numero';
 import type { AppDict } from '@erp/i18n';
+import { LineasDiferidas, cambiosDeEstado } from '../../../lineas-diferidas';
 import {
   createCuentaDetalleGroup,
   type CuentaDetalleGroup,
@@ -53,7 +52,11 @@ import {
   documentoPendienteToFormValue,
 } from '../../contable-documento-detalle.mapper';
 import type { CuentaDetalleRead } from '../../contable-documento-detalle.model';
-import type { CuentaDetalleFormRawValue } from '../../contable-documento-detalle.types';
+import type {
+  CuentaDetalleFormRawValue,
+  NaturalezaCuenta,
+} from '../../contable-documento-detalle.types';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /** Columnas fijas: nº, cuenta, naturaleza, valor y acciones. */
 const BASE_COLUMN_COUNT = 5;
@@ -70,30 +73,39 @@ const BASE_COLUMN_COUNT = 5;
  * `FormGroup` siempre las tiene, así que prenderlas no cambia el shape de la línea
  * ni el mapper.
  *
- * Persistencia idéntica a la familia comercial: en **alta** (`documentId == null`)
- * las líneas viven en el `FormArray` y viajan embebidas al crear el documento; en
- * **edición** transaccionan al instante contra `/documento-detalle` (✓ por fila,
- * baja inmediata). Expone la misma API pública (`saveAll`, `pendingCount`,
- * `hasInvalidPending`) para que el form padre orqueste ítems y cuentas por igual.
+ * Persistencia idéntica a la familia comercial (`LineasDiferidas`): en **alta**
+ * (`documentId == null`) las líneas viven en el `FormArray` y viajan embebidas al
+ * crear el documento. En **edición** van por `/documento-detalle`, pero la tabla no
+ * guarda nada por su cuenta: altas, ediciones, bajas y documentos agregados quedan
+ * pendientes y los persiste `saveAll()` cuando el form padre guarda el documento.
+ * Un solo botón "Guardar" confirma todo; "Volver" lo descarta. Expone la misma API
+ * pública (`saveAll`, `pendingCount`, `hasInvalidPending`, `ocupado`) para que el
+ * form padre orqueste ítems y cuentas por igual.
  *
  * Con `agregarDocumentoEnabled` la tabla ofrece además **agregar documento**
  * (cruce de cartera): un modal de documentos con saldo pendiente cuya selección
  * entra como líneas enlazadas (`documento_afectado`, cuenta/naturaleza
  * bloqueadas, valor = pendiente). Espejo del "importar desde documento" comercial.
+ *
+ * `OnPush`, igual que la tabla comercial: la plantilla solo lee signals, y lo que
+ * cambia sin mover el valor (tocado, sucio) entra por `cambiosDeEstado`.
  */
 @Component({
   selector: 'app-contable-documento-detalles',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
     ReactiveFormsModule,
     ButtonModule,
     InputNumberModule,
+    PegarNumeroDirective,
     InputTextModule,
     SelectModule,
     TooltipModule,
     ConfirmDialogModule,
     ErpCuentaSelectComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
   ],
   providers: [ConfirmationService],
@@ -107,8 +119,12 @@ export class ContableDocumentoDetallesComponent {
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(DialogService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   protected readonly t = this.i18n.t;
+
+  /** Selects de cuenta de la tabla, en el orden de las filas. */
+  private readonly cuentaSelects = viewChildren(ErpCuentaSelectComponent);
 
   /** FormArray de líneas de cuenta, propiedad del form padre. */
   readonly detalles = input.required<FormArray<CuentaDetalleGroup>>();
@@ -119,7 +135,7 @@ export class ContableDocumentoDetallesComponent {
    */
   readonly documentId = input<number | null>(null);
 
-  /** Muestra la columna de tercero por línea (la imputa el pago; la factura no). */
+  /** Muestra la columna de tercero por línea (la imputan el pago y la factura de compra). */
   readonly showContacto = input<boolean>(false);
 
   /**
@@ -139,6 +155,12 @@ export class ContableDocumentoDetallesComponent {
    * `contactoPorDefecto`: el asiento siembra el de su cabecera.
    */
   readonly centroCostoPorDefecto = input<ErpSelectOption | null>(null);
+
+  /**
+   * Naturaleza con la que nace cada línea nueva. Débito salvo que el documento
+   * diga otra cosa: el egreso arranca en crédito.
+   */
+  readonly naturalezaPorDefecto = input<NaturalezaCuenta>('D');
 
   /** Muestra la columna de base gravable. */
   readonly showBase = input<boolean>(false);
@@ -185,13 +207,12 @@ export class ContableDocumentoDetallesComponent {
   readonly showDocumento = input<boolean>(false);
 
   /**
-   * Avisa al padre que se agregaron líneas en **edición** (ya persistidas vía
-   * `masivo/`) para que recargue las líneas con los ids autoritativos del backend.
+   * Catálogo de centros de costo (columna `centro_costo`), cargado una vez para
+   * todas las filas (ver `catalogoCompartido`). Solo se pide si la columna se ve.
    */
-  readonly imported = output<void>();
-
-  /** Endpoint del catálogo de centros de costo (columna `centro_costo`). */
-  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
+  protected readonly centroCostoCatalogo = catalogoCompartido(SELECT_ENDPOINTS.centroCosto, {
+    activo: () => this.showCentroCosto(),
+  });
 
   /** Nº de columnas de la tabla; alimenta el `colspan` del estado vacío. */
   protected readonly columnCount = computed(
@@ -206,12 +227,6 @@ export class ContableDocumentoDetallesComponent {
         this.showDetalle(),
       ].filter(Boolean).length,
   );
-
-  /**
-   * Cruce en curso (modal abierto resolviendo o `masivo/` en vuelo); bloquea
-   * reentradas y pone el botón en loading.
-   */
-  protected readonly addingDocumentos = signal(false);
 
   /** Opciones del select de naturaleza (D/C), con etiquetas i18n. */
   protected readonly naturalezaOptions = computed(() => [
@@ -232,11 +247,24 @@ export class ContableDocumentoDetallesComponent {
    */
   readonly resumen = computed(() => calcularResumenContable(this.lines(), this.carteraTipo()));
 
-  /** Grupo persistiéndose ahora mismo (edición); bloquea su botón. */
-  protected readonly savingGroup = signal<CuentaDetalleGroup | null>(null);
+  /**
+   * Altas, ediciones y bajas pendientes de la edición: la tabla no escribe nada por
+   * su cuenta, las persiste `saveAll()` cuando el form padre guarda el documento.
+   */
+  private readonly lineas = new LineasDiferidas<CuentaDetalleGroup, CuentaDetalleRead>({
+    detalles: () => this.detalles(),
+    documentId: () => this.documentId(),
+    service: this.detalleService,
+    tieneContenido: (fila) => fila.controls.cuenta.value != null,
+    payload: (fila) => cuentaDetalleToPayload(fila.getRawValue()),
+    reconstruir: (leida) => createCuentaDetalleGroup(cuentaDetalleToFormValue(leida)),
+  });
 
-  /** Guardado en lote ("Guardar líneas" / flush del padre) en curso. */
-  protected readonly savingAll = signal(false);
+  /**
+   * Hay un guardado de líneas en curso. El form padre deshabilita "Guardar" mientras
+   * tanto: guardar a la vez reenviaría líneas que aún no tienen `id`.
+   */
+  readonly ocupado = computed(() => this.lineas.guardando());
 
   /**
    * `true` desde que el effect de sincronización corrió, es decir, con los inputs ya
@@ -246,6 +274,37 @@ export class ContableDocumentoDetallesComponent {
    */
   private readonly montada = signal(false);
 
+  /**
+   * Sube con cada cambio de tocado o sucio de las filas (`cambiosDeEstado`), que no
+   * mueve `lines`. Lo leen los derivados de abajo, y por ellos la plantilla.
+   */
+  private readonly revisionEstado = signal(0);
+
+  /** Filas con cambios sin guardar; la plantilla consulta cada fila contra este set. */
+  private readonly pendientes = computed<ReadonlySet<CuentaDetalleGroup>>(() => {
+    this.lines();
+    this.revisionEstado();
+    return this.montada() ? new Set(this.lineas.pendientes()) : new Set();
+  });
+
+  /** Nº de cambios sin guardar (filas pendientes más las quitadas). */
+  private readonly cambiosPendientes = computed(() => {
+    this.lines();
+    this.revisionEstado();
+    return this.montada() ? this.lineas.pendingCount() : 0;
+  });
+
+  /**
+   * Filas que recorre la plantilla. Con `OnPush` el `@for` no puede iterar
+   * `detalles().controls` directo: no es un signal, y una tabla vacía no lee
+   * ningún otro, así que la primera línea agregada no se pintaba. Es una copia
+   * porque `FormArray` muta `controls` en el lugar: el mismo array no avisaría.
+   */
+  protected readonly filas = computed(() => {
+    this.lines();
+    return this.montada() ? [...this.detalles().controls] : [];
+  });
+
   constructor() {
     effect((onCleanup) => {
       const array = this.detalles();
@@ -253,17 +312,25 @@ export class ContableDocumentoDetallesComponent {
       const sync = (): void => this.lines.set(array.getRawValue());
       sync();
       const sub = array.valueChanges.subscribe(sync);
+      sub.add(cambiosDeEstado(array).subscribe(() => this.revisionEstado.update((n) => n + 1)));
       onCleanup(() => sub.unsubscribe());
     });
   }
 
+  /**
+   * Agrega una línea manual y enfoca su cuenta, que al enfocarse despliega la
+   * lista: lo siguiente que hace la persona es elegirla. La fila nueva es la
+   * última, así que su select es el último de la tabla una vez pintada.
+   */
   protected addLinea(): void {
     this.detalles().push(
       createCuentaDetalleGroup({
         contacto: this.contactoPorDefecto(),
         centro_costo: this.centroCostoPorDefecto(),
+        naturaleza: this.naturalezaPorDefecto(),
       }),
     );
+    afterNextRender(() => this.cuentaSelects().at(-1)?.focus(), { injector: this.injector });
   }
 
   /**
@@ -272,7 +339,6 @@ export class ContableDocumentoDetallesComponent {
    * selecciona; toda la resolución/persistencia ocurre aquí.
    */
   protected openAgregarDocumento(): void {
-    if (this.addingDocumentos()) return;
     const data: AgregarDocumentoModalData = {
       contactoId: this.contactoId(),
       carteraTipo: this.carteraTipo(),
@@ -301,44 +367,22 @@ export class ContableDocumentoDetallesComponent {
   }
 
   /**
-   * Construye las líneas enlazadas desde los documentos seleccionados y bifurca
-   * según el modo: alta → push al `FormArray`; edición → alta masiva + recarga
-   * del padre (`imported`). La cuenta y la naturaleza del cruce salen de la
-   * propia fila: el listado ya las trae resueltas.
+   * Agrega las líneas enlazadas de los documentos seleccionados. En edición quedan
+   * pendientes como cualquier alta: se escriben al guardar el documento. La cuenta y
+   * la naturaleza del cruce salen de la propia fila: el listado ya las trae resueltas.
    */
   private resolveAndAddDocumentos(rows: readonly DocumentoPendienteApi[]): void {
-    const formValues = rows.map((row) => documentoPendienteToFormValue(row, this.carteraTipo()));
-    const docId = this.documentId();
-    if (docId == null) {
-      for (const value of formValues) this.detalles().push(createCuentaDetalleGroup(value));
-      const toast = this.t().documentAdd.toasts.addSuccess;
-      this.toast.success(toast.title, toast.desc);
-      return;
+    for (const row of rows) {
+      this.detalles().push(
+        createCuentaDetalleGroup(documentoPendienteToFormValue(row, this.carteraTipo())),
+      );
     }
-
-    this.addingDocumentos.set(true);
-    const detalles = formValues.map(cuentaDetalleToPayload);
-    this.detalleService
-      .crearMasivo(docId, detalles)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.addingDocumentos.set(false);
-          const toast = this.t().documentAdd.toasts.addSuccess;
-          this.toast.success(toast.title, toast.desc);
-          this.imported.emit();
-        },
-        error: () => {
-          this.addingDocumentos.set(false);
-          const toast = this.t().documentAdd.toasts.addError;
-          this.toast.error(toast.title, toast.desc);
-        },
-      });
+    const toast = this.t().documentAdd.toasts.addSuccess;
+    this.toast.success(toast.title, toast.desc);
   }
 
-  /** Pide confirmación y, al aceptar, elimina la línea (persiste en edición). */
+  /** Pide confirmación y, al aceptar, quita la línea (en edición, al guardar). */
   protected removeLinea(group: CuentaDetalleGroup): void {
-    const { id } = group.getRawValue();
     this.confirmation.confirm({
       message: this.t().entities.cuentaDetalle.confirmDeleteLine,
       header: this.t().common.confirms.deleteHeader,
@@ -346,157 +390,33 @@ export class ContableDocumentoDetallesComponent {
       acceptLabel: this.t().common.actions.delete,
       rejectLabel: this.t().common.actions.cancel,
       acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.deleteLinea(group, id),
+      accept: () => this.lineas.quitar(group),
     });
   }
 
-  /**
-   * Una fila está **pendiente** (sin persistir) cuando es nueva con cuenta elegida
-   * o cuando una existente fue modificada. Una fila recién agregada y vacía no
-   * cuenta: no hay nada que guardar ni perder.
-   */
+  /** La fila tiene cambios sin guardar (nueva con cuenta, o persistida y editada). */
   protected isPending(group: CuentaDetalleGroup): boolean {
-    if (this.documentId() == null) return false;
-    return group.controls.id.value == null ? group.controls.cuenta.value != null : group.dirty;
+    return this.pendientes().has(group);
   }
 
-  private pendingRows(): readonly CuentaDetalleGroup[] {
-    return this.detalles().controls.filter((row) => this.isPending(row));
-  }
-
-  /** Nº de líneas sin guardar; alimenta el botón, el toolbar y el guard de salida. */
+  /**
+   * Nº de cambios sin guardar: filas nuevas o editadas más las quitadas. Alimenta el
+   * aviso del toolbar, el del form padre y el guard de salida.
+   */
   pendingCount(): number {
-    if (!this.montada()) return 0;
-    return this.pendingRows().length;
-  }
-
-  private pendingSavable(): readonly CuentaDetalleGroup[] {
-    return this.pendingRows().filter((row) => row.valid);
+    return this.cambiosPendientes();
   }
 
   /** `true` si alguna línea pendiente está incompleta (p. ej. sin cuenta o sin valor). */
   hasInvalidPending(): boolean {
-    return this.pendingRows().some((row) => row.invalid);
-  }
-
-  protected canSaveRow(group: CuentaDetalleGroup): boolean {
-    return this.documentId() != null && group.valid && this.isPending(group);
-  }
-
-  protected isSavingRow(group: CuentaDetalleGroup): boolean {
-    return this.savingGroup() === group;
+    return this.lineas.hayIncompletas();
   }
 
   /**
-   * Persiste una línea (PATCH si ya tiene `id`, POST con `documento_id` si es
-   * nueva) y la reconstruye desde la respuesta autoritativa del backend. Núcleo
-   * compartido por el ✓ por fila y el guardado en lote; no muestra toasts.
-   */
-  private persistRow(group: CuentaDetalleGroup): Observable<CuentaDetalleRead> {
-    const docId = this.documentId() as number;
-    const payload = cuentaDetalleToPayload(group.getRawValue());
-    const id = group.controls.id.value;
-    const op =
-      id != null
-        ? this.detalleService.actualizar<CuentaDetalleRead>(id, payload)
-        : this.detalleService.crear<CuentaDetalleRead>(docId, payload);
-    return op.pipe(
-      tap((saved) => {
-        const index = this.detalles().controls.indexOf(group);
-        if (index >= 0)
-          this.detalles().setControl(
-            index,
-            createCuentaDetalleGroup(cuentaDetalleToFormValue(saved)),
-          );
-      }),
-    );
-  }
-
-  /** Guarda una sola línea (botón ✓ por fila). */
-  protected saveLinea(group: CuentaDetalleGroup): void {
-    if (this.documentId() == null || group.invalid || this.savingGroup() || this.savingAll())
-      return;
-    this.savingGroup.set(group);
-    this.persistRow(group)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.savingGroup.set(null);
-          const toast = this.t().entities.cuentaDetalle.toasts.lineSaveSuccess;
-          this.toast.success(toast.title, toast.desc);
-        },
-        error: () => {
-          this.savingGroup.set(null);
-          const toast = this.t().entities.cuentaDetalle.toasts.lineSaveError;
-          this.toast.error(toast.title, toast.desc);
-        },
-      });
-  }
-
-  /** Click del botón "Guardar líneas": avisa de incompletas y guarda las válidas. */
-  protected onSaveAllClick(): void {
-    if (this.hasInvalidPending()) {
-      const toast = this.t().entities.cuentaDetalle.toasts.incompleteLines;
-      this.toast.warn(toast.title, toast.desc);
-    }
-    if (this.pendingSavable().length === 0) return;
-    this.saveAll().subscribe({
-      next: () => {
-        const toast = this.t().entities.cuentaDetalle.toasts.allSaved;
-        this.toast.success(toast.title, toast.desc);
-      },
-      error: () => {
-        const toast = this.t().entities.cuentaDetalle.toasts.lineSaveError;
-        this.toast.error(toast.title, toast.desc);
-      },
-    });
-  }
-
-  /**
-   * Guarda en lote todas las líneas pendientes y válidas. Lo usa el botón del
-   * toolbar y el form padre al guardar el documento (para no perder cambios).
-   * Operación pura: no muestra toasts (el feedback lo decide cada caller).
+   * Persiste todos los cambios pendientes (ver `LineasDiferidas.guardar`). Lo llama
+   * el form padre al guardar el documento, antes de la cabecera.
    */
   saveAll(): Observable<void> {
-    return defer(() => {
-      const rows = this.pendingSavable();
-      if (this.documentId() == null || rows.length === 0) return of(undefined);
-
-      this.savingAll.set(true);
-      return forkJoin(rows.map((row) => this.persistRow(row))).pipe(
-        map(() => undefined),
-        finalize(() => this.savingAll.set(false)),
-      );
-    }).pipe(takeUntilDestroyed(this.destroyRef));
-  }
-
-  /** Ejecuta la baja: local en alta/línea no persistida; contra la API en edición. */
-  private deleteLinea(group: CuentaDetalleGroup, id: number | null): void {
-    if (this.documentId() == null || id == null) {
-      this.removeGroup(group);
-      return;
-    }
-    this.detalleService
-      .eliminar(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.removeGroup(group);
-          this.toast.success(
-            this.t().common.toasts.deleteSuccess.title,
-            this.t().common.toasts.deleteSuccess.desc,
-          );
-        },
-        error: () =>
-          this.toast.error(
-            this.t().common.toasts.deleteError.title,
-            this.t().common.toasts.deleteError.desc,
-          ),
-      });
-  }
-
-  private removeGroup(group: CuentaDetalleGroup): void {
-    const i = this.detalles().controls.indexOf(group);
-    if (i >= 0) this.detalles().removeAt(i);
+    return defer(() => this.lineas.guardar()).pipe(takeUntilDestroyed(this.destroyRef));
   }
 }

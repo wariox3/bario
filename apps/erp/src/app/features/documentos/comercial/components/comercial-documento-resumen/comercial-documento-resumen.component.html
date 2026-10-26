@@ -1,5 +1,6 @@
 @let r = t().entities.comercialDetalle.resumen;
 @let p = t().entities.documentoPago;
+@let rc = t().entities.cuentaDetalle.resumen;
 
 <div class="flex justify-end">
   <div
@@ -12,10 +13,26 @@
           <span class="tabular-nums text-brand-text">{{ formatCantidad(cantidad() ?? 0) }}</span>
         </div>
       }
-      <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
-        <span class="text-brand-muted">{{ r.subtotal }}</span>
-        <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().subtotal) }}</span>
-      </div>
+      @if (cuentas(); as cu) {
+        @if (cu.creditos > 0) {
+          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+            <span class="text-brand-muted">{{ rc.creditos }}</span>
+            <span class="tabular-nums text-brand-text">{{ formatMoney(cu.creditos) }}</span>
+          </div>
+        }
+        @if (cu.debitos > 0) {
+          <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+            <span class="text-brand-muted">{{ rc.debitos }}</span>
+            <span class="tabular-nums text-brand-text">{{ formatMoney(cu.debitos) }}</span>
+          </div>
+        }
+      }
+      @if (mostrarSubtotal()) {
+        <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
+          <span class="text-brand-muted">{{ r.subtotal }}</span>
+          <span class="tabular-nums text-brand-text">{{ formatMoney(resumen().subtotal) }}</span>
+        </div>
+      }
       @if (resumen().descuento > 0) {
         <div class="flex items-baseline justify-between gap-2 text-[0.74rem]">
           <span class="text-brand-muted">{{ r.descuento }}</span>

@@ -26,11 +26,19 @@ export const CUENTA_COBRO_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.cuentaCobro.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.CUENTA_COBRO,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   // Se cobra en el acto, como en el ERP anterior (usa el form y la ficha del POS).
   hasPagos: true,
   schemaVersion: 1,
   columns: CUENTA_COBRO_COLUMNS,
   filters: CUENTA_COBRO_FILTERS,
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'cuenta-cobro/list',
     new: 'cuenta-cobro/nuevo',

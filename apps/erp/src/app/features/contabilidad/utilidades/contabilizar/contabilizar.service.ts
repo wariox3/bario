@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { map, type Observable } from 'rxjs';
+import { map, tap, type Observable } from 'rxjs';
 import {
   BaseHttpService,
   buildListBody,
   buildListParams,
+  fetchAllPages,
   type FilterCondition,
   type ListQuery,
   type PaginatedResponse,
@@ -101,22 +102,18 @@ export class ContabilizarService extends BaseHttpService {
       filters.push({ field: 'numero', operator: 'lte', value: criterio.numero_hasta });
     }
 
-    const query: ListQuery = {
-      filters,
-      sort: [],
-      page: 0,
-      pageSize: DESCONTABILIZAR_LIMITE,
-    };
+    const query: ListQuery = { filters, sort: [], page: 0 };
 
-    return this.post<PaginatedResponse<ContabilizarRow>>(
-      `${DOCUMENTO_ENDPOINT}lista/`,
-      buildListBody(query),
-      buildListParams(query),
-    ).pipe(
-      map((response) => ({
-        ids: (response.results ?? []).map((row) => row.id),
-        total: response.count ?? 0,
-      })),
-    );
+    // El backend pagina de a 25: se recorren las páginas hasta el tope.
+    let total = 0;
+    return fetchAllPages(
+      (page) =>
+        this.post<PaginatedResponse<ContabilizarRow>>(
+          `${DOCUMENTO_ENDPOINT}lista/`,
+          buildListBody(query),
+          { page },
+        ).pipe(tap((response) => (total = response.count ?? 0))),
+      { max: DESCONTABILIZAR_LIMITE },
+    ).pipe(map((rows) => ({ ids: rows.map((row) => row.id), total })));
   }
 }

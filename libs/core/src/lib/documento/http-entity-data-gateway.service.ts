@@ -22,7 +22,7 @@ import type { EntityDataGateway } from './entity-data-gateway';
  *
  * Convenciones del backend de documentos (`/api/general/documento`):
  *  - **Listado**: POST `<endpoint>/lista/` con body `{ filtros, ordenamientos }`
- *    y la paginación como query params (`?page=…&limit=…`). El filtro por
+ *    y la página como query param (`?page=…`). El filtro por
  *    `documento_tipo_id` se inyecta automáticamente desde
  *    `DocumentEntityConfig.documentTypeId` — el componente nunca lo declara.
  *  - **Batch delete**: POST `<endpoint>/eliminar/` con `{ ids: [...] }`.
@@ -50,8 +50,13 @@ export class HttpEntityDataGateway implements EntityDataGateway {
       );
   }
 
+  /**
+   * Con `cabeceraConImpuestos` pide `<endpoint>/<id>/detalle/`, que suma los
+   * impuestos agrupados (`documento_impuestos`) al mismo documento.
+   */
   getById(entity: EntityConfig, id: string | number): Observable<unknown> {
-    return this.http.get(`${entity.endpoint}/${id}/`);
+    const sufijo = entity.cabeceraConImpuestos ? 'detalle/' : '';
+    return this.http.get(`${entity.endpoint}/${id}/${sufijo}`);
   }
 
   create(entity: EntityConfig, payload: unknown): Observable<unknown> {

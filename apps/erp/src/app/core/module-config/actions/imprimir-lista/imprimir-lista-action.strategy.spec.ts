@@ -17,7 +17,6 @@ const QUERY: ListQuery = {
   filters: [{ field: 'contacto_id', operator: 'eq', value: 3 }],
   sort: [],
   page: 0,
-  pageSize: 20,
 };
 
 function contexto(over: Partial<EntityActionContext> = {}): EntityActionContext {

@@ -25,7 +25,12 @@ export const SALIDA_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: SALIDA_COLUMNS,
   filters: SALIDA_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'salida/list',
     new: 'salida/nuevo',

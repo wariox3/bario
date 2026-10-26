@@ -12,6 +12,7 @@ import {
   I18nService,
   SELECT_ENDPOINTS,
   ToastService,
+  catalogoCompartido,
   formatCop,
   toFiniteNumber,
   type ErpSelectOption,
@@ -81,7 +82,8 @@ export class InventarioDocumentoDetallesComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly formatMoney = formatCop;
-  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+  /** Catálogo de almacenes, cargado una vez para todas las filas (ver `catalogoCompartido`). */
+  protected readonly almacenCatalogo = catalogoCompartido(SELECT_ENDPOINTS.almacen);
 
   /** FormArray de líneas, propiedad del form padre. */
   readonly detalles = input.required<FormArray<InventarioDetalleGroup>>();

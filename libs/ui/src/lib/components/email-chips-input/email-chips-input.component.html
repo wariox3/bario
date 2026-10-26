@@ -1,0 +1,33 @@
+<!-- El clic en el área libre enfoca el input; el teclado entra por el input mismo. -->
+<!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+<div
+  class="email-chips"
+  [class.email-chips--invalid]="invalid()"
+  [class.email-chips--disabled]="disabled()"
+  (click)="enfocar()"
+>
+  @for (correo of correos(); track correo) {
+    <p-chip
+      [label]="correo"
+      class="email-chips__chip"
+      [removable]="!disabled()"
+      [class.email-chips__chip--invalid]="!esValido(correo)"
+      (onRemove)="quitar(correo)"
+    />
+  }
+  <input
+    #campo
+    class="email-chips__input min-w-40 flex-1"
+    type="text"
+    inputmode="email"
+    autocomplete="email"
+    [id]="inputId()"
+    [value]="borrador()"
+    [placeholder]="placeholderVisible()"
+    [disabled]="disabled()"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    (paste)="onPaste($event)"
+    (blur)="onBlur()"
+  />
+</div>

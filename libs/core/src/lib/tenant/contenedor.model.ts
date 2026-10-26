@@ -86,7 +86,7 @@ export interface PermisoSeguridad {
 
 /**
  * Consulta de `/seguridad/permiso/` que el backend resuelve como query params
- * (`?app=general&modelo=gencontacto&accion=view&search=…&page=&limit=`).
+ * (`?app=general&modelo=gencontacto&accion=view&search=…&page=`).
  * Todos opcionales y combinables.
  */
 export interface PermisoCatalogoFiltros {
@@ -94,10 +94,8 @@ export interface PermisoCatalogoFiltros {
   readonly modelo?: string;
   readonly accion?: string;
   readonly search?: string;
-  /** Página 1-based; sin ella el backend responde la primera. */
+  /** Página 1-based; sin ella el backend responde la primera (de a `LIST_PAGE_SIZE`). */
   readonly page?: number;
-  /** Tamaño de página; sin él aplica el default del backend (~25). */
-  readonly limit?: number;
 }
 
 /** Bloque `permiso` de `/seguridad/usuario-cliente-permiso/`. */

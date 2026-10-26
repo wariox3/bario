@@ -26,8 +26,11 @@
       size="small"
       icon="pi pi-check"
       [loading]="isSaving()"
-      [disabled]="isSaving()"
+      [disabled]="isSaving() || tablasOcupadas()"
     />
+    @if (hayCambios()) {
+      <app-cambios-sin-guardar />
+    }
   </lib-page-actions>
 
   <!-- ── Sección: Información general ──────────────────────────────────────── -->
@@ -55,6 +58,7 @@
             <span class="ml-px text-red-500">*</span>
           </label>
           <lib-contacto-select
+            appCrearTercero
             inputId="contacto"
             formControlName="contacto"
             [placeholder]="f.fields.contactoPlaceholder"

@@ -1,5 +1,5 @@
 import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEn, appSwitcherEn, authEn, phoneInputEn } from '@reddoc/ui';
+import { accesosContenedorEn, appSwitcherEn, authEn, phoneInputEn } from '@reddoc/ui/i18n';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {

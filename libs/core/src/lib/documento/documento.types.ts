@@ -21,10 +21,40 @@
  */
 
 /**
+ * Acumulados que el backend calcula sobre **todas** las líneas guardadas. Llegan
+ * en el listado y en la cabecera; `GET documento/<id>/detalle/` suma además el
+ * desglose por impuesto. Son decimales en string.
+ */
+export interface DocumentoTotalesRead {
+  readonly subtotal: string | null;
+  readonly descuento: string | null;
+  readonly total_bruto: string | null;
+  readonly base_impuesto: string | null;
+  readonly impuesto: string | null;
+  readonly impuesto_retencion: string | null;
+  /** Total del documento: ítems con sus impuestos, más débitos y menos créditos de las cuentas. */
+  readonly total: string | null;
+  /**
+   * Suma de las líneas de cuenta contable (`tipo_registro = 'C'`) por naturaleza.
+   * Opcionales: el backend las expone desde el 2026-10-22 y la fila del listado
+   * puede no traerlas.
+   */
+  readonly debito?: string | null;
+  readonly credito?: string | null;
+  /**
+   * Suma de `cantidad` de las líneas de ítem. Llegó el 2026-10-22: sin ella, los
+   * documentos que muestran «Total cantidad» no paginan sus líneas.
+   */
+  readonly cantidad_detalles?: string | null;
+  /** Solo en `documento/<id>/detalle/` (`cabeceraConImpuestos`). */
+  readonly documento_impuestos?: readonly DocumentoImpuestoAgrupadoRead[];
+}
+
+/**
  * Fila plana del listado `…/documento/lista/`. Trae los acumulados que calcula el
  * backend (montos, totales) y las banderas de estado; no trae `detalles`.
  */
-export interface DocumentoListRowBase {
+export interface DocumentoListRowBase extends DocumentoTotalesRead {
   readonly id: number;
   readonly numero: string | null;
   readonly fecha: string | null;
@@ -48,13 +78,6 @@ export interface DocumentoListRowBase {
   readonly comprobante: number | null;
   readonly cuenta: number | null;
   readonly documento_referencia: number | null;
-  readonly subtotal: string | null;
-  readonly descuento: string | null;
-  readonly total_bruto: string | null;
-  readonly base_impuesto: string | null;
-  readonly impuesto: string | null;
-  readonly impuesto_retencion: string | null;
-  readonly total: string | null;
   readonly estado_aprobado: boolean;
   readonly estado_anulado: boolean;
   readonly estado_contabilizado: boolean;
@@ -117,6 +140,8 @@ export interface DocumentoPayloadBase {
 export interface DocumentoDetalleReadBase {
   /** Id de la línea (para distinguir existente vs nueva al editar). */
   readonly id?: number | null;
+  /** Documento al que pertenece la línea. */
+  readonly documento?: number | null;
   /**
    * Discriminador de familia de línea que comparte la tabla `documento-detalle`:
    * `'I'` (ítem de inventario), `'C'` (cuenta contable), etc. Permite separar las
@@ -137,6 +162,24 @@ export interface DocumentoDetallePayloadBase {
   /** Precio como string con 2 decimales (`"1000000.00"`). */
   readonly precio: string;
   readonly impuestos_ids: readonly number[];
+}
+
+/**
+ * Un renglón de `documento_impuestos` (`GET documento/<id>/detalle/`): un
+ * impuesto con la suma de todas las líneas del documento. Primero los que se
+ * cobran y después las retenciones. Los montos llegan como decimal en string.
+ */
+export interface DocumentoImpuestoAgrupadoRead {
+  readonly impuesto_id: number;
+  readonly impuesto_nombre: string;
+  readonly impuesto_nombre_extendido: string;
+  /** `1` suma, `-1` resta (retención). */
+  readonly impuesto_operacion: number;
+  readonly base: string;
+  /** Monto sin signo. */
+  readonly total: string;
+  /** Monto con el signo de la operación: es el que suma al total del documento. */
+  readonly total_operado: string;
 }
 
 /** Impuesto de una línea tal como lo devuelve el read-model. Genérico a cualquier documento. */

@@ -10,8 +10,9 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
+import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import type { MenuItem } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
 import { TabsModule } from 'primeng/tabs';
@@ -21,6 +22,9 @@ import {
   TenantService,
   ToastService,
   calcularResumen,
+  cantidadDesdeCabecera,
+  LIST_PAGE_SIZE,
+  resumenDesdeCabecera,
   resolucionTexto,
   type DocumentoEstados,
   type ResumenDocumento,
@@ -108,6 +112,7 @@ interface CabeceraView {
   selector: 'app-factura-venta-detail',
   standalone: true,
   imports: [
+    PaginatorModule,
     ButtonModule,
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
@@ -152,6 +157,24 @@ export class FacturaVentaDetailComponent implements OnInit {
   });
   /** Líneas del documento, ya mapeadas a la forma del front para alimentar la tabla. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
+  protected readonly pageSize = LIST_PAGE_SIZE;
+  /** Página visible de los ítems, 0-based como `p-paginator`. */
+  protected readonly pagina = signal(0);
+  /** Líneas de ítem del documento según el backend. */
+  protected readonly totalItems = signal(0);
+  protected readonly cargandoItems = signal(false);
+  /** Resumen con los acumulados del backend (`resumenDesdeCabecera`). */
+  private readonly resumenCabecera = signal<ResumenDocumento | null>(null);
+  /** Suma de cantidades según la cabecera (`cantidadDesdeCabecera`). */
+  private readonly cantidadCabecera = signal<number | null>(null);
+  /**
+   * Los ítems se paginan solo si la cabecera trae el resumen y la suma de
+   * cantidades (`cantidad_detalles`, para «Total cantidad»). Si faltara alguno
+   * se traen todos para sumarlos, como antes.
+   */
+  protected readonly paginada = computed(
+    () => this.resumenCabecera() !== null && this.cantidadCabecera() !== null,
+  );
   /** Pagos del documento (`documento-pago`), anulados incluidos, en la forma del front. */
   protected readonly pagos = signal<readonly PagoFormRawValue[]>([]);
   protected readonly isLoading = signal(true);
@@ -185,13 +208,28 @@ export class FacturaVentaDetailComponent implements OnInit {
     return cab ? capacidadesDocumento(cab.estados) : CAPACIDADES_DOCUMENTO_VACIAS;
   });
 
-  /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
-  protected readonly resumen = computed<ResumenDocumento>(() =>
-    calcularResumen(this.lines().map(toLineaCalculo)),
+  /**
+   * ¿Alguna línea vino importada de otro documento? Solo entonces se muestra la
+   * columna REF (`documento_detalle_afectado`, no la referencia del ítem): la
+   * factura que se arma a mano la dejaba vacía en todas las filas.
+   */
+  protected readonly tieneReferencias = computed(() =>
+    this.lines().some((line) => line.documento_detalle_afectado !== null),
   );
 
+  /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
+  protected readonly resumen = computed<ResumenDocumento>(() => {
+    const cabecera = this.resumenCabecera();
+    return this.paginada() && cabecera
+      ? cabecera
+      : calcularResumen(this.lines().map(toLineaCalculo));
+  });
+
   /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
-  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+  protected readonly cantidadTotal = computed(() => {
+    const cabecera = this.cantidadCabecera();
+    return this.paginada() && cabecera !== null ? cabecera : totalCantidad(this.lines());
+  });
 
   /** Recibido, saldo y exceso de los pagos frente al total: misma función que el formulario. */
   protected readonly pagosResumen = computed(() =>
@@ -309,7 +347,7 @@ export class FacturaVentaDetailComponent implements OnInit {
     // `*_nombre` del read; no hace falta resolverlos con peticiones extra.
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      lineas: this.detalleService.paginaDeItems<ComercialDetalleRead>(id, 1),
       pagos: this.pagoService.listarPorDocumento(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -343,7 +381,14 @@ export class FacturaVentaDetailComponent implements OnInit {
               estado_generado: read.estado_generado,
             },
           });
-          this.lines.set(lineas.map((line) => comercialDetalleToFormValue(line)));
+          this.resumenCabecera.set(resumenDesdeCabecera(read));
+          this.cantidadCabecera.set(cantidadDesdeCabecera(read));
+          this.pagina.set(0);
+          this.totalItems.set(lineas.count);
+          this.lines.set(lineas.results.map((line) => comercialDetalleToFormValue(line)));
+          if (!this.paginada() && lineas.count > lineas.results.length) {
+            this.loadTodosLosItems(id);
+          }
           this.pagos.set(pagos.map((pago) => pagoReadToFormValue(pago)));
           this.isLoading.set(false);
         },
@@ -359,6 +404,47 @@ export class FacturaVentaDetailComponent implements OnInit {
   /** Fecha larga de la cabecera del documento (`05 de agosto de 2026`). */
   protected formatFecha(date: Date | null): string {
     return formatFechaLarga(date, '');
+  }
+
+  protected onItemsPageChange(event: PaginatorState): void {
+    const id = this.id();
+    const pagina = event.page ?? 0;
+    if (!id || pagina === this.pagina()) return;
+    this.cargandoItems.set(true);
+    this.detalleService
+      .paginaDeItems<ComercialDetalleRead>(Number(id), pagina + 1)
+      .pipe(
+        finalize(() => this.cargandoItems.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (items) => {
+          this.pagina.set(pagina);
+          this.totalItems.set(items.count);
+          this.lines.set(items.results.map((line) => comercialDetalleToFormValue(line)));
+        },
+        error: () => this.notificarErrorItems(),
+      });
+  }
+
+  /** Todos los ítems, para sumarlos cuando no se puede paginar (ver `paginada`). */
+  private loadTodosLosItems(id: number): void {
+    this.cargandoItems.set(true);
+    this.detalleService
+      .itemsDelDocumento<ComercialDetalleRead>(id)
+      .pipe(
+        finalize(() => this.cargandoItems.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (items) => this.lines.set(items.map((line) => comercialDetalleToFormValue(line))),
+        error: () => this.notificarErrorItems(),
+      });
+  }
+
+  private notificarErrorItems(): void {
+    const toast = this.t().entities.comercialDetalle.toasts.loadError;
+    this.toast.error(toast.title, toast.desc);
   }
 
   /** Navega dentro del tenant y módulo activos: `/t/<slug>/<modulo>/<...routePath>[/extra]`. */

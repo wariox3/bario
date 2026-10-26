@@ -1,7 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { ToolbarAction } from '@reddoc/feature-base';
 
-export const CUENTA_COBRAR_FILTERS_STORAGE_KEY = 'cuenta-cobrar:filters:v1';
+export const CUENTA_COBRAR_FILTERS_STORAGE_KEY = 'cuenta-cobrar:filters:v2';
 
 /**
  * Columnas del informe, en el orden del informe original: identificación del
@@ -96,20 +96,39 @@ export const CUENTA_COBRAR_COLUMNS: readonly ColumnDef[] = [
 ];
 
 /**
- * Campos por los que se puede filtrar.
+ * Campos por los que se puede filtrar: los del informe del ERP anterior
+ * (documento por id, número, fecha y tipo; tercero por nombre e
+ * identificación) más el id del tercero, que se conserva para quien llega con
+ * él desde otra pantalla.
  *
- * Tres y nada más: el documento se busca por su **id** o su **número**, y el
- * tercero por su **id**. Se dejaron fuera fecha, tipo de documento y las
- * búsquedas por texto del contacto — quien usa este informe llega con el
- * documento o el tercero en la mano, no explorando.
- *
- * El tercero va por `contacto_id` y no por nombre: es la convención confirmada
- * para las FK en los filtros de informes, y evita depender de cómo esté escrito
- * el nombre.
+ * El tipo de documento va por `documento_tipo_id` (convención de FK al
+ * filtrar) y por `documento_tipo__nombre`; el número es texto, como en los
+ * listados de documentos, para poder buscarlo con «contiene».
  */
 export const CUENTA_COBRAR_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.cuentaCobrar.columns.id', type: 'number' },
-  { name: 'numero', displayNameKey: 'entities.cuentaCobrar.columns.numero', type: 'number' },
+  { name: 'numero', displayNameKey: 'entities.cuentaCobrar.columns.numero', type: 'string' },
+  { name: 'fecha', displayNameKey: 'entities.cuentaCobrar.columns.fecha', type: 'date' },
+  {
+    name: 'documento_tipo_id',
+    displayNameKey: 'entities.cuentaCobrar.columns.documentoTipoId',
+    type: 'number',
+  },
+  {
+    name: 'documento_tipo__nombre',
+    displayNameKey: 'entities.cuentaCobrar.columns.documentoTipo',
+    type: 'string',
+  },
+  {
+    name: 'contacto__numero_identificacion',
+    displayNameKey: 'entities.cuentaCobrar.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'contacto__nombre_corto',
+    displayNameKey: 'entities.cuentaCobrar.columns.contacto',
+    type: 'string',
+  },
   {
     name: 'contacto_id',
     displayNameKey: 'entities.cuentaCobrar.columns.contactoId',

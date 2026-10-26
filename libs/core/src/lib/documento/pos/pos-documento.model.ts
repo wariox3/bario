@@ -15,12 +15,16 @@
  * (`documento-pago`) que se registra contra el documento ya creado.
  */
 import type { ErpSelectOption } from '../../data';
-import type { DocumentoPayloadBase, DocumentoReadBase } from '../documento.types';
+import type {
+  DocumentoPayloadBase,
+  DocumentoReadBase,
+  DocumentoTotalesRead,
+} from '../documento.types';
 import type { ComercialDetallePayload } from '../comercial/comercial-documento-detalle.model';
 import type { ComercialDetalleFormRawValue } from '../comercial/comercial-documento-detalle.types';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de un documento POS. */
-export interface PosDocumentoRead extends DocumentoReadBase {
+export interface PosDocumentoRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   readonly fecha_vence: string | null;

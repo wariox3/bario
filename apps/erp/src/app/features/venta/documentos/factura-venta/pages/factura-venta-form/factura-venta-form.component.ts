@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -42,6 +42,9 @@ import {
   type PagoRead,
   DocumentoPagoService,
   calcularPagos,
+  type ResumenDocumento,
+  cantidadDesdeCabecera,
+  resumenDesdeCabecera,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -85,6 +88,7 @@ import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
+import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import {
@@ -99,6 +103,7 @@ import type { PagoFormRawValue } from '@erp/features/documentos/pagos/pago.form'
 import { facturaVentaToFormValue, formValueToPayload } from '../../factura-venta.mapper';
 import type { FacturaVentaRead } from '../../factura-venta.model';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de venta.
@@ -134,6 +139,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     ErpAsesorSelectComponent,
     InputTextModule,
@@ -244,13 +250,17 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
 
   /** Resumen del documento: lo pinta el aside bajo los tabs, igual en Detalles y Pagos. */
-  protected readonly resumen = computed(() => calcularResumen(this.lines().map(toLineaCalculo)));
+  protected readonly resumen = computed(
+    () => this.detallesTable()?.resumen() ?? calcularResumen(this.lines().map(toLineaCalculo)),
+  );
 
   /** Total del documento: contra él se validan y se prellenan los pagos. */
   protected readonly totalGeneral = computed(() => this.resumen().total);
 
   /** Suma de cantidades de las líneas (fila «Total cantidad» del resumen). */
-  protected readonly cantidadTotal = computed(() => totalCantidad(this.lines()));
+  protected readonly cantidadTotal = computed(
+    () => this.detallesTable()?.cantidadTotal() ?? totalCantidad(this.lines()),
+  );
 
   /** Espejo reactivo de los pagos para el resumen y la validación del guardado. */
   protected readonly pagosLines = signal<readonly PagoFormRawValue[]>([]);
@@ -344,6 +354,22 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   protected precioListaId(): number | null {
     return precioListaDeContacto(this.form.controls.contacto.value);
   }
+
+  /**
+   * Resumen y suma de cantidades que calculó el backend con todas las líneas
+   * guardadas, leídos de la cabecera en edición; `null` en alta.
+   */
+  protected readonly resumenBase = signal<ResumenDocumento | null>(null);
+  protected readonly cantidadBase = signal<number | null>(null);
+
+  /**
+   * La tabla pagina sus líneas solo si la cabecera trae el resumen y la suma de
+   * cantidades (`cantidad_detalles`, para «Total cantidad»). Si faltara alguno
+   * se traen todas las líneas, como antes.
+   */
+  protected readonly paginada = computed(
+    () => this.resumenBase() !== null && this.cantidadBase() !== null,
+  );
 
   ngOnInit(): void {
     const id = this.id();
@@ -504,32 +530,47 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
       pagos: this.pagoService.listarPorDocumento(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas, pagos }) => {
+        next: ({ cabecera, pagos }) => {
           this.applyCabecera(cabecera as FacturaVentaRead);
-          this.populateLineas(lineas);
+          this.populatePagos(pagos);
+          if (!this.paginada()) this.loadTodasLasLineas(id);
+        },
+        error: () => this.notifyLoadError(),
+      });
+  }
+
+  /**
+   * Carga los pagos y, si la tabla no pagina, todas las líneas (la cabecera ya la
+   * aportó el resolver). Paginada, las líneas las trae la tabla.
+   */
+  private loadLineas(id: number): void {
+    forkJoin({
+      lineas: this.paginada()
+        ? of(null)
+        : this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
+      pagos: this.pagoService.listarPorDocumento(id),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ lineas, pagos }) => {
+          if (lineas) this.populateLineas(lineas);
           this.populatePagos(pagos);
         },
         error: () => this.notifyLoadError(),
       });
   }
 
-  /** Carga líneas y pagos (la cabecera ya la aportó el resolver). */
-  private loadLineas(id: number): void {
-    forkJoin({
-      lineas: this.detalleService.listarPorDocumento<ComercialDetalleRead>(id),
-      pagos: this.pagoService.listarPorDocumento(id),
-    })
+  /** Todas las líneas, para cuando la tabla no pagina (ver `paginada`). */
+  private loadTodasLasLineas(id: number): void {
+    this.detalleService
+      .listarPorDocumento<ComercialDetalleRead>(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ lineas, pagos }) => {
-          this.populateLineas(lineas);
-          this.populatePagos(pagos);
-        },
+        next: (lineas) => this.populateLineas(lineas),
         error: () => this.notifyLoadError(),
       });
   }
@@ -541,6 +582,8 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
    */
   private applyCabecera(read: FacturaVentaRead): void {
     this.form.patchValue(facturaVentaToFormValue(read), { emitEvent: false });
+    this.resumenBase.set(resumenDesdeCabecera(read));
+    this.cantidadBase.set(cantidadDesdeCabecera(read));
     // El patch silencioso no avisa al autocálculo: el contado se reevalúa a mano.
     this.vencimiento.sincronizar();
   }
@@ -555,9 +598,10 @@ export class FacturaVentaFormComponent implements OnInit, CanComponentDeactivate
   /** Reemplaza el FormArray de detalles con las líneas recibidas. */
   private populateLineas(lineas: readonly ComercialDetalleRead[]): void {
     const detalles = this.form.controls.detalles;
-    detalles.clear();
-    for (const line of lineas)
-      detalles.push(createComercialDetalleGroup(comercialDetalleToFormValue(line)));
+    reemplazarFilas(
+      detalles,
+      lineas.map((line) => createComercialDetalleGroup(comercialDetalleToFormValue(line))),
+    );
   }
 
   private notifyLoadError(): void {

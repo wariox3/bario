@@ -42,6 +42,7 @@ import { depreciacionToFormValue, formValueToPayload } from '../../depreciacion.
 import type { DepreciacionRead } from '../../depreciacion.model';
 import { DepreciacionService } from '../../depreciacion.service';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
+import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Depreciación.
@@ -74,6 +75,7 @@ import { MasInformacionComponent } from '@erp/features/documentos/components/mas
     FocusInvalidDirective,
     PageActionsComponent,
     ErpContactoSelectComponent,
+    CrearTerceroDirective,
     ErpApiSelectComponent,
     DepreciacionLineasTableComponent,
   ],

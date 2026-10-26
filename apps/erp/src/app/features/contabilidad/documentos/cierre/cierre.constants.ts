@@ -22,9 +22,6 @@ export const CARGAR_CIERRE_ENDPOINT = '/general/documento/cargar-cierre/';
  */
 export const ELIMINAR_DETALLES_ENDPOINT = '/general/documento-detalle/eliminar-todos/';
 
-/** Líneas por página en la sección de detalles del cierre. */
-export const CIERRE_DETALLE_PAGE_SIZE = 50;
-
 /**
  * Columnas visibles del listado de Cierre contable.
  *

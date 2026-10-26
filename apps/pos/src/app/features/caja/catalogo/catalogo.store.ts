@@ -14,9 +14,6 @@ export interface CriterioBusqueda {
 
 export type EstadoCatalogo = 'cargando' | 'listo' | 'error';
 
-/** Productos por página: una pantalla grande llena sin pedir de más. */
-const TAMANO_PAGINA = 48;
-
 /** Lo que el catálogo nunca muestra: ítems que no son de venta o están inactivos. */
 const FILTROS_BASE: readonly FilterCondition[] = [
   { field: 'venta', operator: 'eq', value: true },
@@ -143,7 +140,6 @@ export class CatalogoStore implements OnDestroy {
         { field: 'nombre', direction: 'asc' },
       ],
       page: this.pagina,
-      pageSize: TAMANO_PAGINA,
     };
     return this.itemService.list(query).pipe(
       map((respuesta) => ({

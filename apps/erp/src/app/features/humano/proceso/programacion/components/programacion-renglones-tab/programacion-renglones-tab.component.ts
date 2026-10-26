@@ -28,7 +28,6 @@ import type { AppDict } from '@erp/i18n';
 import type { CapacidadesProgramacion } from '../../programacion.estado';
 import type { ProgramacionDetalle } from '../../programacion.model';
 import {
-  PROGRAMACION_RENGLONES_PAGE_SIZE,
   RENGLONES_FILTER_FIELDS,
   tonoFechaDesde,
   tonoFechaHasta,
@@ -99,8 +98,6 @@ export class ProgramacionRenglonesTabComponent {
   protected readonly currentPage = signal(0);
   protected readonly selectedRows = signal<readonly ProgramacionDetalle[]>([]);
   protected readonly isBusy = signal(false);
-
-  protected readonly pageSize = PROGRAMACION_RENGLONES_PAGE_SIZE;
 
   /** Columnas según el tipo de pago. */
   protected readonly columns = computed(() => columnasDeRenglones(this.pagoTipoId()));
@@ -211,6 +208,8 @@ export class ProgramacionRenglonesTabComponent {
   protected readonly filterFields = RENGLONES_FILTER_FIELDS;
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
   constructor() {
     effect(() => {
@@ -228,6 +227,16 @@ export class ProgramacionRenglonesTabComponent {
 
   protected onSelectionChange(rows: unknown[]): void {
     this.selectedRows.set(rows as ProgramacionDetalle[]);
+  }
+
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
+    this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
@@ -403,7 +412,7 @@ export class ProgramacionRenglonesTabComponent {
     this.currentPage.set(page);
     this.isLoading.set(true);
     this.service
-      .listarRenglones(id, page, this.pageSize, this.activeFilters())
+      .listarRenglones(id, page, this.activeFilters())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),

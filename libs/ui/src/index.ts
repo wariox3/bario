@@ -15,6 +15,7 @@ export { UserAvatarComponent } from './lib/components/user-avatar/user-avatar.co
 export { ErpApiSelectComponent } from './lib/components/api-select/erp-api-select.component';
 export { ErpApiAutocompleteComponent } from './lib/components/api-autocomplete/erp-api-autocomplete.component';
 export { ErpContactoSelectComponent } from './lib/components/contacto-select/erp-contacto-select.component';
+export { CreateOptionFooterComponent } from './lib/components/create-option-footer/create-option-footer.component';
 export { ErpAsesorSelectComponent } from './lib/components/asesor-select/erp-asesor-select.component';
 export { ContratoAutocompleteComponent } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
 export type { ContratoOption } from './lib/components/contrato-autocomplete/contrato-autocomplete.component';
@@ -24,6 +25,7 @@ export { FocusInvalidDirective } from './lib/directives/focus-invalid.directive'
 export { UppercaseDirective } from './lib/directives/uppercase.directive';
 export { SoloDigitosDirective } from './lib/directives/solo-digitos.directive';
 export { MascaraFechaDirective } from './lib/directives/mascara-fecha.directive';
+export { AceptarConEnterDirective } from './lib/directives/aceptar-con-enter.directive';
 export {
   MascaraUuidDirective,
   UUID_LARGO,
@@ -41,6 +43,7 @@ export type {
 } from './lib/components/accesos-contenedor/i18n';
 export { accesosContenedorEs, accesosContenedorEn } from './lib/components/accesos-contenedor/i18n';
 export { PhoneInputComponent } from './lib/components/phone-input/phone-input.component';
+export { EmailChipsInputComponent } from './lib/components/email-chips-input/email-chips-input.component';
 export type { PhoneInputDict, PhoneInputTranslationsHost } from './lib/components/phone-input/i18n';
 export { phoneInputEs, phoneInputEn } from './lib/components/phone-input/i18n';
 export { AppSwitcherComponent } from './lib/app-switcher/app-switcher.component';

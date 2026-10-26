@@ -227,7 +227,7 @@ Si en la práctica se necesita, es una línea en `capacidadesDe`.
 | PDF programación | `POST humano/programacion/imprimir/`         | `{ id }`                                     |
 | PDF nóminas      | `POST humano/programacion/imprimir-nominas/` | `{ id }`                                     |
 | Importar horas   | `POST humano/programacion/importar-horas/`   | multipart: `archivo` + `programacion_id`     |
-| Renglones        | `GET humano/programacion-detalle/`           | `programacion_id`, `page`, `limit`           |
+| Renglones        | `GET humano/programacion-detalle/`           | `programacion_id`, `page`                    |
 
 Los nombres van con **guion**, la convención de endpoints de este ERP, aunque el legacy escriba
 `importar_horas` y `programacion_detalle` con guion bajo. Lo que sigue siendo supuesto es que las

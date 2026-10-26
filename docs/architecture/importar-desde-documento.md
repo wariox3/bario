@@ -189,7 +189,7 @@ importarDesdeDocumento: {
 ```
 POST /api/general/documento-detalle/pendiente/
 body:   { filtros: [], ordenamientos: [] }      // convención de listas del ERP
-params: ?page=1&limit=10                         // paginación por query params
+params: ?page=1                                  // paginación por query param (de a 25)
 ```
 
 Respuesta: paginado Django REST estándar (compatible con el `PaginatedApiResponse` del gateway,

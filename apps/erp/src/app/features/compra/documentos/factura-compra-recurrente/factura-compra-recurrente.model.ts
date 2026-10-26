@@ -14,11 +14,12 @@
 import type {
   DocumentoPayloadBase,
   DocumentoReadBase,
+  DocumentoTotalesRead,
   ComercialDetallePayload,
 } from '@reddoc/core';
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de compra recurrente. */
-export interface FacturaCompraRecurrenteRead extends DocumentoReadBase {
+export interface FacturaCompraRecurrenteRead extends DocumentoReadBase, DocumentoTotalesRead {
   /** Número (consecutivo) del documento que asigna el backend. */
   readonly numero: string | null;
   readonly plazo_pago: number | null;

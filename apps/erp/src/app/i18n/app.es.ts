@@ -72,6 +72,10 @@ export const es: AppDict = {
       deleteMessage: '¿Estás seguro de que querés eliminar los registros seleccionados?',
     },
     toasts: {
+      formModalError: {
+        title: 'No se pudo abrir el formulario',
+        desc: 'Recarga la página e inténtalo de nuevo.',
+      },
       loadError: {
         title: 'Error al cargar',
         desc: 'No se pudieron obtener los registros. Intentá de nuevo.',
@@ -816,10 +820,6 @@ export const es: AppDict = {
         title: 'Documentos agregados',
         desc: 'Los documentos seleccionados se agregaron como líneas.',
       },
-      addError: {
-        title: 'Error al agregar',
-        desc: 'No se pudieron agregar los documentos. Intentá de nuevo.',
-      },
     },
   },
   modules: {
@@ -1190,9 +1190,12 @@ export const es: AppDict = {
         cliente: 'CLI',
         proveedor: 'PRO',
         empleado: 'EMP',
+        inactivo: 'INA',
       },
       form: {
         createTitle: 'Nuevo contacto',
+        createTerceroTitle: 'Nuevo tercero',
+        createTercero: 'Crear tercero',
         createSubtitle: 'Registrá un nuevo contacto',
         editTitle: 'Editar contacto',
         editSubtitle: 'Actualizá los datos del contacto',
@@ -1229,6 +1232,7 @@ export const es: AppDict = {
           cliente: 'Cliente',
           proveedor: 'Proveedor',
           empleado: 'Empleado',
+          inactivo: 'Inactivo',
           plazoPago: 'Plazo de pago',
           precio: 'Lista de precios',
           asesor: 'Asesor',
@@ -3182,8 +3186,10 @@ export const es: AppDict = {
           sedePlaceholder: 'Selecciona…',
           almacen: 'Almacén',
           almacenPlaceholder: 'Selecciona…',
-          metodoPago: 'Método de pago',
-          metodoPagoPlaceholder: 'Selecciona…',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
+          formaPago: 'Forma de pago',
+          formaPagoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
           comentario: 'Comentario',
         },
@@ -3216,6 +3222,7 @@ export const es: AppDict = {
         sections: {
           general: 'Información general',
           detalles: 'Detalles',
+          cuentas: 'Cuentas',
         },
         labels: {
           numero: 'Número',
@@ -3226,7 +3233,8 @@ export const es: AppDict = {
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
           almacen: 'Almacén',
-          metodoPago: 'Método de pago',
+          centroCosto: 'Centro de costo',
+          formaPago: 'Forma de pago',
           ordenCompra: 'Orden de compra',
           comentario: 'Comentario',
         },
@@ -4140,6 +4148,10 @@ export const es: AppDict = {
       detallePlaceholder: 'Nota…',
       almacenPlaceholder: 'Almacén…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
+      confirmDeleteLines: '¿Eliminar {count} líneas del documento?',
+      removeSelected: 'Eliminar seleccionadas',
+      selectLine: 'Seleccionar línea',
+      selectAllLines: 'Seleccionar todas las líneas',
       createItem: 'Crear ítem',
       extraerIva: {
         title: 'Precio con impuestos incluidos',
@@ -4215,6 +4227,10 @@ export const es: AppDict = {
         lineSaveError: {
           title: 'Error al guardar',
           desc: 'No se pudieron guardar las líneas',
+        },
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron cargar las líneas',
         },
         incompleteLines: {
           title: 'Líneas incompletas',
@@ -4419,18 +4435,16 @@ export const es: AppDict = {
       empty: 'Aún no hay cuentas. Agrega la primera para empezar',
       addLine: 'Agregar cuenta',
       removeLine: 'Eliminar cuenta',
-      saveLine: 'Guardar cuenta',
-      saveAll: 'Guardar cuentas',
       pendingSuffix: 'sin guardar',
       cuentaPlaceholder: 'Buscar cuenta…',
       contactoPlaceholder: 'Buscar contacto…',
       centroCostoPlaceholder: 'Seleccionar…',
       detallePlaceholder: 'Glosa de la línea',
+      baseExigida: 'Esta cuenta exige base: ingresa un valor mayor a cero',
       confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {
-        linea: '#',
-        id: 'Id',
+        id: 'ID',
         numero: 'Número',
         documento: 'Documento',
         documentoTipo: 'Documento tipo',
@@ -4440,6 +4454,8 @@ export const es: AppDict = {
         centroCosto: 'Centro de costo',
         valor: 'Valor',
         base: 'Base',
+        subtotal: 'Subtotal',
+        neto: 'Neto',
         detalle: 'Detalle',
         acciones: 'Acciones',
       },
@@ -4450,21 +4466,9 @@ export const es: AppDict = {
         diferencia: 'Diferencia',
       },
       toasts: {
-        lineSaveSuccess: {
-          title: 'Cuenta guardada',
-          desc: 'La cuenta se guardó correctamente',
-        },
         lineSaveError: {
           title: 'Error al guardar',
           desc: 'No se pudo guardar la cuenta',
-        },
-        allSaved: {
-          title: 'Cuentas guardadas',
-          desc: 'Se guardaron las cuentas pendientes',
-        },
-        incompleteLines: {
-          title: 'Cuentas incompletas',
-          desc: 'Completa o elimina las cuentas sin cuenta o valor antes de guardar',
         },
       },
     },
@@ -6091,6 +6095,7 @@ export const es: AppDict = {
         identificacion: 'Identificación',
         contacto: 'Contacto',
         contactoId: 'ID contacto',
+        documentoTipoId: 'ID tipo',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
@@ -6133,6 +6138,7 @@ export const es: AppDict = {
         identificacion: 'Identificación',
         contacto: 'Contacto',
         contactoId: 'ID contacto',
+        documentoTipoId: 'ID tipo',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',

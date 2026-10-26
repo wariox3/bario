@@ -59,7 +59,6 @@ export class ProgramacionAdicionalesTabComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly selectedRows = signal<readonly Adicional[]>([]);
   protected readonly isBusy = signal(false);
 
@@ -130,7 +129,6 @@ export class ProgramacionAdicionalesTabComponent {
   // ── Handlers del template ─────────────────────────────────────────────────
 
   protected onPageChange(event: PageChangeEvent): void {
-    this.pageSize.set(event.pageSize);
     this.loadPage(event.page);
   }
 
@@ -216,7 +214,7 @@ export class ProgramacionAdicionalesTabComponent {
     const filters: readonly FilterCondition[] = [
       { field: 'programacion_id', operator: 'eq', value: id },
     ];
-    const query: ListQuery = { filters, sort: [], page, pageSize: this.pageSize() };
+    const query: ListQuery = { filters, sort: [], page };
 
     this.currentPage.set(page);
     this.isLoading.set(true);

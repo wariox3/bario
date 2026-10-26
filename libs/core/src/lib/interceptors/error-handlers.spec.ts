@@ -28,7 +28,7 @@ function setup() {
 describe('handleForbidden', () => {
   it('bloquea la pantalla cuando niegan el listado, sin toast', (done) => {
     const { run, toast, blocked } = setup();
-    const req = new HttpRequest('POST', '/api/general/contacto/lista/?page=1&limit=25', {});
+    const req = new HttpRequest('POST', '/api/general/contacto/lista/?page=1', {});
 
     run(req).subscribe({
       complete: () => {

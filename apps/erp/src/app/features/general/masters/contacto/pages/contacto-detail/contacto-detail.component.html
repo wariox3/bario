@@ -315,19 +315,14 @@
           <dt class="contacto-detail__label">
             {{ t().entities.contacto.form.fields.correoFacturacion }}
           </dt>
-          <dd
-            class="contacto-detail__value"
-            [class.contacto-detail__value--empty]="!c.correo_facturacion_electronica"
-          >
-            @if (c.correo_facturacion_electronica) {
+          <dd class="contacto-detail__value flex flex-wrap gap-1.5">
+            @for (correo of correosFacturacion(); track correo) {
               <a
-                [href]="'mailto:' + c.correo_facturacion_electronica"
-                class="contacto-detail__link"
+                [href]="'mailto:' + correo"
+                class="rounded-full bg-brand-surface-2 px-2.5 py-[0.15rem] text-[0.8rem] text-brand-text hover:underline"
               >
-                {{ c.correo_facturacion_electronica }}
+                {{ correo }}
               </a>
-            } @else {
-              —
             }
           </dd>
         </div>

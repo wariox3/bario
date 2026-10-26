@@ -1,9 +1,10 @@
-import { redondearMoneda, toFiniteNumber } from '@reddoc/core';
+import { redondearMoneda, toFiniteNumber, type ResumenDocumento } from '@reddoc/core';
 import { resolverCruce } from '@erp/core/module-config';
 import type { CarteraTipo, DocumentoPendienteApi } from '@erp/core/module-config';
 import type { CuentaDetalleRead, CuentaDetallePayload } from './contable-documento-detalle.model';
 import type {
   CuentaDetalleFormRawValue,
+  CuentaDetalleLineaView,
   NaturalezaCuenta,
   ResumenContable,
 } from './contable-documento-detalle.types';
@@ -37,6 +38,15 @@ export function cuentaDetalleToFormValue(read: CuentaDetalleRead): CuentaDetalle
     documento_afectado_numero:
       read.documento_afectado_numero != null ? String(read.documento_afectado_numero) : null,
     documento_afectado_tipo: read.documento_afectado_documento_tipo_nombre ?? null,
+  };
+}
+
+/** Read-model (GET) → línea de cuenta de la ficha, con el subtotal y el neto del backend. */
+export function cuentaDetalleToLineaView(read: CuentaDetalleRead): CuentaDetalleLineaView {
+  return {
+    ...cuentaDetalleToFormValue(read),
+    subtotal: toFiniteNumber(read.subtotal),
+    neto: toFiniteNumber(read.total),
   };
 }
 
@@ -126,5 +136,20 @@ export function calcularResumenContable(
     debitos: redondearMoneda(debitos),
     creditos: redondearMoneda(creditos),
     total: redondearMoneda(carteraTipo === 'cobrar' ? creditos - debitos : debitos - creditos),
+  };
+}
+
+/**
+ * Resumen de un documento comercial que además lleva cuentas contables (la
+ * factura de compra): los débitos suman al total y los créditos restan
+ * (retenciones, descuentos). Es la regla del legacy con `operacion: 1`.
+ */
+export function resumenConCuentas(
+  resumen: ResumenDocumento,
+  cuentas: Pick<ResumenContable, 'debitos' | 'creditos'>,
+): ResumenDocumento {
+  return {
+    ...resumen,
+    total: redondearMoneda(resumen.total + cuentas.debitos - cuentas.creditos),
   };
 }

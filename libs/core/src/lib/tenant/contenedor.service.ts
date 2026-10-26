@@ -173,7 +173,7 @@ export class ContenedorService extends BaseHttpService {
   /**
    * Una página del catálogo de permisos individuales asignables, con filtros
    * **y paginación** resueltos en el backend (`app`, `modelo`, `accion`,
-   * `search`, `page`, `limit` como query params). Devuelve el envelope DRF tal
+   * `search`, `page` como query params). Devuelve el envelope DRF tal
    * cual: el caller pagina con `count`.
    *
    * Como los grupos, son verticales del schema público: globales, sin
@@ -188,7 +188,6 @@ export class ContenedorService extends BaseHttpService {
     if (filtros.accion) params['accion'] = filtros.accion;
     if (filtros.search) params['search'] = filtros.search;
     if (filtros.page) params['page'] = filtros.page;
-    if (filtros.limit) params['limit'] = filtros.limit;
     return this.get<PaginatedResponse<PermisoSeguridad>>('/seguridad/permiso/', params);
   }
 

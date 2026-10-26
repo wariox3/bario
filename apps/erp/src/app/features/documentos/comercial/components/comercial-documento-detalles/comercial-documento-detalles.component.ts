@@ -1,5 +1,16 @@
 import { pendienteLineaToFormValue } from '@erp/features/documentos/comercial/pendiente-linea.mapper';
-import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+  untracked,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   EMPTY,
@@ -7,7 +18,6 @@ import {
   Subject,
   type Subscription,
   catchError,
-  concat,
   concatMap,
   defer,
   filter,
@@ -15,16 +25,13 @@ import {
   forkJoin,
   from,
   map,
-  mergeMap,
   of,
   switchMap,
-  tap,
   throwError,
-  toArray,
 } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 import { FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import type { MenuItem } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -33,12 +40,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PaginatorModule, type PaginatorState } from 'primeng/paginator';
 import { ConfirmationService } from 'primeng/api';
 import {
   I18nService,
   ToastService,
+  aplicarDeltas,
   calcularResumen,
   formatCop,
+  LIST_PAGE_SIZE,
   toFiniteNumber,
   type ParamValue,
   type ResumenDocumento,
@@ -47,6 +57,7 @@ import {
   toItemOption,
   type ItemApiRow,
   type ItemOption,
+  type LineaCalculo,
   ItemService,
   PrecioDetalleService,
   type Item,
@@ -59,6 +70,7 @@ import {
   lineNeto,
   tasasDelItem,
   toLineaCalculo,
+  totalCantidad,
   type ComercialDetalleRead,
   type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
@@ -68,6 +80,7 @@ import {
   type LineaPendienteApi,
 } from '@erp/core/module-config';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '@erp/core/module-config/actions/entity-action-dialog.defaults';
+import { formModal } from '@erp/core/components/form-modal/form-modal';
 import { ErpItemAutocompleteComponent } from '@erp/core/components/item-autocomplete/erp-item-autocomplete.component';
 import { ErpImpuestoSelectComponent } from '@erp/core/components/impuesto-select/erp-impuesto-select.component';
 import {
@@ -75,24 +88,42 @@ import {
   tasaFromImpuestoOption,
   type ImpuestoSeleccionarOption,
 } from '@erp/core/components/impuesto-select/impuesto-seleccionar.types';
-import { ErpSelectDataService, SELECT_ENDPOINTS, type ErpSelectOption } from '@reddoc/core';
+import {
+  ErpSelectDataService,
+  SELECT_ENDPOINTS,
+  catalogoCompartido,
+  type ErpSelectOption,
+} from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
-import { LineasEnCursoError } from '../../comercial-documento-detalle.errors';
+import {
+  LineasDiferidas,
+  LineasEnCursoError,
+  cambiosDeEstado,
+  type LineaGuardada,
+} from '../../../lineas-diferidas';
+import { agregarFilas } from '../../../form-array-filas';
 import {
   createComercialDetalleGroup,
   type ComercialDetalleGroup,
 } from '../../comercial-documento-detalle.form';
 import { aiuLineaToFormValue, type AiuLinea } from '../../aiu';
 
-/**
- * Líneas que se escriben a la vez al guardar. Acota la ráfaga contra el backend en
- * documentos con muchas líneas (una importación grande) sin serializarlas todas.
- */
-const GUARDADOS_EN_PARALELO = 4;
+/** Cómo estaba guardada una línea: lo que se le resta a lo guardado si cambia. */
+interface LineaOriginal {
+  readonly calculo: LineaCalculo;
+  readonly cantidad: number;
+}
 
-/** Cómo terminó una operación de `saveAll()`: el lote junta todas antes de decidir. */
-type ResultadoGuardado = { readonly ok: true } | { readonly ok: false; readonly err: unknown };
+function lineaOriginal(leida: ComercialDetalleRead): LineaOriginal {
+  const value = comercialDetalleToFormValue(leida);
+  return { calculo: toLineaCalculo(value), cantidad: value.cantidad ?? 0 };
+}
+
+/** Las cantidades admiten decimales: sumar y restar en coma flotante deja colas. */
+function redondearCantidad(valor: number): number {
+  return Math.round(valor * 1e6) / 1e6;
+}
 
 /** Toast con que cierra un agregado de líneas (importar desde documento, AIU). */
 interface ToastTexto {
@@ -115,20 +146,29 @@ interface ToastTexto {
  * la tabla no guarda nada por su cuenta: altas, ediciones, bajas, importadas y AIU
  * quedan pendientes en memoria y las persiste `saveAll()` cuando el form padre
  * guarda el documento. Un solo botón "Guardar" confirma todo; "Volver" lo descarta.
+ *
+ * `OnPush`: con decenas de líneas, revisar la tabla en cada evento de la página
+ * (una tecla, un hover) recalculaba todas las filas. La plantilla solo lee signals
+ * —el espejo `lines` y lo derivado de él— y lo que cambia sin pasar por el valor
+ * (tocado, sucio) entra por `cambiosDeEstado`. Lo que se agregue a la plantilla
+ * tiene que salir de un signal, o no se refresca.
  */
 @Component({
   selector: 'app-comercial-documento-detalles',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     ButtonModule,
+    CheckboxModule,
     SplitButtonModule,
     InputNumberModule,
     InputTextModule,
     PopoverModule,
     TooltipModule,
     ConfirmDialogModule,
+    PaginatorModule,
     ErpItemAutocompleteComponent,
     ErpImpuestoSelectComponent,
     ErpApiSelectComponent,
@@ -146,6 +186,7 @@ export class ComercialDocumentoDetallesComponent {
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(ToastService);
   private readonly dialog = inject(DialogService);
+  private readonly formModal = formModal();
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
@@ -215,8 +256,13 @@ export class ComercialDocumentoDetallesComponent {
    */
   readonly almacenEnabled = input<boolean>(false);
 
-  /** Catálogo del select de almacén de la línea. */
-  protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+  /**
+   * Catálogo de almacenes, cargado una vez para todas las filas (ver
+   * `catalogoCompartido`). Solo se pide si el documento muestra la columna.
+   */
+  protected readonly almacenCatalogo = catalogoCompartido(SELECT_ENDPOINTS.almacen, {
+    activo: () => this.almacenEnabled(),
+  });
 
   /**
    * Almacén de la cabecera, para precargarlo en cada línea nueva (incluidas las
@@ -225,6 +271,56 @@ export class ComercialDocumentoDetallesComponent {
    * No toca las líneas ya creadas ni las que llegan en edición con su almacén.
    */
   readonly almacenPorDefecto = input<ErpSelectOption | null>(null);
+
+  /**
+   * En edición la tabla trae sus propias líneas, de a una página de 25
+   * (`LIST_PAGE_SIZE`), en vez de recibirlas todas del form. El form no las pide
+   * ni las empuja al array. Va con `resumenBase`: sin todas las líneas, el
+   * resumen no se puede sumar en el front.
+   */
+  readonly paginada = input(false);
+
+  /**
+   * Resumen que calculó el backend con todas las líneas guardadas
+   * (`resumenDesdeCabecera`). Solo se usa con `paginada`; sin él, el resumen
+   * suma las filas.
+   */
+  readonly resumenBase = input<ResumenDocumento | null>(null);
+
+  /**
+   * Suma de cantidades de las líneas guardadas, según la cabecera
+   * (`cantidadDesdeCabecera`). Como `resumenBase`, solo se usa con `paginada`.
+   */
+  readonly cantidadBase = input<number | null>(null);
+
+  protected readonly pageSize = LIST_PAGE_SIZE;
+
+  /** Página visible, 0-based como `p-paginator`. */
+  protected readonly pagina = signal(0);
+
+  /** Líneas guardadas del documento según el backend (el `count` de la página). */
+  protected readonly totalLineas = signal(0);
+
+  private readonly cargandoPagina = signal(false);
+  private paginaSub: Subscription | null = null;
+
+  /**
+   * Resumen guardado vigente: arranca en `resumenBase` y se mueve con cada línea
+   * que el guardado confirma (`alGuardado`), aunque el resto del lote falle.
+   */
+  private readonly baseGuardada = linkedSignal(() => this.resumenBase());
+
+  /** Cantidad guardada vigente: igual que `baseGuardada`, para «Total cantidad». */
+  private readonly cantidadGuardada = linkedSignal(() => this.cantidadBase());
+
+  /**
+   * Cómo está guardada cada línea persistida que pasó por la tabla, por id: lo
+   * que hay que restarle a `baseGuardada` y `cantidadGuardada` cuando la línea
+   * cambia o se quita. Se anota al leer cada página y se actualiza con lo que
+   * confirma el guardado. Va en un `Map` plano: cambia siempre junto con `lines`
+   * o las bases, que son los que disparan el resumen.
+   */
+  private readonly originales = new Map<number, LineaOriginal>();
 
   /**
    * Muestra la columna **Detalle** (la nota libre por línea). Default `true`.
@@ -238,11 +334,11 @@ export class ComercialDocumentoDetallesComponent {
   readonly detalleEnabled = input<boolean>(true);
 
   /**
-   * Columnas de la tabla, para el `colspan` del estado vacío: 9 fijas más las
+   * Columnas de la tabla, para el `colspan` del estado vacío: 10 fijas más las
    * opcionales que el documento haya encendido.
    */
   protected readonly columnCount = computed(
-    () => 9 + (this.detalleEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
+    () => 10 + (this.detalleEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
   );
 
   /** Importación en curso; bloquea el botón mientras resuelve los ítems. */
@@ -278,33 +374,110 @@ export class ComercialDocumentoDetallesComponent {
   /** Espejo reactivo del valor del array para la tabla, los totales y el resumen. */
   protected readonly lines = signal<readonly ComercialDetalleFormRawValue[]>([]);
 
+  /**
+   * Filas marcadas para quitar en bloque. La clave es el `FormGroup` y no el `id`:
+   * las líneas nuevas aún no lo tienen.
+   */
+  private readonly marcadas = signal<ReadonlySet<ComercialDetalleGroup>>(new Set());
+
+  /**
+   * Filas marcadas que siguen en la tabla. Se cruza con los controles actuales
+   * porque el array cambia por debajo: guardar reconstruye la fila (`setControl`)
+   * y reemplazar o quitar líneas saca grupos; una marca huérfana no cuenta.
+   */
+  protected readonly seleccionadas = computed(() => {
+    this.lines(); // dependencia: se recalcula con cada cambio del array
+    const marcadas = this.marcadas();
+    return this.montada() ? this.detalles().controls.filter((row) => marcadas.has(row)) : [];
+  });
+
+  /** Todas las filas están marcadas (checkbox de la cabecera lleno). */
+  protected readonly todasSeleccionadas = computed(
+    () => this.lines().length > 0 && this.seleccionadas().length === this.lines().length,
+  );
+
+  /** Hay filas marcadas, pero no todas (checkbox de la cabecera a medias). */
+  protected readonly seleccionParcial = computed(
+    () => this.seleccionadas().length > 0 && !this.todasSeleccionadas(),
+  );
+
   /** Hay al menos una línea: la página pinta el resumen solo entonces. */
-  readonly hayLineas = computed(() => this.lines().length > 0);
+  readonly hayLineas = computed(
+    () => this.lines().length > 0 || this.totalLineas() > this.lineas.bajas().length,
+  );
 
   /**
    * Resumen del documento: subtotal, desglose por impuesto y total.
    * Público: la página lo pinta fuera de la card de líneas, leyéndolo por
    * referencia de plantilla (`#detallesTabla`).
+   *
+   * Paginada, parte del resumen guardado y le suma solo lo que cambió
+   * (`aplicarDeltas`): las filas visibles y las editadas de otras páginas contra
+   * cómo estaban guardadas, más las nuevas y menos las quitadas. Sin tocar nada
+   * muestra exactamente lo del backend, con una sola página cargada.
    */
-  readonly resumen = computed<ResumenDocumento>(() =>
-    calcularResumen(this.lines().map(toLineaCalculo)),
-  );
-
-  /** Guardado de las líneas (flush del form padre al guardar el documento) en curso. */
-  protected readonly savingAll = signal(false);
+  readonly resumen = computed<ResumenDocumento>(() => {
+    const { actuales, originales } = this.comparables();
+    const base = this.baseGuardada();
+    const calculo = actuales.map(toLineaCalculo);
+    if (!this.paginada() || !base) return calcularResumen(calculo);
+    return aplicarDeltas(
+      base,
+      calculo,
+      originales.map((original) => original.calculo),
+    );
+  });
 
   /**
-   * Ids de líneas persistidas que la persona quitó en edición. La fila sale de la
-   * tabla al instante (y del total), pero el `DELETE` espera al guardado del
-   * documento: salir sin guardar las conserva.
+   * Suma de cantidades del documento (fila «Total cantidad» del resumen). Paginada
+   * y con `cantidadBase`, la guardada más lo que cambió, como `resumen`.
    */
-  private readonly eliminadas = signal<readonly number[]>([]);
+  readonly cantidadTotal = computed(() => {
+    const { actuales, originales } = this.comparables();
+    const base = this.cantidadGuardada();
+    if (!this.paginada() || base == null) return totalCantidad(actuales);
+    const antes = originales.reduce((acc, original) => acc + original.cantidad, 0);
+    return redondearCantidad(base + totalCantidad(actuales) - antes);
+  });
+
+  /**
+   * Lo que se compara contra lo guardado: las filas visibles y las editadas de
+   * otras páginas, y los originales de esas filas y de las quitadas. Las nuevas no
+   * tienen original.
+   */
+  private readonly comparables = computed(() => {
+    const visibles = this.lines();
+    const fuera = this.lineas.fueraDePagina().map((fila) => fila.getRawValue());
+    const actuales = [...visibles, ...fuera];
+    const ids = actuales.map((linea) => linea.id).concat(this.lineas.bajas());
+    const originales = ids.flatMap((id) => {
+      const original = id != null ? this.originales.get(id) : undefined;
+      return original ? [original] : [];
+    });
+    return { actuales, originales };
+  });
+
+  /**
+   * Altas, ediciones y bajas pendientes de la edición: la tabla no escribe nada por
+   * su cuenta, las persiste `saveAll()` cuando el form padre guarda el documento.
+   */
+  private readonly lineas = new LineasDiferidas<ComercialDetalleGroup, ComercialDetalleRead>({
+    detalles: () => this.detalles(),
+    documentId: () => this.documentId(),
+    service: this.detalleService,
+    tieneContenido: (fila) => fila.controls.item.value != null,
+    payload: (fila) => comercialDetalleToPayload(fila.getRawValue()),
+    reconstruir: (leida) => createComercialDetalleGroup(comercialDetalleToFormValue(leida)),
+    alGuardar: (cambio) => this.alGuardado(cambio),
+  });
 
   /**
    * Hay un guardado o una importación en curso. El form padre deshabilita "Guardar"
    * mientras tanto: guardar a la vez reenviaría líneas que aún no tienen `id`.
    */
-  readonly ocupado = computed(() => this.savingAll() || this.importing());
+  readonly ocupado = computed(
+    () => this.lineas.guardando() || this.importing() || this.cargandoPagina(),
+  );
 
   /**
    * `true` desde que el effect de sincronización corrió, es decir, con los inputs ya
@@ -314,8 +487,59 @@ export class ComercialDocumentoDetallesComponent {
    */
   private readonly montada = signal(false);
 
-  /** Filas ya cableadas al fetch de impuestos del ítem (evita doble suscripción). */
-  private readonly wired = new WeakSet<ComercialDetalleGroup>();
+  /**
+   * Sube con cada cambio de tocado o sucio de las filas (`cambiosDeEstado`), que no
+   * mueve `lines`. Lo leen los derivados de abajo, y por ellos la plantilla: así un
+   * guardado en blanco pinta en rojo las filas incompletas.
+   */
+  private readonly revisionEstado = signal(0);
+
+  /** Filas con cambios sin guardar; la plantilla consulta cada fila contra este set. */
+  private readonly pendientes = computed<ReadonlySet<ComercialDetalleGroup>>(() => {
+    this.lines();
+    this.revisionEstado();
+    return this.montada() ? new Set(this.lineas.pendientes()) : new Set();
+  });
+
+  /** Nº de cambios sin guardar (filas pendientes más las quitadas). */
+  private readonly cambiosPendientes = computed(() => {
+    this.lines();
+    this.revisionEstado();
+    return this.montada() ? this.lineas.pendingCount() : 0;
+  });
+
+  /**
+   * Filas que recorre la plantilla. Con `OnPush` el `@for` no puede iterar
+   * `detalles().controls` directo: no es un signal, y la tabla solo se refrescaría
+   * si otra lectura de la plantilla dependiera de `lines`. Es una copia porque
+   * `FormArray` muta `controls` en el lugar: el mismo array no avisaría.
+   */
+  protected readonly filas = computed(() => {
+    this.lines();
+    return this.montada() ? [...this.detalles().controls] : [];
+  });
+
+  /**
+   * Montos de cada fila, en el orden del array. Se calculan una vez por cambio de
+   * valor, no por fila en cada revisión de la plantilla.
+   */
+  protected readonly montos = computed(() =>
+    this.lines().map((line) => ({
+      subtotal: lineBruto(line),
+      // Base gravable (`bruto − descuento`): la usa el selector de impuestos para
+      // mostrar cuánto le suma o resta a esta línea cada impuesto.
+      base: lineBase(line),
+      neto: lineNeto(line),
+    })),
+  );
+
+  /**
+   * Suscripciones de cada fila cableada al fetch de impuestos del ítem. Marca qué
+   * filas ya están cableadas (evita doble suscripción) y permite cerrarlas cuando
+   * la fila sale del array: quitarla, reemplazar las líneas o la reconstrucción
+   * del guardado. Sin eso seguían vivas hasta destruir la tabla.
+   */
+  private readonly cableadas = new Map<ComercialDetalleGroup, Subscription>();
 
   /**
    * Pool de tasas del catálogo (`general/impuesto/seleccionar/`) del `modo`
@@ -366,6 +590,18 @@ export class ComercialDocumentoDetallesComponent {
       )
       .subscribe(({ rows, codigo, input }) => this.applyScan(rows, codigo, input));
 
+    this.destroyRef.onDestroy(() => {
+      for (const sub of this.cableadas.values()) sub.unsubscribe();
+    });
+
+    // Paginada, la tabla trae su primera página al conocer el documento.
+    effect(() => {
+      const id = this.documentId();
+      if (!this.paginada() || id == null) return;
+      untracked(() => this.cargarPagina(0));
+    });
+    this.destroyRef.onDestroy(() => this.paginaSub?.unsubscribe());
+
     effect((onCleanup) => {
       const array = this.detalles();
       this.montada.set(true);
@@ -375,8 +611,80 @@ export class ComercialDocumentoDetallesComponent {
       };
       sync();
       const sub = array.valueChanges.subscribe(sync);
+      sub.add(cambiosDeEstado(array).subscribe(() => this.revisionEstado.update((n) => n + 1)));
       onCleanup(() => sub.unsubscribe());
     });
+  }
+
+  protected onPageChange(event: PaginatorState): void {
+    const pagina = event.page ?? 0;
+    if (this.ocupado() || pagina === this.pagina()) return;
+    this.cargarPagina(pagina);
+  }
+
+  /**
+   * Trae una página de líneas y la muestra (`LineasDiferidas.mostrarPagina`): los
+   * cambios sin guardar de otras páginas se conservan. Una página pedida mientras
+   * llegaba otra la reemplaza.
+   */
+  private cargarPagina(pagina: number): void {
+    const id = this.documentId();
+    if (id == null) return;
+    this.paginaSub?.unsubscribe();
+    this.cargandoPagina.set(true);
+    this.paginaSub = this.detalleService
+      .paginaDeItems<ComercialDetalleRead>(id, pagina + 1)
+      .pipe(finalize(() => this.cargandoPagina.set(false)))
+      .subscribe({
+        next: (res) => {
+          const leidas = res.results;
+          this.registrarOriginales(leidas);
+          this.pagina.set(pagina);
+          this.totalLineas.set(res.count);
+          this.marcadas.set(new Set());
+          this.lineas.mostrarPagina(leidas);
+        },
+        error: () => {
+          const toast = this.t().entities.comercialDetalle.toasts.loadError;
+          this.toast.error(toast.title, toast.desc);
+        },
+      });
+  }
+
+  /**
+   * Anota cómo está guardada cada línea leída, la primera vez que se ve. Después
+   * solo la cambia el guardado: releer una página no pisa el original de una línea
+   * que sigue en `baseGuardada` con su valor de entonces.
+   */
+  private registrarOriginales(leidas: readonly ComercialDetalleRead[]): void {
+    for (const leida of leidas) {
+      if (leida.id == null || this.originales.has(leida.id)) continue;
+      this.originales.set(leida.id, lineaOriginal(leida));
+    }
+  }
+
+  /**
+   * Una línea quedó escrita o borrada en el backend: el resumen guardado la cuenta
+   * desde ya. Así un guardado que falla a medias no deja el total desfasado.
+   */
+  private alGuardado(cambio: LineaGuardada<ComercialDetalleRead>): void {
+    const original = this.originales.get(cambio.id);
+    const guardada = cambio.tipo === 'escrita' ? lineaOriginal(cambio.leida) : undefined;
+    if (guardada) this.originales.set(cambio.id, guardada);
+    else this.originales.delete(cambio.id);
+
+    const base = this.baseGuardada();
+    if (base) {
+      this.baseGuardada.set(
+        aplicarDeltas(base, guardada ? [guardada.calculo] : [], original ? [original.calculo] : []),
+      );
+    }
+    const cantidad = this.cantidadGuardada();
+    if (cantidad != null) {
+      this.cantidadGuardada.set(
+        redondearCantidad(cantidad + (guardada?.cantidad ?? 0) - (original?.cantidad ?? 0)),
+      );
+    }
   }
 
   /**
@@ -405,25 +713,18 @@ export class ComercialDocumentoDetallesComponent {
 
   /**
    * Alta de ítem inline desde una línea: abre el formulario del master como
-   * modal (lazy) y, con el ítem creado, lo selecciona en **esa** fila — de ahí
-   * corre la tubería normal de una selección (precio pactado + impuestos). Se
-   * apaga `dismissableMask`: un clic afuera no debe descartar un form a medias.
+   * modal (lazy, vía `formModal`) y, con el ítem creado, lo selecciona en
+   * **esa** fila — de ahí corre la tubería normal de una selección (precio
+   * pactado + impuestos).
    */
   protected onCreateItem(group: ComercialDetalleGroup): void {
-    from(import('@erp/features/general/masters/item/pages/item-form/item-form.component'))
-      .pipe(
-        switchMap(({ ItemFormComponent }) => {
-          const ref = this.dialog.open(ItemFormComponent, {
-            ...ENTITY_ACTION_DIALOG_DEFAULTS,
-            dismissableMask: false,
-            width: 'min(70rem, 95vw)',
-            contentStyle: { 'max-height': '86vh', overflow: 'auto' },
-          });
-          return ref ? ref.onClose : EMPTY;
-        }),
-        filter((created: unknown): created is Item => created != null),
-        takeUntilDestroyed(this.destroyRef),
+    this.formModal
+      .abrir<Item>(() =>
+        import('@erp/features/general/masters/item/pages/item-form/item-form.component').then(
+          (m) => m.ItemFormComponent,
+        ),
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((created) => {
         group.controls.item.setValue(
           toItemOption({
@@ -582,34 +883,115 @@ export class ComercialDocumentoDetallesComponent {
    */
   private agregarLineas(lineas: readonly ComercialDetalleFormRawValue[], exito: ToastTexto): void {
     const almacen = this.almacenPorDefecto();
-    for (const linea of lineas) {
-      const value = linea.almacen == null && almacen != null ? { ...linea, almacen } : linea;
-      this.detalles().push(createComercialDetalleGroup(value));
-    }
+    agregarFilas(
+      this.detalles(),
+      lineas.map((linea) =>
+        createComercialDetalleGroup(
+          linea.almacen == null && almacen != null ? { ...linea, almacen } : linea,
+        ),
+      ),
+    );
     this.toast.success(exito.title, exito.desc);
   }
 
   /**
    * Reemplaza **todas** las líneas por `values` (p. ej. las de la factura que
    * referencia una nota). La confirmación es del llamador. En edición las líneas
-   * persistidas pasan a `eliminadas` y las nuevas quedan pendientes: todo se
-   * escribe al guardar el documento, y salir sin guardar deja la nota como estaba.
+   * persistidas quedan como bajas y las nuevas pendientes: todo se escribe al
+   * guardar el documento, y salir sin guardar deja la nota como estaba.
    */
   reemplazarLineas(values: readonly ComercialDetalleFormRawValue[]): void {
-    if (this.documentId() != null) {
-      const ids = this.detalles()
-        .getRawValue()
-        .map((line) => line.id)
-        .filter((id): id is number => id != null);
-      this.eliminadas.update((actuales) => [...actuales, ...ids]);
+    const id = this.documentId();
+    if (this.paginada() && id != null) {
+      this.reemplazarTodasLasPaginas(id, values);
+      return;
     }
-    this.detalles().clear();
-    for (const value of values) this.detalles().push(createComercialDetalleGroup(value));
+    this.lineas.quitarTodas();
+    this.marcadas.set(new Set());
+    agregarFilas(
+      this.detalles(),
+      values.map((value) => createComercialDetalleGroup(value)),
+    );
+  }
+
+  /**
+   * `reemplazarLineas` con la tabla paginada: las líneas de las otras páginas
+   * también tienen que quedar como bajas, así que se leen todas. Es el único flujo
+   * que lo necesita.
+   */
+  private reemplazarTodasLasPaginas(
+    documentoId: number,
+    values: readonly ComercialDetalleFormRawValue[],
+  ): void {
+    this.importing.set(true);
+    this.detalleService
+      .itemsDelDocumento<ComercialDetalleRead>(documentoId)
+      .pipe(
+        finalize(() => this.importing.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (leidas) => {
+          this.registrarOriginales(leidas);
+          this.lineas.marcarBajas(
+            leidas.map((leida) => leida.id).filter((x): x is number => x != null),
+          );
+          this.lineas.quitarTodas();
+          this.marcadas.set(new Set());
+          agregarFilas(
+            this.detalles(),
+            values.map((value) => createComercialDetalleGroup(value)),
+          );
+        },
+        error: () => {
+          const toast = this.t().entities.comercialDetalle.toasts.loadError;
+          this.toast.error(toast.title, toast.desc);
+        },
+      });
+  }
+
+  protected estaSeleccionada(group: ComercialDetalleGroup): boolean {
+    return this.marcadas().has(group);
+  }
+
+  protected toggleSeleccion(group: ComercialDetalleGroup): void {
+    this.marcadas.update((actuales) => {
+      const siguiente = new Set(actuales);
+      if (!siguiente.delete(group)) siguiente.add(group);
+      return siguiente;
+    });
+  }
+
+  /** Marca todas las filas, o ninguna si ya estaban todas. */
+  protected toggleTodas(): void {
+    this.marcadas.set(this.todasSeleccionadas() ? new Set() : new Set(this.detalles().controls));
+  }
+
+  /**
+   * Pide una sola confirmación y quita todas las filas marcadas. Cada una sigue el
+   * camino de la papelera: en edición el `DELETE` de las persistidas espera al
+   * guardado del documento.
+   */
+  protected removeSeleccionadas(): void {
+    const filas = this.seleccionadas();
+    if (filas.length === 0) return;
+    const dict = this.t().entities.comercialDetalle;
+    this.confirmation.confirm({
+      message:
+        filas.length === 1
+          ? dict.confirmDeleteLine
+          : dict.confirmDeleteLines.replace('{count}', String(filas.length)),
+      header: this.t().common.confirms.deleteHeader,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.t().common.actions.delete,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deleteLineas(filas),
+    });
   }
 
   /** Pide confirmación y, al aceptar, elimina la línea (persiste en edición). */
   protected removeLinea(group: ComercialDetalleGroup): void {
-    const { id } = group.getRawValue();
     this.confirmation.confirm({
       message: this.t().entities.comercialDetalle.confirmDeleteLine,
       header: this.t().common.confirms.deleteHeader,
@@ -617,24 +999,13 @@ export class ComercialDocumentoDetallesComponent {
       acceptLabel: this.t().common.actions.delete,
       rejectLabel: this.t().common.actions.cancel,
       acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.deleteLinea(group, id),
+      accept: () => this.lineas.quitar(group),
     });
   }
 
-  /**
-   * Una fila está **pendiente** (sin persistir) cuando es nueva con ítem elegido
-   * o cuando una existente fue modificada. Una fila recién agregada y vacía no
-   * cuenta: no hay nada que guardar ni perder.
-   */
+  /** La fila tiene cambios sin guardar (nueva con ítem, o persistida y editada). */
   protected isPending(group: ComercialDetalleGroup): boolean {
-    // En alta no hay persistencia por línea: las líneas viajan con el documento.
-    if (this.documentId() == null) return false;
-    return group.controls.id.value == null ? group.controls.item.value != null : group.dirty;
-  }
-
-  /** Filas pendientes (para el conteo del toolbar y el flush del padre). */
-  private pendingRows(): readonly ComercialDetalleGroup[] {
-    return this.detalles().controls.filter((row) => this.isPending(row));
+    return this.pendientes().has(group);
   }
 
   /**
@@ -642,140 +1013,23 @@ export class ComercialDocumentoDetallesComponent {
    * aviso del toolbar, el del form padre y el guard de salida.
    */
   pendingCount(): number {
-    if (!this.montada()) return 0;
-    return this.pendingRows().length + this.eliminadas().length;
+    return this.cambiosPendientes();
   }
 
   /** `true` si alguna línea pendiente está incompleta (p. ej. sin ítem). */
   hasInvalidPending(): boolean {
-    return this.pendingRows().some((row) => row.invalid);
+    return this.lineas.hayIncompletas();
   }
 
   /**
-   * Persiste una línea (PATCH si ya tiene `id`, POST con `documento_id` si es
-   * nueva) y la reconstruye desde la respuesta autoritativa del backend
-   * (impuestos y montos recalculados). Reconstruida, deja de estar pendiente.
-   *
-   * Si la fila cambió mientras la petición viajaba (la persona siguió tecleando, o
-   * llegó tarde el precio o los impuestos de un ítem), no se reconstruye: pisaría lo
-   * nuevo. Solo toma el `id` —para que el próximo guardado sea un PATCH y no otra
-   * alta— y queda pendiente con lo que muestra la pantalla.
-   */
-  private persistRow(
-    group: ComercialDetalleGroup,
-    documentoId: number,
-  ): Observable<ComercialDetalleRead> {
-    const payload = comercialDetalleToPayload(group.getRawValue());
-    const enviado = JSON.stringify(payload);
-    const id = group.controls.id.value;
-    const op =
-      id != null
-        ? this.detalleService.actualizar<ComercialDetalleRead>(id, payload)
-        : this.detalleService.crear<ComercialDetalleRead>(documentoId, payload);
-    return op.pipe(
-      tap((saved) => {
-        const leida = comercialDetalleToFormValue(saved);
-        if (JSON.stringify(comercialDetalleToPayload(group.getRawValue())) !== enviado) {
-          group.controls.id.setValue(leida.id);
-          group.markAsDirty();
-          return;
-        }
-        const index = this.detalles().controls.indexOf(group);
-        if (index >= 0) this.detalles().setControl(index, createComercialDetalleGroup(leida));
-      }),
-    );
-  }
-
-  /**
-   * Borra una línea quitada y la saca de `eliminadas`. Un 404 cuenta como hecho: la
-   * línea ya no existe (p. ej. la borró un intento anterior cuya respuesta se perdió).
-   */
-  private persistBaja(id: number): Observable<void> {
-    const hecho = (): void => this.eliminadas.update((ids) => ids.filter((x) => x !== id));
-    return this.detalleService.eliminar(id).pipe(
-      tap(hecho),
-      catchError((err: unknown) => {
-        if (err instanceof HttpErrorResponse && err.status === 404) {
-          hecho();
-          return of(undefined);
-        }
-        return throwError(() => err);
-      }),
-    );
-  }
-
-  /**
-   * Persiste todos los cambios pendientes: primero las bajas, después las altas y
-   * ediciones válidas. Lo llama el form padre al guardar el documento, antes de la
-   * cabecera; completa cuando todo quedó escrito y emite error si algo falló.
-   *
-   * **Reintentable sin duplicar.** Cada operación corre hasta el final aunque otra
-   * falle (no se cancela nada en vuelo: una petición cancelada puede haber llegado
-   * al backend y el reintento la duplicaría). Lo que se guardó deja de estar
-   * pendiente —la fila se reconstruye con su `id`, la baja sale de `eliminadas`—,
-   * así que volver a guardar solo envía lo que faltó. El backend no ofrece un
-   * guardado atómico de documento + líneas.
-   *
-   * Límite: si un POST llega al backend pero su respuesta se pierde (corte de red),
-   * la fila queda sin `id` y el reintento la crea otra vez. Evitarlo pide una clave
-   * de idempotencia del lado del backend; desde aquí solo se minimiza no cancelando.
-   *
-   * Operación pura: no muestra toasts (el feedback es del caller).
+   * Persiste todos los cambios pendientes (ver `LineasDiferidas.guardar`). Lo llama
+   * el form padre al guardar el documento, antes de la cabecera. Con una importación
+   * en curso se rechaza: sus líneas aún no están en la tabla.
    */
   saveAll(): Observable<void> {
-    // `defer`: el flag de carga y las peticiones se atan al `subscribe`, no a la
-    // llamada, y las filas se evalúan en el momento de ejecutar.
-    return defer(() => {
-      if (this.ocupado()) return throwError(() => new LineasEnCursoError());
-      const documentoId = this.documentId();
-      if (documentoId == null) return of(undefined);
-      const bajas = [...this.eliminadas()];
-      const filas = this.pendingRows().filter((row) => row.valid);
-      if (bajas.length === 0 && filas.length === 0) return of(undefined);
-
-      // Cada operación entrega su resultado en vez de cortar el lote con su error.
-      const resultado = (op: Observable<unknown>): Observable<ResultadoGuardado> =>
-        op.pipe(
-          map((): ResultadoGuardado => ({ ok: true })),
-          catchError((err: unknown) => of<ResultadoGuardado>({ ok: false, err })),
-        );
-
-      this.savingAll.set(true);
-      return concat(
-        from(bajas).pipe(concatMap((id) => resultado(this.persistBaja(id)))),
-        from(filas).pipe(
-          mergeMap((row) => resultado(this.persistRow(row, documentoId)), GUARDADOS_EN_PARALELO),
-        ),
-      ).pipe(
-        toArray(),
-        switchMap((resultados) => {
-          const fallo = resultados.find((r) => !r.ok);
-          return fallo && !fallo.ok ? throwError(() => fallo.err) : of(undefined);
-        }),
-        finalize(() => this.savingAll.set(false)),
-      );
-    }).pipe(takeUntilDestroyed(this.destroyRef));
-  }
-
-  // ── Columnas calculadas (por índice, derivadas del espejo `lines`) ──────────
-  protected subtotalOf(index: number): number {
-    const line = this.lines()[index];
-    return line ? lineBruto(line) : 0;
-  }
-
-  /**
-   * Base gravable de la línea (`bruto − descuento`). La consume el selector de
-   * impuestos para mostrar, opción por opción, cuánto le suma o resta a **esta**
-   * línea elegir ese impuesto.
-   */
-  protected baseOf(index: number): number {
-    const line = this.lines()[index];
-    return line ? lineBase(line) : 0;
-  }
-
-  protected netoOf(index: number): number {
-    const line = this.lines()[index];
-    return line ? lineNeto(line) : 0;
+    return defer(() =>
+      this.importing() ? throwError(() => new LineasEnCursoError()) : this.lineas.guardar(),
+    ).pipe(takeUntilDestroyed(this.destroyRef));
   }
 
   /**
@@ -785,15 +1039,19 @@ export class ComercialDocumentoDetallesComponent {
    *    (cubre alternar impuestos en líneas en edición sin re-elegir el ítem).
    */
   private wireRows(array: FormArray<ComercialDetalleGroup>): void {
+    const actuales = new Set(array.controls);
+    for (const [group, sub] of this.cableadas) {
+      if (actuales.has(group)) continue;
+      sub.unsubscribe();
+      this.cableadas.delete(group);
+    }
     for (const group of array.controls) {
-      if (this.wired.has(group)) continue;
-      this.wired.add(group);
-      group.controls.item.valueChanges
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((opt) => this.loadItemTaxes(group, opt));
-      group.controls.impuestos_ids.valueChanges
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => this.ensureCatalog(group));
+      if (this.cableadas.has(group)) continue;
+      const sub = group.controls.item.valueChanges.subscribe((opt) =>
+        this.loadItemTaxes(group, opt),
+      );
+      sub.add(group.controls.impuestos_ids.valueChanges.subscribe(() => this.ensureCatalog(group)));
+      this.cableadas.set(group, sub);
       // Cubre las filas pobladas después de que llegó el catálogo (en edición
       // el padre las empuja al FormArray cuando responde su propia consulta).
       this.seedRow(group);
@@ -850,6 +1108,9 @@ export class ComercialDocumentoDetallesComponent {
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ item, precioLista }) => {
+        // La persona cambió de ítem mientras esta consulta viajaba: la respuesta es
+        // del anterior y, si llega última, pisaría los impuestos del que quedó.
+        if (group.controls.item.value?.id !== opt.id) return;
         this.applyPrecioPactado(group, opt, item, precioLista);
         group.controls.impuestos_ids.setValue(
           tasasDelItem(item, this.modo()).map((tasa) => tasa.id),
@@ -969,20 +1230,9 @@ export class ComercialDocumentoDetallesComponent {
     op.hide();
   }
 
-  /**
-   * Quita la fila. Si ya existe en el backend (edición), su id pasa a `eliminadas`
-   * y el `DELETE` se hace al guardar el documento.
-   */
-  private deleteLinea(group: ComercialDetalleGroup, id: number | null): void {
-    if (this.documentId() != null && id != null) {
-      this.eliminadas.update((ids) => [...ids, id]);
-    }
-    this.removeGroup(group);
-  }
-
-  /** Quita un grupo del `FormArray` por su referencia (robusto ante reordenamientos). */
-  private removeGroup(group: ComercialDetalleGroup): void {
-    const i = this.detalles().controls.indexOf(group);
-    if (i >= 0) this.detalles().removeAt(i);
+  /** Quita varias filas a la vez y vacía la selección. */
+  private deleteLineas(filas: readonly ComercialDetalleGroup[]): void {
+    for (const fila of filas) this.lineas.quitar(fila);
+    this.marcadas.set(new Set());
   }
 }

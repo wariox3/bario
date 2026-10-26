@@ -356,10 +356,10 @@
           </table>
         </div>
         <!-- Paginación de servidor: la matriz nunca trae el catálogo entero. -->
-        @if (totalResultados() > limite()) {
+        @if (totalResultados() > porPagina) {
           <p-paginator
-            [first]="(pagina() - 1) * limite()"
-            [rows]="limite()"
+            [first]="(pagina() - 1) * porPagina"
+            [rows]="porPagina"
             [totalRecords]="totalResultados()"
             (onPageChange)="onPage($event)"
           />

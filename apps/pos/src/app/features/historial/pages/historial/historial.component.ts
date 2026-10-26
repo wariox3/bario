@@ -76,13 +76,14 @@ export class HistorialComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>(HISTORIAL_ORDEN_DEFAULT);
   protected readonly searchValue = signal('');
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
     this.filterStorage.read(HISTORIAL_FILTROS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly selectedRows = signal<readonly VentaHistorial[]>([]);
   /** Evita lanzar dos descargas si se clickea repetido antes de terminar. */
   private descargando = false;
@@ -108,7 +109,6 @@ export class HistorialComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.cargar();
   }
 
@@ -116,6 +116,16 @@ export class HistorialComponent {
     this.sort.set(sort.length > 0 ? sort : HISTORIAL_ORDEN_DEFAULT);
     this.currentPage.set(0);
     this.cargar();
+  }
+
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
+    this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
@@ -175,7 +185,6 @@ export class HistorialComponent {
       filters: busqueda ? [...this.activeFilters(), busqueda] : this.activeFilters(),
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
   }
 

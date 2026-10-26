@@ -76,6 +76,3 @@ export const CONTABILIDAD_DIALOG_COLUMNS: readonly ColumnDef[] = [
     type: 'text',
   },
 ];
-
-/** Tamaño de página inicial del libro dentro del diálogo. */
-export const CONTABILIDAD_DIALOG_PAGE_SIZE = 25;

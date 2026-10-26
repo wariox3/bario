@@ -12,7 +12,7 @@ Convenciones que asume el frontend:
 - Las acciones sobre un aporte lo identifican con **`aporte_id`** en el cuerpo (no `id`)
   y responden el aporte actualizado.
 - Los tres niveles (`aporte-contrato`, `aporte-detalle`, `aporte-entidad`) se listan por
-  **`POST …/lista/`** con `{ filtros, ordenamientos }` en el cuerpo y `?page=&limit=` en
+  **`POST …/lista/`** con `{ filtros, ordenamientos }` en el cuerpo y `?page=` (de a 25) en
   la URL.
 - Las FK van **sin `_id`** al escribir y al leer, y **con `_id`** al filtrar en un
   `lista/` (estándar decidido; si un `lista/` rechaza `x_id`, se agrega en el backend).

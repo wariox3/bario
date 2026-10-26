@@ -6,6 +6,7 @@ import {
   buildListBody,
   type AdvancedListBody,
   buildListParams,
+  fetchAllPages,
   type FilterCondition,
   type ListQuery,
   type PaginatedResponse,
@@ -32,19 +33,6 @@ export const APORTE_ENDPOINT = '/humano/aporte/';
 export const APORTE_CONTRATO_ENDPOINT = '/humano/aporte-contrato/';
 export const APORTE_DETALLE_ENDPOINT = '/humano/aporte-detalle/';
 export const APORTE_ENTIDAD_ENDPOINT = '/humano/aporte-entidad/';
-
-/**
- * Tope al pedir las entidades del aporte.
- *
- * Los subtotales por tipo y el total general se calculan sobre **todo** el
- * conjunto: son la plata que la empresa va a pagar. El legacy los sacaba de una
- * página de 50 registros, así que con más entidades las cifras quedaban mal.
- *
- * Un aporte tiene decenas de entidades, no miles (EPS, AFP, ARL, cajas, SENA e
- * ICBF), así que traerlas todas es barato. Si algún día no alcanza, el agrupado
- * debe darlo el backend — no subir este número.
- */
-export const APORTE_ENTIDADES_LIMITE = 1000;
 
 /**
  * Servicio del **aporte a seguridad social**: el CRUD de la cabecera, los tres
@@ -112,14 +100,12 @@ export class AporteService extends BaseHttpService {
   listarContratos(
     aporteId: number,
     page: number,
-    pageSize: number,
     filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<AporteContrato>> {
     return this.listar<AporteContrato>(APORTE_CONTRATO_ENDPOINT, {
       filters: [{ field: 'aporte_id', operator: 'eq', value: aporteId }, ...filtros],
       sort: [{ field: 'contrato_id', direction: 'asc' }],
       page,
-      pageSize,
     });
   }
 
@@ -153,7 +139,6 @@ export class AporteService extends BaseHttpService {
   listarDetalles(
     aporteId: number,
     page: number,
-    pageSize: number,
     filtros: readonly FilterCondition[] = [],
   ): Observable<PaginatedResponse<AporteDetalle>> {
     return this.listar<AporteDetalle>(APORTE_DETALLE_ENDPOINT, {
@@ -163,22 +148,28 @@ export class AporteService extends BaseHttpService {
       ],
       sort: [{ field: 'aporte_contrato_id', direction: 'asc' }],
       page,
-      pageSize,
     });
   }
 
   /**
-   * Todas las entidades del aporte en una sola página: los subtotales se calculan
-   * sobre el conjunto completo (ver `APORTE_ENTIDADES_LIMITE`). El orden por
-   * `tipo` es el que usa el agrupado.
+   * **Todas** las entidades del aporte, recorriendo las páginas.
+   *
+   * Los subtotales por tipo y el total general se calculan sobre el conjunto
+   * completo: son la plata que la empresa va a pagar. El legacy los sacaba de
+   * una página de 50 registros, así que con más entidades las cifras quedaban
+   * mal. Un aporte tiene decenas de entidades (EPS, AFP, ARL, cajas, SENA e
+   * ICBF), así que recorrerlas es barato. El orden por `tipo` es el que usa el
+   * agrupado.
    */
-  listarEntidades(aporteId: number): Observable<PaginatedResponse<AporteEntidad>> {
-    return this.listar<AporteEntidad>(APORTE_ENTIDAD_ENDPOINT, {
+  listarEntidades(aporteId: number): Observable<AporteEntidad[]> {
+    const query: ListQuery = {
       filters: [{ field: 'aporte_id', operator: 'eq', value: aporteId }],
       sort: [{ field: 'tipo', direction: 'asc' }],
       page: 0,
-      pageSize: APORTE_ENTIDADES_LIMITE,
-    });
+    };
+    return fetchAllPages((page) =>
+      this.listar<AporteEntidad>(APORTE_ENTIDAD_ENDPOINT, { ...query, page: page - 1 }),
+    );
   }
 
   /** `POST …/lista/` de uno de los tres niveles. */
@@ -294,7 +285,6 @@ export function cuerpoExportacion(
     filters: [{ field: config.filtro, operator: 'eq', value: aporteId }],
     sort: [],
     page: 0,
-    pageSize: 0,
   };
   return { ...buildListBody(query), serializador: config.serializador };
 }

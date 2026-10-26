@@ -79,7 +79,6 @@ export class CuentaCobrarCorteListComponent {
   protected readonly isLoading = signal(false);
   protected readonly isExportingExcel = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
 
   protected readonly generated = computed(() => this.appliedDate() !== null);
@@ -114,7 +113,6 @@ export class CuentaCobrarCorteListComponent {
   protected onPageChange(event: PageChangeEvent): void {
     if (!this.generated()) return;
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -163,7 +161,6 @@ export class CuentaCobrarCorteListComponent {
       filters: [],
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

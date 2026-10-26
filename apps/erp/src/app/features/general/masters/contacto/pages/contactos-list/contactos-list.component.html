@@ -7,13 +7,16 @@
     [searchValue]="searchValue()"
     [searchPlaceholderKey]="'entities.contacto.searchPlaceholder'"
     [filtersEnabled]="true"
-    [activeFiltersCount]="activeFilters().length"
+    [activeFilters]="activeFilters()"
+    [filterFields]="filterFields"
     [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
     [deleteSelectedCount]="selectedRows().length"
     (searched)="onSearchChange($event)"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
     (filtersClear)="clearFilters()"
+    (filterEdit)="openFilters($event)"
+    (filterRemove)="removeFilter($event)"
     (deleteSelected)="removeSelected()"
   />
 
@@ -23,7 +26,6 @@
     [items]="items()"
     [totalCount]="totalCount()"
     [loading]="isLoading()"
-    [pageSize]="pageSize()"
     [currentPage]="currentPage()"
     [sort]="sort()"
     selectionMode="multiple"
@@ -40,6 +42,7 @@
   [fields]="filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />

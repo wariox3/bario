@@ -110,7 +110,6 @@ export class ConceptoNominaTableComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {

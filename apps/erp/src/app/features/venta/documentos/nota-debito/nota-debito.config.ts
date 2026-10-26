@@ -22,13 +22,20 @@ export const NOTA_DEBITO_CONFIG: DocumentEntityConfig = {
   displayNameKey: 'entities.notaDebito.name',
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.NOTA_DEBITO_VENTA,
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   inventoryEffect: 'inflow',
   // Motivo DIAN de la nota: solo los conceptos de la clase nota débito de venta.
   conceptoCorreccionClaseId: DOCUMENTO_CLASE_ID.NOTA_DEBITO_VENTA,
   schemaVersion: 1,
   columns: NOTA_DEBITO_COLUMNS,
   filters: NOTA_DEBITO_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'nota-debito/list',
     new: 'nota-debito/nuevo',

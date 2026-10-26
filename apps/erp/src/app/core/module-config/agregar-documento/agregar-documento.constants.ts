@@ -82,7 +82,11 @@ export const AGREGAR_DOCUMENTO_COLUMNS: readonly ColumnDef[] = [
   },
 ];
 
-/** Orden por defecto: documentos más recientes primero. */
+/**
+ * Orden por defecto: del más antiguo al más reciente. El `id` desempata los de
+ * la misma fecha para que no salten de página entre una consulta y otra.
+ */
 export const AGREGAR_DOCUMENTO_DEFAULT_SORT: readonly SortSpec[] = [
-  { field: 'fecha', direction: 'desc' },
+  { field: 'fecha', direction: 'asc' },
+  { field: 'id', direction: 'asc' },
 ];

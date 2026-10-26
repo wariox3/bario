@@ -63,8 +63,6 @@ export class TurnoFormComponent implements OnInit {
 
   /** Endpoint del selector de tipo de novedad (cross-form: novedad + turno). */
   protected readonly novedadTipoEndpoint = SELECT_ENDPOINTS.novedadTipo;
-  /** Referencia estable para no re-disparar el fetch del selector en cada ciclo de CD. */
-  protected readonly tipoParams: Record<string, string> = { limit: '100' };
 
   /** Id del turno a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();

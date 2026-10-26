@@ -6,9 +6,6 @@ export const CONCILIACIONES_FILTERS_STORAGE_KEY = 'conciliaciones:filters:v1';
 /** Segmentos de ruta del listado, relativos al tenant. */
 export const CONCILIACION_LIST_PATH = ['contabilidad', 'utilidades', 'conciliacion'] as const;
 
-/** Filas por página de las dos tablas hijas (libro y extracto). */
-export const CONCILIACION_TAB_PAGE_SIZE = 25;
-
 /**
  * Catálogo de cuentas bancarias de la cabecera.
  *

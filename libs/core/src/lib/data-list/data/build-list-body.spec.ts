@@ -99,7 +99,6 @@ describe('buildListBody', () => {
     filters: [{ field: 'nombre_corto', operator: 'contains', value: 'm' }],
     sort: [{ field: 'nombre_corto', direction: 'desc' }],
     page: 0,
-    pageSize: 25,
   };
 
   it('arma el body solo con filtros y ordenamientos (paginación va en query params)', () => {
@@ -125,18 +124,13 @@ describe('buildListParams', () => {
     filters: [],
     sort: [],
     page: 0,
-    pageSize: 25,
   };
 
   it('convierte la página 0-based a 1-based bajo la key "page"', () => {
     expect(buildListParams({ ...baseQuery, page: 2 })[LIST_PAGINATION_PARAMS.page]).toBe(3);
   });
 
-  it('expone el tamaño de página bajo la key de tamaño ("limit")', () => {
-    expect(buildListParams({ ...baseQuery, pageSize: 50 })[LIST_PAGINATION_PARAMS.size]).toBe(50);
-  });
-
-  it('arma el set completo de params de paginación', () => {
-    expect(buildListParams(baseQuery)).toEqual({ page: 1, limit: 25 });
+  it('no manda tamaño de página: el backend pagina siempre de a 25', () => {
+    expect(buildListParams(baseQuery)).toEqual({ page: 1 });
   });
 });

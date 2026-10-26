@@ -12,15 +12,6 @@
         <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
         {{ pendingCount() }} {{ t().entities.cuentaDetalle.pendingSuffix }}
       </span>
-      <p-button
-        type="button"
-        size="small"
-        icon="pi pi-save"
-        [label]="t().entities.cuentaDetalle.saveAll + ' (' + pendingCount() + ')'"
-        [loading]="savingAll()"
-        [disabled]="savingAll()"
-        (onClick)="onSaveAllClick()"
-      />
     }
     @if (agregarDocumentoEnabled()) {
       <!-- El tooltip vive en el span: un botón deshabilitado no emite eventos de
@@ -35,8 +26,7 @@
           icon="pi pi-file-plus"
           [label]="t().documentAdd.buttonLabel"
           [outlined]="true"
-          [loading]="addingDocumentos()"
-          [disabled]="contactoId() === null || addingDocumentos()"
+          [disabled]="contactoId() === null || ocupado()"
           (onClick)="openAgregarDocumento()"
         />
       </span>
@@ -47,6 +37,7 @@
       icon="pi pi-plus"
       [label]="t().entities.cuentaDetalle.addLine"
       [outlined]="true"
+      [disabled]="ocupado()"
       (onClick)="addLinea()"
     />
   </div>
@@ -55,8 +46,8 @@
     <table class="contable-detalle-table">
       <thead>
         <tr>
-          <th class="contable-detalle-table__th w-10 text-center">
-            {{ t().entities.cuentaDetalle.columns.linea }}
+          <th class="contable-detalle-table__th w-16 text-center">
+            {{ t().entities.cuentaDetalle.columns.id }}
           </th>
           @if (showNumero()) {
             <th class="contable-detalle-table__th w-28 text-left">
@@ -103,7 +94,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of detalles().controls; track row; let i = $index) {
+        @for (row of filas(); track row) {
           <tr
             [formGroup]="row"
             class="contable-detalle-table__row"
@@ -116,7 +107,7 @@
                   [pTooltip]="t().entities.cuentaDetalle.pendingSuffix"
                 ></span>
               }
-              {{ i + 1 }}
+              {{ row.controls.id.value }}
             </td>
 
             @if (showNumero()) {
@@ -163,6 +154,7 @@
             @if (showContacto()) {
               <td class="contable-detalle-table__td">
                 <lib-contacto-select
+                  appCrearTercero
                   formControlName="contacto"
                   [placeholder]="t().entities.cuentaDetalle.contactoPlaceholder"
                 />
@@ -184,7 +176,7 @@
               <td class="contable-detalle-table__td">
                 <lib-api-select
                   formControlName="centro_costo"
-                  [endpoint]="centroCostoEndpoint"
+                  [catalogo]="centroCostoCatalogo()"
                   [placeholder]="t().entities.cuentaDetalle.centroCostoPlaceholder"
                 />
               </td>
@@ -204,7 +196,16 @@
             </td>
 
             @if (showBase()) {
-              <td class="contable-detalle-table__td">
+              <!-- La cuenta exige base: el tooltip dice por qué el campo quedó en rojo. -->
+              <td
+                class="contable-detalle-table__td"
+                [pTooltip]="
+                  row.controls.base.hasError('baseExigida')
+                    ? t().entities.cuentaDetalle.baseExigida
+                    : ''
+                "
+                tooltipPosition="top"
+              >
                 <p-inputnumber
                   formControlName="base"
                   mode="decimal"
@@ -214,6 +215,10 @@
                   prefix="$ "
                   [fluid]="true"
                   inputStyleClass="text-right"
+                  [invalid]="
+                    row.controls.base.invalid &&
+                    (row.controls.base.touched || row.controls.cuenta.touched)
+                  "
                 />
               </td>
             }
@@ -233,28 +238,13 @@
 
             <td class="contable-detalle-table__td">
               <div class="flex items-center justify-center gap-0.5">
-                @if (canSaveRow(row)) {
-                  <button
-                    type="button"
-                    (click)="saveLinea(row)"
-                    [disabled]="isSavingRow(row)"
-                    [pTooltip]="t().entities.cuentaDetalle.saveLine"
-                    [attr.aria-label]="t().entities.cuentaDetalle.saveLine"
-                    class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-default disabled:opacity-60"
-                  >
-                    @if (isSavingRow(row)) {
-                      <i class="pi pi-spin pi-spinner text-[0.78rem]"></i>
-                    } @else {
-                      <i class="pi pi-check text-[0.78rem]"></i>
-                    }
-                  </button>
-                }
                 <button
                   type="button"
                   (click)="removeLinea(row)"
+                  [disabled]="ocupado()"
                   [pTooltip]="t().entities.cuentaDetalle.removeLine"
                   [attr.aria-label]="t().entities.cuentaDetalle.removeLine"
-                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-brand-muted transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-default disabled:opacity-60"
                 >
                   <i class="pi pi-trash text-[0.78rem]"></i>
                 </button>

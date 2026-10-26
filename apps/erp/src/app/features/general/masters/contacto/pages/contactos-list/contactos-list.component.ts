@@ -89,7 +89,6 @@ export class ContactosListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
   protected readonly selectedRows = signal<readonly Contacto[]>([]);
   protected readonly searchValue = signal('');
@@ -97,6 +96,8 @@ export class ContactosListComponent {
     this.filterStorage.read(CONTACTOS_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
   protected readonly exampleConfig = {
     mode: 'enabled' as const,
@@ -147,7 +148,6 @@ export class ContactosListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -161,7 +161,8 @@ export class ContactosListComponent {
     this.loadList();
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
   }
 
@@ -174,6 +175,11 @@ export class ContactosListComponent {
     this.filterStorage.write(CONTACTOS_FILTERS_STORAGE_KEY, filters);
     this.currentPage.set(0);
     this.loadList();
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected clearFilters(): void {
@@ -270,7 +276,6 @@ export class ContactosListComponent {
       filters,
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

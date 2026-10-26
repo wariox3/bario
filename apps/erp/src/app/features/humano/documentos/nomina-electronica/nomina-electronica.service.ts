@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
-import { BaseHttpService, type BackendFilter, type PaginatedResponse } from '@reddoc/core';
+import type { Observable } from 'rxjs';
+import {
+  BaseHttpService,
+  fetchAllPages,
+  type BackendFilter,
+  type PaginatedResponse,
+} from '@reddoc/core';
 import type {
   NominaElectronicaDetalleRead,
   NominaElectronicaOrigen,
@@ -11,13 +16,6 @@ const DOCUMENTO_LISTA_ENDPOINT = '/general/documento/lista/';
 
 /** Listado filtrado de líneas de documento. Va con **guion**, no con guion bajo. */
 const DOCUMENTO_DETALLE_LISTA_ENDPOINT = '/general/documento-detalle/lista/';
-
-/**
- * Tope de nóminas origen por consolidado. Son las del periodo de **un
- * empleado** —una o dos, según se pague por mes o por quincena—, así que traer
- * todas en una página es holgado y evita paginar la ficha.
- */
-const PAGE_SIZE = 200;
 
 /**
  * Las dos consultas de la ficha de **nómina electrónica** que el framework de
@@ -35,7 +33,8 @@ const PAGE_SIZE = 200;
  *    este consolidado. El legacy manda además un `serializador` acá; se deja el
  *    punto de extensión abierto en un solo lugar.
  *
- * Las dos van por `POST …/lista/` con `filtros`, como los listados.
+ * Las dos van por `POST …/lista/` con `filtros`, como los listados, y recorren
+ * todas las páginas: la ficha muestra el consolidado completo.
  *
  * Tenant-scoped por defecto (lo hereda de `BaseHttpService`).
  */
@@ -67,8 +66,8 @@ export class NominaElectronicaService extends BaseHttpService {
   }
 
   private listar<TRead>(endpoint: string, filtros: readonly BackendFilter[]): Observable<TRead[]> {
-    return this.post<PaginatedResponse<TRead>>(endpoint, { filtros }, { limit: PAGE_SIZE }).pipe(
-      map((res) => [...res.results]),
+    return fetchAllPages((page) =>
+      this.post<PaginatedResponse<TRead>>(endpoint, { filtros }, { page }),
     );
   }
 }

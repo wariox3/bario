@@ -25,10 +25,17 @@ export const FACTURA_COMPRA_CONFIG: DocumentEntityConfig = {
   endpoint: '/api/general/documento',
   documentTypeId: DOCUMENT_TYPE_ID.COMPRA,
   inventoryEffect: 'inflow',
+  // La cabecera llega de `documento/<id>/detalle/`, con los impuestos agrupados.
+  cabeceraConImpuestos: true,
   schemaVersion: 1,
   columns: FACTURA_COMPRA_COLUMNS,
   filters: FACTURA_COMPRA_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'factura-compra/list',
     new: 'factura-compra/nuevo',

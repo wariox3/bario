@@ -63,6 +63,7 @@
             <span class="ml-px text-red-500">*</span>
           </label>
           <lib-contacto-select
+            appCrearTercero
             inputId="contacto"
             formControlName="contacto"
             [extraParams]="contactoParams"
@@ -288,6 +289,9 @@
             [precioListaId]="precioListaId()"
             [almacenEnabled]="true"
             [almacenPorDefecto]="form.controls.almacen.value"
+            [paginada]="paginada()"
+            [resumenBase]="resumenBase()"
+            [cantidadBase]="cantidadBase()"
           />
         </p-tabpanel>
 

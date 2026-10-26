@@ -79,7 +79,6 @@ export class SoportesListComponent {
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
-  protected readonly pageSize = signal(25);
   protected readonly sort = signal<readonly SortSpec[]>([]);
   protected readonly selectedRows = signal<readonly Soporte[]>([]);
   protected readonly searchValue = signal('');
@@ -87,6 +86,8 @@ export class SoportesListComponent {
     this.filterStorage.read(SOPORTES_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
   protected readonly isExportingExcel = signal(false);
 
@@ -121,7 +122,6 @@ export class SoportesListComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.currentPage.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.loadList();
   }
 
@@ -135,8 +135,14 @@ export class SoportesListComponent {
     this.loadList();
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   /**
@@ -225,7 +231,6 @@ export class SoportesListComponent {
       filters,
       sort: this.sort(),
       page: this.currentPage(),
-      pageSize: this.pageSize(),
     };
 
     this.isLoading.set(true);

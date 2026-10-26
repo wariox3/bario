@@ -29,7 +29,12 @@ export const TRASLADO_CONFIG: DocumentEntityConfig = {
   schemaVersion: 1,
   columns: TRASLADO_COLUMNS,
   filters: TRASLADO_FILTERS,
-  defaultSort: [{ field: 'id', direction: 'desc' }],
+  defaultSort: [
+    { field: 'estado_aprobado', direction: 'asc' },
+    { field: 'fecha', direction: 'desc' },
+    { field: 'numero', direction: 'desc' },
+    { field: 'id', direction: 'desc' },
+  ],
   routes: {
     list: 'traslado/list',
     new: 'traslado/nuevo',

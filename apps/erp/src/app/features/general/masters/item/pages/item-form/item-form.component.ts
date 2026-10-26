@@ -1,4 +1,14 @@
-import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  type OnInit,
+  afterNextRender,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -24,6 +34,10 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
+import { prepararFormModal } from '@erp/core/components/form-modal/form-modal';
+
+/** Id del título del modal: el `role="dialog"` lo usa como nombre accesible. */
+const MODAL_TITLE_ID = 'item-form-modal-title';
 import { ITEM_LIST_PATH } from '../../item.constants';
 import { formValueToPayload, itemToFormValue } from '../../item.mapper';
 
@@ -85,6 +99,8 @@ export class ItemFormComponent implements OnInit {
 
   /** `true` cuando el form se abrió como modal desde un documento. */
   protected readonly isModal = this.dialogRef !== null;
+  protected readonly modalTitleId = MODAL_TITLE_ID;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly t = this.i18n.t;
 
@@ -147,6 +163,10 @@ export class ItemFormComponent implements OnInit {
   constructor() {
     this.setupFormReactions();
     this.loadImpuestos();
+    // Nombre accesible del modal y foco en el primer campo (ver `prepararFormModal`).
+    if (this.isModal) {
+      afterNextRender(() => prepararFormModal(this.host.nativeElement, MODAL_TITLE_ID, '#nombre'));
+    }
   }
 
   ngOnInit(): void {

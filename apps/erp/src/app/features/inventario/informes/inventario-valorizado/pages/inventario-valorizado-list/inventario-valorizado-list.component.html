@@ -4,9 +4,12 @@
     [trailingActions]="trailingActions"
     [searchEnabled]="false"
     [filtersEnabled]="true"
-    [activeFiltersCount]="activeFilters().length"
+    [activeFilters]="activeFilters()"
+    [filterFields]="filterFields"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
+    (filterEdit)="openFilters($event)"
+    (filterRemove)="removeFilter($event)"
     (filtersClear)="clearFilters()"
   />
 
@@ -16,7 +19,6 @@
     [items]="items()"
     [totalCount]="totalCount()"
     [loading]="isLoading()"
-    [pageSize]="pageSize()"
     [currentPage]="currentPage()"
     (pageChange)="onPageChange($event)"
   />
@@ -26,6 +28,7 @@
   [fields]="filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />

@@ -46,6 +46,7 @@ export { applyClientFilters, matchesCondition } from './filters/match-conditions
 export { serializeListQuery } from './data/serialize-list-query';
 export {
   BACKEND_OPERATOR,
+  LIST_PAGE_SIZE,
   LIST_PAGINATION_PARAMS,
   buildFiltros,
   buildOrdenamientos,
@@ -53,6 +54,8 @@ export {
   buildListParams,
 } from './data/build-list-body';
 export type { AdvancedListBody, BackendFilter } from './data/build-list-body';
+export { fetchAllPages } from './data/fetch-all-pages';
+export type { FetchAllPagesOptions } from './data/fetch-all-pages';
 
 // Storage
 export { FilterStorageService } from './storage/filter-storage.service';

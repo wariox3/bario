@@ -32,8 +32,6 @@ export interface ElegirRecurrenteModalData {
   readonly documentoTipoOrigen: number;
 }
 
-const PAGE_SIZE = 10;
-
 /** Espera tras la última tecla antes de buscar, para no consultar por cada letra. */
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -124,7 +122,6 @@ export class ElegirRecurrenteModalComponent {
   protected readonly totalCount = signal(0);
   protected readonly loading = signal(true);
   protected readonly page = signal(0);
-  protected readonly pageSize = signal(PAGE_SIZE);
   protected readonly search = signal('');
 
   private readonly search$ = new Subject<string>();
@@ -170,7 +167,6 @@ export class ElegirRecurrenteModalComponent {
       filters: this.filtros(),
       sort: SORT,
       page: this.page(),
-      pageSize: this.pageSize(),
     };
   }
 
@@ -200,7 +196,6 @@ export class ElegirRecurrenteModalComponent {
 
   protected onPageChange(event: PageChangeEvent): void {
     this.page.set(event.page);
-    this.pageSize.set(event.pageSize);
     this.cargar();
   }
 
