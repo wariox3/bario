@@ -36,7 +36,8 @@ interface ResolvedTrailingAction extends ToolbarAction {
  *    cuando `activeFiltersCount > 0`.
  *  - `activeFilters` + `filterFields` → además, una fila bajo la botonera que
  *    dice qué condiciones están activas («Donde nombre contiene perez y…»).
- *    Cada píldora abre el modal y su × la quita sola (`filterRemove`); el
+ *    Cada píldora pide editarse (`filterEdit`, con su fila en el modal) y su
+ *    × la quita sola (`filterRemove`); el
  *    "Limpiar" se muda al final de esa fila.
  *  - `deleteSelectedEnabled` + `deleteSelectedCount > 0` → botón danger
  *    contextual a la izquierda del divisor.
@@ -84,6 +85,11 @@ export class DataToolbarComponent {
    */
   readonly activeFilters = input<readonly FilterCondition[]>([]);
   readonly filterFields = input<readonly FilterField[]>([]);
+  /**
+   * Fila del modal de la condición que la persona tocó para editarla. El host
+   * abre el modal con `focusRow` en ese valor.
+   */
+  readonly filterEdit = output<number>();
   /** Índice (en `activeFilters`) de la condición que la persona quitó. */
   readonly filterRemove = output<number>();
 

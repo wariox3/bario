@@ -12,19 +12,23 @@ import {
 export interface FilterChip {
   /** Posición de la condición en el array original (para quitarla). */
   readonly index: number;
+  /**
+   * Posición entre las condiciones que se pintan. Coincide con la fila del
+   * modal porque ambos descartan las mismas condiciones; es la que se usa para
+   * enfocar su valor al editar.
+   */
+  readonly row: number;
   readonly field: string;
   readonly operator: string;
   /** Vacío cuando el operador no toma valor («está vacío», booleanos). */
   readonly value: string;
 }
 
-/** Cuántos valores de un filtro «en» se muestran antes de resumir con «+N». */
-const MAX_IN_VALUES = 2;
-
 /**
- * Traduce las condiciones activas a píldoras. Las que apuntan a un campo que
- * el listado ya no declara se descartan: no hay etiqueta honesta para ellas y
- * el modal tampoco las muestra.
+ * Traduce las condiciones activas a píldoras. Se descartan las mismas que
+ * descarta el modal (`conditionsToDraft`): campo que el listado ya no declara u
+ * operador fuera del catálogo. No hay etiqueta honesta para ellas, y descartar
+ * igual que el modal mantiene alineado `row` con sus filas.
  */
 export function buildFilterChips(
   conditions: readonly FilterCondition[],
@@ -39,22 +43,19 @@ export function buildFilterChips(
       (op) =>
         op.operator === cond.operator && (op.valueKind !== 'none' || op.fixedValue === cond.value),
     );
+    if (!def) return;
     chips.push({
       index,
+      row: chips.length,
       field: translate(field.displayNameKey),
-      operator: def ? translate(def.labelKey) : cond.operator,
-      value: def?.valueKind === 'none' ? '' : formatValue(cond.value, field.type),
+      operator: translate(def.labelKey),
+      value: def.valueKind === 'none' ? '' : formatValue(cond.value, field.type),
     });
   });
   return chips;
 }
 
 function formatValue(value: FilterCondition['value'], type: FilterField['type']): string {
-  if (Array.isArray(value)) {
-    const shown = value.slice(0, MAX_IN_VALUES).map((v) => formatValue(v, type));
-    const rest = value.length - shown.length;
-    return rest > 0 ? `${shown.join(', ')} +${rest}` : shown.join(', ');
-  }
   if (type === 'date' && typeof value === 'string') return formatFechaCorta(value, value);
   return String(value);
 }

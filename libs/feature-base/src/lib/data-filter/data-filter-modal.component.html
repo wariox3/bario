@@ -1,6 +1,7 @@
 <p-dialog
   [visible]="visible()"
   (visibleChange)="onVisibleChange($event)"
+  (onShow)="onDialogShow()"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
@@ -71,6 +72,7 @@
 
           <div class="w-[158px] shrink-0">
             <p-select
+              #operatorSelect
               size="small"
               panelStyleClass="lib-data-filter-modal__panel"
               [options]="operatorOptionsFor(row)"

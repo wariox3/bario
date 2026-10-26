@@ -1,4 +1,5 @@
 import type { FilterField } from '@reddoc/core';
+import { conditionsToDraft } from '../data-filter/data-filter.logic';
 import { buildFilterChips } from './filter-chips';
 
 const FIELDS: readonly FilterField[] = [
@@ -17,7 +18,9 @@ describe('buildFilterChips', () => {
       FIELDS,
       translate,
     );
-    expect(chips).toEqual([{ index: 0, field: 'nombre', operator: 'contiene', value: 'perez' }]);
+    expect(chips).toEqual([
+      { index: 0, row: 0, field: 'nombre', operator: 'contiene', value: 'perez' },
+    ]);
   });
 
   it('formatea las fechas en formato corto', () => {
@@ -44,24 +47,15 @@ describe('buildFilterChips', () => {
     ]);
   });
 
-  it('resume los filtros «en» largos', () => {
-    const [chip] = buildFilterChips(
-      [{ field: 'id', operator: 'in', value: [1, 2, 3, 4] }],
-      FIELDS,
-      translate,
-    );
-    expect(chip.value).toBe('1, 2 +2');
-  });
-
-  it('descarta campos que el listado no declara y conserva el índice original', () => {
-    const chips = buildFilterChips(
-      [
-        { field: 'viejo', operator: 'eq', value: 1 },
-        { field: 'id', operator: 'eq', value: 7 },
-      ],
-      FIELDS,
-      translate,
-    );
-    expect(chips).toEqual([{ index: 1, field: 'id', operator: 'es', value: '7' }]);
+  it('descarta lo mismo que el modal: la fila coincide con la del modal', () => {
+    const conditions = [
+      { field: 'viejo', operator: 'eq', value: 1 },
+      { field: 'id', operator: 'contains', value: 3 },
+      { field: 'id', operator: 'in', value: [1, 2] },
+      { field: 'id', operator: 'eq', value: 7 },
+    ] as const;
+    const chips = buildFilterChips(conditions, FIELDS, translate);
+    expect(chips).toEqual([{ index: 3, row: 0, field: 'id', operator: 'es', value: '7' }]);
+    expect(conditionsToDraft(conditions, FIELDS)).toHaveLength(chips.length);
   });
 });

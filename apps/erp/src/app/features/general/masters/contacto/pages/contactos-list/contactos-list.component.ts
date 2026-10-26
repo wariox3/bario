@@ -96,6 +96,8 @@ export class ContactosListComponent {
     this.filterStorage.read(CONTACTOS_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
   protected readonly exampleConfig = {
     mode: 'enabled' as const,
@@ -159,7 +161,8 @@ export class ContactosListComponent {
     this.loadList();
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
   }
 

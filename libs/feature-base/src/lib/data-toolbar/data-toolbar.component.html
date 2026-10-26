@@ -152,7 +152,7 @@
           type="button"
           class="flex h-full min-w-0 cursor-pointer items-center gap-1 rounded-l-md border-0 bg-transparent pl-2 pr-1 font-[inherit] text-[inherit] hover:bg-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300"
           [attr.title]="translate('common.filters.title')"
-          (click)="filtersToggle.emit()"
+          (click)="filterEdit.emit(chip.row)"
         >
           <span class="shrink-0 text-brand-muted">{{ chip.field }}</span>
           <span class="shrink-0 text-brand-muted opacity-75">{{ chip.operator }}</span>
