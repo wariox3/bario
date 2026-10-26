@@ -107,6 +107,13 @@ export class DataFilterModalComponent {
   private readonly focusRowIndex = signal<number | null>(null);
   /** Si el foco pendiente viene de una píldora: entonces se selecciona el valor. */
   private readonly selectOnFocus = signal(false);
+  /**
+   * Fila cuyo campo u operador cambió con el panel del selector abierto. Al
+   * cerrarse ese panel el foco salta a su valor. No se salta en el cambio
+   * mismo: con el selector cerrado las flechas cambian la opción una a una, y
+   * saltar ahí le robaría el foco a quien recorre opciones con el teclado.
+   */
+  private changedRow: number | null = null;
 
   constructor() {
     // Al abrir, hidrata el borrador desde los filtros activos (o con una
@@ -233,15 +240,37 @@ export class DataFilterModalComponent {
     this.draft.set([]);
   }
 
+  /** Se abrió el panel de un selector de la fila: los cambios cuentan desde aquí. */
+  protected onSelectShow(): void {
+    this.changedRow = null;
+  }
+
+  /**
+   * Se cerró el panel de un selector. Si en esa apertura se eligió otra opción,
+   * el foco pasa al valor de la fila (o al operador si la fila no toma valor),
+   * que es lo siguiente que se edita. Cerrar con Escape o clic fuera no salta.
+   */
+  protected onSelectHide(index: number): void {
+    if (this.changedRow !== index) return;
+    this.changedRow = null;
+    this.selectOnFocus.set(true);
+    this.focusRowIndex.set(index);
+    // Si el input de valor no cambió de tipo, ya está en el DOM y el effect no
+    // va a correr; si cambió (texto → fecha), lo enfoca el effect al aparecer.
+    this.applyPendingFocus();
+  }
+
   protected onFieldChange(index: number, fieldName: string): void {
     const field = this.fields().find((f) => f.name === fieldName);
     if (!field) return;
+    this.changedRow = index;
     // Cambiar de propiedad resetea operador (al primero del nuevo tipo) y valor.
     const next = newRowForField(field);
     this.draft.update((rows) => rows.map((row, i) => (i === index ? next : row)));
   }
 
   protected onOperatorChange(index: number, opId: string): void {
+    this.changedRow = index;
     this.draft.update((rows) =>
       rows.map((row, i) => {
         if (i !== index) return row;
