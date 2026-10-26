@@ -313,6 +313,25 @@ tres marcos para una sola pieza (se probó en contactos y pasó a estándar, 202
 - Una página que no pueda usar el shell (Enviar factura electrónica, por su tab-strip) copia el
   mismo chrome: título suelto + un recuadro, y el tab-strip encabezándolo.
 
+### Filtros activos como píldoras
+
+El badge del botón "Filtros" dice cuántos, no cuáles; y como los filtros se guardan en el navegador,
+la persona puede volver días después a una lista recortada sin saber por qué. Por eso, con filtros
+aplicados, `lib-data-toolbar` pinta **una fila bajo la botonera** que se lee como la frase del modal:
+`DONDE (Nombre contiene perez ×) Y (Ciudad es igual a Medellín ×)  Limpiar filtros`.
+
+- Píldora `h-6 rounded-md bg-sky-50` con borde navy de baja opacidad: campo y operador en
+  `text-brand-muted`, **valor en navy semibold** (es lo que se busca con la vista). Fechas con
+  `formatFechaCorta`; operadores sin valor («está vacío», «es sí») no pintan valor.
+- Clic en la píldora → abre el modal con el **valor de esa fila enfocado y seleccionado** (o su
+  operador si no toma valor). La × quita solo esa condición sin pasar por el modal. "Limpiar"
+  vive al final de la fila, no en la botonera.
+- En el modal, elegir campo u operador **salta el foco al valor** al cerrarse el panel del select
+  (no en cada cambio: con el select cerrado las flechas cambian la opción una a una).
+- Cableado por listado: `[activeFilters]` + `[filterFields]` (en lugar de `[activeFiltersCount]`),
+  `(filterEdit)="openFilters($event)"`, `(filterRemove)="removeFilter($event)"` y
+  `[focusRow]="filterFocusRow()"` en `<lib-data-filter-modal>`. Contactos es el ejemplo.
+
 ## Patrón: barra de acciones pegajosa (`<lib-page-actions>`)
 
 `libs/ui/src/lib/components/page-actions/` (vía `@reddoc/ui`) — la fila de botones de una página

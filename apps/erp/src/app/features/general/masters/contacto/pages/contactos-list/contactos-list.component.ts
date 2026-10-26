@@ -96,6 +96,8 @@ export class ContactosListComponent {
     this.filterStorage.read(CONTACTOS_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
 
   protected readonly exampleConfig = {
     mode: 'enabled' as const,
@@ -159,7 +161,8 @@ export class ContactosListComponent {
     this.loadList();
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
   }
 
@@ -172,6 +175,11 @@ export class ContactosListComponent {
     this.filterStorage.write(CONTACTOS_FILTERS_STORAGE_KEY, filters);
     this.currentPage.set(0);
     this.loadList();
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected clearFilters(): void {

@@ -1,6 +1,7 @@
 <p-dialog
   [visible]="visible()"
   (visibleChange)="onVisibleChange($event)"
+  (onShow)="onDialogShow()"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
@@ -63,6 +64,8 @@
               [options]="fieldOptions()"
               [ngModel]="row.field"
               (ngModelChange)="onFieldChange($index, $event)"
+              (onShow)="onSelectShow()"
+              (onHide)="onSelectHide($index)"
               optionLabel="label"
               optionValue="value"
               appendTo="body"
@@ -71,11 +74,14 @@
 
           <div class="w-[158px] shrink-0">
             <p-select
+              #operatorSelect
               size="small"
               panelStyleClass="lib-data-filter-modal__panel"
               [options]="operatorOptionsFor(row)"
               [ngModel]="row.opId"
               (ngModelChange)="onOperatorChange($index, $event)"
+              (onShow)="onSelectShow()"
+              (onHide)="onSelectHide($index)"
               optionLabel="label"
               optionValue="value"
               appendTo="body"

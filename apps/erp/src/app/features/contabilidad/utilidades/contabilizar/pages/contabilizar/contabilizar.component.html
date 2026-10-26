@@ -11,8 +11,11 @@
     <lib-data-toolbar
       class="contabilizar-toolbar__filters"
       [filtersEnabled]="true"
-      [activeFiltersCount]="activeFilters().length"
+      [activeFilters]="activeFilters()"
+      [filterFields]="filterFields"
       (filtersToggle)="openFilters()"
+      (filterEdit)="openFilters($event)"
+      (filterRemove)="removeFilter($event)"
       (filtersClear)="clearFilters()"
     />
     <p-button
@@ -54,6 +57,7 @@
   [fields]="filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />

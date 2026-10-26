@@ -82,6 +82,8 @@ export class HistorialComponent {
     this.filterStorage.read(HISTORIAL_FILTROS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly selectedRows = signal<readonly VentaHistorial[]>([]);
   /** Evita lanzar dos descargas si se clickea repetido antes de terminar. */
   private descargando = false;
@@ -114,6 +116,16 @@ export class HistorialComponent {
     this.sort.set(sort.length > 0 ? sort : HISTORIAL_ORDEN_DEFAULT);
     this.currentPage.set(0);
     this.cargar();
+  }
+
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
+    this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
