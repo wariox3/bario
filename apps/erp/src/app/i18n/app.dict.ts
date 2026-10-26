@@ -4672,6 +4672,7 @@ export interface AppDict
         identificacion: string;
         contacto: string;
         contactoId: string;
+        documentoTipoId: string;
         subtotal: string;
         impuesto: string;
         total: string;
@@ -4711,6 +4712,7 @@ export interface AppDict
         identificacion: string;
         contacto: string;
         contactoId: string;
+        documentoTipoId: string;
         subtotal: string;
         impuesto: string;
         total: string;
