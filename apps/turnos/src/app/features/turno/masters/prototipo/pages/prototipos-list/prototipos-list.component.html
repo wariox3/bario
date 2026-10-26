@@ -2,9 +2,12 @@
   <lib-data-toolbar
     toolbar
     [filtersEnabled]="true"
-    [activeFiltersCount]="activeFilters().length"
+    [activeFilters]="activeFilters()"
+    [filterFields]="filterFields"
     [refreshEnabled]="true"
     (filtersToggle)="openFilters()"
+    (filterEdit)="openFilters($event)"
+    (filterRemove)="removeFilter($event)"
     (filtersClear)="clearFilters()"
     (refresh)="onRefresh()"
   />
@@ -28,6 +31,7 @@
   [fields]="filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />

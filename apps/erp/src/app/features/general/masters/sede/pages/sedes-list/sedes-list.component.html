@@ -5,11 +5,14 @@
     [trailingActions]="acciones.trailingActions()"
     [searchPlaceholderKey]="'entities.sede.searchPlaceholder'"
     [filtersEnabled]="true"
-    [activeFiltersCount]="activeFilters().length"
+    [activeFilters]="activeFilters()"
+    [filterFields]="filterFields"
     [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
     [deleteSelectedCount]="selectedRows().length"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
+    (filterEdit)="openFilters($event)"
+    (filterRemove)="removeFilter($event)"
     (filtersClear)="clearFilters()"
     (deleteSelected)="removeSelected()"
   />
@@ -36,6 +39,7 @@
   [fields]="filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />

@@ -80,6 +80,8 @@ export class AlmacenesListComponent {
     this.filterStorage.read(ALMACENES_FILTERS_STORAGE_KEY),
   );
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly isExportingExcel = signal(false);
 
   protected readonly hasSelection = computed(() => this.selectedRows().length > 0);
@@ -109,8 +111,14 @@ export class AlmacenesListComponent {
     this.loadList();
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {

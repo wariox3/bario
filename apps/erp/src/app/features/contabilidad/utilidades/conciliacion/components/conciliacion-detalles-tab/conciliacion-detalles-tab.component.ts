@@ -83,6 +83,8 @@ export class ConciliacionDetallesTabComponent {
   protected readonly currentPage = signal(0);
   protected readonly activeFilters = signal<readonly FilterCondition[]>([]);
   protected readonly filtersVisible = signal(false);
+  /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
+  protected readonly filterFocusRow = signal<number | null>(null);
   /** Alguna operación en vuelo: bloquea toda la botonera para no encadenarlas. */
   protected readonly isBusy = signal(false);
 
@@ -153,7 +155,8 @@ export class ConciliacionDetallesTabComponent {
     this.loadPage(event.page);
   }
 
-  protected openFilters(): void {
+  protected openFilters(focusRow: number | null = null): void {
+    this.filterFocusRow.set(focusRow);
     this.filtersVisible.set(true);
   }
 
@@ -177,6 +180,11 @@ export class ConciliacionDetallesTabComponent {
         this.onExportExcel();
         break;
     }
+  }
+
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
   }
 
   protected onFiltersApply(filters: readonly FilterCondition[]): void {

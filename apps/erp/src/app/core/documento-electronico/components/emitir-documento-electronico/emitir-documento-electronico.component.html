@@ -10,8 +10,11 @@
     <lib-data-toolbar
       class="min-w-0 flex-1"
       [filtersEnabled]="true"
-      [activeFiltersCount]="activeFilters().length"
+      [activeFilters]="activeFilters()"
+      [filterFields]="config().filterFields"
       (filtersToggle)="openFilters()"
+      (filterEdit)="openFilters($event)"
+      (filterRemove)="removeFilter($event)"
       (filtersClear)="clearFilters()"
     />
     @if (config().descartable) {
@@ -57,6 +60,7 @@
   [fields]="config().filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />

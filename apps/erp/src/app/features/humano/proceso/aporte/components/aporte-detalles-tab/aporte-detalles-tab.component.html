@@ -6,8 +6,11 @@
       [trailingActions]="trailingActions"
       [searchEnabled]="false"
       [filtersEnabled]="true"
-      [activeFiltersCount]="activeFilters().length"
+      [activeFilters]="activeFilters()"
+      [filterFields]="filterFields"
       (filtersToggle)="openFilters()"
+      (filterEdit)="openFilters($event)"
+      (filterRemove)="removeFilter($event)"
       (filtersClear)="clearFilters()"
       (actionInvoked)="onToolbarAction($event)"
     />
@@ -40,6 +43,7 @@
   [fields]="filterFields"
   [value]="activeFilters()"
   [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />
