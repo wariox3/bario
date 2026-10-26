@@ -174,6 +174,11 @@ export class ContactosListComponent {
     this.loadList();
   }
 
+  /** Quita una sola condición desde su píldora, sin pasar por el modal. */
+  protected removeFilter(index: number): void {
+    this.onFiltersApply(this.activeFilters().filter((_, i) => i !== index));
+  }
+
   protected clearFilters(): void {
     this.activeFilters.set([]);
     this.filterStorage.clear(CONTACTOS_FILTERS_STORAGE_KEY);

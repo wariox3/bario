@@ -5,8 +5,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MenuModule } from 'primeng/menu';
 import type { MenuItem } from 'primeng/api';
 import { debounce, distinctUntilChanged, skip, timer } from 'rxjs';
-import { I18nService } from '@reddoc/core';
+import { I18nService, type FilterCondition, type FilterField } from '@reddoc/core';
 import type { ToolbarAction } from './data-toolbar.types';
+import { buildFilterChips, type FilterChip } from './filter-chips';
 
 /**
  * Trailing action ya resuelta: si tiene `children`, el `menuItems` viene
@@ -33,6 +34,10 @@ interface ResolvedTrailingAction extends ToolbarAction {
  *  - `searchEnabled` → input de búsqueda con icono e indicador de clear.
  *  - `filtersEnabled` → botón "Filtros" con badge de count; aparece "Limpiar"
  *    cuando `activeFiltersCount > 0`.
+ *  - `activeFilters` + `filterFields` → además, una fila bajo la botonera que
+ *    dice qué condiciones están activas («Donde nombre contiene perez y…»).
+ *    Cada píldora abre el modal y su × la quita sola (`filterRemove`); el
+ *    "Limpiar" se muda al final de esa fila.
  *  - `deleteSelectedEnabled` + `deleteSelectedCount > 0` → botón danger
  *    contextual a la izquierda del divisor.
  *  - `trailingActions` → array declarativo (exportar, importar, etc.).
@@ -72,6 +77,15 @@ export class DataToolbarComponent {
   readonly activeFiltersCount = input<number>(0);
   readonly filtersToggle = output<void>();
   readonly filtersClear = output<void>();
+  /**
+   * Condiciones activas y los campos que las describen. Opcionales: sin ellas
+   * el toolbar se queda con el badge de conteo; con ellas pinta la fila de
+   * píldoras y el conteo sale de aquí.
+   */
+  readonly activeFilters = input<readonly FilterCondition[]>([]);
+  readonly filterFields = input<readonly FilterField[]>([]);
+  /** Índice (en `activeFilters`) de la condición que la persona quitó. */
+  readonly filterRemove = output<number>();
 
   // ── Refresh ───────────────────────────────────────────────────────────────
   readonly refreshEnabled = input<boolean>(false);
@@ -130,6 +144,19 @@ export class DataToolbarComponent {
         : null,
     }));
   });
+
+  /** Píldoras de la fila de condiciones; vacía si el host no pasó las condiciones. */
+  protected readonly filterChips = computed<readonly FilterChip[]>(() => {
+    this.i18n.t(); // re-traducir al cambiar de idioma
+    return buildFilterChips(this.activeFilters(), this.filterFields(), (key) =>
+      this.translate(key),
+    );
+  });
+
+  /** Conteo del badge: el de las píldoras cuando las hay, si no el que pasó el host. */
+  protected readonly filtersCount = computed(() =>
+    this.filterChips().length > 0 ? this.filterChips().length : this.activeFiltersCount(),
+  );
 
   protected onSearchInput(event: Event): void {
     // Solo actualiza el display; la emisión la dispara el stream debounced.

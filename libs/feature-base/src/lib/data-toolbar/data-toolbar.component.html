@@ -28,17 +28,18 @@
       <button
         type="button"
         class="lib-data-toolbar__btn"
-        [class.lib-data-toolbar__btn--ghost]="activeFiltersCount() === 0"
-        [class.lib-data-toolbar__btn--active]="activeFiltersCount() > 0"
+        [class.lib-data-toolbar__btn--ghost]="filtersCount() === 0"
+        [class.lib-data-toolbar__btn--active]="filtersCount() > 0"
         (click)="filtersToggle.emit()"
       >
         <i class="pi pi-filter"></i>
         <span>{{ translate('common.actions.filters') }}</span>
-        @if (activeFiltersCount() > 0) {
-          <span class="lib-data-toolbar__badge">{{ activeFiltersCount() }}</span>
+        @if (filtersCount() > 0) {
+          <span class="lib-data-toolbar__badge">{{ filtersCount() }}</span>
         }
       </button>
-      @if (activeFiltersCount() > 0) {
+      <!-- Con píldoras, "Limpiar" vive al final de su fila, junto a lo que borra -->
+      @if (filtersCount() > 0 && filterChips().length === 0) {
         <button
           type="button"
           class="lib-data-toolbar__btn lib-data-toolbar__btn--ghost"
@@ -130,3 +131,51 @@
     </button>
   }
 </div>
+
+<!-- Fila de condiciones activas: se lee como la frase del modal («Donde … y …») -->
+@if (filtersEnabled() && filterChips().length > 0) {
+  <div
+    class="flex flex-wrap items-center gap-x-1.5 gap-y-1.5 border-b border-[rgba(19,38,60,0.08)] px-4 py-2"
+  >
+    @for (chip of filterChips(); track chip.index; let first = $first) {
+      <span
+        class="text-[0.62rem] font-bold uppercase tracking-[0.05em]"
+        [class.text-brand-muted]="first"
+        [class.text-sky-600]="!first"
+      >
+        {{ first ? translate('common.filters.where') : translate('common.filters.and') }}
+      </span>
+      <span
+        class="inline-flex h-6 max-w-[22rem] items-center rounded-md border border-[rgba(19,38,60,0.1)] bg-sky-50 text-[0.74rem] leading-none"
+      >
+        <button
+          type="button"
+          class="flex h-full min-w-0 cursor-pointer items-center gap-1 rounded-l-md border-0 bg-transparent pl-2 pr-1 font-[inherit] text-[inherit] hover:bg-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300"
+          [attr.title]="translate('common.filters.title')"
+          (click)="filtersToggle.emit()"
+        >
+          <span class="shrink-0 text-brand-muted">{{ chip.field }}</span>
+          <span class="shrink-0 text-brand-muted opacity-75">{{ chip.operator }}</span>
+          @if (chip.value) {
+            <span class="truncate font-semibold text-brand-navy">{{ chip.value }}</span>
+          }
+        </button>
+        <button
+          type="button"
+          class="flex h-full w-6 shrink-0 cursor-pointer items-center justify-center rounded-r-md border-0 bg-transparent text-brand-muted hover:bg-sky-100 hover:text-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300"
+          [attr.aria-label]="translate('common.filters.removeCondition') + ': ' + chip.field"
+          (click)="filterRemove.emit(chip.index)"
+        >
+          <i class="pi pi-times text-[0.55rem]"></i>
+        </button>
+      </span>
+    }
+    <button
+      type="button"
+      class="ml-1 cursor-pointer rounded-md border-0 bg-transparent px-1.5 py-0.5 font-[inherit] text-[0.72rem] font-semibold text-brand-muted hover:bg-[rgba(19,38,60,0.04)] hover:text-brand-navy"
+      (click)="filtersClear.emit()"
+    >
+      {{ translate('common.actions.clearFilters') }}
+    </button>
+  </div>
+}

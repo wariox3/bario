@@ -7,13 +7,15 @@
     [searchValue]="searchValue()"
     [searchPlaceholderKey]="'entities.contacto.searchPlaceholder'"
     [filtersEnabled]="true"
-    [activeFiltersCount]="activeFilters().length"
+    [activeFilters]="activeFilters()"
+    [filterFields]="filterFields"
     [deleteSelectedEnabled]="hasSelection() && acciones.puedeEliminar()"
     [deleteSelectedCount]="selectedRows().length"
     (searched)="onSearchChange($event)"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
     (filtersClear)="clearFilters()"
+    (filterRemove)="removeFilter($event)"
     (deleteSelected)="removeSelected()"
   />
 
