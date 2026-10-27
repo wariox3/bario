@@ -26,7 +26,7 @@ import { ContabilizarService } from '../../contabilizar.service';
 import type { ContabilizarRow } from '../../contabilizar.model';
 import { DescontabilizarModalComponent } from '../../components/descontabilizar-modal/descontabilizar-modal.component';
 import { ContabilizarErroresDialogComponent } from '../../components/contabilizar-errores-dialog/contabilizar-errores-dialog.component';
-import { parseContabilizarError, type ContabilizarError } from '../../contabilizar-error';
+import { parseContabilizarError, type ContabilizarError } from '@erp/core/contabilidad';
 import {
   BASE_FILTERS,
   COLUMNS,

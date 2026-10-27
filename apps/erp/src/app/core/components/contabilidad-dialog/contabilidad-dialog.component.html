@@ -35,6 +35,22 @@
   <!-- ── Body ─────────────────────────────────────────────────────────────── -->
   @if (visible()) {
     <div class="flex flex-col gap-4">
+      @if (fallo(); as fallo) {
+        <div
+          class="flex gap-2.5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-red-800"
+          role="alert"
+        >
+          <i class="pi pi-exclamation-circle mt-[0.2rem] text-[0.85rem]"></i>
+          <div class="flex min-w-0 flex-col gap-1">
+            <p class="m-0 text-[0.8rem] font-semibold">{{ fallo.titulo }}</p>
+            <ul class="m-0 flex list-none flex-col gap-0.5 p-0 text-[0.8rem] leading-snug">
+              @for (mensaje of fallo.mensajes; track $index) {
+                <li>{{ mensaje }}</li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
       @if (descuadrado()) {
         <p
           class="m-0 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-[0.8rem] font-semibold text-amber-800"
