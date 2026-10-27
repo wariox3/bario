@@ -1,9 +1,32 @@
-import type { ColumnDef, FilterField } from '@reddoc/core';
+import type { ColumnDef, FilterCondition, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 import type { ImportMaster } from '@erp/core/components/import-dialog/import-dialog.types';
 import { IMPORT_MASTERS_ALL } from '@erp/core/components/import-dialog/import-masters.constant';
 
 export const CONTACTOS_FILTERS_STORAGE_KEY = 'contactos:filters:v1';
+
+/** Rol que acota el listado según el módulo: Venta ve clientes y Compra proveedores. */
+export type ContactoRolModulo = 'cliente' | 'proveedor';
+
+/** Rol del módulo activo; `null` en los módulos que ven todos los contactos. */
+export function contactoRolDelModulo(moduleId: string | null): ContactoRolModulo | null {
+  if (moduleId === 'venta') return 'cliente';
+  if (moduleId === 'compra') return 'proveedor';
+  return null;
+}
+
+/** Cada rol guarda sus filtros aparte, para que no se crucen entre módulos. */
+export function contactosFiltersStorageKey(rol: ContactoRolModulo | null): string {
+  return rol ? `contactos:${rol}:filters:v1` : CONTACTOS_FILTERS_STORAGE_KEY;
+}
+
+/**
+ * Filtro fijo del listado en Venta (`cliente=true`) y Compra (`proveedor=true`),
+ * igual que `empleado=true` en Humano. Se concatena a los filtros del usuario.
+ */
+export function contactoRolFilter(rol: ContactoRolModulo): FilterCondition {
+  return { field: rol, operator: 'eq', value: true };
+}
 
 /**
  * Campo sobre el que opera la búsqueda rápida del toolbar (input de texto).

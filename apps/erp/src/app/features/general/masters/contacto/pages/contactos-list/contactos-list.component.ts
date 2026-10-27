@@ -36,19 +36,22 @@ import type { Contacto } from '../../contacto.model';
 import {
   CONTACTOS_COLUMNS,
   CONTACTOS_FILTER_FIELDS,
-  CONTACTOS_FILTERS_STORAGE_KEY,
   CONTACTOS_QUICK_SEARCH_FIELD,
   CONTACTOS_IMPORT_MASTERS,
   CONTACTOS_PRIMARY_ACTION,
   CONTACTOS_ROW_ACTIONS,
   CONTACTOS_TRAILING_ACTIONS,
+  contactoRolDelModulo,
+  contactoRolFilter,
+  contactosFiltersStorageKey,
 } from '../../contacto.constants';
 
 /**
  * Listado de contactos.
  *
  * Master administrativo del módulo General (`features/general/`):
- * cubre clientes, proveedores y empleados sobre el mismo recurso.
+ * cubre clientes, proveedores y empleados sobre el mismo recurso. En Venta
+ * solo lista clientes y en Compra solo proveedores (`contactoRolDelModulo`).
  *
  * Camino B del enfoque híbrido: feature directo que compone los building
  * blocks compartidos (`<lib-data-toolbar>` + `<lib-data-table>`) dentro de
@@ -84,6 +87,10 @@ export class ContactosListComponent {
 
   protected readonly t = this.i18n.t;
 
+  /** Rol que fija el módulo activo (Venta → cliente, Compra → proveedor). */
+  private readonly rol = contactoRolDelModulo(this.activeModule.activeId());
+  private readonly storageKey = contactosFiltersStorageKey(this.rol);
+
   // ── Estado ────────────────────────────────────────────────────────────────
   protected readonly items = signal<readonly Contacto[]>([]);
   protected readonly totalCount = signal(0);
@@ -93,7 +100,7 @@ export class ContactosListComponent {
   protected readonly selectedRows = signal<readonly Contacto[]>([]);
   protected readonly searchValue = signal('');
   protected readonly activeFilters = signal<readonly FilterCondition[]>(
-    this.filterStorage.read(CONTACTOS_FILTERS_STORAGE_KEY),
+    this.filterStorage.read(this.storageKey),
   );
   protected readonly filtersVisible = signal(false);
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
@@ -172,7 +179,7 @@ export class ContactosListComponent {
    */
   protected onFiltersApply(filters: readonly FilterCondition[]): void {
     this.activeFilters.set(filters);
-    this.filterStorage.write(CONTACTOS_FILTERS_STORAGE_KEY, filters);
+    this.filterStorage.write(this.storageKey, filters);
     this.currentPage.set(0);
     this.loadList();
   }
@@ -184,7 +191,7 @@ export class ContactosListComponent {
 
   protected clearFilters(): void {
     this.activeFilters.set([]);
-    this.filterStorage.clear(CONTACTOS_FILTERS_STORAGE_KEY);
+    this.filterStorage.clear(this.storageKey);
     this.currentPage.set(0);
     this.loadList();
   }
@@ -248,7 +255,7 @@ export class ContactosListComponent {
       .download('/general/contacto/excel/', {
         method: 'POST',
         body: {
-          filtros: buildFiltros(this.activeFilters()),
+          filtros: buildFiltros(this.withRolFilter(this.activeFilters())),
           ordenamientos: buildOrdenamientos(this.sort()),
         },
         fallbackFilename: 'contactos.xlsx',
@@ -270,7 +277,9 @@ export class ContactosListComponent {
     // La búsqueda rápida se añade como un filtro `contiene` más, combinado (AND)
     // con los filtros avanzados activos.
     const search = quickSearchCondition(CONTACTOS_QUICK_SEARCH_FIELD, this.searchValue());
-    const filters = search ? [...this.activeFilters(), search] : this.activeFilters();
+    const filters = this.withRolFilter(
+      search ? [...this.activeFilters(), search] : this.activeFilters(),
+    );
 
     const query: ListQuery = {
       filters,
@@ -299,6 +308,11 @@ export class ContactosListComponent {
           );
         },
       });
+  }
+
+  /** Antepone el filtro fijo del módulo (si lo hay) a los del usuario. */
+  private withRolFilter(filters: readonly FilterCondition[]): readonly FilterCondition[] {
+    return this.rol ? [contactoRolFilter(this.rol), ...filters] : filters;
   }
 
   private confirmRemove(ids: readonly number[]): void {

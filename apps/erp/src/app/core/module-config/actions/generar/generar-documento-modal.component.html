@@ -49,6 +49,30 @@
       />
     </div>
 
+    @if (d.validarFechasLabel) {
+      <div class="flex items-center gap-2">
+        <label for="generar-validar-fechas" class="flex cursor-pointer items-center gap-2.5">
+          <p-checkbox
+            inputId="generar-validar-fechas"
+            [ngModel]="validarFechas()"
+            (ngModelChange)="validarFechas.set($event)"
+            name="validarFechas"
+            [binary]="true"
+          />
+          <span class="text-[0.85rem] text-brand-text">{{ d.validarFechasLabel }}</span>
+        </label>
+        @if (d.validarFechasHint) {
+          <i
+            class="pi pi-question-circle cursor-help text-[0.85rem] text-brand-muted"
+            [pTooltip]="d.validarFechasHint"
+            tooltipPosition="top"
+            tabindex="0"
+            [attr.aria-label]="d.validarFechasHint"
+          ></i>
+        }
+      </div>
+    }
+
     <div
       class="mt-1 flex items-center justify-end gap-3 border-t border-[rgba(20,48,73,0.08)] pt-5"
     >

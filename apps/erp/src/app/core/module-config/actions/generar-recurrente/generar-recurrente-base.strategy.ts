@@ -5,7 +5,10 @@ import { DOCUMENT_TYPE_ID, extractErrorMessage, I18nService, ToastService } from
 import type { AppDict } from '@erp/i18n';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '../entity-action-dialog.defaults';
-import type { GenerarDocumentoModalTexts } from '../generar/generar-documento-modal.component';
+import type {
+  GenerarDocumentoModalResult,
+  GenerarDocumentoModalTexts,
+} from '../generar/generar-documento-modal.component';
 import type { EntityActionContext, EntityActionStrategy } from '../entity-action-strategy';
 import { GenerarRecurrenteService } from './generar-recurrente.service';
 
@@ -98,8 +101,8 @@ export abstract class GenerarRecurrenteBaseStrategy implements EntityActionStrat
         return ref ? ref.onClose : EMPTY;
       }),
       // El modal cierra con `null` al cancelar: solo seguimos con un período real.
-      filter((periodo: unknown): periodo is Date => periodo instanceof Date),
-      switchMap((periodo) => {
+      filter((res: unknown): res is GenerarDocumentoModalResult => res != null),
+      switchMap(({ periodo, validarFechas }) => {
         this.generating = true;
         return this.api
           .generar({
@@ -110,6 +113,7 @@ export abstract class GenerarRecurrenteBaseStrategy implements EntityActionStrat
             documento_ids: scope === 'todos' ? [] : scope,
             mes: periodo.getMonth() + 1,
             anio: periodo.getFullYear(),
+            validar_fechas: validarFechas,
           })
           .pipe(
             tap((res) => {

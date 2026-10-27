@@ -386,6 +386,9 @@ export const en: AppDict = {
       todosWarning:
         'One invoice will be generated for every recurring template in the list, regardless of the filters applied. This action cannot be undone.',
       periodoLabel: 'Period',
+      validarFechasLabel: 'Validate dates',
+      validarFechasHint:
+        'Only generates templates dated up to the end of the period and moves them to the next month. Unchecked, it generates all of them without checking or moving their date.',
       submit: 'Generate',
       cancel: 'Cancel',
       sinDestino: 'This document has no target invoice defined.',
@@ -5671,6 +5674,12 @@ export const en: AppDict = {
           },
         },
       },
+      errores: {
+        title: 'Documents not posted',
+        subtitle: 'Fix the reason and try again.',
+        toast: 'Check the error details.',
+        cols: { mensaje: 'Reason' },
+      },
       toasts: {
         contabilizar: {
           success: {
@@ -7192,8 +7201,8 @@ export const en: AppDict = {
     general: {
       parametros: {
         title: 'Parameters',
-        hint: 'Values the ERP uses to compute taxes and issue documents.',
-        groups: { fiscal: 'Tax', emision: 'Electronic documents' },
+        hint: 'Values the ERP uses to compute taxes and to issue and post documents.',
+        groups: { fiscal: 'Tax', emision: 'Electronic documents', contabilidad: 'Accounting' },
       },
       uvt: {
         hint: 'Current tax value unit; the basis for fiscal calculations.',
@@ -7202,6 +7211,10 @@ export const en: AppDict = {
       emitirAutomaticamente: {
         label: 'Issue automatically',
         hint: 'Approving a document sends it to DIAN with no extra steps.',
+      },
+      contabilizarAutomaticamente: {
+        label: 'Post automatically',
+        hint: 'Approving a document generates its accounting entries with no extra steps.',
       },
       documentoTipo: {
         title: 'Document types',

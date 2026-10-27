@@ -19,6 +19,7 @@ import { ImpuestoTableComponent } from './impuesto-table/impuesto-table.componen
 const GENERAL_FIELD_MAP = {
   gen_uvt: 'uvt',
   gen_emitir_automaticamente: 'emitir_automaticamente',
+  gen_contabilizar_automaticamente: 'contabilizar_automaticamente',
 };
 
 /** Pestañas de la tarjeta de catálogos (`?tab=`). La primera es la de por defecto. */
@@ -30,13 +31,16 @@ function esCatalogoTab(value: string | null): value is CatalogoTab {
 }
 
 /**
- * Área "General" de la configuración: la UVT (`gen_uvt`) y la emisión
- * automática de documentos electrónicos (`gen_emitir_automaticamente`).
+ * Área "General" de la configuración: la UVT (`gen_uvt`), la emisión
+ * automática de documentos electrónicos (`gen_emitir_automaticamente`) y la
+ * contabilización automática (`gen_contabilizar_automaticamente`).
  *
  * Auto-contenida: lee y guarda solo sus campos (`GENERAL_CAMPOS`). La UVT es la
  * base de los cálculos fiscales, por eso vive en su propia sección destacada;
  * la emisión automática va en la suya porque no es un parámetro de cálculo sino
- * una decisión sobre cómo salen los documentos hacia la DIAN.
+ * una decisión sobre cómo salen los documentos hacia la DIAN. La contabilización
+ * automática es la misma clase de decisión al aprobar, pero sobre la
+ * contabilidad: por eso tiene su propio grupo y no comparte el de la DIAN.
  *
  * Debajo, en su propia tarjeta con pestañas, los catálogos normativos que cada
  * empresa ajusta: tipos de documento e impuestos.
@@ -84,6 +88,7 @@ export class GeneralConfigComponent {
   protected readonly form = this.fb.group({
     uvt: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
     emitir_automaticamente: this.fb.nonNullable.control(false),
+    contabilizar_automaticamente: this.fb.nonNullable.control(false),
   });
 
   constructor() {

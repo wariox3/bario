@@ -13,6 +13,7 @@ function optionFromId(id: number | null | undefined): ErpSelectOption | null {
 export interface GeneralConfigFormValue {
   readonly uvt: number | null;
   readonly emitir_automaticamente: boolean;
+  readonly contabilizar_automaticamente: boolean;
 }
 
 export function configuracionToGeneralForm(
@@ -21,6 +22,7 @@ export function configuracionToGeneralForm(
   return {
     uvt: toFiniteNumber(config.gen_uvt),
     emitir_automaticamente: config.gen_emitir_automaticamente ?? false,
+    contabilizar_automaticamente: config.gen_contabilizar_automaticamente ?? false,
   };
 }
 
@@ -28,6 +30,7 @@ export function generalFormToPayload(form: GeneralConfigFormValue): Configuracio
   return {
     gen_uvt: form.uvt,
     gen_emitir_automaticamente: form.emitir_automaticamente,
+    gen_contabilizar_automaticamente: form.contabilizar_automaticamente,
   };
 }
 

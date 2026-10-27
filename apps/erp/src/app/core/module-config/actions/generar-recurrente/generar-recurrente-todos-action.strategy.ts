@@ -39,6 +39,8 @@ export class GenerarRecurrenteTodosActionStrategy extends GenerarRecurrenteBaseS
       modalSubtitle: dict.todosModalSubtitle,
       warning: dict.todosWarning,
       periodoLabel: dict.periodoLabel,
+      validarFechasLabel: dict.validarFechasLabel,
+      validarFechasHint: dict.validarFechasHint,
       submit: dict.submit,
       cancel: dict.cancel,
     };

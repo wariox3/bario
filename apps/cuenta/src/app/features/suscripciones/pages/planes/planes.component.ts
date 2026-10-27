@@ -424,7 +424,7 @@ export class PlanesComponent implements OnInit {
           const message =
             err instanceof WompiCheckoutError
               ? err.message
-              : 'No se pudo iniciar el pago. Intentá de nuevo.';
+              : 'No se pudo iniciar el pago. Intenta de nuevo.';
           console.error('[planes] error iniciar pago:', err);
           this.toast.error('Error', message);
         },
@@ -471,7 +471,7 @@ export class PlanesComponent implements OnInit {
             return;
           }
           console.error('[planes] error actualizar plan:', err);
-          this.toast.error('Error', 'No se pudo actualizar el plan. Intentá de nuevo.');
+          this.toast.error('Error', 'No se pudo actualizar el plan. Intenta de nuevo.');
         },
       });
   }

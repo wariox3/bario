@@ -55,7 +55,7 @@ export const contenedoresEs: ContenedoresDict = {
       },
       noContenedores: {
         title: 'Sin empresas',
-        sub: 'Aún no tenés ningún espacio de trabajo asignado.',
+        sub: 'Aún no tienes ningún espacio de trabajo asignado.',
         cta: 'Crear primera empresa',
       },
     },
@@ -150,7 +150,7 @@ export const contenedoresEs: ContenedoresDict = {
     subtitle: 'Esta acción es permanente y no se puede deshacer.',
     warning: 'Se eliminarán todos los datos asociados a este contenedor de forma irreversible.',
     containerLabel: 'Contenedor a eliminar',
-    confirmLabel: 'Para confirmar, escribí el nombre exacto del contenedor',
+    confirmLabel: 'Para confirmar, escribe el nombre exacto del contenedor',
     confirmError: 'El nombre no coincide.',
     submit: 'Eliminar',
     cancel: 'Cancelar',

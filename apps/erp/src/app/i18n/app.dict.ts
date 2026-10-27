@@ -368,6 +368,8 @@ export interface AppDict
       todosModalSubtitle: string;
       todosWarning: string;
       periodoLabel: string;
+      validarFechasLabel: string;
+      validarFechasHint: string;
       submit: string;
       cancel: string;
       sinDestino: string;
@@ -4376,6 +4378,12 @@ export interface AppDict
           parcial: { title: string; desc: string };
         };
       };
+      errores: {
+        title: string;
+        subtitle: string;
+        toast: string;
+        cols: { mensaje: string };
+      };
       toasts: {
         contabilizar: {
           success: { title: string; desc: string };
@@ -5440,9 +5448,14 @@ export interface AppDict
     unsavedChanges: string;
     actions: { save: string };
     general: {
-      parametros: { title: string; hint: string; groups: { fiscal: string; emision: string } };
+      parametros: {
+        title: string;
+        hint: string;
+        groups: { fiscal: string; emision: string; contabilidad: string };
+      };
       uvt: { hint: string; label: string };
       emitirAutomaticamente: { label: string; hint: string };
+      contabilizarAutomaticamente: { label: string; hint: string };
       documentoTipo: {
         title: string;
         hint: string;

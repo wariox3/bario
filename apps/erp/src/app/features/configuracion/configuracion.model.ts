@@ -33,6 +33,8 @@ export interface ConfiguracionRead {
    * manual. El backend lo expone como booleano puro (nunca nulo).
    */
   readonly gen_emitir_automaticamente: boolean;
+  /** Si al aprobar un documento se contabiliza sin intervención manual. */
+  readonly gen_contabilizar_automaticamente: boolean;
 
   // Datos de la empresa (área Empresa)
   /** La expone la API; hoy ningún formulario del ERP la escribe. */
