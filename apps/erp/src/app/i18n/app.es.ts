@@ -393,6 +393,9 @@ export const es: AppDict = {
       todosWarning:
         'Se generará una factura por cada plantilla recurrente del listado, sin tener en cuenta los filtros aplicados. Esta acción no se puede revertir.',
       periodoLabel: 'Período',
+      validarFechasLabel: 'Validar fechas',
+      validarFechasHint:
+        'Solo genera las plantillas con fecha hasta el fin del período y las pasa al mes siguiente. Sin marcar, genera todas sin mirar ni mover su fecha.',
       submit: 'Generar',
       cancel: 'Cancelar',
       sinDestino: 'Este documento no tiene definida la factura que debe generar.',

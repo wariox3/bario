@@ -386,6 +386,9 @@ export const en: AppDict = {
       todosWarning:
         'One invoice will be generated for every recurring template in the list, regardless of the filters applied. This action cannot be undone.',
       periodoLabel: 'Period',
+      validarFechasLabel: 'Validate dates',
+      validarFechasHint:
+        'Only generates templates dated up to the end of the period and moves them to the next month. Unchecked, it generates all of them without checking or moving their date.',
       submit: 'Generate',
       cancel: 'Cancel',
       sinDestino: 'This document has no target invoice defined.',

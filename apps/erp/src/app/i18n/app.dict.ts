@@ -368,6 +368,8 @@ export interface AppDict
       todosModalSubtitle: string;
       todosWarning: string;
       periodoLabel: string;
+      validarFechasLabel: string;
+      validarFechasHint: string;
       submit: string;
       cancel: string;
       sinDestino: string;

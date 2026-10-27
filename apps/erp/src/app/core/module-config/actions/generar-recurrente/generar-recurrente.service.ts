@@ -48,6 +48,13 @@ export interface GenerarRecurrentePayload {
   readonly documento_ids: readonly number[];
   readonly mes: number;
   readonly anio: number;
+  /**
+   * Requerido. `true`: solo toma las plantillas con fecha hasta el último día
+   * del período y avanza la fecha de cada una al mes siguiente, así que repetir
+   * el período no las vuelve a tomar. `false`: genera todas las elegidas sin
+   * mirar su fecha y sin moverla.
+   */
+  readonly validar_fechas: boolean;
 }
 
 /**

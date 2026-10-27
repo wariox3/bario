@@ -32,6 +32,8 @@ export class GenerarRecurrenteSeleccionadosActionStrategy extends GenerarRecurre
       modalHeader: dict.modalHeader,
       modalSubtitle: dict.modalSubtitle,
       periodoLabel: dict.periodoLabel,
+      validarFechasLabel: dict.validarFechasLabel,
+      validarFechasHint: dict.validarFechasHint,
       submit: dict.submit,
       cancel: dict.cancel,
     };
