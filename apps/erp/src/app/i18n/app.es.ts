@@ -1718,6 +1718,9 @@ export const es: AppDict = {
         codigo: 'Código',
         nombre: 'Nombre',
         centroCosto: 'Centro de costo',
+        cajaPlaca: 'Placa de caja',
+        cajaUbicacion: 'Ubicación de caja',
+        cajaTipo: 'Tipo de caja',
       },
       form: {
         createTitle: 'Nueva sede',
@@ -1729,6 +1732,15 @@ export const es: AppDict = {
           codigo: 'Código',
           centroCosto: 'Centro de costo',
           centroCostoPlaceholder: 'Busca un centro de costo…',
+          cajaPlaca: 'Placa de caja',
+          cajaUbicacion: 'Ubicación de caja',
+          cajaTipo: 'Tipo de caja',
+        },
+        sections: {
+          caja: {
+            title: 'Información de caja',
+            subtitle: 'Placa, tipo y ubicación de la caja de la sede',
+          },
         },
         validation: {
           required: 'Este campo es requerido',
@@ -1746,7 +1758,7 @@ export const es: AppDict = {
         },
       },
       detail: {
-        sections: { general: 'Información general' },
+        sections: { general: 'Información general', caja: 'Información de caja' },
         notFound: {
           title: 'Sede no encontrada',
           desc: 'La sede que buscas no existe o fue eliminada.',

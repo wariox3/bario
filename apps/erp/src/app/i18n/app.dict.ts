@@ -1249,7 +1249,15 @@ export interface AppDict
     sede: {
       name: string;
       searchPlaceholder: string;
-      columns: { id: string; codigo: string; nombre: string; centroCosto: string };
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        centroCosto: string;
+        cajaPlaca: string;
+        cajaUbicacion: string;
+        cajaTipo: string;
+      };
       form: {
         createTitle: string;
         editTitle: string;
@@ -1260,7 +1268,11 @@ export interface AppDict
           codigo: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
+          cajaPlaca: string;
+          cajaUbicacion: string;
+          cajaTipo: string;
         };
+        sections: { caja: { title: string; subtitle: string } };
         validation: { required: string; maxlength: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -1271,7 +1283,7 @@ export interface AppDict
         };
       };
       detail: {
-        sections: { general: string };
+        sections: { general: string; caja: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
