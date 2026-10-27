@@ -4,17 +4,9 @@ import { DialogModule } from 'primeng/dialog';
 import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 
-/** Un documento que no se contabilizó, ya con lo necesario para reconocerlo. */
-export interface ContabilizarErrorFila {
-  readonly documentoId: number;
-  readonly documentoTipo: string | null;
-  readonly mensaje: string;
-}
-
 /**
- * Lista los documentos que el backend rechazó al contabilizar, uno por fila con
- * su motivo. El tipo sale de la selección que se mandó: el backend solo
- * devuelve el id, y no se piden datos extra para pintarlo.
+ * Muestra por qué el backend no contabilizó: su `detail` (que ya nombra el
+ * documento) y debajo cada motivo de `errores`.
  */
 @Component({
   selector: 'app-contabilizar-errores-dialog',
@@ -29,5 +21,6 @@ export class ContabilizarErroresDialogComponent {
   protected readonly t = this.i18n.t;
 
   readonly visible = model<boolean>(false);
-  readonly errores = input<readonly ContabilizarErrorFila[]>([]);
+  readonly detail = input<string | null>(null);
+  readonly mensajes = input<readonly string[]>([]);
 }

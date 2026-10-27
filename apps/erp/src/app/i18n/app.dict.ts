@@ -4381,9 +4381,8 @@ export interface AppDict
       errores: {
         title: string;
         subtitle: string;
-        /** Descripción del toast; `{n}` es la cantidad de documentos rechazados. */
         toast: string;
-        cols: { id: string; documento: string; mensaje: string };
+        cols: { mensaje: string };
       };
       toasts: {
         contabilizar: {

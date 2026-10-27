@@ -30,32 +30,31 @@
   </ng-template>
 
   @if (visible()) {
-    <div class="overflow-hidden rounded-[10px] border border-[rgba(20,48,73,0.1)]">
-      <div class="max-h-[420px] overflow-auto">
-        <table class="w-full border-collapse text-[0.8rem]">
-          <thead class="sticky top-0 z-10 bg-white">
-            <tr
-              class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-[0.72rem] font-semibold text-brand-muted"
-            >
-              <th class="whitespace-nowrap px-3.5 py-2.5">{{ d.cols.id }}</th>
-              <th class="whitespace-nowrap px-3.5 py-2.5">{{ d.cols.documento }}</th>
-              <th class="px-3.5 py-2.5">{{ d.cols.mensaje }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (error of errores(); track error.documentoId) {
+    <div class="flex flex-col gap-3">
+      @if (detail(); as detail) {
+        <p class="m-0 text-[0.85rem] font-semibold text-brand-text">{{ detail }}</p>
+      }
+      <div class="overflow-hidden rounded-[10px] border border-[rgba(20,48,73,0.1)]">
+        <div class="max-h-[420px] overflow-auto">
+          <table class="w-full border-collapse text-[0.8rem]">
+            <thead class="sticky top-0 z-10 bg-white">
               <tr
-                class="border-t border-[rgba(20,48,73,0.08)] align-top text-brand-text first:border-t-0"
+                class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-[0.72rem] font-semibold text-brand-muted"
               >
-                <td class="whitespace-nowrap px-3.5 py-2.5 font-semibold tabular-nums">
-                  {{ error.documentoId }}
-                </td>
-                <td class="whitespace-nowrap px-3.5 py-2.5">{{ error.documentoTipo }}</td>
-                <td class="px-3.5 py-2.5 leading-snug">{{ error.mensaje }}</td>
+                <th class="px-3.5 py-2.5">{{ d.cols.mensaje }}</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (mensaje of mensajes(); track $index) {
+                <tr
+                  class="border-t border-[rgba(20,48,73,0.08)] align-top text-brand-text first:border-t-0"
+                >
+                  <td class="px-3.5 py-2.5 leading-snug">{{ mensaje }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   }

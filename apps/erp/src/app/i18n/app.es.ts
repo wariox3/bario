@@ -5760,10 +5760,9 @@ export const es: AppDict = {
       },
       errores: {
         title: 'Documentos sin contabilizar',
-        subtitle:
-          'No se pudieron contabilizar estos documentos. Corrige el motivo e intenta de nuevo.',
-        toast: '{n} documento(s) no se contabilizaron. Revisa el detalle.',
-        cols: { id: 'ID', documento: 'Documento', mensaje: 'Motivo' },
+        subtitle: 'Corrige el motivo e intenta de nuevo.',
+        toast: 'Revisa el detalle del error.',
+        cols: { mensaje: 'Motivo' },
       },
       toasts: {
         contabilizar: {

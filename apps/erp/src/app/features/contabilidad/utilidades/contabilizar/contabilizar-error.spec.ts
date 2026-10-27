@@ -1,44 +1,46 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { parseContabilizarErrores } from './contabilizar-error';
+import { parseContabilizarError } from './contabilizar-error';
 
 function http400(body: unknown): HttpErrorResponse {
   return new HttpErrorResponse({ status: 400, error: body });
 }
 
-describe('parseContabilizarErrores', () => {
-  it('devuelve un error por documento con su mensaje', () => {
-    const errores = parseContabilizarErrores(
+describe('parseContabilizarError', () => {
+  it('devuelve el detail y un mensaje por error', () => {
+    const error = parseContabilizarError(
       http400({
-        detail:
-          'Documento 157 (NOTA CREDITO COMPRA 2): detalle 496: el impuesto «IVA 19%»: la cuenta 240810 exige base.',
+        detail: 'Documento 157 (NOTA CREDITO COMPRA 2) no se pudo contabilizar.',
         errores: [
           {
             documento_id: 157,
             mensaje: 'Detalle 496: el impuesto «IVA 19%»: la cuenta 240810 exige base.',
           },
-          { documento_id: 160, mensaje: 'Sin cuenta configurada.' },
+          { documento_id: 157, mensaje: 'Sin cuenta configurada.' },
         ],
       }),
     );
 
-    expect(errores).toEqual([
-      {
-        documentoId: 157,
-        mensaje: 'Detalle 496: el impuesto «IVA 19%»: la cuenta 240810 exige base.',
-      },
-      { documentoId: 160, mensaje: 'Sin cuenta configurada.' },
-    ]);
+    expect(error).toEqual({
+      detail: 'Documento 157 (NOTA CREDITO COMPRA 2) no se pudo contabilizar.',
+      mensajes: [
+        'Detalle 496: el impuesto «IVA 19%»: la cuenta 240810 exige base.',
+        'Sin cuenta configurada.',
+      ],
+    });
   });
 
-  it('descarta las entradas sin id o sin mensaje', () => {
-    const errores = parseContabilizarErrores(
-      http400({ errores: [{ mensaje: 'x' }, { documento_id: 1, mensaje: '  ' }, 'texto'] }),
+  it('descarta las entradas sin mensaje', () => {
+    const error = parseContabilizarError(
+      http400({ errores: [{ documento_id: 1 }, { mensaje: '  ' }, 'texto'] }),
     );
-    expect(errores).toEqual([]);
+    expect(error).toEqual({ detail: null, mensajes: [] });
   });
 
-  it('devuelve vacío si el cuerpo no trae errores', () => {
-    expect(parseContabilizarErrores(http400({ detail: 'Algo falló.' }))).toEqual([]);
-    expect(parseContabilizarErrores(new Error('red'))).toEqual([]);
+  it('devuelve vacío si no es un error HTTP con cuerpo', () => {
+    expect(parseContabilizarError(http400({ detail: 'Algo falló.' }))).toEqual({
+      detail: 'Algo falló.',
+      mensajes: [],
+    });
+    expect(parseContabilizarError(new Error('red'))).toEqual({ detail: null, mensajes: [] });
   });
 });

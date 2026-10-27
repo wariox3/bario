@@ -25,11 +25,8 @@ import type { AppDict } from '@erp/i18n';
 import { ContabilizarService } from '../../contabilizar.service';
 import type { ContabilizarRow } from '../../contabilizar.model';
 import { DescontabilizarModalComponent } from '../../components/descontabilizar-modal/descontabilizar-modal.component';
-import {
-  ContabilizarErroresDialogComponent,
-  type ContabilizarErrorFila,
-} from '../../components/contabilizar-errores-dialog/contabilizar-errores-dialog.component';
-import { parseContabilizarErrores } from '../../contabilizar-error';
+import { ContabilizarErroresDialogComponent } from '../../components/contabilizar-errores-dialog/contabilizar-errores-dialog.component';
+import { parseContabilizarError, type ContabilizarError } from '../../contabilizar-error';
 import {
   BASE_FILTERS,
   COLUMNS,
@@ -94,8 +91,8 @@ export class ContabilizarComponent {
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly descontabilizarVisible = signal(false);
-  /** Documentos que el backend rechazó en el último intento de contabilizar. */
-  protected readonly errores = signal<readonly ContabilizarErrorFila[]>([]);
+  /** Lo que respondió el backend en el último intento fallido de contabilizar. */
+  protected readonly error = signal<ContabilizarError>({ detail: null, mensajes: [] });
   protected readonly erroresVisible = signal(false);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
@@ -172,10 +169,7 @@ export class ContabilizarComponent {
   }
 
   protected onContabilizar(): void {
-    // Se guarda la selección: `finalize` la limpia y hace falta para nombrar
-    // los documentos que el backend rechace (solo devuelve su id).
-    const seleccion = this.selectedRows();
-    const ids = seleccion.map((row) => row.id);
+    const ids = this.selectedRows().map((row) => row.id);
     if (ids.length === 0) return;
 
     const toast = this.t().entities.contabilizar.toasts.contabilizar;
@@ -192,38 +186,25 @@ export class ContabilizarComponent {
       )
       .subscribe({
         next: () => this.toast.success(toast.success.title, toast.success.desc),
-        error: (err: unknown) => this.onContabilizarError(err, seleccion),
+        error: (err: unknown) => this.onContabilizarError(err),
       });
   }
 
   /**
-   * Con `errores` por documento se abre el detalle; si no, el `detail` del
-   * backend (o el genérico) va al toast.
+   * Con `errores` se abre el detalle (el `detail` arriba y cada motivo debajo);
+   * si no, el `detail` del backend (o el genérico) va al toast.
    */
-  private onContabilizarError(err: unknown, seleccion: readonly ContabilizarRow[]): void {
+  private onContabilizarError(err: unknown): void {
     const toast = this.t().entities.contabilizar.toasts.contabilizar.error;
-    const errores = parseContabilizarErrores(err);
-    if (errores.length === 0) {
+    const error = parseContabilizarError(err);
+    if (error.mensajes.length === 0) {
       this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
       return;
     }
 
-    const porId = new Map(seleccion.map((row) => [row.id, row]));
-    this.errores.set(
-      errores.map((error) => {
-        const row = porId.get(error.documentoId);
-        return {
-          documentoId: error.documentoId,
-          documentoTipo: row?.documento_tipo_nombre ?? null,
-          mensaje: error.mensaje,
-        };
-      }),
-    );
+    this.error.set(error);
     this.erroresVisible.set(true);
-    this.toast.error(
-      toast.title,
-      this.t().entities.contabilizar.errores.toast.replace('{n}', String(errores.length)),
-    );
+    this.toast.error(toast.title, this.t().entities.contabilizar.errores.toast);
   }
 
   /** El modal ya notificó el resultado; acá solo se refresca la lista. */
