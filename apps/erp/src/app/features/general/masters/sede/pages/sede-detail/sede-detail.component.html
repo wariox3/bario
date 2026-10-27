@@ -73,20 +73,54 @@
       </h2>
     </div>
 
-    <!-- Un solo grupo: dos campos no piden columnas divididas, piden una fila
-         que se lea de un vistazo. El que falta se pinta con «—», nunca se oculta:
-         si no aparece, no se distingue de "no lo miré". -->
+    <!-- Un solo grupo que se lea de un vistazo. El campo que falta se deja vacío,
+         nunca se oculta: si no aparece, no se distingue de "no lo miré". -->
     <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
       <div class="flex flex-col gap-0.5">
         <dt class="sede-detail__label">{{ t().entities.sede.columns.nombre }}</dt>
         <dd class="sede-detail__value" [class.sede-detail__value--empty]="!s.nombre">
-          {{ s.nombre || '—' }}
+          {{ s.nombre }}
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
         <dt class="sede-detail__label">{{ t().entities.sede.columns.centroCosto }}</dt>
         <dd class="sede-detail__value" [class.sede-detail__value--empty]="!s.centro_costo_nombre">
-          {{ s.centro_costo_nombre || '—' }}
+          {{ s.centro_costo_nombre }}
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ── Información de caja ─────────────────────────────────────────────────── -->
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-wallet text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ t().entities.sede.detail.sections.caja }}
+      </h2>
+    </div>
+
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-0.5">
+        <dt class="sede-detail__label">{{ t().entities.sede.columns.cajaPlaca }}</dt>
+        <dd class="sede-detail__value" [class.sede-detail__value--empty]="!s.caja_placa">
+          {{ s.caja_placa }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="sede-detail__label">{{ t().entities.sede.columns.cajaTipo }}</dt>
+        <dd class="sede-detail__value" [class.sede-detail__value--empty]="!s.caja_tipo">
+          {{ s.caja_tipo }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5 sm:col-span-2">
+        <dt class="sede-detail__label">{{ t().entities.sede.columns.cajaUbicacion }}</dt>
+        <dd class="sede-detail__value" [class.sede-detail__value--empty]="!s.caja_ubicacion">
+          {{ s.caja_ubicacion }}
         </dd>
       </div>
     </dl>

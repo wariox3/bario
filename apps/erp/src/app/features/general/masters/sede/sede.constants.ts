@@ -30,12 +30,18 @@ export const SEDES_COLUMNS: readonly ColumnDef[] = [
     headerKey: 'entities.sede.columns.centroCosto',
     type: 'text',
   },
+  { field: 'caja_placa', headerKey: 'entities.sede.columns.cajaPlaca', type: 'text' },
+  { field: 'caja_tipo', headerKey: 'entities.sede.columns.cajaTipo', type: 'text' },
+  { field: 'caja_ubicacion', headerKey: 'entities.sede.columns.cajaUbicacion', type: 'text' },
 ];
 
 export const SEDES_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.sede.columns.id', type: 'number' },
   { name: 'codigo', displayNameKey: 'entities.sede.columns.codigo', type: 'string' },
   { name: 'nombre', displayNameKey: 'entities.sede.columns.nombre', type: 'string' },
+  { name: 'caja_placa', displayNameKey: 'entities.sede.columns.cajaPlaca', type: 'string' },
+  { name: 'caja_tipo', displayNameKey: 'entities.sede.columns.cajaTipo', type: 'string' },
+  { name: 'caja_ubicacion', displayNameKey: 'entities.sede.columns.cajaUbicacion', type: 'string' },
 ];
 
 export const SEDES_ROW_ACTIONS: readonly RowAction[] = [

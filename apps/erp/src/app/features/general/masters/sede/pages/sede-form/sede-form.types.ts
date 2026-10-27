@@ -6,5 +6,8 @@ import type { ErpSelectOption } from '@reddoc/core';
  */
 export interface SedeFormRawValue {
   readonly nombre: string | null;
+  readonly caja_placa: string | null;
+  readonly caja_ubicacion: string | null;
+  readonly caja_tipo: string | null;
   readonly centro_costo: ErpSelectOption | null;
 }

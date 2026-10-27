@@ -1675,6 +1675,9 @@ export const en: AppDict = {
         codigo: 'Code',
         nombre: 'Name',
         centroCosto: 'Cost center',
+        cajaPlaca: 'Register plate',
+        cajaUbicacion: 'Register location',
+        cajaTipo: 'Register type',
       },
       form: {
         createTitle: 'New branch',
@@ -1686,6 +1689,15 @@ export const en: AppDict = {
           codigo: 'Code',
           centroCosto: 'Cost center',
           centroCostoPlaceholder: 'Search a cost center…',
+          cajaPlaca: 'Register plate',
+          cajaUbicacion: 'Register location',
+          cajaTipo: 'Register type',
+        },
+        sections: {
+          caja: {
+            title: 'Register information',
+            subtitle: 'Plate, type and location of the branch register',
+          },
         },
         validation: {
           required: 'This field is required',
@@ -1700,7 +1712,7 @@ export const en: AppDict = {
         },
       },
       detail: {
-        sections: { general: 'General information' },
+        sections: { general: 'General information', caja: 'Register information' },
         notFound: {
           title: 'Branch not found',
           desc: 'The branch you are looking for does not exist or was deleted.',
