@@ -24,7 +24,11 @@ import {
   toFiniteNumber,
 } from '@reddoc/core';
 import { DataTableComponent, type PageChangeEvent } from '@reddoc/feature-base';
-import { DocumentoContabilizacionService, type Movimiento } from '@erp/core/contabilidad';
+import {
+  DocumentoContabilizacionService,
+  parseContabilizarError,
+  type Movimiento,
+} from '@erp/core/contabilidad';
 import type { AppDict } from '@erp/i18n';
 import { DocumentoMovimientosService } from './documento-movimientos.service';
 import { CONTABILIDAD_DIALOG_COLUMNS } from './contabilidad-dialog.constants';
@@ -33,6 +37,12 @@ import { CONTABILIDAD_DIALOG_COLUMNS } from './contabilidad-dialog.constants';
 interface TotalesLibro {
   readonly debitos: number;
   readonly creditos: number;
+}
+
+/** Por qué falló el último (des)contabilizar, para la franja sobre el libro. */
+interface FalloContabilizacion {
+  readonly titulo: string;
+  readonly mensajes: readonly string[];
 }
 
 /**
@@ -65,6 +75,11 @@ interface TotalesLibro {
  * La lista se pide al abrir y se refresca tras contabilizar o descontabilizar;
  * al cerrarse queda vacía, para que la próxima apertura no muestre el libro del
  * documento anterior mientras llega la respuesta.
+ *
+ * Si el backend rechaza la acción, sus motivos van en una franja sobre el libro
+ * y no en otro modal encima de este: es un solo documento, el que ya está
+ * abierto, así que el `detail` («Documento 157 (…) no se pudo contabilizar») se
+ * omite cuando llegan `errores`.
  */
 @Component({
   selector: 'app-contabilidad-dialog',
@@ -122,6 +137,8 @@ export class ContabilidadDialogComponent {
   /** Contabilizar o descontabilizar en curso. */
   protected readonly isProcessing = signal(false);
   protected readonly isExporting = signal(false);
+  /** Motivos del último (des)contabilizar rechazado; `null` si no falló. */
+  protected readonly fallo = signal<FalloContabilizacion | null>(null);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
 
@@ -163,6 +180,7 @@ export class ContabilidadDialogComponent {
       const documentoId = this.documentoId();
       untracked(() => {
         this.currentPage.set(0);
+        this.fallo.set(null);
         if (abierto && documentoId !== null) {
           this.cargar(documentoId);
         } else {
@@ -266,7 +284,9 @@ export class ContabilidadDialogComponent {
    * de borrarse, así que lo que se estaba viendo ya no existe—.
    *
    * En error también se recarga: el ERP anterior lo hacía porque el backend
-   * puede haber dejado el documento a medias, y el libro es la evidencia.
+   * puede haber dejado el documento a medias, y el libro es la evidencia. El
+   * error no va a un toast sino a la franja (`fallo`), junto al botón que lo
+   * provocó; sin `errores` legibles muestra el `detail` o el texto genérico.
    */
   private ejecutar(
     accion: () => Observable<unknown>,
@@ -277,6 +297,7 @@ export class ContabilidadDialogComponent {
     if (documentoId === null) return;
 
     this.isProcessing.set(true);
+    this.fallo.set(null);
     accion()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -290,7 +311,11 @@ export class ContabilidadDialogComponent {
           this.cargar(documentoId);
         },
         error: (err: unknown) => {
-          this.toast.error(error.title, extractErrorMessage(err, error.desc));
+          const { mensajes } = parseContabilizarError(err);
+          this.fallo.set({
+            titulo: error.title,
+            mensajes: mensajes.length > 0 ? mensajes : [extractErrorMessage(err, error.desc)],
+          });
           this.currentPage.set(0);
           this.cargar(documentoId);
         },
