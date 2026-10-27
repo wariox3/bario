@@ -1,0 +1,74 @@
+@let d = t().entities.contabilizar.errores;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '860px', maxWidth: '96vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-red-50 text-red-700"
+      >
+        <i class="pi pi-exclamation-circle text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ d.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ d.subtitle }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <div class="overflow-hidden rounded-[10px] border border-[rgba(20,48,73,0.1)]">
+      <div class="max-h-[420px] overflow-auto">
+        <table class="w-full border-collapse text-[0.8rem]">
+          <thead class="sticky top-0 z-10 bg-white">
+            <tr
+              class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-[0.72rem] font-semibold text-brand-muted"
+            >
+              <th class="whitespace-nowrap px-3.5 py-2.5">{{ d.cols.id }}</th>
+              <th class="whitespace-nowrap px-3.5 py-2.5">{{ d.cols.documento }}</th>
+              <th class="px-3.5 py-2.5">{{ d.cols.mensaje }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (error of errores(); track error.documentoId) {
+              <tr
+                class="border-t border-[rgba(20,48,73,0.08)] align-top text-brand-text first:border-t-0"
+              >
+                <td class="whitespace-nowrap px-3.5 py-2.5 font-semibold tabular-nums">
+                  {{ error.documentoId }}
+                </td>
+                <td class="whitespace-nowrap px-3.5 py-2.5">{{ error.documentoTipo }}</td>
+                <td class="px-3.5 py-2.5 leading-snug">{{ error.mensaje }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.close"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="visible.set(false)"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

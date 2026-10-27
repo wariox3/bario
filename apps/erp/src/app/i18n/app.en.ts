@@ -5674,6 +5674,12 @@ export const en: AppDict = {
           },
         },
       },
+      errores: {
+        title: 'Documents not posted',
+        subtitle: 'The backend rejected these documents. Fix the reason and try again.',
+        toast: '{n} document(s) were not posted. Check the details.',
+        cols: { id: 'ID', documento: 'Document', mensaje: 'Reason' },
+      },
       toasts: {
         contabilizar: {
           success: {
