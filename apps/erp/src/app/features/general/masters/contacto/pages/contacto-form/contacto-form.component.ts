@@ -45,7 +45,7 @@ import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
 import { ContactoService } from '../../contacto.service';
-import { CONTACTO_LIST_PATH } from '../../contacto.constants';
+import { CONTACTO_LIST_PATH, contactoRolDelModulo } from '../../contacto.constants';
 import { contactoToFormValue, formValueToPayload } from '../../contacto.mapper';
 import type { ContactoFormDialogData } from './contacto-form.types';
 import { prepararFormModal } from '@erp/core/components/form-modal/form-modal';
@@ -340,11 +340,14 @@ export class ContactoFormComponent implements OnInit {
   // ── Internos ────────────────────────────────────────────────────────────────
 
   /**
-   * Premarca el rol que pidió el documento (modal). Va como hidratación: la card
-   * de proveedor se revela sin el scroll que acompaña a marcarla a mano.
+   * Premarca el rol que pidió el documento (modal) o, como página, el del módulo
+   * activo: un alta desde Venta nace cliente y desde Compra proveedor, para que
+   * aparezca en el listado filtrado de donde se creó. En edición la carga del
+   * contacto pisa estos valores. Va como hidratación: la card de proveedor se
+   * revela sin el scroll que acompaña a marcarla a mano.
    */
   private applyRolInicial(): void {
-    const rol = this.dialogData?.rol;
+    const rol = this.dialogData?.rol ?? contactoRolDelModulo(this.activeModule.activeId());
     if (!rol) return;
     this.isHydrating = true;
     this.form.patchValue({
