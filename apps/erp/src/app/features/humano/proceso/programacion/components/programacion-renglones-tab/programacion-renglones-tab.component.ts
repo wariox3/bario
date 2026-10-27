@@ -13,7 +13,13 @@ import { EMPTY, filter, finalize, from, switchMap } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
-import { FileDownloadService, I18nService, ToastService, type FilterCondition } from '@reddoc/core';
+import {
+  FileDownloadService,
+  I18nService,
+  ToastService,
+  type FilterCondition,
+  extractErrorMessage,
+} from '@reddoc/core';
 import {
   DataFilterModalComponent,
   DataTableComponent,
@@ -379,10 +385,10 @@ export class ProgramacionRenglonesTabComponent {
           this.selectedRows.set([]);
           this.loadPage(0);
         },
-        error: () =>
+        error: (err: unknown) =>
           this.toast.error(
             this.t().common.toasts.deleteError.title,
-            this.t().common.toasts.deleteError.desc,
+            extractErrorMessage(err, this.t().common.toasts.deleteError.desc),
           ),
       });
   }

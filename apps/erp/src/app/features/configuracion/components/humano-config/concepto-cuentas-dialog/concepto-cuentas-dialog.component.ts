@@ -12,6 +12,7 @@ import {
   ToastService,
   type ErpSelectOption,
   type ModelGrants,
+  extractErrorMessage,
 } from '@reddoc/core';
 import { ErpApiSelectComponent, FieldErrorComponent } from '@reddoc/ui';
 import { ErpCuentaSelectComponent } from '@erp/core/components/cuenta-select/erp-cuenta-select.component';
@@ -263,7 +264,11 @@ export class ConceptoCuentasDialogComponent {
           this.toast.success(toasts.deleteSuccess.title, toasts.deleteSuccess.desc);
           this.refrescar();
         },
-        error: () => this.toast.error(toasts.deleteError.title, toasts.deleteError.desc),
+        error: (err: unknown) =>
+          this.toast.error(
+            toasts.deleteError.title,
+            extractErrorMessage(err, toasts.deleteError.desc),
+          ),
       });
   }
 }

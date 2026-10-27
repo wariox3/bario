@@ -22,6 +22,7 @@ import {
   ItemService,
   type Item,
   type ItemImpuesto,
+  extractErrorMessage,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
@@ -319,9 +320,12 @@ export class ItemDetailComponent implements OnInit {
           this.toast.success(toasts.imageRemoveSuccess.title, toasts.imageRemoveSuccess.desc);
           this.loadItem(it.id);
         },
-        error: () => {
+        error: (err: unknown) => {
           this.isSavingImage.set(false);
-          this.toast.error(toasts.imageRemoveError.title, toasts.imageRemoveError.desc);
+          this.toast.error(
+            toasts.imageRemoveError.title,
+            extractErrorMessage(err, toasts.imageRemoveError.desc),
+          );
         },
       });
   }

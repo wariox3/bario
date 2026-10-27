@@ -24,6 +24,7 @@ import {
   SELECT_ENDPOINTS,
   TenantService,
   ToastService,
+  extractErrorMessage,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, documentoBreadcrumb } from '@erp/core/erp-modules';
@@ -292,9 +293,12 @@ export class CierreFormComponent implements OnInit {
           this.page.set(0);
           this.loadLineas(id);
         },
-        error: () => {
+        error: (err: unknown) => {
           this.isBusyLineas.set(false);
-          this.toast.error(toasts.deleteAllError.title, toasts.deleteAllError.desc);
+          this.toast.error(
+            toasts.deleteAllError.title,
+            extractErrorMessage(err, toasts.deleteAllError.desc),
+          );
         },
       });
   }

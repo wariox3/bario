@@ -34,6 +34,7 @@ import {
   esColumnaSabado,
   toIsoDate,
   toProgramacionFecha,
+  extractErrorMessage,
 } from '@reddoc/core';
 import type { AppDict } from '@turnos/i18n';
 import {
@@ -416,9 +417,9 @@ export class ProgramacionPrototipoModalComponent {
           this.toast.success(ts.title, ts.desc);
           this.applied.emit();
         },
-        error: () => {
+        error: (err: unknown) => {
           const ts = this.t().entities.programacion.detail.prototipoModal.toasts.deleteError;
-          this.toast.error(ts.title, ts.desc);
+          this.toast.error(ts.title, extractErrorMessage(err, ts.desc));
         },
       });
   }

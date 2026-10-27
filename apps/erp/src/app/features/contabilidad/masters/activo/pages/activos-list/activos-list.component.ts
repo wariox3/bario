@@ -16,6 +16,7 @@ import {
   type FilterCondition,
   type ListQuery,
   type SortSpec,
+  extractErrorMessage,
 } from '@reddoc/core';
 import {
   DataFilterModalComponent,
@@ -285,10 +286,10 @@ export class ActivosListComponent {
           this.selectedRows.set([]);
           this.loadList();
         },
-        error: () => {
+        error: (err: unknown) => {
           this.toast.error(
             this.t().common.toasts.deleteError.title,
-            this.t().common.toasts.deleteError.desc,
+            extractErrorMessage(err, this.t().common.toasts.deleteError.desc),
           );
         },
       });
