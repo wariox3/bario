@@ -368,6 +368,8 @@ export interface AppDict
       todosModalSubtitle: string;
       todosWarning: string;
       periodoLabel: string;
+      validarFechasLabel: string;
+      validarFechasHint: string;
       submit: string;
       cancel: string;
       sinDestino: string;
@@ -1247,7 +1249,15 @@ export interface AppDict
     sede: {
       name: string;
       searchPlaceholder: string;
-      columns: { id: string; codigo: string; nombre: string; centroCosto: string };
+      columns: {
+        id: string;
+        codigo: string;
+        nombre: string;
+        centroCosto: string;
+        cajaPlaca: string;
+        cajaUbicacion: string;
+        cajaTipo: string;
+      };
       form: {
         createTitle: string;
         editTitle: string;
@@ -1258,7 +1268,11 @@ export interface AppDict
           codigo: string;
           centroCosto: string;
           centroCostoPlaceholder: string;
+          cajaPlaca: string;
+          cajaUbicacion: string;
+          cajaTipo: string;
         };
+        sections: { caja: { title: string; subtitle: string } };
         validation: { required: string; maxlength: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -1269,7 +1283,7 @@ export interface AppDict
         };
       };
       detail: {
-        sections: { general: string };
+        sections: { general: string; caja: string };
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
       };
@@ -4376,6 +4390,12 @@ export interface AppDict
           parcial: { title: string; desc: string };
         };
       };
+      errores: {
+        title: string;
+        subtitle: string;
+        toast: string;
+        cols: { mensaje: string };
+      };
       toasts: {
         contabilizar: {
           success: { title: string; desc: string };
@@ -5440,9 +5460,14 @@ export interface AppDict
     unsavedChanges: string;
     actions: { save: string };
     general: {
-      parametros: { title: string; hint: string; groups: { fiscal: string; emision: string } };
+      parametros: {
+        title: string;
+        hint: string;
+        groups: { fiscal: string; emision: string; contabilidad: string };
+      };
       uvt: { hint: string; label: string };
       emitirAutomaticamente: { label: string; hint: string };
+      contabilizarAutomaticamente: { label: string; hint: string };
       documentoTipo: {
         title: string;
         hint: string;

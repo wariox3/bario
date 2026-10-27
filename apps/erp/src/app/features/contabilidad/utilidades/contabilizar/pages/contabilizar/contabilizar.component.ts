@@ -7,6 +7,7 @@ import {
   I18nService,
   TenantService,
   ToastService,
+  extractErrorMessage,
   type FilterCondition,
   type ListQuery,
   type SortSpec,
@@ -24,6 +25,8 @@ import type { AppDict } from '@erp/i18n';
 import { ContabilizarService } from '../../contabilizar.service';
 import type { ContabilizarRow } from '../../contabilizar.model';
 import { DescontabilizarModalComponent } from '../../components/descontabilizar-modal/descontabilizar-modal.component';
+import { ContabilizarErroresDialogComponent } from '../../components/contabilizar-errores-dialog/contabilizar-errores-dialog.component';
+import { parseContabilizarError, type ContabilizarError } from '../../contabilizar-error';
 import {
   BASE_FILTERS,
   COLUMNS,
@@ -57,6 +60,7 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     DescontabilizarModalComponent,
+    ContabilizarErroresDialogComponent,
   ],
   templateUrl: './contabilizar.component.html',
   styleUrl: './contabilizar.component.scss',
@@ -87,6 +91,9 @@ export class ContabilizarComponent {
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly descontabilizarVisible = signal(false);
+  /** Lo que respondió el backend en el último intento fallido de contabilizar. */
+  protected readonly error = signal<ContabilizarError>({ detail: null, mensajes: [] });
+  protected readonly erroresVisible = signal(false);
 
   // ── Derivados ─────────────────────────────────────────────────────────────
 
@@ -179,8 +186,25 @@ export class ContabilizarComponent {
       )
       .subscribe({
         next: () => this.toast.success(toast.success.title, toast.success.desc),
-        error: () => this.toast.error(toast.error.title, toast.error.desc),
+        error: (err: unknown) => this.onContabilizarError(err),
       });
+  }
+
+  /**
+   * Con `errores` se abre el detalle (el `detail` arriba y cada motivo debajo);
+   * si no, el `detail` del backend (o el genérico) va al toast.
+   */
+  private onContabilizarError(err: unknown): void {
+    const toast = this.t().entities.contabilizar.toasts.contabilizar.error;
+    const error = parseContabilizarError(err);
+    if (error.mensajes.length === 0) {
+      this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
+      return;
+    }
+
+    this.error.set(error);
+    this.erroresVisible.set(true);
+    this.toast.error(toast.title, this.t().entities.contabilizar.errores.toast);
   }
 
   /** El modal ya notificó el resultado; acá solo se refresca la lista. */

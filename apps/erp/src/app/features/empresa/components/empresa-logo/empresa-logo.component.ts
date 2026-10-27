@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { I18nService, ToastService } from '@reddoc/core';
+import { I18nService, ToastService, extractErrorMessage } from '@reddoc/core';
 import { ErpImageUploadComponent } from '@erp/core/components/image-upload/erp-image-upload.component';
 import type { AppDict } from '@erp/i18n';
 import { EmpresaLogotipoService } from '../../empresa-logotipo.service';
@@ -125,9 +125,12 @@ export class EmpresaLogoComponent {
           this.isSaving.set(false);
           this.toast.success(toasts.removeSuccess.title, toasts.removeSuccess.desc);
         },
-        error: () => {
+        error: (err: unknown) => {
           this.isSaving.set(false);
-          this.toast.error(toasts.removeError.title, toasts.removeError.desc);
+          this.toast.error(
+            toasts.removeError.title,
+            extractErrorMessage(err, toasts.removeError.desc),
+          );
         },
       });
   }

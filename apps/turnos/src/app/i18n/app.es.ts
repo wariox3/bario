@@ -42,12 +42,12 @@ export const es: AppDict = {
     },
     confirms: {
       deleteHeader: 'Confirmar eliminación',
-      deleteMessage: '¿Estás seguro de que querés eliminar los registros seleccionados?',
+      deleteMessage: '¿Estás seguro de que quieres eliminar los registros seleccionados?',
     },
     toasts: {
       loadError: {
         title: 'Error al cargar',
-        desc: 'No se pudieron obtener los registros. Intentá de nuevo.',
+        desc: 'No se pudieron obtener los registros. Intenta de nuevo.',
       },
       deleteSuccess: {
         title: 'Registros eliminados',
@@ -55,7 +55,7 @@ export const es: AppDict = {
       },
       deleteError: {
         title: 'Error al eliminar',
-        desc: 'No se pudieron eliminar los registros. Intentá de nuevo.',
+        desc: 'No se pudieron eliminar los registros. Intenta de nuevo.',
       },
       exportError: {
         title: 'Error al exportar',
@@ -66,7 +66,7 @@ export const es: AppDict = {
     imageUpload: {
       change: 'Cambiar imagen',
       remove: 'Quitar imagen',
-      removeConfirm: '¿Querés quitar la imagen?',
+      removeConfirm: '¿Quieres quitar la imagen?',
       tooLarge: 'La imagen es muy grande (máximo 2 MB).',
       hint: 'PNG o JPG, hasta 2 MB.',
       dialogTitle: 'Recortar imagen',
@@ -106,8 +106,8 @@ export const es: AppDict = {
     },
     import: {
       dropzone: {
-        primary: 'Arrastrá tu archivo Excel aquí',
-        secondary: 'o hacé clic para seleccionarlo',
+        primary: 'Arrastra tu archivo Excel aquí',
+        secondary: 'o haz clic para seleccionarlo',
         hint: 'Archivos {types} · hasta {max} MB',
         invalidType: 'El archivo no tiene un formato válido.',
         tooLarge: 'El archivo supera el tamaño máximo permitido.',
@@ -129,7 +129,7 @@ export const es: AppDict = {
         downloading: 'Descargando…',
         error: {
           title: 'No se pudo descargar el ejemplo',
-          desc: 'Reintentá en unos segundos.',
+          desc: 'Reintenta en unos segundos.',
         },
       },
       submit: 'Importar',
@@ -142,7 +142,7 @@ export const es: AppDict = {
         },
         error: {
           title: 'No se pudo importar',
-          desc: 'Revisá el archivo y volvé a intentarlo.',
+          desc: 'Revisa el archivo y vuelve a intentarlo.',
         },
       },
     },
@@ -157,7 +157,7 @@ export const es: AppDict = {
       dashboard: 'Dashboard',
       home: 'Inicio',
       account: 'Gestionar cuenta',
-      empty: 'Seleccioná un módulo desde la barra superior.',
+      empty: 'Selecciona un módulo desde la barra superior.',
       sections: {
         master: 'Administrador',
         document: 'Documentos',
@@ -200,8 +200,8 @@ export const es: AppDict = {
       form: {
         createTitle: 'Nuevo puesto',
         editTitle: 'Editar puesto',
-        createSubtitle: 'Completá la información del puesto de trabajo',
-        editSubtitle: 'Modificá la información del puesto de trabajo',
+        createSubtitle: 'Completa la información del puesto de trabajo',
+        editSubtitle: 'Modifica la información del puesto de trabajo',
         cancel: 'Cancelar',
         submitCreate: 'Crear puesto',
         submitEdit: 'Guardar cambios',
@@ -219,13 +219,13 @@ export const es: AppDict = {
           longitud: 'Longitud',
           comentario: 'Comentario',
           ciudad: 'Ciudad',
-          ciudadPlaceholder: 'Buscá una ciudad…',
+          ciudadPlaceholder: 'Busca una ciudad…',
           contacto: 'Contacto',
-          contactoPlaceholder: 'Buscá un contacto…',
+          contactoPlaceholder: 'Busca un contacto…',
           centroCosto: 'Centro de costo',
-          centroCostoPlaceholder: 'Buscá un centro de costo…',
+          centroCostoPlaceholder: 'Busca un centro de costo…',
           programador: 'Programador',
-          programadorPlaceholder: 'Buscá un programador…',
+          programadorPlaceholder: 'Busca un programador…',
         },
         validation: {
           required: 'Este campo es requerido',
@@ -247,7 +247,7 @@ export const es: AppDict = {
         eyebrow: 'Puesto',
         notFound: {
           title: 'Puesto no encontrado',
-          desc: 'El puesto que buscás no existe o fue eliminado.',
+          desc: 'El puesto que buscas no existe o fue eliminado.',
         },
         sections: {
           ubicacion: 'Ubicación',
@@ -270,8 +270,8 @@ export const es: AppDict = {
       form: {
         createTitle: 'Nuevo programador',
         editTitle: 'Editar programador',
-        createSubtitle: 'Completá la información del programador',
-        editSubtitle: 'Modificá la información del programador',
+        createSubtitle: 'Completa la información del programador',
+        editSubtitle: 'Modifica la información del programador',
         cancel: 'Cancelar',
         submitCreate: 'Crear programador',
         submitEdit: 'Guardar cambios',
@@ -297,7 +297,7 @@ export const es: AppDict = {
         eyebrow: 'Programador',
         notFound: {
           title: 'Programador no encontrado',
-          desc: 'El programador que buscás no existe o fue eliminado.',
+          desc: 'El programador que buscas no existe o fue eliminado.',
         },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el programador' },
@@ -331,7 +331,7 @@ export const es: AppDict = {
         },
         notFound: {
           title: 'Prototipo no encontrado',
-          desc: 'El prototipo que buscás no existe o fue eliminado.',
+          desc: 'El prototipo que buscas no existe o fue eliminado.',
         },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el prototipo' },
@@ -353,8 +353,8 @@ export const es: AppDict = {
       form: {
         createTitle: 'Nueva secuencia',
         editTitle: 'Editar secuencia',
-        createSubtitle: 'Completá el patrón de turnos de la secuencia',
-        editSubtitle: 'Modificá el patrón de turnos de la secuencia',
+        createSubtitle: 'Completa el patrón de turnos de la secuencia',
+        editSubtitle: 'Modifica el patrón de turnos de la secuencia',
         cancel: 'Cancelar',
         submitCreate: 'Crear secuencia',
         submitEdit: 'Guardar cambios',
@@ -405,7 +405,7 @@ export const es: AppDict = {
         eyebrow: 'Secuencia',
         notFound: {
           title: 'Secuencia no encontrada',
-          desc: 'La secuencia que buscás no existe o fue eliminada.',
+          desc: 'La secuencia que buscas no existe o fue eliminada.',
         },
         sections: {
           principal: 'Información principal',
@@ -516,7 +516,7 @@ export const es: AppDict = {
         programacionModal: {
           title: 'Agregar contrato al puesto',
           editTitle: 'Editar programación del contrato',
-          subtitle: 'Asigná los empleados de este puesto.',
+          subtitle: 'Asigna los empleados de este puesto.',
           placeholder: 'En construcción.',
           contratoLabel: 'Contrato',
           contratoPlaceholder: 'Buscar contrato…',
@@ -582,7 +582,7 @@ export const es: AppDict = {
           secuenciaPlaceholder: 'Buscar secuencia…',
           seleccionarTodo: 'Seleccionar todas las filas',
           seleccionarFila: 'Seleccionar fila',
-          empty: 'Todavía no hay filas. Usá “Nuevo” para agregar un contrato.',
+          empty: 'Todavía no hay filas. Usa “Nuevo” para agregar un contrato.',
           cargando: 'Cargando el prototipo…',
           nuevo: 'Nuevo',
           guardar: 'Guardar',
@@ -591,14 +591,14 @@ export const es: AppDict = {
           limpiar: 'Limpiar',
           generar: 'Generar',
           desgenerar: 'Desgenerar',
-          validacion: 'Completá contrato, secuencia y fecha de inicio en todas las filas.',
+          validacion: 'Completa contrato, secuencia y fecha de inicio en todas las filas.',
           sinCambios: 'No hay cambios para guardar.',
           sinAfectado: 'Este puesto no tiene documento afectado, no se puede guardar el prototipo.',
           sinGuardar: 'Cambios sin guardar',
           descartar: {
             header: 'Cambios sin guardar',
             message:
-              'Tenés cambios en el prototipo que no guardaste. Si cerrás se perderán. ¿Descartar?',
+              'Tienes cambios en el prototipo que no guardaste. Si cierras se perderán. ¿Descartar?',
             aceptar: 'Descartar',
           },
           generarErrores: { dias: 'días', cerrar: 'Cerrar' },
@@ -608,7 +608,7 @@ export const es: AppDict = {
             mes: 'Mes',
             codigo: 'Cód.',
             empleado: 'Empleado',
-            empty: 'Simulá para ver cómo quedaría la programación.',
+            empty: 'Simula para ver cómo quedaría la programación.',
           },
           toasts: {
             saveSuccess: {
@@ -666,8 +666,8 @@ export const es: AppDict = {
       form: {
         createTitle: 'Nuevo turno',
         editTitle: 'Editar turno',
-        createSubtitle: 'Completá la información del turno',
-        editSubtitle: 'Modificá la información del turno',
+        createSubtitle: 'Completa la información del turno',
+        editSubtitle: 'Modifica la información del turno',
         fields: {
           codigo: 'Código',
           nombre: 'Nombre',
@@ -700,7 +700,7 @@ export const es: AppDict = {
         eyebrow: 'Turno',
         notFound: {
           title: 'Turno no encontrado',
-          desc: 'El turno que buscás no existe o fue eliminado.',
+          desc: 'El turno que buscas no existe o fue eliminado.',
         },
         sections: { principal: 'Información principal' },
         activo: 'Activo',
@@ -734,7 +734,7 @@ export const es: AppDict = {
         },
         error: {
           title: 'No se pudo regenerar',
-          desc: 'Ocurrió un error al recalcular las horas. Intentá de nuevo.',
+          desc: 'Ocurrió un error al recalcular las horas. Intenta de nuevo.',
         },
       },
     },

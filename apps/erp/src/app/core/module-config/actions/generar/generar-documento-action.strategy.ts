@@ -8,6 +8,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '../entity-action-dialog.defaults';
 import type { EntityActionContext, EntityActionStrategy } from '../entity-action-strategy';
 import { GenerarDocumentoService } from './generar-documento.service';
+import type { GenerarDocumentoModalResult } from './generar-documento-modal.component';
 
 /**
  * Acción "generar": abre un modal con un selector de mes/año y genera un documento
@@ -50,8 +51,8 @@ export class GenerarDocumentoActionStrategy implements EntityActionStrategy {
         return ref ? ref.onClose : EMPTY;
       }),
       // El modal cierra con `null` al cancelar: solo seguimos con un período real.
-      filter((periodo: unknown): periodo is Date => periodo instanceof Date),
-      switchMap((periodo) =>
+      filter((res: unknown): res is GenerarDocumentoModalResult => res != null),
+      switchMap(({ periodo }) =>
         this.api
           .generar({
             documento_tipo_id: DOCUMENT_TYPE_ID.CONTRATO_SERVICIO,

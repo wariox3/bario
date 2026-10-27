@@ -92,6 +92,9 @@ export class ElegirRecurrenteActionStrategy implements EntityActionStrategy {
             documento_ids: [plantillaId],
             mes: hoy.getMonth() + 1,
             anio: hoy.getFullYear(),
+            // Sin check en este modal: se respeta la fecha de la plantilla,
+            // como el botón del ERP anterior.
+            validar_fechas: true,
           })
           .pipe(
             tap((res) => {

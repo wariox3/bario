@@ -13,6 +13,7 @@ import {
   normalizeHttpError,
   type ContenedorMember,
   type FilterCondition,
+  extractErrorMessage,
 } from '@reddoc/core';
 import { AccessDeniedComponent } from '@erp/core/components/access-denied/access-denied.component';
 import {
@@ -261,8 +262,11 @@ export class UsuariosListComponent {
           this.selectedRows.set([]);
           this.load();
         },
-        error: () => {
-          this.toast.error(toasts.deleteError.title, toasts.deleteError.desc);
+        error: (err: unknown) => {
+          this.toast.error(
+            toasts.deleteError.title,
+            extractErrorMessage(err, toasts.deleteError.desc),
+          );
           // Un lote puede haber quedado a medias: recargar muestra qué sobrevivió.
           this.load();
         },

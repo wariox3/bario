@@ -18,6 +18,7 @@ import {
   type ErpSelectOption,
   type ItemOption,
   ItemService,
+  extractErrorMessage,
 } from '@reddoc/core';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import { DocumentoDetalleService } from '@erp/core/module-config';
@@ -370,10 +371,10 @@ export class InventarioDocumentoDetallesComponent {
             this.t().common.toasts.deleteSuccess.desc,
           );
         },
-        error: () =>
+        error: (err: unknown) =>
           this.toast.error(
             this.t().common.toasts.deleteError.title,
-            this.t().common.toasts.deleteError.desc,
+            extractErrorMessage(err, this.t().common.toasts.deleteError.desc),
           ),
       });
   }

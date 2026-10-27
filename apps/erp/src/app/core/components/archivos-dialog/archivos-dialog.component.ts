@@ -17,7 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService, FORMATO_FECHA } from '@reddoc/core';
+import { I18nService, ToastService, FORMATO_FECHA, extractErrorMessage } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import { formatBytes } from '@erp/core/utils/format-bytes';
 import { ARCHIVO_TIPO, ArchivoService } from './archivo.service';
@@ -275,9 +275,9 @@ export class ArchivosDialogComponent {
           this.toast.success(toast.title, toast.desc);
           this.cargarLista(owner);
         },
-        error: () => {
+        error: (err: unknown) => {
           const toast = this.t().common.archivos.toasts.deleteError;
-          this.toast.error(toast.title, toast.desc);
+          this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
         },
       });
   }

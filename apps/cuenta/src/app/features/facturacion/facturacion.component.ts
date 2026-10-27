@@ -83,7 +83,7 @@ export class FacturacionComponent implements OnInit {
           this.printingId.set(null);
           this.toast.error(
             'Error',
-            extractErrorMessage(err, 'No se pudo descargar el PDF. Intentá de nuevo.'),
+            extractErrorMessage(err, 'No se pudo descargar el PDF. Intenta de nuevo.'),
           );
         },
       });

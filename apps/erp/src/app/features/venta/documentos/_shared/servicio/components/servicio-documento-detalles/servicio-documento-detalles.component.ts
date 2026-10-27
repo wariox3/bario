@@ -4,7 +4,13 @@ import { FormArray } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { I18nService, ToastService, calcularResumen, type ResumenDocumento } from '@reddoc/core';
+import {
+  I18nService,
+  ToastService,
+  calcularResumen,
+  type ResumenDocumento,
+  extractErrorMessage,
+} from '@reddoc/core';
 import { DocumentoDetalleService } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ServicioDocumentoDetalleModalComponent } from '../servicio-documento-detalle-modal/servicio-documento-detalle-modal.component';
@@ -158,10 +164,10 @@ export class ServicioDocumentoDetallesComponent {
             this.t().common.toasts.deleteSuccess.desc,
           );
         },
-        error: () =>
+        error: (err: unknown) =>
           this.toast.error(
             this.t().common.toasts.deleteError.title,
-            this.t().common.toasts.deleteError.desc,
+            extractErrorMessage(err, this.t().common.toasts.deleteError.desc),
           ),
       });
   }

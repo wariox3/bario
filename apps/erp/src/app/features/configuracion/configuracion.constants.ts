@@ -12,6 +12,7 @@ import type { ConfiguracionCampo } from './configuracion.model';
 export const GENERAL_CAMPOS = [
   'gen_uvt',
   'gen_emitir_automaticamente',
+  'gen_contabilizar_automaticamente',
 ] as const satisfies readonly ConfiguracionCampo[];
 
 // ── Área Humano ───────────────────────────────────────────────────────────────

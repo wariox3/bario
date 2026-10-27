@@ -15,6 +15,7 @@ import {
   Contenedor,
   ContenedorMember,
   ContenedorService,
+  extractErrorMessage,
   getInitials,
   I18nService,
   ToastService,
@@ -129,10 +130,10 @@ export class ContenedorMembersListComponent {
           this.toastService.success(toasts.title, toasts.desc);
           this.loadMembers(c.cliente_id);
         },
-        error: () => {
+        error: (err: unknown) => {
           this.removingId.set(null);
           const toasts = this.t().contenedores.invite.toasts.removeError;
-          this.toastService.error(toasts.title, toasts.desc);
+          this.toastService.error(toasts.title, extractErrorMessage(err, toasts.desc));
         },
       });
   }

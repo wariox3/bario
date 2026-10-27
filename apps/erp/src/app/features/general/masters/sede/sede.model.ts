@@ -8,6 +8,10 @@ export interface Sede {
   readonly id: number;
   readonly nombre: string;
   readonly codigo: string;
+  /** Datos de la caja de la sede (texto libre, opcionales). */
+  readonly caja_placa: string | null;
+  readonly caja_ubicacion: string | null;
+  readonly caja_tipo: string | null;
   readonly centro_costo: number | null;
   readonly centro_costo_nombre: string | null;
 }
@@ -15,5 +19,8 @@ export interface Sede {
 /** Write-model para crear/editar una sede. FK como id pelado. */
 export interface SedePayload {
   readonly nombre: string;
+  readonly caja_placa: string | null;
+  readonly caja_ubicacion: string | null;
+  readonly caja_tipo: string | null;
   readonly centro_costo: number | null;
 }

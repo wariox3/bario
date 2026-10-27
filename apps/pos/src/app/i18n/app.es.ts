@@ -42,12 +42,12 @@ export const es: AppDict = {
     },
     confirms: {
       deleteHeader: 'Confirmar eliminación',
-      deleteMessage: '¿Estás seguro de que querés eliminar los registros seleccionados?',
+      deleteMessage: '¿Estás seguro de que quieres eliminar los registros seleccionados?',
     },
     toasts: {
       loadError: {
         title: 'Error al cargar',
-        desc: 'No se pudieron obtener los registros. Intentá de nuevo.',
+        desc: 'No se pudieron obtener los registros. Intenta de nuevo.',
       },
       deleteSuccess: {
         title: 'Registros eliminados',
@@ -55,7 +55,7 @@ export const es: AppDict = {
       },
       deleteError: {
         title: 'Error al eliminar',
-        desc: 'No se pudieron eliminar los registros. Intentá de nuevo.',
+        desc: 'No se pudieron eliminar los registros. Intenta de nuevo.',
       },
       exportError: {
         title: 'Error al exportar',
@@ -66,7 +66,7 @@ export const es: AppDict = {
     imageUpload: {
       change: 'Cambiar imagen',
       remove: 'Quitar imagen',
-      removeConfirm: '¿Querés quitar la imagen?',
+      removeConfirm: '¿Quieres quitar la imagen?',
       tooLarge: 'La imagen es muy grande (máximo 2 MB).',
       hint: 'PNG o JPG, hasta 2 MB.',
       dialogTitle: 'Recortar imagen',
@@ -106,8 +106,8 @@ export const es: AppDict = {
     },
     import: {
       dropzone: {
-        primary: 'Arrastrá tu archivo Excel aquí',
-        secondary: 'o hacé clic para seleccionarlo',
+        primary: 'Arrastra tu archivo Excel aquí',
+        secondary: 'o haz clic para seleccionarlo',
         hint: 'Archivos {types} · hasta {max} MB',
         invalidType: 'El archivo no tiene un formato válido.',
         tooLarge: 'El archivo supera el tamaño máximo permitido.',
@@ -129,7 +129,7 @@ export const es: AppDict = {
         downloading: 'Descargando…',
         error: {
           title: 'No se pudo descargar el ejemplo',
-          desc: 'Reintentá en unos segundos.',
+          desc: 'Reintenta en unos segundos.',
         },
       },
       submit: 'Importar',
@@ -142,7 +142,7 @@ export const es: AppDict = {
         },
         error: {
           title: 'No se pudo importar',
-          desc: 'Revisá el archivo y volvé a intentarlo.',
+          desc: 'Revisa el archivo y vuelve a intentarlo.',
         },
       },
     },

@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.11](https://github.com/wariox3/bario/compare/v0.1.10...v0.1.11) (2026-10-27)
+
+### Features
+
+- **erp:** filtrar los contactos por cliente en venta y proveedor en compra ([70cbe05](https://github.com/wariox3/bario/commit/70cbe05605a2f34fd2e90230c0f900b806b87c37))
+- **erp:** mostrar el detail y los motivos al fallar contabilizar ([4ee363f](https://github.com/wariox3/bario/commit/4ee363f6eef5de9e604f0e720c955e05ef1ac30f))
+- **erp:** mostrar por documento los errores al contabilizar ([0e25efd](https://github.com/wariox3/bario/commit/0e25efdc11ac30efec40c56cd0faa6a00bf6058e))
+- **erp:** sumar el check contabilizar automaticamente a la configuracion general ([b0ea683](https://github.com/wariox3/bario/commit/b0ea683f8521b504c43c483e2b0c49338e24bc50))
+- **erp:** sumar el check validar fechas al generar facturas recurrentes ([3625f91](https://github.com/wariox3/bario/commit/3625f91b6cbd3765a3be4aed3009e558aedf5e07))
+- **erp:** sumar los datos de caja a la sede ([2af6cf5](https://github.com/wariox3/bario/commit/2af6cf5fbff810a3b8ba2f50b40d8d50fd258c15))
+
+### Bug Fixes
+
+- mostrar el mensaje del backend al fallar un borrado ([62d89e1](https://github.com/wariox3/bario/commit/62d89e1d44996e7d7e7a61d322e2584f1e0c8fb8))
+- pasar los textos de la interfaz de voseo a tuteo ([fa9402d](https://github.com/wariox3/bario/commit/fa9402d4d418c9a13b7260494def3c0cc15521b7))
+
 ## [0.1.10](https://github.com/wariox3/bario/compare/v0.1.9...v0.1.10) (2026-10-26)
 
 ### Features

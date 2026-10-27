@@ -18,7 +18,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { finalize } from 'rxjs';
-import { I18nService, ToastService } from '@reddoc/core';
+import { I18nService, ToastService, extractErrorMessage } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 import type { ArchivoOwner } from '../archivos-dialog/archivo.types';
 import { FileDropzoneComponent } from '../file-dropzone/file-dropzone.component';
@@ -232,9 +232,9 @@ export class ImagenesDialogComponent {
       )
       .subscribe({
         next: () => this.alCambiar(owner, this.t().common.imagenes.toasts.deleteSuccess),
-        error: () => {
+        error: (err: unknown) => {
           const toast = this.t().common.imagenes.toasts.deleteError;
-          this.toast.error(toast.title, toast.desc);
+          this.toast.error(toast.title, extractErrorMessage(err, toast.desc));
         },
       });
   }
