@@ -7290,8 +7290,12 @@ export const es: AppDict = {
     general: {
       parametros: {
         title: 'Parámetros',
-        hint: 'Valores con los que el ERP calcula impuestos y emite documentos.',
-        groups: { fiscal: 'Tributario', emision: 'Documentos electrónicos' },
+        hint: 'Valores con los que el ERP calcula impuestos, emite y contabiliza documentos.',
+        groups: {
+          fiscal: 'Tributario',
+          emision: 'Documentos electrónicos',
+          contabilidad: 'Contabilidad',
+        },
       },
       uvt: {
         hint: 'Unidad de valor tributario vigente; base de los cálculos fiscales.',
@@ -7300,6 +7304,10 @@ export const es: AppDict = {
       emitirAutomaticamente: {
         label: 'Emitir automáticamente',
         hint: 'Al aprobar un documento se envía a la DIAN sin pasos adicionales.',
+      },
+      contabilizarAutomaticamente: {
+        label: 'Contabilizar automáticamente',
+        hint: 'Al aprobar un documento se generan sus movimientos contables sin pasos adicionales.',
       },
       documentoTipo: {
         title: 'Tipos de documento',

@@ -5442,9 +5442,14 @@ export interface AppDict
     unsavedChanges: string;
     actions: { save: string };
     general: {
-      parametros: { title: string; hint: string; groups: { fiscal: string; emision: string } };
+      parametros: {
+        title: string;
+        hint: string;
+        groups: { fiscal: string; emision: string; contabilidad: string };
+      };
       uvt: { hint: string; label: string };
       emitirAutomaticamente: { label: string; hint: string };
+      contabilizarAutomaticamente: { label: string; hint: string };
       documentoTipo: {
         title: string;
         hint: string;

@@ -7195,8 +7195,8 @@ export const en: AppDict = {
     general: {
       parametros: {
         title: 'Parameters',
-        hint: 'Values the ERP uses to compute taxes and issue documents.',
-        groups: { fiscal: 'Tax', emision: 'Electronic documents' },
+        hint: 'Values the ERP uses to compute taxes and to issue and post documents.',
+        groups: { fiscal: 'Tax', emision: 'Electronic documents', contabilidad: 'Accounting' },
       },
       uvt: {
         hint: 'Current tax value unit; the basis for fiscal calculations.',
@@ -7205,6 +7205,10 @@ export const en: AppDict = {
       emitirAutomaticamente: {
         label: 'Issue automatically',
         hint: 'Approving a document sends it to DIAN with no extra steps.',
+      },
+      contabilizarAutomaticamente: {
+        label: 'Post automatically',
+        hint: 'Approving a document generates its accounting entries with no extra steps.',
       },
       documentoTipo: {
         title: 'Document types',
