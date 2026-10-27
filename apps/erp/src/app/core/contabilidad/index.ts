@@ -4,3 +4,4 @@ export {
   type Movimiento,
 } from './movimiento-contable.model';
 export { DocumentoContabilizacionService } from './documento-contabilizacion.service';
+export { parseContabilizarError, type ContabilizarError } from './contabilizar-error';
