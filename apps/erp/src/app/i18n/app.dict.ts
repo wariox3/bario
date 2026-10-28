@@ -317,6 +317,8 @@ export interface AppDict
         utility: string;
         report: string;
         reception: string;
+        /** Ciclo de nómina de Humano: programación, aporte y liquidación. */
+        payroll: string;
       };
     };
     userMenu: {
@@ -1542,7 +1544,7 @@ export interface AppDict
         empty: string;
         loadError: string;
         total: string;
-        columns: { id: string; fecha: string; documento: string; pago: string };
+        columns: { id: string; tipo: string; fecha: string; numero: string; deduccion: string };
       };
       columns: {
         id: string;
@@ -5006,6 +5008,19 @@ export interface AppDict
       confirm: { header: string; accept: string; cancel: string };
       toasts: {
         success: { title: string };
+        error: { title: string; desc: string };
+      };
+    };
+    validarCreditos: {
+      name: string;
+      description: string;
+      run: string;
+      confirm: { header: string; message: string; accept: string; cancel: string };
+      toasts: {
+        success: {
+          title: string;
+          desc: { generic: string; zero: string; one: string; other: string };
+        };
         error: { title: string; desc: string };
       };
     };

@@ -749,28 +749,11 @@ Es lo mismo que hacía el ERP anterior (`general/documento_detalle/?credito_id=�
 pedía además `serializador=credito_pago`, un mecanismo que la API nueva **no tiene**: la palabra
 `serializador` no aparece ni una vez en el OpenAPI.
 
-### 9.1 Por confirmar con backend
+### 9.1 Contrato confirmado con backend
 
-| #   | Qué                                                                     | Qué pasa si está mal                                                                   |
-| --- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| 1   | Que `credito_id` esté en los `campos_filtrables` de `documento-detalle` | **No da error**: devuelve todas las líneas del tenant y la card las muestra como pagos |
-| 2   | De qué campo sale el valor descontado                                   | La card suma otra cosa. El serializador expone `total`, pero no `pago` ni `deduccion`  |
-| 3   | Que `id` sea filtrable con el operador `in` en `documento/lista/`       | **No da error**: las columnas de fecha y documento salen vacías                        |
+Verificado contra la respuesta real de `documento-detalle/lista/` (crédito 1, 2026-10-28):
 
-Sobre el #2: el ERP anterior leía el valor de un campo **`pago`** de la línea, que el serializador
-actual no expone —tampoco `concepto`, `devengado` ni `deduccion`, los demás campos de la familia
-humano que sí están en §1.3—. `CreditoPagoLineaRead` declara `pago` como opcional y se cae a `total`:
-el día que backend lo sume, la card lo toma sin tocar nada.
-
-Sobre el #3: si backend sumara `documento_numero` y `documento_fecha` al serializador de la línea
-—ya existen en el de `documento-detalle-informe`, que a su vez no expone `credito`— sobraría la
-segunda petición entera.
-
-### 9.2 Cómo verificarlo sin backend
-
-Abrir la ficha de un crédito con pagos y mirar la red:
-
-- Si la card lista pagos de **otros** créditos, falló el #1.
-- Si los valores no cuadran con el `abono` que muestra la ficha, falló el #2. Ese `abono` sale del
-  propio crédito y es el contraste más rápido.
-- Si las columnas de fecha y documento no aparecen, falló el #3 o la nómina no tiene número.
+- `credito_id` es filtrable: devuelve solo la línea del crédito (`count: 1`).
+- El valor descontado sale de `deduccion`; `total` llega en `0` en las líneas de nómina.
+- La línea trae `documento_documento_tipo_nombre`, `documento_fecha` y `documento_numero`, así que
+  la tabla de pagos sale de una sola petición, sin pedir las cabeceras aparte.

@@ -24,6 +24,9 @@ export class NominaConceptosTableComponent {
   /** Conceptos a renderizar, tal como los devuelve el backend. */
   readonly lines = input.required<readonly NominaDetalleRead[]>();
 
+  /** Muestra la columna «Operación»; el resumen de la programación la oculta. */
+  readonly mostrarOperacion = input(true);
+
   protected readonly formatMoney = formatCop;
 
   /**

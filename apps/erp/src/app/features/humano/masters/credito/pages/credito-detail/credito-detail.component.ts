@@ -68,7 +68,7 @@ export class CreditoDetailComponent implements OnInit {
     return valor != null ? formatCop(valor) : '';
   }
 
-  /** Migas: módulo Humano → listado de créditos → contrato abierto. */
+  /** Migas: módulo Humano → listado de créditos → id del crédito abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
     const credito = this.credito();
@@ -82,7 +82,7 @@ export class CreditoDetailComponent implements OnInit {
         routerLink: slug ? ['/t', slug, ...CREDITO_LIST_PATH] : undefined,
       },
     ];
-    if (credito) items.push({ label: credito.contrato_nombre ?? '' });
+    if (credito) items.push({ label: String(credito.id) });
     return items;
   });
 

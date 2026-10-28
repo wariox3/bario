@@ -302,6 +302,7 @@ export const en: AppDict = {
         utility: 'Utilities',
         report: 'Reports',
         reception: 'Reception',
+        payroll: 'Payroll',
       },
     },
     userMenu: {
@@ -2090,7 +2091,13 @@ export const en: AppDict = {
         empty: 'This loan has no payments applied yet',
         loadError: 'Could not load the payments',
         total: 'Total deducted',
-        columns: { id: 'ID', fecha: 'Date', documento: 'Document', pago: 'Amount' },
+        columns: {
+          id: 'ID',
+          tipo: 'Document type',
+          numero: 'Number',
+          fecha: 'Date',
+          deduccion: 'Deduction',
+        },
       },
       columns: {
         id: 'ID',
@@ -6499,6 +6506,34 @@ export const en: AppDict = {
         error: {
           title: 'Could not validate',
           desc: 'An error occurred while validating the balances. Try again.',
+        },
+      },
+    },
+    validarCreditos: {
+      name: 'Validate loans',
+      description:
+        'This process recalculates the paid amount, current installment and balance of each loan from approved payrolls and fixes those that do not match what is stored.',
+      run: 'Validate',
+      confirm: {
+        header: 'Validate loans?',
+        message:
+          'The balances of all loans will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+        accept: 'Validate',
+        cancel: 'Cancel',
+      },
+      toasts: {
+        success: {
+          title: 'Validation completed',
+          desc: {
+            generic: 'Loan balances were checked and fixed.',
+            zero: 'All loans matched: nothing to fix.',
+            one: '1 loan was fixed.',
+            other: '{n} loans were fixed.',
+          },
+        },
+        error: {
+          title: 'Could not validate',
+          desc: 'An error occurred while validating the loans. Try again.',
         },
       },
     },

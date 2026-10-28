@@ -1,6 +1,7 @@
 @let p = t().entities.credito.pagos;
 
-@if (isLoading()) {
+<!-- Al cambiar de página la tabla se queda en su lugar; el spinner es solo la primera carga. -->
+@if (isLoading() && filas().length === 0) {
   <div class="flex items-center justify-center gap-2 py-10 text-brand-muted">
     <i class="pi pi-spin pi-spinner text-[1.1rem]"></i>
     <span class="text-[0.85rem]">{{ t().common.list.records }}…</span>
@@ -23,16 +24,10 @@
           class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-brand-muted"
         >
           <th class="w-20 px-3 py-2 text-right font-semibold">{{ p.columns.id }}</th>
-          <!-- Fecha y documento salen de la cabecera de la nómina y pueden no
-               resolverse: una columna entera de guiones no dice nada, así que
-               solo van si vienen. -->
-          @if (muestraFecha()) {
-            <th class="w-32 px-3 py-2 font-semibold">{{ p.columns.fecha }}</th>
-          }
-          @if (muestraDocumento()) {
-            <th class="w-28 px-3 py-2 text-right font-semibold">{{ p.columns.documento }}</th>
-          }
-          <th class="px-3 py-2 text-right font-semibold">{{ p.columns.pago }}</th>
+          <th class="px-3 py-2 font-semibold">{{ p.columns.tipo }}</th>
+          <th class="w-28 px-3 py-2 text-right font-semibold">{{ p.columns.numero }}</th>
+          <th class="w-32 px-3 py-2 font-semibold">{{ p.columns.fecha }}</th>
+          <th class="px-3 py-2 text-right font-semibold">{{ p.columns.deduccion }}</th>
         </tr>
       </thead>
       <tbody>
@@ -41,16 +36,13 @@
             <td class="px-3 py-2 text-right font-mono tabular-nums text-brand-muted">
               {{ fila.id }}
             </td>
-            @if (muestraFecha()) {
-              <td class="px-3 py-2 font-mono tabular-nums text-brand-text">{{ fila.fecha }}</td>
-            }
-            @if (muestraDocumento()) {
-              <td class="px-3 py-2 text-right font-mono tabular-nums text-brand-text">
-                {{ fila.documento }}
-              </td>
-            }
+            <td class="px-3 py-2 text-brand-text">{{ fila.tipo }}</td>
             <td class="px-3 py-2 text-right font-mono tabular-nums text-brand-text">
-              {{ fila.pago }}
+              {{ fila.numero }}
+            </td>
+            <td class="px-3 py-2 font-mono tabular-nums text-brand-text">{{ fila.fecha }}</td>
+            <td class="px-3 py-2 text-right font-mono tabular-nums text-brand-text">
+              {{ fila.deduccion }}
             </td>
           </tr>
         }
@@ -58,10 +50,7 @@
       <!-- Cuánto se lleva descontado es lo que se busca al abrir la tabla. -->
       <tfoot>
         <tr class="border-t border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.02)]">
-          <td
-            class="px-3 py-2 text-[0.78rem] font-semibold text-brand-muted"
-            [attr.colspan]="1 + (muestraFecha() ? 1 : 0) + (muestraDocumento() ? 1 : 0)"
-          >
+          <td class="px-3 py-2 text-[0.78rem] font-semibold text-brand-muted" colspan="4">
             {{ p.total }}
           </td>
           <td class="px-3 py-2 text-right font-mono text-[0.85rem] font-semibold tabular-nums">
@@ -71,4 +60,13 @@
       </tfoot>
     </table>
   </div>
+
+  @if (totalPagos() > pageSize) {
+    <p-paginator
+      [rows]="pageSize"
+      [totalRecords]="totalPagos()"
+      [first]="page() * pageSize"
+      (onPageChange)="onPageChange($event)"
+    />
+  }
 }

@@ -16,11 +16,14 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
   defaultChildPath: 'inicio',
   menu: [
     { kind: 'item', labelKey: 'layout.nav.home', iconClass: 'pi pi-home', path: 'inicio' },
+    // El ciclo de nómina es el trabajo diario del área: de cada pantalla salen
+    // los documentos (nóminas, seguridad social). Las URLs siguen bajo
+    // `proceso/` para no romper enlaces guardados.
     {
       kind: 'accordion',
-      id: 'humano-proceso',
-      labelKey: 'layout.nav.sections.process',
-      iconClass: 'pi pi-cog',
+      id: 'humano-nomina',
+      labelKey: 'layout.nav.sections.payroll',
+      iconClass: 'pi pi-calendar',
       defaultExpanded: true,
       groups: [
         {
@@ -104,6 +107,23 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
             },
             { labelKey: 'entities.credito.name', path: 'creditos', modelo: MODELO.humano.credito },
             { labelKey: 'entities.novedad.name', path: 'novedades', modelo: MODELO.humano.novedad },
+          ],
+        },
+      ],
+    },
+    {
+      kind: 'accordion',
+      id: 'humano-proceso',
+      labelKey: 'layout.nav.sections.process',
+      iconClass: 'pi pi-sync',
+      defaultExpanded: false,
+      groups: [
+        {
+          items: [
+            {
+              labelKey: 'entities.validarCreditos.name',
+              path: 'proceso/validar-creditos',
+            },
           ],
         },
       ],

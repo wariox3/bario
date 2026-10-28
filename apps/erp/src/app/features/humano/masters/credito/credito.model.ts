@@ -49,43 +49,18 @@ export interface CreditoPayload {
 }
 
 /**
- * Pago aplicado a un crédito, ya listo para pintar.
+ * Pago aplicado a un crédito: cada descuento hecho al empleado en una nómina.
  *
- * Cada pago es un descuento hecho al empleado en una nómina. No existe entidad
- * propia en el backend: son **líneas de documento** (`/general/documento-detalle/`)
- * que apuntan al crédito por su FK `credito`. `CreditoService.pagos` arma esto
- * cruzando las líneas con la cabecera de su documento.
+ * No existe entidad propia en el backend: son **líneas de documento**
+ * (`/general/documento-detalle/`) que apuntan al crédito por su FK `credito`.
+ * La línea ya trae el tipo, la fecha y el número de su documento, y el valor
+ * descontado en `deduccion`.
  */
 export interface CreditoPago {
   readonly id: number;
-  /** Valor descontado. Como el resto de los montos, puede llegar como string Decimal. */
-  readonly pago: string | number | null;
-  /** Fecha del documento del que salió el descuento; `null` si no se pudo resolver. */
-  readonly fecha?: string | null;
-  /** Consecutivo de la nómina del descuento; `null` si no se pudo resolver. */
-  readonly documento?: number | null;
-}
-
-/**
- * Línea de documento leída con el filtro por crédito.
- *
- * Es el `GenDocumentoDetalle` genérico, del que acá solo interesan cuatro
- * campos. `pago` es el nombre que usaba el ERP anterior para el valor
- * descontado y **hoy no viene en el serializador**; se declara opcional para
- * que la card lo tome sin tocar nada el día que el backend lo sume, y mientras
- * tanto se cae a `total`.
- */
-export interface CreditoPagoLineaRead {
-  readonly id: number;
-  /** Id del documento (nómina) al que pertenece la línea. */
-  readonly documento: number | null;
-  readonly pago?: string | number | null;
-  readonly total?: string | number | null;
-}
-
-/** Lo único que se le pide a la cabecera del documento para identificar el pago. */
-export interface CreditoPagoDocumentoRead {
-  readonly id: number;
-  readonly numero: number | null;
-  readonly fecha: string | null;
+  readonly documento_documento_tipo_nombre: string | null;
+  readonly documento_fecha: string | null;
+  readonly documento_numero: number | null;
+  /** Valor descontado. Como el resto de los montos, llega como string Decimal. */
+  readonly deduccion: string | number | null;
 }

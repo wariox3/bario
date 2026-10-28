@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
   DestroyRef,
   ViewChild,
   computed,
@@ -163,6 +164,7 @@ function toOption(row: ContratoApiRow): ContratoOption {
 export class ContratoAutocompleteComponent implements ControlValueAccessor {
   private readonly dataService = inject(ErpSelectDataService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
 
   @ViewChild(AutoComplete) private readonly ac?: AutoComplete;
 
@@ -198,6 +200,8 @@ export class ContratoAutocompleteComponent implements ControlValueAccessor {
   private onChangeFn: (value: ContratoOption | null) => void = () => undefined;
   onTouchedFn: () => void = () => undefined;
   private skipNextFocus = false;
+  /** El último blur fue por cambiar de pestaña o de ventana (ver `onBlurred`). */
+  private windowBlurred = false;
   private focused = false;
   private reopenTimer?: ReturnType<typeof setTimeout>;
 
@@ -257,9 +261,11 @@ export class ContratoAutocompleteComponent implements ControlValueAccessor {
     // Red de seguridad: salda el descuadre que `onBlurred` no pudo saldar por tener
     // el panel abierto (salir con Tab sin elegir nada).
     this.reconcileForceSelection();
-    // Tras seleccionar, PrimeNG devuelve el foco al input; eso no debe reabrir el panel.
-    if (this.skipNextFocus) {
+    // Tras seleccionar, PrimeNG devuelve el foco al input, y al volver a la pestaña lo
+    // devuelve el navegador. Ninguno lo pidió la persona: no reabren el panel.
+    if (this.skipNextFocus || this.windowBlurred) {
       this.skipNextFocus = false;
+      this.windowBlurred = false;
       return;
     }
     this.ac?.search(undefined, '', 'focus');
@@ -284,6 +290,9 @@ export class ContratoAutocompleteComponent implements ControlValueAccessor {
   }
 
   onBlurred(): void {
+    // Sin foco en el documento, el blur no es por pasar a otro campo sino por cambiar
+    // de pestaña o de ventana; al volver, el navegador re-enfoca este input.
+    this.windowBlurred = !this.document.hasFocus();
     this.focused = false;
     clearTimeout(this.reopenTimer);
     this.reconcileForceSelection();
