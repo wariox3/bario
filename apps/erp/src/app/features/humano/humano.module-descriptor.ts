@@ -40,6 +40,10 @@ export const HUMANO_MODULE: ErpModuleDescriptor = {
               path: 'proceso/liquidacion',
               activeMatch: 'proceso/liquidacion',
             },
+            {
+              labelKey: 'entities.validarCreditos.name',
+              path: 'proceso/validar-creditos',
+            },
           ],
         },
       ],

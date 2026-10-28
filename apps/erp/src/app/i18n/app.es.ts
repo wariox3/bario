@@ -6594,6 +6594,34 @@ export const es: AppDict = {
         },
       },
     },
+    validarCreditos: {
+      name: 'Validar créditos',
+      description:
+        'Este proceso recalcula el abono, la cuota actual y el saldo de cada crédito desde las nóminas aprobadas y corrige los que no cuadren con lo guardado.',
+      run: 'Validar',
+      confirm: {
+        header: '¿Validar créditos?',
+        message:
+          'Se recalcularán los saldos de todos los créditos y se corregirán los que no cuadren. La operación puede tardar unos segundos.',
+        accept: 'Validar',
+        cancel: 'Cancelar',
+      },
+      toasts: {
+        success: {
+          title: 'Validación completada',
+          desc: {
+            generic: 'Los saldos de los créditos se revisaron y corrigieron.',
+            zero: 'Todos los créditos cuadraban: no hubo nada que corregir.',
+            one: 'Se corrigió 1 crédito.',
+            other: 'Se corrigieron {n} créditos.',
+          },
+        },
+        error: {
+          title: 'No se pudo validar',
+          desc: 'Ocurrió un error al validar los créditos. Intenta de nuevo.',
+        },
+      },
+    },
     validarDepreciacion: {
       name: 'Validar depreciación',
       description:

@@ -5009,6 +5009,19 @@ export interface AppDict
         error: { title: string; desc: string };
       };
     };
+    validarCreditos: {
+      name: string;
+      description: string;
+      run: string;
+      confirm: { header: string; message: string; accept: string; cancel: string };
+      toasts: {
+        success: {
+          title: string;
+          desc: { generic: string; zero: string; one: string; other: string };
+        };
+        error: { title: string; desc: string };
+      };
+    };
     validarDepreciacion: {
       name: string;
       description: string;

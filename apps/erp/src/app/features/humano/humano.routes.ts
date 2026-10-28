@@ -53,6 +53,13 @@ export const HUMANO_ROUTES: Route[] = [
           import('./proceso/liquidacion/liquidacion.routes').then((m) => m.LIQUIDACION_ROUTES),
       },
       {
+        path: 'proceso/validar-creditos',
+        loadChildren: () =>
+          import('./proceso/validar-creditos/validar-creditos.routes').then(
+            (m) => m.VALIDAR_CREDITOS_ROUTES,
+          ),
+      },
+      {
         path: 'utilidades/enviar-nomina-electronica',
         loadChildren: () =>
           import('./utilidades/enviar-nomina-electronica/enviar-nomina-electronica.routes').then(

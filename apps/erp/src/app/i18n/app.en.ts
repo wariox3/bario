@@ -6502,6 +6502,34 @@ export const en: AppDict = {
         },
       },
     },
+    validarCreditos: {
+      name: 'Validate loans',
+      description:
+        'This process recalculates the paid amount, current installment and balance of each loan from approved payrolls and fixes those that do not match what is stored.',
+      run: 'Validate',
+      confirm: {
+        header: 'Validate loans?',
+        message:
+          'The balances of all loans will be recalculated and those that do not match will be fixed. This may take a few seconds.',
+        accept: 'Validate',
+        cancel: 'Cancel',
+      },
+      toasts: {
+        success: {
+          title: 'Validation completed',
+          desc: {
+            generic: 'Loan balances were checked and fixed.',
+            zero: 'All loans matched: nothing to fix.',
+            one: '1 loan was fixed.',
+            other: '{n} loans were fixed.',
+          },
+        },
+        error: {
+          title: 'Could not validate',
+          desc: 'An error occurred while validating the loans. Try again.',
+        },
+      },
+    },
     validarDepreciacion: {
       name: 'Validate depreciation',
       description:
