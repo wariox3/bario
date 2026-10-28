@@ -293,6 +293,15 @@ export interface AppDict
   layout: {
     menuLabel: string;
     drawerHeader: string;
+    moduleBar: {
+      label: string;
+      more: string;
+    };
+    modulePicker: {
+      change: string;
+      close: string;
+      choose: string;
+    };
     tenantBadge: {
       ariaLabel: string;
     };

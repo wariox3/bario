@@ -278,6 +278,15 @@ export const en: AppDict = {
   layout: {
     menuLabel: 'Open menu',
     drawerHeader: 'Menu',
+    moduleBar: {
+      label: 'Modules',
+      more: 'More',
+    },
+    modulePicker: {
+      change: 'Change',
+      close: 'Close',
+      choose: 'Pick a module',
+    },
     tenantBadge: {
       ariaLabel: 'Current company',
     },

@@ -1,4 +1,5 @@
 :host {
+  position: relative;
   display: flex;
   flex: 1;
   min-width: 0;
@@ -9,24 +10,35 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  overflow-x: auto;
-  scrollbar-width: none;
+  min-width: 0;
 
-  &::-webkit-scrollbar {
-    display: none;
+  // Copia de medición: fuera del flujo, sin alto y sin pintarse.
+  &--ghost {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   &__item {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 0.45rem;
     padding: 0.4rem 0.8rem;
+    border: none;
     border-radius: 8px;
+    background: transparent;
+    font: inherit;
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--brand-muted);
     text-decoration: none;
     white-space: nowrap;
+    cursor: pointer;
     transition:
       background 0.12s ease,
       color 0.12s ease;
@@ -53,11 +65,17 @@
     transition: color 0.12s ease;
   }
 
+  &__chevron {
+    font-size: 0.65rem;
+    color: var(--brand-muted);
+  }
+
   &__label {
     line-height: 1;
   }
 }
 
+// En móvil los módulos se cambian desde el drawer (`<app-module-picker>`).
 @media (max-width: 768px) {
   :host {
     display: none;
