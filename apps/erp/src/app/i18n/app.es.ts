@@ -2160,7 +2160,13 @@ export const es: AppDict = {
         empty: 'Este crédito todavía no tiene pagos aplicados',
         loadError: 'No se pudieron cargar los pagos',
         total: 'Total descontado',
-        columns: { id: 'ID', fecha: 'Fecha', documento: 'Documento', pago: 'Valor' },
+        columns: {
+          id: 'ID',
+          tipo: 'Documento tipo',
+          numero: 'Número',
+          fecha: 'Fecha',
+          deduccion: 'Deducción',
+        },
       },
       columns: {
         id: 'ID',

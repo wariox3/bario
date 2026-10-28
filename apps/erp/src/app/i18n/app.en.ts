@@ -2090,7 +2090,13 @@ export const en: AppDict = {
         empty: 'This loan has no payments applied yet',
         loadError: 'Could not load the payments',
         total: 'Total deducted',
-        columns: { id: 'ID', fecha: 'Date', documento: 'Document', pago: 'Amount' },
+        columns: {
+          id: 'ID',
+          tipo: 'Document type',
+          numero: 'Number',
+          fecha: 'Date',
+          deduccion: 'Deduction',
+        },
       },
       columns: {
         id: 'ID',
