@@ -19,7 +19,9 @@
           {{ c.columns.dias }}
         </th>
         <th class="nomina-conceptos-table__th w-28 text-right">{{ c.columns.valorHora }}</th>
-        <th class="nomina-conceptos-table__th w-24 text-left">{{ c.columns.operacion }}</th>
+        @if (mostrarOperacion()) {
+          <th class="nomina-conceptos-table__th w-24 text-left">{{ c.columns.operacion }}</th>
+        }
         <th class="nomina-conceptos-table__th w-32 text-right">{{ c.columns.devengado }}</th>
         <th class="nomina-conceptos-table__th w-32 text-right">{{ c.columns.deduccion }}</th>
         <th class="nomina-conceptos-table__th w-32 text-right" [title]="c.tooltips.basePrestacion">
@@ -59,7 +61,9 @@
           <td class="nomina-conceptos-table__td text-right tabular-nums">
             {{ formatAmount(line.hora) }}
           </td>
-          <td class="nomina-conceptos-table__td text-brand-text">{{ operacionLabel(line) }}</td>
+          @if (mostrarOperacion()) {
+            <td class="nomina-conceptos-table__td text-brand-text">{{ operacionLabel(line) }}</td>
+          }
           <td class="nomina-conceptos-table__td text-right tabular-nums">
             {{ formatAmount(line.devengado) }}
           </td>
@@ -78,7 +82,10 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="15" class="px-5 py-8 text-center text-sm text-brand-muted">
+          <td
+            [attr.colspan]="mostrarOperacion() ? 15 : 14"
+            class="px-5 py-8 text-center text-sm text-brand-muted"
+          >
             <i class="pi pi-inbox mr-2"></i>{{ c.empty }}
           </td>
         </tr>

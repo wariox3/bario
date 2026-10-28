@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
   DestroyRef,
   ViewChild,
   forwardRef,
@@ -97,6 +98,7 @@ function toReferenciaOption(doc: DocumentoReferenciaApi): ReferenciaOption {
 export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccessor {
   private readonly service = inject(DocumentoReferenciaService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
 
   @ViewChild(AutoComplete) private readonly ac?: AutoComplete;
 
@@ -117,6 +119,8 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
   private onTouchedFn: () => void = () => undefined;
   /** Tras elegir, PrimeNG devuelve el foco al input: eso no debe reabrir el panel. */
   private skipNextFocus = false;
+  /** El último blur fue por cambiar de pestaña o de ventana (ver `onBlurred`). */
+  private windowBlurred = false;
 
   /** Términos de búsqueda; `switchMap` deja ganar la última consulta. */
   private readonly query$ = new Subject<string>();
@@ -161,8 +165,11 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
 
   /** Cada enfoque lista los documentos sin el filtro de la búsqueda anterior. */
   onFocusInput(): void {
-    if (this.skipNextFocus) {
+    // Tras seleccionar, PrimeNG devuelve el foco al input, y al volver a la pestaña lo
+    // devuelve el navegador. Ninguno lo pidió la persona: no reabren el panel.
+    if (this.skipNextFocus || this.windowBlurred) {
       this.skipNextFocus = false;
+      this.windowBlurred = false;
       return;
     }
     this.ac?.search(undefined, '', 'focus');
@@ -179,6 +186,9 @@ export class ErpDocumentoReferenciaSelectComponent implements ControlValueAccess
    * blur viene de un clic sobre una opción y la selección ya está en camino.
    */
   onBlurred(): void {
+    // Sin foco en el documento, el blur no es por pasar a otro campo sino por cambiar
+    // de pestaña o de ventana; al volver, el navegador re-enfoca este input.
+    this.windowBlurred = !this.document.hasFocus();
     if (this.value() !== null && !this.ac?.overlayVisible) {
       const input: HTMLInputElement | undefined = this.ac?.inputEL?.nativeElement;
       if (input && input.value.trim() === '') this.onValueChange(null);
