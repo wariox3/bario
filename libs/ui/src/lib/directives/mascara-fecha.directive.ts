@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, ElementRef, inject } from '@angular/core';
+import { DOCUMENT, DestroyRef, Directive, ElementRef, inject } from '@angular/core';
 import { DatePicker } from 'primeng/datepicker';
 
 /** Un tramo de dígitos del formato (`dd`, `mm`, `yy`) y lo que lo cierra. */
@@ -322,6 +322,9 @@ export function saltarSeparadorAlBorrar(
  * Al borrar no se rearma nada: el retroceso no pelea con un separador que
  * reaparece. Lo único que se cuida es que no se lleve un separador de en medio
  * (`saltarSeparadorAlBorrar`).
+ *
+ * De paso, como ya está sobre todo datepicker, evita que el calendario se abra
+ * solo al volver a la pestaña (`onFocusRestaurado`).
  */
 @Directive({
   // Va sobre el elemento de PrimeNG, sin atributo propio: la máscara es de todo
@@ -333,18 +336,51 @@ export function saltarSeparadorAlBorrar(
 export class MascaraFechaDirective {
   private readonly datePicker = inject(DatePicker, { self: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly document = inject(DOCUMENT);
+  /** El último blur fue por cambiar de pestaña o de ventana (ver `onFocusOut`). */
+  private ventanaSinFoco = false;
 
   constructor() {
     // Fase de captura en el host: corre antes que los listeners de PrimeNG
     // sobre el input interno.
     const antes = (event: Event): void => this.onBeforeInput(event);
     const despues = (event: Event): void => this.onInput(event);
+    const alSalir = (): void => this.onFocusOut();
+    const alEntrar = (): void => this.onFocusRestaurado();
     this.host.addEventListener('beforeinput', antes, { capture: true });
     this.host.addEventListener('input', despues, { capture: true });
+    this.host.addEventListener('focusout', alSalir, { capture: true });
+    this.host.addEventListener('focus', alEntrar, { capture: true });
     inject(DestroyRef).onDestroy(() => {
       this.host.removeEventListener('beforeinput', antes, { capture: true });
       this.host.removeEventListener('input', despues, { capture: true });
+      this.host.removeEventListener('focusout', alSalir, { capture: true });
+      this.host.removeEventListener('focus', alEntrar, { capture: true });
     });
+  }
+
+  /**
+   * Sin foco en el documento, el blur no es por pasar a otro campo sino por
+   * cambiar de pestaña o de ventana; al volver, el navegador re-enfoca el input.
+   */
+  private onFocusOut(): void {
+    this.ventanaSinFoco = !this.document.hasFocus();
+  }
+
+  /**
+   * PrimeNG abre el calendario en todo `focus` del input (`showOnFocus`), también
+   * en el que devuelve el navegador al volver a la pestaña, que no lo pidió la
+   * persona. Este listener corre en captura, antes que el de PrimeNG: apaga
+   * `showOnFocus` solo para ese foco y lo restaura en la tarea siguiente —una
+   * microtarea correría antes que el listener de PrimeNG—.
+   */
+  private onFocusRestaurado(): void {
+    if (!this.ventanaSinFoco) return;
+    this.ventanaSinFoco = false;
+    const dp = this.datePicker;
+    if (!dp.showOnFocus) return;
+    dp.showOnFocus = false;
+    setTimeout(() => (dp.showOnFocus = true));
   }
 
   /** Tramos del formato de este datepicker, o `null` si no lleva máscara. */
