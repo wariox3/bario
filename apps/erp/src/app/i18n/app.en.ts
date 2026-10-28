@@ -1751,6 +1751,10 @@ export const en: AppDict = {
           clasificacion: 'Class, group and account it belongs to',
           comportamiento: 'Rules for using the account in movements',
         },
+        enUso: {
+          titulo: 'This account already has movements',
+          hint: 'Its behavior can no longer change.',
+        },
         fields: {
           codigo: 'Code',
           nombre: 'Name',

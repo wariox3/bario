@@ -1308,6 +1308,7 @@ export interface AppDict
         editSubtitle: string;
         sections: { clasificacion: string; comportamiento: string };
         sectionsHint: { clasificacion: string; comportamiento: string };
+        enUso: { titulo: string; hint: string };
         fields: {
           codigo: string;
           nombre: string;
