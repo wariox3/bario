@@ -46,7 +46,7 @@ export function rolInicial(
 
 /**
  * Alta de tercero sin salir del documento: sobre un `<lib-contacto-select>`,
- * ofrece "Crear tercero" al pie de sus sugerencias, abre el formulario de
+ * ofrece "Nuevo contacto" al pie de sus sugerencias, abre el formulario de
  * contacto como modal y deja elegido el contacto creado.
  *
  * ```html

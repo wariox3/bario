@@ -1,14 +1,13 @@
 <header class="app-header">
   <div class="app-header__brand">
-    @if (activeDescriptor()) {
-      <button
-        class="app-header__hamburger"
-        (click)="toggleDrawer()"
-        [attr.aria-label]="t().layout.menuLabel"
-      >
-        <i class="pi pi-bars"></i>
-      </button>
-    }
+    <button
+      type="button"
+      class="app-header__hamburger"
+      (click)="toggleDrawer()"
+      [attr.aria-label]="t().layout.menuLabel"
+    >
+      <i class="pi pi-bars"></i>
+    </button>
     <img src="/logos/reddoc.svg" alt="RedDoc" class="app-header__logo" />
     <span class="app-header__divider" aria-hidden="true"></span>
     <app-tenant-badge />
@@ -44,19 +43,24 @@
   </main>
 </div>
 
-<!-- Drawer móvil — solo cuando hay módulo activo (si no, no hay menú que abrir) -->
-@if (activeDescriptor()) {
-  <p-drawer
-    [visible]="drawerVisible()"
-    (visibleChange)="drawerVisible.set($event)"
-    position="left"
-    [header]="t().layout.drawerHeader"
-  >
-    <nav class="workspace-nav">
+<!--
+  Drawer móvil: arriba el selector de módulo (el topbar no cabe en móvil) y debajo
+  las secciones del módulo activo. Existe siempre: sin módulo activo la grilla de
+  módulos es la única salida de pantallas como el dashboard.
+-->
+<p-drawer
+  [visible]="drawerVisible()"
+  (visibleChange)="drawerVisible.set($event)"
+  position="left"
+  [header]="t().layout.drawerHeader"
+>
+  <app-module-picker [(open)]="pickerOpen" />
+  @if (activeDescriptor()) {
+    <nav class="workspace-nav workspace-nav--drawer" [class.workspace-nav--dimmed]="pickerOpen()">
       <ng-container *ngTemplateOutlet="navTpl; context: { $implicit: true }" />
     </nav>
-  </p-drawer>
-}
+  }
+</p-drawer>
 
 <!-- Template de navegación compartido entre sidebar y drawer -->
 <ng-template #navTpl let-inDrawer>

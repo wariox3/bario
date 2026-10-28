@@ -14,7 +14,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
  * que llegue el `click`: sin él, el blur dispararía la reconciliación de
  * `forceSelection` y el panel se cerraría bajo el puntero.
  *
- * Lo usan `lib-contacto-select` («Crear tercero») y `app-item-autocomplete`
+ * Lo usan `lib-contacto-select` («Nuevo contacto») y `app-item-autocomplete`
  * («Crear ítem»); el alta en sí es siempre de quien escucha `create`.
  */
 @Component({

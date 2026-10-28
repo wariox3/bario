@@ -195,6 +195,17 @@
 // ─── Sidebar: acordeones de módulo ───────────────────────────────────────────
 
 .workspace-nav {
+  // En el drawer va bajo el selector de módulo.
+  &--drawer {
+    margin-top: 0.5rem;
+    transition: opacity 0.12s ease;
+  }
+
+  // Con la grilla de módulos abierta, las secciones pasan a segundo plano.
+  &--dimmed {
+    opacity: 0.4;
+  }
+
   &__module {
     display: flex;
     flex-direction: column;

@@ -397,6 +397,15 @@ export const es: AppDict = {
         cuenta: 'Cuenta',
         asesor: 'Asesor',
       },
+      masInfo: {
+        titulo: 'Más información',
+        opcional: 'Opcional',
+        soporte: 'Soporte',
+        soportePlaceholder: 'Número o referencia',
+        comentario: 'Comentario',
+        comentarioPlaceholder: 'Una nota para el cliente o para la caja',
+        enTirilla: 'Sale impreso en la tirilla',
+      },
       fases: {
         preparando: 'Preparando…',
         guardando: 'Guardando…',
@@ -410,6 +419,7 @@ export const es: AppDict = {
         total: 'Total',
         recibido: 'Recibido',
         imprimir: 'Imprimir',
+        descargar: 'Descargar',
         nuevaVenta: 'Nueva venta',
         pagado: {
           efectivo: 'Pagado en efectivo',
@@ -466,6 +476,10 @@ export const es: AppDict = {
           title: 'No se pudo imprimir',
           desc: 'Puedes imprimir la venta desde el historial.',
         },
+        descargar: {
+          title: 'No se pudo descargar',
+          desc: 'Intenta de nuevo en un momento.',
+        },
       },
     },
   },
@@ -519,7 +533,8 @@ export const es: AppDict = {
   },
   configuracion: {
     title: 'Configuración de la caja',
-    subtitle: 'El tipo de documento es de la empresa; lo demás se guarda en este dispositivo.',
+    subtitle:
+      'El tipo de documento y la tirilla son de la empresa; lo demás se guarda en este dispositivo.',
     documento: {
       title: 'Tipo de documento',
       hint: 'Lo comparten todas las cajas de la empresa.',
@@ -529,6 +544,19 @@ export const es: AppDict = {
     tipos: {
       pos: 'Factura POS',
       posElectronica: 'Factura POS electrónica',
+    },
+    tirilla: {
+      title: 'Tirilla',
+      hint: 'Textos fijos que salen en todas las tirillas de la empresa.',
+      superior: 'Información superior',
+      superiorPlaceholder: 'Ej. Régimen, horario o dirección de la tienda',
+      superiorHint: 'Sale arriba, antes de los productos.',
+      inferior: 'Información inferior',
+      inferiorPlaceholder: 'Ej. Gracias por su compra · Cambios dentro de 8 días',
+      inferiorHint: 'Sale al final, después del total.',
+      muestra: 'Así queda',
+      deLaVenta: 'Productos, total, soporte y comentario de cada venta',
+      error: 'No se pudieron leer los textos de la tirilla.',
     },
     operacion: {
       title: 'Operación',
@@ -553,6 +581,10 @@ export const es: AppDict = {
       },
       tipoError: {
         title: 'No se pudo guardar el tipo de documento',
+        desc: 'Lo demás quedó guardado. Intenta de nuevo.',
+      },
+      tirillaError: {
+        title: 'No se pudieron guardar los textos de la tirilla',
         desc: 'Lo demás quedó guardado. Intenta de nuevo.',
       },
     },

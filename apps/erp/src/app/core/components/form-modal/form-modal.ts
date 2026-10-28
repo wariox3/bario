@@ -24,7 +24,7 @@ export interface FormModal {
 }
 
 /**
- * Alta inline de un master desde otra pantalla («Crear tercero», «Crear ítem»):
+ * Alta inline de un master desde otra pantalla («Nuevo contacto», «Crear ítem»):
  * el form se abre en un modal y lo creado vuelve a quien lo pidió.
  *
  * Reúne lo que cada alta inline necesita y es fácil olvidar:

@@ -34,6 +34,21 @@ export class CuentaService extends BaseHttpService {
     return this.post<Cuenta>(this.resourcePath, payload);
   }
 
+  /**
+   * ¿Algún movimiento contable ya referencia la cuenta?
+   *
+   * Lo consulta el formulario en edición para bloquear el comportamiento
+   * (permite movimiento, exige base/contacto/centro de costo).
+   *
+   * `GET /contabilidad/cuenta/{id}/validar-uso/` → `{ uso: boolean }`
+   * (operación `contabilidad_cuenta_validar_uso_retrieve` del schema del contenedor).
+   */
+  validarUso(id: number): Observable<boolean> {
+    return this.get<{ uso: boolean }>(`${this.resourcePath}${id}/validar-uso/`).pipe(
+      map((respuesta) => respuesta.uso),
+    );
+  }
+
   update(id: number, payload: CuentaPayload): Observable<Cuenta> {
     return this.put<Cuenta>(`${this.resourcePath}${id}/`, payload);
   }

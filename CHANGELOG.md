@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.13](https://github.com/wariox3/bario/compare/v0.1.12...v0.1.13) (2026-10-28)
+
+### Features
+
+- **erp:** bloquear el comportamiento de una cuenta con movimientos ([289bd0a](https://github.com/wariox3/bario/commit/289bd0a290c07eb7b374721a587cb9c97ada9778))
+- **erp:** crear la factura de venta desde una factura recurrente ([b645ae0](https://github.com/wariox3/bario/commit/b645ae088dca70412eb662dc873daa64d00e9e3b))
+- **erp:** editar los textos de la tirilla POS en el formato de venta ([68df034](https://github.com/wariox3/bario/commit/68df034e55739daa56fc663fa5d038e8245a8ba2))
+- **erp:** llamar «Nuevo contacto» al alta de tercero desde un documento ([1759972](https://github.com/wariox3/bario/commit/1759972840f533437aa2e5812fb2ff5378df3fe1))
+- **erp:** navegar entre módulos desde móvil y agrupar los que no caben en «Más» ([e67db0c](https://github.com/wariox3/bario/commit/e67db0c7a439d9708715a0f21627e1c07bca3310))
+- **pos:** abrir el diálogo de impresión de la venta sin pasar por otra pestaña ([d7562e5](https://github.com/wariox3/bario/commit/d7562e5ed934c2e0fc49e140eb632018ca61a583))
+- **pos:** agregar soporte y comentario de la venta al cobrar ([28de5da](https://github.com/wariox3/bario/commit/28de5da3be64653d6745326323bd96e86e0005a5))
+- **pos:** configurar los textos de arriba y abajo de la tirilla ([a105bfa](https://github.com/wariox3/bario/commit/a105bfa5bfa59f6da66cc6bab4560ea7622dcc3c))
+- **pos:** descargar el PDF de la venta desde la pantalla de éxito del cobro ([fb09270](https://github.com/wariox3/bario/commit/fb0927008c392e6fc6270643d9dd467516558774))
+
+### Bug Fixes
+
+- **core:** no cerrar la sesión cuando falla el reintento tras el refresh ([7bc8aa5](https://github.com/wariox3/bario/commit/7bc8aa576f31cb0b7c9d6379735210c9a78e12bd))
+- **erp:** mostrar el documento afectado en la ficha del pago ([618b49e](https://github.com/wariox3/bario/commit/618b49ea0bd540a5cac371ba7a4af94ea17078d2))
+
+### Refactoring
+
+- **erp:** apuntar los resúmenes de los inicios a los endpoints de tablero ([345ec77](https://github.com/wariox3/bario/commit/345ec7717ef9ee5eb87af396d6e88ebb086ef447))
+
+### Documentation
+
+- sumar la guía de release y hotfix ([d8097e2](https://github.com/wariox3/bario/commit/d8097e2d11764b035027df84150c39b2bdaf9fda))
+
 ## [0.1.12](https://github.com/wariox3/bario/compare/v0.1.11...v0.1.12) (2026-10-27)
 
 ### Features

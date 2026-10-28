@@ -1,5 +1,5 @@
 /**
- * Respuesta de `GET general/documento/cartera-resumen/?tipo=`. Cifras de las
+ * Respuesta de `GET general/tablero/cartera/?tipo=`. Cifras de las
  * cuentas por cobrar o por pagar **a una fecha de corte** (hoy). Vencido +
  * vigente = pendiente; un documento sin `fecha_vence` vence en su `fecha`.
  *

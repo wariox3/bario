@@ -1,24 +1,32 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { I18nService, TenantService } from '@reddoc/core';
-import { ActiveModuleStore, ERP_MODULES, type ErpModuleDescriptor } from '@erp/core/erp-modules';
-import { PermissionsService, hasVisibleMenu, type ModeloId } from '@erp/core/permissions';
+import { MenuModule } from 'primeng/menu';
+import type { MenuItem } from 'primeng/api';
+import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-
-interface VisibleModule {
-  readonly id: string;
-  readonly label: string;
-  readonly iconClass: string;
-  readonly targetPath: string;
-  readonly isActive: boolean;
-}
+import { splitModules } from './split-modules';
+import { VisibleModulesStore } from './visible-modules.store';
 
 /**
  * Topbar de módulos del ERP.
  *
  * Vive en el header del `WorkspaceLayout`. Renderiza un link por cada módulo
- * habilitado para el tenant activo (filtrado por `PermissionsService`) y
- * marca como activo el que está en `ActiveModuleStore`.
+ * habilitado para el tenant activo (`VisibleModulesStore`) y marca como activo
+ * el que está en `ActiveModuleStore`.
+ *
+ * Cuando no caben todos, los que sobran van a un menú «Más» (priority+). Las
+ * medidas salen de una copia invisible de la barra (`#ghost`) con todos los
+ * módulos, así el reparto no depende de lo que esté pintado en ese momento.
  *
  * Cada link apunta a `/t/<slug>/<moduleId>`; el resolver de ese módulo y/o
  * su `''` redirect llevan al destino real (master/documento por defecto o
@@ -27,52 +35,61 @@ interface VisibleModule {
 @Component({
   selector: 'app-module-bar',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, MenuModule],
   templateUrl: './module-bar.component.html',
   styleUrl: './module-bar.component.scss',
 })
 export class ModuleBarComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
-  private readonly tenant = inject(TenantService);
-  private readonly permissions = inject(PermissionsService);
-  private readonly activeModule = inject(ActiveModuleStore);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly store = inject(VisibleModulesStore);
 
-  private readonly t = this.i18n.t;
+  protected readonly t = this.i18n.t;
+  protected readonly modules = this.store.modules;
 
-  protected readonly modules = computed<readonly VisibleModule[]>(() => {
-    const slug = this.tenant.currentSlug();
-    if (!slug) return [];
-    const activeId = this.activeModule.activeId();
-    const can = (modelo?: ModeloId) => this.permissions.canShowInMenu(modelo);
-    // Dos filtros distintos: el plan del tenant dice si el módulo existe, los
-    // permisos del usuario dicen si le queda algo adentro. Un módulo del plan
-    // sin ninguna entrada alcanzable abre a un sidebar vacío — no se muestra.
-    return ERP_MODULES.filter(
-      (m) => this.permissions.canAccessModule(m.id) && hasVisibleMenu(m.menu, can),
-    ).map((m) => this.toVisible(m, slug, activeId));
-  });
+  private readonly ghost = viewChild<ElementRef<HTMLElement>>('ghost');
 
-  private toVisible(
-    descriptor: ErpModuleDescriptor,
-    slug: string,
-    activeId: string | null,
-  ): VisibleModule {
-    return {
-      id: descriptor.id,
-      label: this.translate(descriptor.displayNameKey),
-      iconClass: descriptor.iconClass,
-      targetPath: `/t/${slug}/${descriptor.id}`,
-      isActive: descriptor.id === activeId,
-    };
+  private readonly available = signal(0);
+  private readonly itemWidths = signal<readonly number[]>([]);
+  private readonly moreWidth = signal(0);
+  private readonly gap = signal(0);
+
+  protected readonly split = computed(() =>
+    splitModules(this.modules(), this.itemWidths(), this.moreWidth(), this.gap(), this.available()),
+  );
+
+  protected readonly overflowItems = computed<MenuItem[]>(() =>
+    this.split().overflow.map((mod) => ({
+      label: mod.label,
+      icon: mod.iconClass,
+      routerLink: mod.targetPath,
+    })),
+  );
+
+  constructor() {
+    const observer = new ResizeObserver(() => this.measure());
+    observer.observe(this.host.nativeElement);
+    inject(DestroyRef).onDestroy(() => observer.disconnect());
+
+    // La copia se re-mide sola cuando cambia de ancho (idioma, módulos del
+    // plan, el activo que pasa a negrita); el observer sigue al nodo vigente.
+    effect((onCleanup) => {
+      const ghost = this.ghost()?.nativeElement;
+      if (!ghost) return;
+      observer.observe(ghost);
+      onCleanup(() => observer.unobserve(ghost));
+    });
+
+    afterNextRender(() => this.measure());
   }
 
-  private translate(key: string): string {
-    const parts = key.split('.');
-    let current: unknown = this.t();
-    for (const part of parts) {
-      if (current === null || typeof current !== 'object') return key;
-      current = (current as Record<string, unknown>)[part];
-    }
-    return typeof current === 'string' ? current : key;
+  private measure(): void {
+    this.available.set(this.host.nativeElement.clientWidth);
+    const ghost = this.ghost()?.nativeElement;
+    if (!ghost) return;
+    const items = Array.from(ghost.querySelectorAll<HTMLElement>('[data-module]'));
+    this.itemWidths.set(items.map((el) => el.getBoundingClientRect().width));
+    this.moreWidth.set(ghost.querySelector('[data-more]')?.getBoundingClientRect().width ?? 0);
+    this.gap.set(parseFloat(getComputedStyle(ghost).columnGap) || 0);
   }
 }

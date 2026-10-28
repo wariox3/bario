@@ -329,6 +329,16 @@ export interface AppDict
         cuenta: string;
         asesor: string;
       };
+      /** Soporte y comentario de la venta, plegados bajo la cuenta y el asesor. */
+      masInfo: {
+        titulo: string;
+        opcional: string;
+        soporte: string;
+        soportePlaceholder: string;
+        comentario: string;
+        comentarioPlaceholder: string;
+        enTirilla: string;
+      };
       fases: Record<FaseCobro, string>;
       exito: {
         titulo: string;
@@ -337,6 +347,7 @@ export interface AppDict
         total: string;
         recibido: string;
         imprimir: string;
+        descargar: string;
         nuevaVenta: string;
         /** Cómo se pagó, en la pantalla de éxito fuera del efectivo. */
         pagado: Record<MedioPagoId, string>;
@@ -368,6 +379,7 @@ export interface AppDict
         plazoContado: string;
         descartar: string;
         imprimir: { title: string; desc: string };
+        descargar: { title: string; desc: string };
         cuentaTransferencia: string;
         sinValor: string;
       };
@@ -407,6 +419,20 @@ export interface AppDict
     subtitle: string;
     documento: { title: string; hint: string; error: string; reintentar: string };
     tipos: { pos: string; posElectronica: string };
+    /** Textos fijos de la tirilla (`ven_pos_informacion_superior` / `_inferior`). */
+    tirilla: {
+      title: string;
+      hint: string;
+      superior: string;
+      superiorPlaceholder: string;
+      superiorHint: string;
+      inferior: string;
+      inferiorPlaceholder: string;
+      inferiorHint: string;
+      muestra: string;
+      deLaVenta: string;
+      error: string;
+    };
     operacion: { title: string; hint: string };
     campos: {
       almacen: string;
@@ -422,6 +448,7 @@ export interface AppDict
     toasts: {
       guardada: { title: string; desc: string };
       tipoError: { title: string; desc: string };
+      tirillaError: { title: string; desc: string };
     };
   };
 }

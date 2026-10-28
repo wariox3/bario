@@ -6,8 +6,8 @@ import type { ComercialResumen, ComercialTipo } from './comercial-resumen.model'
 
 /** Endpoint de cada resumen; misma respuesta en los dos. */
 export const COMERCIAL_RESUMEN_ENDPOINT = {
-  venta: '/general/documento/venta-resumen/',
-  compra: '/general/documento/compra-resumen/',
+  venta: '/general/tablero/venta/',
+  compra: '/general/tablero/compra/',
 } as const satisfies Record<ComercialTipo, string>;
 
 /** Ventas o compras del mes o del año en curso, con su serie por día o por mes. */

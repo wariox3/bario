@@ -17,14 +17,18 @@ import {
 const VENTA_FORMATO_FIELD_MAP = {
   ven_factura_informacion_superior: 'informacion_superior',
   ven_factura_informacion_inferior: 'informacion_inferior',
+  ven_pos_informacion_superior: 'pos_informacion_superior',
+  ven_pos_informacion_inferior: 'pos_informacion_inferior',
 };
 
-/** Tope de cada texto: el del ERP anterior (la columna del backend no tiene). */
+/** Tope de cada texto: el del ERP anterior (la columna del backend no tiene). El POS usa el mismo. */
 const INFORMACION_MAX = 2000;
 
 /**
  * Sub-pestaña "Formato" de Venta: los textos libres que la factura impresa lleva
- * arriba y abajo (`ven_factura_informacion_superior` / `_inferior`).
+ * arriba y abajo (`ven_factura_informacion_superior` / `_inferior`) y los de la
+ * tirilla del POS (`ven_pos_informacion_superior` / `_inferior`). El POS también
+ * edita los de la tirilla desde su configuración.
  *
  * Auto-contenida: lee y guarda solo sus campos (`VENTA_FORMATO_CAMPOS`). Ambos
  * son opcionales; vaciar uno lo borra.
@@ -53,6 +57,8 @@ export class VentaFormatoConfigComponent {
   protected readonly form = this.fb.nonNullable.group({
     informacion_superior: ['', Validators.maxLength(INFORMACION_MAX)],
     informacion_inferior: ['', Validators.maxLength(INFORMACION_MAX)],
+    pos_informacion_superior: ['', Validators.maxLength(INFORMACION_MAX)],
+    pos_informacion_inferior: ['', Validators.maxLength(INFORMACION_MAX)],
   });
 
   constructor() {

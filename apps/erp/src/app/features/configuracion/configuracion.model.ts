@@ -55,6 +55,10 @@ export interface ConfiguracionRead {
   readonly ven_factura_informacion_superior: string | null;
   /** Texto libre que la factura impresa lleva abajo. */
   readonly ven_factura_informacion_inferior: string | null;
+  /** Texto libre que la tirilla del POS lleva arriba. */
+  readonly ven_pos_informacion_superior: string | null;
+  /** Texto libre que la tirilla del POS lleva abajo. */
+  readonly ven_pos_informacion_inferior: string | null;
 
   // AIU de la factura de venta (área Venta): ítems con que se liquidan la
   // administración, el imprevisto y la utilidad. FK a `GenItem`; el `_nombre` es

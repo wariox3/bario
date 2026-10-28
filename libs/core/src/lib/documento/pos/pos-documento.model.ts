@@ -59,6 +59,8 @@ export interface PosDocumentoPayload extends DocumentoPayloadBase {
   readonly asesor: number | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
+  /** Lo manda la caja del POS; el form del ERP no lo edita y lo omite. */
+  readonly soporte?: string | null;
   /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
   readonly detalles?: readonly ComercialDetallePayload[];
 }

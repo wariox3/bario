@@ -139,7 +139,7 @@ export class ErpContactoSelectComponent implements ControlValueAccessor {
    */
   readonly allowCreate = signal(false);
   /** Texto del pie; quien enciende `allowCreate` lo traduce. */
-  readonly createLabel = signal('Crear tercero');
+  readonly createLabel = signal('Nuevo contacto');
   readonly createRequested = output<void>();
 
   readonly value = signal<ErpSelectOption | null>(null);

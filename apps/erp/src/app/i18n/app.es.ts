@@ -288,6 +288,15 @@ export const es: AppDict = {
   layout: {
     menuLabel: 'Abrir menú',
     drawerHeader: 'Menú',
+    moduleBar: {
+      label: 'Módulos',
+      more: 'Más',
+    },
+    modulePicker: {
+      change: 'Cambiar',
+      close: 'Cerrar',
+      choose: 'Elige un módulo',
+    },
     tenantBadge: {
       ariaLabel: 'Empresa actual',
     },
@@ -424,17 +433,25 @@ export const es: AppDict = {
       buttonLabel: 'Recurrente',
       modalHeader: 'Factura desde recurrente',
       modalSubtitle: 'Elige la factura recurrente desde la que se crea la nueva factura',
-      searchPlaceholder: 'Buscar por proveedor o identificación',
       seleccionar: 'Seleccionar',
       cancel: 'Cancelar',
       sinOrigen: 'Este documento no tiene definida la factura recurrente de la que sale.',
       columns: {
         id: 'ID',
         identificacion: 'Identificación',
-        contacto: 'Proveedor',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
+      },
+      contraparte: {
+        proveedor: {
+          searchPlaceholder: 'Buscar por proveedor o identificación',
+          column: 'Proveedor',
+        },
+        cliente: {
+          searchPlaceholder: 'Buscar por cliente o identificación',
+          column: 'Cliente',
+        },
       },
       empty: {
         title: 'Sin facturas recurrentes',
@@ -1200,8 +1217,7 @@ export const es: AppDict = {
       },
       form: {
         createTitle: 'Nuevo contacto',
-        createTerceroTitle: 'Nuevo tercero',
-        createTercero: 'Crear tercero',
+        createTercero: 'Nuevo contacto',
         createSubtitle: 'Registra un nuevo contacto',
         editTitle: 'Editar contacto',
         editSubtitle: 'Actualiza los datos del contacto',
@@ -1796,6 +1812,10 @@ export const es: AppDict = {
         sectionsHint: {
           clasificacion: 'Clase, grupo y cuenta a la que pertenece',
           comportamiento: 'Reglas de uso de la cuenta en los movimientos',
+        },
+        enUso: {
+          titulo: 'Esta cuenta ya tiene movimientos',
+          hint: 'Su comportamiento no se puede cambiar.',
         },
         fields: {
           codigo: 'Código',
@@ -7560,6 +7580,16 @@ export const es: AppDict = {
           informacionInferior: 'Aparece al pie de la factura.',
         },
         validation: { max: 'Máximo 2000 caracteres' },
+        pos: {
+          section: {
+            title: 'Tirilla POS',
+            hint: 'Textos fijos que salen en todas las tirillas del punto de venta.',
+          },
+          hints: {
+            informacionSuperior: 'Sale arriba de la tirilla, antes de los productos.',
+            informacionInferior: 'Sale al final de la tirilla, después del total.',
+          },
+        },
       },
       aiu: {
         section: {

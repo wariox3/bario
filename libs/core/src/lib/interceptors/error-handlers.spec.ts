@@ -1,10 +1,12 @@
-import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
+import { HttpErrorResponse, HttpHandlerFn, HttpRequest, HttpResponse } from '@angular/common/http';
 import type { Router } from '@angular/router';
-import { handleForbidden } from './error-handlers';
+import { of, throwError } from 'rxjs';
+import { handleForbidden, handleUnauthorized } from './error-handlers';
 import type { ForbiddenPageStore } from '../errors/forbidden-page.store';
+import { TokenRefreshService } from '../services/token-refresh.service';
 import type { ToastService } from '../services/toast.service';
 import type { TenantService } from '../tenant/tenant.service';
-import type { RoutePaths } from '../tokens';
+import type { AuthServiceContract, RoutePaths } from '../tokens';
 
 const forbidden = (detail = 'No tienes acceso a este recurso.') =>
   new HttpErrorResponse({ status: 403, statusText: 'Forbidden', error: { detail } });
@@ -76,6 +78,69 @@ describe('handleForbidden', () => {
     run(req).subscribe({
       error: () => {
         expect(blocked).toEqual([]);
+        done();
+      },
+    });
+  });
+});
+
+describe('handleUnauthorized', () => {
+  const unauthorized = new HttpErrorResponse({
+    status: 401,
+    error: { detail: 'Las credenciales de autenticación no se proveyeron.' },
+  });
+  const req = new HttpRequest('DELETE', '/api/humano/programacion/5/');
+
+  function setup(refresh: AuthServiceContract['refresh']) {
+    const authService = { refresh, clearSession: jest.fn() } as unknown as AuthServiceContract;
+    const tokenRefresh = new TokenRefreshService();
+    const run = (next: HttpHandlerFn) =>
+      handleUnauthorized(req, next, authService, tokenRefresh, unauthorized, []);
+    return { run, authService, tokenRefresh };
+  }
+
+  it('reintenta la petición tras renovar el token', (done) => {
+    const { run, authService, tokenRefresh } = setup(() => of(undefined));
+    const next = jest.fn(() => of(new HttpResponse({ status: 204 })));
+
+    run(next).subscribe({
+      complete: () => {
+        expect(next).toHaveBeenCalledWith(req);
+        expect(authService.clearSession).not.toHaveBeenCalled();
+        expect(tokenRefresh.refreshing).toBe(false);
+        done();
+      },
+    });
+  });
+
+  it('no cierra la sesión si el reintento falla con un error de negocio', (done) => {
+    const { run, authService } = setup(() => of(undefined));
+    const negocio = new HttpErrorResponse({
+      status: 400,
+      error: { detail: 'No se puede eliminar una programación con contratos cargados.' },
+    });
+
+    run(() => throwError(() => negocio)).subscribe({
+      error: (err) => {
+        expect(err).toBe(negocio);
+        expect(authService.clearSession).not.toHaveBeenCalled();
+        done();
+      },
+      complete: () => done.fail('el error del reintento debe propagarse'),
+    });
+  });
+
+  it('cierra la sesión si el refresh falla, sin reintentar', (done) => {
+    const refreshError = new HttpErrorResponse({ status: 401 });
+    const { run, authService, tokenRefresh } = setup(() => throwError(() => refreshError));
+    const next = jest.fn();
+
+    run(next).subscribe({
+      error: (err) => {
+        expect(err).toBe(refreshError);
+        expect(next).not.toHaveBeenCalled();
+        expect(authService.clearSession).toHaveBeenCalled();
+        expect(tokenRefresh.refreshing).toBe(false);
         done();
       },
     });

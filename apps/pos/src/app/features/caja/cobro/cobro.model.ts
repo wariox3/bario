@@ -18,7 +18,8 @@ export interface SolicitudCobro {
   readonly almacen: ErpSelectOption;
   readonly sede: ErpSelectOption | null;
   readonly asesor: ErpSelectOption | null;
-  /** Va al comentario del documento: p. ej. la referencia de una transferencia. */
+  readonly soporte: string | null;
+  /** Lo que escribió quien cobra, más la referencia de una transferencia. */
   readonly comentario: string | null;
 }
 

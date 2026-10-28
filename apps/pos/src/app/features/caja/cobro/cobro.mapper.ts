@@ -20,7 +20,7 @@ export function solicitudToPayload(
   hoy: Date,
 ): PosDocumentoPayload {
   const { venta, almacen } = solicitud;
-  return posDocumentoToPayload(
+  const documento = posDocumentoToPayload(
     {
       contacto: venta.contacto,
       fecha: hoy,
@@ -36,6 +36,7 @@ export function solicitudToPayload(
     },
     solicitud.documentoTipoId,
   );
+  return { ...documento, soporte: solicitud.soporte };
 }
 
 /** Pagos del cobro → cuerpos de `POST documento-pago/` contra el documento creado. */

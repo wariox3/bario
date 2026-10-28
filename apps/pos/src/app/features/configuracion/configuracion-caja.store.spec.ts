@@ -178,4 +178,36 @@ describe('ConfiguracionEmpresaService', () => {
     req.flush({ ven_pos_documento_tipo: POS });
     expect(await guardado).toBe(POS);
   });
+
+  it('lee los textos de la tirilla; los que no hay quedan vacíos', async () => {
+    const { servicio, http } = preparar();
+    const textos = lastValueFrom(servicio.textosTirilla());
+    const req = http.expectOne((r) => r.url === '/api/general/configuracion/campos/');
+    expect(req.request.params.get('campos')).toBe(
+      'ven_pos_informacion_superior,ven_pos_informacion_inferior',
+    );
+    req.flush({
+      ven_pos_informacion_superior: 'Régimen simple',
+      ven_pos_informacion_inferior: null,
+    });
+    expect(await textos).toEqual({ superior: 'Régimen simple', inferior: '' });
+  });
+
+  it('guarda los textos recortados y manda null el que queda en blanco', async () => {
+    const { servicio, http } = preparar();
+    const guardado = lastValueFrom(
+      servicio.guardarTextosTirilla({ superior: '  Régimen simple ', inferior: '   ' }),
+    );
+    const req = http.expectOne('/api/general/configuracion/actualizar/');
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({
+      ven_pos_informacion_superior: 'Régimen simple',
+      ven_pos_informacion_inferior: null,
+    });
+    req.flush({
+      ven_pos_informacion_superior: 'Régimen simple',
+      ven_pos_informacion_inferior: null,
+    });
+    expect(await guardado).toEqual({ superior: 'Régimen simple', inferior: '' });
+  });
 });

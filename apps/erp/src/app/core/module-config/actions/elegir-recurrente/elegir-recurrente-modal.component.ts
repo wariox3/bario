@@ -26,10 +26,14 @@ import {
   type PlantillaRecurrenteRow,
 } from '../generar-recurrente/generar-recurrente.service';
 
+/** Quién es el contacto de la plantilla: rotula la búsqueda y su columna. */
+export type ContraparteRecurrente = 'proveedor' | 'cliente';
+
 /** Lo que el strategy le pasa al modal por `DialogService.open(..., { data })`. */
 export interface ElegirRecurrenteModalData {
   /** Tipo de las plantillas a listar (p. ej. factura de compra recurrente). */
   readonly documentoTipoOrigen: number;
+  readonly contraparte: ContraparteRecurrente;
 }
 
 /** Espera tras la última tecla antes de buscar, para no consultar por cada letra. */
@@ -38,7 +42,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 /** Las más nuevas primero, como el listado de plantillas. */
 const SORT: readonly SortSpec[] = [{ field: 'id', direction: 'desc' }];
 
-const COLUMNS: readonly ColumnDef[] = [
+const columnas = (contraparte: ContraparteRecurrente): readonly ColumnDef[] => [
   {
     field: 'id',
     headerKey: 'documentActions.elegirRecurrente.columns.id',
@@ -54,7 +58,7 @@ const COLUMNS: readonly ColumnDef[] = [
   },
   {
     field: 'contacto_nombre_corto',
-    headerKey: 'documentActions.elegirRecurrente.columns.contacto',
+    headerKey: `documentActions.elegirRecurrente.contraparte.${contraparte}.column`,
     type: 'text',
   },
   {
@@ -115,7 +119,9 @@ export class ElegirRecurrenteModalComponent {
 
   protected readonly t = this.i18n.t;
 
-  protected readonly columns = COLUMNS;
+  protected readonly contraparte: ContraparteRecurrente =
+    this.config.data?.contraparte ?? 'proveedor';
+  protected readonly columns = columnas(this.contraparte);
   protected readonly rowActions = ROW_ACTIONS;
 
   protected readonly items = signal<readonly PlantillaRecurrenteRow[]>([]);
