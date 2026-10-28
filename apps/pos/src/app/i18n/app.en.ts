@@ -407,6 +407,7 @@ export const en: AppDict = {
         total: 'Total',
         recibido: 'Received',
         imprimir: 'Print',
+        descargar: 'Download',
         nuevaVenta: 'New sale',
         pagado: {
           efectivo: 'Paid in cash',
@@ -461,6 +462,10 @@ export const en: AppDict = {
         imprimir: {
           title: 'Could not print',
           desc: 'You can print the sale from the history.',
+        },
+        descargar: {
+          title: 'Could not download',
+          desc: 'Try again in a moment.',
         },
         cuentaTransferencia: 'Choose the account the transfer goes to.',
       },

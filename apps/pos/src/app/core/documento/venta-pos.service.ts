@@ -1,6 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { type Observable, map } from 'rxjs';
-import { BaseHttpService, FileDownloadService, type PosDocumentoPayload } from '@reddoc/core';
+import {
+  BaseHttpService,
+  FileDownloadService,
+  type FileDownloadOptions,
+  type PosDocumentoPayload,
+} from '@reddoc/core';
 
 const DOCUMENTO = '/general/documento/';
 
@@ -41,10 +46,19 @@ export class VentaPosService extends BaseHttpService {
    * del tipo de documento, sin sacar a la persona de la caja.
    */
   imprimir(id: number): Observable<void> {
-    return this.descargas.print(`${DOCUMENTO}imprimir/`, {
-      method: 'POST',
-      body: { filtros: [{ propiedad: 'id', operador: '=', valor: id }] },
-      fallbackFilename: `venta-${id}.pdf`,
-    });
+    return this.descargas.print(`${DOCUMENTO}imprimir/`, opcionesPdf(id));
   }
+
+  /** Descarga ese mismo PDF, para guardarlo o enviarlo. */
+  descargar(id: number): Observable<void> {
+    return this.descargas.download(`${DOCUMENTO}imprimir/`, opcionesPdf(id));
+  }
+}
+
+function opcionesPdf(id: number): FileDownloadOptions {
+  return {
+    method: 'POST',
+    body: { filtros: [{ propiedad: 'id', operador: '=', valor: id }] },
+    fallbackFilename: `venta-${id}.pdf`,
+  };
 }

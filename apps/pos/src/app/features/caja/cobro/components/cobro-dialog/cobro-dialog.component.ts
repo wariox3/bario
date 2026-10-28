@@ -184,6 +184,7 @@ export class CobroDialogComponent {
   protected readonly error = signal<string | null>(null);
   protected readonly ventaCobrada = signal<VentaCobrada | null>(null);
   protected readonly imprimiendo = signal(false);
+  protected readonly descargando = signal(false);
   protected readonly descartando = signal(false);
 
   protected readonly procesando = computed(() => this.fase() !== null || this.descartando());
@@ -341,6 +342,23 @@ export class CobroDialogComponent {
         error: () => {
           this.imprimiendo.set(false);
           const tx = this.t().caja.cobro.errores.imprimir;
+          this.toast.error(tx.title, tx.desc);
+        },
+      });
+  }
+
+  protected onDescargar(): void {
+    const venta = this.ventaCobrada();
+    if (!venta || this.descargando()) return;
+    this.descargando.set(true);
+    this.ventas
+      .descargar(venta.documentoId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.descargando.set(false),
+        error: () => {
+          this.descargando.set(false);
+          const tx = this.t().caja.cobro.errores.descargar;
           this.toast.error(tx.title, tx.desc);
         },
       });

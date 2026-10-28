@@ -410,6 +410,7 @@ export const es: AppDict = {
         total: 'Total',
         recibido: 'Recibido',
         imprimir: 'Imprimir',
+        descargar: 'Descargar',
         nuevaVenta: 'Nueva venta',
         pagado: {
           efectivo: 'Pagado en efectivo',
@@ -465,6 +466,10 @@ export const es: AppDict = {
         imprimir: {
           title: 'No se pudo imprimir',
           desc: 'Puedes imprimir la venta desde el historial.',
+        },
+        descargar: {
+          title: 'No se pudo descargar',
+          desc: 'Intenta de nuevo en un momento.',
         },
       },
     },

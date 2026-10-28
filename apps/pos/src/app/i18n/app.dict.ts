@@ -337,6 +337,7 @@ export interface AppDict
         total: string;
         recibido: string;
         imprimir: string;
+        descargar: string;
         nuevaVenta: string;
         /** Cómo se pagó, en la pantalla de éxito fuera del efectivo. */
         pagado: Record<MedioPagoId, string>;
@@ -368,6 +369,7 @@ export interface AppDict
         plazoContado: string;
         descartar: string;
         imprimir: { title: string; desc: string };
+        descargar: { title: string; desc: string };
         cuentaTransferencia: string;
         sinValor: string;
       };
