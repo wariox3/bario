@@ -1200,8 +1200,7 @@ export const es: AppDict = {
       },
       form: {
         createTitle: 'Nuevo contacto',
-        createTerceroTitle: 'Nuevo tercero',
-        createTercero: 'Crear tercero',
+        createTercero: 'Nuevo contacto',
         createSubtitle: 'Registra un nuevo contacto',
         editTitle: 'Editar contacto',
         editSubtitle: 'Actualiza los datos del contacto',

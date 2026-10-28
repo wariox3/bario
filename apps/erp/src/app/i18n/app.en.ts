@@ -1182,9 +1182,8 @@ export const en: AppDict = {
         inactivo: 'INA',
       },
       form: {
-        createTitle: 'new contact',
-        createTerceroTitle: 'New third party',
-        createTercero: 'Create third party',
+        createTitle: 'New contact',
+        createTercero: 'New contact',
         createSubtitle: 'Register a new contact',
         editTitle: 'Edit contact',
         editSubtitle: 'Update the contact details',

@@ -914,7 +914,6 @@ export interface AppDict
       };
       form: {
         createTitle: string;
-        createTerceroTitle: string;
         createTercero: string;
         createSubtitle: string;
         editTitle: string;
