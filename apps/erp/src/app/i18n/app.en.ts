@@ -7460,6 +7460,16 @@ export const en: AppDict = {
           informacionInferior: 'Shown at the bottom of the invoice.',
         },
         validation: { max: 'Maximum 2000 characters' },
+        pos: {
+          section: {
+            title: 'POS receipt',
+            hint: 'Fixed texts printed on every point of sale receipt.',
+          },
+          hints: {
+            informacionSuperior: 'Printed at the top of the receipt, before the products.',
+            informacionInferior: 'Printed at the end of the receipt, after the total.',
+          },
+        },
       },
       aiu: {
         section: {

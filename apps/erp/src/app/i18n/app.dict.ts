@@ -5608,6 +5608,11 @@ export interface AppDict
         fields: { informacionSuperior: string; informacionInferior: string };
         hints: { informacionSuperior: string; informacionInferior: string };
         validation: { max: string };
+        /** Tirilla del POS: reusa las etiquetas de `fields`. */
+        pos: {
+          section: { title: string; hint: string };
+          hints: { informacionSuperior: string; informacionInferior: string };
+        };
       };
       aiu: {
         section: { title: string; hint: string };

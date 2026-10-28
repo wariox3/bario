@@ -7580,6 +7580,16 @@ export const es: AppDict = {
           informacionInferior: 'Aparece al pie de la factura.',
         },
         validation: { max: 'Máximo 2000 caracteres' },
+        pos: {
+          section: {
+            title: 'Tirilla POS',
+            hint: 'Textos fijos que salen en todas las tirillas del punto de venta.',
+          },
+          hints: {
+            informacionSuperior: 'Sale arriba de la tirilla, antes de los productos.',
+            informacionInferior: 'Sale al final de la tirilla, después del total.',
+          },
+        },
       },
       aiu: {
         section: {

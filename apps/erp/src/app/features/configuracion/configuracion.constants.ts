@@ -27,10 +27,12 @@ export const HUMANO_CAMPOS = [
 
 // ── Área Venta ────────────────────────────────────────────────────────────────
 
-/** Campos de la sub-pestaña Formato de Venta (textos de la factura impresa). */
+/** Campos de la sub-pestaña Formato de Venta (textos de la factura impresa y de la tirilla POS). */
 export const VENTA_FORMATO_CAMPOS = [
   'ven_factura_informacion_superior',
   'ven_factura_informacion_inferior',
+  'ven_pos_informacion_superior',
+  'ven_pos_informacion_inferior',
 ] as const satisfies readonly ConfiguracionCampo[];
 
 /**
