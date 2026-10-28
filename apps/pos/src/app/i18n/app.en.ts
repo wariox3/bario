@@ -530,7 +530,8 @@ export const en: AppDict = {
   },
   configuracion: {
     title: 'Register settings',
-    subtitle: 'The document type belongs to the company; the rest is stored on this device.',
+    subtitle:
+      'The document type and the receipt belong to the company; the rest is stored on this device.',
     documento: {
       title: 'Document type',
       hint: 'Shared by every register of the company.',
@@ -540,6 +541,19 @@ export const en: AppDict = {
     tipos: {
       pos: 'POS invoice',
       posElectronica: 'Electronic POS invoice',
+    },
+    tirilla: {
+      title: 'Receipt',
+      hint: 'Fixed texts printed on every receipt of the company.',
+      superior: 'Header information',
+      superiorPlaceholder: 'E.g. tax regime, opening hours or store address',
+      superiorHint: 'Printed at the top, before the products.',
+      inferior: 'Footer information',
+      inferiorPlaceholder: 'E.g. Thank you for your purchase · Returns within 8 days',
+      inferiorHint: 'Printed at the end, after the total.',
+      muestra: 'Preview',
+      deLaVenta: 'Products, total, support and comment of each sale',
+      error: "Couldn't read the receipt texts.",
     },
     operacion: {
       title: 'Operation',
@@ -564,6 +578,10 @@ export const en: AppDict = {
       },
       tipoError: {
         title: "Couldn't save the document type",
+        desc: 'Everything else was saved. Try again.',
+      },
+      tirillaError: {
+        title: "Couldn't save the receipt texts",
         desc: 'Everything else was saved. Try again.',
       },
     },
