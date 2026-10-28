@@ -36,15 +36,18 @@ export function handleUnauthorized(
   if (!tokenRefresh.refreshing) {
     tokenRefresh.startRefresh();
 
+    // El `catchError` va antes del reintento: solo un refresh fallido cierra la
+    // sesión. Si el reintento falla (un 4xx de negocio, un 500), la sesión ya se
+    // renovó y el error es de la petición, no de la autenticación.
     return authService.refresh().pipe(
-      switchMap(() => {
-        tokenRefresh.completeRefresh();
-        return next(req);
-      }),
       catchError((refreshError) => {
         tokenRefresh.failRefresh();
         authService.clearSession();
         return throwError(() => refreshError);
+      }),
+      switchMap(() => {
+        tokenRefresh.completeRefresh();
+        return next(req);
       }),
     );
   }
