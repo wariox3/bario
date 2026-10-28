@@ -69,6 +69,8 @@ export function humanoFormToPayload(form: HumanoConfigFormValue): ConfiguracionP
 export interface VentaFormatoConfigFormValue {
   readonly informacion_superior: string;
   readonly informacion_inferior: string;
+  readonly pos_informacion_superior: string;
+  readonly pos_informacion_inferior: string;
 }
 
 export function configuracionToVentaFormatoForm(
@@ -77,6 +79,8 @@ export function configuracionToVentaFormatoForm(
   return {
     informacion_superior: config.ven_factura_informacion_superior ?? '',
     informacion_inferior: config.ven_factura_informacion_inferior ?? '',
+    pos_informacion_superior: config.ven_pos_informacion_superior ?? '',
+    pos_informacion_inferior: config.ven_pos_informacion_inferior ?? '',
   };
 }
 
@@ -85,6 +89,8 @@ export function ventaFormatoFormToPayload(form: VentaFormatoConfigFormValue): Co
   return {
     ven_factura_informacion_superior: form.informacion_superior.trim() || null,
     ven_factura_informacion_inferior: form.informacion_inferior.trim() || null,
+    ven_pos_informacion_superior: form.pos_informacion_superior.trim() || null,
+    ven_pos_informacion_inferior: form.pos_informacion_inferior.trim() || null,
   };
 }
 

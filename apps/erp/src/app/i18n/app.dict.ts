@@ -293,6 +293,15 @@ export interface AppDict
   layout: {
     menuLabel: string;
     drawerHeader: string;
+    moduleBar: {
+      label: string;
+      more: string;
+    };
+    modulePicker: {
+      change: string;
+      close: string;
+      choose: string;
+    };
     tenantBadge: {
       ariaLabel: string;
     };
@@ -383,18 +392,17 @@ export interface AppDict
       buttonLabel: string;
       modalHeader: string;
       modalSubtitle: string;
-      searchPlaceholder: string;
       seleccionar: string;
       cancel: string;
       sinOrigen: string;
       columns: {
         id: string;
         identificacion: string;
-        contacto: string;
         subtotal: string;
         impuesto: string;
         total: string;
       };
+      contraparte: Record<'proveedor' | 'cliente', { searchPlaceholder: string; column: string }>;
       empty: { title: string; sub: string; desc: string };
       success: { title: string; desc: string };
       loadError: { title: string; desc: string };
@@ -914,7 +922,6 @@ export interface AppDict
       };
       form: {
         createTitle: string;
-        createTerceroTitle: string;
         createTercero: string;
         createSubtitle: string;
         editTitle: string;
@@ -1308,6 +1315,7 @@ export interface AppDict
         editSubtitle: string;
         sections: { clasificacion: string; comportamiento: string };
         sectionsHint: { clasificacion: string; comportamiento: string };
+        enUso: { titulo: string; hint: string };
         fields: {
           codigo: string;
           nombre: string;
@@ -5295,7 +5303,7 @@ export interface AppDict
   inicio: {
     /** Selector del período de las gráficas (mes o año en curso). */
     periodo: { aria: string; mes: string; anio: string };
-    /** Ingresos contra egresos del resumen del negocio (`resultado-resumen/`). */
+    /** Ingresos contra egresos del resumen del negocio (`tablero/resultado/`). */
     resultadoResumen: {
       titulo: string;
       desc: string;
@@ -5600,6 +5608,11 @@ export interface AppDict
         fields: { informacionSuperior: string; informacionInferior: string };
         hints: { informacionSuperior: string; informacionInferior: string };
         validation: { max: string };
+        /** Tirilla del POS: reusa las etiquetas de `fields`. */
+        pos: {
+          section: { title: string; hint: string };
+          hints: { informacionSuperior: string; informacionInferior: string };
+        };
       };
       aiu: {
         section: { title: string; hint: string };

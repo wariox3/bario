@@ -278,6 +278,15 @@ export const en: AppDict = {
   layout: {
     menuLabel: 'Open menu',
     drawerHeader: 'Menu',
+    moduleBar: {
+      label: 'Modules',
+      more: 'More',
+    },
+    modulePicker: {
+      change: 'Change',
+      close: 'Close',
+      choose: 'Pick a module',
+    },
     tenantBadge: {
       ariaLabel: 'Current company',
     },
@@ -414,17 +423,19 @@ export const en: AppDict = {
       buttonLabel: 'Recurring',
       modalHeader: 'Invoice from recurring',
       modalSubtitle: 'Pick the recurring invoice the new invoice is created from',
-      searchPlaceholder: 'Search by supplier or ID number',
       seleccionar: 'Select',
       cancel: 'Cancel',
       sinOrigen: 'This document has no recurring invoice defined to come from.',
       columns: {
         id: 'ID',
         identificacion: 'ID number',
-        contacto: 'Supplier',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
+      },
+      contraparte: {
+        proveedor: { searchPlaceholder: 'Search by supplier or ID number', column: 'Supplier' },
+        cliente: { searchPlaceholder: 'Search by customer or ID number', column: 'Customer' },
       },
       empty: {
         title: 'No recurring invoices',
@@ -1182,9 +1193,8 @@ export const en: AppDict = {
         inactivo: 'INA',
       },
       form: {
-        createTitle: 'new contact',
-        createTerceroTitle: 'New third party',
-        createTercero: 'Create third party',
+        createTitle: 'New contact',
+        createTercero: 'New contact',
         createSubtitle: 'Register a new contact',
         editTitle: 'Edit contact',
         editSubtitle: 'Update the contact details',
@@ -1750,6 +1760,10 @@ export const en: AppDict = {
         sectionsHint: {
           clasificacion: 'Class, group and account it belongs to',
           comportamiento: 'Rules for using the account in movements',
+        },
+        enUso: {
+          titulo: 'This account already has movements',
+          hint: 'Its behavior can no longer change.',
         },
         fields: {
           codigo: 'Code',
@@ -7446,6 +7460,16 @@ export const en: AppDict = {
           informacionInferior: 'Shown at the bottom of the invoice.',
         },
         validation: { max: 'Maximum 2000 characters' },
+        pos: {
+          section: {
+            title: 'POS receipt',
+            hint: 'Fixed texts printed on every point of sale receipt.',
+          },
+          hints: {
+            informacionSuperior: 'Printed at the top of the receipt, before the products.',
+            informacionInferior: 'Printed at the end of the receipt, after the total.',
+          },
+        },
       },
       aiu: {
         section: {

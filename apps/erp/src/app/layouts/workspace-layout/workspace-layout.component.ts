@@ -11,6 +11,7 @@ import { ActiveModuleStore } from '@erp/core/erp-modules';
 import { PermissionsService, visibleSections } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
 import { ModuleBarComponent } from '../module-bar/module-bar.component';
+import { ModulePickerComponent } from '../module-picker/module-picker.component';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
 import { AccessDeniedPageComponent } from '@erp/core/components/access-denied/access-denied.page';
 import type {
@@ -40,6 +41,7 @@ import type {
     UserMenuComponent,
     AppSwitcherComponent,
     ModuleBarComponent,
+    ModulePickerComponent,
     TenantBadgeComponent,
     AccessDeniedPageComponent,
   ],
@@ -102,6 +104,9 @@ export class WorkspaceLayoutComponent {
 
   protected readonly drawerVisible = signal(false);
 
+  /** Grilla de módulos desplegada dentro del drawer. */
+  protected readonly pickerOpen = signal(false);
+
   constructor() {
     // Al cambiar el módulo activo, sembramos el acordeón que contiene la ruta
     // actual; si ninguno la contiene, el primero marcado `defaultExpanded: true`.
@@ -158,7 +163,9 @@ export class WorkspaceLayoutComponent {
     this.expandedAccordionId.update((current) => (current === accordionId ? null : accordionId));
   }
 
+  /** Cada apertura del drawer arranca en las secciones, con la grilla replegada. */
   protected toggleDrawer(): void {
+    this.pickerOpen.set(false);
     this.drawerVisible.update((v) => !v);
   }
 

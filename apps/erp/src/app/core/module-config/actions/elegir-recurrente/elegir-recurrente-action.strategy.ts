@@ -14,15 +14,32 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { ENTITY_ACTION_DIALOG_DEFAULTS } from '../entity-action-dialog.defaults';
 import type { EntityActionContext, EntityActionStrategy } from '../entity-action-strategy';
 import { GenerarRecurrenteService } from '../generar-recurrente/generar-recurrente.service';
-import type { ElegirRecurrenteModalData } from './elegir-recurrente-modal.component';
+import type {
+  ContraparteRecurrente,
+  ElegirRecurrenteModalData,
+} from './elegir-recurrente-modal.component';
+
+interface OrigenRecurrente {
+  /** Tipo de la plantilla recurrente de la que sale el documento. */
+  readonly tipo: number;
+  /** Quién es el contacto del documento, para rotular el modal. */
+  readonly contraparte: ContraparteRecurrente;
+}
 
 /**
  * Plantilla recurrente de la que sale cada documento real. Es el mapa inverso
  * del de `GenerarRecurrenteBaseStrategy`: acá el anfitrión es el destino (el
  * listado de facturas) y el origen se deduce.
  */
-const ORIGEN_POR_DESTINO: Readonly<Record<number, number>> = {
-  [DOCUMENT_TYPE_ID.COMPRA]: DOCUMENT_TYPE_ID.FACTURA_COMPRA_RECURRENTE,
+const ORIGEN_POR_DESTINO: Readonly<Record<number, OrigenRecurrente>> = {
+  [DOCUMENT_TYPE_ID.COMPRA]: {
+    tipo: DOCUMENT_TYPE_ID.FACTURA_COMPRA_RECURRENTE,
+    contraparte: 'proveedor',
+  },
+  [DOCUMENT_TYPE_ID.FACTURA_VENTA]: {
+    tipo: DOCUMENT_TYPE_ID.FACTURA_VENTA_RECURRENTE,
+    contraparte: 'cliente',
+  },
 };
 
 /**
@@ -67,7 +84,10 @@ export class ElegirRecurrenteActionStrategy implements EntityActionStrategy {
     }
     if (this.generating) return EMPTY;
 
-    const data: ElegirRecurrenteModalData = { documentoTipoOrigen: origen };
+    const data: ElegirRecurrenteModalData = {
+      documentoTipoOrigen: origen.tipo,
+      contraparte: origen.contraparte,
+    };
 
     // Lazy: la tabla del modal queda fuera del bundle inicial (los strategies
     // se proveen eager en root).
@@ -87,7 +107,7 @@ export class ElegirRecurrenteActionStrategy implements EntityActionStrategy {
         const hoy = startOfToday();
         return this.api
           .generar({
-            documento_tipo_origen: origen,
+            documento_tipo_origen: origen.tipo,
             documento_tipo_destino: destino,
             documento_ids: [plantillaId],
             mes: hoy.getMonth() + 1,

@@ -1,5 +1,6 @@
 import { Component, DestroyRef, type OnInit, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, forkJoin, of } from 'rxjs';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -69,6 +70,8 @@ export class CuentaFormComponent implements OnInit {
   readonly id = input<string>();
   protected readonly isEditMode = computed(() => !!this.id());
   protected readonly isSaving = signal(false);
+  /** La cuenta ya tiene movimientos: su comportamiento queda bloqueado. */
+  protected readonly enUso = signal(false);
 
   protected readonly claseEndpoint = CUENTA_CLASE_ENDPOINT;
 
@@ -227,16 +230,36 @@ export class CuentaFormComponent implements OnInit {
   }
 
   /**
-   * Carga la cuenta en edición. Parchea con `emitEvent: false` para no disparar
-   * la cascada (que borraría grupo/cuenta) y sincroniza manualmente los espejos
-   * de id y la habilitación de los selects hijos.
+   * Apaga los checks de comportamiento de una cuenta con movimientos. El payload
+   * sale de `getRawValue()`, así que viajan con el valor que ya tenían.
+   */
+  private aplicarBloqueoPorUso(): void {
+    this.enUso.set(true);
+    const { permite_movimiento, exige_base, exige_contacto, exige_centro_costo } =
+      this.form.controls;
+    for (const control of [permite_movimiento, exige_base, exige_contacto, exige_centro_costo]) {
+      control.disable({ emitEvent: false });
+    }
+  }
+
+  /**
+   * Carga la cuenta en edición junto con su estado de uso, para que el
+   * formulario nazca ya bloqueado. Si `validar-uso/` falla degrada a `false`:
+   * deja de proteger, pero no rompe la pantalla.
+   *
+   * Parchea con `emitEvent: false` para no disparar la cascada (que borraría
+   * grupo/cuenta) y sincroniza manualmente los espejos de id y la habilitación
+   * de los selects hijos.
    */
   private loadCuenta(id: number): void {
-    this.service
-      .getById(id)
+    forkJoin({
+      cuenta: this.service.getById(id),
+      enUso: this.service.validarUso(id).pipe(catchError(() => of(false))),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (c) => {
+        next: ({ cuenta: c, enUso }) => {
+          if (enUso) this.aplicarBloqueoPorUso();
           const value = cuentaToFormValue(c);
           this.form.patchValue(value, { emitEvent: false });
           if (value.cuenta_clase) {

@@ -48,32 +48,32 @@
           </td>
           @if (showDocumentoAfectado()) {
             <td class="contable-detalle-table__td text-brand-text tabular-nums">
-              {{ line.documento_afectado ?? '—' }}
+              {{ line.documento_afectado }}
             </td>
             <td class="contable-detalle-table__td text-brand-text">
-              {{ line.documento_afectado_tipo || '—' }}
+              {{ line.documento_afectado_tipo }}
             </td>
             <td class="contable-detalle-table__td text-brand-text tabular-nums">
-              {{ line.documento_afectado_numero || '—' }}
+              {{ line.documento_afectado_numero }}
             </td>
           }
           @if (showNumero()) {
             <td class="contable-detalle-table__td text-brand-text tabular-nums">
-              {{ line.numero ?? '—' }}
+              {{ line.numero }}
             </td>
           }
           <td class="contable-detalle-table__td font-medium text-brand-text">
-            {{ line.cuenta?.nombre || '—' }}
+            {{ line.cuenta?.nombre }}
           </td>
           @if (showContacto()) {
             <td class="contable-detalle-table__td text-brand-text">
-              {{ line.contacto?.nombre || '—' }}
+              {{ line.contacto?.nombre }}
             </td>
           }
           <td class="contable-detalle-table__td text-brand-text">{{ naturalezaLabel(line) }}</td>
           @if (showCentroCosto()) {
             <td class="contable-detalle-table__td text-brand-text">
-              {{ line.centro_costo?.nombre || '—' }}
+              {{ line.centro_costo?.nombre }}
             </td>
           }
           <td
@@ -87,7 +87,7 @@
             </td>
           }
           @if (showDetalle()) {
-            <td class="contable-detalle-table__td text-brand-muted">{{ line.detalle || '—' }}</td>
+            <td class="contable-detalle-table__td text-brand-muted">{{ line.detalle }}</td>
           }
           @if (showTotales()) {
             <td class="contable-detalle-table__td text-right tabular-nums text-brand-muted">

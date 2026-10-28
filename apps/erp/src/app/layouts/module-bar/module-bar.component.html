@@ -1,14 +1,42 @@
 @if (modules().length) {
-  <nav class="module-bar" role="navigation">
-    @for (mod of modules(); track mod.id) {
+  <nav class="module-bar" [attr.aria-label]="t().layout.moduleBar.label">
+    @for (mod of split().visible; track mod.id) {
       <a
         class="module-bar__item"
         [class.module-bar__item--active]="mod.isActive"
+        [attr.aria-current]="mod.isActive ? 'page' : null"
         [routerLink]="mod.targetPath"
       >
         <i class="module-bar__icon {{ mod.iconClass }}" aria-hidden="true"></i>
         <span class="module-bar__label">{{ mod.label }}</span>
       </a>
     }
+    @if (split().overflow.length) {
+      <button
+        type="button"
+        class="module-bar__item"
+        aria-haspopup="menu"
+        (click)="moreMenu.toggle($event)"
+      >
+        <span class="module-bar__label">{{ t().layout.moduleBar.more }}</span>
+        <i class="module-bar__chevron pi pi-chevron-down" aria-hidden="true"></i>
+      </button>
+    }
   </nav>
+
+  <p-menu #moreMenu [popup]="true" [model]="overflowItems()" appendTo="body" />
+
+  <!-- Copia invisible con todos los módulos: solo sirve para medir. -->
+  <div #ghost class="module-bar module-bar--ghost" aria-hidden="true">
+    @for (mod of modules(); track mod.id) {
+      <span class="module-bar__item" [class.module-bar__item--active]="mod.isActive" data-module>
+        <i class="module-bar__icon {{ mod.iconClass }}"></i>
+        <span class="module-bar__label">{{ mod.label }}</span>
+      </span>
+    }
+    <span class="module-bar__item" data-more>
+      <span class="module-bar__label">{{ t().layout.moduleBar.more }}</span>
+      <i class="module-bar__chevron pi pi-chevron-down"></i>
+    </span>
+  </div>
 }

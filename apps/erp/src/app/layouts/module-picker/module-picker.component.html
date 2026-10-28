@@ -1,0 +1,46 @@
+@if (active(); as current) {
+  <button
+    type="button"
+    class="module-picker__current"
+    [attr.aria-expanded]="open()"
+    aria-controls="module-picker-grid"
+    (click)="open.set(!open())"
+  >
+    <span class="module-picker__tile" aria-hidden="true">
+      <i class="{{ current.iconClass }}"></i>
+    </span>
+    <span class="module-picker__name">{{ current.label }}</span>
+    <span class="module-picker__action">
+      {{ open() ? t().layout.modulePicker.close : t().layout.modulePicker.change }}
+      <i
+        class="pi"
+        [class.pi-chevron-up]="open()"
+        [class.pi-chevron-down]="!open()"
+        aria-hidden="true"
+      ></i>
+    </span>
+  </button>
+} @else {
+  <p class="module-picker__prompt">{{ t().layout.modulePicker.choose }}</p>
+}
+
+@if (showGrid()) {
+  <nav
+    id="module-picker-grid"
+    class="module-picker__grid"
+    [attr.aria-label]="t().layout.moduleBar.label"
+  >
+    @for (mod of modules(); track mod.id) {
+      <a
+        class="module-picker__option"
+        [class.module-picker__option--active]="mod.isActive"
+        [attr.aria-current]="mod.isActive ? 'page' : null"
+        [routerLink]="mod.targetPath"
+        (click)="open.set(false)"
+      >
+        <i class="module-picker__icon {{ mod.iconClass }}" aria-hidden="true"></i>
+        <span class="module-picker__label">{{ mod.label }}</span>
+      </a>
+    }
+  </nav>
+}

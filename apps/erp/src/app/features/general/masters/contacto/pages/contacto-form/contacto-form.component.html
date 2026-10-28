@@ -14,7 +14,7 @@
     <!-- El frame `erp-action-dialog` no trae header propio: se pinta aquí. -->
     <div class="flex items-center justify-between gap-3">
       <h2 [id]="modalTitleId" class="m-0 text-[1rem] font-bold tracking-tight text-brand-text">
-        {{ t().entities.contacto.form.createTerceroTitle }}
+        {{ t().entities.contacto.form.createTitle }}
       </h2>
       <p-button
         type="button"
@@ -49,6 +49,7 @@
   }
   <!-- ── Sección 1: Información principal ──────────────────────────────────── -->
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <!-- En el modal «Nuevo contacto» ya es el título del diálogo: la card nombra su sección. -->
     <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4">
       <span
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
@@ -58,16 +59,20 @@
       <div class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
         <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">
           {{
-            isEditMode()
-              ? t().entities.contacto.form.editTitle
-              : t().entities.contacto.form.createTitle
+            isModal
+              ? t().entities.contacto.form.sections.principal
+              : isEditMode()
+                ? t().entities.contacto.form.editTitle
+                : t().entities.contacto.form.createTitle
           }}
         </h2>
         <p class="m-0 text-[0.75rem] text-brand-muted">
           {{
-            isEditMode()
-              ? t().entities.contacto.form.editSubtitle
-              : t().entities.contacto.form.createSubtitle
+            isModal
+              ? t().entities.contacto.form.sectionsHint.principal
+              : isEditMode()
+                ? t().entities.contacto.form.editSubtitle
+                : t().entities.contacto.form.createSubtitle
           }}
         </p>
       </div>

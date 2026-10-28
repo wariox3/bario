@@ -5,7 +5,7 @@ import { ERROR_TOAST } from '../interceptors/error-http-context';
 import { TENANT_SCOPED } from '../tenant/tenant-http-context';
 import { ENVIRONMENT } from '../tokens';
 import { buildHttpParams, type ParamValue } from '../services/base-http.service';
-import { parseFilename, triggerBrowserDownload } from './file-download.utils';
+import { imprimirBlob, parseFilename, triggerBrowserDownload } from './file-download.utils';
 
 export interface FileDownloadOptions {
   /** Filename usado si el backend no expone `Content-Disposition`. */
@@ -33,7 +33,7 @@ export interface FileDownloadOptions {
  *   binario, no JSON tipado.
  * - Hereda `authInterceptor` (cookies HTTP-only) y `tenantInterceptor` (header
  *   `X-Tenant`) automáticamente.
- * - El blob se consume internamente disparando la descarga del navegador, por
+ * - El blob se consume internamente (descarga o diálogo de impresión), por
  *   eso devuelve `Observable<void>`: el caller solo necesita saber cuándo
  *   terminó (para apagar un spinner) y manejar errores.
  */
@@ -42,7 +42,28 @@ export class FileDownloadService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(ENVIRONMENT).apiUrl;
 
+  /** Descarga el archivo con el nombre que mande el backend. */
   download(path: string, options: FileDownloadOptions = {}): Observable<void> {
+    return this.fetch(path, options).pipe(
+      map(({ blob, filename }) => triggerBrowserDownload(blob, filename)),
+    );
+  }
+
+  /**
+   * Pide un PDF y abre directo el diálogo de impresión, sin pasar por otra
+   * pestaña. Si el navegador no lo permite, lo abre en una pestaña (ver
+   * `imprimirBlob`).
+   */
+  print(path: string, options: FileDownloadOptions = {}): Observable<void> {
+    return this.fetch(path, options).pipe(
+      map(({ blob, filename }) => imprimirBlob(blob, filename)),
+    );
+  }
+
+  private fetch(
+    path: string,
+    options: FileDownloadOptions,
+  ): Observable<{ readonly blob: Blob; readonly filename: string }> {
     const url = `${this.baseUrl}${path}`;
     const context = new HttpContext()
       .set(TENANT_SCOPED, options.tenantScoped ?? true)
@@ -72,7 +93,7 @@ export class FileDownloadService {
           throw new Error('Respuesta vacía del servidor');
         }
         const filename = parseFilename(response.headers.get('content-disposition'), fallback);
-        triggerBrowserDownload(blob, filename);
+        return { blob, filename };
       }),
     );
   }

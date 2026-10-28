@@ -4,7 +4,7 @@ import { BaseHttpService } from '@reddoc/core';
 import type { ContratoResumen } from './contrato-resumen.model';
 
 /** Endpoint de las cifras de contratos del inicio de Humano. */
-export const CONTRATO_RESUMEN_ENDPOINT = '/humano/contrato/resumen/';
+export const CONTRATO_RESUMEN_ENDPOINT = '/humano/tablero/contrato/';
 
 /** Cifras de contratos para la ficha del inicio de Humano. */
 @Injectable({ providedIn: 'root' })

@@ -1,5 +1,5 @@
 /**
- * Respuesta de `GET humano/contrato/resumen/`. Cifras de los contratos **a una
+ * Respuesta de `GET humano/tablero/contrato/`. Cifras de los contratos **a una
  * fecha de corte** (hoy): cuántos hay, cuántos siguen activos y cuántos se
  * terminaron, más los ingresos y retiros del mes de esa fecha.
  *

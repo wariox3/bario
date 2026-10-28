@@ -27,6 +27,7 @@ interface Interno {
   readonly medio: Signal<MedioPagoPos>;
   readonly error: Signal<string | null>;
   readonly faltante: Signal<number>;
+  readonly resumenMasInfo: Signal<string>;
   readonly ventaCobrada: Signal<{
     documentoId: number;
     medio: string;
@@ -141,6 +142,8 @@ describe('CobroDialogComponent', () => {
         cuenta,
         asesor: null,
         referencia: '',
+        soporte: '',
+        comentario: '',
       });
       expect(interno.medio().id).toBe('efectivo');
     });
@@ -237,6 +240,50 @@ describe('CobroDialogComponent', () => {
       interno.onCobrar();
       expect(cobro.cobrar).not.toHaveBeenCalled();
       expect(interno.error()).toBe(errores.configuracion);
+    });
+  });
+
+  describe('más información', () => {
+    it('sin escribir nada, soporte y comentario van vacíos', () => {
+      const { interno, cobro } = preparar();
+      interno.onCobrar();
+      const solicitud = cobro.cobrar.mock.calls[0][0];
+      expect(solicitud.soporte).toBeNull();
+      expect(solicitud.comentario).toBeNull();
+    });
+
+    it('soporte y comentario llegan a la solicitud sin espacios de sobra', () => {
+      const { interno, cobro } = preparar();
+      interno.form.controls['soporte'].setValue(' OC-881 ');
+      interno.form.controls['comentario'].setValue(' Entregar en bodega ');
+      interno.onCobrar();
+      const solicitud = cobro.cobrar.mock.calls[0][0];
+      expect(solicitud.soporte).toBe('OC-881');
+      expect(solicitud.comentario).toBe('Entregar en bodega');
+    });
+
+    it('en transferencia la referencia se suma al comentario', () => {
+      const { interno, cobro } = preparar();
+      interno.onTecla(tecla('F2'));
+      interno.form.controls['comentario'].setValue('Entregar en bodega');
+      interno.form.controls['referencia'].setValue('M123456');
+      interno.onCobrar();
+      expect(cobro.cobrar.mock.calls[0][0].comentario).toBe(
+        `Entregar en bodega · ${es.caja.cobro.transferencia.comentario} M123456`,
+      );
+    });
+
+    it('cerrada muestra lo escrito, y al abrir otra venta los campos arrancan vacíos', () => {
+      const { interno, fixture } = preparar();
+      interno.form.controls['soporte'].setValue('OC-881');
+      interno.form.controls['comentario'].setValue('Entregar en bodega');
+      expect(interno.resumenMasInfo()).toBe('OC-881 · Entregar en bodega');
+      fixture.componentInstance.visible.set(false);
+      fixture.detectChanges();
+      fixture.componentInstance.visible.set(true);
+      fixture.detectChanges();
+      expect(interno.form.controls['soporte'].value).toBe('');
+      expect(interno.resumenMasInfo()).toBe('');
     });
   });
 
