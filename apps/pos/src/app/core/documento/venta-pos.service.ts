@@ -36,9 +36,12 @@ export class VentaPosService extends BaseHttpService {
     return this.delete(`${DOCUMENTO}${id}/`);
   }
 
-  /** Descarga el PDF que arma el backend con el formato del tipo de documento. */
+  /**
+   * Abre el diálogo de impresión con el PDF que arma el backend según el formato
+   * del tipo de documento, sin sacar a la persona de la caja.
+   */
   imprimir(id: number): Observable<void> {
-    return this.descargas.download(`${DOCUMENTO}imprimir/`, {
+    return this.descargas.print(`${DOCUMENTO}imprimir/`, {
       method: 'POST',
       body: { filtros: [{ propiedad: 'id', operador: '=', valor: id }] },
       fallbackFilename: `venta-${id}.pdf`,

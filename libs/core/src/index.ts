@@ -38,7 +38,11 @@ export { BaseHttpService, buildHttpParams } from './lib/services/base-http.servi
 export type { ParamValue, RequestOptions } from './lib/services/base-http.service';
 export { FileDownloadService } from './lib/http/file-download.service';
 export type { FileDownloadOptions } from './lib/http/file-download.service';
-export { parseFilename, triggerBrowserDownload } from './lib/http/file-download.utils';
+export {
+  imprimirBlob,
+  parseFilename,
+  triggerBrowserDownload,
+} from './lib/http/file-download.utils';
 export { CiudadService, CIUDAD_FUENTE, type CiudadFuente } from './lib/services/ciudad.service';
 export type { Ciudad } from './lib/models/ciudad.model';
 export { IdentificacionService } from './lib/services/identificacion.service';
