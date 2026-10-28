@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.14](https://github.com/wariox3/bario/compare/v0.1.13...v0.1.14) (2026-10-28)
+
+### Features
+
+- **erp:** agregar el proceso validar créditos en humano ([35be59c](https://github.com/wariox3/bario/commit/35be59c1f67a6018130587b95369b05544776f13))
+- **erp:** agrupar el ciclo de nómina en su propio acordeón en humano ([b73f15e](https://github.com/wariox3/bario/commit/b73f15e5b557f91558ac15ea5fbc0654a92c3c2f))
+- **erp:** paginar los pagos del crédito y mostrar su documento y deducción ([19c89ec](https://github.com/wariox3/bario/commit/19c89ec9dfca8f9c4fee0565c03380d42c21570e))
+
+### Bug Fixes
+
+- **erp:** ocultar la columna operación en el resumen de nómina de la programación ([ef72353](https://github.com/wariox3/bario/commit/ef72353bd854a38b5bf3c3d07e57acd0e1a1d4ac))
+- **ui:** no reabrir el calendario al volver a la pestaña ([a27992a](https://github.com/wariox3/bario/commit/a27992a6fb86517ccf4081447a391ac93cb0279b))
+- **ui:** no reabrir los autocompletes al volver a la pestaña ([2b6d38f](https://github.com/wariox3/bario/commit/2b6d38f31ed60f39f6705c108908b07e529721ef))
+
 ## [0.1.13](https://github.com/wariox3/bario/compare/v0.1.12...v0.1.13) (2026-10-28)
 
 ### Features
