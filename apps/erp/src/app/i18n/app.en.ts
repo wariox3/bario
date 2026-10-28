@@ -414,17 +414,19 @@ export const en: AppDict = {
       buttonLabel: 'Recurring',
       modalHeader: 'Invoice from recurring',
       modalSubtitle: 'Pick the recurring invoice the new invoice is created from',
-      searchPlaceholder: 'Search by supplier or ID number',
       seleccionar: 'Select',
       cancel: 'Cancel',
       sinOrigen: 'This document has no recurring invoice defined to come from.',
       columns: {
         id: 'ID',
         identificacion: 'ID number',
-        contacto: 'Supplier',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
+      },
+      contraparte: {
+        proveedor: { searchPlaceholder: 'Search by supplier or ID number', column: 'Supplier' },
+        cliente: { searchPlaceholder: 'Search by customer or ID number', column: 'Customer' },
       },
       empty: {
         title: 'No recurring invoices',

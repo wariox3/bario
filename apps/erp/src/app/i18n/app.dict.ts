@@ -383,18 +383,17 @@ export interface AppDict
       buttonLabel: string;
       modalHeader: string;
       modalSubtitle: string;
-      searchPlaceholder: string;
       seleccionar: string;
       cancel: string;
       sinOrigen: string;
       columns: {
         id: string;
         identificacion: string;
-        contacto: string;
         subtotal: string;
         impuesto: string;
         total: string;
       };
+      contraparte: Record<'proveedor' | 'cliente', { searchPlaceholder: string; column: string }>;
       empty: { title: string; sub: string; desc: string };
       success: { title: string; desc: string };
       loadError: { title: string; desc: string };

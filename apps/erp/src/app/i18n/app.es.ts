@@ -424,17 +424,25 @@ export const es: AppDict = {
       buttonLabel: 'Recurrente',
       modalHeader: 'Factura desde recurrente',
       modalSubtitle: 'Elige la factura recurrente desde la que se crea la nueva factura',
-      searchPlaceholder: 'Buscar por proveedor o identificación',
       seleccionar: 'Seleccionar',
       cancel: 'Cancelar',
       sinOrigen: 'Este documento no tiene definida la factura recurrente de la que sale.',
       columns: {
         id: 'ID',
         identificacion: 'Identificación',
-        contacto: 'Proveedor',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
+      },
+      contraparte: {
+        proveedor: {
+          searchPlaceholder: 'Buscar por proveedor o identificación',
+          column: 'Proveedor',
+        },
+        cliente: {
+          searchPlaceholder: 'Buscar por cliente o identificación',
+          column: 'Cliente',
+        },
       },
       empty: {
         title: 'Sin facturas recurrentes',
