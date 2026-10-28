@@ -322,6 +322,88 @@
             </div>
           </div>
 
+          <!--
+            Más información: soporte y comentario, que salen en la tirilla. Plegada en
+            una línea para no estorbar el cobro de siempre; cerrada muestra lo escrito.
+          -->
+          @let mi = tx.masInfo;
+          @let abierta = masInfoAbierta();
+          <div class="rounded-xl border-[1.5px] border-[#e9edf2]">
+            <button
+              type="button"
+              class="flex h-11 w-full items-center gap-2 rounded-[10px] px-3.5 text-left transition-colors hover:bg-[#fbfcfd] disabled:opacity-50"
+              [attr.aria-expanded]="abierta"
+              aria-controls="cobro-mas-info"
+              [disabled]="procesando()"
+              (click)="toggleMasInfo()"
+            >
+              <i
+                class="pi pi-chevron-right text-[0.7rem] text-[#8fa4b8] transition-transform"
+                [class.rotate-90]="abierta"
+                aria-hidden="true"
+              ></i>
+              <span class="shrink-0 text-xs font-semibold text-[#526680]">{{ mi.titulo }}</span>
+              @if (!abierta && resumenMasInfo()) {
+                <span class="min-w-0 truncate text-xs text-brand-text">{{ resumenMasInfo() }}</span>
+              }
+              <span class="ml-auto shrink-0 text-[11px] text-[#8fa4b8]">{{ mi.opcional }}</span>
+            </button>
+            @if (abierta) {
+              <div id="cobro-mas-info" class="grid gap-3 border-t border-[#f2f4f7] p-3.5">
+                <div>
+                  <label
+                    for="cobro-soporte"
+                    class="mb-2 block text-xs font-semibold text-[#526680]"
+                  >
+                    {{ mi.soporte }}
+                  </label>
+                  <input
+                    id="cobro-soporte"
+                    type="text"
+                    formControlName="soporte"
+                    autocomplete="off"
+                    [attr.maxlength]="soporteMax"
+                    class="h-11 w-full rounded-xl border-[1.5px] border-[#e9edf2] bg-white px-3.5 text-brand-text outline-none placeholder:text-[#c9d6e2] focus:border-brand-blue focus:shadow-[0_0_0_4px_#e8f6ff]"
+                    [placeholder]="mi.soportePlaceholder"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="cobro-comentario"
+                    class="mb-2 block text-xs font-semibold text-[#526680]"
+                  >
+                    {{ mi.comentario }}
+                  </label>
+                  <textarea
+                    id="cobro-comentario"
+                    formControlName="comentario"
+                    rows="2"
+                    [attr.maxlength]="comentarioMax"
+                    class="block w-full resize-none rounded-xl border-[1.5px] border-[#e9edf2] bg-white px-3.5 py-2.5 text-brand-text outline-none placeholder:text-[#c9d6e2] focus:border-brand-blue focus:shadow-[0_0_0_4px_#e8f6ff]"
+                    [placeholder]="mi.comentarioPlaceholder"
+                  ></textarea>
+                  <div class="mt-1.5 flex items-center gap-1.5 text-[11px] text-[#8fa4b8]">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2zM9 7h6M9 11h6M9 15h4" />
+                    </svg>
+                    <span>{{ mi.enTirilla }}</span>
+                    <span class="ml-auto tabular-nums"
+                      >{{ comentarioLargo() }}/{{ comentarioMax }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
           @if (error(); as mensaje) {
             <p
               class="m-0 rounded-xl bg-[#fdecee] px-3.5 py-2.5 text-xs text-[#d92d3a]"

@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  Injector,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -50,6 +52,14 @@ import { cambio, sugerenciasEfectivo } from '../../efectivo';
 import { MEDIOS_PAGO_POS, type MedioPagoId, type MedioPagoPos } from '../../medios-pago';
 import { VentaPosService } from '../../../../../core/documento/venta-pos.service';
 
+/** El backend admite 100 en `soporte`. */
+const SOPORTE_MAX = 100;
+/**
+ * El backend admite 500 en `comentario`; se dejan 100 libres para la referencia
+ * de la transferencia, que se le suma al guardar.
+ */
+const COMENTARIO_MAX = 400;
+
 const FORMATO_PESOS = new Intl.NumberFormat('es-CO', {
   style: 'currency',
   currency: 'COP',
@@ -95,6 +105,9 @@ function partirContacto(etiqueta: string): { nombre: string; identificacion: str
  * - **Transferencia** cobra el total contra la cuenta de transferencia de la
  *   caja; la referencia del comprobante (opcional) va al comentario del
  *   documento, porque el pago no tiene dónde guardarla.
+ * - **Más información.** Soporte y comentario de la venta, opcionales y
+ *   plegados: salen en la tirilla. La referencia de la transferencia se suma
+ *   al comentario.
  * - **Crédito y débito** se ven apagados y no se pueden elegir (tampoco con
  *   F3/F4). Su formulario (datáfono y aprobación) ya está para cuando se
  *   habiliten.
@@ -164,6 +177,7 @@ export class CobroDialogComponent {
   private readonly toast = inject(ToastService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
   private readonly carritos = inject(CarritosStore);
   private readonly configuracion = inject(ConfiguracionCajaStore);
   private readonly cobroService = inject(CobroService);
@@ -214,9 +228,27 @@ export class CobroDialogComponent {
           : null,
     ]),
     referencia: this.fb.nonNullable.control('', Validators.maxLength(60)),
+    soporte: this.fb.nonNullable.control('', Validators.maxLength(SOPORTE_MAX)),
+    comentario: this.fb.nonNullable.control('', Validators.maxLength(COMENTARIO_MAX)),
     cuenta: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     asesor: this.fb.control<ErpSelectOption | null>(null),
   });
+
+  protected readonly soporteMax = SOPORTE_MAX;
+  protected readonly comentarioMax = COMENTARIO_MAX;
+
+  /**
+   * «Más información» abierta. No se cierra al preparar otra venta: la caja que
+   * la usa la encuentra abierta en el siguiente cobro.
+   */
+  protected readonly masInfoAbierta = signal(false);
+  private readonly soporte = signal('');
+  private readonly comentario = signal('');
+  protected readonly comentarioLargo = computed(() => this.comentario().length);
+  /** Lo que ya se escribió, para verlo con la banda cerrada. */
+  protected readonly resumenMasInfo = computed(() =>
+    [this.soporte().trim(), this.comentario().trim()].filter(Boolean).join(' · '),
+  );
 
   private readonly recibido = signal(0);
   protected readonly cambioEfectivo = computed(() => cambio(this.recibido(), this.total()));
@@ -228,6 +260,12 @@ export class CobroDialogComponent {
     this.form.controls.recibido.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((valor) => this.recibido.set(valor ?? 0));
+    this.form.controls.soporte.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((valor) => this.soporte.set(valor));
+    this.form.controls.comentario.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((valor) => this.comentario.set(valor));
 
     this.destroyRef.onDestroy(() => (this.destruido = true));
 
@@ -276,6 +314,18 @@ export class CobroDialogComponent {
     if (indice < 0 || indice >= this.medios.length) return;
     event.preventDefault();
     this.elegirMedio(this.medios[indice]);
+  }
+
+  /**
+   * Al desplegarla a mano se salta al soporte. Sin autofocus en la plantilla:
+   * abierta desde la venta anterior, le robaría el foco a lo recibido.
+   */
+  protected toggleMasInfo(): void {
+    this.masInfoAbierta.update((abierta) => !abierta);
+    if (!this.masInfoAbierta()) return;
+    afterNextRender(() => document.getElementById('cobro-soporte')?.focus(), {
+      injector: this.injector,
+    });
   }
 
   protected usarMonto(monto: number): void {
@@ -393,6 +443,8 @@ export class CobroDialogComponent {
       cuenta: config.cuentaEfectivo,
       asesor: config.asesor,
       referencia: '',
+      soporte: '',
+      comentario: '',
     });
     this.vista.set(this.cobroPendiente() ? 'pendiente' : 'cobro');
   }
@@ -459,7 +511,7 @@ export class CobroDialogComponent {
 
   private armarSolicitud(): SolicitudCobro | null {
     const config = this.configuracion.configuracion();
-    const { cuenta, asesor, referencia } = this.form.getRawValue();
+    const { cuenta, asesor, referencia, soporte, comentario } = this.form.getRawValue();
     const medio = this.medio();
     const tx = this.t().caja.cobro;
     const cuentaBanco = cuenta ?? this.cuentaPorMedio(medio.id);
@@ -472,6 +524,9 @@ export class CobroDialogComponent {
       return null;
     }
     const ref = referencia.trim();
+    const transferencia =
+      medio.id === 'transferencia' && ref ? `${tx.transferencia.comentario} ${ref}` : '';
+    const notas = [comentario.trim(), transferencia].filter(Boolean).join(' · ');
     return {
       venta: this.carritos.activo(),
       documentoTipoId: config.documentoTipoId,
@@ -481,8 +536,8 @@ export class CobroDialogComponent {
       almacen: config.almacen,
       sede: config.sede,
       asesor: asesor ? { id: asesor.id, nombre: asesorLabel(asesor) } : null,
-      comentario:
-        medio.id === 'transferencia' && ref ? `${tx.transferencia.comentario} ${ref}` : null,
+      soporte: soporte.trim() || null,
+      comentario: notas || null,
     };
   }
 }

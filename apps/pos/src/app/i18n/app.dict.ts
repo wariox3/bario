@@ -329,6 +329,16 @@ export interface AppDict
         cuenta: string;
         asesor: string;
       };
+      /** Soporte y comentario de la venta, plegados bajo la cuenta y el asesor. */
+      masInfo: {
+        titulo: string;
+        opcional: string;
+        soporte: string;
+        soportePlaceholder: string;
+        comentario: string;
+        comentarioPlaceholder: string;
+        enTirilla: string;
+      };
       fases: Record<FaseCobro, string>;
       exito: {
         titulo: string;

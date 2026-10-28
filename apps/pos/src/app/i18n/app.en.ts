@@ -394,6 +394,15 @@ export const en: AppDict = {
         cuenta: 'Account',
         asesor: 'Advisor',
       },
+      masInfo: {
+        titulo: 'More information',
+        opcional: 'Optional',
+        soporte: 'Support',
+        soportePlaceholder: 'Number or reference',
+        comentario: 'Comment',
+        comentarioPlaceholder: 'A note for the customer or the register',
+        enTirilla: 'Printed on the receipt',
+      },
       fases: {
         preparando: 'Preparing…',
         guardando: 'Saving…',

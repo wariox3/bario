@@ -38,6 +38,7 @@ const solicitud: SolicitudCobro = {
   almacen: { id: 2, nombre: 'Principal' },
   sede: null,
   asesor: { id: 4, nombre: 'Ana' },
+  soporte: null,
   comentario: null,
 };
 
@@ -83,6 +84,16 @@ describe('solicitudToPayload', () => {
       new Date(2026, 9, 14),
     );
     expect(conReferencia.comentario).toBe('Transferencia, ref. M123');
+  });
+
+  it('el soporte de la solicitud llega al documento', () => {
+    const conSoporte = solicitudToPayload(
+      { ...solicitud, soporte: 'OC-881' },
+      { id: 22, nombre: 'Efectivo' },
+      { id: 1, nombre: 'Contado' },
+      new Date(2026, 9, 14),
+    );
+    expect(conSoporte.soporte).toBe('OC-881');
   });
 });
 
