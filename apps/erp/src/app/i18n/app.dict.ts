@@ -317,6 +317,8 @@ export interface AppDict
         utility: string;
         report: string;
         reception: string;
+        /** Ciclo de nómina de Humano: programación, aporte y liquidación. */
+        payroll: string;
       };
     };
     userMenu: {

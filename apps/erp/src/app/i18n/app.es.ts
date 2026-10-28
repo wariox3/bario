@@ -312,6 +312,7 @@ export const es: AppDict = {
         utility: 'Utilidades',
         report: 'Informes',
         reception: 'Recepción',
+        payroll: 'Nómina',
       },
     },
     userMenu: {
