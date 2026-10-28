@@ -6,9 +6,9 @@ import type { ResumenPeriodo } from '@erp/features/documentos/resumen-periodo/re
  */
 export interface ResultadoResumenPunto {
   readonly fecha: string;
-  /** Subtotal neto de las ventas: los documentos de `venta-resumen`. */
+  /** Subtotal neto de las ventas: los documentos de `tablero/venta/`. */
   readonly ingreso: string;
-  /** Subtotal neto de las compras: los documentos de `compra-resumen`. */
+  /** Subtotal neto de las compras: los documentos de `tablero/compra/`. */
   readonly egreso: string;
 }
 
@@ -20,10 +20,10 @@ export interface ResultadoResumenTotales {
 }
 
 /**
- * Respuesta de `GET general/documento/resultado-resumen/?periodo=`: ingresos
+ * Respuesta de `GET general/tablero/resultado/?periodo=`: ingresos
  * contra egresos del período en curso, **antes de impuestos** (el IVA no es
  * ingreso ni gasto). El schema no tipa la respuesta: la forma sigue a la de
- * `venta-resumen` con los campos que declara su descripción.
+ * `tablero/venta/` con los campos que declara su descripción.
  */
 export interface ResultadoResumen {
   readonly periodo: ResumenPeriodo;

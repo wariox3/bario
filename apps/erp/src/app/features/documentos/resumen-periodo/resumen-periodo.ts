@@ -8,7 +8,7 @@ import { fromIsoDate, startOfToday, toIsoDate } from '@reddoc/core';
  * de acá para que todas se lean igual.
  */
 
-/** Período que aceptan los `*-resumen/?periodo=`: el mes o el año en curso. */
+/** Período que aceptan los endpoints de `general/tablero/` (`?periodo=`): el mes o el año en curso. */
 export type ResumenPeriodo = 'mes' | 'anio';
 
 export const RESUMEN_PERIODOS: readonly ResumenPeriodo[] = ['mes', 'anio'];

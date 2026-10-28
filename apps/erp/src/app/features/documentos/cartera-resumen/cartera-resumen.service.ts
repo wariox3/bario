@@ -5,7 +5,7 @@ import type { CarteraTipo } from '@erp/core/module-config';
 import type { CarteraResumen } from './cartera-resumen.model';
 
 /** Endpoint de las cifras del tablero de cartera. */
-export const CARTERA_RESUMEN_ENDPOINT = '/general/documento/cartera-resumen/';
+export const CARTERA_RESUMEN_ENDPOINT = '/general/tablero/cartera/';
 
 /**
  * Cifras del tablero de cuentas por cobrar (`cobrar`, inicio de Cartera) o por

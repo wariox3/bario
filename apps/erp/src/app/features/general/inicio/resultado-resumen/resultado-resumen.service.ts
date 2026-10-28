@@ -4,7 +4,7 @@ import { BaseHttpService } from '@reddoc/core';
 import type { ResumenPeriodo } from '@erp/features/documentos/resumen-periodo/resumen-periodo';
 import type { ResultadoResumen } from './resultado-resumen.model';
 
-export const RESULTADO_RESUMEN_ENDPOINT = '/general/documento/resultado-resumen/';
+export const RESULTADO_RESUMEN_ENDPOINT = '/general/tablero/resultado/';
 
 /** Ingresos contra egresos del mes o del año en curso, por día o por mes. */
 @Injectable({ providedIn: 'root' })

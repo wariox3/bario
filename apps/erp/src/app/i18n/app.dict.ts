@@ -5295,7 +5295,7 @@ export interface AppDict
   inicio: {
     /** Selector del período de las gráficas (mes o año en curso). */
     periodo: { aria: string; mes: string; anio: string };
-    /** Ingresos contra egresos del resumen del negocio (`resultado-resumen/`). */
+    /** Ingresos contra egresos del resumen del negocio (`tablero/resultado/`). */
     resultadoResumen: {
       titulo: string;
       desc: string;
