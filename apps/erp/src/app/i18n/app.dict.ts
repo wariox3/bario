@@ -1456,10 +1456,9 @@ export interface AppDict
       };
       inconsistencias: {
         title: string;
-        columns: { comprobante: string; numero: string; documento: string; descripcion: string };
-        empty: string;
-        loadError: string;
-        abrirDocumento: string;
+        /** Estado vacío de la tabla: lo guardado del periodo no tiene filas. */
+        empty: { title: string; desc: string };
+        loadError: { title: string; desc: string };
       };
       toasts: {
         bloquearSuccess: { title: string; desc: string };

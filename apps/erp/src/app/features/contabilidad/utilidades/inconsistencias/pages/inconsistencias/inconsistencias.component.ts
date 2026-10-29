@@ -13,14 +13,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
-import {
-  buildFiltros,
-  FileDownloadService,
-  I18nService,
-  LIST_PAGE_SIZE,
-  TenantService,
-  ToastService,
-} from '@reddoc/core';
+import { I18nService, LIST_PAGE_SIZE, TenantService, ToastService } from '@reddoc/core';
 import {
   DataTableComponent,
   ListShellComponent,
@@ -29,13 +22,12 @@ import {
   type RowActionInvokedEvent,
 } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
-import type {
-  InconsistenciaGuardada,
-  PeriodoOpcion,
-} from '@erp/features/contabilidad/masters/periodo/periodo.model';
+import type { PeriodoOpcion } from '@erp/features/contabilidad/masters/periodo/periodo.model';
+import type { InconsistenciaGuardada } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.model';
+import { InconsistenciaService } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.service';
+import { INCONSISTENCIA_COLUMNS } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.constants';
 import { PeriodoService } from '@erp/features/contabilidad/masters/periodo/periodo.service';
-import { ACCION_RESOLVER, COLUMNS, ROW_ACTIONS } from '../../inconsistencias.constants';
-import { INCONSISTENCIA_ENDPOINT, InconsistenciasService } from '../../inconsistencias.service';
+import { ACCION_RESOLVER, ROW_ACTIONS } from '../../inconsistencias.constants';
 
 /** Fase de la consola: qué muestra el cuerpo bajo la botonera. */
 type Estado = 'inicial' | 'analizando' | 'listo' | 'error';
@@ -78,16 +70,15 @@ type Estado = 'inicial' | 'analizando' | 'listo' | 'error';
 })
 export class InconsistenciasComponent {
   private readonly service = inject(PeriodoService);
-  private readonly inconsistencias = inject(InconsistenciasService);
+  private readonly inconsistencias = inject(InconsistenciaService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(ToastService);
-  private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
-  protected readonly columns = COLUMNS;
+  protected readonly columns = INCONSISTENCIA_COLUMNS;
   protected readonly rowActions = ROW_ACTIONS;
 
   private readonly periodos = signal<readonly PeriodoOpcion[]>([]);
@@ -192,15 +183,8 @@ export class InconsistenciasComponent {
     const id = this.periodoId();
     if (id === null || this.exportandoExcel()) return;
     this.exportandoExcel.set(true);
-    this.fileDownload
-      .download(`${INCONSISTENCIA_ENDPOINT}excel/`, {
-        method: 'POST',
-        body: {
-          filtros: buildFiltros([{ field: 'periodo_id', operator: 'eq', value: id }]),
-          ordenamientos: [],
-        },
-        fallbackFilename: 'inconsistencias.xlsx',
-      })
+    this.inconsistencias
+      .exportarExcel(id)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.exportandoExcel.set(false)),

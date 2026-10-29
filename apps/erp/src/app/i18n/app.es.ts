@@ -2036,15 +2036,14 @@ export const es: AppDict = {
       },
       inconsistencias: {
         title: 'Inconsistencias',
-        columns: {
-          comprobante: 'Comprobante',
-          numero: 'Número',
-          documento: 'Documento',
-          descripcion: 'Descripción',
+        empty: {
+          title: 'Sin inconsistencias',
+          desc: 'El último análisis de este periodo no encontró nada.',
         },
-        empty: 'Este periodo no tiene inconsistencias.',
-        loadError: 'No se pudieron cargar las inconsistencias.',
-        abrirDocumento: 'Abrir documento en otra pestaña',
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron cargar las inconsistencias.',
+        },
       },
       toasts: {
         bloquearSuccess: {

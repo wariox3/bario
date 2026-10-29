@@ -11,7 +11,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { Menu, MenuModule } from 'primeng/menu';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
@@ -22,7 +21,7 @@ import type { AppDict } from '@erp/i18n';
 import { PeriodoService } from '../../periodo.service';
 import type { Periodo } from '../../periodo.model';
 import { aniosDisponibles, mesesDeAnio, periodoEstado } from '../../periodo.utils';
-import { PeriodoInconsistenciasComponent } from '../../components/periodo-inconsistencias/periodo-inconsistencias.component';
+import { PeriodoInconsistenciasDialogComponent } from '../../components/periodo-inconsistencias-dialog/periodo-inconsistencias-dialog.component';
 import { PeriodoAnioNuevoDialogComponent } from '../../components/periodo-anio-nuevo/periodo-anio-nuevo-dialog.component';
 
 /**
@@ -45,9 +44,8 @@ import { PeriodoAnioNuevoDialogComponent } from '../../components/periodo-anio-n
     BreadcrumbComponent,
     ButtonModule,
     MenuModule,
-    DialogModule,
     ConfirmDialog,
-    PeriodoInconsistenciasComponent,
+    PeriodoInconsistenciasDialogComponent,
     PeriodoAnioNuevoDialogComponent,
   ],
   providers: [ConfirmationService],

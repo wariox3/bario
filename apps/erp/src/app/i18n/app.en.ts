@@ -1978,15 +1978,14 @@ export const en: AppDict = {
       },
       inconsistencias: {
         title: 'Inconsistencies',
-        columns: {
-          comprobante: 'Voucher',
-          numero: 'Number',
-          documento: 'Document',
-          descripcion: 'Description',
+        empty: {
+          title: 'No inconsistencies',
+          desc: 'The last analysis of this period found nothing.',
         },
-        empty: 'This period has no inconsistencies.',
-        loadError: 'Inconsistencies could not be loaded.',
-        abrirDocumento: 'Open document in a new tab',
+        loadError: {
+          title: 'Loading error',
+          desc: "Inconsistencies couldn't be loaded.",
+        },
       },
       toasts: {
         bloquearSuccess: { title: 'Period locked', desc: 'The period was locked successfully' },

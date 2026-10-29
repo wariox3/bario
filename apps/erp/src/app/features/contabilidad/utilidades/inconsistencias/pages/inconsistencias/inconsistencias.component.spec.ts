@@ -14,7 +14,7 @@ import {
 import { ConfirmationService, type Confirmation } from 'primeng/api';
 import { DataTableComponent } from '@reddoc/feature-base';
 import { dictionaries } from '@erp/i18n';
-import type { InconsistenciaGuardada } from '@erp/features/contabilidad/masters/periodo/periodo.model';
+import type { InconsistenciaGuardada } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.model';
 import { ACCION_RESOLVER, ROW_ACTIONS } from '../../inconsistencias.constants';
 import { InconsistenciasComponent } from './inconsistencias.component';
 

@@ -1,13 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { BaseHttpService, fetchAllPages, type PaginatedResponse } from '@reddoc/core';
-import type {
-  InconsistenciaGuardada,
-  Periodo,
-  PeriodoAccionResultado,
-  PeriodoInconsistencia,
-  PeriodoOpcion,
-} from './periodo.model';
+import type { InconsistenciaGuardada } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.model';
+import type { Periodo, PeriodoAccionResultado, PeriodoOpcion } from './periodo.model';
 
 /**
  * Acceso HTTP al master Periodo (`/contabilidad/periodo/`). Tenant-scoped por
@@ -66,16 +61,6 @@ export class PeriodoService extends BaseHttpService {
   /** bloqueado → cerrado (prácticamente irreversible; la vista confirma antes). Devuelve el periodo actualizado. */
   cerrar(id: number): Observable<Periodo> {
     return this.post<Periodo>(`${this.resourcePath}cerrar/`, { id });
-  }
-
-  /**
-   * Inconsistencias que impedirían bloquear el periodo. **No lo bloquea ni toca
-   * su estado**: lista vacía significa que se puede bloquear.
-   */
-  inconsistencias(id: number): Observable<readonly PeriodoInconsistencia[]> {
-    return this.get<{ inconsistencias: readonly PeriodoInconsistencia[] }>(
-      `${this.resourcePath}${id}/inconsistencias/`,
-    ).pipe(map((r) => r.inconsistencias ?? []));
   }
 
   /** Periodos sin bloquear: los únicos que todavía se pueden analizar. Todas las páginas. */

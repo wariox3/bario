@@ -148,15 +148,7 @@
 />
 
 <!-- Diálogo de inconsistencias -->
-<p-dialog
-  [header]="e.inconsistencias.title"
-  [visible]="dialogVisible()"
-  (visibleChange)="dialogVisible.set($event)"
-  [modal]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '46rem', maxWidth: '95vw' }"
->
-  @if (dialogVisible() && periodoInconsistencia(); as p) {
-    <app-periodo-inconsistencias [periodoId]="p.id" />
-  }
-</p-dialog>
+<app-periodo-inconsistencias-dialog
+  [(visible)]="dialogVisible"
+  [periodo]="periodoInconsistencia()"
+/>
