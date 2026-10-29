@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.15](https://github.com/wariox3/bario/compare/v0.1.14...v0.1.15) (2026-10-29)
+
+### Features
+
+- **erp:** avisar en el inicio de contabilidad los documentos pendientes por contabilizar ([63d9b1f](https://github.com/wariox3/bario/commit/63d9b1f468217d12bcf05b3de9ff6b55bccb95d3))
+- **erp:** estado de resultados en cascada en el inicio de contabilidad ([75432f9](https://github.com/wariox3/bario/commit/75432f9389dd59ba593d8280dbc86a04029d36db))
+- **erp:** exportar a excel las inconsistencias del periodo ([51362a1](https://github.com/wariox3/bario/commit/51362a19b22e258bfffa5d5d71be812c435019aa))
+- **erp:** modal de inconsistencias del periodo con el chrome estándar y excel ([8c9e03d](https://github.com/wariox3/bario/commit/8c9e03d4d93b0b46a1c7145bdaad3d1e41597171))
+- **erp:** mostrar en el inicio de contabilidad las inconsistencias del periodo ([6b4a869](https://github.com/wariox3/bario/commit/6b4a869f39cefb7754fbab209ee754578585fe5c))
+- **erp:** resolver inconsistencias desde el modal del master de periodos ([a351507](https://github.com/wariox3/bario/commit/a351507e15349f70efc169633223eec1db0af194))
+- **erp:** utilidad de inconsistencias en contabilidad ([64c8a2f](https://github.com/wariox3/bario/commit/64c8a2f2fe75b21a0396434f41644e23cdc0cf17))
+
+### Bug Fixes
+
+- **erp:** alinear el selector de periodo con los botones en inconsistencias ([2b9ef68](https://github.com/wariox3/bario/commit/2b9ef68e05f6346eac6e8d459a5a8809366dc1f8))
+- **erp:** cascada legible en anchos angostos del inicio de contabilidad ([2188e65](https://github.com/wariox3/bario/commit/2188e658fe31dfc1777da2f9fb7cc130f562cf86))
+- **erp:** estado de resultados hasta el último día del período ([4d0d6f6](https://github.com/wariox3/bario/commit/4d0d6f6d2d17817170bb772161f1ec4d50fd29be))
+- **erp:** reconciliar el periodo tras una acción fallida y traer todas las páginas ([a28db65](https://github.com/wariox3/bario/commit/a28db65aecd664bd8695613df18e6b92dd5dd97d))
+
 ## [0.1.14](https://github.com/wariox3/bario/compare/v0.1.13...v0.1.14) (2026-10-28)
 
 ### Features

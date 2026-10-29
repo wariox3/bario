@@ -91,6 +91,7 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
               path: 'utilidades/conciliacion',
               activeMatch: 'utilidades/conciliacion',
             },
+            { labelKey: 'entities.inconsistencias.name', path: 'utilidades/inconsistencias' },
           ],
         },
       ],

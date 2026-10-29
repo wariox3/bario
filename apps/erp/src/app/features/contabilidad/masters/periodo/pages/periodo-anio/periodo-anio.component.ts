@@ -11,18 +11,17 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgClass } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { Menu, MenuModule } from 'primeng/menu';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { ConfirmationService, type MenuItem } from 'primeng/api';
 import { type Observable, finalize } from 'rxjs';
-import { I18nService, TenantService, ToastService } from '@reddoc/core';
+import { I18nService, TenantService, ToastService, extractErrorMessage } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
 import { PeriodoService } from '../../periodo.service';
 import type { Periodo } from '../../periodo.model';
 import { aniosDisponibles, mesesDeAnio, periodoEstado } from '../../periodo.utils';
-import { PeriodoInconsistenciasComponent } from '../../components/periodo-inconsistencias/periodo-inconsistencias.component';
+import { PeriodoInconsistenciasDialogComponent } from '../../components/periodo-inconsistencias-dialog/periodo-inconsistencias-dialog.component';
 import { PeriodoAnioNuevoDialogComponent } from '../../components/periodo-anio-nuevo/periodo-anio-nuevo-dialog.component';
 
 /**
@@ -33,9 +32,9 @@ import { PeriodoAnioNuevoDialogComponent } from '../../components/periodo-anio-n
  *
  * Estado en cliente: trae todos los periodos una vez (`listAll`) y deriva años y
  * meses con `computed`. Las acciones de estado (bloquear/desbloquear/cerrar) hacen
- * **optimistic update**: parchean el periodo en el signal de inmediato, reconcilian
- * con el periodo que devuelve el backend y revierten si la petición falla. Así la
- * fila cambia al instante sin recargar ni mostrar el spinner de la lista completa.
+ * **optimistic update**: parchean el periodo en el signal de inmediato y reconcilian
+ * con el backend, tanto si sale bien como si falla. Así la fila cambia al instante
+ * sin recargar ni mostrar el spinner de la lista completa.
  */
 @Component({
   selector: 'app-periodo-anio',
@@ -45,9 +44,8 @@ import { PeriodoAnioNuevoDialogComponent } from '../../components/periodo-anio-n
     BreadcrumbComponent,
     ButtonModule,
     MenuModule,
-    DialogModule,
     ConfirmDialog,
-    PeriodoInconsistenciasComponent,
+    PeriodoInconsistenciasDialogComponent,
     PeriodoAnioNuevoDialogComponent,
   ],
   providers: [ConfirmationService],
@@ -217,8 +215,14 @@ export class PeriodoAnioComponent implements OnInit {
 
   /**
    * Ejecuta una acción de estado con optimistic update: aplica `optimista` al
-   * instante, reconcilia con el periodo que devuelve el backend en `next` (fuente
-   * de verdad, incluye `estado_inconsistencia`) y revierte a `original` si falla.
+   * instante y reconcilia con el periodo que devuelve el backend en `next` (fuente
+   * de verdad, incluye `estado_inconsistencia`).
+   *
+   * Si falla no basta con volver a `original`: una acción rechazada también puede
+   * cambiar el periodo. Bloquear con inconsistencias responde 400 **después** de
+   * guardar el análisis y encender `estado_inconsistencia`, y la copia de antes del
+   * clic lo tenía apagado. Por eso se vuelve a `original` mientras se pide el
+   * periodo al backend, y se pinta lo que diga. El toast lleva su `detail`.
    */
   private ejecutarAccion(
     original: Periodo,
@@ -233,11 +237,20 @@ export class PeriodoAnioComponent implements OnInit {
         this.patchPeriodo(actualizado);
         this.toast.success(okToast.title, okToast.desc);
       },
-      error: () => {
+      error: (err: unknown) => {
         this.patchPeriodo(original);
-        this.toast.error(errToast.title, errToast.desc);
+        this.toast.error(errToast.title, extractErrorMessage(err, errToast.desc));
+        this.recargarPeriodo(original.id);
       },
     });
+  }
+
+  /** Trae un periodo del backend y lo parchea. Si tampoco responde, queda `original` (sin otro aviso). */
+  private recargarPeriodo(id: number): void {
+    this.service
+      .obtener(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (periodo) => this.patchPeriodo(periodo), error: () => undefined });
   }
 
   /** Reemplaza un periodo en el signal por su versión actualizada (match por `id`). */

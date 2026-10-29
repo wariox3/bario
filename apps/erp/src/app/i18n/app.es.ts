@@ -2036,15 +2036,14 @@ export const es: AppDict = {
       },
       inconsistencias: {
         title: 'Inconsistencias',
-        columns: {
-          comprobante: 'Comprobante',
-          numero: 'Número',
-          documento: 'Documento',
-          descripcion: 'Descripción',
+        empty: {
+          title: 'Sin inconsistencias',
+          desc: 'El último análisis de este periodo no encontró nada.',
         },
-        empty: 'Este periodo no tiene inconsistencias.',
-        loadError: 'No se pudieron cargar las inconsistencias.',
-        abrirDocumento: 'Abrir documento en otra pestaña',
+        loadError: {
+          title: 'Error al cargar',
+          desc: 'No se pudieron cargar las inconsistencias.',
+        },
       },
       toasts: {
         bloquearSuccess: {
@@ -5750,6 +5749,47 @@ export const es: AppDict = {
         },
       },
     },
+    inconsistencias: {
+      name: 'Inconsistencias',
+      periodo: 'Periodo',
+      periodoPlaceholder: 'Elige un periodo abierto',
+      sinPeriodos: 'No hay periodos abiertos',
+      analizar: 'Analizar',
+      analizando: 'Analizando el periodo…',
+      columns: {
+        tipo: 'Tipo',
+        descripcion: 'Descripción',
+        comprobante: 'Comprobante',
+        numero: 'Número',
+        documento: 'Documento',
+        cuenta: 'Cuenta',
+      },
+      inicial:
+        'Elige un periodo abierto y analízalo: se revisa lo mismo que al bloquearlo, sin bloquearlo. Lo que encuentre queda guardado en el periodo.',
+      resolver: {
+        accion: 'Resolver',
+        confirm: {
+          header: 'Resolver inconsistencia',
+          message:
+            '{tipo}: {descripcion}. El sistema la corregirá automáticamente. ¿Quieres continuar?',
+          accept: 'Resolver',
+          cancel: 'Cancelar',
+        },
+        toast: {
+          title: 'Inconsistencia resuelta',
+          desc: 'Se corrigió automáticamente.',
+        },
+      },
+      encontradas: {
+        one: '1 inconsistencia en {periodo}',
+        other: '{n} inconsistencias en {periodo}',
+      },
+      sinInconsistencias: {
+        title: 'Sin inconsistencias',
+        desc: '{periodo} ya se puede bloquear.',
+      },
+      error: 'No se pudo analizar el periodo. Intenta de nuevo en un momento.',
+    },
     contabilizar: {
       name: 'Contabilizar',
       actions: { contabilizar: 'Contabilizar', descontabilizar: 'Descontabilizar' },
@@ -7105,7 +7145,12 @@ export const es: AppDict = {
     },
   },
   inicio: {
-    periodo: { aria: 'Período', mes: 'Mes actual', anio: 'Año actual' },
+    periodo: {
+      aria: 'Período',
+      mes: 'Mes actual',
+      trimestre: 'Trimestre actual',
+      anio: 'Año actual',
+    },
     resultadoResumen: {
       titulo: 'Ingresos y egresos',
       desc: 'Subtotales netos de ventas y compras, antes de impuestos.',
@@ -7163,6 +7208,48 @@ export const es: AppDict = {
       vencido: 'Vencido',
       error: {
         title: 'No se pudo cargar el saldo',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
+    pendienteContabilizar: {
+      uno: 'Tienes {n} documento pendiente por contabilizar este mes.',
+      varios: 'Tienes {n} documentos pendientes por contabilizar este mes.',
+      verDetalle: 'Ver detalle',
+    },
+    inconsistencias: {
+      titulo: 'Inconsistencias del periodo',
+      una: '{n} encontrada en el último análisis',
+      varias: '{n} encontradas en el último análisis',
+      verUtilidad: 'Ir a inconsistencias',
+    },
+    estadoResultados: {
+      titulo: 'Cómo nos fue',
+      desc: 'De lo que vendimos a lo que nos quedó, según la contabilidad.',
+      rango: 'del {desde} al {hasta}',
+      trimestre: 'trimestre {n} de {anio}',
+      tarjetas: { vendimos: 'Vendimos', gastamos: 'Gastamos', nos_quedo: 'Nos quedó' },
+      deCada100: 'de cada 100 pesos de ventas',
+      variacion: { sube: 'Subió', baja: 'Bajó', vs: 'vs.' },
+      cascada: {
+        ventas: 'Ventas',
+        costo_ventas: 'Costo de lo vendido',
+        utilidad_bruta: 'Ganancia bruta',
+        gastos_operacion: 'Gastos de operación',
+        utilidad_operacional: 'Ganancia operacional',
+        otros_netos: 'Otros ingresos y gastos',
+        impuestos: 'Impuestos',
+        utilidad_neta: 'Nos quedó',
+      },
+      leyenda: {
+        entrada: 'Entra',
+        salida: 'Sale',
+        subtotal: 'Lo que va quedando',
+        ganancia: 'Ganancia',
+        perdida: 'Pérdida',
+      },
+      sinMovimiento: 'Aún no hay movimientos contables en este período',
+      error: {
+        title: 'No se pudo cargar el estado de resultados',
         desc: 'Intenta de nuevo en un momento.',
       },
     },

@@ -19,3 +19,8 @@ export function aniosDisponibles(periodos: readonly Periodo[]): readonly number[
 export function mesesDeAnio(periodos: readonly Periodo[], anio: number): readonly Periodo[] {
   return periodos.filter((p) => p.anio === anio).sort((a, b) => b.mes - a.mes);
 }
+
+/** Id `AAAAMM` del periodo de una fecha local: octubre de 2026 → `202610`. */
+export function periodoIdDe(fecha: Date): number {
+  return fecha.getFullYear() * 100 + fecha.getMonth() + 1;
+}

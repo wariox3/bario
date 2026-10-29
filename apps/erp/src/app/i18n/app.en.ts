@@ -1978,15 +1978,14 @@ export const en: AppDict = {
       },
       inconsistencias: {
         title: 'Inconsistencies',
-        columns: {
-          comprobante: 'Voucher',
-          numero: 'Number',
-          documento: 'Document',
-          descripcion: 'Description',
+        empty: {
+          title: 'No inconsistencies',
+          desc: 'The last analysis of this period found nothing.',
         },
-        empty: 'This period has no inconsistencies.',
-        loadError: 'Inconsistencies could not be loaded.',
-        abrirDocumento: 'Open document in a new tab',
+        loadError: {
+          title: 'Loading error',
+          desc: "Inconsistencies couldn't be loaded.",
+        },
       },
       toasts: {
         bloquearSuccess: { title: 'Period locked', desc: 'The period was locked successfully' },
@@ -5661,6 +5660,47 @@ export const en: AppDict = {
         },
       },
     },
+    inconsistencias: {
+      name: 'Inconsistencies',
+      periodo: 'Period',
+      periodoPlaceholder: 'Choose an open period',
+      sinPeriodos: 'No open periods',
+      analizar: 'Analyze',
+      analizando: 'Analyzing the period…',
+      columns: {
+        tipo: 'Type',
+        descripcion: 'Description',
+        comprobante: 'Voucher',
+        numero: 'Number',
+        documento: 'Document',
+        cuenta: 'Account',
+      },
+      inicial:
+        'Choose an open period and analyze it: it runs the same checks as locking, without locking. Whatever it finds is saved on the period.',
+      resolver: {
+        accion: 'Resolve',
+        confirm: {
+          header: 'Resolve inconsistency',
+          message:
+            '{tipo}: {descripcion}. The system will fix it automatically. Do you want to continue?',
+          accept: 'Resolve',
+          cancel: 'Cancel',
+        },
+        toast: {
+          title: 'Inconsistency resolved',
+          desc: 'It was fixed automatically.',
+        },
+      },
+      encontradas: {
+        one: '1 inconsistency in {periodo}',
+        other: '{n} inconsistencies in {periodo}',
+      },
+      sinInconsistencias: {
+        title: 'No inconsistencies',
+        desc: '{periodo} can now be locked.',
+      },
+      error: "The period couldn't be analyzed. Try again in a moment.",
+    },
     contabilizar: {
       name: 'Post to ledger',
       actions: { contabilizar: 'Post', descontabilizar: 'Unpost' },
@@ -7007,7 +7047,7 @@ export const en: AppDict = {
     },
   },
   inicio: {
-    periodo: { aria: 'Period', mes: 'This month', anio: 'This year' },
+    periodo: { aria: 'Period', mes: 'This month', trimestre: 'This quarter', anio: 'This year' },
     resultadoResumen: {
       titulo: 'Income and expenses',
       desc: 'Net subtotals of sales and purchases, before taxes.',
@@ -7059,6 +7099,48 @@ export const en: AppDict = {
       vencido: 'Overdue',
       error: {
         title: 'Could not load the balance',
+        desc: 'Try again in a moment.',
+      },
+    },
+    pendienteContabilizar: {
+      uno: 'You have {n} document pending to post this month.',
+      varios: 'You have {n} documents pending to post this month.',
+      verDetalle: 'View details',
+    },
+    inconsistencias: {
+      titulo: 'Period inconsistencies',
+      una: '{n} found in the last analysis',
+      varias: '{n} found in the last analysis',
+      verUtilidad: 'Go to inconsistencies',
+    },
+    estadoResultados: {
+      titulo: 'How we did',
+      desc: 'From what we sold to what we kept, according to the books.',
+      rango: 'from {desde} to {hasta}',
+      trimestre: 'Q{n} {anio}',
+      tarjetas: { vendimos: 'We sold', gastamos: 'We spent', nos_quedo: 'We kept' },
+      deCada100: 'out of every 100 pesos in sales',
+      variacion: { sube: 'Up', baja: 'Down', vs: 'vs.' },
+      cascada: {
+        ventas: 'Sales',
+        costo_ventas: 'Cost of sales',
+        utilidad_bruta: 'Gross profit',
+        gastos_operacion: 'Operating expenses',
+        utilidad_operacional: 'Operating profit',
+        otros_netos: 'Other income and expenses',
+        impuestos: 'Taxes',
+        utilidad_neta: 'We kept',
+      },
+      leyenda: {
+        entrada: 'In',
+        salida: 'Out',
+        subtotal: 'Running total',
+        ganancia: 'Profit',
+        perdida: 'Loss',
+      },
+      sinMovimiento: 'No accounting activity in this period yet',
+      error: {
+        title: "The income statement couldn't be loaded",
         desc: 'Try again in a moment.',
       },
     },
