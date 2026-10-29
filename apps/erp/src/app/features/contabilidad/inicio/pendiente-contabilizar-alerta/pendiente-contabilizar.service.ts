@@ -12,11 +12,6 @@ export interface PendienteContabilizar {
   readonly cantidad: number;
 }
 
-/** Periodo `AAAAMM` de una fecha local: octubre de 2026 → `202610`. */
-export function periodoIdDe(fecha: Date): number {
-  return fecha.getFullYear() * 100 + fecha.getMonth() + 1;
-}
-
 /** Cuántos documentos del periodo quedan sin contabilizar. */
 @Injectable({ providedIn: 'root' })
 export class PendienteContabilizarService extends BaseHttpService {

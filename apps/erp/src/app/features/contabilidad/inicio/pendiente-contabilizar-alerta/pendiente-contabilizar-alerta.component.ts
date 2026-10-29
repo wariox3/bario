@@ -10,7 +10,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { I18nService, TenantService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import { periodoIdDe, PendienteContabilizarService } from './pendiente-contabilizar.service';
+import { periodoIdDe } from '@erp/features/contabilidad/masters/periodo/periodo.utils';
+import { PendienteContabilizarService } from './pendiente-contabilizar.service';
 
 /**
  * Aviso del inicio de Contabilidad: documentos del mes en curso que siguen sin

@@ -7107,6 +7107,12 @@ export const en: AppDict = {
       varios: 'You have {n} documents pending to post this month.',
       verDetalle: 'View details',
     },
+    inconsistencias: {
+      titulo: 'Period inconsistencies',
+      una: '{n} found in the last analysis',
+      varias: '{n} found in the last analysis',
+      verUtilidad: 'Go to inconsistencies',
+    },
     estadoResultados: {
       titulo: 'How we did',
       desc: 'From what we sold to what we kept, according to the books.',

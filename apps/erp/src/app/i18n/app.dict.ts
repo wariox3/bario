@@ -5384,6 +5384,8 @@ export interface AppDict
     };
     /** Aviso del inicio de Contabilidad (`tablero/pendiente-contabilizar/`); `{n}` es la cantidad. */
     pendienteContabilizar: { uno: string; varios: string; verDetalle: string };
+    /** Inconsistencias guardadas del mes en curso, bajo la cascada (`inconsistencia/lista/`). */
+    inconsistencias: { titulo: string; una: string; varias: string; verUtilidad: string };
     /** Estado de resultados en cascada del inicio de Contabilidad (`tablero/estado-resultados/`). */
     estadoResultados: {
       titulo: string;

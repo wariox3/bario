@@ -7216,6 +7216,12 @@ export const es: AppDict = {
       varios: 'Tienes {n} documentos pendientes por contabilizar este mes.',
       verDetalle: 'Ver detalle',
     },
+    inconsistencias: {
+      titulo: 'Inconsistencias del periodo',
+      una: '{n} encontrada en el último análisis',
+      varias: '{n} encontradas en el último análisis',
+      verUtilidad: 'Ir a inconsistencias',
+    },
     estadoResultados: {
       titulo: 'Cómo nos fue',
       desc: 'De lo que vendimos a lo que nos quedó, según la contabilidad.',
