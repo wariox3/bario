@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { BaseHttpService, type PaginatedResponse } from '@reddoc/core';
-import type { Periodo, PeriodoAccionResultado, PeriodoInconsistencia } from './periodo.model';
+import { BaseHttpService, fetchAllPages, type PaginatedResponse } from '@reddoc/core';
+import type {
+  InconsistenciaGuardada,
+  Periodo,
+  PeriodoAccionResultado,
+  PeriodoInconsistencia,
+  PeriodoOpcion,
+} from './periodo.model';
 
 /**
  * Acceso HTTP al master Periodo (`/contabilidad/periodo/`). Tenant-scoped por
@@ -59,5 +65,29 @@ export class PeriodoService extends BaseHttpService {
     return this.get<{ inconsistencias: readonly PeriodoInconsistencia[] }>(
       `${this.resourcePath}${id}/inconsistencias/`,
     ).pipe(map((r) => r.inconsistencias ?? []));
+  }
+
+  /** Periodos sin bloquear: los únicos que todavía se pueden analizar. Todas las páginas. */
+  abiertos(): Observable<PeriodoOpcion[]> {
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<PeriodoOpcion>>(`${this.resourcePath}seleccionar/`, {
+        estado_bloqueado: false,
+        page,
+      }),
+    );
+  }
+
+  /**
+   * Corre el mismo análisis que `bloquear`, **sin bloquear**: reemplaza las
+   * inconsistencias guardadas del periodo, actualiza su `estado_inconsistencia`
+   * y responde lo guardado, paginado de a 25. Cada página vuelve a analizar:
+   * es lo que expone el backend. `count` en 0: el periodo se puede bloquear.
+   */
+  analizar(id: number, page: number): Observable<PaginatedResponse<InconsistenciaGuardada>> {
+    return this.post<PaginatedResponse<InconsistenciaGuardada>>(
+      `${this.resourcePath}${id}/analizar/`,
+      {},
+      { page },
+    );
   }
 }

@@ -5750,6 +5750,47 @@ export const es: AppDict = {
         },
       },
     },
+    inconsistencias: {
+      name: 'Inconsistencias',
+      periodo: 'Periodo',
+      periodoPlaceholder: 'Elige un periodo abierto',
+      sinPeriodos: 'No hay periodos abiertos',
+      analizar: 'Analizar',
+      analizando: 'Analizando el periodo…',
+      columns: {
+        tipo: 'Tipo',
+        descripcion: 'Descripción',
+        comprobante: 'Comprobante',
+        numero: 'Número',
+        documento: 'Documento',
+        cuenta: 'Cuenta',
+      },
+      inicial:
+        'Elige un periodo abierto y analízalo: se revisa lo mismo que al bloquearlo, sin bloquearlo. Lo que encuentre queda guardado en el periodo.',
+      resolver: {
+        accion: 'Resolver',
+        confirm: {
+          header: 'Resolver inconsistencia',
+          message:
+            '{tipo}: {descripcion}. El sistema la corregirá automáticamente y volverá a analizar el periodo. ¿Quieres continuar?',
+          accept: 'Resolver',
+          cancel: 'Cancelar',
+        },
+        toast: {
+          title: 'Inconsistencia resuelta',
+          desc: 'Se corrigió y el periodo se volvió a analizar.',
+        },
+      },
+      encontradas: {
+        one: '1 inconsistencia en {periodo}',
+        other: '{n} inconsistencias en {periodo}',
+      },
+      sinInconsistencias: {
+        title: 'Sin inconsistencias',
+        desc: '{periodo} ya se puede bloquear.',
+      },
+      error: 'No se pudo analizar el periodo. Intenta de nuevo en un momento.',
+    },
     contabilizar: {
       name: 'Contabilizar',
       actions: { contabilizar: 'Contabilizar', descontabilizar: 'Descontabilizar' },

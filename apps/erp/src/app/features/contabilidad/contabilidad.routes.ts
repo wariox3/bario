@@ -58,6 +58,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        path: 'utilidades/inconsistencias',
+        loadChildren: () =>
+          import('./utilidades/inconsistencias/inconsistencias.routes').then(
+            (m) => m.INCONSISTENCIAS_ROUTES,
+          ),
+      },
+      {
         path: 'utilidades/contabilizar',
         loadChildren: () =>
           import('./utilidades/contabilizar/contabilizar.routes').then(

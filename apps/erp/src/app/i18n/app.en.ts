@@ -5661,6 +5661,47 @@ export const en: AppDict = {
         },
       },
     },
+    inconsistencias: {
+      name: 'Inconsistencies',
+      periodo: 'Period',
+      periodoPlaceholder: 'Choose an open period',
+      sinPeriodos: 'No open periods',
+      analizar: 'Analyze',
+      analizando: 'Analyzing the period…',
+      columns: {
+        tipo: 'Type',
+        descripcion: 'Description',
+        comprobante: 'Voucher',
+        numero: 'Number',
+        documento: 'Document',
+        cuenta: 'Account',
+      },
+      inicial:
+        'Choose an open period and analyze it: it runs the same checks as locking, without locking. Whatever it finds is saved on the period.',
+      resolver: {
+        accion: 'Resolve',
+        confirm: {
+          header: 'Resolve inconsistency',
+          message:
+            '{tipo}: {descripcion}. The system will fix it automatically and analyze the period again. Do you want to continue?',
+          accept: 'Resolve',
+          cancel: 'Cancel',
+        },
+        toast: {
+          title: 'Inconsistency resolved',
+          desc: 'It was fixed and the period was analyzed again.',
+        },
+      },
+      encontradas: {
+        one: '1 inconsistency in {periodo}',
+        other: '{n} inconsistencies in {periodo}',
+      },
+      sinInconsistencias: {
+        title: 'No inconsistencies',
+        desc: '{periodo} can now be locked.',
+      },
+      error: "The period couldn't be analyzed. Try again in a moment.",
+    },
     contabilizar: {
       name: 'Post to ledger',
       actions: { contabilizar: 'Post', descontabilizar: 'Unpost' },

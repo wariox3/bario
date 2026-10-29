@@ -1,0 +1,107 @@
+<!--
+  Utilidad "Inconsistencias" (Contabilidad). Botonera: el periodo abierto y el
+  botón que lo analiza, leídos como una frase. Cuerpo: qué hacer, el análisis en
+  curso o lo que encontró, paginado en <lib-data-table>.
+-->
+@let d = t().entities.inconsistencias;
+
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="d.name">
+  <div toolbar class="flex flex-wrap items-center gap-2">
+    <p-select
+      class="w-full sm:w-64"
+      size="small"
+      [ariaLabel]="d.periodo"
+      [options]="opciones()"
+      optionLabel="nombre"
+      optionValue="id"
+      [ngModel]="periodoId()"
+      (ngModelChange)="onPeriodo($event)"
+      [placeholder]="d.periodoPlaceholder"
+      [emptyMessage]="d.sinPeriodos"
+      [loading]="cargandoPeriodos()"
+      [filter]="opciones().length > 10"
+      [resetFilterOnHide]="true"
+      [disabled]="estado() === 'analizando' || paginando()"
+      appendTo="body"
+    />
+    <p-button
+      size="small"
+      icon="pi pi-search"
+      [label]="d.analizar"
+      [loading]="estado() === 'analizando'"
+      [disabled]="periodoId() === null || paginando()"
+      (onClick)="onAnalizar()"
+    />
+  </div>
+
+  <div table class="flex min-h-0 flex-1 flex-col">
+    @switch (estado()) {
+      @case ('listo') {
+        @if (totalCount()) {
+          <p
+            class="m-0 flex items-center gap-2 border-b border-[rgba(20,48,73,0.08)] px-4 py-2.5 text-[0.8rem] font-semibold text-brand-text"
+          >
+            <i class="pi pi-exclamation-triangle text-[0.85rem] text-amber-600"></i>
+            {{ resumen() }}
+          </p>
+          <lib-data-table
+            class="min-h-0 flex-1"
+            [columns]="columns"
+            [items]="items()"
+            [totalCount]="totalCount()"
+            [loading]="paginando()"
+            [currentPage]="currentPage()"
+            [rowActions]="rowActions"
+            (pageChange)="onPageChange($event)"
+            (rowActionInvoked)="onRowAction($event)"
+          />
+        } @else {
+          <div class="flex flex-1 items-center justify-center p-8 max-[576px]:p-5">
+            <div class="flex max-w-md flex-col items-center gap-2 text-center">
+              <span
+                class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"
+              >
+                <i class="pi pi-check-circle text-[1.3rem]"></i>
+              </span>
+              <p class="m-0 text-[0.9rem] font-semibold text-brand-text">
+                {{ d.sinInconsistencias.title }}
+              </p>
+              <p class="m-0 text-[0.82rem] text-brand-muted">{{ sinInconsistencias() }}</p>
+            </div>
+          </div>
+        }
+      }
+      @case ('analizando') {
+        <div
+          class="flex flex-1 items-center justify-center gap-2 p-8 text-brand-muted"
+          aria-busy="true"
+        >
+          <i class="pi pi-spin pi-spinner text-[1.1rem]"></i>
+          <span class="text-[0.85rem]">{{ d.analizando }}</span>
+        </div>
+      }
+      @case ('error') {
+        <div class="flex flex-1 items-center justify-center p-8 max-[576px]:p-5">
+          <div class="flex max-w-md flex-col items-center gap-2 text-center">
+            <i class="pi pi-exclamation-circle text-[1.3rem] text-brand-muted"></i>
+            <p class="m-0 text-[0.85rem] text-brand-muted">{{ d.error }}</p>
+          </div>
+        </div>
+      }
+      @default {
+        <div class="flex flex-1 items-center justify-center p-8 max-[576px]:p-5">
+          <div class="flex max-w-md flex-col items-center gap-3 text-center">
+            <span
+              class="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-700"
+            >
+              <i class="pi pi-search text-[1.3rem]"></i>
+            </span>
+            <p class="m-0 text-[0.9rem] leading-relaxed text-brand-text/80">{{ d.inicial }}</p>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</lib-list-shell>
+
+<p-confirmDialog />

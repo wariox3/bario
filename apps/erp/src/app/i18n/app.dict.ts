@@ -4366,6 +4366,36 @@ export interface AppDict
         };
       };
     };
+    /** Utilidad de Contabilidad: analiza un periodo abierto sin bloquearlo. */
+    inconsistencias: {
+      name: string;
+      periodo: string;
+      periodoPlaceholder: string;
+      sinPeriodos: string;
+      analizar: string;
+      analizando: string;
+      inicial: string;
+      columns: {
+        tipo: string;
+        descripcion: string;
+        comprobante: string;
+        numero: string;
+        documento: string;
+        cuenta: string;
+      };
+      /** Corrección automática de las de tipo `resolver_automatico`. */
+      resolver: {
+        accion: string;
+        /** `message` lleva `{tipo}` y `{descripcion}`. */
+        confirm: { header: string; message: string; accept: string; cancel: string };
+        toast: { title: string; desc: string };
+      };
+      /** `{n}` inconsistencias en `{periodo}`. */
+      encontradas: { one: string; other: string };
+      /** `desc` lleva `{periodo}`. */
+      sinInconsistencias: { title: string; desc: string };
+      error: string;
+    };
     contabilizar: {
       name: string;
       actions: { contabilizar: string; descontabilizar: string };
