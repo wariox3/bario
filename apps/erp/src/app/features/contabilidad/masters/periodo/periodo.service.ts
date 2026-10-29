@@ -13,8 +13,8 @@ import type {
  * Acceso HTTP al master Periodo (`/contabilidad/periodo/`). Tenant-scoped por
  * default de `BaseHttpService` (los endpoints viven en el schema del tenant).
  *
- * A diferencia de los masters estándar, Periodo **no pagina**: `listAll()` trae
- * todos los periodos de todos los años y la vista los agrupa por año en cliente.
+ * A diferencia de los masters estándar, la vista de Periodo no pagina: `listAll()`
+ * recorre todas las páginas del endpoint y la vista agrupa por año en cliente.
  */
 @Injectable({ providedIn: 'root' })
 export class PeriodoService extends BaseHttpService {
@@ -23,18 +23,29 @@ export class PeriodoService extends BaseHttpService {
   /**
    * Todos los periodos (todos los años). La vista deriva años y meses de aquí.
    *
-   * El endpoint responde paginado (`{ count, results }`), pero el caso vacío puede
-   * llegar como cuerpo nulo o como arreglo pelado; normalizamos para devolver
+   * El endpoint pagina de a 25 y un año son 13 periodos: con dos años ya hay
+   * segunda página, así que se recorren todas. El caso vacío puede llegar como
+   * cuerpo nulo o como arreglo pelado; se normaliza a una página para devolver
    * **siempre** un arreglo (la vista recorre estos datos en `computed`).
    */
   listAll(): Observable<readonly Periodo[]> {
-    return this.get<PaginatedResponse<Periodo> | Periodo[] | null>(this.resourcePath).pipe(
-      map((r) => {
-        if (r == null) return [];
-        if (Array.isArray(r)) return r;
-        return r.results ?? [];
-      }),
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<Periodo> | Periodo[] | null>(this.resourcePath, { page }).pipe(
+        map((r): PaginatedResponse<Periodo> => {
+          if (r == null) return { count: 0, next: null, previous: null, results: [] };
+          if (Array.isArray(r)) return { count: r.length, next: null, previous: null, results: r };
+          return { ...r, results: r.results ?? [] };
+        }),
+      ),
     );
+  }
+
+  /**
+   * Un periodo como está en el backend: para reconciliar la vista tras una acción
+   * fallida. Sin toast propio: corre de fondo y el fallo de la acción ya se avisó.
+   */
+  obtener(id: number): Observable<Periodo> {
+    return this.get<Periodo>(`${this.resourcePath}${id}/`, undefined, { errorToast: false });
   }
 
   /** Crea los 12 meses de un año nuevo. El backend genera los registros. */
