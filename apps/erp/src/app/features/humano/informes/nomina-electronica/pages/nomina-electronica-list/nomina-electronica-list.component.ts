@@ -25,7 +25,7 @@ import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core
 import type { AppDict } from '@erp/i18n';
 import {
   NominaElectronicaInformeService,
-  NOMINA_ELECTRONICA_INFORME_EXPORT_SERIALIZADOR,
+  NOMINA_ELECTRONICA_INFORME,
 } from '../../nomina-electronica.service';
 import type { NominaElectronicaInforme } from '../../nomina-electronica.model';
 import {
@@ -152,11 +152,9 @@ export class NominaElectronicaListComponent {
       .download(this.service.exportUrl, {
         method: 'POST',
         body: {
-          // El filtro de clase va también en la descarga: si no, el Excel
-          // traería documentos que no son nómina electrónica.
-          filtros: buildFiltros([...this.service.baseFilters, ...this.activeFilters()]),
+          filtros: buildFiltros(this.activeFilters()),
           ordenamientos: buildOrdenamientos(this.sort()),
-          serializador: NOMINA_ELECTRONICA_INFORME_EXPORT_SERIALIZADOR,
+          informe: NOMINA_ELECTRONICA_INFORME,
         },
         fallbackFilename: 'nomina-electronica.xlsx',
       })

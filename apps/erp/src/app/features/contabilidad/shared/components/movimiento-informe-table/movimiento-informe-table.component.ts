@@ -36,7 +36,7 @@ interface InformeFilaVm {
 
 /**
  * Tabla de los nueve informes contables que sirve
- * `/contabilidad/movimiento-informe/`.
+ * `/contabilidad/movimiento-informe-personalizado/`.
  *
  * Pinta el informe como lo que es: un **árbol aplanado**. El backend intercala
  * las filas de subtotal de clase, grupo y cuenta antes de cada auxiliar, y el

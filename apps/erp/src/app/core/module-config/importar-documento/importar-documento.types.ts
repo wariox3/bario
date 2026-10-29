@@ -62,6 +62,13 @@ export interface LineaPendienteApi {
   readonly cantidad: string;
   /** Precio unitario de la línea origen (decimal como string). */
   readonly precio: string;
+  /**
+   * Porcentaje de descuento de la línea origen (`"10.000000"`): es lo que la
+   * línea importada hereda. Opcional por prudencia: sin él nace en 0.
+   */
+  readonly porcentaje_descuento?: string | null;
+  /** Monto del descuento que calculó el backend; solo de lectura, no se hereda. */
+  readonly descuento?: string | null;
   /** Valor total de la línea origen (decimal como string). */
   readonly total: string;
   /** Valor ya facturado/afectado (decimal como string). */

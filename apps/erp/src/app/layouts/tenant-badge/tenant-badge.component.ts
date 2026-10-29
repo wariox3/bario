@@ -5,7 +5,7 @@ import type { AppDict } from '@erp/i18n';
 /**
  * Identidad del contenedor activo en el header del `WorkspaceLayout`.
  *
- * Ancla de "¿en qué empresa estoy?": monograma (inicial) + nombre, arriba-izquierda
+ * Ancla de "¿en qué empresa estoy?": monograma (imagen o inicial) + nombre, arriba-izquierda
  * junto al logo. Etiqueta estática (cambiar de empresa vive en el user-menu).
  *
  * El nombre legible lo provee `TenantService.currentContenedor()`, que el
@@ -32,4 +32,9 @@ export class TenantBadgeComponent {
 
   /** Inicial para el monograma; tolera nombres truncados manteniendo identidad. */
   protected readonly inicial = computed(() => this.nombre().charAt(0).toUpperCase());
+
+  /** Miniatura de la empresa; si no tiene, el monograma muestra la inicial. */
+  protected readonly imagen = computed(
+    () => this.tenant.currentContenedor()?.cliente_imagen_thumbnail ?? null,
+  );
 }
