@@ -7102,6 +7102,11 @@ export const en: AppDict = {
         desc: 'Try again in a moment.',
       },
     },
+    pendienteContabilizar: {
+      uno: 'You have {n} document pending to post this month.',
+      varios: 'You have {n} documents pending to post this month.',
+      verDetalle: 'View details',
+    },
     estadoResultados: {
       titulo: 'How we did',
       desc: 'From what we sold to what we kept, according to the books.',

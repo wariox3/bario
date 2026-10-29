@@ -5382,6 +5382,8 @@ export interface AppDict
       vencido: string;
       error: { title: string; desc: string };
     };
+    /** Aviso del inicio de Contabilidad (`tablero/pendiente-contabilizar/`); `{n}` es la cantidad. */
+    pendienteContabilizar: { uno: string; varios: string; verDetalle: string };
     /** Estado de resultados en cascada del inicio de Contabilidad (`tablero/estado-resultados/`). */
     estadoResultados: {
       titulo: string;
