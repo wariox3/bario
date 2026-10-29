@@ -4,7 +4,13 @@
     role="img"
     [attr.aria-label]="t().layout.tenantBadge.ariaLabel + ': ' + nombre()"
   >
-    <span class="tenant-badge__mono" aria-hidden="true">{{ inicial() }}</span>
+    <span class="tenant-badge__mono overflow-hidden" aria-hidden="true">
+      @if (imagen(); as src) {
+        <img [src]="src" alt="" class="size-full object-cover" />
+      } @else {
+        {{ inicial() }}
+      }
+    </span>
     <span class="tenant-badge__name" [title]="nombre()">{{ nombre() }}</span>
   </div>
 }
