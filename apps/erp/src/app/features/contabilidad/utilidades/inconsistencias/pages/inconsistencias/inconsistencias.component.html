@@ -7,8 +7,9 @@
 
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="d.name">
   <div toolbar class="flex flex-wrap items-center gap-2">
+    <!-- A la altura de los botones (32px): el line-height 1.5 del preflight lo dejaba en 35px. -->
     <p-select
-      class="w-full sm:w-64"
+      class="w-full sm:w-64 [&_.p-select-label]:leading-[18px]"
       size="small"
       [ariaLabel]="d.periodo"
       [options]="opciones()"
