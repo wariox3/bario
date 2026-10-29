@@ -5317,7 +5317,7 @@ export interface AppDict
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
     /** Selector del período de las gráficas (mes o año en curso). */
-    periodo: { aria: string; mes: string; anio: string };
+    periodo: { aria: string; mes: string; trimestre: string; anio: string };
     /** Ingresos contra egresos del resumen del negocio (`tablero/resultado/`). */
     resultadoResumen: {
       titulo: string;
@@ -5351,6 +5351,40 @@ export interface AppDict
       saldoAl: string;
       vigente: string;
       vencido: string;
+      error: { title: string; desc: string };
+    };
+    /** Estado de resultados en cascada del inicio de Contabilidad (`tablero/estado-resultados/`). */
+    estadoResultados: {
+      titulo: string;
+      desc: string;
+      corteAl: string;
+      /** Rótulo del trimestre en curso: `{n}` del 1 al 4 y `{anio}`. */
+      trimestre: string;
+      tarjetas: { vendimos: string; gastamos: string; nos_quedo: string };
+      /** Tras el margen redondeado: "12 de cada 100 pesos de ventas". */
+      deCada100: string;
+      /** `sube`/`baja` solo para lectores de pantalla: la flecha es visual. */
+      variacion: { sube: string; baja: string; vs: string };
+      /** Rótulo de cada fila de la cascada, por su `clave`. */
+      cascada: Record<
+        | 'ventas'
+        | 'costo_ventas'
+        | 'utilidad_bruta'
+        | 'gastos_operacion'
+        | 'utilidad_operacional'
+        | 'otros_netos'
+        | 'impuestos'
+        | 'utilidad_neta',
+        string
+      >;
+      leyenda: {
+        entrada: string;
+        salida: string;
+        subtotal: string;
+        ganancia: string;
+        perdida: string;
+      };
+      sinMovimiento: string;
       error: { title: string; desc: string };
     };
     contratoResumen: {

@@ -7007,7 +7007,7 @@ export const en: AppDict = {
     },
   },
   inicio: {
-    periodo: { aria: 'Period', mes: 'This month', anio: 'This year' },
+    periodo: { aria: 'Period', mes: 'This month', trimestre: 'This quarter', anio: 'This year' },
     resultadoResumen: {
       titulo: 'Income and expenses',
       desc: 'Net subtotals of sales and purchases, before taxes.',
@@ -7059,6 +7059,37 @@ export const en: AppDict = {
       vencido: 'Overdue',
       error: {
         title: 'Could not load the balance',
+        desc: 'Try again in a moment.',
+      },
+    },
+    estadoResultados: {
+      titulo: 'How we did',
+      desc: 'From what we sold to what we kept, according to the books.',
+      corteAl: 'as of',
+      trimestre: 'Q{n} {anio}',
+      tarjetas: { vendimos: 'We sold', gastamos: 'We spent', nos_quedo: 'We kept' },
+      deCada100: 'out of every 100 pesos in sales',
+      variacion: { sube: 'Up', baja: 'Down', vs: 'vs.' },
+      cascada: {
+        ventas: 'Sales',
+        costo_ventas: 'Cost of sales',
+        utilidad_bruta: 'Gross profit',
+        gastos_operacion: 'Operating expenses',
+        utilidad_operacional: 'Operating profit',
+        otros_netos: 'Other income and expenses',
+        impuestos: 'Taxes',
+        utilidad_neta: 'We kept',
+      },
+      leyenda: {
+        entrada: 'In',
+        salida: 'Out',
+        subtotal: 'Running total',
+        ganancia: 'Profit',
+        perdida: 'Loss',
+      },
+      sinMovimiento: 'No accounting activity in this period yet',
+      error: {
+        title: "The income statement couldn't be loaded",
         desc: 'Try again in a moment.',
       },
     },

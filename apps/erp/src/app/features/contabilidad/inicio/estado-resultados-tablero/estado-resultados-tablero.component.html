@@ -1,0 +1,145 @@
+<!--
+  Estado de resultados del período, a todo el ancho de la grilla del inicio (el
+  host es `contents`). Arriba las tres cifras que un gerente pregunta; abajo la
+  cascada que lleva de la primera a la última, con los mismos cuadritos de color.
+-->
+@let tx = t().inicio.estadoResultados;
+
+<section
+  class="animate-fade-up flex h-full flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface sm:col-span-2 lg:col-span-4"
+  [attr.aria-busy]="estado() === 'cargando'"
+>
+  <header class="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 px-5 pt-4">
+    <div class="flex flex-col gap-0.5">
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">{{ tx.titulo }}</h2>
+      <p class="m-0 text-[0.75rem] text-brand-muted">{{ tx.desc }}</p>
+    </div>
+    <app-periodo-selector [opciones]="periodos" [(periodo)]="periodo" />
+  </header>
+
+  @if (resumen(); as res) {
+    <div class="transition-opacity" [class.opacity-50]="recargando()">
+      <p class="m-0 px-5 pt-3 text-[0.72rem] text-brand-muted">
+        <span class="inline-block first-letter:uppercase">{{ rotuloPeriodo() }}</span>
+        · {{ tx.corteAl }} {{ fechaCorte() }}
+      </p>
+
+      <!-- Las tres cifras, en el orden de la cascada: la primera barra y la última. -->
+      <dl class="m-0 grid grid-cols-1 gap-y-3 px-5 pt-2 sm:grid-cols-3">
+        @for (tarjeta of tarjetas(); track tarjeta.clave) {
+          <div
+            class="flex flex-col gap-0.5 border-[rgba(20,48,73,0.08)] sm:not-first:border-l sm:not-first:pl-5"
+          >
+            <dt class="flex items-center gap-1.5 text-[0.72rem] text-brand-muted">
+              @switch (tarjeta.clave) {
+                @case ('vendimos') {
+                  <span class="h-2 w-2 rounded-[3px] bg-[rgba(20,48,73,0.72)]"></span>
+                }
+                @case ('gastamos') {
+                  <span class="h-2 w-2 rounded-[3px] bg-[#77aad7]"></span>
+                }
+                @case ('nos_quedo') {
+                  <span
+                    class="h-2 w-2 rounded-[3px]"
+                    [class.bg-green-600]="!perdida()"
+                    [class.bg-red-600]="perdida()"
+                  ></span>
+                }
+              }
+              {{ tx.tarjetas[tarjeta.clave] }}
+            </dt>
+            <!-- Solo "Nos quedó" cambia de color, y solo si es pérdida. -->
+            <dd
+              class="m-0 text-[1.25rem] font-bold leading-tight tracking-[-0.02em] tabular-nums"
+              [class.text-brand-text]="tarjeta.clave !== 'nos_quedo' || !perdida()"
+              [class.text-red-600]="tarjeta.clave === 'nos_quedo' && perdida()"
+            >
+              {{ formatMoney(tarjeta.valor) }}
+            </dd>
+            @if (tarjeta.clave === 'nos_quedo' && margen() !== null) {
+              <dd class="m-0 text-[0.72rem] text-brand-muted">
+                <span class="font-semibold tabular-nums text-brand-text">{{ margen() }}</span>
+                {{ tx.deCada100 }}
+              </dd>
+            }
+            <!-- Sin color: que el gasto suba no es bueno, que la venta suba sí. -->
+            @if (tarjeta.variacion; as v) {
+              <dd class="m-0 flex items-center gap-1 text-[0.72rem] text-brand-muted">
+                @if (v.sube) {
+                  <span aria-hidden="true">▲</span
+                  ><span class="sr-only">{{ tx.variacion.sube }}</span>
+                } @else if (v.baja) {
+                  <span aria-hidden="true">▼</span
+                  ><span class="sr-only">{{ tx.variacion.baja }}</span>
+                }
+                <span class="font-semibold tabular-nums">{{ v.texto }}</span>
+                {{ tx.variacion.vs }} {{ v.vs }}
+              </dd>
+            }
+          </div>
+        }
+      </dl>
+
+      @if (sinMovimiento()) {
+        <div class="px-5 pt-4 pb-5">
+          <p
+            class="m-0 rounded-md border border-[rgba(20,48,73,0.1)] px-3 py-6 text-center text-[0.78rem] text-brand-muted"
+          >
+            {{ tx.sinMovimiento }}
+          </p>
+        </div>
+      } @else {
+        <div class="px-3 pt-4">
+          <div class="h-72">
+            <p-chart
+              type="bar"
+              [data]="datosGrafica()"
+              [options]="opcionesGrafica()"
+              [plugins]="plugins"
+              [style]="{ height: '100%' }"
+            />
+          </div>
+        </div>
+
+        <!-- Leyenda propia: los cuadritos son los de las tarjetas. -->
+        <ul
+          class="m-0 flex list-none flex-wrap gap-x-4 gap-y-1 px-5 pt-2 pb-4 text-[0.72rem] text-brand-muted"
+        >
+          <li class="flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-[3px] bg-[rgba(20,48,73,0.72)]"></span>
+            {{ tx.leyenda.entrada }}
+          </li>
+          <li class="flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-[3px] bg-[#77aad7]"></span>
+            {{ tx.leyenda.salida }}
+          </li>
+          <li class="flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-[3px] bg-brand-muted"></span>
+            {{ tx.leyenda.subtotal }}
+          </li>
+          <li class="flex items-center gap-1.5">
+            <span
+              class="h-2 w-2 rounded-[3px]"
+              [class.bg-green-600]="!perdida()"
+              [class.bg-red-600]="perdida()"
+            ></span>
+            {{ perdida() ? tx.leyenda.perdida : tx.leyenda.ganancia }}
+          </li>
+        </ul>
+      }
+    </div>
+  } @else if (estado() === 'cargando') {
+    <div class="px-5 pt-3 pb-5" aria-hidden="true">
+      <div class="mb-4 h-14 animate-pulse rounded-md bg-brand-surface-2"></div>
+      <div class="h-72 animate-pulse rounded-md bg-brand-surface-2"></div>
+    </div>
+  } @else {
+    <div class="flex items-start gap-2 px-5 pt-3 pb-5">
+      <i class="pi pi-exclamation-circle mt-0.5 text-[0.85rem] text-brand-muted"></i>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.8rem] font-semibold text-brand-text">{{ tx.error.title }}</span>
+        <span class="text-[0.72rem] text-brand-muted">{{ tx.error.desc }}</span>
+      </div>
+    </div>
+  }
+</section>

@@ -7105,7 +7105,12 @@ export const es: AppDict = {
     },
   },
   inicio: {
-    periodo: { aria: 'Período', mes: 'Mes actual', anio: 'Año actual' },
+    periodo: {
+      aria: 'Período',
+      mes: 'Mes actual',
+      trimestre: 'Trimestre actual',
+      anio: 'Año actual',
+    },
     resultadoResumen: {
       titulo: 'Ingresos y egresos',
       desc: 'Subtotales netos de ventas y compras, antes de impuestos.',
@@ -7163,6 +7168,37 @@ export const es: AppDict = {
       vencido: 'Vencido',
       error: {
         title: 'No se pudo cargar el saldo',
+        desc: 'Intenta de nuevo en un momento.',
+      },
+    },
+    estadoResultados: {
+      titulo: 'Cómo nos fue',
+      desc: 'De lo que vendimos a lo que nos quedó, según la contabilidad.',
+      corteAl: 'corte al',
+      trimestre: 'trimestre {n} de {anio}',
+      tarjetas: { vendimos: 'Vendimos', gastamos: 'Gastamos', nos_quedo: 'Nos quedó' },
+      deCada100: 'de cada 100 pesos de ventas',
+      variacion: { sube: 'Subió', baja: 'Bajó', vs: 'vs.' },
+      cascada: {
+        ventas: 'Ventas',
+        costo_ventas: 'Costo de lo vendido',
+        utilidad_bruta: 'Ganancia bruta',
+        gastos_operacion: 'Gastos de operación',
+        utilidad_operacional: 'Ganancia operacional',
+        otros_netos: 'Otros ingresos y gastos',
+        impuestos: 'Impuestos',
+        utilidad_neta: 'Nos quedó',
+      },
+      leyenda: {
+        entrada: 'Entra',
+        salida: 'Sale',
+        subtotal: 'Lo que va quedando',
+        ganancia: 'Ganancia',
+        perdida: 'Pérdida',
+      },
+      sinMovimiento: 'Aún no hay movimientos contables en este período',
+      error: {
+        title: 'No se pudo cargar el estado de resultados',
         desc: 'Intenta de nuevo en un momento.',
       },
     },

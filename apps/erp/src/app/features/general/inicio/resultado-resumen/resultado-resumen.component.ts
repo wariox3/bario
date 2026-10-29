@@ -28,9 +28,6 @@ import { ResultadoResumenService } from './resultado-resumen.service';
 
 type Estado = 'cargando' | 'listo' | 'error';
 
-/** Hover del egreso: el sky un punto más hondo, como el navy sólido del ingreso. */
-const ACENTO_HOVER = '#5b93c4';
-
 /**
  * Ingresos contra egresos del período, para el resumen del negocio de General.
  *
@@ -127,7 +124,7 @@ export class ResultadoResumenComponent {
           label: tx.egreso,
           data: valores('egreso'),
           backgroundColor: this.paleta.acento,
-          hoverBackgroundColor: ACENTO_HOVER,
+          hoverBackgroundColor: this.paleta.acentoHover,
         },
       ],
     };
