@@ -1456,10 +1456,9 @@ export interface AppDict
       };
       inconsistencias: {
         title: string;
-        columns: { comprobante: string; numero: string; documento: string; descripcion: string };
-        empty: string;
-        loadError: string;
-        abrirDocumento: string;
+        /** Estado vacío de la tabla: lo guardado del periodo no tiene filas. */
+        empty: { title: string; desc: string };
+        loadError: { title: string; desc: string };
       };
       toasts: {
         bloquearSuccess: { title: string; desc: string };
@@ -4366,6 +4365,36 @@ export interface AppDict
         };
       };
     };
+    /** Utilidad de Contabilidad: analiza un periodo abierto sin bloquearlo. */
+    inconsistencias: {
+      name: string;
+      periodo: string;
+      periodoPlaceholder: string;
+      sinPeriodos: string;
+      analizar: string;
+      analizando: string;
+      inicial: string;
+      columns: {
+        tipo: string;
+        descripcion: string;
+        comprobante: string;
+        numero: string;
+        documento: string;
+        cuenta: string;
+      };
+      /** Corrección automática de las de tipo `resolver_automatico`. */
+      resolver: {
+        accion: string;
+        /** `message` lleva `{tipo}` y `{descripcion}`. */
+        confirm: { header: string; message: string; accept: string; cancel: string };
+        toast: { title: string; desc: string };
+      };
+      /** `{n}` inconsistencias en `{periodo}`. */
+      encontradas: { one: string; other: string };
+      /** `desc` lleva `{periodo}`. */
+      sinInconsistencias: { title: string; desc: string };
+      error: string;
+    };
     contabilizar: {
       name: string;
       actions: { contabilizar: string; descontabilizar: string };
@@ -5317,7 +5346,7 @@ export interface AppDict
   /** Copy de los inicios (landing) de cada módulo. */
   inicio: {
     /** Selector del período de las gráficas (mes o año en curso). */
-    periodo: { aria: string; mes: string; anio: string };
+    periodo: { aria: string; mes: string; trimestre: string; anio: string };
     /** Ingresos contra egresos del resumen del negocio (`tablero/resultado/`). */
     resultadoResumen: {
       titulo: string;
@@ -5351,6 +5380,45 @@ export interface AppDict
       saldoAl: string;
       vigente: string;
       vencido: string;
+      error: { title: string; desc: string };
+    };
+    /** Aviso del inicio de Contabilidad (`tablero/pendiente-contabilizar/`); `{n}` es la cantidad. */
+    pendienteContabilizar: { uno: string; varios: string; verDetalle: string };
+    /** Inconsistencias guardadas del mes en curso, bajo la cascada (`inconsistencia/lista/`). */
+    inconsistencias: { titulo: string; una: string; varias: string; verUtilidad: string };
+    /** Estado de resultados en cascada del inicio de Contabilidad (`tablero/estado-resultados/`). */
+    estadoResultados: {
+      titulo: string;
+      desc: string;
+      /** Rango pintado bajo el título: `{desde}` y `{hasta}` en fecha corta. */
+      rango: string;
+      /** Rótulo del trimestre en curso: `{n}` del 1 al 4 y `{anio}`. */
+      trimestre: string;
+      tarjetas: { vendimos: string; gastamos: string; nos_quedo: string };
+      /** Tras el margen redondeado: "12 de cada 100 pesos de ventas". */
+      deCada100: string;
+      /** `sube`/`baja` solo para lectores de pantalla: la flecha es visual. */
+      variacion: { sube: string; baja: string; vs: string };
+      /** Rótulo de cada fila de la cascada, por su `clave`. */
+      cascada: Record<
+        | 'ventas'
+        | 'costo_ventas'
+        | 'utilidad_bruta'
+        | 'gastos_operacion'
+        | 'utilidad_operacional'
+        | 'otros_netos'
+        | 'impuestos'
+        | 'utilidad_neta',
+        string
+      >;
+      leyenda: {
+        entrada: string;
+        salida: string;
+        subtotal: string;
+        ganancia: string;
+        perdida: string;
+      };
+      sinMovimiento: string;
       error: { title: string; desc: string };
     };
     contratoResumen: {

@@ -26,11 +26,11 @@ export const CONTABILIDAD_ROUTES: Route[] = [
     children: [
       moduleIndexRoute(CONTABILIDAD_MODULE),
       {
-        // Inicio del módulo (vacío por ahora — sin endpoints de estadísticas).
+        // Inicio del módulo: el estado de resultados en cascada.
         path: 'inicio',
         loadComponent: () =>
-          import('@erp/layouts/module-placeholder/module-placeholder.component').then(
-            (m) => m.ModulePlaceholderComponent,
+          import('./inicio/contabilidad-inicio.component').then(
+            (m) => m.ContabilidadInicioComponent,
           ),
       },
       {
@@ -55,6 +55,13 @@ export const CONTABILIDAD_ROUTES: Route[] = [
         loadChildren: () =>
           import('./utilidades/conciliacion/conciliacion.routes').then(
             (m) => m.CONCILIACION_ROUTES,
+          ),
+      },
+      {
+        path: 'utilidades/inconsistencias',
+        loadChildren: () =>
+          import('./utilidades/inconsistencias/inconsistencias.routes').then(
+            (m) => m.INCONSISTENCIAS_ROUTES,
           ),
       },
       {

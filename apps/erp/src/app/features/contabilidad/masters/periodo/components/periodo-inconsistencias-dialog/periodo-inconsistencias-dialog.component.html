@@ -1,0 +1,81 @@
+@let d = t().entities.periodo.inconsistencias;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isResolving()"
+  [dismissableMask]="!isResolving()"
+  [style]="{ width: '1100px', maxWidth: '96vw' }"
+  styleClass="cp-inconsistencias-dialog"
+>
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3.5">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-amber-50 text-amber-600"
+      >
+        <i class="pi pi-exclamation-triangle text-[1.05rem]"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2
+          class="m-0 truncate text-[1.05rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-text"
+        >
+          {{ d.title }}
+        </h2>
+        <p class="m-0 truncate text-[0.75rem] tracking-[0.01em] text-brand-muted">
+          {{ nombrePeriodo() }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ── Body ─────────────────────────────────────────────────────────────── -->
+  @if (visible()) {
+    <div class="cp-inconsistencias-dialog__table">
+      <lib-data-table
+        [columns]="columns"
+        [items]="items()"
+        [totalCount]="totalCount()"
+        [loading]="isLoading() || isResolving()"
+        [currentPage]="currentPage()"
+        [rowActions]="rowActions"
+        scrollHeight="380px"
+        emptyTitleKey="entities.periodo.inconsistencias.empty.title"
+        emptySubKey="entities.periodo.inconsistencias.empty.desc"
+        (pageChange)="onPageChange($event)"
+        (rowActionInvoked)="onRowAction($event)"
+      />
+    </div>
+  }
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center gap-3 border-t border-[rgba(20,48,73,0.08)] pt-4">
+      <p-button
+        type="button"
+        [label]="t().common.actions.exportExcel"
+        icon="pi pi-file-excel"
+        [outlined]="true"
+        severity="secondary"
+        [loading]="isExporting()"
+        [disabled]="isExporting() || totalCount() === 0"
+        (onClick)="exportarExcel()"
+      />
+      <p-button
+        class="ml-auto"
+        type="button"
+        [label]="t().common.actions.close"
+        [outlined]="true"
+        severity="secondary"
+        [disabled]="isResolving()"
+        (onClick)="visible.set(false)"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Confirmación de resolver: propia del diálogo, no la de la página. -->
+<p-confirmDialog />

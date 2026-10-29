@@ -1,0 +1,44 @@
+<!--
+  Inconsistencias guardadas del mes en curso, a todo el ancho de la grilla del
+  inicio (el host es `contents`). Solo se pinta si hay alguna.
+-->
+@if (totalCount() > 0) {
+  @let tx = t().inicio.inconsistencias;
+
+  <section
+    class="animate-fade-up flex flex-col overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface sm:col-span-2 lg:col-span-4"
+  >
+    <header class="flex items-center gap-3 px-5 pt-4 pb-3">
+      <span
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600"
+      >
+        <i class="pi pi-exclamation-triangle text-[0.85rem]" aria-hidden="true"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">{{ tx.titulo }}</h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ subtitulo() }}</p>
+      </div>
+    </header>
+
+    <lib-data-table
+      [columns]="columns"
+      [items]="items()"
+      [totalCount]="totalCount()"
+      [loading]="isLoading()"
+      [currentPage]="currentPage()"
+      scrollHeight="380px"
+      (pageChange)="onPageChange($event)"
+    />
+
+    <!-- A la utilidad, donde se vuelve a analizar y se resuelven. -->
+    <footer class="border-t border-[rgba(20,48,73,0.06)] px-5 py-2">
+      <a
+        [routerLink]="utilidadLink()"
+        class="inline-flex items-center gap-1.5 text-[0.75rem] font-semibold text-sky-700 transition-colors hover:text-brand-navy"
+      >
+        {{ tx.verUtilidad }}
+        <i class="pi pi-arrow-right text-[0.62rem]" aria-hidden="true"></i>
+      </a>
+    </footer>
+  </section>
+}

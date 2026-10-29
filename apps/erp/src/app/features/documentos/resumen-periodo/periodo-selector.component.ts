@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, model } from '@angular/core';
 import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
-import { RESUMEN_PERIODOS, type ResumenPeriodo } from './resumen-periodo';
+import { RESUMEN_PERIODOS, type RangoPeriodo, type ResumenPeriodo } from './resumen-periodo';
 
 /**
- * Selector mes / año de las gráficas de los inicios. Segmentado y no dropdown:
- * son dos opciones y se cambia de un clic, viéndolas a ambas.
+ * Selector de período de las gráficas de los inicios. Segmentado y no dropdown:
+ * son pocas opciones y se cambia de un clic, viéndolas todas. Por defecto ofrece
+ * lo que acepta `?periodo=`; una gráfica que pide fechas puede sumar el
+ * trimestre pasándole `RANGO_PERIODOS`.
  */
 @Component({
   selector: 'app-periodo-selector',
@@ -18,7 +20,7 @@ import { RESUMEN_PERIODOS, type ResumenPeriodo } from './resumen-periodo';
       role="radiogroup"
       [attr.aria-label]="p.aria"
     >
-      @for (opcion of periodos; track opcion) {
+      @for (opcion of opciones(); track opcion) {
         <button
           type="button"
           role="radio"
@@ -37,9 +39,9 @@ import { RESUMEN_PERIODOS, type ResumenPeriodo } from './resumen-periodo';
     </div>
   `,
 })
-export class PeriodoSelectorComponent {
+export class PeriodoSelectorComponent<T extends RangoPeriodo = ResumenPeriodo> {
   protected readonly t = inject<I18nService<AppDict>>(I18nService).t;
-  protected readonly periodos = RESUMEN_PERIODOS;
 
-  readonly periodo = model.required<ResumenPeriodo>();
+  readonly opciones = input<readonly T[]>(RESUMEN_PERIODOS as readonly T[]);
+  readonly periodo = model.required<T>();
 }

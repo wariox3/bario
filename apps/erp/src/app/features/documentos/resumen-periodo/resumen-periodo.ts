@@ -13,6 +13,11 @@ export type ResumenPeriodo = 'mes' | 'anio';
 
 export const RESUMEN_PERIODOS: readonly ResumenPeriodo[] = ['mes', 'anio'];
 
+/** Para los endpoints que reciben fechas: suman el trimestre en curso. */
+export type RangoPeriodo = ResumenPeriodo | 'trimestre';
+
+export const RANGO_PERIODOS: readonly RangoPeriodo[] = ['mes', 'trimestre', 'anio'];
+
 /** El punto del período en el que estamos hoy, y los que todavía no llegan. */
 export type Tramo = 'pasado' | 'hoy' | 'futuro';
 
@@ -20,6 +25,47 @@ export type PaletaGrafica = ReturnType<typeof leerPaletaGrafica>;
 
 export function localeDe(lang: string): string {
   return lang === 'en' ? 'en-US' : 'es-CO';
+}
+
+/**
+ * Rango completo del período en curso, del primer al último día, para los
+ * endpoints que piden fechas y no `?periodo=`. Llega más allá de hoy a
+ * propósito: en contabilidad se registra con fecha del cierre del mes
+ * (depreciación, provisiones, causaciones), y cortar en hoy lo dejaría afuera.
+ */
+export function rangoDePeriodo(
+  periodo: RangoPeriodo,
+  hoy: Date = startOfToday(),
+): { readonly fecha_desde: string; readonly fecha_hasta: string } {
+  const mesInicial = { mes: hoy.getMonth(), trimestre: trimestreDe(hoy) * 3, anio: 0 }[periodo];
+  const meses = { mes: 1, trimestre: 3, anio: 12 }[periodo];
+  const desde = new Date(hoy.getFullYear(), mesInicial, 1);
+  // El día 0 del mes siguiente es el último del período.
+  const hasta = new Date(hoy.getFullYear(), mesInicial + meses, 0);
+  return { fecha_desde: toIsoDate(desde), fecha_hasta: toIsoDate(hasta) };
+}
+
+/** Trimestre de la fecha, de 0 a 3. */
+export function trimestreDe(fecha: Date): number {
+  return Math.floor(fecha.getMonth() / 3);
+}
+
+/** Un formateador por locale: el eje lo llama en cada tick de cada render. */
+const compactos = new Map<string, Intl.NumberFormat>();
+
+/** Pesos compactos (`$ 1,2 M`): el eje Y y las etiquetas sobre las barras. */
+export function formatCopCompacto(valor: number, locale: string): string {
+  let formatter = compactos.get(locale);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'COP',
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    });
+    compactos.set(locale, formatter);
+  }
+  return formatter.format(valor);
 }
 
 /**
@@ -82,6 +128,11 @@ export function leerPaletaGrafica(doc: Document) {
     barra: 'rgba(20, 48, 73, 0.72)',
     // El sky de marca: el único acento de las gráficas.
     acento: '#77aad7',
+    // Su hover: un punto más hondo, como el navy sólido de la barra.
+    acentoHover: '#5b93c4',
+    // Semánticos: el resultado de un período, nunca un tipo de dato cualquiera.
+    rojo: leer('--color-red-600', '#dc2626'),
+    verde: leer('--color-green-600', '#16a34a'),
     tenue: 'rgba(20, 48, 73, 0.25)',
     linea: 'rgba(20, 48, 73, 0.06)',
     fuente: getComputedStyle(doc.body).fontFamily,
@@ -97,12 +148,6 @@ export function ejesPeriodo(
   tramos: readonly Tramo[],
   locale: string,
 ): ChartOptions<'bar'>['scales'] {
-  const compacto = new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: 'COP',
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  });
   const fuente = { family: paleta.fuente, size: 11 };
   return {
     x: {
@@ -131,7 +176,7 @@ export function ejesPeriodo(
         color: paleta.muted,
         maxTicksLimit: 5,
         padding: 8,
-        callback: (value) => compacto.format(Number(value)),
+        callback: (value) => formatCopCompacto(Number(value), locale),
       },
     },
   };
