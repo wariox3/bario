@@ -23,14 +23,14 @@ export const NOMINA_DETALLE_INFORME_COLUMNS: readonly ColumnDef[] = [
     align: 'right',
   },
   {
-    field: 'documento',
+    field: 'documento_id',
     headerKey: `${I18N}.columns.documento`,
     type: 'number',
     width: '100px',
     align: 'right',
   },
   {
-    field: 'documento_documento_tipo_nombre',
+    field: 'documento_tipo_nombre',
     headerKey: `${I18N}.columns.documentoTipo`,
     type: 'text',
     width: '130px',

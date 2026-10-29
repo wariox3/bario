@@ -1,6 +1,6 @@
 import {
   calcularImpuestosLinea,
-  redondearMoneda,
+  lineBase,
   toFiniteNumber,
   type ComercialDetalleFormRawValue,
   type TasaImpuesto,
@@ -12,8 +12,10 @@ import type { LineaPendienteApi } from '@erp/core/module-config';
  * **nueva** del formulario para "importar desde documento". La fila ya trae todo
  * (item, precio, cantidad, impuestos), así que no se requiere lectura extra:
  *  - construye el `ItemOption` desde `item_id`/`item_nombre`/`precio`;
+ *  - hereda el `porcentaje_descuento` de la línea origen (el `descuento` de la
+ *    fila es el monto y el form trabaja en porcentaje);
  *  - mapea los impuestos a tasas y calcula sus montos con el kernel
- *    (`calcularImpuestosLinea`) — front autoritativo;
+ *    (`calcularImpuestosLinea`) sobre la base ya descontada — front autoritativo;
  *  - `id = null` para que la línea se cree (POST), no se actualice (PATCH);
  *  - fija `documento_detalle_afectado = id` (línea origen) para descontar su pendiente.
  *
@@ -31,13 +33,14 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     // La fila pendiente manda la operación; el default solo cubre su ausencia.
     operacion: imp.impuesto_operacion ?? 1,
   }));
-  const base = redondearMoneda((cantidad ?? 0) * precio);
+  const descuento = toFiniteNumber(row.porcentaje_descuento) ?? 0;
+  const base = lineBase({ cantidad, precio, descuento });
   return {
     id: null,
     item: { id: row.item_id, nombre: row.item_nombre, precio },
     cantidad,
     precio,
-    descuento: 0,
+    descuento,
     impuestos_ids: tasas.map((tasa) => tasa.id),
     impuestos_totales: calcularImpuestosLinea(base, tasas),
     impuestos_disponibles: tasas,

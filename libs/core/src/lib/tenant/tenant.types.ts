@@ -26,6 +26,8 @@ export interface ContenedorAccess extends ContenedorAccesoFlags {
   activo: boolean;
   cliente_id: number;
   propietario: boolean;
+  /** Miniatura de la imagen de la empresa; sin ella, el header pinta la inicial. */
+  cliente_imagen_thumbnail?: string | null;
 }
 
 /**

@@ -5,7 +5,7 @@ import type { InformeAuxiliarContactoRow, InformeId } from '../../shared/movimie
 /**
  * Servicio HTTP del informe **Auxiliar por contacto**.
  *
- * Toda la mecánica —las tres acciones sobre `/contabilidad/movimiento-informe/`,
+ * Toda la mecánica —las tres acciones sobre `/contabilidad/movimiento-informe-personalizado/`,
  * el body común, la paginación por query params— vive en
  * `MovimientoInformeService`; acá solo se declara el discriminador.
  *

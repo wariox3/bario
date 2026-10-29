@@ -20,7 +20,7 @@ Estado (2026-07-29): portados el **asiento contable** (documento tipo 13, §6), 
 **movimientos** (§9) y la **conciliación bancaria** (§10).
 
 Estado (2026-09-04): el **balance de prueba** migró al contrato nuevo
-(`/contabilidad/movimiento-informe/`) y salió de la familia vieja. Ver §0.
+(`/contabilidad/movimiento-informe-personalizado/`) y salió de la familia vieja. Ver §0.
 
 Estado (2026-09-07): el schema del backend **cambió** después de esa migración —columnas
 renombradas, jerarquía nueva con `tipo`, sin `incluir_cierre`— así que el balance de prueba se
@@ -46,7 +46,11 @@ rango de fechas, que pasaron a `rango-fechas.validators.ts` porque también los 
 
 ---
 
-## 0. Familia nueva de informes — `/contabilidad/movimiento-informe/`
+## 0. Familia nueva de informes — `/contabilidad/movimiento-informe-personalizado/`
+
+El 2026-10-29 el backend movió esta familia de `/contabilidad/movimiento-informe/` a
+`/contabilidad/movimiento-informe-personalizado/`, con el mismo body y las mismas cuatro acciones.
+La ruta vieja quedó para el listado plano de movimientos (§9).
 
 Confirmado contra el **schema del contenedor**: `GET https://reddocapi.uk/api/contenedor/schema/`
 sirve el OpenAPI con todas las rutas del tenant. Ahí está declarado todo lo de abajo.
@@ -159,7 +163,7 @@ nombre, su archivo y qué bloques de columnas enciende (`showContacto`, `showMov
 
 ### Queda pendiente
 
-- [x] **La acción `POST /contabilidad/movimiento-informe/pdf/`** — publicada por el backend y
+- [x] **La acción `POST /contabilidad/movimiento-informe-personalizado/pdf/`** — publicada por el backend y
       encendida en el front (2026-09-10). Quedó como acción aparte, con el mismo
       `InformeContabilidadRequestRequest` de body que `lista/` y `excel/`, y respuesta
       `application/pdf`.
@@ -320,17 +324,17 @@ No son deudas, son mejoras que el informe original tampoco tenía:
 
 ## 4. Mapa de los informes portados
 
-| Informe                        | Endpoint                   | Parámetros                | Tabla                         | PDF |
-| ------------------------------ | -------------------------- | ------------------------- | ----------------------------- | --- |
-| Balance de prueba              | `movimiento-informe/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
-| Balance de prueba por contacto | `movimiento-informe/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
-| Auxiliar de cuenta             | `movimiento-informe/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
-| Auxiliar por contacto          | `movimiento-informe/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
-| Auxiliar general               | `movimiento-informe/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
-| Base                           | `movimiento-informe/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | no  |
-| Certificado de retención       | `movimiento-informe/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | sí  |
-| Estado de resultados           | `movimiento-informe/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
-| Estado de situación financiera | `movimiento-informe/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
+| Informe                        | Endpoint                                 | Parámetros                | Tabla                         | PDF |
+| ------------------------------ | ---------------------------------------- | ------------------------- | ----------------------------- | --- |
+| Balance de prueba              | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
+| Balance de prueba por contacto | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
+| Auxiliar de cuenta             | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
+| Auxiliar por contacto          | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
+| Auxiliar general               | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | propia (jerárquica, paginada) | no  |
+| Base                           | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | no  |
+| Certificado de retención       | `movimiento-informe-personalizado/` (§0) | periodo + rango + filtros | compartida (plana, paginada)  | sí  |
+| Estado de resultados           | `movimiento-informe-personalizado/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
+| Estado de situación financiera | `movimiento-informe-personalizado/` (§0) | solo periodo              | compartida (plana, paginada)  | no  |
 
 > "Completos" = periodo + rango de cuentas + las dos banderas.
 
@@ -604,6 +608,15 @@ Es el **libro**: la línea ya contabilizada, en una sola página de solo lectura
 importación y Excel. No es un documento ni un informe de los que se "generan", así que estrena la
 sección **Movimientos** del sidebar (`layout.nav.sections.movement`, una clave que ya existía en la
 i18n sin que ningún módulo la usara). URL: `/t/<slug>/contabilidad/movimientos`.
+
+Desde el 2026-10-29 la lista y el Excel van contra `POST /contabilidad/movimiento-informe/`
+(`lista/`, `excel/`), el informe plano de movimientos. La importación y su plantilla siguen en
+`/contabilidad/movimiento/`, que es el único que las sirve. El informe exige `informe: 'movimiento'`
+en el body (400 sin él).
+
+**Filtros que el backend rechaza con 400** (ya fallaban contra `/contabilidad/movimiento/`):
+`centro_costo__nombre` y `comprobante__nombre`. Acepta `centro_costo_id` y `comprobante_id`, pero el
+filtro del listado no tiene selector. Pendiente: que el backend sume los de texto o quitarlos.
 
 ### 9.1 Por confirmar con backend
 

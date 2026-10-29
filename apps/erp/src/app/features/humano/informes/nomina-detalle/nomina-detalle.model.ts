@@ -1,10 +1,10 @@
 /**
  * Fila del informe **Nómina detallada**
- * (`POST /general/documento-detalle/lista/`; el Excel sale de
- * `documento-detalle-informe/excel/` con `informe: 'nomina_detalle'`).
+ * (`POST /general/documento-detalle-informe/lista/` y `excel/`, con
+ * `informe: 'nomina_detalle'`).
  *
  * Es un **concepto liquidado** —una línea de nómina— con los datos de su
- * documento padre aplanados (`documento_fecha`, `documento_documento_tipo_nombre`).
+ * documento padre aplanados (`documento_fecha`, `documento_tipo_nombre`).
  * Mientras la ficha de nómina muestra los conceptos de *un* documento, este
  * informe los recorre todos, así que sirve para cruzar un concepto a través de
  * varias nóminas.
@@ -14,17 +14,18 @@
  *
  * Convención del backend: montos como `string` con cola de decimales
  * (`"250000.000000"`); fechas como `yyyy-MM-dd`. Verificado contra la respuesta
- * real el 2026-10-20. La respuesta trae además los campos comerciales y de
- * programación de la línea, que no se modelan porque el informe no los usa.
+ * real el 2026-10-29. La respuesta trae además campos que el informe no usa
+ * (`documento_fecha_hasta`, `contrato_id`, `cantidad`, `pago_operado`…), así
+ * que no se modelan.
  */
 export interface NominaDetalleInforme {
   readonly id: number;
   /** Documento (nómina) al que pertenece la línea. */
-  readonly documento: number | null;
-  readonly documento_documento_tipo_nombre: string | null;
+  readonly documento_id: number | null;
+  readonly documento_tipo_nombre: string | null;
   /** Fecha de la nómina (`yyyy-MM-dd`). */
   readonly documento_fecha: string | null;
-  readonly contacto: number | null;
+  readonly contacto_id: number | null;
   readonly contacto_numero_identificacion: string | null;
   readonly contacto_nombre_corto: string | null;
   readonly concepto_id: number | null;

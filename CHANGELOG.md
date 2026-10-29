@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.16](https://github.com/wariox3/bario/compare/v0.1.15...v0.1.16) (2026-10-29)
+
+### Features
+
+- mostrar la imagen del contenedor en el header de erp, turnos y pos ([3002c59](https://github.com/wariox3/bario/commit/3002c5988528e464cef08ba4b59af0e29f730925))
+
+### Bug Fixes
+
+- **erp:** apuntar los informes de contabilidad a sus endpoints nuevos ([fc9c18e](https://github.com/wariox3/bario/commit/fc9c18e7572e7b318e2dd9856f4e92fa9459b65a))
+- **erp:** heredar el descuento de la línea al importar desde documento ([dcefa83](https://github.com/wariox3/bario/commit/dcefa83f3aa97b3e3a90b437046ace80ac5ec63a))
+- **erp:** llevar los informes de nómina a los endpoints de informes ([da5bf11](https://github.com/wariox3/bario/commit/da5bf11bf251f6722e1724867b549fbd63b6d9bc))
+- **pos:** permitir centavos en lo recibido al cobrar en efectivo ([7769794](https://github.com/wariox3/bario/commit/7769794c9c27d234227020f3d0b97ff13a001c36))
+
 ## [0.1.15](https://github.com/wariox3/bario/compare/v0.1.14...v0.1.15) (2026-10-29)
 
 ### Features
