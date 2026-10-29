@@ -5,7 +5,10 @@ import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { ChartModule } from 'primeng/chart';
 import { ENVIRONMENT, I18nService } from '@reddoc/core';
 import { dictionaries } from '@erp/i18n';
-import { EstadoResultadosTableroComponent } from './estado-resultados-tablero.component';
+import {
+  EstadoResultadosTableroComponent,
+  partirEnDosLineas,
+} from './estado-resultados-tablero.component';
 import type { EstadoResultadosTablero, FilaCascada } from './estado-resultados-tablero.model';
 
 const URL = '/api/contabilidad/tablero/estado-resultados/';
@@ -158,5 +161,16 @@ describe('EstadoResultadosTableroComponent', () => {
 
     expect(texto()).toContain(tx.error.title);
     expect(texto()).not.toContain(tx.tarjetas.vendimos);
+  });
+});
+
+describe('partirEnDosLineas', () => {
+  it('corta por el espacio más cercano a la mitad', () => {
+    expect(partirEnDosLineas('Ganancia operacional')).toEqual(['Ganancia', 'operacional']);
+    expect(partirEnDosLineas('Otros ingresos y gastos')).toEqual(['Otros ingresos', 'y gastos']);
+  });
+
+  it('una sola palabra queda entera', () => {
+    expect(partirEnDosLineas('Impuestos')).toBe('Impuestos');
   });
 });

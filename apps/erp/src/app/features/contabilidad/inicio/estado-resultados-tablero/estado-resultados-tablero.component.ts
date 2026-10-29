@@ -4,11 +4,13 @@ import {
   computed,
   DOCUMENT,
   effect,
+  ElementRef,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
-import type { ChartData, ChartOptions, Plugin } from 'chart.js';
+import type { ChartData, ChartOptions, Plugin, Scale } from 'chart.js';
 import {
   formatCop,
   formatFechaCorta,
@@ -41,15 +43,25 @@ type Estado = 'cargando' | 'listo' | 'error';
 
 type ClaveTarjeta = 'vendimos' | 'gastamos' | 'nos_quedo';
 
-/** Bajo este ancho de canvas los rótulos del eje X van en dos líneas. */
-const ANCHO_MOVIL = 576;
+/**
+ * Ancho por barra bajo el que la cascada se acuesta: ni en dos líneas ni en
+ * diagonal caben ocho rótulos uno al lado del otro. Se mide la gráfica y no la
+ * pantalla: con el menú lateral abierto, una laptop también se queda corta.
+ */
+const ANCHO_MIN_POR_BARRA = 80;
+
+/** Margen para volver a pararse: sin él, la barra de scroll que aparece o se va la hace titilar. */
+const HISTERESIS = 4;
+
+/** Ancho por barra desde el que un rótulo cabe en una sola línea. */
+const ANCHO_UNA_LINEA = 130;
 
 /** Separación entre la barra y su etiqueta de valor, en px. */
 const AIRE_ETIQUETA = 4;
 
 /**
- * Parte un rótulo en dos líneas por el espacio más cercano a la mitad, para
- * que las ocho barras quepan en un celular sin rotar el texto.
+ * Parte un rótulo en dos líneas por el espacio más cercano a la mitad
+ * ("Ganancia / operacional"), para la cascada de pie en anchos medianos.
  */
 export function partirEnDosLineas(texto: string): string | string[] {
   const espacios = [...texto.matchAll(/ /g)].map((m) => m.index);
@@ -68,6 +80,12 @@ export function partirEnDosLineas(texto: string): string | string[] {
  * "Vendimos" es la primera, "Nos quedó" la última. Las salidas van en el sky de
  * marca, como el egreso de `resultado-resumen`; el rojo queda solo para la
  * pérdida, así no se gasta en un mes sano.
+ *
+ * Cuando la gráfica es angosta (un celular, o una laptop con el menú abierto)
+ * la cascada se acuesta y se lee de arriba abajo, como el estado
+ * de resultados impreso: rótulo completo a la izquierda, valor al final de la
+ * barra. En los dos sentidos, subtotales y total van en negrita, como los
+ * renglones de suma de un estado de resultados.
  *
  * El host es `display: contents` para que la card caiga directo en la grilla
  * del inicio y ocupe todo su ancho.
@@ -105,7 +123,14 @@ export class EstadoResultadosTableroComponent {
 
   private readonly locale = computed(() => localeDe(this.i18n.lang()));
 
-  private readonly paleta = leerPaletaGrafica(inject(DOCUMENT));
+  private readonly documento = inject(DOCUMENT);
+  private readonly paleta = leerPaletaGrafica(this.documento);
+
+  /** Cascada acostada (`indexAxis: 'y'`): cuando la gráfica es angosta. */
+  protected readonly horizontal = signal(false);
+
+  /** Contenedor de la gráfica: su ancho no cambia al acostarla, así que se puede medir. */
+  private readonly lienzo = viewChild<ElementRef<HTMLElement>>('lienzo');
 
   protected readonly rotuloPeriodo = computed(() => {
     const r = this.resumen();
@@ -194,6 +219,7 @@ export class EstadoResultadosTableroComponent {
 
   protected readonly datosGrafica = computed<ChartData<'bar'>>(() => {
     const barras = this.barras();
+    const horizontal = this.horizontal();
     const colores = barras.map((b) => this.color(b.fila.tipo, b.fin));
     return {
       labels: barras.map((b) => this.rotulo(b.fila)),
@@ -204,7 +230,7 @@ export class EstadoResultadosTableroComponent {
           hoverBackgroundColor: colores.map((c) => c.hover),
           borderRadius: 4,
           borderSkipped: false,
-          maxBarThickness: 56,
+          maxBarThickness: horizontal ? 22 : 56,
           categoryPercentage: 0.78,
           barPercentage: 0.9,
         },
@@ -215,16 +241,58 @@ export class EstadoResultadosTableroComponent {
   protected readonly opcionesGrafica = computed<ChartOptions<'bar'>>(() => {
     const barras = this.barras();
     const locale = this.locale();
+    const horizontal = this.horizontal();
     const tx = this.t().inicio.estadoResultados;
     const fuente = { family: this.paleta.fuente, size: 11 };
+    // Los renglones de suma resaltan, como en el estado de resultados impreso.
+    const esSuma = (i: number): boolean => {
+      const tipo = barras[i]?.fila.tipo;
+      return tipo === 'subtotal' || tipo === 'total';
+    };
+
+    const categoria = {
+      grid: { display: false },
+      border: { color: this.paleta.linea },
+      ticks: {
+        font: (ctx: { index: number }) => ({ ...fuente, weight: esSuma(ctx.index) ? 600 : 400 }),
+        color: (ctx: { index: number }) =>
+          esSuma(ctx.index) ? this.paleta.navy : this.paleta.muted,
+        maxRotation: 0,
+        // Son ocho pasos de una sola cuenta: saltarse uno corta el camino.
+        autoSkip: false,
+        // Acostada, los rótulos se alinean a la izquierda, como los renglones.
+        crossAlign: horizontal ? ('far' as const) : ('near' as const),
+        // De pie y sin espacio para una línea, el rótulo va en dos.
+        callback(this: Scale, value: string | number) {
+          const rotulo = this.getLabelForValue(Number(value));
+          const porBarra = this.chart.width / Math.max(barras.length, 1);
+          return !horizontal && porBarra < ANCHO_UNA_LINEA ? partirEnDosLineas(rotulo) : rotulo;
+        },
+      },
+    };
+    const valor = {
+      // Con pérdida el eje cruza el cero; el cero siempre queda a la vista.
+      beginAtZero: true,
+      grace: horizontal ? '15%' : '10%',
+      grid: { color: this.paleta.linea },
+      border: { display: false },
+      ticks: {
+        font: fuente,
+        color: this.paleta.muted,
+        maxTicksLimit: horizontal ? 4 : 5,
+        padding: horizontal ? 4 : 8,
+        callback: (value: string | number) => formatCopCompacto(Number(value), locale),
+      },
+    };
 
     return {
+      indexAxis: horizontal ? 'y' : 'x',
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 350 },
-      interaction: { mode: 'index', intersect: false },
-      // Aire arriba para la etiqueta de la barra más alta.
-      layout: { padding: { top: 18 } },
+      interaction: { mode: 'index', intersect: false, axis: horizontal ? 'y' : 'x' },
+      // Aire para la etiqueta de la barra que más se aleja: arriba, o a la derecha acostada.
+      layout: { padding: horizontal ? { right: 28 } : { top: 18 } },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -234,60 +302,29 @@ export class EstadoResultadosTableroComponent {
             // En lo que entra o sale, cómo queda la cuenta después de la barra.
             footer: (items) => {
               const barra = barras[items[0]?.dataIndex ?? -1];
-              if (!barra || barra.fila.tipo === 'subtotal' || barra.fila.tipo === 'total') {
-                return '';
-              }
+              if (!barra || esSuma(items[0]?.dataIndex ?? -1)) return '';
               return `${tx.leyenda.subtotal}: ${formatCop(barra.fin, locale)}`;
             },
           },
         },
       },
-      scales: {
-        x: {
-          grid: { display: false },
-          border: { color: this.paleta.linea },
-          ticks: {
-            font: fuente,
-            color: this.paleta.muted,
-            maxRotation: 0,
-            // Son ocho pasos de una sola cuenta: saltarse uno corta el camino.
-            autoSkip: false,
-            callback(value) {
-              const rotulo = this.getLabelForValue(Number(value));
-              return this.chart.width < ANCHO_MOVIL ? partirEnDosLineas(rotulo) : rotulo;
-            },
-          },
-        },
-        y: {
-          // Con pérdida el eje baja del cero; el cero siempre queda a la vista.
-          beginAtZero: true,
-          grace: '10%',
-          grid: { color: this.paleta.linea },
-          border: { display: false },
-          ticks: {
-            font: fuente,
-            color: this.paleta.muted,
-            maxTicksLimit: 5,
-            padding: 8,
-            callback: (value) => formatCopCompacto(Number(value), locale),
-          },
-        },
-      },
+      scales: horizontal ? { y: categoria, x: valor } : { x: categoria, y: valor },
     };
   });
 
   /**
-   * Etiqueta de valor sobre cada barra (bajo ella si baja) y el filete punteado
-   * que une el final de una barra con el arranque de la siguiente: el camino
-   * del peso se lee de izquierda a derecha sin pasar el mouse.
+   * Etiqueta de valor al final de cada barra y el filete punteado que une el
+   * final de una con el arranque de la siguiente: el camino del peso se lee sin
+   * pasar el mouse, de izquierda a derecha o, acostada, de arriba abajo.
    */
   protected readonly plugins: Plugin<'bar'>[] = [
     {
       id: 'cascadaEtiquetas',
       afterDatasetsDraw: (chart) => {
         const barras = this.barras();
+        const acostada = chart.options.indexAxis === 'y';
         const elementos = chart.getDatasetMeta(0).data;
-        const escala = chart.scales['y'];
+        const escala = chart.scales[acostada ? 'x' : 'y'];
         if (!escala) return;
         const { ctx } = chart;
         const locale = this.locale();
@@ -297,34 +334,44 @@ export class EstadoResultadosTableroComponent {
         ctx.lineWidth = 1;
         ctx.setLineDash([3, 3]);
         for (let i = 0; i < barras.length - 1; i++) {
-          const actual = elementos[i]?.getProps(['x', 'width'], true);
-          const siguiente = elementos[i + 1]?.getProps(['x', 'width'], true);
+          const actual = elementos[i]?.getProps(['x', 'y', 'width', 'height'], true);
+          const siguiente = elementos[i + 1]?.getProps(['x', 'y', 'width', 'height'], true);
           const barra = barras[i];
           if (!actual || !siguiente || !barra) continue;
-          const y = Math.round(escala.getPixelForValue(barra.fin)) + 0.5;
+          const nivel = Math.round(escala.getPixelForValue(barra.fin)) + 0.5;
           ctx.beginPath();
-          ctx.moveTo(actual['x'] + actual['width'] / 2, y);
-          ctx.lineTo(siguiente['x'] - siguiente['width'] / 2, y);
+          if (acostada) {
+            ctx.moveTo(nivel, actual['y'] + actual['height'] / 2);
+            ctx.lineTo(nivel, siguiente['y'] - siguiente['height'] / 2);
+          } else {
+            ctx.moveTo(actual['x'] + actual['width'] / 2, nivel);
+            ctx.lineTo(siguiente['x'] - siguiente['width'] / 2, nivel);
+          }
           ctx.stroke();
         }
 
         ctx.setLineDash([]);
         ctx.font = `600 11px ${this.paleta.fuente}`;
         ctx.fillStyle = this.paleta.navy;
-        ctx.textAlign = 'center';
         barras.forEach((barra, i) => {
           const el = elementos[i]?.getProps(['x', 'y', 'base'], true);
           if (!el) return;
+          const texto = formatCopCompacto(toFiniteNumber(barra.fila.valor) ?? 0, locale);
           const sube = barra.fin >= barra.inicio;
-          ctx.textBaseline = sube ? 'bottom' : 'top';
-          const y = sube
-            ? Math.min(el['y'], el['base']) - AIRE_ETIQUETA
-            : Math.max(el['y'], el['base']) + AIRE_ETIQUETA;
-          ctx.fillText(
-            formatCopCompacto(toFiniteNumber(barra.fila.valor) ?? 0, locale),
-            el['x'],
-            y,
-          );
+          if (acostada) {
+            // Siempre a la derecha de la barra, como la columna de montos del
+            // estado impreso: a la izquierda chocaría con los rótulos.
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(texto, Math.max(el['x'], el['base']) + AIRE_ETIQUETA, el['y']);
+          } else {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = sube ? 'bottom' : 'top';
+            const y = sube
+              ? Math.min(el['y'], el['base']) - AIRE_ETIQUETA
+              : Math.max(el['y'], el['base']) + AIRE_ETIQUETA;
+            ctx.fillText(texto, el['x'], y);
+          }
         });
 
         ctx.restore();
@@ -333,6 +380,21 @@ export class EstadoResultadosTableroComponent {
   ];
 
   constructor() {
+    // El contenedor aparece con los datos; jsdom no trae `ResizeObserver` y ahí queda de pie.
+    effect((onCleanup) => {
+      const el = this.lienzo()?.nativeElement;
+      const Observador = this.documento.defaultView?.ResizeObserver;
+      if (!el || !Observador) return;
+      const observador = new Observador(([entrada]) => {
+        if (!entrada) return;
+        const porBarra = entrada.contentRect.width / Math.max(this.barras().length, 1);
+        const umbral = ANCHO_MIN_POR_BARRA + (this.horizontal() ? HISTERESIS : 0);
+        this.horizontal.set(porBarra < umbral);
+      });
+      observador.observe(el);
+      onCleanup(() => observador.disconnect());
+    });
+
     effect((onCleanup) => {
       const periodo = this.periodo();
       this.estado.set('cargando');
