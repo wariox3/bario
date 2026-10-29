@@ -1,6 +1,6 @@
 /**
  * Fila del informe **Nómina electrónica**
- * (`POST /general/documento/lista/`, `serializador: 'nomina'`).
+ * (`POST /general/documento-informe/lista/`, `informe: 'nomina_electronica'`).
  *
  * Es una nómina electrónica (documento de clase `702`) con su liquidación
  * resumida y el estado del envío a la DIAN. A diferencia de la nómina detallada

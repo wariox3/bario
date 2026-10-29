@@ -1,6 +1,6 @@
 /**
- * Fila del informe **Nómina** (`POST /general/documento/lista/`,
- * `serializador: 'nomina'`).
+ * Fila del informe **Nómina** (`POST /general/documento-informe/lista/`,
+ * `informe: 'nomina'`).
  *
  * Una fila por nómina liquidada, con el periodo, el empleado y la liquidación
  * resumida. Es el gemelo de `NominaElectronicaInforme` sobre la clase 701: no

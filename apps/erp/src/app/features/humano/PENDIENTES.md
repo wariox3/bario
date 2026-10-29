@@ -38,20 +38,28 @@ dos de ellos fallan sin dar error.
 
 ## 1. Por confirmar con backend
 
-### 1.1 Serializadores
+### 1.1 Endpoints de los informes
 
-Los informes piden un serializador por nombre. En el legacy viajaban como **query param de un GET**;
-acá van en el **body del POST** a `lista/`, que es la convención nueva. Hay que confirmar que el
-backend los acepte ahí.
+**Resuelto (2026-10-29).** Los tres informes dejaron el master de documentos y su `serializador`:
+van contra los endpoints de informes con un `informe` en el body, el mismo en la lista y en el
+Excel. El backend acota la clase por su cuenta, así que el front ya no manda filtro de clase.
 
-| Dónde                         | Listado  | Excel                        |
-| ----------------------------- | -------- | ---------------------------- |
-| `informes/nomina`             | `nomina` | `informe_nomina`             |
-| `informes/nomina-detalle`     | `nomina` | `informe_nomina_detalle`     |
-| `informes/nomina-electronica` | `nomina` | `informe_nomina_electronica` |
+| Dónde                         | Endpoint                             | `informe`            |
+| ----------------------------- | ------------------------------------ | -------------------- |
+| `informes/nomina`             | `general/documento-informe/`         | `nomina`             |
+| `informes/nomina-detalle`     | `general/documento-detalle-informe/` | `nomina_detalle`     |
+| `informes/nomina-electronica` | `general/documento-informe/`         | `nomina_electronica` |
 
-Nótese que **el serializador del listado y el del Excel son distintos** en los tres. Si el backend
-unificó, se simplifica.
+Verificado contra la respuesta real (tenant `temporal_3`) el 2026-10-29: las columnas de nómina y
+de nómina detallada llegan completas. En la detallada cambiaron tres nombres: `documento_id`,
+`documento_tipo_nombre` y `contacto_id`. Nómina electrónica no se pudo validar: el tenant no tiene
+documentos de la clase 702, ni por el endpoint viejo.
+
+**Filtros que el backend rechaza con 400** en `informes/nomina-detalle` (ya fallaban contra
+`documento-detalle/`): `documento__numero`, `documento__fecha_desde`,
+`documento__contacto__numero_identificacion` y `documento__contacto__nombre_corto`. Acepta
+`documento__contacto_id`, `concepto_id` y `documento__contrato_id`, pero el filtro del listado no
+tiene selector. Pendiente: que el backend sume los de texto o quitarlos del front.
 
 ### 1.2 Nombres de campo del empleado
 

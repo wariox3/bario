@@ -23,10 +23,7 @@ import {
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
-import {
-  NominaDetalleInformeService,
-  NOMINA_DETALLE_INFORME_EXPORT_INFORME,
-} from '../../nomina-detalle.service';
+import { NominaDetalleInformeService, NOMINA_DETALLE_INFORME } from '../../nomina-detalle.service';
 import type { NominaDetalleInforme } from '../../nomina-detalle.model';
 import {
   NOMINA_DETALLE_INFORME_COLUMNS,
@@ -152,10 +149,9 @@ export class NominaDetalleListComponent {
       .download(this.service.exportUrl, {
         method: 'POST',
         body: {
-          // El `informe` ya acota a líneas de nómina: no hace falta el filtro de clase.
           filtros: buildFiltros(this.activeFilters()),
           ordenamientos: buildOrdenamientos(this.sort()),
-          informe: NOMINA_DETALLE_INFORME_EXPORT_INFORME,
+          informe: NOMINA_DETALLE_INFORME,
         },
         fallbackFilename: 'nomina-detalle.xlsx',
       })

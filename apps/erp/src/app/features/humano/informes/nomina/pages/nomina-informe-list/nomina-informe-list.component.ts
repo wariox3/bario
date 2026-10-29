@@ -23,7 +23,7 @@ import {
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
 import type { AppDict } from '@erp/i18n';
-import { NominaInformeService, NOMINA_INFORME_EXPORT_SERIALIZADOR } from '../../nomina.service';
+import { NominaInformeService, NOMINA_INFORME } from '../../nomina.service';
 import type { NominaInforme } from '../../nomina.model';
 import {
   NOMINA_INFORME_COLUMNS,
@@ -150,11 +150,9 @@ export class NominaInformeListComponent {
       .download(this.service.exportUrl, {
         method: 'POST',
         body: {
-          // El filtro de clase va también en la descarga: si no, el Excel
-          // traería documentos que no son nómina.
-          filtros: buildFiltros([...this.service.baseFilters, ...this.activeFilters()]),
+          filtros: buildFiltros(this.activeFilters()),
           ordenamientos: buildOrdenamientos(this.sort()),
-          serializador: NOMINA_INFORME_EXPORT_SERIALIZADOR,
+          informe: NOMINA_INFORME,
         },
         fallbackFilename: 'nomina.xlsx',
       })
