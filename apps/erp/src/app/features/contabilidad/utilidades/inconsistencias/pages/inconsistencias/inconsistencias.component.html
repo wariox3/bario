@@ -1,6 +1,6 @@
 <!--
   Utilidad "Inconsistencias" (Contabilidad). Botonera: el periodo abierto y el
-  botón que lo analiza, leídos como una frase. Cuerpo: qué hacer, el análisis en
+  botón que lo analiza, leídos como una frase; el Excel a la derecha. Cuerpo: qué hacer, el análisis en
   curso o lo que encontró, paginado en <lib-data-table>.
 -->
 @let d = t().entities.inconsistencias;
@@ -31,6 +31,18 @@
       [loading]="estado() === 'analizando'"
       [disabled]="periodoId() === null || paginando()"
       (onClick)="onAnalizar()"
+    />
+    <!-- Exporta lo que el análisis dejó guardado: se habilita tras analizar. -->
+    <p-button
+      class="sm:ml-auto"
+      icon="pi pi-file-excel"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [label]="t().common.actions.exportExcel"
+      [loading]="exportandoExcel()"
+      [disabled]="!puedeExportar()"
+      (onClick)="onExportarExcel()"
     />
   </div>
 

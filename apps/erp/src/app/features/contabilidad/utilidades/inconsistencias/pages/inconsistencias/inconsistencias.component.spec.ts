@@ -3,7 +3,14 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { ENVIRONMENT, I18nService, TenantService, ToastService } from '@reddoc/core';
+import { of } from 'rxjs';
+import {
+  ENVIRONMENT,
+  FileDownloadService,
+  I18nService,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
 import { ConfirmationService, type Confirmation } from 'primeng/api';
 import { DataTableComponent } from '@reddoc/feature-base';
 import { dictionaries } from '@erp/i18n';
@@ -48,6 +55,8 @@ describe('InconsistenciasComponent', () => {
 
   const d = dictionaries.es.entities.inconsistencias;
   const toast = { success: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+  // jsdom no descarga archivos: basta con ver qué se pidió.
+  const descarga = { download: jest.fn(() => of(undefined)) };
   const texto = (): string => (fixture.nativeElement as HTMLElement).textContent ?? '';
 
   beforeEach(() => {
@@ -61,6 +70,7 @@ describe('InconsistenciasComponent', () => {
         { provide: I18nService, useValue: { t: signal(dictionaries.es), lang: signal('es') } },
         { provide: TenantService, useValue: { currentSlug: () => 'demo' } },
         { provide: ToastService, useValue: toast },
+        { provide: FileDownloadService, useValue: descarga },
       ],
     });
     // La tabla de PrimeNG no aporta a lo que se prueba: queda como etiqueta muda.
@@ -214,5 +224,26 @@ describe('InconsistenciasComponent', () => {
     reanalisis.flush(pagina(1, [inconsistencia(8, 'Descuadre', false)]));
     expect(toast.success).toHaveBeenCalled();
     expect(component['totalCount']()).toBe(1);
+  });
+
+  it('el Excel se habilita tras analizar y exporta lo guardado del periodo', () => {
+    periodos();
+    component['onPeriodo'](3);
+    expect(component['puedeExportar']()).toBe(false);
+
+    analizar(3).flush(pagina(1, [inconsistencia(1, 'Descuadre')]));
+    expect(component['puedeExportar']()).toBe(true);
+    component['onExportarExcel']();
+
+    expect(descarga.download).toHaveBeenCalledWith(
+      '/contabilidad/inconsistencia/excel/',
+      expect.objectContaining({
+        method: 'POST',
+        body: {
+          filtros: [{ propiedad: 'periodo_id', operador: '=', valor: 3 }],
+          ordenamientos: [],
+        },
+      }),
+    );
   });
 });

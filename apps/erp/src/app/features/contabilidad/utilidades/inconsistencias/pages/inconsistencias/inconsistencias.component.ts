@@ -8,12 +8,19 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import type { Subscription } from 'rxjs';
+import { finalize, type Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
-import { I18nService, LIST_PAGE_SIZE, TenantService, ToastService } from '@reddoc/core';
+import {
+  buildFiltros,
+  FileDownloadService,
+  I18nService,
+  LIST_PAGE_SIZE,
+  TenantService,
+  ToastService,
+} from '@reddoc/core';
 import {
   DataTableComponent,
   ListShellComponent,
@@ -28,7 +35,7 @@ import type {
 } from '@erp/features/contabilidad/masters/periodo/periodo.model';
 import { PeriodoService } from '@erp/features/contabilidad/masters/periodo/periodo.service';
 import { ACCION_RESOLVER, COLUMNS, ROW_ACTIONS } from '../../inconsistencias.constants';
-import { InconsistenciasService } from '../../inconsistencias.service';
+import { INCONSISTENCIA_ENDPOINT, InconsistenciasService } from '../../inconsistencias.service';
 
 /** Fase de la consola: qué muestra el cuerpo bajo la botonera. */
 type Estado = 'inicial' | 'analizando' | 'listo' | 'error';
@@ -45,6 +52,9 @@ type Estado = 'inicial' | 'analizando' | 'listo' | 'error';
  * La respuesta viene paginada de a 25 y el backend no expone otra forma de
  * pedir las páginas siguientes que el mismo `analizar/?page=`: cambiar de
  * página vuelve a analizar.
+ *
+ * El Excel lo arma el backend (`inconsistencia/excel/`) con lo guardado del
+ * periodo: se habilita tras analizar, cuando lo guardado es lo que se ve.
  *
  * Las filas que el backend sabe corregir solo (`resolver_automatico`) traen el
  * botón Resolver. Tras resolver se vuelve a analizar la página: así se ve la
@@ -71,6 +81,7 @@ export class InconsistenciasComponent {
   private readonly inconsistencias = inject(InconsistenciasService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly toast = inject(ToastService);
+  private readonly fileDownload = inject(FileDownloadService);
   private readonly tenant = inject(TenantService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
@@ -89,6 +100,7 @@ export class InconsistenciasComponent {
   protected readonly items = signal<readonly InconsistenciaGuardada[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly currentPage = signal(0);
+  protected readonly exportandoExcel = signal(false);
   /** Nombre del periodo analizado: el selector puede cambiar antes de que llegue la respuesta. */
   protected readonly periodoAnalizado = signal('');
 
@@ -169,6 +181,37 @@ export class InconsistenciasComponent {
     this.currentPage.set(event.page);
     this.paginando.set(true);
     this.cargar(id);
+  }
+
+  /** Hay algo que exportar: un análisis con resultados y sin otra petición en curso. */
+  protected readonly puedeExportar = computed(
+    () => this.estado() === 'listo' && this.totalCount() > 0 && !this.paginando(),
+  );
+
+  protected onExportarExcel(): void {
+    const id = this.periodoId();
+    if (id === null || this.exportandoExcel()) return;
+    this.exportandoExcel.set(true);
+    this.fileDownload
+      .download(`${INCONSISTENCIA_ENDPOINT}excel/`, {
+        method: 'POST',
+        body: {
+          filtros: buildFiltros([{ field: 'periodo_id', operator: 'eq', value: id }]),
+          ordenamientos: [],
+        },
+        fallbackFilename: 'inconsistencias.xlsx',
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.exportandoExcel.set(false)),
+      )
+      .subscribe({
+        error: () =>
+          this.toast.error(
+            this.t().common.toasts.exportError.title,
+            this.t().common.toasts.exportError.desc,
+          ),
+      });
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
