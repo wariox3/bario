@@ -18,7 +18,7 @@ export function rangoFechas(desde: string, hasta: string): ValidatorFn {
  * Es una regla contable, no una arbitrariedad: el saldo anterior se calcula
  * contra la apertura del ejercicio, así que un rango a caballo entre dos años
  * daría un informe que no cuadra. Es el default de los informes de
- * `/contabilidad/movimiento-informe/`.
+ * `/contabilidad/movimiento-informe-personalizado/`.
  */
 export function rangoFechasMismoAnio(desde: string, hasta: string): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {

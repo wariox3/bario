@@ -51,7 +51,7 @@ export class CertificadoRetencionComponent extends MovimientoInformePageBase<Inf
 
   /**
    * El único de los nueve que imprime: `POST
-   * /contabilidad/movimiento-informe/pdf/` solo acepta `certificado_retencion`
+   * /contabilidad/movimiento-informe-personalizado/pdf/` solo acepta `certificado_retencion`
    * y responde 400 a los otros ocho.
    *
    * El PDF sale con **una hoja por tercero**, así que el tercero del formulario

@@ -12,7 +12,8 @@ import type {
  * La cuarta, `pdf/`, comparte el body pero **solo la sirve el certificado de
  * retención**: ver `pdfUrl`.
  */
-export const MOVIMIENTO_INFORME_ENDPOINT = '/contabilidad/movimiento-informe/';
+export const MOVIMIENTO_INFORME_PERSONALIZADO_ENDPOINT =
+  '/contabilidad/movimiento-informe-personalizado/';
 
 /**
  * Base de los servicios de los informes contables.
@@ -34,7 +35,7 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
   protected abstract readonly informe: InformeId;
 
   /** URL de la descarga de Excel (la usa `FileDownloadService`). */
-  readonly exportUrl = `${MOVIMIENTO_INFORME_ENDPOINT}excel/`;
+  readonly exportUrl = `${MOVIMIENTO_INFORME_PERSONALIZADO_ENDPOINT}excel/`;
 
   /**
    * URL de la impresión en PDF, simétrica a `excel/`: mismo verbo y mismo body.
@@ -44,7 +45,7 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
    * 400 a los otros ocho informes. Por eso el botón se enciende informe por
    * informe con `soportaPdf` y no de una vez en la botonera.
    */
-  readonly pdfUrl = `${MOVIMIENTO_INFORME_ENDPOINT}pdf/`;
+  readonly pdfUrl = `${MOVIMIENTO_INFORME_PERSONALIZADO_ENDPOINT}pdf/`;
 
   /**
    * Body común a las tres acciones. Público porque la descarga la dispara la
@@ -57,7 +58,7 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
   /** Una página (0-based) del informe. */
   list(params: MovimientoInformeParams, page: number): Observable<PaginatedResponse<TRow>> {
     return this.post<PaginatedResponse<TRow>>(
-      `${MOVIMIENTO_INFORME_ENDPOINT}lista/`,
+      `${MOVIMIENTO_INFORME_PERSONALIZADO_ENDPOINT}lista/`,
       this.buildBody(params),
       { [LIST_PAGINATION_PARAMS.page]: page + 1 },
     );
@@ -70,7 +71,7 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
    */
   totales(params: MovimientoInformeParams): Observable<InformeTotales> {
     return this.post<InformeTotales>(
-      `${MOVIMIENTO_INFORME_ENDPOINT}totales/`,
+      `${MOVIMIENTO_INFORME_PERSONALIZADO_ENDPOINT}totales/`,
       this.buildBody(params),
     );
   }

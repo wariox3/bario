@@ -21,7 +21,7 @@ import {
 
 /**
  * Base de las páginas de los informes contables, los nueve que pegan a
- * `/contabilidad/movimiento-informe/`.
+ * `/contabilidad/movimiento-informe-personalizado/`.
  *
  * Todas hacen lo mismo —armar los parámetros, generar, paginar y descargar el
  * Excel— y solo cambian el informe, el nombre visible y el nombre del archivo.

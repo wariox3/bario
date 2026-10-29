@@ -26,8 +26,8 @@ import { ImportDialogComponent } from '@erp/core/components/import-dialog/import
 import { importState } from '@erp/core/components/import-dialog/import-state';
 import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
-import { MOVIMIENTO_SERIALIZADOR, type Movimiento } from '@erp/core/contabilidad';
-import { MovimientoService } from '../../movimiento.service';
+import type { Movimiento } from '@erp/core/contabilidad';
+import { MOVIMIENTO_INFORME, MovimientoService } from '../../movimiento.service';
 import {
   MOVIMIENTO_COLUMNS,
   MOVIMIENTO_FILTER_FIELDS,
@@ -191,7 +191,7 @@ export class MovimientosListComponent {
         body: {
           filtros: buildFiltros(this.activeFilters()),
           ordenamientos: buildOrdenamientos(this.sort()),
-          serializador: MOVIMIENTO_SERIALIZADOR,
+          informe: MOVIMIENTO_INFORME,
         },
         fallbackFilename: 'movimientos.xlsx',
       })

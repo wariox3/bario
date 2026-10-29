@@ -5,7 +5,7 @@ import type { InformeContactoRow, InformeId } from '../../shared/movimiento-info
 /**
  * Servicio HTTP del informe **Balance de prueba por contacto**.
  *
- * Toda la mecánica —las tres acciones sobre `/contabilidad/movimiento-informe/`,
+ * Toda la mecánica —las tres acciones sobre `/contabilidad/movimiento-informe-personalizado/`,
  * el body común, la paginación por query params— vive en
  * `MovimientoInformeService`; acá solo se declara el discriminador.
  *

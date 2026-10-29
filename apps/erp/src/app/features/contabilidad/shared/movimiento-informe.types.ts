@@ -3,7 +3,7 @@ import type { BackendFilter, ErpSelectOption } from '@reddoc/core';
 
 /**
  * Contrato de los **informes agregados sobre el movimiento contable**, servidos
- * por `/contabilidad/movimiento-informe/` en tres acciones con el **mismo body**:
+ * por `/contabilidad/movimiento-informe-personalizado/` en tres acciones con el **mismo body**:
  * `lista/` (paginada), `excel/` y `totales/`.
  *
  * Los **nueve** informes contables del ERP viven acá. Lo que define todo lo
