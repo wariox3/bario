@@ -5771,13 +5771,13 @@ export const es: AppDict = {
         confirm: {
           header: 'Resolver inconsistencia',
           message:
-            '{tipo}: {descripcion}. El sistema la corregirá automáticamente y volverá a analizar el periodo. ¿Quieres continuar?',
+            '{tipo}: {descripcion}. El sistema la corregirá automáticamente. ¿Quieres continuar?',
           accept: 'Resolver',
           cancel: 'Cancelar',
         },
         toast: {
           title: 'Inconsistencia resuelta',
-          desc: 'Se corrigió y el periodo se volvió a analizar.',
+          desc: 'Se corrigió automáticamente.',
         },
       },
       encontradas: {

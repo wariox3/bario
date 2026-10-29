@@ -11,13 +11,23 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { finalize, type Subscription } from 'rxjs';
-import { I18nService, ToastService } from '@reddoc/core';
-import { DataTableComponent, type PageChangeEvent } from '@reddoc/feature-base';
+import { I18nService, LIST_PAGE_SIZE, ToastService } from '@reddoc/core';
+import {
+  DataTableComponent,
+  type PageChangeEvent,
+  type RowActionInvokedEvent,
+} from '@reddoc/feature-base';
 import type { AppDict } from '@erp/i18n';
-import { INCONSISTENCIA_COLUMNS } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.constants';
+import {
+  ACCION_RESOLVER,
+  INCONSISTENCIA_COLUMNS,
+  ROW_ACTIONS,
+} from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.constants';
 import type { InconsistenciaGuardada } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.model';
 import { InconsistenciaService } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.service';
 import type { Periodo } from '../../periodo.model';
@@ -27,6 +37,8 @@ import type { Periodo } from '../../periodo.model';
  *
  * Muestra lo guardado del periodo (`inconsistencia/lista/`), paginado, con las
  * mismas columnas que la utilidad Inconsistencias, y en el pie ofrece el Excel.
+ * Las filas que el backend sabe corregir solo traen el botón Resolver, como en
+ * la utilidad; tras resolver se recarga la página de la lista.
  * Es lo que encendió el triángulo del mes: `bloquear` y `analizar` guardan el
  * análisis y `estado_inconsistencia`. No vuelve a analizar: para eso está la
  * utilidad.
@@ -42,8 +54,9 @@ import type { Periodo } from '../../periodo.model';
 @Component({
   selector: 'app-periodo-inconsistencias-dialog',
   standalone: true,
-  imports: [ButtonModule, DataTableComponent, DialogModule],
+  imports: [ButtonModule, ConfirmDialogModule, DataTableComponent, DialogModule],
   templateUrl: './periodo-inconsistencias-dialog.component.html',
+  providers: [ConfirmationService],
   styleUrl: './periodo-inconsistencias-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -56,17 +69,21 @@ export class PeriodoInconsistenciasDialogComponent {
 
   private readonly service = inject(InconsistenciaService);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
   protected readonly t = this.i18n.t;
   protected readonly columns = INCONSISTENCIA_COLUMNS;
+  protected readonly rowActions = ROW_ACTIONS;
 
   protected readonly items = signal<readonly InconsistenciaGuardada[]>([]);
   protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(false);
   protected readonly currentPage = signal(0);
   protected readonly isExporting = signal(false);
+  /** Resolver en curso: no se acepta otra ni se cierra el diálogo. */
+  protected readonly isResolving = signal(false);
 
   private carga: Subscription | null = null;
 
@@ -119,6 +136,47 @@ export class PeriodoInconsistenciasDialogComponent {
         error: () => {
           const toast = this.t().common.toasts.exportError;
           this.toast.error(toast.title, toast.desc);
+        },
+      });
+  }
+
+  protected onRowAction(event: RowActionInvokedEvent): void {
+    if (event.actionId !== ACCION_RESOLVER || this.isResolving()) return;
+    const fila = event.row as InconsistenciaGuardada;
+    const dict = this.t().entities.inconsistencias.resolver;
+    this.confirmation.confirm({
+      header: dict.confirm.header,
+      icon: 'pi pi-info-circle',
+      message: dict.confirm.message
+        .replace('{tipo}', fila.inconsistencia_tipo_nombre)
+        .replace('{descripcion}', fila.descripcion),
+      acceptLabel: dict.confirm.accept,
+      rejectLabel: dict.confirm.cancel,
+      acceptIcon: 'pi pi-wrench',
+      rejectButtonStyleClass: 'p-button-outlined p-button-secondary',
+      accept: () => this.resolver(fila),
+    });
+  }
+
+  private resolver(fila: InconsistenciaGuardada): void {
+    const periodo = this.periodo();
+    if (!periodo) return;
+    const dict = this.t().entities.inconsistencias.resolver;
+    this.isResolving.set(true);
+    // El error lo avisa el interceptor con el mensaje del backend.
+    this.service
+      .resolver(fila.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isResolving.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success(dict.toast.title, dict.toast.desc);
+          // Si era la única de la última página, esa página ya no existe.
+          const ultima = Math.max(Math.ceil((this.totalCount() - 1) / LIST_PAGE_SIZE) - 1, 0);
+          this.currentPage.set(Math.min(this.currentPage(), ultima));
+          this.cargar(periodo.id);
         },
       });
   }

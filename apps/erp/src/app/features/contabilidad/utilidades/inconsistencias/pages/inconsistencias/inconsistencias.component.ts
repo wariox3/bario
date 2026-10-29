@@ -25,9 +25,12 @@ import type { AppDict } from '@erp/i18n';
 import type { PeriodoOpcion } from '@erp/features/contabilidad/masters/periodo/periodo.model';
 import type { InconsistenciaGuardada } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.model';
 import { InconsistenciaService } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.service';
-import { INCONSISTENCIA_COLUMNS } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.constants';
+import {
+  ACCION_RESOLVER,
+  INCONSISTENCIA_COLUMNS,
+  ROW_ACTIONS,
+} from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.constants';
 import { PeriodoService } from '@erp/features/contabilidad/masters/periodo/periodo.service';
-import { ACCION_RESOLVER, ROW_ACTIONS } from '../../inconsistencias.constants';
 
 /** Fase de la consola: qué muestra el cuerpo bajo la botonera. */
 type Estado = 'inicial' | 'analizando' | 'listo' | 'error';

@@ -4,7 +4,13 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { ENVIRONMENT, FileDownloadService, I18nService, ToastService } from '@reddoc/core';
+import { ConfirmationService, type Confirmation } from 'primeng/api';
 import { dictionaries } from '@erp/i18n';
+import type { InconsistenciaGuardada } from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.model';
+import {
+  ACCION_RESOLVER,
+  ROW_ACTIONS,
+} from '@erp/features/contabilidad/shared/inconsistencia/inconsistencia.constants';
 import type { Periodo } from '../../periodo.model';
 import { PeriodoInconsistenciasDialogComponent } from './periodo-inconsistencias-dialog.component';
 
@@ -18,6 +24,25 @@ const OCTUBRE: Periodo = {
   estado_cerrado: false,
   estado_inconsistencia: true,
 };
+
+function fila(id: number, resolverAutomatico: boolean): InconsistenciaGuardada {
+  return {
+    id,
+    numero: null,
+    descripcion: 'Sobra base',
+    fecha: '2026-10-29T10:00:00Z',
+    inconsistencia_tipo: 8,
+    inconsistencia_tipo_nombre: 'Sobra base',
+    inconsistencia_tipo_resolver_automatico: resolverAutomatico,
+    periodo: OCTUBRE.id,
+    comprobante: null,
+    comprobante_nombre: null,
+    movimiento: null,
+    movimiento_cuenta_codigo: null,
+    documento: null,
+    documento_documento_tipo_nombre: null,
+  };
+}
 
 describe('PeriodoInconsistenciasDialogComponent', () => {
   let fixture: ComponentFixture<PeriodoInconsistenciasDialogComponent>;
@@ -113,5 +138,35 @@ describe('PeriodoInconsistenciasDialogComponent', () => {
     fixture.detectChanges();
 
     expect(component['totalCount']()).toBe(0);
+  });
+
+  it('ofrece Resolver con la misma acción que la utilidad', () => {
+    expect(component['rowActions']).toBe(ROW_ACTIONS);
+    const resolver = ROW_ACTIONS.find((a) => a.id === ACCION_RESOLVER);
+    expect(resolver?.visibleFor?.(fila(1, true))).toBe(true);
+    expect(resolver?.visibleFor?.(fila(2, false))).toBe(false);
+  });
+
+  it('resolver confirma, manda el id y recarga la página sin reanalizar', () => {
+    const resoluble = fila(7, true);
+    abrir().flush({ count: 2, next: null, previous: null, results: [resoluble, fila(8, false)] });
+    // El diálogo trae su propia confirmación: se acepta en cuanto se pide.
+    const confirmacion = fixture.debugElement.injector.get(ConfirmationService);
+    jest
+      .spyOn(confirmacion, 'confirm')
+      .mockImplementation((c: Confirmation) => (c.accept?.(), confirmacion));
+
+    component['onRowAction']({ actionId: ACCION_RESOLVER, row: resoluble });
+
+    const req = http.expectOne('/api/contabilidad/inconsistencia/resolver/');
+    expect(req.request.body).toEqual({ id: 7 });
+    req.flush(null, { status: 204, statusText: 'No Content' });
+
+    http.expectNone((r) => r.url.includes('/analizar/'));
+    const recarga = http.expectOne((r) => r.url === LISTA);
+    expect(recarga.request.params.get('page')).toBe('1');
+    recarga.flush({ count: 1, next: null, previous: null, results: [fila(8, false)] });
+    expect(toast.success).toHaveBeenCalled();
+    expect(component['totalCount']()).toBe(1);
   });
 });
