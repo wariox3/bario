@@ -148,7 +148,14 @@ export class EstadoResultadosTableroComponent {
       .replace('{anio}', String(desde.getFullYear()));
   }
 
-  protected readonly fechaCorte = computed(() => formatFechaCorta(this.resumen()?.fecha_hasta, ''));
+  /** `del 01/10/2026 al 31/10/2026`: el rango completo, no un corte en hoy. */
+  protected readonly rango = computed(() => {
+    const r = this.resumen();
+    if (!r) return '';
+    return this.t()
+      .inicio.estadoResultados.rango.replace('{desde}', formatFechaCorta(r.fecha_desde, ''))
+      .replace('{hasta}', formatFechaCorta(r.fecha_hasta, ''));
+  });
 
   protected readonly perdida = computed(
     () => (toFiniteNumber(this.resumen()?.tarjetas.nos_quedo) ?? 0) < 0,

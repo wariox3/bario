@@ -7174,7 +7174,7 @@ export const es: AppDict = {
     estadoResultados: {
       titulo: 'Cómo nos fue',
       desc: 'De lo que vendimos a lo que nos quedó, según la contabilidad.',
-      corteAl: 'corte al',
+      rango: 'del {desde} al {hasta}',
       trimestre: 'trimestre {n} de {anio}',
       tarjetas: { vendimos: 'Vendimos', gastamos: 'Gastamos', nos_quedo: 'Nos quedó' },
       deCada100: 'de cada 100 pesos de ventas',

@@ -7065,7 +7065,7 @@ export const en: AppDict = {
     estadoResultados: {
       titulo: 'How we did',
       desc: 'From what we sold to what we kept, according to the books.',
-      corteAl: 'as of',
+      rango: 'from {desde} to {hasta}',
       trimestre: 'Q{n} {anio}',
       tarjetas: { vendimos: 'We sold', gastamos: 'We spent', nos_quedo: 'We kept' },
       deCada100: 'out of every 100 pesos in sales',

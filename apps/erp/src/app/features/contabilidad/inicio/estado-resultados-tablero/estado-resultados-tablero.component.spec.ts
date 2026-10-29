@@ -37,7 +37,7 @@ function respuesta(valores: readonly number[]): EstadoResultadosTablero {
   const neta = valores.at(-1) ?? 0;
   return {
     fecha_desde: '2026-07-01',
-    fecha_hasta: '2026-08-15',
+    fecha_hasta: '2026-09-30',
     tarjetas: { vendimos: valores[0] ?? 0, gastamos: 0, nos_quedo: neta, margen_neto: null },
     cascada: claves.map((clave, i) => ({
       clave,
@@ -47,7 +47,7 @@ function respuesta(valores: readonly number[]): EstadoResultadosTablero {
     })),
     comparativo: {
       fecha_desde: '2025-07-01',
-      fecha_hasta: '2025-08-15',
+      fecha_hasta: '2025-09-30',
       vendimos: 0,
       gastamos: 0,
       nos_quedo: 0,
@@ -98,11 +98,12 @@ describe('EstadoResultadosTableroComponent', () => {
     fixture.detectChanges();
   }
 
-  it('arranca en el mes en curso hasta hoy y muestra el esqueleto mientras carga', () => {
+  it('arranca en el mes en curso completo y muestra el esqueleto mientras carga', () => {
     const req = http.expectOne((r) => r.url === URL);
 
     expect(req.request.params.get('fecha_desde')).toBe('2026-08-01');
-    expect(req.request.params.get('fecha_hasta')).toBe('2026-08-15');
+    // Hasta el último día, no hasta hoy: lo causado al cierre del mes también cuenta.
+    expect(req.request.params.get('fecha_hasta')).toBe('2026-08-31');
     const section = (fixture.nativeElement as HTMLElement).querySelector('section');
     expect(section?.getAttribute('aria-busy')).toBe('true');
     expect(texto()).not.toContain(tx.tarjetas.vendimos);
@@ -111,9 +112,9 @@ describe('EstadoResultadosTableroComponent', () => {
   });
 
   it.each([
-    ['trimestre', '2026-07-01'],
-    ['anio', '2026-01-01'],
-  ] as const)('al pasar a %s pide desde %s hasta hoy', (periodo, desde) => {
+    ['trimestre', '2026-07-01', '2026-09-30'],
+    ['anio', '2026-01-01', '2026-12-31'],
+  ] as const)('al pasar a %s pide de %s a %s', (periodo, desde, hasta) => {
     http.expectOne((r) => r.url === URL).flush(respuesta([0]));
     fixture.detectChanges();
 
@@ -121,7 +122,7 @@ describe('EstadoResultadosTableroComponent', () => {
 
     const req = http.expectOne((r) => r.url === URL);
     expect(req.request.params.get('fecha_desde')).toBe(desde);
-    expect(req.request.params.get('fecha_hasta')).toBe('2026-08-15');
+    expect(req.request.params.get('fecha_hasta')).toBe(hasta);
     req.flush(respuesta([0]));
   });
 
@@ -134,6 +135,7 @@ describe('EstadoResultadosTableroComponent', () => {
     fixture.detectChanges();
 
     expect(texto()).toContain('trimestre 3 de 2026');
+    expect(texto()).toContain('del 01/07/2026 al 30/09/2026');
   });
 
   it('con datos pinta las tarjetas y la gráfica', () => {

@@ -5357,7 +5357,8 @@ export interface AppDict
     estadoResultados: {
       titulo: string;
       desc: string;
-      corteAl: string;
+      /** Rango pintado bajo el título: `{desde}` y `{hasta}` en fecha corta. */
+      rango: string;
       /** Rótulo del trimestre en curso: `{n}` del 1 al 4 y `{anio}`. */
       trimestre: string;
       tarjetas: { vendimos: string; gastamos: string; nos_quedo: string };

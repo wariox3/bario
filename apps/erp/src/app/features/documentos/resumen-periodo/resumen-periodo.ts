@@ -27,14 +27,22 @@ export function localeDe(lang: string): string {
   return lang === 'en' ? 'en-US' : 'es-CO';
 }
 
-/** Rango del período en curso hasta hoy, para los endpoints que piden fechas y no `?periodo=`. */
+/**
+ * Rango completo del período en curso, del primer al último día, para los
+ * endpoints que piden fechas y no `?periodo=`. Llega más allá de hoy a
+ * propósito: en contabilidad se registra con fecha del cierre del mes
+ * (depreciación, provisiones, causaciones), y cortar en hoy lo dejaría afuera.
+ */
 export function rangoDePeriodo(
   periodo: RangoPeriodo,
   hoy: Date = startOfToday(),
 ): { readonly fecha_desde: string; readonly fecha_hasta: string } {
   const mesInicial = { mes: hoy.getMonth(), trimestre: trimestreDe(hoy) * 3, anio: 0 }[periodo];
+  const meses = { mes: 1, trimestre: 3, anio: 12 }[periodo];
   const desde = new Date(hoy.getFullYear(), mesInicial, 1);
-  return { fecha_desde: toIsoDate(desde), fecha_hasta: toIsoDate(hoy) };
+  // El día 0 del mes siguiente es el último del período.
+  const hasta = new Date(hoy.getFullYear(), mesInicial + meses, 0);
+  return { fecha_desde: toIsoDate(desde), fecha_hasta: toIsoDate(hasta) };
 }
 
 /** Trimestre de la fecha, de 0 a 3. */
