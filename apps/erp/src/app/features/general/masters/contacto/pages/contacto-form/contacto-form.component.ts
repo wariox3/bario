@@ -24,9 +24,11 @@ import {
   FocusInvalidDirective,
   PageActionsComponent,
   PhoneInputComponent,
+  SoloDigitosDirective,
 } from '@reddoc/ui';
 import {
   CIUDAD_FUENTE,
+  ConsultaDianService,
   FormErrorService,
   I18nService,
   SELECT_ENDPOINTS,
@@ -35,8 +37,11 @@ import {
   TIPO_PERSONA,
   agregarCorreo,
   calcularDigitoVerificacion,
+  datosDeConsultaDian,
+  esIdentificacionNumerica,
   type NumeroIdentificacionSnapshot,
   numeroIdentificacionUnicoValidator,
+  soloDigitosSegunIdentificacionValidator,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
 import { ErpApiSelectComponent, ErpAsesorSelectComponent } from '@reddoc/ui';
@@ -84,6 +89,7 @@ const MODAL_TITLE_ID = 'contacto-form-modal-title';
     PhoneInputComponent,
     EmailChipsInputComponent,
     CiudadAutocompleteComponent,
+    SoloDigitosDirective,
   ],
   templateUrl: './contacto-form.component.html',
   styleUrl: './contacto-form.component.scss',
@@ -91,6 +97,7 @@ const MODAL_TITLE_ID = 'contacto-form-modal-title';
 export class ContactoFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly contactoService = inject(ContactoService);
+  private readonly consultaDian = inject(ConsultaDianService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
@@ -169,11 +176,32 @@ export class ContactoFormComponent implements OnInit {
   /** El endpoint de precio devuelve listas de venta y compra; filtramos venta. */
   protected readonly precioParams: Record<string, string> = { venta: 'True' };
 
+  /** Tipo de identificación elegido y el catálogo del que salió. */
+  private readonly identificacion = signal<ErpSelectOption | null>(null);
+  private readonly identificaciones = signal<readonly ErpSelectOption[]>([]);
+
+  /**
+   * Cédula y NIT van solo con dígitos; pasaporte y documentos extranjeros
+   * admiten letras. Lo decide el código DIAN del tipo, que se busca en el
+   * catálogo por id: en edición el valor cargado trae solo `{ id, nombre }`.
+   */
+  protected readonly identificacionNumerica = computed(() => {
+    const elegida = this.identificacion();
+    const fila = this.identificaciones().find((o) => o.id === elegida?.id) ?? elegida;
+    return esIdentificacionNumerica(fila);
+  });
+
   protected readonly form = this.fb.group({
     tipo_persona: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     responsabilidad: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     identificacion: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    numero_identificacion: ['', Validators.required],
+    numero_identificacion: [
+      '',
+      [
+        Validators.required,
+        soloDigitosSegunIdentificacionValidator(() => this.identificacionNumerica()),
+      ],
+    ],
     digito_verificacion: this.fb.control<string>({ value: '', disabled: true }),
     nombre_corto: ['', Validators.required],
     nombre1: [''],
@@ -289,8 +317,8 @@ export class ContactoFormComponent implements OnInit {
     const dian = this.t().entities.contacto.form.dian;
     this.isConsultingDian.set(true);
 
-    this.contactoService
-      .consultarDian({ identificacion_id: identificacionId, numero_identificacion: numero })
+    this.consultaDian
+      .consultar({ identificacion_id: identificacionId, numero_identificacion: numero })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
@@ -299,34 +327,17 @@ export class ContactoFormComponent implements OnInit {
             this.toast.info(dian.notFound.title, res.mensaje || dian.notFound.desc);
             return;
           }
-          // Solo pisamos un campo si la DIAN devolvió valor: nunca borramos lo
-          // que el usuario ya escribió.
-          const patch: {
-            nombre1?: string;
-            nombre_corto?: string;
-            correo?: string;
-            correo_facturacion_electronica?: string;
-          } = {};
-          if (res.nombre) {
-            // El nombre llega como un único string; en Natural va entero a
-            // nombre1 (no es fiable partirlo en nombre/apellido).
-            if (this.esNatural()) patch.nombre1 = res.nombre;
-            else patch.nombre_corto = res.nombre;
-          }
-          if (res.correo) {
-            patch.correo = res.correo;
+          const datos = datosDeConsultaDian(res, this.esNatural());
+          this.form.patchValue(datos);
+          if (datos.correo) {
             // Facturación admite varios correos: el de la DIAN se suma a los que
             // ya había (si es válido y no estaba), en vez de reemplazarlos.
-            patch.correo_facturacion_electronica = agregarCorreo(
-              this.form.controls.correo_facturacion_electronica.value,
-              res.correo,
+            this.form.controls.correo_facturacion_electronica.setValue(
+              agregarCorreo(this.form.controls.correo_facturacion_electronica.value, datos.correo),
             );
-          }
-          this.form.patchValue(patch);
-          // Si la DIAN trajo un correo malformado ("NO", etc.), el validador
-          // email ya marcó el control inválido; lo marcamos touched para que el
-          // mensaje de error se muestre bajo el input.
-          if (res.correo) {
+            // Si la DIAN trajo un correo malformado ("NO", etc.), el validador
+            // email ya marcó el control inválido; lo marcamos touched para que el
+            // mensaje de error se muestre bajo el input.
             this.form.controls.correo.markAsTouched();
           }
         },
@@ -335,6 +346,12 @@ export class ContactoFormComponent implements OnInit {
           this.toast.error(dian.error.title, dian.error.desc);
         },
       });
+  }
+
+  /** Con el catálogo a mano, el tipo cargado en edición ya sabe si es numérico. */
+  protected onIdentificacionesCargadas(opciones: readonly ErpSelectOption[]): void {
+    this.identificaciones.set(opciones);
+    this.form.controls.numero_identificacion.updateValueAndValidity();
   }
 
   // ── Internos ────────────────────────────────────────────────────────────────
@@ -413,7 +430,8 @@ export class ContactoFormComponent implements OnInit {
     );
 
     // Cambiar el tipo de identificación dispara la revalidación del número.
-    controls.identificacion.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+    controls.identificacion.valueChanges.pipe(takeUntilDestroyed()).subscribe((identificacion) => {
+      this.identificacion.set(identificacion);
       controls.numero_identificacion.updateValueAndValidity();
     });
 

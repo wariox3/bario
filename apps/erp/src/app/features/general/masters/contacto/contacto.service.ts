@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, forkJoin, map, of } from 'rxjs';
+import { Observable, forkJoin, map } from 'rxjs';
 import {
   BaseHttpService,
   buildListBody,
@@ -7,8 +7,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import { environment } from '../../../../../environments/environment';
-import type { ConsultaDianResponse, Contacto, ContactoPayload } from './contacto.model';
+import type { Contacto, ContactoPayload } from './contacto.model';
 
 /**
  * Servicio HTTP de contactos.
@@ -55,22 +54,6 @@ export class ContactoService extends BaseHttpService {
     return this.post<{ existe: boolean }>(`${this.resourcePath}validar/`, data);
   }
 
-  /**
-   * Consulta el registro de la DIAN por tipo + número de identificación.
-   * Si `existe` es `true`, devuelve nombre y correo para autocompletar el
-   * formulario de alta.
-   *
-   * La consulta real solo responde en producción; fuera de ella se mockea con
-   * `consultaDianMock`.
-   */
-  consultarDian(data: {
-    identificacion_id: number;
-    numero_identificacion: string;
-  }): Observable<ConsultaDianResponse> {
-    if (!environment.production) return consultaDianMock(data.numero_identificacion);
-    return this.post<ConsultaDianResponse>(`${this.resourcePath}consulta-dian/`, data);
-  }
-
   /** Importación masiva desde un archivo Excel. */
   importar(file: File): Observable<unknown> {
     return this.postFile<unknown>(`${this.resourcePath}importar/`, file);
@@ -93,27 +76,4 @@ export class ContactoService extends BaseHttpService {
     const deletions = ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`));
     return forkJoin(deletions).pipe(map(() => undefined));
   }
-}
-
-/**
- * Respuesta simulada de `consulta-dian/` para desarrollo: un número terminado en
- * `0` no existe; cualquier otro devuelve el ejemplo de la DIAN.
- */
-function consultaDianMock(numero: string): Observable<ConsultaDianResponse> {
-  const respuesta: ConsultaDianResponse = numero.endsWith('0')
-    ? {
-        existe: false,
-        nombre: '',
-        correo: '',
-        codigo: '404',
-        mensaje: 'El adquirente No existe en la base de datos',
-      }
-    : {
-        existe: true,
-        nombre: 'ALMACENES EXITO S A',
-        correo: 'njudiciales@grupo-exito.com',
-        codigo: '200',
-        mensaje: '',
-      };
-  return of(respuesta).pipe(delay(600));
 }

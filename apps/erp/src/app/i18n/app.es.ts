@@ -1277,6 +1277,7 @@ export const es: AppDict = {
           celularInvalido: 'El número no es un celular válido.',
           celularLongitud: 'El número no tiene el largo de un celular del país elegido.',
           numeroIdentificacionExistente: 'Este número de identificación ya está registrado.',
+          soloDigitos: 'Este tipo de identificación solo admite números.',
         },
         submitCreate: 'Crear contacto',
         submitEdit: 'Guardar cambios',

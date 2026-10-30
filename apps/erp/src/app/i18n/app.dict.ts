@@ -972,6 +972,7 @@ export interface AppDict
           celularInvalido: string;
           celularLongitud: string;
           numeroIdentificacionExistente: string;
+          soloDigitos: string;
         };
         submitCreate: string;
         submitEdit: string;

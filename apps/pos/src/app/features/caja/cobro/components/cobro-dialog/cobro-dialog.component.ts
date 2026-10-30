@@ -498,7 +498,7 @@ export class CobroDialogComponent {
       return;
     }
     if (err.causa instanceof CatalogoCobroError) {
-      this.error.set(errores[err.causa.falta]);
+      this.error.set(this.mensajeCatalogo(err.causa));
     } else {
       this.error.set(extractErrorMessage(err.causa, errores.generico));
     }
@@ -507,6 +507,16 @@ export class CobroDialogComponent {
       this.carritos.registrarCobro(uuid, { documentoId: err.documentoId, pagado: err.pagado });
       this.vista.set('pendiente');
     }
+  }
+
+  /** El método de pago faltante se nombra por el medio que lo pidió, no por efectivo. */
+  private mensajeCatalogo(causa: CatalogoCobroError): string {
+    const tx = this.t().caja.cobro;
+    if (causa.falta === 'plazoContado') return tx.errores.plazoContado;
+    const medio = MEDIOS_PAGO_POS.find((m) => m.codigoDian === causa.codigoDian) ?? this.medio();
+    return tx.errores.metodoPago
+      .replace('{medio}', tx.medios[medio.id].toLocaleLowerCase())
+      .replace('{codigo}', causa.codigoDian ?? medio.codigoDian);
   }
 
   private armarSolicitud(): SolicitudCobro | null {

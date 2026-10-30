@@ -73,7 +73,7 @@
         <div class="flex items-center gap-2">
           <input
             pInputText
-            libSoloDigitos
+            [libSoloDigitos]="identificacionNumerica()"
             id="cliente-numero"
             formControlName="numero_identificacion"
             autocomplete="off"
@@ -87,10 +87,23 @@
           >
             {{ digitoVerificacion() }}
           </span>
+          <p-button
+            type="button"
+            [label]="tx.dian.consultar"
+            icon="pi pi-search"
+            severity="secondary"
+            styleClass="!h-10 whitespace-nowrap"
+            [loading]="consultandoDian()"
+            [disabled]="!puedeConsultarDian() || guardando()"
+            (onClick)="consultarDian()"
+          />
         </div>
         <lib-field-error
           [control]="f.numero_identificacion"
-          [messages]="{ numeroIdentificacionExistente: tx.errores.existente }"
+          [messages]="{
+            numeroIdentificacionExistente: tx.errores.existente,
+            soloDigitos: tx.errores.soloDigitos,
+          }"
         />
       </div>
 

@@ -37,6 +37,11 @@ export interface ReddocEnvironment {
   wompiRedirectOrigin?: string;
   /** Reporte de errores a Sentry. Ausente = apagado (desarrollo local). */
   sentry?: SentryConfig;
+  /**
+   * La consulta DIAN de contactos responde con un ejemplo en vez de ir al
+   * backend, que solo la resuelve en producción. Ausente = consulta real.
+   */
+  consultaDianSimulada?: boolean;
 }
 
 export interface RoutePaths {

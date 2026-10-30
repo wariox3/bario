@@ -46,10 +46,17 @@ export class CobroError extends Error {
   }
 }
 
-/** El tenant no tiene el método de pago o el plazo de contado que el cobro necesita. */
+/**
+ * El tenant no tiene el método de pago o el plazo de contado que el cobro necesita.
+ * Si falta un método de pago, lleva el código DIAN que se buscó: sin él, el mensaje
+ * no puede decir cuál de los medios es el que falta.
+ */
 export class CatalogoCobroError extends Error {
-  constructor(readonly falta: 'metodoPago' | 'plazoContado') {
-    super(`Falta en el catálogo del tenant: ${falta}`);
+  constructor(
+    readonly falta: 'metodoPago' | 'plazoContado',
+    readonly codigoDian: string | null = null,
+  ) {
+    super(`Falta en el catálogo del tenant: ${falta}${codigoDian ? ` ${codigoDian}` : ''}`);
     this.name = 'CatalogoCobroError';
   }
 }

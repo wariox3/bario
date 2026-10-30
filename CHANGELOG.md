@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.16](https://github.com/wariox3/bario/compare/v0.1.15...v0.1.16) (2026-10-29)
+
+### Features
+
+- mostrar la imagen del contenedor en el header de erp, turnos y pos ([3002c59](https://github.com/wariox3/bario/commit/3002c5988528e464cef08ba4b59af0e29f730925))
+
+### Bug Fixes
+
+- **erp:** apuntar los informes de contabilidad a sus endpoints nuevos ([fc9c18e](https://github.com/wariox3/bario/commit/fc9c18e7572e7b318e2dd9856f4e92fa9459b65a))
+- **erp:** heredar el descuento de la línea al importar desde documento ([dcefa83](https://github.com/wariox3/bario/commit/dcefa83f3aa97b3e3a90b437046ace80ac5ec63a))
+- **erp:** llevar los informes de nómina a los endpoints de informes ([da5bf11](https://github.com/wariox3/bario/commit/da5bf11bf251f6722e1724867b549fbd63b6d9bc))
+- **pos:** permitir centavos en lo recibido al cobrar en efectivo ([7769794](https://github.com/wariox3/bario/commit/7769794c9c27d234227020f3d0b97ff13a001c36))
+
+## [0.1.15](https://github.com/wariox3/bario/compare/v0.1.14...v0.1.15) (2026-10-29)
+
+### Features
+
+- **erp:** avisar en el inicio de contabilidad los documentos pendientes por contabilizar ([63d9b1f](https://github.com/wariox3/bario/commit/63d9b1f468217d12bcf05b3de9ff6b55bccb95d3))
+- **erp:** estado de resultados en cascada en el inicio de contabilidad ([75432f9](https://github.com/wariox3/bario/commit/75432f9389dd59ba593d8280dbc86a04029d36db))
+- **erp:** exportar a excel las inconsistencias del periodo ([51362a1](https://github.com/wariox3/bario/commit/51362a19b22e258bfffa5d5d71be812c435019aa))
+- **erp:** modal de inconsistencias del periodo con el chrome estándar y excel ([8c9e03d](https://github.com/wariox3/bario/commit/8c9e03d4d93b0b46a1c7145bdaad3d1e41597171))
+- **erp:** mostrar en el inicio de contabilidad las inconsistencias del periodo ([6b4a869](https://github.com/wariox3/bario/commit/6b4a869f39cefb7754fbab209ee754578585fe5c))
+- **erp:** resolver inconsistencias desde el modal del master de periodos ([a351507](https://github.com/wariox3/bario/commit/a351507e15349f70efc169633223eec1db0af194))
+- **erp:** utilidad de inconsistencias en contabilidad ([64c8a2f](https://github.com/wariox3/bario/commit/64c8a2f2fe75b21a0396434f41644e23cdc0cf17))
+
+### Bug Fixes
+
+- **erp:** alinear el selector de periodo con los botones en inconsistencias ([2b9ef68](https://github.com/wariox3/bario/commit/2b9ef68e05f6346eac6e8d459a5a8809366dc1f8))
+- **erp:** cascada legible en anchos angostos del inicio de contabilidad ([2188e65](https://github.com/wariox3/bario/commit/2188e658fe31dfc1777da2f9fb7cc130f562cf86))
+- **erp:** estado de resultados hasta el último día del período ([4d0d6f6](https://github.com/wariox3/bario/commit/4d0d6f6d2d17817170bb772161f1ec4d50fd29be))
+- **erp:** reconciliar el periodo tras una acción fallida y traer todas las páginas ([a28db65](https://github.com/wariox3/bario/commit/a28db65aecd664bd8695613df18e6b92dd5dd97d))
+
+## [0.1.14](https://github.com/wariox3/bario/compare/v0.1.13...v0.1.14) (2026-10-28)
+
+### Features
+
+- **erp:** agregar el proceso validar créditos en humano ([35be59c](https://github.com/wariox3/bario/commit/35be59c1f67a6018130587b95369b05544776f13))
+- **erp:** agrupar el ciclo de nómina en su propio acordeón en humano ([b73f15e](https://github.com/wariox3/bario/commit/b73f15e5b557f91558ac15ea5fbc0654a92c3c2f))
+- **erp:** paginar los pagos del crédito y mostrar su documento y deducción ([19c89ec](https://github.com/wariox3/bario/commit/19c89ec9dfca8f9c4fee0565c03380d42c21570e))
+
+### Bug Fixes
+
+- **erp:** ocultar la columna operación en el resumen de nómina de la programación ([ef72353](https://github.com/wariox3/bario/commit/ef72353bd854a38b5bf3c3d07e57acd0e1a1d4ac))
+- **ui:** no reabrir el calendario al volver a la pestaña ([a27992a](https://github.com/wariox3/bario/commit/a27992a6fb86517ccf4081447a391ac93cb0279b))
+- **ui:** no reabrir los autocompletes al volver a la pestaña ([2b6d38f](https://github.com/wariox3/bario/commit/2b6d38f31ed60f39f6705c108908b07e529721ef))
+
 ## [0.1.13](https://github.com/wariox3/bario/compare/v0.1.12...v0.1.13) (2026-10-28)
 
 ### Features

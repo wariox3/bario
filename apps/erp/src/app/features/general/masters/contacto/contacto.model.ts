@@ -104,17 +104,3 @@ export interface ContactoPayload {
   readonly cuenta_banco_clase: number | null;
   readonly plazo_pago_proveedor: number | null;
 }
-
-/**
- * Respuesta de la consulta a la DIAN (`consulta-dian/`).
- * `existe` indica si la identificación figura en el registro; cuando es `false`
- * nombre y correo llegan vacíos y `mensaje` trae el motivo que da la DIAN.
- * `codigo` es el estado que devuelve la DIAN (`"200"`, `"404"`); no lo usamos.
- */
-export interface ConsultaDianResponse {
-  readonly existe: boolean;
-  readonly nombre: string;
-  readonly correo: string;
-  readonly codigo: string;
-  readonly mensaje: string;
-}
