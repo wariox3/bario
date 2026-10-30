@@ -318,7 +318,21 @@ export const es: AppDict = {
         direccion: 'Dirección',
         ciudad: 'Ciudad',
       },
-      errores: { existente: 'Ya existe un contacto con esta identificación.' },
+      errores: {
+        existente: 'Ya existe un contacto con esta identificación.',
+        soloDigitos: 'Este tipo de identificación solo admite números.',
+      },
+      dian: {
+        consultar: 'Consultar DIAN',
+        sinResultados: {
+          title: 'Sin resultados',
+          desc: 'No se encontró información en la DIAN para esa identificación.',
+        },
+        error: {
+          title: 'Error de consulta',
+          desc: 'No se pudo consultar la DIAN. Intenta de nuevo.',
+        },
+      },
       toasts: {
         creado: { title: 'Cliente creado', desc: 'Quedó elegido en la venta.' },
         error: 'No se pudo crear el cliente',

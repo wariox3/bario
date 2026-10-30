@@ -318,7 +318,18 @@ export const en: AppDict = {
         direccion: 'Address',
         ciudad: 'City',
       },
-      errores: { existente: 'A contact with this ID already exists.' },
+      errores: {
+        existente: 'A contact with this ID already exists.',
+        soloDigitos: 'This ID type only allows digits.',
+      },
+      dian: {
+        consultar: 'Look up DIAN',
+        sinResultados: {
+          title: 'No results',
+          desc: 'No information was found in DIAN for that identification.',
+        },
+        error: { title: 'Lookup failed', desc: 'Could not query DIAN. Please try again.' },
+      },
       toasts: {
         creado: { title: 'Customer created', desc: 'It was selected for the sale.' },
         error: 'The customer could not be created',

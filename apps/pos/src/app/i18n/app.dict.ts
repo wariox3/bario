@@ -266,7 +266,12 @@ export interface AppDict
         direccion: string;
         ciudad: string;
       };
-      errores: { existente: string };
+      errores: { existente: string; soloDigitos: string };
+      dian: {
+        consultar: string;
+        sinResultados: { title: string; desc: string };
+        error: { title: string; desc: string };
+      };
       toasts: { creado: { title: string; desc: string }; error: string };
     };
     item: {
