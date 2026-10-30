@@ -368,15 +368,29 @@ describe('CobroDialogComponent', () => {
       expect(interno.error()).toBeTruthy();
     });
 
-    it('si al tenant le falta el método de pago, lo dice', () => {
+    it('si al tenant le falta el método de pago, nombra el medio que lo pidió', () => {
       const { interno, cobro } = preparar();
       cobro.cobrar.mockReturnValueOnce(
         throwError(
-          () => new CobroError('preparando', null, false, new CatalogoCobroError('metodoPago')),
+          () =>
+            new CobroError('preparando', null, false, new CatalogoCobroError('metodoPago', '47')),
         ),
       );
       interno.onCobrar();
-      expect(interno.error()).toBe(errores.metodoPago);
+      expect(interno.error()).toBe(
+        'La empresa no tiene el método de pago transferencia (código DIAN 47).',
+      );
+    });
+
+    it('si al tenant le falta el plazo de contado, lo dice', () => {
+      const { interno, cobro } = preparar();
+      cobro.cobrar.mockReturnValueOnce(
+        throwError(
+          () => new CobroError('preparando', null, false, new CatalogoCobroError('plazoContado')),
+        ),
+      );
+      interno.onCobrar();
+      expect(interno.error()).toBe(errores.plazoContado);
     });
 
     it('termina aunque el diálogo se destruya a mitad del cobro', () => {

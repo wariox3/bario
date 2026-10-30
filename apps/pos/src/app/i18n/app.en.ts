@@ -464,7 +464,7 @@ export const en: AppDict = {
       errores: {
         generico: 'The charge could not be completed. Try again.',
         configuracion: 'The register is not set up: document type, warehouse or cash account.',
-        metodoPago: 'The company has no cash payment method (DIAN code 10).',
+        metodoPago: 'The company has no {medio} payment method (DIAN code {codigo}).',
         plazoContado: 'The company has no cash payment term (0 days).',
         sinValor: 'The sale is at $0: the total must be greater than zero to charge.',
         descartar: 'The document could not be discarded.',

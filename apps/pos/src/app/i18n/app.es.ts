@@ -468,7 +468,7 @@ export const es: AppDict = {
         generico: 'No se pudo completar el cobro. Intenta de nuevo.',
         configuracion: 'Falta configurar la caja: tipo de documento, almacén o cuenta de efectivo.',
         cuentaTransferencia: 'Elige la cuenta donde entra la transferencia.',
-        metodoPago: 'La empresa no tiene el método de pago efectivo (código DIAN 10).',
+        metodoPago: 'La empresa no tiene el método de pago {medio} (código DIAN {codigo}).',
         plazoContado: 'La empresa no tiene un plazo de pago de contado (0 días).',
         sinValor: 'La venta está en $0: el total debe ser mayor que cero para cobrar.',
         descartar: 'No se pudo descartar el documento.',
