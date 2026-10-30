@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { TextareaModule } from 'primeng/textarea';
 import {
-  CUENTA_BANCO_ENDPOINT,
   DOCUMENT_TYPE_ID,
   I18nService,
   SELECT_ENDPOINTS,
@@ -33,8 +32,8 @@ type EstadoTirilla = 'cargando' | 'listo' | 'error';
 
 /**
  * Configuración de la caja: con qué tipo de documento factura, de qué almacén
- * sale la mercancía, a qué cuentas entran el efectivo y las transferencias, y
- * sede y asesor por defecto.
+ * sale la mercancía y sede y asesor por defecto. La cuenta de cada cobro no se
+ * configura: el cobro la toma del tipo de cuenta bancaria del medio de pago.
  *
  * El tipo de documento y los textos de la tirilla son de la empresa y se guardan
  * en el backend: cambiarlos aquí los cambia para todas sus cajas. El resto se
@@ -72,13 +71,10 @@ export class ConfiguracionCajaComponent {
   protected readonly tipos = POS_DOCUMENTO_TIPOS;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
   protected readonly sedeEndpoint = SELECT_ENDPOINTS.sede;
-  protected readonly cuentaEndpoint = CUENTA_BANCO_ENDPOINT;
 
   protected readonly form = this.fb.group({
     documentoTipoId: this.fb.control<PosDocumentoTipoId | null>(null, Validators.required),
     almacen: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    cuentaEfectivo: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    cuentaTransferencia: this.fb.control<ErpSelectOption | null>(null),
     sede: this.fb.control<ErpSelectOption | null>(null),
     asesor: this.fb.control<ErpSelectOption | null>(null),
     tirilla: this.fb.nonNullable.group({
@@ -151,12 +147,9 @@ export class ConfiguracionCajaComponent {
 
   protected onSubmit(): void {
     if (this.guardando() || this.form.invalid) return;
-    const { documentoTipoId, almacen, cuentaEfectivo, cuentaTransferencia, sede, asesor } =
-      this.form.getRawValue();
+    const { documentoTipoId, almacen, sede, asesor } = this.form.getRawValue();
     this.store.guardarLocal({
       almacen,
-      cuentaEfectivo,
-      cuentaTransferencia,
       sede,
       // El selector de asesor trae `nombre_corto`, no `nombre`: se normaliza para
       // que la opción guardada tenga la forma `{ id, nombre }` de las demás.

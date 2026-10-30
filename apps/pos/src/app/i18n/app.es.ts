@@ -177,7 +177,7 @@ export const es: AppDict = {
     title: 'Caja',
     configuracion: {
       title: 'Configuración requerida',
-      desc: 'Antes de vender, elige el tipo de documento de la empresa y el almacén y la cuenta de efectivo de esta caja.',
+      desc: 'Antes de vender, elige el tipo de documento de la empresa y el almacén de esta caja.',
       accion: 'Ir a configuración',
     },
     configuracionError: {
@@ -426,6 +426,12 @@ export const es: AppDict = {
       ingreso: {
         cuenta: 'Cuenta',
         asesor: 'Asesor',
+        sinCuentas: {
+          caja: 'No hay cuentas de efectivo. Crea una en el ERP, como cuenta bancaria de tipo efectivo.',
+          banco: 'No hay cuentas bancarias. Crea una en el ERP para cobrar por este medio.',
+        },
+        cuentasError: 'No se pudieron cargar las cuentas.',
+        reintentar: 'Reintentar',
       },
       masInfo: {
         titulo: 'Más información',
@@ -479,7 +485,7 @@ export const es: AppDict = {
       requisitos: {
         configuracion: {
           title: 'Falta configurar la caja',
-          desc: 'Elige el tipo de documento, el almacén y la cuenta de efectivo en configuración.',
+          desc: 'Elige el tipo de documento y el almacén en configuración.',
         },
         productos: {
           title: 'La venta está vacía',
@@ -496,9 +502,8 @@ export const es: AppDict = {
       },
       errores: {
         generico: 'No se pudo completar el cobro. Intenta de nuevo.',
-        configuracion: 'Falta configurar la caja: tipo de documento, almacén o cuenta de efectivo.',
-        cuentaTransferencia: 'Elige la cuenta donde entra la transferencia.',
-        metodoPago: 'La empresa no tiene el método de pago {medio} (código DIAN {codigo}).',
+        configuracion: 'Falta configurar la caja: tipo de documento o almacén.',
+        cuenta: 'Todavía no se cargan las cuentas. Intenta de nuevo en un momento.',
         plazoContado: 'La empresa no tiene un plazo de pago de contado (0 días).',
         sinValor: 'La venta está en $0: el total debe ser mayor que cero para cobrar.',
         descartar: 'No se pudo descartar el documento.',
@@ -594,11 +599,6 @@ export const es: AppDict = {
     },
     campos: {
       almacen: 'Almacén',
-      cuentaEfectivo: 'Cuenta de efectivo',
-      cuentaEfectivoHint: 'Cuenta donde se registran los cobros en efectivo.',
-      cuentaTransferencia: 'Cuenta de transferencia',
-      cuentaTransferenciaHint:
-        'Cuenta bancaria donde entran los cobros por transferencia. Sin ella, la caja no cobra por transferencia.',
       sede: 'Sede',
       asesor: 'Asesor por defecto',
     },

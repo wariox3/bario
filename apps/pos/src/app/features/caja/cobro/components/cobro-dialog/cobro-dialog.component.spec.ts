@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import type { FormGroup } from '@angular/forms';
 import { Subject, of, throwError } from 'rxjs';
 import { ConfirmationService, type Confirmation } from 'primeng/api';
-import { I18nService, ToastService, type ErpSelectOption } from '@reddoc/core';
+import { I18nService, ToastService } from '@reddoc/core';
 import { es } from '../../../../../i18n/app.es';
 import { VentaPosService } from '../../../../../core/documento/venta-pos.service';
 import type { ConfiguracionCaja } from '../../../../configuracion/configuracion-caja.model';
@@ -17,6 +17,7 @@ import {
   type SolicitudCobro,
 } from '../../cobro.model';
 import { CobroService } from '../../cobro.service';
+import { CuentasCobroService, type CuentaCobro } from '../../cuentas-cobro';
 import type { MedioPagoPos } from '../../medios-pago';
 import { CobroDialogComponent } from './cobro-dialog.component';
 
@@ -26,6 +27,8 @@ interface Interno {
   readonly encabezado: Signal<{ venta: string; cliente: string; identificacion: string } | null>;
   readonly medio: Signal<MedioPagoPos>;
   readonly error: Signal<string | null>;
+  readonly estadoCuentas: Signal<'cargando' | 'listo' | 'error'>;
+  readonly cuentasMedio: Signal<readonly CuentaCobro[]>;
   readonly faltante: Signal<number>;
   readonly resumenMasInfo: Signal<string>;
   readonly ventaCobrada: Signal<{
@@ -42,15 +45,16 @@ interface Interno {
   onTecla(event: KeyboardEvent): void;
   onEscape(): void;
   usarMonto(monto: number): void;
+  cargarCuentas(): void;
 }
 
-const cuenta: ErpSelectOption = { id: 9, nombre: 'Caja general' };
+/** Tipo 3 es caja (efectivo); 1 y 2, banco. */
+const cuenta: CuentaCobro = { id: 9, nombre: 'Caja general', tipo: 3 };
+const banco: CuentaCobro = { id: 11, nombre: 'Bancolombia', tipo: 1 };
 
 const configuracionCompleta: ConfiguracionCaja = {
   documentoTipoId: 27,
   almacen: { id: 2, nombre: 'Principal' },
-  cuentaEfectivo: cuenta,
-  cuentaTransferencia: { id: 11, nombre: 'Bancolombia' },
   sede: null,
   asesor: null,
 };
@@ -62,6 +66,8 @@ function preparar(
     config?: Partial<ConfiguracionCaja>;
     pendiente?: CobroPendiente;
     total?: number;
+    cuentas?: readonly CuentaCobro[];
+    recordadas?: Partial<Record<string, number>>;
   } = {},
 ) {
   const activo = signal<Carrito>({
@@ -94,6 +100,12 @@ function preparar(
     imprimir: jest.fn(() => of(undefined)),
   };
   const confirmacion = { confirm: jest.fn((c: Confirmation) => c.accept?.()) };
+  const recordadas: Partial<Record<string, number>> = { ...cambios.recordadas };
+  const cuentasCobro = {
+    cuentas: jest.fn(() => of([...(cambios.cuentas ?? [cuenta, banco])])),
+    recordada: jest.fn((medio: string) => recordadas[medio] ?? null),
+    recordar: jest.fn((medio: string, id: number) => (recordadas[medio] = id)),
+  };
 
   TestBed.configureTestingModule({
     providers: [
@@ -107,6 +119,7 @@ function preparar(
       },
       { provide: CobroService, useValue: cobro },
       { provide: VentaPosService, useValue: ventas },
+      { provide: CuentasCobroService, useValue: cuentasCobro },
     ],
   });
   // La plantilla (PrimeNG, selects con HTTP) no es lo que se prueba: la lógica sí.
@@ -127,6 +140,7 @@ function preparar(
     cobro,
     ventas,
     cobradas,
+    cuentasCobro,
   };
 }
 
@@ -134,7 +148,7 @@ const tecla = (key: string) => new KeyboardEvent('keydown', { key, cancelable: t
 
 describe('CobroDialogComponent', () => {
   describe('al abrir', () => {
-    it('propone el total como recibido y la cuenta y el asesor de la caja', () => {
+    it('propone el total como recibido, la única cuenta de efectivo y el asesor de la caja', () => {
       const { interno } = preparar();
       expect(interno.vista()).toBe('cobro');
       expect(interno.form.getRawValue()).toEqual({
@@ -157,8 +171,10 @@ describe('CobroDialogComponent', () => {
       });
     });
 
-    it('sin cuenta de efectivo configurada, la cuenta queda vacía y no cobra', () => {
-      const { interno, cobro } = preparar({ config: { cuentaEfectivo: null } });
+    it('sin cuentas de efectivo, la cuenta queda vacía y no cobra', () => {
+      const { interno, cobro } = preparar({ cuentas: [banco] });
+      expect(interno.estadoCuentas()).toBe('listo');
+      expect(interno.cuentasMedio()).toEqual([]);
       expect(interno.form.controls['cuenta'].value).toBeNull();
       interno.onCobrar();
       expect(cobro.cobrar).not.toHaveBeenCalled();
@@ -216,7 +232,7 @@ describe('CobroDialogComponent', () => {
       const solicitud = cobro.cobrar.mock.calls[0][0];
       expect(solicitud.pagos).toEqual([{ cuentaBanco: cuenta, monto: 47_600 }]);
       expect(solicitud.documentoTipoId).toBe(27);
-      expect(solicitud.medio.codigoDian).toBe('10');
+      expect(solicitud.medio.id).toBe('efectivo');
     });
 
     it('al terminar muestra el éxito con recibido y cambio, y cierra la venta', () => {
@@ -287,10 +303,56 @@ describe('CobroDialogComponent', () => {
     });
   });
 
-  describe('cobrar por transferencia', () => {
-    const banco = { id: 11, nombre: 'Bancolombia' };
+  describe('cuentas del cobro', () => {
+    const caja2: CuentaCobro = { id: 10, nombre: 'Caja 2', tipo: 3 };
 
-    it('toma la cuenta de transferencia de la caja y cobra el total', () => {
+    it('el selector solo ofrece las cuentas del tipo del medio', () => {
+      const { interno } = preparar({ cuentas: [cuenta, caja2, banco] });
+      expect(interno.cuentasMedio()).toEqual([cuenta, caja2]);
+      interno.onTecla(tecla('F2'));
+      expect(interno.cuentasMedio()).toEqual([banco]);
+    });
+
+    it('con varias del medio no propone ninguna si la caja no ha usado una', () => {
+      const { interno, cobro } = preparar({ cuentas: [cuenta, caja2, banco] });
+      expect(interno.form.controls['cuenta'].value).toBeNull();
+      interno.onCobrar();
+      expect(cobro.cobrar).not.toHaveBeenCalled();
+    });
+
+    it('con varias propone la última que usó la caja con ese medio', () => {
+      const { interno } = preparar({
+        cuentas: [cuenta, caja2, banco],
+        recordadas: { efectivo: 10 },
+      });
+      expect(interno.form.controls['cuenta'].value).toEqual(caja2);
+    });
+
+    it('una cuenta recordada que ya no existe no se propone', () => {
+      const { interno } = preparar({ cuentas: [cuenta, caja2], recordadas: { efectivo: 99 } });
+      expect(interno.form.controls['cuenta'].value).toBeNull();
+    });
+
+    it('al cobrar recuerda la cuenta elegida para ese medio', () => {
+      const { interno, cuentasCobro } = preparar({ cuentas: [cuenta, caja2, banco] });
+      interno.form.controls['cuenta'].setValue(caja2);
+      interno.onCobrar();
+      expect(cuentasCobro.recordar).toHaveBeenCalledWith('efectivo', 10);
+    });
+
+    it('si fallan las cuentas queda en error y se puede reintentar', () => {
+      const { interno, cuentasCobro } = preparar();
+      cuentasCobro.cuentas.mockReturnValueOnce(throwError(() => new Error('500')));
+      interno.cargarCuentas();
+      expect(interno.estadoCuentas()).toBe('error');
+      interno.cargarCuentas();
+      expect(interno.estadoCuentas()).toBe('listo');
+      expect(interno.form.controls['cuenta'].value).toEqual(cuenta);
+    });
+  });
+
+  describe('cobrar por transferencia', () => {
+    it('toma la única cuenta de banco y cobra el total', () => {
       const { interno, cobro } = preparar();
       interno.onTecla(tecla('F2'));
       expect(interno.form.controls['cuenta'].value).toEqual(banco);
@@ -298,7 +360,7 @@ describe('CobroDialogComponent', () => {
       interno.usarMonto(10);
       interno.onCobrar();
       const solicitud = cobro.cobrar.mock.calls[0][0];
-      expect(solicitud.medio.codigoDian).toBe('47');
+      expect(solicitud.medio.id).toBe('transferencia');
       expect(solicitud.pagos).toEqual([{ cuentaBanco: banco, monto: 47_600 }]);
       expect(solicitud.comentario).toBeNull();
     });
@@ -326,8 +388,8 @@ describe('CobroDialogComponent', () => {
       });
     });
 
-    it('sin cuenta de transferencia configurada la cuenta queda vacía y no cobra', () => {
-      const { interno, cobro } = preparar({ config: { cuentaTransferencia: null } });
+    it('sin cuentas de banco la cuenta queda vacía y no cobra', () => {
+      const { interno, cobro } = preparar({ cuentas: [cuenta] });
       interno.onTecla(tecla('F2'));
       expect(interno.form.controls['cuenta'].value).toBeNull();
       interno.onCobrar();
@@ -366,20 +428,6 @@ describe('CobroDialogComponent', () => {
       expect(carritos.registrarCobro).not.toHaveBeenCalled();
       expect(interno.vista()).toBe('cobro');
       expect(interno.error()).toBeTruthy();
-    });
-
-    it('si al tenant le falta el método de pago, nombra el medio que lo pidió', () => {
-      const { interno, cobro } = preparar();
-      cobro.cobrar.mockReturnValueOnce(
-        throwError(
-          () =>
-            new CobroError('preparando', null, false, new CatalogoCobroError('metodoPago', '47')),
-        ),
-      );
-      interno.onCobrar();
-      expect(interno.error()).toBe(
-        'La empresa no tiene el método de pago transferencia (código DIAN 47).',
-      );
     });
 
     it('si al tenant le falta el plazo de contado, lo dice', () => {

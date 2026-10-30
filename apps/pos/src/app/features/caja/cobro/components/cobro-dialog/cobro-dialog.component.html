@@ -298,8 +298,9 @@
           }
 
           <!--
-            Cuenta y asesor de esta venta, siempre a la vista: vienen de la caja y se
-            cambian aquí mismo si hace falta. La cuenta es la del medio elegido.
+            Cuenta y asesor de esta venta, siempre a la vista. La cuenta solo ofrece las
+            del tipo del medio elegido y llega propuesta si hay una sola o la caja ya
+            usó una; el asesor viene de la caja. Ambos se cambian aquí mismo.
           -->
           <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             <div>
@@ -309,10 +310,27 @@
               <lib-api-select
                 inputId="cobro-cuenta"
                 formControlName="cuenta"
-                [endpoint]="cuentaEndpoint"
+                [catalogo]="cuentasMedio()"
                 [invalid]="form.controls.cuenta.invalid && form.controls.cuenta.touched"
               />
-              <lib-field-error [control]="form.controls.cuenta" />
+              @if (estadoCuentas() === 'error') {
+                <p class="m-0 mt-1.5 text-xs text-red-700" role="alert">
+                  {{ tx.ingreso.cuentasError }}
+                  <button
+                    type="button"
+                    class="cursor-pointer border-0 bg-transparent p-0 font-semibold text-brand-blue underline"
+                    (click)="cargarCuentas()"
+                  >
+                    {{ tx.ingreso.reintentar }}
+                  </button>
+                </p>
+              } @else if (estadoCuentas() === 'listo' && cuentasMedio().length === 0) {
+                <p class="m-0 mt-1.5 text-xs text-red-700" role="alert">
+                  {{ tx.ingreso.sinCuentas[medio().cuenta] }}
+                </p>
+              } @else {
+                <lib-field-error [control]="form.controls.cuenta" />
+              }
             </div>
             <div>
               <label for="cobro-asesor" class="mb-2 block text-xs font-semibold text-[#526680]">

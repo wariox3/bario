@@ -13,10 +13,11 @@
    - **Tipo de documento** (factura POS o POS electrónica): es **de la empresa** y vive en el
      backend (`GenConfiguracion.ven_pos_documento_tipo`, por `configuracion/campos/` y
      `actualizar/`). Cambiarlo lo cambia para todas sus cajas.
-   - **Almacén, cuenta de efectivo, sede y asesor:** son **de la caja física** y se guardan en
-     el navegador, por empresa.
+   - **Almacén, sede y asesor:** son **de la caja física** y se guardan en el navegador, por
+     empresa.
 
-   Sin tipo, almacén y cuenta, la caja avisa y no deja cobrar. Si no se puede leer el tipo,
+   La cuenta de cada cobro no se configura: sale del tipo de cuenta bancaria (ver Cobrar).
+   Sin tipo y almacén, la caja avisa y no deja cobrar. Si no se puede leer el tipo,
    avisa con un reintento.
 
 3. **Armar la venta.** Tocar una tarjeta o leer un código suma una unidad. Varias ventas
@@ -31,12 +32,21 @@
    el papel dice "Documento no válido como factura". La ciudad de la empresa no sale porque
    la configuración solo trae su id.
 
-4. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio; la cuenta y el
-   asesor salen de la caja y están a la vista para cambiarlos. Transferencia: el total entra
-   a la cuenta de transferencia de la caja y la referencia del comprobante (opcional) va al
-   comentario del documento, porque el pago no tiene dónde guardarla. Crédito y débito se
-   ven deshabilitados y no se pueden elegir. El cobro crea el documento con sus líneas,
-   registra el pago y lo aprueba. Al terminar se puede imprimir el PDF del backend.
+4. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio. Transferencia: el
+   total exacto, y la referencia del comprobante (opcional) va al comentario del documento,
+   porque el pago no tiene dónde guardarla. El asesor sale de la caja y se puede cambiar.
+
+   **La cuenta sale del medio.** El selector solo ofrece las cuentas bancarias de su tipo:
+   el efectivo, las de tipo caja (`CUENTA_BANCO_TIPO_CAJA`, el 3); el resto, cualquier otro
+   tipo (1 "Banco nacional", 2…). Si hay una sola, va puesta; si hay varias, se propone la
+   última que usó esta caja con ese medio (en el navegador, `pos:cuentas:<slug>`) y si no,
+   la elige quien cobra. Las cuentas se piden enteras cada vez que se abre el cobro y se
+   filtran en el front, porque `cuenta-banco/seleccionar/` no declara filtro por tipo.
+
+   Crédito y débito se ven deshabilitados y no se pueden elegir. El cobro crea el documento
+   con sus líneas, registra el pago y lo aprueba. Al terminar se puede imprimir el PDF del
+   backend.
+
 5. **Consultar.** `/t/<slug>/historial`: facturas POS de los dos tipos, con filtros e
    imprimir.
 
@@ -102,10 +112,11 @@ comercial, pagos, cabecera POS, utilidades de contacto y permisos por modelo.
   `@reddoc/ui/i18n`**, no del barrel. Desde el barrel arrastran al bundle inicial todo lo
   que también usan las pantallas lazy (pasó de 1.14 a 1.45 MB). El budget del POS está a
   1.3 MB para que esa regresión rompa el build.
-- **Nada de ids fijos del tenant.** El método de pago sale del código DIAN del medio
-  (`10` efectivo) y el plazo, del de 0 días.
-- **Un medio de pago nuevo** se habilita en `cobro/medios-pago.ts`, con su formulario en
-  el diálogo y su cuenta en la configuración. El pipeline no cambia.
+- **Nada de ids fijos del tenant**, con una excepción decidida por producto: el método de
+  pago del documento va siempre con id `1` (`METODO_PAGO_POS_ID`, en `cobro.mapper.ts`),
+  sea cual sea el medio, sin consultar el catálogo. El plazo sí se busca: el de 0 días.
+- **Un medio de pago nuevo** se habilita en `cobro/medios-pago.ts` (con si entra a una
+  cuenta de caja o de banco) y su formulario en el diálogo. El pipeline no cambia.
 - **Una sola pestaña por empresa.** Las ventas se guardan como un solo bloque en
   `localStorage`; dos pestañas se las pisarían. `core/pestana/pestana-unica.service.ts` reserva
   la caja con Web Locks y el workspace muestra un aviso en la segunda pestaña, que toma la caja

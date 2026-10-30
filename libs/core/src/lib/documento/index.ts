@@ -64,7 +64,11 @@ export { precioListaDeContacto } from './comercial/precio-lista-contacto';
 export type { PagoRead, PagoPayload } from './pagos/pago.model';
 export type { PagoCalculable, ResumenPagos } from './pagos/pago.calculo';
 export { calcularPagos } from './pagos/pago.calculo';
-export { CUENTA_BANCO_ENDPOINT, DOCUMENTO_PAGO_ENDPOINT } from './pagos/pago.constants';
+export {
+  CUENTA_BANCO_ENDPOINT,
+  CUENTA_BANCO_TIPO_CAJA,
+  DOCUMENTO_PAGO_ENDPOINT,
+} from './pagos/pago.constants';
 export { DocumentoPagoService } from './pagos/pago.service';
 
 // Cabecera de la familia POS (factura POS 27 y POS electrónica 24).

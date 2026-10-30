@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import {
   type Observable,
+  forkJoin,
   concat,
   defer,
-  forkJoin,
   ignoreElements,
   map,
   of,
@@ -59,12 +59,9 @@ export class CobroService {
     const crear = paso('guardando', () =>
       documentoId !== null
         ? of(null)
-        : forkJoin({
-            metodo: this.catalogos.metodoPago(solicitud.medio.codigoDian),
-            plazo: this.catalogos.plazoContado(),
-          }).pipe(
-            switchMap(({ metodo, plazo }) =>
-              this.ventas.crear(solicitudToPayload(solicitud, metodo, plazo, startOfToday())),
+        : this.catalogos.plazoContado().pipe(
+            switchMap((plazo) =>
+              this.ventas.crear(solicitudToPayload(solicitud, plazo, startOfToday())),
             ),
             tap((id) => (documentoId = id)),
           ),

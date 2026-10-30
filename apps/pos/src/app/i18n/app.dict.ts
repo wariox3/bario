@@ -347,6 +347,10 @@ export interface AppDict
       ingreso: {
         cuenta: string;
         asesor: string;
+        /** No hay cuentas del tipo del medio: caja para efectivo, banco para el resto. */
+        sinCuentas: { caja: string; banco: string };
+        cuentasError: string;
+        reintentar: string;
       };
       /** Soporte y comentario de la venta, plegados bajo la cuenta y el asesor. */
       masInfo: {
@@ -395,12 +399,11 @@ export interface AppDict
         generico: string;
         configuracion: string;
         /** Lleva `{medio}` (en minúscula) y `{codigo}`, el código DIAN que no está. */
-        metodoPago: string;
         plazoContado: string;
         descartar: string;
         imprimir: { title: string; desc: string };
         descargar: { title: string; desc: string };
-        cuentaTransferencia: string;
+        cuenta: string;
         sinValor: string;
       };
     };
@@ -456,10 +459,6 @@ export interface AppDict
     operacion: { title: string; hint: string };
     campos: {
       almacen: string;
-      cuentaEfectivo: string;
-      cuentaEfectivoHint: string;
-      cuentaTransferencia: string;
-      cuentaTransferenciaHint: string;
       sede: string;
       asesor: string;
     };

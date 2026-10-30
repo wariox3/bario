@@ -34,24 +34,39 @@ describe('ConfiguracionCajaStore', () => {
   beforeEach(() => localStorage.clear());
 
   it('junta el tipo de la empresa con lo guardado en la caja', () => {
-    localStorage.setItem(
-      'pos:config:acme',
-      JSON.stringify({ almacen, cuentaEfectivo: cuenta, sede: null, asesor: null }),
-    );
+    localStorage.setItem('pos:config:acme', JSON.stringify({ almacen, sede: null, asesor: null }));
     const { store } = preparar();
     expect(store.estadoTipo()).toBe('listo');
     expect(store.configuracion()).toEqual({
       documentoTipoId: POS,
       almacen,
-      cuentaEfectivo: cuenta,
-      cuentaTransferencia: null,
       sede: null,
       asesor: null,
     });
     expect(store.completa()).toBe(true);
   });
 
-  it('lo guardado antes de pasar el tipo al backend conserva almacén y cuenta', () => {
+  it('lo guardado con las cuentas de antes conserva almacén, sede y asesor', () => {
+    localStorage.setItem(
+      'pos:config:acme',
+      JSON.stringify({
+        almacen,
+        cuentaEfectivo: cuenta,
+        cuentaTransferencia: { id: 11, nombre: 'Bancolombia' },
+        sede: null,
+        asesor: null,
+      }),
+    );
+    const { store } = preparar();
+    expect(store.configuracion()).toEqual({
+      documentoTipoId: POS,
+      almacen,
+      sede: null,
+      asesor: null,
+    });
+  });
+
+  it('lo guardado antes de pasar el tipo al backend conserva el almacén', () => {
     localStorage.setItem(
       'pos:config:acme',
       JSON.stringify({
@@ -69,13 +84,7 @@ describe('ConfiguracionCajaStore', () => {
 
   it('sin tipo en la empresa la caja no está completa', () => {
     const { store } = preparar(null);
-    store.guardarLocal({
-      almacen,
-      cuentaEfectivo: cuenta,
-      cuentaTransferencia: null,
-      sede: null,
-      asesor: null,
-    });
+    store.guardarLocal({ almacen, sede: null, asesor: null });
     expect(store.completa()).toBe(false);
   });
 
@@ -118,18 +127,9 @@ describe('ConfiguracionCajaStore', () => {
 
   it('lo de la caja se guarda en el navegador, sin el tipo', () => {
     const { store } = preparar();
-    const banco = { id: 11, nombre: 'Bancolombia' };
-    store.guardarLocal({
-      almacen,
-      cuentaEfectivo: cuenta,
-      cuentaTransferencia: banco,
-      sede: null,
-      asesor: null,
-    });
+    store.guardarLocal({ almacen, sede: null, asesor: null });
     expect(JSON.parse(localStorage.getItem('pos:config:acme') ?? 'null')).toEqual({
       almacen,
-      cuentaEfectivo: cuenta,
-      cuentaTransferencia: banco,
       sede: null,
       asesor: null,
     });

@@ -166,6 +166,7 @@ export {
   precioListaDeContacto,
   calcularPagos,
   CUENTA_BANCO_ENDPOINT,
+  CUENTA_BANCO_TIPO_CAJA,
   DOCUMENTO_PAGO_ENDPOINT,
   DocumentoPagoService,
   posDocumentoToFormValue,

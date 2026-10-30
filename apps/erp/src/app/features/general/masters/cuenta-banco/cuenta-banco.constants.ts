@@ -1,4 +1,9 @@
-import { type ColumnDef, type FilterField, SELECT_ENDPOINTS } from '@reddoc/core';
+import {
+  CUENTA_BANCO_TIPO_CAJA,
+  type ColumnDef,
+  type FilterField,
+  SELECT_ENDPOINTS,
+} from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
 
 export const CUENTAS_BANCO_FILTERS_STORAGE_KEY = 'cuentas-banco:filters:v1';
@@ -8,12 +13,11 @@ export const CUENTAS_BANCO_QUICK_SEARCH_FIELD = 'nombre';
 export const CUENTA_BANCO_LIST_PATH = ['cuentas-banco'] as const;
 
 /**
- * Id del tipo "caja" (efectivo). Para este tipo el backend no espera número de
- * cuenta ni clase de cuenta: ambos campos se ocultan y se envían en `null`.
- * Valor heredado del legacy (hardcodeado como `3`); confirmar contra el catálogo
- * de `cuenta-banco-tipo` si cambiara.
+ * Id del tipo "caja" (efectivo), compartido con el POS desde `@reddoc/core`.
+ * Para este tipo el backend no espera número de cuenta ni clase de cuenta: ambos
+ * campos se ocultan y se envían en `null`.
  */
-export const CUENTA_BANCO_TIPO_CAJA = 3;
+export { CUENTA_BANCO_TIPO_CAJA };
 
 /** Endpoints de los selectores FK. */
 export const CUENTA_BANCO_TIPO_ENDPOINT = '/general/cuenta-banco-tipo/seleccionar/';
