@@ -17,13 +17,17 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import {
   CIUDAD_FUENTE,
+  ConsultaDianService,
   FormErrorService,
   I18nService,
   SELECT_ENDPOINTS,
   TIPO_PERSONA,
   ToastService,
   calcularDigitoVerificacion,
+  datosDeConsultaDian,
+  esIdentificacionNumerica,
   numeroIdentificacionUnicoValidator,
+  soloDigitosSegunIdentificacionValidator,
   type Ciudad,
   type ErpSelectOption,
 } from '@reddoc/core';
@@ -68,6 +72,7 @@ export class ClienteRapidoDialogComponent {
   private readonly formErrors = inject(FormErrorService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly service = inject(ClienteRapidoService);
+  private readonly consultaDian = inject(ConsultaDianService);
 
   protected readonly t = this.i18n.t;
 
@@ -80,6 +85,7 @@ export class ClienteRapidoDialogComponent {
   protected readonly ciudadFuente = CIUDAD_FUENTE.erp;
 
   protected readonly guardando = signal(false);
+  protected readonly consultandoDian = signal(false);
   private readonly tipoPersona = signal<number | null>(TIPO_PERSONA.NATURAL);
   protected readonly esNatural = computed(() => this.tipoPersona() === TIPO_PERSONA.NATURAL);
   protected readonly identificacionParams = computed<Record<string, string>>(() => {
@@ -89,10 +95,23 @@ export class ClienteRapidoDialogComponent {
     return params;
   });
 
+  /**
+   * Cédula y NIT van solo con dígitos; pasaporte y documentos extranjeros
+   * admiten letras. Lo decide el código DIAN del tipo elegido.
+   */
+  protected readonly identificacionNumerica = signal(false);
+
   protected readonly form = this.fb.nonNullable.group({
     tipo_persona: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     identificacion: this.fb.control<ErpSelectOption | null>(null, Validators.required),
-    numero_identificacion: ['', [Validators.required, Validators.maxLength(20)]],
+    numero_identificacion: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(20),
+        soloDigitosSegunIdentificacionValidator(() => this.identificacionNumerica()),
+      ],
+    ],
     nombre_corto: ['', Validators.maxLength(200)],
     nombre1: ['', Validators.maxLength(50)],
     nombre2: ['', Validators.maxLength(50)],
@@ -104,7 +123,12 @@ export class ClienteRapidoDialogComponent {
     ciudad: this.fb.control<Ciudad | null>(null, Validators.required),
   });
 
+  private readonly identificacionId = signal<number | null>(null);
   private readonly numero = signal('');
+  /** La DIAN se consulta por tipo + número: sin ambos, el botón no tiene qué buscar. */
+  protected readonly puedeConsultarDian = computed(
+    () => !this.consultandoDian() && this.identificacionId() !== null && this.numero() !== '',
+  );
   protected readonly digitoVerificacion = computed(() =>
     this.numero() ? calcularDigitoVerificacion(this.numero()) : '',
   );
@@ -126,9 +150,11 @@ export class ClienteRapidoDialogComponent {
         () => null,
       ),
     );
-    controls.identificacion.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => controls.numero_identificacion.updateValueAndValidity());
+    controls.identificacion.valueChanges.pipe(takeUntilDestroyed()).subscribe((identificacion) => {
+      this.identificacionId.set(identificacion?.id ?? null);
+      this.identificacionNumerica.set(esIdentificacionNumerica(identificacion));
+      controls.numero_identificacion.updateValueAndValidity();
+    });
 
     effect(() => {
       if (!this.visible()) return;
@@ -153,6 +179,38 @@ export class ClienteRapidoDialogComponent {
         error: (err: unknown) => {
           this.guardando.set(false);
           this.formErrors.handle(this.form, err, this.t().caja.cliente.toasts.error);
+        },
+      });
+  }
+
+  /**
+   * Trae de la DIAN el nombre y el correo registrados para la identificación.
+   * Solo completa lo que llegó con valor: lo que ya se escribió no se borra.
+   */
+  protected consultarDian(): void {
+    const identificacionId = this.identificacionId();
+    const numero = this.numero();
+    if (identificacionId === null || !numero || this.consultandoDian()) return;
+    const tx = this.t().caja.cliente.dian;
+    this.consultandoDian.set(true);
+    this.consultaDian
+      .consultar({ identificacion_id: identificacionId, numero_identificacion: numero })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.consultandoDian.set(false);
+          if (!res.existe) {
+            this.toast.info(tx.sinResultados.title, res.mensaje || tx.sinResultados.desc);
+            return;
+          }
+          const datos = datosDeConsultaDian(res, this.esNatural());
+          this.form.patchValue(datos);
+          // Un correo malformado de la DIAN ("NO") queda a la vista con su error.
+          if (datos.correo) this.form.controls.correo.markAsTouched();
+        },
+        error: () => {
+          this.consultandoDian.set(false);
+          this.toast.error(tx.error.title, tx.error.desc);
         },
       });
   }

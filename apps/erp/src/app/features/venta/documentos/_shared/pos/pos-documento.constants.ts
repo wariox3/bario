@@ -10,6 +10,15 @@ export const SEDE_ENDPOINT = '/general/sede/seleccionar/';
 /** Endpoint `seleccionar` de métodos de pago. */
 export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
 
+/** Opciones de {@link buildPosColumns}. */
+export interface PosColumnsOptions {
+  /**
+   * Suma la columna `estado_electronico` (si el documento ya se emitió a la
+   * DIAN). Solo aplica a los POS que se transmiten (la factura POS electrónica).
+   */
+  readonly electronico?: boolean;
+}
+
 /**
  * Construye las columnas del listado de un documento POS para el namespace i18n
  * dado (`'facturaPos'`, `'facturaPosElectronica'`…). La estructura es idéntica
@@ -21,8 +30,23 @@ export const METODO_PAGO_ENDPOINT = '/general/metodo-pago/seleccionar/';
  * comparten el shape canónico del endpoint `general/documento/lista/`
  * (`DocumentoListRowBase`).
  */
-export function buildPosColumns(i18nNamespace: string): readonly ColumnDef[] {
+export function buildPosColumns(
+  i18nNamespace: string,
+  options: PosColumnsOptions = {},
+): readonly ColumnDef[] {
   const ns = `entities.${i18nNamespace}.columns`;
+  const electronico: readonly ColumnDef[] = options.electronico
+    ? [
+        {
+          field: 'estado_electronico',
+          headerKey: `${ns}.electronico`,
+          type: 'boolean',
+          width: '70px',
+          align: 'center',
+        },
+      ]
+    : [];
+
   return [
     {
       field: 'id',
@@ -96,6 +120,7 @@ export function buildPosColumns(i18nNamespace: string): readonly ColumnDef[] {
       width: '70px',
       align: 'center',
     },
+    ...electronico,
   ];
 }
 

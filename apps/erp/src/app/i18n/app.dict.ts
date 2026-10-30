@@ -972,6 +972,7 @@ export interface AppDict
           celularInvalido: string;
           celularLongitud: string;
           numeroIdentificacionExistente: string;
+          soloDigitos: string;
         };
         submitCreate: string;
         submitEdit: string;
@@ -2115,6 +2116,7 @@ export interface AppDict
         aprobado: string;
         anulado: string;
         contabilizado: string;
+        electronico: string;
       };
       filters: {
         aprobado: string;

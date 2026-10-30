@@ -296,12 +296,20 @@ export { applyServerErrors, clearServerError } from './lib/utils/form-errors';
 export type { ServerFieldMap, ApplyServerErrorsResult } from './lib/utils/form-errors';
 export { FormErrorService } from './lib/services/form-error.service';
 export {
+  ConsultaDianService,
+  IDENTIFICACIONES_NUMERICAS,
   TIPO_PERSONA,
   calcularDigitoVerificacion,
   construirNombreCorto,
+  datosDeConsultaDian,
+  esIdentificacionNumerica,
   numeroIdentificacionUnicoValidator,
+  soloDigitosSegunIdentificacionValidator,
 } from './lib/contacto';
 export type {
+  ConsultaDianRequest,
+  ConsultaDianResponse,
+  DatosConsultaDian,
   NombresInput,
   NumeroIdentificacionSnapshot,
   ValidarIdentificacion,

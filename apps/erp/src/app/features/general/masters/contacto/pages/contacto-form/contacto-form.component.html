@@ -133,6 +133,7 @@
             [params]="identificacionParams()"
             [suggestedIndex]="isEditMode() ? null : 0"
             [invalid]="form.controls.identificacion.invalid && form.controls.identificacion.touched"
+            (optionsLoaded)="onIdentificacionesCargadas($event)"
           />
         </div>
 
@@ -147,6 +148,7 @@
               id="numero_identificacion"
               pInputText
               type="text"
+              [libSoloDigitos]="identificacionNumerica()"
               formControlName="numero_identificacion"
               class="flex-1"
               fluid
@@ -182,6 +184,7 @@
               required: t().entities.contacto.form.validation.required,
               numeroIdentificacionExistente:
                 t().entities.contacto.form.validation.numeroIdentificacionExistente,
+              soloDigitos: t().entities.contacto.form.validation.soloDigitos,
             }"
           />
         </div>

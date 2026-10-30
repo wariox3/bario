@@ -1254,6 +1254,7 @@ export const en: AppDict = {
           celularInvalido: 'Enter a valid mobile number.',
           celularLongitud: "The number doesn't match a mobile length for the selected country.",
           numeroIdentificacionExistente: 'This identification number is already registered.',
+          soloDigitos: 'This ID type only allows digits.',
         },
         submitCreate: 'Create contact',
         submitEdit: 'Save changes',
@@ -2812,6 +2813,7 @@ export const en: AppDict = {
         aprobado: 'Apr',
         anulado: 'Voi',
         contabilizado: 'Pos',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Approved',

@@ -1,4 +1,11 @@
-import { Directive, ElementRef, HostListener, inject } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  HostListener,
+  booleanAttribute,
+  inject,
+  input,
+} from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 /**
@@ -14,7 +21,11 @@ import { NgControl } from '@angular/forms';
  * **Para un celular no**: esos van con `<lib-phone-input>`, que además del
  * saneo trae el selector de indicativo y compone el E.164 que el backend
  * espera. Esta directiva sola deja el número sin indicativo, que es justo lo
- * que había que arreglar. Hoy no la usa nadie; queda como building block.
+ * que había que arreglar.
+ *
+ * Se puede apagar con `[libSoloDigitos]="false"` cuando el mismo campo a veces
+ * admite letras: el número de identificación es solo dígitos para una cédula,
+ * pero no para un pasaporte (ver `esIdentificacionNumerica`, `@reddoc/core`).
  *
  * **No** impone un largo ni un formato: el tope va con `maxlength` en el
  * template, y así un número extranjero, más corto o más largo que el local,
@@ -32,21 +43,25 @@ export class SoloDigitosDirective {
   private readonly host = inject<ElementRef<HTMLInputElement>>(ElementRef);
   private readonly ngControl = inject(NgControl, { optional: true });
 
+  /** Como atributo suelto (`libSoloDigitos`) queda encendida. */
+  readonly activa = input(true, { alias: 'libSoloDigitos', transform: booleanAttribute });
+
   @HostListener('input')
   onInput(): void {
-    const input = this.host.nativeElement;
-    const original = input.value;
+    if (!this.activa()) return;
+    const campo = this.host.nativeElement;
+    const original = campo.value;
     const soloDigitos = original.replace(/\D/g, '');
     if (original === soloDigitos) return;
 
     // El cursor se reubica contando **dígitos**, no caracteres: al limpiar
     // separadores el texto se acorta, y conservar el índice crudo saltaría el
     // cursor hacia adelante en cada tecleo dentro de un número ya escrito.
-    const cursor = input.selectionStart ?? original.length;
+    const cursor = campo.selectionStart ?? original.length;
     const digitosAntes = original.slice(0, cursor).replace(/\D/g, '').length;
 
     this.ngControl?.control?.setValue(soloDigitos);
-    input.value = soloDigitos;
-    input.setSelectionRange(digitosAntes, digitosAntes);
+    campo.value = soloDigitos;
+    campo.setSelectionRange(digitosAntes, digitosAntes);
   }
 }

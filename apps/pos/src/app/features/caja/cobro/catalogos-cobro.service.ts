@@ -31,9 +31,11 @@ const MAX_PAGINAS = 20;
  * - el **método de pago** por su código DIAN (`10` es efectivo);
  * - el **plazo de contado**, el de 0 días: una venta de caja se paga en el acto.
  *
- * Los `seleccionar/` paginan y el catálogo DIAN de métodos es largo, así que se
- * recorren páginas hasta encontrarlo. Se recuerda por tenant y código; un error
- * no se recuerda.
+ * Los `seleccionar/` paginan y el catálogo DIAN de métodos es largo: el método
+ * se pide con `search` (el endpoint busca por nombre o código) y aun así se
+ * recorren páginas hasta la fila de código exacto, porque `search` también trae
+ * los que lo contienen (`10` trae `100`). Se recuerda por tenant y código; un
+ * error no se recuerda.
  */
 @Injectable({ providedIn: 'root' })
 export class CatalogosCobroService extends BaseHttpService {
@@ -43,13 +45,11 @@ export class CatalogosCobroService extends BaseHttpService {
 
   metodoPago(codigoDian: string): Observable<ErpSelectOption> {
     return this.recordar(`metodo:${codigoDian}`, () =>
-      this.buscar<MetodoPagoFila>(
-        SELECT_ENDPOINTS.metodoPago,
-        (f) => f.codigo === codigoDian,
-        1,
-      ).pipe(
+      this.buscar<MetodoPagoFila>(SELECT_ENDPOINTS.metodoPago, (f) => f.codigo === codigoDian, {
+        search: codigoDian,
+      }).pipe(
         map((fila) => {
-          if (!fila) throw new CatalogoCobroError('metodoPago');
+          if (!fila) throw new CatalogoCobroError('metodoPago', codigoDian);
           return { id: fila.id, nombre: fila.nombre };
         }),
       ),
@@ -58,7 +58,7 @@ export class CatalogosCobroService extends BaseHttpService {
 
   plazoContado(): Observable<ErpSelectOption> {
     return this.recordar('plazo:contado', () =>
-      this.buscar<PlazoPagoFila>(SELECT_ENDPOINTS.plazoPago, (f) => f.dias === 0, 1).pipe(
+      this.buscar<PlazoPagoFila>(SELECT_ENDPOINTS.plazoPago, (f) => f.dias === 0).pipe(
         map((fila) => {
           if (!fila) throw new CatalogoCobroError('plazoContado');
           return { id: fila.id, nombre: fila.nombre };
@@ -86,14 +86,15 @@ export class CatalogosCobroService extends BaseHttpService {
   private buscar<T>(
     endpoint: string,
     coincide: (fila: T) => boolean,
-    page: number,
+    params: Record<string, string> = {},
+    page = 1,
   ): Observable<T | null> {
-    return this.get<PaginatedResponse<T>>(endpoint, { page }).pipe(
+    return this.get<PaginatedResponse<T>>(endpoint, { ...params, page }).pipe(
       concatMap((respuesta) => {
         const fila = (respuesta.results ?? []).find(coincide);
         if (fila) return of(fila);
         if (!respuesta.next || page >= MAX_PAGINAS) return of(null);
-        return this.buscar(endpoint, coincide, page + 1);
+        return this.buscar(endpoint, coincide, params, page + 1);
       }),
     );
   }

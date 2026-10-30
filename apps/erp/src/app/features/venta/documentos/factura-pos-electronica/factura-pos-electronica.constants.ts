@@ -8,12 +8,14 @@ import { buildPosColumns, buildPosFilters } from '../_shared/pos/pos-documento.c
  * (`facturaPosElectronica`). Si este documento necesita divergir de la familia,
  * deja de usar la factory para la columna/filtro en cuestión.
  *
- * A diferencia del POS normal suma el filtro `estado_electronico`: este
+ * A diferencia del POS normal suma la columna y el filtro `estado_electronico`: este
  * documento sí se transmite a la DIAN, así que el flag varía por fila y sirve
  * para aislar lo pendiente de transmitir (mismo criterio que la factura de
  * venta electrónica).
  */
-export const FACTURA_POS_ELECTRONICA_COLUMNS = buildPosColumns('facturaPosElectronica');
+export const FACTURA_POS_ELECTRONICA_COLUMNS = buildPosColumns('facturaPosElectronica', {
+  electronico: true,
+});
 export const FACTURA_POS_ELECTRONICA_FILTERS = buildPosFilters('facturaPosElectronica', {
   electronico: true,
 });

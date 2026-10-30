@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.17](https://github.com/wariox3/bario/compare/v0.1.16...v0.1.17) (2026-10-30)
+
+### Features
+
+- consultar DIAN y validar el número de identificación según su tipo ([35a6305](https://github.com/wariox3/bario/commit/35a6305db8c5caff4ccf57c47d3d0283294400ee))
+- **erp:** mostrar si la factura POS electrónica ya se emitió en el listado ([ba89247](https://github.com/wariox3/bario/commit/ba8924750db7ddd2d190fbf19ffd0571e77309d0))
+
+### Bug Fixes
+
+- **pos:** nombrar el medio de pago que falta al cobrar ([43273c4](https://github.com/wariox3/bario/commit/43273c4fb5c9527c1de3d3754bb73996a145bc30))
+
 ## [0.1.16](https://github.com/wariox3/bario/compare/v0.1.15...v0.1.16) (2026-10-29)
 
 ### Features

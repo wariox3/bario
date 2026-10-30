@@ -318,7 +318,21 @@ export const es: AppDict = {
         direccion: 'Dirección',
         ciudad: 'Ciudad',
       },
-      errores: { existente: 'Ya existe un contacto con esta identificación.' },
+      errores: {
+        existente: 'Ya existe un contacto con esta identificación.',
+        soloDigitos: 'Este tipo de identificación solo admite números.',
+      },
+      dian: {
+        consultar: 'Consultar DIAN',
+        sinResultados: {
+          title: 'Sin resultados',
+          desc: 'No se encontró información en la DIAN para esa identificación.',
+        },
+        error: {
+          title: 'Error de consulta',
+          desc: 'No se pudo consultar la DIAN. Intenta de nuevo.',
+        },
+      },
       toasts: {
         creado: { title: 'Cliente creado', desc: 'Quedó elegido en la venta.' },
         error: 'No se pudo crear el cliente',
@@ -468,7 +482,7 @@ export const es: AppDict = {
         generico: 'No se pudo completar el cobro. Intenta de nuevo.',
         configuracion: 'Falta configurar la caja: tipo de documento, almacén o cuenta de efectivo.',
         cuentaTransferencia: 'Elige la cuenta donde entra la transferencia.',
-        metodoPago: 'La empresa no tiene el método de pago efectivo (código DIAN 10).',
+        metodoPago: 'La empresa no tiene el método de pago {medio} (código DIAN {codigo}).',
         plazoContado: 'La empresa no tiene un plazo de pago de contado (0 días).',
         sinValor: 'La venta está en $0: el total debe ser mayor que cero para cobrar.',
         descartar: 'No se pudo descartar el documento.',

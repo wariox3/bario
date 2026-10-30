@@ -266,7 +266,12 @@ export interface AppDict
         direccion: string;
         ciudad: string;
       };
-      errores: { existente: string };
+      errores: { existente: string; soloDigitos: string };
+      dian: {
+        consultar: string;
+        sinResultados: { title: string; desc: string };
+        error: { title: string; desc: string };
+      };
       toasts: { creado: { title: string; desc: string }; error: string };
     };
     item: {
@@ -375,6 +380,7 @@ export interface AppDict
       errores: {
         generico: string;
         configuracion: string;
+        /** Lleva `{medio}` (en minúscula) y `{codigo}`, el código DIAN que no está. */
         metodoPago: string;
         plazoContado: string;
         descartar: string;
