@@ -279,6 +279,22 @@ export const en: AppDict = {
         message: 'Every product is removed from this sale.',
         aceptar: 'Clear',
       },
+      preCuenta: {
+        boton: 'Print bill',
+        titulo: 'Pre-bill',
+        aviso: 'Not valid as an invoice',
+        nit: 'Tax ID',
+        telefono: 'Tel.',
+        fecha: 'Date',
+        cliente: 'Customer',
+        subtotal: 'Subtotal',
+        descuento: 'Discount',
+        total: 'Total',
+        error: {
+          title: 'Could not print the bill',
+          desc: 'The company details could not be read. Try again.',
+        },
+      },
       linea: {
         editar: 'Edit line',
         retirar: 'Remove',

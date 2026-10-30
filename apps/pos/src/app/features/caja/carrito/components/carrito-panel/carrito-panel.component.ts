@@ -17,11 +17,14 @@ import {
   ModelPermissionsService,
   ToastService,
   formatCop,
+  imprimirBlob,
   type ErpSelectOption,
 } from '@reddoc/core';
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../../configuracion/configuracion-caja.store';
+import { ConfiguracionEmpresaService } from '../../../../configuracion/configuracion-empresa.service';
+import { preCuentaHtml } from '../../../pre-cuenta/pre-cuenta';
 import { ClienteRapidoDialogComponent } from '../../../cliente/components/cliente-rapido-dialog/cliente-rapido-dialog.component';
 import { CobroDialogComponent } from '../../../cobro/components/cobro-dialog/cobro-dialog.component';
 import { CarritosStore } from '../../carritos.store';
@@ -33,7 +36,8 @@ import {
 } from '../editar-linea-dialog/editar-linea-dialog.component';
 
 /**
- * Panel de la venta activa: cliente, líneas, resumen y acciones (vaciar y cobrar).
+ * Panel de la venta activa: cliente, líneas, resumen y acciones (vaciar,
+ * imprimir la pre-cuenta y cobrar).
  *
  * Cobrar no se apaga: si falta algo (configuración de la caja, cliente o
  * productos) avisa qué. Con un cobro pendiente la venta queda bloqueada y el
@@ -61,6 +65,7 @@ export class CarritoPanelComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly configuracion = inject(ConfiguracionCajaStore);
+  private readonly empresa = inject(ConfiguracionEmpresaService);
 
   protected readonly t = this.i18n.t;
   protected readonly store = inject(CarritosStore);
@@ -70,6 +75,7 @@ export class CarritoPanelComponent {
 
   protected readonly cobrando = signal(false);
   protected readonly creandoCliente = signal(false);
+  protected readonly imprimiendoCuenta = signal(false);
   private readonly permisos = inject(ModelPermissionsService);
   protected readonly puedeCrearCliente = computed(() =>
     this.permisos.allows(MODELO.general.contacto, 'crear'),
@@ -123,6 +129,33 @@ export class CarritoPanelComponent {
       }
     }
     this.cobrando.set(true);
+  }
+
+  /**
+   * Imprime lo que se va a cobrar sin cobrarlo (alguien se lleva la cuenta y
+   * vuelve a pagar). La arma la caja: no crea documento ni consume número, y la
+   * venta sigue editable. Los datos de la empresa se leen en cada impresión.
+   */
+  protected onImprimirCuenta(): void {
+    if (this.imprimiendoCuenta()) return;
+    const venta = this.store.activo();
+    if (venta.lineas.length === 0) return;
+    this.imprimiendoCuenta.set(true);
+    this.empresa
+      .empresaTirilla()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (empresa) => {
+          this.imprimiendoCuenta.set(false);
+          const html = preCuentaHtml(venta, empresa, this.t().caja.carrito.preCuenta, new Date());
+          imprimirBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), 'pre-cuenta.html');
+        },
+        error: () => {
+          this.imprimiendoCuenta.set(false);
+          const tx = this.t().caja.carrito.preCuenta.error;
+          this.toast.error(tx.title, tx.desc);
+        },
+      });
   }
 
   protected onGuardarEdicion(cambios: CambiosLinea): void {

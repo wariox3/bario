@@ -8,6 +8,13 @@ interface CamposPos {
   readonly ven_pos_documento_tipo?: number | null;
   readonly ven_pos_informacion_superior?: string | null;
   readonly ven_pos_informacion_inferior?: string | null;
+  readonly gen_empresa_razon_social?: string | null;
+  readonly gen_empresa_nombre_corto?: string | null;
+  readonly gen_empresa_numero_identificacion?: string | null;
+  readonly gen_empresa_digito_verificacion?: string | null;
+  readonly gen_empresa_direccion?: string | null;
+  readonly gen_empresa_telefono?: string | null;
+  readonly gen_empresa_correo?: string | null;
 }
 
 /** Textos fijos que el backend imprime arriba y abajo de cada tirilla. */
@@ -15,6 +22,29 @@ export interface TextosTirilla {
   readonly superior: string;
   readonly inferior: string;
 }
+
+/** Lo que va arriba de un papel que la caja arma sola (la pre-cuenta). */
+export interface EmpresaTirilla {
+  readonly nombre: string;
+  /** Número de identificación con su dígito de verificación, si lo tiene. */
+  readonly identificacion: string;
+  readonly direccion: string;
+  readonly telefono: string;
+  readonly correo: string;
+  readonly textos: TextosTirilla;
+}
+
+const CAMPOS_EMPRESA_TIRILLA = [
+  'gen_empresa_razon_social',
+  'gen_empresa_nombre_corto',
+  'gen_empresa_numero_identificacion',
+  'gen_empresa_digito_verificacion',
+  'gen_empresa_direccion',
+  'gen_empresa_telefono',
+  'gen_empresa_correo',
+  'ven_pos_informacion_superior',
+  'ven_pos_informacion_inferior',
+] as const;
 
 /**
  * La parte de la configuración del POS que es **de la empresa**, no de la caja:
@@ -51,6 +81,15 @@ export class ConfiguracionEmpresaService extends BaseHttpService {
     ).pipe(map(aTextos));
   }
 
+  /** Datos de la empresa y textos de la tirilla, en una sola consulta. */
+  empresaTirilla(): Observable<EmpresaTirilla> {
+    return this.get<CamposPos>(
+      '/general/configuracion/campos/',
+      { campos: CAMPOS_EMPRESA_TIRILLA.join(',') },
+      { errorToast: false },
+    ).pipe(map(aEmpresaTirilla));
+  }
+
   /** En blanco viaja `null`: el backend rechaza el string vacío (`minLength: 1`). */
   guardarTextosTirilla(textos: TextosTirilla): Observable<TextosTirilla> {
     return this.patch<CamposPos>(
@@ -68,6 +107,19 @@ function aTextos(campos: CamposPos): TextosTirilla {
   return {
     superior: campos.ven_pos_informacion_superior ?? '',
     inferior: campos.ven_pos_informacion_inferior ?? '',
+  };
+}
+
+function aEmpresaTirilla(campos: CamposPos): EmpresaTirilla {
+  const numero = campos.gen_empresa_numero_identificacion ?? '';
+  const dv = campos.gen_empresa_digito_verificacion ?? '';
+  return {
+    nombre: campos.gen_empresa_razon_social || campos.gen_empresa_nombre_corto || '',
+    identificacion: numero && dv ? `${numero}-${dv}` : numero,
+    direccion: campos.gen_empresa_direccion ?? '',
+    telefono: campos.gen_empresa_telefono ?? '',
+    correo: campos.gen_empresa_correo ?? '',
+    textos: aTextos(campos),
   };
 }
 

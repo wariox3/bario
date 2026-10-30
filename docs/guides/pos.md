@@ -23,6 +23,14 @@
    abiertas en pestañas, que sobreviven a recargas. Cliente por defecto "Consumidor
    final"; al cambiarlo, las líneas se recotizan con su lista de precios (las editadas a
    mano se respetan). La caja no deja pasar del stock disponible.
+
+   **Imprimir cuenta** (el botón de la impresora, junto a Cobrar) saca una pre-cuenta de
+   80 mm con lo que se va a cobrar, para quien se lleva la cuenta y vuelve a pagar. La arma
+   la caja (`caja/pre-cuenta/`) con el resumen del carrito y los datos de la empresa de
+   `configuracion/campos/`: no crea documento ni consume número, la venta sigue editable y
+   el papel dice "Documento no válido como factura". La ciudad de la empresa no sale porque
+   la configuración solo trae su id.
+
 4. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio; la cuenta y el
    asesor salen de la caja y están a la vista para cambiarlos. Transferencia: el total entra
    a la cuenta de transferencia de la caja y la referencia del comprobante (opcional) va al

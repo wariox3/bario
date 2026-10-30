@@ -227,6 +227,20 @@ export interface AppDict
         total: string;
       };
       vaciar: { boton: string; header: string; message: string; aceptar: string };
+      /** Papel con lo que se va a cobrar, antes de cobrar. No es factura. */
+      preCuenta: {
+        boton: string;
+        titulo: string;
+        aviso: string;
+        nit: string;
+        telefono: string;
+        fecha: string;
+        cliente: string;
+        subtotal: string;
+        descuento: string;
+        total: string;
+        error: { title: string; desc: string };
+      };
       linea: {
         editar: string;
         retirar: string;

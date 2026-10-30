@@ -279,6 +279,22 @@ export const es: AppDict = {
         message: 'Se retiran todos los productos de esta venta.',
         aceptar: 'Vaciar',
       },
+      preCuenta: {
+        boton: 'Imprimir cuenta',
+        titulo: 'Pre-cuenta',
+        aviso: 'Documento no válido como factura',
+        nit: 'NIT',
+        telefono: 'Tel.',
+        fecha: 'Fecha',
+        cliente: 'Cliente',
+        subtotal: 'Subtotal',
+        descuento: 'Descuento',
+        total: 'Total',
+        error: {
+          title: 'No se pudo imprimir la cuenta',
+          desc: 'No se pudieron leer los datos de la empresa. Intenta de nuevo.',
+        },
+      },
       linea: {
         editar: 'Editar línea',
         retirar: 'Retirar',
