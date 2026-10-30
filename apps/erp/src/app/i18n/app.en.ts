@@ -2812,6 +2812,7 @@ export const en: AppDict = {
         aprobado: 'Apr',
         anulado: 'Voi',
         contabilizado: 'Pos',
+        electronico: 'Ele',
       },
       filters: {
         aprobado: 'Approved',
