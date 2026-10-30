@@ -177,7 +177,7 @@ export const en: AppDict = {
     title: 'Register',
     configuracion: {
       title: 'Setup required',
-      desc: "Before selling, choose the company's document type and this register's warehouse and cash account.",
+      desc: "Before selling, choose the company's document type and this register's warehouse.",
       accion: 'Go to settings',
     },
     configuracionError: {
@@ -278,6 +278,22 @@ export const en: AppDict = {
         header: 'Clear sale',
         message: 'Every product is removed from this sale.',
         aceptar: 'Clear',
+      },
+      preCuenta: {
+        boton: 'Print bill',
+        titulo: 'Pre-bill',
+        aviso: 'Not valid as an invoice',
+        nit: 'Tax ID',
+        telefono: 'Tel.',
+        fecha: 'Date',
+        cliente: 'Customer',
+        subtotal: 'Subtotal',
+        descuento: 'Discount',
+        total: 'Total',
+        error: {
+          title: 'Could not print the bill',
+          desc: 'The company details could not be read. Try again.',
+        },
       },
       linea: {
         editar: 'Edit line',
@@ -404,6 +420,12 @@ export const en: AppDict = {
       ingreso: {
         cuenta: 'Account',
         asesor: 'Advisor',
+        sinCuentas: {
+          caja: 'There are no cash accounts. Create one in the ERP as a cash-type bank account.',
+          banco: 'There are no bank accounts. Create one in the ERP to charge with this method.',
+        },
+        cuentasError: 'The accounts could not be loaded.',
+        reintentar: 'Retry',
       },
       masInfo: {
         titulo: 'More information',
@@ -457,7 +479,7 @@ export const en: AppDict = {
       requisitos: {
         configuracion: {
           title: 'The register is not set up',
-          desc: 'Choose the document type, warehouse and cash account in settings.',
+          desc: 'Choose the document type and warehouse in settings.',
         },
         productos: {
           title: 'The sale is empty',
@@ -474,8 +496,7 @@ export const en: AppDict = {
       },
       errores: {
         generico: 'The charge could not be completed. Try again.',
-        configuracion: 'The register is not set up: document type, warehouse or cash account.',
-        metodoPago: 'The company has no {medio} payment method (DIAN code {codigo}).',
+        configuracion: 'The register is not set up: document type or warehouse.',
         plazoContado: 'The company has no cash payment term (0 days).',
         sinValor: 'The sale is at $0: the total must be greater than zero to charge.',
         descartar: 'The document could not be discarded.',
@@ -487,7 +508,7 @@ export const en: AppDict = {
           title: 'Could not download',
           desc: 'Try again in a moment.',
         },
-        cuentaTransferencia: 'Choose the account the transfer goes to.',
+        cuenta: 'The accounts are still loading. Try again in a moment.',
       },
     },
   },
@@ -572,11 +593,6 @@ export const en: AppDict = {
     },
     campos: {
       almacen: 'Warehouse',
-      cuentaEfectivo: 'Cash account',
-      cuentaEfectivoHint: 'Account where cash payments are recorded.',
-      cuentaTransferencia: 'Transfer account',
-      cuentaTransferenciaHint:
-        "Bank account where transfer payments come in. Without it, the register can't charge by transfer.",
       sede: 'Branch',
       asesor: 'Default advisor',
     },

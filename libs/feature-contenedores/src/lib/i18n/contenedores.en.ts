@@ -1,6 +1,7 @@
 import type { ContenedoresDict } from './contenedores.dict';
 
 export const contenedoresEn: ContenedoresDict = {
+  saludo: { manana: 'Good morning', tarde: 'Good afternoon', noche: 'Good evening' },
   list: {
     title: 'Your companies',
     subtitle: 'Pick a workspace to continue',

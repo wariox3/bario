@@ -9,12 +9,6 @@ import {
 } from '@reddoc/core';
 import { CatalogoCobroError } from './cobro.model';
 
-interface MetodoPagoFila {
-  readonly id: number;
-  readonly nombre: string;
-  readonly codigo?: string | null;
-}
-
 interface PlazoPagoFila {
   readonly id: number;
   readonly nombre: string;
@@ -25,36 +19,19 @@ interface PlazoPagoFila {
 const MAX_PAGINAS = 20;
 
 /**
- * Resuelve contra los catálogos del tenant lo que el documento POS necesita y
- * el POS anterior quemaba (`metodo_pago: 10`, `plazo_pago: 1`):
+ * Resuelve contra el catálogo del tenant el **plazo de contado** que el documento
+ * POS necesita (el POS anterior lo quemaba como `plazo_pago: 1`): el de 0 días,
+ * porque una venta de caja se paga en el acto. El método de pago no se busca:
+ * va fijo (`METODO_PAGO_POS_ID`).
  *
- * - el **método de pago** por su código DIAN (`10` es efectivo);
- * - el **plazo de contado**, el de 0 días: una venta de caja se paga en el acto.
- *
- * Los `seleccionar/` paginan y el catálogo DIAN de métodos es largo: el método
- * se pide con `search` (el endpoint busca por nombre o código) y aun así se
- * recorren páginas hasta la fila de código exacto, porque `search` también trae
- * los que lo contienen (`10` trae `100`). Se recuerda por tenant y código; un
- * error no se recuerda.
+ * El `seleccionar/` pagina: se recorren páginas hasta la fila. Se recuerda por
+ * tenant; un error no se recuerda.
  */
 @Injectable({ providedIn: 'root' })
 export class CatalogosCobroService extends BaseHttpService {
   private readonly tenant = inject(TenantService);
 
   private readonly cache = new Map<string, Observable<ErpSelectOption>>();
-
-  metodoPago(codigoDian: string): Observable<ErpSelectOption> {
-    return this.recordar(`metodo:${codigoDian}`, () =>
-      this.buscar<MetodoPagoFila>(SELECT_ENDPOINTS.metodoPago, (f) => f.codigo === codigoDian, {
-        search: codigoDian,
-      }).pipe(
-        map((fila) => {
-          if (!fila) throw new CatalogoCobroError('metodoPago', codigoDian);
-          return { id: fila.id, nombre: fila.nombre };
-        }),
-      ),
-    );
-  }
 
   plazoContado(): Observable<ErpSelectOption> {
     return this.recordar('plazo:contado', () =>

@@ -45,19 +45,18 @@ const solicitud: SolicitudCobro = {
 describe('solicitudToPayload', () => {
   const payload = solicitudToPayload(
     solicitud,
-    { id: 21, nombre: 'Efectivo' },
     { id: 1, nombre: 'Contado' },
     new Date(2026, 9, 14),
   );
 
-  it('factura y vence hoy, a contado, con el método y el tipo de la caja', () => {
+  it('factura y vence hoy, a contado, con el método fijo y el tipo de la caja', () => {
     expect(payload).toMatchObject({
       documento_tipo: DOCUMENT_TYPE_ID.FACTURA_POS,
       contacto: 3,
       fecha: '2026-10-14',
       fecha_vence: '2026-10-14',
       plazo_pago: 1,
-      metodo_pago: 21,
+      metodo_pago: 1,
       almacen: 2,
       asesor: 4,
       sede: null,
@@ -79,7 +78,6 @@ describe('solicitudToPayload', () => {
   it('el comentario de la solicitud llega al documento', () => {
     const conReferencia = solicitudToPayload(
       { ...solicitud, comentario: 'Transferencia, ref. M123' },
-      { id: 22, nombre: 'Transferencia' },
       { id: 1, nombre: 'Contado' },
       new Date(2026, 9, 14),
     );
@@ -89,7 +87,6 @@ describe('solicitudToPayload', () => {
   it('el soporte de la solicitud llega al documento', () => {
     const conSoporte = solicitudToPayload(
       { ...solicitud, soporte: 'OC-881' },
-      { id: 22, nombre: 'Efectivo' },
       { id: 1, nombre: 'Contado' },
       new Date(2026, 9, 14),
     );

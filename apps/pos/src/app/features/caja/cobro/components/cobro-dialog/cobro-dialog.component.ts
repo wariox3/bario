@@ -25,7 +25,6 @@ import { AutoFocus } from 'primeng/autofocus';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import {
-  CUENTA_BANCO_ENDPOINT,
   I18nService,
   ToastService,
   asesorLabel,
@@ -48,6 +47,12 @@ import {
   type FaseCobro,
   type SolicitudCobro,
 } from '../../cobro.model';
+import {
+  CuentasCobroService,
+  cuentaPropuesta,
+  cuentasDelMedio,
+  type CuentaCobro,
+} from '../../cuentas-cobro';
 import { cambio, sugerenciasEfectivo } from '../../efectivo';
 import { MEDIOS_PAGO_POS, type MedioPagoId, type MedioPagoPos } from '../../medios-pago';
 import { VentaPosService } from '../../../../../core/documento/venta-pos.service';
@@ -68,6 +73,8 @@ const FORMATO_PESOS = new Intl.NumberFormat('es-CO', {
 });
 
 type Vista = 'cobro' | 'exito' | 'pendiente';
+
+type EstadoCuentas = 'cargando' | 'listo' | 'error';
 
 /** Venta ya cobrada: lo que la pantalla de éxito necesita aunque el carrito ya no exista. */
 interface VentaCobrada {
@@ -100,11 +107,12 @@ function partirContacto(etiqueta: string): { nombre: string; identificacion: str
  *
  * - **Cobro.** Total, medio de pago (cuatro tarjetas con atajo F1–F4), lo
  *   recibido con billetes sugeridos y el cambio a entregar o lo que falta.
- *   Cuenta y asesor vienen de la configuración: el pie dice a qué cuenta
- *   ingresa y permite cambiarlo. Enter cobra.
- * - **Transferencia** cobra el total contra la cuenta de transferencia de la
- *   caja; la referencia del comprobante (opcional) va al comentario del
- *   documento, porque el pago no tiene dónde guardarla.
+ *   El asesor viene de la configuración. La cuenta sale del medio: el
+ *   selector solo ofrece las de su tipo (caja para efectivo, banco para el
+ *   resto) y propone la única o la última que usó esta caja. Enter cobra.
+ * - **Transferencia** cobra el total contra una cuenta de banco; la referencia
+ *   del comprobante (opcional) va al comentario del documento, porque el pago
+ *   no tiene dónde guardarla.
  * - **Más información.** Soporte y comentario de la venta, opcionales y
  *   plegados: salen en la tirilla. La referencia de la transferencia se suma
  *   al comentario.
@@ -182,6 +190,7 @@ export class CobroDialogComponent {
   private readonly configuracion = inject(ConfiguracionCajaStore);
   private readonly cobroService = inject(CobroService);
   private readonly ventas = inject(VentaPosService);
+  private readonly cuentasCobro = inject(CuentasCobroService);
 
   protected readonly t = this.i18n.t;
 
@@ -190,7 +199,6 @@ export class CobroDialogComponent {
   readonly cobrada = output<void>();
 
   protected readonly medios = MEDIOS_PAGO_POS;
-  protected readonly cuentaEndpoint = CUENTA_BANCO_ENDPOINT;
 
   protected readonly vista = signal<Vista>('cobro');
   protected readonly encabezado = signal<Encabezado | null>(null);
@@ -216,6 +224,12 @@ export class CobroDialogComponent {
 
   /** Medio elegido; hoy siempre efectivo, pero la solicitud ya lo lleva. */
   protected readonly medio = signal<MedioPagoPos>(MEDIOS_PAGO_POS[0]);
+
+  /** Cuentas bancarias del tenant; se piden cada vez que se abre el cobro. */
+  private readonly cuentas = signal<readonly CuentaCobro[]>([]);
+  protected readonly estadoCuentas = signal<EstadoCuentas>('cargando');
+  /** Las que admite el medio elegido: lo único que ofrece el selector. */
+  protected readonly cuentasMedio = computed(() => cuentasDelMedio(this.cuentas(), this.medio()));
 
   protected readonly form = this.fb.group({
     // Lo recibido solo cuenta en efectivo: las demás formas pagan el total exacto.
@@ -286,25 +300,37 @@ export class CobroDialogComponent {
     'border-[#e9edf2] bg-white text-brand-text hover:border-brand-blue hover:text-brand-blue';
 
   /**
-   * Solo se eligen los medios habilitados: los demás se ven apagados.
-   * Cada uno trae la cuenta que la caja tiene configurada para él (vacía si no
-   * tiene: el selector de cuenta está siempre a la vista para elegirla).
+   * Solo se eligen los medios habilitados: los demás se ven apagados. Al cambiar
+   * de medio cambia la cuenta: la propuesta para ese medio, o vacía para elegirla.
    */
   protected elegirMedio(medio: MedioPagoPos): void {
     if (this.procesando() || !medio.habilitado || medio.id === this.medio().id) return;
     this.medio.set(medio);
-    const cuenta = this.cuentaPorMedio(medio.id);
-    this.form.controls.cuenta.setValue(cuenta);
-    this.form.controls.cuenta.markAsUntouched();
+    this.proponerCuenta();
     this.form.controls.recibido.updateValueAndValidity();
     this.error.set(null);
   }
 
-  private cuentaPorMedio(medio: MedioPagoId): ErpSelectOption | null {
-    const config = this.configuracion.configuracion();
-    if (medio === 'efectivo') return config.cuentaEfectivo;
-    if (medio === 'transferencia') return config.cuentaTransferencia;
-    return null;
+  protected cargarCuentas(): void {
+    this.estadoCuentas.set('cargando');
+    this.cuentasCobro
+      .cuentas()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (cuentas) => {
+          this.cuentas.set(cuentas);
+          this.estadoCuentas.set('listo');
+          this.proponerCuenta();
+        },
+        error: () => this.estadoCuentas.set('error'),
+      });
+  }
+
+  private proponerCuenta(): void {
+    const medio = this.medio().id;
+    const cuenta = cuentaPropuesta(this.cuentasMedio(), this.cuentasCobro.recordada(medio));
+    this.form.controls.cuenta.setValue(cuenta);
+    this.form.controls.cuenta.markAsUntouched();
   }
 
   /** F1–F4 eligen el medio de pago mientras se está cobrando. */
@@ -440,13 +466,14 @@ export class CobroDialogComponent {
     });
     this.form.reset({
       recibido: this.total(),
-      cuenta: config.cuentaEfectivo,
+      cuenta: null,
       asesor: config.asesor,
       referencia: '',
       soporte: '',
       comentario: '',
     });
     this.vista.set(this.cobroPendiente() ? 'pendiente' : 'cobro');
+    this.cargarCuentas();
   }
 
   private ejecutar(): void {
@@ -460,6 +487,9 @@ export class CobroDialogComponent {
     const vuelto = efectivo ? this.cambioEfectivo() : 0;
     const medio = solicitud.medio.id;
     this.error.set(null);
+    // Se recuerda al empezar, no al terminar: si el cobro queda a medias, al
+    // retomarlo (sin selector a la vista) se propone esta misma cuenta.
+    this.cuentasCobro.recordar(medio, solicitud.pagos[0].cuentaBanco.id);
 
     this.cobroService
       .cobrar(solicitud)
@@ -498,7 +528,7 @@ export class CobroDialogComponent {
       return;
     }
     if (err.causa instanceof CatalogoCobroError) {
-      this.error.set(this.mensajeCatalogo(err.causa));
+      this.error.set(errores.plazoContado);
     } else {
       this.error.set(extractErrorMessage(err.causa, errores.generico));
     }
@@ -509,28 +539,19 @@ export class CobroDialogComponent {
     }
   }
 
-  /** El método de pago faltante se nombra por el medio que lo pidió, no por efectivo. */
-  private mensajeCatalogo(causa: CatalogoCobroError): string {
-    const tx = this.t().caja.cobro;
-    if (causa.falta === 'plazoContado') return tx.errores.plazoContado;
-    const medio = MEDIOS_PAGO_POS.find((m) => m.codigoDian === causa.codigoDian) ?? this.medio();
-    return tx.errores.metodoPago
-      .replace('{medio}', tx.medios[medio.id].toLocaleLowerCase())
-      .replace('{codigo}', causa.codigoDian ?? medio.codigoDian);
-  }
-
   private armarSolicitud(): SolicitudCobro | null {
     const config = this.configuracion.configuracion();
     const { cuenta, asesor, referencia, soporte, comentario } = this.form.getRawValue();
     const medio = this.medio();
     const tx = this.t().caja.cobro;
-    const cuentaBanco = cuenta ?? this.cuentaPorMedio(medio.id);
-    if (config.documentoTipoId === null || config.almacen === null || cuentaBanco === null) {
-      this.error.set(
-        medio.id === 'transferencia' && cuentaBanco === null
-          ? tx.errores.cuentaTransferencia
-          : tx.errores.configuracion,
-      );
+    if (config.documentoTipoId === null || config.almacen === null) {
+      this.error.set(tx.errores.configuracion);
+      return null;
+    }
+    // En el cobro el formulario ya la exige; esto es para retomar uno pendiente.
+    const cuentaBanco = cuenta;
+    if (cuentaBanco === null) {
+      this.error.set(tx.errores.cuenta);
       return null;
     }
     const ref = referencia.trim();

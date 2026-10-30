@@ -33,6 +33,7 @@ import {
   ToastService,
 } from '@reddoc/core';
 import { isSuscripcionExpired } from '../../utils/contenedor-suscripcion.utils';
+import { fechaConDia, momentoDelDia, primerNombre } from '../../utils/saludo.utils';
 import { ContenedoresCreateDialogComponent } from '../../components/create-dialog/contenedores-create-dialog.component';
 import { ContenedoresDeleteDialogComponent } from '../../components/delete-dialog/contenedores-delete-dialog.component';
 import { ContenedoresInviteDialogComponent } from '../../components/invite-dialog/contenedores-invite-dialog.component';
@@ -42,6 +43,9 @@ import { ContenedorCardItemComponent } from '../../components/contenedor-card-it
 import { CONTENEDORES_CAPABILITIES_FULL } from '../../contenedores.capabilities';
 import type { ContenedoresCapabilities } from '../../contenedores.capabilities';
 import type { ContenedoresTranslationsHost } from '../../i18n';
+
+/** Cada cuánto se revisa la hora: el saludo cambia solo si la página queda abierta. */
+const RELOJ_MS = 60_000;
 
 /** Cada cuánto se consulta el estado de los contenedores que se están creando. */
 const ESTADO_POLL_MS = 5000;
@@ -117,6 +121,22 @@ export class ContenedoresListComponent {
   private readonly reload$ = new Subject<void>();
 
   readonly currentUser = this.authService.currentUser;
+
+  private readonly ahora = toSignal(timer(0, RELOJ_MS).pipe(map(() => new Date())), {
+    initialValue: new Date(),
+  });
+
+  /** "Viernes, 30 de octubre", en el idioma de la app. */
+  readonly fechaHoy = computed(() =>
+    fechaConDia(this.ahora(), this.i18n.lang() === 'en' ? 'en-US' : 'es-CO'),
+  );
+
+  /** "Buenos días, Mario" según la hora; sin nombre, solo el saludo. */
+  readonly saludo = computed(() => {
+    const texto = this.t().contenedores.saludo[momentoDelDia(this.ahora())];
+    const nombre = primerNombre(this.currentUser()?.nombre_corto);
+    return nombre ? `${texto}, ${nombre}` : texto;
+  });
 
   /** Entrar como soporte: lo habilita la app y solo lo ve el staff de la plataforma. */
   readonly canSupport = computed(

@@ -38,7 +38,6 @@ function preparar() {
     listarPorDocumento: jest.fn().mockReturnValue(of<PagoRead[]>([])),
   };
   const catalogos = {
-    metodoPago: jest.fn().mockReturnValue(of({ id: 21, nombre: 'Efectivo' })),
     plazoContado: jest.fn().mockReturnValue(of({ id: 1, nombre: 'Contado' })),
   };
   TestBed.configureTestingModule({

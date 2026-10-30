@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.18](https://github.com/wariox3/bario/compare/v0.1.17...v0.1.18) (2026-10-30)
+
+### Features
+
+- **contenedores:** saludar con la fecha y la hora del día ([908ea03](https://github.com/wariox3/bario/commit/908ea03a21ac480de000dd82754d003381cfb811))
+- **pos:** imprimir la pre-cuenta de la venta antes de cobrarla ([7fef9f4](https://github.com/wariox3/bario/commit/7fef9f48221b77ee1e51c66f6e8bab3640e6da0a))
+- **pos:** tomar la cuenta del cobro por su tipo y fijar el método de pago ([a663735](https://github.com/wariox3/bario/commit/a663735a43efc428d5633862ccb27bd38e0505a3))
+
 ## [0.1.17](https://github.com/wariox3/bario/compare/v0.1.16...v0.1.17) (2026-10-30)
 
 ### Features

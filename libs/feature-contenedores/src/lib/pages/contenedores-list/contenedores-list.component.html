@@ -1,9 +1,18 @@
 <div class="cl">
+  <header class="mb-5">
+    <p class="m-0 text-[0.8rem] text-brand-muted">{{ fechaHoy() }}</p>
+    <h1
+      class="m-0 mt-1 text-[1.6rem] leading-tight font-extrabold tracking-[-0.03em] text-brand-text"
+    >
+      {{ saludo() }}
+    </h1>
+  </header>
+
   <div class="cl-panel">
     <!-- Panel header -->
     <div class="cl-panel__header">
       <div class="cl-panel__header-text">
-        <h1 class="cl-panel__title">{{ t().contenedores.list.title }}</h1>
+        <h2 class="cl-panel__title">{{ t().contenedores.list.title }}</h2>
         @if (!isLoading() && counts().total > 0) {
           <p class="cl-panel__sub">{{ summaryText() }}</p>
         } @else {

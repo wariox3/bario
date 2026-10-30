@@ -104,7 +104,10 @@
       </div>
     </dl>
 
-    <!-- Vaciar se estira a la altura de Cobrar (fluid, 43px) en vez del compacto de 32px. -->
+    <!--
+      Vaciar e imprimir cuenta se estiran a la altura de Cobrar (fluid, 43px) en vez del
+      compacto de 32px.
+    -->
     <div class="flex items-stretch gap-2">
       <p-button
         type="button"
@@ -116,6 +119,19 @@
         [outlined]="true"
         [disabled]="venta.lineas.length === 0 || bloqueada()"
         (onClick)="onVaciar()"
+      />
+      <p-button
+        type="button"
+        class="flex"
+        styleClass="!h-auto !w-[2.75rem] [&_.p-button-icon]:!text-base"
+        icon="pi pi-print"
+        severity="secondary"
+        [outlined]="true"
+        [ariaLabel]="tx.preCuenta.boton"
+        [title]="tx.preCuenta.boton"
+        [loading]="imprimiendoCuenta()"
+        [disabled]="venta.lineas.length === 0 || bloqueada()"
+        (onClick)="onImprimirCuenta()"
       />
       <p-button
         type="button"

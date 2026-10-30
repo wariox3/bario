@@ -4,6 +4,8 @@
  * textos, igual que `AuthDict` en `@reddoc/ui`.
  */
 export interface ContenedoresDict {
+  /** Encabezado de la página: la fecha de hoy y un saludo según la hora. */
+  saludo: { manana: string; tarde: string; noche: string };
   list: {
     title: string;
     subtitle: string;
