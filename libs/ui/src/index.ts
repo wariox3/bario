@@ -37,6 +37,7 @@ export { TelefonoPipe } from './lib/pipes/telefono.pipe';
 export type { AuthDict, AuthTranslationsHost } from './lib/auth/i18n';
 export { authEs, authEn } from './lib/auth/i18n';
 export { GruposSeguridadComponent } from './lib/components/grupos-seguridad/grupos-seguridad.component';
+export { iconoDeGrupo } from './lib/components/grupos-seguridad/icono-de-grupo';
 export type {
   GruposSeguridadDict,
   GruposSeguridadTranslationsHost,

@@ -5489,15 +5489,14 @@ export interface AppDict
         propietario: { title: string; desc: string };
         grupos: {
           count: { zero: string; one: string; other: string };
+          completos: string;
+          niveles: { ninguno: string; menu: string; completo: string };
+          nivelesHint: { ninguno: string; menu: string; completo: string };
           emptyCatalog: string;
           hint: string;
-          toasts: {
-            added: { title: string; desc: string };
-            removed: { title: string; desc: string };
-          };
+          toasts: { changed: { title: string; desc: string } };
         };
         permisos: {
-          flags: { superuser: string; staff: string };
           agregar: string;
           empty: { title: string; desc: string };
           dialog: { title: string; subtitle: string };

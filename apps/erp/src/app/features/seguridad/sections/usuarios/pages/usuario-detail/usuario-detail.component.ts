@@ -12,13 +12,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
-import { finalize } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import {
   I18nService,
   TenantService,
   ToastService,
   getInitials,
   type ContenedorMember,
+  type UsuarioClienteGrupo,
   type UsuarioClientePermiso,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -37,8 +38,9 @@ import { SeguridadUsuariosService } from '../../usuarios.service';
  *
  * La información del miembro va en su propia card; debajo, la card de acceso
  * con pestañas "Grupos" y "Permisos" alimentadas por
- * `/seguridad/usuario-cliente-permiso/` (misma receta de deep-link `?tab=` que
- * Configuración usa con `?seccion=`).
+ * `/seguridad/usuario-cliente-grupo/` y `/seguridad/usuario-cliente-permiso/`,
+ * ambos filtrados por la membresía (`usuario_cliente_id` = el `id` de la URL).
+ * Misma receta de deep-link `?tab=` que Configuración usa con `?seccion=`.
  */
 @Component({
   selector: 'app-usuario-detail',
@@ -76,8 +78,10 @@ export class UsuarioDetailComponent {
   protected readonly isLoading = signal(false);
   protected readonly notFound = signal(false);
 
-  /** Fila de usuario-cliente-permiso del miembro; alimenta ambas pestañas. */
-  protected readonly permisoRow = signal<UsuarioClientePermiso | null>(null);
+  /** Grupos de la membresía (`usuario-cliente-grupo`). */
+  protected readonly grupos = signal<readonly UsuarioClienteGrupo[]>([]);
+  /** Permisos personalizados de la membresía (`usuario-cliente-permiso`). */
+  protected readonly permisos = signal<readonly UsuarioClientePermiso[]>([]);
   protected readonly isLoadingPermiso = signal(false);
 
   /**
@@ -146,7 +150,7 @@ export class UsuarioDetailComponent {
           this.notFound.set(!member);
           // Al propietario no se le piden permisos: no se va a mostrar nada.
           if (member && !member.propietario) {
-            this.loadPermisos(member.usuario_id);
+            this.loadPermisos(member.id);
           }
         },
         error: () => {
@@ -159,20 +163,23 @@ export class UsuarioDetailComponent {
   }
 
   /**
-   * Grupos y permisos del miembro. Si falla, las pestañas muestran sus empty
-   * states (sin toast: el detalle ya cargó y esto es información secundaria).
+   * Grupos y permisos de la membresía. Si alguno falla, su pestaña muestra el
+   * empty state (sin toast: el detalle ya cargó y esto es información
+   * secundaria); el otro se pinta igual.
    */
-  private loadPermisos(usuarioId: number): void {
+  private loadPermisos(usuarioClienteId: number): void {
     this.isLoadingPermiso.set(true);
-    this.service
-      .getPermisoMiembro(usuarioId)
+    forkJoin({
+      grupos: this.service.getGruposMiembro(usuarioClienteId).pipe(catchError(() => of([]))),
+      permisos: this.service.getPermisosMiembro(usuarioClienteId).pipe(catchError(() => of([]))),
+    })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoadingPermiso.set(false)),
       )
-      .subscribe({
-        next: (row) => this.permisoRow.set(row),
-        error: () => this.permisoRow.set(null),
+      .subscribe(({ grupos, permisos }) => {
+        this.grupos.set(grupos);
+        this.permisos.set(permisos);
       });
   }
 }

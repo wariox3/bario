@@ -21,6 +21,7 @@ import {
   PermisoSeguridad,
   SendInviteRequest,
   UserSearchResult,
+  UsuarioClienteGrupo,
   UsuarioClientePermiso,
 } from './contenedor.model';
 
@@ -192,65 +193,65 @@ export class ContenedorService extends BaseHttpService {
   }
 
   /**
-   * Membresía + permiso efectivo (grupos y permisos directos) de un usuario.
-   *
-   * Excepción dentro de este servicio global: este endpoint sí es
-   * tenant-scoped (viaja con `X-Tenant`), por eso el override por petición.
+   * Grupos de una membresía (`usuario_cliente_id` = `id` de `lista-usuario`,
+   * no el `usuario_id`). Schema público: sin `X-Tenant`. Pagina de a 25, así
+   * que se recorren todas las páginas.
    */
-  getMemberPermisos(usuarioId: number): Observable<PaginatedResponse<UsuarioClientePermiso>> {
-    return this.get<PaginatedResponse<UsuarioClientePermiso>>(
-      '/seguridad/usuario-cliente-permiso/',
-      { usuario_id: usuarioId },
-      { tenantScoped: true },
-    );
-  }
-
-  /** Asigna un grupo de seguridad al usuario. Tenant-scoped, como el listado. */
-  addMemberGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
-    return this.post(
-      '/seguridad/usuario-cliente-permiso/agregar-grupo/',
-      { usuario_id: usuarioId, grupo_id: grupoId },
-      undefined,
-      { tenantScoped: true },
-    );
-  }
-
-  /** Quita un grupo de seguridad al usuario. Tenant-scoped, como el listado. */
-  removeMemberGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
-    return this.post(
-      '/seguridad/usuario-cliente-permiso/quitar-grupo/',
-      { usuario_id: usuarioId, grupo_id: grupoId },
-      undefined,
-      { tenantScoped: true },
+  getMemberGrupos(usuarioClienteId: number): Observable<readonly UsuarioClienteGrupo[]> {
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<UsuarioClienteGrupo>>('/seguridad/usuario-cliente-grupo/', {
+        usuario_cliente_id: usuarioClienteId,
+        page,
+      }),
     );
   }
 
   /**
-   * Asigna un permiso individual al usuario. Tenant-scoped, como el listado.
-   * SUPUESTO pendiente de confirmar con backend: el body `{ usuario_id,
-   * permiso_id }`, espejo del `{ usuario_id, grupo_id }` de los grupos.
+   * Asigna un grupo a la membresía. `heredarPermisos` decide el nivel: con él
+   * tiene todos los permisos del grupo; sin él, solo el módulo en el menú. Se
+   * manda siempre explícito (no hay PUT: cambiarlo es quitar y volver a agregar).
    */
-  addMemberPermiso(usuarioId: number, permisoId: number): Observable<unknown> {
-    return this.post(
-      '/seguridad/usuario-cliente-permiso/agregar-permiso/',
-      { usuario_id: usuarioId, permiso_id: permisoId },
-      undefined,
-      { tenantScoped: true },
-    );
+  addMemberGrupo(
+    usuarioClienteId: number,
+    grupoId: number,
+    heredarPermisos: boolean,
+  ): Observable<UsuarioClienteGrupo> {
+    return this.post<UsuarioClienteGrupo>('/seguridad/usuario-cliente-grupo/', {
+      usuario_cliente: usuarioClienteId,
+      grupo: grupoId,
+      heredar_permisos: heredarPermisos,
+    });
+  }
+
+  /** Quita un grupo borrando su fila (`id` de `usuario-cliente-grupo`). */
+  removeMemberGrupo(asignacionId: number): Observable<unknown> {
+    return this.delete(`/seguridad/usuario-cliente-grupo/${asignacionId}/`);
   }
 
   /**
-   * Quita un permiso individual al usuario. SUPUESTO pendiente de confirmar
-   * con backend: se asume `quitar-permiso/` espejo de `agregar-permiso/`
-   * (como el par de grupos).
+   * Permisos personalizados de una membresía. Schema público, paginado como
+   * los grupos.
    */
-  removeMemberPermiso(usuarioId: number, permisoId: number): Observable<unknown> {
-    return this.post(
-      '/seguridad/usuario-cliente-permiso/quitar-permiso/',
-      { usuario_id: usuarioId, permiso_id: permisoId },
-      undefined,
-      { tenantScoped: true },
+  getMemberPermisos(usuarioClienteId: number): Observable<readonly UsuarioClientePermiso[]> {
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<UsuarioClientePermiso>>('/seguridad/usuario-cliente-permiso/', {
+        usuario_cliente_id: usuarioClienteId,
+        page,
+      }),
     );
+  }
+
+  /** Asigna un permiso personalizado a la membresía. */
+  addMemberPermiso(usuarioClienteId: number, permisoId: number): Observable<UsuarioClientePermiso> {
+    return this.post<UsuarioClientePermiso>('/seguridad/usuario-cliente-permiso/', {
+      usuario_cliente: usuarioClienteId,
+      permiso: permisoId,
+    });
+  }
+
+  /** Quita un permiso personalizado borrando su fila (`id` de `usuario-cliente-permiso`). */
+  removeMemberPermiso(asignacionId: number): Observable<unknown> {
+    return this.delete(`/seguridad/usuario-cliente-permiso/${asignacionId}/`);
   }
 
   /**

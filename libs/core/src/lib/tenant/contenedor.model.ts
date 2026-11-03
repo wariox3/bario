@@ -48,23 +48,11 @@ export interface SendInviteRequest {
   grupo_ids?: readonly number[];
 }
 
-/**
- * Grupo de seguridad de `/seguridad/grupo/`.
- *
- * Shape confirmado por `/seguridad/usuario-cliente-permiso/` (`permiso.grupos`
- * llega como `{ id, nombre }`).
- */
+/** Grupo de seguridad de `/seguridad/grupo/` (`{ id, nombre }`). */
 export interface GrupoSeguridad {
   readonly id: number;
   readonly nombre: string;
 }
-
-/**
- * Permiso directo de un usuario (`permiso.permisos` de
- * `/seguridad/usuario-cliente-permiso/`). Confirmado: el backend manda el
- * mismo serializador del catálogo (`PermisoSeguridad`), etiquetas incluidas.
- */
-export type PermisoAsignado = PermisoSeguridad;
 
 /**
  * Permiso individual del catálogo `/seguridad/permiso/` (shape confirmado):
@@ -97,25 +85,40 @@ export interface PermisoCatalogoFiltros {
   readonly page?: number;
 }
 
-/** Bloque `permiso` de `/seguridad/usuario-cliente-permiso/`. */
-export interface UsuarioPermiso {
+/**
+ * Fila de `/seguridad/usuario-cliente-grupo/`: un grupo de una membresía.
+ *
+ * Vive en el schema público (sin `X-Tenant`) y se filtra por
+ * `usuario_cliente_id`, el `id` de la membresía, no el del usuario. Quitar el
+ * grupo es borrar la fila por su `id`.
+ */
+export interface UsuarioClienteGrupo {
   readonly id: number;
-  readonly profile_id: number;
-  readonly is_superuser: boolean;
-  readonly is_staff: boolean;
-  readonly grupos: readonly GrupoSeguridad[];
-  readonly permisos: readonly PermisoAsignado[];
+  /** `id` de la membresía (`usuario-cliente`). */
+  readonly usuario_cliente: number;
+  readonly grupo: number;
+  readonly grupo_name: string | null;
+  /** Con él, el miembro tiene todos los permisos del grupo; sin él, solo el menú. */
+  readonly heredar_permisos?: boolean;
 }
 
-/** Fila de `/seguridad/usuario-cliente-permiso/`: membresía + permiso efectivo. */
+/**
+ * Fila de `/seguridad/usuario-cliente-permiso/`: un permiso personalizado de
+ * una membresía, con el permiso desglosado. Mismo esquema que los grupos: se
+ * filtra por `usuario_cliente_id` y se quita borrando la fila por su `id`.
+ *
+ * No trae la etiqueta legible del modelo (`modelo_label` del catálogo): solo
+ * `app_label` y `model` del content type.
+ */
 export interface UsuarioClientePermiso {
   readonly id: number;
-  readonly usuario_id: number;
-  readonly usuario_nombre_corto: string | null;
-  readonly usuario_email: string;
-  /** Como en `ContenedorMember`: el rol se fue, quedó la bandera. */
-  readonly propietario: boolean;
-  readonly permiso: UsuarioPermiso;
+  /** `id` de la membresía (`usuario-cliente`). */
+  readonly usuario_cliente: number;
+  readonly permiso: number;
+  readonly permiso_codename: string | null;
+  readonly permiso_name: string | null;
+  readonly permiso_content_type_app_label: string | null;
+  readonly permiso_content_type_model: string | null;
 }
 
 /**

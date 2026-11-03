@@ -7223,25 +7223,24 @@ export const en: AppDict = {
         },
         grupos: {
           count: {
-            zero: 'Does not belong to any group yet. Tap one to assign it.',
-            one: 'Belongs to 1 of {total} groups',
-            other: 'Belongs to {n} of {total} groups',
+            zero: 'No access to any module yet.',
+            one: 'Has access to 1 of {total} modules',
+            other: 'Has access to {n} of {total} modules',
+          },
+          completos: '{n} with full access',
+          niveles: { ninguno: 'No access', menu: 'Menu only', completo: 'Full' },
+          nivelesHint: {
+            ninguno: 'Does not see the module.',
+            menu: 'Sees the module and its pending items; what they can do comes from their custom permissions.',
+            completo: 'Has every permission of the group.',
           },
           emptyCatalog: 'No groups available.',
-          hint: 'Groups are platform verticals: they define which areas the person can access within the company. Tap a tile to assign or remove.',
+          hint: 'Menu only shows the module without granting permissions: define what they can do there in the Permissions tab. Full grants every permission of the group.',
           toasts: {
-            added: {
-              title: 'Group assigned',
-              desc: 'The person now belongs to {grupo}.',
-            },
-            removed: {
-              title: 'Group removed',
-              desc: 'The person no longer belongs to {grupo}.',
-            },
+            changed: { title: 'Access updated', desc: '{grupo}: {nivel}.' },
           },
         },
         permisos: {
-          flags: { superuser: 'Superuser', staff: 'Staff' },
           agregar: 'Add permissions',
           empty: {
             title: 'No direct permissions',

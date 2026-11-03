@@ -299,6 +299,44 @@ tabular-nums`). El número dice qué hay, el clic dice qué hacer. Tres estados,
 - **Cuándo NO:** si el barrido es destructivo o costoso (bulk por columna = decenas de escrituras de
   un clic), no va como toggle directo — eso pide confirmación explícita.
 
+## Patrón: nivel de acceso por fila (selector segmentado)
+
+Cuando cada entidad tiene **una sola decisión con varios pasos ordenados** (no varias decisiones
+independientes), va como lista con un selector segmentado por fila, no como tabla ni como matriz de
+toggles. Ejemplo vivo: pestaña Grupos de `usuario-grupos-panel` — un grupo es un módulo y su fila
+de `usuario-cliente-grupo` + `heredar_permisos` se lee como Sin acceso · Solo menú · Completo.
+
+- **Por qué no tabla:** si un dato solo existe cuando el otro está activo (la flag sin membresía no
+  existe), dos columnas obligan a deshabilitar una y explicarlo. Un nivel ordenado lo resuelve en
+  un control y no admite estados imposibles.
+- **Contenedor:** un solo recuadro `rounded-lg border border-[rgba(19,38,60,0.08)]` con
+  `divide-y divide-[rgba(19,38,60,0.06)]`; fila `px-3.5 py-2.5`, `flex-col` en móvil y
+  `sm:flex-row sm:items-center` (el selector baja bajo el nombre, alineado al inicio).
+- **Izquierda:** ícono en caja `h-7 w-7 rounded-md` + nombre `text-[0.85rem] font-medium truncate`
+  (`min-w-0`). Con acceso: caja `bg-[rgba(20,48,73,0.08)] text-brand-navy` y nombre `text-brand-text`;
+  sin acceso: caja `bg-[rgba(19,38,60,0.04)]` y todo `text-brand-muted`. Solo cambia la tinta, nunca
+  el peso: la fila no salta.
+- **Selector:** `role="radiogroup"` `inline-flex gap-0.5 rounded-lg border
+border-[rgba(20,48,73,0.1)] p-0.5`; cada opción `role="radio"` `[attr.aria-checked]`,
+  `rounded-md px-2.5 py-1 text-[0.75rem] font-medium`. Activo según el paso, en el idioma de la
+  ficha navy (tenue = tiene algo, sólido = lleno):
+  - paso nulo (sin acceso) → neutro `bg-[rgba(19,38,60,0.06)] text-brand-text`, no navy: no hay
+    nada que afirmar.
+  - paso intermedio → `bg-[rgba(20,48,73,0.1)] text-brand-navy`.
+  - paso máximo → `bg-brand-navy text-white`.
+  - inactivo → `text-brand-muted`, hover con el tinte de nav (`0.04`).
+- **Explicar los pasos:** `title` por opción con qué significa ese nivel + un `hint` al pie del
+  panel que dice dónde se completa el paso intermedio (ej. «lo defines en la pestaña Permisos»).
+- **Contador arriba:** «Accede a {n} de {total} módulos · {m} con acceso completo»; el segundo
+  tramo solo si `m > 0`.
+- **Optimista con dos estados:** `guardado` (linkedSignal del input, lo que de verdad hay) y
+  `optimista` (lo que se pinta mientras vuela). Al terminar se limpia el optimista y queda lo
+  guardado: el error revierte solo, sin lógica inversa. La fila en vuelo: selector `opacity-60`,
+  botones `disabled:cursor-wait` y un `pi-spinner` chico junto al nombre.
+- **Backend sin PUT:** cambiar entre pasos no nulos es borrar + crear **en serie**. Si el borrado
+  entró y el alta no, se anota la baja en `guardado` antes de propagar el error: la fila muestra lo
+  que quedó, no lo que se pidió. Un toast por cambio con el nivel destino.
+
 ## Patrón: listado (`<lib-list-shell>`, un solo recuadro)
 
 `libs/feature-base/src/lib/list-shell/` — breadcrumb, título suelto (`1.125rem/700` navy) y **un
