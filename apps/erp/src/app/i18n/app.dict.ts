@@ -4,6 +4,7 @@ import type {
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
+  SaludoTranslationsHost,
 } from '@reddoc/ui/i18n';
 
 /**
@@ -64,6 +65,7 @@ export interface AppDict
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
     PhoneInputTranslationsHost,
+    SaludoTranslationsHost,
     ContenedoresTranslationsHost,
     AccesosContenedorTranslationsHost {
   common: {

@@ -4,6 +4,7 @@ import type {
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
+  SaludoTranslationsHost,
 } from '@reddoc/ui/i18n';
 import type { PosNavKey } from '../layouts/workspace-layout/workspace-menu';
 import type { FaseCobro } from '../features/caja/cobro/cobro.model';
@@ -18,6 +19,7 @@ export interface AppDict
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
     PhoneInputTranslationsHost,
+    SaludoTranslationsHost,
     ContenedoresTranslationsHost,
     AccesosContenedorTranslationsHost {
   common: {

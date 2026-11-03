@@ -1,11 +1,18 @@
 import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEs, appSwitcherEs, authEs, phoneInputEs } from '@reddoc/ui/i18n';
+import {
+  accesosContenedorEs,
+  appSwitcherEs,
+  authEs,
+  phoneInputEs,
+  saludoEs,
+} from '@reddoc/ui/i18n';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
   auth: authEs,
   appSwitcher: appSwitcherEs,
   phoneInput: phoneInputEs,
+  saludo: saludoEs,
   contenedores: contenedoresEs,
   accesosContenedor: accesosContenedorEs,
   common: {

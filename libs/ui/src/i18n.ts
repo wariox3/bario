@@ -17,3 +17,5 @@ export type { PhoneInputDict, PhoneInputTranslationsHost } from './lib/component
 export { phoneInputEs, phoneInputEn } from './lib/components/phone-input/i18n';
 export type { AppSwitcherDict, AppSwitcherTranslationsHost } from './lib/app-switcher/i18n';
 export { appSwitcherEs, appSwitcherEn } from './lib/app-switcher/i18n';
+export type { SaludoDict, SaludoTranslationsHost } from './lib/components/saludo/i18n';
+export { saludoEs, saludoEn } from './lib/components/saludo/i18n';

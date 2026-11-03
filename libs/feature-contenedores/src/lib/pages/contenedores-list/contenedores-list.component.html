@@ -1,12 +1,5 @@
 <div class="cl">
-  <header class="mb-5">
-    <p class="m-0 text-[0.8rem] text-brand-muted">{{ fechaHoy() }}</p>
-    <h1
-      class="m-0 mt-1 text-[1.6rem] leading-tight font-extrabold tracking-[-0.03em] text-brand-text"
-    >
-      {{ saludo() }}
-    </h1>
-  </header>
+  <lib-saludo class="mb-5 block" [nombre]="currentUser()?.nombre_corto" />
 
   <div class="cl-panel">
     <!-- Panel header -->
