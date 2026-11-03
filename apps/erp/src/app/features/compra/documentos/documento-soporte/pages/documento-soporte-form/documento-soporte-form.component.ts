@@ -177,10 +177,10 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
   protected readonly isEditMode = computed(() => !!this.id());
 
   /**
-   * En alta, el select de almacén auto-selecciona la primera bodega (como el
-   * legacy): lo habitual es tener una sola. En edición manda la del documento.
+   * En alta, forma de pago, sede y almacén auto-seleccionan su primera opción
+   * (como el legacy): lo habitual es tener una sola. En edición manda la del documento.
    */
-  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
+  protected readonly primeraOpcionSugerida = computed(() => (this.isEditMode() ? null : 0));
 
   /**
    * En alta, el método de pago sugiere "Instrumento no definido". Se busca por
