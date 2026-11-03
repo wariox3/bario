@@ -78,15 +78,6 @@ interface FiltrosRecepcion {
   readonly hasta: Date | null;
 }
 
-/** Del primer al último día del mes en curso. */
-function rangoMesActual(): { desde: Date; hasta: Date } {
-  const hoy = new Date();
-  return {
-    desde: new Date(hoy.getFullYear(), hoy.getMonth(), 1),
-    hasta: new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0),
-  };
-}
-
 /**
  * Documentos recibidos (Compra › Recepción): la bandeja de lo que los
  * proveedores mandan al buzón del emisor en RedEDoc.
@@ -94,7 +85,8 @@ function rangoMesActual(): { desde: Date; hasta: Date } {
  * Los filtros van a la vista en la barra —búsqueda, tipo y rango de emisión—
  * porque el endpoint no habla `campo__operador` sino parámetros propios. Se
  * editan en borrador y solo viajan al pulsar **Filtrar**.
- * Arranca en los documentos sin recepción del mes en curso. A la derecha,
+ * Arranca en los documentos sin recepción y sin fechas: vacías no viajan y el
+ * backend decide el rango. A la derecha,
  * **Cargar archivo** para lo que no llegó por correo.
  *
  * Desde Correos se llega con `?correo=&desde=&hasta=`: los documentos que salieron
@@ -142,8 +134,8 @@ export class DocumentosRecibidosListComponent {
   protected readonly busquedaInput = signal('');
   protected readonly tipo = signal<DocumentoRecibidoTipo | null>(null);
   protected readonly estadoRecepcion = signal<EstadoRecepcionFiltro>('no');
-  protected readonly desde = signal<Date | null>(rangoMesActual().desde);
-  protected readonly hasta = signal<Date | null>(rangoMesActual().hasta);
+  protected readonly desde = signal<Date | null>(null);
+  protected readonly hasta = signal<Date | null>(null);
   /** Lo que viaja al backend: la foto del borrador al pulsar Filtrar. */
   private readonly filtros = signal<FiltrosRecepcion>(this.borrador());
   /** Correo del que salieron los documentos, si se llegó desde Correos. */
