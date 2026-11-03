@@ -4852,6 +4852,7 @@ export interface AppDict
         hasta: string;
         delCorreo: string;
         quitarCorreo: string;
+        filtrar: string;
         estadoRecepcion: string;
         estadosRecepcion: { todos: string; si: string; no: string };
       };

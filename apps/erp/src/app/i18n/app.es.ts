@@ -6353,6 +6353,7 @@ export const es: AppDict = {
         hasta: 'Hasta',
         delCorreo: 'Del correo',
         quitarCorreo: 'Quitar el filtro por correo',
+        filtrar: 'Filtrar',
         estadoRecepcion: 'Recepción',
         estadosRecepcion: { todos: 'Todos', si: 'Sí', no: 'No' },
       },

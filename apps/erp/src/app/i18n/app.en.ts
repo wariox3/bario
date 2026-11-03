@@ -6261,6 +6261,7 @@ export const en: AppDict = {
         hasta: 'To',
         delCorreo: 'From email',
         quitarCorreo: 'Remove the email filter',
+        filtrar: 'Filter',
         estadoRecepcion: 'Receipt',
         estadosRecepcion: { todos: 'All', si: 'Yes', no: 'No' },
       },
