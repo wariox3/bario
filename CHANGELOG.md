@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.20](https://github.com/wariox3/bario/compare/v0.1.19...v0.1.20) (2026-11-03)
+
+### Features
+
+- **compra:** botón filtrar y mes actual por defecto en documentos recibidos ([79a9f0c](https://github.com/wariox3/bario/commit/79a9f0c6c293e7f75aac7c7943b6cada324fe54c))
+- **compra:** pestaña de cuentas en la factura de compra recurrente ([772c2a8](https://github.com/wariox3/bario/commit/772c2a81a7902c39f531b13c28a4e8c098bceef5))
+- **compra:** sugerir forma de pago y sede en el alta del documento soporte ([9573721](https://github.com/wariox3/bario/commit/95737216edf9c3fc3c51ef6fdaac2db1b7976442))
+- **humano:** agregar observaciones al crédito ([ec0d57d](https://github.com/wariox3/bario/commit/ec0d57d673a1c23b5409d75eaa3b252b5043db06))
+- **venta:** generar la cuenta de cobro desde una factura recurrente ([923b856](https://github.com/wariox3/bario/commit/923b8566b5e5eec0fd61938a24f50f9c8aae39a4))
+- **venta:** sugerir método de pago y sede en el alta de los documentos POS ([8ae19c0](https://github.com/wariox3/bario/commit/8ae19c0f945af29ad1906d624ca34455e8abb76a))
+
+### Bug Fixes
+
+- **compra:** filtrar documentos recibidos solo con el botón ([297b74c](https://github.com/wariox3/bario/commit/297b74c390717c01bef2ba088da3756ff4b6aff9))
+- **contenedores:** ejemplo de idea sobre cartera en vez de vigilantes ([4492e0b](https://github.com/wariox3/bario/commit/4492e0bb9be5384260cef637babe79b762901bbe))
+- **core:** separar los filtros guardados por contenedor ([f282996](https://github.com/wariox3/bario/commit/f2829969d01bb4d78182e10c41236d5cca8bdb66))
+- **humano:** filtrar la novedad de referencia con contrato_id y novedad_tipo_id ([1aae193](https://github.com/wariox3/bario/commit/1aae19329a86c9091b0ce1052a06c8fd3c623490))
+- **turnos:** cargar las páginas de auth desde @reddoc/ui/auth ([9811bd8](https://github.com/wariox3/bario/commit/9811bd8cbfdefb984c92d3ac258ff3ca383334ef))
+
 ## [0.1.19](https://github.com/wariox3/bario/compare/v0.1.18...v0.1.19) (2026-11-03)
 
 ### Features
