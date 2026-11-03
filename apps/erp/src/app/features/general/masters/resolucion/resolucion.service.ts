@@ -112,7 +112,9 @@ export class ResolucionService extends BaseHttpService {
         subscriber.complete();
       });
     }
-    const deletions = ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`));
+    const deletions = ids.map((id) =>
+      this.delete<void>(`${this.resourcePath}${id}/`, { errorToast: false }),
+    );
     return forkJoin(deletions).pipe(map(() => undefined));
   }
 }

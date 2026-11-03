@@ -30,12 +30,16 @@ describe('membresiaToAccess', () => {
   });
 
   it('propietario ausente se lee como false', () => {
-    const { propietario: _omitido, ...sinPropietario } = MEMBRESIA;
+    const sinPropietario = { ...MEMBRESIA, propietario: undefined };
     expect(membresiaToAccess('acme', sinPropietario).propietario).toBe(false);
   });
 
   it('sin nombre ni imagen deja null, para que el header use el slug y la inicial', () => {
-    const { cliente_nombre: _n, cliente_imagen_thumbnail: _i, ...sinMarca } = MEMBRESIA;
+    const sinMarca = {
+      ...MEMBRESIA,
+      cliente_nombre: undefined,
+      cliente_imagen_thumbnail: undefined,
+    };
     const access = membresiaToAccess('acme', sinMarca);
     expect(access.cliente_nombre).toBeNull();
     expect(access.cliente_imagen_thumbnail).toBeNull();

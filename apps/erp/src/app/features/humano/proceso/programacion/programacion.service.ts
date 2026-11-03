@@ -71,7 +71,9 @@ export class ProgramacionService extends BaseHttpService {
   /** Elimina una o varias programaciones (DELETE por id, en paralelo). */
   remove(ids: readonly number[]): Observable<void> {
     if (ids.length === 0) return of(undefined);
-    const deletions = ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`));
+    const deletions = ids.map((id) =>
+      this.delete<void>(`${this.resourcePath}${id}/`, { errorToast: false }),
+    );
     return forkJoin(deletions).pipe(map(() => undefined));
   }
 

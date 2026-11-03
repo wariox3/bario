@@ -68,8 +68,8 @@ export class CuentaService extends BaseHttpService {
 
   remove(ids: readonly number[]): Observable<void> {
     if (ids.length === 0) return of(undefined);
-    return forkJoin(ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`))).pipe(
-      map(() => undefined),
-    );
+    return forkJoin(
+      ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`, { errorToast: false })),
+    ).pipe(map(() => undefined));
   }
 }

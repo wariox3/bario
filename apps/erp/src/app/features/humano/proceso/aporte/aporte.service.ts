@@ -81,7 +81,9 @@ export class AporteService extends BaseHttpService {
   /** Elimina uno o varios aportes (DELETE por id, en paralelo). */
   remove(ids: readonly number[]): Observable<void> {
     if (ids.length === 0) return of(undefined);
-    const deletions = ids.map((id) => this.delete<void>(`${this.resourcePath}${id}/`));
+    const deletions = ids.map((id) =>
+      this.delete<void>(`${this.resourcePath}${id}/`, { errorToast: false }),
+    );
     return forkJoin(deletions).pipe(map(() => undefined));
   }
 
@@ -118,7 +120,9 @@ export class AporteService extends BaseHttpService {
    */
   eliminarContratos(ids: readonly number[]): Observable<void> {
     if (ids.length === 0) return of(undefined);
-    const deletions = ids.map((id) => this.delete<void>(`${APORTE_CONTRATO_ENDPOINT}${id}/`));
+    const deletions = ids.map((id) =>
+      this.delete<void>(`${APORTE_CONTRATO_ENDPOINT}${id}/`, { errorToast: false }),
+    );
     return forkJoin(deletions).pipe(map(() => undefined));
   }
 
