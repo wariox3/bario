@@ -3591,6 +3591,7 @@ export const es: AppDict = {
           ordenCompra: 'Orden de compra',
           comentario: 'Comentario',
         },
+        tabs: { detalles: 'Detalles', cuentas: 'Cuentas' },
         validation: { required: 'Este campo es requerido' },
         toasts: {
           createSuccess: {
@@ -3619,6 +3620,7 @@ export const es: AppDict = {
         sections: {
           general: 'Información general',
           detalles: 'Detalles',
+          cuentas: 'Cuentas',
         },
         labels: {
           proveedor: 'Proveedor',

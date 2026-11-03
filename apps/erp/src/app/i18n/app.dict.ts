@@ -2704,6 +2704,7 @@ export interface AppDict
           ordenCompra: string;
           comentario: string;
         };
+        tabs: { detalles: string; cuentas: string };
         validation: { required: string };
         toasts: {
           createSuccess: { title: string; desc: string };
@@ -2714,7 +2715,7 @@ export interface AppDict
         };
       };
       detail: {
-        sections: { general: string; detalles: string };
+        sections: { general: string; detalles: string; cuentas: string };
         labels: {
           proveedor: string;
           identificacion: string;

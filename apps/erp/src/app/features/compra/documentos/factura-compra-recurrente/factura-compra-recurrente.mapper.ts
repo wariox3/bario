@@ -4,6 +4,7 @@ import {
   toIsoDate,
   comercialDetalleToPayload,
 } from '@reddoc/core';
+import { cuentaDetalleToPayload } from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
 import type {
   FacturaCompraRecurrenteRead,
   FacturaCompraRecurrentePayload,
@@ -16,7 +17,7 @@ import type { FacturaCompraRecurrenteFormRawValue } from './factura-compra-recur
  */
 export function facturaCompraRecurrenteToFormValue(
   read: FacturaCompraRecurrenteRead,
-): Partial<Omit<FacturaCompraRecurrenteFormRawValue, 'detalles'>> {
+): Partial<Omit<FacturaCompraRecurrenteFormRawValue, 'detalles' | 'cuentas'>> {
   return {
     contacto: documentoContactoToOption(read),
     fecha: fromIsoDate(read.fecha),
@@ -44,7 +45,9 @@ export function facturaCompraRecurrenteToFormValue(
  *
  * `documento_tipo` proviene del `documentTypeId` del `DocumentEntityConfig`.
  * En **edición** se omiten los detalles (`includeDetalles=false`): transaccionan
- * en vivo contra `documento-detalle`. En **alta** viajan embebidos.
+ * en vivo contra `documento-detalle`. En **alta** viajan embebidos: se concatenan
+ * las líneas de ítem (comerciales) y las de cuenta contable en el único array
+ * `detalles` que espera el backend (cada una lleva su `tipo_registro`).
  */
 export function formValueToPayload(
   raw: FacturaCompraRecurrenteFormRawValue,
@@ -62,6 +65,13 @@ export function formValueToPayload(
     almacen: raw.almacen?.id ?? null,
     orden_compra: raw.orden_compra?.trim() || null,
     comentario: raw.comentario?.trim() || null,
-    ...(includeDetalles ? { detalles: raw.detalles.map(comercialDetalleToPayload) } : {}),
+    ...(includeDetalles
+      ? {
+          detalles: [
+            ...raw.detalles.map(comercialDetalleToPayload),
+            ...raw.cuentas.map(cuentaDetalleToPayload),
+          ],
+        }
+      : {}),
   };
 }
