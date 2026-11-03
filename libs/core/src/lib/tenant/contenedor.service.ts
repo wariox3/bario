@@ -18,6 +18,7 @@ import {
   ContenedoresResponse,
   CreateContenedorRequest,
   GrupoSeguridad,
+  MembresiaContenedor,
   PermisoCatalogoFiltros,
   PermisoSeguridad,
   SendInviteRequest,
@@ -47,6 +48,18 @@ export class ContenedorService extends BaseHttpService {
 
   getAccesos(): Observable<ContenedoresResponse> {
     return this.get<ContenedoresResponse>('/contenedor/cliente/lista-usuario/');
+  }
+
+  /**
+   * Membresía del usuario en el contenedor `schemaName`: lo que valida la
+   * entrada a `/t/:slug`. Sin toast: quien llama decide qué hacer con el 404.
+   */
+  getMembresia(schemaName: string): Observable<MembresiaContenedor> {
+    return this.get<MembresiaContenedor>(
+      '/seguridad/usuario-cliente/usuario/',
+      { schema_name: schemaName },
+      { errorToast: false },
+    );
   }
 
   /**

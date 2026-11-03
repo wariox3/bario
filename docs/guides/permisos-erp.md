@@ -4,6 +4,19 @@ Guía en orden de lectura. Primero **qué problema resolvemos**, después **el
 recorrido completo** de una petición desde que el usuario entra hasta que ve (o
 no) la pantalla, y al final **la receta** para sumar un recurso.
 
+> **Estado actual (2026-11-03): el endpoint por modelo está retirado.**
+> `ModelPermissionsService.fetch()` ya no llama a `GET /general/modelo/<id>/permiso/`
+> y responde "todo permitido": el usuario ve todas las rutas y botones, y el backend
+> niega con 403 donde no le toca. Guards, `withPermission`, `MODELO` y la cache siguen
+> en pie; el recorrido de abajo describe cómo funciona cuando hay una fuente de
+> permisos, y conectar una nueva es reemplazar solo `fetch()`.
+>
+> **Los módulos ya no salen del plan (`acceso_*`) sino de los grupos de la membresía.**
+> `readModuleAccessFlags` traduce `grupos` con `GRUPO_ACCESO` (1 Venta, 2 Compra,
+> 3 Tesorería, 4 Cartera, 5 Inventario, 6 Humano, 7 Contabilidad, 8 Turno) a las mismas
+> flags que leen los descriptores y el guard del POS. Propietario, superusuario y soporte
+> entran a todo. Donde abajo dice "plan del tenant", léase "grupos del usuario".
+
 ---
 
 ## 0. El problema
@@ -31,11 +44,11 @@ pedir acceso, ni nosotros reproducir el reporte.
 responde tres preguntas **independientes**. Confundirlas es el error caro de
 esta capa:
 
-| Pregunta                           | API                                    | De dónde sale                          |
-| ---------------------------------- | -------------------------------------- | -------------------------------------- |
-| ¿Qué **compró el tenant**?         | `enabledModuleIds` / `canAccessModule` | Flags `acceso_*` del contenedor ✅     |
-| ¿Qué puede hacer **este usuario**? | `can(modelo)` / `canResolve(modelo)`   | `GET /general/modelo/<id>/permiso/` ✅ |
-| ¿**Administra** el contenedor?     | `isContenedorAdmin`                    | `rol_id` del contenedor ✅             |
+| Pregunta                           | API                                    | De dónde sale                      |
+| ---------------------------------- | -------------------------------------- | ---------------------------------- |
+| ¿Qué **compró el tenant**?         | `enabledModuleIds` / `canAccessModule` | Flags `acceso_*` del contenedor ✅ |
+| ¿Qué puede hacer **este usuario**? | `can(modelo)` / `canResolve(modelo)`   | Retirado: hoy permite todo         |
+| ¿**Administra** el contenedor?     | `isContenedorAdmin`                    | `rol_id` del contenedor ✅         |
 
 El acceso final es la **intersección**. El tercero gobierna solo la pantalla de
 Seguridad, no el trabajo operativo.

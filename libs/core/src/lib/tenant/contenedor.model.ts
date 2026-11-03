@@ -248,9 +248,41 @@ export interface Contenedor extends ContenedorAccesoFlags {
    * de la empresa. Opcional: un despliegue que no lo mande se lee como `false`.
    */
   soporte?: boolean;
+  /** Superusuario de la plataforma: entra a todos los módulos. */
+  is_superuser?: boolean;
+  /** Grupos de la membresía: deciden a qué módulos entra (ver `GRUPO_ACCESO`). */
+  grupos?: readonly number[];
 }
 
 export type ContenedoresResponse = PaginatedResponse<Contenedor>;
+
+/**
+ * Membresía de quien consulta en un contenedor:
+ * `GET /seguridad/usuario-cliente/usuario/?schema_name=<schema>` (serializer
+ * `SegUsuarioCliente`, sin `X-Tenant`). Responde 404 si el contenedor no existe
+ * o el usuario no es miembro.
+ *
+ * Es lo que valida la entrada a `/t/:slug` tras una recarga dura. No trae el
+ * `schema_name` (es el que se mandó). `cliente_nombre` y
+ * `cliente_imagen_thumbnail` se pidieron al backend: mientras no lleguen, el
+ * header pinta el slug y la inicial.
+ */
+export interface MembresiaContenedor {
+  /** Id de la membresía (la fila usuario-cliente), no del usuario. */
+  readonly id: number;
+  readonly usuario_id: number;
+  readonly usuario_nombre_corto: string;
+  readonly usuario_email: string;
+  readonly cliente_id: number;
+  /** El schema no lo marca requerido: ausente se lee como `false`. */
+  readonly propietario?: boolean;
+  readonly soporte: boolean;
+  readonly is_superuser: boolean;
+  /** Ids de los grupos de la membresía. */
+  readonly grupos: readonly number[];
+  readonly cliente_nombre?: string | null;
+  readonly cliente_imagen_thumbnail?: string | null;
+}
 
 /**
  * Ficha de una empresa (`GET /contenedor/cliente/{id}/`, serializer

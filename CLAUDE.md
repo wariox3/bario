@@ -192,7 +192,7 @@ El `BaseDocumentListComponent` se importa **siempre vía `loadComponent`** desde
 - **Topbar** (`apps/erp/src/app/layouts/module-bar/`): renderiza un link por cada módulo habilitado por `PermissionsService`. Highlight al activo.
 - **Sidebar** (`apps/erp/src/app/layouts/workspace-layout/`): se filtra al módulo activo leyendo `ActiveModuleStore.activeDescriptor().menu`. Empty state cuando no hay módulo activo (ej: `/t/:slug/dashboard`).
 - **Active module store** (`apps/erp/src/app/core/erp-modules/active-module.store.ts`): signal escrito por `erpModuleResolver(id)` puesto en la ruta raíz de cada `<modulo>.routes.ts`.
-- **Permisos** (`apps/erp/src/app/core/permissions/`): tres ejes ortogonales — qué módulos compró el tenant (flags `acceso_*` del contenedor), qué puede hacer el usuario sobre cada modelo del backend (`GET /general/modelo/<id>/permiso/`, pedido al entrar al feature) y si administra el contenedor (`rol_id`). Ver `docs/guides/permisos-erp.md` antes de tocarlo.
+- **Permisos** (`apps/erp/src/app/core/permissions/`): tres ejes ortogonales — a qué módulos entra el usuario (sus **grupos** en la membresía: 1 Venta, 2 Compra, 3 Tesorería, 4 Cartera, 5 Inventario, 6 Humano, 7 Contabilidad, 8 Turno — `GRUPO_ACCESO` en `libs/core`; propietario, superusuario y soporte entran a todo), qué puede hacer el usuario sobre cada modelo del backend (hoy permite todo: `GET /general/modelo/<id>/permiso/` se retiró y solo cambia `ModelPermissionsService.fetch()` para conectar otra fuente) y si administra el contenedor (`rol_id`). Ver `docs/guides/permisos-erp.md` antes de tocarlo.
 
 **Estructura de carpetas dentro de un módulo (camino B)**: cada master es un bounded context auto-contenido bajo `masters/<entity>/`:
 

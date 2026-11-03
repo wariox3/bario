@@ -8,7 +8,12 @@ export { clearTenantGuard } from './clear-tenant.guard';
 export { rootRedirectGuard } from './root-redirect.guard';
 export { TENANT_SCOPED } from './tenant-http-context';
 export { ContenedorService } from './contenedor.service';
-export { MODULE_ACCESS_PREFIX, readModuleAccessFlags, accesoFlag } from './contenedor-acceso';
+export {
+  MODULE_ACCESS_PREFIX,
+  GRUPO_ACCESO,
+  readModuleAccessFlags,
+  accesoFlag,
+} from './contenedor-acceso';
 export type { AccesoFlagName, ContenedorAccesoId } from './contenedor-acceso';
 export type {
   IngresarContenedorResponse,
@@ -17,6 +22,7 @@ export type {
 } from './contenedor.service';
 export type {
   Contenedor,
+  MembresiaContenedor,
   ContenedorDetalle,
   ContenedorEstado,
   ContenedorEstadoResponse,

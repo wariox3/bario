@@ -6,26 +6,34 @@ export type TenantSlug = string;
 export const LAST_TENANT_KEY = 'reddoc-last-tenant';
 
 /**
- * Subconjunto de `Contenedor` que el tenant activo mantiene en memoria.
+ * Lo que el tenant activo mantiene en memoria del contenedor.
  *
- * Todos los productores (`tenantAccessGuard`, `rootRedirectGuard`, la lista de
- * contenedores) alimentan esto con un `Contenedor` completo de
- * `/contenedor/cliente/lista-usuario/`, así que `cliente_id` y `propietario`
- * siempre vienen: el primero identifica al contenedor en los endpoints del
- * schema público, el segundo dice si el usuario administra esta empresa.
+ * Tiene dos productores:
+ *  - la lista de contenedores y `rootRedirectGuard`, con la fila completa de
+ *    `/contenedor/cliente/lista-usuario/`;
+ *  - `tenantAccessGuard` tras una recarga dura, con la membresía de
+ *    `/seguridad/usuario-cliente/usuario/`, que no trae `activo` y puede no traer
+ *    el nombre ni la imagen.
  *
- * El nombre es `cliente_nombre` —con el prefijo del FK— porque esa fila es la
- * membresía del usuario, no el cliente; la ficha lo llama `nombre`.
+ * Por eso solo `schema_name`, `cliente_id` y `propietario` son seguros: el
+ * primero identifica al tenant, el segundo al contenedor en los endpoints del
+ * schema público y el tercero dice si el usuario administra esta empresa.
  *
- * Hereda los `acceso_*` por lo mismo: vienen en la misma respuesta y son lo que
- * decide qué módulos se le muestran al usuario en este contenedor.
+ * A qué módulos entra el usuario lo deciden `grupos` (más `propietario`,
+ * `is_superuser` y `soporte`, que abren todo): ver `readModuleAccessFlags`. Los
+ * `acceso_*` heredados ya no los manda ningún endpoint.
  */
 export interface ContenedorAccess extends ContenedorAccesoFlags {
   schema_name: string;
-  cliente_nombre: string;
-  activo: boolean;
   cliente_id: number;
   propietario: boolean;
+  soporte?: boolean;
+  is_superuser?: boolean;
+  /** Grupos de la membresía; deciden los módulos (ver `GRUPO_ACCESO`). */
+  grupos?: readonly number[];
+  /** Sin él, el header pinta el slug. */
+  cliente_nombre?: string | null;
+  activo?: boolean;
   /** Miniatura de la imagen de la empresa; sin ella, el header pinta la inicial. */
   cliente_imagen_thumbnail?: string | null;
 }

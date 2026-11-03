@@ -33,8 +33,24 @@ const CONTENEDOR = {
   acceso_tesoreria: true,
 };
 
+/** Membresía de `/seguridad/usuario-cliente/usuario/`: lo que valida la recarga dura. */
+const MEMBRESIA = {
+  id: 21,
+  usuario_id: 1,
+  usuario_nombre_corto: 'Ana',
+  usuario_email: 'ana@seguridad.co',
+  cliente_id: 13,
+  propietario: false,
+  soporte: false,
+  is_superuser: false,
+  // Contabilidad (7), no Venta (1).
+  grupos: [7],
+};
+
+const URL_MEMBRESIA = '/api/seguridad/usuario-cliente/usuario/?schema_name=seguridad';
+
 /**
- * Un módulo fuera del plan no se abre **ni por URL directa en recarga dura**.
+ * Un módulo fuera del plan no se abría **ni por URL directa en recarga dura**.
  *
  * Es el caso que se escapaba: `moduleAccessGuard` es `canMatch` y lee las flags
  * del contenedor, pero el contenedor lo poblaba un `canActivate`, que corre
@@ -42,6 +58,10 @@ const CONTENEDOR = {
  * se lee como "sin restricción" y Venta abría. Navegando dentro de la app sí
  * bloqueaba —ahí ya estaba cargado—, o sea que el mismo link se comportaba
  * distinto según cómo llegaras.
+ *
+ * Hoy el acceso sale de los **grupos** de la membresía (ver `GRUPO_ACCESO`), que
+ * el guard de acceso trae en la recarga dura: tiene que dejarlos en el tenant
+ * **antes** de que el guard de módulos decida.
  */
 describe('acceso a módulos · recarga dura sobre un módulo fuera del plan', () => {
   let http: HttpTestingController;
@@ -63,6 +83,7 @@ describe('acceso a módulos · recarga dura sobre un módulo fuera del plan', ()
         },
         { provide: TENANT_ROUTES, useValue: { contenedoresRoot: '/contenedores' } },
         provideRouter([
+          { path: 'contenedores', component: VentaStubComponent },
           {
             path: 't/:tenantSlug',
             canMatch: [tenantSlugMatchGuard, tenantAccessGuard],
@@ -80,18 +101,26 @@ describe('acceso a módulos · recarga dura sobre un módulo fuera del plan', ()
     http = TestBed.inject(HttpTestingController);
   });
 
-  it('cae en el acceso denegado sin perder la URL', async () => {
+  it('sin el grupo de Venta cae en el acceso denegado sin perder la URL', async () => {
     const harness = await RouterTestingHarness.create();
     const navegacion = harness.navigateByUrl('/t/seguridad/venta/contactos');
     await dejarCorrerElGuard();
 
     // Lo que hace el guard de acceso al no tener el contenedor en memoria.
-    http
-      .expectOne('/api/contenedor/cliente/lista-usuario/')
-      .flush({ count: 1, results: [CONTENEDOR] });
+    http.expectOne(URL_MEMBRESIA).flush(MEMBRESIA);
 
     expect(await navegacion).toBeInstanceOf(AccessDeniedPageComponent);
     expect(TestBed.inject(Router).url).toBe('/t/seguridad/venta/contactos');
+  });
+
+  it('con el grupo de Venta abre normal y deja el contenedor poblado', async () => {
+    const harness = await RouterTestingHarness.create();
+    const navegacion = harness.navigateByUrl('/t/seguridad/venta/contactos');
+    await dejarCorrerElGuard();
+    http.expectOne(URL_MEMBRESIA).flush({ ...MEMBRESIA, grupos: [1, 7] });
+
+    expect(await navegacion).toBeInstanceOf(VentaStubComponent);
+    expect(TestBed.inject(TenantService).currentContenedor()?.cliente_id).toBe(13);
   });
 
   it('con el contenedor poblado al activar, el módulo abría — el bug que arregla', async () => {
@@ -134,14 +163,15 @@ describe('acceso a módulos · recarga dura sobre un módulo fuera del plan', ()
     expect(componente).toBeInstanceOf(VentaStubComponent);
   });
 
-  it('un módulo que sí está en el plan abre normal', async () => {
+  it('sin membresía (404) no abre el módulo', async () => {
     const harness = await RouterTestingHarness.create();
     const navegacion = harness.navigateByUrl('/t/seguridad/venta/contactos');
     await dejarCorrerElGuard();
     http
-      .expectOne('/api/contenedor/cliente/lista-usuario/')
-      .flush({ count: 1, results: [{ ...CONTENEDOR, acceso_venta: true }] });
+      .expectOne(URL_MEMBRESIA)
+      .flush({ detail: 'No es miembro' }, { status: 404, statusText: 'Not Found' });
 
-    expect(await navegacion).toBeInstanceOf(VentaStubComponent);
+    await navegacion;
+    expect(TestBed.inject(Router).url).toBe('/contenedores');
   });
 });

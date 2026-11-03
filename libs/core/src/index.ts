@@ -240,6 +240,7 @@ export {
   MODULE_ACCESS_PREFIX,
   readModuleAccessFlags,
   accesoFlag,
+  GRUPO_ACCESO,
 } from './lib/tenant';
 export type {
   AccesoFlagName,
@@ -251,6 +252,7 @@ export type {
   UpdateContenedorRequest,
   UpdateContenedorResponse,
   Contenedor,
+  MembresiaContenedor,
   ContenedorDetalle,
   ContenedorEstado,
   ContenedorEstadoResponse,

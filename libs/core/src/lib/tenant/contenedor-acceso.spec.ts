@@ -42,4 +42,29 @@ describe('readModuleAccessFlags', () => {
   it('ignora valores que no sean el booleano true', () => {
     expect(readModuleAccessFlags({ acceso_venta: 'true', acceso_compra: 1 })).toEqual(new Set());
   });
+
+  describe('por grupos de la membresía', () => {
+    const MIEMBRO = { schema_name: 'acme', cliente_id: 8, propietario: false, soporte: false };
+
+    it('cada grupo del catálogo habilita su módulo y los demás grupos se ignoran', () => {
+      const flags = readModuleAccessFlags({ ...MIEMBRO, grupos: [1, 7, 42] });
+      expect(flags).toEqual(new Set(['acceso_venta', 'acceso_contabilidad']));
+    });
+
+    it('sin grupos no habilita ningún módulo (Set vacío, no null)', () => {
+      expect(readModuleAccessFlags({ ...MIEMBRO, grupos: [] })).toEqual(new Set());
+    });
+
+    it('los grupos mandan sobre flags acceso_* que hubieran quedado', () => {
+      const flags = readModuleAccessFlags({ ...MIEMBRO, grupos: [2], acceso_venta: true });
+      expect(flags).toEqual(new Set(['acceso_compra']));
+    });
+
+    it.each([['propietario'], ['is_superuser'], ['soporte']])(
+      '%s entra a todo aunque no tenga grupos',
+      (bandera) => {
+        expect(readModuleAccessFlags({ ...MIEMBRO, grupos: [], [bandera]: true })).toBeNull();
+      },
+    );
+  });
 });
