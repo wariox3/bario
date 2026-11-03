@@ -41,11 +41,11 @@
             <!-- Name + email -->
             <div class="flex min-w-0 flex-1 flex-col leading-tight">
               <span class="truncate text-[0.85rem] font-semibold text-brand-navy">
-                {{ invite.usuario_invitado_nombre_corto || invite.usuario_invitado_correo }}
+                {{ invite.usuario_invitado_nombre_corto || invite.usuario_invitado_email }}
               </span>
               @if (invite.usuario_invitado_nombre_corto) {
                 <span class="truncate text-[0.72rem] text-brand-muted">
-                  {{ invite.usuario_invitado_correo }}
+                  {{ invite.usuario_invitado_email }}
                 </span>
               }
             </div>
@@ -59,7 +59,7 @@
                 {{ estadoLabel(invite.estado) }}
               </span>
               <span class="text-[0.65rem] leading-none text-brand-muted">
-                {{ invite.rol_nombre }} · {{ invite.fecha | date: formatoFecha }}
+                {{ meta(invite) }}
               </span>
             </div>
           </li>

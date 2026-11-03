@@ -83,6 +83,28 @@ export const contenedoresEn: ContenedoresDict = {
       soporte: 'Support',
     },
   },
+  invitaciones: {
+    eyebrow: { one: 'Pending invitation', other: '{n} pending invitations' },
+    invitedBy: '{nombre} invited you',
+    someone: 'Someone',
+    accept: 'Join',
+    reject: 'Decline',
+    confirmReject: 'Decline the invitation?',
+    confirmYes: 'Yes, decline',
+    confirmNo: 'No',
+    more: { one: 'Show 1 more', other: 'Show {n} more' },
+    less: 'Show less',
+    toasts: {
+      acceptError: {
+        title: "Couldn't join",
+        desc: "The invitation couldn't be accepted. Try again.",
+      },
+      rejectError: {
+        title: "Couldn't decline",
+        desc: "The invitation couldn't be declined. Try again.",
+      },
+    },
+  },
   create: {
     title: 'New company',
     subtitle: 'Configure the new workspace',

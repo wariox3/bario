@@ -1,9 +1,9 @@
-import { DatePipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ContenedorService, getInitials, I18nService, ToastService } from '@reddoc/core';
 import {
-  FORMATO_FECHA,
+  formatFechaCorta,
   Contenedor,
   ContenedorInvitacionEstado,
   ContenedorInvitacionPendiente,
@@ -13,13 +13,10 @@ import type { ContenedoresTranslationsHost } from '../../i18n';
 @Component({
   selector: 'lib-contenedor-pending-invites',
   standalone: true,
-  imports: [DatePipe, NgClass],
+  imports: [NgClass],
   templateUrl: './contenedor-pending-invites.component.html',
 })
 export class ContenedorPendingInvitesComponent {
-  /** Formato de fecha del sistema, para el `| date` de la plantilla. */
-  protected readonly formatoFecha = FORMATO_FECHA.angular;
-
   private readonly contenedorService = inject(ContenedorService);
   private readonly toastService = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
@@ -44,8 +41,14 @@ export class ContenedorPendingInvitesComponent {
 
   initials(invite: ContenedorInvitacionPendiente): string {
     const source =
-      invite.usuario_invitado_nombre_corto?.trim() || invite.usuario_invitado_correo || '';
-    return getInitials(source);
+      invite.usuario_invitado_nombre_corto?.trim() || invite.usuario_invitado_email || '';
+    return source ? getInitials(source) : '';
+  }
+
+  /** Grupos con los que entrará el invitado, y la fecha. */
+  meta(invite: ContenedorInvitacionPendiente): string {
+    const fecha = formatFechaCorta(invite.fecha, '');
+    return [invite.grupos_nombres.join(', '), fecha].filter(Boolean).join(' · ');
   }
 
   estadoLabel(estado: ContenedorInvitacionEstado): string {

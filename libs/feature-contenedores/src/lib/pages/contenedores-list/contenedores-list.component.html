@@ -1,6 +1,10 @@
 <div class="cl">
   <lib-saludo class="mb-5 block" [nombre]="currentUser()?.nombre_corto" />
 
+  @if (capabilities().invitaciones) {
+    <lib-invitaciones-recibidas (aceptada)="onInvitacionAceptada($event)" />
+  }
+
   <div class="cl-panel">
     <!-- Panel header -->
     <div class="cl-panel__header">
@@ -127,7 +131,7 @@
           @if (viewMode() === 'list') {
             <ul class="cl-list">
               @for (item of filteredContenedores(); track item.cliente_id; let i = $index) {
-                <li>
+                <li [class.cl-recien]="item.cliente_id === recienUnidaId()">
                   <lib-contenedor-row-item
                     [contenedor]="item"
                     [index]="i"
@@ -158,6 +162,7 @@
             <div class="cl-grid">
               @for (item of filteredContenedores(); track item.cliente_id; let i = $index) {
                 <lib-contenedor-card-item
+                  [class.cl-recien]="item.cliente_id === recienUnidaId()"
                   [contenedor]="item"
                   [index]="i"
                   [showMenu]="hasRowActions()"

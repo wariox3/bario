@@ -83,6 +83,28 @@ export interface ContenedoresDict {
       soporte: string;
     };
   };
+  /** Invitaciones que recibió la persona, sobre el listado de empresas. */
+  invitaciones: {
+    /** Rótulo sobre el bloque; `{n}` es la cantidad. */
+    eyebrow: { one: string; other: string };
+    /** «{nombre} te invitó». */
+    invitedBy: string;
+    /** Quien invita, si no trae nombre ni correo. */
+    someone: string;
+    accept: string;
+    reject: string;
+    /** Rechazar se confirma en la misma fila. */
+    confirmReject: string;
+    confirmYes: string;
+    confirmNo: string;
+    /** `{n}` invitaciones plegadas. */
+    more: { one: string; other: string };
+    less: string;
+    toasts: {
+      acceptError: { title: string; desc: string };
+      rejectError: { title: string; desc: string };
+    };
+  };
   create: {
     title: string;
     subtitle: string;

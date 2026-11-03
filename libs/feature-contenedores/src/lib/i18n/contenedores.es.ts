@@ -83,6 +83,28 @@ export const contenedoresEs: ContenedoresDict = {
       soporte: 'Soporte',
     },
   },
+  invitaciones: {
+    eyebrow: { one: 'Invitación pendiente', other: '{n} invitaciones pendientes' },
+    invitedBy: '{nombre} te invitó',
+    someone: 'Alguien',
+    accept: 'Unirme',
+    reject: 'Rechazar',
+    confirmReject: '¿Rechazar la invitación?',
+    confirmYes: 'Sí, rechazar',
+    confirmNo: 'No',
+    more: { one: 'Ver 1 más', other: 'Ver {n} más' },
+    less: 'Ver menos',
+    toasts: {
+      acceptError: {
+        title: 'No pudiste unirte',
+        desc: 'No se pudo aceptar la invitación. Intenta de nuevo.',
+      },
+      rejectError: {
+        title: 'No se pudo rechazar',
+        desc: 'No se pudo rechazar la invitación. Intenta de nuevo.',
+      },
+    },
+  },
   create: {
     title: 'Nuevo contenedor',
     subtitle: 'Configura el nuevo espacio de trabajo',

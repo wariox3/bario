@@ -385,3 +385,36 @@
     transform: translateY(0);
   }
 }
+
+// ─── Empresa recién unida (aceptó una invitación) ─────────────────────────────
+// El halo sky se enciende y se apaga solo: la invitación punteada de arriba
+// acaba de convertirse en esta fila. Una sola vez, sin quedarse marcada.
+
+.cl-recien {
+  display: block;
+  border-radius: 10px;
+  animation: recienUnida 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+lib-contenedor-card-item.cl-recien {
+  border-radius: 12px;
+}
+
+@keyframes recienUnida {
+  0% {
+    box-shadow: 0 0 0 0 rgba(119 170 215 / 0);
+    background: rgba(119 170 215 / 0);
+  }
+  18% {
+    box-shadow: 0 0 0 3px rgba(119 170 215 / 0.45);
+    background: rgba(119 170 215 / 0.08);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(119 170 215 / 0);
+    background: rgba(119 170 215 / 0);
+  }
+}

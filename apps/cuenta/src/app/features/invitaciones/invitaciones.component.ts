@@ -2,9 +2,14 @@ import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
-import { ToastService, extractErrorMessage, getInitials, FORMATO_FECHA } from '@reddoc/core';
-import { InvitacionPendiente } from './models/invitacion.model';
-import { InvitacionesService } from './services/invitaciones.service';
+import {
+  ContenedorService,
+  InvitacionRecibida,
+  ToastService,
+  extractErrorMessage,
+  getInitials,
+  FORMATO_FECHA,
+} from '@reddoc/core';
 
 @Component({
   selector: 'app-invitaciones',
@@ -16,12 +21,12 @@ export class InvitacionesComponent implements OnInit {
   /** Formato de fecha del sistema, para el `| date` de la plantilla. */
   protected readonly formatoFecha = FORMATO_FECHA.angular;
 
-  private readonly invitacionesService = inject(InvitacionesService);
+  private readonly contenedorService = inject(ContenedorService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly isLoading = signal(true);
-  readonly invitaciones = signal<InvitacionPendiente[]>([]);
+  readonly invitaciones = signal<InvitacionRecibida[]>([]);
   readonly acceptingId = signal<number | null>(null);
   readonly rejectingId = signal<number | null>(null);
 
@@ -29,20 +34,24 @@ export class InvitacionesComponent implements OnInit {
     this.load();
   }
 
-  initials(inv: InvitacionPendiente): string {
+  initials(inv: InvitacionRecibida): string {
     return getInitials(inv.cliente_nombre ?? '');
   }
 
-  inviterLabel(inv: InvitacionPendiente): string {
-    return inv.usuario_nombre_corto?.trim() || inv.usuario_correo || 'Un miembro del contenedor';
+  gruposLabel(inv: InvitacionRecibida): string {
+    return inv.grupos_nombres.join(', ');
   }
 
-  accept(inv: InvitacionPendiente): void {
+  inviterLabel(inv: InvitacionRecibida): string {
+    return inv.usuario_nombre_corto?.trim() || inv.usuario_email || 'Un miembro del contenedor';
+  }
+
+  accept(inv: InvitacionRecibida): void {
     if (this.isBusy()) return;
 
     this.acceptingId.set(inv.id);
-    this.invitacionesService
-      .aceptar(inv.id)
+    this.contenedorService
+      .aceptarInvitacion(inv.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -57,12 +66,12 @@ export class InvitacionesComponent implements OnInit {
       });
   }
 
-  reject(inv: InvitacionPendiente): void {
+  reject(inv: InvitacionRecibida): void {
     if (this.isBusy()) return;
 
     this.rejectingId.set(inv.id);
-    this.invitacionesService
-      .rechazar(inv.id)
+    this.contenedorService
+      .rechazarInvitacion(inv.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -86,8 +95,8 @@ export class InvitacionesComponent implements OnInit {
 
   private load(): void {
     this.isLoading.set(true);
-    this.invitacionesService
-      .getPendientes()
+    this.contenedorService
+      .getInvitacionesRecibidas()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {

@@ -40,6 +40,7 @@ import { ContenedoresInviteDialogComponent } from '../../components/invite-dialo
 import { ContenedoresSupportDialogComponent } from '../../components/support-dialog/contenedores-support-dialog.component';
 import { ContenedorRowItemComponent } from '../../components/contenedor-row-item/contenedor-row-item.component';
 import { ContenedorCardItemComponent } from '../../components/contenedor-card-item/contenedor-card-item.component';
+import { InvitacionesRecibidasComponent } from '../../components/invitaciones-recibidas/invitaciones-recibidas.component';
 import { CONTENEDORES_CAPABILITIES_FULL } from '../../contenedores.capabilities';
 import type { ContenedoresCapabilities } from '../../contenedores.capabilities';
 import type { ContenedoresTranslationsHost } from '../../i18n';
@@ -68,6 +69,7 @@ interface EstadoConsultado {
     ButtonModule,
     ConfirmDialogModule,
     SaludoComponent,
+    InvitacionesRecibidasComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './contenedores-list.component.html',
@@ -157,14 +159,26 @@ export class ContenedoresListComponent {
 
   readonly isLoading = computed(() => this.response() === undefined);
 
+  /**
+   * Empresa a la que la persona se acaba de unir aceptando una invitación: va
+   * primera en el listado y se marca con un halo, para que se vea que la
+   * invitación se convirtió en una de sus empresas.
+   */
+  readonly recienUnidaId = signal<number | null>(null);
+
   readonly contenedores = computed(() => {
     const results = this.response()?.results ?? [];
     const estados = this.estadosConsultados();
-    if (!estados.size) return results;
-    return results.map((c) => {
-      const estado = estados.get(c.cliente_id);
-      return estado ? { ...c, estado } : c;
-    });
+    const conEstado = estados.size
+      ? results.map((c) => {
+          const estado = estados.get(c.cliente_id);
+          return estado ? { ...c, estado } : c;
+        })
+      : results;
+    const recien = this.recienUnidaId();
+    if (recien === null) return conEstado;
+    const unida = conEstado.find((c) => c.cliente_id === recien);
+    return unida ? [unida, ...conEstado.filter((c) => c !== unida)] : conEstado;
   });
 
   /** Ids que siguen en creación, como clave estable para reiniciar el sondeo solo si cambian. */
@@ -462,6 +476,11 @@ export class ContenedoresListComponent {
 
   onSupportAdded(): void {
     this.showSupport.set(false);
+    this.reload$.next();
+  }
+
+  onInvitacionAceptada(clienteId: number): void {
+    this.recienUnidaId.set(clienteId);
     this.reload$.next();
   }
 

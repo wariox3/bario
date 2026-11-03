@@ -20,19 +20,47 @@ export type ContenedorMembersResponse = PaginatedResponse<ContenedorMember>;
 
 export type ContenedorInvitacionEstado = 'P' | 'A' | 'R';
 
-export interface ContenedorInvitacionPendiente {
-  id: number;
-  usuario_invitado: number;
-  usuario_invitado_nombre_corto: string | null;
-  usuario_invitado_correo: string;
-  rol: number;
-  rol_nombre: string;
-  estado: ContenedorInvitacionEstado;
-  fecha: string;
+/**
+ * Invitación a un contenedor tal como la devuelve el backend (`CtnInvitacion`),
+ * en los dos listados: la que se envía (`pendiente-cliente/`) y la que se
+ * recibe (`pendiente-usuario/`).
+ *
+ * `usuario*` es **quien invita**; del invitado solo llega su id
+ * (`usuario_invitado`). `grupos_nombres` es con qué entrará al aceptar.
+ */
+export interface ContenedorInvitacion {
+  readonly id: number;
+  readonly cliente: number;
+  readonly cliente_nombre: string;
+  readonly usuario: number;
+  readonly usuario_nombre_corto: string;
+  readonly usuario_email: string;
+  readonly usuario_invitado: number;
+  readonly grupos: readonly number[];
+  readonly grupos_nombres: readonly string[];
+  readonly estado: ContenedorInvitacionEstado;
+  readonly fecha: string;
+}
+
+/**
+ * Invitación que envió un contenedor (`GET /contenedor/invitacion/pendiente-cliente/`).
+ *
+ * Al propietario le importa **a quién** invitó, y `CtnInvitacion` no trae el
+ * nombre ni el correo del invitado: se pidieron al backend. Mientras no lleguen,
+ * la fila los deja vacíos (no se resuelven con peticiones extra).
+ */
+export interface ContenedorInvitacionPendiente extends ContenedorInvitacion {
+  readonly usuario_invitado_nombre_corto?: string | null;
+  readonly usuario_invitado_email?: string | null;
 }
 
 export type ContenedorInvitacionesPendientesResponse =
   PaginatedResponse<ContenedorInvitacionPendiente>;
+
+/** Invitación que recibió el usuario autenticado (`GET /contenedor/invitacion/pendiente-usuario/`). */
+export type InvitacionRecibida = ContenedorInvitacion;
+
+export type InvitacionesRecibidasResponse = PaginatedResponse<InvitacionRecibida>;
 
 /**
  * Invitación a un contenedor (`POST /contenedor/invitacion/`,

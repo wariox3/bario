@@ -584,6 +584,37 @@ visual**: si cada módulo inventara la suya, el ERP tendría varias formas de de
   entrada al módulo, incluso en contenedores que resolvieron eso hace meses. Si la sonda falla, no
   se ofrece nada.
 
+## Patrón: invitación recibida (fila punteada que se vuelve tuya)
+
+`libs/feature-contenedores/.../invitaciones-recibidas/` (`<lib-invitaciones-recibidas>`), entre
+`lib-saludo` y el panel de `/contenedores`. Responde `pendiente-usuario/` con aceptar/rechazar.
+
+- **Es una fila del listado que todavía no es suya.** Misma anatomía que `contenedor-row-item`
+  (monograma, nombre, pill «Miembro», meta), pero **punteada**: el recuadro
+  (`rounded-[14px] border-dashed border-[rgba(20,48,73,0.22)]`), el monograma
+  (`h-10 w-10 rounded-[10px] border-dashed border-[rgba(20,48,73,0.28)]`, sin fondo) y los
+  separadores entre filas (`border-dashed 0.1`). Mismo idioma que la pill de soporte: el punteado
+  dice «está, pero no es tu casa». Nada de color nuevo ni banda de alerta.
+- **Rótulo encima, no cabecera dentro:** `pi-envelope` + «n invitaciones pendientes» en
+  `0.72rem/semibold text-brand-muted`. El recuadro solo lleva filas.
+- **Atmósfera mínima:** solo el halo sky (`rgba(119,170,215,0.2)`) arriba a la derecha. Sin grilla
+  de puntos ni marca de agua: no es una función de la plataforma sino una persona invitando.
+- **Sin skeleton ni empty state:** `signal<… | null>`; no se pinta hasta confirmar ≥ 1. Si falla,
+  silencio (`errorToast: false`).
+- **Acciones:** «Rechazar» `[text]` secondary + «Unirme» primario con `pi-arrow-right` a la derecha
+  (eco del CTA «Ingresar →» de la fila). **Rechazar se confirma en la fila**, no en modal: los
+  botones se cambian por «¿Rechazar la invitación?» + «No» (text) + «Sí, rechazar» (danger
+  outlined) y vuelve sola a los 5 s.
+- **Salida plegada:** cada `<li>` es `grid grid-rows-[1fr]` → `data-[saliendo=true]:grid-rows-[0fr]
+opacity-0` en `280ms`; el bloque entero hace lo mismo con su última fila. El listado sube sin
+  salto. Truco reusable para retirar cualquier fila sin medir alturas.
+- **Continuidad al aceptar:** el listado recarga, la empresa nueva va **primera** y su fila lleva
+  `.cl-recien` — halo `0 0 0 3px rgba(119 170 215 / 0.45)` + tinte `0.08` que se enciende y se
+  apaga en `2.4s`. La invitación punteada «se convierte» en la fila sólida. Sin toast de éxito:
+  la fila nueva ya lo dice.
+- **Más de 2:** las demás detrás de «Ver n más» (botón a todo el ancho, `border-t` punteado).
+- Capability `invitaciones` en `ContenedoresCapabilities`.
+
 ## Patrón: acuse de una acción masiva (modal recibo)
 
 Cuando un clic crea cientos de registros de una, la acción **no se resuelve en silencio** — pero

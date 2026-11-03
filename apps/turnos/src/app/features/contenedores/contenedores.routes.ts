@@ -20,6 +20,7 @@ const TURNOS_CONTENEDORES_CAPABILITIES: ContenedoresCapabilities = {
   subscription: true,
   viewToggle: true,
   support: true,
+  invitaciones: true,
 };
 
 export const CONTENEDORES_ROUTES: Route[] = [

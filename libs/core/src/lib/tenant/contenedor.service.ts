@@ -13,6 +13,7 @@ import {
   ContenedorDetalle,
   ContenedorEstadoResponse,
   ContenedorInvitacionesPendientesResponse,
+  InvitacionesRecibidasResponse,
   ContenedorMembersResponse,
   ContenedoresResponse,
   CreateContenedorRequest,
@@ -156,6 +157,25 @@ export class ContenedorService extends BaseHttpService {
 
   sendInvitation(payload: SendInviteRequest): Observable<unknown> {
     return this.post('/contenedor/invitacion/', payload);
+  }
+
+  /** Invitaciones pendientes que recibió el usuario autenticado. */
+  getInvitacionesRecibidas(opts?: RequestOptions): Observable<InvitacionesRecibidasResponse> {
+    return this.get<InvitacionesRecibidasResponse>(
+      '/contenedor/invitacion/pendiente-usuario/',
+      undefined,
+      opts,
+    );
+  }
+
+  /** Acepta una invitación recibida: el usuario pasa a ser miembro (409 si ya lo era). */
+  aceptarInvitacion(id: number, opts?: RequestOptions): Observable<unknown> {
+    return this.post(`/contenedor/invitacion/${id}/aceptar/`, {}, undefined, opts);
+  }
+
+  /** Rechaza una invitación recibida. No se deshace: hace falta otra invitación. */
+  rechazarInvitacion(id: number, opts?: RequestOptions): Observable<unknown> {
+    return this.post(`/contenedor/invitacion/${id}/rechazar/`, {}, undefined, opts);
   }
 
   /**

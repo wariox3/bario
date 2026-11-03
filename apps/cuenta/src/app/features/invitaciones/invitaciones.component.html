@@ -91,12 +91,15 @@
               </span>
             </div>
 
-            <!-- Role pill -->
-            <span
-              class="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-[0.1rem] text-[0.65rem] font-semibold leading-none text-slate-700"
-            >
-              {{ inv.rol_nombre }}
-            </span>
+            <!-- Grupos con los que entra al aceptar -->
+            @if (inv.grupos_nombres.length) {
+              <span
+                class="max-w-[12rem] shrink-0 truncate rounded-full border border-slate-200 bg-slate-50 px-2 py-[0.1rem] text-[0.65rem] font-semibold leading-none text-slate-700"
+                [title]="gruposLabel(inv)"
+              >
+                {{ gruposLabel(inv) }}
+              </span>
+            }
 
             <!-- Actions -->
             <div class="flex shrink-0 items-center gap-2 max-[480px]:w-full">
