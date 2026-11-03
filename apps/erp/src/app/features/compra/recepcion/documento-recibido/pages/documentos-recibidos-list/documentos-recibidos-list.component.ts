@@ -93,7 +93,7 @@ function rangoMesActual(): { desde: Date; hasta: Date } {
  *
  * Los filtros van a la vista en la barra —búsqueda, tipo y rango de emisión—
  * porque el endpoint no habla `campo__operador` sino parámetros propios. Se
- * editan en borrador y viajan al pulsar **Filtrar** (o Enter en la búsqueda).
+ * editan en borrador y solo viajan al pulsar **Filtrar**.
  * Arranca en los documentos sin recepción del mes en curso. A la derecha,
  * **Cargar archivo** para lo que no llegó por correo.
  *
