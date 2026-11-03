@@ -1,7 +1,6 @@
 import type { ContenedoresDict } from './contenedores.dict';
 
 export const contenedoresEn: ContenedoresDict = {
-  saludo: { manana: 'Good morning', tarde: 'Good afternoon', noche: 'Good evening' },
   list: {
     title: 'Your companies',
     subtitle: 'Pick a workspace to continue',
@@ -84,6 +83,53 @@ export const contenedoresEn: ContenedoresDict = {
       soporte: 'Support',
     },
   },
+  invitaciones: {
+    eyebrow: { one: 'Pending invitation', other: '{n} pending invitations' },
+    invitedBy: '{nombre} invited you',
+    someone: 'Someone',
+    accept: 'Join',
+    reject: 'Decline',
+    confirmReject: 'Decline the invitation?',
+    confirmYes: 'Yes, decline',
+    confirmNo: 'No',
+    more: { one: 'Show 1 more', other: 'Show {n} more' },
+    less: 'Show less',
+    toasts: {
+      acceptError: {
+        title: "Couldn't join",
+        desc: "The invitation couldn't be accepted. Try again.",
+      },
+      rejectError: {
+        title: "Couldn't decline",
+        desc: "The invitation couldn't be declined. Try again.",
+      },
+    },
+  },
+  ideas: {
+    title: 'What would you like to improve or automate today?',
+    subtitle: 'Tell us in your own words. The team reviews it and keeps you posted.',
+    placeholder: 'E.g.: Alert me when a guard goes over 48 hours in a week',
+    required: 'Tell us your idea before sending it.',
+    shortcut: 'Ctrl + Enter to send',
+    submit: 'Send idea',
+    sent: "Received. We'll let you know once the team reviews it.",
+    listTitle: 'Your ideas',
+    etapas: {
+      recibida: 'Received',
+      evaluacion: 'Under review',
+      respondida: 'Answered',
+      cerrada: 'Closed',
+    },
+    empty: {
+      title: "You haven't sent any ideas yet",
+      sub: 'Something you repeat by hand every week is a good start.',
+    },
+    loadError: "We couldn't load your ideas.",
+    retry: 'Retry',
+    toasts: {
+      error: { title: "Couldn't send", desc: "Your idea wasn't sent. Try again in a moment." },
+    },
+  },
   create: {
     title: 'New company',
     subtitle: 'Configure the new workspace',
@@ -164,11 +210,6 @@ export const contenedoresEn: ContenedoresDict = {
       invalid: 'Enter a valid email.',
       submit: 'Send invitation',
       sending: 'Sending…',
-      grupos: {
-        label: 'Groups',
-        placeholder: 'Select groups (optional)',
-        empty: 'No groups available.',
-      },
     },
     pending: {
       estados: { P: 'Pending', A: 'Accepted', R: 'Rejected' },

@@ -1,0 +1,147 @@
+@if (total() > 0) {
+  <!-- El bloque entero se pliega con su última fila: el listado sube sin salto. -->
+  <section
+    class="grid grid-rows-[1fr] opacity-100 transition-[grid-template-rows,opacity] duration-[280ms] ease-out data-[cerrando=true]:grid-rows-[0fr] data-[cerrando=true]:opacity-0 motion-reduce:transition-none"
+    [attr.data-cerrando]="cerrando()"
+    [attr.aria-label]="encabezado()"
+  >
+    <div class="min-h-0 overflow-hidden">
+      <div class="pb-4 animate-fade-up motion-reduce:animate-none">
+        <p
+          class="m-0 mb-2 flex items-center gap-1.5 text-[0.72rem] font-semibold tracking-[-0.005em] text-brand-muted"
+        >
+          <i class="pi pi-envelope text-[0.72rem]" aria-hidden="true"></i>
+          {{ encabezado() }}
+        </p>
+
+        <!-- Punteado = ofrecida, todavía no es suya (como la pill de soporte: está, pero no es su casa). -->
+        <div
+          class="relative overflow-hidden rounded-[14px] border border-dashed border-[rgba(20,48,73,0.22)] bg-brand-surface"
+        >
+          <!-- El acento de marca como luz, no como bloque de color. -->
+          <div
+            class="pointer-events-none absolute -top-20 -right-12 h-48 w-72 rounded-full bg-[radial-gradient(closest-side,rgba(119,170,215,0.2),transparent)]"
+            aria-hidden="true"
+          ></div>
+
+          <ul class="relative m-0 list-none p-0">
+            @for (inv of visibles(); track inv.id) {
+              <li
+                class="grid grid-rows-[1fr] border-t border-dashed border-[rgba(20,48,73,0.1)] first:border-t-0 opacity-100 transition-[grid-template-rows,opacity] duration-[280ms] ease-out data-[saliendo=true]:grid-rows-[0fr] data-[saliendo=true]:opacity-0 motion-reduce:transition-none"
+                [attr.data-saliendo]="saliendo().has(inv.id)"
+              >
+                <div class="min-h-0 overflow-hidden">
+                  <div class="flex items-center gap-3.5 px-4 py-3 max-[560px]:flex-wrap">
+                    <!-- Monograma con el mismo contorno punteado: la empresa aún no es suya. -->
+                    <span
+                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-dashed border-[rgba(20,48,73,0.28)] text-[0.85rem] font-bold tracking-[-0.03em] text-brand-navy"
+                      aria-hidden="true"
+                    >
+                      {{ iniciales(inv) }}
+                    </span>
+
+                    <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span class="flex min-w-0 items-center gap-2">
+                        <span
+                          class="truncate text-[0.9rem] font-bold leading-tight tracking-[-0.02em] text-brand-navy"
+                        >
+                          {{ inv.cliente_nombre }}
+                        </span>
+                        <span
+                          class="inline-flex shrink-0 items-center rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[0.65rem] font-semibold leading-none text-slate-600"
+                        >
+                          {{ miembroLabel() }}
+                        </span>
+                      </span>
+                      <span
+                        class="flex min-w-0 items-center gap-1.5 text-[0.74rem] tracking-[-0.005em] text-brand-muted"
+                      >
+                        <span class="truncate">
+                          {{ invitadoPor(inv) }}
+                          @if (recencia(inv); as cuando) {
+                            · {{ cuando }}
+                          }
+                        </span>
+                        @if (inv.grupos_nombres.length) {
+                          <span class="flex min-w-0 items-center gap-1" [title]="grupos(inv)">
+                            <span aria-hidden="true">·</span>
+                            <i class="pi pi-users text-[0.68rem] opacity-70" aria-hidden="true"></i>
+                            <span class="truncate">{{ grupos(inv) }}</span>
+                          </span>
+                        }
+                      </span>
+                    </div>
+
+                    <div
+                      class="flex shrink-0 items-center gap-1.5 max-[560px]:w-full max-[560px]:justify-end"
+                    >
+                      @if (confirmandoId() === inv.id) {
+                        <span
+                          class="mr-1 text-[0.78rem] font-medium text-brand-text animate-fade-up motion-reduce:animate-none"
+                          role="status"
+                        >
+                          {{ t().confirmReject }}
+                        </span>
+                        <p-button
+                          size="small"
+                          severity="secondary"
+                          [text]="true"
+                          [label]="t().confirmNo"
+                          [disabled]="rechazandoId() === inv.id"
+                          (onClick)="cancelarConfirmacion()"
+                        />
+                        <p-button
+                          size="small"
+                          severity="danger"
+                          [outlined]="true"
+                          [label]="t().confirmYes"
+                          [loading]="rechazandoId() === inv.id"
+                          (onClick)="rechazar(inv)"
+                        />
+                      } @else {
+                        <p-button
+                          size="small"
+                          severity="secondary"
+                          [text]="true"
+                          [label]="t().reject"
+                          [disabled]="ocupado()"
+                          (onClick)="pedirConfirmacion(inv)"
+                        />
+                        <p-button
+                          size="small"
+                          icon="pi pi-arrow-right"
+                          iconPos="right"
+                          [label]="t().accept"
+                          [loading]="aceptandoId() === inv.id"
+                          [disabled]="ocupado() && aceptandoId() !== inv.id"
+                          (onClick)="aceptar(inv)"
+                        />
+                      }
+                    </div>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+
+          @if (ocultas() > 0) {
+            <button
+              type="button"
+              class="relative flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-dashed border-[rgba(20,48,73,0.1)] bg-transparent py-2 text-[0.74rem] font-semibold text-brand-muted transition-colors hover:bg-[rgba(20,48,73,0.025)] hover:text-brand-navy focus-visible:outline-none focus-visible:bg-[rgba(20,48,73,0.04)]"
+              [attr.aria-expanded]="expandido()"
+              (click)="expandido.set(!expandido())"
+            >
+              {{ expandido() ? t().less : verMas() }}
+              <i
+                class="pi text-[0.65rem]"
+                [class.pi-chevron-down]="!expandido()"
+                [class.pi-chevron-up]="expandido()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+}

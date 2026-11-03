@@ -1,4 +1,4 @@
-import type { PaginatedResponse } from '../models/pagination.model';
+import type { PaginatedResponse } from '../../models/pagination.model';
 
 /**
  * Miembro del contenedor (`/seguridad/usuario-cliente/lista-cliente/`).
@@ -20,52 +20,67 @@ export type ContenedorMembersResponse = PaginatedResponse<ContenedorMember>;
 
 export type ContenedorInvitacionEstado = 'P' | 'A' | 'R';
 
-export interface ContenedorInvitacionPendiente {
-  id: number;
-  usuario_invitado: number;
-  usuario_invitado_nombre_corto: string | null;
-  usuario_invitado_correo: string;
-  rol: number;
-  rol_nombre: string;
-  estado: ContenedorInvitacionEstado;
-  fecha: string;
+/**
+ * Invitación a un contenedor tal como la devuelve el backend (`CtnInvitacion`),
+ * en los dos listados: la que se envía (`pendiente-cliente/`) y la que se
+ * recibe (`pendiente-usuario/`).
+ *
+ * `usuario*` es **quien invita**; del invitado solo llega su id
+ * (`usuario_invitado`). `grupos_nombres` es con qué entrará al aceptar.
+ */
+export interface ContenedorInvitacion {
+  readonly id: number;
+  readonly cliente: number;
+  readonly cliente_nombre: string;
+  readonly usuario: number;
+  readonly usuario_nombre_corto: string;
+  readonly usuario_email: string;
+  readonly usuario_invitado: number;
+  readonly grupos: readonly number[];
+  readonly grupos_nombres: readonly string[];
+  readonly estado: ContenedorInvitacionEstado;
+  readonly fecha: string;
+}
+
+/**
+ * Invitación que envió un contenedor (`GET /contenedor/invitacion/pendiente-cliente/`).
+ *
+ * Al propietario le importa **a quién** invitó, y `CtnInvitacion` no trae el
+ * nombre ni el correo del invitado: se pidieron al backend. Mientras no lleguen,
+ * la fila los deja vacíos (no se resuelven con peticiones extra).
+ */
+export interface ContenedorInvitacionPendiente extends ContenedorInvitacion {
+  readonly usuario_invitado_nombre_corto?: string | null;
+  readonly usuario_invitado_email?: string | null;
 }
 
 export type ContenedorInvitacionesPendientesResponse =
   PaginatedResponse<ContenedorInvitacionPendiente>;
 
+/** Invitación que recibió el usuario autenticado (`GET /contenedor/invitacion/pendiente-usuario/`). */
+export type InvitacionRecibida = ContenedorInvitacion;
+
+export type InvitacionesRecibidasResponse = PaginatedResponse<InvitacionRecibida>;
+
 /**
- * Invitación a un contenedor (`POST /contenedor/invitacion/`).
+ * Invitación a un contenedor (`POST /contenedor/invitacion/`,
+ * `CtnInvitacionCrearRequest`).
  *
- * Además de a quién se invita, la invitación lleva **con qué entra**: los
- * grupos de seguridad y las flags `acceso_*` de los módulos que va a poder
- * abrir. Son las mismas flags que describen el plan del contenedor
- * (`ContenedorAccesoFlags`), acá aplicadas a la persona.
+ * Además de a quién se invita, la invitación lleva **con qué entra**: sus
+ * grupos de seguridad. Los accesos por módulo ya no viajan acá.
  */
-export interface SendInviteRequest extends ContenedorAccesoFlags {
+export interface SendInviteRequest {
   cliente_id: number;
   usuario_id: number;
   /** Grupos de seguridad a los que pertenecerá el invitado al aceptar. */
   grupo_ids?: readonly number[];
 }
 
-/**
- * Grupo de seguridad de `/seguridad/grupo/`.
- *
- * Shape confirmado por `/seguridad/usuario-cliente-permiso/` (`permiso.grupos`
- * llega como `{ id, nombre }`).
- */
+/** Grupo de seguridad de `/seguridad/grupo/` (`{ id, nombre }`). */
 export interface GrupoSeguridad {
   readonly id: number;
   readonly nombre: string;
 }
-
-/**
- * Permiso directo de un usuario (`permiso.permisos` de
- * `/seguridad/usuario-cliente-permiso/`). Confirmado: el backend manda el
- * mismo serializador del catálogo (`PermisoSeguridad`), etiquetas incluidas.
- */
-export type PermisoAsignado = PermisoSeguridad;
 
 /**
  * Permiso individual del catálogo `/seguridad/permiso/` (shape confirmado):
@@ -98,25 +113,40 @@ export interface PermisoCatalogoFiltros {
   readonly page?: number;
 }
 
-/** Bloque `permiso` de `/seguridad/usuario-cliente-permiso/`. */
-export interface UsuarioPermiso {
+/**
+ * Fila de `/seguridad/usuario-cliente-grupo/`: un grupo de una membresía.
+ *
+ * Vive en el schema público (sin `X-Tenant`) y se filtra por
+ * `usuario_cliente_id`, el `id` de la membresía, no el del usuario. Quitar el
+ * grupo es borrar la fila por su `id`.
+ */
+export interface UsuarioClienteGrupo {
   readonly id: number;
-  readonly profile_id: number;
-  readonly is_superuser: boolean;
-  readonly is_staff: boolean;
-  readonly grupos: readonly GrupoSeguridad[];
-  readonly permisos: readonly PermisoAsignado[];
+  /** `id` de la membresía (`usuario-cliente`). */
+  readonly usuario_cliente: number;
+  readonly grupo: number;
+  readonly grupo_name: string | null;
+  /** Con él, el miembro tiene todos los permisos del grupo; sin él, solo el menú. */
+  readonly heredar_permisos?: boolean;
 }
 
-/** Fila de `/seguridad/usuario-cliente-permiso/`: membresía + permiso efectivo. */
+/**
+ * Fila de `/seguridad/usuario-cliente-permiso/`: un permiso personalizado de
+ * una membresía, con el permiso desglosado. Mismo esquema que los grupos: se
+ * filtra por `usuario_cliente_id` y se quita borrando la fila por su `id`.
+ *
+ * No trae la etiqueta legible del modelo (`modelo_label` del catálogo): solo
+ * `app_label` y `model` del content type.
+ */
 export interface UsuarioClientePermiso {
   readonly id: number;
-  readonly usuario_id: number;
-  readonly usuario_nombre_corto: string | null;
-  readonly usuario_email: string;
-  /** Como en `ContenedorMember`: el rol se fue, quedó la bandera. */
-  readonly propietario: boolean;
-  readonly permiso: UsuarioPermiso;
+  /** `id` de la membresía (`usuario-cliente`). */
+  readonly usuario_cliente: number;
+  readonly permiso: number;
+  readonly permiso_codename: string | null;
+  readonly permiso_name: string | null;
+  readonly permiso_content_type_app_label: string | null;
+  readonly permiso_content_type_model: string | null;
 }
 
 /**
@@ -218,9 +248,41 @@ export interface Contenedor extends ContenedorAccesoFlags {
    * de la empresa. Opcional: un despliegue que no lo mande se lee como `false`.
    */
   soporte?: boolean;
+  /** Superusuario de la plataforma: entra a todos los módulos. */
+  readonly is_superuser?: boolean;
+  /** Grupos de la membresía: deciden a qué módulos entra (ver `GRUPO_ACCESO`). */
+  readonly grupos: readonly number[];
 }
 
 export type ContenedoresResponse = PaginatedResponse<Contenedor>;
+
+/**
+ * Membresía de quien consulta en un contenedor:
+ * `GET /seguridad/usuario-cliente/usuario/?schema_name=<schema>` (serializer
+ * `SegUsuarioCliente`, sin `X-Tenant`). Responde 404 si el contenedor no existe
+ * o el usuario no es miembro.
+ *
+ * Es lo que valida la entrada a `/t/:slug` tras una recarga dura. No trae el
+ * `schema_name` (es el que se mandó). `cliente_nombre` y
+ * `cliente_imagen_thumbnail` se pidieron al backend: mientras no lleguen, el
+ * header pinta el slug y la inicial.
+ */
+export interface MembresiaContenedor {
+  /** Id de la membresía (la fila usuario-cliente), no del usuario. */
+  readonly id: number;
+  readonly usuario_id: number;
+  readonly usuario_nombre_corto: string;
+  readonly usuario_email: string;
+  readonly cliente_id: number;
+  /** El schema no lo marca requerido: ausente se lee como `false`. */
+  readonly propietario?: boolean;
+  readonly soporte: boolean;
+  readonly is_superuser: boolean;
+  /** Ids de los grupos de la membresía. */
+  readonly grupos: readonly number[];
+  readonly cliente_nombre?: string | null;
+  readonly cliente_imagen_thumbnail?: string | null;
+}
 
 /**
  * Ficha de una empresa (`GET /contenedor/cliente/{id}/`, serializer

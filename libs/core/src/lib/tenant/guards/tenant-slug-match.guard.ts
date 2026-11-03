@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import type { CanMatchFn, Route, UrlSegment } from '@angular/router';
-import { TenantService } from './tenant.service';
+import { TenantService } from '../tenant.service';
 import { tenantSlugFromSegments } from './tenant-slug.utils';
 
 /**

@@ -5,7 +5,6 @@ import {
   FileDownloadService,
   TenantService,
   buildFiltros,
-  type ContenedorAccesoFlags,
   type ContenedorMember,
   type FilterCondition,
   type GrupoSeguridad,
@@ -13,6 +12,7 @@ import {
   type PermisoCatalogoFiltros,
   type PermisoSeguridad,
   type UserSearchResult,
+  type UsuarioClienteGrupo,
   type UsuarioClientePermiso,
 } from '@reddoc/core';
 import { ContenedorNoResueltoError } from '../../seguridad.errors';
@@ -93,34 +93,41 @@ export class SeguridadUsuariosService {
       .pipe(tap((pagina) => this.catalogoPermisosCache.set(clave, pagina)));
   }
 
+  /** Grupos de la membresía (`id` de `lista-usuario`, no el `usuario_id`). */
+  getGruposMiembro(usuarioClienteId: number): Observable<readonly UsuarioClienteGrupo[]> {
+    return this.contenedor.getMemberGrupos(usuarioClienteId);
+  }
+
+  /** Permisos personalizados de la membresía. */
+  getPermisosMiembro(usuarioClienteId: number): Observable<readonly UsuarioClientePermiso[]> {
+    return this.contenedor.getMemberPermisos(usuarioClienteId);
+  }
+
   /**
-   * Permiso efectivo del miembro (grupos y permisos directos). SUPUESTO
-   * pendiente de confirmar con backend: la consulta por `usuario_id` devuelve
-   * una sola fila (la fila no trae `cliente_id` para desambiguar), así que se
-   * toma la primera.
+   * Asigna un grupo a la membresía con su nivel (`heredarPermisos`); devuelve
+   * la fila creada (su `id` sirve para quitarlo).
    */
-  getPermisoMiembro(usuarioId: number): Observable<UsuarioClientePermiso | null> {
-    return this.contenedor.getMemberPermisos(usuarioId).pipe(map((r) => r.results[0] ?? null));
+  addGrupo(
+    usuarioClienteId: number,
+    grupoId: number,
+    heredarPermisos: boolean,
+  ): Observable<UsuarioClienteGrupo> {
+    return this.contenedor.addMemberGrupo(usuarioClienteId, grupoId, heredarPermisos);
   }
 
-  /** Asigna un grupo de seguridad al miembro. */
-  addGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
-    return this.contenedor.addMemberGrupo(usuarioId, grupoId);
+  /** Quita un grupo por el `id` de su fila. */
+  removeGrupo(asignacionId: number): Observable<unknown> {
+    return this.contenedor.removeMemberGrupo(asignacionId);
   }
 
-  /** Quita un grupo de seguridad al miembro. */
-  removeGrupo(usuarioId: number, grupoId: number): Observable<unknown> {
-    return this.contenedor.removeMemberGrupo(usuarioId, grupoId);
+  /** Asigna un permiso a la membresía; devuelve la fila creada. */
+  addPermiso(usuarioClienteId: number, permisoId: number): Observable<UsuarioClientePermiso> {
+    return this.contenedor.addMemberPermiso(usuarioClienteId, permisoId);
   }
 
-  /** Asigna un permiso individual al miembro. */
-  addPermiso(usuarioId: number, permisoId: number): Observable<unknown> {
-    return this.contenedor.addMemberPermiso(usuarioId, permisoId);
-  }
-
-  /** Quita un permiso individual al miembro. */
-  removePermiso(usuarioId: number, permisoId: number): Observable<unknown> {
-    return this.contenedor.removeMemberPermiso(usuarioId, permisoId);
+  /** Quita un permiso por el `id` de su fila. */
+  removePermiso(asignacionId: number): Observable<unknown> {
+    return this.contenedor.removeMemberPermiso(asignacionId);
   }
 
   /**
@@ -128,23 +135,13 @@ export class SeguridadUsuariosService {
    * accesos por módulo.
    *
    * **Sin rol**: el rol no viaja en la invitación, se cambia desde la fila del
-   * listado. Los grupos solo viajan cuando se eligió alguno; los accesos viajan
-   * con su booleano explícito (incluido `false`) para que el backend no tenga
-   * que adivinar qué significa una flag ausente.
+   * listado. Los grupos solo viajan cuando se eligió alguno.
    */
-  invite(
-    usuarioId: number,
-    opciones: {
-      readonly grupoIds?: readonly number[];
-      readonly accesos?: ContenedorAccesoFlags;
-    } = {},
-  ): Observable<unknown> {
-    const grupoIds = opciones.grupoIds ?? [];
+  invite(usuarioId: number, grupoIds: readonly number[] = []): Observable<unknown> {
     return this.contenedor.sendInvitation({
       cliente_id: this.requireClienteId(),
       usuario_id: usuarioId,
       ...(grupoIds.length > 0 ? { grupo_ids: grupoIds } : {}),
-      ...opciones.accesos,
     });
   }
 

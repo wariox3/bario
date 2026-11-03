@@ -36,12 +36,13 @@ export {
 export { TelefonoPipe } from './lib/pipes/telefono.pipe';
 export type { AuthDict, AuthTranslationsHost } from './lib/auth/i18n';
 export { authEs, authEn } from './lib/auth/i18n';
-export { AccesosContenedorComponent } from './lib/components/accesos-contenedor/accesos-contenedor.component';
+export { GruposSeguridadComponent } from './lib/components/grupos-seguridad/grupos-seguridad.component';
+export { iconoDeGrupo } from './lib/components/grupos-seguridad/icono-de-grupo';
 export type {
-  AccesosContenedorDict,
-  AccesosContenedorTranslationsHost,
-} from './lib/components/accesos-contenedor/i18n';
-export { accesosContenedorEs, accesosContenedorEn } from './lib/components/accesos-contenedor/i18n';
+  GruposSeguridadDict,
+  GruposSeguridadTranslationsHost,
+} from './lib/components/grupos-seguridad/i18n';
+export { gruposSeguridadEs, gruposSeguridadEn } from './lib/components/grupos-seguridad/i18n';
 export { PhoneInputComponent } from './lib/components/phone-input/phone-input.component';
 export { EmailChipsInputComponent } from './lib/components/email-chips-input/email-chips-input.component';
 export type { PhoneInputDict, PhoneInputTranslationsHost } from './lib/components/phone-input/i18n';
@@ -49,3 +50,6 @@ export { phoneInputEs, phoneInputEn } from './lib/components/phone-input/i18n';
 export { AppSwitcherComponent } from './lib/app-switcher/app-switcher.component';
 export type { AppSwitcherDict, AppSwitcherTranslationsHost } from './lib/app-switcher/i18n';
 export { appSwitcherEs, appSwitcherEn } from './lib/app-switcher/i18n';
+export { SaludoComponent } from './lib/components/saludo/saludo.component';
+export type { SaludoDict, SaludoTranslationsHost } from './lib/components/saludo/i18n';
+export { saludoEs, saludoEn } from './lib/components/saludo/i18n';

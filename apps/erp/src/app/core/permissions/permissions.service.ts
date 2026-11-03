@@ -22,8 +22,8 @@ const GRANTS_COMPLETOS = false;
  *
  * Responde tres preguntas ortogonales, que conviene no mezclar:
  *
- *  1. **¿Qué compró el tenant?** — `enabledModuleIds` / `canAccessModule`.
- *     Depende del plan del contenedor, no de quién sos.
+ *  1. **¿A qué módulos entra?** — `enabledModuleIds` / `canAccessModule`.
+ *     Sale de los grupos de la membresía (ver `GRUPO_ACCESO` en `@reddoc/core`).
  *  2. **¿Qué puede hacer este usuario?** — `can` / `canResolve`, sobre los
  *     modelos del backend (`ModelPermissionsService`).
  *  3. **¿Administra el contenedor?** — `isContenedorPropietario`, de la bandera
@@ -39,13 +39,13 @@ export class PermissionsService {
   private readonly modelPermissions = inject(ModelPermissionsService);
 
   /**
-   * Módulos habilitados por el plan del contenedor activo.
+   * Módulos habilitados para el usuario en el contenedor activo.
    *
-   * El backend manda las flags `acceso_*` en `/contenedor/cliente/lista-usuario/`
+   * `readModuleAccessFlags` traduce los grupos de la membresía a flags `acceso_*`
    * y cada descriptor declara cuál le corresponde. Un módulo sin `accessFlag`
    * (General) está siempre disponible: es la base, no se contrata aparte.
    *
-   * Si el contenedor no trae ninguna flag, no se restringe nada — ver
+   * Propietario, superusuario y soporte no se restringen — ver
    * `readModuleAccessFlags`.
    */
   readonly enabledModuleIds = computed<ReadonlySet<string>>(() => {

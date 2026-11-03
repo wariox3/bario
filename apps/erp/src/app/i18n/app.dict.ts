@@ -1,9 +1,10 @@
 import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
 import type {
-  AccesosContenedorTranslationsHost,
+  GruposSeguridadTranslationsHost,
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
+  SaludoTranslationsHost,
 } from '@reddoc/ui/i18n';
 
 /**
@@ -64,8 +65,9 @@ export interface AppDict
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
     PhoneInputTranslationsHost,
+    SaludoTranslationsHost,
     ContenedoresTranslationsHost,
-    AccesosContenedorTranslationsHost {
+    GruposSeguridadTranslationsHost {
   common: {
     comingSoon: string;
     /** Colapsable de los documentos con los campos opcionales que menos se tocan. */
@@ -5474,10 +5476,6 @@ export interface AppDict
           usuarioPlaceholder: string;
           usuarioHint: string;
           usuarioInvalid: string;
-          grupos: string;
-          gruposPlaceholder: string;
-          gruposHint: string;
-          gruposEmpty: string;
         };
         submit: string;
         sending: string;
@@ -5491,15 +5489,14 @@ export interface AppDict
         propietario: { title: string; desc: string };
         grupos: {
           count: { zero: string; one: string; other: string };
+          completos: string;
+          niveles: { ninguno: string; menu: string; completo: string };
+          nivelesHint: { ninguno: string; menu: string; completo: string };
           emptyCatalog: string;
           hint: string;
-          toasts: {
-            added: { title: string; desc: string };
-            removed: { title: string; desc: string };
-          };
+          toasts: { changed: { title: string; desc: string } };
         };
         permisos: {
-          flags: { superuser: string; staff: string };
           agregar: string;
           empty: { title: string; desc: string };
           dialog: { title: string; subtitle: string };

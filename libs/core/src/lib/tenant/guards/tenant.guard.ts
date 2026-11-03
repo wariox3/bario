@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { ROUTE_PATHS_TOKEN } from '../tokens';
-import { TenantService } from './tenant.service';
+import { ROUTE_PATHS_TOKEN } from '../../tokens';
+import { TenantService } from '../tenant.service';
 
 /**
  * Marca el tenant activo a partir del slug de la URL `/t/:tenantSlug`.

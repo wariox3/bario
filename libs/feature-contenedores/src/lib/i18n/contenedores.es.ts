@@ -1,7 +1,6 @@
 import type { ContenedoresDict } from './contenedores.dict';
 
 export const contenedoresEs: ContenedoresDict = {
-  saludo: { manana: 'Buenos días', tarde: 'Buenas tardes', noche: 'Buenas noches' },
   list: {
     title: 'Tus contenedores de empresa',
     subtitle: 'Selecciona un espacio de trabajo para continuar',
@@ -82,6 +81,56 @@ export const contenedoresEs: ContenedoresDict = {
       propietario: 'Propietario',
       miembro: 'Miembro',
       soporte: 'Soporte',
+    },
+  },
+  invitaciones: {
+    eyebrow: { one: 'Invitación pendiente', other: '{n} invitaciones pendientes' },
+    invitedBy: '{nombre} te invitó',
+    someone: 'Alguien',
+    accept: 'Unirme',
+    reject: 'Rechazar',
+    confirmReject: '¿Rechazar la invitación?',
+    confirmYes: 'Sí, rechazar',
+    confirmNo: 'No',
+    more: { one: 'Ver 1 más', other: 'Ver {n} más' },
+    less: 'Ver menos',
+    toasts: {
+      acceptError: {
+        title: 'No pudiste unirte',
+        desc: 'No se pudo aceptar la invitación. Intenta de nuevo.',
+      },
+      rejectError: {
+        title: 'No se pudo rechazar',
+        desc: 'No se pudo rechazar la invitación. Intenta de nuevo.',
+      },
+    },
+  },
+  ideas: {
+    title: '¿Qué te gustaría mejorar o automatizar hoy?',
+    subtitle: 'Escríbelo con tus palabras. Lo revisa el equipo y te avisamos cómo avanza.',
+    placeholder: 'Ej.: Que me avise cuando un vigilante acumule más de 48 horas en la semana',
+    required: 'Cuéntanos tu idea antes de enviarla.',
+    shortcut: 'Ctrl + Enter para enviar',
+    submit: 'Enviar idea',
+    sent: 'Recibida. Te avisamos cuando el equipo la revise.',
+    listTitle: 'Tus ideas',
+    etapas: {
+      recibida: 'Recibida',
+      evaluacion: 'En evaluación',
+      respondida: 'Respondida',
+      cerrada: 'Cerrada',
+    },
+    empty: {
+      title: 'Aún no has enviado ideas',
+      sub: 'Lo que repites cada semana a mano es un buen comienzo.',
+    },
+    loadError: 'No pudimos traer tus ideas.',
+    retry: 'Reintentar',
+    toasts: {
+      error: {
+        title: 'No se pudo enviar',
+        desc: 'Tu idea no se envió. Intenta de nuevo en un momento.',
+      },
     },
   },
   create: {
@@ -176,11 +225,6 @@ export const contenedoresEs: ContenedoresDict = {
       invalid: 'Ingresa un correo válido.',
       submit: 'Enviar invitación',
       sending: 'Enviando…',
-      grupos: {
-        label: 'Grupos',
-        placeholder: 'Selecciona los grupos (opcional)',
-        empty: 'No hay grupos disponibles.',
-      },
     },
     pending: {
       estados: { P: 'Pendiente', A: 'Aceptada', R: 'Rechazada' },

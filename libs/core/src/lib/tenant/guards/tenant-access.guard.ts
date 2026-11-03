@@ -1,11 +1,13 @@
 import { inject } from '@angular/core';
 import { type CanMatchFn, Router, type Route, type UrlSegment } from '@angular/router';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { catchError, map, of } from 'rxjs';
-import { AUTH_SERVICE } from '../tokens';
-import { ToastService } from '../services/toast.service';
-import { TenantService } from './tenant.service';
-import { TENANT_ROUTES } from './tenant.types';
-import { ContenedorService } from './contenedor.service';
+import { AUTH_SERVICE } from '../../tokens';
+import { ToastService } from '../../services/toast.service';
+import { TenantService } from '../tenant.service';
+import { TENANT_ROUTES } from '../tenant.types';
+import { ContenedorService } from '../contenedor/contenedor.service';
+import { membresiaToAccess } from '../contenedor/membresia.mapper';
 import { tenantSlugFromSegments } from './tenant-slug.utils';
 
 /**
@@ -23,6 +25,12 @@ import { tenantSlugFromSegments } from './tenant-slug.utils';
  * Si `currentContenedor` ya coincide con el slug, no revalida (se entró vía la
  * página de contenedores o ya se validó esta sesión). Tras recarga dura es
  * `null` —solo se persiste el slug— así que revalida una vez.
+ *
+ * La validación es `GET /seguridad/usuario-cliente/usuario/?schema_name=<slug>`:
+ * la membresía del usuario en ese contenedor y nada más, en vez de traer la
+ * lista entera de empresas para buscar una. Un 404 (no existe o no es miembro)
+ * o un 400 (slug inválido) es "sin acceso"; cualquier otro error vuelve a la
+ * lista de contenedores sin aviso, como antes.
  *
  * **Sin sesión no pide nada**: devuelve `true` sin tocar el backend y deja que
  * `authGuard` (en `canActivate`) redirija al login conservando el `returnUrl`.
@@ -53,13 +61,21 @@ export const tenantAccessGuard: CanMatchFn = (route: Route, segments: UrlSegment
     return router.createUrlTree([routes.contenedoresRoot]);
   };
 
-  return contenedorService.getAccesos().pipe(
-    map((res) => {
-      const match = res.results.find((c) => c.schema_name === slug);
-      if (!match) return denegado();
-      tenant.setCurrent(match);
+  return contenedorService.getMembresia(slug).pipe(
+    map((membresia) => {
+      tenant.setCurrent(membresiaToAccess(slug, membresia));
       return true;
     }),
-    catchError(() => of(router.createUrlTree([routes.contenedoresRoot]))),
+    catchError((error: unknown) =>
+      of(esSinAcceso(error) ? denegado() : router.createUrlTree([routes.contenedoresRoot])),
+    ),
   );
 };
+
+/** El backend responde 404 si no es miembro y 400 si el slug no es un schema válido. */
+function esSinAcceso(error: unknown): boolean {
+  return (
+    error instanceof HttpErrorResponse &&
+    (error.status === HttpStatusCode.NotFound || error.status === HttpStatusCode.BadRequest)
+  );
+}

@@ -3,6 +3,7 @@ import type {
   ParamValue,
   PermisoCatalogoFiltros,
   PermisoSeguridad,
+  UsuarioClientePermiso,
 } from '@reddoc/core';
 import {
   ACCIONES_PERMISO,
@@ -52,6 +53,29 @@ export function permisoCatalogoKey(filtros: PermisoCatalogoFiltros): string {
   return [filtros.app, filtros.modelo, filtros.accion, filtros.search, filtros.page]
     .map((valor) => valor ?? '')
     .join('|');
+}
+
+/**
+ * Fila de `usuario-cliente-permiso` → la forma del catálogo, para pintarla en
+ * la misma matriz. La acción sale del prefijo del `codename` (`view_gencontacto`
+ * → `view`); lo que no sea una de las cuatro estándar cae a los extras.
+ *
+ * La fila no trae la etiqueta legible del modelo, así que se muestra el nombre
+ * técnico (`gencontacto`) hasta que el backend la serialice.
+ */
+export function permisoDeAsignacion(fila: UsuarioClientePermiso): PermisoSeguridad {
+  const codename = fila.permiso_codename ?? '';
+  const modelo = fila.permiso_content_type_model ?? '';
+  const separador = codename.indexOf('_');
+  return {
+    id: fila.permiso,
+    app: fila.permiso_content_type_app_label ?? '',
+    modelo,
+    modelo_label: modelo,
+    accion: separador > 0 ? codename.slice(0, separador) : codename,
+    codename,
+    nombre: fila.permiso_name ?? codename,
+  };
 }
 
 /** Fila de la matriz de permisos: un modelo con su permiso por acción. */

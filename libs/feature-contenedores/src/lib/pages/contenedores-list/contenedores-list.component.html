@@ -1,12 +1,9 @@
 <div class="cl">
-  <header class="mb-5">
-    <p class="m-0 text-[0.8rem] text-brand-muted">{{ fechaHoy() }}</p>
-    <h1
-      class="m-0 mt-1 text-[1.6rem] leading-tight font-extrabold tracking-[-0.03em] text-brand-text"
-    >
-      {{ saludo() }}
-    </h1>
-  </header>
+  <lib-saludo class="mb-5 block" [nombre]="currentUser()?.nombre_corto" />
+
+  @if (capabilities().invitaciones) {
+    <lib-invitaciones-recibidas (aceptada)="onInvitacionAceptada($event)" />
+  }
 
   <div class="cl-panel">
     <!-- Panel header -->
@@ -134,7 +131,7 @@
           @if (viewMode() === 'list') {
             <ul class="cl-list">
               @for (item of filteredContenedores(); track item.cliente_id; let i = $index) {
-                <li>
+                <li [class.cl-recien]="item.cliente_id === recienUnidaId()">
                   <lib-contenedor-row-item
                     [contenedor]="item"
                     [index]="i"
@@ -165,6 +162,7 @@
             <div class="cl-grid">
               @for (item of filteredContenedores(); track item.cliente_id; let i = $index) {
                 <lib-contenedor-card-item
+                  [class.cl-recien]="item.cliente_id === recienUnidaId()"
                   [contenedor]="item"
                   [index]="i"
                   [showMenu]="hasRowActions()"
@@ -210,6 +208,12 @@
       }
     </div>
   </div>
+
+  @if (capabilities().ideas) {
+    @defer (on idle) {
+      <lib-ideas class="mt-4" />
+    }
+  }
 </div>
 
 <p-menu #rowMenu [model]="rowMenuItems" [popup]="true" appendTo="body" styleClass="cl-row-menu" />

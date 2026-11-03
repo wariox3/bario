@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.19](https://github.com/wariox3/bario/compare/v0.1.18...v0.1.19) (2026-11-03)
+
+### Features
+
+- **contenedores:** enviar ideas de mejora a la mesa de ayuda desde el inicio ([b25527d](https://github.com/wariox3/bario/commit/b25527d5d606119c00c15a0f68218c274ef567ca))
+- **contenedores:** invitar con grupos en grilla y sin accesos por módulo ([5e9dc5d](https://github.com/wariox3/bario/commit/5e9dc5db5402f578e3a09988339177b4db42ec41))
+- **contenedores:** responder invitaciones recibidas desde el listado ([bcb1072](https://github.com/wariox3/bario/commit/bcb107244b7324d35992a6173c11a20a91bbd11e))
+- **seguridad:** grupos y permisos del usuario por membresía con nivel de acceso ([33a8e56](https://github.com/wariox3/bario/commit/33a8e56f9b34cb0dccca2465b9f62229a0025f3b))
+- **tenant:** validar la membresía y decidir módulos por grupos ([e6769d5](https://github.com/wariox3/bario/commit/e6769d579fe0bf4e73d04aff1ea662c46aff5c75))
+- **ui:** saludo con frases que varían según la hora y el día ([a378ae2](https://github.com/wariox3/bario/commit/a378ae276e7a7624a39ff168eef1987ed302bad9))
+
+### Bug Fixes
+
+- **core:** avisar una sola vez el error al eliminar ([7a73abe](https://github.com/wariox3/bario/commit/7a73abe8995b731e1fdd90435a1ee706d5816890))
+
+### Refactoring
+
+- **tenant:** grupos obligatorios, acceso tipado y mapper de membresía ([063b28e](https://github.com/wariox3/bario/commit/063b28e33a683e84bb053168a1d45804c8c2bea0))
+- **tenant:** separar guards, contenedor y acceso en carpetas ([112dd9e](https://github.com/wariox3/bario/commit/112dd9effdd0d96c477a29a37954ee36bf12e7c2))
+
 ## [0.1.18](https://github.com/wariox3/bario/compare/v0.1.17...v0.1.18) (2026-10-30)
 
 ### Features

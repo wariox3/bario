@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, map, of } from 'rxjs';
+import { ERROR_TOAST } from '../interceptors/error-http-context';
 import { buildHttpParams } from '../services/base-http.service';
 import { parseFilename, triggerBrowserDownload } from '../http/file-download.utils';
 import {
@@ -71,14 +72,18 @@ export class HttpEntityDataGateway implements EntityDataGateway {
    * Elimina uno o varios documentos vía `DELETE <endpoint>/<id>/` (REST estándar).
    * Cuando hay varios ids se paralelizan los DELETEs y se espera a que todos
    * terminen; con la lista vacía no se hace ninguna petición.
+   *
+   * Sin toast del interceptor: la lista que borra avisa el error con su propio
+   * título ("Error al eliminar"), y con los dos salían dos avisos iguales.
    */
   remove(entity: EntityConfig, ids: readonly (string | number)[]): Observable<void> {
     if (ids.length === 0) {
       return of(undefined);
     }
-    return forkJoin(ids.map((id) => this.http.delete(`${entity.endpoint}/${id}/`))).pipe(
-      map(() => undefined),
-    );
+    const context = new HttpContext().set(ERROR_TOAST, false);
+    return forkJoin(
+      ids.map((id) => this.http.delete(`${entity.endpoint}/${id}/`, { context })),
+    ).pipe(map(() => undefined));
   }
 
   /**

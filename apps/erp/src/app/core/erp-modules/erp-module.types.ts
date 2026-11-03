@@ -1,3 +1,4 @@
+import type { AccesoFlagName } from '@reddoc/core';
 import type { SidebarSection } from './sidebar-menu.types';
 
 /**
@@ -26,14 +27,15 @@ export interface ErpModuleDescriptor {
    */
   readonly defaultChildPath: string | null;
   /**
-   * Flag del contenedor que habilita este módulo, p. ej. `'acceso_venta'`.
+   * Flag que habilita este módulo, p. ej. `'acceso_venta'`. La deriva
+   * `readModuleAccessFlags` de los grupos de la membresía (`GRUPO_ACCESO`).
    *
-   * Es el eje **plan del tenant**: qué contrató la empresa, no qué puede hacer
-   * el usuario (eso son los `PermissionCode` del menú). Sin declarar, el módulo
+   * Es el eje **a qué módulos entra**, no qué puede hacer dentro (eso son los
+   * permisos por modelo). Sin declarar, el módulo
    * está siempre disponible — es el caso de General, que es la base, y de las
    * áreas ocultas como Seguridad.
    */
-  readonly accessFlag?: string;
+  readonly accessFlag?: AccesoFlagName;
   /** Entradas del sidebar mostradas cuando este módulo está activo. */
   readonly menu: readonly SidebarSection[];
 }

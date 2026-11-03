@@ -26,6 +26,10 @@ export interface ContenedoresCapabilities {
    * capability, el botón exige que el usuario sea staff (`is_staff` de `/me/`).
    */
   readonly support: boolean;
+  /** Responder, sobre el listado, las invitaciones que recibió la persona. */
+  readonly invitaciones: boolean;
+  /** Enviar ideas de mejora a la mesa de ayuda y ver cómo avanzan. */
+  readonly ideas: boolean;
 }
 
 /** Todas las acciones habilitadas. Es el default del componente. */
@@ -38,4 +42,6 @@ export const CONTENEDORES_CAPABILITIES_FULL: ContenedoresCapabilities = {
   subscription: true,
   viewToggle: true,
   support: true,
+  invitaciones: true,
+  ideas: true,
 };

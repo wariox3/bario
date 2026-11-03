@@ -22,24 +22,27 @@ import {
   of,
   switchMap,
   tap,
+  throwError,
+  type Observable,
 } from 'rxjs';
 import {
   I18nService,
   LIST_PAGE_SIZE,
   ToastService,
   type PaginatedResponse,
-  type PermisoAsignado,
   type PermisoCatalogoFiltros,
   type PermisoSeguridad,
-  type UsuarioPermiso,
+  type UsuarioClientePermiso,
 } from '@reddoc/core';
 import { PERMISO_APPS } from '@erp/core/permissions';
 import type { AppDict } from '@erp/i18n';
+import { PermisoSinAsignacionError } from '../../../../seguridad.errors';
 import { ACCIONES_PERMISO, type AccionColumna } from '../../usuarios.constants';
 import { SeguridadUsuariosService } from '../../usuarios.service';
 import {
   agruparPermisos,
   permisoCatalogoKey,
+  permisoDeAsignacion,
   type PermisoAppGrupo,
   type PermisoModeloFila,
 } from '../../usuarios.utils';
@@ -60,9 +63,9 @@ const PAGINA_VACIA: PaginatedResponse<PermisoSeguridad> = {
 };
 
 /**
- * Permisos directos del miembro: la tab responde primero "¿qué tiene?" — la
- * matriz de `permiso.permisos` agrupada app → modelo × acción (el backend
- * manda el mismo serializador del catálogo, con `modelo_label` y `nombre`).
+ * Permisos personalizados del miembro: la tab responde primero "¿qué tiene?" —
+ * la matriz de sus filas de `usuario-cliente-permiso` agrupada app → modelo ×
+ * acción (cada fila se lleva a la forma del catálogo con `permisoDeAsignacion`).
  * Entrar a la tab no dispara peticiones: los asignados ya vienen con el
  * detalle.
  *
@@ -74,8 +77,9 @@ const PAGINA_VACIA: PaginatedResponse<PermisoSeguridad> = {
  * esa columna y `p-paginator` al pie. El catálogo recién se consulta al abrir
  * el dialog, y cada consulta queda cacheada en el servicio.
  *
- * Gestionar es tocar (chip o celda): toggle **optimista** contra
- * `agregar-permiso/` / `quitar-permiso/` — responde al instante, toast al
+ * Gestionar es tocar (chip o celda): toggle **optimista** — agregar es un
+ * `POST usuario-cliente-permiso/` y quitar un `DELETE` de la fila por su `id`
+ * (por eso se guarda el `id` de cada asignación) — responde al instante, toast al
  * confirmar, revierte si el backend falla (el toast de error lo pone el
  * `errorInterceptor` global) y el control queda bloqueado mientras la
  * petición vuela. La lista principal y el picker comparten estado: togglear
@@ -97,11 +101,11 @@ export class UsuarioPermisosPanelComponent {
   protected readonly t = this.i18n.t;
   protected readonly acciones = ACCIONES_PERMISO;
 
-  /** `usuario_id` del miembro (el que espera `agregar-permiso/`). */
-  readonly usuarioId = input.required<number>();
+  /** `id` de la membresía (`usuario_cliente` del `POST`). */
+  readonly usuarioClienteId = input.required<number>();
 
-  /** Bloque `permiso` del miembro; `null` mientras no llega o si falló. */
-  readonly permiso = input<UsuarioPermiso | null>(null);
+  /** Filas de `usuario-cliente-permiso` de la membresía. */
+  readonly asignaciones = input<readonly UsuarioClientePermiso[]>([]);
 
   /** Dialog del picker de catálogo. */
   protected readonly pickerAbierto = signal(false);
@@ -140,17 +144,17 @@ export class UsuarioPermisosPanelComponent {
     page: this.pagina(),
   }));
 
-  protected readonly tieneFlags = computed(() => {
-    const p = this.permiso();
-    return p != null && (p.is_superuser || p.is_staff);
-  });
-
   /**
    * Permisos directos del miembro. Editable (el toggle optimista lo muta) y
-   * re-sincronizado si el `permiso` del input cambia.
+   * re-sincronizado si las asignaciones del input cambian.
    */
-  private readonly asignados = linkedSignal<readonly PermisoAsignado[]>(
-    () => this.permiso()?.permisos ?? [],
+  private readonly asignados = linkedSignal<readonly PermisoSeguridad[]>(() =>
+    this.asignaciones().map(permisoDeAsignacion),
+  );
+
+  /** Permiso → `id` de su fila, para poder borrarla. Se completa al confirmar un alta. */
+  private readonly filaIds = linkedSignal<ReadonlyMap<number, number>>(
+    () => new Map(this.asignaciones().map((a) => [a.permiso, a.id])),
   );
 
   private readonly asignadosIds = computed<ReadonlySet<number>>(
@@ -245,7 +249,6 @@ export class UsuarioPermisosPanelComponent {
   /** Toggle optimista (celda de la matriz principal o del picker). */
   protected toggle(permisoItem: PermisoSeguridad): void {
     if (this.estaPendiente(permisoItem.id)) return;
-    const usuarioId = this.usuarioId();
     const teniaPermiso = this.tieneAsignado(permisoItem.id);
     const etiqueta = permisoItem.nombre;
 
@@ -255,24 +258,22 @@ export class UsuarioPermisosPanelComponent {
     );
     this.pendientes.update((ids) => [...ids, permisoItem.id]);
 
-    const request = teniaPermiso
-      ? this.service.removePermiso(usuarioId, permisoItem.id)
-      : this.service.addPermiso(usuarioId, permisoItem.id);
-
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.pendientes.update((ids) => ids.filter((i) => i !== permisoItem.id));
-        const toasts = this.t().seguridad.usuarios.detalle.permisos.toasts;
-        const toast = teniaPermiso ? toasts.removed : toasts.added;
-        this.toast.success(toast.title, toast.desc.replace('{permiso}', etiqueta));
-      },
-      error: () => {
-        this.pendientes.update((ids) => ids.filter((i) => i !== permisoItem.id));
-        this.asignados.update((lista) =>
-          teniaPermiso ? [...lista, permisoItem] : lista.filter((p) => p.id !== permisoItem.id),
-        );
-      },
-    });
+    this.peticion(permisoItem.id, teniaPermiso)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.pendientes.update((ids) => ids.filter((i) => i !== permisoItem.id));
+          const toasts = this.t().seguridad.usuarios.detalle.permisos.toasts;
+          const toast = teniaPermiso ? toasts.removed : toasts.added;
+          this.toast.success(toast.title, toast.desc.replace('{permiso}', etiqueta));
+        },
+        error: () => {
+          this.pendientes.update((ids) => ids.filter((i) => i !== permisoItem.id));
+          this.asignados.update((lista) =>
+            teniaPermiso ? [...lista, permisoItem] : lista.filter((p) => p.id !== permisoItem.id),
+          );
+        },
+      });
   }
 
   protected onBusquedaInput(event: Event): void {
@@ -375,7 +376,6 @@ export class UsuarioPermisosPanelComponent {
     const objetivo = quitando ? celdas : celdas.filter((celda) => !this.tieneAsignado(celda.id));
     if (objetivo.length === 0) return;
 
-    const usuarioId = this.usuarioId();
     const objetivoIds = new Set(objetivo.map((celda) => celda.id));
 
     this.asignados.update((lista) =>
@@ -385,10 +385,7 @@ export class UsuarioPermisosPanelComponent {
 
     forkJoin(
       objetivo.map((celda) =>
-        (quitando
-          ? this.service.removePermiso(usuarioId, celda.id)
-          : this.service.addPermiso(usuarioId, celda.id)
-        ).pipe(
+        this.peticion(celda.id, quitando).pipe(
           map(() => ({ celda, ok: true })),
           catchError(() => of({ celda, ok: false })),
         ),
@@ -442,6 +439,30 @@ export class UsuarioPermisosPanelComponent {
     return asignado
       ? base + 'bg-brand-navy text-white'
       : base + 'bg-[rgba(20,48,73,0.05)] text-brand-muted hover:bg-[rgba(20,48,73,0.1)]';
+  }
+
+  /**
+   * Alta o baja de un permiso, manteniendo el mapa permiso → fila: el alta
+   * anota el `id` que devuelve el `POST` y la baja lo suelta al confirmar.
+   * Sin fila conocida no hay qué borrar: falla y el caller revierte.
+   */
+  private peticion(permisoId: number, quitando: boolean): Observable<unknown> {
+    if (!quitando) {
+      return this.service
+        .addPermiso(this.usuarioClienteId(), permisoId)
+        .pipe(tap((fila) => this.filaIds.update((m) => new Map(m).set(permisoId, fila.id))));
+    }
+    const filaId = this.filaIds().get(permisoId);
+    if (filaId == null) return throwError(() => new PermisoSinAsignacionError(permisoId));
+    return this.service.removePermiso(filaId).pipe(
+      tap(() =>
+        this.filaIds.update((m) => {
+          const siguiente = new Map(m);
+          siguiente.delete(permisoId);
+          return siguiente;
+        }),
+      ),
+    );
   }
 
   /** Suma apps nuevas a las pills sin perder las ya conocidas. */

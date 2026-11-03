@@ -4,8 +4,6 @@
  * textos, igual que `AuthDict` en `@reddoc/ui`.
  */
 export interface ContenedoresDict {
-  /** Encabezado de la página: la fecha de hoy y un saludo según la hora. */
-  saludo: { manana: string; tarde: string; noche: string };
   list: {
     title: string;
     subtitle: string;
@@ -84,6 +82,46 @@ export interface ContenedoresDict {
       miembro: string;
       soporte: string;
     };
+  };
+  /** Invitaciones que recibió la persona, sobre el listado de empresas. */
+  invitaciones: {
+    /** Rótulo sobre el bloque; `{n}` es la cantidad. */
+    eyebrow: { one: string; other: string };
+    /** «{nombre} te invitó». */
+    invitedBy: string;
+    /** Quien invita, si no trae nombre ni correo. */
+    someone: string;
+    accept: string;
+    reject: string;
+    /** Rechazar se confirma en la misma fila. */
+    confirmReject: string;
+    confirmYes: string;
+    confirmNo: string;
+    /** `{n}` invitaciones plegadas. */
+    more: { one: string; other: string };
+    less: string;
+    toasts: {
+      acceptError: { title: string; desc: string };
+      rejectError: { title: string; desc: string };
+    };
+  };
+  /** Las dos cards al pie del inicio: enviar una idea y su trayecto. */
+  ideas: {
+    title: string;
+    subtitle: string;
+    placeholder: string;
+    required: string;
+    /** Ayuda bajo el campo: el atajo para enviar. */
+    shortcut: string;
+    submit: string;
+    /** Acuse que reemplaza un rato la ayuda tras enviar. */
+    sent: string;
+    listTitle: string;
+    etapas: { recibida: string; evaluacion: string; respondida: string; cerrada: string };
+    empty: { title: string; sub: string };
+    loadError: string;
+    retry: string;
+    toasts: { error: { title: string; desc: string } };
   };
   create: {
     title: string;
@@ -164,11 +202,6 @@ export interface ContenedoresDict {
       invalid: string;
       submit: string;
       sending: string;
-      grupos: {
-        label: string;
-        placeholder: string;
-        empty: string;
-      };
     };
     pending: {
       estados: { P: string; A: string; R: string };

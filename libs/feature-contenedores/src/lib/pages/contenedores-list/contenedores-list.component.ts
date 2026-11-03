@@ -32,20 +32,19 @@ import {
   TenantService,
   ToastService,
 } from '@reddoc/core';
+import { SaludoComponent } from '@reddoc/ui';
 import { isSuscripcionExpired } from '../../utils/contenedor-suscripcion.utils';
-import { fechaConDia, momentoDelDia, primerNombre } from '../../utils/saludo.utils';
 import { ContenedoresCreateDialogComponent } from '../../components/create-dialog/contenedores-create-dialog.component';
 import { ContenedoresDeleteDialogComponent } from '../../components/delete-dialog/contenedores-delete-dialog.component';
 import { ContenedoresInviteDialogComponent } from '../../components/invite-dialog/contenedores-invite-dialog.component';
 import { ContenedoresSupportDialogComponent } from '../../components/support-dialog/contenedores-support-dialog.component';
 import { ContenedorRowItemComponent } from '../../components/contenedor-row-item/contenedor-row-item.component';
 import { ContenedorCardItemComponent } from '../../components/contenedor-card-item/contenedor-card-item.component';
+import { InvitacionesRecibidasComponent } from '../../components/invitaciones-recibidas/invitaciones-recibidas.component';
+import { IdeasComponent } from '../../components/ideas/ideas.component';
 import { CONTENEDORES_CAPABILITIES_FULL } from '../../contenedores.capabilities';
 import type { ContenedoresCapabilities } from '../../contenedores.capabilities';
 import type { ContenedoresTranslationsHost } from '../../i18n';
-
-/** Cada cuánto se revisa la hora: el saludo cambia solo si la página queda abierta. */
-const RELOJ_MS = 60_000;
 
 /** Cada cuánto se consulta el estado de los contenedores que se están creando. */
 const ESTADO_POLL_MS = 5000;
@@ -70,6 +69,9 @@ interface EstadoConsultado {
     MenuModule,
     ButtonModule,
     ConfirmDialogModule,
+    SaludoComponent,
+    InvitacionesRecibidasComponent,
+    IdeasComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './contenedores-list.component.html',
@@ -122,22 +124,6 @@ export class ContenedoresListComponent {
 
   readonly currentUser = this.authService.currentUser;
 
-  private readonly ahora = toSignal(timer(0, RELOJ_MS).pipe(map(() => new Date())), {
-    initialValue: new Date(),
-  });
-
-  /** "Viernes, 30 de octubre", en el idioma de la app. */
-  readonly fechaHoy = computed(() =>
-    fechaConDia(this.ahora(), this.i18n.lang() === 'en' ? 'en-US' : 'es-CO'),
-  );
-
-  /** "Buenos días, Mario" según la hora; sin nombre, solo el saludo. */
-  readonly saludo = computed(() => {
-    const texto = this.t().contenedores.saludo[momentoDelDia(this.ahora())];
-    const nombre = primerNombre(this.currentUser()?.nombre_corto);
-    return nombre ? `${texto}, ${nombre}` : texto;
-  });
-
   /** Entrar como soporte: lo habilita la app y solo lo ve el staff de la plataforma. */
   readonly canSupport = computed(
     () => this.capabilities().support && this.currentUser()?.is_staff === true,
@@ -175,14 +161,26 @@ export class ContenedoresListComponent {
 
   readonly isLoading = computed(() => this.response() === undefined);
 
+  /**
+   * Empresa a la que la persona se acaba de unir aceptando una invitación: va
+   * primera en el listado y se marca con un halo, para que se vea que la
+   * invitación se convirtió en una de sus empresas.
+   */
+  readonly recienUnidaId = signal<number | null>(null);
+
   readonly contenedores = computed(() => {
     const results = this.response()?.results ?? [];
     const estados = this.estadosConsultados();
-    if (!estados.size) return results;
-    return results.map((c) => {
-      const estado = estados.get(c.cliente_id);
-      return estado ? { ...c, estado } : c;
-    });
+    const conEstado = estados.size
+      ? results.map((c) => {
+          const estado = estados.get(c.cliente_id);
+          return estado ? { ...c, estado } : c;
+        })
+      : results;
+    const recien = this.recienUnidaId();
+    if (recien === null) return conEstado;
+    const unida = conEstado.find((c) => c.cliente_id === recien);
+    return unida ? [unida, ...conEstado.filter((c) => c !== unida)] : conEstado;
   });
 
   /** Ids que siguen en creación, como clave estable para reiniciar el sondeo solo si cambian. */
@@ -480,6 +478,11 @@ export class ContenedoresListComponent {
 
   onSupportAdded(): void {
     this.showSupport.set(false);
+    this.reload$.next();
+  }
+
+  onInvitacionAceptada(clienteId: number): void {
+    this.recienUnidaId.set(clienteId);
     this.reload$.next();
   }
 

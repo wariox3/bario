@@ -1,9 +1,10 @@
 import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
 import type {
-  AccesosContenedorTranslationsHost,
+  GruposSeguridadTranslationsHost,
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
+  SaludoTranslationsHost,
 } from '@reddoc/ui/i18n';
 
 export interface AppDict
@@ -11,8 +12,9 @@ export interface AppDict
     AuthTranslationsHost,
     AppSwitcherTranslationsHost,
     PhoneInputTranslationsHost,
+    SaludoTranslationsHost,
     ContenedoresTranslationsHost,
-    AccesosContenedorTranslationsHost {
+    GruposSeguridadTranslationsHost {
   common: {
     comingSoon: string;
     actions: {

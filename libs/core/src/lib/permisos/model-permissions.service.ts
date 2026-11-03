@@ -1,26 +1,21 @@
 import { Injectable, effect, inject, signal, untracked } from '@angular/core';
-import { Observable, catchError, map, of, shareReplay, tap } from 'rxjs';
+import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
 import { BaseHttpService } from '../services/base-http.service';
 import { TenantService } from '../tenant/tenant.service';
 import { AUTH_SERVICE } from '../tokens';
 import type { ModeloId } from './modelo.catalog';
 import type { ModelGrants, PermissionAction } from './permission.types';
 
-/** Ante cualquier duda, se permite: el backend es quien realmente niega. */
+/** Ante cualquier duda —y hoy siempre—, se permite: el backend es quien realmente niega. */
 const PERMITE_TODO: ModelGrants = { ver: true, crear: true, editar: true, eliminar: true };
 
 /**
  * Permisos del usuario sobre los modelos del backend, con cache por contenedor.
  *
- * **Una petición por modelo, la primera vez que se entra a su feature.** La
- * dispara el `permissionGuard` en el `canMatch` de la ruta, así que la respuesta
- * ya está cuando la pantalla monta: los botones no aparecen para desaparecer
- * después. Entrar a la lista, abrir el formulario y volver cuesta **una** sola
- * petición en toda la sesión.
- *
- * No hay petición masiva porque el backend todavía no la expone; el día que
- * exista, solo cambia `fetch()` —y recién ahí se podrá podar el menú, que hoy
- * muestra todo hasta que el usuario entra.
+ * **Hoy no consulta a nadie: permite todo.** El endpoint por modelo
+ * (`GET /general/modelo/<id>/permiso/`) se retiró; ver `fetch()`. La cache, la
+ * época y el reset quedan en pie para que enchufar otra fuente toque un solo
+ * método.
  *
  * **Ante error de red, permite.** Esto no es seguridad, es UX: el backend
  * responde 403 igual. Un endpoint de permisos con hipo no puede dejar a nadie
@@ -109,7 +104,7 @@ export class ModelPermissionsService extends BaseHttpService {
     // sigue entregando al guard que la esperaba —cancelar su navegación sería
     // peor— pero no se guarda.
     const epoca = this.epoca;
-    const request = this.fetch(modelo).pipe(
+    const request = this.fetch().pipe(
       tap((grants) => {
         if (epoca !== this.epoca) return;
         this.remember(modelo, grants);
@@ -147,18 +142,16 @@ export class ModelPermissionsService extends BaseHttpService {
   }
 
   /**
-   * El **único** punto de contacto con el backend. El día que exista un endpoint
-   * que devuelva todos los modelos de una, se reemplaza esto y nada más.
+   * El **único** punto de contacto con la fuente de permisos.
    *
-   * Puede fallar a propósito: quien decide qué hacer con el error es `load()`,
-   * que responde permisivo **sin** guardar esa respuesta.
+   * **Hoy permite todo sin preguntar.** `GET /general/modelo/<id>/permiso/` se
+   * retiró del front a pedido del negocio: el usuario ve todas las rutas y
+   * botones, y el backend sigue respondiendo 403 donde no le toca. El día que
+   * haya otra fuente (una consulta masiva, los permisos por membresía), se
+   * reemplaza esto y nada más: guards, menú y botones ya leen de `load()`.
    */
-  private fetch(modelo: ModeloId): Observable<ModelGrants> {
-    return this.get<Partial<ModelGrants>>(`/general/modelo/${modelo}/permiso/`, undefined, {
-      // Sin toast: un permiso que no se pudo consultar no es algo que el usuario
-      // deba resolver; se permite y el backend niega si corresponde.
-      errorToast: false,
-    }).pipe(map((response) => normalize(response)));
+  private fetch(): Observable<ModelGrants> {
+    return of(PERMITE_TODO);
   }
 
   private remember(modelo: ModeloId, grants: ModelGrants): void {
@@ -166,15 +159,4 @@ export class ModelPermissionsService extends BaseHttpService {
     next.set(modelo, grants);
     this.cache.set(next);
   }
-}
-
-/** Completa la respuesta del backend; un campo ausente se lee como permitido. */
-function normalize(response: Partial<ModelGrants> | null | undefined): ModelGrants {
-  if (response === null || typeof response !== 'object') return PERMITE_TODO;
-  return {
-    ver: response.ver ?? true,
-    crear: response.crear ?? true,
-    editar: response.editar ?? true,
-    eliminar: response.eliminar ?? true,
-  };
 }

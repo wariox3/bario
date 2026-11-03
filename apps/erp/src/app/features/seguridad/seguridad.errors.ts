@@ -9,3 +9,14 @@ export class ContenedorNoResueltoError extends Error {
     this.name = 'ContenedorNoResueltoError';
   }
 }
+
+/**
+ * Se intentó quitar un permiso del que no se conoce la fila de
+ * `usuario-cliente-permiso`: sin su `id` no hay `DELETE` posible.
+ */
+export class PermisoSinAsignacionError extends Error {
+  constructor(permisoId: number) {
+    super(`El permiso ${permisoId} no tiene una fila de usuario-cliente-permiso conocida.`);
+    this.name = 'PermisoSinAsignacionError';
+  }
+}

@@ -90,7 +90,7 @@
     <p class="m-0 text-[0.75rem] leading-relaxed text-brand-muted">{{ det.accesoHint }}</p>
   </section>
 
-  <!-- Debajo, la card de acceso: grupos y permisos de usuario-cliente-permiso. -->
+  <!-- Debajo, la card de acceso: usuario-cliente-grupo y usuario-cliente-permiso. -->
   <section
     class="overflow-hidden rounded-xl border border-[rgba(19,38,60,0.08)] bg-white shadow-[0_1px_2px_rgba(19,38,60,0.04)]"
   >
@@ -110,10 +110,7 @@
                   <i class="pi pi-spin pi-spinner text-xl" aria-hidden="true"></i>
                 </div>
               } @else {
-                <app-usuario-grupos-panel
-                  [usuarioId]="u.usuario_id"
-                  [asignados]="permisoRow()?.permiso?.grupos ?? []"
-                />
+                <app-usuario-grupos-panel [usuarioClienteId]="u.id" [asignados]="grupos()" />
               }
             </div>
           </p-tabpanel>
@@ -129,8 +126,8 @@
                   </div>
                 } @else {
                   <app-usuario-permisos-panel
-                    [usuarioId]="u.usuario_id"
-                    [permiso]="permisoRow()?.permiso ?? null"
+                    [usuarioClienteId]="u.id"
+                    [asignaciones]="permisos()"
                   />
                 }
               }

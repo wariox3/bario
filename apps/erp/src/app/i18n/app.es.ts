@@ -1,13 +1,14 @@
 import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
-import { accesosContenedorEs, appSwitcherEs, authEs, phoneInputEs } from '@reddoc/ui/i18n';
+import { gruposSeguridadEs, appSwitcherEs, authEs, phoneInputEs, saludoEs } from '@reddoc/ui/i18n';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
   auth: authEs,
   appSwitcher: appSwitcherEs,
   phoneInput: phoneInputEs,
+  saludo: saludoEs,
   contenedores: contenedoresEs,
-  accesosContenedor: accesosContenedorEs,
+  gruposSeguridad: gruposSeguridadEs,
   common: {
     comingSoon: 'Próximamente disponible.',
     masInformacion: { title: 'Más información', hint: 'opcional' },
@@ -7318,10 +7319,6 @@ export const es: AppDict = {
           usuarioPlaceholder: 'nombre@empresa.com',
           usuarioHint: 'Escribe al menos 3 caracteres. La persona ya debe tener cuenta en RedDoc.',
           usuarioInvalid: 'Elige a alguien de la lista.',
-          grupos: 'Grupos',
-          gruposPlaceholder: 'Selecciona los grupos (opcional)',
-          gruposHint: 'Opcional. La persona pertenecerá a estos grupos al aceptar la invitación.',
-          gruposEmpty: 'No hay grupos disponibles.',
         },
         submit: 'Enviar invitación',
         sending: 'Enviando…',
@@ -7342,25 +7339,24 @@ export const es: AppDict = {
         },
         grupos: {
           count: {
-            zero: 'Todavía no pertenece a ningún grupo. Toca uno para asignarlo.',
-            one: 'Pertenece a 1 de {total} grupos',
-            other: 'Pertenece a {n} de {total} grupos',
+            zero: 'Todavía no accede a ningún módulo.',
+            one: 'Accede a 1 de {total} módulos',
+            other: 'Accede a {n} de {total} módulos',
+          },
+          completos: '{n} con acceso completo',
+          niveles: { ninguno: 'Sin acceso', menu: 'Solo menú', completo: 'Completo' },
+          nivelesHint: {
+            ninguno: 'No ve el módulo.',
+            menu: 'Ve el módulo y sus pendientes; lo que puede hacer sale de sus permisos personalizados.',
+            completo: 'Tiene todos los permisos del grupo.',
           },
           emptyCatalog: 'No hay grupos disponibles.',
-          hint: 'Los grupos son verticales de la plataforma: definen a qué áreas accede la persona dentro de la empresa. Toca una ficha para asignar o quitar.',
+          hint: 'Solo menú muestra el módulo sin darle permisos: lo que puede hacer ahí lo defines en la pestaña Permisos. Completo le da todos los permisos del grupo.',
           toasts: {
-            added: {
-              title: 'Grupo asignado',
-              desc: 'La persona ahora pertenece a {grupo}.',
-            },
-            removed: {
-              title: 'Grupo quitado',
-              desc: 'La persona ya no pertenece a {grupo}.',
-            },
+            changed: { title: 'Acceso actualizado', desc: '{grupo}: {nivel}.' },
           },
         },
         permisos: {
-          flags: { superuser: 'Superusuario', staff: 'Staff' },
           agregar: 'Agregar permisos',
           empty: {
             title: 'Sin permisos directos',

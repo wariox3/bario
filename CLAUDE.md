@@ -192,7 +192,7 @@ El `BaseDocumentListComponent` se importa **siempre vía `loadComponent`** desde
 - **Topbar** (`apps/erp/src/app/layouts/module-bar/`): renderiza un link por cada módulo habilitado por `PermissionsService`. Highlight al activo.
 - **Sidebar** (`apps/erp/src/app/layouts/workspace-layout/`): se filtra al módulo activo leyendo `ActiveModuleStore.activeDescriptor().menu`. Empty state cuando no hay módulo activo (ej: `/t/:slug/dashboard`).
 - **Active module store** (`apps/erp/src/app/core/erp-modules/active-module.store.ts`): signal escrito por `erpModuleResolver(id)` puesto en la ruta raíz de cada `<modulo>.routes.ts`.
-- **Permisos** (`apps/erp/src/app/core/permissions/`): tres ejes ortogonales — qué módulos compró el tenant (flags `acceso_*` del contenedor), qué puede hacer el usuario sobre cada modelo del backend (`GET /general/modelo/<id>/permiso/`, pedido al entrar al feature) y si administra el contenedor (`rol_id`). Ver `docs/guides/permisos-erp.md` antes de tocarlo.
+- **Permisos** (`apps/erp/src/app/core/permissions/`): tres ejes ortogonales — a qué módulos entra el usuario (sus **grupos** en la membresía: 1 Venta, 2 Compra, 3 Tesorería, 4 Cartera, 5 Inventario, 6 Humano, 7 Contabilidad, 8 Turno — `GRUPO_ACCESO` en `libs/core`; propietario, superusuario y soporte entran a todo), qué puede hacer el usuario sobre cada modelo del backend (hoy permite todo: `GET /general/modelo/<id>/permiso/` se retiró y solo cambia `ModelPermissionsService.fetch()` para conectar otra fuente) y si administra el contenedor (`rol_id`). Ver `docs/guides/permisos-erp.md` antes de tocarlo.
 
 **Estructura de carpetas dentro de un módulo (camino B)**: cada master es un bounded context auto-contenido bajo `masters/<entity>/`:
 
@@ -225,6 +225,8 @@ Regla: lo que solo importa a un master vive dentro del master.
 4. Claves i18n `entities.<entity>.*` en `app.es.ts` / `app.en.ts`.
 
 **Formularios (masters y documentos):** el botón de guardar **no** se deshabilita por `form.invalid` — un botón muerto no explica qué falta ni deja avanzar. Va `[disabled]="isSaving()"` y `libFocusInvalid` (`FocusInvalidDirective`, de `@reddoc/ui`) sobre el `<form>`: al intentar guardar en blanco marca todo como tocado —así aparece cada `<lib-field-error>`— y lleva a la persona al primer campo que falta. El guard `if (form.invalid …) return;` del `onSubmit` no cambia.
+
+**Un error se avisa una sola vez:** el `errorInterceptor` muestra un toast para todo error HTTP (salvo 401 y 422) y lo vuelve a lanzar. Si la pantalla también lo avisa en su `error:` —como hacen los listados al eliminar, con su `deleteError`—, la petición debe ir con `{ errorToast: false }`, o salen dos toasts con el mismo `detail`. Los `remove(ids)` de los servicios y el del `HttpEntityDataGateway` (documentos) ya lo pasan; un master nuevo hace lo mismo.
 
 **Al guardar un documento se cae en su ficha, no en el listado:** crear y editar terminan en `routes.detail` para que la persona revise lo que quedó almacenado. En alta el id sale de la respuesta del `POST` (`extractDocumentoId`, en `@erp/core/module-config`); si no viniera, se cae al listado antes que navegar a una URL inválida. Excepción viva: depreciación y cierre, que al crear entran a `editar/:id` porque el documento nace vacío y sus líneas se cargan desde el form. Cancelar sigue volviendo al listado.
 
