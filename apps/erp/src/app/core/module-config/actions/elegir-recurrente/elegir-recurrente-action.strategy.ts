@@ -40,11 +40,17 @@ const ORIGEN_POR_DESTINO: Readonly<Record<number, OrigenRecurrente>> = {
     tipo: DOCUMENT_TYPE_ID.FACTURA_VENTA_RECURRENTE,
     contraparte: 'cliente',
   },
+  // La cuenta de cobro no tiene plantilla propia: sale de la factura de venta recurrente.
+  [DOCUMENT_TYPE_ID.CUENTA_COBRO]: {
+    tipo: DOCUMENT_TYPE_ID.FACTURA_VENTA_RECURRENTE,
+    contraparte: 'cliente',
+  },
 };
 
 /**
- * Acción "Recurrente" del listado de facturas: elegir **una** plantilla
- * recurrente y crear desde ella la factura, como el botón del ERP anterior.
+ * Acción "Recurrente" del listado de facturas y de cuentas de cobro: elegir
+ * **una** plantilla recurrente y crear desde ella el documento, como el botón
+ * del ERP anterior.
  *
  * Abre un modal con las plantillas del tipo de origen; al elegir una manda
  * `POST general/documento/generar-recurrente/` con ese id y el mes en curso.

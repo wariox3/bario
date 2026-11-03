@@ -433,8 +433,8 @@ export const es: AppDict = {
     },
     elegirRecurrente: {
       buttonLabel: 'Recurrente',
-      modalHeader: 'Factura desde recurrente',
-      modalSubtitle: 'Elige la factura recurrente desde la que se crea la nueva factura',
+      modalHeader: 'Generar desde recurrente',
+      modalSubtitle: 'Elige la factura recurrente desde la que se crea el documento',
       seleccionar: 'Seleccionar',
       cancel: 'Cancelar',
       sinOrigen: 'Este documento no tiene definida la factura recurrente de la que sale.',
@@ -461,8 +461,8 @@ export const es: AppDict = {
         desc: 'Esa factura recurrente ya se generó este mes o tiene una fecha posterior.',
       },
       success: {
-        title: 'Factura generada',
-        desc: 'La factura se creó a partir de la factura recurrente.',
+        title: 'Documento generado',
+        desc: 'El documento se creó a partir de la factura recurrente.',
       },
       loadError: {
         title: 'Error al cargar',
@@ -470,7 +470,7 @@ export const es: AppDict = {
       },
       error: {
         title: 'Error al generar',
-        desc: 'No se pudo generar la factura. Intenta de nuevo.',
+        desc: 'No se pudo generar el documento. Intenta de nuevo.',
       },
     },
     detail: {
