@@ -2139,6 +2139,7 @@ export const en: AppDict = {
           inactivo: 'Inactive',
           aplicaPrima: 'Applies to bonus',
           aplicaCesantia: 'Applies to severance',
+          comentario: 'Notes',
         },
         plan: {
           exacto: '{cuotas} installments of {monto}',

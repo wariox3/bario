@@ -153,3 +153,6 @@ export const CREDITOS_TRAILING_ACTIONS: readonly ToolbarAction[] = [
     ],
   },
 ];
+
+/** Largo máximo de las observaciones: `HumCreditoRequest.comentario.maxLength`. */
+export const CREDITO_COMENTARIO_MAX_LENGTH = 300;

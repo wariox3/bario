@@ -1584,6 +1584,7 @@ export interface AppDict
           inactivo: string;
           aplicaPrima: string;
           aplicaCesantia: string;
+          comentario: string;
         };
         plan: { exacto: string; conFinal: string };
         validation: {

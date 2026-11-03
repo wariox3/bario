@@ -262,6 +262,21 @@
             </span>
           </label>
         </div>
+
+        <!-- Observaciones -->
+        <div class="flex flex-col gap-1.5 sm:col-span-2">
+          <label for="comentario" class="credito-form__label">
+            {{ t().entities.credito.form.fields.comentario }}
+          </label>
+          <textarea
+            id="comentario"
+            pTextarea
+            formControlName="comentario"
+            rows="3"
+            [maxlength]="comentarioMaxLength"
+            class="w-full"
+          ></textarea>
+        </div>
       </div>
     </div>
   </section>

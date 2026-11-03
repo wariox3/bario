@@ -2209,6 +2209,7 @@ export const es: AppDict = {
           inactivo: 'Inactivo',
           aplicaPrima: 'Aplica prima',
           aplicaCesantia: 'Aplica cesantía',
+          comentario: 'Observaciones',
         },
         plan: {
           exacto: '{cuotas} cuotas de {monto}',
