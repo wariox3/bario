@@ -71,7 +71,11 @@ import {
 } from '@erp/core/guards/leave-document-form';
 import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
 import type { AppDict } from '@erp/i18n';
-import { METODO_PAGO_ENDPOINT, SEDE_ENDPOINT } from '../../pos-documento.constants';
+import {
+  METODO_PAGO_ENDPOINT,
+  METODO_PAGO_NO_DEFINIDO,
+  SEDE_ENDPOINT,
+} from '../../pos-documento.constants';
 import { DocumentoPagosComponent } from '@erp/features/documentos/pagos/components/documento-pagos/documento-pagos.component';
 import {
   guardarTablasEnSerie,
@@ -222,10 +226,20 @@ export class PosDocumentoFormComponent implements OnInit, CanComponentDeactivate
   protected readonly isEditMode = computed(() => !!this.id());
 
   /**
-   * En alta, el select de almacén auto-selecciona la primera bodega (como el
+   * En alta, sede y almacén auto-seleccionan su primera opción (como el
    * legacy): lo habitual es tener una sola. En edición manda la del documento.
    */
-  protected readonly almacenSuggestedIndex = computed(() => (this.isEditMode() ? null : 0));
+  protected readonly primeraOpcionSugerida = computed(() => (this.isEditMode() ? null : 0));
+
+  /**
+   * En alta, el método de pago sugiere "Instrumento no definido". Se busca por
+   * su código DIAN (`1`), no por posición: el catálogo no llega en ese orden.
+   */
+  protected readonly metodoPagoSugerido = computed(() =>
+    this.isEditMode()
+      ? null
+      : (option: ErpSelectOption) => option['codigo'] === METODO_PAGO_NO_DEFINIDO,
+  );
 
   /** Id del documento como número (`null` en alta); alimenta la transacción por línea. */
   protected readonly documentId = computed(() => {

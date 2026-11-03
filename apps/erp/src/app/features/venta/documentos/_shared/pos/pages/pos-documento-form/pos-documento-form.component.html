@@ -161,6 +161,7 @@
             inputId="metodo_pago"
             formControlName="metodo_pago"
             [endpoint]="metodoPagoEndpoint"
+            [suggestedMatch]="metodoPagoSugerido()"
             [placeholder]="f.fields.metodoPagoPlaceholder"
             [invalid]="form.controls.metodo_pago.invalid && form.controls.metodo_pago.touched"
           />
@@ -177,6 +178,7 @@
             inputId="sede"
             formControlName="sede"
             [endpoint]="sedeEndpoint"
+            [suggestedIndex]="primeraOpcionSugerida()"
             [placeholder]="f.fields.sedePlaceholder"
           />
         </div>
@@ -188,7 +190,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
-            [suggestedIndex]="almacenSuggestedIndex()"
+            [suggestedIndex]="primeraOpcionSugerida()"
             [placeholder]="f.fields.almacenPlaceholder"
           />
         </div>
