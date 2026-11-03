@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
-import { AUTH_SERVICE } from '../tokens';
-import { TenantService } from './tenant.service';
-import { TENANT_ROUTES } from './tenant.types';
-import { ContenedorService } from './contenedor.service';
+import { AUTH_SERVICE } from '../../tokens';
+import { TenantService } from '../tenant.service';
+import { TENANT_ROUTES } from '../tenant.types';
+import { ContenedorService } from '../contenedor/contenedor.service';
 
 export const rootRedirectGuard: CanActivateFn = () => {
   const router = inject(Router);

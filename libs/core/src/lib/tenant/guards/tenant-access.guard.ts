@@ -2,12 +2,12 @@ import { inject } from '@angular/core';
 import { type CanMatchFn, Router, type Route, type UrlSegment } from '@angular/router';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { catchError, map, of } from 'rxjs';
-import { AUTH_SERVICE } from '../tokens';
-import { ToastService } from '../services/toast.service';
-import { TenantService } from './tenant.service';
-import { TENANT_ROUTES } from './tenant.types';
-import { ContenedorService } from './contenedor.service';
-import { membresiaToAccess } from './membresia.mapper';
+import { AUTH_SERVICE } from '../../tokens';
+import { ToastService } from '../../services/toast.service';
+import { TenantService } from '../tenant.service';
+import { TENANT_ROUTES } from '../tenant.types';
+import { ContenedorService } from '../contenedor/contenedor.service';
+import { membresiaToAccess } from '../contenedor/membresia.mapper';
 import { tenantSlugFromSegments } from './tenant-slug.utils';
 
 /**

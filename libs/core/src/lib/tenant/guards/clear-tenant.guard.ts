@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
-import { TenantService } from './tenant.service';
+import { TenantService } from '../tenant.service';
 
 /**
  * Suelta el tenant activo al entrar al selector de contenedores.

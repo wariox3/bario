@@ -1,4 +1,4 @@
-import type { PaginatedResponse } from '../models/pagination.model';
+import type { PaginatedResponse } from '../../models/pagination.model';
 
 /**
  * Miembro del contenedor (`/seguridad/usuario-cliente/lista-cliente/`).

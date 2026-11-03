@@ -1,5 +1,5 @@
 import type { MembresiaContenedor } from './contenedor.model';
-import type { ContenedorAccess } from './tenant.types';
+import type { ContenedorAccess } from '../tenant.types';
 
 /**
  * Membresía de `/seguridad/usuario-cliente/usuario/` → contenedor activo.

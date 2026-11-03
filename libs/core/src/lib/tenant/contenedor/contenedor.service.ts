@@ -5,9 +5,9 @@ import {
   BaseHttpService,
   type ParamValue,
   type RequestOptions,
-} from '../services/base-http.service';
-import type { PaginatedResponse } from '../models/pagination.model';
-import { fetchAllPages } from '../data-list/data/fetch-all-pages';
+} from '../../services/base-http.service';
+import type { PaginatedResponse } from '../../models/pagination.model';
+import { fetchAllPages } from '../../data-list/data/fetch-all-pages';
 import {
   Contenedor,
   ContenedorDetalle,

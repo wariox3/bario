@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { type CanMatchFn, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { TenantService } from './tenant.service';
+import { TenantService } from '../tenant.service';
 import { tenantSlugMatchGuard } from './tenant-slug-match.guard';
 
 @Component({ standalone: true, template: 'contactos' })

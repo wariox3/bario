@@ -3,10 +3,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router, provideRouter } from '@angular/router';
-import { AUTH_SERVICE, ENVIRONMENT } from '../tokens';
-import { ToastService } from '../services/toast.service';
-import { TenantService } from './tenant.service';
-import { TENANT_ROUTES } from './tenant.types';
+import { AUTH_SERVICE, ENVIRONMENT } from '../../tokens';
+import { ToastService } from '../../services/toast.service';
+import { TenantService } from '../tenant.service';
+import { TENANT_ROUTES } from '../tenant.types';
 import { tenantAccessGuard } from './tenant-access.guard';
 
 @Component({ standalone: true, template: '' })

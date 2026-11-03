@@ -1,4 +1,4 @@
-import type { ContenedorAccess } from './tenant.types';
+import type { ContenedorAccess } from '../tenant.types';
 
 /**
  * Prefijo de las flags de acceso por módulo (`acceso_venta`, `acceso_compra`, …).

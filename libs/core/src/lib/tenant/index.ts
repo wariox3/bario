@@ -1,25 +1,25 @@
 export { LAST_TENANT_KEY, TENANT_ROUTES } from './tenant.types';
 export type { TenantSlug, ContenedorAccess, TenantRoutes } from './tenant.types';
 export { TenantService } from './tenant.service';
-export { tenantGuard } from './tenant.guard';
-export { tenantAccessGuard } from './tenant-access.guard';
-export { tenantSlugMatchGuard } from './tenant-slug-match.guard';
-export { clearTenantGuard } from './clear-tenant.guard';
-export { rootRedirectGuard } from './root-redirect.guard';
+export { tenantGuard } from './guards/tenant.guard';
+export { tenantAccessGuard } from './guards/tenant-access.guard';
+export { tenantSlugMatchGuard } from './guards/tenant-slug-match.guard';
+export { clearTenantGuard } from './guards/clear-tenant.guard';
+export { rootRedirectGuard } from './guards/root-redirect.guard';
 export { TENANT_SCOPED } from './tenant-http-context';
-export { ContenedorService } from './contenedor.service';
+export { ContenedorService } from './contenedor/contenedor.service';
 export {
   MODULE_ACCESS_PREFIX,
   GRUPO_ACCESO,
   readModuleAccessFlags,
   accesoFlag,
-} from './contenedor-acceso';
-export type { AccesoFlagName, ContenedorAccesoId } from './contenedor-acceso';
+} from './acceso/contenedor-acceso';
+export type { AccesoFlagName, ContenedorAccesoId } from './acceso/contenedor-acceso';
 export type {
   IngresarContenedorResponse,
   UpdateContenedorRequest,
   UpdateContenedorResponse,
-} from './contenedor.service';
+} from './contenedor/contenedor.service';
 export type {
   Contenedor,
   MembresiaContenedor,
@@ -44,4 +44,4 @@ export type {
   ContenedoresResponse,
   CreateContenedorRequest,
   UserSearchResult,
-} from './contenedor.model';
+} from './contenedor/contenedor.model';
