@@ -176,6 +176,7 @@
             inputId="forma_pago"
             formControlName="forma_pago"
             [endpoint]="formaPagoEndpoint"
+            [suggestedIndex]="primeraOpcionSugerida()"
             [placeholder]="t().entities.documentoSoporte.form.fields.formaPagoPlaceholder"
           />
         </div>
@@ -189,6 +190,7 @@
             inputId="sede"
             formControlName="sede"
             [endpoint]="sedeEndpoint"
+            [suggestedIndex]="primeraOpcionSugerida()"
             [placeholder]="t().entities.documentoSoporte.form.fields.sedePlaceholder"
           />
         </div>
@@ -202,7 +204,7 @@
             inputId="almacen"
             formControlName="almacen"
             [endpoint]="almacenEndpoint"
-            [suggestedIndex]="almacenSuggestedIndex()"
+            [suggestedIndex]="primeraOpcionSugerida()"
             [placeholder]="t().entities.documentoSoporte.form.fields.almacenPlaceholder"
           />
         </div>

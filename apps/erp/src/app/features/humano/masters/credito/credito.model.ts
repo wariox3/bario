@@ -5,8 +5,8 @@
  * (`contrato`, `concepto`) llegan como id pelado (sin sufijo `_id`) + companion
  * `*_nombre`. Los montos (`total`, `cuota`, `abono`, `saldo`) pueden llegar como
  * string Decimal → se normalizan a número en el mapper. Los campos `abono`,
- * `saldo`, `cuota_actual`, `validar_cuotas`, `pagado` y `comentario` los gestiona
- * el backend y no se editan desde el formulario.
+ * `saldo`, `cuota_actual`, `validar_cuotas` y `pagado` los gestiona el backend y
+ * no se editan desde el formulario.
  */
 export interface Credito {
   readonly id: number;
@@ -44,6 +44,8 @@ export interface CreditoPayload {
   inactivo: boolean;
   aplica_prima: boolean;
   aplica_cesantia: boolean;
+  /** Observaciones. El backend no acepta `''` (`minLength: 1`): vacío va `null`. */
+  comentario: string | null;
   contrato: number | null;
   concepto: number | null;
 }

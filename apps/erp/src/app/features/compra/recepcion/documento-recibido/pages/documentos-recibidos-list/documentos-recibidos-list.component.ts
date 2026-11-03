@@ -17,7 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { catchError, debounceTime, distinctUntilChanged, finalize, of, switchMap } from 'rxjs';
+import { catchError, finalize, of, switchMap } from 'rxjs';
 import {
   I18nService,
   TenantService,
@@ -69,15 +69,33 @@ const PAGE_SIZE = 25;
 /** Orden del backend cuando no se pide otro: los más recientes primero. */
 const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 'desc' }];
 
+/** Filtros que viajan al backend; la barra los edita en borrador hasta pulsar Filtrar. */
+interface FiltrosRecepcion {
+  readonly busqueda: string;
+  readonly tipo: DocumentoRecibidoTipo | null;
+  readonly estadoRecepcion: EstadoRecepcionFiltro;
+  readonly desde: Date | null;
+  readonly hasta: Date | null;
+}
+
+/** Del primer al último día del mes en curso. */
+function rangoMesActual(): { desde: Date; hasta: Date } {
+  const hoy = new Date();
+  return {
+    desde: new Date(hoy.getFullYear(), hoy.getMonth(), 1),
+    hasta: new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0),
+  };
+}
+
 /**
  * Documentos recibidos (Compra › Recepción): la bandeja de lo que los
  * proveedores mandan al buzón del emisor en RedEDoc.
  *
  * Los filtros van a la vista en la barra —búsqueda, tipo y rango de emisión—
- * porque el endpoint no habla `campo__operador` sino parámetros propios. Arranca
- * en los documentos sin recepción y sin fechas: vacías no viajan y el backend
- * decide el rango. A la derecha, **Cargar archivo** para lo que no llegó por
- * correo.
+ * porque el endpoint no habla `campo__operador` sino parámetros propios. Se
+ * editan en borrador y solo viajan al pulsar **Filtrar**.
+ * Arranca en los documentos sin recepción del mes en curso. A la derecha,
+ * **Cargar archivo** para lo que no llegó por correo.
  *
  * Desde Correos se llega con `?correo=&desde=&hasta=`: los documentos que salieron
  * de ese correo, con un chip para quitar el filtro y volver a la bandeja.
@@ -120,13 +138,14 @@ export class DocumentosRecibidosListComponent {
   protected readonly rowActions = [...ROW_ACTIONS, ...ACCIONES_RECEPCION_ROW];
 
   // ── Filtros ───────────────────────────────────────────────────────────────
-  /** Lo que se escribe; la búsqueda que viaja es `busqueda`, ya con debounce. */
+  // Borrador de la barra: no dispara peticiones hasta `filtrar()`.
   protected readonly busquedaInput = signal('');
-  private readonly busqueda = signal('');
   protected readonly tipo = signal<DocumentoRecibidoTipo | null>(null);
   protected readonly estadoRecepcion = signal<EstadoRecepcionFiltro>('no');
-  protected readonly desde = signal<Date | null>(null);
-  protected readonly hasta = signal<Date | null>(null);
+  protected readonly desde = signal<Date | null>(rangoMesActual().desde);
+  protected readonly hasta = signal<Date | null>(rangoMesActual().hasta);
+  /** Lo que viaja al backend: la foto del borrador al pulsar Filtrar. */
+  private readonly filtros = signal<FiltrosRecepcion>(this.borrador());
   /** Correo del que salieron los documentos, si se llegó desde Correos. */
   protected readonly correo = signal<number | null>(null);
 
@@ -170,17 +189,17 @@ export class DocumentosRecibidosListComponent {
 
   private readonly query = computed<DocumentoRecibidoQuery>(() => {
     const orden = this.sort()[0];
+    const f = this.filtros();
     this.recargas();
     return {
       page: this.currentPage() + 1,
       page_size: this.pageSize(),
-      search: this.busqueda().trim() || undefined,
-      documento_tipo: this.tipo() ?? undefined,
-      estado_recepcion:
-        this.estadoRecepcion() === 'todos' ? undefined : this.estadoRecepcion() === 'si',
+      search: f.busqueda.trim() || undefined,
+      documento_tipo: f.tipo ?? undefined,
+      estado_recepcion: f.estadoRecepcion === 'todos' ? undefined : f.estadoRecepcion === 'si',
       correo: this.correo() ?? undefined,
-      desde: toIsoDate(this.desde()) ?? undefined,
-      hasta: toIsoDate(this.hasta()) ?? undefined,
+      desde: toIsoDate(f.desde) ?? undefined,
+      hasta: toIsoDate(f.hasta) ?? undefined,
       ordering: orden
         ? ((orden.direction === 'desc' ? `-${orden.field}` : orden.field) as DocumentoRecibidoOrden)
         : undefined,
@@ -189,13 +208,6 @@ export class DocumentosRecibidosListComponent {
 
   constructor() {
     this.leerFiltrosDeUrl();
-
-    toObservable(this.busquedaInput)
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
-      .subscribe((texto) => {
-        this.busqueda.set(texto);
-        this.currentPage.set(0);
-      });
 
     toObservable(this.query)
       .pipe(
@@ -223,6 +235,23 @@ export class DocumentosRecibidosListComponent {
     const hasta = fromIsoDate(params.get('hasta'));
     if (desde) this.desde.set(desde);
     if (hasta) this.hasta.set(hasta);
+    this.filtros.set(this.borrador());
+  }
+
+  private borrador(): FiltrosRecepcion {
+    return {
+      busqueda: this.busquedaInput(),
+      tipo: this.tipo(),
+      estadoRecepcion: this.estadoRecepcion(),
+      desde: this.desde(),
+      hasta: this.hasta(),
+    };
+  }
+
+  /** Aplica lo que hay en la barra y vuelve a la primera página. */
+  protected filtrar(): void {
+    this.filtros.set(this.borrador());
+    this.currentPage.set(0);
   }
 
   /** Quita el filtro por correo y lo saca de la URL; el rango queda como está. */
@@ -235,26 +264,6 @@ export class DocumentosRecibidosListComponent {
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
-  }
-
-  protected onTipo(tipo: DocumentoRecibidoTipo | null): void {
-    this.tipo.set(tipo);
-    this.currentPage.set(0);
-  }
-
-  protected onEstadoRecepcion(estado: EstadoRecepcionFiltro): void {
-    this.estadoRecepcion.set(estado);
-    this.currentPage.set(0);
-  }
-
-  protected onDesde(fecha: Date | null): void {
-    this.desde.set(fecha);
-    this.currentPage.set(0);
-  }
-
-  protected onHasta(fecha: Date | null): void {
-    this.hasta.set(fecha);
-    this.currentPage.set(0);
   }
 
   protected onPageChange(event: PageChangeEvent): void {

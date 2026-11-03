@@ -227,6 +227,15 @@
         </dl>
       </div>
     </div>
+
+    @if (c.comentario) {
+      <div class="border-t border-[rgba(20,48,73,0.08)] px-5 py-4">
+        <dl class="flex flex-col gap-0.5">
+          <dt class="credito-detail__label">{{ t().entities.credito.form.fields.comentario }}</dt>
+          <dd class="credito-detail__value whitespace-pre-line">{{ c.comentario }}</dd>
+        </dl>
+      </div>
+    }
   </section>
 
   <!-- ── Pagos ───────────────────────────────────────────────────────────────── -->

@@ -139,6 +139,7 @@
     >
       <p-tablist>
         <p-tab value="detalles">{{ det.sections.detalles }}</p-tab>
+        <p-tab value="cuentas">{{ det.sections.cuentas }}</p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -162,12 +163,22 @@
             />
           }
         </p-tabpanel>
+
+        <p-tabpanel value="cuentas">
+          <app-contable-documento-lineas-table
+            [lines]="cuentas()"
+            [showCentroCosto]="true"
+            [showContacto]="true"
+            [showBase]="true"
+            [showTotales]="true"
+          />
+        </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
   </section>
 
   <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
-  @if (totalItems() > 0) {
-    <app-comercial-documento-resumen [resumen]="resumen()" />
+  @if (hayLineas()) {
+    <app-comercial-documento-resumen [resumen]="resumen()" [cuentas]="resumenCuentas()" />
   }
 }

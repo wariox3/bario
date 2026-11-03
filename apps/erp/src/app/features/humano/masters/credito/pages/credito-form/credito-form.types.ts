@@ -17,4 +17,5 @@ export interface CreditoFormRawValue {
   inactivo: boolean | null;
   aplica_prima: boolean | null;
   aplica_cesantia: boolean | null;
+  comentario: string | null;
 }

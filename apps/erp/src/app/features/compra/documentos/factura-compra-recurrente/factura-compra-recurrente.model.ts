@@ -16,7 +16,20 @@ import type {
   DocumentoReadBase,
   DocumentoTotalesRead,
   ComercialDetallePayload,
+  ComercialDetalleRead,
 } from '@reddoc/core';
+import type {
+  CuentaDetallePayload,
+  CuentaDetalleRead,
+} from '@erp/features/documentos/contable/contable-documento-detalle.model';
+
+/**
+ * Línea de la plantilla tal como la devuelve `documento-detalle`: como en la
+ * factura de compra, mezcla líneas de ítem (comerciales) y de cuenta contable
+ * (gastos fijos cargados directo a una cuenta: arriendo, servicios...),
+ * discriminadas por `tipo_registro`.
+ */
+export type FacturaCompraRecurrenteLineaRead = ComercialDetalleRead & CuentaDetalleRead;
 
 /** Read-model (GET `/documento/:id/`) de la cabecera de una factura de compra recurrente. */
 export interface FacturaCompraRecurrenteRead extends DocumentoReadBase, DocumentoTotalesRead {
@@ -46,6 +59,10 @@ export interface FacturaCompraRecurrentePayload extends DocumentoPayloadBase {
   readonly almacen: number | null;
   readonly orden_compra: string | null;
   readonly comentario: string | null;
-  /** Solo en alta: en edición las líneas transaccionan contra `documento-detalle`. */
-  readonly detalles?: readonly ComercialDetallePayload[];
+  /**
+   * Solo en alta: en edición las líneas transaccionan contra `documento-detalle`.
+   * Mezcla líneas de ítem y de cuenta contable; el backend las discrimina por
+   * `tipo_registro`.
+   */
+  readonly detalles?: readonly (ComercialDetallePayload | CuentaDetallePayload)[];
 }

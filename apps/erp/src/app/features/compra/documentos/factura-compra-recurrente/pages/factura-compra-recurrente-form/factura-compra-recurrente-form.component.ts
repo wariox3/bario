@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -33,7 +33,11 @@ import { compraDocumentoBreadcrumb } from '@erp/features/compra/shared/compra-br
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import { ErpApiSelectComponent } from '@reddoc/ui';
 import type { ErpSelectOption } from '@reddoc/core';
-import { ENTITY_DATA_GATEWAY, extractDocumentoId } from '@erp/core/module-config';
+import {
+  DocumentoDetalleService,
+  ENTITY_DATA_GATEWAY,
+  extractDocumentoId,
+} from '@erp/core/module-config';
 import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { CanComponentDeactivate } from '@erp/core/guards/unsaved-changes.guard';
 import {
@@ -43,6 +47,7 @@ import {
 } from '@erp/core/guards/leave-document-form';
 import {
   guardarTablasEnSerie,
+  pestanaConPrimerError,
   type TablaEnVivoDocumento,
 } from '@erp/features/documentos/tablas-en-vivo';
 import { CambiosSinGuardarComponent } from '@erp/features/documentos/components/cambios-sin-guardar/cambios-sin-guardar.component';
@@ -50,6 +55,18 @@ import type { AppDict } from '@erp/i18n';
 import { setupPlazoPagoDesdeContacto } from '@erp/features/documentos/comercial/plazo-pago-contacto';
 import { ComercialDocumentoDetallesComponent } from '@erp/features/documentos/comercial/components/comercial-documento-detalles/comercial-documento-detalles.component';
 import type { ComercialDetalleGroup } from '@erp/features/documentos/comercial/comercial-documento-detalle.form';
+import { reemplazarFilas } from '@erp/features/documentos/form-array-filas';
+import { ContableDocumentoDetallesComponent } from '@erp/features/documentos/contable/components/contable-documento-detalles/contable-documento-detalles.component';
+import {
+  createCuentaDetalleGroup,
+  propagarCentroCostoALineas,
+  propagarContactoALineas,
+  type CuentaDetalleGroup,
+} from '@erp/features/documentos/contable/contable-documento-detalle.form';
+import {
+  cuentaDetalleToFormValue,
+  resumenConCuentas,
+} from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
 import {
   FORMA_PAGO_ENDPOINT,
   PLAZO_PAGO_ENDPOINT,
@@ -59,11 +76,19 @@ import {
   facturaCompraRecurrenteToFormValue,
   formValueToPayload,
 } from '../../factura-compra-recurrente.mapper';
-import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrente.model';
+import type {
+  FacturaCompraRecurrenteLineaRead,
+  FacturaCompraRecurrenteRead,
+} from '../../factura-compra-recurrente.model';
 import { SELECT_ENDPOINTS } from '@reddoc/core';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
 import { MasInformacionComponent } from '@erp/features/documentos/components/mas-informacion/mas-informacion.component';
 import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/crear-tercero.directive';
+
+/** Lo que el guard de salida necesita de cada tabla de líneas. */
+interface FlushableLineTable {
+  pendingCount(): number;
+}
 
 /**
  * Formulario de alta/edición de la **cabecera** de una Factura de compra
@@ -77,6 +102,11 @@ import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/cr
  * Es de la familia comercial (misma tabla de líneas que la factura de compra,
  * en `modo="compra"`), y suma a la cabecera el plazo/forma de pago, el centro de
  * costo, el almacén, la sede, el asesor y la orden de compra.
+ *
+ * Como la factura de compra, tiene una pestaña de **cuentas**: los gastos fijos
+ * que se repiten cada mes (arriendo, servicios, honorarios) suelen ir directo a
+ * una cuenta de gasto, sin un ítem que los represente. El ERP anterior la tenía
+ * y la conservó en sus dos depuraciones de este formulario.
  *
  * La misma página cubre crear y editar: sin `:id` → alta; con `:id` → edición.
  */
@@ -101,6 +131,7 @@ import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/cr
     CrearTerceroDirective,
     ErpApiSelectComponent,
     ComercialDocumentoDetallesComponent,
+    ContableDocumentoDetallesComponent,
     TabsModule,
   ],
   providers: [ConfirmationService],
@@ -110,6 +141,7 @@ import { CrearTerceroDirective } from '@erp/features/general/masters/contacto/cr
 export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponentDeactivate {
   private readonly fb = inject(FormBuilder);
   private readonly gateway = inject(ENTITY_DATA_GATEWAY);
+  private readonly detalleService = inject(DocumentoDetalleService);
   private readonly toast = inject(ToastService);
   private readonly formErrors = inject(FormErrorService);
   private readonly tenant = inject(TenantService);
@@ -120,14 +152,57 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
 
   protected readonly t = this.i18n.t;
 
-  /** Tabla de líneas: el padre le delega el flush y el conteo de pendientes. */
+  /** Tabla de líneas de ítem: el padre le delega el flush y el conteo de pendientes. */
   private readonly detallesTable = viewChild(ComercialDocumentoDetallesComponent);
 
+  /** Tabla de líneas de cuenta contable; mismo contrato de flush que la de ítems. */
+  private readonly cuentasTable = viewChild(ContableDocumentoDetallesComponent);
+
   /**
-   * La tabla de líneas está guardando o resolviendo ítems (AIU). "Guardar" espera:
+   * Alguna tabla de líneas está guardando o resolviendo ítems (AIU). "Guardar" espera:
    * un segundo lote reenviaría líneas que todavía no tienen `id`.
    */
-  protected readonly tablasOcupadas = computed(() => this.detallesTable()?.ocupado() ?? false);
+  protected readonly tablasOcupadas = computed(
+    () => (this.detallesTable()?.ocupado() ?? false) || (this.cuentasTable()?.ocupado() ?? false),
+  );
+
+  /** Hay líneas de ítem o de cuenta: la página pinta el resumen solo entonces. */
+  protected readonly hayLineas = computed(
+    () =>
+      (this.detallesTable()?.hayLineas() ?? false) || (this.cuentasTable()?.hayLineas() ?? false),
+  );
+
+  /** Débitos y créditos de las cuentas, para las filas del resumen. */
+  protected readonly resumenCuentas = computed(
+    () => this.cuentasTable()?.resumen() ?? { debitos: 0, creditos: 0, total: 0 },
+  );
+
+  /**
+   * Resumen de la plantilla: subtotal, descuento e impuestos de los ítems y un
+   * total al que las cuentas débito suman y las crédito restan. Es uno solo para
+   * las dos pestañas, igual que en la factura de compra.
+   */
+  protected readonly resumen = computed(() => {
+    const items = this.detallesTable()?.resumen() ?? {
+      subtotal: 0,
+      descuento: 0,
+      impuestos: [],
+      total: 0,
+    };
+    return resumenConCuentas(items, this.resumenCuentas());
+  });
+
+  /** Tab activo del bloque de líneas (Detalles / Cuentas). */
+  protected readonly activeTab = signal<'detalles' | 'cuentas'>('detalles');
+
+  /**
+   * Control del form → pestaña que lo contiene, en orden de pantalla. Al guardar con
+   * errores se abre la del primero, para que `libFocusInvalid` pueda llevar al campo.
+   */
+  private readonly pestanasPorControl: Readonly<Record<string, 'detalles' | 'cuentas'>> = {
+    detalles: 'detalles',
+    cuentas: 'cuentas',
+  };
 
   // Endpoints de catálogos (compartidos + propios del recurrente).
   protected readonly plazoPagoEndpoint = PLAZO_PAGO_ENDPOINT;
@@ -188,7 +263,17 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     orden_compra: this.fb.control<string | null>(null, Validators.maxLength(50)),
     comentario: this.fb.control<string | null>(null, Validators.maxLength(500)),
     detalles: new FormArray<ComercialDetalleGroup>([]),
+    cuentas: new FormArray<CuentaDetalleGroup>([]),
   });
+
+  /**
+   * Espejo en signal del contacto y el centro de costo de la cabecera, para que
+   * siembre con ellos cada cuenta nueva. Se escriben en los dos únicos puntos donde
+   * cambian —la elección del usuario y la carga en edición—; esta última patchea
+   * con `emitEvent: false`, así que no basta con seguir `valueChanges`.
+   */
+  protected readonly contactoCabecera = signal<ErpSelectOption | null>(null);
+  protected readonly centroCostoCabecera = signal<ErpSelectOption | null>(null);
 
   constructor() {
     // El plazo lo pacta el proveedor: elegirlo autocompleta el campo. Esta
@@ -200,6 +285,20 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
       origen: 'proveedor',
       destroyRef: this.destroyRef,
     });
+
+    this.form.controls.contacto.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((contacto) => {
+        this.contactoCabecera.set(contacto);
+        propagarContactoALineas(this.form.controls.cuentas, contacto);
+      });
+
+    this.form.controls.centro_costo.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((centroCosto) => {
+        this.centroCostoCabecera.set(centroCosto);
+        propagarCentroCostoALineas(this.form.controls.cuentas, centroCosto);
+      });
   }
 
   /**
@@ -211,18 +310,27 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   ngOnInit(): void {
     const id = this.id();
     if (!id) return;
-    // En edición la cabecera ya viene del resolver: la aplicamos sin red; las
-    // líneas las trae la tabla. Sin resolved (fail-open) se pide la cabecera.
+    // En edición la cabecera ya viene del resolver: la aplicamos sin red y solo
+    // pedimos las cuentas (los ítems los trae su tabla, paginada). Sin resolved
+    // (fail-open) cae a la carga completa.
     const prefetched = this.documentoEdit();
     if (prefetched) {
       this.applyCabecera(prefetched as FacturaCompraRecurrenteRead);
+      this.loadCuentas(Number(id));
     } else {
       this.loadDocumento(Number(id));
     }
   }
 
   protected onSubmit(): void {
-    if (this.form.invalid || this.form.pending || this.isSaving() || this.tablasOcupadas()) return;
+    if (this.isSaving() || this.tablasOcupadas()) return;
+    if (this.form.invalid || this.form.pending) {
+      // `libFocusInvalid` marca todo como tocado y lleva al primer campo con error, pero
+      // un panel inactivo está oculto: antes se abre la pestaña que lo contiene.
+      const pestana = pestanaConPrimerError(this.form, this.pestanasPorControl);
+      if (pestana) this.activeTab.set(pestana);
+      return;
+    }
 
     const id = this.id();
     this.isSaving.set(true);
@@ -233,8 +341,8 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
     }
 
     // Edición: el backend no acepta las líneas en el documento, van por
-    // `documento-detalle`. Se guardan sus cambios pendientes (bajas, altas y ediciones)
-    // antes de la cabecera; si fallan, se avisa con el motivo del backend y no se sigue.
+    // `documento-detalle`. Se guardan los cambios pendientes de ítems y cuentas, en
+    // serie, antes de la cabecera; si fallan, se avisa con el motivo del backend y no se sigue.
     guardarTablasEnSerie(this.tablasEnVivo(), this.toast)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -245,12 +353,19 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
 
   /** Tablas que se guardan aparte del documento, en el orden en que se guardan. */
   private tablasEnVivo(): readonly TablaEnVivoDocumento[] {
+    const { comercialDetalle, cuentaDetalle } = this.t().entities;
     return [
-      {
-        tabla: this.detallesTable(),
-        errorAlGuardar: this.t().entities.comercialDetalle.toasts.lineSaveError,
-      },
+      { tabla: this.detallesTable(), errorAlGuardar: comercialDetalle.toasts.lineSaveError },
+      { tabla: this.cuentasTable(), errorAlGuardar: cuentaDetalle.toasts.lineSaveError },
     ];
+  }
+
+  /** Tablas de líneas montadas (ítems + cuentas), para el guard de salida. */
+  private lineTables(): FlushableLineTable[] {
+    return [this.detallesTable(), this.cuentasTable()].filter(
+      (table): table is ComercialDocumentoDetallesComponent | ContableDocumentoDetallesComponent =>
+        table != null,
+    );
   }
 
   /** Guarda la cabecera (create/update). Asume `isSaving` ya en `true`. */
@@ -300,7 +415,9 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
       form: this.form,
       // En alta nada persiste aparte: tocar una línea y salir también pierde trabajo.
       enAlta: !this.id(),
-      pendingLines: this.detallesTable()?.pendingCount() ?? 0,
+      pendingLines: this.lineTables().reduce((total, table) => total + table.pendingCount(), 0),
+      // Dos tablas en vivo: ítems y cuentas contables.
+      lineControls: ['detalles', 'cuentas'],
     };
   }
 
@@ -324,23 +441,51 @@ export class FacturaCompraRecurrenteFormComponent implements OnInit, CanComponen
   }
 
   /**
-   * Carga la cabecera (fallback si el resolver no la pre-cargó). Las líneas las
-   * trae la tabla, de a una página (`paginada`).
+   * Carga completa (cabecera + cuentas), fallback si el resolver no pre-cargó la
+   * cabecera. Los ítems los trae la tabla, de a una página (`paginada`).
    */
   private loadDocumento(id: number): void {
-    this.gateway
-      .getById(this.document(), id)
+    forkJoin({
+      cabecera: this.gateway.getById(this.document(), id),
+      cuentas: this.detalleService.cuentasDelDocumento<FacturaCompraRecurrenteLineaRead>(id),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (cabecera) => this.applyCabecera(cabecera as FacturaCompraRecurrenteRead),
+        next: ({ cabecera, cuentas }) => {
+          this.applyCabecera(cabecera as FacturaCompraRecurrenteRead);
+          this.populateCuentas(cuentas);
+        },
+        error: () => this.notifyLoadError(),
+      });
+  }
+
+  /** Carga solo las cuentas (la cabecera ya la aportó el resolver). */
+  private loadCuentas(id: number): void {
+    this.detalleService
+      .cuentasDelDocumento<FacturaCompraRecurrenteLineaRead>(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (cuentas) => this.populateCuentas(cuentas),
         error: () => this.notifyLoadError(),
       });
   }
 
   /** Pobla la cabecera en el form (`emitEvent: false`: sin efectos colaterales). */
   private applyCabecera(read: FacturaCompraRecurrenteRead): void {
-    this.form.patchValue(facturaCompraRecurrenteToFormValue(read), { emitEvent: false });
+    const value = facturaCompraRecurrenteToFormValue(read);
+    this.form.patchValue(value, { emitEvent: false });
     this.resumenBase.set(resumenDesdeCabecera(read));
+    // Las cuentas que agregue el usuario en edición nacen con el contacto y el
+    // centro de costo de la plantilla, igual que en alta.
+    this.contactoCabecera.set(value.contacto ?? null);
+    this.centroCostoCabecera.set(value.centro_costo ?? null);
+  }
+
+  private populateCuentas(lineas: readonly FacturaCompraRecurrenteLineaRead[]): void {
+    reemplazarFilas(
+      this.form.controls.cuentas,
+      lineas.map((line) => createCuentaDetalleGroup(cuentaDetalleToFormValue(line))),
+    );
   }
 
   private notifyLoadError(): void {

@@ -11,6 +11,8 @@ const STORAGE_KEY_PREFIX = 'entity-filters';
  *
  * Cada master directo (camino B) define su propia clave literal y no usa
  * este helper — éste solo aplica al camino A (documentos transaccionales).
+ *
+ * No lleva el tenant: `FilterStorageService` le antepone el slug activo.
  */
 export function buildEntityStorageKey(moduleId: string, entity: EntityConfig): string {
   return `${STORAGE_KEY_PREFIX}:${moduleId}:${entity.id}:v${entity.schemaVersion}`;

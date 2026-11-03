@@ -196,16 +196,19 @@
   <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
     <p-tabs
       class="[&_.p-tablist-tab-list]:px-5 [&_.p-tabpanels]:p-0 max-[576px]:[&_.p-tablist-tab-list]:px-4"
-      value="detalles"
+      [value]="activeTab()"
+      (valueChange)="activeTab.set($any($event))"
     >
       <p-tablist>
-        <p-tab value="detalles">{{ t().entities.comercialDetalle.title }}</p-tab>
+        <p-tab value="detalles">{{
+          t().entities.facturaCompraRecurrente.form.tabs.detalles
+        }}</p-tab>
+        <p-tab value="cuentas">{{ t().entities.facturaCompraRecurrente.form.tabs.cuentas }}</p-tab>
       </p-tablist>
 
       <p-tabpanels>
         <p-tabpanel value="detalles">
           <app-comercial-documento-detalles
-            #detallesTabla
             modo="compra"
             [detalles]="form.controls.detalles"
             [documentId]="documentId()"
@@ -216,13 +219,25 @@
             [resumenBase]="resumenBase()"
           />
         </p-tabpanel>
+
+        <p-tabpanel value="cuentas">
+          <app-contable-documento-detalles
+            [detalles]="form.controls.cuentas"
+            [documentId]="documentId()"
+            [contactoPorDefecto]="contactoCabecera()"
+            [centroCostoPorDefecto]="centroCostoCabecera()"
+            [showCentroCosto]="true"
+            [showContacto]="true"
+            [showBase]="true"
+          />
+        </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
   </section>
 
   <!-- Resumen del documento: fuera de la card, flotando bajo ella -->
-  @if (detallesTabla.hayLineas()) {
-    <app-comercial-documento-resumen [resumen]="detallesTabla.resumen()" />
+  @if (hayLineas()) {
+    <app-comercial-documento-resumen [resumen]="resumen()" [cuentas]="resumenCuentas()" />
   }
 </form>
 

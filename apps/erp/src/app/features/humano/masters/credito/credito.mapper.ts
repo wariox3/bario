@@ -28,6 +28,7 @@ export function creditoToFormValue(c: Credito): Partial<CreditoFormRawValue> {
     inactivo: c.inactivo,
     aplica_prima: c.aplica_prima,
     aplica_cesantia: c.aplica_cesantia,
+    comentario: c.comentario ?? null,
   };
 }
 
@@ -44,6 +45,7 @@ export function formValueToPayload(v: CreditoFormRawValue): CreditoPayload {
     inactivo: v.inactivo ?? false,
     aplica_prima: v.aplica_prima ?? false,
     aplica_cesantia: v.aplica_cesantia ?? false,
+    comentario: v.comentario?.trim() || null,
     contrato: v.contrato?.id ?? null,
     concepto: v.concepto?.id ?? null,
   };
