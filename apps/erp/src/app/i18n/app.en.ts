@@ -423,8 +423,8 @@ export const en: AppDict = {
     },
     elegirRecurrente: {
       buttonLabel: 'Recurring',
-      modalHeader: 'Invoice from recurring',
-      modalSubtitle: 'Pick the recurring invoice the new invoice is created from',
+      modalHeader: 'Generate from recurring',
+      modalSubtitle: 'Pick the recurring invoice the document is created from',
       seleccionar: 'Select',
       cancel: 'Cancel',
       sinOrigen: 'This document has no recurring invoice defined to come from.',
@@ -445,8 +445,8 @@ export const en: AppDict = {
         desc: 'That recurring invoice was already generated this month or has a later date.',
       },
       success: {
-        title: 'Invoice generated',
-        desc: 'The invoice was created from the recurring invoice.',
+        title: 'Document generated',
+        desc: 'The document was created from the recurring invoice.',
       },
       loadError: {
         title: 'Could not load',
@@ -454,7 +454,7 @@ export const en: AppDict = {
       },
       error: {
         title: 'Generation failed',
-        desc: 'Could not generate the invoice. Please try again.',
+        desc: 'Could not generate the document. Please try again.',
       },
     },
     detail: {
@@ -2139,6 +2139,7 @@ export const en: AppDict = {
           inactivo: 'Inactive',
           aplicaPrima: 'Applies to bonus',
           aplicaCesantia: 'Applies to severance',
+          comentario: 'Notes',
         },
         plan: {
           exacto: '{cuotas} installments of {monto}',
@@ -3521,6 +3522,7 @@ export const en: AppDict = {
           ordenCompra: 'Purchase order',
           comentario: 'Comment',
         },
+        tabs: { detalles: 'Details', cuentas: 'Accounts' },
         validation: { required: 'This field is required' },
         toasts: {
           createSuccess: {
@@ -3549,6 +3551,7 @@ export const en: AppDict = {
         sections: {
           general: 'General information',
           detalles: 'Details',
+          cuentas: 'Accounts',
         },
         labels: {
           proveedor: 'Supplier',
@@ -6258,6 +6261,7 @@ export const en: AppDict = {
         hasta: 'To',
         delCorreo: 'From email',
         quitarCorreo: 'Remove the email filter',
+        filtrar: 'Filter',
         estadoRecepcion: 'Receipt',
         estadosRecepcion: { todos: 'All', si: 'Yes', no: 'No' },
       },

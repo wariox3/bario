@@ -32,7 +32,7 @@
         [placeholder]="d.filtros.tipo"
         [ariaLabel]="d.filtros.tipo"
         [ngModel]="tipo()"
-        (ngModelChange)="onTipo($event)"
+        (ngModelChange)="tipo.set($event)"
         appendTo="body"
       />
 
@@ -44,7 +44,7 @@
         optionValue="value"
         [ariaLabel]="d.filtros.estadoRecepcion"
         [ngModel]="estadoRecepcion()"
-        (ngModelChange)="onEstadoRecepcion($event)"
+        (ngModelChange)="estadoRecepcion.set($event)"
         appendTo="body"
       />
 
@@ -57,7 +57,7 @@
           [ariaLabel]="d.filtros.desde"
           [maxDate]="hasta()"
           [ngModel]="desde()"
-          (ngModelChange)="onDesde($event)"
+          (ngModelChange)="desde.set($event)"
           appendTo="body"
         />
       </div>
@@ -70,10 +70,21 @@
           [ariaLabel]="d.filtros.hasta"
           [minDate]="desde()"
           [ngModel]="hasta()"
-          (ngModelChange)="onHasta($event)"
+          (ngModelChange)="hasta.set($event)"
           appendTo="body"
         />
       </div>
+
+      <!-- Se estira a la altura de la fila para igualar a los inputs. -->
+      <p-button
+        class="self-stretch"
+        styleClass="!h-full"
+        size="small"
+        icon="pi pi-filter"
+        severity="secondary"
+        [label]="d.filtros.filtrar"
+        (onClick)="filtrar()"
+      />
 
       @if (correo(); as id) {
         <span

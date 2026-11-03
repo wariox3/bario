@@ -12,11 +12,12 @@ import {
   calcularResumen,
   LIST_PAGE_SIZE,
   resumenDesdeCabecera,
+  cuentasDesdeCabecera,
+  type CuentasCabecera,
   type ResumenDocumento,
   type DocumentoEstados,
   comercialDetalleToFormValue,
   toLineaCalculo,
-  type ComercialDetalleRead,
   type ComercialDetalleFormRawValue,
 } from '@reddoc/core';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@reddoc/feature-base';
@@ -26,10 +27,20 @@ import type { DocumentEntityConfig } from '@erp/core/module-config';
 import type { AppDict } from '@erp/i18n';
 import { ComercialDocumentoLineasTableComponent } from '@erp/features/documentos/comercial/components/comercial-documento-lineas-table/comercial-documento-lineas-table.component';
 import { ComercialDocumentoResumenComponent } from '@erp/features/documentos/comercial/components/comercial-documento-resumen/comercial-documento-resumen.component';
+import { ContableDocumentoLineasTableComponent } from '@erp/features/documentos/contable/components/contable-documento-lineas-table/contable-documento-lineas-table.component';
+import {
+  calcularResumenContable,
+  cuentaDetalleToLineaView,
+  resumenConCuentas,
+} from '@erp/features/documentos/contable/contable-documento-detalle.mapper';
+import type { CuentaDetalleLineaView } from '@erp/features/documentos/contable/contable-documento-detalle.types';
 import { DocumentDetailActionsComponent } from '@erp/core/module-config/components/document-detail-actions/document-detail-actions.component';
 import { DocumentEstadosComponent } from '@erp/core/module-config/components/document-estados/document-estados.component';
 import { AfectacionModalComponent } from '@erp/core/module-config/components/afectacion-modal/afectacion-modal.component';
-import type { FacturaCompraRecurrenteRead } from '../../factura-compra-recurrente.model';
+import type {
+  FacturaCompraRecurrenteLineaRead,
+  FacturaCompraRecurrenteRead,
+} from '../../factura-compra-recurrente.model';
 
 /** Cabecera legible de la factura recurrente para la ficha (solo lo que trae `getById`). */
 interface CabeceraView {
@@ -67,6 +78,7 @@ interface CabeceraView {
     BreadcrumbComponent,
     ComercialDocumentoLineasTableComponent,
     ComercialDocumentoResumenComponent,
+    ContableDocumentoLineasTableComponent,
     DocumentDetailActionsComponent,
     DocumentEstadosComponent,
     AfectacionModalComponent,
@@ -101,12 +113,16 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
   /** Líneas de ítem del documento según el backend. */
   protected readonly totalItems = signal(0);
   protected readonly cargandoItems = signal(false);
+  /** Líneas de cuenta contable (`tipo_registro = 'C'`): van en su propia pestaña. */
+  protected readonly cuentas = signal<readonly CuentaDetalleLineaView[]>([]);
   /**
    * Resumen con los acumulados del backend (`resumenDesdeCabecera`): con las
    * líneas paginadas no se puede sumar en el front. `null` si la cabecera no trae
    * el desglose por impuesto: se suman las líneas.
    */
   private readonly resumenCabecera = signal<ResumenDocumento | null>(null);
+  /** Débitos y créditos según la cabecera; `null` si no los trae: se suman las cuentas. */
+  private readonly cuentasCabecera = signal<CuentasCabecera | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly notFound = signal(false);
 
@@ -127,10 +143,29 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
     return canEditRow({ id: Number(this.id()), estado_aprobado: cab.estados.estado_aprobado });
   });
 
-  /** Resumen financiero del documento: subtotal, descuento, impuestos y total. */
-  protected readonly resumen = computed<ResumenDocumento>(
-    () => this.resumenCabecera() ?? calcularResumen(this.lines().map(toLineaCalculo)),
+  /**
+   * Débitos y créditos de las cuentas contables: los de la cabecera (`debito` /
+   * `credito`). Si no los trae, suma el neto de cada línea; sin neto, su valor.
+   */
+  protected readonly resumenCuentas = computed<CuentasCabecera>(
+    () =>
+      this.cuentasCabecera() ??
+      calcularResumenContable(
+        this.cuentas().map((cuenta) => ({ ...cuenta, valor: cuenta.neto ?? cuenta.valor })),
+      ),
   );
+
+  /**
+   * Resumen financiero: subtotal, descuento e impuestos de los ítems y un total al
+   * que las cuentas débito suman y las crédito restan.
+   */
+  protected readonly resumen = computed<ResumenDocumento>(() => {
+    const items = this.resumenCabecera() ?? calcularResumen(this.lines().map(toLineaCalculo));
+    return resumenConCuentas(items, this.resumenCuentas());
+  });
+
+  /** Hay líneas de algún tipo: la ficha pinta el resumen solo entonces. */
+  protected readonly hayLineas = computed(() => this.totalItems() > 0 || this.cuentas().length > 0);
 
   /** Migas: módulo Compra → listado del documento → identificador del documento abierto. */
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() =>
@@ -177,11 +212,12 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
   private loadDocumento(id: number): void {
     forkJoin({
       cabecera: this.gateway.getById(this.document(), id),
-      lineas: this.detalleService.paginaDeItems<ComercialDetalleRead>(id, 1),
+      lineas: this.detalleService.paginaDeItems<FacturaCompraRecurrenteLineaRead>(id, 1),
+      cuentas: this.detalleService.cuentasDelDocumento<FacturaCompraRecurrenteLineaRead>(id),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cabecera, lineas }) => {
+        next: ({ cabecera, lineas, cuentas }) => {
           const read = cabecera as FacturaCompraRecurrenteRead;
           this.cabecera.set({
             proveedor: read.contacto_nombre_corto ?? null,
@@ -204,9 +240,11 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
             },
           });
           this.resumenCabecera.set(resumenDesdeCabecera(read));
+          this.cuentasCabecera.set(cuentasDesdeCabecera(read));
           this.pagina.set(0);
           this.totalItems.set(lineas.count);
           this.lines.set(lineas.results.map((line) => comercialDetalleToFormValue(line)));
+          this.cuentas.set(cuentas.map(cuentaDetalleToLineaView));
           this.isLoading.set(false);
         },
         error: () => {
@@ -224,7 +262,7 @@ export class FacturaCompraRecurrenteDetailComponent implements OnInit {
     if (!id || pagina === this.pagina()) return;
     this.cargandoItems.set(true);
     this.detalleService
-      .paginaDeItems<ComercialDetalleRead>(Number(id), pagina + 1)
+      .paginaDeItems<FacturaCompraRecurrenteLineaRead>(Number(id), pagina + 1)
       .pipe(
         finalize(() => this.cargandoItems.set(false)),
         takeUntilDestroyed(this.destroyRef),

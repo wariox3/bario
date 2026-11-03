@@ -108,7 +108,7 @@ export const contenedoresEs: ContenedoresDict = {
   ideas: {
     title: '¿Qué te gustaría mejorar o automatizar hoy?',
     subtitle: 'Escríbelo con tus palabras. Lo revisa el equipo y te avisamos cómo avanza.',
-    placeholder: 'Ej.: Que me avise cuando un vigilante acumule más de 48 horas en la semana',
+    placeholder: 'Ej.: Que me avise cuando una factura lleve más de 30 días vencida sin pago',
     required: 'Cuéntanos tu idea antes de enviarla.',
     shortcut: 'Ctrl + Enter para enviar',
     submit: 'Enviar idea',

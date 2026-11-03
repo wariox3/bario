@@ -108,7 +108,7 @@ export const contenedoresEn: ContenedoresDict = {
   ideas: {
     title: 'What would you like to improve or automate today?',
     subtitle: 'Tell us in your own words. The team reviews it and keeps you posted.',
-    placeholder: 'E.g.: Alert me when a guard goes over 48 hours in a week',
+    placeholder: 'E.g.: Alert me when an invoice is more than 30 days overdue and unpaid',
     required: 'Tell us your idea before sending it.',
     shortcut: 'Ctrl + Enter to send',
     submit: 'Send idea',

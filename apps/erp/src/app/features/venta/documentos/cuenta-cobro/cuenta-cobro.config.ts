@@ -60,6 +60,8 @@ export const CUENTA_COBRO_CONFIG: DocumentEntityConfig = {
   canEditRow: (row) => !row.estado_aprobado,
   // Acciones extra del dropdown "Acciones" (cada id ↔ un EntityActionStrategy
   // registrado en ENTITY_ACTION_PROVIDERS):
+  //  - 'elegir-recurrente': crear la cuenta de cobro desde una factura de venta
+  //    recurrente.
   //  - 'export-excel': descarga el listado (filtros/orden activos) a Excel.
-  extraActionIds: ['imprimir', 'imprimir-zip', 'export-excel'],
+  extraActionIds: ['elegir-recurrente', 'imprimir', 'imprimir-zip', 'export-excel'],
 };

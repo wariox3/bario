@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TextareaModule } from 'primeng/textarea';
 import {
   FieldErrorComponent,
   FocusInvalidDirective,
@@ -26,7 +27,12 @@ import type { ErpSelectOption } from '@reddoc/core';
 import { ContratoAutocompleteComponent, type ContratoOption } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { CreditoService } from '../../credito.service';
-import { CONCEPTO_ENDPOINT, CREDITO_LIST_PATH, CONCEPTO_PARAMS } from '../../credito.constants';
+import {
+  CONCEPTO_ENDPOINT,
+  CONCEPTO_PARAMS,
+  CREDITO_COMENTARIO_MAX_LENGTH,
+  CREDITO_LIST_PATH,
+} from '../../credito.constants';
 import { creditoToFormValue, formValueToPayload } from '../../credito.mapper';
 import { montoPositivo } from '../../../../shared/monto-positivo.validator';
 import {
@@ -58,6 +64,7 @@ import {
     DatePickerModule,
     MascaraFechaDirective,
     CheckboxModule,
+    TextareaModule,
     FieldErrorComponent,
     PageActionsComponent,
     ContratoAutocompleteComponent,
@@ -80,6 +87,7 @@ export class CreditoFormComponent implements OnInit {
 
   protected readonly conceptoEndpoint = CONCEPTO_ENDPOINT;
   protected readonly conceptoParams = CONCEPTO_PARAMS;
+  protected readonly comentarioMaxLength = CREDITO_COMENTARIO_MAX_LENGTH;
 
   /** Id del crédito a editar (route param `:id`). Ausente en modo alta. */
   readonly id = input<string>();
@@ -113,6 +121,10 @@ export class CreditoFormComponent implements OnInit {
       inactivo: [false],
       aplica_prima: [false],
       aplica_cesantia: [false],
+      comentario: this.fb.control<string | null>(
+        null,
+        Validators.maxLength(CREDITO_COMENTARIO_MAX_LENGTH),
+      ),
     },
     // Compara dos campos, así que vive en el grupo y no en un control.
     { validators: cuotaNoSuperaTotal },
