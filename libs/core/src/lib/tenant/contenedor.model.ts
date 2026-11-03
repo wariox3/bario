@@ -249,9 +249,9 @@ export interface Contenedor extends ContenedorAccesoFlags {
    */
   soporte?: boolean;
   /** Superusuario de la plataforma: entra a todos los módulos. */
-  is_superuser?: boolean;
+  readonly is_superuser?: boolean;
   /** Grupos de la membresía: deciden a qué módulos entra (ver `GRUPO_ACCESO`). */
-  grupos?: readonly number[];
+  readonly grupos: readonly number[];
 }
 
 export type ContenedoresResponse = PaginatedResponse<Contenedor>;

@@ -21,18 +21,6 @@ import { withModuleAccess } from './with-module-access';
 @Component({ standalone: true, template: 'venta' })
 class VentaStubComponent {}
 
-/** Como lo manda el backend: la empresa no contrató Venta. */
-const CONTENEDOR = {
-  id: 21,
-  cliente_id: 13,
-  schema_name: 'seguridad',
-  cliente_nombre: 'Seguridad',
-  activo: true,
-  propietario: true,
-  acceso_venta: false,
-  acceso_tesoreria: true,
-};
-
 /** Membresía de `/seguridad/usuario-cliente/usuario/`: lo que valida la recarga dura. */
 const MEMBRESIA = {
   id: 21,
@@ -141,7 +129,12 @@ describe('acceso a módulos · recarga dura sobre un módulo fuera del plan', ()
             // corre después de todos los `canMatch`.
             canActivate: [
               () => {
-                TestBed.inject(TenantService).setCurrent(CONTENEDOR);
+                TestBed.inject(TenantService).setCurrent({
+                  schema_name: 'seguridad',
+                  cliente_id: MEMBRESIA.cliente_id,
+                  propietario: false,
+                  grupos: MEMBRESIA.grupos,
+                });
                 return true;
               },
             ],
@@ -159,7 +152,7 @@ describe('acceso a módulos · recarga dura sobre un módulo fuera del plan', ()
     const harness = await RouterTestingHarness.create();
     const componente = await harness.navigateByUrl('/t/seguridad/venta/contactos');
 
-    // Venta abierta pese a `acceso_venta: false`.
+    // Venta abierta pese a no tener el grupo de Venta.
     expect(componente).toBeInstanceOf(VentaStubComponent);
   });
 

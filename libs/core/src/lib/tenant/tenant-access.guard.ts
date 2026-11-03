@@ -7,6 +7,7 @@ import { ToastService } from '../services/toast.service';
 import { TenantService } from './tenant.service';
 import { TENANT_ROUTES } from './tenant.types';
 import { ContenedorService } from './contenedor.service';
+import { membresiaToAccess } from './membresia.mapper';
 import { tenantSlugFromSegments } from './tenant-slug.utils';
 
 /**
@@ -62,16 +63,7 @@ export const tenantAccessGuard: CanMatchFn = (route: Route, segments: UrlSegment
 
   return contenedorService.getMembresia(slug).pipe(
     map((membresia) => {
-      tenant.setCurrent({
-        schema_name: slug,
-        cliente_id: membresia.cliente_id,
-        propietario: membresia.propietario === true,
-        soporte: membresia.soporte,
-        is_superuser: membresia.is_superuser,
-        grupos: membresia.grupos,
-        cliente_nombre: membresia.cliente_nombre ?? null,
-        cliente_imagen_thumbnail: membresia.cliente_imagen_thumbnail ?? null,
-      });
+      tenant.setCurrent(membresiaToAccess(slug, membresia));
       return true;
     }),
     catchError((error: unknown) =>

@@ -76,16 +76,9 @@ describe('tenantAccessGuard', () => {
     await navegacion;
 
     expect(router.url).toBe('/t/acme');
-    expect(tenant.currentContenedor()).toEqual({
-      schema_name: 'acme',
-      cliente_id: 8,
-      propietario: true,
-      soporte: false,
-      is_superuser: false,
-      grupos: [1, 7],
-      cliente_nombre: 'Acme',
-      cliente_imagen_thumbnail: null,
-    });
+    // El mapeo completo lo cubre `membresia.mapper.spec`; acá, que se guardó.
+    expect(tenant.currentContenedor()?.cliente_id).toBe(8);
+    expect(tenant.currentContenedor()?.grupos).toEqual([1, 7]);
   });
 
   it('un 404 (no es miembro) avisa y vuelve a la lista de contenedores', async () => {
@@ -101,6 +94,18 @@ describe('tenantAccessGuard', () => {
     expect(tenant.currentContenedor()).toBeNull();
   });
 
+  it('un 400 (schema inválido) también es sin acceso', async () => {
+    const navegacion = router.navigateByUrl('/t/acme');
+    await unTick();
+    http
+      .expectOne(URL_MEMBRESIA)
+      .flush({ detail: 'schema_name inválido' }, { status: 400, statusText: 'Bad Request' });
+    await navegacion;
+
+    expect(router.url).toBe('/contenedores');
+    expect(toastWarn).toHaveBeenCalled();
+  });
+
   it('un error de red vuelve a la lista sin decir que no tiene acceso', async () => {
     const navegacion = router.navigateByUrl('/t/acme');
     await unTick();
@@ -112,7 +117,7 @@ describe('tenantAccessGuard', () => {
   });
 
   it('si el contenedor activo ya es el del slug, no vuelve a preguntar', async () => {
-    tenant.setCurrent({ schema_name: 'acme', cliente_id: 8, propietario: false });
+    tenant.setCurrent({ schema_name: 'acme', cliente_id: 8, propietario: false, grupos: [] });
 
     await router.navigateByUrl('/t/acme');
 

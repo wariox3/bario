@@ -1,5 +1,4 @@
 import { InjectionToken } from '@angular/core';
-import type { ContenedorAccesoFlags } from './contenedor.model';
 
 export type TenantSlug = string;
 
@@ -10,32 +9,28 @@ export const LAST_TENANT_KEY = 'reddoc-last-tenant';
  *
  * Tiene dos productores:
  *  - la lista de contenedores y `rootRedirectGuard`, con la fila completa de
- *    `/contenedor/cliente/lista-usuario/`;
+ *    `/contenedor/cliente/lista-usuario/` (`Contenedor` cumple este contrato);
  *  - `tenantAccessGuard` tras una recarga dura, con la membresía de
- *    `/seguridad/usuario-cliente/usuario/`, que no trae `activo` y puede no traer
- *    el nombre ni la imagen.
+ *    `/seguridad/usuario-cliente/usuario/` (ver `membresiaToAccess`), que no trae
+ *    `activo` y todavía no trae el nombre ni la imagen.
  *
- * Por eso solo `schema_name`, `cliente_id` y `propietario` son seguros: el
- * primero identifica al tenant, el segundo al contenedor en los endpoints del
- * schema público y el tercero dice si el usuario administra esta empresa.
- *
- * A qué módulos entra el usuario lo deciden `grupos` (más `propietario`,
- * `is_superuser` y `soporte`, que abren todo): ver `readModuleAccessFlags`. Los
- * `acceso_*` heredados ya no los manda ningún endpoint.
+ * `grupos` es obligatorio porque las dos fuentes lo mandan y decide a qué
+ * módulos entra el usuario (ver `readModuleAccessFlags`): una fila sin él
+ * abriría todo en silencio.
  */
-export interface ContenedorAccess extends ContenedorAccesoFlags {
-  schema_name: string;
-  cliente_id: number;
-  propietario: boolean;
-  soporte?: boolean;
-  is_superuser?: boolean;
+export interface ContenedorAccess {
+  readonly schema_name: string;
+  readonly cliente_id: number;
+  readonly propietario: boolean;
   /** Grupos de la membresía; deciden los módulos (ver `GRUPO_ACCESO`). */
-  grupos?: readonly number[];
+  readonly grupos: readonly number[];
+  readonly soporte?: boolean;
+  readonly is_superuser?: boolean;
   /** Sin él, el header pinta el slug. */
-  cliente_nombre?: string | null;
-  activo?: boolean;
+  readonly cliente_nombre?: string | null;
+  readonly activo?: boolean;
   /** Miniatura de la imagen de la empresa; sin ella, el header pinta la inicial. */
-  cliente_imagen_thumbnail?: string | null;
+  readonly cliente_imagen_thumbnail?: string | null;
 }
 
 /**
