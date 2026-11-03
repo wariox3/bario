@@ -19,19 +19,16 @@ import {
 } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
 import {
   I18nService,
   TenantService,
   ToastService,
-  buildAccesoFlags,
   extractErrorMessage,
   getInitials,
-  type ContenedorAccesoId,
   type GrupoSeguridad,
   type UserSearchResult,
 } from '@reddoc/core';
-import { AccesosContenedorComponent } from '@reddoc/ui';
+import { GruposSeguridadComponent } from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { SeguridadUsuariosService } from '../../usuarios.service';
 
@@ -46,24 +43,13 @@ const SEARCH_MIN_LENGTH = 3;
  * eso el diálogo no toca el listado: emite `invited` y el host recarga.
  *
  * **El rol no se pide ni se manda**: se cambia desde la fila del listado. Lo
- * que sí se define acá es con qué entra la persona — sus **grupos de
- * seguridad** (`grupo_ids`) y sus **accesos por módulo** (flags `acceso_*`).
- *
- * Los accesos ofrecidos se recortan al plan del contenedor: no se puede invitar
- * a alguien a un módulo que la empresa no contrató. Arrancan todos apagados: se
- * marca explícitamente a qué se le da acceso.
+ * que sí se define acá es con qué entra la persona: sus **grupos de
+ * seguridad** (`grupo_ids`). Arrancan todos apagados.
  */
 @Component({
   selector: 'app-invitar-usuario-dialog',
   standalone: true,
-  imports: [
-    FormsModule,
-    DialogModule,
-    ButtonModule,
-    AutoCompleteModule,
-    MultiSelectModule,
-    AccesosContenedorComponent,
-  ],
+  imports: [FormsModule, DialogModule, ButtonModule, AutoCompleteModule, GruposSeguridadComponent],
   templateUrl: './invitar-usuario-dialog.component.html',
   styles: ':host { display: contents; }',
 })
@@ -94,16 +80,13 @@ export class InvitarUsuarioDialogComponent {
     return typeof value === 'object' && value !== null ? value : null;
   });
 
-  // Mutable a propósito: `<p-multiselect [options]>` no acepta `readonly`.
-  protected readonly grupos = signal<GrupoSeguridad[]>([]);
-  protected readonly selectedGrupoIds = signal<number[]>([]);
+  protected readonly grupos = signal<readonly GrupoSeguridad[]>([]);
+  /** Grupos marcados. Arranca vacío: se asigna lo que se marque, nada más. */
+  protected readonly selectedGrupoIds = signal<readonly number[]>([]);
   protected readonly isLoadingGrupos = signal(false);
 
-  /** Contenedor al que se invita: el activo. Recorta los accesos ofrecidos. */
+  /** Contenedor al que se invita: el activo. Su nombre va en el título. */
   protected readonly contenedor = this.tenant.currentContenedor;
-
-  /** Accesos marcados. Arranca vacío: se otorga lo que se marque, nada más. */
-  protected readonly selectedAccesoIds = signal<readonly ContenedorAccesoId[]>([]);
 
   /** Términos tecleados; la última consulta gana. */
   private readonly search$ = new Subject<string>();
@@ -131,7 +114,6 @@ export class InvitarUsuarioDialogComponent {
         this.selection.set('');
         this.suggestions.set([]);
         this.selectedGrupoIds.set([]);
-        this.selectedAccesoIds.set([]);
         this.isSending.set(false);
         this.loadGrupos();
       }
@@ -145,7 +127,7 @@ export class InvitarUsuarioDialogComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (grupos) => {
-          this.grupos.set([...grupos]);
+          this.grupos.set(grupos);
           this.isLoadingGrupos.set(false);
         },
         error: () => {
@@ -178,10 +160,7 @@ export class InvitarUsuarioDialogComponent {
     this.isSending.set(true);
     const toasts = this.t().seguridad.usuarios.toasts;
     this.service
-      .invite(user.id, {
-        grupoIds: this.selectedGrupoIds(),
-        accesos: buildAccesoFlags(this.contenedor(), this.selectedAccesoIds()),
-      })
+      .invite(user.id, this.selectedGrupoIds())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

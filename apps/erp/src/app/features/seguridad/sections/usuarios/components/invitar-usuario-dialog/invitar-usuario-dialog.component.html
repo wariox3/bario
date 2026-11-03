@@ -86,42 +86,14 @@
         }
       </div>
 
-      <div class="flex flex-col gap-1.5">
-        <label
-          for="invitar-grupos"
-          class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
-        >
-          {{ inv.fields.grupos }}
-        </label>
-        <p-multiselect
-          inputId="invitar-grupos"
-          [options]="grupos()"
-          [ngModel]="selectedGrupoIds()"
-          (ngModelChange)="selectedGrupoIds.set($event ?? [])"
-          [ngModelOptions]="{ standalone: true }"
-          optionLabel="nombre"
-          optionValue="id"
-          dataKey="id"
-          display="chip"
-          [maxSelectedLabels]="3"
-          [showClear]="true"
-          [loading]="isLoadingGrupos()"
-          [placeholder]="inv.fields.gruposPlaceholder"
-          [emptyMessage]="inv.fields.gruposEmpty"
-          appendTo="body"
-          [fluid]="true"
-        />
-        <span class="text-[0.72rem] text-brand-muted">{{ inv.fields.gruposHint }}</span>
-      </div>
-
       <!--
         El rol no se pide acá a propósito: se cambia desde la fila del listado.
       -->
-
-      <lib-accesos-contenedor
-        [contenedor]="contenedor()"
-        [(selected)]="selectedAccesoIds"
-        inputIdPrefix="invitar-acceso"
+      <lib-grupos-seguridad
+        [grupos]="grupos()"
+        [loading]="isLoadingGrupos()"
+        [(selected)]="selectedGrupoIds"
+        inputIdPrefix="invitar-grupo"
       />
 
       <!--

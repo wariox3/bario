@@ -7,6 +7,7 @@ import {
   type RequestOptions,
 } from '../services/base-http.service';
 import type { PaginatedResponse } from '../models/pagination.model';
+import { fetchAllPages } from '../data-list/data/fetch-all-pages';
 import {
   Contenedor,
   ContenedorDetalle,
@@ -160,13 +161,12 @@ export class ContenedorService extends BaseHttpService {
    * Grupos de seguridad disponibles para asignar en la invitación.
    *
    * Los grupos son verticales del schema público: globales, no dependen del
-   * contenedor. SUPUESTO pendiente de confirmar con backend: el shape de la
-   * respuesta — se tolera tanto un array plano como el envelope paginado de
-   * DRF.
+   * contenedor. El endpoint pagina (`PaginatedSegGrupoList`), así que se
+   * recorren todas las páginas: si no, el grupo 26 en adelante no aparecería.
    */
   getGrupos(): Observable<readonly GrupoSeguridad[]> {
-    return this.get<GrupoSeguridad[] | PaginatedResponse<GrupoSeguridad>>('/seguridad/grupo/').pipe(
-      map((r) => (Array.isArray(r) ? r : (r.results ?? []))),
+    return fetchAllPages((page) =>
+      this.get<PaginatedResponse<GrupoSeguridad>>(`/seguridad/grupo/?page=${page}`),
     );
   }
 

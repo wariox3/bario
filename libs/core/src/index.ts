@@ -238,15 +238,11 @@ export {
   TENANT_ROUTES,
   ContenedorService,
   MODULE_ACCESS_PREFIX,
-  CONTENEDOR_ACCESOS,
   readModuleAccessFlags,
   accesoFlag,
-  accesosDisponibles,
-  buildAccesoFlags,
 } from './lib/tenant';
 export type {
   AccesoFlagName,
-  ContenedorAcceso,
   ContenedorAccesoId,
   TenantSlug,
   ContenedorAccess,

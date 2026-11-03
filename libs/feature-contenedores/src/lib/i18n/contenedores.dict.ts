@@ -162,11 +162,6 @@ export interface ContenedoresDict {
       invalid: string;
       submit: string;
       sending: string;
-      grupos: {
-        label: string;
-        placeholder: string;
-        empty: string;
-      };
     };
     pending: {
       estados: { P: string; A: string; R: string };

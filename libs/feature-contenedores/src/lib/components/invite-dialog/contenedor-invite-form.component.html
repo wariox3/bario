@@ -49,37 +49,11 @@
     }
   </div>
 
-  <div class="flex flex-col gap-1.5">
-    <label
-      for="invite-grupos"
-      class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted"
-    >
-      {{ t().contenedores.invite.form.grupos.label }}
-    </label>
-    <p-multiselect
-      inputId="invite-grupos"
-      [options]="grupos()"
-      [ngModel]="selectedGrupoIds()"
-      (ngModelChange)="selectedGrupoIds.set($event ?? [])"
-      [ngModelOptions]="{ standalone: true }"
-      optionLabel="nombre"
-      optionValue="id"
-      dataKey="id"
-      display="chip"
-      [maxSelectedLabels]="3"
-      [showClear]="true"
-      [loading]="isLoadingGrupos()"
-      [placeholder]="t().contenedores.invite.form.grupos.placeholder"
-      [emptyMessage]="t().contenedores.invite.form.grupos.empty"
-      appendTo="body"
-      [fluid]="true"
-    />
-  </div>
-
-  <lib-accesos-contenedor
-    [contenedor]="contenedor()"
-    [(selected)]="selectedAccesoIds"
-    inputIdPrefix="invite-acceso"
+  <lib-grupos-seguridad
+    [grupos]="grupos()"
+    [loading]="isLoadingGrupos()"
+    [(selected)]="selectedGrupoIds"
+    inputIdPrefix="invite-grupo"
   />
 
   <div class="flex justify-end">

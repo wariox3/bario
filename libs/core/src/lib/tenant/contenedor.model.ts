@@ -35,14 +35,13 @@ export type ContenedorInvitacionesPendientesResponse =
   PaginatedResponse<ContenedorInvitacionPendiente>;
 
 /**
- * Invitación a un contenedor (`POST /contenedor/invitacion/`).
+ * Invitación a un contenedor (`POST /contenedor/invitacion/`,
+ * `CtnInvitacionCrearRequest`).
  *
- * Además de a quién se invita, la invitación lleva **con qué entra**: los
- * grupos de seguridad y las flags `acceso_*` de los módulos que va a poder
- * abrir. Son las mismas flags que describen el plan del contenedor
- * (`ContenedorAccesoFlags`), acá aplicadas a la persona.
+ * Además de a quién se invita, la invitación lleva **con qué entra**: sus
+ * grupos de seguridad. Los accesos por módulo ya no viajan acá.
  */
-export interface SendInviteRequest extends ContenedorAccesoFlags {
+export interface SendInviteRequest {
   cliente_id: number;
   usuario_id: number;
   /** Grupos de seguridad a los que pertenecerá el invitado al aceptar. */

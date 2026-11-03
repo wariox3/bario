@@ -1,11 +1,5 @@
 import { contenedoresEn } from '@reddoc/feature-contenedores/i18n';
-import {
-  accesosContenedorEn,
-  appSwitcherEn,
-  authEn,
-  phoneInputEn,
-  saludoEn,
-} from '@reddoc/ui/i18n';
+import { gruposSeguridadEn, appSwitcherEn, authEn, phoneInputEn, saludoEn } from '@reddoc/ui/i18n';
 import type { AppDict } from './app.dict';
 
 export const en: AppDict = {
@@ -14,7 +8,7 @@ export const en: AppDict = {
   phoneInput: phoneInputEn,
   saludo: saludoEn,
   contenedores: contenedoresEn,
-  accesosContenedor: accesosContenedorEn,
+  gruposSeguridad: gruposSeguridadEn,
   common: {
     comingSoon: 'Coming soon.',
     masInformacion: { title: 'More information', hint: 'optional' },
@@ -7216,10 +7210,6 @@ export const en: AppDict = {
           usuarioPlaceholder: 'name@company.com',
           usuarioHint: 'Type at least 3 characters. The person must already have a RedDoc account.',
           usuarioInvalid: 'Pick someone from the list.',
-          grupos: 'Groups',
-          gruposPlaceholder: 'Select the groups (optional)',
-          gruposHint: 'Optional. The person will belong to these groups once they accept.',
-          gruposEmpty: 'No groups available.',
         },
         submit: 'Send invitation',
         sending: 'Sending…',

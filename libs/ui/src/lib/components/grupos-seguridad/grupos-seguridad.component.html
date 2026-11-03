@@ -1,0 +1,48 @@
+@let dict = t().gruposSeguridad;
+
+<div class="flex flex-col gap-1.5">
+  <div class="flex items-baseline justify-between gap-2">
+    <span class="text-[0.72rem] font-medium uppercase tracking-[0.08em] text-brand-muted">
+      {{ dict.label }}
+    </span>
+    @if (grupos().length > 0) {
+      <button
+        type="button"
+        class="text-[0.72rem] font-semibold text-brand-blue hover:underline"
+        (click)="toggleTodos()"
+      >
+        {{ todos() ? dict.ninguno : dict.todos }}
+      </button>
+    }
+  </div>
+  <div
+    class="grid max-h-60 grid-cols-2 gap-1.5 overflow-y-auto rounded-lg border border-[rgba(20,48,73,0.1)] p-2"
+  >
+    @if (loading()) {
+      <span class="col-span-2 flex items-center gap-2 px-2 py-1.5 text-[0.8rem] text-brand-muted">
+        <i class="pi pi-spin pi-spinner text-[0.8rem]"></i>
+        {{ dict.loading }}
+      </span>
+    } @else {
+      @for (grupo of grupos(); track grupo.id) {
+        <label
+          [for]="inputIdPrefix() + '-' + grupo.id"
+          class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-[rgba(20,48,73,0.04)]"
+        >
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="isSelected(grupo.id)"
+            (ngModelChange)="toggle(grupo.id)"
+            [ngModelOptions]="{ standalone: true }"
+            [inputId]="inputIdPrefix() + '-' + grupo.id"
+          />
+          <i [class]="iconoDeGrupo(grupo.nombre)" class="text-[0.8rem] text-brand-muted"></i>
+          <span class="text-[0.8rem] text-brand-text">{{ grupo.nombre }}</span>
+        </label>
+      } @empty {
+        <span class="col-span-2 px-2 py-1.5 text-[0.8rem] text-brand-muted">{{ dict.empty }}</span>
+      }
+    }
+  </div>
+  <span class="text-[0.72rem] text-brand-muted">{{ dict.hint }}</span>
+</div>

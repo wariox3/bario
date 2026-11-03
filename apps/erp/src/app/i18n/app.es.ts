@@ -1,11 +1,5 @@
 import { contenedoresEs } from '@reddoc/feature-contenedores/i18n';
-import {
-  accesosContenedorEs,
-  appSwitcherEs,
-  authEs,
-  phoneInputEs,
-  saludoEs,
-} from '@reddoc/ui/i18n';
+import { gruposSeguridadEs, appSwitcherEs, authEs, phoneInputEs, saludoEs } from '@reddoc/ui/i18n';
 import type { AppDict } from './app.dict';
 
 export const es: AppDict = {
@@ -14,7 +8,7 @@ export const es: AppDict = {
   phoneInput: phoneInputEs,
   saludo: saludoEs,
   contenedores: contenedoresEs,
-  accesosContenedor: accesosContenedorEs,
+  gruposSeguridad: gruposSeguridadEs,
   common: {
     comingSoon: 'Próximamente disponible.',
     masInformacion: { title: 'Más información', hint: 'opcional' },
@@ -7325,10 +7319,6 @@ export const es: AppDict = {
           usuarioPlaceholder: 'nombre@empresa.com',
           usuarioHint: 'Escribe al menos 3 caracteres. La persona ya debe tener cuenta en RedDoc.',
           usuarioInvalid: 'Elige a alguien de la lista.',
-          grupos: 'Grupos',
-          gruposPlaceholder: 'Selecciona los grupos (opcional)',
-          gruposHint: 'Opcional. La persona pertenecerá a estos grupos al aceptar la invitación.',
-          gruposEmpty: 'No hay grupos disponibles.',
         },
         submit: 'Enviar invitación',
         sending: 'Enviando…',

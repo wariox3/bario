@@ -1,6 +1,6 @@
 import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
 import type {
-  AccesosContenedorTranslationsHost,
+  GruposSeguridadTranslationsHost,
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
@@ -21,7 +21,7 @@ export interface AppDict
     PhoneInputTranslationsHost,
     SaludoTranslationsHost,
     ContenedoresTranslationsHost,
-    AccesosContenedorTranslationsHost {
+    GruposSeguridadTranslationsHost {
   common: {
     comingSoon: string;
     actions: {

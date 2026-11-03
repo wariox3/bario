@@ -1,6 +1,6 @@
 import type { ContenedoresTranslationsHost } from '@reddoc/feature-contenedores/i18n';
 import type {
-  AccesosContenedorTranslationsHost,
+  GruposSeguridadTranslationsHost,
   AppSwitcherTranslationsHost,
   AuthTranslationsHost,
   PhoneInputTranslationsHost,
@@ -67,7 +67,7 @@ export interface AppDict
     PhoneInputTranslationsHost,
     SaludoTranslationsHost,
     ContenedoresTranslationsHost,
-    AccesosContenedorTranslationsHost {
+    GruposSeguridadTranslationsHost {
   common: {
     comingSoon: string;
     /** Colapsable de los documentos con los campos opcionales que menos se tocan. */
@@ -5476,10 +5476,6 @@ export interface AppDict
           usuarioPlaceholder: string;
           usuarioHint: string;
           usuarioInvalid: string;
-          grupos: string;
-          gruposPlaceholder: string;
-          gruposHint: string;
-          gruposEmpty: string;
         };
         submit: string;
         sending: string;
