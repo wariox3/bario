@@ -41,6 +41,7 @@ import { ContenedoresSupportDialogComponent } from '../../components/support-dia
 import { ContenedorRowItemComponent } from '../../components/contenedor-row-item/contenedor-row-item.component';
 import { ContenedorCardItemComponent } from '../../components/contenedor-card-item/contenedor-card-item.component';
 import { InvitacionesRecibidasComponent } from '../../components/invitaciones-recibidas/invitaciones-recibidas.component';
+import { IdeasComponent } from '../../components/ideas/ideas.component';
 import { CONTENEDORES_CAPABILITIES_FULL } from '../../contenedores.capabilities';
 import type { ContenedoresCapabilities } from '../../contenedores.capabilities';
 import type { ContenedoresTranslationsHost } from '../../i18n';
@@ -70,6 +71,7 @@ interface EstadoConsultado {
     ConfirmDialogModule,
     SaludoComponent,
     InvitacionesRecibidasComponent,
+    IdeasComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './contenedores-list.component.html',

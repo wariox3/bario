@@ -208,6 +208,12 @@
       }
     </div>
   </div>
+
+  @if (capabilities().ideas) {
+    @defer (on idle) {
+      <lib-ideas class="mt-4" />
+    }
+  }
 </div>
 
 <p-menu #rowMenu [model]="rowMenuItems" [popup]="true" appendTo="body" styleClass="cl-row-menu" />

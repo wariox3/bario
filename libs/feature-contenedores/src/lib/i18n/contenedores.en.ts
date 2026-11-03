@@ -105,6 +105,31 @@ export const contenedoresEn: ContenedoresDict = {
       },
     },
   },
+  ideas: {
+    title: 'What would you like to improve or automate today?',
+    subtitle: 'Tell us in your own words. The team reviews it and keeps you posted.',
+    placeholder: 'E.g.: Alert me when a guard goes over 48 hours in a week',
+    required: 'Tell us your idea before sending it.',
+    shortcut: 'Ctrl + Enter to send',
+    submit: 'Send idea',
+    sent: "Received. We'll let you know once the team reviews it.",
+    listTitle: 'Your ideas',
+    etapas: {
+      recibida: 'Received',
+      evaluacion: 'Under review',
+      respondida: 'Answered',
+      cerrada: 'Closed',
+    },
+    empty: {
+      title: "You haven't sent any ideas yet",
+      sub: 'Something you repeat by hand every week is a good start.',
+    },
+    loadError: "We couldn't load your ideas.",
+    retry: 'Retry',
+    toasts: {
+      error: { title: "Couldn't send", desc: "Your idea wasn't sent. Try again in a moment." },
+    },
+  },
   create: {
     title: 'New company',
     subtitle: 'Configure the new workspace',

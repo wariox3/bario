@@ -105,6 +105,34 @@ export const contenedoresEs: ContenedoresDict = {
       },
     },
   },
+  ideas: {
+    title: '¿Qué te gustaría mejorar o automatizar hoy?',
+    subtitle: 'Escríbelo con tus palabras. Lo revisa el equipo y te avisamos cómo avanza.',
+    placeholder: 'Ej.: Que me avise cuando un vigilante acumule más de 48 horas en la semana',
+    required: 'Cuéntanos tu idea antes de enviarla.',
+    shortcut: 'Ctrl + Enter para enviar',
+    submit: 'Enviar idea',
+    sent: 'Recibida. Te avisamos cuando el equipo la revise.',
+    listTitle: 'Tus ideas',
+    etapas: {
+      recibida: 'Recibida',
+      evaluacion: 'En evaluación',
+      respondida: 'Respondida',
+      cerrada: 'Cerrada',
+    },
+    empty: {
+      title: 'Aún no has enviado ideas',
+      sub: 'Lo que repites cada semana a mano es un buen comienzo.',
+    },
+    loadError: 'No pudimos traer tus ideas.',
+    retry: 'Reintentar',
+    toasts: {
+      error: {
+        title: 'No se pudo enviar',
+        desc: 'Tu idea no se envió. Intenta de nuevo en un momento.',
+      },
+    },
+  },
   create: {
     title: 'Nuevo contenedor',
     subtitle: 'Configura el nuevo espacio de trabajo',

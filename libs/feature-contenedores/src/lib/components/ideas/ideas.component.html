@@ -1,0 +1,146 @@
+@let tx = t();
+
+<!-- Estiradas a la misma altura: la del campo crece hasta el pie de «Tus ideas». -->
+<div class="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
+  <!-- Contar la idea -->
+  <section
+    class="flex flex-col rounded-[14px] border border-[rgba(19,38,60,0.08)] bg-brand-surface px-6 py-5 animate-fade-up motion-reduce:animate-none max-[560px]:px-4"
+    aria-labelledby="ideas-titulo"
+  >
+    <h2
+      id="ideas-titulo"
+      class="m-0 text-[1.02rem] font-extrabold leading-tight tracking-[-0.03em] text-brand-navy"
+    >
+      {{ tx.title }}
+    </h2>
+    <p class="m-0 mt-1 text-[0.78rem] leading-snug text-brand-muted">{{ tx.subtitle }}</p>
+
+    <form
+      class="mt-4 flex flex-1 flex-col gap-1.5"
+      [formGroup]="form"
+      libFocusInvalid
+      (ngSubmit)="enviar()"
+    >
+      <label for="ideas-descripcion" class="sr-only">{{ tx.title }}</label>
+      <textarea
+        id="ideas-descripcion"
+        pTextarea
+        rows="3"
+        class="min-h-[7.5rem] w-full flex-1 resize-none"
+        formControlName="descripcion"
+        [maxlength]="max"
+        [placeholder]="tx.placeholder"
+        [invalid]="descripcion.invalid && descripcion.touched"
+        (keydown.enter)="onAtajo($event)"
+      ></textarea>
+      <lib-field-error
+        [control]="descripcion"
+        [messages]="{ required: tx.required, pattern: tx.required }"
+      />
+
+      <div class="mt-auto flex items-center justify-between pt-1.5 gap-3 max-[560px]:flex-wrap">
+        <p class="m-0 min-h-[1rem] text-[0.72rem] text-brand-muted" role="status">
+          @if (acuse()) {
+            <span
+              class="inline-flex items-center gap-1.5 font-medium text-emerald-700 animate-fade-up motion-reduce:animate-none"
+            >
+              <i class="pi pi-check text-[0.7rem]" aria-hidden="true"></i>
+              {{ tx.sent }}
+            </span>
+          } @else if (contador(); as c) {
+            <span class="tabular-nums">{{ c }}</span>
+          } @else {
+            <span class="max-[560px]:hidden">{{ tx.shortcut }}</span>
+          }
+        </p>
+        <p-button
+          type="submit"
+          [label]="tx.submit"
+          [loading]="enviando()"
+          [disabled]="enviando()"
+          styleClass="max-[560px]:w-full"
+          class="max-[560px]:w-full"
+        />
+      </div>
+    </form>
+  </section>
+
+  <!-- Trayecto de las últimas ideas -->
+  <section
+    class="rounded-[14px] border border-[rgba(19,38,60,0.08)] bg-brand-surface px-5 py-5 animate-fade-up motion-reduce:animate-none"
+    aria-labelledby="ideas-lista-titulo"
+  >
+    <h2
+      id="ideas-lista-titulo"
+      class="m-0 text-[0.9rem] font-bold leading-tight tracking-[-0.02em] text-brand-navy"
+    >
+      {{ tx.listTitle }}
+    </h2>
+
+    @if (estado() === 'cargando' && ideas().length === 0) {
+      <ul class="m-0 mt-4 flex list-none flex-col gap-4 p-0" aria-hidden="true">
+        @for (i of [0, 1, 2]; track i) {
+          <li class="flex flex-col gap-2">
+            <span class="h-3 w-[85%] animate-pulse rounded bg-[rgba(19,38,60,0.07)]"></span>
+            <span class="h-2 w-24 animate-pulse rounded bg-[rgba(19,38,60,0.05)]"></span>
+          </li>
+        }
+      </ul>
+    } @else if (mostrarError()) {
+      <div class="mt-3 flex flex-col items-start gap-1">
+        <p class="m-0 text-[0.78rem] text-brand-muted">{{ tx.loadError }}</p>
+        <button
+          type="button"
+          class="cursor-pointer border-0 bg-transparent p-0 text-[0.78rem] font-semibold text-brand-navy underline-offset-2 hover:underline focus-visible:underline focus-visible:outline-none"
+          (click)="reintentar()"
+        >
+          {{ tx.retry }}
+        </button>
+      </div>
+    } @else if (ideas().length === 0) {
+      <div class="mt-3 flex items-start gap-3">
+        <span
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[rgba(19,38,60,0.08)] bg-[rgba(19,38,60,0.03)]"
+          aria-hidden="true"
+        >
+          <i class="pi pi-lightbulb text-[0.8rem] text-brand-muted"></i>
+        </span>
+        <div class="flex flex-col gap-0.5">
+          <p class="m-0 text-[0.8rem] font-semibold text-brand-text">{{ tx.empty.title }}</p>
+          <p class="m-0 text-[0.74rem] leading-snug text-brand-muted">{{ tx.empty.sub }}</p>
+        </div>
+      </div>
+    } @else {
+      <ol class="m-0 mt-3 flex list-none flex-col p-0">
+        @for (idea of ideas(); track idea.id) {
+          <li
+            class="-mx-2 flex flex-col gap-2 rounded-lg px-2 py-2.5 transition-colors duration-[2400ms] ease-out motion-reduce:transition-none"
+            [class]="idea.id === recienId() ? 'bg-[rgba(119,170,215,0.14)]' : 'bg-transparent'"
+          >
+            <p
+              class="m-0 line-clamp-2 text-[0.82rem] leading-snug text-brand-text"
+              [title]="idea.descripcion"
+            >
+              {{ idea.descripcion }}
+            </p>
+
+            <!-- Trayecto: un tramo por etapa, lleno hasta donde va el caso. -->
+            <div class="flex items-center gap-2" [class]="idea.tono">
+              <span class="flex items-center gap-[3px]" aria-hidden="true">
+                @for (e of etapas; track e; let i = $index) {
+                  <span
+                    class="h-1 w-3.5 rounded-full"
+                    [class]="i <= idea.paso ? 'bg-current' : 'bg-[rgba(19,38,60,0.1)]'"
+                  ></span>
+                }
+              </span>
+              <span class="text-[0.68rem] font-semibold leading-none">
+                {{ tx.etapas[idea.etapa] }}
+              </span>
+            </div>
+          </li>
+        }
+      </ol>
+    }
+  </section>
+</div>

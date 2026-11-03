@@ -105,6 +105,24 @@ export interface ContenedoresDict {
       rejectError: { title: string; desc: string };
     };
   };
+  /** Las dos cards al pie del inicio: enviar una idea y su trayecto. */
+  ideas: {
+    title: string;
+    subtitle: string;
+    placeholder: string;
+    required: string;
+    /** Ayuda bajo el campo: el atajo para enviar. */
+    shortcut: string;
+    submit: string;
+    /** Acuse que reemplaza un rato la ayuda tras enviar. */
+    sent: string;
+    listTitle: string;
+    etapas: { recibida: string; evaluacion: string; respondida: string; cerrada: string };
+    empty: { title: string; sub: string };
+    loadError: string;
+    retry: string;
+    toasts: { error: { title: string; desc: string } };
+  };
   create: {
     title: string;
     subtitle: string;

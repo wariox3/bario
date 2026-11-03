@@ -28,6 +28,8 @@ export interface ContenedoresCapabilities {
   readonly support: boolean;
   /** Responder, sobre el listado, las invitaciones que recibió la persona. */
   readonly invitaciones: boolean;
+  /** Enviar ideas de mejora a la mesa de ayuda y ver cómo avanzan. */
+  readonly ideas: boolean;
 }
 
 /** Todas las acciones habilitadas. Es el default del componente. */
@@ -41,4 +43,5 @@ export const CONTENEDORES_CAPABILITIES_FULL: ContenedoresCapabilities = {
   viewToggle: true,
   support: true,
   invitaciones: true,
+  ideas: true,
 };
