@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.21](https://github.com/wariox3/bario/compare/v0.1.20...v0.1.21) (2026-11-03)
+
+### Bug Fixes
+
+- **compra:** fechas en blanco por defecto en documentos recibidos ([7a9076f](https://github.com/wariox3/bario/commit/7a9076f7fdd930a69b38558af45c040894af3655))
+
 ## [0.1.20](https://github.com/wariox3/bario/compare/v0.1.19...v0.1.20) (2026-11-03)
 
 ### Features
