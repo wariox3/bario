@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { type Observable, catchError, map, of, shareReplay, tap } from 'rxjs';
 import {
+  CONTACTO_ACTIVO_PARAMS,
   ErpSelectDataService,
   TenantService,
   buildContactoLabel,
@@ -42,7 +43,11 @@ export class ConsumidorFinalService {
     if (enCache) return enCache;
 
     const consulta = this.data
-      .fetchOptions<ContactoFila>(CONTACTO_SELECCIONAR, { cliente: 'True', search: '2222222222' })
+      .fetchOptions<ContactoFila>(CONTACTO_SELECCIONAR, {
+        ...CONTACTO_ACTIVO_PARAMS,
+        cliente: 'True',
+        search: '2222222222',
+      })
       .pipe(
         map((filas) => {
           const fila = filas.find((f) => ES_CONSUMIDOR_FINAL.test(f.numero_identificacion ?? ''));

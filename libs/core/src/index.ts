@@ -297,6 +297,7 @@ export { applyServerErrors, clearServerError } from './lib/utils/form-errors';
 export type { ServerFieldMap, ApplyServerErrorsResult } from './lib/utils/form-errors';
 export { FormErrorService } from './lib/services/form-error.service';
 export {
+  CONTACTO_ACTIVO_PARAMS,
   ConsultaDianService,
   IDENTIFICACIONES_NUMERICAS,
   TIPO_PERSONA,

@@ -1,4 +1,5 @@
 export { TIPO_PERSONA } from './tipo-persona';
+export { CONTACTO_ACTIVO_PARAMS } from './contacto-activo';
 export { calcularDigitoVerificacion } from './digito-verificacion.util';
 export { construirNombreCorto } from './nombre-corto.util';
 export {

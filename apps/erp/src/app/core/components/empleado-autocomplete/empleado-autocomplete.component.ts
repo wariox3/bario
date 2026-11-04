@@ -19,7 +19,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { Subject, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { ErpSelectDataService, type ParamValue } from '@reddoc/core';
+import { CONTACTO_ACTIVO_PARAMS, ErpSelectDataService, type ParamValue } from '@reddoc/core';
 
 /**
  * Opción de empleado seleccionado. A diferencia de `ErpSelectOption`, conserva la
@@ -323,7 +323,11 @@ export class EmpleadoAutocompleteComponent implements ControlValueAccessor {
 
   private fetchEmpleados(query: string) {
     return this.dataService
-      .fetchOptions<EmpleadoApiRow>(this.endpoint(), { ...this.extraParams(), search: query })
+      .fetchOptions<EmpleadoApiRow>(this.endpoint(), {
+        ...CONTACTO_ACTIVO_PARAMS,
+        ...this.extraParams(),
+        search: query,
+      })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         map((rows) => rows.map(toOption)),

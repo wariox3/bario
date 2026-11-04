@@ -18,6 +18,7 @@ import { Subject, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import {
   buildContactoLabel,
+  CONTACTO_ACTIVO_PARAMS,
   ErpSelectDataService,
   type ErpSelectOption,
   type ParamValue,
@@ -295,7 +296,11 @@ export class ErpContactoSelectComponent implements ControlValueAccessor {
 
   private fetchContactos(query: string) {
     return this.dataService
-      .fetchOptions<ContactoApiRow>(ENDPOINT, { ...this.extraParams(), search: query })
+      .fetchOptions<ContactoApiRow>(ENDPOINT, {
+        ...CONTACTO_ACTIVO_PARAMS,
+        ...this.extraParams(),
+        search: query,
+      })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         map((rows) => rows.map(toOption)),
