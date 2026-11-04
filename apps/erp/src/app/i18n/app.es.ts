@@ -643,14 +643,18 @@ export const es: AppDict = {
         centroCosto: 'Centro de costo',
         contacto: 'Contacto',
       },
-      validation: { centroCostoExigido: 'Su cuenta exige centro de costo' },
+      validation: {
+        centroCostoExigido: 'Su cuenta exige centro de costo',
+        baseExigida: 'Su cuenta exige base mayor a cero',
+        contactoExigido: 'Su cuenta exige contacto',
+      },
       toasts: {
         success: { title: 'Documento corregido', desc: 'Se guardaron las correcciones.' },
         error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
         sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
-        centroCostoExigido: {
-          title: 'Falta el centro de costo',
-          desc: 'Algunas cuentas exigen centro de costo. Completa las celdas marcadas.',
+        exigidos: {
+          title: 'Faltan datos de la cuenta',
+          desc: 'Algunas cuentas exigen centro de costo, base o contacto. Completa las celdas marcadas.',
         },
         loadError: {
           title: 'No se pudo cargar',

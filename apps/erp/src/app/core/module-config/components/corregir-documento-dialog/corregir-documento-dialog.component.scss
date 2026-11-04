@@ -51,8 +51,8 @@
   vertical-align: middle;
 }
 
-// El autocomplete de `libs/ui` no ofrece `size`: en la celda se baja al tamaño
-// `small` de PrimeNG para que la fila quede compacta como el resto del ERP.
+// Los autocompletes de `libs/ui` (centro de costo, contacto) no ofrecen `size`:
+// en la celda se bajan al tamaño `small` de PrimeNG, el mismo de la base.
 :host ::ng-deep .cp-corregir-dialog__td--control .p-autocomplete-input {
   padding-block: var(--p-form-field-sm-padding-y, 0.375rem);
   padding-inline: var(--p-form-field-sm-padding-x, 0.625rem);

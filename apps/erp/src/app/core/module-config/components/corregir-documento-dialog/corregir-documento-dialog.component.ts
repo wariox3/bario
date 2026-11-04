@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { InputNumberModule } from 'primeng/inputnumber';
 import {
   I18nService,
   SELECT_ENDPOINTS,
@@ -24,15 +25,20 @@ import {
   formatCop,
   type ErpSelectOption,
 } from '@reddoc/core';
-import { ErpApiAutocompleteComponent, ErpApiSelectComponent } from '@reddoc/ui';
+import {
+  ErpApiAutocompleteComponent,
+  ErpApiSelectComponent,
+  ErpContactoSelectComponent,
+} from '@reddoc/ui';
 import type { AppDict } from '@erp/i18n';
 import { CorregirDocumentoService } from './corregir-documento.service';
 import {
   aCabeceraCorregible,
   aLineaCorregible,
-  lineasSinCentroCostoExigido,
+  exigidosFaltantes,
   payloadContabilidad,
   type CabeceraCorregible,
+  type CampoExigible,
   type LineaCorregible,
 } from './corregir-documento';
 
@@ -60,8 +66,10 @@ const SEDE_ENDPOINT = '/general/sede/seleccionar/';
     FormsModule,
     DialogModule,
     ButtonModule,
+    InputNumberModule,
     ErpApiSelectComponent,
     ErpApiAutocompleteComponent,
+    ErpContactoSelectComponent,
   ],
   templateUrl: './corregir-documento-dialog.component.html',
   styleUrl: './corregir-documento-dialog.component.scss',
@@ -95,12 +103,14 @@ export class CorregirDocumentoDialogComponent {
   protected readonly lineas = signal<readonly LineaCorregible[]>([]);
 
   /**
-   * Se intentó guardar con algún centro de costo exigido vacío. Desde ahí cada
-   * celda en falta se marca y se desmarca sola al completarla.
+   * Se intentó guardar con algún campo exigido vacío. Desde ahí cada celda en
+   * falta se marca y se desmarca sola al completarla.
    */
   private readonly mostrarFaltantes = signal(false);
-  protected readonly sinCentroCostoExigido = computed(() =>
-    this.mostrarFaltantes() ? lineasSinCentroCostoExigido(this.lineas()) : new Set<number>(),
+  protected readonly faltantes = computed(() =>
+    this.mostrarFaltantes()
+      ? exigidosFaltantes(this.lineas())
+      : new Map<number, ReadonlySet<CampoExigible>>(),
   );
 
   constructor() {
@@ -146,11 +156,11 @@ export class CorregirDocumentoDialogComponent {
     if (id == null || !cabeceraOriginal || !cabecera || this.isSaving()) return;
     const ts = this.t().documentActions.corregir.toasts;
 
-    // La cuenta manda: si exige centro de costo no se puede quitar. Si no lo
-    // exige, vaciarlo es válido y viaja `null`.
-    if (lineasSinCentroCostoExigido(this.lineas()).size > 0) {
+    // La cuenta manda: lo que exige no se puede dejar vacío. Lo que no exige,
+    // vaciarlo es válido y viaja `null`.
+    if (exigidosFaltantes(this.lineas()).size > 0) {
       this.mostrarFaltantes.set(true);
-      this.toast.error(ts.centroCostoExigido.title, ts.centroCostoExigido.desc);
+      this.toast.error(ts.exigidos.title, ts.exigidos.desc);
       return;
     }
 

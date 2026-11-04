@@ -6,7 +6,7 @@ import { buildContactoLabel, toFiniteNumber, type ErpSelectOption } from '@reddo
  *
  * El diálogo arranca con una copia de lo que trae el backend y al guardar manda
  * **solo lo que cambió** en un único `actualizar-contabilidad/`: la sede si
- * cambió y, en `detalles`, cada línea cuyo centro de costo cambió. Lo que
+ * cambió y, en `detalles`, cada línea tocada con sus claves cambiadas. Lo que
  * viaja a la DIAN (número, resolución, fechas) lo corrige otro diálogo, el del
  * dropdown Electrónico. Comparar contra el original es lo
  * que evita reescribir líneas que nadie movió.
@@ -31,8 +31,10 @@ export interface CorregirLineaRead {
   readonly base?: string | number | null;
   readonly centro_costo?: number | null;
   readonly centro_costo_nombre?: string | null;
-  /** La cuenta de la línea tiene «Exige centro de costo». */
+  /** Exigencias de la cuenta de la línea: qué no puede quedar vacío. */
   readonly cuenta_exige_centro_costo?: boolean | null;
+  readonly cuenta_exige_base?: boolean | null;
+  readonly cuenta_exige_contacto?: boolean | null;
   readonly contacto?: number | null;
   readonly contacto_nombre_corto?: string | null;
   readonly contacto_numero_identificacion?: string | null;
@@ -46,8 +48,7 @@ export interface LineaCorregible {
   readonly id: number;
   /**
    * Línea de cuenta (`tipo_registro = 'C'`): la única con base y contacto
-   * propios. Las de ítem los toman de la cabecera. Hoy solo se muestran: el
-   * backend aún no los corrige (ver `LineaPatch`).
+   * propios. Las de ítem los toman de la cabecera.
    */
   readonly esCuenta: boolean;
   /** Ítem o, en una línea de cuenta, código y nombre de la cuenta. */
@@ -56,14 +57,18 @@ export interface LineaCorregible {
   readonly precio: number | null;
   readonly subtotal: number | null;
   readonly centroCosto: ErpSelectOption | null;
-  /**
-   * La cuenta de la línea exige centro de costo: no se puede quitar. Si la
-   * cuenta no lo exige, vaciarlo es válido y viaja `null`.
-   */
-  readonly exigeCentroCosto: boolean;
   readonly base: number | null;
   readonly contacto: ErpSelectOption | null;
+  /**
+   * Lo que la cuenta de la línea exige (`cuenta_exige_*` del read). Si la
+   * cuenta no lo exige, vaciar el campo es válido y viaja `null`.
+   */
+  readonly exige: CamposExigibles;
 }
+
+/** Campos de una línea que su cuenta puede exigir. */
+export type CampoExigible = 'centroCosto' | 'base' | 'contacto';
+export type CamposExigibles = Readonly<Record<CampoExigible, boolean>>;
 
 /** Cambios de cabecera: solo las claves que cambiaron. */
 export interface CabeceraPatch {
@@ -71,13 +76,15 @@ export interface CabeceraPatch {
 }
 
 /**
- * Cambio de una línea. `actualizar-contabilidad/` solo declara `id` y
- * `centro_costo` por detalle, y exige `centro_costo` siempre: una `base` o un
- * `contacto` que viajen los descarta callado. Cuando el backend los acepte, se
- * suman acá y en `cambiosLinea`, y el diálogo vuelve a ofrecerlos editables.
+ * Cambio de una línea: base y contacto solo si cambiaron. `centro_costo` viaja
+ * siempre, aunque no haya cambiado: el schema de `actualizar-contabilidad/` lo
+ * exige en cada detalle, y mandar el vigente no altera nada. Cuando el backend
+ * lo vuelva opcional, puede pasar a viajar solo si cambió.
  */
 export interface LineaPatch {
   centro_costo: number | null;
+  base?: number | null;
+  contacto?: number | null;
 }
 
 /** Cuerpo de `POST general/documento/actualizar-contabilidad/`. */
@@ -112,7 +119,6 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
     precio: toFiniteNumber(read.precio),
     subtotal: toFiniteNumber(read.subtotal),
     centroCosto: opcion(read.centro_costo, read.centro_costo_nombre),
-    exigeCentroCosto: read.cuenta_exige_centro_costo === true,
     base: toFiniteNumber(read.base),
     contacto:
       read.contacto == null
@@ -124,6 +130,11 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
               read.contacto_nombre_corto,
             ),
           },
+    exige: {
+      centroCosto: read.cuenta_exige_centro_costo === true,
+      base: read.cuenta_exige_base === true,
+      contacto: read.cuenta_exige_contacto === true,
+    },
   };
 }
 
@@ -142,30 +153,56 @@ export function cambiosCabecera(
 }
 
 /**
- * El centro de costo de la línea si cambió; `null` si no. Base y contacto no
- * cuentan: el backend todavía no los corrige (ver `LineaPatch`).
+ * Lo que cambió en una línea; `null` si nada. Base y contacto solo cuentan en
+ * las líneas de cuenta: en las de ítem el diálogo no los ofrece. Si algo
+ * cambió, el centro de costo va siempre (ver `LineaPatch`).
  */
 export function cambiosLinea(
   original: LineaCorregible,
   actual: LineaCorregible,
 ): LineaPatch | null {
-  if (mismoId(original.centroCosto, actual.centroCosto)) return null;
-  return { centro_costo: actual.centroCosto?.id ?? null };
+  const cambioCentroCosto = !mismoId(original.centroCosto, actual.centroCosto);
+  const cambioBase = actual.esCuenta && original.base !== actual.base;
+  const cambioContacto = actual.esCuenta && !mismoId(original.contacto, actual.contacto);
+  if (!cambioCentroCosto && !cambioBase && !cambioContacto) return null;
+  return {
+    centro_costo: actual.centroCosto?.id ?? null,
+    ...(cambioBase ? { base: actual.base } : {}),
+    ...(cambioContacto ? { contacto: actual.contacto?.id ?? null } : {}),
+  };
 }
 
+/** El campo que la cuenta exige quedó vacío (una base exigida va mayor a cero). */
+function faltaExigido(linea: LineaCorregible, campo: CampoExigible): boolean {
+  if (!linea.exige[campo]) return false;
+  switch (campo) {
+    case 'centroCosto':
+      return linea.centroCosto == null;
+    case 'base':
+      return linea.esCuenta && (linea.base ?? 0) <= 0;
+    case 'contacto':
+      return linea.esCuenta && linea.contacto == null;
+  }
+}
+
+const CAMPOS_EXIGIBLES: readonly CampoExigible[] = ['centroCosto', 'base', 'contacto'];
+
 /**
- * Ids de las líneas sin el centro de costo que su cuenta exige. Cuenta también
- * la que ya venía sin él: el diálogo existe para corregir, así que no deja
- * guardar mientras quede una línea inconsistente.
+ * Campos que su cuenta exige y quedaron vacíos, por id de línea; solo las
+ * líneas con alguno. Cuenta también la línea que ya venía así: el diálogo
+ * existe para corregir, así que no deja guardar mientras quede una
+ * inconsistente. Base y contacto solo se exigen en las líneas de cuenta, las
+ * únicas que los ofrecen.
  */
-export function lineasSinCentroCostoExigido(
+export function exigidosFaltantes(
   lineas: readonly LineaCorregible[],
-): ReadonlySet<number> {
-  return new Set(
-    lineas
-      .filter((linea) => linea.exigeCentroCosto && linea.centroCosto == null)
-      .map((linea) => linea.id),
-  );
+): ReadonlyMap<number, ReadonlySet<CampoExigible>> {
+  const faltantes = new Map<number, ReadonlySet<CampoExigible>>();
+  for (const linea of lineas) {
+    const campos = CAMPOS_EXIGIBLES.filter((campo) => faltaExigido(linea, campo));
+    if (campos.length > 0) faltantes.set(linea.id, new Set(campos));
+  }
+  return faltantes;
 }
 
 /**

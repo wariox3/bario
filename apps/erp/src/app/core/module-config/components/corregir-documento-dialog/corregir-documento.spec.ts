@@ -3,7 +3,7 @@ import {
   aLineaCorregible,
   cambiosCabecera,
   cambiosLinea,
-  lineasSinCentroCostoExigido,
+  exigidosFaltantes,
   payloadContabilidad,
   type LineaCorregible,
 } from './corregir-documento';
@@ -103,22 +103,30 @@ describe('cambiosLinea', () => {
     expect(cambiosLinea(LINEA_ITEM, actual)).toEqual({ centro_costo: null });
   });
 
-  it('no manda base ni contacto: actualizar-contabilidad/ no los declara', () => {
+  it('manda base y contacto de una línea de cuenta, con el centro de costo vigente', () => {
     const actual: LineaCorregible = {
       ...LINEA_CUENTA,
       base: 1500,
       contacto: { id: 10, nombre: 'Otro' },
     };
-    expect(cambiosLinea(LINEA_CUENTA, actual)).toBeNull();
+    expect(cambiosLinea(LINEA_CUENTA, actual)).toEqual({
+      centro_costo: null,
+      base: 1500,
+      contacto: 10,
+    });
   });
 
-  it('manda solo el centro de costo aunque también cambie la base', () => {
-    const actual: LineaCorregible = {
-      ...LINEA_CUENTA,
-      base: 1500,
-      centroCosto: { id: 7, nombre: 'Ventas' },
-    };
-    expect(cambiosLinea(LINEA_CUENTA, actual)).toEqual({ centro_costo: 7 });
+  it('si solo cambia la base, igual manda el centro de costo: el schema lo exige', () => {
+    const original = { ...LINEA_CUENTA, centroCosto: { id: 7, nombre: 'Ventas' } };
+    expect(cambiosLinea(original, { ...original, base: 2000 })).toEqual({
+      centro_costo: 7,
+      base: 2000,
+    });
+  });
+
+  it('ignora base y contacto en una línea de ítem', () => {
+    const actual: LineaCorregible = { ...LINEA_ITEM, base: 50, contacto: { id: 1, nombre: 'x' } };
+    expect(cambiosLinea(LINEA_ITEM, actual)).toBeNull();
   });
 });
 
@@ -157,23 +165,44 @@ describe('payloadContabilidad', () => {
   });
 });
 
-describe('lineasSinCentroCostoExigido', () => {
-  it('lee la exigencia de la cuenta y la da por falsa si no viene', () => {
-    expect(LINEA_EXIGE_CC.exigeCentroCosto).toBe(true);
-    expect(LINEA_CUENTA.exigeCentroCosto).toBe(false);
+describe('exigidosFaltantes', () => {
+  /** Línea de la cuenta 520530 que exige las tres cosas, con todo completo. */
+  const CESANTIAS = aLineaCorregible({
+    id: 4,
+    tipo_registro: 'C',
+    cuenta_codigo: '520530',
+    base: '1000.000000',
+    centro_costo: 5,
+    contacto: 9,
+    cuenta_exige_centro_costo: true,
+    cuenta_exige_base: true,
+    cuenta_exige_contacto: true,
   });
 
-  it('marca la línea que quita el centro de costo que su cuenta exige', () => {
-    const lineas = [LINEA_ITEM, LINEA_CUENTA, { ...LINEA_EXIGE_CC, centroCosto: null }];
-    expect([...lineasSinCentroCostoExigido(lineas)]).toEqual([3]);
+  it('lee las exigencias de la cuenta y las da por falsas si no vienen', () => {
+    expect(LINEA_EXIGE_CC.exige).toEqual({ centroCosto: true, base: false, contacto: false });
+    expect(LINEA_CUENTA.exige).toEqual({ centroCosto: false, base: false, contacto: false });
   });
 
-  it('deja quitarlo si la cuenta no lo exige', () => {
-    const lineas = [{ ...LINEA_ITEM, centroCosto: null }, LINEA_CUENTA, LINEA_EXIGE_CC];
-    expect(lineasSinCentroCostoExigido(lineas).size).toBe(0);
+  it('no marca nada si todo lo exigido está completo', () => {
+    expect(exigidosFaltantes([LINEA_ITEM, LINEA_CUENTA, LINEA_EXIGE_CC, CESANTIAS]).size).toBe(0);
   });
 
-  it('marca también la línea que ya venía sin él, aunque nadie la tocara', () => {
+  it('marca cada campo exigido que quedó vacío, con la base en cero como vacía', () => {
+    const vacia = { ...CESANTIAS, centroCosto: null, base: 0, contacto: null };
+    expect([...(exigidosFaltantes([vacia]).get(4) ?? [])]).toEqual([
+      'centroCosto',
+      'base',
+      'contacto',
+    ]);
+  });
+
+  it('deja vaciar lo que la cuenta no exige', () => {
+    const lineas = [{ ...LINEA_CUENTA, base: 0, contacto: null }, LINEA_ITEM];
+    expect(exigidosFaltantes(lineas).size).toBe(0);
+  });
+
+  it('marca también la línea que ya venía sin el centro de costo, aunque nadie la tocara', () => {
     const sinCc = aLineaCorregible({
       id: 2,
       tipo_registro: 'C',
@@ -181,6 +210,6 @@ describe('lineasSinCentroCostoExigido', () => {
       centro_costo: null,
       cuenta_exige_centro_costo: true,
     });
-    expect([...lineasSinCentroCostoExigido([sinCc])]).toEqual([2]);
+    expect([...exigidosFaltantes([sinCc]).keys()]).toEqual([2]);
   });
 });

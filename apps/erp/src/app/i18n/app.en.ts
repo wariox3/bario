@@ -627,14 +627,18 @@ export const en: AppDict = {
         centroCosto: 'Cost center',
         contacto: 'Contact',
       },
-      validation: { centroCostoExigido: 'Its account requires a cost center' },
+      validation: {
+        centroCostoExigido: 'Its account requires a cost center',
+        baseExigida: 'Its account requires a base greater than zero',
+        contactoExigido: 'Its account requires a contact',
+      },
       toasts: {
         success: { title: 'Document corrected', desc: 'The corrections were saved.' },
         error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
         sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
-        centroCostoExigido: {
-          title: 'Cost center missing',
-          desc: 'Some accounts require a cost center. Fill in the highlighted cells.',
+        exigidos: {
+          title: 'Account data missing',
+          desc: 'Some accounts require a cost center, base or contact. Fill in the highlighted cells.',
         },
         loadError: {
           title: 'Could not load',
