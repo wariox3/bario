@@ -75,12 +75,13 @@ const CONFIRMACION: Readonly<
  * **Emitir** es la excepción que sigue saliendo como evento: solo lo tiene la
  * nómina electrónica, que lo resuelve en su ficha.
  *
- * Dos acciones son **opt-in** vía `showAnular` / `showEmitir`, apagadas por
- * default: no todo documento se anula ni se emite a la DIAN, y esta botonera la
- * comparte todo el ERP. Prenderlas por default le pondría botones a fichas cuyo
- * backend no los atiende. `showAprobacion` y `showImprimir` son el caso
- * simétrico: vienen encendidos y se apagan donde no aplican (las plantillas
- * recurrentes). Si el dropdown "Acciones" se queda sin entradas, no se pinta.
+ * Dos acciones son **opt-in**, apagadas por default: no todo documento se anula
+ * ni se emite a la DIAN, y esta botonera la comparte todo el ERP. Anular lo
+ * declara el config (`capabilities.canAnular`), porque fichas compartidas como
+ * la de servicio lo ofrecen en un documento (cuenta de cobro) y no en otro
+ * (pedido servicio); Emitir, la ficha con `showEmitir`. `showAprobacion` y
+ * `showImprimir` son el caso simétrico: vienen encendidos y se apagan donde no
+ * aplican (las plantillas recurrentes). Si el dropdown "Acciones" se queda sin entradas, no se pinta.
  */
 @Component({
   selector: 'app-document-detail-actions',
@@ -127,7 +128,13 @@ export class DocumentDetailActionsComponent {
   readonly canDesaprobar = input<boolean>(true);
   readonly canImprimir = input<boolean>(true);
   readonly canArchivos = input<boolean>(true);
-  readonly canAnular = input<boolean>(true);
+  /**
+   * Habilita "Anular". Default `false`, como `canCorregir`: es irreversible, así
+   * que una ficha que olvide atarlo a `capacidades().puedeAnular` lo deja
+   * apagado en vez de ofrecerlo sobre un documento sin aprobar o ya enviado a la
+   * DIAN. Que aparezca lo decide el config (`capabilities.canAnular`).
+   */
+  readonly canAnular = input<boolean>(false);
   readonly canEmitir = input<boolean>(true);
   readonly canContabilizar = input<boolean>(true);
   /**
@@ -145,8 +152,7 @@ export class DocumentDetailActionsComponent {
    */
   readonly contabilizado = input<boolean>(false);
 
-  /** Presencia de las acciones opt-in. Apagadas salvo que la ficha las pida. */
-  readonly showAnular = input<boolean>(false);
+  /** Presencia de Emitir (opt-in). Apagada salvo que la ficha la pida. */
   readonly showEmitir = input<boolean>(false);
 
   /**
@@ -221,7 +227,7 @@ export class DocumentDetailActionsComponent {
         command: () => this.onAccionEstado('desaprobar'),
       });
     }
-    if (this.showAnular()) {
+    if (this.document().capabilities.canAnular) {
       items.push({
         label: a.anular,
         icon: 'pi pi-ban',

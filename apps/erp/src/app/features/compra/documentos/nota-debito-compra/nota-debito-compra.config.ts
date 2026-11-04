@@ -51,6 +51,7 @@ export const NOTA_DEBITO_COMPRA_CONFIG: DocumentEntityConfig = {
     canExportZip: false,
     canGenerate: false,
     canCorregir: true,
+    canAnular: true,
   },
   // Un documento aprobado ya no se edita. Regla única consumida por la lista,
   // el detalle y el resolver de la ruta de edición.

@@ -53,6 +53,13 @@ describe('capacidadesDocumento — enviado a la DIAN', () => {
     expect(capacidadesDocumento(ENVIADO).puedeAnular).toBe(false);
   });
 
+  it('cierra anular también si ya es electrónico o notificado, sin `enviado`', () => {
+    expect(capacidadesDocumento({ ...APROBADO, estado_electronico: true }).puedeAnular).toBe(false);
+    expect(
+      capacidadesDocumento({ ...APROBADO, estado_electronico_notificado: true }).puedeAnular,
+    ).toBe(false);
+  });
+
   it('deja desaprobar, como en el ERP anterior', () => {
     expect(capacidadesDocumento(ENVIADO).puedeDesaprobar).toBe(true);
   });

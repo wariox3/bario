@@ -51,6 +51,13 @@ export interface DocumentCapabilities {
    * plantillas no lo ofrecen.
    */
   readonly canCorregir?: boolean;
+  /**
+   * "Anular" en el dropdown "Acciones" de la ficha: cierra para siempre un
+   * documento aprobado (`POST <endpoint>/anular/`). Opcional y `false` por
+   * defecto: lo ofrecen los mismos documentos que en el ERP anterior; notas de
+   * venta, pedidos, plantillas recurrentes y procesos de humano no.
+   */
+  readonly canAnular?: boolean;
 }
 
 /**
