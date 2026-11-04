@@ -10,7 +10,7 @@ import {
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
-import { HISTORIAL_FILTRO_BASE } from './historial.constants';
+import { HISTORIAL_FILTRO_BASE, HISTORIAL_FORMATO_EXCEL } from './historial.constants';
 
 /** Fila del historial: la del listado de documentos, más los flags que pinta. */
 export interface VentaHistorial extends DocumentoListRowBase {
@@ -22,7 +22,8 @@ const DOCUMENTO = '/general/documento/';
 /**
  * Ventas de caja del tenant (`POST documento/lista/` acotado a los tipos POS).
  * Los filtros del usuario se suman al filtro base del tipo de documento; las
- * descargas (`imprimir/`, `imprimir-zip/`, `excel/`) mandan ese mismo body.
+ * descargas (`imprimir/`, `imprimir-zip/`, `excel/`) mandan ese mismo body;
+ * el Excel suma su `formato_excel`.
  */
 @Injectable({ providedIn: 'root' })
 export class HistorialService extends BaseHttpService {
@@ -46,15 +47,23 @@ export class HistorialService extends BaseHttpService {
     return this.descargar('imprimir-zip', query, 'ventas.zip');
   }
 
+  /** El Excel con las columnas de venta POS (`formato_excel`), no el genérico. */
   exportarExcel(query: ListQuery): Observable<void> {
-    return this.descargar('excel', query, 'ventas.xlsx');
+    return this.descargar('excel', query, 'ventas.xlsx', {
+      formato_excel: HISTORIAL_FORMATO_EXCEL,
+    });
   }
 
   /** Sin toast global: el historial avisa con el mensaje que mande el backend. */
-  private descargar(accion: string, query: ListQuery, fallbackFilename: string): Observable<void> {
+  private descargar(
+    accion: string,
+    query: ListQuery,
+    fallbackFilename: string,
+    extra: Readonly<Record<string, unknown>> = {},
+  ): Observable<void> {
     return this.descargas.download(`${DOCUMENTO}${accion}/`, {
       method: 'POST',
-      body: this.body(query),
+      body: { ...this.body(query), ...extra },
       fallbackFilename,
       errorToast: false,
     });
