@@ -518,10 +518,12 @@ export interface AppDict
         centroCosto: string;
         contacto: string;
       };
+      validation: { centroCostoExigido: string };
       toasts: {
         success: { title: string; desc: string };
         error: { title: string; desc: string };
         sinCambios: { title: string; desc: string };
+        centroCostoExigido: { title: string; desc: string };
         loadError: { title: string; desc: string };
       };
     };
@@ -3393,6 +3395,8 @@ export interface AppDict
       centroCostoPlaceholder: string;
       detallePlaceholder: string;
       baseExigida: string;
+      contactoExigido: string;
+      centroCostoExigido: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {

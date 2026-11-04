@@ -73,7 +73,7 @@
                 <th class="cp-corregir-dialog__th w-[120px] text-right">
                   {{ dict.cols.subtotal }}
                 </th>
-                <th class="cp-corregir-dialog__th w-[150px]">{{ dict.cols.base }}</th>
+                <th class="cp-corregir-dialog__th w-[130px] text-right">{{ dict.cols.base }}</th>
                 <th class="cp-corregir-dialog__th w-[200px]">{{ dict.cols.centroCosto }}</th>
                 <th class="cp-corregir-dialog__th w-[230px]">{{ dict.cols.contacto }}</th>
               </tr>
@@ -92,23 +92,15 @@
                   <td class="cp-corregir-dialog__td text-right tabular-nums">
                     {{ formatMoney(linea.subtotal) }}
                   </td>
-                  <td class="cp-corregir-dialog__td">
-                    <!-- Base y contacto son propios solo de las líneas de cuenta. -->
+                  <!-- Base y contacto son propios de las líneas de cuenta. Solo se muestran:
+                       actualizar-contabilidad/ aún no los corrige. -->
+                  <td class="cp-corregir-dialog__td text-right tabular-nums">
                     @if (linea.esCuenta) {
-                      <p-inputnumber
-                        [inputId]="'corregir-base-' + linea.id"
-                        [ngModel]="linea.base"
-                        (ngModelChange)="setLinea(linea.id, { base: $event })"
-                        mode="decimal"
-                        [min]="0"
-                        [minFractionDigits]="0"
-                        [maxFractionDigits]="2"
-                        [fluid]="true"
-                        size="small"
-                      />
+                      {{ formatMoney(linea.base) }}
                     }
                   </td>
-                  <td class="cp-corregir-dialog__td">
+                  <td class="cp-corregir-dialog__td cp-corregir-dialog__td--control">
+                    @let faltaCentroCosto = sinCentroCostoExigido().has(linea.id);
                     <lib-api-autocomplete
                       [inputId]="'corregir-centro-costo-' + linea.id"
                       [endpoint]="centroCostoEndpoint"
@@ -116,16 +108,17 @@
                       [ngModel]="linea.centroCosto"
                       (ngModelChange)="setLinea(linea.id, { centroCosto: $event })"
                       [placeholder]="dict.fields.buscar"
+                      [invalid]="faltaCentroCosto"
                     />
+                    @if (faltaCentroCosto) {
+                      <small class="mt-1 block text-[0.7rem] text-red-600">
+                        {{ dict.validation.centroCostoExigido }}
+                      </small>
+                    }
                   </td>
                   <td class="cp-corregir-dialog__td">
                     @if (linea.esCuenta) {
-                      <lib-contacto-select
-                        [inputId]="'corregir-contacto-' + linea.id"
-                        [ngModel]="linea.contacto"
-                        (ngModelChange)="setLinea(linea.id, { contacto: $event })"
-                        [placeholder]="dict.fields.buscar"
-                      />
+                      {{ linea.contacto?.nombre }}
                     }
                   </td>
                 </tr>

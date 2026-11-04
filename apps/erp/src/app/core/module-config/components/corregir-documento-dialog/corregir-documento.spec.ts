@@ -3,6 +3,7 @@ import {
   aLineaCorregible,
   cambiosCabecera,
   cambiosLinea,
+  lineasSinCentroCostoExigido,
   payloadContabilidad,
   type LineaCorregible,
 } from './corregir-documento';
@@ -30,6 +31,15 @@ const LINEA_CUENTA = aLineaCorregible({
   contacto: 9,
   contacto_numero_identificacion: '900123',
   contacto_nombre_corto: 'Proveedor SAS',
+});
+
+const LINEA_EXIGE_CC = aLineaCorregible({
+  id: 3,
+  tipo_registro: 'C',
+  cuenta_codigo: '519595',
+  centro_costo: 5,
+  centro_costo_nombre: 'Administración',
+  cuenta_exige_centro_costo: true,
 });
 
 describe('aLineaCorregible', () => {
@@ -93,18 +103,22 @@ describe('cambiosLinea', () => {
     expect(cambiosLinea(LINEA_ITEM, actual)).toEqual({ centro_costo: null });
   });
 
-  it('manda base y contacto de una línea de cuenta', () => {
+  it('no manda base ni contacto: actualizar-contabilidad/ no los declara', () => {
     const actual: LineaCorregible = {
       ...LINEA_CUENTA,
       base: 1500,
       contacto: { id: 10, nombre: 'Otro' },
     };
-    expect(cambiosLinea(LINEA_CUENTA, actual)).toEqual({ base: 1500, contacto: 10 });
+    expect(cambiosLinea(LINEA_CUENTA, actual)).toBeNull();
   });
 
-  it('ignora base y contacto en una línea de ítem', () => {
-    const actual: LineaCorregible = { ...LINEA_ITEM, base: 50, contacto: { id: 1, nombre: 'x' } };
-    expect(cambiosLinea(LINEA_ITEM, actual)).toBeNull();
+  it('manda solo el centro de costo aunque también cambie la base', () => {
+    const actual: LineaCorregible = {
+      ...LINEA_CUENTA,
+      base: 1500,
+      centroCosto: { id: 7, nombre: 'Ventas' },
+    };
+    expect(cambiosLinea(LINEA_CUENTA, actual)).toEqual({ centro_costo: 7 });
   });
 });
 
@@ -140,5 +154,33 @@ describe('payloadContabilidad', () => {
         lineas: [{ ...LINEA_ITEM, centroCosto: null }, LINEA_CUENTA],
       }),
     ).toEqual({ id: 5054, detalles: [{ id: 1, centro_costo: null }] });
+  });
+});
+
+describe('lineasSinCentroCostoExigido', () => {
+  it('lee la exigencia de la cuenta y la da por falsa si no viene', () => {
+    expect(LINEA_EXIGE_CC.exigeCentroCosto).toBe(true);
+    expect(LINEA_CUENTA.exigeCentroCosto).toBe(false);
+  });
+
+  it('marca la línea que quita el centro de costo que su cuenta exige', () => {
+    const lineas = [LINEA_ITEM, LINEA_CUENTA, { ...LINEA_EXIGE_CC, centroCosto: null }];
+    expect([...lineasSinCentroCostoExigido(lineas)]).toEqual([3]);
+  });
+
+  it('deja quitarlo si la cuenta no lo exige', () => {
+    const lineas = [{ ...LINEA_ITEM, centroCosto: null }, LINEA_CUENTA, LINEA_EXIGE_CC];
+    expect(lineasSinCentroCostoExigido(lineas).size).toBe(0);
+  });
+
+  it('marca también la línea que ya venía sin él, aunque nadie la tocara', () => {
+    const sinCc = aLineaCorregible({
+      id: 2,
+      tipo_registro: 'C',
+      cuenta_codigo: '520530',
+      centro_costo: null,
+      cuenta_exige_centro_costo: true,
+    });
+    expect([...lineasSinCentroCostoExigido([sinCc])]).toEqual([2]);
   });
 });

@@ -64,6 +64,55 @@ describe('base exigida por la cuenta', () => {
   });
 });
 
+describe('contacto y centro de costo exigidos por la cuenta', () => {
+  const CESANTIAS = {
+    id: 97,
+    nombre: '520530 - Cesantías',
+    exige_contacto: true,
+    exige_centro_costo: true,
+  };
+
+  it('marca contacto y centro de costo vacíos cuando la cuenta los exige', () => {
+    const group = createCuentaDetalleGroup({ cuenta: CUENTA, valor: 100 });
+    group.controls.cuenta.setValue(CESANTIAS);
+
+    expect(group.controls.contacto.hasError('contactoExigido')).toBe(true);
+    expect(group.controls.centro_costo.hasError('centroCostoExigido')).toBe(true);
+    expect(group.invalid).toBe(true);
+  });
+
+  it('valida desde que nace una línea cargada con la cuenta que los exige', () => {
+    const group = createCuentaDetalleGroup({ id: 2, cuenta: CESANTIAS, valor: 100 });
+
+    expect(group.controls.centro_costo.hasError('centroCostoExigido')).toBe(true);
+  });
+
+  it('acepta la línea en cuanto los dos tienen valor', () => {
+    const group = createCuentaDetalleGroup({
+      cuenta: CESANTIAS,
+      valor: 100,
+      contacto: COLORMAX,
+      centro_costo: { id: 4, nombre: 'Ventas' },
+    });
+
+    expect(group.valid).toBe(true);
+  });
+
+  it('no exige nada si la cuenta no lo pide', () => {
+    expect(createCuentaDetalleGroup({ cuenta: CUENTA, valor: 100 }).valid).toBe(true);
+  });
+
+  it('no valida el contacto de una línea enlazada: lo fija el cruce', () => {
+    const group = createCuentaDetalleGroup({
+      cuenta: { ...CESANTIAS, exige_centro_costo: false },
+      valor: 100,
+      documento_afectado: 50,
+    });
+
+    expect(group.valid).toBe(true);
+  });
+});
+
 describe('propagarContactoALineas', () => {
   it('cambia solo las líneas manuales sin guardar', () => {
     const doc = enlazada();

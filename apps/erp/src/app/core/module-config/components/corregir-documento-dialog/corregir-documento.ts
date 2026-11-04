@@ -6,7 +6,7 @@ import { buildContactoLabel, toFiniteNumber, type ErpSelectOption } from '@reddo
  *
  * El diálogo arranca con una copia de lo que trae el backend y al guardar manda
  * **solo lo que cambió** en un único `actualizar-contabilidad/`: la sede si
- * cambió y, en `detalles`, cada línea tocada con sus claves cambiadas. Lo que
+ * cambió y, en `detalles`, cada línea cuyo centro de costo cambió. Lo que
  * viaja a la DIAN (número, resolución, fechas) lo corrige otro diálogo, el del
  * dropdown Electrónico. Comparar contra el original es lo
  * que evita reescribir líneas que nadie movió.
@@ -31,6 +31,8 @@ export interface CorregirLineaRead {
   readonly base?: string | number | null;
   readonly centro_costo?: number | null;
   readonly centro_costo_nombre?: string | null;
+  /** La cuenta de la línea tiene «Exige centro de costo». */
+  readonly cuenta_exige_centro_costo?: boolean | null;
   readonly contacto?: number | null;
   readonly contacto_nombre_corto?: string | null;
   readonly contacto_numero_identificacion?: string | null;
@@ -44,7 +46,8 @@ export interface LineaCorregible {
   readonly id: number;
   /**
    * Línea de cuenta (`tipo_registro = 'C'`): la única con base y contacto
-   * propios. Las de ítem los toman de la cabecera.
+   * propios. Las de ítem los toman de la cabecera. Hoy solo se muestran: el
+   * backend aún no los corrige (ver `LineaPatch`).
    */
   readonly esCuenta: boolean;
   /** Ítem o, en una línea de cuenta, código y nombre de la cuenta. */
@@ -53,6 +56,11 @@ export interface LineaCorregible {
   readonly precio: number | null;
   readonly subtotal: number | null;
   readonly centroCosto: ErpSelectOption | null;
+  /**
+   * La cuenta de la línea exige centro de costo: no se puede quitar. Si la
+   * cuenta no lo exige, vaciarlo es válido y viaja `null`.
+   */
+  readonly exigeCentroCosto: boolean;
   readonly base: number | null;
   readonly contacto: ErpSelectOption | null;
 }
@@ -62,11 +70,14 @@ export interface CabeceraPatch {
   sede?: number | null;
 }
 
-/** Cambios de una línea: solo las claves que cambiaron. */
+/**
+ * Cambio de una línea. `actualizar-contabilidad/` solo declara `id` y
+ * `centro_costo` por detalle, y exige `centro_costo` siempre: una `base` o un
+ * `contacto` que viajen los descarta callado. Cuando el backend los acepte, se
+ * suman acá y en `cambiosLinea`, y el diálogo vuelve a ofrecerlos editables.
+ */
 export interface LineaPatch {
-  centro_costo?: number | null;
-  base?: number | null;
-  contacto?: number | null;
+  centro_costo: number | null;
 }
 
 /** Cuerpo de `POST general/documento/actualizar-contabilidad/`. */
@@ -101,6 +112,7 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
     precio: toFiniteNumber(read.precio),
     subtotal: toFiniteNumber(read.subtotal),
     centroCosto: opcion(read.centro_costo, read.centro_costo_nombre),
+    exigeCentroCosto: read.cuenta_exige_centro_costo === true,
     base: toFiniteNumber(read.base),
     contacto:
       read.contacto == null
@@ -130,24 +142,30 @@ export function cambiosCabecera(
 }
 
 /**
- * Lo que cambió en una línea; `null` si nada. Base y contacto solo cuentan en
- * las líneas de cuenta: en las de ítem el diálogo no los ofrece.
+ * El centro de costo de la línea si cambió; `null` si no. Base y contacto no
+ * cuentan: el backend todavía no los corrige (ver `LineaPatch`).
  */
 export function cambiosLinea(
   original: LineaCorregible,
   actual: LineaCorregible,
 ): LineaPatch | null {
-  const patch: LineaPatch = {};
-  if (!mismoId(original.centroCosto, actual.centroCosto)) {
-    patch.centro_costo = actual.centroCosto?.id ?? null;
-  }
-  if (actual.esCuenta) {
-    if (original.base !== actual.base) patch.base = actual.base;
-    if (!mismoId(original.contacto, actual.contacto)) {
-      patch.contacto = actual.contacto?.id ?? null;
-    }
-  }
-  return Object.keys(patch).length > 0 ? patch : null;
+  if (mismoId(original.centroCosto, actual.centroCosto)) return null;
+  return { centro_costo: actual.centroCosto?.id ?? null };
+}
+
+/**
+ * Ids de las líneas sin el centro de costo que su cuenta exige. Cuenta también
+ * la que ya venía sin él: el diálogo existe para corregir, así que no deja
+ * guardar mientras quede una línea inconsistente.
+ */
+export function lineasSinCentroCostoExigido(
+  lineas: readonly LineaCorregible[],
+): ReadonlySet<number> {
+  return new Set(
+    lineas
+      .filter((linea) => linea.exigeCentroCosto && linea.centroCosto == null)
+      .map((linea) => linea.id),
+  );
 }
 
 /**

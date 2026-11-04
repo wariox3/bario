@@ -14,13 +14,27 @@ function toNaturaleza(value: string | null | undefined): NaturalezaCuenta {
   return value === 'C' ? 'C' : 'D';
 }
 
-/** Read-model (GET) → valores de formulario de una línea de cuenta. */
+/**
+ * Read-model (GET) → valores de formulario de una línea de cuenta.
+ *
+ * La cuenta lleva sus exigencias (`exige_base`, `exige_contacto`,
+ * `exige_centro_costo`) con la misma forma que las trae `<app-cuenta-select>`:
+ * así una línea cargada en edición se valida igual que una recién elegida.
+ */
 export function cuentaDetalleToFormValue(read: CuentaDetalleRead): CuentaDetalleFormRawValue {
   const label = [read.cuenta_codigo, read.cuenta_nombre].filter(Boolean).join(' - ');
   return {
     id: read.id ?? null,
     cuenta:
-      read.cuenta != null ? { id: read.cuenta, nombre: label || read.cuenta_nombre || '' } : null,
+      read.cuenta != null
+        ? {
+            id: read.cuenta,
+            nombre: label || read.cuenta_nombre || '',
+            exige_base: read.cuenta_exige_base === true,
+            exige_contacto: read.cuenta_exige_contacto === true,
+            exige_centro_costo: read.cuenta_exige_centro_costo === true,
+          }
+        : null,
     naturaleza: toNaturaleza(read.naturaleza),
     valor: toFiniteNumber(read.precio) ?? 0,
     contacto:

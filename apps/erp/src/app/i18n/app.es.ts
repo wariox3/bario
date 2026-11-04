@@ -643,10 +643,15 @@ export const es: AppDict = {
         centroCosto: 'Centro de costo',
         contacto: 'Contacto',
       },
+      validation: { centroCostoExigido: 'Su cuenta exige centro de costo' },
       toasts: {
         success: { title: 'Documento corregido', desc: 'Se guardaron las correcciones.' },
         error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
         sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
+        centroCostoExigido: {
+          title: 'Falta el centro de costo',
+          desc: 'Algunas cuentas exigen centro de costo. Completa las celdas marcadas.',
+        },
         loadError: {
           title: 'No se pudo cargar',
           desc: 'No se pudo cargar el documento para corregirlo.',
@@ -4491,6 +4496,8 @@ export const es: AppDict = {
       centroCostoPlaceholder: 'Seleccionar…',
       detallePlaceholder: 'Glosa de la línea',
       baseExigida: 'Esta cuenta exige base: ingresa un valor mayor a cero',
+      contactoExigido: 'Esta cuenta exige contacto: selecciona uno',
+      centroCostoExigido: 'Esta cuenta exige centro de costo: selecciona uno',
       confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {

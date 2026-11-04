@@ -627,10 +627,15 @@ export const en: AppDict = {
         centroCosto: 'Cost center',
         contacto: 'Contact',
       },
+      validation: { centroCostoExigido: 'Its account requires a cost center' },
       toasts: {
         success: { title: 'Document corrected', desc: 'The corrections were saved.' },
         error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
         sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
+        centroCostoExigido: {
+          title: 'Cost center missing',
+          desc: 'Some accounts require a cost center. Fill in the highlighted cells.',
+        },
         loadError: {
           title: 'Could not load',
           desc: 'The document could not be loaded for correction.',
@@ -4409,6 +4414,8 @@ export const en: AppDict = {
       centroCostoPlaceholder: 'Select…',
       detallePlaceholder: 'Line description',
       baseExigida: 'This account requires a base: enter a value greater than zero',
+      contactoExigido: 'This account requires a contact: select one',
+      centroCostoExigido: 'This account requires a cost center: select one',
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
