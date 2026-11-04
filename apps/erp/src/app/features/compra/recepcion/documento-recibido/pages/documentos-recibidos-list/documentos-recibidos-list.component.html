@@ -1,73 +1,93 @@
 <!--
   Documentos recibidos (Compra › Recepción). Chrome estándar de <lib-list-shell>;
   en el slot [toolbar], los filtros en línea a la izquierda y Cargar archivo a la
-  derecha. Las fechas van en un ancho acotado y `fluid`, como pide el sistema.
+  derecha. Cada filtro lleva su label encima; las fechas van en un ancho acotado
+  y `fluid`, como pide el sistema. Lo aplicado con Filtrar se recuerda en localStorage.
 -->
 @let d = t().entities.documentoRecibido;
 
 <lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="d.name">
   <div toolbar class="flex flex-wrap items-end justify-between gap-3">
     <div class="flex flex-wrap items-end gap-2">
-      <p-iconfield iconPosition="left" class="w-full sm:w-64">
-        <p-inputicon styleClass="pi pi-search" />
-        <input
-          pInputText
-          type="search"
-          pSize="small"
+      <div class="flex w-full flex-col gap-1 sm:w-64">
+        <label for="dr-busqueda" class="text-[0.8rem] font-medium text-brand-text">{{
+          d.filtros.busqueda
+        }}</label>
+        <p-iconfield iconPosition="left" class="w-full">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            id="dr-busqueda"
+            pInputText
+            type="search"
+            pSize="small"
+            class="w-full"
+            [placeholder]="d.filtros.buscar"
+            [ngModel]="busquedaInput()"
+            (ngModelChange)="busquedaInput.set($event)"
+          />
+        </p-iconfield>
+      </div>
+
+      <div class="flex w-40 flex-col gap-1">
+        <label for="dr-tipo" class="text-[0.8rem] font-medium text-brand-text">{{
+          d.filtros.tipo
+        }}</label>
+        <p-select
+          inputId="dr-tipo"
+          size="small"
           class="w-full"
-          [placeholder]="d.filtros.buscar"
-          [attr.aria-label]="d.filtros.buscar"
-          [ngModel]="busquedaInput()"
-          (ngModelChange)="busquedaInput.set($event)"
+          [options]="tipoOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          [placeholder]="d.filtros.estadosRecepcion.todos"
+          [ngModel]="tipo()"
+          (ngModelChange)="tipo.set($event)"
+          appendTo="body"
         />
-      </p-iconfield>
+      </div>
 
-      <p-select
-        size="small"
-        class="w-40"
-        [options]="tipoOptions()"
-        optionLabel="label"
-        optionValue="value"
-        [showClear]="true"
-        [placeholder]="d.filtros.tipo"
-        [ariaLabel]="d.filtros.tipo"
-        [ngModel]="tipo()"
-        (ngModelChange)="tipo.set($event)"
-        appendTo="body"
-      />
+      <div class="flex w-32 flex-col gap-1">
+        <label for="dr-recepcion" class="text-[0.8rem] font-medium text-brand-text">{{
+          d.filtros.estadoRecepcion
+        }}</label>
+        <p-select
+          inputId="dr-recepcion"
+          size="small"
+          class="w-full"
+          [options]="estadoRecepcionOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="estadoRecepcion()"
+          (ngModelChange)="estadoRecepcion.set($event)"
+          appendTo="body"
+        />
+      </div>
 
-      <p-select
-        size="small"
-        class="w-32"
-        [options]="estadoRecepcionOptions()"
-        optionLabel="label"
-        optionValue="value"
-        [ariaLabel]="d.filtros.estadoRecepcion"
-        [ngModel]="estadoRecepcion()"
-        (ngModelChange)="estadoRecepcion.set($event)"
-        appendTo="body"
-      />
-
-      <div class="w-36">
+      <div class="flex w-36 flex-col gap-1">
+        <label for="dr-desde" class="text-[0.8rem] font-medium text-brand-text">{{
+          d.filtros.desde
+        }}</label>
         <p-datepicker
+          inputId="dr-desde"
           size="small"
           [fluid]="true"
           [showIcon]="true"
-          [placeholder]="d.filtros.desde"
-          [ariaLabel]="d.filtros.desde"
           [maxDate]="hasta()"
           [ngModel]="desde()"
           (ngModelChange)="desde.set($event)"
           appendTo="body"
         />
       </div>
-      <div class="w-36">
+      <div class="flex w-36 flex-col gap-1">
+        <label for="dr-hasta" class="text-[0.8rem] font-medium text-brand-text">{{
+          d.filtros.hasta
+        }}</label>
         <p-datepicker
+          inputId="dr-hasta"
           size="small"
           [fluid]="true"
           [showIcon]="true"
-          [placeholder]="d.filtros.hasta"
-          [ariaLabel]="d.filtros.hasta"
           [minDate]="desde()"
           [ngModel]="hasta()"
           (ngModelChange)="hasta.set($event)"
@@ -75,16 +95,35 @@
         />
       </div>
 
-      <!-- Se estira a la altura de la fila para igualar a los inputs. -->
-      <p-button
-        class="self-stretch"
-        styleClass="!h-full"
-        size="small"
-        icon="pi pi-filter"
-        severity="secondary"
-        [label]="d.filtros.filtrar"
-        (onClick)="filtrar()"
-      />
+      <!-- Espaciador a la altura del label; el botón se estira hasta la de los inputs. -->
+      <div class="flex flex-col gap-1 self-stretch">
+        <span class="invisible text-[0.8rem] font-medium" aria-hidden="true">.</span>
+        <p-button
+          class="flex-1"
+          styleClass="!h-full"
+          size="small"
+          icon="pi pi-filter"
+          severity="secondary"
+          [label]="d.filtros.filtrar"
+          (onClick)="filtrar()"
+        />
+      </div>
+
+      @if (hayFiltros()) {
+        <div class="flex flex-col gap-1 self-stretch">
+          <span class="invisible text-[0.8rem] font-medium" aria-hidden="true">.</span>
+          <p-button
+            class="flex-1"
+            styleClass="!h-full"
+            size="small"
+            icon="pi pi-filter-slash"
+            severity="secondary"
+            [text]="true"
+            [label]="d.filtros.limpiar"
+            (onClick)="limpiar()"
+          />
+        </div>
+      }
 
       @if (correo(); as id) {
         <span

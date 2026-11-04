@@ -6266,6 +6266,7 @@ export const en: AppDict = {
         },
       },
       filtros: {
+        busqueda: 'Search',
         buscar: 'Search by supplier, tax ID, number or CUE',
         tipo: 'Type',
         desde: 'From',
@@ -6273,6 +6274,7 @@ export const en: AppDict = {
         delCorreo: 'From email',
         quitarCorreo: 'Remove the email filter',
         filtrar: 'Filter',
+        limpiar: 'Clear',
         estadoRecepcion: 'Receipt',
         estadosRecepcion: { todos: 'All', si: 'Yes', no: 'No' },
       },

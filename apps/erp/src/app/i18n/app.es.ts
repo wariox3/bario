@@ -6358,6 +6358,7 @@ export const es: AppDict = {
         },
       },
       filtros: {
+        busqueda: 'Buscar',
         buscar: 'Buscar por proveedor, NIT, número o CUE',
         tipo: 'Tipo',
         desde: 'Desde',
@@ -6365,6 +6366,7 @@ export const es: AppDict = {
         delCorreo: 'Del correo',
         quitarCorreo: 'Quitar el filtro por correo',
         filtrar: 'Filtrar',
+        limpiar: 'Limpiar',
         estadoRecepcion: 'Recepción',
         estadosRecepcion: { todos: 'Todos', si: 'Sí', no: 'No' },
       },

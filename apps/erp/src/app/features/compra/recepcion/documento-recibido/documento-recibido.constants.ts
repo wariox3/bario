@@ -5,6 +5,9 @@ import type { EventoRadian } from './evento-radian.model';
 
 const I18N = 'entities.documentoRecibido';
 
+/** Filtros de la barra guardados en `localStorage` (el servicio antepone el tenant). */
+export const DOCUMENTOS_RECIBIDOS_FILTERS_STORAGE_KEY = 'compra:documentos-recibidos:filters:v1';
+
 /** Tipos del filtro, en el orden en que se ofrecen. */
 export const TIPOS: readonly DocumentoRecibidoTipo[] = [
   'factura_venta',

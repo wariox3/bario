@@ -4850,6 +4850,7 @@ export interface AppDict
         personaNoGuardada: { title: string; desc: string };
       };
       filtros: {
+        busqueda: string;
         buscar: string;
         tipo: string;
         desde: string;
@@ -4857,6 +4858,7 @@ export interface AppDict
         delCorreo: string;
         quitarCorreo: string;
         filtrar: string;
+        limpiar: string;
         estadoRecepcion: string;
         estadosRecepcion: { todos: string; si: string; no: string };
       };
