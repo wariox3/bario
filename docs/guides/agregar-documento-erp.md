@@ -296,6 +296,8 @@ Todas las que no apliquen van en `false`.
 | `canExportZip`      | (futuro) export ZIP.                                                                                                                                                                                                                                                   |
 | `canGenerate`       | (futuro) acción "Generar" (vía `extraActionIds`).                                                                                                                                                                                                                      |
 | `canViewAfectacion` | Opcional. El `id` de la fila se vuelve enlace y abre la **afectación del documento** (`DocumentoAfectacionModalComponent`: el documento, su referencia y las líneas de otros documentos que lo afectan por cabecera, como los pagos). Por ahora solo factura de venta. |
+| `canCorregir`       | Opcional. **Ficha de detalle**: "Corregir" en el dropdown "Opciones" (sede y datos contables de un documento aprobado).                                                                                                                                                |
+| `canAnular`         | Opcional. **Ficha de detalle**: "Anular" en el dropdown "Acciones". La ficha pasa `[canAnular]="capacidades().puedeAnular"`; lo enviado a la DIAN no se anula.                                                                                                         |
 
 - **Documento solo-lista** (como `contrato-servicio`): **todas en `false`** y en
   `routes.ts` declarás solo `list` + redirect. El genérico muestra solo card + tabla

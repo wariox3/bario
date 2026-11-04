@@ -44,6 +44,7 @@ export const FACTURA_POS_CONFIG: DocumentEntityConfig = {
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
+    canAnular: true,
   },
   // Un documento aprobado ya no se edita. Regla única consumida por la lista,
   // el detalle y el resolver de la ruta de edición.
