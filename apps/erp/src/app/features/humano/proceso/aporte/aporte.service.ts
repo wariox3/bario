@@ -90,7 +90,8 @@ export class AporteService extends BaseHttpService {
   // ── Contratos incluidos ───────────────────────────────────────────────────
 
   /**
-   * Página de contratos del aporte, ordenados por contrato.
+   * Página de contratos del aporte, ordenados por `id` ascendente: el mismo
+   * orden de la columna Id que se ve, y estable entre páginas.
    *
    * Los tres niveles del aporte van por `POST …/lista/` con el filtro y el orden
    * en el cuerpo: el recurso no publica `GET` en la raíz. `page` es 0-based, como
@@ -106,7 +107,7 @@ export class AporteService extends BaseHttpService {
   ): Observable<PaginatedResponse<AporteContrato>> {
     return this.listar<AporteContrato>(APORTE_CONTRATO_ENDPOINT, {
       filters: [{ field: 'aporte_id', operator: 'eq', value: aporteId }, ...filtros],
-      sort: [{ field: 'contrato_id', direction: 'asc' }],
+      sort: [{ field: 'id', direction: 'asc' }],
       page,
     });
   }
@@ -138,7 +139,8 @@ export class AporteService extends BaseHttpService {
 
   /**
    * Página de líneas liquidadas. Solo lectura: las fabrica el backend al generar.
-   * Cuelgan del contrato del aporte, así que el filtro cruza por él.
+   * Cuelgan del contrato del aporte, así que el filtro cruza por él. Van por
+   * `id` ascendente, como los contratos.
    */
   listarDetalles(
     aporteId: number,
@@ -150,7 +152,7 @@ export class AporteService extends BaseHttpService {
         { field: 'aporte_contrato__aporte_id', operator: 'eq', value: aporteId },
         ...filtros,
       ],
-      sort: [{ field: 'aporte_contrato_id', direction: 'asc' }],
+      sort: [{ field: 'id', direction: 'asc' }],
       page,
     });
   }
