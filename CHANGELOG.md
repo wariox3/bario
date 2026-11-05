@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.22](https://github.com/wariox3/bario/compare/v0.1.21...v0.1.22) (2026-11-05)
+
+### Features
+
+- **compra:** recordar y limpiar los filtros de documentos recibidos ([d64645d](https://github.com/wariox3/bario/commit/d64645db1f416c7e56adc2683e2fbb3751537f33))
+- **documento:** avisar en corregir que base y contacto son de las líneas de cuenta ([cac3724](https://github.com/wariox3/bario/commit/cac37246dfa54893afd365b64c2de764a058426e))
+- **documento:** corregir base y contacto de las líneas de cuenta ([339b573](https://github.com/wariox3/bario/commit/339b573703b5928f0f2be61c918b2c97265addfa))
+- **documentos:** ofrecer anular en la ficha de los documentos del legacy ([661633e](https://github.com/wariox3/bario/commit/661633e4a3c6eee2f41fe3fb6ef0c07f33fae231))
+- **empresa:** sumar el correo copia de la empresa ([3585553](https://github.com/wariox3/bario/commit/35855539b6fb47b36e05c852a33632a9d54bde64))
+- **pos:** administrador de cajas con lista, formulario y ficha ([922e55f](https://github.com/wariox3/bario/commit/922e55f176a47e5f03eb13109ac081955764d370))
+- **pos:** exigir turno abierto para cobrar y sumar la ficha del turno ([2d107d4](https://github.com/wariox3/bario/commit/2d107d49752c2a162a1bb6af89406e368cc90947))
+- **pos:** pedir el Excel de ventas POS en el historial ([515a271](https://github.com/wariox3/bario/commit/515a271bf980092f9f5f8b1d25d03f1bebf2bb8f))
+- **pos:** separar vender de caja y sumar turno al sidebar ([2ce1831](https://github.com/wariox3/bario/commit/2ce1831c3653aa910717766c03c9829d6bfdba16))
+- **pos:** turnos de caja con lista, apertura, resumen y cierre ([5c7d1ad](https://github.com/wariox3/bario/commit/5c7d1ad17f22a423294db2b7736561e7e0d0f888))
+
+### Bug Fixes
+
+- **contacto:** ofrecer solo contactos activos en los selectores ([43a7f1b](https://github.com/wariox3/bario/commit/43a7f1bbf5f028b713f84ebc18e10b2f04f22781))
+- **documento:** corregir base y contacto solo si la cuenta los exige ([ba6a2c0](https://github.com/wariox3/bario/commit/ba6a2c0467b7c84dbc30487438e1506793b7f962))
+- **documento:** respetar las exigencias de la cuenta al corregir y en las líneas contables ([d8e8460](https://github.com/wariox3/bario/commit/d8e8460abc287be474728dcaf8f882569775a52d))
+- **humano:** mostrar identificación y empleado en los detalles del aporte ([1d8a6f2](https://github.com/wariox3/bario/commit/1d8a6f25c2fb4f190f4a8d23c9b50c91866e7267))
+- **humano:** ordenar por id los contratos y detalles del aporte ([2e4f672](https://github.com/wariox3/bario/commit/2e4f67274b5fcefbfce82fe84ec69c9df34fd997))
+- **pos:** separar la cuenta de la base en el turno en curso ([4819d64](https://github.com/wariox3/bario/commit/4819d6430b1eaf72b5232a8db0aa20cd17cccfa2))
+- **sede:** quitar los campos de caja de la lista de sedes ([3e61ab6](https://github.com/wariox3/bario/commit/3e61ab6b632525f2d5660993a09e6010e8a25d42))
+
 ## [0.1.21](https://github.com/wariox3/bario/compare/v0.1.20...v0.1.21) (2026-11-03)
 
 ### Bug Fixes
