@@ -60,9 +60,7 @@
       class="m-0 grid grid-cols-2 content-start gap-x-5 gap-y-4 border-b border-[rgba(20,48,73,0.08)] px-5 py-4 lg:border-r lg:border-b-0"
     >
       <div class="col-span-2 flex flex-col gap-0.5">
-        <dt
-          class="text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
-        >
+        <dt class="text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted opacity-70">
           {{ tx.totalVendido }}
         </dt>
         <dd
@@ -83,7 +81,7 @@
         }
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted uppercase opacity-70">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
           {{ tx.desde }}
         </dt>
         <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
@@ -91,21 +89,26 @@
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted uppercase opacity-70">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
           {{ tx.corrido }}
         </dt>
         <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
           {{ corrido() }}
         </dd>
       </div>
-      <div class="col-span-2 flex flex-col gap-0.5">
-        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted uppercase opacity-70">
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
           {{ tx.base }}
         </dt>
         <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
           {{ base() }}
         </dd>
-        <dd class="m-0 truncate text-[0.75rem] text-brand-muted">
+      </div>
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
+          {{ tx.cuentaBase }}
+        </dt>
+        <dd class="m-0 truncate text-[0.85rem] text-brand-text">
           {{ turno().cuenta_banco_nombre }}
         </dd>
       </div>

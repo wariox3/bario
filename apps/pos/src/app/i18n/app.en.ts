@@ -614,6 +614,7 @@ export const en: AppDict = {
       desde: 'Since',
       corrido: 'Running',
       base: 'Float',
+      cuentaBase: 'Float account',
       esperado: {
         title: 'Expected at close',
         hint: 'Float plus payments, by account',

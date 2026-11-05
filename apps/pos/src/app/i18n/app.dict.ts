@@ -483,6 +483,7 @@ export interface AppDict
       desde: string;
       corrido: string;
       base: string;
+      cuentaBase: string;
       esperado: {
         title: string;
         hint: string;

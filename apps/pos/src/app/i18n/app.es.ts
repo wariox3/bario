@@ -620,6 +620,7 @@ export const es: AppDict = {
       desde: 'Desde',
       corrido: 'Lleva',
       base: 'Base',
+      cuentaBase: 'Cuenta de la base',
       esperado: {
         title: 'Debe haber al cerrar',
         hint: 'Base más lo cobrado, por cuenta',
