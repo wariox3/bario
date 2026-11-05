@@ -7,8 +7,8 @@ import type {
   SaludoTranslationsHost,
 } from '@reddoc/ui/i18n';
 import type { PosNavKey } from '../layouts/workspace-layout/workspace-menu';
-import type { FaseCobro } from '../features/caja/cobro/cobro.model';
-import type { MedioPagoId } from '../features/caja/cobro/medios-pago';
+import type { FaseCobro } from '../features/vender/cobro/cobro.model';
+import type { MedioPagoId } from '../features/vender/cobro/medios-pago';
 
 /**
  * Diccionario del POS. Hereda los bloques que traen los libs compartidos (auth,
@@ -155,7 +155,7 @@ export interface AppDict
       logout: string;
     };
   };
-  caja: {
+  vender: {
     title: string;
     configuracion: { title: string; desc: string; accion: string };
     /** No se pudo leer el tipo de documento de la empresa. */

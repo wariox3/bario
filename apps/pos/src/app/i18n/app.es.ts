@@ -155,7 +155,9 @@ export const es: AppDict = {
       ariaLabel: 'Empresa actual',
     },
     nav: {
+      vender: 'Vender',
       caja: 'Caja',
+      turno: 'Turno',
       historial: 'Historial',
       configuracion: 'Configuración',
     },
@@ -174,8 +176,8 @@ export const es: AppDict = {
       logout: 'Cerrar sesión',
     },
   },
-  caja: {
-    title: 'Caja',
+  vender: {
+    title: 'Vender',
     configuracion: {
       title: 'Configuración requerida',
       desc: 'Antes de vender, elige el tipo de documento de la empresa y el almacén de esta caja.',

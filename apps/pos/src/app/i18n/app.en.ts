@@ -155,7 +155,9 @@ export const en: AppDict = {
       ariaLabel: 'Current company',
     },
     nav: {
-      caja: 'Register',
+      vender: 'Sell',
+      caja: 'Cash register',
+      turno: 'Shift',
       historial: 'History',
       configuracion: 'Settings',
     },
@@ -174,8 +176,8 @@ export const en: AppDict = {
       logout: 'Sign out',
     },
   },
-  caja: {
-    title: 'Register',
+  vender: {
+    title: 'Sell',
     configuracion: {
       title: 'Setup required',
       desc: "Before selling, choose the company's document type and this register's warehouse.",

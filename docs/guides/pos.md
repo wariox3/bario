@@ -6,7 +6,7 @@
 
 ## Recorrido de quien vende
 
-1. **Entrar a la empresa.** Login → `/contenedores` → `/t/<slug>/caja`. Solo entran
+1. **Entrar a la empresa.** Login → `/contenedores` → `/t/<slug>/vender`. Solo entran
    empresas con el módulo de venta (`acceso_venta`); sin él, se vuelve a contenedores
    con un aviso (`core/acceso/venta-access.guard.ts`).
 2. **Configurar la caja una vez.** `/t/<slug>/configuracion`, con dos dueños:
@@ -27,7 +27,7 @@
 
    **Imprimir cuenta** (el botón de la impresora, junto a Cobrar) saca una pre-cuenta de
    80 mm con lo que se va a cobrar, para quien se lleva la cuenta y vuelve a pagar. La arma
-   la caja (`caja/pre-cuenta/`) con el resumen del carrito y los datos de la empresa de
+   la caja (`vender/pre-cuenta/`) con el resumen del carrito y los datos de la empresa de
    `configuracion/campos/`: no crea documento ni consume número, la venta sigue editable y
    el papel dice "Documento no válido como factura". La ciudad de la empresa no sale porque
    la configuración solo trae su id.
@@ -91,15 +91,17 @@ apps/pos/src/app/
 │   ├── storage/pos-storage.service.ts     localStorage tolerante a fallos
 │   └── utils/generar-id.ts                id local (sirve sin HTTPS)
 ├── features/
-│   ├── caja/
+│   ├── vender/
 │   │   ├── catalogo/      store, mapper, tarjeta, buscador
 │   │   ├── carrito/       modelo, operaciones puras, store, panel, pestañas
 │   │   ├── cobro/         medios de pago, pipeline reanudable, diálogo
 │   │   ├── cliente/       alta rápida de cliente
 │   │   ├── item-rapido/   alta rápida de ítem
-│   │   └── pages/caja/    la pantalla
+│   │   └── pages/vender/  la pantalla de venta
 │   ├── historial/
-│   └── configuracion/     store de la caja + página
+│   ├── configuracion/     store de la caja + página
+│   ├── caja/              página vacía (pendiente de definir)
+│   └── turno/             página vacía (pendiente de definir)
 └── layouts/               shell (contenedores) y workspace (sidebar)
 ```
 

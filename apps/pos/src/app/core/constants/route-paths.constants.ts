@@ -11,7 +11,7 @@ export const ROUTE_PATHS = {
     root: '/contenedores',
   },
   tenant: {
-    /** Home del tenant en el POS: la caja, donde se vende. */
-    home: (slug: string) => `/t/${slug}/caja`,
+    /** Home del tenant en el POS: la pantalla de venta. */
+    home: (slug: string) => `/t/${slug}/vender`,
   },
 };
