@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.23](https://github.com/wariox3/bario/compare/v0.1.22...v0.1.23) (2026-11-05)
+
+### Bug Fixes
+
+- **pos:** agrandar la letra de la pre-cuenta impresa ([6898a3f](https://github.com/wariox3/bario/commit/6898a3f1e51e7f110eb933873d824d7dab74f3ef))
+
 ## [0.1.22](https://github.com/wariox3/bario/compare/v0.1.21...v0.1.22) (2026-11-05)
 
 ### Features

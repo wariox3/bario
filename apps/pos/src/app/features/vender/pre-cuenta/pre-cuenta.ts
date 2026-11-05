@@ -23,6 +23,10 @@ export interface TextosPreCuenta {
  *
  * Las líneas van por su bruto (`cantidad × precio`) para que sumen el subtotal;
  * el descuento y los impuestos se desglosan abajo, como en el resumen de la caja.
+ *
+ * El cuerpo mide 72 mm, el área que imprime de verdad un rollo de 80 mm: si
+ * mide más, el driver encoge todo para que quepa. Va en sans-serif y a 15px
+ * porque la Courier es de trazo fino y en papel térmico sale tenue.
  */
 export function preCuentaHtml(
   venta: Carrito,
@@ -65,18 +69,18 @@ export function preCuentaHtml(
 <style>
   @page { size: 80mm 297mm; margin: 0; }
   * { box-sizing: border-box; }
-  body { margin: 0; padding: 4mm; width: 80mm; font: 12px/1.35 'Courier New', monospace; color: #000; }
+  body { margin: 0; padding: 2mm 3mm; width: 72mm; font: 15px/1.35 Arial, Helvetica, sans-serif; color: #000; }
   p { margin: 0; overflow-wrap: anywhere; }
   .centro { text-align: center; }
   .fuerte { font-weight: bold; }
   .texto { margin-top: 2mm; white-space: pre-line; }
-  .titulo { margin-top: 3mm; font-size: 14px; font-weight: bold; text-align: center; }
+  .titulo { margin-top: 3mm; font-size: 19px; font-weight: bold; text-align: center; }
   .aviso { margin-top: 1mm; text-align: center; font-weight: bold; }
-  hr { border: 0; border-top: 1px dashed #000; margin: 2mm 0; }
+  hr { border: 0; border-top: 2px dashed #000; margin: 2mm 0; }
   .fila { display: flex; justify-content: space-between; gap: 2mm; }
   .fila span:last-child { white-space: nowrap; }
   .linea + .linea { margin-top: 1.5mm; }
-  .total { font-size: 14px; font-weight: bold; }
+  .total { font-size: 18px; font-weight: bold; }
 </style>
 </head>
 <body>
