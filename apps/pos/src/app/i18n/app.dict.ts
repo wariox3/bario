@@ -413,6 +413,42 @@ export interface AppDict
   acceso: {
     sinVenta: { title: string; desc: string };
   };
+  /** Administrador de cajas (`venta/caja/`). */
+  cajas: {
+    columns: {
+      id: string;
+      nombre: string;
+      placa: string;
+      tipo: string;
+      ubicacion: string;
+      sede: string;
+      activo: string;
+    };
+    form: {
+      createTitle: string;
+      editTitle: string;
+      createSubtitle: string;
+      editSubtitle: string;
+      fields: {
+        nombre: string;
+        sede: string;
+        placa: string;
+        tipo: string;
+        ubicacion: string;
+        activo: string;
+      };
+      validation: { required: string; maxlength: string };
+      toasts: Record<
+        'createSuccess' | 'editSuccess' | 'createError' | 'editError' | 'loadError',
+        { title: string; desc: string }
+      >;
+    };
+    detail: {
+      sections: { general: string };
+      notFound: { title: string; desc: string };
+      toasts: { loadError: { title: string; desc: string } };
+    };
+  };
   historial: {
     buscar: string;
     columns: {

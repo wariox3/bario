@@ -521,6 +521,52 @@ export const en: AppDict = {
       desc: 'This company has not purchased the sales module, which the register uses.',
     },
   },
+  cajas: {
+    columns: {
+      id: 'Id',
+      nombre: 'Name',
+      placa: 'Plate',
+      tipo: 'Type',
+      ubicacion: 'Location',
+      sede: 'Branch',
+      activo: 'Active',
+    },
+    form: {
+      createTitle: 'New cash register',
+      editTitle: 'Edit cash register',
+      createSubtitle: 'Fill in the cash register details',
+      editSubtitle: 'Update the cash register details',
+      fields: {
+        nombre: 'Name',
+        sede: 'Branch',
+        placa: 'Plate',
+        tipo: 'Type',
+        ubicacion: 'Location',
+        activo: 'Active',
+      },
+      validation: {
+        required: 'This field is required',
+        maxlength: 'Exceeds the maximum length',
+      },
+      toasts: {
+        createSuccess: { title: 'Cash register created', desc: 'The cash register was created.' },
+        editSuccess: { title: 'Cash register updated', desc: 'Your changes were saved.' },
+        createError: { title: 'Could not create', desc: 'The cash register could not be created.' },
+        editError: { title: 'Could not save', desc: 'Your changes could not be saved.' },
+        loadError: { title: 'Could not load', desc: 'The cash register could not be loaded.' },
+      },
+    },
+    detail: {
+      sections: { general: 'General information' },
+      notFound: {
+        title: 'Cash register not found',
+        desc: 'The cash register does not exist or was deleted.',
+      },
+      toasts: {
+        loadError: { title: 'Could not load', desc: 'The cash register could not be loaded.' },
+      },
+    },
+  },
   historial: {
     buscar: 'Search by customer',
     columns: {

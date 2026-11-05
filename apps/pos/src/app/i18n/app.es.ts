@@ -527,6 +527,52 @@ export const es: AppDict = {
       desc: 'Esta empresa no tiene contratado el módulo de venta, que es el que usa la caja.',
     },
   },
+  cajas: {
+    columns: {
+      id: 'Id',
+      nombre: 'Nombre',
+      placa: 'Placa',
+      tipo: 'Tipo',
+      ubicacion: 'Ubicación',
+      sede: 'Sede',
+      activo: 'Activa',
+    },
+    form: {
+      createTitle: 'Nueva caja',
+      editTitle: 'Editar caja',
+      createSubtitle: 'Completa la información de la caja',
+      editSubtitle: 'Modifica la información de la caja',
+      fields: {
+        nombre: 'Nombre',
+        sede: 'Sede',
+        placa: 'Placa',
+        tipo: 'Tipo',
+        ubicacion: 'Ubicación',
+        activo: 'Activa',
+      },
+      validation: {
+        required: 'Este campo es obligatorio',
+        maxlength: 'Supera la longitud máxima',
+      },
+      toasts: {
+        createSuccess: { title: 'Caja creada', desc: 'La caja se creó correctamente.' },
+        editSuccess: { title: 'Caja actualizada', desc: 'Los cambios se guardaron correctamente.' },
+        createError: { title: 'Error al crear', desc: 'No se pudo crear la caja.' },
+        editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios.' },
+        loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la caja.' },
+      },
+    },
+    detail: {
+      sections: { general: 'Información general' },
+      notFound: {
+        title: 'Caja no encontrada',
+        desc: 'La caja que buscas no existe o fue eliminada.',
+      },
+      toasts: {
+        loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la caja.' },
+      },
+    },
+  },
   historial: {
     buscar: 'Buscar por cliente',
     columns: {

@@ -1,0 +1,97 @@
+@let d = t().cajas.detail;
+@let col = t().cajas.columns;
+<lib-breadcrumb [items]="breadcrumbItems()" />
+
+<header class="flex items-center gap-2">
+  <p-button
+    type="button"
+    [label]="t().common.actions.back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (onClick)="onBack()"
+  />
+  @if (caja()) {
+    <p-buttongroup>
+      <p-button
+        type="button"
+        [label]="t().common.actions.new"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-plus"
+        size="small"
+        (onClick)="onNew()"
+      />
+      <p-button
+        type="button"
+        [label]="t().common.actions.edit"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-pencil"
+        size="small"
+        (onClick)="onEdit()"
+      />
+    </p-buttongroup>
+  }
+</header>
+
+@if (isLoading()) {
+  <div
+    class="flex items-center justify-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface py-20 text-brand-muted"
+  >
+    <i class="pi pi-spin pi-spinner text-xl"></i>
+  </div>
+} @else if (notFound()) {
+  <div
+    class="flex flex-col items-center rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface px-6 py-16 text-center"
+  >
+    <i class="pi pi-inbox mb-3 text-2xl text-brand-muted opacity-50"></i>
+    <p class="m-0 text-[0.95rem] font-bold text-brand-text">{{ d.notFound.title }}</p>
+    <p class="m-0 mt-1 max-w-70 text-[0.8rem] leading-relaxed text-brand-muted">
+      {{ d.notFound.desc }}
+    </p>
+  </div>
+} @else if (caja(); as c) {
+  <h1 class="sr-only">{{ c.nombre }}</h1>
+
+  <section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+    <div class="flex items-center gap-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-wallet text-[1rem]"></i>
+      </span>
+      <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">
+        {{ d.sections.general }}
+      </h2>
+    </div>
+
+    <!-- El campo que falta se deja vacío, nunca se oculta. -->
+    <dl class="grid grid-cols-1 gap-x-6 gap-y-3 px-5 py-4 sm:grid-cols-2">
+      @for (
+        dato of [
+          { label: col.nombre, valor: c.nombre },
+          { label: col.sede, valor: c.sede_nombre },
+          { label: col.placa, valor: c.placa },
+          { label: col.tipo, valor: c.tipo },
+          { label: col.ubicacion, valor: c.ubicacion },
+          {
+            label: col.activo,
+            valor: c.estado_activo ? t().common.boolean.true : t().common.boolean.false,
+          },
+        ];
+        track dato.label
+      ) {
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-[0.7rem] font-medium tracking-[0.01em] text-brand-muted">
+            {{ dato.label }}
+          </dt>
+          <dd class="m-0 text-[0.85rem] leading-snug font-medium break-words text-brand-text">
+            {{ dato.valor }}
+          </dd>
+        </div>
+      }
+    </dl>
+  </section>
+}

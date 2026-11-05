@@ -1,9 +1,9 @@
 /**
  * Entrada del sidebar del POS.
  *
- * El POS es mono-módulo y su menú es corto y plano (vender, caja, turno,
- * historial, configuración): no necesita los acordeones de turnos ni el menú por módulo
- * del ERP. `path` es relativo al tenant; el `WorkspaceLayout` le prepende
+ * El POS es mono-módulo y su menú es corto y plano (vender, historial,
+ * configuración, caja, turno): no necesita los acordeones de turnos ni el
+ * menú por módulo del ERP. `path` es relativo al tenant; el `WorkspaceLayout` le prepende
  * `/t/<slug>/`.
  */
 export interface PosNavItem {
@@ -19,8 +19,8 @@ export type PosNavKey = 'vender' | 'caja' | 'turno' | 'historial' | 'configuraci
 
 export const WORKSPACE_MENU: readonly PosNavItem[] = [
   { labelKey: 'vender', iconClass: 'pi pi-shopping-cart', path: 'vender' },
-  { labelKey: 'caja', iconClass: 'pi pi-wallet', path: 'caja' },
-  { labelKey: 'turno', iconClass: 'pi pi-clock', path: 'turno' },
   { labelKey: 'historial', iconClass: 'pi pi-history', path: 'historial' },
   { labelKey: 'configuracion', iconClass: 'pi pi-cog', path: 'configuracion' },
+  { labelKey: 'caja', iconClass: 'pi pi-wallet', path: 'caja' },
+  { labelKey: 'turno', iconClass: 'pi pi-clock', path: 'turno' },
 ];
