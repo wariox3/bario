@@ -7640,6 +7640,7 @@ export const en: AppDict = {
         ciudadPlaceholder: 'Search city…',
         telefono: 'Phone',
         correo: 'Email',
+        correoCopia: 'CC email',
       },
       validation: {
         required: 'This field is required',

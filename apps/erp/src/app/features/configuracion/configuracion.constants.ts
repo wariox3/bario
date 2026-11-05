@@ -73,4 +73,5 @@ export const EMPRESA_CAMPOS = [
   'gen_empresa_ciudad',
   'gen_empresa_telefono',
   'gen_empresa_correo',
+  'gen_empresa_correo_copia',
 ] as const satisfies readonly ConfiguracionCampo[];

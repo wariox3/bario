@@ -40,6 +40,7 @@ interface FichaEmisor {
   readonly direccion: string;
   readonly telefono: string;
   readonly correo: string;
+  readonly correoCopia: string;
 }
 
 /** Identificación completa (`número-DV`). */
@@ -115,6 +116,7 @@ export class RededocStepComponent {
       direccion: e.gen_empresa_direccion ?? '',
       telefono: e.gen_empresa_telefono ?? '',
       correo: e.gen_empresa_correo ?? '',
+      correoCopia: e.gen_empresa_correo_copia ?? '',
     };
   });
 
@@ -129,6 +131,7 @@ export class RededocStepComponent {
       direccion: e.direccion,
       telefono: e.telefono,
       correo: e.correo,
+      correoCopia: e.correo_copia ?? '',
     };
   });
 

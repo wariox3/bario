@@ -7765,6 +7765,7 @@ export const es: AppDict = {
         ciudadPlaceholder: 'Buscar ciudad…',
         telefono: 'Teléfono',
         correo: 'Correo electrónico',
+        correoCopia: 'Correo copia',
       },
       validation: {
         required: 'Este campo es obligatorio',

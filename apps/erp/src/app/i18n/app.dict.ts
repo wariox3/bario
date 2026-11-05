@@ -5734,6 +5734,7 @@ export interface AppDict
         ciudadPlaceholder: string;
         telefono: string;
         correo: string;
+        correoCopia: string;
       };
       validation: { required: string; emailInvalid: string; onlyDigits: string };
     };

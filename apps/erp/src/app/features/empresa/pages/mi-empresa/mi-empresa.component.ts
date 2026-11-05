@@ -103,6 +103,7 @@ export class MiEmpresaComponent {
       direccion: c.gen_empresa_direccion ?? '',
       telefono: c.gen_empresa_telefono ?? '',
       correo: c.gen_empresa_correo ?? '',
+      correoCopia: c.gen_empresa_correo_copia ?? '',
     };
   });
 
