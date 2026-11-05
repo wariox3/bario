@@ -2,6 +2,10 @@
 
 <h1 class="list-shell__title">{{ title() }}</h1>
 
+<!-- Lo que la página quiera decir antes de la tabla (p. ej. el turno en curso
+     del POS). Va suelto, fuera del recuadro: no es parte del listado. -->
+<ng-content select="[encabezado]" />
+
 <!-- Un solo recuadro: la botonera (proyectada) es su cabecera y la tabla el
      cuerpo. El total de registros lo da el paginador. -->
 <section class="list-shell__frame">

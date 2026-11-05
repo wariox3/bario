@@ -11,6 +11,8 @@ import type { AppDict } from '@pos/i18n';
 import { PestanaUnicaService } from '../../core/pestana/pestana-unica.service';
 import { PosStorageService } from '../../core/storage/pos-storage.service';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
+import { TurnoChipComponent } from '../../features/turno/components/turno-chip/turno-chip.component';
+import { TurnoActualStore } from '../../features/turno/turno-actual.store';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
 import { WORKSPACE_MENU, type PosNavItem } from './workspace-menu';
 
@@ -44,6 +46,7 @@ import { WORKSPACE_MENU, type PosNavItem } from './workspace-menu';
     UserMenuComponent,
     AppSwitcherComponent,
     TenantBadgeComponent,
+    TurnoChipComponent,
   ],
   templateUrl: './workspace-layout.component.html',
   styleUrl: './workspace-layout.component.scss',
@@ -57,28 +60,30 @@ export class WorkspaceLayoutComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly items = WORKSPACE_MENU;
+  /** Con turno abierto, «Turno» lleva un punto verde en el sidebar. */
+  protected readonly conTurno = inject(TurnoActualStore).abierto;
   protected readonly drawerVisible = signal(false);
   protected readonly estadoPestana = this.pestana.estado;
 
-  /** La ruta actual es la caja. */
-  private readonly enCaja = toSignal(
+  /** La ruta actual es la pantalla de venta. */
+  private readonly enVender = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map((e) => esCaja(e.urlAfterRedirects)),
+      map((e) => esVender(e.urlAfterRedirects)),
     ),
-    { initialValue: esCaja(this.router.url) },
+    { initialValue: esVender(this.router.url) },
   );
 
-  /** Preferencia de la persona fuera de la caja, recordada en el dispositivo. */
+  /** Preferencia de la persona fuera de la pantalla de venta, recordada en el dispositivo. */
   private readonly preferenciaColapsado = signal(
     this.storage.leer(CLAVE_SIDEBAR, esBooleano) ?? false,
   );
 
-  /** En la caja: la persona lo expandió en esta visita. Se reinicia al volver a entrar. */
-  private readonly expandidoEnCaja = signal(false);
+  /** En la pantalla de venta: la persona lo expandió en esta visita. Se reinicia al volver a entrar. */
+  private readonly expandidoEnVender = signal(false);
 
   protected readonly colapsado = computed(() =>
-    this.enCaja() ? !this.expandidoEnCaja() : this.preferenciaColapsado(),
+    this.enVender() ? !this.expandidoEnVender() : this.preferenciaColapsado(),
   );
 
   constructor() {
@@ -88,20 +93,20 @@ export class WorkspaceLayoutComponent {
     });
     inject(DestroyRef).onDestroy(() => this.pestana.soltar());
 
-    // Entrar a la caja siempre la abre con el sidebar colapsado.
+    // Entrar a vender siempre abre con el sidebar colapsado.
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
       .subscribe((e) => {
-        if (esCaja(e.urlAfterRedirects)) this.expandidoEnCaja.set(false);
+        if (esVender(e.urlAfterRedirects)) this.expandidoEnVender.set(false);
       });
   }
 
   protected alternarSidebar(): void {
-    if (this.enCaja()) {
-      this.expandidoEnCaja.update((v) => !v);
+    if (this.enVender()) {
+      this.expandidoEnVender.update((v) => !v);
       return;
     }
     const siguiente = !this.preferenciaColapsado();
@@ -127,7 +132,7 @@ function esBooleano(valor: unknown): valor is boolean {
   return typeof valor === 'boolean';
 }
 
-/** `/t/<slug>/caja` (con o sin query/fragmento). */
-function esCaja(url: string): boolean {
-  return /^\/t\/[^/]+\/caja(?:[/?#]|$)/.test(url);
+/** `/t/<slug>/vender` (con o sin query/fragmento). */
+function esVender(url: string): boolean {
+  return /^\/t\/[^/]+\/vender(?:[/?#]|$)/.test(url);
 }

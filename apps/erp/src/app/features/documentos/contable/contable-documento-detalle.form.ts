@@ -28,35 +28,55 @@ export type CuentaDetalleGroup = FormGroup<{
   documento_afectado_tipo: FormControl<string | null>;
 }>;
 
+/** La cuenta elegida en la línea del control. */
+function cuentaDeLaLinea(control: AbstractControl): ErpSelectOption | null | undefined {
+  return control.parent?.get('cuenta')?.value as ErpSelectOption | null | undefined;
+}
+
 /**
- * La cuenta de la línea exige base (`exige_base` del `seleccionar/`) y la base
- * está en cero. Vive en el control `base` —no en el grupo— para que
- * `libFocusInvalid` lleve a la persona a ese campo; por eso lee la cuenta del
- * padre y el grupo lo re-evalúa cada vez que la cuenta cambia.
+ * Exigencias de la cuenta (`exige_base`, `exige_contacto`, `exige_centro_costo`,
+ * del `seleccionar/` o del read de la línea en edición). Cada error vive en su
+ * control —no en el grupo— para que `libFocusInvalid` lleve a la persona a ese
+ * campo; por eso lee la cuenta del padre y el grupo los re-evalúa cada vez que
+ * la cuenta cambia.
  *
- * Una cuenta cargada desde el backend (edición, cruce) no trae la bandera: no se
- * valida hasta que se vuelva a elegir en el selector.
+ * Una cuenta sembrada por el cruce de cartera no trae las banderas: no se valida
+ * hasta que se vuelva a elegir en el selector.
  */
 function baseExigidaValidator(control: AbstractControl<number | null>): ValidationErrors | null {
-  const cuenta = control.parent?.get('cuenta')?.value as ErpSelectOption | null | undefined;
-  if (cuenta?.['exige_base'] !== true) return null;
+  if (cuentaDeLaLinea(control)?.['exige_base'] !== true) return null;
   return (control.value ?? 0) > 0 ? null : { baseExigida: true };
+}
+
+function contactoExigidoValidator(
+  control: AbstractControl<ErpSelectOption | null>,
+): ValidationErrors | null {
+  if (cuentaDeLaLinea(control)?.['exige_contacto'] !== true) return null;
+  return control.value != null ? null : { contactoExigido: true };
+}
+
+function centroCostoExigidoValidator(
+  control: AbstractControl<ErpSelectOption | null>,
+): ValidationErrors | null {
+  if (cuentaDeLaLinea(control)?.['exige_centro_costo'] !== true) return null;
+  return control.value != null ? null : { centroCostoExigido: true };
 }
 
 /**
  * Crea un `FormGroup` de línea de cuenta (vacío o precargado en edición).
  *
  * Una línea de cuenta no recalcula impuestos ni deriva campos —su valor lo
- * teclea el usuario directo—. La única suscripción interna re-evalúa la base
- * cuando cambia la cuenta, porque su obligatoriedad depende de ella
- * (`baseExigidaValidator`). El acumulado de débitos/créditos se deriva fuera, en
+ * teclea el usuario directo—. La única suscripción interna re-evalúa base,
+ * contacto y centro de costo cuando cambia la cuenta, porque su obligatoriedad
+ * depende de ella (las `exige_*` de la cuenta). El acumulado de débitos/créditos se deriva fuera, en
  * la tabla, a partir del valor del array.
  *
  * `contacto`, `centro_costo`, `base`, `numero` y `detalle` existen siempre en el
  * grupo aunque la tabla los oculte: así el shape de la línea es uno solo y el
  * mapper no necesita ramas. Un documento que no los usa los deja en su default nulo.
- * Ninguno es obligatorio —solo `cuenta` y `valor` lo son—, salvo la `base` cuando
- * la cuenta elegida la exige.
+ * Ninguno es obligatorio —solo `cuenta` y `valor` lo son—, salvo la base, el
+ * contacto y el centro de costo cuando la cuenta elegida los exige. Un contacto
+ * deshabilitado (línea enlazada) no se valida: lo fija el cruce.
  *
  * Una línea **enlazada** (`documento_afectado != null`) nace con `cuenta`,
  * `naturaleza` y `contacto` deshabilitados: su imputación y su tercero los fija el
@@ -83,11 +103,14 @@ export function createCuentaDetalleGroup(
     valor: new FormControl<number | null>(value?.valor ?? null, {
       validators: [Validators.required, Validators.min(0.01)],
     }),
-    contacto: new FormControl<ErpSelectOption | null>({
-      value: value?.contacto ?? null,
-      disabled: enlazada,
-    }),
-    centro_costo: new FormControl<ErpSelectOption | null>(value?.centro_costo ?? null),
+    contacto: new FormControl<ErpSelectOption | null>(
+      { value: value?.contacto ?? null, disabled: enlazada },
+      contactoExigidoValidator,
+    ),
+    centro_costo: new FormControl<ErpSelectOption | null>(
+      value?.centro_costo ?? null,
+      centroCostoExigidoValidator,
+    ),
     base: new FormControl<number | null>(value?.base ?? 0, baseExigidaValidator),
     numero: new FormControl<number | null>(value?.numero ?? null),
     detalle: new FormControl<string | null>(value?.detalle ?? null, Validators.maxLength(200)),
@@ -98,8 +121,10 @@ export function createCuentaDetalleGroup(
     documento_afectado_tipo: new FormControl<string | null>(value?.documento_afectado_tipo ?? null),
   });
   // El control y su suscriptor mueren con el grupo: no hace falta desuscribir.
-  group.controls.cuenta.valueChanges.subscribe(() => group.controls.base.updateValueAndValidity());
-  group.controls.base.updateValueAndValidity();
+  const exigidos = [group.controls.base, group.controls.contacto, group.controls.centro_costo];
+  const revalidar = () => exigidos.forEach((control) => control.updateValueAndValidity());
+  group.controls.cuenta.valueChanges.subscribe(revalidar);
+  revalidar();
   return group;
 }
 

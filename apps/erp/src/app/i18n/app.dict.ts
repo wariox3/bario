@@ -503,6 +503,8 @@ export interface AppDict
       title: string;
       subtitle: string;
       empty: string;
+      /** Por qué base y contacto solo aparecen en las líneas de cuenta. */
+      notaCuenta: string;
       fields: {
         sede: string;
         seleccionar: string;
@@ -518,10 +520,14 @@ export interface AppDict
         centroCosto: string;
         contacto: string;
       };
+      validation: { centroCostoExigido: string; baseExigida: string; contactoExigido: string };
       toasts: {
         success: { title: string; desc: string };
         error: { title: string; desc: string };
         sinCambios: { title: string; desc: string };
+        /** Se suma al `detail` cuando el backend rechaza líneas puntuales. */
+        revisaLineas: string;
+        exigidos: { title: string; desc: string };
         loadError: { title: string; desc: string };
       };
     };
@@ -3393,6 +3399,8 @@ export interface AppDict
       centroCostoPlaceholder: string;
       detallePlaceholder: string;
       baseExigida: string;
+      contactoExigido: string;
+      centroCostoExigido: string;
       confirmDeleteLine: string;
       naturaleza: { debito: string; credito: string };
       columns: {
@@ -4846,6 +4854,7 @@ export interface AppDict
         personaNoGuardada: { title: string; desc: string };
       };
       filtros: {
+        busqueda: string;
         buscar: string;
         tipo: string;
         desde: string;
@@ -4853,6 +4862,7 @@ export interface AppDict
         delCorreo: string;
         quitarCorreo: string;
         filtrar: string;
+        limpiar: string;
         estadoRecepcion: string;
         estadosRecepcion: { todos: string; si: string; no: string };
       };
@@ -5728,6 +5738,7 @@ export interface AppDict
         ciudadPlaceholder: string;
         telefono: string;
         correo: string;
+        correoCopia: string;
       };
       validation: { required: string; emailInvalid: string; onlyDigits: string };
     };

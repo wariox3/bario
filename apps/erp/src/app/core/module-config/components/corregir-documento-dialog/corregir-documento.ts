@@ -31,6 +31,10 @@ export interface CorregirLineaRead {
   readonly base?: string | number | null;
   readonly centro_costo?: number | null;
   readonly centro_costo_nombre?: string | null;
+  /** Exigencias de la cuenta de la línea: qué no puede quedar vacío. */
+  readonly cuenta_exige_centro_costo?: boolean | null;
+  readonly cuenta_exige_base?: boolean | null;
+  readonly cuenta_exige_contacto?: boolean | null;
   readonly contacto?: number | null;
   readonly contacto_nombre_corto?: string | null;
   readonly contacto_numero_identificacion?: string | null;
@@ -55,14 +59,23 @@ export interface LineaCorregible {
   readonly centroCosto: ErpSelectOption | null;
   readonly base: number | null;
   readonly contacto: ErpSelectOption | null;
+  /**
+   * Lo que la cuenta de la línea exige (`cuenta_exige_*` del read). Si la
+   * cuenta no lo exige, vaciar el campo es válido y viaja `null`.
+   */
+  readonly exige: CamposExigibles;
 }
+
+/** Campos de una línea que su cuenta puede exigir. */
+export type CampoExigible = 'centroCosto' | 'base' | 'contacto';
+export type CamposExigibles = Readonly<Record<CampoExigible, boolean>>;
 
 /** Cambios de cabecera: solo las claves que cambiaron. */
 export interface CabeceraPatch {
   sede?: number | null;
 }
 
-/** Cambios de una línea: solo las claves que cambiaron. */
+/** Cambio de una línea: solo las claves que cambiaron. */
 export interface LineaPatch {
   centro_costo?: number | null;
   base?: number | null;
@@ -112,7 +125,22 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
               read.contacto_nombre_corto,
             ),
           },
+    exige: {
+      centroCosto: read.cuenta_exige_centro_costo === true,
+      base: read.cuenta_exige_base === true,
+      contacto: read.cuenta_exige_contacto === true,
+    },
   };
+}
+
+/**
+ * Base y contacto se corrigen solo en una línea de cuenta cuya cuenta los
+ * exige: si no los exige, `actualizar-contabilidad/` los rechaza ("La cuenta
+ * 130505 no exige base."). El centro de costo se corrige en cualquier línea;
+ * su `exige` solo impide dejarlo vacío.
+ */
+export function corrigeCampo(linea: LineaCorregible, campo: 'base' | 'contacto'): boolean {
+  return linea.esCuenta && linea.exige[campo];
 }
 
 function mismoId(a: ErpSelectOption | null, b: ErpSelectOption | null): boolean {
@@ -130,24 +158,57 @@ export function cambiosCabecera(
 }
 
 /**
- * Lo que cambió en una línea; `null` si nada. Base y contacto solo cuentan en
- * las líneas de cuenta: en las de ítem el diálogo no los ofrece.
+ * Lo que cambió en una línea; `null` si nada. Base y contacto solo cuentan
+ * donde se pueden corregir (`corrigeCampo`): en el resto el diálogo los
+ * bloquea y mandarlos haría fallar toda la corrección.
  */
 export function cambiosLinea(
   original: LineaCorregible,
   actual: LineaCorregible,
 ): LineaPatch | null {
-  const patch: LineaPatch = {};
-  if (!mismoId(original.centroCosto, actual.centroCosto)) {
-    patch.centro_costo = actual.centroCosto?.id ?? null;
+  const cambioCentroCosto = !mismoId(original.centroCosto, actual.centroCosto);
+  const cambioBase = corrigeCampo(actual, 'base') && original.base !== actual.base;
+  const cambioContacto =
+    corrigeCampo(actual, 'contacto') && !mismoId(original.contacto, actual.contacto);
+  if (!cambioCentroCosto && !cambioBase && !cambioContacto) return null;
+  return {
+    ...(cambioCentroCosto ? { centro_costo: actual.centroCosto?.id ?? null } : {}),
+    ...(cambioBase ? { base: actual.base } : {}),
+    ...(cambioContacto ? { contacto: actual.contacto?.id ?? null } : {}),
+  };
+}
+
+/** El campo que la cuenta exige quedó vacío (una base exigida va mayor a cero). */
+function faltaExigido(linea: LineaCorregible, campo: CampoExigible): boolean {
+  if (!linea.exige[campo]) return false;
+  switch (campo) {
+    case 'centroCosto':
+      return linea.centroCosto == null;
+    case 'base':
+      return linea.esCuenta && (linea.base ?? 0) <= 0;
+    case 'contacto':
+      return linea.esCuenta && linea.contacto == null;
   }
-  if (actual.esCuenta) {
-    if (original.base !== actual.base) patch.base = actual.base;
-    if (!mismoId(original.contacto, actual.contacto)) {
-      patch.contacto = actual.contacto?.id ?? null;
-    }
+}
+
+const CAMPOS_EXIGIBLES: readonly CampoExigible[] = ['centroCosto', 'base', 'contacto'];
+
+/**
+ * Campos que su cuenta exige y quedaron vacíos, por id de línea; solo las
+ * líneas con alguno. Cuenta también la línea que ya venía así: el diálogo
+ * existe para corregir, así que no deja guardar mientras quede una
+ * inconsistente. Base y contacto solo se exigen en las líneas de cuenta, las
+ * únicas que los ofrecen.
+ */
+export function exigidosFaltantes(
+  lineas: readonly LineaCorregible[],
+): ReadonlyMap<number, ReadonlySet<CampoExigible>> {
+  const faltantes = new Map<number, ReadonlySet<CampoExigible>>();
+  for (const linea of lineas) {
+    const campos = CAMPOS_EXIGIBLES.filter((campo) => faltaExigido(linea, campo));
+    if (campos.length > 0) faltantes.set(linea.id, new Set(campos));
   }
-  return Object.keys(patch).length > 0 ? patch : null;
+  return faltantes;
 }
 
 /**
@@ -170,4 +231,45 @@ export function payloadContabilidad(
   });
   if (!cabecera && detalles.length === 0) return null;
   return { id, ...cabecera, detalles };
+}
+
+/** Rechazo de `actualizar-contabilidad/`: el motivo general y el de cada línea. */
+export interface RechazoCorreccion {
+  readonly detail: string | null;
+  /** Motivo por id de línea. */
+  readonly porLinea: ReadonlyMap<number, string>;
+}
+
+function esObjeto(valor: unknown): valor is Record<string, unknown> {
+  return typeof valor === 'object' && valor !== null;
+}
+
+/**
+ * Lee el 400 de `actualizar-contabilidad/` —
+ * `{ detail, errores: [{ indice, id, mensaje }] }`— para marcar cada línea
+ * rechazada. Si un error no trae `id`, se ubica por `indice` en los
+ * `detalles` enviados. `null` si la respuesta no trae `errores`: el diálogo
+ * cae al aviso genérico.
+ */
+export function rechazoCorreccion(
+  err: unknown,
+  enviados: readonly { readonly id: number }[],
+): RechazoCorreccion | null {
+  const body = esObjeto(err) && esObjeto(err['error']) ? err['error'] : null;
+  const errores = body?.['errores'];
+  if (!body || !Array.isArray(errores)) return null;
+  const porLinea = new Map<number, string>();
+  for (const error of errores) {
+    if (!esObjeto(error) || typeof error['mensaje'] !== 'string') continue;
+    const indice = error['indice'];
+    const id =
+      typeof error['id'] === 'number'
+        ? error['id']
+        : typeof indice === 'number'
+          ? enviados[indice]?.id
+          : undefined;
+    if (id != null) porLinea.set(id, error['mensaje']);
+  }
+  const detail = typeof body['detail'] === 'string' ? body['detail'] : null;
+  return { detail, porLinea };
 }

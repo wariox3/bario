@@ -628,6 +628,8 @@ export const es: AppDict = {
       title: 'Corregir documento',
       subtitle: 'Ajusta la sede y los datos contables sin desaprobar',
       empty: 'El documento no tiene líneas',
+      notaCuenta:
+        'La base y el contacto solo se corrigen en las líneas de cuenta (tipo C) cuya cuenta los exige. Las líneas de ítem los toman de la cabecera del documento.',
       fields: {
         sede: 'Sede',
         seleccionar: 'Selecciona…',
@@ -643,10 +645,20 @@ export const es: AppDict = {
         centroCosto: 'Centro de costo',
         contacto: 'Contacto',
       },
+      validation: {
+        centroCostoExigido: 'Su cuenta exige centro de costo',
+        baseExigida: 'Su cuenta exige base mayor a cero',
+        contactoExigido: 'Su cuenta exige contacto',
+      },
       toasts: {
         success: { title: 'Documento corregido', desc: 'Se guardaron las correcciones.' },
         error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
         sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
+        revisaLineas: 'Revisa las líneas marcadas en rojo.',
+        exigidos: {
+          title: 'Faltan datos de la cuenta',
+          desc: 'Algunas cuentas exigen centro de costo, base o contacto. Completa las celdas marcadas.',
+        },
         loadError: {
           title: 'No se pudo cargar',
           desc: 'No se pudo cargar el documento para corregirlo.',
@@ -4491,6 +4503,8 @@ export const es: AppDict = {
       centroCostoPlaceholder: 'Seleccionar…',
       detallePlaceholder: 'Glosa de la línea',
       baseExigida: 'Esta cuenta exige base: ingresa un valor mayor a cero',
+      contactoExigido: 'Esta cuenta exige contacto: selecciona uno',
+      centroCostoExigido: 'Esta cuenta exige centro de costo: selecciona uno',
       confirmDeleteLine: '¿Eliminar esta cuenta del documento?',
       naturaleza: { debito: 'Débito', credito: 'Crédito' },
       columns: {
@@ -6347,6 +6361,7 @@ export const es: AppDict = {
         },
       },
       filtros: {
+        busqueda: 'Buscar',
         buscar: 'Buscar por proveedor, NIT, número o CUE',
         tipo: 'Tipo',
         desde: 'Desde',
@@ -6354,6 +6369,7 @@ export const es: AppDict = {
         delCorreo: 'Del correo',
         quitarCorreo: 'Quitar el filtro por correo',
         filtrar: 'Filtrar',
+        limpiar: 'Limpiar',
         estadoRecepcion: 'Recepción',
         estadosRecepcion: { todos: 'Todos', si: 'Sí', no: 'No' },
       },
@@ -7752,6 +7768,7 @@ export const es: AppDict = {
         ciudadPlaceholder: 'Buscar ciudad…',
         telefono: 'Teléfono',
         correo: 'Correo electrónico',
+        correoCopia: 'Correo copia',
       },
       validation: {
         required: 'Este campo es obligatorio',

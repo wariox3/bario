@@ -20,6 +20,10 @@ export interface CuentaDetalleRead extends DocumentoDetalleReadBase {
   readonly cuenta?: number | null;
   readonly cuenta_codigo?: string | null;
   readonly cuenta_nombre?: string | null;
+  /** Exigencias de la cuenta: qué pide su configuración a la línea. */
+  readonly cuenta_exige_base?: boolean | null;
+  readonly cuenta_exige_contacto?: boolean | null;
+  readonly cuenta_exige_centro_costo?: boolean | null;
   /** Naturaleza contable (`'D'`/`'C'`); el mapper cae a `'D'` si viene ausente. */
   readonly naturaleza?: string | null;
   /** Tercero de la línea (solo lo imputan los documentos que agrupan por contacto). */

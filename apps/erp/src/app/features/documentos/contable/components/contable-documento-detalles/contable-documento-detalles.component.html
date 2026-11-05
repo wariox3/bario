@@ -150,11 +150,24 @@
             </td>
 
             @if (showContacto()) {
-              <td class="contable-detalle-table__td">
+              <!-- La cuenta exige contacto: el tooltip dice por qué el campo quedó en rojo. -->
+              <td
+                class="contable-detalle-table__td"
+                [pTooltip]="
+                  row.controls.contacto.hasError('contactoExigido')
+                    ? t().entities.cuentaDetalle.contactoExigido
+                    : ''
+                "
+                tooltipPosition="top"
+              >
                 <lib-contacto-select
                   appCrearTercero
                   formControlName="contacto"
                   [placeholder]="t().entities.cuentaDetalle.contactoPlaceholder"
+                  [invalid]="
+                    row.controls.contacto.invalid &&
+                    (row.controls.contacto.touched || row.controls.cuenta.touched)
+                  "
                 />
               </td>
             }
@@ -171,11 +184,24 @@
             </td>
 
             @if (showCentroCosto()) {
-              <td class="contable-detalle-table__td">
+              <!-- La cuenta exige centro de costo: mismo aviso que la base y el contacto. -->
+              <td
+                class="contable-detalle-table__td"
+                [pTooltip]="
+                  row.controls.centro_costo.hasError('centroCostoExigido')
+                    ? t().entities.cuentaDetalle.centroCostoExigido
+                    : ''
+                "
+                tooltipPosition="top"
+              >
                 <lib-api-select
                   formControlName="centro_costo"
                   [catalogo]="centroCostoCatalogo()"
                   [placeholder]="t().entities.cuentaDetalle.centroCostoPlaceholder"
+                  [invalid]="
+                    row.controls.centro_costo.invalid &&
+                    (row.controls.centro_costo.touched || row.controls.cuenta.touched)
+                  "
                 />
               </td>
             }

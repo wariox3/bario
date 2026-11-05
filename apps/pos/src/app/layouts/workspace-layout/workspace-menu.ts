@@ -1,9 +1,9 @@
 /**
  * Entrada del sidebar del POS.
  *
- * El POS es mono-módulo y su menú es corto y plano (caja, historial,
- * configuración): no necesita los acordeones de turnos ni el menú por módulo
- * del ERP. `path` es relativo al tenant; el `WorkspaceLayout` le prepende
+ * El POS es mono-módulo y su menú es corto y plano (vender, historial,
+ * configuración, caja, turno): no necesita los acordeones de turnos ni el
+ * menú por módulo del ERP. `path` es relativo al tenant; el `WorkspaceLayout` le prepende
  * `/t/<slug>/`.
  */
 export interface PosNavItem {
@@ -12,13 +12,17 @@ export interface PosNavItem {
   /** Clase PrimeIcon, p. ej. `'pi pi-shopping-cart'`. */
   readonly iconClass: string;
   readonly path: string;
+  /** Abre un grupo nuevo: el sidebar pinta un divisor antes del ítem. */
+  readonly separadoAntes?: boolean;
 }
 
 /** Secciones navegables del POS; cada una tiene su etiqueta en `layout.nav`. */
-export type PosNavKey = 'caja' | 'historial' | 'configuracion';
+export type PosNavKey = 'vender' | 'caja' | 'turno' | 'historial' | 'configuracion';
 
 export const WORKSPACE_MENU: readonly PosNavItem[] = [
-  { labelKey: 'caja', iconClass: 'pi pi-shopping-cart', path: 'caja' },
+  { labelKey: 'vender', iconClass: 'pi pi-shopping-cart', path: 'vender' },
   { labelKey: 'historial', iconClass: 'pi pi-history', path: 'historial' },
   { labelKey: 'configuracion', iconClass: 'pi pi-cog', path: 'configuracion' },
+  { labelKey: 'caja', iconClass: 'pi pi-wallet', path: 'caja', separadoAntes: true },
+  { labelKey: 'turno', iconClass: 'pi pi-clock', path: 'turno' },
 ];

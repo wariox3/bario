@@ -6,7 +6,7 @@
 
 ## Recorrido de quien vende
 
-1. **Entrar a la empresa.** Login → `/contenedores` → `/t/<slug>/caja`. Solo entran
+1. **Entrar a la empresa.** Login → `/contenedores` → `/t/<slug>/vender`. Solo entran
    empresas con el módulo de venta (`acceso_venta`); sin él, se vuelve a contenedores
    con un aviso (`core/acceso/venta-access.guard.ts`).
 2. **Configurar la caja una vez.** `/t/<slug>/configuracion`, con dos dueños:
@@ -20,19 +20,33 @@
    Sin tipo y almacén, la caja avisa y no deja cobrar. Si no se puede leer el tipo,
    avisa con un reintento.
 
-3. **Armar la venta.** Tocar una tarjeta o leer un código suma una unidad. Varias ventas
+3. **Abrir turno.** `/t/<slug>/turno`. Sin turno abierto la caja **no cobra**: Vender
+   avisa con un enlace a Turno y el cobro lo frena (`TurnoActualStore`, que consulta
+   `venta/turno/abierto/` al entrar a la empresa; un 404 es "sin turno", no un error). Se abre
+   con la caja (`venta/caja/`, el administrador de cajas), la base y la cuenta de efectivo
+   donde queda la base (obligatoria si la base es mayor que cero). Toda factura POS lleva el
+   `turno` de quien la cobra. El header muestra el turno y cuánto lleva desde cualquier
+   pantalla.
+
+   Sobre la lista de turnos va el tablero del turno en curso: lo vendido y lo que debe haber
+   en cada cuenta al cerrar (`resumen/`), y el pre-cierre (`imprimir/`, 80 mm). **Cerrar**
+   es el arqueo: lo contado por cuenta contra lo esperado, con la diferencia en vivo; el
+   contado arranca vacío para que cerrar sin contar no dé "cuadra". El backend no cierra si
+   queda alguna venta del turno sin aprobar o anular.
+
+4. **Armar la venta.** Tocar una tarjeta o leer un código suma una unidad. Varias ventas
    abiertas en pestañas, que sobreviven a recargas. Cliente por defecto "Consumidor
    final"; al cambiarlo, las líneas se recotizan con su lista de precios (las editadas a
    mano se respetan). La caja no deja pasar del stock disponible.
 
    **Imprimir cuenta** (el botón de la impresora, junto a Cobrar) saca una pre-cuenta de
    80 mm con lo que se va a cobrar, para quien se lleva la cuenta y vuelve a pagar. La arma
-   la caja (`caja/pre-cuenta/`) con el resumen del carrito y los datos de la empresa de
+   la caja (`vender/pre-cuenta/`) con el resumen del carrito y los datos de la empresa de
    `configuracion/campos/`: no crea documento ni consume número, la venta sigue editable y
    el papel dice "Documento no válido como factura". La ciudad de la empresa no sale porque
    la configuración solo trae su id.
 
-4. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio. Transferencia: el
+5. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio. Transferencia: el
    total exacto, y la referencia del comprobante (opcional) va al comentario del documento,
    porque el pago no tiene dónde guardarla. El asesor sale de la caja y se puede cambiar.
 
@@ -47,7 +61,7 @@
    con sus líneas, registra el pago y lo aprueba. Al terminar se puede imprimir el PDF del
    backend.
 
-5. **Consultar.** `/t/<slug>/historial`: facturas POS de los dos tipos, con filtros e
+6. **Consultar.** `/t/<slug>/historial`: facturas POS de los dos tipos, con filtros e
    imprimir.
 
 ### Atajos
@@ -91,15 +105,17 @@ apps/pos/src/app/
 │   ├── storage/pos-storage.service.ts     localStorage tolerante a fallos
 │   └── utils/generar-id.ts                id local (sirve sin HTTPS)
 ├── features/
-│   ├── caja/
+│   ├── vender/
 │   │   ├── catalogo/      store, mapper, tarjeta, buscador
 │   │   ├── carrito/       modelo, operaciones puras, store, panel, pestañas
 │   │   ├── cobro/         medios de pago, pipeline reanudable, diálogo
 │   │   ├── cliente/       alta rápida de cliente
 │   │   ├── item-rapido/   alta rápida de ítem
-│   │   └── pages/caja/    la pantalla
+│   │   └── pages/vender/  la pantalla de venta
 │   ├── historial/
-│   └── configuracion/     store de la caja + página
+│   ├── configuracion/     store de la caja + página
+│   ├── caja/              administrador de cajas (lista, form, ficha)
+│   └── turno/             turnos: lista, tablero, abrir/cerrar, TurnoActualStore
 └── layouts/               shell (contenedores) y workspace (sidebar)
 ```
 

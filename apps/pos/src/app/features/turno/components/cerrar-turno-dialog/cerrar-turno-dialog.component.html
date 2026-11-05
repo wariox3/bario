@@ -1,0 +1,182 @@
+@let c = t().turno.cerrar;
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event && cerrar()"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  [breakpoints]="{ '640px': '96vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!guardando()"
+  [closeOnEscape]="!guardando()"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-lock text-[1.05rem]" aria-hidden="true"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] leading-tight font-bold tracking-tight text-brand-text">
+          {{ titulo() }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ c.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @switch (estado()) {
+    @case ('cargando') {
+      <div class="flex items-center justify-center py-14 text-brand-muted">
+        <i class="pi pi-spin pi-spinner text-xl"></i>
+      </div>
+    }
+    @case ('error') {
+      <div class="flex flex-col items-center gap-3 py-10 text-center">
+        <p class="m-0 text-[0.85rem] text-brand-muted">{{ c.errorResumen }}</p>
+        <p-button
+          type="button"
+          [label]="c.reintentar"
+          icon="pi pi-refresh"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="cargar()"
+        />
+      </div>
+    }
+    @default {
+      <form
+        #formulario
+        [formGroup]="form"
+        libFocusInvalid
+        (ngSubmit)="onSubmit()"
+        autocomplete="off"
+        class="flex flex-col gap-4"
+      >
+        <!-- El arqueo: una fila por cuenta, esperado contra contado. -->
+        <div class="overflow-hidden rounded-[10px] border border-[rgba(20,48,73,0.12)]">
+          <div
+            class="hidden grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)] gap-3 border-b border-[rgba(20,48,73,0.08)] bg-[rgba(20,48,73,0.025)] px-3.5 py-2 text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase sm:grid"
+          >
+            <span>{{ c.columnas.cuenta }}</span>
+            <span class="text-right">{{ c.columnas.esperado }}</span>
+            <span class="text-right">{{ c.columnas.contado }}</span>
+            <span class="text-right">{{ c.columnas.diferencia }}</span>
+          </div>
+
+          <div formArrayName="contados">
+            @for (fila of filas(); track fila.id; let i = $index) {
+              <div
+                class="grid grid-cols-2 items-center gap-x-3 gap-y-1.5 border-b border-[rgba(20,48,73,0.08)] px-3.5 py-2.5 last:border-b-0 sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)]"
+              >
+                <label
+                  [for]="'contado-' + i"
+                  class="col-span-2 truncate text-[0.85rem] font-semibold text-brand-text sm:col-span-1"
+                >
+                  {{ fila.nombre }}
+                </label>
+                <span class="text-[0.85rem] text-brand-muted tabular-nums sm:text-right">
+                  <span class="text-[0.7rem] sm:hidden">{{ c.columnas.esperado }} </span>
+                  {{ fila.esperado }}
+                </span>
+                <p-inputnumber
+                  [inputId]="'contado-' + i"
+                  [formControlName]="i"
+                  mode="currency"
+                  currency="COP"
+                  locale="es-CO"
+                  [min]="0"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  [fluid]="true"
+                  inputStyleClass="tabular-nums text-right"
+                  [invalid]="contadoControl(i).invalid && contadoControl(i).touched"
+                />
+                <span
+                  class="col-span-2 text-[0.85rem] font-semibold tabular-nums sm:col-span-1 sm:text-right"
+                  [class.text-emerald-700]="fila.cuadre === 'cuadra'"
+                  [class.text-red-600]="fila.cuadre === 'falta'"
+                  [class.text-amber-700]="fila.cuadre === 'sobra'"
+                >
+                  {{ fila.diferencia }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <div
+            class="grid grid-cols-2 items-center gap-3 border-t-2 border-[rgba(20,48,73,0.12)] px-3.5 py-2.5 text-[0.85rem] sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)]"
+          >
+            <span class="font-bold text-brand-text">{{ c.columnas.total }}</span>
+            <span class="text-right font-semibold text-brand-navy tabular-nums">
+              {{ fmt.pesos(totalEsperado()) }}
+            </span>
+            <span class="hidden text-right font-semibold text-brand-text tabular-nums sm:block">
+              {{ fmt.pesos(totalContado()) }}
+            </span>
+            <span class="hidden sm:block"></span>
+          </div>
+        </div>
+
+        <!-- Veredicto: aparece cuando ya se contó todo. -->
+        @if (veredicto(); as v) {
+          <div
+            class="flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-[0.82rem] font-medium"
+            [class.bg-emerald-50]="v === 'cuadra'"
+            [class.text-emerald-800]="v === 'cuadra'"
+            [class.bg-red-50]="v === 'falta'"
+            [class.text-red-700]="v === 'falta'"
+            [class.bg-amber-50]="v === 'sobra'"
+            [class.text-amber-800]="v === 'sobra'"
+            role="status"
+          >
+            <i
+              class="pi text-[0.95rem]"
+              [class.pi-check-circle]="v === 'cuadra'"
+              [class.pi-exclamation-triangle]="v !== 'cuadra'"
+              aria-hidden="true"
+            ></i>
+            {{ textoVeredicto() }}
+          </div>
+        }
+
+        <div class="flex flex-col gap-1.5">
+          <label for="cierre-comentario" class="text-[0.8rem] font-medium text-brand-text">
+            {{ c.comentario }}
+          </label>
+          <textarea
+            pTextarea
+            id="cierre-comentario"
+            formControlName="comentario"
+            rows="2"
+            [maxlength]="comentarioMax"
+            [placeholder]="c.comentarioPlaceholder"
+            class="w-full resize-none"
+          ></textarea>
+          <lib-field-error [control]="form.controls.comentario" />
+        </div>
+      </form>
+    }
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="guardando()"
+      (onClick)="cerrar()"
+    />
+    <p-button
+      type="button"
+      [label]="c.accion"
+      icon="pi pi-lock"
+      [loading]="guardando()"
+      [disabled]="guardando() || estado() !== 'listo'"
+      (onClick)="enviar()"
+    />
+  </ng-template>
+</p-dialog>

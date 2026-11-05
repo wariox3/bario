@@ -1,0 +1,175 @@
+@let tx = t().turno.enCurso;
+<section
+  class="relative animate-fade-up overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface"
+  [attr.aria-label]="tx.title"
+>
+  <!-- Atmósfera: grilla de puntos y halo sky, como las tiras de los inicios. -->
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-y-0 right-0 w-[55%] bg-[radial-gradient(circle,rgba(20,48,73,0.12)_1px,transparent_1.6px)] [mask-image:linear-gradient(to_left,rgba(0,0,0,0.85),transparent)] bg-[size:14px_14px]"
+  ></div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -top-16 -right-10 h-56 w-72 rounded-full bg-[radial-gradient(closest-side,rgba(119,170,215,0.22),transparent)]"
+  ></div>
+
+  <!-- Quién y dónde, con las acciones del turno -->
+  <div
+    class="relative flex flex-wrap items-center gap-x-5 gap-y-3 border-b border-[rgba(20,48,73,0.08)] px-5 py-4"
+  >
+    <div class="flex min-w-[15rem] flex-1 items-center gap-3">
+      <span
+        class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-clock text-[1rem]" aria-hidden="true"></i>
+        <!-- El turno está vivo: un punto que late en la esquina del chip. -->
+        <span class="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5" aria-hidden="true">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:animate-none"
+          ></span>
+          <span
+            class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white"
+          ></span>
+        </span>
+      </span>
+      <div class="flex min-w-0 flex-col">
+        <h2 class="m-0 text-[0.95rem] font-bold tracking-tight text-brand-text">{{ tx.title }}</h2>
+        <p class="m-0 mt-0.5 truncate text-[0.8rem] text-brand-muted">{{ lugar() }}</p>
+      </div>
+    </div>
+
+    <div class="flex shrink-0 flex-wrap items-center gap-2">
+      <p-button
+        type="button"
+        [label]="tx.preCierre"
+        icon="pi pi-print"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [loading]="imprimiendo()"
+        [disabled]="imprimiendo()"
+        (onClick)="imprimir.emit()"
+      />
+      <ng-content />
+    </div>
+  </div>
+
+  <div class="relative grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.25fr)]">
+    <!-- Lo vendido y el reloj del turno -->
+    <dl
+      class="m-0 grid grid-cols-2 content-start gap-x-5 gap-y-4 border-b border-[rgba(20,48,73,0.08)] px-5 py-4 lg:border-r lg:border-b-0"
+    >
+      <div class="col-span-2 flex flex-col gap-0.5">
+        <dt class="text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted opacity-70">
+          {{ tx.totalVendido }}
+        </dt>
+        <dd
+          class="m-0 text-[1.5rem] leading-tight font-semibold tracking-tight text-brand-navy tabular-nums"
+        >
+          @if (estadoResumen() === 'cargando') {
+            <span
+              class="inline-block h-7 w-40 animate-pulse rounded-md bg-[rgba(20,48,73,0.06)]"
+            ></span>
+          } @else {
+            {{ totalVenta() }}
+          }
+        </dd>
+        @if (estadoResumen() === 'listo') {
+          <dd class="m-0 text-[0.75rem] text-brand-muted">
+            {{ ventasTexto() }}
+          </dd>
+        }
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
+          {{ tx.desde }}
+        </dt>
+        <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
+          {{ desde() }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
+          {{ tx.corrido }}
+        </dt>
+        <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
+          {{ corrido() }}
+        </dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
+          {{ tx.base }}
+        </dt>
+        <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
+          {{ base() }}
+        </dd>
+      </div>
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted opacity-70">
+          {{ tx.cuentaBase }}
+        </dt>
+        <dd class="m-0 truncate text-[0.85rem] text-brand-text">
+          {{ turno().cuenta_banco_nombre }}
+        </dd>
+      </div>
+    </dl>
+
+    <!-- Lo que debe haber al cerrar, por cuenta: un tiquete con guías punteadas -->
+    <div class="flex min-w-0 flex-col gap-2.5 px-5 py-4">
+      <div class="flex items-baseline justify-between gap-3">
+        <h3 class="m-0 text-[0.8rem] font-bold text-brand-text">{{ tx.esperado.title }}</h3>
+        <span class="text-[0.72rem] text-brand-muted">{{ tx.esperado.hint }}</span>
+      </div>
+
+      @switch (estadoResumen()) {
+        @case ('cargando') {
+          @for (fila of [1, 2]; track fila) {
+            <div class="h-5 animate-pulse rounded-md bg-[rgba(20,48,73,0.05)]"></div>
+          }
+        }
+        @case ('error') {
+          <p class="m-0 text-[0.8rem] text-brand-muted">
+            {{ tx.esperado.error }}
+            <button
+              type="button"
+              class="cursor-pointer border-0 bg-transparent p-0 font-semibold text-brand-navy underline"
+              (click)="recargarResumen.emit()"
+            >
+              {{ tx.esperado.reintentar }}
+            </button>
+          </p>
+        }
+        @default {
+          @for (c of cuentas(); track c.id) {
+            <div class="flex items-baseline gap-2 text-[0.85rem]">
+              <span class="flex min-w-0 flex-col">
+                <span class="truncate text-brand-text">{{ c.nombre }}</span>
+                @if (c.esBase) {
+                  <span class="text-[0.7rem] text-brand-muted">{{ tx.esperado.conBase }}</span>
+                }
+              </span>
+              <span
+                aria-hidden="true"
+                class="min-w-4 flex-1 -translate-y-[0.2rem] border-b border-dotted border-[rgba(20,48,73,0.25)]"
+              ></span>
+              <span class="font-medium text-brand-text tabular-nums">{{ c.esperado }}</span>
+            </div>
+          } @empty {
+            <p class="m-0 text-[0.8rem] text-brand-muted">{{ tx.esperado.vacio }}</p>
+          }
+          @if (cuentas().length > 0) {
+            <div
+              class="mt-0.5 flex items-baseline gap-2 border-t-2 border-[rgba(20,48,73,0.12)] pt-2.5 text-[0.85rem]"
+            >
+              <span class="font-bold text-brand-text">{{ tx.esperado.total }}</span>
+              <span class="flex-1"></span>
+              <span class="text-[0.95rem] font-semibold text-brand-navy tabular-nums">{{
+                totalEsperado()
+              }}</span>
+            </div>
+          }
+        }
+      }
+    </div>
+  </div>
+</section>

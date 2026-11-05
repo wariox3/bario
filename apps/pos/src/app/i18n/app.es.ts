@@ -155,7 +155,9 @@ export const es: AppDict = {
       ariaLabel: 'Empresa actual',
     },
     nav: {
+      vender: 'Vender',
       caja: 'Caja',
+      turno: 'Turno',
       historial: 'Historial',
       configuracion: 'Configuración',
     },
@@ -174,8 +176,8 @@ export const es: AppDict = {
       logout: 'Cerrar sesión',
     },
   },
-  caja: {
-    title: 'Caja',
+  vender: {
+    title: 'Vender',
     configuracion: {
       title: 'Configuración requerida',
       desc: 'Antes de vender, elige el tipo de documento de la empresa y el almacén de esta caja.',
@@ -184,6 +186,16 @@ export const es: AppDict = {
     configuracionError: {
       title: 'No se pudo leer la configuración de la empresa',
       desc: 'Sin el tipo de documento la caja no puede cobrar.',
+      accion: 'Reintentar',
+    },
+    turno: {
+      title: 'No tienes un turno abierto',
+      desc: 'Abre un turno para poder cobrar. Las ventas quedan en el turno de quien las cobra.',
+      accion: 'Abrir turno',
+    },
+    turnoError: {
+      title: 'No se pudo consultar tu turno',
+      desc: 'Sin saber si tienes turno abierto la caja no puede cobrar.',
       accion: 'Reintentar',
     },
     buscador: {
@@ -488,6 +500,14 @@ export const es: AppDict = {
           title: 'Falta configurar la caja',
           desc: 'Elige el tipo de documento y el almacén en configuración.',
         },
+        turno: {
+          title: 'No tienes un turno abierto',
+          desc: 'Abre un turno en la sección Turno para cobrar.',
+        },
+        turnoDesconocido: {
+          title: 'Todavía no se sabe si tienes turno',
+          desc: 'Espera un momento o reintenta la consulta del turno.',
+        },
         productos: {
           title: 'La venta está vacía',
           desc: 'Agrega al menos un producto para cobrar.',
@@ -504,6 +524,7 @@ export const es: AppDict = {
       errores: {
         generico: 'No se pudo completar el cobro. Intenta de nuevo.',
         configuracion: 'Falta configurar la caja: tipo de documento o almacén.',
+        turno: 'No tienes un turno abierto: ábrelo en la sección Turno para cobrar.',
         cuenta: 'Todavía no se cargan las cuentas. Intenta de nuevo en un momento.',
         plazoContado: 'La empresa no tiene un plazo de pago de contado (0 días).',
         sinValor: 'La venta está en $0: el total debe ser mayor que cero para cobrar.',
@@ -523,6 +544,182 @@ export const es: AppDict = {
     sinVenta: {
       title: 'Sin módulo de venta',
       desc: 'Esta empresa no tiene contratado el módulo de venta, que es el que usa la caja.',
+    },
+  },
+  cajas: {
+    columns: {
+      id: 'Id',
+      nombre: 'Nombre',
+      placa: 'Placa',
+      tipo: 'Tipo',
+      ubicacion: 'Ubicación',
+      sede: 'Sede',
+      activo: 'Activa',
+    },
+    form: {
+      createTitle: 'Nueva caja',
+      editTitle: 'Editar caja',
+      createSubtitle: 'Completa la información de la caja',
+      editSubtitle: 'Modifica la información de la caja',
+      fields: {
+        nombre: 'Nombre',
+        sede: 'Sede',
+        placa: 'Placa',
+        tipo: 'Tipo',
+        ubicacion: 'Ubicación',
+        activo: 'Activa',
+      },
+      validation: {
+        required: 'Este campo es obligatorio',
+        maxlength: 'Supera la longitud máxima',
+      },
+      toasts: {
+        createSuccess: { title: 'Caja creada', desc: 'La caja se creó correctamente.' },
+        editSuccess: { title: 'Caja actualizada', desc: 'Los cambios se guardaron correctamente.' },
+        createError: { title: 'Error al crear', desc: 'No se pudo crear la caja.' },
+        editError: { title: 'Error al guardar', desc: 'No se pudieron guardar los cambios.' },
+        loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la caja.' },
+      },
+    },
+    detail: {
+      sections: { general: 'Información general' },
+      notFound: {
+        title: 'Caja no encontrada',
+        desc: 'La caja que buscas no existe o fue eliminada.',
+      },
+      toasts: {
+        loadError: { title: 'Error al cargar', desc: 'No se pudo cargar la caja.' },
+      },
+    },
+  },
+  turno: {
+    error: {
+      title: 'No se pudo consultar tu turno',
+      desc: 'Revisa la conexión y vuelve a entrar.',
+    },
+    columns: {
+      id: 'Id',
+      caja: 'Caja',
+      sede: 'Sede',
+      cajero: 'Cajero',
+      apertura: 'Apertura',
+      cierre: 'Cierre',
+      base: 'Base',
+      documentos: 'Ventas',
+      totalVenta: 'Total vendido',
+      cerrado: 'Cerrado',
+      estado: 'Estado',
+    },
+    estado: { true: 'Cerrado', false: 'Abierto' },
+    enCurso: {
+      title: 'Tu turno está abierto',
+      preCierre: 'Imprimir pre-cierre',
+      totalVendido: 'Total vendido',
+      unaVenta: '1 venta',
+      ventas: '{n} ventas',
+      desde: 'Desde',
+      corrido: 'Lleva',
+      base: 'Base',
+      cuentaBase: 'Cuenta de la base',
+      esperado: {
+        title: 'Debe haber al cerrar',
+        hint: 'Base más lo cobrado, por cuenta',
+        conBase: 'Incluye la base',
+        total: 'Total esperado',
+        vacio: 'Todavía no hay nada que contar.',
+        error: 'No se pudo calcular lo esperado.',
+        reintentar: 'Reintentar',
+      },
+    },
+    cerrar: {
+      title: 'Cerrar turno #{id}',
+      subtitle: 'Cuenta lo que hay en cada cuenta. Lo esperado ya incluye la base.',
+      accion: 'Cerrar turno',
+      errorResumen: 'No se pudo calcular lo esperado del turno.',
+      reintentar: 'Reintentar',
+      columnas: {
+        cuenta: 'Cuenta',
+        esperado: 'Esperado',
+        contado: 'Contado',
+        diferencia: 'Diferencia',
+        total: 'Total',
+      },
+      veredicto: {
+        cuadra: 'La caja cuadra. Puedes cerrar el turno.',
+        falta: 'Faltan {monto}. Cuéntalo de nuevo o explica la diferencia en el comentario.',
+        sobra: 'Sobran {monto}. Explica la diferencia en el comentario.',
+      },
+      comentario: 'Comentario',
+      comentarioPlaceholder: 'Explica la diferencia, si la hay',
+      toasts: {
+        exito: { title: 'Turno cerrado', desc: 'El arqueo quedó guardado.' },
+        error: { title: 'No se pudo cerrar el turno' },
+      },
+    },
+    cerrado: {
+      title: 'Cerraste el turno #{id} · {caja}',
+      contaste: 'Contaste {contado} contra {esperado} esperados.',
+      cuadro: 'La caja cuadró.',
+      faltaron: 'Faltaron {monto}.',
+      sobraron: 'Sobraron {monto}.',
+      imprimir: 'Imprimir cierre',
+      descartar: 'Ocultar',
+    },
+    detalle: {
+      title: 'Turno #{id}',
+      grupos: { caja: 'Caja', horario: 'Horario', ventas: 'Ventas' },
+      campos: {
+        caja: 'Caja',
+        sede: 'Sede',
+        cajero: 'Cajero',
+        apertura: 'Apertura',
+        cierre: 'Cierre',
+        duracion: 'Duración',
+        ventas: 'Ventas',
+        total: 'Total vendido',
+        base: 'Base',
+        cuentaBase: 'Cuenta de la base',
+      },
+      arqueo: {
+        title: 'Arqueo',
+        titleAbierto: 'Debe haber al cerrar',
+        hintAbierto: 'El turno sigue abierto: el arqueo se hace al cerrarlo.',
+        vacio: 'Sin cuentas que contar.',
+      },
+      notFound: {
+        title: 'Turno no encontrado',
+        desc: 'El turno que buscas no existe o no se pudo cargar.',
+      },
+      toasts: {
+        loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el turno.' },
+      },
+    },
+    chip: { abierto: 'Turno', sinTurno: 'Sin turno' },
+    toasts: {
+      imprimirError: { title: 'No se pudo imprimir', desc: 'El informe del turno no se generó.' },
+    },
+    abrir: {
+      title: 'Abrir turno',
+      subtitle: 'Elige la caja y cuenta la base con la que arrancas.',
+      accion: 'Abrir turno',
+      fields: {
+        caja: 'Caja',
+        base: 'Base',
+        cuenta: 'Cuenta banco',
+      },
+      validation: {
+        required: 'Este campo es obligatorio',
+        min: 'La base no puede ser negativa',
+        cuentaRequerida: 'Con base, elige la cuenta donde queda',
+      },
+      cuentasError: 'No se pudieron cargar las cuentas.',
+      reintentar: 'Reintentar',
+      sinCuentas:
+        'No hay cuentas de efectivo. Crea una en el ERP, como cuenta bancaria de tipo efectivo.',
+      toasts: {
+        exito: { title: 'Turno abierto', desc: 'Ya puedes vender en esta caja.' },
+        error: { title: 'No se pudo abrir el turno' },
+      },
     },
   },
   historial: {

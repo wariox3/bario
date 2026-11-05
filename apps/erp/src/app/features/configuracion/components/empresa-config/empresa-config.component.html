@@ -259,6 +259,23 @@
 
           <div class="flex flex-col gap-1.5">
             <label
+              for="correo_copia"
+              class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
+            >
+              {{ t().configuracion.empresa.fields.correoCopia }}
+            </label>
+            <input
+              pInputText
+              id="correo_copia"
+              formControlName="correo_copia"
+              fluid
+              [invalid]="form.controls.correo_copia.invalid && form.controls.correo_copia.touched"
+            />
+            <lib-field-error [control]="form.controls.correo_copia" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label
               for="telefono"
               class="text-[0.78rem] font-semibold tracking-[-0.01em] text-brand-text"
             >

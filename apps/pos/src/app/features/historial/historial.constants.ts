@@ -22,6 +22,14 @@ export const HISTORIAL_FILTRO_BASE: FilterCondition = {
   value: [DOCUMENT_TYPE_ID.FACTURA_POS, DOCUMENT_TYPE_ID.FACTURA_POS_ELECTRONICO],
 };
 
+/**
+ * Formato del Excel de ventas POS (`formato_excel` del body de
+ * `documento/excel/`). El backend arma un Excel distinto por formato: sin él
+ * sale el genérico, el mismo de nómina, con columnas que no son las de una
+ * venta de caja.
+ */
+export const HISTORIAL_FORMATO_EXCEL = 100;
+
 /** Más recientes primero. */
 export const HISTORIAL_ORDEN_DEFAULT = [
   { field: 'fecha', direction: 'desc' },

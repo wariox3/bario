@@ -7,8 +7,8 @@ import type {
   SaludoTranslationsHost,
 } from '@reddoc/ui/i18n';
 import type { PosNavKey } from '../layouts/workspace-layout/workspace-menu';
-import type { FaseCobro } from '../features/caja/cobro/cobro.model';
-import type { MedioPagoId } from '../features/caja/cobro/medios-pago';
+import type { FaseCobro } from '../features/vender/cobro/cobro.model';
+import type { MedioPagoId } from '../features/vender/cobro/medios-pago';
 
 /**
  * Diccionario del POS. Hereda los bloques que traen los libs compartidos (auth,
@@ -155,11 +155,14 @@ export interface AppDict
       logout: string;
     };
   };
-  caja: {
+  vender: {
     title: string;
     configuracion: { title: string; desc: string; accion: string };
     /** No se pudo leer el tipo de documento de la empresa. */
     configuracionError: { title: string; desc: string; accion: string };
+    /** Sin turno abierto: lleva a abrirlo. */
+    turno: { title: string; desc: string; accion: string };
+    turnoError: { title: string; desc: string; accion: string };
     buscador: {
       modo: string;
       porNombre: string;
@@ -393,6 +396,9 @@ export interface AppDict
       };
       requisitos: {
         configuracion: { title: string; desc: string };
+        turno: { title: string; desc: string };
+        /** Todavía no se sabe si hay turno (consultando o falló la consulta). */
+        turnoDesconocido: { title: string; desc: string };
         productos: { title: string; desc: string };
         cliente: { title: string; desc: string };
         sinValor: { title: string; desc: string };
@@ -400,6 +406,7 @@ export interface AppDict
       errores: {
         generico: string;
         configuracion: string;
+        turno: string;
         /** Lleva `{medio}` (en minúscula) y `{codigo}`, el código DIAN que no está. */
         plazoContado: string;
         descartar: string;
@@ -412,6 +419,152 @@ export interface AppDict
   };
   acceso: {
     sinVenta: { title: string; desc: string };
+  };
+  /** Administrador de cajas (`venta/caja/`). */
+  cajas: {
+    columns: {
+      id: string;
+      nombre: string;
+      placa: string;
+      tipo: string;
+      ubicacion: string;
+      sede: string;
+      activo: string;
+    };
+    form: {
+      createTitle: string;
+      editTitle: string;
+      createSubtitle: string;
+      editSubtitle: string;
+      fields: {
+        nombre: string;
+        sede: string;
+        placa: string;
+        tipo: string;
+        ubicacion: string;
+        activo: string;
+      };
+      validation: { required: string; maxlength: string };
+      toasts: Record<
+        'createSuccess' | 'editSuccess' | 'createError' | 'editError' | 'loadError',
+        { title: string; desc: string }
+      >;
+    };
+    detail: {
+      sections: { general: string };
+      notFound: { title: string; desc: string };
+      toasts: { loadError: { title: string; desc: string } };
+    };
+  };
+  /** Turnos de caja (`venta/turno/`): el listado, el turno en curso y abrir. */
+  turno: {
+    error: { title: string; desc: string };
+    columns: {
+      id: string;
+      caja: string;
+      sede: string;
+      cajero: string;
+      apertura: string;
+      cierre: string;
+      base: string;
+      documentos: string;
+      totalVenta: string;
+      cerrado: string;
+      estado: string;
+    };
+    estado: { true: string; false: string };
+    enCurso: {
+      title: string;
+      preCierre: string;
+      totalVendido: string;
+      unaVenta: string;
+      /** `{n}` = cantidad de ventas. */
+      ventas: string;
+      desde: string;
+      corrido: string;
+      base: string;
+      cuentaBase: string;
+      esperado: {
+        title: string;
+        hint: string;
+        conBase: string;
+        total: string;
+        vacio: string;
+        error: string;
+        reintentar: string;
+      };
+    };
+    cerrar: {
+      /** `{id}` = número del turno. */
+      title: string;
+      subtitle: string;
+      accion: string;
+      errorResumen: string;
+      reintentar: string;
+      columnas: {
+        cuenta: string;
+        esperado: string;
+        contado: string;
+        diferencia: string;
+        total: string;
+      };
+      /** `{monto}` = lo que falta o sobra. */
+      veredicto: { cuadra: string; falta: string; sobra: string };
+      comentario: string;
+      comentarioPlaceholder: string;
+      toasts: { exito: { title: string; desc: string }; error: { title: string } };
+    };
+    cerrado: {
+      /** `{id}` y `{caja}` del turno. */
+      title: string;
+      /** `{contado}` y `{esperado}` en pesos. */
+      contaste: string;
+      cuadro: string;
+      /** `{monto}` en pesos. */
+      faltaron: string;
+      sobraron: string;
+      imprimir: string;
+      descartar: string;
+    };
+    detalle: {
+      /** `{id}` = número del turno. */
+      title: string;
+      grupos: { caja: string; horario: string; ventas: string };
+      campos: {
+        caja: string;
+        sede: string;
+        cajero: string;
+        apertura: string;
+        cierre: string;
+        duracion: string;
+        ventas: string;
+        total: string;
+        base: string;
+        cuentaBase: string;
+      };
+      arqueo: {
+        title: string;
+        titleAbierto: string;
+        hintAbierto: string;
+        vacio: string;
+      };
+      notFound: { title: string; desc: string };
+      toasts: { loadError: { title: string; desc: string } };
+    };
+    /** Chip del header. */
+    chip: { abierto: string; sinTurno: string };
+    toasts: { imprimirError: { title: string; desc: string } };
+    abrir: {
+      title: string;
+      subtitle: string;
+      accion: string;
+      fields: { caja: string; base: string; cuenta: string };
+      validation: { required: string; min: string; cuentaRequerida: string };
+      cuentasError: string;
+      reintentar: string;
+      sinCuentas: string;
+      toasts: { exito: { title: string; desc: string }; error: { title: string } };
+    };
   };
   historial: {
     buscar: string;

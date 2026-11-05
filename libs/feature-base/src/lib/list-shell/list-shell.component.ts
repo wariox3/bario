@@ -20,6 +20,10 @@ import type { BreadcrumbItem } from '../breadcrumb/breadcrumb.types';
  * </lib-list-shell>
  * ```
  *
+ * El slot opcional `encabezado` va entre el título y el recuadro, suelto: algo
+ * que la página dice antes del listado y no es parte de él (el turno en curso
+ * del POS).
+ *
  * El slot `toolbar` admite el `<lib-data-toolbar>` tal cual (trae su padding y su
  * divisor) o un contenedor propio —filtros + botones de una utilidad, panel de
  * parámetros de un informe—, al que el shell le da el divisor y, si es un `div`,

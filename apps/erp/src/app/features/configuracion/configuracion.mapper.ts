@@ -192,6 +192,7 @@ export interface EmpresaConfigFormValue {
   readonly ciudad: Ciudad | null;
   readonly telefono: string;
   readonly correo: string;
+  readonly correo_copia: string;
 }
 
 /**
@@ -217,6 +218,7 @@ export function configuracionToEmpresaForm(
       (config.gen_empresa_ciudad != null ? { id: config.gen_empresa_ciudad, nombre: '' } : null),
     telefono: config.gen_empresa_telefono ?? '',
     correo: config.gen_empresa_correo ?? '',
+    correo_copia: config.gen_empresa_correo_copia ?? '',
   };
 }
 
@@ -235,5 +237,8 @@ export function empresaFormToPayload(form: EmpresaConfigFormValue): Configuracio
     gen_empresa_ciudad: form.ciudad?.id ?? null,
     gen_empresa_telefono: form.telefono.trim() || null,
     gen_empresa_correo: form.correo.trim() || null,
+    // Sin `|| null`: la columna no es nulable en el schema del contenedor, así
+    // que vacío viaja como `''` (el campo es opcional).
+    gen_empresa_correo_copia: form.correo_copia.trim(),
   };
 }

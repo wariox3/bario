@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  computed,
   effect,
   inject,
   input,
@@ -34,8 +35,12 @@ import { CorregirDocumentoService } from './corregir-documento.service';
 import {
   aCabeceraCorregible,
   aLineaCorregible,
+  corrigeCampo,
+  exigidosFaltantes,
   payloadContabilidad,
+  rechazoCorreccion,
   type CabeceraCorregible,
+  type CampoExigible,
   type LineaCorregible,
 } from './corregir-documento';
 
@@ -45,7 +50,7 @@ const SEDE_ENDPOINT = '/general/sede/seleccionar/';
  * Diálogo **Corregir** del dropdown "Opciones" de la ficha —la corrección
  * **contable**—: arregla un documento aprobado sin desaprobarlo, que liberaría
  * su número. Corrige la sede de la cabecera, el centro de costo de cada línea y
- * la base y el contacto de las líneas de cuenta. Lo que en el ERP anterior se
+ * la base y el contacto de las líneas de cuenta cuya cuenta los exige. Lo que en el ERP anterior se
  * llamaba "grupo" es acá el centro de costo. Lo que viaja a la DIAN lo corrige
  * `CorregirElectronicoDialogComponent`, en el dropdown Electrónico.
  *
@@ -88,6 +93,7 @@ export class CorregirDocumentoDialogComponent {
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly formatMoney = formatCop;
+  protected readonly corrigeCampo = corrigeCampo;
 
   protected readonly isLoading = signal(false);
   protected readonly isSaving = signal(false);
@@ -98,6 +104,23 @@ export class CorregirDocumentoDialogComponent {
   protected readonly cabecera = signal<CabeceraCorregible | null>(null);
   private readonly lineasOriginales = signal<ReadonlyMap<number, LineaCorregible>>(new Map());
   protected readonly lineas = signal<readonly LineaCorregible[]>([]);
+
+  /**
+   * Se intentó guardar con algún campo exigido vacío. Desde ahí cada celda en
+   * falta se marca y se desmarca sola al completarla.
+   */
+  private readonly mostrarFaltantes = signal(false);
+  protected readonly faltantes = computed(() =>
+    this.mostrarFaltantes()
+      ? exigidosFaltantes(this.lineas())
+      : new Map<number, ReadonlySet<CampoExigible>>(),
+  );
+
+  /**
+   * Motivo con que el backend rechazó cada línea en el último guardado. Se
+   * borra el de una línea al editarla y todos al recargar.
+   */
+  protected readonly rechazos = signal<ReadonlyMap<number, string>>(new Map());
 
   constructor() {
     // Se consulta cada vez que se abre: entre una apertura y otra la ficha pudo
@@ -125,6 +148,13 @@ export class CorregirDocumentoDialogComponent {
   }
 
   protected setLinea(id: number, cambio: Partial<LineaCorregible>): void {
+    if (this.rechazos().has(id)) {
+      this.rechazos.update((rechazos) => {
+        const resto = new Map(rechazos);
+        resto.delete(id);
+        return resto;
+      });
+    }
     this.lineas.update((lineas) =>
       lineas.map((linea) => (linea.id === id ? { ...linea, ...cambio } : linea)),
     );
@@ -132,8 +162,8 @@ export class CorregirDocumentoDialogComponent {
 
   /**
    * Manda todo lo que cambió en un solo `actualizar-contabilidad/`. Si falla,
-   * el aviso dice el motivo del backend y el diálogo queda abierto con lo
-   * editado, para corregir y reintentar.
+   * el aviso dice el motivo del backend, cada línea rechazada muestra el suyo
+   * y el diálogo queda abierto con lo editado, para corregir y reintentar.
    */
   protected onGuardar(): void {
     const id = this.documentoId();
@@ -141,6 +171,14 @@ export class CorregirDocumentoDialogComponent {
     const cabecera = this.cabecera();
     if (id == null || !cabeceraOriginal || !cabecera || this.isSaving()) return;
     const ts = this.t().documentActions.corregir.toasts;
+
+    // La cuenta manda: lo que exige no se puede dejar vacío. Lo que no exige,
+    // vaciarlo es válido y viaja `null`.
+    if (exigidosFaltantes(this.lineas()).size > 0) {
+      this.mostrarFaltantes.set(true);
+      this.toast.error(ts.exigidos.title, ts.exigidos.desc);
+      return;
+    }
 
     const payload = payloadContabilidad(
       id,
@@ -154,6 +192,7 @@ export class CorregirDocumentoDialogComponent {
     }
 
     this.isSaving.set(true);
+    this.rechazos.set(new Map());
     this.service
       .actualizarContabilidad(payload)
       .pipe(
@@ -167,6 +206,15 @@ export class CorregirDocumentoDialogComponent {
           this.visible.set(false);
         },
         error: (err: unknown) => {
+          const rechazo = rechazoCorreccion(err, payload.detalles);
+          if (rechazo && rechazo.porLinea.size > 0) {
+            this.rechazos.set(rechazo.porLinea);
+            this.toast.error(
+              ts.error.title,
+              `${rechazo.detail ?? ts.error.desc} ${ts.revisaLineas}`,
+            );
+            return;
+          }
           this.toast.error(ts.error.title, extractErrorMessage(err, ts.error.desc));
         },
       });
@@ -175,6 +223,8 @@ export class CorregirDocumentoDialogComponent {
   private load(id: number): void {
     this.isLoading.set(true);
     this.loadFailed.set(false);
+    this.mostrarFaltantes.set(false);
+    this.rechazos.set(new Map());
     forkJoin({ cabecera: this.service.cabecera(id), lineas: this.service.lineas(id) })
       .pipe(
         takeUntilDestroyed(this.destroyRef),

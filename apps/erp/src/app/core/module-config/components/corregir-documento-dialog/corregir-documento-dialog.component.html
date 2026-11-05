@@ -61,6 +61,13 @@
           </div>
         </div>
 
+        <!-- Base y contacto solo existen en las líneas de cuenta: se avisa para
+             que no parezca un fallo que falten en las de ítem. -->
+        <p class="m-0 flex items-start gap-2 text-[0.75rem] text-brand-muted">
+          <i class="pi pi-info-circle mt-[0.1rem] shrink-0 text-[0.8rem]"></i>
+          <span>{{ dict.notaCuenta }}</span>
+        </p>
+
         <!-- Líneas -->
         <div class="cp-corregir-dialog__table overflow-x-auto">
           <table class="w-full min-w-[960px] border-collapse text-[0.78rem]">
@@ -80,9 +87,21 @@
             </thead>
             <tbody>
               @for (linea of lineas(); track linea.id) {
-                <tr class="border-t border-[rgba(20,48,73,0.08)] text-brand-text">
+                <tr
+                  class="border-t border-[rgba(20,48,73,0.08)] text-brand-text"
+                  [class.bg-red-50]="rechazos().has(linea.id)"
+                >
                   <td class="cp-corregir-dialog__td text-right tabular-nums">{{ linea.id }}</td>
-                  <td class="cp-corregir-dialog__td">{{ linea.descripcion }}</td>
+                  @let rechazo = rechazos().get(linea.id);
+                  <td class="cp-corregir-dialog__td">
+                    {{ linea.descripcion }}
+                    @if (rechazo) {
+                      <small class="mt-1 flex items-start gap-1 text-[0.7rem] text-red-600">
+                        <i class="pi pi-exclamation-circle mt-[0.1rem] shrink-0 text-[0.7rem]"></i>
+                        <span>{{ rechazo }}</span>
+                      </small>
+                    }
+                  </td>
                   <td class="cp-corregir-dialog__td text-right tabular-nums">
                     {{ linea.cantidad }}
                   </td>
@@ -92,8 +111,11 @@
                   <td class="cp-corregir-dialog__td text-right tabular-nums">
                     {{ formatMoney(linea.subtotal) }}
                   </td>
-                  <td class="cp-corregir-dialog__td">
-                    <!-- Base y contacto son propios solo de las líneas de cuenta. -->
+                  @let falta = faltantes().get(linea.id);
+                  <!-- Base y contacto son propios solo de las líneas de cuenta, y se
+                       corrigen solo si su cuenta los exige: si no, el backend los
+                       rechaza. Bloqueados, igual muestran su valor. -->
+                  <td class="cp-corregir-dialog__td cp-corregir-dialog__td--control">
                     @if (linea.esCuenta) {
                       <p-inputnumber
                         [inputId]="'corregir-base-' + linea.id"
@@ -105,10 +127,19 @@
                         [maxFractionDigits]="2"
                         [fluid]="true"
                         size="small"
+                        inputStyleClass="text-right"
+                        [disabled]="!corrigeCampo(linea, 'base')"
+                        [invalid]="!!falta?.has('base')"
                       />
+                      @if (falta?.has('base')) {
+                        <small class="mt-1 block text-[0.7rem] text-red-600">
+                          {{ dict.validation.baseExigida }}
+                        </small>
+                      }
                     }
                   </td>
-                  <td class="cp-corregir-dialog__td">
+                  <td class="cp-corregir-dialog__td cp-corregir-dialog__td--control">
+                    @let faltaCentroCosto = !!falta?.has('centroCosto');
                     <lib-api-autocomplete
                       [inputId]="'corregir-centro-costo-' + linea.id"
                       [endpoint]="centroCostoEndpoint"
@@ -116,16 +147,29 @@
                       [ngModel]="linea.centroCosto"
                       (ngModelChange)="setLinea(linea.id, { centroCosto: $event })"
                       [placeholder]="dict.fields.buscar"
+                      [invalid]="faltaCentroCosto"
                     />
+                    @if (faltaCentroCosto) {
+                      <small class="mt-1 block text-[0.7rem] text-red-600">
+                        {{ dict.validation.centroCostoExigido }}
+                      </small>
+                    }
                   </td>
-                  <td class="cp-corregir-dialog__td">
+                  <td class="cp-corregir-dialog__td cp-corregir-dialog__td--control">
                     @if (linea.esCuenta) {
                       <lib-contacto-select
                         [inputId]="'corregir-contacto-' + linea.id"
                         [ngModel]="linea.contacto"
                         (ngModelChange)="setLinea(linea.id, { contacto: $event })"
                         [placeholder]="dict.fields.buscar"
+                        [disabled]="!corrigeCampo(linea, 'contacto')"
+                        [invalid]="!!falta?.has('contacto')"
                       />
+                      @if (falta?.has('contacto')) {
+                        <small class="mt-1 block text-[0.7rem] text-red-600">
+                          {{ dict.validation.contactoExigido }}
+                        </small>
+                      }
                     }
                   </td>
                 </tr>

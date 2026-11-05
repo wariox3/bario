@@ -170,6 +170,19 @@
 
           <div class="flex flex-col gap-0.5">
             <dt class="mi-empresa__label">
+              {{ t().configuracion.empresa.fields.correoCopia }}
+            </dt>
+            <!-- Texto libre: puede traer varias direcciones, así que no va como mailto. -->
+            <dd
+              class="mi-empresa__value break-words"
+              [class.mi-empresa__value--empty]="!f.correoCopia"
+            >
+              {{ f.correoCopia }}
+            </dd>
+          </div>
+
+          <div class="flex flex-col gap-0.5">
+            <dt class="mi-empresa__label">
               {{ t().configuracion.empresa.fields.telefono }}
             </dt>
             <dd class="mi-empresa__value" [class.mi-empresa__value--empty]="!f.telefono">

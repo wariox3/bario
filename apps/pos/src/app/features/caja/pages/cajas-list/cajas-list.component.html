@@ -1,0 +1,46 @@
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().layout.nav.caja">
+  <lib-data-toolbar
+    toolbar
+    [primaryAction]="primaryAction"
+    [filtersEnabled]="true"
+    [activeFilters]="activeFilters()"
+    [filterFields]="filterFields"
+    [trailingActions]="toolbarActions"
+    [deleteSelectedEnabled]="hasSelection()"
+    [deleteSelectedCount]="selectedRows().length"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filterEdit)="openFilters($event)"
+    (filterRemove)="removeFilter($event)"
+    (filtersClear)="clearFilters()"
+    (deleteSelected)="eliminarSeleccionadas()"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    [rowActions]="rowActions"
+    (selectionChange)="onSelectionChange($event)"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowActionInvoked)="onRowAction($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<p-confirmdialog [style]="{ width: '24rem' }" [breakpoints]="{ '576px': '92vw' }" />

@@ -37,7 +37,10 @@ export interface CapacidadesDocumento {
   readonly puedeAprobar: boolean;
   /** Revertir la aprobación. Deja el documento vivo y editable otra vez. */
   readonly puedeDesaprobar: boolean;
-  /** Anular: irreversible, congela el documento. No es lo mismo que desaprobar. */
+  /**
+   * Anular: irreversible, congela el documento. No es lo mismo que desaprobar.
+   * Se apaga en cuanto el documento sale hacia la DIAN: ver la tabla.
+   */
   readonly puedeAnular: boolean;
   /**
    * Corrección **contable** (dropdown Opciones): sede y datos contables de las
@@ -78,6 +81,15 @@ export interface CapacidadesDocumento {
  * - **Anular no es desaprobar.** Desaprobar devuelve el documento a borrador;
  *   anular lo cierra para siempre. Por eso desaprobar sigue disponible después
  *   de emitir y anular no.
+ * - **Lo que salió hacia la DIAN no se anula.** Con cualquiera de las tres
+ *   banderas —en camino, emitido o notificado— la DIAN tiene (o va a tener) el
+ *   documento con su CUFE/CUDE/CUNE y lo da por válido: anularlo acá dejaría el
+ *   ERP diciendo una cosa y la DIAN otra. Lo emitido se revierte con su propio
+ *   documento electrónico —nota crédito en venta, nota de ajuste en documento
+ *   soporte, nómina de ajuste en la electrónica—. El legacy solo miraba
+ *   `enviado`, y en compra y nómina electrónica ni eso.
+ * - **Contabilizado no bloquea anular**, igual que en el legacy: el backend
+ *   revierte el movimiento al anular.
  * - **Contabilizado bloquea desaprobar.** Revertir la aprobación de un documento
  *   ya contabilizado exigiría revertir el asiento. El legacy solo lo respetaba
  *   en remisión y factura de venta; acá vale para todos, que es la regla que las
@@ -120,7 +132,7 @@ export function capacidadesDocumento(estados: DocumentoEstados): CapacidadesDocu
   return {
     puedeAprobar: !aprobado,
     puedeDesaprobar: aprobado && !estados.estado_contabilizado,
-    puedeAnular: aprobado && !estados.estado_electronico_enviado,
+    puedeAnular: aprobado && !enviadoDian(estados),
     puedeCorregir: corregible,
     puedeCorregirElectronico: corregible && !enviadoDian(estados),
     puedeEmitirElectronico:

@@ -41,6 +41,7 @@ const EMPRESA_FIELD_MAP = {
   gen_empresa_ciudad: 'ciudad',
   gen_empresa_telefono: 'telefono',
   gen_empresa_correo: 'correo',
+  gen_empresa_correo_copia: 'correo_copia',
 };
 
 /** Identificación y teléfono son solo dígitos, igual que en el ERP anterior. */
@@ -163,6 +164,8 @@ export class EmpresaConfigComponent {
       Validators.email,
       Validators.maxLength(255),
     ]),
+    /** Opcional y texto libre: el backend no lo declara `format: email`. */
+    correo_copia: this.fb.nonNullable.control('', [Validators.maxLength(255)]),
   });
 
   constructor() {

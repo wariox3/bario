@@ -612,6 +612,8 @@ export const en: AppDict = {
       title: 'Correct document',
       subtitle: 'Adjust the branch and accounting data without unapproving',
       empty: 'The document has no lines',
+      notaCuenta:
+        'Base and contact can only be corrected on account lines (type C) whose account requires them. Item lines take them from the document header.',
       fields: {
         sede: 'Branch',
         seleccionar: 'Select…',
@@ -627,10 +629,20 @@ export const en: AppDict = {
         centroCosto: 'Cost center',
         contacto: 'Contact',
       },
+      validation: {
+        centroCostoExigido: 'Its account requires a cost center',
+        baseExigida: 'Its account requires a base greater than zero',
+        contactoExigido: 'Its account requires a contact',
+      },
       toasts: {
         success: { title: 'Document corrected', desc: 'The corrections were saved.' },
         error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
         sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
+        revisaLineas: 'Check the lines marked in red.',
+        exigidos: {
+          title: 'Account data missing',
+          desc: 'Some accounts require a cost center, base or contact. Fill in the highlighted cells.',
+        },
         loadError: {
           title: 'Could not load',
           desc: 'The document could not be loaded for correction.',
@@ -4409,6 +4421,8 @@ export const en: AppDict = {
       centroCostoPlaceholder: 'Select…',
       detallePlaceholder: 'Line description',
       baseExigida: 'This account requires a base: enter a value greater than zero',
+      contactoExigido: 'This account requires a contact: select one',
+      centroCostoExigido: 'This account requires a cost center: select one',
       confirmDeleteLine: 'Remove this account from the document?',
       naturaleza: { debito: 'Debit', credito: 'Credit' },
       columns: {
@@ -6255,6 +6269,7 @@ export const en: AppDict = {
         },
       },
       filtros: {
+        busqueda: 'Search',
         buscar: 'Search by supplier, tax ID, number or CUE',
         tipo: 'Type',
         desde: 'From',
@@ -6262,6 +6277,7 @@ export const en: AppDict = {
         delCorreo: 'From email',
         quitarCorreo: 'Remove the email filter',
         filtrar: 'Filter',
+        limpiar: 'Clear',
         estadoRecepcion: 'Receipt',
         estadosRecepcion: { todos: 'All', si: 'Yes', no: 'No' },
       },
@@ -7627,6 +7643,7 @@ export const en: AppDict = {
         ciudadPlaceholder: 'Search city…',
         telefono: 'Phone',
         correo: 'Email',
+        correoCopia: 'CC email',
       },
       validation: {
         required: 'This field is required',

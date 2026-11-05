@@ -48,6 +48,7 @@ export interface ConfiguracionRead {
   readonly gen_empresa_ciudad: number | null;
   readonly gen_empresa_telefono: string | null;
   readonly gen_empresa_correo: string | null;
+  readonly gen_empresa_correo_copia: string | null;
   readonly gen_empresa_imagen: string | null;
 
   // Formato de la factura de venta (área Venta)

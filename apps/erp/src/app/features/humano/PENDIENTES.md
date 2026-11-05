@@ -628,8 +628,8 @@ utilidades electrónicas (venta, compra, humano).
 La asimetría de la última fila es del backend, no un desliz: ya estaba anotada en §1.5 como rareza de
 las utilidades y ahora vive también en el contrato del gateway, que es donde se tropieza.
 
-`DocumentDetailActionsComponent` ganó las dos acciones como **opt-in** (`showAnular` / `showEmitir`,
-apagadas por default). La botonera la comparte todo el ERP; prenderlas por default le pondría botones
+`DocumentDetailActionsComponent` ganó las dos acciones como **opt-in**, apagadas por default: Anular
+con `capabilities.canAnular` en el config y Emitir con `showEmitir` en la ficha. La botonera la comparte todo el ERP; prenderlas por default le pondría botones
 a fichas cuyo backend no los atiende.
 
 ### 7.3 Endpoints y supuestos
@@ -724,7 +724,7 @@ Tres preguntas abiertas:
 | #   | Decisión                                                            | Por qué                                                                                                                                    |
 | --- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1   | La ficha expone **aprobar y desaprobar**; el legacy solo desaprobar | Mismo agujero que tenía la nómina (decisión #1 del §2): sin aprobar, desaprobar es un camino sin retorno. Ambas bloqueadas si está anulado |
-| 2   | **No** se ofrece "Anular", aunque el gateway ya sabe hacerlo        | El legacy no lo expone para este documento y no hay motivo para inventarlo. `showAnular` es opt-in justamente para esto                    |
+| 2   | **No** se ofrece "Anular", aunque el gateway ya sabe hacerlo        | El legacy no lo expone para este documento y no hay motivo para inventarlo. `capabilities.canAnular` es opt-in justamente para esto        |
 | 3   | El PDF manda **solo el id**                                         | El legacy le suma `filtros`, `limite`, `desplazar`, `ordenamientos`, `limite_conteo`, `modelo` y `tipo`, que el endpoint no usa            |
 | 4   | Se omite la columna del FK crudo del contacto                       | Redundante con la identificación y el nombre que van al lado (misma decisión #7 del §2)                                                    |
 | 5   | **No hay módulo de estado con tests**                               | Son dos capacidades sobre dos banderas, como en la ficha de nómina —que tampoco lo tiene—. Un archivo puro acá sería ceremonia             |

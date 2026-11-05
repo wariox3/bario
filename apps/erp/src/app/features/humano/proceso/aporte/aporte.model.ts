@@ -154,8 +154,8 @@ export interface AporteDetalle {
   readonly id: number;
   readonly aporte_contrato: number | null;
   /** Quién es el empleado de la línea, aplanado desde su contrato del aporte. */
-  readonly aporte_contrato__contacto_numero_identificacion: string | null;
-  readonly aporte_contrato__contacto_nombre_corto: string | null;
+  readonly aporte_contrato_contrato_contacto_numero_identificacion: string | null;
+  readonly aporte_contrato_contrato_contacto_nombre_corto: string | null;
 
   readonly ingreso: boolean;
   readonly retiro: boolean;

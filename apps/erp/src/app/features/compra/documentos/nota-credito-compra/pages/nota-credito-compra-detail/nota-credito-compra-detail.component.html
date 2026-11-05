@@ -19,6 +19,7 @@
       [document]="document()"
       [canAprobar]="capacidades().puedeAprobar"
       [canDesaprobar]="capacidades().puedeDesaprobar"
+      [canAnular]="capacidades().puedeAnular"
       [canCorregir]="capacidades().puedeCorregir"
       [contabilizado]="!!cabecera()?.estados?.estado_contabilizado"
       (documentoChanged)="onDocumentoChanged()"

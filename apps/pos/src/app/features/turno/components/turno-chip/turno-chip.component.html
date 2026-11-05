@@ -1,0 +1,25 @@
+@let tx = t().turno.chip;
+@if (actual.abierto()) {
+  <a
+    [routerLink]="ruta()"
+    [title]="titulo()"
+    class="inline-flex h-8 items-center gap-2 rounded-lg border border-[rgba(19,38,60,0.12)] px-2.5 text-[0.78rem] font-semibold whitespace-nowrap text-brand-text no-underline transition-colors hover:bg-[rgba(19,38,60,0.04)]"
+  >
+    <span class="relative flex h-2 w-2" aria-hidden="true">
+      <span
+        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:animate-none"
+      ></span>
+      <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+    </span>
+    <span class="max-[576px]:hidden">{{ tx.abierto }}</span>
+    <span class="font-medium text-brand-muted tabular-nums">{{ corrido() }}</span>
+  </a>
+} @else if (actual.sinTurno()) {
+  <a
+    [routerLink]="ruta()"
+    class="inline-flex h-8 items-center gap-2 rounded-lg border border-dashed border-slate-400 px-2.5 text-[0.78rem] font-semibold whitespace-nowrap text-slate-600 no-underline transition-colors hover:bg-[rgba(19,38,60,0.04)]"
+  >
+    <i class="pi pi-clock text-[0.8rem]" aria-hidden="true"></i>
+    {{ tx.sinTurno }}
+  </a>
+}

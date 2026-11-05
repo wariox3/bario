@@ -51,6 +51,7 @@ export const TRASLADO_CONFIG: DocumentEntityConfig = {
     canExportExcel: true,
     canExportZip: false,
     canGenerate: false,
+    canAnular: true,
   },
   // Un traslado aprobado ya movió stock: no se edita. Regla única consumida por
   // la lista, el detalle y el resolver de la ruta de edición.

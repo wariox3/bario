@@ -19,11 +19,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { catchError, finalize, of, switchMap } from 'rxjs';
 import {
+  FilterStorageService,
   I18nService,
   TenantService,
   ToastService,
   fromIsoDate,
   toIsoDate,
+  type FilterCondition,
   type SortSpec,
 } from '@reddoc/core';
 import {
@@ -49,6 +51,7 @@ import type { EventoRadianCodigo } from '../../evento-radian.model';
 import { CargarDocumentoDialogComponent } from '../../components/cargar-documento-dialog/cargar-documento-dialog.component';
 import {
   COLUMNS,
+  DOCUMENTOS_RECIBIDOS_FILTERS_STORAGE_KEY,
   ESTADOS_RECEPCION,
   ROW_ACTIONS,
   ROW_ACTION_DETALLE,
@@ -69,6 +72,15 @@ const PAGE_SIZE = 25;
 /** Orden del backend cuando no se pide otro: los más recientes primero. */
 const DEFAULT_SORT: readonly SortSpec[] = [{ field: 'fecha_emision', direction: 'desc' }];
 
+/** Estado de la barra al entrar sin nada guardado, y al que vuelve Limpiar. */
+const FILTROS_INICIALES: FiltrosRecepcion = {
+  busqueda: '',
+  tipo: null,
+  estadoRecepcion: 'no',
+  desde: null,
+  hasta: null,
+};
+
 /** Filtros que viajan al backend; la barra los edita en borrador hasta pulsar Filtrar. */
 interface FiltrosRecepcion {
   readonly busqueda: string;
@@ -86,7 +98,8 @@ interface FiltrosRecepcion {
  * porque el endpoint no habla `campo__operador` sino parámetros propios. Se
  * editan en borrador y solo viajan al pulsar **Filtrar**.
  * Arranca en los documentos sin recepción y sin fechas: vacías no viajan y el
- * backend decide el rango. A la derecha,
+ * backend decide el rango. Lo aplicado con Filtrar se guarda en `localStorage`
+ * (por tenant) y es lo que se encuentra al volver. A la derecha,
  * **Cargar archivo** para lo que no llegó por correo.
  *
  * Desde Correos se llega con `?correo=&desde=&hasta=`: los documentos que salieron
@@ -118,6 +131,7 @@ export class DocumentosRecibidosListComponent {
   private readonly service = inject(DocumentoRecibidoService);
   private readonly tenant = inject(TenantService);
   private readonly toast = inject(ToastService);
+  private readonly filterStorage = inject(FilterStorageService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly activeModule = inject(ActiveModuleStore);
@@ -131,13 +145,24 @@ export class DocumentosRecibidosListComponent {
 
   // ── Filtros ───────────────────────────────────────────────────────────────
   // Borrador de la barra: no dispara peticiones hasta `filtrar()`.
-  protected readonly busquedaInput = signal('');
-  protected readonly tipo = signal<DocumentoRecibidoTipo | null>(null);
-  protected readonly estadoRecepcion = signal<EstadoRecepcionFiltro>('no');
-  protected readonly desde = signal<Date | null>(null);
-  protected readonly hasta = signal<Date | null>(null);
+  protected readonly busquedaInput = signal(FILTROS_INICIALES.busqueda);
+  protected readonly tipo = signal(FILTROS_INICIALES.tipo);
+  protected readonly estadoRecepcion = signal(FILTROS_INICIALES.estadoRecepcion);
+  protected readonly desde = signal(FILTROS_INICIALES.desde);
+  protected readonly hasta = signal(FILTROS_INICIALES.hasta);
   /** Lo que viaja al backend: la foto del borrador al pulsar Filtrar. */
   private readonly filtros = signal<FiltrosRecepcion>(this.borrador());
+  /** Limpiar solo aparece si lo aplicado difiere del estado inicial. */
+  protected readonly hayFiltros = computed(() => {
+    const f = this.filtros();
+    return (
+      f.busqueda.trim() !== FILTROS_INICIALES.busqueda ||
+      f.tipo !== FILTROS_INICIALES.tipo ||
+      f.estadoRecepcion !== FILTROS_INICIALES.estadoRecepcion ||
+      f.desde !== FILTROS_INICIALES.desde ||
+      f.hasta !== FILTROS_INICIALES.hasta
+    );
+  });
   /** Correo del que salieron los documentos, si se llegó desde Correos. */
   protected readonly correo = signal<number | null>(null);
 
@@ -199,6 +224,7 @@ export class DocumentosRecibidosListComponent {
   });
 
   constructor() {
+    this.leerFiltrosGuardados();
     this.leerFiltrosDeUrl();
 
     toObservable(this.query)
@@ -216,6 +242,49 @@ export class DocumentosRecibidosListComponent {
         this.items.set(res ? res.results.map(toDocumentoRecibidoRow) : []);
         this.totalCount.set(res?.count ?? 0);
       });
+  }
+
+  /** Restaura en la barra lo último que se aplicó con Filtrar. */
+  private leerFiltrosGuardados(): void {
+    for (const { field, value } of this.filterStorage.read(
+      DOCUMENTOS_RECIBIDOS_FILTERS_STORAGE_KEY,
+    )) {
+      if (typeof value !== 'string') continue;
+      switch (field) {
+        case 'search':
+          this.busquedaInput.set(value);
+          break;
+        case 'documento_tipo':
+          if ((TIPOS as readonly string[]).includes(value))
+            this.tipo.set(value as DocumentoRecibidoTipo);
+          break;
+        case 'estado_recepcion':
+          if ((ESTADOS_RECEPCION as readonly string[]).includes(value))
+            this.estadoRecepcion.set(value as EstadoRecepcionFiltro);
+          break;
+        case 'desde':
+          this.desde.set(fromIsoDate(value));
+          break;
+        case 'hasta':
+          this.hasta.set(fromIsoDate(value));
+          break;
+      }
+    }
+    this.filtros.set(this.borrador());
+  }
+
+  /** Guarda lo aplicado; lo vacío no se guarda y queda en su valor inicial. */
+  private guardarFiltros(f: FiltrosRecepcion): void {
+    const condiciones: FilterCondition[] = [];
+    const agregar = (field: string, value: string | null): void => {
+      if (value) condiciones.push({ field, operator: 'eq', value });
+    };
+    agregar('search', f.busqueda.trim());
+    agregar('documento_tipo', f.tipo);
+    agregar('estado_recepcion', f.estadoRecepcion);
+    agregar('desde', toIsoDate(f.desde));
+    agregar('hasta', toIsoDate(f.hasta));
+    this.filterStorage.write(DOCUMENTOS_RECIBIDOS_FILTERS_STORAGE_KEY, condiciones);
   }
 
   /** Toma de la URL el correo y el rango con que lo abre Correos. */
@@ -242,7 +311,21 @@ export class DocumentosRecibidosListComponent {
 
   /** Aplica lo que hay en la barra y vuelve a la primera página. */
   protected filtrar(): void {
-    this.filtros.set(this.borrador());
+    const filtros = this.borrador();
+    this.filtros.set(filtros);
+    this.guardarFiltros(filtros);
+    this.currentPage.set(0);
+  }
+
+  /** Vuelve la barra al estado inicial, olvida lo guardado y aplica. El correo queda. */
+  protected limpiar(): void {
+    this.busquedaInput.set(FILTROS_INICIALES.busqueda);
+    this.tipo.set(FILTROS_INICIALES.tipo);
+    this.estadoRecepcion.set(FILTROS_INICIALES.estadoRecepcion);
+    this.desde.set(FILTROS_INICIALES.desde);
+    this.hasta.set(FILTROS_INICIALES.hasta);
+    this.filterStorage.clear(DOCUMENTOS_RECIBIDOS_FILTERS_STORAGE_KEY);
+    this.filtros.set(FILTROS_INICIALES);
     this.currentPage.set(0);
   }
 
