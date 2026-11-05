@@ -1,0 +1,121 @@
+@let a = t().turno.abrir;
+@let f = form.controls;
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="!$event && cerrar()"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  [breakpoints]="{ '576px': '94vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!guardando()"
+  [closeOnEscape]="!guardando()"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+      >
+        <i class="pi pi-play text-[1.05rem]" aria-hidden="true"></i>
+      </span>
+      <div class="flex min-w-0 flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] leading-tight font-bold tracking-tight text-brand-text">
+          {{ a.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ a.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form
+    #formulario
+    [formGroup]="form"
+    libFocusInvalid
+    (ngSubmit)="onSubmit()"
+    autocomplete="off"
+    class="flex flex-col gap-4"
+  >
+    <div class="flex flex-col gap-1.5">
+      <label for="turno-caja" class="text-[0.8rem] font-medium text-brand-text">
+        {{ a.fields.caja }}
+        <span class="ml-px text-red-500">*</span>
+      </label>
+      <lib-api-select inputId="turno-caja" formControlName="caja" [endpoint]="cajaEndpoint" />
+      <lib-field-error [control]="f.caja" [messages]="{ required: a.validation.required }" />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="turno-base" class="text-[0.8rem] font-medium text-brand-text">
+        {{ a.fields.base }}
+      </label>
+      <p-inputnumber
+        inputId="turno-base"
+        formControlName="base"
+        mode="currency"
+        currency="COP"
+        locale="es-CO"
+        [min]="0"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="2"
+        [fluid]="true"
+        [invalid]="f.base.invalid && f.base.touched"
+      />
+      <lib-field-error
+        [control]="f.base"
+        [messages]="{ required: a.validation.required, min: a.validation.min }"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="turno-cuenta" class="text-[0.8rem] font-medium text-brand-text">
+        {{ a.fields.cuenta }}
+        @if (conBase()) {
+          <span class="ml-px text-red-500">*</span>
+        }
+      </label>
+      <lib-api-select
+        inputId="turno-cuenta"
+        formControlName="cuenta"
+        [catalogo]="cuentasEfectivo()"
+        [invalid]="f.cuenta.invalid && f.cuenta.touched"
+      />
+      @if (estadoCuentas() === 'error') {
+        <span class="text-[0.72rem] text-red-600">
+          {{ a.cuentasError }}
+          <button
+            type="button"
+            class="cursor-pointer border-0 bg-transparent p-0 font-semibold text-red-700 underline"
+            (click)="cargarCuentas()"
+          >
+            {{ a.reintentar }}
+          </button>
+        </span>
+      } @else if (estadoCuentas() === 'listo' && cuentasEfectivo().length === 0) {
+        <span class="text-[0.72rem] text-brand-muted">{{ a.sinCuentas }}</span>
+      }
+      <lib-field-error
+        [control]="f.cuenta"
+        [messages]="{ required: a.validation.cuentaRequerida }"
+      />
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      type="button"
+      [label]="t().common.actions.cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="guardando()"
+      (onClick)="cerrar()"
+    />
+    <p-button
+      type="button"
+      [label]="a.accion"
+      icon="pi pi-play"
+      [loading]="guardando()"
+      [disabled]="guardando()"
+      (onClick)="formulario.requestSubmit()"
+    />
+  </ng-template>
+</p-dialog>

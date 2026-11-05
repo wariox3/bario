@@ -12,6 +12,8 @@ export interface PosNavItem {
   /** Clase PrimeIcon, p. ej. `'pi pi-shopping-cart'`. */
   readonly iconClass: string;
   readonly path: string;
+  /** Abre un grupo nuevo: el sidebar pinta un divisor antes del ítem. */
+  readonly separadoAntes?: boolean;
 }
 
 /** Secciones navegables del POS; cada una tiene su etiqueta en `layout.nav`. */
@@ -21,6 +23,6 @@ export const WORKSPACE_MENU: readonly PosNavItem[] = [
   { labelKey: 'vender', iconClass: 'pi pi-shopping-cart', path: 'vender' },
   { labelKey: 'historial', iconClass: 'pi pi-history', path: 'historial' },
   { labelKey: 'configuracion', iconClass: 'pi pi-cog', path: 'configuracion' },
-  { labelKey: 'caja', iconClass: 'pi pi-wallet', path: 'caja' },
+  { labelKey: 'caja', iconClass: 'pi pi-wallet', path: 'caja', separadoAntes: true },
   { labelKey: 'turno', iconClass: 'pi pi-clock', path: 'turno' },
 ];

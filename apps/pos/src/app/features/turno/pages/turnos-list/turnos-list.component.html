@@ -1,0 +1,82 @@
+<lib-list-shell [breadcrumb]="breadcrumbItems()" [title]="t().layout.nav.turno">
+  @if (enCurso(); as turno) {
+    <app-turno-en-curso
+      encabezado
+      class="shrink-0"
+      [turno]="turno"
+      [resumen]="resumen()"
+      [estadoResumen]="estadoResumen()"
+      [imprimiendo]="imprimiendo()"
+      (imprimir)="imprimir(turno.id)"
+      (recargarResumen)="cargarResumen()"
+    >
+      <p-button
+        type="button"
+        [label]="t().turno.cerrar.accion"
+        icon="pi pi-lock"
+        size="small"
+        (onClick)="cerrarVisible.set(true)"
+      />
+    </app-turno-en-curso>
+  } @else if (recienCerrado(); as cerrado) {
+    <app-turno-cerrado
+      encabezado
+      class="shrink-0"
+      [turno]="cerrado"
+      [imprimiendo]="imprimiendo()"
+      (imprimir)="imprimir(cerrado.id)"
+      (descartar)="recienCerrado.set(null)"
+    />
+  }
+
+  <lib-data-toolbar
+    toolbar
+    [primaryAction]="primaryAction()"
+    [filtersEnabled]="true"
+    [activeFilters]="activeFilters()"
+    [filterFields]="filterFields"
+    (actionInvoked)="onToolbarAction($event)"
+    (filtersToggle)="openFilters()"
+    (filterEdit)="openFilters($event)"
+    (filterRemove)="removeFilter($event)"
+    (filtersClear)="clearFilters()"
+  />
+
+  <lib-data-table
+    table
+    [columns]="columns"
+    [items]="items()"
+    [totalCount]="totalCount()"
+    [loading]="isLoading()"
+    [currentPage]="currentPage()"
+    [sort]="sort()"
+    [rowActions]="rowActions"
+    (rowActionInvoked)="onRowAction($event)"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+  />
+</lib-list-shell>
+
+<lib-data-filter-modal
+  [fields]="filterFields"
+  [value]="activeFilters()"
+  [visible]="filtersVisible()"
+  [focusRow]="filterFocusRow()"
+  (visibleChange)="filtersVisible.set($event)"
+  (apply)="onFiltersApply($event)"
+/>
+
+<app-abrir-turno-dialog
+  [visible]="abrirVisible()"
+  (visibleChange)="abrirVisible.set($event)"
+  (abierto)="onAbierto($event)"
+/>
+
+@if (enCurso(); as turno) {
+  <app-cerrar-turno-dialog
+    [visible]="cerrarVisible()"
+    [turno]="turno"
+    (visibleChange)="cerrarVisible.set($event)"
+    (cerrado)="onCerrado($event)"
+  />
+}

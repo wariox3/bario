@@ -95,6 +95,9 @@
 <!-- Navegación compartida entre sidebar y drawer -->
 <ng-template #navTpl let-inDrawer let-rail="rail">
   @for (item of items; track item.path) {
+    @if (item.separadoAntes) {
+      <hr class="mx-1.5 my-2 h-px border-0 bg-[rgba(19,38,60,0.08)]" />
+    }
     <a
       class="workspace-nav__item"
       [routerLink]="itemPath(item)"

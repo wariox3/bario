@@ -449,6 +449,88 @@ export interface AppDict
       toasts: { loadError: { title: string; desc: string } };
     };
   };
+  /** Turnos de caja (`venta/turno/`): el listado, el turno en curso y abrir. */
+  turno: {
+    error: { title: string; desc: string };
+    columns: {
+      id: string;
+      caja: string;
+      sede: string;
+      cajero: string;
+      apertura: string;
+      cierre: string;
+      base: string;
+      documentos: string;
+      totalVenta: string;
+      cerrado: string;
+      estado: string;
+    };
+    estado: { true: string; false: string };
+    enCurso: {
+      title: string;
+      preCierre: string;
+      totalVendido: string;
+      unaVenta: string;
+      /** `{n}` = cantidad de ventas. */
+      ventas: string;
+      desde: string;
+      corrido: string;
+      base: string;
+      esperado: {
+        title: string;
+        hint: string;
+        conBase: string;
+        total: string;
+        vacio: string;
+        error: string;
+        reintentar: string;
+      };
+    };
+    cerrar: {
+      /** `{id}` = número del turno. */
+      title: string;
+      subtitle: string;
+      accion: string;
+      errorResumen: string;
+      reintentar: string;
+      columnas: {
+        cuenta: string;
+        esperado: string;
+        contado: string;
+        diferencia: string;
+        total: string;
+      };
+      /** `{monto}` = lo que falta o sobra. */
+      veredicto: { cuadra: string; falta: string; sobra: string };
+      comentario: string;
+      comentarioPlaceholder: string;
+      toasts: { exito: { title: string; desc: string }; error: { title: string } };
+    };
+    cerrado: {
+      /** `{id}` y `{caja}` del turno. */
+      title: string;
+      /** `{contado}` y `{esperado}` en pesos. */
+      contaste: string;
+      cuadro: string;
+      /** `{monto}` en pesos. */
+      faltaron: string;
+      sobraron: string;
+      imprimir: string;
+      descartar: string;
+    };
+    toasts: { imprimirError: { title: string; desc: string } };
+    abrir: {
+      title: string;
+      subtitle: string;
+      accion: string;
+      fields: { caja: string; base: string; cuenta: string };
+      validation: { required: string; min: string; cuentaRequerida: string };
+      cuentasError: string;
+      reintentar: string;
+      sinCuentas: string;
+      toasts: { exito: { title: string; desc: string }; error: { title: string } };
+    };
+  };
   historial: {
     buscar: string;
     columns: {
