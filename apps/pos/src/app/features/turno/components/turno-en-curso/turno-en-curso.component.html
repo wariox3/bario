@@ -83,32 +83,26 @@
         }
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt
-          class="text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
-        >
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted uppercase opacity-70">
           {{ tx.desde }}
         </dt>
-        <dd class="m-0 text-[0.85rem] font-semibold text-brand-text tabular-nums">
+        <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
           {{ desde() }}
         </dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt
-          class="text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
-        >
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted uppercase opacity-70">
           {{ tx.corrido }}
         </dt>
-        <dd class="m-0 text-[0.85rem] font-semibold text-brand-text tabular-nums">
+        <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
           {{ corrido() }}
         </dd>
       </div>
       <div class="col-span-2 flex flex-col gap-0.5">
-        <dt
-          class="text-[0.65rem] font-semibold tracking-[0.06em] text-brand-muted uppercase opacity-70"
-        >
+        <dt class="text-[0.65rem] tracking-[0.06em] text-brand-muted uppercase opacity-70">
           {{ tx.base }}
         </dt>
-        <dd class="m-0 text-[0.85rem] font-semibold text-brand-text tabular-nums">
+        <dd class="m-0 text-[0.85rem] text-brand-text tabular-nums">
           {{ base() }}
         </dd>
         <dd class="m-0 truncate text-[0.75rem] text-brand-muted">
@@ -146,7 +140,7 @@
           @for (c of cuentas(); track c.id) {
             <div class="flex items-baseline gap-2 text-[0.85rem]">
               <span class="flex min-w-0 flex-col">
-                <span class="truncate font-semibold text-brand-text">{{ c.nombre }}</span>
+                <span class="truncate text-brand-text">{{ c.nombre }}</span>
                 @if (c.esBase) {
                   <span class="text-[0.7rem] text-brand-muted">{{ tx.esperado.conBase }}</span>
                 }

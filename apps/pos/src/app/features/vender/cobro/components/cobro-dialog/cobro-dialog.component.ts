@@ -39,6 +39,7 @@ import {
 } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../../configuracion/configuracion-caja.store';
+import { TurnoActualStore } from '../../../../turno/turno-actual.store';
 import { CarritosStore } from '../../../carrito/carritos.store';
 import { CobroService } from '../../cobro.service';
 import {
@@ -188,6 +189,7 @@ export class CobroDialogComponent {
   private readonly injector = inject(Injector);
   private readonly carritos = inject(CarritosStore);
   private readonly configuracion = inject(ConfiguracionCajaStore);
+  private readonly turnoActual = inject(TurnoActualStore);
   private readonly cobroService = inject(CobroService);
   private readonly ventas = inject(VentaPosService);
   private readonly cuentasCobro = inject(CuentasCobroService);
@@ -548,6 +550,11 @@ export class CobroDialogComponent {
       this.error.set(tx.errores.configuracion);
       return null;
     }
+    const turno = this.turnoActual.turno();
+    if (turno === null) {
+      this.error.set(tx.errores.turno);
+      return null;
+    }
     // En el cobro el formulario ya la exige; esto es para retomar uno pendiente.
     const cuentaBanco = cuenta;
     if (cuentaBanco === null) {
@@ -560,6 +567,7 @@ export class CobroDialogComponent {
     const notas = [comentario.trim(), transferencia].filter(Boolean).join(' · ');
     return {
       venta: this.carritos.activo(),
+      turno: turno.id,
       documentoTipoId: config.documentoTipoId,
       medio,
       // En efectivo se registra el total: el cambio se devuelve, no entra a la cuenta.

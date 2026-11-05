@@ -72,8 +72,12 @@ export const TURNOS_ACCION_ABRIR: ToolbarAction = {
   iconClass: 'pi pi-play',
 };
 
-/** Imprimir el cierre, solo en los turnos cerrados (los abiertos saldrían como pre-cierre). */
+/**
+ * Ver la ficha de cualquier turno; imprimir el cierre, solo en los cerrados (los
+ * abiertos saldrían como pre-cierre, que se imprime desde su ficha o el tablero).
+ */
 export const TURNOS_ACCIONES_FILA: readonly RowAction[] = [
+  { id: 'view', labelKey: 'common.actions.view', iconClass: 'pi pi-eye', inline: true },
   {
     id: 'imprimir',
     labelKey: 'turno.cerrado.imprimir',

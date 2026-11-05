@@ -12,6 +12,8 @@ export interface PagoCobro {
 /** Todo lo que el cobro necesita, ya validado por el diálogo. */
 export interface SolicitudCobro {
   readonly venta: Carrito;
+  /** El turno abierto de quien cobra: toda venta del POS queda en un turno. */
+  readonly turno: number;
   readonly documentoTipoId: PosDocumentoTipoId;
   readonly medio: MedioPagoPos;
   readonly pagos: readonly PagoCobro[];

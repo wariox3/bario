@@ -24,6 +24,7 @@ import {
 } from '@reddoc/core';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../configuracion/configuracion-caja.store';
+import { TurnoActualStore } from '../../../turno/turno-actual.store';
 import { CatalogoStore, type CriterioBusqueda } from '../../catalogo/catalogo.store';
 import type { ProductoCatalogo } from '../../catalogo/producto-catalogo.model';
 import { BuscadorProductosComponent } from '../../catalogo/components/buscador-productos/buscador-productos.component';
@@ -89,6 +90,10 @@ export class VenderComponent {
   protected readonly rutaConfiguracion = computed(
     () => `/t/${this.tenant.currentSlug() ?? ''}/configuracion`,
   );
+
+  /** Sin turno abierto no se cobra: el aviso lleva a abrirlo. */
+  protected readonly turnoActual = inject(TurnoActualStore);
+  protected readonly rutaTurno = computed(() => `/t/${this.tenant.currentSlug() ?? ''}/turno`);
 
   /**
    * Permisos del usuario sobre ítems y contactos: deciden si se ofrecen el ítem

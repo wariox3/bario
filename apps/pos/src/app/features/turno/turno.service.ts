@@ -56,6 +56,11 @@ export class TurnoService extends BaseHttpService {
     return this.post<Turno>(`${RECURSO}abrir/`, payload);
   }
 
+  /** El turno con su arqueo (`detalles` vacío mientras está abierto). */
+  getById(id: number): Observable<TurnoConDetalles> {
+    return this.get<TurnoConDetalles>(`${RECURSO}${id}/`);
+  }
+
   /** Guarda el arqueo y cierra el turno; devuelve el turno con sus detalles. */
   cerrar(payload: CerrarTurnoPayload): Observable<TurnoConDetalles> {
     return this.post<TurnoConDetalles>(`${RECURSO}cerrar/`, payload);

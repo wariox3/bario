@@ -188,6 +188,16 @@ export const es: AppDict = {
       desc: 'Sin el tipo de documento la caja no puede cobrar.',
       accion: 'Reintentar',
     },
+    turno: {
+      title: 'No tienes un turno abierto',
+      desc: 'Abre un turno para poder cobrar. Las ventas quedan en el turno de quien las cobra.',
+      accion: 'Abrir turno',
+    },
+    turnoError: {
+      title: 'No se pudo consultar tu turno',
+      desc: 'Sin saber si tienes turno abierto la caja no puede cobrar.',
+      accion: 'Reintentar',
+    },
     buscador: {
       modo: 'Buscar por',
       porNombre: 'Nombre',
@@ -490,6 +500,14 @@ export const es: AppDict = {
           title: 'Falta configurar la caja',
           desc: 'Elige el tipo de documento y el almacén en configuración.',
         },
+        turno: {
+          title: 'No tienes un turno abierto',
+          desc: 'Abre un turno en la sección Turno para cobrar.',
+        },
+        turnoDesconocido: {
+          title: 'Todavía no se sabe si tienes turno',
+          desc: 'Espera un momento o reintenta la consulta del turno.',
+        },
         productos: {
           title: 'La venta está vacía',
           desc: 'Agrega al menos un producto para cobrar.',
@@ -506,6 +524,7 @@ export const es: AppDict = {
       errores: {
         generico: 'No se pudo completar el cobro. Intenta de nuevo.',
         configuracion: 'Falta configurar la caja: tipo de documento o almacén.',
+        turno: 'No tienes un turno abierto: ábrelo en la sección Turno para cobrar.',
         cuenta: 'Todavía no se cargan las cuentas. Intenta de nuevo en un momento.',
         plazoContado: 'La empresa no tiene un plazo de pago de contado (0 días).',
         sinValor: 'La venta está en $0: el total debe ser mayor que cero para cobrar.',
@@ -645,6 +664,36 @@ export const es: AppDict = {
       imprimir: 'Imprimir cierre',
       descartar: 'Ocultar',
     },
+    detalle: {
+      title: 'Turno #{id}',
+      grupos: { caja: 'Caja', horario: 'Horario', ventas: 'Ventas' },
+      campos: {
+        caja: 'Caja',
+        sede: 'Sede',
+        cajero: 'Cajero',
+        apertura: 'Apertura',
+        cierre: 'Cierre',
+        duracion: 'Duración',
+        ventas: 'Ventas',
+        total: 'Total vendido',
+        base: 'Base',
+        cuentaBase: 'Cuenta de la base',
+      },
+      arqueo: {
+        title: 'Arqueo',
+        titleAbierto: 'Debe haber al cerrar',
+        hintAbierto: 'El turno sigue abierto: el arqueo se hace al cerrarlo.',
+        vacio: 'Sin cuentas que contar.',
+      },
+      notFound: {
+        title: 'Turno no encontrado',
+        desc: 'El turno que buscas no existe o no se pudo cargar.',
+      },
+      toasts: {
+        loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el turno.' },
+      },
+    },
+    chip: { abierto: 'Turno', sinTurno: 'Sin turno' },
     toasts: {
       imprimirError: { title: 'No se pudo imprimir', desc: 'El informe del turno no se generó.' },
     },

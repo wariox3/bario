@@ -32,6 +32,7 @@ const venta: Carrito = {
 
 const solicitud: SolicitudCobro = {
   venta,
+  turno: 12,
   documentoTipoId: DOCUMENT_TYPE_ID.FACTURA_POS,
   medio: MEDIOS_PAGO_POS[0],
   pagos: [{ cuentaBanco: { id: 9, nombre: 'Caja general' }, monto: 2380 }],
@@ -61,6 +62,10 @@ describe('solicitudToPayload', () => {
       asesor: 4,
       sede: null,
     });
+  });
+
+  it('la venta queda en el turno de quien cobra', () => {
+    expect(payload.turno).toBe(12);
   });
 
   it('las líneas salen del almacén de la caja al cobrar, con sus impuestos', () => {

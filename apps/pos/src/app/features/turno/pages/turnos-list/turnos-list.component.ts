@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
@@ -38,15 +38,18 @@ import {
   TURNOS_ORDEN_DEFAULT,
 } from '../../turno.constants';
 import type { Turno, TurnoConDetalles, TurnoFila, TurnoResumen } from '../../turno.model';
+import { TurnoActualStore } from '../../turno-actual.store';
+import { turnoNav } from '../../turno.nav';
 import { TurnoService } from '../../turno.service';
 
 /**
  * Turnos de caja: el movimiento. Arriba, el turno en curso de quien consulta
  * (si lo tiene); debajo, el listado de todos los turnos, más recientes primero.
  *
- * "Abrir turno" vive en la botonera y solo se ofrece cuando la persona no tiene
- * uno abierto: el backend admite uno por cajero. Mientras se consulta el abierto
- * no se ofrece nada, para no mostrar un botón que luego desaparece.
+ * "Abrir turno" vive en la botonera y solo se ofrece cuando se sabe que la
+ * persona no tiene uno abierto (`TurnoActualStore`, que comparte con Vender y el
+ * header): el backend admite uno por cajero, y mientras se consulta no se
+ * muestra un botón que luego desaparece.
  */
 @Component({
   selector: 'app-turnos-list',
@@ -67,6 +70,8 @@ import { TurnoService } from '../../turno.service';
 })
 export class TurnosListComponent {
   private readonly service = inject(TurnoService);
+  private readonly actual = inject(TurnoActualStore);
+  private readonly nav = turnoNav();
   private readonly filterStorage = inject(FilterStorageService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
@@ -86,8 +91,8 @@ export class TurnosListComponent {
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
 
-  /** `undefined` mientras se consulta; `null` si la persona no tiene turno abierto. */
-  protected readonly enCurso = signal<Turno | null | undefined>(undefined);
+  /** El turno abierto de quien consulta; `null` también mientras no se sabe. */
+  protected readonly enCurso = this.actual.turno;
   protected readonly abrirVisible = signal(false);
   protected readonly resumen = signal<TurnoResumen | null>(null);
   protected readonly estadoResumen = signal<EstadoResumen>('cargando');
@@ -96,8 +101,9 @@ export class TurnosListComponent {
   /** El turno recién cerrado, para el acuse; se descarta a mano o al abrir otro. */
   protected readonly recienCerrado = signal<TurnoConDetalles | null>(null);
 
+  /** Solo cuando se sabe que no hay turno: mientras se consulta no se ofrece nada. */
   protected readonly primaryAction = computed<ToolbarAction | null>(() =>
-    this.enCurso() === null ? TURNOS_ACCION_ABRIR : null,
+    this.actual.sinTurno() ? TURNOS_ACCION_ABRIR : null,
   );
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => [
@@ -109,8 +115,24 @@ export class TurnosListComponent {
   protected readonly rowActions = TURNOS_ACCIONES_FILA;
 
   constructor() {
-    this.consultarEnCurso();
+    // Al entrar se pregunta de nuevo: el turno pudo abrirse o cerrarse en otro equipo.
+    this.actual.cargar();
     this.cargar();
+
+    // Cada turno que llega al tablero trae su resumen.
+    effect(() => {
+      const id = this.enCurso()?.id;
+      untracked(() => {
+        this.resumen.set(null);
+        if (id !== undefined) this.cargarResumen();
+      });
+    });
+
+    effect(() => {
+      if (this.actual.estado() !== 'error') return;
+      const tx = untracked(() => this.t().turno.error);
+      this.toast.error(tx.title, tx.desc);
+    });
   }
 
   protected onToolbarAction(actionId: string): void {
@@ -120,22 +142,22 @@ export class TurnosListComponent {
   /** El turno recién abierto pasa al tablero y entra primero en la lista. */
   protected onAbierto(turno: Turno): void {
     this.recienCerrado.set(null);
-    this.enCurso.set(turno);
-    this.cargarResumen();
+    this.actual.fijar(turno);
     this.currentPage.set(0);
     this.cargar();
   }
 
   /** El cierre deja el acuse en el lugar del tablero y vuelve a ofrecer abrir. */
   protected onCerrado(turno: TurnoConDetalles): void {
-    this.enCurso.set(null);
-    this.resumen.set(null);
+    this.actual.fijar(null);
     this.recienCerrado.set(turno);
     this.cargar();
   }
 
   protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId === 'imprimir') this.imprimir((event.row as TurnoFila).id);
+    const id = (event.row as TurnoFila).id;
+    if (event.actionId === 'view') this.nav.ir('detalle', id);
+    else if (event.actionId === 'imprimir') this.imprimir(id);
   }
 
   protected onPageChange(event: PageChangeEvent): void {
@@ -171,24 +193,6 @@ export class TurnosListComponent {
     this.filterStorage.clear(TURNOS_FILTROS_STORAGE_KEY);
     this.currentPage.set(0);
     this.cargar();
-  }
-
-  /** Si la consulta falla no se ofrece abrir: podría haber uno abierto que no se vio. */
-  private consultarEnCurso(): void {
-    this.service
-      .abierto()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (turno) => {
-          this.enCurso.set(turno);
-          if (turno) this.cargarResumen();
-        },
-        error: () => {
-          this.enCurso.set(undefined);
-          const tx = this.t().turno.error;
-          this.toast.error(tx.title, tx.desc);
-        },
-      });
   }
 
   protected cargarResumen(): void {

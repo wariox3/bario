@@ -17,6 +17,7 @@ const venta: Carrito = {
 
 const solicitud = (cambios: Partial<Carrito> = {}): SolicitudCobro => ({
   venta: { ...venta, ...cambios },
+  turno: 12,
   documentoTipoId: DOCUMENT_TYPE_ID.FACTURA_POS,
   medio: MEDIOS_PAGO_POS[0],
   pagos: [{ cuentaBanco: { id: 9, nombre: 'Caja' }, monto: 1000 }],

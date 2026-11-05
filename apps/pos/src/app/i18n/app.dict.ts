@@ -160,6 +160,9 @@ export interface AppDict
     configuracion: { title: string; desc: string; accion: string };
     /** No se pudo leer el tipo de documento de la empresa. */
     configuracionError: { title: string; desc: string; accion: string };
+    /** Sin turno abierto: lleva a abrirlo. */
+    turno: { title: string; desc: string; accion: string };
+    turnoError: { title: string; desc: string; accion: string };
     buscador: {
       modo: string;
       porNombre: string;
@@ -393,6 +396,9 @@ export interface AppDict
       };
       requisitos: {
         configuracion: { title: string; desc: string };
+        turno: { title: string; desc: string };
+        /** Todavía no se sabe si hay turno (consultando o falló la consulta). */
+        turnoDesconocido: { title: string; desc: string };
         productos: { title: string; desc: string };
         cliente: { title: string; desc: string };
         sinValor: { title: string; desc: string };
@@ -400,6 +406,7 @@ export interface AppDict
       errores: {
         generico: string;
         configuracion: string;
+        turno: string;
         /** Lleva `{medio}` (en minúscula) y `{codigo}`, el código DIAN que no está. */
         plazoContado: string;
         descartar: string;
@@ -518,6 +525,33 @@ export interface AppDict
       imprimir: string;
       descartar: string;
     };
+    detalle: {
+      /** `{id}` = número del turno. */
+      title: string;
+      grupos: { caja: string; horario: string; ventas: string };
+      campos: {
+        caja: string;
+        sede: string;
+        cajero: string;
+        apertura: string;
+        cierre: string;
+        duracion: string;
+        ventas: string;
+        total: string;
+        base: string;
+        cuentaBase: string;
+      };
+      arqueo: {
+        title: string;
+        titleAbierto: string;
+        hintAbierto: string;
+        vacio: string;
+      };
+      notFound: { title: string; desc: string };
+      toasts: { loadError: { title: string; desc: string } };
+    };
+    /** Chip del header. */
+    chip: { abierto: string; sinTurno: string };
     toasts: { imprimirError: { title: string; desc: string } };
     abrir: {
       title: string;

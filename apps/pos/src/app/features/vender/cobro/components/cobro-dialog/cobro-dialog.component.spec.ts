@@ -8,6 +8,7 @@ import { es } from '../../../../../i18n/app.es';
 import { VentaPosService } from '../../../../../core/documento/venta-pos.service';
 import type { ConfiguracionCaja } from '../../../../configuracion/configuracion-caja.model';
 import { ConfiguracionCajaStore } from '../../../../configuracion/configuracion-caja.store';
+import { TurnoActualStore } from '../../../../turno/turno-actual.store';
 import type { Carrito, CobroPendiente } from '../../../carrito/carrito.model';
 import { CarritosStore } from '../../../carrito/carritos.store';
 import {
@@ -68,6 +69,8 @@ function preparar(
     total?: number;
     cuentas?: readonly CuentaCobro[];
     recordadas?: Partial<Record<string, number>>;
+    /** Id del turno abierto; `null` = sin turno. */
+    turno?: number | null;
   } = {},
 ) {
   const activo = signal<Carrito>({
@@ -120,6 +123,12 @@ function preparar(
       { provide: CobroService, useValue: cobro },
       { provide: VentaPosService, useValue: ventas },
       { provide: CuentasCobroService, useValue: cuentasCobro },
+      {
+        provide: TurnoActualStore,
+        useValue: {
+          turno: signal(cambios.turno === null ? null : { id: cambios.turno ?? 12 }),
+        },
+      },
     ],
   });
   // La plantilla (PrimeNG, selects con HTTP) no es lo que se prueba: la lógica sí.
@@ -256,6 +265,19 @@ describe('CobroDialogComponent', () => {
       interno.onCobrar();
       expect(cobro.cobrar).not.toHaveBeenCalled();
       expect(interno.error()).toBe(errores.configuracion);
+    });
+
+    it('sin turno abierto no intenta cobrar', () => {
+      const { interno, cobro } = preparar({ turno: null });
+      interno.onCobrar();
+      expect(cobro.cobrar).not.toHaveBeenCalled();
+      expect(interno.error()).toBe(errores.turno);
+    });
+
+    it('la venta va con el turno abierto de quien cobra', () => {
+      const { interno, cobro } = preparar({ turno: 31 });
+      interno.onCobrar();
+      expect(cobro.cobrar.mock.calls[0][0].turno).toBe(31);
     });
   });
 

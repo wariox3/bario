@@ -47,6 +47,43 @@
         </div>
       }
 
+      @if (turnoActual.sinTurno()) {
+        <div
+          class="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+          role="status"
+        >
+          <i class="pi pi-clock text-amber-600" aria-hidden="true"></i>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <p class="m-0 text-[0.85rem] font-semibold text-amber-900">{{ tx.turno.title }}</p>
+            <p class="m-0 text-[0.78rem] text-amber-800">{{ tx.turno.desc }}</p>
+          </div>
+          <a
+            [routerLink]="rutaTurno()"
+            class="text-[0.8rem] font-semibold text-amber-900 underline underline-offset-2"
+          >
+            {{ tx.turno.accion }}
+          </a>
+        </div>
+      } @else if (turnoActual.estado() === 'error') {
+        <div
+          class="flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+          role="alert"
+        >
+          <i class="pi pi-exclamation-circle text-red-600" aria-hidden="true"></i>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <p class="m-0 text-[0.85rem] font-semibold text-red-900">{{ tx.turnoError.title }}</p>
+            <p class="m-0 text-[0.78rem] text-red-800">{{ tx.turnoError.desc }}</p>
+          </div>
+          <button
+            type="button"
+            class="text-[0.8rem] font-semibold text-red-900 underline underline-offset-2"
+            (click)="turnoActual.cargar()"
+          >
+            {{ tx.turnoError.accion }}
+          </button>
+        </div>
+      }
+
       <app-buscador-productos
         [puedeCrearItem]="puedeCrearItem()"
         (buscar)="onBuscar($event)"

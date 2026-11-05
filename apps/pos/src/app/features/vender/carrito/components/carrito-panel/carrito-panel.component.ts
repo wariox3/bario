@@ -23,6 +23,7 @@ import {
 import { ErpContactoSelectComponent } from '@reddoc/ui';
 import type { AppDict } from '@pos/i18n';
 import { ConfiguracionCajaStore } from '../../../../configuracion/configuracion-caja.store';
+import { TurnoActualStore } from '../../../../turno/turno-actual.store';
 import { ConfiguracionEmpresaService } from '../../../../configuracion/configuracion-empresa.service';
 import { preCuentaHtml } from '../../../pre-cuenta/pre-cuenta';
 import { ClienteRapidoDialogComponent } from '../../../cliente/components/cliente-rapido-dialog/cliente-rapido-dialog.component';
@@ -65,6 +66,7 @@ export class CarritoPanelComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly configuracion = inject(ConfiguracionCajaStore);
+  private readonly turnoActual = inject(TurnoActualStore);
   private readonly empresa = inject(ConfiguracionEmpresaService);
 
   protected readonly t = this.i18n.t;
@@ -112,6 +114,12 @@ export class CarritoPanelComponent {
     if (!venta.cobro) {
       if (!this.configuracion.completa()) {
         this.toast.warn(tx.configuracion.title, tx.configuracion.desc);
+        return;
+      }
+      // Sin turno no se cobra: toda venta queda en el turno de quien la cobra.
+      if (!this.turnoActual.abierto()) {
+        const aviso = this.turnoActual.estado() === 'listo' ? tx.turno : tx.turnoDesconocido;
+        this.toast.warn(aviso.title, aviso.desc);
         return;
       }
       if (venta.lineas.length === 0) {

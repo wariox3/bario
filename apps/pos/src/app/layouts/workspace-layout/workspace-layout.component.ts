@@ -11,6 +11,8 @@ import type { AppDict } from '@pos/i18n';
 import { PestanaUnicaService } from '../../core/pestana/pestana-unica.service';
 import { PosStorageService } from '../../core/storage/pos-storage.service';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
+import { TurnoChipComponent } from '../../features/turno/components/turno-chip/turno-chip.component';
+import { TurnoActualStore } from '../../features/turno/turno-actual.store';
 import { TenantBadgeComponent } from '../tenant-badge/tenant-badge.component';
 import { WORKSPACE_MENU, type PosNavItem } from './workspace-menu';
 
@@ -44,6 +46,7 @@ import { WORKSPACE_MENU, type PosNavItem } from './workspace-menu';
     UserMenuComponent,
     AppSwitcherComponent,
     TenantBadgeComponent,
+    TurnoChipComponent,
   ],
   templateUrl: './workspace-layout.component.html',
   styleUrl: './workspace-layout.component.scss',
@@ -57,6 +60,8 @@ export class WorkspaceLayoutComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly items = WORKSPACE_MENU;
+  /** Con turno abierto, «Turno» lleva un punto verde en el sidebar. */
+  protected readonly conTurno = inject(TurnoActualStore).abierto;
   protected readonly drawerVisible = signal(false);
   protected readonly estadoPestana = this.pestana.estado;
 

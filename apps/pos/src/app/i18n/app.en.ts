@@ -188,6 +188,16 @@ export const en: AppDict = {
       desc: "Without the document type the register can't charge.",
       accion: 'Retry',
     },
+    turno: {
+      title: 'You have no open shift',
+      desc: 'Open a shift to charge. Sales stay in the shift of whoever charges them.',
+      accion: 'Open shift',
+    },
+    turnoError: {
+      title: "Couldn't check your shift",
+      desc: "Without knowing whether you have an open shift the register can't charge.",
+      accion: 'Retry',
+    },
     buscador: {
       modo: 'Search by',
       porNombre: 'Name',
@@ -484,6 +494,14 @@ export const en: AppDict = {
           title: 'The register is not set up',
           desc: 'Choose the document type and warehouse in settings.',
         },
+        turno: {
+          title: 'You have no open shift',
+          desc: 'Open a shift in the Shift section to charge.',
+        },
+        turnoDesconocido: {
+          title: 'Your shift is not known yet',
+          desc: 'Wait a moment or retry checking your shift.',
+        },
         productos: {
           title: 'The sale is empty',
           desc: 'Add at least one product to charge.',
@@ -500,6 +518,7 @@ export const en: AppDict = {
       errores: {
         generico: 'The charge could not be completed. Try again.',
         configuracion: 'The register is not set up: document type or warehouse.',
+        turno: 'You have no open shift: open it in the Shift section to charge.',
         plazoContado: 'The company has no cash payment term (0 days).',
         sinValor: 'The sale is at $0: the total must be greater than zero to charge.',
         descartar: 'The document could not be discarded.',
@@ -639,6 +658,36 @@ export const en: AppDict = {
       imprimir: 'Print close',
       descartar: 'Hide',
     },
+    detalle: {
+      title: 'Shift #{id}',
+      grupos: { caja: 'Register', horario: 'Hours', ventas: 'Sales' },
+      campos: {
+        caja: 'Cash register',
+        sede: 'Branch',
+        cajero: 'Cashier',
+        apertura: 'Opened',
+        cierre: 'Closed',
+        duracion: 'Duration',
+        ventas: 'Sales',
+        total: 'Total sold',
+        base: 'Float',
+        cuentaBase: 'Float account',
+      },
+      arqueo: {
+        title: 'Cash count',
+        titleAbierto: 'Expected at close',
+        hintAbierto: 'The shift is still open: the count happens when it closes.',
+        vacio: 'No accounts to count.',
+      },
+      notFound: {
+        title: 'Shift not found',
+        desc: 'The shift does not exist or could not be loaded.',
+      },
+      toasts: {
+        loadError: { title: 'Could not load', desc: 'The shift could not be loaded.' },
+      },
+    },
+    chip: { abierto: 'Shift', sinTurno: 'No shift' },
     toasts: {
       imprimirError: { title: 'Could not print', desc: 'The shift report was not generated.' },
     },

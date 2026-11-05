@@ -20,7 +20,21 @@
    Sin tipo y almacén, la caja avisa y no deja cobrar. Si no se puede leer el tipo,
    avisa con un reintento.
 
-3. **Armar la venta.** Tocar una tarjeta o leer un código suma una unidad. Varias ventas
+3. **Abrir turno.** `/t/<slug>/turno`. Sin turno abierto la caja **no cobra**: Vender
+   avisa con un enlace a Turno y el cobro lo frena (`TurnoActualStore`, que consulta
+   `venta/turno/abierto/` al entrar a la empresa; un 404 es "sin turno", no un error). Se abre
+   con la caja (`venta/caja/`, el administrador de cajas), la base y la cuenta de efectivo
+   donde queda la base (obligatoria si la base es mayor que cero). Toda factura POS lleva el
+   `turno` de quien la cobra. El header muestra el turno y cuánto lleva desde cualquier
+   pantalla.
+
+   Sobre la lista de turnos va el tablero del turno en curso: lo vendido y lo que debe haber
+   en cada cuenta al cerrar (`resumen/`), y el pre-cierre (`imprimir/`, 80 mm). **Cerrar**
+   es el arqueo: lo contado por cuenta contra lo esperado, con la diferencia en vivo; el
+   contado arranca vacío para que cerrar sin contar no dé "cuadra". El backend no cierra si
+   queda alguna venta del turno sin aprobar o anular.
+
+4. **Armar la venta.** Tocar una tarjeta o leer un código suma una unidad. Varias ventas
    abiertas en pestañas, que sobreviven a recargas. Cliente por defecto "Consumidor
    final"; al cambiarlo, las líneas se recotizan con su lista de precios (las editadas a
    mano se respetan). La caja no deja pasar del stock disponible.
@@ -32,7 +46,7 @@
    el papel dice "Documento no válido como factura". La ciudad de la empresa no sale porque
    la configuración solo trae su id.
 
-4. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio. Transferencia: el
+5. **Cobrar.** Efectivo: lo recibido (con billetes sugeridos) y el cambio. Transferencia: el
    total exacto, y la referencia del comprobante (opcional) va al comentario del documento,
    porque el pago no tiene dónde guardarla. El asesor sale de la caja y se puede cambiar.
 
@@ -47,7 +61,7 @@
    con sus líneas, registra el pago y lo aprueba. Al terminar se puede imprimir el PDF del
    backend.
 
-5. **Consultar.** `/t/<slug>/historial`: facturas POS de los dos tipos, con filtros e
+6. **Consultar.** `/t/<slug>/historial`: facturas POS de los dos tipos, con filtros e
    imprimir.
 
 ### Atajos
@@ -100,8 +114,8 @@ apps/pos/src/app/
 │   │   └── pages/vender/  la pantalla de venta
 │   ├── historial/
 │   ├── configuracion/     store de la caja + página
-│   ├── caja/              página vacía (pendiente de definir)
-│   └── turno/             página vacía (pendiente de definir)
+│   ├── caja/              administrador de cajas (lista, form, ficha)
+│   └── turno/             turnos: lista, tablero, abrir/cerrar, TurnoActualStore
 └── layouts/               shell (contenedores) y workspace (sidebar)
 ```
 

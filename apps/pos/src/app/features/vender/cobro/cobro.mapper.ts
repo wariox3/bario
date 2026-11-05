@@ -19,7 +19,8 @@ export const METODO_PAGO_POS_ID = 1;
  * Una venta de caja se factura y vence hoy, a contado, con el método de pago
  * fijo (`METODO_PAGO_POS_ID`). Todas las líneas salen
  * del almacén configurado en la caja al momento de cobrar (no del que había al
- * agregarlas), y viajan embebidas con sus impuestos.
+ * agregarlas), y viajan embebidas con sus impuestos. El documento queda en el
+ * turno abierto de quien cobra.
  */
 export function solicitudToPayload(
   solicitud: SolicitudCobro,
@@ -43,7 +44,7 @@ export function solicitudToPayload(
     },
     solicitud.documentoTipoId,
   );
-  return { ...documento, soporte: solicitud.soporte };
+  return { ...documento, soporte: solicitud.soporte, turno: solicitud.turno };
 }
 
 /** Pagos del cobro → cuerpos de `POST documento-pago/` contra el documento creado. */

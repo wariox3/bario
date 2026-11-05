@@ -12,6 +12,7 @@
     <app-tenant-badge />
   </div>
   <div class="app-header__actions">
+    <app-turno-chip />
     <lib-app-switcher />
     <app-user-menu />
   </div>
@@ -107,7 +108,15 @@
       tooltipPosition="right"
       (click)="inDrawer && drawerVisible.set(false)"
     >
-      <i class="workspace-nav__icon {{ item.iconClass }}"></i>
+      <span class="relative inline-flex">
+        <i class="workspace-nav__icon {{ item.iconClass }}"></i>
+        @if (item.labelKey === 'turno' && conTurno()) {
+          <span
+            class="absolute -top-0.5 -right-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"
+            aria-hidden="true"
+          ></span>
+        }
+      </span>
       <span class="workspace-nav__label">{{ t().layout.nav[item.labelKey] }}</span>
     </a>
   }
