@@ -503,6 +503,8 @@ export interface AppDict
       title: string;
       subtitle: string;
       empty: string;
+      /** Por qué base y contacto solo aparecen en las líneas de cuenta. */
+      notaCuenta: string;
       fields: {
         sede: string;
         seleccionar: string;

@@ -61,6 +61,13 @@
           </div>
         </div>
 
+        <!-- Base y contacto solo existen en las líneas de cuenta: se avisa para
+             que no parezca un fallo que falten en las de ítem. -->
+        <p class="m-0 flex items-start gap-2 text-[0.75rem] text-brand-muted">
+          <i class="pi pi-info-circle mt-[0.1rem] shrink-0 text-[0.8rem]"></i>
+          <span>{{ dict.notaCuenta }}</span>
+        </p>
+
         <!-- Líneas -->
         <div class="cp-corregir-dialog__table overflow-x-auto">
           <table class="w-full min-w-[960px] border-collapse text-[0.78rem]">

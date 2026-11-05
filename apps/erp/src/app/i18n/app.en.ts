@@ -612,6 +612,8 @@ export const en: AppDict = {
       title: 'Correct document',
       subtitle: 'Adjust the branch and accounting data without unapproving',
       empty: 'The document has no lines',
+      notaCuenta:
+        'Base and contact can only be corrected on account lines (type C). Item lines take them from the document header.',
       fields: {
         sede: 'Branch',
         seleccionar: 'Select…',

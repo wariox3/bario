@@ -628,6 +628,8 @@ export const es: AppDict = {
       title: 'Corregir documento',
       subtitle: 'Ajusta la sede y los datos contables sin desaprobar',
       empty: 'El documento no tiene líneas',
+      notaCuenta:
+        'La base y el contacto solo se corrigen en las líneas de cuenta (tipo C). Las líneas de ítem los toman de la cabecera del documento.',
       fields: {
         sede: 'Sede',
         seleccionar: 'Selecciona…',
