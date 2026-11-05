@@ -525,6 +525,8 @@ export interface AppDict
         success: { title: string; desc: string };
         error: { title: string; desc: string };
         sinCambios: { title: string; desc: string };
+        /** Se suma al `detail` cuando el backend rechaza líneas puntuales. */
+        revisaLineas: string;
         exigidos: { title: string; desc: string };
         loadError: { title: string; desc: string };
       };

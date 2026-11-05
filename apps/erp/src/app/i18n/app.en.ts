@@ -613,7 +613,7 @@ export const en: AppDict = {
       subtitle: 'Adjust the branch and accounting data without unapproving',
       empty: 'The document has no lines',
       notaCuenta:
-        'Base and contact can only be corrected on account lines (type C). Item lines take them from the document header.',
+        'Base and contact can only be corrected on account lines (type C) whose account requires them. Item lines take them from the document header.',
       fields: {
         sede: 'Branch',
         seleccionar: 'Select…',
@@ -638,6 +638,7 @@ export const en: AppDict = {
         success: { title: 'Document corrected', desc: 'The corrections were saved.' },
         error: { title: 'Could not correct', desc: 'The document could not be corrected.' },
         sinCambios: { title: 'No changes', desc: 'There was nothing to correct.' },
+        revisaLineas: 'Check the lines marked in red.',
         exigidos: {
           title: 'Account data missing',
           desc: 'Some accounts require a cost center, base or contact. Fill in the highlighted cells.',

@@ -75,14 +75,9 @@ export interface CabeceraPatch {
   sede?: number | null;
 }
 
-/**
- * Cambio de una línea: base y contacto solo si cambiaron. `centro_costo` viaja
- * siempre, aunque no haya cambiado: el schema de `actualizar-contabilidad/` lo
- * exige en cada detalle, y mandar el vigente no altera nada. Cuando el backend
- * lo vuelva opcional, puede pasar a viajar solo si cambió.
- */
+/** Cambio de una línea: solo las claves que cambiaron. */
 export interface LineaPatch {
-  centro_costo: number | null;
+  centro_costo?: number | null;
   base?: number | null;
   contacto?: number | null;
 }
@@ -138,6 +133,16 @@ export function aLineaCorregible(read: CorregirLineaRead): LineaCorregible {
   };
 }
 
+/**
+ * Base y contacto se corrigen solo en una línea de cuenta cuya cuenta los
+ * exige: si no los exige, `actualizar-contabilidad/` los rechaza ("La cuenta
+ * 130505 no exige base."). El centro de costo se corrige en cualquier línea;
+ * su `exige` solo impide dejarlo vacío.
+ */
+export function corrigeCampo(linea: LineaCorregible, campo: 'base' | 'contacto'): boolean {
+  return linea.esCuenta && linea.exige[campo];
+}
+
 function mismoId(a: ErpSelectOption | null, b: ErpSelectOption | null): boolean {
   return (a?.id ?? null) === (b?.id ?? null);
 }
@@ -153,20 +158,21 @@ export function cambiosCabecera(
 }
 
 /**
- * Lo que cambió en una línea; `null` si nada. Base y contacto solo cuentan en
- * las líneas de cuenta: en las de ítem el diálogo no los ofrece. Si algo
- * cambió, el centro de costo va siempre (ver `LineaPatch`).
+ * Lo que cambió en una línea; `null` si nada. Base y contacto solo cuentan
+ * donde se pueden corregir (`corrigeCampo`): en el resto el diálogo los
+ * bloquea y mandarlos haría fallar toda la corrección.
  */
 export function cambiosLinea(
   original: LineaCorregible,
   actual: LineaCorregible,
 ): LineaPatch | null {
   const cambioCentroCosto = !mismoId(original.centroCosto, actual.centroCosto);
-  const cambioBase = actual.esCuenta && original.base !== actual.base;
-  const cambioContacto = actual.esCuenta && !mismoId(original.contacto, actual.contacto);
+  const cambioBase = corrigeCampo(actual, 'base') && original.base !== actual.base;
+  const cambioContacto =
+    corrigeCampo(actual, 'contacto') && !mismoId(original.contacto, actual.contacto);
   if (!cambioCentroCosto && !cambioBase && !cambioContacto) return null;
   return {
-    centro_costo: actual.centroCosto?.id ?? null,
+    ...(cambioCentroCosto ? { centro_costo: actual.centroCosto?.id ?? null } : {}),
     ...(cambioBase ? { base: actual.base } : {}),
     ...(cambioContacto ? { contacto: actual.contacto?.id ?? null } : {}),
   };
@@ -225,4 +231,45 @@ export function payloadContabilidad(
   });
   if (!cabecera && detalles.length === 0) return null;
   return { id, ...cabecera, detalles };
+}
+
+/** Rechazo de `actualizar-contabilidad/`: el motivo general y el de cada línea. */
+export interface RechazoCorreccion {
+  readonly detail: string | null;
+  /** Motivo por id de línea. */
+  readonly porLinea: ReadonlyMap<number, string>;
+}
+
+function esObjeto(valor: unknown): valor is Record<string, unknown> {
+  return typeof valor === 'object' && valor !== null;
+}
+
+/**
+ * Lee el 400 de `actualizar-contabilidad/` —
+ * `{ detail, errores: [{ indice, id, mensaje }] }`— para marcar cada línea
+ * rechazada. Si un error no trae `id`, se ubica por `indice` en los
+ * `detalles` enviados. `null` si la respuesta no trae `errores`: el diálogo
+ * cae al aviso genérico.
+ */
+export function rechazoCorreccion(
+  err: unknown,
+  enviados: readonly { readonly id: number }[],
+): RechazoCorreccion | null {
+  const body = esObjeto(err) && esObjeto(err['error']) ? err['error'] : null;
+  const errores = body?.['errores'];
+  if (!body || !Array.isArray(errores)) return null;
+  const porLinea = new Map<number, string>();
+  for (const error of errores) {
+    if (!esObjeto(error) || typeof error['mensaje'] !== 'string') continue;
+    const indice = error['indice'];
+    const id =
+      typeof error['id'] === 'number'
+        ? error['id']
+        : typeof indice === 'number'
+          ? enviados[indice]?.id
+          : undefined;
+    if (id != null) porLinea.set(id, error['mensaje']);
+  }
+  const detail = typeof body['detail'] === 'string' ? body['detail'] : null;
+  return { detail, porLinea };
 }

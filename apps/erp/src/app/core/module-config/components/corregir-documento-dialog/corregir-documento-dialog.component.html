@@ -87,9 +87,21 @@
             </thead>
             <tbody>
               @for (linea of lineas(); track linea.id) {
-                <tr class="border-t border-[rgba(20,48,73,0.08)] text-brand-text">
+                <tr
+                  class="border-t border-[rgba(20,48,73,0.08)] text-brand-text"
+                  [class.bg-red-50]="rechazos().has(linea.id)"
+                >
                   <td class="cp-corregir-dialog__td text-right tabular-nums">{{ linea.id }}</td>
-                  <td class="cp-corregir-dialog__td">{{ linea.descripcion }}</td>
+                  @let rechazo = rechazos().get(linea.id);
+                  <td class="cp-corregir-dialog__td">
+                    {{ linea.descripcion }}
+                    @if (rechazo) {
+                      <small class="mt-1 flex items-start gap-1 text-[0.7rem] text-red-600">
+                        <i class="pi pi-exclamation-circle mt-[0.1rem] shrink-0 text-[0.7rem]"></i>
+                        <span>{{ rechazo }}</span>
+                      </small>
+                    }
+                  </td>
                   <td class="cp-corregir-dialog__td text-right tabular-nums">
                     {{ linea.cantidad }}
                   </td>
@@ -100,7 +112,9 @@
                     {{ formatMoney(linea.subtotal) }}
                   </td>
                   @let falta = faltantes().get(linea.id);
-                  <!-- Base y contacto son propios solo de las líneas de cuenta. -->
+                  <!-- Base y contacto son propios solo de las líneas de cuenta, y se
+                       corrigen solo si su cuenta los exige: si no, el backend los
+                       rechaza. Bloqueados, igual muestran su valor. -->
                   <td class="cp-corregir-dialog__td cp-corregir-dialog__td--control">
                     @if (linea.esCuenta) {
                       <p-inputnumber
@@ -114,6 +128,7 @@
                         [fluid]="true"
                         size="small"
                         inputStyleClass="text-right"
+                        [disabled]="!corrigeCampo(linea, 'base')"
                         [invalid]="!!falta?.has('base')"
                       />
                       @if (falta?.has('base')) {
@@ -147,6 +162,7 @@
                         [ngModel]="linea.contacto"
                         (ngModelChange)="setLinea(linea.id, { contacto: $event })"
                         [placeholder]="dict.fields.buscar"
+                        [disabled]="!corrigeCampo(linea, 'contacto')"
                         [invalid]="!!falta?.has('contacto')"
                       />
                       @if (falta?.has('contacto')) {

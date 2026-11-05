@@ -629,7 +629,7 @@ export const es: AppDict = {
       subtitle: 'Ajusta la sede y los datos contables sin desaprobar',
       empty: 'El documento no tiene líneas',
       notaCuenta:
-        'La base y el contacto solo se corrigen en las líneas de cuenta (tipo C). Las líneas de ítem los toman de la cabecera del documento.',
+        'La base y el contacto solo se corrigen en las líneas de cuenta (tipo C) cuya cuenta los exige. Las líneas de ítem los toman de la cabecera del documento.',
       fields: {
         sede: 'Sede',
         seleccionar: 'Selecciona…',
@@ -654,6 +654,7 @@ export const es: AppDict = {
         success: { title: 'Documento corregido', desc: 'Se guardaron las correcciones.' },
         error: { title: 'No se pudo corregir', desc: 'El documento no se pudo corregir.' },
         sinCambios: { title: 'Sin cambios', desc: 'No había nada que corregir.' },
+        revisaLineas: 'Revisa las líneas marcadas en rojo.',
         exigidos: {
           title: 'Faltan datos de la cuenta',
           desc: 'Algunas cuentas exigen centro de costo, base o contacto. Completa las celdas marcadas.',
