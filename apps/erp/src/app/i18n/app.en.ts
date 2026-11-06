@@ -2679,7 +2679,7 @@ export const en: AppDict = {
         numero: 'Number',
         fecha: 'Date',
         identificacion: 'ID number',
-        contacto: 'Contact',
+        contacto: 'Customer',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',

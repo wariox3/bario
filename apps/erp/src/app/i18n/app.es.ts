@@ -2746,7 +2746,7 @@ export const es: AppDict = {
         numero: 'Número',
         fecha: 'Fecha',
         identificacion: 'Identificación',
-        contacto: 'Contacto',
+        contacto: 'Cliente',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
