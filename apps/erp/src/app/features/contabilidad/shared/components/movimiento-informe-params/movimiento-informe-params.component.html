@@ -30,10 +30,10 @@
             [inputId]="p + '-fecha-desde'"
             formControlName="fecha_desde"
             [showIcon]="true"
-            [readonlyInput]="true"
             appendTo="body"
             [fluid]="true"
           />
+          <lib-field-error [control]="form().controls.fecha_desde" />
         </div>
 
         <div class="mi-params__field">
@@ -44,10 +44,10 @@
             [inputId]="p + '-fecha-hasta'"
             formControlName="fecha_hasta"
             [showIcon]="true"
-            [readonlyInput]="true"
             appendTo="body"
             [fluid]="true"
           />
+          <lib-field-error [control]="form().controls.fecha_hasta" />
         </div>
       </div>
     </div>

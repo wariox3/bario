@@ -1,10 +1,11 @@
 import nx from '@nx/eslint-plugin';
-import baseConfig from '../../eslint.config.mjs';
+import baseConfig, { sinReadonlyInput } from '../../eslint.config.mjs';
 
 export default [
   ...baseConfig,
   ...nx.configs['flat/angular'],
   ...nx.configs['flat/angular-template'],
+  sinReadonlyInput,
   {
     files: ['**/*.ts'],
     rules: {

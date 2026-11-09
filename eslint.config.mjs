@@ -1,5 +1,27 @@
 import nx from '@nx/eslint-plugin';
 
+/**
+ * Las fechas se teclean: `MascaraFechaDirective` arma el texto, pero sobre un
+ * input `readonly` nunca llega a recibir una tecla y nada avisa.
+ *
+ * Se exporta aparte y cada proyecto con datepickers la suma: dentro del arreglo
+ * de abajo, el `eslint` de lint-staged (config raíz, sin parser de plantillas)
+ * intentaría parsear los `.html` como TypeScript.
+ */
+export const sinReadonlyInput = {
+  files: ['**/*.html'],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: "BoundAttribute[name='readonlyInput'], TextAttribute[name='readonlyInput']",
+        message:
+          'No uses readonlyInput en un p-datepicker: bloquea el teclado y anula MascaraFechaDirective.',
+      },
+    ],
+  },
+};
+
 export default [
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],

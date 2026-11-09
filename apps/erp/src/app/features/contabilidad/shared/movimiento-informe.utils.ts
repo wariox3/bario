@@ -1,4 +1,4 @@
-import type { FormBuilder, ValidatorFn } from '@angular/forms';
+import { Validators, type FormBuilder, type ValidatorFn } from '@angular/forms';
 import { buildFiltros, toIsoDate, type ErpSelectOption, type FilterCondition } from '@reddoc/core';
 import { rangoFechasMismoAnio } from './rango-fechas.validators';
 import type { MovimientoInformeForm, MovimientoInformeParams } from './movimiento-informe.types';
@@ -61,8 +61,9 @@ export function buildMovimientoInformeForm(
 ): MovimientoInformeForm {
   return fb.nonNullable.group(
     {
-      fecha_desde: [inicioDelMes()],
-      fecha_hasta: [finDelMes()],
+      // Obligatorias: el datepicker deja `null` mientras la fecha tecleada está a medias.
+      fecha_desde: [inicioDelMes(), Validators.required],
+      fecha_hasta: [finDelMes(), Validators.required],
       cuenta_desde: [null as ErpSelectOption | null],
       cuenta_hasta: [null as ErpSelectOption | null],
       solo_con_saldo: [true],

@@ -6229,6 +6229,7 @@ export const es: AppDict = {
     cuentaCobrarCorte: {
       name: 'Cuentas por cobrar corte',
       fechaCorte: 'Corte a la fecha',
+      fechaRequerida: 'Indica la fecha de corte',
       generar: 'Generar',
       empty: {
         title: 'Genera el informe',

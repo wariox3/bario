@@ -69,8 +69,8 @@ export class CuentaCobrarCorteListComponent {
   protected readonly t = this.i18n.t;
 
   // ── Estado ────────────────────────────────────────────────────────────────
-  /** Valor del datepicker (default hoy); aún no consultado. */
-  protected readonly fecha = signal<Date>(startOfToday());
+  /** Valor del datepicker (default hoy); `null` si está vacía o a medio teclear. */
+  protected readonly fecha = signal<Date | null>(startOfToday());
   /** Fecha de corte realmente consultada. `null` hasta la primera generación. */
   protected readonly appliedDate = signal<string | null>(null);
 
@@ -104,7 +104,10 @@ export class CuentaCobrarCorteListComponent {
   /** Aplica la fecha del datepicker y trae la primera página del corte. */
   protected generar(): void {
     const iso = toIsoDate(this.fecha());
-    if (!iso) return;
+    if (!iso) {
+      this.toast.warn(this.t().entities.cuentaCobrarCorte.fechaRequerida);
+      return;
+    }
     this.appliedDate.set(iso);
     this.currentPage.set(0);
     this.loadList();

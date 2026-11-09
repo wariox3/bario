@@ -4768,6 +4768,7 @@ export interface AppDict
     cuentaCobrarCorte: {
       name: string;
       fechaCorte: string;
+      fechaRequerida: string;
       generar: string;
       empty: { title: string; sub: string };
       columns: {

@@ -29,6 +29,17 @@ describe('movimiento-informe · filtros', () => {
     return form;
   }
 
+  it.each(['fecha_desde', 'fecha_hasta'] as const)('sin %s el formulario no es válido', (campo) => {
+    const form = formEnEnero();
+    expect(form.valid).toBe(true);
+
+    // Lo que deja el datepicker con una fecha borrada o a medio teclear.
+    form.controls[campo].setValue(null as unknown as Date);
+
+    expect(form.invalid).toBe(true);
+    expect(form.controls[campo].hasError('required')).toBe(true);
+  });
+
   it('emite el body del ejemplo de backend, tal cual', () => {
     const params = buildMovimientoInformeParams(
       formEnEnero(),

@@ -210,6 +210,7 @@ export abstract class MovimientoInformePageBase<TRow> {
     // PrimeNG reemite `onPageChange` cuando se le reprograma `first`/`rows`;
     // sin este guard cada respuesta dispararía otra consulta idéntica.
     if (page === this.page()) return;
+    if (!this.parametrosValidos()) return;
 
     this.page.set(page);
     this.consultar();
@@ -240,7 +241,7 @@ export abstract class MovimientoInformePageBase<TRow> {
     progreso: WritableSignal<boolean>,
     body: Record<string, unknown> = this.service.buildBody(this.buildParams()),
   ): void {
-    if (!this.canExport()) return;
+    if (!this.canExport() || !this.parametrosValidos()) return;
     progreso.set(true);
     this.fileDownload
       .download(url, {
@@ -262,6 +263,16 @@ export abstract class MovimientoInformePageBase<TRow> {
   }
 
   // ── Internos ──────────────────────────────────────────────────────────────
+
+  /**
+   * Paginar y exportar leen el formulario actual, que puede haber quedado con
+   * una fecha a medio teclear después de generar: sin esto viajaría vacía.
+   */
+  private parametrosValidos(): boolean {
+    if (!this.form.invalid) return true;
+    this.form.markAllAsTouched();
+    return false;
+  }
 
   /** Traduce el formulario al body del informe, con los filtros propios sumados. */
   protected buildParams(): MovimientoInformeParams {

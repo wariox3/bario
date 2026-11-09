@@ -6139,6 +6139,7 @@ export const en: AppDict = {
     cuentaCobrarCorte: {
       name: 'Accounts receivable as of date',
       fechaCorte: 'As of date',
+      fechaRequerida: 'Enter the as-of date',
       generar: 'Generate',
       empty: {
         title: 'Generate the report',
