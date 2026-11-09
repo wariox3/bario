@@ -5420,8 +5420,16 @@ export interface AppDict
       desc: string;
       /** Rango pintado bajo el título: `{desde}` y `{hasta}` en fecha corta. */
       rango: string;
-      /** Rótulo del trimestre en curso: `{n}` del 1 al 4 y `{anio}`. */
+      /** Rótulo de un trimestre: `{n}` del 1 al 4 y `{anio}`. */
       trimestre: string;
+      /** Texto del segmentado cuando lo elegido no es el período en curso. */
+      segmento: { mes: string; trimestre: string };
+      selectorMes: {
+        elegirMes: string;
+        elegirTrimestre: string;
+        anioAnterior: string;
+        anioSiguiente: string;
+      };
       tarjetas: { vendimos: string; gastamos: string; nos_quedo: string };
       /** Tras el margen redondeado: "12 de cada 100 pesos de ventas". */
       deCada100: string;

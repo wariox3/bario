@@ -14,7 +14,17 @@
       <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">{{ tx.titulo }}</h2>
       <p class="m-0 text-[0.75rem] text-brand-muted">{{ tx.desc }}</p>
     </div>
-    <app-periodo-selector [opciones]="periodos" [(periodo)]="periodo" />
+    <!-- El botón va antes: al pasar a año desaparece y el segmentado no se mueve. -->
+    <div class="flex flex-wrap items-stretch gap-2">
+      @if (modoSelector(); as modo) {
+        <app-mes-selector class="flex" [modo]="modo" [(mes)]="mes" />
+      }
+      <app-periodo-selector
+        [opciones]="periodos"
+        [etiquetas]="etiquetasPeriodo()"
+        [(periodo)]="periodo"
+      />
+    </div>
   </header>
 
   @if (resumen(); as res) {

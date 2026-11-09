@@ -7261,6 +7261,13 @@ export const es: AppDict = {
       desc: 'De lo que vendimos a lo que nos quedó, según la contabilidad.',
       rango: 'del {desde} al {hasta}',
       trimestre: 'trimestre {n} de {anio}',
+      segmento: { mes: 'Mes', trimestre: 'Trimestre' },
+      selectorMes: {
+        elegirMes: 'Elegir mes',
+        elegirTrimestre: 'Elegir trimestre',
+        anioAnterior: 'Año anterior',
+        anioSiguiente: 'Año siguiente',
+      },
       tarjetas: { vendimos: 'Vendimos', gastamos: 'Gastamos', nos_quedo: 'Nos quedó' },
       deCada100: 'de cada 100 pesos de ventas',
       variacion: { sube: 'Subió', baja: 'Bajó', vs: 'vs.' },

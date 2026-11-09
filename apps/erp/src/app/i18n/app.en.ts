@@ -7152,6 +7152,13 @@ export const en: AppDict = {
       desc: 'From what we sold to what we kept, according to the books.',
       rango: 'from {desde} to {hasta}',
       trimestre: 'Q{n} {anio}',
+      segmento: { mes: 'Month', trimestre: 'Quarter' },
+      selectorMes: {
+        elegirMes: 'Choose month',
+        elegirTrimestre: 'Choose quarter',
+        anioAnterior: 'Previous year',
+        anioSiguiente: 'Next year',
+      },
       tarjetas: { vendimos: 'We sold', gastamos: 'We spent', nos_quedo: 'We kept' },
       deCada100: 'out of every 100 pesos in sales',
       variacion: { sube: 'Up', baja: 'Down', vs: 'vs.' },

@@ -33,7 +33,7 @@ import { RESUMEN_PERIODOS, type RangoPeriodo, type ResumenPeriodo } from './resu
           [attr.aria-checked]="periodo() === opcion"
           (click)="periodo.set(opcion)"
         >
-          {{ p[opcion] }}
+          {{ etiquetas()[opcion] ?? p[opcion] }}
         </button>
       }
     </div>
@@ -44,4 +44,6 @@ export class PeriodoSelectorComponent<T extends RangoPeriodo = ResumenPeriodo> {
 
   readonly opciones = input<readonly T[]>(RESUMEN_PERIODOS as readonly T[]);
   readonly periodo = model.required<T>();
+  /** Reemplaza el texto de una opción: "Mes actual" mentiría con otro mes elegido. */
+  readonly etiquetas = input<Partial<Record<RangoPeriodo, string>>>({});
 }
