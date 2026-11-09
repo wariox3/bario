@@ -172,6 +172,11 @@ export const CONTABILIDAD_ROUTES: Route[] = [
         loadChildren: () =>
           import('./masters/periodo/periodo.routes').then((m) => m.PERIODO_ROUTES),
       }),
+      {
+        path: 'exogena',
+        loadChildren: () =>
+          import('./masters/exogena/exogena.routes').then((m) => m.EXOGENA_ROUTES),
+      },
     ],
   },
 ];

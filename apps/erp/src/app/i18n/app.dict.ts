@@ -321,6 +321,8 @@ export interface AppDict
         reception: string;
         /** Ciclo de nómina de Humano: programación, aporte y liquidación. */
         payroll: string;
+        /** Trámites propios del área contable: exógena. */
+        accounting: string;
       };
     };
     userMenu: {
@@ -1441,6 +1443,54 @@ export interface AppDict
         dadoDeBaja: string;
         notFound: { title: string; desc: string };
         toasts: { loadError: { title: string; desc: string } };
+      };
+    };
+    exogena: {
+      name: string;
+      confirmDelete: string;
+      columns: {
+        id: string;
+        anio: string;
+        comentario: string;
+        generada: string;
+        presentada: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: { anio: string; comentario: string };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string };
+          editError: { title: string };
+        };
+      };
+      detail: {
+        sections: { general: string };
+        estados: { pendiente: string; generada: string; presentada: string };
+        notFound: { title: string; desc: string };
+      };
+      formatos: {
+        title: string;
+        cargar: string;
+        empty: string;
+        loadError: string;
+        columns: {
+          formato: string;
+          cuantiaMenor: string;
+          registros: string;
+          total: string;
+          fechaGeneracion: string;
+          presentado: string;
+        };
+        toasts: {
+          cargados: { title: string; one: string; other: string };
+          sinNuevos: { title: string; desc: string };
+        };
       };
     };
     periodo: {

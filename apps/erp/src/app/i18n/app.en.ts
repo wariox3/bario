@@ -304,6 +304,7 @@ export const en: AppDict = {
         report: 'Reports',
         reception: 'Reception',
         payroll: 'Payroll',
+        accounting: 'Accounting',
       },
     },
     userMenu: {
@@ -1943,6 +1944,70 @@ export const en: AppDict = {
         },
         toasts: {
           loadError: { title: 'Load error', desc: 'The asset could not be loaded' },
+        },
+      },
+    },
+    exogena: {
+      name: 'Exogenous information',
+      confirmDelete: 'Delete this exogenous report and all its formats?',
+      columns: {
+        id: 'ID',
+        anio: 'Year',
+        comentario: 'Comment',
+        generada: 'Generated',
+        presentada: 'Filed',
+      },
+      form: {
+        createTitle: 'New exogenous report',
+        editTitle: 'Edit exogenous report',
+        createSubtitle: 'Enter the year to report',
+        editSubtitle: 'Only the comment can be changed',
+        fields: { anio: 'Year', comentario: 'Comment' },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Exogenous report created',
+            desc: 'The exogenous report was created successfully',
+          },
+          editSuccess: {
+            title: 'Exogenous report updated',
+            desc: 'Changes were saved successfully',
+          },
+          createError: { title: 'Could not create the exogenous report' },
+          editError: { title: 'Could not save the changes' },
+        },
+      },
+      detail: {
+        sections: { general: 'General information' },
+        estados: { pendiente: 'Pending', generada: 'Generated', presentada: 'Filed' },
+        notFound: {
+          title: 'Exogenous report not found',
+          desc: 'The exogenous report you are looking for does not exist or was deleted.',
+        },
+      },
+      formatos: {
+        title: 'Formats',
+        cargar: 'Load formats',
+        empty: 'This exogenous report has no formats yet.',
+        loadError: 'The formats could not be loaded.',
+        columns: {
+          formato: 'Format',
+          cuantiaMenor: 'Minimum amount',
+          registros: 'Records',
+          total: 'Total',
+          fechaGeneracion: 'Generated on',
+          presentado: 'Filed',
+        },
+        toasts: {
+          cargados: {
+            title: 'Formats loaded',
+            one: '1 format was added.',
+            other: '{n} formats were added.',
+          },
+          sinNuevos: {
+            title: 'No new formats',
+            desc: 'The exogenous report already had every format in the catalog.',
+          },
         },
       },
     },

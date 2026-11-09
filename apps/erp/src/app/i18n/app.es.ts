@@ -314,6 +314,7 @@ export const es: AppDict = {
         report: 'Informes',
         reception: 'Recepción',
         payroll: 'Nómina',
+        accounting: 'Contabilidad',
       },
     },
     userMenu: {
@@ -2002,6 +2003,67 @@ export const es: AppDict = {
         },
         toasts: {
           loadError: { title: 'Error al cargar', desc: 'No se pudo cargar el activo' },
+        },
+      },
+    },
+    exogena: {
+      name: 'Exógena',
+      confirmDelete: '¿Eliminar esta exógena y todos sus formatos?',
+      columns: {
+        id: 'ID',
+        anio: 'Año',
+        comentario: 'Comentario',
+        generada: 'Generada',
+        presentada: 'Presentada',
+      },
+      form: {
+        createTitle: 'Nueva exógena',
+        editTitle: 'Editar exógena',
+        createSubtitle: 'Indica el año que vas a reportar',
+        editSubtitle: 'Solo se puede modificar el comentario',
+        fields: { anio: 'Año', comentario: 'Comentario' },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: { title: 'Exógena creada', desc: 'La exógena se creó correctamente' },
+          editSuccess: {
+            title: 'Exógena actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          createError: { title: 'No se pudo crear la exógena' },
+          editError: { title: 'No se pudieron guardar los cambios' },
+        },
+      },
+      detail: {
+        sections: { general: 'Información general' },
+        estados: { pendiente: 'Pendiente', generada: 'Generada', presentada: 'Presentada' },
+        notFound: {
+          title: 'Exógena no encontrada',
+          desc: 'La exógena que buscas no existe o fue eliminada.',
+        },
+      },
+      formatos: {
+        title: 'Formatos',
+        cargar: 'Cargar formatos',
+        empty: 'Esta exógena aún no tiene formatos.',
+        loadError: 'No se pudieron cargar los formatos.',
+        columns: {
+          formato: 'Formato',
+          cuantiaMenor: 'Cuantía menor',
+          registros: 'Registros',
+          total: 'Total',
+          fechaGeneracion: 'Generado el',
+          presentado: 'Presentado',
+        },
+        toasts: {
+          cargados: {
+            title: 'Formatos cargados',
+            one: 'Se agregó 1 formato.',
+            other: 'Se agregaron {n} formatos.',
+          },
+          sinNuevos: {
+            title: 'Sin formatos nuevos',
+            desc: 'La exógena ya tenía todos los formatos del catálogo.',
+          },
         },
       },
     },
