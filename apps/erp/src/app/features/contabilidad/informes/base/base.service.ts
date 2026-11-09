@@ -5,7 +5,7 @@ import type { InformeBasesRow, InformeId } from '../../shared/movimiento-informe
 /**
  * Servicio HTTP del informe **Base**.
  *
- * Toda la mecánica —las tres acciones sobre `/contabilidad/movimiento-informe-personalizado/`,
+ * Toda la mecánica —las tres acciones sobre `/contabilidad/movimiento-informe-base/`,
  * el body común, la paginación por query params— vive en
  * `MovimientoInformeService`; acá solo se declara el discriminador.
  *

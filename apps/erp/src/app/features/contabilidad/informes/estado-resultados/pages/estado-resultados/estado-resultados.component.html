@@ -37,8 +37,10 @@
       [showPdf]="soportaPdf"
       [exportingPdf]="isExportingPdf()"
       [hint]="hint()"
+      [showExcelEspecial]="true"
       (generar)="generar()"
       (excel)="exportExcel()"
+      (excelEspecial)="exportExcelEspecial()"
       (pdf)="exportPdf()"
     />
   </app-movimiento-informe-params>

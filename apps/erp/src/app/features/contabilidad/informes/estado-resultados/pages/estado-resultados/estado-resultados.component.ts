@@ -95,4 +95,14 @@ export class EstadoResultadosComponent extends MovimientoInformePageBase<Informe
   protected override extraFilters(): readonly FilterCondition[] {
     return buildFiltrosDetalle({ centroCosto: this.centroCosto.value });
   }
+
+  /** Excel del estado formal, con los mismos periodo y filtros de la consulta. */
+  protected exportExcelEspecial(): void {
+    this.descargar(
+      this.service.exportEspecialUrl,
+      `${this.archivo}-formal.xlsx`,
+      this.isExportingExcel,
+      this.service.buildBodyEspecial(this.buildParams()),
+    );
+  }
 }

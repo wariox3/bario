@@ -5441,6 +5441,7 @@ export const en: AppDict = {
     },
     informeCuentas: {
       generar: 'Generate',
+      excelOpciones: { excel: 'Excel', excelBase: 'Base Excel' },
       groups: {
         periodo: 'Period',
         cuentas: 'Chart of accounts',

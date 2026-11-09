@@ -21,7 +21,7 @@ import {
 
 /**
  * Base de las páginas de los informes contables, los nueve que pegan a
- * `/contabilidad/movimiento-informe-personalizado/`.
+ * `/contabilidad/movimiento-informe-base/`.
  *
  * Todas hacen lo mismo —armar los parámetros, generar, paginar y descargar el
  * Excel— y solo cambian el informe, el nombre visible y el nombre del archivo.
@@ -231,15 +231,21 @@ export abstract class MovimientoInformePageBase<TRow> {
   /**
    * Descarga binaria del informe completo. Las dos salidas comparten verbo,
    * body y manejo de error; lo único propio de cada una es a qué acción pega,
-   * cómo se llama el archivo y qué botón muestra su spinner.
+   * cómo se llama el archivo y qué botón muestra su spinner. Un informe con una
+   * salida de contrato propio pasa su `body`; el resto usa el de la consulta.
    */
-  private descargar(url: string, archivo: string, progreso: WritableSignal<boolean>): void {
+  protected descargar(
+    url: string,
+    archivo: string,
+    progreso: WritableSignal<boolean>,
+    body: Record<string, unknown> = this.service.buildBody(this.buildParams()),
+  ): void {
     if (!this.canExport()) return;
     progreso.set(true);
     this.fileDownload
       .download(url, {
         method: 'POST',
-        body: this.service.buildBody(this.buildParams()),
+        body,
         fallbackFilename: archivo,
       })
       .pipe(

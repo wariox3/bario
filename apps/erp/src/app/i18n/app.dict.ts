@@ -4182,6 +4182,7 @@ export interface AppDict
     /** Piezas compartidas por los informes contables de saldos por cuenta. */
     informeCuentas: {
       generar: string;
+      excelOpciones: { excel: string; excelBase: string };
       descuadre: string;
       /** Micro-encabezados de las bandas del panel de parámetros. */
       groups: {

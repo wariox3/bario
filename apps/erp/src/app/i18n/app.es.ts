@@ -5530,6 +5530,7 @@ export const es: AppDict = {
     },
     informeCuentas: {
       generar: 'Generar',
+      excelOpciones: { excel: 'Excel', excelBase: 'Excel base' },
       descuadre: 'El informe no cuadra',
       groups: {
         periodo: 'Periodo',
