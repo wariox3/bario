@@ -1,4 +1,5 @@
 import type { ModuleConfig } from '@erp/core/module-config';
+import { SALDO_INICIAL_CXC_CONFIG } from '@erp/features/documentos/saldo-inicial/saldo-inicial.config';
 import { PAGO_CONFIG } from './documentos/pago/pago.config';
 
 /**
@@ -7,12 +8,12 @@ import { PAGO_CONFIG } from './documentos/pago/pago.config';
  *
  * Cada entrada en `documents` representa un tipo de documento transaccional
  * sobre el endpoint genérico `/api/general/documento`. Para sumar un documento
- * nuevo (p. ej. saldo inicial de CxC): crear su carpeta bajo `documentos/<id>/`
- * con su config + rutas y agregarlo aquí.
+ * nuevo: crear su carpeta bajo `documentos/<id>/` con su config + rutas y
+ * agregarlo aquí.
  */
 export const CARTERA_CONFIG: ModuleConfig = {
   id: 'cartera',
   displayNameKey: 'modules.cartera.name',
   iconClass: 'pi pi-credit-card',
-  documents: [PAGO_CONFIG],
+  documents: [PAGO_CONFIG, SALDO_INICIAL_CXC_CONFIG],
 };

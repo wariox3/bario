@@ -56,4 +56,21 @@
   />
 }
 
+<!-- Importación por Excel: mismo criterio de carga diferida que la afectación. -->
+@defer (when importar.visible()) {
+  <app-import-dialog
+    [visible]="importar.visible()"
+    (visibleChange)="importar.setVisible($event)"
+    [title]="translate('documentActions.importarExcel.title')"
+    [subtitle]="translate('documentActions.importarExcel.subtitle')"
+    [importing]="importar.loading()"
+    [errors]="importar.errors()"
+    [errorSummary]="importar.errorSummary()"
+    [errorTotal]="importar.errorTotal()"
+    [masters]="importar.masters"
+    [exampleConfig]="importExample()"
+    (importRequested)="importar.submit($event)"
+  />
+}
+
 <p-confirmDialog />

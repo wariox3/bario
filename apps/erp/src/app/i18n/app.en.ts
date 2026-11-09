@@ -317,6 +317,10 @@ export const en: AppDict = {
     },
   },
   documentActions: {
+    importarExcel: {
+      title: 'Import from Excel',
+      subtitle: 'Upload a file with one document per row. If any row fails, none are saved.',
+    },
     emisionElectronica: {
       actions: { emitir: 'Emit', descartar: 'Discard' },
       columns: { estado: 'Status' },
@@ -3739,6 +3743,22 @@ export const en: AppDict = {
     },
     saldoInicial: {
       name: 'Opening balance',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        total: 'Total',
+        aprobado: 'App',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
     },
     cierre: {
       name: 'Year-end closing',

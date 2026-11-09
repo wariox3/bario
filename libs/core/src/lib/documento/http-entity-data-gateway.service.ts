@@ -122,6 +122,19 @@ export class HttpEntityDataGateway implements EntityDataGateway {
     );
   }
 
+  /**
+   * Multipart con `archivo` y `documento_tipo_id`, el campo que distingue los
+   * tipos que comparten plantilla. Sin toast del interceptor: los errores los
+   * muestra el diálogo de importación.
+   */
+  importarExcel(entity: EntityConfig, archivo: File): Observable<unknown> {
+    const form = new FormData();
+    form.append('archivo', archivo, archivo.name);
+    form.append('documento_tipo_id', String(entity.documentTypeId));
+    const context = new HttpContext().set(ERROR_TOAST, false);
+    return this.http.post(`${entity.endpoint}/importar/`, form, { context });
+  }
+
   /** Aprueba el documento: `POST <endpoint>/<id>/aprobar/` sin body. */
   aprobar(entity: EntityConfig, id: string | number): Observable<unknown> {
     return this.http.post(`${entity.endpoint}/aprobar/`, {

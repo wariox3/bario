@@ -1,4 +1,5 @@
 import type { ModuleConfig } from '@erp/core/module-config';
+import { SALDO_INICIAL_CXP_CONFIG } from '@erp/features/documentos/saldo-inicial/saldo-inicial.config';
 import { EGRESO_CONFIG } from './documentos/egreso/egreso.config';
 
 /**
@@ -14,5 +15,5 @@ export const TESORERIA_CONFIG: ModuleConfig = {
   id: 'tesoreria',
   displayNameKey: 'modules.tesoreria.name',
   iconClass: 'pi pi-wallet',
-  documents: [EGRESO_CONFIG],
+  documents: [EGRESO_CONFIG, SALDO_INICIAL_CXP_CONFIG],
 };

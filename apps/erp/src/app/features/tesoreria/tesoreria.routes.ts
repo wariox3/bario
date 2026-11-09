@@ -36,10 +36,9 @@ export const TESORERIA_ROUTES: Route[] = [
           import('./documentos/egreso/egreso.routes').then((m) => m.EGRESO_ROUTES),
       },
       {
-        // Carcasa: shell vacío, pendiente de implementar como documento.
         path: 'saldo-inicial',
         loadChildren: () =>
-          import('./documentos/saldo-inicial/saldo-inicial.routes').then(
+          import('@erp/features/documentos/saldo-inicial/saldo-inicial.routes').then(
             (m) => m.SALDO_INICIAL_ROUTES,
           ),
       },

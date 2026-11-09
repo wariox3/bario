@@ -327,6 +327,11 @@ export const es: AppDict = {
     },
   },
   documentActions: {
+    importarExcel: {
+      title: 'Importar desde Excel',
+      subtitle:
+        'Sube un archivo con un documento por fila. Si alguna fila falla, no se guarda ninguna.',
+    },
     emisionElectronica: {
       actions: { emitir: 'Emitir', descartar: 'Descartar' },
       columns: { estado: 'Estado' },
@@ -3809,6 +3814,22 @@ export const es: AppDict = {
     },
     saldoInicial: {
       name: 'Saldo inicial',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
     },
     cierre: {
       name: 'Cierre',

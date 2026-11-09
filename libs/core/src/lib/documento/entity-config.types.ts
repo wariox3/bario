@@ -45,6 +45,11 @@ export interface DocumentCapabilities {
    */
   readonly canViewAfectacion?: boolean;
   /**
+   * "Importar" en el dropdown "Acciones" del listado: carga documentos del tipo
+   * desde un Excel (`POST <endpoint>/importar/`). Opcional y `false` por defecto.
+   */
+  readonly canImportExcel?: boolean;
+  /**
    * "Corregir" en el dropdown "Opciones" de la ficha: arregla un documento
    * aprobado sin desaprobarlo —la sede y los datos contables de sus líneas—.
    * Opcional y `false` por defecto: inventario, procesos generados y

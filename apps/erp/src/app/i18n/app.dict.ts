@@ -334,6 +334,7 @@ export interface AppDict
     };
   };
   documentActions: {
+    importarExcel: { title: string; subtitle: string };
     emisionElectronica: {
       actions: { emitir: string; descartar: string };
       columns: { estado: string };
@@ -2864,6 +2865,22 @@ export interface AppDict
     };
     saldoInicial: {
       name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
     };
     cierre: {
       name: string;
