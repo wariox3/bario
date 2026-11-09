@@ -53,7 +53,8 @@ El 2026-10-29 el backend movió esta familia de `/contabilidad/movimiento-inform
 La ruta vieja quedó para el listado plano de movimientos (§9).
 
 Luego el backend la renombró a `/contabilidad/movimiento-informe-base/`, y el front ya apunta ahí.
-Los informes presentados (`estado_resultados_formal`) van por `/contabilidad/movimiento-informe-especial/excel/`.
+El estado de resultados salió de esa familia: va por `/contabilidad/movimiento-informe-resultado/`
+(`lista/` y `excel/`, sin paginar ni `totales/`), con la presentación `base` o `formal` en `informe`.
 
 Confirmado contra el **schema del contenedor**: `GET https://reddocapi.uk/api/contenedor/schema/`
 sirve el OpenAPI con todas las rutas del tenant. Ahí está declarado todo lo de abajo.

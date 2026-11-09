@@ -34,7 +34,7 @@ export abstract class MovimientoInformeService<TRow> extends BaseHttpService {
   protected abstract readonly informe: InformeId;
 
   /** URL de la descarga de Excel (la usa `FileDownloadService`). */
-  readonly exportUrl = `${MOVIMIENTO_INFORME_BASE_ENDPOINT}excel/`;
+  readonly exportUrl: string = `${MOVIMIENTO_INFORME_BASE_ENDPOINT}excel/`;
 
   /**
    * URL de la impresión en PDF, simétrica a `excel/`: mismo verbo y mismo body.

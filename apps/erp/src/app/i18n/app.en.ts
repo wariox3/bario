@@ -5441,7 +5441,6 @@ export const en: AppDict = {
     },
     informeCuentas: {
       generar: 'Generate',
-      excelOpciones: { excel: 'Excel', excelBase: 'Base Excel' },
       groups: {
         periodo: 'Period',
         cuentas: 'Chart of accounts',
@@ -5798,6 +5797,17 @@ export const en: AppDict = {
     },
     estadoResultados: {
       name: 'Income statement',
+      presentacion: { label: 'Presentation', base: 'Base', formal: 'Formal' },
+      formal: {
+        columns: {
+          codigo: 'Code',
+          nombre: 'Name',
+          actual: 'Current',
+          anterior: 'Previous year',
+          variacion: 'Change',
+          porcentaje: '%',
+        },
+      },
       empty: {
         notGenerated: {
           title: 'Report not generated yet',

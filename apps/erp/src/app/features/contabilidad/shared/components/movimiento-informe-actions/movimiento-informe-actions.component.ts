@@ -1,15 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  input,
-  output,
-  viewChild,
-} from '@angular/core';
-import type { MenuItem } from 'primeng/api';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { Menu, MenuModule } from 'primeng/menu';
 import { I18nService } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
 
@@ -23,7 +13,7 @@ import type { AppDict } from '@erp/i18n';
 @Component({
   selector: 'app-movimiento-informe-actions',
   standalone: true,
-  imports: [ButtonModule, MenuModule],
+  imports: [ButtonModule],
   template: `
     @let d = t();
     <div class="flex items-center justify-end gap-2">
@@ -50,32 +40,16 @@ import type { AppDict } from '@erp/i18n';
           (onClick)="pdf.emit()"
         />
       }
-      @if (showExcelEspecial()) {
-        <p-button
-          type="button"
-          icon="pi pi-chevron-down"
-          iconPos="right"
-          severity="secondary"
-          [outlined]="true"
-          size="small"
-          [label]="d.common.actions.export"
-          [loading]="exportingExcel()"
-          [disabled]="!canExport()"
-          (onClick)="toggleExcelMenu($event)"
-        />
-        <p-menu #excelMenu [popup]="true" [model]="excelItems()" appendTo="body" />
-      } @else {
-        <p-button
-          icon="pi pi-file-excel"
-          severity="secondary"
-          [outlined]="true"
-          size="small"
-          [label]="d.common.actions.exportExcel"
-          [loading]="exportingExcel()"
-          [disabled]="!canExport()"
-          (onClick)="excel.emit()"
-        />
-      }
+      <p-button
+        icon="pi pi-file-excel"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [label]="d.common.actions.exportExcel"
+        [loading]="exportingExcel()"
+        [disabled]="!canExport()"
+        (onClick)="excel.emit()"
+      />
       <p-button
         icon="pi pi-bolt"
         size="small"
@@ -118,37 +92,7 @@ export class MovimientoInformeActionsComponent {
    */
   readonly hint = input<string>('');
 
-  /**
-   * El informe tiene además una versión presentada en Excel: el botón pasa a
-   * ser un dropdown con «Excel» (`excelEspecial`) y «Excel base» (`excel`).
-   */
-  readonly showExcelEspecial = input<boolean>(false);
-
   readonly generar = output<void>();
   readonly excel = output<void>();
-  readonly excelEspecial = output<void>();
   readonly pdf = output<void>();
-
-  private readonly excelMenu = viewChild<Menu>('excelMenu');
-
-  /** `computed` (ref estable salvo cambio de idioma) para no perder el primer click. */
-  protected readonly excelItems = computed<MenuItem[]>(() => {
-    const opciones = this.t().entities.informeCuentas.excelOpciones;
-    return [
-      {
-        label: opciones.excel,
-        icon: 'pi pi-file-excel',
-        command: () => this.excelEspecial.emit(),
-      },
-      {
-        label: opciones.excelBase,
-        icon: 'pi pi-file-excel',
-        command: () => this.excel.emit(),
-      },
-    ];
-  });
-
-  protected toggleExcelMenu(event: Event): void {
-    this.excelMenu()?.toggle(event);
-  }
 }

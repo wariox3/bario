@@ -1,7 +1,7 @@
 import { DestroyRef, computed, inject, signal, type WritableSignal } from '@angular/core';
 import { FormBuilder, type AbstractControl, type ValidatorFn } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize, forkJoin, type Observable } from 'rxjs';
 import type { PaginatorState } from 'primeng/paginator';
 import { FileDownloadService, I18nService, TenantService, ToastService } from '@reddoc/core';
 import type { FilterCondition } from '@reddoc/core';
@@ -268,30 +268,45 @@ export abstract class MovimientoInformePageBase<TRow> {
     return buildMovimientoInformeParams(this.form, this.extraFilters());
   }
 
-  private consultar(): void {
+  /** Consulta paginada de la familia. Un informe con otro contrato la sobrescribe. */
+  protected consultar(): void {
     const params = this.buildParams();
+    this.ejecutarConsulta(
+      forkJoin({
+        pagina: this.service.list(params, this.page()),
+        totales: this.service.totales(params),
+      }),
+      ({ pagina, totales }) => {
+        this.rows.set(pagina.results);
+        this.totalCount.set(pagina.count);
+        this.totales.set(totales);
+      },
+    );
+  }
 
+  /** Deja la pantalla sin resultados cuando la consulta falla. */
+  protected limpiarResultado(): void {
+    this.rows.set([]);
+    this.totalCount.set(0);
+    this.totales.set(null);
+  }
+
+  /** Progreso, marca de generado y manejo de error, comunes a toda consulta. */
+  protected ejecutarConsulta<T>(consulta: Observable<T>, aplicar: (resultado: T) => void): void {
     this.isLoading.set(true);
-    forkJoin({
-      pagina: this.service.list(params, this.page()),
-      totales: this.service.totales(params),
-    })
+    consulta
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe({
-        next: ({ pagina, totales }) => {
-          this.rows.set(pagina.results);
-          this.totalCount.set(pagina.count);
-          this.totales.set(totales);
+        next: (resultado) => {
+          aplicar(resultado);
           this.generated.set(true);
           this.paramsStale.set(false);
         },
         error: () => {
-          this.rows.set([]);
-          this.totalCount.set(0);
-          this.totales.set(null);
+          this.limpiarResultado();
           // Se marca igual como generado: la tabla debe decir "sin resultados",
           // no "todavía no generaste" — el toast ya informa del fallo.
           this.generated.set(true);

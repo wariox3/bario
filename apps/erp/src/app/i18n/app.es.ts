@@ -5530,7 +5530,6 @@ export const es: AppDict = {
     },
     informeCuentas: {
       generar: 'Generar',
-      excelOpciones: { excel: 'Excel', excelBase: 'Excel base' },
       descuadre: 'El informe no cuadra',
       groups: {
         periodo: 'Periodo',
@@ -5888,6 +5887,17 @@ export const es: AppDict = {
     },
     estadoResultados: {
       name: 'Estado de resultados',
+      presentacion: { label: 'Presentación', base: 'Base', formal: 'Formal' },
+      formal: {
+        columns: {
+          codigo: 'Código',
+          nombre: 'Nombre',
+          actual: 'Actual',
+          anterior: 'Año anterior',
+          variacion: 'Variación',
+          porcentaje: '%',
+        },
+      },
       empty: {
         notGenerated: {
           title: 'Todavía no generaste el informe',

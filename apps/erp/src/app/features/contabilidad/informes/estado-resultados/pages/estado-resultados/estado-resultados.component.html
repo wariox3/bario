@@ -28,6 +28,21 @@
       />
     </div>
 
+    <div class="mi-params__field">
+      <label for="er-presentacion" class="mi-params__label">{{
+        t().entities.estadoResultados.presentacion.label
+      }}</label>
+      <p-select
+        inputId="er-presentacion"
+        [formControl]="presentacion"
+        [options]="presentaciones()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [fluid]="true"
+      />
+    </div>
+
     <app-movimiento-informe-actions
       acciones
       [loading]="isLoading()"
@@ -37,27 +52,32 @@
       [showPdf]="soportaPdf"
       [exportingPdf]="isExportingPdf()"
       [hint]="hint()"
-      [showExcelEspecial]="true"
       (generar)="generar()"
       (excel)="exportExcel()"
-      (excelEspecial)="exportExcelEspecial()"
       (pdf)="exportPdf()"
     />
   </app-movimiento-informe-params>
 
-  <app-movimiento-informe-table
-    table
-    [rows]="rows()"
-    [amounts]="montos()"
-    [empty]="empty"
-    [totales]="totales()"
-    [loading]="isLoading()"
-    [generated]="generated()"
-    [showUbicacion]="true"
-    [jerarquia]="false"
-    [descuadre]="false"
-    [totalCount]="totalCount()"
-    [page]="page()"
-    (pageChange)="onPageChange($event)"
-  />
+  <ng-container ngProjectAs="[table]">
+    @if (formal(); as informeFormal) {
+      <app-resultado-formal-table
+        [informe]="informeFormal"
+        [empty]="empty"
+        [loading]="isLoading()"
+      />
+    } @else {
+      <!-- Sin `totalCount`: la presentación base no pagina y el pie queda oculto. -->
+      <app-movimiento-informe-table
+        [rows]="rows()"
+        [amounts]="montos()"
+        [empty]="empty"
+        [totales]="totales()"
+        [loading]="isLoading()"
+        [generated]="generated()"
+        [showUbicacion]="true"
+        [jerarquia]="false"
+        [descuadre]="false"
+      />
+    }
+  </ng-container>
 </lib-list-shell>
