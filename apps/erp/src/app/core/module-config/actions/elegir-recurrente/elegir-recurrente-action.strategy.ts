@@ -54,9 +54,9 @@ const ORIGEN_POR_DESTINO: Readonly<Record<number, OrigenRecurrente>> = {
  *
  * Abre un modal con las plantillas del tipo de origen; al elegir una manda
  * `POST general/documento/generar-recurrente/` con ese id y el mes en curso.
- * El backend copia la plantilla entera con fecha de hoy y avanza la fecha de
- * la plantilla al mes siguiente, así que repetir la misma en el mismo mes
- * responde `generados: 0`.
+ * El backend copia la plantilla entera con fecha de hoy. Va con
+ * `validar_fechas: false`: la fecha de la plantilla no se mira ni se mueve, así
+ * que repetir la misma en el mismo mes crea otro documento.
  *
  * El backend solo devuelve la cantidad creada, no el id: no se puede abrir la
  * ficha de la factura nueva, así que se recarga el listado, donde aparece
@@ -118,9 +118,9 @@ export class ElegirRecurrenteActionStrategy implements EntityActionStrategy {
             documento_ids: [plantillaId],
             mes: hoy.getMonth() + 1,
             anio: hoy.getFullYear(),
-            // Sin check en este modal: se respeta la fecha de la plantilla,
-            // como el botón del ERP anterior.
-            validar_fechas: true,
+            // Sin check en este modal: la persona ya eligió la plantilla, así
+            // que se genera sin mirar su fecha y sin moverla.
+            validar_fechas: false,
           })
           .pipe(
             tap((res) => {
