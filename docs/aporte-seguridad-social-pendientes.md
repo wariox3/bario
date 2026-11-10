@@ -78,9 +78,7 @@ El schema no publica qué campos acepta cada `lista/`. El frontend usa estos:
 | Endpoint                 | Filtro                       | Uso                           |
 | ------------------------ | ---------------------------- | ----------------------------- |
 | `aporte-contrato/lista/` | `aporte_id`                  | Fijo: acota al aporte abierto |
-| `aporte-contrato/lista/` | `id`                         | Filtro de la tabla            |
 | `aporte-detalle/lista/`  | `aporte_contrato__aporte_id` | Fijo: acota al aporte abierto |
-| `aporte-detalle/lista/`  | `id`                         | Filtro de la tabla            |
 | `aporte-entidad/lista/`  | `aporte_id`                  | Fijo: acota al aporte abierto |
 
 Y estos ordenamientos: `contrato_id` (contratos), `aporte_contrato_id` (detalles), `tipo`
@@ -88,6 +86,44 @@ Y estos ordenamientos: `contrato_id` (contratos), `aporte_contrato_id` (detalles
 
 Los filtros fijos son los críticos: si el backend no los acepta, la pestaña muestra
 registros de **todos** los aportes.
+
+### Filtros de las tablas de contratos y detalles ❌ PENDIENTE (2026-11-10)
+
+El filtro de cada pestaña ofrece lo mismo que el ERP anterior, más la identificación del
+empleado. Hay que confirmar que estén en los `campos_filtrables` (o agregarlos). Un filtro
+fuera de la whitelist **no da error**: el `lista/` responde sin filtrar, así que desde el
+frontend no hay forma de notar que falta.
+
+| Endpoint                 | `propiedad`                                                  | Operadores           |
+| ------------------------ | ------------------------------------------------------------ | -------------------- |
+| `aporte-contrato/lista/` | `id`                                                         | `=`, `!=`, `>`, `<`… |
+| `aporte-contrato/lista/` | `contrato__contacto__numero_identificacion`                  | `=`, `contiene`, …   |
+| `aporte-contrato/lista/` | `contrato__contacto__nombre_corto`                           | `=`, `contiene`, …   |
+| `aporte-contrato/lista/` | `contrato_id`                                                | `=`, `!=`, `>`, `<`… |
+| `aporte-detalle/lista/`  | `id`                                                         | `=`, `!=`, `>`, `<`… |
+| `aporte-detalle/lista/`  | `aporte_contrato__contrato__contacto__numero_identificacion` | `=`, `contiene`, …   |
+| `aporte-detalle/lista/`  | `aporte_contrato__contrato__contacto__nombre_corto`          | `=`, `contiene`, …   |
+| `aporte-detalle/lista/`  | `aporte_contrato_id`                                         | `=`, `!=`, `>`, `<`… |
+
+Ejemplo (detalles de un empleado dentro del aporte 2):
+
+```json
+{
+  "filtros": [
+    { "propiedad": "aporte_contrato__aporte_id", "operador": "=", "valor": 2 },
+    {
+      "propiedad": "aporte_contrato__contrato__contacto__nombre_corto",
+      "operador": "contiene",
+      "valor": "perez"
+    }
+  ],
+  "ordenamientos": ["id"]
+}
+```
+
+En el ERP anterior el "Contrato" de la pestaña de contratos filtraba por
+`contrato__contacto_id` (el id del empleado, no el del contrato); acá va por `contrato_id`,
+que es lo que muestra la columna.
 
 ### "Ver detalle" de un contrato (nóminas del periodo)
 

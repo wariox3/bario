@@ -5433,7 +5433,12 @@ export const es: AppDict = {
         },
       },
       detalles: {
-        columns: { id: 'ID', empleado: 'Empleado', contrato: 'Contrato' },
+        columns: {
+          id: 'ID',
+          identificacion: 'Identificación',
+          empleado: 'Empleado',
+          contrato: 'Contrato',
+        },
         leyendaTitulo: 'Qué significa cada sigla',
         novedad: { true: 'Sí', false: '—' },
         siglas: {

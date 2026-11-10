@@ -273,12 +273,63 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
   },
 ];
 
+/**
+ * Filtros de la pestaña de contratos: los del ERP anterior más la identificación,
+ * uno por cada columna que identifica al empleado.
+ *
+ * Contrato filtra por el id del contrato (`contrato_id`), que es lo que pinta su
+ * columna. El ERP anterior lo rotulaba "Contrato" pero mandaba
+ * `contrato__contacto_id`, el id del empleado.
+ *
+ * TODO(backend): confirmar que estén en los `campos_filtrables` de
+ * `aporte-contrato/lista/` (ver `docs/aporte-seguridad-social-pendientes.md` §3).
+ * Uno fuera de la whitelist no da error: devuelve la pestaña sin filtrar.
+ */
 export const APORTE_CONTRATO_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.contratos.columns.id', type: 'number' },
+  {
+    name: 'contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.aporte.contratos.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'contrato__contacto__nombre_corto',
+    displayNameKey: 'entities.aporte.contratos.columns.empleado',
+    type: 'string',
+  },
+  {
+    name: 'contrato_id',
+    displayNameKey: 'entities.aporte.contratos.columns.contrato',
+    type: 'number',
+  },
 ];
 
+/**
+ * Filtros de la pestaña de detalles, con el mismo criterio que los de contratos.
+ *
+ * Contrato filtra por `aporte_contrato_id`, como el ERP anterior: la columna pinta
+ * el renglón del aporte (el ID de la pestaña de contratos), no el contrato.
+ *
+ * TODO(backend): confirmar que estén en los `campos_filtrables` de
+ * `aporte-detalle/lista/` (ver `docs/aporte-seguridad-social-pendientes.md` §3).
+ */
 export const APORTE_DETALLE_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.detalles.columns.id', type: 'number' },
+  {
+    name: 'aporte_contrato__contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.aporte.detalles.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'aporte_contrato__contrato__contacto__nombre_corto',
+    displayNameKey: 'entities.aporte.detalles.columns.empleado',
+    type: 'string',
+  },
+  {
+    name: 'aporte_contrato_id',
+    displayNameKey: 'entities.aporte.detalles.columns.contrato',
+    type: 'number',
+  },
 ];
 
 // ── Excel de las pestañas ───────────────────────────────────────────────────

@@ -4164,7 +4164,7 @@ export interface AppDict
         empty: { title: string; sub: string };
       };
       detalles: {
-        columns: { id: string; empleado: string; contrato: string };
+        columns: { id: string; identificacion: string; empleado: string; contrato: string };
         leyendaTitulo: string;
         /** Valores de las banderas de novedad en la tabla (`Sí` / `—`). */
         novedad: { true: string; false: string };

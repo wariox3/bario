@@ -5346,7 +5346,12 @@ export const en: AppDict = {
         },
       },
       detalles: {
-        columns: { id: 'ID', empleado: 'Employee', contrato: 'Contract' },
+        columns: {
+          id: 'ID',
+          identificacion: 'Identification',
+          empleado: 'Employee',
+          contrato: 'Contract',
+        },
         leyendaTitulo: 'What each code means',
         novedad: { true: 'Yes', false: '—' },
         siglas: {
