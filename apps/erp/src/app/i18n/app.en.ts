@@ -4371,6 +4371,28 @@ export const en: AppDict = {
         title: 'Import entries',
         subtitle: 'Upload an Excel file with the records to load',
       },
+      eliminarSaldoInicial: {
+        action: 'Delete opening balance',
+        title: 'Delete opening balance',
+        subtitle: 'Removes the opening balance entries of a voucher and number',
+        fields: {
+          comprobante: 'Voucher',
+          comprobantePlaceholder: 'Select…',
+          numero: 'Number',
+        },
+        validation: { required: 'This field is required' },
+        warning:
+          'The whole entry is deleted so the books stay balanced. If any line is in a locked period, nothing is deleted. This action cannot be undone.',
+        submit: 'Delete',
+        toasts: {
+          success: { title: 'Opening balance deleted', desc: '{n} entries were deleted.' },
+          vacio: {
+            title: 'Nothing to delete',
+            desc: 'There are no opening balance entries with that voucher and number.',
+          },
+          error: { title: 'Could not delete', desc: 'Please try again.' },
+        },
+      },
       columns: {
         id: 'ID',
         numero: 'Number',

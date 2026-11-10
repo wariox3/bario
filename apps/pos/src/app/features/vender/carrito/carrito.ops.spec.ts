@@ -1,4 +1,4 @@
-import type { Item } from '@reddoc/core';
+import { DOCUMENT_TYPE_ID, type Item } from '@reddoc/core';
 import type { ProductoCatalogo } from '../catalogo/producto-catalogo.model';
 import type { Carrito } from './carrito.model';
 import {
@@ -6,6 +6,7 @@ import {
   cabeEnStock,
   cantidadTotal,
   conCantidad,
+  conTipoDocumento,
   contactoParaGuardar,
   crearCarrito,
   editarLinea,
@@ -132,9 +133,42 @@ describe('persistencia', () => {
     expect(esEstadoCarritos({ ...estado, carritos: [{ uuid: 'x' }] })).toBe(false);
   });
 
+  it('acepta una venta con tipo POS y descarta un tipo que no es de la familia', () => {
+    const estado = estadoInicial('Venta 1', null);
+    const conTipo = (documentoTipoId: unknown) => ({
+      ...estado,
+      carritos: [{ ...estado.carritos[0], documentoTipoId }],
+    });
+    expect(esEstadoCarritos(conTipo(DOCUMENT_TYPE_ID.FACTURA_POS_ELECTRONICO))).toBe(true);
+    expect(esEstadoCarritos(conTipo(1))).toBe(false);
+  });
+
   it('del contacto guarda id, etiqueta y lista de precios', () => {
     expect(
       contactoParaGuardar({ id: 3, nombre: '22 - Consumidor final', precio_id: 2, direccion: 'x' }),
     ).toEqual({ id: 3, nombre: '22 - Consumidor final', precio_id: 2 });
+  });
+});
+
+describe('tipo de documento', () => {
+  const { FACTURA_POS, FACTURA_POS_ELECTRONICO } = DOCUMENT_TYPE_ID;
+
+  it('guarda el tipo cuando difiere del de la empresa', () => {
+    const venta = conTipoDocumento(
+      crearCarrito('Venta 1', null),
+      FACTURA_POS_ELECTRONICO,
+      FACTURA_POS,
+    );
+    expect(venta.documentoTipoId).toBe(FACTURA_POS_ELECTRONICO);
+  });
+
+  it('volver al de la empresa lo borra: la venta lo sigue', () => {
+    const elegido = conTipoDocumento(
+      crearCarrito('Venta 1', null),
+      FACTURA_POS_ELECTRONICO,
+      FACTURA_POS,
+    );
+    const venta = conTipoDocumento(elegido, FACTURA_POS, FACTURA_POS);
+    expect('documentoTipoId' in venta).toBe(false);
   });
 });

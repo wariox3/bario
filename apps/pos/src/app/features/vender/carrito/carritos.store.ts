@@ -11,6 +11,7 @@ import {
 } from '@reddoc/core';
 import type { AppDict } from '@pos/i18n';
 import { PosStorageService } from '../../../core/storage/pos-storage.service';
+import type { PosDocumentoTipoId } from '../../configuracion/configuracion-caja.model';
 import { ConfiguracionCajaStore } from '../../configuracion/configuracion-caja.store';
 import type { ProductoCatalogo } from '../catalogo/producto-catalogo.model';
 import type { Carrito, CobroPendiente, EstadoCarritos } from './carrito.model';
@@ -20,6 +21,7 @@ import {
   cabeEnStock,
   cantidadTotal,
   conCantidad,
+  conTipoDocumento,
   contactoParaGuardar,
   crearCarrito,
   editarLinea,
@@ -85,6 +87,13 @@ export class CarritosStore {
   );
   readonly resumen = computed(() => resumenCarrito(this.activo()));
   readonly cantidadTotal = computed(() => cantidadTotal(this.activo()));
+  /**
+   * Tipo de documento con el que se factura la venta activa: el suyo, o el de la
+   * empresa si no eligió otro. `null` mientras el de la empresa no se conozca.
+   */
+  readonly tipoDocumento = computed<PosDocumentoTipoId | null>(
+    () => this.activo().documentoTipoId ?? this.configuracion.configuracion().documentoTipoId,
+  );
   /** Cobro empezado y sin terminar de la venta activa, o `null`. */
   readonly cobroPendiente = computed(() => this.activo().cobro ?? null);
   /** Unidades de cada ítem en la venta activa: el badge de las tarjetas del catálogo. */
@@ -163,7 +172,21 @@ export class CarritosStore {
       nombre: c.nombre,
       contacto: c.contacto,
       lineas: c.lineas,
+      ...(c.documentoTipoId === undefined ? {} : { documentoTipoId: c.documentoTipoId }),
     }));
+  }
+
+  // ── Tipo de documento ──────────────────────────────────────────────────────
+
+  /**
+   * Elige el tipo de documento de la venta activa. Elegir el de la empresa lo
+   * borra de la venta, que vuelve a seguirlo. Con un cobro pendiente no cambia:
+   * su documento ya se creó con un tipo.
+   */
+  cambiarTipoDocumento(tipo: PosDocumentoTipoId): void {
+    if (this.activo().cobro) return;
+    const empresa = this.configuracion.configuracion().documentoTipoId;
+    this.mutarCarrito(this.activo().uuid, (c) => conTipoDocumento(c, tipo, empresa));
   }
 
   // ── Cliente ────────────────────────────────────────────────────────────────

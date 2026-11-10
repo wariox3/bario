@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.25](https://github.com/wariox3/bario/compare/v0.1.24...v0.1.25) (2026-11-10)
+
+### Features
+
+- **contabilidad:** eliminar saldo inicial por comprobante y número ([56b4c92](https://github.com/wariox3/bario/commit/56b4c9227dbedcfe6f8925892ad4506739ee97d0))
+- **contabilidad:** quitar la importación del informe de movimientos ([59608ca](https://github.com/wariox3/bario/commit/59608cab1ebe5385d936c093d0da54670cc7b3e3))
+- **contabilidad:** utilidad de movimientos de saldo inicial ([4cec30f](https://github.com/wariox3/bario/commit/4cec30ff1655a1c45cb14a55acc4b1d0b1e1279a))
+- **pos:** elegir el tipo de documento en cada venta ([a80537e](https://github.com/wariox3/bario/commit/a80537eb7ca0058d976068be5b2c19b893a22d38))
+
+### Bug Fixes
+
+- **contabilidad:** no avisar descuadre al guardar un asiento sin líneas ([8ec995f](https://github.com/wariox3/bario/commit/8ec995f56c8941f45017a3e8f75ddb45360b1110))
+
 ## [0.1.24](https://github.com/wariox3/bario/compare/v0.1.23...v0.1.24) (2026-11-10)
 
 ### Features

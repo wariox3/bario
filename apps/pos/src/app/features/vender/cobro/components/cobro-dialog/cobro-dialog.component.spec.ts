@@ -71,18 +71,23 @@ function preparar(
     recordadas?: Partial<Record<string, number>>;
     /** Id del turno abierto; `null` = sin turno. */
     turno?: number | null;
+    /** Tipo elegido en la venta; sin él, factura con el de la empresa. */
+    tipoVenta?: Carrito['documentoTipoId'];
   } = {},
 ) {
+  const configuracion = signal<ConfiguracionCaja>({ ...configuracionCompleta, ...cambios.config });
   const activo = signal<Carrito>({
     uuid: 'u1',
     nombre: 'Venta 2',
     contacto: { id: 1, nombre: '222222222222 - Consumidor final' },
     lineas: [],
+    ...(cambios.tipoVenta === undefined ? {} : { documentoTipoId: cambios.tipoVenta }),
   });
   const total = signal(cambios.total ?? 47_600);
   const pendiente = signal<CobroPendiente | null>(cambios.pendiente ?? null);
   const carritos = {
     activo,
+    tipoDocumento: computed(() => activo().documentoTipoId ?? configuracion().documentoTipoId),
     resumen: computed(() => ({ total: total() })),
     cobroPendiente: pendiente.asReadonly(),
     cerrarCobrada: jest.fn(),
@@ -118,7 +123,7 @@ function preparar(
       { provide: CarritosStore, useValue: carritos },
       {
         provide: ConfiguracionCajaStore,
-        useValue: { configuracion: signal({ ...configuracionCompleta, ...cambios.config }) },
+        useValue: { configuracion },
       },
       { provide: CobroService, useValue: cobro },
       { provide: VentaPosService, useValue: ventas },
@@ -258,6 +263,13 @@ describe('CobroDialogComponent', () => {
       });
       expect(carritos.cerrarCobrada).toHaveBeenCalledWith('u1');
       expect(cobradas).toHaveBeenCalledTimes(1);
+    });
+
+    it('factura con el tipo elegido en la venta, no con el de la empresa', () => {
+      const { interno, cobro } = preparar({ tipoVenta: 24 });
+      interno.usarMonto(50_000);
+      interno.onCobrar();
+      expect(cobro.cobrar.mock.calls[0][0].documentoTipoId).toBe(24);
     });
 
     it('sin la configuración de la caja no intenta cobrar', () => {

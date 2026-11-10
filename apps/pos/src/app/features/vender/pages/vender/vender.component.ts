@@ -34,6 +34,7 @@ import { ItemRapidoDialogComponent } from '../../item-rapido/components/item-rap
 import { CarritosStore, type ResultadoAgregar } from '../../carrito/carritos.store';
 import { ConsumidorFinalService } from '../../carrito/consumidor-final.service';
 import { CarritoPanelComponent } from '../../carrito/components/carrito-panel/carrito-panel.component';
+import { TipoDocumentoSelectorComponent } from '../../carrito/components/tipo-documento-selector/tipo-documento-selector.component';
 import { CarritoTabsComponent } from '../../carrito/components/carrito-tabs/carrito-tabs.component';
 
 /**
@@ -61,6 +62,7 @@ import { CarritoTabsComponent } from '../../carrito/components/carrito-tabs/carr
     ProductoCardComponent,
     CarritoPanelComponent,
     CarritoTabsComponent,
+    TipoDocumentoSelectorComponent,
     ItemRapidoDialogComponent,
   ],
   providers: [CatalogoStore, ConfirmationService],
