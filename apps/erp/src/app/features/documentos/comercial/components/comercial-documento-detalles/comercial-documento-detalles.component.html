@@ -93,6 +93,11 @@
               {{ t().entities.comercialDetalle.columns.almacen }}
             </th>
           }
+          @if (centroCostoEnabled()) {
+            <th class="comercial-detalle-table__th w-40 text-left">
+              {{ t().entities.comercialDetalle.columns.centroCosto }}
+            </th>
+          }
           <th class="comercial-detalle-table__th w-24 text-right">
             {{ t().entities.comercialDetalle.columns.cantidad }}
           </th>
@@ -168,6 +173,16 @@
                   formControlName="almacen"
                   [catalogo]="almacenCatalogo()"
                   [placeholder]="t().entities.comercialDetalle.almacenPlaceholder"
+                />
+              </td>
+            }
+
+            @if (centroCostoEnabled()) {
+              <td class="comercial-detalle-table__td">
+                <lib-api-select
+                  formControlName="centro_costo"
+                  [catalogo]="centroCostoCatalogo()"
+                  [placeholder]="t().entities.comercialDetalle.centroCostoPlaceholder"
                 />
               </td>
             }

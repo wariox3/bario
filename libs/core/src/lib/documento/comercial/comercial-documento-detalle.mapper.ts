@@ -180,6 +180,10 @@ export function comercialDetalleToFormValue(
     impuestos_disponibles: [],
     detalle: read.detalle ?? null,
     almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
+    centro_costo:
+      read.centro_costo != null
+        ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
+        : null,
     documento_detalle_afectado: read.documento_detalle_afectado ?? null,
   };
 }
@@ -214,6 +218,7 @@ export function comercialDetalleToPayload(
     porcentaje_descuento: (raw.descuento ?? 0).toFixed(2),
     detalle: raw.detalle?.trim() || null,
     almacen: raw.almacen?.id ?? null,
+    centro_costo: raw.centro_costo?.id ?? null,
     impuestos_ids: raw.impuestos_ids,
     documento_detalle_afectado: raw.documento_detalle_afectado,
   };

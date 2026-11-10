@@ -2578,6 +2578,8 @@ export interface AppDict
           sedePlaceholder: string;
           almacen: string;
           almacenPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2601,6 +2603,7 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           almacen: string;
+          centroCosto: string;
           metodoPago: string;
           formaPago: string;
           resolucion: string;
@@ -3236,6 +3239,7 @@ export interface AppDict
       itemPlaceholder: string;
       detallePlaceholder: string;
       almacenPlaceholder: string;
+      centroCostoPlaceholder: string;
       confirmDeleteLine: string;
       confirmDeleteLines: string;
       removeSelected: string;
@@ -3274,6 +3278,7 @@ export interface AppDict
         ref: string;
         item: string;
         almacen: string;
+        centroCosto: string;
         cantidad: string;
         precio: string;
         descuento: string;

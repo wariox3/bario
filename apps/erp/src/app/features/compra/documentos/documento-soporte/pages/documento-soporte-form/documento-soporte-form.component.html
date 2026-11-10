@@ -209,6 +209,19 @@
           />
         </div>
 
+        <!-- Centro de costo: lo heredan las líneas nuevas; cada una lo puede cambiar. -->
+        <div class="flex flex-col gap-1.5">
+          <label for="centro_costo" class="documento-soporte-form__label">
+            {{ t().entities.documentoSoporte.form.fields.centroCosto }}
+          </label>
+          <lib-api-select
+            inputId="centro_costo"
+            formControlName="centro_costo"
+            [endpoint]="centroCostoEndpoint"
+            [placeholder]="t().entities.documentoSoporte.form.fields.centroCostoPlaceholder"
+          />
+        </div>
+
         <!-- Orden de compra -->
         <div class="flex flex-col gap-1.5">
           <label for="orden_compra" class="documento-soporte-form__label">
@@ -282,6 +295,8 @@
             [documentId]="documentId()"
             [contactoId]="form.controls.contacto.value?.id ?? null"
             [almacenEnabled]="true"
+            [centroCostoEnabled]="true"
+            [centroCostoPorDefecto]="form.controls.centro_costo.value"
             [almacenPorDefecto]="form.controls.almacen.value"
             [paginada]="true"
             [resumenBase]="resumenBase()"

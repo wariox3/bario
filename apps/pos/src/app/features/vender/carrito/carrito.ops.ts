@@ -74,6 +74,8 @@ export function lineaDesdeProducto(
     impuestos_disponibles: tasas,
     detalle: null,
     almacen,
+    // El POS no maneja centro de costo por línea.
+    centro_costo: null,
     documento_detalle_afectado: null,
     codigo: producto.codigo,
     imagenUrl: producto.imagenUrl,

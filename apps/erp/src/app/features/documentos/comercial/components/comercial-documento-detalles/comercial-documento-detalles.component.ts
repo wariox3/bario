@@ -105,6 +105,7 @@ import {
 import { agregarFilas } from '../../../form-array-filas';
 import {
   createComercialDetalleGroup,
+  propagarCentroCostoALineasComerciales,
   type ComercialDetalleGroup,
 } from '../../comercial-documento-detalle.form';
 import { aiuLineaToFormValue, type AiuLinea } from '../../aiu';
@@ -273,6 +274,27 @@ export class ComercialDocumentoDetallesComponent {
   readonly almacenPorDefecto = input<ErpSelectOption | null>(null);
 
   /**
+   * Muestra la columna **Centro de costo** (el «grupo» del ERP anterior). La
+   * encienden los documentos de compra: al contabilizar, la cuenta del ítem
+   * puede exigirlo, y sin él en la línea el documento no se contabiliza aunque
+   * la cabecera lo tenga. Como el almacén, quien la encienda aquí la enciende
+   * también en la tabla de solo lectura de su ficha.
+   */
+  readonly centroCostoEnabled = input<boolean>(false);
+
+  /** Catálogo de centros de costo, compartido por todas las filas. */
+  protected readonly centroCostoCatalogo = catalogoCompartido(SELECT_ENDPOINTS.centroCosto, {
+    activo: () => this.centroCostoEnabled(),
+  });
+
+  /**
+   * Centro de costo de la cabecera. Precarga cada línea nueva y, si la persona
+   * lo cambia, se replica en las líneas aún sin guardar
+   * (`propagarCentroCostoALineasComerciales`); las guardadas conservan el suyo.
+   */
+  readonly centroCostoPorDefecto = input<ErpSelectOption | null>(null);
+
+  /**
    * En edición la tabla trae sus propias líneas, de a una página de 25
    * (`LIST_PAGE_SIZE`), en vez de recibirlas todas del form. El form no las pide
    * ni las empuja al array. Va con `resumenBase`: sin todas las líneas, el
@@ -338,7 +360,11 @@ export class ComercialDocumentoDetallesComponent {
    * opcionales que el documento haya encendido.
    */
   protected readonly columnCount = computed(
-    () => 10 + (this.detalleEnabled() ? 1 : 0) + (this.almacenEnabled() ? 1 : 0),
+    () =>
+      10 +
+      (this.detalleEnabled() ? 1 : 0) +
+      (this.almacenEnabled() ? 1 : 0) +
+      (this.centroCostoEnabled() ? 1 : 0),
   );
 
   /** Importación en curso; bloquea el botón mientras resuelve los ítems. */
@@ -594,6 +620,20 @@ export class ComercialDocumentoDetallesComponent {
       for (const sub of this.cableadas.values()) sub.unsubscribe();
     });
 
+    // Cambiar el centro de costo de la cabecera lo replica en las líneas sin
+    // guardar. Solo cuando cambia de verdad: la primera lectura (el valor con
+    // que abre el form) no toca nada, las líneas nuevas ya lo toman al crearse.
+    let centroCostoPrevio: number | null | undefined;
+    effect(() => {
+      const centroCosto = this.centroCostoPorDefecto();
+      const id = centroCosto?.id ?? null;
+      if (!this.centroCostoEnabled()) return;
+      if (centroCostoPrevio !== undefined && centroCostoPrevio !== id) {
+        untracked(() => propagarCentroCostoALineasComerciales(this.detalles(), centroCosto));
+      }
+      centroCostoPrevio = id;
+    });
+
     // Paginada, la tabla trae su primera página al conocer el documento.
     effect(() => {
       const id = this.documentId();
@@ -708,7 +748,13 @@ export class ComercialDocumentoDetallesComponent {
   }
 
   protected addLinea(): void {
-    this.detalles().push(createComercialDetalleGroup(undefined, this.almacenPorDefecto()));
+    this.detalles().push(
+      createComercialDetalleGroup(
+        undefined,
+        this.almacenPorDefecto(),
+        this.centroCostoPorDefecto(),
+      ),
+    );
   }
 
   /**
@@ -878,17 +924,20 @@ export class ComercialDocumentoDetallesComponent {
    * guardado del documento. No se escriben aparte: hacerlo obligaba a recargar el
    * documento y eso pisaba los cambios sin guardar de la cabecera y de otras líneas.
    *
-   * La línea que llega sin almacén hereda el de la cabecera, igual que una
-   * agregada a mano (`almacenPorDefecto`).
+   * La línea que llega sin almacén o sin centro de costo hereda los de la
+   * cabecera, igual que una agregada a mano.
    */
   private agregarLineas(lineas: readonly ComercialDetalleFormRawValue[], exito: ToastTexto): void {
     const almacen = this.almacenPorDefecto();
+    const centroCosto = this.centroCostoPorDefecto();
     agregarFilas(
       this.detalles(),
       lineas.map((linea) =>
-        createComercialDetalleGroup(
-          linea.almacen == null && almacen != null ? { ...linea, almacen } : linea,
-        ),
+        createComercialDetalleGroup({
+          ...linea,
+          almacen: linea.almacen ?? almacen,
+          centro_costo: linea.centro_costo ?? centroCosto,
+        }),
       ),
     );
     this.toast.success(exito.title, exito.desc);

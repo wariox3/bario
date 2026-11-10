@@ -45,8 +45,10 @@ export function pendienteLineaToFormValue(row: LineaPendienteApi): ComercialDeta
     impuestos_totales: calcularImpuestosLinea(base, tasas),
     impuestos_disponibles: tasas,
     detalle: null,
-    // La fila pendiente no trae almacén: la línea importada nace sin él.
+    // La fila pendiente no trae almacén ni centro de costo: la línea importada
+    // nace sin ellos y hereda los de la cabecera al agregarse.
     almacen: null,
+    centro_costo: null,
     documento_detalle_afectado: row.id,
   };
 }

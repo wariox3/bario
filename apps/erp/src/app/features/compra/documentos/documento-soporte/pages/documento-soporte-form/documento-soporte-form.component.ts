@@ -150,6 +150,7 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
   protected readonly plazoPagoEndpoint = SELECT_ENDPOINTS.plazoPago;
   protected readonly sedeEndpoint = SEDE_ENDPOINT;
   protected readonly almacenEndpoint = SELECT_ENDPOINTS.almacen;
+  protected readonly centroCostoEndpoint = SELECT_ENDPOINTS.centroCosto;
   protected readonly metodoPagoEndpoint = METODO_PAGO_ENDPOINT;
   protected readonly formaPagoEndpoint = FORMA_PAGO_ENDPOINT;
   protected readonly resolucionEndpoint = RESOLUCION_ENDPOINT;
@@ -216,6 +217,7 @@ export class DocumentoSoporteFormComponent implements OnInit, CanComponentDeacti
     plazo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     sede: this.fb.control<ErpSelectOption | null>(null),
     almacen: this.fb.control<ErpSelectOption | null>(null),
+    centro_costo: this.fb.control<ErpSelectOption | null>(null),
     metodo_pago: this.fb.control<ErpSelectOption | null>(null, Validators.required),
     forma_pago: this.fb.control<ErpSelectOption | null>(null),
     resolucion: this.fb.control<ErpSelectOption | null>(null),

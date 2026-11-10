@@ -77,6 +77,7 @@ export function aiuLineaToFormValue(item: Item, precio: number): ComercialDetall
     impuestos_disponibles: [],
     detalle: null,
     almacen: null,
+    centro_costo: null,
     documento_detalle_afectado: null,
   };
 }

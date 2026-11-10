@@ -12,6 +12,9 @@
         @if (almacenEnabled()) {
           <th class="comercial-detalle-table__th w-36 text-left">{{ c.columns.almacen }}</th>
         }
+        @if (centroCostoEnabled()) {
+          <th class="comercial-detalle-table__th w-40 text-left">{{ c.columns.centroCosto }}</th>
+        }
         <th class="comercial-detalle-table__th w-24 text-right">{{ c.columns.cantidad }}</th>
         <th class="comercial-detalle-table__th w-32 text-right">{{ c.columns.precio }}</th>
         <th class="comercial-detalle-table__th w-24 text-right">{{ c.columns.descuento }}</th>
@@ -62,6 +65,11 @@
           @if (almacenEnabled()) {
             <td class="comercial-detalle-table__td text-brand-text">
               {{ line.almacen?.nombre || '—' }}
+            </td>
+          }
+          @if (centroCostoEnabled()) {
+            <td class="comercial-detalle-table__td text-brand-text">
+              {{ line.centro_costo?.nombre }}
             </td>
           }
           <td class="comercial-detalle-table__td text-right tabular-nums">{{ line.cantidad }}</td>

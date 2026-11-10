@@ -29,6 +29,7 @@ describe('comercial detalle · descuento', () => {
     impuestos_disponibles: [],
     detalle: null,
     almacen: null,
+    centro_costo: null,
     documento_detalle_afectado: null,
   };
 
@@ -70,6 +71,7 @@ describe('comercial detalle · total cantidad', () => {
     impuestos_disponibles: [],
     detalle: null,
     almacen: null,
+    centro_costo: null,
     documento_detalle_afectado: null,
   });
 
@@ -224,5 +226,45 @@ describe('comercial detalle · línea de la factura referencia', () => {
     expect(linea.impuestos_ids).toEqual([1]);
     expect(linea.detalle).toBe('Nota de la línea');
     expect(linea.almacen).toEqual({ id: 5, nombre: 'Principal' });
+  });
+});
+
+/**
+ * El centro de costo de la línea (el «grupo» del ERP anterior). La
+ * contabilización de compra lo exige cuando la cuenta del ítem lo pide; sin él
+ * en la línea, el documento no se podía contabilizar aunque la cabecera lo
+ * tuviera.
+ */
+describe('comercial detalle · centro de costo', () => {
+  it('lo lee con su nombre para etiquetar el select', () => {
+    const read: ComercialDetalleRead = {
+      id: 1,
+      item: 3,
+      cantidad: '1',
+      precio: '100',
+      centro_costo: 8,
+      centro_costo_nombre: 'Administración',
+    };
+    expect(comercialDetalleToFormValue(read).centro_costo).toEqual({
+      id: 8,
+      nombre: 'Administración',
+    });
+  });
+
+  it('queda en null cuando la línea no lo trae', () => {
+    const read: ComercialDetalleRead = { id: 1, item: 3, cantidad: '1', precio: '100' };
+    expect(comercialDetalleToFormValue(read).centro_costo).toBeNull();
+  });
+
+  it('viaja por id en el payload', () => {
+    const read: ComercialDetalleRead = {
+      id: 1,
+      item: 3,
+      cantidad: '1',
+      precio: '100',
+      centro_costo: 8,
+      centro_costo_nombre: 'Administración',
+    };
+    expect(comercialDetalleToPayload(comercialDetalleToFormValue(read)).centro_costo).toBe(8);
   });
 });

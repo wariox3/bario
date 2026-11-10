@@ -36,6 +36,13 @@ export interface ComercialDetalleFormRawValue {
    */
   readonly almacen: ErpSelectOption | null;
   /**
+   * Centro de costo de la línea (el «grupo» del ERP anterior). Lo muestran los
+   * documentos de compra (`centroCostoEnabled`), que lo heredan de la cabecera:
+   * la contabilización lo exige cuando la cuenta del ítem lo pide. En el resto
+   * conserva el valor que trajo la línea, o `null`.
+   */
+  readonly centro_costo: ErpSelectOption | null;
+  /**
    * Id de la línea origen que esta línea **afecta** (descuenta su pendiente),
    * cuando proviene de "importar desde documento". `null` en líneas normales.
    * No se renderiza; viaja al backend en el payload para conservar el vínculo.
