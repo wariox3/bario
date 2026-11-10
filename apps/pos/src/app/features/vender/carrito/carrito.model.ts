@@ -1,4 +1,5 @@
 import type { ComercialDetalleFormRawValue, ErpSelectOption, ItemOption } from '@reddoc/core';
+import type { PosDocumentoTipoId } from '../../configuracion/configuracion-caja.model';
 
 /**
  * Una línea del carrito. Es la línea comercial de `@reddoc/core` (la misma que
@@ -40,6 +41,11 @@ export interface Carrito {
   /** Opción del contacto; conserva `precio_id` para cotizar contra su lista. */
   readonly contacto: ErpSelectOption | null;
   readonly lineas: readonly LineaCarrito[];
+  /**
+   * Tipo de documento elegido para esta venta. Ausente, la venta factura con el
+   * de la empresa (y sigue sus cambios): solo se guarda cuando difiere de él.
+   */
+  readonly documentoTipoId?: PosDocumentoTipoId;
   /** Ausente mientras no se haya intentado cobrar. */
   readonly cobro?: CobroPendiente;
 }

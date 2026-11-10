@@ -5,9 +5,19 @@
   [attr.aria-label]="venta.nombre"
 >
   <div class="flex flex-col gap-1.5 border-b border-[rgba(20,48,73,0.08)] px-4 py-3">
-    <label for="carrito-cliente" class="text-[0.78rem] font-semibold text-brand-text">
-      {{ tx.cliente }}
-    </label>
+    <!--
+      En el drawer (tablet) el tipo de documento comparte fila con el rótulo del
+      cliente; en escritorio va en la fila de pestañas. El -my-0.5 absorbe lo que el
+      selector mide de más que el rótulo, así la fila no crece.
+    -->
+    <div class="flex items-center justify-between gap-2">
+      <label for="carrito-cliente" class="text-[0.78rem] font-semibold text-brand-text">
+        {{ tx.cliente }}
+      </label>
+      @if (conTipoDocumento()) {
+        <app-tipo-documento-selector class="-my-0.5" [corto]="true" />
+      }
+    </div>
     <!-- items-stretch: el botón toma la altura del campo, no la del botón compacto. -->
     <div class="flex items-stretch gap-2">
       <lib-contacto-select

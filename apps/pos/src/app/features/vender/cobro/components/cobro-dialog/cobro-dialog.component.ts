@@ -546,7 +546,8 @@ export class CobroDialogComponent {
     const { cuenta, asesor, referencia, soporte, comentario } = this.form.getRawValue();
     const medio = this.medio();
     const tx = this.t().vender.cobro;
-    if (config.documentoTipoId === null || config.almacen === null) {
+    const documentoTipoId = this.carritos.tipoDocumento();
+    if (documentoTipoId === null || config.almacen === null) {
       this.error.set(tx.errores.configuracion);
       return null;
     }
@@ -568,7 +569,7 @@ export class CobroDialogComponent {
     return {
       venta: this.carritos.activo(),
       turno: turno.id,
-      documentoTipoId: config.documentoTipoId,
+      documentoTipoId,
       medio,
       // En efectivo se registra el total: el cambio se devuelve, no entra a la cuenta.
       pagos: [{ cuentaBanco, monto: this.total() }],

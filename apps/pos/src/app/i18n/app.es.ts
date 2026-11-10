@@ -272,6 +272,7 @@ export const es: AppDict = {
       prefijoVenta: 'Venta',
       cliente: 'Cliente',
       clientePlaceholder: 'Buscar cliente…',
+      tipoDocumento: { grupo: 'Tipo de documento', pos: 'POS', posElectronica: 'Electrónica' },
       nuevoCliente: 'Nuevo cliente',
       vacio: 'La venta está vacía',
       vacioDesc: 'Toca un producto o escanea su código para agregarlo.',
@@ -767,10 +768,10 @@ export const es: AppDict = {
   configuracion: {
     title: 'Configuración de la caja',
     subtitle:
-      'El tipo de documento y la tirilla son de la empresa; lo demás se guarda en este dispositivo.',
+      'El tipo de documento por defecto y la tirilla son de la empresa; lo demás se guarda en este dispositivo.',
     documento: {
       title: 'Tipo de documento',
-      hint: 'Lo comparten todas las cajas de la empresa.',
+      hint: 'Tipo con el que arranca cada venta; puedes cambiarlo al facturar.',
       error: 'No se pudo leer el tipo de documento de la empresa.',
       reintentar: 'Reintentar',
     },

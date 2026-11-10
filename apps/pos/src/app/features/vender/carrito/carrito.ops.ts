@@ -8,6 +8,10 @@ import {
   type ResumenDocumento,
 } from '@reddoc/core';
 import { generarId } from '../../../core/utils/generar-id';
+import {
+  POS_DOCUMENTO_TIPOS,
+  type PosDocumentoTipoId,
+} from '../../configuracion/configuracion-caja.model';
 import type { ProductoCatalogo } from '../catalogo/producto-catalogo.model';
 import {
   VERSION_CARRITOS,
@@ -28,6 +32,21 @@ export function crearCarrito(nombre: string, contacto: ErpSelectOption | null): 
 export function estadoInicial(nombre: string, contacto: ErpSelectOption | null): EstadoCarritos {
   const carrito = crearCarrito(nombre, contacto);
   return { version: VERSION_CARRITOS, carritos: [carrito], activoId: carrito.uuid };
+}
+
+/**
+ * La venta con su tipo de documento. Si es el de la empresa (`empresa`), la
+ * venta no lo guarda: lo sigue, y un cambio en la configuración le llega.
+ */
+export function conTipoDocumento(
+  carrito: Carrito,
+  tipo: PosDocumentoTipoId,
+  empresa: PosDocumentoTipoId | null,
+): Carrito {
+  const venta: { -readonly [K in keyof Carrito]: Carrito[K] } = { ...carrito };
+  if (tipo === empresa) delete venta.documentoTipoId;
+  else venta.documentoTipoId = tipo;
+  return venta;
 }
 
 /** Primer número libre para "Venta N": no repite el de una pestaña abierta. */
@@ -188,10 +207,15 @@ function esCobroPendiente(valor: unknown): boolean {
   );
 }
 
+function esTipoDocumento(valor: unknown): boolean {
+  return valor === undefined || POS_DOCUMENTO_TIPOS.some((tipo) => tipo === valor);
+}
+
 function esCarrito(valor: unknown): boolean {
   return (
     esObjeto(valor) &&
     esCobroPendiente(valor['cobro']) &&
+    esTipoDocumento(valor['documentoTipoId']) &&
     typeof valor['uuid'] === 'string' &&
     typeof valor['nombre'] === 'string' &&
     (valor['contacto'] === null || esOpcion(valor['contacto'])) &&

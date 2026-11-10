@@ -4,6 +4,7 @@ import {
   DestroyRef,
   computed,
   inject,
+  input,
   output,
   signal,
 } from '@angular/core';
@@ -31,6 +32,7 @@ import { CobroDialogComponent } from '../../../cobro/components/cobro-dialog/cob
 import { CarritosStore } from '../../carritos.store';
 import type { LineaCarrito } from '../../carrito.model';
 import { CarritoLineaComponent } from '../carrito-linea/carrito-linea.component';
+import { TipoDocumentoSelectorComponent } from '../tipo-documento-selector/tipo-documento-selector.component';
 import {
   EditarLineaDialogComponent,
   type CambiosLinea,
@@ -56,6 +58,7 @@ import {
     ErpContactoSelectComponent,
     CarritoLineaComponent,
     EditarLineaDialogComponent,
+    TipoDocumentoSelectorComponent,
   ],
   templateUrl: './carrito-panel.component.html',
 })
@@ -71,6 +74,12 @@ export class CarritoPanelComponent {
 
   protected readonly t = this.i18n.t;
   protected readonly store = inject(CarritosStore);
+
+  /**
+   * Pinta el tipo de documento junto al cliente. Solo en el drawer de tablet: en
+   * escritorio el selector va en la fila de pestañas, fuera del panel.
+   */
+  readonly conTipoDocumento = input(false);
 
   /** Se cobró una venta; la caja refresca el catálogo. */
   readonly cobrada = output<void>();

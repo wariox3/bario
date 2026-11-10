@@ -272,6 +272,7 @@ export const en: AppDict = {
       prefijoVenta: 'Sale',
       cliente: 'Customer',
       clientePlaceholder: 'Search customer…',
+      tipoDocumento: { grupo: 'Document type', pos: 'POS', posElectronica: 'Electronic' },
       nuevoCliente: 'New customer',
       vacio: 'The sale is empty',
       vacioDesc: 'Tap a product or scan its code to add it.',
@@ -760,10 +761,10 @@ export const en: AppDict = {
   configuracion: {
     title: 'Register settings',
     subtitle:
-      'The document type and the receipt belong to the company; the rest is stored on this device.',
+      'The default document type and the receipt belong to the company; the rest is stored on this device.',
     documento: {
       title: 'Document type',
-      hint: 'Shared by every register of the company.',
+      hint: 'Every sale starts with this type; you can change it when invoicing.',
       error: "Couldn't read the company's document type.",
       reintentar: 'Retry',
     },

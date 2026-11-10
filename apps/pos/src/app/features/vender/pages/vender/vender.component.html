@@ -2,7 +2,16 @@
 <h1 class="sr-only">{{ tx.title }}</h1>
 
 <div class="flex min-h-0 flex-1 flex-col gap-3">
-  <app-carrito-tabs />
+  <!--
+    El tipo de documento va en la fila de pestañas, alineado con el panel de la venta
+    (380px). En tablet esa fila no tiene espacio: el selector pasa al drawer.
+  -->
+  <div class="flex items-center gap-4">
+    <app-carrito-tabs class="min-w-0 flex-1" />
+    @if (!compacta()) {
+      <app-tipo-documento-selector class="flex w-[380px] shrink-0 justify-end" />
+    }
+  </div>
 
   <div class="flex min-h-0 flex-1 gap-4">
     <div class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
@@ -195,7 +204,11 @@
     [header]="tx.compacta.titulo"
     styleClass="!w-full sm:!w-[26rem]"
   >
-    <app-carrito-panel (cobrada)="catalogo.recargar()" class="flex h-full min-h-0 flex-col" />
+    <app-carrito-panel
+      [conTipoDocumento]="true"
+      (cobrada)="catalogo.recargar()"
+      class="flex h-full min-h-0 flex-col"
+    />
   </p-drawer>
 }
 

@@ -216,6 +216,8 @@ export interface AppDict
       prefijoVenta: string;
       cliente: string;
       clientePlaceholder: string;
+      /** Selector de la venta; el nombre completo de cada tipo va en `configuracion.tipos`. */
+      tipoDocumento: { grupo: string; pos: string; posElectronica: string };
       nuevoCliente: string;
       vacio: string;
       vacioDesc: string;
