@@ -39,9 +39,9 @@
             inputId="dc-fecha-desde"
             formControlName="fecha_desde"
             [showIcon]="true"
-            [readonlyInput]="true"
             appendTo="body"
           />
+          <lib-field-error [control]="form.controls.fecha_desde" />
         </div>
 
         <div class="flex flex-col gap-1.5">
@@ -53,9 +53,9 @@
             inputId="dc-fecha-hasta"
             formControlName="fecha_hasta"
             [showIcon]="true"
-            [readonlyInput]="true"
             appendTo="body"
           />
+          <lib-field-error [control]="form.controls.fecha_hasta" />
         </div>
       </div>
 

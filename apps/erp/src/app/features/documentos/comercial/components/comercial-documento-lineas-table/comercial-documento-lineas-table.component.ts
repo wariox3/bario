@@ -45,6 +45,12 @@ export class ComercialDocumentoLineasTableComponent {
   readonly almacenEnabled = input<boolean>(false);
 
   /**
+   * Muestra la columna **Centro de costo** de la línea. Va encendida donde la
+   * tabla editable también la enciende (los documentos de compra).
+   */
+  readonly centroCostoEnabled = input<boolean>(false);
+
+  /**
    * Muestra la columna **REF** (`documento_detalle_afectado`, la línea origen de
    * la que se importó). Default `true`; la apaga el documento cuyo form no
    * importa líneas desde otro documento (p. ej. las recurrentes), donde quedaría
@@ -73,6 +79,7 @@ export class ComercialDocumentoLineasTableComponent {
       8 +
       (this.refEnabled() ? 1 : 0) +
       (this.almacenEnabled() ? 1 : 0) +
+      (this.centroCostoEnabled() ? 1 : 0) +
       (this.detalleEnabled() ? 1 : 0),
   );
 

@@ -126,6 +126,56 @@ describe('EstadoResultadosTableroComponent', () => {
     req.flush(respuesta([0]));
   });
 
+  it('con otro mes elegido pide ese mes y deja de llamarlo actual', () => {
+    http.expectOne((r) => r.url === URL).flush(respuesta([0]));
+    fixture.detectChanges();
+
+    fixture.componentInstance['mes'].set(new Date(2026, 2, 1));
+    fixture.detectChanges();
+
+    const req = http.expectOne((r) => r.url === URL);
+    expect(req.request.params.get('fecha_desde')).toBe('2026-03-01');
+    expect(req.request.params.get('fecha_hasta')).toBe('2026-03-31');
+    req.flush(respuesta([0]));
+    fixture.detectChanges();
+
+    expect(texto()).not.toContain(dictionaries.es.inicio.periodo.mes);
+    expect(texto()).toContain(tx.segmento.mes);
+  });
+
+  it('en trimestre el mes elegido define cuál se pide', () => {
+    http.expectOne((r) => r.url === URL).flush(respuesta([0]));
+    fixture.detectChanges();
+    fixture.componentInstance['mes'].set(new Date(2026, 1, 10));
+    fixture.detectChanges();
+    http.expectOne((r) => r.url === URL).flush(respuesta([0]));
+    fixture.detectChanges();
+
+    elegir(tx.segmento.trimestre);
+
+    const req = http.expectOne((r) => r.url === URL);
+    expect(req.request.params.get('fecha_desde')).toBe('2026-01-01');
+    expect(req.request.params.get('fecha_hasta')).toBe('2026-03-31');
+    req.flush(respuesta([0]));
+  });
+
+  it('el año ignora el mes elegido y oculta el selector de mes', () => {
+    http.expectOne((r) => r.url === URL).flush(respuesta([0]));
+    fixture.detectChanges();
+    fixture.componentInstance['mes'].set(new Date(2024, 1, 10));
+    fixture.detectChanges();
+    http.expectOne((r) => r.url === URL).flush(respuesta([0]));
+    fixture.detectChanges();
+
+    elegir(dictionaries.es.inicio.periodo.anio);
+
+    const req = http.expectOne((r) => r.url === URL);
+    expect(req.request.params.get('fecha_desde')).toBe('2026-01-01');
+    req.flush(respuesta([0]));
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).querySelector('app-mes-selector')).toBeNull();
+  });
+
   it('rotula el trimestre con su número y el año', () => {
     http.expectOne((r) => r.url === URL).flush(respuesta([0]));
     fixture.detectChanges();

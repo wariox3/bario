@@ -16,6 +16,7 @@ import {
   formatFechaCorta,
   fromIsoDate,
   I18nService,
+  startOfToday,
   toFiniteNumber,
 } from '@reddoc/core';
 import type { AppDict } from '@erp/i18n';
@@ -38,6 +39,7 @@ import type {
   TipoCascada,
 } from './estado-resultados-tablero.model';
 import { EstadoResultadosTableroService } from './estado-resultados-tablero.service';
+import { MesSelectorComponent, type ModoMesSelector } from './mes-selector.component';
 
 type Estado = 'cargando' | 'listo' | 'error';
 
@@ -93,7 +95,7 @@ export function partirEnDosLineas(texto: string): string | string[] {
 @Component({
   selector: 'app-estado-resultados-tablero',
   standalone: true,
-  imports: [ChartModule, PeriodoSelectorComponent],
+  imports: [ChartModule, MesSelectorComponent, PeriodoSelectorComponent],
   templateUrl: './estado-resultados-tablero.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
@@ -103,11 +105,34 @@ export class EstadoResultadosTableroComponent {
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
   protected readonly t = this.i18n.t;
 
-  /** Mes, trimestre o año en curso: el endpoint recibe fechas, así que cabe el trimestre. */
+  /** Mes, trimestre o año: el endpoint recibe fechas, así que cabe el trimestre. */
   protected readonly periodos = RANGO_PERIODOS;
 
   /** Arranca en el mes: es lo que se mira a diario. */
   protected readonly periodo = signal<RangoPeriodo>('mes');
+
+  /** Mes de referencia del mes o del trimestre; el año siempre es el que corre. */
+  protected readonly mes = signal(startOfToday());
+
+  private readonly hoy = startOfToday();
+
+  /** El año no tiene selector: solo se ofrece el que corre. */
+  protected readonly modoSelector = computed<ModoMesSelector | null>(() => {
+    const periodo = this.periodo();
+    return periodo === 'anio' ? null : periodo;
+  });
+
+  /** "Mes actual" solo mientras lo elegido sea el período en curso. */
+  protected readonly etiquetasPeriodo = computed<Partial<Record<RangoPeriodo, string>>>(() => {
+    const mes = this.mes();
+    const segmento = this.t().inicio.estadoResultados.segmento;
+    const esElEnCurso = (periodo: RangoPeriodo): boolean =>
+      rangoDePeriodo(periodo, mes).fecha_desde === rangoDePeriodo(periodo, this.hoy).fecha_desde;
+    return {
+      ...(esElEnCurso('mes') ? {} : { mes: segmento.mes }),
+      ...(esElEnCurso('trimestre') ? {} : { trimestre: segmento.trimestre }),
+    };
+  });
 
   protected readonly estado = signal<Estado>('cargando');
   protected readonly resumen = signal<EstadoResultadosTablero | null>(null);
@@ -405,7 +430,9 @@ export class EstadoResultadosTableroComponent {
     effect((onCleanup) => {
       const periodo = this.periodo();
       this.estado.set('cargando');
-      const sub = this.service.obtener(rangoDePeriodo(periodo)).subscribe({
+      const rango =
+        periodo === 'anio' ? rangoDePeriodo('anio') : rangoDePeriodo(periodo, this.mes());
+      const sub = this.service.obtener(rango).subscribe({
         next: (res) => {
           this.resumen.set(res);
           this.periodoPintado.set(periodo);

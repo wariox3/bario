@@ -34,10 +34,9 @@ export const CARTERA_ROUTES: Route[] = [
         loadChildren: () => import('./documentos/pago/pago.routes').then((m) => m.PAGO_ROUTES),
       },
       {
-        // Carcasa: shell vacío, pendiente de implementar como documento (CxC, tipo 18).
         path: 'saldo-inicial',
         loadChildren: () =>
-          import('./documentos/saldo-inicial/saldo-inicial.routes').then(
+          import('@erp/features/documentos/saldo-inicial/saldo-inicial.routes').then(
             (m) => m.SALDO_INICIAL_ROUTES,
           ),
       },

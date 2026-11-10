@@ -28,6 +28,12 @@ export interface DocumentoSoporteRead extends DocumentoReadBase, DocumentoTotale
   /** Almacén general: el que heredan las líneas nuevas. */
   readonly almacen?: number | null;
   readonly almacen_nombre?: string | null;
+  /**
+   * Centro de costo de la cabecera: lo heredan las líneas nuevas (el «grupo» del
+   * ERP anterior).
+   */
+  readonly centro_costo?: number | null;
+  readonly centro_costo_nombre?: string | null;
   readonly metodo_pago: number | null;
   readonly metodo_pago_nombre?: string | null;
   readonly forma_pago: number | null;
@@ -51,6 +57,7 @@ export interface DocumentoSoportePayload extends DocumentoPayloadBase {
   readonly plazo_pago: number | null;
   readonly sede: number | null;
   readonly almacen: number | null;
+  readonly centro_costo: number | null;
   readonly metodo_pago: number | null;
   readonly forma_pago: number | null;
   readonly resolucion: number | null;

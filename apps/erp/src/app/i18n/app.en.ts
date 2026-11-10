@@ -304,6 +304,7 @@ export const en: AppDict = {
         report: 'Reports',
         reception: 'Reception',
         payroll: 'Payroll',
+        accounting: 'Accounting',
       },
     },
     userMenu: {
@@ -317,6 +318,10 @@ export const en: AppDict = {
     },
   },
   documentActions: {
+    importarExcel: {
+      title: 'Import from Excel',
+      subtitle: 'Upload a file with one document per row. If any row fails, none are saved.',
+    },
     emisionElectronica: {
       actions: { emitir: 'Emit', descartar: 'Discard' },
       columns: { estado: 'Status' },
@@ -1942,6 +1947,70 @@ export const en: AppDict = {
         },
       },
     },
+    exogena: {
+      name: 'Exogenous information',
+      confirmDelete: 'Delete this exogenous report and all its formats?',
+      columns: {
+        id: 'ID',
+        anio: 'Year',
+        comentario: 'Comment',
+        generada: 'Generated',
+        presentada: 'Filed',
+      },
+      form: {
+        createTitle: 'New exogenous report',
+        editTitle: 'Edit exogenous report',
+        createSubtitle: 'Enter the year to report',
+        editSubtitle: 'Only the comment can be changed',
+        fields: { anio: 'Year', comentario: 'Comment' },
+        validation: { required: 'This field is required' },
+        toasts: {
+          createSuccess: {
+            title: 'Exogenous report created',
+            desc: 'The exogenous report was created successfully',
+          },
+          editSuccess: {
+            title: 'Exogenous report updated',
+            desc: 'Changes were saved successfully',
+          },
+          createError: { title: 'Could not create the exogenous report' },
+          editError: { title: 'Could not save the changes' },
+        },
+      },
+      detail: {
+        sections: { general: 'General information' },
+        estados: { pendiente: 'Pending', generada: 'Generated', presentada: 'Filed' },
+        notFound: {
+          title: 'Exogenous report not found',
+          desc: 'The exogenous report you are looking for does not exist or was deleted.',
+        },
+      },
+      formatos: {
+        title: 'Formats',
+        cargar: 'Load formats',
+        empty: 'This exogenous report has no formats yet.',
+        loadError: 'The formats could not be loaded.',
+        columns: {
+          formato: 'Format',
+          cuantiaMenor: 'Minimum amount',
+          registros: 'Records',
+          total: 'Total',
+          fechaGeneracion: 'Generated on',
+          presentado: 'Filed',
+        },
+        toasts: {
+          cargados: {
+            title: 'Formats loaded',
+            one: '1 format was added.',
+            other: '{n} formats were added.',
+          },
+          sinNuevos: {
+            title: 'No new formats',
+            desc: 'The exogenous report already had every format in the catalog.',
+          },
+        },
+      },
+    },
     periodo: {
       name: 'Periods',
       meses: [
@@ -2679,7 +2748,7 @@ export const en: AppDict = {
         numero: 'Number',
         fecha: 'Date',
         identificacion: 'ID number',
-        contacto: 'Contact',
+        contacto: 'Customer',
         subtotal: 'Subtotal',
         impuesto: 'Tax',
         total: 'Total',
@@ -3287,6 +3356,8 @@ export const en: AppDict = {
           sedePlaceholder: 'Select…',
           almacen: 'Warehouse',
           almacenPlaceholder: 'Select…',
+          centroCosto: 'Cost center',
+          centroCostoPlaceholder: 'Select…',
           ordenCompra: 'Purchase order',
           comentario: 'Comment',
         },
@@ -3328,6 +3399,7 @@ export const en: AppDict = {
           plazoPago: 'Payment terms',
           sede: 'Branch',
           almacen: 'Warehouse',
+          centroCosto: 'Cost center',
           metodoPago: 'Payment method',
           formaPago: 'Payment form',
           resolucion: 'Resolution',
@@ -3739,6 +3811,22 @@ export const en: AppDict = {
     },
     saldoInicial: {
       name: 'Opening balance',
+      columns: {
+        id: 'ID',
+        numero: 'Number',
+        fecha: 'Date',
+        identificacion: 'ID number',
+        contacto: 'Contact',
+        total: 'Total',
+        aprobado: 'App',
+        anulado: 'Void',
+        contabilizado: 'Post',
+      },
+      filters: {
+        aprobado: 'Approved',
+        anulado: 'Voided',
+        contabilizado: 'Posted',
+      },
     },
     cierre: {
       name: 'Year-end closing',
@@ -4130,6 +4218,7 @@ export const en: AppDict = {
       itemPlaceholder: 'Search item…',
       detallePlaceholder: 'Note…',
       almacenPlaceholder: 'Warehouse…',
+      centroCostoPlaceholder: 'Cost center…',
       confirmDeleteLine: 'Remove this line from the document?',
       confirmDeleteLines: 'Remove {count} lines from the document?',
       removeSelected: 'Remove selected',
@@ -4187,6 +4276,7 @@ export const en: AppDict = {
         ref: 'Ref',
         item: 'Item',
         almacen: 'Warehouse',
+        centroCosto: 'Cost center',
         cantidad: 'Qty.',
         precio: 'Price',
         descuento: 'Disc. %',
@@ -5256,7 +5346,12 @@ export const en: AppDict = {
         },
       },
       detalles: {
-        columns: { id: 'ID', empleado: 'Employee', contrato: 'Contract' },
+        columns: {
+          id: 'ID',
+          identificacion: 'Identification',
+          empleado: 'Employee',
+          contrato: 'Contract',
+        },
         leyendaTitulo: 'What each code means',
         novedad: { true: 'Yes', false: '—' },
         siglas: {
@@ -5797,6 +5892,17 @@ export const en: AppDict = {
     },
     estadoResultados: {
       name: 'Income statement',
+      presentacion: { label: 'Presentation', base: 'Base', formal: 'Formal' },
+      formal: {
+        columns: {
+          codigo: 'Code',
+          nombre: 'Name',
+          actual: 'Current',
+          anterior: 'Previous year',
+          variacion: 'Change',
+          porcentaje: '%',
+        },
+      },
       empty: {
         notGenerated: {
           title: 'Report not generated yet',
@@ -6128,6 +6234,7 @@ export const en: AppDict = {
     cuentaCobrarCorte: {
       name: 'Accounts receivable as of date',
       fechaCorte: 'As of date',
+      fechaRequerida: 'Enter the as-of date',
       generar: 'Generate',
       empty: {
         title: 'Generate the report',
@@ -7141,6 +7248,13 @@ export const en: AppDict = {
       desc: 'From what we sold to what we kept, according to the books.',
       rango: 'from {desde} to {hasta}',
       trimestre: 'Q{n} {anio}',
+      segmento: { mes: 'Month', trimestre: 'Quarter' },
+      selectorMes: {
+        elegirMes: 'Choose month',
+        elegirTrimestre: 'Choose quarter',
+        anioAnterior: 'Previous year',
+        anioSiguiente: 'Next year',
+      },
       tarjetas: { vendimos: 'We sold', gastamos: 'We spent', nos_quedo: 'We kept' },
       deCada100: 'out of every 100 pesos in sales',
       variacion: { sube: 'Up', baja: 'Down', vs: 'vs.' },

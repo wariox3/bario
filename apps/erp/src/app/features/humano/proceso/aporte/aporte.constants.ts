@@ -1,6 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
-import type { AporteCotizaciones } from './aporte.model';
+import { capacidadesDe } from './aporte.estado';
+import type { Aporte, AporteCotizaciones } from './aporte.model';
 import type { AporteExportKey } from './aporte.service';
 
 export const APORTES_FILTERS_STORAGE_KEY = 'aportes:filters:v1';
@@ -120,13 +121,23 @@ export const APORTES_FILTER_FIELDS: readonly FilterField[] = [
 ];
 
 /**
- * Acciones de fila. **No incluye eliminar**: borrar un aporte depende de su
- * estado (`capacidadesDe(...).puedeEliminar`) y la tabla compartida no condiciona
- * acciones por fila. El borrado vive en el workspace, donde la capacidad se
- * evalúa contra el aporte abierto.
+ * Si un aporte del listado se puede eliminar: solo en borrador (sin generar ni
+ * aprobar). La regla es la de `capacidadesDe`; la usan el checkbox de la fila y
+ * la acción de eliminar, así que las dos se apagan juntas.
  */
+export const aporteEliminable = (row: unknown): boolean =>
+  capacidadesDe(row as Aporte).puedeEliminar;
+
+/** Acciones de fila. Eliminar solo aparece en los aportes en borrador. */
 export const APORTES_ROW_ACTIONS: readonly RowAction[] = [
   { id: 'view', labelKey: 'common.actions.view', iconClass: 'pi pi-eye', inline: true },
+  {
+    id: 'delete',
+    labelKey: 'common.actions.delete',
+    iconClass: 'pi pi-trash',
+    severity: 'danger',
+    visibleFor: aporteEliminable,
+  },
 ];
 
 export const APORTES_PRIMARY_ACTION: ToolbarAction = {
@@ -262,12 +273,63 @@ export const APORTE_CONTRATO_COLUMNS: readonly ColumnDef[] = [
   },
 ];
 
+/**
+ * Filtros de la pestaña de contratos: los del ERP anterior más la identificación,
+ * uno por cada columna que identifica al empleado.
+ *
+ * Contrato filtra por el id del contrato (`contrato_id`), que es lo que pinta su
+ * columna. El ERP anterior lo rotulaba "Contrato" pero mandaba
+ * `contrato__contacto_id`, el id del empleado.
+ *
+ * TODO(backend): confirmar que estén en los `campos_filtrables` de
+ * `aporte-contrato/lista/` (ver `docs/aporte-seguridad-social-pendientes.md` §3).
+ * Uno fuera de la whitelist no da error: devuelve la pestaña sin filtrar.
+ */
 export const APORTE_CONTRATO_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.contratos.columns.id', type: 'number' },
+  {
+    name: 'contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.aporte.contratos.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'contrato__contacto__nombre_corto',
+    displayNameKey: 'entities.aporte.contratos.columns.empleado',
+    type: 'string',
+  },
+  {
+    name: 'contrato_id',
+    displayNameKey: 'entities.aporte.contratos.columns.contrato',
+    type: 'number',
+  },
 ];
 
+/**
+ * Filtros de la pestaña de detalles, con el mismo criterio que los de contratos.
+ *
+ * Contrato filtra por `aporte_contrato_id`, como el ERP anterior: la columna pinta
+ * el renglón del aporte (el ID de la pestaña de contratos), no el contrato.
+ *
+ * TODO(backend): confirmar que estén en los `campos_filtrables` de
+ * `aporte-detalle/lista/` (ver `docs/aporte-seguridad-social-pendientes.md` §3).
+ */
 export const APORTE_DETALLE_FILTER_FIELDS: readonly FilterField[] = [
   { name: 'id', displayNameKey: 'entities.aporte.detalles.columns.id', type: 'number' },
+  {
+    name: 'aporte_contrato__contrato__contacto__numero_identificacion',
+    displayNameKey: 'entities.aporte.detalles.columns.identificacion',
+    type: 'string',
+  },
+  {
+    name: 'aporte_contrato__contrato__contacto__nombre_corto',
+    displayNameKey: 'entities.aporte.detalles.columns.empleado',
+    type: 'string',
+  },
+  {
+    name: 'aporte_contrato_id',
+    displayNameKey: 'entities.aporte.detalles.columns.contrato',
+    type: 'number',
+  },
 ];
 
 // ── Excel de las pestañas ───────────────────────────────────────────────────

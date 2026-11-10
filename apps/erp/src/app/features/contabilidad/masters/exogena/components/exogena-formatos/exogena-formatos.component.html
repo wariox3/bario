@@ -1,0 +1,91 @@
+@let f = t().entities.exogena.formatos;
+
+<section class="overflow-hidden rounded-xl border border-[rgba(20,48,73,0.1)] bg-brand-surface">
+  <div
+    class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,48,73,0.08)] px-5 py-3.5"
+  >
+    <span
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-50 text-sky-700"
+    >
+      <i class="pi pi-list text-[1rem]"></i>
+    </span>
+    <h2 class="m-0 text-[0.9rem] font-bold tracking-tight text-brand-text">{{ f.title }}</h2>
+
+    <div class="ml-auto">
+      <p-button
+        type="button"
+        [label]="f.cargar"
+        icon="pi pi-download"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [loading]="isCargando()"
+        [disabled]="isCargando()"
+        (onClick)="cargarFormatos()"
+      />
+    </div>
+  </div>
+
+  <div class="px-5 py-4">
+    <!-- Al cambiar de página la tabla se queda en su lugar; el spinner es solo la primera carga. -->
+    @if (isLoading() && filas().length === 0) {
+      <div class="flex items-center justify-center py-10 text-brand-muted">
+        <i class="pi pi-spin pi-spinner text-[1.1rem]"></i>
+      </div>
+    } @else if (hasError()) {
+      <div class="flex flex-col items-center gap-1 py-10 text-center">
+        <i class="pi pi-exclamation-triangle text-[1.4rem] text-red-500"></i>
+        <p class="m-0 text-[0.85rem] text-brand-muted">{{ f.loadError }}</p>
+      </div>
+    } @else if (filas().length === 0) {
+      <div class="flex flex-col items-center gap-1 py-10 text-center">
+        <i class="pi pi-inbox text-[1.4rem] text-brand-muted opacity-50"></i>
+        <p class="m-0 text-[0.85rem] text-brand-muted">{{ f.empty }}</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto rounded-lg border border-[rgba(20,48,73,0.1)]">
+        <table class="w-full border-collapse text-[0.82rem]">
+          <thead>
+            <tr
+              class="border-b border-[rgba(20,48,73,0.1)] bg-[rgba(20,48,73,0.03)] text-left text-brand-muted"
+            >
+              <th class="px-3 py-2 font-semibold">{{ f.columns.formato }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ f.columns.cuantiaMenor }}</th>
+              <th class="w-24 px-3 py-2 text-right font-semibold">{{ f.columns.registros }}</th>
+              <th class="px-3 py-2 text-right font-semibold">{{ f.columns.total }}</th>
+              <th class="w-32 px-3 py-2 font-semibold">{{ f.columns.fechaGeneracion }}</th>
+              <th class="w-24 px-3 py-2 font-semibold">{{ f.columns.presentado }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (fila of filas(); track fila.id) {
+              <tr class="border-b border-[rgba(20,48,73,0.06)] last:border-0">
+                <td class="px-3 py-2 text-brand-text">{{ fila.nombre }}</td>
+                <td class="px-3 py-2 text-right tabular-nums text-brand-text">
+                  {{ fila.cuantiaMenor }}
+                </td>
+                <td class="px-3 py-2 text-right tabular-nums text-brand-text">
+                  {{ fila.registros }}
+                </td>
+                <td class="px-3 py-2 text-right tabular-nums text-brand-text">{{ fila.total }}</td>
+                <td class="px-3 py-2 tabular-nums text-brand-text">{{ fila.fechaGeneracion }}</td>
+                <td class="px-3 py-2 text-brand-text">
+                  {{ fila.presentado ? t().common.boolean.true : t().common.boolean.false }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalFormatos() > pageSize) {
+        <p-paginator
+          [rows]="pageSize"
+          [totalRecords]="totalFormatos()"
+          [first]="page() * pageSize"
+          (onPageChange)="onPageChange($event)"
+        />
+      }
+    }
+  </div>
+</section>

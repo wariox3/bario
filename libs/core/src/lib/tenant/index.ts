@@ -7,6 +7,7 @@ export { tenantSlugMatchGuard } from './guards/tenant-slug-match.guard';
 export { clearTenantGuard } from './guards/clear-tenant.guard';
 export { rootRedirectGuard } from './guards/root-redirect.guard';
 export { TENANT_SCOPED } from './tenant-http-context';
+export { rutaSinTenant } from './ruta-sin-tenant';
 export { ContenedorService } from './contenedor/contenedor.service';
 export {
   MODULE_ACCESS_PREFIX,

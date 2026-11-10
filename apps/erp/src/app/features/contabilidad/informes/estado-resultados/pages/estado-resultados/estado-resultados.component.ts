@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
 import { ListShellComponent } from '@reddoc/feature-base';
 import { ErpApiAutocompleteComponent } from '@reddoc/ui';
 import type { ErpSelectOption, FilterCondition } from '@reddoc/core';
@@ -13,7 +14,10 @@ import { buildFiltrosDetalle } from '../../../../shared/movimiento-informe.utils
 import { MovimientoInformeActionsComponent } from '../../../../shared/components/movimiento-informe-actions/movimiento-informe-actions.component';
 import { MovimientoInformeParamsComponent } from '../../../../shared/components/movimiento-informe-params/movimiento-informe-params.component';
 import { MovimientoInformeTableComponent } from '../../../../shared/components/movimiento-informe-table/movimiento-informe-table.component';
+import { ResultadoFormalTableComponent } from '../../components/resultado-formal-table/resultado-formal-table.component';
 import { EstadoResultadosService } from '../../estado-resultados.service';
+import type { PresentacionResultado, ResultadoFormal } from '../../estado-resultados.types';
+import { totalesDeBase } from '../../estado-resultados.utils';
 
 /**
  * Master de centros de costo. No hay componente propio: el ERP los resuelve con
@@ -45,17 +49,23 @@ const CENTRO_COSTO_ENDPOINT = '/contabilidad/centro-costo/seleccionar/';
  * `PENDIENTES.md` §9).
  *
  * `solo_con_saldo` no se ofrece: el backend lo ignora en los planos.
+ *
+ * Tiene dos **presentaciones**, base y formal, con endpoint propio y sin
+ * paginar. La tabla sigue a lo último generado, no al selector: cambiarlo solo
+ * avisa que hay que generar de nuevo, como cualquier otro parámetro.
  */
 @Component({
   selector: 'app-estado-resultados',
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    SelectModule,
     ListShellComponent,
     ErpApiAutocompleteComponent,
     MovimientoInformeParamsComponent,
     MovimientoInformeActionsComponent,
     MovimientoInformeTableComponent,
+    ResultadoFormalTableComponent,
   ],
   templateUrl: './estado-resultados.component.html',
   styleUrl: './estado-resultados.component.scss',
@@ -69,11 +79,27 @@ export class EstadoResultadosComponent extends MovimientoInformePageBase<Informe
   /** Centro de costo por el que acotar (opcional). Viaja como `centro_costo_id`. */
   protected readonly centroCosto = new FormControl<ErpSelectOption | null>(null);
 
+  protected readonly presentacion = new FormControl<PresentacionResultado>('formal', {
+    nonNullable: true,
+  });
+
+  protected readonly presentaciones = computed(() => {
+    const textos = this.t().entities.estadoResultados.presentacion;
+    return [
+      { value: 'base', label: textos.base },
+      { value: 'formal', label: textos.formal },
+    ];
+  });
+
+  /** Último estado formal generado; `null` cuando lo que se ve es la presentación base. */
+  protected readonly formal = signal<ResultadoFormal | null>(null);
+
   constructor() {
     super();
-    // También deja viejo el informe ya generado. Va acá y no en la base porque
+    // También dejan viejo el informe ya generado. Va acá y no en la base porque
     // los campos de la subclase recién existen a esta altura.
     this.watchParam(this.centroCosto);
+    this.watchParam(this.presentacion);
   }
 
   protected get nombre(): string {
@@ -94,5 +120,38 @@ export class EstadoResultadosComponent extends MovimientoInformePageBase<Informe
 
   protected override extraFilters(): readonly FilterCondition[] {
     return buildFiltrosDetalle({ centroCosto: this.centroCosto.value });
+  }
+
+  protected override consultar(): void {
+    const params = this.buildParams();
+    if (this.presentacion.value === 'formal') {
+      this.ejecutarConsulta(this.service.listaFormal(params), (formal) => {
+        this.formal.set(formal);
+        this.rows.set([]);
+        this.totales.set(null);
+      });
+      return;
+    }
+    this.ejecutarConsulta(this.service.listaBase(params), (filas) => {
+      this.formal.set(null);
+      this.rows.set(filas);
+      this.totales.set(totalesDeBase(filas));
+    });
+  }
+
+  protected override limpiarResultado(): void {
+    super.limpiarResultado();
+    this.formal.set(null);
+  }
+
+  /** Excel de la presentación elegida, con el periodo y los filtros del formulario. */
+  protected override exportExcel(): void {
+    const presentacion = this.presentacion.value;
+    this.descargar(
+      this.service.exportUrl,
+      `${this.archivo}-${presentacion}.xlsx`,
+      this.isExportingExcel,
+      this.service.buildBodyResultado(presentacion, this.buildParams()),
+    );
   }
 }

@@ -241,6 +241,7 @@ export {
   readModuleAccessFlags,
   accesoFlag,
   GRUPO_ACCESO,
+  rutaSinTenant,
 } from './lib/tenant';
 export type {
   AccesoFlagName,

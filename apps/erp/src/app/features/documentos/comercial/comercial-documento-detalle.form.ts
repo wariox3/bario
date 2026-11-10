@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { type FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import type { ErpSelectOption, ImpuestoLinea, TasaImpuesto } from '@reddoc/core';
 import {
   type ItemOption,
@@ -19,6 +19,8 @@ export type ComercialDetalleGroup = FormGroup<{
   detalle: FormControl<string | null>;
   /** Almacén de la línea; solo se renderiza donde la tabla declara la columna. */
   almacen: FormControl<ErpSelectOption | null>;
+  /** Centro de costo de la línea; solo se renderiza donde la tabla declara la columna. */
+  centro_costo: FormControl<ErpSelectOption | null>;
   /** Línea origen afectada (importar desde documento); `null` en líneas normales. */
   documento_detalle_afectado: FormControl<number | null>;
 }>;
@@ -31,6 +33,9 @@ export type ComercialDetalleGroup = FormGroup<{
  * la persona corrija solo las excepciones. Solo lo pasa el documento que muestra
  * la columna; el resto crea la línea sin almacén.
  *
+ * `centroCostoPorDefecto` hace lo mismo con el centro de costo (el «grupo» del
+ * legacy, que en compra precargaba cada línea con el de la cabecera).
+ *
  * Suscripciones auto-contenidas (solo referencian controles del propio grupo,
  * así viven/mueren con él):
  *  - al elegir ítem → autollena el precio (editable).
@@ -41,6 +46,7 @@ export type ComercialDetalleGroup = FormGroup<{
 export function createComercialDetalleGroup(
   value?: Partial<ComercialDetalleFormRawValue>,
   almacenPorDefecto?: ErpSelectOption | null,
+  centroCostoPorDefecto?: ErpSelectOption | null,
 ): ComercialDetalleGroup {
   const group: ComercialDetalleGroup = new FormGroup({
     id: new FormControl<number | null>(value?.id ?? null),
@@ -68,6 +74,9 @@ export function createComercialDetalleGroup(
     ),
     detalle: new FormControl<string | null>(value?.detalle ?? null),
     almacen: new FormControl<ErpSelectOption | null>(value?.almacen ?? almacenPorDefecto ?? null),
+    centro_costo: new FormControl<ErpSelectOption | null>(
+      value?.centro_costo ?? centroCostoPorDefecto ?? null,
+    ),
     documento_detalle_afectado: new FormControl<number | null>(
       value?.documento_detalle_afectado ?? null,
     ),
@@ -90,4 +99,20 @@ export function createComercialDetalleGroup(
   group.controls.impuestos_disponibles.valueChanges.subscribe(recompute);
 
   return group;
+}
+
+/**
+ * Replica el centro de costo de la cabecera en las líneas que aún no se
+ * guardaron. Las persistidas conservan el suyo: cambiarlo es decisión explícita,
+ * fila por fila. A diferencia de las líneas de cuenta, las importadas de otro
+ * documento sí lo reciben: el ítem no trae centro de costo propio de su origen.
+ */
+export function propagarCentroCostoALineasComerciales(
+  detalles: FormArray<ComercialDetalleGroup>,
+  centroCosto: ErpSelectOption | null,
+): void {
+  for (const group of detalles.controls) {
+    if (group.controls.id.value !== null) continue;
+    group.controls.centro_costo.setValue(centroCosto);
+  }
 }

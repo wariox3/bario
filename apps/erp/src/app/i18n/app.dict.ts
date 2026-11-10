@@ -321,6 +321,8 @@ export interface AppDict
         reception: string;
         /** Ciclo de nómina de Humano: programación, aporte y liquidación. */
         payroll: string;
+        /** Trámites propios del área contable: exógena. */
+        accounting: string;
       };
     };
     userMenu: {
@@ -334,6 +336,7 @@ export interface AppDict
     };
   };
   documentActions: {
+    importarExcel: { title: string; subtitle: string };
     emisionElectronica: {
       actions: { emitir: string; descartar: string };
       columns: { estado: string };
@@ -1442,6 +1445,54 @@ export interface AppDict
         toasts: { loadError: { title: string; desc: string } };
       };
     };
+    exogena: {
+      name: string;
+      confirmDelete: string;
+      columns: {
+        id: string;
+        anio: string;
+        comentario: string;
+        generada: string;
+        presentada: string;
+      };
+      form: {
+        createTitle: string;
+        editTitle: string;
+        createSubtitle: string;
+        editSubtitle: string;
+        fields: { anio: string; comentario: string };
+        validation: { required: string };
+        toasts: {
+          createSuccess: { title: string; desc: string };
+          editSuccess: { title: string; desc: string };
+          createError: { title: string };
+          editError: { title: string };
+        };
+      };
+      detail: {
+        sections: { general: string };
+        estados: { pendiente: string; generada: string; presentada: string };
+        notFound: { title: string; desc: string };
+      };
+      formatos: {
+        title: string;
+        cargar: string;
+        empty: string;
+        loadError: string;
+        columns: {
+          formato: string;
+          cuantiaMenor: string;
+          registros: string;
+          total: string;
+          fechaGeneracion: string;
+          presentado: string;
+        };
+        toasts: {
+          cargados: { title: string; one: string; other: string };
+          sinNuevos: { title: string; desc: string };
+        };
+      };
+    };
     periodo: {
       name: string;
       /** 13 entradas: enero..diciembre (índices 0..11) + cierre (12). */
@@ -2527,6 +2578,8 @@ export interface AppDict
           sedePlaceholder: string;
           almacen: string;
           almacenPlaceholder: string;
+          centroCosto: string;
+          centroCostoPlaceholder: string;
           ordenCompra: string;
           comentario: string;
         };
@@ -2550,6 +2603,7 @@ export interface AppDict
           plazoPago: string;
           sede: string;
           almacen: string;
+          centroCosto: string;
           metodoPago: string;
           formaPago: string;
           resolucion: string;
@@ -2864,6 +2918,22 @@ export interface AppDict
     };
     saldoInicial: {
       name: string;
+      columns: {
+        id: string;
+        numero: string;
+        fecha: string;
+        identificacion: string;
+        contacto: string;
+        total: string;
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
+      filters: {
+        aprobado: string;
+        anulado: string;
+        contabilizado: string;
+      };
     };
     cierre: {
       name: string;
@@ -3169,6 +3239,7 @@ export interface AppDict
       itemPlaceholder: string;
       detallePlaceholder: string;
       almacenPlaceholder: string;
+      centroCostoPlaceholder: string;
       confirmDeleteLine: string;
       confirmDeleteLines: string;
       removeSelected: string;
@@ -3207,6 +3278,7 @@ export interface AppDict
         ref: string;
         item: string;
         almacen: string;
+        centroCosto: string;
         cantidad: string;
         precio: string;
         descuento: string;
@@ -4092,7 +4164,7 @@ export interface AppDict
         empty: { title: string; sub: string };
       };
       detalles: {
-        columns: { id: string; empleado: string; contrato: string };
+        columns: { id: string; identificacion: string; empleado: string; contrato: string };
         leyendaTitulo: string;
         /** Valores de las banderas de novedad en la tabla (`Sí` / `—`). */
         novedad: { true: string; false: string };
@@ -4467,6 +4539,17 @@ export interface AppDict
     };
     estadoResultados: {
       name: string;
+      presentacion: { label: string; base: string; formal: string };
+      formal: {
+        columns: {
+          codigo: string;
+          nombre: string;
+          actual: string;
+          anterior: string;
+          variacion: string;
+          porcentaje: string;
+        };
+      };
       empty: {
         notGenerated: { title: string; sub: string };
         noData: { title: string; sub: string };
@@ -4757,6 +4840,7 @@ export interface AppDict
     cuentaCobrarCorte: {
       name: string;
       fechaCorte: string;
+      fechaRequerida: string;
       generar: string;
       empty: { title: string; sub: string };
       columns: {
@@ -5409,8 +5493,16 @@ export interface AppDict
       desc: string;
       /** Rango pintado bajo el título: `{desde}` y `{hasta}` en fecha corta. */
       rango: string;
-      /** Rótulo del trimestre en curso: `{n}` del 1 al 4 y `{anio}`. */
+      /** Rótulo de un trimestre: `{n}` del 1 al 4 y `{anio}`. */
       trimestre: string;
+      /** Texto del segmentado cuando lo elegido no es el período en curso. */
+      segmento: { mes: string; trimestre: string };
+      selectorMes: {
+        elegirMes: string;
+        elegirTrimestre: string;
+        anioAnterior: string;
+        anioSiguiente: string;
+      };
       tarjetas: { vendimos: string; gastamos: string; nos_quedo: string };
       /** Tras el margen redondeado: "12 de cada 100 pesos de ventas". */
       deCada100: string;

@@ -15,6 +15,7 @@ const linea: LineaCarrito = {
   impuestos_disponibles: [],
   detalle: null,
   almacen: { id: 1, nombre: 'Viejo' },
+  centro_costo: null,
   documento_detalle_afectado: null,
   codigo: 'A-01',
   imagenUrl: null,

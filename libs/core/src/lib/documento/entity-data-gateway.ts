@@ -55,6 +55,13 @@ export interface EntityDataGateway {
   imprimirZip(entity: EntityConfig, query: ListQuery): Observable<void>;
 
   /**
+   * Importa documentos del tipo de `entity` desde un Excel, vía multipart a
+   * `POST <endpoint>/importar/`. El retorno es `unknown` porque solo se usa para
+   * detectar errores de validación, que el backend puede reportar con 200.
+   */
+  importarExcel(entity: EntityConfig, archivo: File): Observable<unknown>;
+
+  /**
    * Aprueba un documento vía `POST <endpoint>/aprobar/` con body `{ id }`.
    * Devuelve el documento actualizado por el backend.
    */

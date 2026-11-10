@@ -314,6 +314,7 @@ export const es: AppDict = {
         report: 'Informes',
         reception: 'Recepción',
         payroll: 'Nómina',
+        accounting: 'Contabilidad',
       },
     },
     userMenu: {
@@ -327,6 +328,11 @@ export const es: AppDict = {
     },
   },
   documentActions: {
+    importarExcel: {
+      title: 'Importar desde Excel',
+      subtitle:
+        'Sube un archivo con un documento por fila. Si alguna fila falla, no se guarda ninguna.',
+    },
     emisionElectronica: {
       actions: { emitir: 'Emitir', descartar: 'Descartar' },
       columns: { estado: 'Estado' },
@@ -2000,6 +2006,67 @@ export const es: AppDict = {
         },
       },
     },
+    exogena: {
+      name: 'Exógena',
+      confirmDelete: '¿Eliminar esta exógena y todos sus formatos?',
+      columns: {
+        id: 'ID',
+        anio: 'Año',
+        comentario: 'Comentario',
+        generada: 'Generada',
+        presentada: 'Presentada',
+      },
+      form: {
+        createTitle: 'Nueva exógena',
+        editTitle: 'Editar exógena',
+        createSubtitle: 'Indica el año que vas a reportar',
+        editSubtitle: 'Solo se puede modificar el comentario',
+        fields: { anio: 'Año', comentario: 'Comentario' },
+        validation: { required: 'Este campo es requerido' },
+        toasts: {
+          createSuccess: { title: 'Exógena creada', desc: 'La exógena se creó correctamente' },
+          editSuccess: {
+            title: 'Exógena actualizada',
+            desc: 'Los cambios se guardaron correctamente',
+          },
+          createError: { title: 'No se pudo crear la exógena' },
+          editError: { title: 'No se pudieron guardar los cambios' },
+        },
+      },
+      detail: {
+        sections: { general: 'Información general' },
+        estados: { pendiente: 'Pendiente', generada: 'Generada', presentada: 'Presentada' },
+        notFound: {
+          title: 'Exógena no encontrada',
+          desc: 'La exógena que buscas no existe o fue eliminada.',
+        },
+      },
+      formatos: {
+        title: 'Formatos',
+        cargar: 'Cargar formatos',
+        empty: 'Esta exógena aún no tiene formatos.',
+        loadError: 'No se pudieron cargar los formatos.',
+        columns: {
+          formato: 'Formato',
+          cuantiaMenor: 'Cuantía menor',
+          registros: 'Registros',
+          total: 'Total',
+          fechaGeneracion: 'Generado el',
+          presentado: 'Presentado',
+        },
+        toasts: {
+          cargados: {
+            title: 'Formatos cargados',
+            one: 'Se agregó 1 formato.',
+            other: 'Se agregaron {n} formatos.',
+          },
+          sinNuevos: {
+            title: 'Sin formatos nuevos',
+            desc: 'La exógena ya tenía todos los formatos del catálogo.',
+          },
+        },
+      },
+    },
     periodo: {
       name: 'Periodos',
       meses: [
@@ -2746,7 +2813,7 @@ export const es: AppDict = {
         numero: 'Número',
         fecha: 'Fecha',
         identificacion: 'Identificación',
-        contacto: 'Contacto',
+        contacto: 'Cliente',
         subtotal: 'Subtotal',
         impuesto: 'Impuesto',
         total: 'Total',
@@ -3357,6 +3424,8 @@ export const es: AppDict = {
           sedePlaceholder: 'Selecciona…',
           almacen: 'Almacén',
           almacenPlaceholder: 'Selecciona…',
+          centroCosto: 'Centro de costo',
+          centroCostoPlaceholder: 'Selecciona…',
           ordenCompra: 'Orden de compra',
           comentario: 'Comentario',
         },
@@ -3398,6 +3467,7 @@ export const es: AppDict = {
           plazoPago: 'Plazo de pago',
           sede: 'Sede',
           almacen: 'Almacén',
+          centroCosto: 'Centro de costo',
           metodoPago: 'Método de pago',
           formaPago: 'Forma de pago',
           resolucion: 'Resolución',
@@ -3809,6 +3879,22 @@ export const es: AppDict = {
     },
     saldoInicial: {
       name: 'Saldo inicial',
+      columns: {
+        id: 'ID',
+        numero: 'Número',
+        fecha: 'Fecha',
+        identificacion: 'Identificación',
+        contacto: 'Contacto',
+        total: 'Total',
+        aprobado: 'Apr',
+        anulado: 'Anu',
+        contabilizado: 'Con',
+      },
+      filters: {
+        aprobado: 'Aprobado',
+        anulado: 'Anulado',
+        contabilizado: 'Contabilizado',
+      },
     },
     cierre: {
       name: 'Cierre',
@@ -4209,6 +4295,7 @@ export const es: AppDict = {
       itemPlaceholder: 'Buscar ítem…',
       detallePlaceholder: 'Nota…',
       almacenPlaceholder: 'Almacén…',
+      centroCostoPlaceholder: 'Centro de costo…',
       confirmDeleteLine: '¿Eliminar esta línea del documento?',
       confirmDeleteLines: '¿Eliminar {count} líneas del documento?',
       removeSelected: 'Eliminar seleccionadas',
@@ -4269,6 +4356,7 @@ export const es: AppDict = {
         ref: 'Ref',
         item: 'Ítem',
         almacen: 'Almacén',
+        centroCosto: 'Centro de costo',
         cantidad: 'Cant.',
         precio: 'Precio',
         descuento: 'Desc. %',
@@ -5345,7 +5433,12 @@ export const es: AppDict = {
         },
       },
       detalles: {
-        columns: { id: 'ID', empleado: 'Empleado', contrato: 'Contrato' },
+        columns: {
+          id: 'ID',
+          identificacion: 'Identificación',
+          empleado: 'Empleado',
+          contrato: 'Contrato',
+        },
         leyendaTitulo: 'Qué significa cada sigla',
         novedad: { true: 'Sí', false: '—' },
         siglas: {
@@ -5887,6 +5980,17 @@ export const es: AppDict = {
     },
     estadoResultados: {
       name: 'Estado de resultados',
+      presentacion: { label: 'Presentación', base: 'Base', formal: 'Formal' },
+      formal: {
+        columns: {
+          codigo: 'Código',
+          nombre: 'Nombre',
+          actual: 'Actual',
+          anterior: 'Año anterior',
+          variacion: 'Variación',
+          porcentaje: '%',
+        },
+      },
       empty: {
         notGenerated: {
           title: 'Todavía no generaste el informe',
@@ -6218,6 +6322,7 @@ export const es: AppDict = {
     cuentaCobrarCorte: {
       name: 'Cuentas por cobrar corte',
       fechaCorte: 'Corte a la fecha',
+      fechaRequerida: 'Indica la fecha de corte',
       generar: 'Generar',
       empty: {
         title: 'Genera el informe',
@@ -7250,6 +7355,13 @@ export const es: AppDict = {
       desc: 'De lo que vendimos a lo que nos quedó, según la contabilidad.',
       rango: 'del {desde} al {hasta}',
       trimestre: 'trimestre {n} de {anio}',
+      segmento: { mes: 'Mes', trimestre: 'Trimestre' },
+      selectorMes: {
+        elegirMes: 'Elegir mes',
+        elegirTrimestre: 'Elegir trimestre',
+        anioAnterior: 'Año anterior',
+        anioSiguiente: 'Año siguiente',
+      },
       tarjetas: { vendimos: 'Vendimos', gastamos: 'Gastamos', nos_quedo: 'Nos quedó' },
       deCada100: 'de cada 100 pesos de ventas',
       variacion: { sube: 'Subió', baja: 'Bajó', vs: 'vs.' },

@@ -33,6 +33,9 @@ export interface ComercialDetalleRead extends DocumentoDetalleReadBase {
   readonly almacen?: number | null;
   /** Nombre del almacén, para etiquetar el select al cargar en edición. */
   readonly almacen_nombre?: string | null;
+  /** Centro de costo de la línea; ver la nota en el form value. */
+  readonly centro_costo?: number | null;
+  readonly centro_costo_nombre?: string | null;
   /** Línea origen afectada, si la línea provino de "importar desde documento". */
   readonly documento_detalle_afectado?: number | null;
 }
@@ -44,6 +47,8 @@ export interface ComercialDetallePayload extends DocumentoDetallePayloadBase {
   readonly detalle: string | null;
   /** Almacén de la línea; ver la nota de `almacen` en el read. */
   readonly almacen: number | null;
+  /** Centro de costo de la línea; la contabilización lo exige si la cuenta lo pide. */
+  readonly centro_costo: number | null;
   /** Línea origen afectada (importar desde documento); `null` en líneas normales. */
   readonly documento_detalle_afectado: number | null;
 }

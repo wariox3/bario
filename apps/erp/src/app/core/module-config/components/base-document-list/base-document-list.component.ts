@@ -49,12 +49,22 @@ import { MissingModuleContextError } from '../../errors/config.errors';
 import { ModuleNavigationStore } from '../../module-navigation.store';
 import { buildEntityStorageKey } from '../../storage/build-entity-storage-key';
 import { DocumentoAfectacionModalComponent } from '../documento-afectacion-modal/documento-afectacion-modal.component';
+import { ImportDialogComponent } from '../../../components/import-dialog/import-dialog.component';
+import type { ExampleConfig } from '../../../components/import-dialog/import-dialog.types';
+import { importState } from '../../../components/import-dialog/import-state';
 
 /**
  * Acción de la celda `id` cuando el documento declara `canViewAfectacion`. Sale
  * por `rowActionInvoked`, como las acciones de fila.
  */
 const AFECTACION_ACTION_ID = 'afectacion';
+
+/** "Importar" del dropdown "Acciones" — derivada de `capabilities.canImportExcel`. */
+const IMPORT_ACTION: ToolbarAction = {
+  id: 'import',
+  labelKey: 'common.actions.import',
+  iconClass: 'pi pi-upload',
+};
 
 /** Acción primaria "Nuevo" del toolbar — derivada de `capabilities.canCreate`. */
 const NEW_ACTION: ToolbarAction = {
@@ -94,6 +104,7 @@ const NEW_ACTION: ToolbarAction = {
     DataToolbarComponent,
     DataFilterModalComponent,
     DocumentoAfectacionModalComponent,
+    ImportDialogComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './base-document-list.component.html',
@@ -135,9 +146,21 @@ export class BaseDocumentListComponent {
   /** Modal de afectación (solo documentos con `canViewAfectacion`). */
   protected readonly afectacionVisible = signal(false);
   protected readonly afectacionDocumentoId = signal<number | null>(null);
+  /** Diálogo de importación (solo documentos con `canImportExcel`). */
+  protected readonly importar = importState({
+    upload: (file) => this.gateway.importarExcel(this.document(), file),
+    onImported: () => this.loadList(),
+  });
 
   // ── Derivados ─────────────────────────────────────────────────────────────
   protected readonly capabilities = computed(() => this.document().capabilities);
+
+  /** Plantilla del diálogo de importación, según el tipo del documento. */
+  protected readonly importExample = computed<ExampleConfig>(() => ({
+    mode: 'enabled',
+    endpoint: '/general/documento/importar-ejemplo/',
+    params: { documento_tipo_id: this.document().documentTypeId },
+  }));
 
   /**
    * Columnas del documento. Con `canViewAfectacion`, la del `id` se vuelve
@@ -199,9 +222,10 @@ export class BaseDocumentListComponent {
     const standalone = strategies
       .filter((s) => s.placement === 'button')
       .map((s) => s.toolbarAction);
-    const children = strategies
-      .filter((s) => (s.placement ?? 'menu') === 'menu')
-      .map((s) => s.toolbarAction);
+    const children = [
+      ...(this.capabilities().canImportExcel ? [IMPORT_ACTION] : []),
+      ...strategies.filter((s) => (s.placement ?? 'menu') === 'menu').map((s) => s.toolbarAction),
+    ];
 
     if (children.length === 0) return standalone;
     return [
@@ -361,6 +385,10 @@ export class BaseDocumentListComponent {
   protected onToolbarAction(actionId: string): void {
     if (actionId === 'new') {
       this.navigateToNew();
+      return;
+    }
+    if (actionId === IMPORT_ACTION.id) {
+      this.importar.open();
       return;
     }
     // Acciones extra: delega en su strategy sin conocer su modal ni su endpoint.

@@ -25,6 +25,10 @@ export function documentoSoporteToFormValue(
         : null,
     sede: read.sede != null ? { id: read.sede, nombre: read.sede_nombre ?? '' } : null,
     almacen: read.almacen != null ? { id: read.almacen, nombre: read.almacen_nombre ?? '' } : null,
+    centro_costo:
+      read.centro_costo != null
+        ? { id: read.centro_costo, nombre: read.centro_costo_nombre ?? '' }
+        : null,
     metodo_pago:
       read.metodo_pago != null
         ? { id: read.metodo_pago, nombre: read.metodo_pago_nombre ?? '' }
@@ -59,6 +63,7 @@ export function formValueToPayload(
     plazo_pago: raw.plazo_pago?.id ?? null,
     sede: raw.sede?.id ?? null,
     almacen: raw.almacen?.id ?? null,
+    centro_costo: raw.centro_costo?.id ?? null,
     metodo_pago: raw.metodo_pago?.id ?? null,
     forma_pago: raw.forma_pago?.id ?? null,
     resolucion: raw.resolucion?.id ?? null,
