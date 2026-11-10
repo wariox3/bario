@@ -36,17 +36,3 @@
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />
-
-<app-import-dialog
-  [visible]="importar.visible()"
-  (visibleChange)="importar.setVisible($event)"
-  [title]="m.import.title"
-  [subtitle]="m.import.subtitle"
-  [importing]="importar.loading()"
-  [errors]="importar.errors()"
-  [errorSummary]="importar.errorSummary()"
-  [errorTotal]="importar.errorTotal()"
-  [masters]="importar.masters"
-  (importRequested)="importar.submit($event)"
-  [exampleConfig]="exampleConfig"
-/>

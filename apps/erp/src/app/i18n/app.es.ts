@@ -4447,10 +4447,6 @@ export const es: AppDict = {
     },
     movimientoContable: {
       name: 'Movimientos',
-      import: {
-        title: 'Importar movimientos',
-        subtitle: 'Sube un Excel con los registros a cargar',
-      },
       columns: {
         id: 'ID',
         numero: 'Número',

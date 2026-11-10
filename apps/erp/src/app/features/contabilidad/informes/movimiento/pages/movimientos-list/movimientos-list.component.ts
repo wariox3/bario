@@ -22,9 +22,6 @@ import {
   type PageChangeEvent,
 } from '@reddoc/feature-base';
 import { ActiveModuleStore, currentModuleId, resolveModuleName } from '@erp/core/erp-modules';
-import { ImportDialogComponent } from '@erp/core/components/import-dialog/import-dialog.component';
-import { importState } from '@erp/core/components/import-dialog/import-state';
-import type { ExampleConfig } from '@erp/core/components/import-dialog/import-dialog.types';
 import type { AppDict } from '@erp/i18n';
 import type { Movimiento } from '@erp/core/contabilidad';
 import { MOVIMIENTO_INFORME, MovimientoService } from '../../movimiento.service';
@@ -32,15 +29,14 @@ import {
   MOVIMIENTO_COLUMNS,
   MOVIMIENTO_FILTER_FIELDS,
   MOVIMIENTO_FILTERS_STORAGE_KEY,
-  MOVIMIENTO_IMPORT_MASTERS,
   MOVIMIENTO_TRAILING_ACTIONS,
 } from '../../movimiento.constants';
 
 /**
  * Consulta de **movimientos contables** del módulo Contabilidad.
  *
- * El libro: la línea ya contabilizada, con paginación, filtros, importación
- * masiva y descarga de Excel. No tiene crear/editar/eliminar ni ficha — un
+ * El libro: la línea ya contabilizada, con paginación, filtros y descarga de
+ * Excel. No tiene crear/editar/eliminar ni ficha — un
  * movimiento lo genera la contabilización de un documento, no se teclea; para
  * verlo en contexto se abre el documento que lo originó.
  *
@@ -53,13 +49,7 @@ import {
 @Component({
   selector: 'app-movimientos-list',
   standalone: true,
-  imports: [
-    ListShellComponent,
-    DataTableComponent,
-    DataToolbarComponent,
-    DataFilterModalComponent,
-    ImportDialogComponent,
-  ],
+  imports: [ListShellComponent, DataTableComponent, DataToolbarComponent, DataFilterModalComponent],
   templateUrl: './movimientos-list.component.html',
   styleUrl: './movimientos-list.component.scss',
 })
@@ -89,26 +79,6 @@ export class MovimientosListComponent {
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly isExportingExcel = signal(false);
-
-  // ── Importación ───────────────────────────────────────────────────────────
-  /**
-   * Estado del diálogo de importación. Vuelve a la primera página al terminar:
-   * las líneas importadas entran al libro y desplazan lo que se estaba viendo.
-   */
-  protected readonly importar = importState({
-    upload: (file) => this.service.importar(file),
-    onImported: () => {
-      this.currentPage.set(0);
-      this.loadList();
-    },
-    masters: MOVIMIENTO_IMPORT_MASTERS,
-  });
-
-  /** Plantilla de ejemplo de la importación (endpoint supuesto — ver servicio). */
-  protected readonly exampleConfig: ExampleConfig = {
-    mode: 'enabled',
-    endpoint: this.service.exampleUrl,
-  };
 
   // ── Derivados ─────────────────────────────────────────────────────────────
 
@@ -171,9 +141,6 @@ export class MovimientosListComponent {
 
   protected onToolbarAction(actionId: string): void {
     switch (actionId) {
-      case 'import':
-        this.importar.open();
-        break;
       case 'export-excel':
         this.exportExcel();
         break;

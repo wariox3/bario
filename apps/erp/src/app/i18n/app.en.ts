@@ -4367,10 +4367,6 @@ export const en: AppDict = {
     },
     movimientoContable: {
       name: 'Journal entries',
-      import: {
-        title: 'Import entries',
-        subtitle: 'Upload an Excel file with the records to load',
-      },
       columns: {
         id: 'ID',
         numero: 'Number',
