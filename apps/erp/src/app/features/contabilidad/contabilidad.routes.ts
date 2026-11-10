@@ -72,6 +72,14 @@ export const CONTABILIDAD_ROUTES: Route[] = [
           ),
       },
       {
+        // Movimientos de saldo inicial, con su importación.
+        path: 'utilidades/movimientos',
+        loadChildren: () =>
+          import('./utilidades/movimiento/movimiento.routes').then(
+            (m) => m.MOVIMIENTO_UTILIDAD_ROUTES,
+          ),
+      },
+      {
         path: 'proceso/validar-depreciacion',
         loadChildren: () =>
           import('./procesos/validar-depreciacion/validar-depreciacion.routes').then(

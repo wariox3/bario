@@ -3360,6 +3360,8 @@ export interface AppDict
     };
     movimientoContable: {
       name: string;
+      import: { title: string; subtitle: string };
+      deleteByFilters: { action: string; header: string; message: string };
       columns: {
         id: string;
         numero: string;

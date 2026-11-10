@@ -4447,6 +4447,16 @@ export const es: AppDict = {
     },
     movimientoContable: {
       name: 'Movimientos',
+      import: {
+        title: 'Importar movimientos',
+        subtitle: 'Sube un Excel con los registros a cargar',
+      },
+      deleteByFilters: {
+        action: 'Eliminar según filtros',
+        header: 'Eliminar según filtros',
+        message:
+          'Se eliminarán los {total} movimientos que cumplen los filtros actuales, no solo los de esta página. Esta acción no se puede deshacer.',
+      },
       columns: {
         id: 'ID',
         numero: 'Número',

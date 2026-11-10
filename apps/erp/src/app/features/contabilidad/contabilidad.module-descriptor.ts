@@ -100,6 +100,7 @@ export const CONTABILIDAD_MODULE: ErpModuleDescriptor = {
               activeMatch: 'utilidades/conciliacion',
             },
             { labelKey: 'entities.inconsistencias.name', path: 'utilidades/inconsistencias' },
+            { labelKey: 'entities.movimientoContable.name', path: 'utilidades/movimientos' },
           ],
         },
       ],

@@ -4367,6 +4367,16 @@ export const en: AppDict = {
     },
     movimientoContable: {
       name: 'Journal entries',
+      import: {
+        title: 'Import entries',
+        subtitle: 'Upload an Excel file with the records to load',
+      },
+      deleteByFilters: {
+        action: 'Delete by filters',
+        header: 'Delete by filters',
+        message:
+          'All {total} entries matching the current filters will be deleted, not just this page. This action cannot be undone.',
+      },
       columns: {
         id: 'ID',
         numero: 'Number',
