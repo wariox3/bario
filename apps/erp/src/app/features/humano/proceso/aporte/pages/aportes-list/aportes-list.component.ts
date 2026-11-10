@@ -1,6 +1,8 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { finalize } from 'rxjs';
 import {
   FileDownloadService,
@@ -9,6 +11,7 @@ import {
   TenantService,
   ToastService,
   buildFiltros,
+  extractErrorMessage,
   buildOrdenamientos,
   type FilterCondition,
   type ListQuery,
@@ -34,21 +37,27 @@ import {
   APORTES_ROW_ACTIONS,
   APORTES_TRAILING_ACTIONS,
   APORTE_LIST_PATH,
+  aporteEliminable,
 } from '../../aporte.constants';
 
 /**
  * Listado de **aportes a seguridad social**.
  *
- * Solo consulta y navegación: filtros, paginación, Excel y abrir un aporte.
- * **Sin borrado múltiple ni acción de eliminar por fila** — igual que el listado
- * de programaciones: borrar un aporte depende de su estado
- * (`capacidadesDe(...).puedeEliminar`, solo en borrador) y la tabla compartida no
- * sabe condicionar acciones fila por fila.
+ * Filtros, paginación, Excel, abrir un aporte y eliminar. Solo se elimina un
+ * aporte en borrador (`aporteEliminable`, que lee `capacidadesDe`): los generados
+ * o aprobados no pintan checkbox ni acción de eliminar en su fila.
  */
 @Component({
   selector: 'app-aportes-list',
   standalone: true,
-  imports: [ListShellComponent, DataTableComponent, DataToolbarComponent, DataFilterModalComponent],
+  imports: [
+    ListShellComponent,
+    DataTableComponent,
+    DataToolbarComponent,
+    DataFilterModalComponent,
+    ConfirmDialogModule,
+  ],
+  providers: [ConfirmationService],
   templateUrl: './aportes-list.component.html',
   styleUrl: './aportes-list.component.scss',
 })
@@ -59,6 +68,7 @@ export class AportesListComponent {
   private readonly tenant = inject(TenantService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
@@ -76,6 +86,9 @@ export class AportesListComponent {
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly isExportingExcel = signal(false);
+  protected readonly selectedRows = signal<readonly Aporte[]>([]);
+  /** Respaldo del predicado de la tabla: solo cuenta lo que de verdad se puede borrar. */
+  protected readonly eliminables = computed(() => this.selectedRows().filter(aporteEliminable));
 
   protected readonly breadcrumbItems = computed<readonly BreadcrumbItem[]>(() => {
     const slug = this.tenant.currentSlug();
@@ -93,6 +106,7 @@ export class AportesListComponent {
   protected readonly rowActions = APORTES_ROW_ACTIONS;
   protected readonly primaryAction = APORTES_PRIMARY_ACTION;
   protected readonly trailingActions = APORTES_TRAILING_ACTIONS;
+  protected readonly eliminable = aporteEliminable;
 
   constructor() {
     this.loadList();
@@ -135,8 +149,24 @@ export class AportesListComponent {
     this.loadList();
   }
 
+  protected onSelectionChange(rows: unknown[]): void {
+    this.selectedRows.set(rows as Aporte[]);
+  }
+
   protected onRowAction(event: RowActionInvokedEvent): void {
-    if (event.actionId === 'view') this.navigateTo('detalle', (event.row as Aporte).id);
+    const aporte = event.row as Aporte;
+    switch (event.actionId) {
+      case 'view':
+        this.navigateTo('detalle', aporte.id);
+        break;
+      case 'delete':
+        this.confirmRemove([aporte]);
+        break;
+    }
+  }
+
+  protected removeSelected(): void {
+    this.confirmRemove(this.eliminables());
   }
 
   protected onToolbarAction(actionId: string): void {
@@ -151,6 +181,42 @@ export class AportesListComponent {
   }
 
   // ── Internos ──────────────────────────────────────────────────────────────
+
+  private confirmRemove(aportes: readonly Aporte[]): void {
+    if (aportes.length === 0) return;
+    this.confirmation.confirm({
+      header: this.t().common.confirms.deleteHeader,
+      message: this.t().common.confirms.deleteMessage,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.t().common.actions.delete,
+      rejectLabel: this.t().common.actions.cancel,
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.executeRemove(aportes.map((a) => a.id)),
+    });
+  }
+
+  private executeRemove(ids: readonly number[]): void {
+    this.service
+      .remove(ids)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toast.success(
+            this.t().common.toasts.deleteSuccess.title,
+            this.t().common.toasts.deleteSuccess.desc,
+          );
+          this.loadList();
+        },
+        error: (err: unknown) => {
+          this.toast.error(
+            this.t().common.toasts.deleteError.title,
+            extractErrorMessage(err, this.t().common.toasts.deleteError.desc),
+          );
+          // Un lote puede haber quedado a medias: recargar muestra qué sobrevivió.
+          this.loadList();
+        },
+      });
+  }
 
   private exportExcel(): void {
     if (this.isExportingExcel()) return;
@@ -193,10 +259,12 @@ export class AportesListComponent {
       )
       .subscribe({
         next: (response) => {
+          this.selectedRows.set([]);
           this.items.set(response.results);
           this.totalCount.set(response.count);
         },
         error: () => {
+          this.selectedRows.set([]);
           this.items.set([]);
           this.totalCount.set(0);
           this.toast.error(

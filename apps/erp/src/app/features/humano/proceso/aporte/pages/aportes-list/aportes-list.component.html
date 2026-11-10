@@ -7,11 +7,14 @@
     [filtersEnabled]="true"
     [activeFilters]="activeFilters()"
     [filterFields]="filterFields"
+    [deleteSelectedEnabled]="eliminables().length > 0"
+    [deleteSelectedCount]="eliminables().length"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
     (filterEdit)="openFilters($event)"
     (filterRemove)="removeFilter($event)"
     (filtersClear)="clearFilters()"
+    (deleteSelected)="removeSelected()"
   />
 
   <lib-data-table
@@ -22,9 +25,13 @@
     [loading]="isLoading()"
     [currentPage]="currentPage()"
     [sort]="sort()"
+    selectionMode="multiple"
+    [selectedRows]="selectedRows()"
+    [selectableFor]="eliminable"
     [rowActions]="rowActions"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
+    (selectionChange)="onSelectionChange($event)"
     (rowActionInvoked)="onRowAction($event)"
   />
 </lib-list-shell>
@@ -37,3 +44,5 @@
   (visibleChange)="filtersVisible.set($event)"
   (apply)="onFiltersApply($event)"
 />
+
+<p-confirmDialog />

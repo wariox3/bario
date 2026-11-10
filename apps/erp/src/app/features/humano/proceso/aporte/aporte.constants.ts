@@ -1,6 +1,7 @@
 import type { ColumnDef, FilterField } from '@reddoc/core';
 import type { RowAction, ToolbarAction } from '@reddoc/feature-base';
-import type { AporteCotizaciones } from './aporte.model';
+import { capacidadesDe } from './aporte.estado';
+import type { Aporte, AporteCotizaciones } from './aporte.model';
 import type { AporteExportKey } from './aporte.service';
 
 export const APORTES_FILTERS_STORAGE_KEY = 'aportes:filters:v1';
@@ -120,13 +121,23 @@ export const APORTES_FILTER_FIELDS: readonly FilterField[] = [
 ];
 
 /**
- * Acciones de fila. **No incluye eliminar**: borrar un aporte depende de su
- * estado (`capacidadesDe(...).puedeEliminar`) y la tabla compartida no condiciona
- * acciones por fila. El borrado vive en el workspace, donde la capacidad se
- * evalúa contra el aporte abierto.
+ * Si un aporte del listado se puede eliminar: solo en borrador (sin generar ni
+ * aprobar). La regla es la de `capacidadesDe`; la usan el checkbox de la fila y
+ * la acción de eliminar, así que las dos se apagan juntas.
  */
+export const aporteEliminable = (row: unknown): boolean =>
+  capacidadesDe(row as Aporte).puedeEliminar;
+
+/** Acciones de fila. Eliminar solo aparece en los aportes en borrador. */
 export const APORTES_ROW_ACTIONS: readonly RowAction[] = [
   { id: 'view', labelKey: 'common.actions.view', iconClass: 'pi pi-eye', inline: true },
+  {
+    id: 'delete',
+    labelKey: 'common.actions.delete',
+    iconClass: 'pi pi-trash',
+    severity: 'danger',
+    visibleFor: aporteEliminable,
+  },
 ];
 
 export const APORTES_PRIMARY_ACTION: ToolbarAction = {
