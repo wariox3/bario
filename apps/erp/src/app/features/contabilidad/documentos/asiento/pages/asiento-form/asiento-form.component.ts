@@ -331,10 +331,13 @@ export class AsientoFormComponent implements OnInit, CanComponentDeactivate {
     });
   }
 
-  /** ¿Cierra el asiento? (débitos = créditos). Un asiento vacío no cuadra. */
+  /**
+   * ¿Cierra el asiento? (débitos = créditos). Sin líneas no hay nada que
+   * descuadre —débitos y créditos son ambos cero—, así que no se avisa.
+   */
   private cuadra(): boolean {
     const detalles = this.form.controls.detalles.getRawValue();
-    if (detalles.length === 0) return false;
+    if (detalles.length === 0) return true;
     const { debitos, creditos } = calcularResumenContable(detalles);
     return debitos === creditos;
   }
