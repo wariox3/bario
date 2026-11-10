@@ -4451,11 +4451,27 @@ export const es: AppDict = {
         title: 'Importar movimientos',
         subtitle: 'Sube un Excel con los registros a cargar',
       },
-      deleteByFilters: {
-        action: 'Eliminar según filtros',
-        header: 'Eliminar según filtros',
-        message:
-          'Se eliminarán los {total} movimientos que cumplen los filtros actuales, no solo los de esta página. Esta acción no se puede deshacer.',
+      eliminarSaldoInicial: {
+        action: 'Eliminar saldo inicial',
+        title: 'Eliminar saldo inicial',
+        subtitle: 'Borra los movimientos de saldo inicial de un comprobante y número',
+        fields: {
+          comprobante: 'Comprobante',
+          comprobantePlaceholder: 'Selecciona…',
+          numero: 'Número',
+        },
+        validation: { required: 'Este campo es requerido' },
+        warning:
+          'Se elimina el asiento completo para no descuadrar la contabilidad. Si algún movimiento está en un periodo bloqueado, no se elimina ninguno. Esta acción no se puede deshacer.',
+        submit: 'Eliminar',
+        toasts: {
+          success: { title: 'Saldo inicial eliminado', desc: 'Se eliminaron {n} movimientos.' },
+          vacio: {
+            title: 'Nada que eliminar',
+            desc: 'No hay movimientos de saldo inicial con ese comprobante y número.',
+          },
+          error: { title: 'No se pudo eliminar', desc: 'Intenta de nuevo.' },
+        },
       },
       columns: {
         id: 'ID',

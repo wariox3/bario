@@ -17,7 +17,7 @@ export const MOVIMIENTO_UTILIDAD_BASE_FILTERS: readonly FilterCondition[] = [
 
 /**
  * Acciones del toolbar: importar desde Excel, descargar el Excel de la consulta
- * y eliminar todo lo que cumplan los filtros.
+ * y eliminar el saldo inicial de un comprobante y número.
  */
 export const MOVIMIENTO_UTILIDAD_TRAILING_ACTIONS: readonly ToolbarAction[] = [
   {
@@ -28,8 +28,8 @@ export const MOVIMIENTO_UTILIDAD_TRAILING_ACTIONS: readonly ToolbarAction[] = [
       { id: 'import', labelKey: 'common.actions.import', iconClass: 'pi pi-upload' },
       { id: 'export-excel', labelKey: 'common.actions.exportExcel', iconClass: 'pi pi-file-excel' },
       {
-        id: 'delete-by-filters',
-        labelKey: 'entities.movimientoContable.deleteByFilters.action',
+        id: 'eliminar-saldo-inicial',
+        labelKey: 'entities.movimientoContable.eliminarSaldoInicial.action',
         iconClass: 'pi pi-trash',
       },
     ],

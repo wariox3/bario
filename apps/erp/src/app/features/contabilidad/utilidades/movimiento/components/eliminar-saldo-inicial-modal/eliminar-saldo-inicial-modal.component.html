@@ -1,0 +1,98 @@
+@let m = t().entities.movimientoContable.eliminarSaldoInicial;
+
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!processing()"
+  [dismissableMask]="!processing()"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '768px': '95vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-red-50 text-red-600"
+      >
+        <i class="pi pi-trash text-[1.05rem]"></i>
+      </span>
+      <div class="flex flex-col gap-[0.1rem]">
+        <h2 class="m-0 text-[1.02rem] font-bold leading-tight tracking-tight text-brand-text">
+          {{ m.title }}
+        </h2>
+        <p class="m-0 text-[0.75rem] text-brand-muted">{{ m.subtitle }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (visible()) {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      libFocusInvalid
+      autocomplete="off"
+      class="flex flex-col gap-4 pt-1"
+    >
+      <div class="flex flex-col gap-1.5">
+        <label for="esi-comprobante" class="text-[0.8rem] font-medium text-brand-text">
+          {{ m.fields.comprobante }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <lib-api-select
+          inputId="esi-comprobante"
+          formControlName="comprobante"
+          [endpoint]="comprobanteEndpoint"
+          [placeholder]="m.fields.comprobantePlaceholder"
+          [invalid]="form.controls.comprobante.invalid && form.controls.comprobante.touched"
+        />
+        <lib-field-error
+          [control]="form.controls.comprobante"
+          [messages]="{ required: m.validation.required }"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="esi-numero" class="text-[0.8rem] font-medium text-brand-text">
+          {{ m.fields.numero }}
+          <span class="ml-px text-red-500">*</span>
+        </label>
+        <p-inputnumber
+          inputId="esi-numero"
+          formControlName="numero"
+          [useGrouping]="false"
+          [min]="0"
+          fluid
+        />
+        <lib-field-error
+          [control]="form.controls.numero"
+          [messages]="{ required: m.validation.required }"
+        />
+      </div>
+
+      <p class="m-0 rounded-lg bg-amber-50 px-3 py-2 text-[0.78rem] text-amber-800">
+        <i class="pi pi-exclamation-triangle mr-1.5"></i>{{ m.warning }}
+      </p>
+
+      <div class="flex justify-end gap-2">
+        <p-button
+          severity="secondary"
+          [text]="true"
+          [label]="t().common.actions.cancel"
+          [disabled]="processing()"
+          (onClick)="visible.set(false)"
+        />
+        <p-button
+          type="submit"
+          severity="danger"
+          icon="pi pi-trash"
+          [label]="m.submit"
+          [loading]="processing()"
+          [disabled]="processing()"
+        />
+      </div>
+    </form>
+  }
+</p-dialog>

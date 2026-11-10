@@ -8,9 +8,6 @@
     [filtersEnabled]="true"
     [activeFilters]="activeFilters()"
     [filterFields]="filterFields"
-    [deleteSelectedEnabled]="selectedRows().length > 0"
-    [deleteSelectedCount]="selectedRows().length"
-    (deleteSelected)="removeSelected()"
     (actionInvoked)="onToolbarAction($event)"
     (filtersToggle)="openFilters()"
     (filterEdit)="openFilters($event)"
@@ -26,9 +23,6 @@
     [loading]="isLoading()"
     [currentPage]="currentPage()"
     [sort]="sort()"
-    selectionMode="multiple"
-    [selectedRows]="selectedRows()"
-    (selectionChange)="onSelectionChange($event)"
     (pageChange)="onPageChange($event)"
     (sortChange)="onSortChange($event)"
   />
@@ -43,7 +37,10 @@
   (apply)="onFiltersApply($event)"
 />
 
-<p-confirmDialog />
+<app-eliminar-saldo-inicial-modal
+  [(visible)]="eliminarVisible"
+  (done)="onSaldoInicialEliminado()"
+/>
 
 <app-import-dialog
   [visible]="importar.visible()"

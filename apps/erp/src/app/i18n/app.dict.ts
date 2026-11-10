@@ -3361,7 +3361,20 @@ export interface AppDict
     movimientoContable: {
       name: string;
       import: { title: string; subtitle: string };
-      deleteByFilters: { action: string; header: string; message: string };
+      eliminarSaldoInicial: {
+        action: string;
+        title: string;
+        subtitle: string;
+        fields: { comprobante: string; comprobantePlaceholder: string; numero: string };
+        validation: { required: string };
+        warning: string;
+        submit: string;
+        toasts: {
+          success: { title: string; desc: string };
+          vacio: { title: string; desc: string };
+          error: { title: string; desc: string };
+        };
+      };
       columns: {
         id: string;
         numero: string;

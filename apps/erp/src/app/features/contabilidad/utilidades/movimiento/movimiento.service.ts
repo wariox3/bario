@@ -1,16 +1,25 @@
 import { Injectable } from '@angular/core';
-import { of, type Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
 import {
   BaseHttpService,
-  buildFiltros,
   buildListBody,
-  type FilterCondition,
   buildListParams,
   type ListQuery,
   type PaginatedResponse,
 } from '@reddoc/core';
 import { MOVIMIENTO_ENDPOINT, type Movimiento } from '@erp/core/contabilidad';
 import { MOVIMIENTO_UTILIDAD_BASE_FILTERS } from './movimiento.constants';
+
+/** Cuerpo de `eliminar-masivo/`: el asiento de saldo inicial a borrar. */
+export interface EliminarSaldoInicialPayload {
+  readonly comprobante_id: number;
+  readonly numero: number;
+}
+
+/** Respuesta de `eliminar-masivo/`: cuántos movimientos borró. */
+export interface EliminarSaldoInicialResponse {
+  readonly eliminados: number;
+}
 
 /**
  * Servicio HTTP de la utilidad **Movimientos**: los movimientos de saldo
@@ -38,25 +47,18 @@ export class MovimientoUtilidadService extends BaseHttpService {
     );
   }
 
-  /** Elimina los movimientos seleccionados (`POST eliminar/` con `{ ids }`). */
-  eliminar(ids: readonly number[]): Observable<unknown> {
-    if (ids.length === 0) return of(undefined);
-    return this.post<unknown>(`${MOVIMIENTO_ENDPOINT}eliminar/`, { ids }, undefined, {
-      errorToast: false,
-    });
-  }
-
   /**
-   * Elimina todo lo que cumpla los filtros (`POST eliminar-masivo/` con
-   * `{ filtros }`, los mismos de `lista/`).
-   *
-   * El filtro permanente de saldo inicial va siempre primero: sin él, un
-   * listado sin filtros del usuario borraría todo el libro.
+   * Elimina los movimientos de saldo inicial de un comprobante y número
+   * (`POST eliminar-masivo/`). El backend borra el asiento completo para no
+   * descuadrar la contabilidad, y si alguno cae en un periodo bloqueado no
+   * borra ninguno.
    */
-  eliminarMasivo(filters: readonly FilterCondition[]): Observable<unknown> {
-    return this.post<unknown>(
+  eliminarSaldoInicial(
+    payload: EliminarSaldoInicialPayload,
+  ): Observable<EliminarSaldoInicialResponse> {
+    return this.post<EliminarSaldoInicialResponse>(
       `${MOVIMIENTO_ENDPOINT}eliminar-masivo/`,
-      { filtros: buildFiltros([...MOVIMIENTO_UTILIDAD_BASE_FILTERS, ...filters]) },
+      payload,
       undefined,
       { errorToast: false },
     );

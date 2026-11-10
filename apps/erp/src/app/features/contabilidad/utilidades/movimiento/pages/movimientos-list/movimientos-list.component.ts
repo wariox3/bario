@@ -1,8 +1,6 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { finalize, type Observable } from 'rxjs';
+import { finalize } from 'rxjs';
 import {
   FileDownloadService,
   FilterStorageService,
@@ -11,7 +9,6 @@ import {
   ToastService,
   buildFiltros,
   buildOrdenamientos,
-  extractErrorMessage,
   type FilterCondition,
   type ListQuery,
   type SortSpec,
@@ -41,6 +38,7 @@ import {
   MOVIMIENTO_UTILIDAD_IMPORT_MASTERS,
   MOVIMIENTO_UTILIDAD_TRAILING_ACTIONS,
 } from '../../movimiento.constants';
+import { EliminarSaldoInicialModalComponent } from '../../components/eliminar-saldo-inicial-modal/eliminar-saldo-inicial-modal.component';
 
 /**
  * Utilidad **Movimientos** del módulo Contabilidad: los movimientos de saldo
@@ -49,9 +47,9 @@ import {
  * Muestra lo mismo que el informe de movimientos (mismas columnas y filtros),
  * pero contra `/contabilidad/movimiento/` y siempre con `saldo_inicial = true`
  * —un filtro permanente que la persona no ve ni puede quitar—. Suma la
- * importación desde Excel, que es por donde entran estos saldos, y el borrado:
- * de lo seleccionado (`eliminar/`) o de todo lo que cumpla los filtros
- * (`eliminar-masivo/`).
+ * importación desde Excel, que es por donde entran estos saldos, y el borrado
+ * del saldo inicial de un comprobante y número (`eliminar-masivo/`). No hay
+ * selección de filas: se borra el asiento completo, nunca líneas sueltas.
  *
  * **Sin fila de totales**: la tabla pagina, así que sumar la página visible se
  * leería como el total.
@@ -65,9 +63,8 @@ import {
     DataToolbarComponent,
     DataFilterModalComponent,
     ImportDialogComponent,
-    ConfirmDialogModule,
+    EliminarSaldoInicialModalComponent,
   ],
-  providers: [ConfirmationService],
   templateUrl: './movimientos-list.component.html',
   styleUrl: './movimientos-list.component.scss',
 })
@@ -79,7 +76,6 @@ export class MovimientosUtilidadListComponent {
   private readonly tenant = inject(TenantService);
   private readonly activeModule = inject(ActiveModuleStore);
   private readonly toast = inject(ToastService);
-  private readonly confirmation = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly i18n = inject<I18nService<AppDict>>(I18nService);
 
@@ -98,7 +94,8 @@ export class MovimientosUtilidadListComponent {
   /** Fila del modal a enfocar al abrirlo desde una píldora; `null` desde el botón. */
   protected readonly filterFocusRow = signal<number | null>(null);
   protected readonly isExportingExcel = signal(false);
-  protected readonly selectedRows = signal<readonly Movimiento[]>([]);
+  /** Modal de eliminar el saldo inicial de un comprobante y número. */
+  protected readonly eliminarVisible = signal(false);
 
   // ── Importación ───────────────────────────────────────────────────────────
   /** Vuelve a la primera página al terminar: lo importado desplaza lo que se veía. */
@@ -184,72 +181,19 @@ export class MovimientosUtilidadListComponent {
       case 'export-excel':
         this.exportExcel();
         break;
-      case 'delete-by-filters':
-        this.confirmRemoveByFilters();
+      case 'eliminar-saldo-inicial':
+        this.eliminarVisible.set(true);
         break;
     }
   }
 
-  protected onSelectionChange(rows: unknown[]): void {
-    this.selectedRows.set(rows as Movimiento[]);
-  }
-
-  protected removeSelected(): void {
-    const ids = this.selectedRows().map((m) => m.id);
-    if (ids.length === 0) return;
-    this.confirmation.confirm({
-      header: this.t().common.confirms.deleteHeader,
-      message: this.t().common.confirms.deleteMessage,
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: this.t().common.actions.delete,
-      rejectLabel: this.t().common.actions.cancel,
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.executeRemove(this.service.eliminar(ids)),
-    });
+  /** Lo borrado sale del listado: se vuelve a la primera página. */
+  protected onSaldoInicialEliminado(): void {
+    this.currentPage.set(0);
+    this.loadList();
   }
 
   // ── Internos ──────────────────────────────────────────────────────────────
-
-  /**
-   * Confirma el borrado por filtros mostrando cuántos movimientos abarca: el
-   * total del listado, no la página visible. Con el listado vacío no hay nada
-   * que borrar y no se pregunta.
-   */
-  private confirmRemoveByFilters(): void {
-    const total = this.totalCount();
-    if (total === 0) return;
-    const dict = this.t().entities.movimientoContable.deleteByFilters;
-    this.confirmation.confirm({
-      header: dict.header,
-      message: dict.message.replace('{total}', String(total)),
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: this.t().common.actions.delete,
-      rejectLabel: this.t().common.actions.cancel,
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.executeRemove(this.service.eliminarMasivo(this.activeFilters())),
-    });
-  }
-
-  private executeRemove(request: Observable<unknown>): void {
-    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.toast.success(
-          this.t().common.toasts.deleteSuccess.title,
-          this.t().common.toasts.deleteSuccess.desc,
-        );
-        this.selectedRows.set([]);
-        this.currentPage.set(0);
-        this.loadList();
-      },
-      error: (err: unknown) => {
-        this.toast.error(
-          this.t().common.toasts.deleteError.title,
-          extractErrorMessage(err, this.t().common.toasts.deleteError.desc),
-        );
-        this.loadList();
-      },
-    });
-  }
 
   private exportExcel(): void {
     if (this.isExportingExcel()) return;
