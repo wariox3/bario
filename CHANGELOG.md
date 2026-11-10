@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.24](https://github.com/wariox3/bario/compare/v0.1.23...v0.1.24) (2026-11-10)
+
+### Features
+
+- **contabilidad:** elegir el mes o trimestre de cómo nos fue ([105358c](https://github.com/wariox3/bario/commit/105358cfa560e8eb6bb436c548420ef6f2a440ca))
+- **contabilidad:** elegir la presentación del estado de resultados ([17d87f4](https://github.com/wariox3/bario/commit/17d87f412d66f34712dddeea7097b524459bb88d))
+- **contabilidad:** exportar el estado de resultados en excel y excel base ([4b547f0](https://github.com/wariox3/bario/commit/4b547f02dbe21c72cf57a30a1768405bb81fc28f))
+- **contabilidad:** gestionar la exógena por año ([5364f01](https://github.com/wariox3/bario/commit/5364f01ca12ba54965bfd165252229eb7c625de0))
+- **erp:** eliminar aportes en borrador desde el listado ([30ebb14](https://github.com/wariox3/bario/commit/30ebb148bdb1042cb9e2432105255ce71b2f5c1b))
+- **erp:** filtrar contratos y detalles del aporte por empleado y contrato ([56cfd15](https://github.com/wariox3/bario/commit/56cfd15b8849b0f9f7bde8838a76f2dc3a877785))
+- **erp:** listar e importar el saldo inicial de cartera y tesorería ([3834c0e](https://github.com/wariox3/bario/commit/3834c0e63f722992bed8b80da846a2a8aa6594d1))
+- **feature-base:** copiar la ruta sin tenant desde el breadcrumb ([27747d8](https://github.com/wariox3/bario/commit/27747d8fa1828614b1f450eef5e8ccb409b2913c))
+
+### Bug Fixes
+
+- **compra:** heredar el centro de costo de la cabecera en las líneas de ítem ([6271f50](https://github.com/wariox3/bario/commit/6271f502787a5b092af16aab48471f630db77f1a))
+- **erp:** dejar teclear las fechas de los informes contables ([dbce0fa](https://github.com/wariox3/bario/commit/dbce0fab299d39e431b053bdeecc01b7de68a400))
+- **erp:** generar desde recurrente sin validar fechas ([a6b9ea2](https://github.com/wariox3/bario/commit/a6b9ea2e0f3a6b7bb5a81d23e27b5fbfb096bd28))
+- **venta:** llamar cliente al contacto en el listado de factura de venta ([5d71727](https://github.com/wariox3/bario/commit/5d717276cead6059f01cf21c255ae995f6892f23))
+
 ## [0.1.23](https://github.com/wariox3/bario/compare/v0.1.22...v0.1.23) (2026-11-05)
 
 ### Bug Fixes
